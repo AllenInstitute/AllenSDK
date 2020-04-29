@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.7.0] = 2020-04-20
+## [1.7.0] = 2020-04-29
 
 ### Added
 - Internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
@@ -14,7 +14,8 @@ on a rising edge. We are no longer providing a default delay value in case of er
 
 ### Bug Fixes
 - experiment\_table from behavior project cache has NaNs in the 'imaging\_depth' column for MultiScope experiments due to incorrect join in behavior\_project\_lims\_api.py and 4 other places where ophys\_sessions was incorrectly queried for imaging\_depth\_id
-
+- get_keys method for sync datasets was returning the wrong line labels and creating incorrect key, value pairs for
+data loading from sync files
 
 ## [1.6.0] = 2020-03-23
 
