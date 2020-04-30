@@ -33,23 +33,100 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+from typing import Tuple, Optional
+import os
+import logging
+
+import numpy as np
 import scipy.sparse as sparse
 import scipy.linalg as linalg
-import numpy as np
-import os
 import matplotlib.pyplot as plt
-import logging
 import matplotlib.colors as colors
+
+import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.config.manifest import Manifest
 
-def demix_time_dep_masks(raw_traces, stack, masks):
-    '''
 
-    :param raw_traces: extracted traces
-    :param stack: movie (same length as traces)
-    :param masks: binary roi masks
-    :return: demixed traces
-    '''
+def identify_valid_masks(mask_array):
+    ms = mask_set.MaskSet(masks=mask_array.astype(bool))
+    valid_masks = np.ones(mask_array.shape[0]).astype(bool)
+
+    # detect duplicates
+    duplicates = ms.detect_duplicates(overlap_threshold=0.9)
+    if len(duplicates) > 0:
+        valid_masks[duplicates.keys()] = False
+        
+    # detect unions, only for remaining valid masks
+    valid_idxs = np.where(valid_masks)
+    ms = mask_set.MaskSet(masks=mask_array[valid_idxs].astype(bool))
+    unions = ms.detect_unions()
+
+    if len(unions) > 0:
+        un_idxs = unions.keys()
+        valid_masks[valid_idxs[0][un_idxs]] = False
+
+    return valid_masks
+
+
+def _demix_point(source_frame: np.ndarray, mask_traces: np.ndarray,
+                 flat_masks: sparse,
+                 pixels_per_mask: np.ndarray) -> Optional[np.ndarray]:
+    """
+    Helper function to run demixing for single point in time for a
+    source with overlapping traces.
+
+    Parameters
+    ==========
+    source_frame: values of movie source at the single time point,
+    unraveled in the x-y dimension (1d array of length HxW )
+    flat_masks: 2d-array of binary masks unraveled in the x-y dimension
+    mask traces: values of mask trace at single time point (1d-array of
+        length n, where `n` is number of masks)
+    pixels_per_mask: Number of pixels for each mask associated with
+        trace (1d-array of length `n`)
+
+    Returns
+    =======
+    Array of demixed trace values for each mask if all trace data is
+    nonzero. Otherwise, returns None.
+    """
+    mask_weighted_trace = mask_traces * pixels_per_mask
+
+    # Skip if there is zero signal anywhere in one of the traces
+    if (mask_weighted_trace == 0).any():
+        return None
+    norm_mat = sparse.diags(pixels_per_mask / mask_weighted_trace, offsets=0)
+    source_mat = sparse.diags(source_frame, offsets=0)
+    source_mask_projection = flat_masks.dot(source_mat)
+    weighted_masks = norm_mat.dot(source_mask_projection)
+    # cast to dense numpy array for linear solver because solution is dense
+    overlap = flat_masks.dot(weighted_masks.T).toarray()
+    try:
+        demix_traces = linalg.solve(overlap, mask_weighted_trace)
+    except linalg.LinAlgError:
+        logging.warning("Singular matrix, using least squares to solve.")
+        x, _, _, _ = linalg.lstsq(overlap, mask_weighted_trace)
+        demix_traces = x
+    return demix_traces
+
+
+def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
+                         masks: np.ndarray) -> Tuple[np.ndarray, list]:
+    """
+    Demix traces of potentially overlapping masks extraced from a single
+    2p recording.
+
+    :param raw_traces: 2d array of traces for each mask, of dimensions
+        (t, n), where `t` is the number of time points and `n` is the
+        number of masks.
+    :param stack: 3d array representing a 1p recording movie, of
+        dimensions (t, H, W).
+    :param masks: 3d array of binary roi masks, of shape (n, H, W),
+        where `n` is the number of masks, and HW are the dimensions of
+        an individual frame in the movie `stack`.
+    :return: Tuple of demixed traces and whether each frame was skipped
+        in the demixing calculation.
+    """
     N, T = raw_traces.shape
     _, x, y = masks.shape
     P = x * y
@@ -58,8 +135,6 @@ def demix_time_dep_masks(raw_traces, stack, masks):
         stack = stack.reshape(T, P)
 
     num_pixels_in_mask = np.sum(masks, axis=(1, 2))
-    F = raw_traces.T * num_pixels_in_mask  # shape (T,N)
-    F = F.T
 
     flat_masks = masks.reshape(N, P)
     flat_masks = sparse.csr_matrix(flat_masks)
@@ -68,30 +143,15 @@ def demix_time_dep_masks(raw_traces, stack, masks):
     demix_traces = np.zeros((N, T))
 
     for t in range(T):
-
-        weighted_mask_sum = F[:, t]
-        drop_test = (weighted_mask_sum == 0)
-
-        if np.sum(drop_test == 0):
-            norm_mat = sparse.diags(num_pixels_in_mask / weighted_mask_sum, offsets=0)
-            stack_t = sparse.diags(stack[t], offsets=0)
-
-            flat_weighted_masks = norm_mat.dot(flat_masks.dot(stack_t))
-
-            overlap = flat_masks.dot(flat_weighted_masks.T).toarray()  # cast to dense numpy array for linear solver because solution is dense
-            try:
-                demix_traces[:, t] = linalg.solve(overlap, F[:, t])
-            except linalg.LinAlgError as e:
-                logging.warning("singular matrix, using least squares")
-                x, _, _, _ = linalg.lstsq(overlap, F[:, t])
-                demix_traces[:, t] = x
-
+        demixed_point = _demix_point(
+            stack[t], raw_traces[:, t], flat_masks, num_pixels_in_mask)
+        if demixed_point is not None:
+            demix_traces[:, t] = demixed_point
             drop_frames.append(False)
-
         else:
             drop_frames.append(True)
-
     return demix_traces, drop_frames
+
 
 def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
     fig, ax = plt.subplots()
@@ -103,12 +163,15 @@ def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
     plt.savefig(save_file)
     plt.close(fig)
 
+
 def find_zero_baselines(traces):
     means = traces.mean(axis=1)
-    stds =  traces.std(axis=1)
+    stds = traces.std(axis=1)
     return np.where((means-stds) < 0)
-    
-def plot_negative_baselines(raw_traces, demix_traces, mask_array, roi_ids_mask, plot_dir, ext='png'):
+
+
+def plot_negative_baselines(raw_traces, demix_traces, mask_array, 
+                            roi_ids_mask, plot_dir, ext='png'):
     N, T = raw_traces.shape
     _, x, y = mask_array.shape
 
@@ -134,11 +197,10 @@ def plot_negative_baselines(raw_traces, demix_traces, mask_array, roi_ids_mask, 
     overlap_inds.update(zero_inds)
 
     return list(overlap_inds)
-        
 
-    
-        
-def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array, roi_ids_mask, plot_dir, ext='png'):
+
+def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
+                             roi_ids_mask, plot_dir, ext='png'):
 
     N, T = raw_traces.shape
     _, x, y = mask_array.shape
@@ -226,6 +288,7 @@ def find_negative_baselines(trace):
     means = trace.mean(axis=1)
     stds = trace.std(axis=1)
     return np.where((means+stds) < 0)
+
 
 def find_negative_transients_threshold(trace, window=500, length=10, std_devs=3):
     trace = np.pad(trace, pad_width=(window-1, 0), mode='constant', constant_values=[np.mean(trace[:window])])
@@ -332,4 +395,3 @@ def plot_transients(roi_ind, t_trans, masks, traces, demix_traces, savefile):
 
     plt.savefig(savefile)
     plt.close(fig)
-

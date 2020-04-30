@@ -10,7 +10,7 @@ import h5py
 import numpy as np
 import shutil
 
-import allensdk.internal.brain_observatory.demixer as demixer
+import allensdk.brain_observatory.demixer as demixer
 from allensdk.config.manifest import Manifest
 
 import allensdk.core.json_utilities as ju
