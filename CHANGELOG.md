@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] = 2020-04-30
+
+### Bug Fixes
+- Time sync tests were failing because of removed content. Tests were running only on nightly.
+
 ## [1.7.0] = 2020-04-29
 
 ### Added
