@@ -117,9 +117,9 @@ for manifest_config in manifest_dict['manifest']:
 new_manifest_file = 'manifest_new.json'
      
 manifest_dict['biophys'][0]['model_file'] = [new_manifest_file, new_model_file]
-json.dump(manifest_dict, open(new_manifest_file, 'w'), indent=2)  
+json.dump(manifest_dict, open(new_manifest_file, 'w'), indent=2)
 
-schema_new = dict(manifest_file=new_manifest_file, axon_type='stub_axon')
+schema_new = dict(manifest_file=new_manifest_file, axon_type='stub')
 runner.run(schema_new, procs=1, sweeps=[sweep_num])
 
 #%% Comparing the responses

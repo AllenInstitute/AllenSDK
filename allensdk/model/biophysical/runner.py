@@ -216,9 +216,10 @@ def load_description(args_dict):
     manifest_json_path = args_dict['manifest_file']
     
     description = Config().load(manifest_json_path)
-    if 'axon_type' in args_dict:  # For newest all-active models update the axon replacement
-        axon_replacement_dict = {'axon_type': args_dict['axon_type']}
-        description.update_data(axon_replacement_dict, 'biophys')
+    
+    # For newest all-active models update the axon replacement
+    axon_replacement_dict = {'axon_type': args_dict.get('axon_type', 'truncated')}
+    description.update_data(axon_replacement_dict, 'biophys')
 
     # fix nonstandard description sections
     fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
@@ -231,7 +232,8 @@ def load_description(args_dict):
 sim_parser = argparse.ArgumentParser(description='Run simulation for biophysical models with the provided configuration')
 sim_parser.add_argument('manifest_file',
                         help='.json configurations for running the simulations')
-sim_parser.add_argument('--axon_type', required=False, help='axon replacement for biophysical models')
+sim_parser.add_argument('--axon_type', default='truncated', choices=['stub', 'truncated'],
+                        help='axon replacement for all-active models; truncated: diameter read from .swc, stub: 60 micron long 1 micron wide stub')
 
 if '__main__' == __name__:
     schema = sim_parser.parse_args()

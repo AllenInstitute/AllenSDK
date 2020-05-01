@@ -71,11 +71,8 @@ def create_utils(description, model_type=None):
         except KeyError as e:
             logging.error("Could not infer model type from description")
 
-    try:
-       axon_type = description.data['biophys'][1]['axon_type']
-    except IndexError or KeyError:
-        axon_type = 'reconstructed_axon'
-        
+    axon_type = description.data['biophys'][1]['axon_type']
+    
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)
     elif model_type == ALL_ACTIVE_TYPE:
@@ -201,7 +198,7 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
-        '''Assign a current waveform as input stimulus. 
+        '''Assign a current waveform as input stimulus.
 
         Parameters
         ----------
@@ -323,8 +320,8 @@ class AllActiveUtils(Utils):
         description : Config
             Configuration to run the simulation
         axon_type : string
-                reconstructed_axon - diameter of the axon segments is read from .swc (default)
-                stub_axon - diameter of axon segments is 1 micron
+                truncated - diameter of the axon segments is read from .swc (default)
+                stub - diameter of axon segments is 1 micron
             How the axon is replaced within NEURON
                 
         """
@@ -339,7 +336,7 @@ class AllActiveUtils(Utils):
         morph_filename : string
             Path to morphology.
         '''
-        if self.axon_type == 'stub_axon':
+        if self.axon_type == 'stub':
             self._log.info('Replacing axon with a stub : length 60 micron, diameter 1 micron')
             super(AllActiveUtils, self).generate_morphology(morph_filename)
             return

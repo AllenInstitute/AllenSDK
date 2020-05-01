@@ -104,7 +104,7 @@ This can take some time.
     python -m allensdk.model.biophysical.runner manifest.json # perisomatic models
     python -m allensdk.model.biophysical.runner manifest.json # legacy all-active models
     # new all-active models (axon replaced by a 60 micron long 1 micron diameter stub)
-    python -m allensdk.model.biophysical.runner manifest.json --axon_type stub_axon 
+    python -m allensdk.model.biophysical.runner manifest.json --axon_type stub 
 
 
 Selecting a Specific Sweep
