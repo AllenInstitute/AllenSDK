@@ -81,16 +81,18 @@ def test_roundtrip_basic_metadata(roundtripper):
     assert dt == api.get_session_start_time()
 
 
-def test_add_metadata(nwbfile, roundtripper):
-    metadata = {
+@pytest.mark.parametrize("metadata", [
+    {
         "specimen_name": "mouse_1",
         "age_in_days": 100.0,
         "full_genotype": "wt",
         "strain": "c57",
         "sex": "F",
         "stimulus_name": "brain_observatory_2.0"
-    }
-    write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
+    },
+])
+def test_add_metadata(nwbfile, roundtripper, metadata):
+    nwbfile = write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained = api.get_metadata()
