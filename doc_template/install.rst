@@ -4,7 +4,7 @@ This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
 .. ATTENTION::
-    We are dropping Python 2 support. The Allen SDK is developed and tested with Python 3.6 and 3.7. We do not guarantee consistent behavior with other Python versions.
+    As of October 2019, we have dropped Python 2 support. The Allen SDK is developed and tested with Python 3.6 and 3.7. We do not guarantee consistent behavior with other Python versions.
 
 
 Quick Start Using Anaconda
