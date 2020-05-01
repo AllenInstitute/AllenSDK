@@ -32,7 +32,9 @@ from allensdk.brain_observatory.argschema_utilities import (
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, EcephysLabMetaData
+from allensdk.brain_observatory.ecephys.nwb import (EcephysProbe,
+                                                    EcephysElectrodeGroup,
+                                                    EcephysSpecimen)
 from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
 
@@ -258,10 +260,16 @@ def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
     return output
 
 
-def add_metadata_to_nwbfile(nwbfile, metadata):
-    nwbfile.add_lab_meta_data(
-        EcephysLabMetaData(name="metadata", **metadata)
-    )
+def add_metadata_to_nwbfile(nwbfile, input_metadata):
+    metadata = input_metadata.copy()
+
+    if "full_genotype" in metadata:
+        metadata["genotype"] = metadata.pop("full_genotype")
+
+    if "stimulus_name" in metadata:
+        nwbfile.stimulus_notes = metadata.pop("stimulus_name")
+
+    nwbfile.subject = EcephysSpecimen(**metadata)
     return nwbfile
 
 

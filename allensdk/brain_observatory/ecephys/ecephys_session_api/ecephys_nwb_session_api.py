@@ -330,7 +330,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return units
 
     def get_metadata(self):
-        return self.nwbfile.lab_meta_data['metadata'].to_dict()
+        nwb_subject = self.nwbfile.subject
+        metadata = {
+            "specimen_name": nwb_subject.specimen_name,
+            "age_in_days": nwb_subject.age_in_days,
+            "full_genotype": nwb_subject.genotype,
+            "strain": nwb_subject.strain,
+            "sex": nwb_subject.sex,
+            "stimulus_name": self.nwbfile.stimulus_notes
+        }
+        return metadata
 
 
 def clobbering_merge(to_df, from_df, **kwargs):

@@ -1,19 +1,15 @@
-import os
+from pathlib import Path
 
 import pynwb
 
-namespace_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "AIBS_ecephys_namespace.yaml"))
-pynwb.load_namespaces(namespace_path)
 
+file_dir = Path(__file__).parent
+namespace_path = (file_dir / "ndx-aibs-ecephys.namespace.yaml").resolve()
+pynwb.load_namespaces(str(namespace_path))
 
-def to_dict(self) -> dict:
-    out: dict = {}
-    for key in self.__nwbfields__:
-        if key not in ("name", "help"):
-            out[key] = getattr(self, key)
-    return out
+EcephysProbe = pynwb.get_class('EcephysProbe', 'ndx-aibs-ecephys')
 
+EcephysElectrodeGroup = pynwb.get_class('EcephysElectrodeGroup',
+                                        'ndx-aibs-ecephys')
 
-EcephysProbe = pynwb.get_class('EcephysProbe', 'AIBS_ecephys')
-EcephysLabMetaData = pynwb.get_class('EcephysLabMetaData', 'AIBS_ecephys')
-EcephysLabMetaData.to_dict = to_dict
+EcephysSpecimen = pynwb.get_class('EcephysSpecimen', 'ndx-aibs-ecephys')
