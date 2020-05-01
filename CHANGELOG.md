@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 - Time sync tests were failing because of removed content. Tests were running only on nightly.
+- Notebook tests failing on nightly because of down server, switched tests to production server.
 
 ## [1.7.0] = 2020-04-29
 
