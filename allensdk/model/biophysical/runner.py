@@ -233,7 +233,7 @@ sim_parser = argparse.ArgumentParser(description='Run simulation for biophysical
 sim_parser.add_argument('manifest_file',
                         help='.json configurations for running the simulations')
 sim_parser.add_argument('--axon_type', default='truncated', choices=['stub', 'truncated'],
-                        help='axon replacement for all-active models; truncated: diameter read from .swc, stub: 60 micron long 1 micron wide stub')
+                        help='axon replacement for all-active models; truncated: truncate reconstructed axon after 60 micron, stub: replace reconstructed axon with a uniform stub 60 micron long and 1 micron in diameter')
 
 if '__main__' == __name__:
     schema = sim_parser.parse_args()

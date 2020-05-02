@@ -313,7 +313,7 @@ class Utils(HocUtils):
 
 class AllActiveUtils(Utils):
     
-    def __init__(self, description, axon_type='reconstructed_axon'):
+    def __init__(self, description, axon_type):
         """
         Parameters
         ----------
@@ -341,7 +341,7 @@ class AllActiveUtils(Utils):
             super(AllActiveUtils, self).generate_morphology(morph_filename)
             return
         
-        self._log.info('Legacy model - Replacing axon with a stub: length 60 micron, diameter read from .swc')
+        self._log.info('Legacy model - Truncating reconstructed axon after 60 micron')
         morph_basename = os.path.basename(morph_filename)
         morph_extension = morph_basename.split('.')[-1]
         if morph_extension.lower() == 'swc':
