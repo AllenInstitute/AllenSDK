@@ -1,5 +1,4 @@
-from allensdk.api.queries.biophysical_api import \
-    BiophysicalApi
+from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 bp = BiophysicalApi()
 bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
