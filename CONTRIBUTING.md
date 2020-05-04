@@ -3,12 +3,12 @@
 Thank you for your interest in contributing! There are a few ways you can contribute
 to the AllenSDK project:
 
-* [Answering User Questions](##Answering-UserQuestions)
-* [Adding test coverage](###Testing-Guidelines)
-* [Add Example Notebooks](###Add-example-notebooks)
-* [Reporting Bugs](###Reporting-Bugs)
-* [Requesting features](###Suggesting-Features/Enhancements)
-* [Contributing Code](##Contributing-Code)
+* [Answering User Questions](#answering-user-questions)
+* [Adding test coverage](#testing-guidelines)
+* [Add Example Notebooks](#add-example-notebooks)
+* [Reporting Bugs](#reporting-bugs)
+* [Requesting features](#suggesting-featuresenhancements)
+* [Contributing Code](#contributing-code)
 
 ## Answering User Questions
 A great way to contribute to the AllenSDK is to help answer user questions on 
@@ -30,7 +30,7 @@ If there is no existing issue, create a new one. You should include:
     * What you were expecting to happen
     * How your system is configured (operating system, Python version)
 
-If you are comfortable addressing this issue yourself, take a look at the [guide to contributing code](##contributing-code) below.
+If you are comfortable addressing this issue yourself, take a look at the [guide to contributing code](#contributing-code) below.
 
 ### Add Example Notebooks
 Adding example notebooks are a great way to contribute to documentation and help
@@ -80,10 +80,10 @@ Contributing code yourself can be a great way to include the features you want
 in the AllenSDK.
 
 To contribute code, please follow this list:
-* Read [contributing guidelines](#Contributing-to-the-AllenSDK)
+* Read [contributing guidelines](#contributing-to-the-allensdk)
 * Sign Contributor License Agreement (CLA)
-* Check if changes are consistent with [Coding Style](###Style-Guidelines)
-* [Write Unit Tests](###Testing-Guidelines)
+* Check if changes are consistent with [Coding Style](#style-guidelines)
+* [Write Unit Tests](#testing-guidelines)
 * Run Unit Tests 
 * Make a pull request
 
