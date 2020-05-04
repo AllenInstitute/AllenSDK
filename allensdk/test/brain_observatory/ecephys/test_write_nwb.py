@@ -182,7 +182,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,srate,lfp_srate,has_lfp,expected', [
+@pytest.mark.parametrize('pid,name,srate,lfp_srate,has_lfp,expected', [
     [
         12,
         'a probe',
@@ -190,7 +190,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
         2500.0,
         True,
         pd.DataFrame({
-            'description': ['a probe'],
+            'name': ['a probe'],
             'sampling_rate': [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
@@ -198,10 +198,10 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
         }, index=pd.Index([12], name='id'))
     ]
 ])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, has_lfp, expected):
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, name, srate, lfp_srate, has_lfp, expected):
 
     nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid,
-                                                   description=desc,
+                                                   name=name,
                                                    sampling_rate=srate,
                                                    lfp_sampling_rate=lfp_srate,
                                                    has_lfp_data=has_lfp)
