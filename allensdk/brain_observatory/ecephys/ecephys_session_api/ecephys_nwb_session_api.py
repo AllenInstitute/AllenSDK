@@ -80,10 +80,10 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():
             probes.append({
-                'id': int(k),
-                'description': v.description,
+                'id': v.probe_id,
+                'name': v.name,
                 'location': v.location,
-                "sampling_rate": v.sampling_rate,
+                "sampling_rate": v.device.sampling_rate,
                 "lfp_sampling_rate": v.lfp_sampling_rate,
                 "has_lfp_data": v.has_lfp_data
             })

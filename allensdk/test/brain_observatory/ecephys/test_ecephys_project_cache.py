@@ -140,7 +140,10 @@ def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_
                 session_start_time=datetime.now()
             )
 
-            write_nwb.add_probe_to_nwbfile(nwbfile, 11, sampling_rate=1.0, lfp_sampling_rate=2.0, has_lfp_data=True)
+            write_nwb.add_probe_to_nwbfile(nwbfile, 11, sampling_rate=1.0,
+                                           lfp_sampling_rate=2.0,
+                                           has_lfp_data=True,
+                                           name="Test Probe")
 
             with pynwb.NWBHDF5IO(path, "w") as io:
                 io.write(nwbfile)
@@ -320,7 +323,7 @@ def test_get_session_data_continual_failure(tmpdir_factory, mock_api):
 
     sid = 12345
     with pytest.raises(ValueError):
-        session = cache.get_session_data(sid)
+        _ = cache.get_session_data(sid)
 
 
 def test_get_probe_lfp_data(tmpdir_factory, mock_api):
@@ -342,7 +345,7 @@ def test_get_probe_lfp_data(tmpdir_factory, mock_api):
     pid = 11
 
     session = cache.get_session_data(sid)
-    lfp_file =  session.api._probe_nwbfile(pid)
+    lfp_file = session.api._probe_nwbfile(pid)
 
     assert str(pid) == lfp_file.identifier
 
@@ -366,7 +369,7 @@ def test_get_probe_lfp_data_continually_failing(tmpdir_factory, mock_api):
 
     with pytest.raises(ValueError):
         session = cache.get_session_data(sid)
-        lfp_file = session.api._probe_nwbfile(pid)
+        _ = session.api._probe_nwbfile(pid)
 
 
 def test_from_lims_default(tmpdir_factory):
