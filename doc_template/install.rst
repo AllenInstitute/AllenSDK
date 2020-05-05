@@ -91,5 +91,5 @@ example Dockerfiles are available.
      cd allensdk/doc_template/examples_root/examples/nb
      jupyter notebook --ip=* --no-browser --allow-root
 
-     On your host machine, navigate to the path provided by the last command in your browser.
+     Using the browser on your host machine, navigate to the path provided by the output from the jupyter notebook command.
      
