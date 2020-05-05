@@ -49,7 +49,7 @@ import os
 @pytest.fixture
 def boc(tmpdir_factory):
     manifest_file = tmpdir_factory.mktemp('data').join(os.path.join('boc','manifest.json'))
-    endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://twarehouse-backup'
+    endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://api.brain-map.org'
     return BrainObservatoryCache(manifest_file=str(manifest_file), base_uri=endpoint)
 
 
