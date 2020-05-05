@@ -3,10 +3,25 @@ Install Guide
 This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
-The Allen SDK was developed and tested with Python 2.7.13 and Python 3.6.4, installed
-as part of `Anaconda Python <https://store.continuum.io/cshop/anaconda/>`_ distribution 
-version `4.3.13 <http://repo.continuum.io/archive/index.html>`_.  We do not guarantee
-consistent behavior with other Python versions.  
+.. ATTENTION::
+    As of October 2019, we have dropped Python 2 support. The Allen SDK is developed and tested with Python 3.6 and 3.7. We do not guarantee consistent behavior with other Python versions.
+
+
+Quick Start Using Anaconda
+--------------------------
+The Allen SDK comes packaged with the Anaconda Python distribution platform.
+
+ #. From the `Anaconda downloads page <https://www.anaconda.com/products/individual>`_, download the Python 3.7 version for your operating system and run the installer.
+
+ #. After the installation is complete, download one of our many `Jupyter Notebook examples <https://allensdk.readthedocs.io/en/latest/examples.html>`_.
+
+ #. Open up a terminal (in Windows open Anaconda3).
+
+ #. Navigate to the directory where you downloaded the Jupyter Notebook example and run the following command::
+
+      jupyter notebook
+
+ #. Your browser should open and you should see the Jupyter Notebook example. Enjoy using the Allen SDK!
 
 Quick Start Using Pip
 ---------------------

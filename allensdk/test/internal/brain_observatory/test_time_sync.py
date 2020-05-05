@@ -26,6 +26,17 @@ MIN_BOUND = .03
 MAX_BOUND = .04
 
 
+### Mock keys
+mock_keys = {
+    "photodiode": "photodiode",
+    "2p": "2p_vsync",
+    "stimulus": "stim_vsync",
+    "eye_camera": "cam2_exposure",
+    "behavior_camera": "cam1_exposure",
+    "acquiring": "2p_acquiring",
+    "lick_sensor": "lick_1"
+}
+
 class MockSyncDataset(Dataset):
     """
     Mock the Dataset class so it doesn't load an h5 file upon
@@ -264,7 +275,7 @@ def test_regression_calculate_camera_alignment(nikon_input,
 def test_get_corrected_eye_times(eye_data_length):
     true_times = np.arange(6000)
 
-    with patch.object(ts, "get_keys", return_value=ts.VERSION_1_KEYS):
+    with patch.object(ts, "get_keys", return_value=mock_keys):
         with patch.object(ts.Dataset, "load"):
             aligner = ts.OphysTimeAligner("test")
 
@@ -292,7 +303,7 @@ def test_get_corrected_eye_times(eye_data_length):
 def test_get_corrected_behavior_times(behavior_data_length):
     true_times = np.arange(6000)
 
-    with patch.object(ts, "get_keys", return_value=ts.VERSION_1_KEYS):
+    with patch.object(ts, "get_keys", return_value=mock_keys):
         with patch.object(ts.Dataset, "load"):
             aligner = ts.OphysTimeAligner("test")
 
@@ -331,7 +342,7 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
         true_falling[0] -= 3
         true_rising[0] -= 3
 
-    with patch.object(ts, "get_keys", return_value=ts.VERSION_1_KEYS):
+    with patch.object(ts, "get_keys", return_value=mock_keys):
         with patch.object(ts.Dataset, "load"):
             aligner = ts.OphysTimeAligner("test")
 
@@ -370,7 +381,7 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
 def test_get_corrected_ophys_times_nikon(ophys_data_length):
     true_times = np.arange(6000)
 
-    with patch.object(ts, "get_keys", return_value=ts.VERSION_1_KEYS):
+    with patch.object(ts, "get_keys", return_value=mock_keys):
         with patch.object(ts.Dataset, "load"):
             aligner = ts.OphysTimeAligner("test", "NIKONA1RMP")
 
