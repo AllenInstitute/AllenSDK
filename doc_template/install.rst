@@ -73,9 +73,9 @@ example Dockerfiles are available.
 
  #. Use Docker to build the image::
 
-         docker pull alleninstitute/allensdk
+     docker pull alleninstitute/allensdk
  
-     Other docker configurations are also available under docker directory in the source repository.
+    Other docker configurations are also available under docker directory in the source repository.
  
  #. Run the docker image::
  
@@ -91,5 +91,5 @@ example Dockerfiles are available.
      cd allensdk/doc_template/examples_root/examples/nb
      jupyter notebook --ip=* --no-browser --allow-root
 
-     Using the browser on your host machine, navigate to the path provided by the output from the jupyter notebook command.
+    Using the browser on your host machine, navigate to the path provided by the output from the jupyter notebook command.
      
