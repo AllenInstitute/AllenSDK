@@ -92,19 +92,24 @@ class Probe(RaisingSchema):
     sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
     lfp_sampling_rate = Float(default=2500.0, allow_none=True, help="sampling rate of LFP data on this probe")
     temporal_subsampling_factor = Float(default=2.0, allow_none=True, help="subsampling factor applied to lfp data for this probe (across time)")
-    spike_amplitudes_path = String(validate=check_read_access, 
+    spike_amplitudes_path = String(
+        validate=check_read_access,
         help="path to npy file containing scale factor applied to the kilosort template used to extract each spike"
     )
-    spike_templates_path = String(validate=check_read_access, 
-        help="path to file associating each spike with a kilosort template"    
+    spike_templates_path = String(
+        validate=check_read_access,
+        help="path to file associating each spike with a kilosort template"
     )
-    templates_path = String(validate=check_read_access,
+    templates_path = String(
+        validate=check_read_access,
         help="path to file contianing an (nTemplates)x(nSamples)x(nUnits) array of kilosort templates"
     )
-    inverse_whitening_matrix_path = String(validate=check_read_access,
+    inverse_whitening_matrix_path = String(
+        validate=check_read_access,
         help="Kilosort templates are whitened. In order to use them for scaling spike amplitudes to volts, we need to remove the whitening"
     )
-    amplitude_scale_factor = Float(default=0.195e-6, 
+    amplitude_scale_factor = Float(
+        default=0.195e-6,
         help="amplitude scale factor converting raw amplitudes to Volts. Default converts from bits -> uV -> V"
     )
 
@@ -118,12 +123,12 @@ class InvalidEpoch(RaisingSchema):
 
 
 class SessionMetadata(RaisingSchema):
-      specimen_name = String(required=True)
-      age_in_days = Float(required=True)
-      full_genotype = String(required=True)
-      strain = String(required=True)
-      sex = String(required=True)
-      stimulus_name = String(required=True)
+    specimen_name = String(required=True)
+    age_in_days = Float(required=True)
+    full_genotype = String(required=True)
+    strain = String(required=True)
+    sex = String(required=True)
+    stimulus_name = String(required=True)
 
 
 class InputSchema(ArgSchema):
