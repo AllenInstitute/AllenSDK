@@ -15,12 +15,12 @@ from hdmf.backends.hdf5.h5_utils import H5DataIO
 from allensdk.config.manifest import Manifest
 
 from ._schemas import InputSchema, OutputSchema
+from allensdk.brain_observatory.nwb import setup_table_for_invalid_times  # noqa: F401
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
     add_invalid_times,
     setup_table_for_epochs,
-    setup_table_for_invalid_times,
     read_eye_dlc_tracking_ellipses,
     read_eye_gaze_mappings,
     add_eye_tracking_ellipse_fit_data_to_nwbfile,

@@ -144,26 +144,23 @@ def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color,
      None),
 
     # Test for older version of optotable that used nwb reserved "name" col
-    (pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "name": ["w", "x", "y", "z"]}),
-     pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "stimulus_name": ["w", "x", "y", "z"],
-        "duration": [0.5, 0.5, 0.5, 0.5]})),
+    (pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "name": ["w", "x", "y", "z"]}),
+     pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "stimulus_name": ["w", "x", "y", "z"],
+                   "duration": [0.5, 0.5, 0.5, 0.5]})),
 
-    (pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "stimulus_name": ["w", "x", "y", "z"]}),
+    (pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "stimulus_name": ["w", "x", "y", "z"]}),
      None)
 ])
 def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, expected):
@@ -602,27 +599,27 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
 def invalid_epochs():
 
     epochs = [
-    {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 1998.0,
-      "end_time": 2005.0,
-    },
-    {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 2114.0,
-      "end_time": 2121.0,
-    },
-    {
-      "type": "EcephysProbe",
-      "id": 123448407,
-      "label": "ProbeB",
-      "start_time": 114.0,
-      "end_time": 211.0,
-    },
+        {
+            "type": "EcephysSession",
+            "id": 739448407,
+            "label": "stimulus",
+            "start_time": 1998.0,
+            "end_time": 2005.0,
+        },
+        {
+            "type": "EcephysSession",
+            "id": 739448407,
+            "label": "stimulus",
+            "start_time": 2114.0,
+            "end_time": 2121.0,
+        },
+        {
+            "type": "EcephysProbe",
+            "id": 123448407,
+            "label": "ProbeB",
+            "start_time": 114.0,
+            "end_time": 211.0,
+        },
     ]
 
     return epochs
@@ -670,11 +667,11 @@ def test_no_invalid_times_table():
 def test_setup_table_for_invalid_times():
 
     epoch = {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 1998.0,
-      "end_time": 2005.0,
+        "type": "EcephysSession",
+        "id": 739448407,
+        "label": "stimulus",
+        "start_time": 1998.0,
+        "end_time": 2005.0,
     }
 
     s = write_nwb.setup_table_for_invalid_times([epoch]).loc[0]
