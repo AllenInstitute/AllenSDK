@@ -28,6 +28,9 @@ class Channel(RaisingSchema):
     probe_horizontal_position = Int(required=True)
     manual_structure_id = Int(required=True, allow_none=True)
     manual_structure_acronym = String(required=True, allow_none=True)
+    anterior_posterior_ccf_coordinate = Float(allow_none=True)
+    dorsal_ventral_ccf_coordinate = Float(allow_none=True)
+    left_right_ccf_coordinate = Float(allow_none=True)
 
 
 class Unit(RaisingSchema):
