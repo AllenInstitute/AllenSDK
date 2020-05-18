@@ -85,6 +85,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
 
         maxInt_a13_file = self.get_max_projection_file()
         pixel_size = self.get_surface_2p_pixel_size_um()
+        print(pixel_size)
         max_projection = mpimg.imread(maxInt_a13_file)
         return ImageApi.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
@@ -371,7 +372,9 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 JOIN scans sc ON sc.image_id=oe.ophys_primary_image_id
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=True)
+        query = self.lims_db.fetchone(query, strict=True)
+        print(query)
+        return query
 
 
     @memoize
