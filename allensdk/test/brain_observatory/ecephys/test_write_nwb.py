@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 import logging
+import platform
 
 import pytest
 import pynwb
@@ -527,7 +528,13 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
                 "valid_data", "x", "y", "z", "location"]
         ]
 
-        pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
+        # There is a difference in how int dtypes are being saved in Windows
+        # that are causing tests to fail.
+        # Perhaps related to: https://stackoverflow.com/a/36279549
+        if platform.system() == "Windows":
+            pd.testing.assert_frame_equal(obt_electrodes, exp_electrodes, check_like=True, check_dtype=False)
+        else:
+            pd.testing.assert_frame_equal(obt_electrodes, exp_electrodes, check_like=True)
 
         csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
 
