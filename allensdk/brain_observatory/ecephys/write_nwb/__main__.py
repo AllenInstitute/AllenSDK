@@ -481,8 +481,8 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
             valid_data=row["valid_data"],
             probe_id=row["probe_id"],
             group=electrode_group,
-            imp=150000.0,
             location=row["manual_structure_acronym"],
+            imp=np.nan,
             filtering=""
         )
 
