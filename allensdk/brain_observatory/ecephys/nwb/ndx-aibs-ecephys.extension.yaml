@@ -1,0 +1,37 @@
+groups:
+- neurodata_type_def: EcephysProbe
+  neurodata_type_inc: Device
+  doc: A neuropixels probe device
+  attributes:
+  - name: sampling_rate
+    dtype: float64
+    doc: The sampling rate for the device
+  - name: probe_id
+    dtype: int
+    doc: Unique ID of the neuropixels probe
+- neurodata_type_def: EcephysElectrodeGroup
+  neurodata_type_inc: ElectrodeGroup
+  doc: A group consisting of the channels on a single neuropixels probe
+  attributes:
+  - name: has_lfp_data
+    dtype: bool
+    doc: Indicates availability of LFP data
+  - name: probe_id
+    dtype: int
+    doc: Unique ID of the neuropixels probe
+  - name: lfp_sampling_rate
+    dtype: float64
+    doc: The sampling rate at which data were acquired on this electrode group's channels
+- neurodata_type_def: EcephysSpecimen
+  neurodata_type_inc: Subject
+  doc: Metadata for ecephys specimen
+  attributes:
+  - name: specimen_name
+    dtype: text
+    doc: Full name of specimen
+  - name: age_in_days
+    dtype: float
+    doc: Age of specimen in days
+  - name: strain
+    dtype: text
+    doc: Specimen strain

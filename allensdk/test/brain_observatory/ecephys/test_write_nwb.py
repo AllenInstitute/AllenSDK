@@ -81,16 +81,18 @@ def test_roundtrip_basic_metadata(roundtripper):
     assert dt == api.get_session_start_time()
 
 
-def test_add_metadata(nwbfile, roundtripper):
-    metadata = {
+@pytest.mark.parametrize("metadata", [
+    {
         "specimen_name": "mouse_1",
         "age_in_days": 100.0,
         "full_genotype": "wt",
         "strain": "c57",
         "sex": "F",
         "stimulus_name": "brain_observatory_2.0"
-    }
-    write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
+    },
+])
+def test_add_metadata(nwbfile, roundtripper, metadata):
+    nwbfile = write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained = api.get_metadata()
@@ -180,7 +182,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,srate,lfp_srate,has_lfp,expected', [
+@pytest.mark.parametrize('pid,name,srate,lfp_srate,has_lfp,expected', [
     [
         12,
         'a probe',
@@ -188,7 +190,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
         2500.0,
         True,
         pd.DataFrame({
-            'description': ['a probe'],
+            'name': ['a probe'],
             'sampling_rate': [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
@@ -196,10 +198,10 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
         }, index=pd.Index([12], name='id'))
     ]
 ])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, has_lfp, expected):
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, name, srate, lfp_srate, has_lfp, expected):
 
     nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid,
-                                                   description=desc,
+                                                   name=name,
                                                    sampling_rate=srate,
                                                    lfp_sampling_rate=lfp_srate,
                                                    has_lfp_data=has_lfp)

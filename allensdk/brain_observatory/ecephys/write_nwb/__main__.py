@@ -32,7 +32,9 @@ from allensdk.brain_observatory.argschema_utilities import (
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, EcephysLabMetaData
+from allensdk.brain_observatory.ecephys.nwb import (EcephysProbe,
+                                                    EcephysElectrodeGroup,
+                                                    EcephysSpecimen)
 from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
 
@@ -258,10 +260,16 @@ def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
     return output
 
 
-def add_metadata_to_nwbfile(nwbfile, metadata):
-    nwbfile.add_lab_meta_data(
-        EcephysLabMetaData(name="metadata", **metadata)
-    )
+def add_metadata_to_nwbfile(nwbfile, input_metadata):
+    metadata = input_metadata.copy()
+
+    if "full_genotype" in metadata:
+        metadata["genotype"] = metadata.pop("full_genotype")
+
+    if "stimulus_name" in metadata:
+        nwbfile.stimulus_notes = metadata.pop("stimulus_name")
+
+    nwbfile.subject = EcephysSpecimen(**metadata)
     return nwbfile
 
 
@@ -331,29 +339,31 @@ def read_running_speed(path):
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, has_lfp_data,
-                         description="",
-                         location=""):
-    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount
-    to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
+def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
+                         has_lfp_data, name, location=""):
+    """ Creates objects required for representation of a single
+    extracellular ephys probe within an NWB file.
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
         file to which probe information will be assigned.
     probe_id : int
-        unique identifier for this probe - will be used to fill the "name" field on this probe's device and group
+        unique identifier for this probe
     sampling_rate: float,
-        sampling rate
+        sampling rate of the neuropixels probe
     lfp_sampling_rate: float
         sampling rate of LFP
     has_lfp_data: bool
         True if LFP data is available for the probe, otherwise False
-    description : str, optional
-        human-readable description of this probe. Practically (and temporarily), we use tags like "probeA" or "probeB"
+    name : str, optional
+        human-readable name for this probe.
+        Practically, we use tags like "probeA" or "probeB"
     location : str, optional
-        unspecified information about the location of this probe. Currently left blank, but in the future will probably contain
-        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will
+        unspecified information about the location of this probe.
+        Currently left blank, but in the future will probably contain
+        an expanded form of the information currently implicit in
+        'probeA' (ie targeting and insertion plan) while channels will
         carry the results of ccf registration.
 
     Returns
@@ -366,15 +376,19 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, ha
             electrode group object corresponding to this probe
 
     """
-    probe_nwb_device = pynwb.device.Device(name=str(probe_id))
-    probe_nwb_electrode_group = EcephysProbe(
-        name=str(probe_id),
-        description=description,
+    probe_nwb_device = EcephysProbe(name=name,
+                                    description="Neuropixels 1.0 Probe",  # required field
+                                    probe_id=probe_id,
+                                    sampling_rate=sampling_rate)
+
+    probe_nwb_electrode_group = EcephysElectrodeGroup(
+        name=name,
+        description="Ecephys Electrode Group",  # required field
+        probe_id=probe_id,
         location=location,
         device=probe_nwb_device,
-        sampling_rate=sampling_rate,
         lfp_sampling_rate=lfp_sampling_rate,
-        has_lfp_data=has_lfp_data,
+        has_lfp_data=has_lfp_data
     )
 
     nwbfile.add_device(probe_nwb_device)
@@ -524,7 +538,8 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
 
 
 def write_probe_lfp_file(session_start_time, log_level, probe):
-    """ Writes LFP data (and associated channel information) for one probe to a standalone nwb file
+    """ Writes LFP data (and associated channel information) for one
+    probe to a standalone nwb file
     """
 
     logging.getLogger('').setLevel(log_level)
@@ -542,15 +557,16 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
         nwbfile,
         probe_id=probe["id"],
-        description=probe["name"],
+        name=probe["name"],
         sampling_rate=probe["sampling_rate"],
         lfp_sampling_rate=probe["lfp_sampling_rate"],
         has_lfp_data=probe["lfp"] is not None
     )
 
-    channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
-    channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
-    lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
+    channels = prepare_probewise_channel_table(probe['channels'],
+                                               probe_nwb_electrode_group)
+    lfp_channels = np.load(probe['lfp']['input_channels_path'],
+                           allow_pickle=False)
 
     channels.reset_index(inplace=True)
     channels.set_index("local_index", inplace=True)
@@ -709,7 +725,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
             nwbfile,
             probe_id=probe["id"],
-            description=probe["name"],
+            name=probe["name"],
             sampling_rate=probe["sampling_rate"],
             lfp_sampling_rate=probe["lfp_sampling_rate"],
             has_lfp_data=probe["lfp"] is not None

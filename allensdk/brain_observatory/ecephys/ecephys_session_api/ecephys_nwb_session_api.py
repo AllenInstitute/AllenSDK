@@ -80,10 +80,10 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():
             probes.append({
-                'id': int(k),
-                'description': v.description,
+                'id': v.probe_id,
+                'name': v.name,
                 'location': v.location,
-                "sampling_rate": v.sampling_rate,
+                "sampling_rate": v.device.sampling_rate,
                 "lfp_sampling_rate": v.lfp_sampling_rate,
                 "has_lfp_data": v.has_lfp_data
             })
@@ -330,7 +330,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return units
 
     def get_metadata(self):
-        return self.nwbfile.lab_meta_data['metadata'].to_dict()
+        nwb_subject = self.nwbfile.subject
+        metadata = {
+            "specimen_name": nwb_subject.specimen_name,
+            "age_in_days": nwb_subject.age_in_days,
+            "full_genotype": nwb_subject.genotype,
+            "strain": nwb_subject.strain,
+            "sex": nwb_subject.sex,
+            "stimulus_name": self.nwbfile.stimulus_notes
+        }
+        return metadata
 
 
 def clobbering_merge(to_df, from_df, **kwargs):
