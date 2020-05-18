@@ -267,7 +267,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
          "y": [30.0, 20.0],
          "z": [35.0, 25.0],
          "location": ["CA3", "CA1"],
-         "imp": [150000.0, 150000.0],
+         "imp": [np.nan, np.nan],
          "filtering": ["", ""]
      }).set_index("id"))
 
