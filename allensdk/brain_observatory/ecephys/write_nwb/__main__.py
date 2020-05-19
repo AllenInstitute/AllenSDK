@@ -430,7 +430,10 @@ def add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
 def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
                            channels: List[dict],
                            electrode_group: EcephysElectrodeGroup,
-                           local_index_whitelist: Optional[np.ndarray] = None):
+                           local_index_whitelist: Optional[np.ndarray] = None,
+                           impedence_default: float = np.nan,
+                           filtering_default: str = ("AP band: 500 Hz high-pass; "
+                                                     "LFP band: 1000 Hz low-pass")):
     """Add electrode information to an ecephys nwbfile electrode table.
 
     Parameters
@@ -450,11 +453,23 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
             anterior_posterior_ccf_coordinate
             dorsal_ventral_ccf_coordinate
             left_right_ccf_coordinate
+
+            Optional fields which may be used in the future:
+            impedence: The impedence of a given channel.
+                       Will use `impedence_default` if field is None.
+            filtering: The type of hardware filtering done a channel.
+                       Will use `filtering_default` if field is None.
     electrode_group : EcephysElectrodeGroup
         The pynwb electrode group that electrodes should be associated with
     local_index_whitelist : Optional[np.ndarray], optional
         If provided, only add electrodes (a.k.a. channels) specified by the
         whitelist (and in order specified), by default None
+    impedence_default : float
+        The impedence value to use if the `channels` dict does not contain
+        impedence values for a given channel.
+    filtering_default : str
+        The hardware filtering description str to use if the `channels` dict
+        does not contain filtering info.
     """
     add_ecephys_electrode_columns(nwbfile)
 
@@ -469,6 +484,8 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
         x = row["anterior_posterior_ccf_coordinate"]
         y = row["dorsal_ventral_ccf_coordinate"]
         z = row["left_right_ccf_coordinate"]
+        impedence = row.get("impedence")
+        filtering = row.get("filtering")
 
         nwbfile.add_electrode(
             id=row["id"],
@@ -482,8 +499,8 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
             probe_id=row["probe_id"],
             group=electrode_group,
             location=row["manual_structure_acronym"],
-            imp=np.nan,
-            filtering=""
+            imp=(impedence_default if impedence is None else impedence),
+            filtering=(filtering_default if filtering is None else filtering)
         )
 
 
