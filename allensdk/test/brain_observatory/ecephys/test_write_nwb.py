@@ -243,7 +243,9 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
        "anterior_posterior_ccf_coordinate": 15.0,
        "dorsal_ventral_ccf_coordinate": 20.0,
        "left_right_ccf_coordinate": 25.0,
-       "manual_structure_acronym": "CA1"},
+       "manual_structure_acronym": "CA1",
+       "impedence": None,
+       "filtering": None},
       {"id": 2,
        "probe_id": 1234,
        "valid_data": True,
@@ -253,7 +255,9 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
        "anterior_posterior_ccf_coordinate": 25.0,
        "dorsal_ventral_ccf_coordinate": 30.0,
        "left_right_ccf_coordinate": 35.0,
-       "manual_structure_acronym": "CA3"}],
+       "manual_structure_acronym": "CA3",
+       "impedence": 42.0,
+       "filtering": "custom"}],
 
      [15, 23],
 
@@ -268,8 +272,8 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
          "y": [30.0, 20.0],
          "z": [35.0, 25.0],
          "location": ["CA3", "CA1"],
-         "imp": [np.nan, np.nan],
-         "filtering": ["", ""]
+         "imp": [42.0, np.nan],
+         "filtering": ["custom", "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"]
      }).set_index("id"))
 
 ])

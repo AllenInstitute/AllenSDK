@@ -31,6 +31,8 @@ class Channel(RaisingSchema):
     anterior_posterior_ccf_coordinate = Float(allow_none=True)
     dorsal_ventral_ccf_coordinate = Float(allow_none=True)
     left_right_ccf_coordinate = Float(allow_none=True)
+    impedence = Float(required=False, allow_none=True, default=None)
+    filtering = String(required=False, allow_none=True, default=None)
 
 
 class Unit(RaisingSchema):
