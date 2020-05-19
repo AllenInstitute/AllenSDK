@@ -244,8 +244,8 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
        "dorsal_ventral_ccf_coordinate": 20.0,
        "left_right_ccf_coordinate": 25.0,
        "manual_structure_acronym": "CA1",
-       "impedence": None,
-       "filtering": None},
+       "impedence": np.nan,
+       "filtering": "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"},
       {"id": 2,
        "probe_id": 1234,
        "valid_data": True,
@@ -432,7 +432,9 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 5.0,
                 "dorsal_ventral_ccf_coordinate": 10.0,
                 "left_right_ccf_coordinate": 15.0,
-                "manual_structure_acronym": "CA1"
+                "manual_structure_acronym": "CA1",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             },
             {
                 "id": 1,
@@ -444,7 +446,9 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 10.0,
                 "dorsal_ventral_ccf_coordinate": 15.0,
                 "left_right_ccf_coordinate": 20.0,
-                "manual_structure_acronym": "CA2"
+                "manual_structure_acronym": "CA2",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             },
             {
                 "id": 2,
@@ -456,7 +460,9 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 15.0,
                 "dorsal_ventral_ccf_coordinate": 20.0,
                 "left_right_ccf_coordinate": 25.0,
-                "manual_structure_acronym": "CA3"
+                "manual_structure_acronym": "CA3",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             }
         ],
         "lfp": {
@@ -529,7 +535,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         obt_electrodes = obt_f.electrodes.to_dataframe().loc[
             :, ["local_index", "probe_horizontal_position",
                 "probe_id", "probe_vertical_position",
-                "valid_data", "x", "y", "z", "location"]
+                "valid_data", "x", "y", "z", "location", "impedence",
+                "filtering"]
         ]
 
         # There is a difference in how int dtypes are being saved in Windows
@@ -822,7 +829,9 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
                      "anterior_posterior_ccf_coordinate": 15.0,
                      "dorsal_ventral_ccf_coordinate": 20.0,
                      "left_right_ccf_coordinate": 25.0,
-                     "manual_structure_acronym": "CA1"},
+                     "manual_structure_acronym": "CA1",
+                     "impedence": np.nan,
+                     "filtering": "Unknown"},
                     {"id": 2,
                      "probe_id": 1234,
                      "valid_data": True,
@@ -832,7 +841,9 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
                      "anterior_posterior_ccf_coordinate": 25.0,
                      "dorsal_ventral_ccf_coordinate": 30.0,
                      "left_right_ccf_coordinate": 35.0,
-                     "manual_structure_acronym": "CA3"}],
+                     "manual_structure_acronym": "CA3",
+                     "impedence": np.nan,
+                     "filtering": "Unknown"}],
 
        "units": [{"id": 777,
                   "local_index": 7,

@@ -1,4 +1,5 @@
-from marshmallow import RAISE
+import marshmallow as mm
+import numpy as np
 
 from argschema import ArgSchema
 from argschema.fields import (
@@ -20,6 +21,16 @@ from allensdk.brain_observatory.argschema_utilities import (
 
 
 class Channel(RaisingSchema):
+
+    @mm.pre_load
+    def set_field_defaults(self, data, **kwargs):
+        if data.get("filtering") is None:
+            data["filtering"] = ("AP band: 500 Hz high-pass; "
+                                 "LFP band: 1000 Hz low-pass")
+        if data.get("manual_structure_acronym") is None:
+            data["manual_structure_acronym"] = ""
+        return data
+
     id = Int(required=True)
     probe_id = Int(required=True)
     valid_data = Boolean(required=True)
@@ -27,12 +38,21 @@ class Channel(RaisingSchema):
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
     manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True, allow_none=True)
+    manual_structure_acronym = String(required=True)
     anterior_posterior_ccf_coordinate = Float(allow_none=True)
     dorsal_ventral_ccf_coordinate = Float(allow_none=True)
     left_right_ccf_coordinate = Float(allow_none=True)
     impedence = Float(required=False, allow_none=True, default=None)
-    filtering = String(required=False, allow_none=True, default=None)
+    filtering = String(required=False)
+
+    @mm.post_load
+    def set_impedence_default(self, data, **kwargs):
+        # This must be a post_load operation as np.nan is not a valid
+        # JSON format 'float' type for the Marshmallow `Float` field
+        # (so validation fails if this is set at pre_load)
+        if data.get("impedence") is None:
+            data["impedence"] = np.nan
+        return data
 
 
 class Unit(RaisingSchema):
@@ -135,7 +155,7 @@ class SessionMetadata(RaisingSchema):
 
 class InputSchema(ArgSchema):
     class Meta:
-        unknown = RAISE
+        unknown = mm.RAISE
 
     log_level = LogLevel(
         default="INFO", help="set the logging level of the module"
