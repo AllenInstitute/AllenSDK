@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 import logging
+import platform
 
 import pytest
 import pynwb
@@ -20,13 +21,13 @@ from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing impor
 @pytest.fixture
 def units_table():
     return pynwb.misc.Units.from_dataframe(pd.DataFrame({
-        'peak_channel_id': [5, 10, 15],
-        'local_index': [0, 1, 2],
-        'quality': ['good', 'good', 'noise'],
-        'firing_rate': [0.5, 1.2, -3.14],
-        'snr': [1.0, 2.4, 5],
-        'isi_violations': [34, 39, 22]
-    }, index=pd.Index([11, 22, 33], name='id')), name='units')
+        "peak_channel_id": [5, 10, 15],
+        "local_index": [0, 1, 2],
+        "quality": ["good", "good", "noise"],
+        "firing_rate": [0.5, 1.2, -3.14],
+        "snr": [1.0, 2.4, 5],
+        "isi_violations": [34, 39, 22]
+    }, index=pd.Index([11, 22, 33], name="id")), name="units")
 
 
 @pytest.fixture
@@ -65,14 +66,14 @@ def stimulus_presentations_color():
         "start_time": [1., 2., 4., 5., 6.],
         "stop_time": [2., 4., 5., 6., 8.],
         "color": ["1.0", "", r"[1.0,-1.0, 10., -42.12, -.1]", "-1.0", ""]
-    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))
+    }, index=pd.Index(name="stimulus_presentations_id", data=[0, 1, 2, 3, 4]))
 
 
 def test_roundtrip_basic_metadata(roundtripper):
     dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
-        session_description='EcephysSession',
-        identifier='{}'.format(12345),
+        session_description="EcephysSession",
+        identifier="{}".format(12345),
         session_start_time=dt
     )
 
@@ -135,7 +136,7 @@ def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color,
     assert not mismatched, f"expected: {expected_color}, obtained: {obtained_color}"
 
 
-@pytest.mark.parametrize('opto_table, expected', [
+@pytest.mark.parametrize("opto_table, expected", [
     (pd.DataFrame({
         "start_time": [0., 1., 2., 3.],
         "stop_time": [0.5, 1.5, 2.5, 3.5],
@@ -144,26 +145,23 @@ def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color,
      None),
 
     # Test for older version of optotable that used nwb reserved "name" col
-    (pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "name": ["w", "x", "y", "z"]}),
-     pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "stimulus_name": ["w", "x", "y", "z"],
-        "duration": [0.5, 0.5, 0.5, 0.5]})),
+    (pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "name": ["w", "x", "y", "z"]}),
+     pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "stimulus_name": ["w", "x", "y", "z"],
+                   "duration": [0.5, 0.5, 0.5, 0.5]})),
 
-    (pd.DataFrame({
-        "start_time": [0., 1., 2., 3.],
-        "stop_time": [0.5, 1.5, 2.5, 3.5],
-        "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"],
-        "stimulus_name": ["w", "x", "y", "z"]}),
+    (pd.DataFrame({"start_time": [0., 1., 2., 3.],
+                   "stop_time": [0.5, 1.5, 2.5, 3.5],
+                   "level": [10., 9., 8., 7.],
+                   "condition": ["a", "a", "b", "c"],
+                   "stimulus_name": ["w", "x", "y", "z"]}),
      None)
 ])
 def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, expected):
@@ -181,21 +179,21 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
     pd.testing.assert_frame_equal(obtained, expected, check_like=True)
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,name,srate,lfp_srate,has_lfp,expected', [
+@pytest.mark.parametrize("roundtrip", [True, False])
+@pytest.mark.parametrize("pid,name,srate,lfp_srate,has_lfp,expected", [
     [
         12,
-        'a probe',
+        "a probe",
         30000.0,
         2500.0,
         True,
         pd.DataFrame({
-            'name': ['a probe'],
-            'sampling_rate': [30000.0],
+            "name": ["a probe"],
+            "sampling_rate": [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
             "location": [""]
-        }, index=pd.Index([12], name='id'))
+        }, index=pd.Index([12], name="id"))
     ]
 ])
 def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, name, srate, lfp_srate, has_lfp, expected):
@@ -213,43 +211,93 @@ def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, name, srate
     pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
 
 
-def test_prepare_probewise_channel_table():
+@pytest.mark.parametrize("columns_to_add, expected_columns", [
+    (None,
 
-    channels = [
-        {
-            'id': 2,
-            'probe_id': 12,
-            'local_index': 44,
-            'probe_vertical_position': 21,
-            'probe_horizontal_position': 30
-        },
-        {
-            'id': 1,
-            'probe_id': 12,
-            'local_index': 43,
-            'probe_vertical_position': 20,
-            'probe_horizontal_position': 30
-        }
-    ]
+     {"probe_vertical_position", "probe_horizontal_position",
+      "probe_id", "local_index", "valid_data", "x", "y", "z", "group",
+      "group_name", "imp", "location", "filtering"}),
 
-    dev = pynwb.device.Device(name='foo')
-    eg = pynwb.ecephys.ElectrodeGroup(name='foo_group', description='', location='', device=dev)
+    ([("test_column_a", "description_a"),
+      ("test_column_b", "description_b")],
 
-    expected = pd.DataFrame({
-        'probe_id': [12, 12],
-        'local_index': [44, 43],
-        'probe_vertical_position': [21, 20],
-        'probe_horizontal_position': [30, 30],
-        'group': [eg] * 2
-    }, index=pd.Index([2, 1], name='id'))
+     {"x", "y", "z", "group", "group_name", "imp", "location", "filtering",
+      "test_column_a", "test_column_b"})
+])
+def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
+                                       expected_columns):
 
-    obtained = write_nwb.prepare_probewise_channel_table(channels, eg)
+    write_nwb.add_ecephys_electrode_columns(nwbfile, columns_to_add)
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+    assert set(nwbfile.electrodes.colnames) == expected_columns
 
 
-@pytest.mark.parametrize('dc,order,exp_idx,exp_data', [
-    [{'a': [1, 2, 3], 'b': [4, 5, 6]}, ['a', 'b'], [3, 6], [1, 2, 3, 4, 5, 6]]
+@pytest.mark.parametrize(("channels, local_index_whitelist, "
+                          "expected_electrode_table"), [
+    ([{"id": 1,
+       "probe_id": 1234,
+       "valid_data": True,
+       "local_index": 23,
+       "probe_vertical_position": 10,
+       "probe_horizontal_position": 10,
+       "anterior_posterior_ccf_coordinate": 15.0,
+       "dorsal_ventral_ccf_coordinate": 20.0,
+       "left_right_ccf_coordinate": 25.0,
+       "manual_structure_acronym": "CA1",
+       "impedence": np.nan,
+       "filtering": "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"},
+      {"id": 2,
+       "probe_id": 1234,
+       "valid_data": True,
+       "local_index": 15,
+       "probe_vertical_position": 20,
+       "probe_horizontal_position": 20,
+       "anterior_posterior_ccf_coordinate": 25.0,
+       "dorsal_ventral_ccf_coordinate": 30.0,
+       "left_right_ccf_coordinate": 35.0,
+       "manual_structure_acronym": "CA3",
+       "impedence": 42.0,
+       "filtering": "custom"}],
+
+     [15, 23],
+
+     pd.DataFrame({
+         "id": [2, 1],
+         "probe_id": [1234, 1234],
+         "valid_data": [True, True],
+         "local_index": [15, 23],
+         "probe_vertical_position": [20, 10],
+         "probe_horizontal_position": [20, 10],
+         "x": [25.0, 15.0],
+         "y": [30.0, 20.0],
+         "z": [35.0, 25.0],
+         "location": ["CA3", "CA1"],
+         "imp": [42.0, np.nan],
+         "filtering": ["custom", "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"]
+     }).set_index("id"))
+
+])
+def test_add_ecephys_electrodes(nwbfile, channels, local_index_whitelist,
+                                expected_electrode_table):
+
+    mock_device = pynwb.device.Device(name="mock_device")
+    mock_electrode_group = pynwb.ecephys.ElectrodeGroup(name="mock_group",
+                                                        description="",
+                                                        location="",
+                                                        device=mock_device)
+
+    write_nwb.add_ecephys_electrodes(nwbfile, channels, mock_electrode_group,
+                                     local_index_whitelist)
+
+    obt_electrode_table = nwbfile.electrodes.to_dataframe().drop(columns=["group", "group_name"])
+
+    pd.testing.assert_frame_equal(obt_electrode_table,
+                                  expected_electrode_table,
+                                  check_like=True)
+
+
+@pytest.mark.parametrize("dc,order,exp_idx,exp_data", [
+    [{"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], [3, 6], [1, 2, 3, 4, 5, 6]]
 ])
 def test_dict_to_indexed_array(dc, order, exp_idx, exp_data):
 
@@ -263,15 +311,15 @@ def test_add_ragged_data_to_dynamic_table(units_table, spike_times):
     write_nwb.add_ragged_data_to_dynamic_table(
         table=units_table,
         data=spike_times,
-        column_name='spike_times'
+        column_name="spike_times"
     )
 
-    assert np.allclose([1, 2, 3, 4, 5, 6], units_table['spike_times'][0])
-    assert np.allclose([], units_table['spike_times'][1])
-    assert np.allclose([13, 4, 12], units_table['spike_times'][2])
+    assert np.allclose([1, 2, 3, 4, 5, 6], units_table["spike_times"][0])
+    assert np.allclose([], units_table["spike_times"][1])
+    assert np.allclose([13, 4, 12], units_table["spike_times"][2])
 
 
-@pytest.mark.parametrize('roundtrip,include_rotation', [
+@pytest.mark.parametrize("roundtrip,include_rotation", [
     [True, True],
     [True, False]
 ])
@@ -291,7 +339,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
-@pytest.mark.parametrize('roundtrip', [[True]])
+@pytest.mark.parametrize("roundtrip", [[True]])
 def test_add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
 
     nwbfile = write_nwb.add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
@@ -307,20 +355,20 @@ def test_add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, roundtripper
 
 
 def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):
-    dirname = str(tmpdir_factory.mktemp('ecephys_nwb_test'))
-    stim_table_path = os.path.join(dirname, 'stim_table.csv')
+    dirname = str(tmpdir_factory.mktemp("ecephys_nwb_test"))
+    stim_table_path = os.path.join(dirname, "stim_table.csv")
 
     stimulus_presentations.to_csv(stim_table_path)
-    obt = write_nwb.read_stimulus_table(stim_table_path, column_renames_map={'alpha': 'beta'})
+    obt = write_nwb.read_stimulus_table(stim_table_path, column_renames_map={"alpha": "beta"})
 
-    assert np.allclose(stimulus_presentations['alpha'].values, obt['beta'].values)
+    assert np.allclose(stimulus_presentations["alpha"].values, obt["beta"].values)
 
 
 # read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None)
 def test_read_spike_times_to_dictionary(tmpdir_factory):
-    dirname = str(tmpdir_factory.mktemp('ecephys_nwb_spike_times'))
-    spike_times_path = os.path.join(dirname, 'spike_times.npy')
-    spike_units_path = os.path.join(dirname, 'spike_units.npy')
+    dirname = str(tmpdir_factory.mktemp("ecephys_nwb_spike_times"))
+    spike_times_path = os.path.join(dirname, "spike_times.npy")
+    spike_units_path = os.path.join(dirname, "spike_units.npy")
 
     spike_times = np.sort(np.random.rand(30))
     np.save(spike_times_path, spike_times, allow_pickle=False)
@@ -336,8 +384,8 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
 
 
 def test_read_waveforms_to_dictionary(tmpdir_factory):
-    dirname = str(tmpdir_factory.mktemp('ecephys_nwb_mean_waveforms'))
-    waveforms_path = os.path.join(dirname, 'mean_waveforms.npy')
+    dirname = str(tmpdir_factory.mktemp("ecephys_nwb_mean_waveforms"))
+    waveforms_path = os.path.join(dirname, "mean_waveforms.npy")
 
     nunits = 10
     nchannels = 30
@@ -359,9 +407,9 @@ def lfp_data():
     subsample_channels = np.array([3, 2])
 
     return {
-        'data': np.arange(total_timestamps * len(subsample_channels), dtype=np.int16).reshape((total_timestamps, len(subsample_channels))),
-        'timestamps': np.linspace(0, 1, total_timestamps),
-        'subsample_channels': subsample_channels
+        "data": np.arange(total_timestamps * len(subsample_channels), dtype=np.int16).reshape((total_timestamps, len(subsample_channels))),
+        "timestamps": np.linspace(0, 1, total_timestamps),
+        "subsample_channels": subsample_channels
     }
 
 
@@ -375,25 +423,46 @@ def probe_data():
         "temporal_subsampling_factor": 2.0,
         "channels": [
             {
-                'id': 0,
-                'probe_id': 12,
-                'local_index': 1,
-                'probe_vertical_position': 21,
-                'probe_horizontal_position': 33
+                "id": 0,
+                "probe_id": 12,
+                "local_index": 1,
+                "probe_vertical_position": 21,
+                "probe_horizontal_position": 33,
+                "valid_data": True,
+                "anterior_posterior_ccf_coordinate": 5.0,
+                "dorsal_ventral_ccf_coordinate": 10.0,
+                "left_right_ccf_coordinate": 15.0,
+                "manual_structure_acronym": "CA1",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             },
             {
-                'id': 1,
-                'probe_id': 12,
-                'local_index': 2,
-                'probe_vertical_position': 21,
-                'probe_horizontal_position': 32
+                "id": 1,
+                "probe_id": 12,
+                "local_index": 2,
+                "probe_vertical_position": 21,
+                "probe_horizontal_position": 32,
+                "valid_data": True,
+                "anterior_posterior_ccf_coordinate": 10.0,
+                "dorsal_ventral_ccf_coordinate": 15.0,
+                "left_right_ccf_coordinate": 20.0,
+                "manual_structure_acronym": "CA2",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             },
             {
-                'id': 2,
-                'probe_id': 12,
-                'local_index': 3,
-                'probe_vertical_position': 21,
-                'probe_horizontal_position': 31
+                "id": 2,
+                "probe_id": 12,
+                "local_index": 3,
+                "probe_vertical_position": 21,
+                "probe_horizontal_position": 31,
+                "valid_data": True,
+                "anterior_posterior_ccf_coordinate": 15.0,
+                "dorsal_ventral_ccf_coordinate": 20.0,
+                "left_right_ccf_coordinate": 25.0,
+                "manual_structure_acronym": "CA3",
+                "impedence": np.nan,
+                "filtering": "Unknown"
             }
         ],
         "lfp": {
@@ -451,6 +520,10 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
     write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
 
     exp_electrodes = pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
+    exp_electrodes.rename(columns={"anterior_posterior_ccf_coordinate": "x",
+                                   "dorsal_ventral_ccf_coordinate": "y",
+                                   "left_right_ccf_coordinate": "z",
+                                   "manual_structure_acronym": "location"}, inplace=True)
 
     with pynwb.NWBHDF5IO(output_path, "r") as obt_io:
         obt_f = obt_io.read()
@@ -460,10 +533,19 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
 
         obt_electrodes = obt_f.electrodes.to_dataframe().loc[
-            :, ['local_index', 'probe_horizontal_position', 'probe_id', 'probe_vertical_position']
+            :, ["local_index", "probe_horizontal_position",
+                "probe_id", "probe_vertical_position",
+                "valid_data", "x", "y", "z", "location", "impedence",
+                "filtering"]
         ]
 
-        pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
+        # There is a difference in how int dtypes are being saved in Windows
+        # that are causing tests to fail.
+        # Perhaps related to: https://stackoverflow.com/a/36279549
+        if platform.system() == "Windows":
+            pd.testing.assert_frame_equal(obt_electrodes, exp_electrodes, check_like=True, check_dtype=False)
+        else:
+            pd.testing.assert_frame_equal(obt_electrodes, exp_electrodes, check_like=True)
 
         csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
 
@@ -472,7 +554,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         assert np.allclose([[1, 2], [3, 3]], csd_series.control[:])  # csd interpolated channel locations
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
+@pytest.mark.parametrize("roundtrip", [True, False])
 def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, probe_data, csd_data):
 
     expected_csd = xr.DataArray(
@@ -490,7 +572,7 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
     expected_lfp = xr.DataArray(
         name="LFP",
         data=lfp_data["data"],
-        dims=['time', 'channel'],
+        dims=["time", "channel"],
         coords=[lfp_data["timestamps"], [2, 1]]
     )
 
@@ -520,7 +602,7 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
 
     write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
 
-    obt = EcephysNwbSessionApi(path=None, probe_lfp_paths={12345: NWBHDF5IO(output_path, 'r').read})
+    obt = EcephysNwbSessionApi(path=None, probe_lfp_paths={12345: NWBHDF5IO(output_path, "r").read})
 
     obtained_lfp = obt.get_lfp(12345)
     obtained_csd = obt.get_current_source_density(12345)
@@ -535,27 +617,27 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
 def invalid_epochs():
 
     epochs = [
-    {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 1998.0,
-      "end_time": 2005.0,
-    },
-    {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 2114.0,
-      "end_time": 2121.0,
-    },
-    {
-      "type": "EcephysProbe",
-      "id": 123448407,
-      "label": "ProbeB",
-      "start_time": 114.0,
-      "end_time": 211.0,
-    },
+        {
+            "type": "EcephysSession",
+            "id": 739448407,
+            "label": "stimulus",
+            "start_time": 1998.0,
+            "end_time": 2005.0,
+        },
+        {
+            "type": "EcephysSession",
+            "id": 739448407,
+            "label": "stimulus",
+            "start_time": 2114.0,
+            "end_time": 2121.0,
+        },
+        {
+            "type": "EcephysProbe",
+            "id": 123448407,
+            "label": "ProbeB",
+            "start_time": 114.0,
+            "end_time": 211.0,
+        },
     ]
 
     return epochs
@@ -566,16 +648,16 @@ def test_add_invalid_times(invalid_epochs, tmpdir_factory):
     nwbfile_name = str(tmpdir_factory.mktemp("test").join("test_invalid_times.nwb"))
 
     nwbfile = NWBFile(
-        session_description='EcephysSession',
-        identifier='{}'.format(739448407),
+        session_description="EcephysSession",
+        identifier="{}".format(739448407),
         session_start_time=datetime.now()
     )
 
     nwbfile = write_nwb.add_invalid_times(nwbfile, invalid_epochs)
 
-    with NWBHDF5IO(nwbfile_name, mode='w') as io:
+    with NWBHDF5IO(nwbfile_name, mode="w") as io:
         io.write(nwbfile)
-    nwbfile_in = NWBHDF5IO(nwbfile_name, mode='r').read()
+    nwbfile_in = NWBHDF5IO(nwbfile_name, mode="r").read()
 
     df = nwbfile.invalid_times.to_dataframe()
     df_in = nwbfile_in.invalid_times.to_dataframe()
@@ -603,18 +685,18 @@ def test_no_invalid_times_table():
 def test_setup_table_for_invalid_times():
 
     epoch = {
-      "type": "EcephysSession",
-      "id": 739448407,
-      "label": "stimulus",
-      "start_time": 1998.0,
-      "end_time": 2005.0,
+        "type": "EcephysSession",
+        "id": 739448407,
+        "label": "stimulus",
+        "start_time": 1998.0,
+        "end_time": 2005.0,
     }
 
     s = write_nwb.setup_table_for_invalid_times([epoch]).loc[0]
 
-    assert s['start_time'] == epoch['start_time']
-    assert s['stop_time'] == epoch['end_time']
-    assert s['tags'] == [epoch['type'], str(epoch['id']), epoch['label']]
+    assert s["start_time"] == epoch["start_time"]
+    assert s["stop_time"] == epoch["end_time"]
+    assert s["tags"] == [epoch["type"], str(epoch["id"]), epoch["label"]]
 
 
 @pytest.fixture
@@ -727,8 +809,8 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
     np.testing.assert_equal(obtained_spike_amplitudes, expected_spike_amplitudes)
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('probes, parsed_probe_data, expected', [
+@pytest.mark.parametrize("roundtrip", [True, False])
+@pytest.mark.parametrize("probes, parsed_probe_data, expected_units_table", [
     ([{"id": 1234,
        "name": "probeA",
        "sampling_rate": 29999.9655245905,
@@ -742,12 +824,27 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
                      "probe_id": 1234,
                      "valid_data": True,
                      "local_index": 0,
-                     "a": 42.0},
+                     "probe_vertical_position": 10,
+                     "probe_horizontal_position": 10,
+                     "anterior_posterior_ccf_coordinate": 15.0,
+                     "dorsal_ventral_ccf_coordinate": 20.0,
+                     "left_right_ccf_coordinate": 25.0,
+                     "manual_structure_acronym": "CA1",
+                     "impedence": np.nan,
+                     "filtering": "Unknown"},
                     {"id": 2,
                      "probe_id": 1234,
                      "valid_data": True,
                      "local_index": 1,
-                     "a": 84.0}],
+                     "probe_vertical_position": 20,
+                     "probe_horizontal_position": 20,
+                     "anterior_posterior_ccf_coordinate": 25.0,
+                     "dorsal_ventral_ccf_coordinate": 30.0,
+                     "left_right_ccf_coordinate": 35.0,
+                     "manual_structure_acronym": "CA3",
+                     "impedence": np.nan,
+                     "filtering": "Unknown"}],
+
        "units": [{"id": 777,
                   "local_index": 7,
                   "quality": "good",
@@ -760,7 +857,7 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
                   "b": 10}]}],
 
      (pd.DataFrame({"id": [777, 778], "local_index": [7, 9],  # units_table
-                    "a": [0.5, 1.0], "b": [5, 10]}).set_index(keys='id', drop=True),
+                    "a": [0.5, 1.0], "b": [5, 10]}).set_index(keys="id", drop=True),
       {777: np.array([0., 1., 2., -1., 5., 4.]),  # spike_times
        778: np.array([5., 4., 3., -1., 6.])},
       {777: np.array([0., 1., 2., 3., 4., 5.]),  # spike_amplitudes
@@ -773,16 +870,16 @@ def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, e
                    "spike_times": [[0., 1., 2., 4., 5.], [3., 4., 5., 6.]],
                    "spike_amplitudes": [[0., 1., 2., 5., 4.], [2., 1., 0., 4.]],
                    "waveform_mean": [[1., 2., 3., 4., 5., 6.], [1., 2., 3., 4., 5.]]}
-                  ).set_index(keys='id', drop=True)),
+                  ).set_index(keys="id", drop=True)),
 ])
 def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
                                        roundtrip, probes, parsed_probe_data,
-                                       expected):
+                                       expected_units_table):
 
     def mock_parse_probes_data(probes):
         return parsed_probe_data
 
-    monkeypatch.setattr(write_nwb, 'parse_probes_data', mock_parse_probes_data)
+    monkeypatch.setattr(write_nwb, "parse_probes_data", mock_parse_probes_data)
     nwbfile = write_nwb.add_probewise_data_to_nwbfile(nwbfile, probes)
 
     if roundtrip:
@@ -790,26 +887,27 @@ def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(obt.nwbfile.units.to_dataframe(), expected)
+    pd.testing.assert_frame_equal(obt.nwbfile.units.to_dataframe(),
+                                  expected_units_table)
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('eye_tracking_rig_geometry, expected', [
-    ({'monitor_position_mm': [1., 2., 3.],
-      'monitor_rotation_deg': [4., 5., 6.],
-      'camera_position_mm': [7., 8., 9.],
-      'camera_rotation_deg': [10., 11., 12.],
-      'led_position_mm': [13., 14., 15.],
-      'equipment': 'test_rig'},
+@pytest.mark.parametrize("roundtrip", [True, False])
+@pytest.mark.parametrize("eye_tracking_rig_geometry, expected", [
+    ({"monitor_position_mm": [1., 2., 3.],
+      "monitor_rotation_deg": [4., 5., 6.],
+      "camera_position_mm": [7., 8., 9.],
+      "camera_rotation_deg": [10., 11., 12.],
+      "led_position_mm": [13., 14., 15.],
+      "equipment": "test_rig"},
 
      #  Expected
-     {'geometry': pd.DataFrame({'monitor_position_mm': [1., 2., 3.],
-                                'monitor_rotation_deg': [4., 5., 6.],
-                                'camera_position_mm': [7., 8., 9.],
-                                'camera_rotation_deg': [10., 11., 12.],
-                                'led_position_mm': [13., 14., 15.]},
-                               index=['x', 'y', 'z']),
-      'equipment': 'test_rig'}),
+     {"geometry": pd.DataFrame({"monitor_position_mm": [1., 2., 3.],
+                                "monitor_rotation_deg": [4., 5., 6.],
+                                "camera_position_mm": [7., 8., 9.],
+                                "camera_rotation_deg": [10., 11., 12.],
+                                "led_position_mm": [13., 14., 15.]},
+                               index=["x", "y", "z"]),
+      "equipment": "test_rig"}),
 ])
 def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
                                                        roundtrip,
@@ -824,13 +922,13 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
     obtained_metadata = obt.get_rig_metadata()
 
-    pd.testing.assert_frame_equal(obtained_metadata['geometry'], expected['geometry'], check_like=True)
-    assert obtained_metadata['equipment'] == expected['equipment']
+    pd.testing.assert_frame_equal(obtained_metadata["geometry"], expected["geometry"], check_like=True)
+    assert obtained_metadata["equipment"] == expected["equipment"]
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize(('eye_tracking_frame_times, eye_dlc_tracking_data, '
-                          'eye_gaze_data, expected'), [
+@pytest.mark.parametrize("roundtrip", [True, False])
+@pytest.mark.parametrize(("eye_tracking_frame_times, eye_dlc_tracking_data, "
+                          "eye_gaze_data, expected"), [
     (
         # eye_tracking_frame_times
         pd.Series([3., 4., 5., 6., 7.]),
