@@ -9,17 +9,19 @@ It is maintained by the `Allen Institute for Brain Science <http://www.alleninst
 
 Quick Start Using Anaconda
 --------------------------
-The Allen SDK comes packaged with the Anaconda Python distribution platform.
-
  #. From the `Anaconda downloads page <https://www.anaconda.com/products/individual>`_, download the Python 3.7 version for your operating system and run the installer.
 
- #. After the installation is complete, download one of our many `Jupyter Notebook examples <https://allensdk.readthedocs.io/en/latest/examples.html>`_.
+ #. After the installation is complete, open up a terminal (in Windows open Anaconda3 Command Prompt).
 
- #. Open up a terminal (in Windows open Anaconda3).
+ #. Install the AllenSDK using PIP::
 
- #. Navigate to the directory where you downloaded the Jupyter Notebook example and run the following command::
+     pip install allensdk
 
-      jupyter notebook
+ #. Download one of our many `Jupyter Notebook examples <https://allensdk.readthedocs.io/en/latest/examples.html>`_ to a new folder.
+
+ #. In your terminal, navigate to the directory where you downloaded the Jupyter Notebook example and run the following command::
+
+     jupyter notebook
 
  #. Your browser should open and you should see the Jupyter Notebook example. Enjoy using the Allen SDK!
 
@@ -40,25 +42,7 @@ To uninstall the SDK::
 
 Other Distribution Formats
 --------------------------
-
 The Allen SDK is also available from the Github source repository.
-
-Required Dependencies
----------------------
-
- * `NumPy <http://wiki.scipy.org/Tentative_NumPy_Tutorial>`_
- * `SciPy <http://www.scipy.org/>`_
- * `matplotlib <http://matplotlib.org/>`_
- * `h5py <http://www.h5py.org>`_
- * `pandas <http://pandas.pydata.org>`_
- * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
- * `Jinja2 <http://jinja.pocoo.org>`_
-
-Optional Dependencies
----------------------
-
- * `pytest <http://pytest.org/latest>`_
- * `coverage <http://nedbatchelder.com/code/coverage>`_
 
 Installation with Docker (Optional)
 -----------------------------------
