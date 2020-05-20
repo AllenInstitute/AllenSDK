@@ -204,17 +204,24 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking rig metadata. (NWB error: {e})")
             return None
 
-        rig_geometry = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
-        rig_geometry.reset_index(inplace=True, drop=True)
-        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
-        rig_equipment = et_mod.get_data_interface("equipment").to_dataframe()
+        meta = et_mod.get_data_interface("eye_tracking_rig_metadata")
 
-        rig_metadata = {
+        rig_geometry = pd.DataFrame({
+            f"monitor_position_{meta.monitor_position__unit}": meta.monitor_position,
+            f"camera_position_{meta.camera_position__unit}": meta.camera_position,
+            f"led_position_{meta.led_position__unit}": meta.led_position,
+            f"monitor_rotation_{meta.monitor_rotation__unit}": meta.monitor_rotation,
+            f"camera_rotation_{meta.camera_rotation__unit}": meta.camera_rotation
+        })
+
+        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
+
+        returned_metadata = {
             "geometry": rig_geometry,
-            "equipment": rig_equipment["equipment"][0]
+            "equipment": meta.equipment
         }
 
-        return rig_metadata
+        return returned_metadata
 
     def get_pupil_data(self, suppress_pupil_data: bool = True) -> Optional[pd.DataFrame]:
         try:
