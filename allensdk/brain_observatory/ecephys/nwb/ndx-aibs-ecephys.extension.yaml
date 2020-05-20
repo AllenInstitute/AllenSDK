@@ -35,3 +35,66 @@ groups:
   - name: strain
     dtype: text
     doc: Specimen strain
+- neurodata_type_def: EcephysEyeTrackingRigMetadata
+  neurodata_type_inc: NWBDataInterface
+  doc: Metadata for ecephys experiment rig
+  attributes:
+  - name: equipment
+    dtype: text
+    doc: Description of rig
+  datasets:
+  - name: monitor_position
+    dtype: float32
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of monitor (x, y, z)
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: camera_position
+    dtype: float32
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of camera (x, y, z)
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: led_position
+    dtype: float32
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of LED (x, y, z)
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: monitor_rotation
+    dtype: float32
+    dims:
+    - 3
+    shape:
+    - null
+    doc: rotation of monitor (x, y, z)
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: camera_rotation
+    dtype: float32
+    dims:
+    - 3
+    shape:
+    - null
+    doc: rotation of camera (x, y, z)
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data

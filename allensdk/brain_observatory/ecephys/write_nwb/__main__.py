@@ -34,7 +34,8 @@ from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 from allensdk.brain_observatory.ecephys.nwb import (EcephysProbe,
                                                     EcephysElectrodeGroup,
-                                                    EcephysSpecimen)
+                                                    EcephysSpecimen,
+                                                    EcephysEyeTrackingRigMetadata)
 from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
 
@@ -852,17 +853,22 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
                                                   description='Eye tracking rig metadata module')
 
-    rig_geometry_data = pd.DataFrame(eye_tracking_rig_geometry).drop('equipment', axis=1)
-    equipment_data = pd.DataFrame({"equipment": [eye_tracking_rig_geometry['equipment']]})
+    rig_metadata = EcephysEyeTrackingRigMetadata(
+        name="eye_tracking_rig_metadata",
+        equipment=eye_tracking_rig_geometry['equipment'],
+        monitor_position=eye_tracking_rig_geometry['monitor_position_mm'],
+        monitor_position__unit="mm",
+        camera_position=eye_tracking_rig_geometry['camera_position_mm'],
+        camera_position__unit="mm",
+        led_position=eye_tracking_rig_geometry['led_position_mm'],
+        led_position__unit="mm",
+        monitor_rotation=eye_tracking_rig_geometry['monitor_rotation_deg'],
+        monitor_rotation__unit="deg",
+        camera_rotation=eye_tracking_rig_geometry['camera_rotation_deg'],
+        camera_rotation__unit="deg"
+    )
 
-    rig_geometry_interface = pynwb.core.DynamicTable.from_dataframe(df=rig_geometry_data,
-                                                                    name="rig_geometry_data")
-    equipment_interface = pynwb.core.DynamicTable.from_dataframe(df=equipment_data,
-                                                                 name="equipment")
-
-    eye_tracking_rig_mod.add_data_interface(rig_geometry_interface)
-    eye_tracking_rig_mod.add_data_interface(equipment_interface)
-
+    eye_tracking_rig_mod.add_data_interface(rig_metadata)
     nwbfile.add_processing_module(eye_tracking_rig_mod)
 
     return nwbfile
