@@ -824,7 +824,8 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     opto_ts = pynwb.base.TimeSeries(
         name="optotagging",
         timestamps=optotagging_table["start_time"].values,
-        data=optotagging_table["duration"].values
+        data=optotagging_table["duration"].values,
+        unit="seconds"
     )
 
     opto_mod = pynwb.ProcessingModule("optotagging", "optogenetic stimulution data")
