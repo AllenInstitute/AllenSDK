@@ -1,4 +1,5 @@
-from pynwb.spec import NWBAttributeSpec, NWBGroupSpec, NWBNamespaceBuilder
+from pynwb.spec import (NWBAttributeSpec, NWBDatasetSpec,
+                        NWBGroupSpec, NWBNamespaceBuilder)
 
 # This is the script used to generate the AIBS ecephys NWB extension .yaml
 # files. It can be run by installing pynwb and executing
@@ -69,10 +70,60 @@ ecephys_specimen_ext = NWBGroupSpec(doc="Metadata for ecephys specimen",
                                     neurodata_type_def="EcephysSpecimen",
                                     neurodata_type_inc="Subject")
 
+# Ecephys eye tracking rig metadata extension (inherits from `NWBContainer`)
+rig_equipment_attr = NWBAttributeSpec(name="equipment",
+                                      doc="Description of rig",
+                                      dtype="text")
+
+unit_attr = NWBAttributeSpec('unit', 'Unit of measurement for the data', 'text')
+
+rig_monitor_position_dset = NWBDatasetSpec(name="monitor_position",
+                                           doc="position of monitor (x, y, z)",
+                                           attributes=[unit_attr],
+                                           dtype='float32',
+                                           dims=(3,))
+
+rig_camera_position_dset = NWBDatasetSpec(name="camera_position",
+                                          doc="position of camera (x, y, z)",
+                                          attributes=[unit_attr],
+                                          dtype='float32',
+                                          dims=(3,))
+
+rig_led_position_dset = NWBDatasetSpec(name="led_position",
+                                       doc="position of LED (x, y, z)",
+                                       attributes=[unit_attr],
+                                       dtype='float32',
+                                       dims=(3,))
+
+rig_monitor_rotation_dset = NWBDatasetSpec(name="monitor_rotation",
+                                           doc="rotation of monitor (x, y, z)",
+                                           attributes=[unit_attr],
+                                           dtype='float32',
+                                           dims=(3,))
+
+rig_camera_rotation_dset = NWBDatasetSpec(name="camera_rotation",
+                                          doc="rotation of camera (x, y, z)",
+                                          attributes=[unit_attr],
+                                          dtype='float32',
+                                          dims=(3,))
+
+ecephys_eye_tracking_rig_metadata_ext = NWBGroupSpec(
+    doc="Metadata for ecephys experiment rig",
+    attributes=[rig_equipment_attr],
+    datasets=[rig_monitor_position_dset,
+              rig_camera_position_dset,
+              rig_led_position_dset,
+              rig_monitor_rotation_dset,
+              rig_camera_rotation_dset],
+    neurodata_type_def="EcephysEyeTrackingRigMetadata",
+    neurodata_type_inc="NWBDataInterface"
+)
+
 ext_source = "ndx-aibs-ecephys.extension.yaml"
 ns_builder.add_spec(ext_source, ecephys_probe_ext)
 ns_builder.add_spec(ext_source, ecephys_egroup_ext)
 ns_builder.add_spec(ext_source, ecephys_specimen_ext)
+ns_builder.add_spec(ext_source, ecephys_eye_tracking_rig_metadata_ext)
 
 namespace_path = "ndx-aibs-ecephys.namespace.yaml"
 ns_builder.export(namespace_path)
