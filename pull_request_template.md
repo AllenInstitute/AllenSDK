@@ -65,19 +65,19 @@ example:
 ### Configuration details:
 
 # Checklist
-- [ ] My code follows Google style guide
+- [ ] My code follows [Allen Institute Contribution Guidelines](https://github.com/AllenInstitute/AllenSDK/blob/master/CONTRIBUTING.md)
 - [ ] My code is unit tested where appropriate and does not decrease
       test coverage
 - [ ] I have performed a self review of my own code
-- [ ] I have commented my code, specifically adding doc strings to any
-      added functions
+- [ ] My code is well-documented, and the docstrings conform to [Numpy Standards](https://numpydoc.readthedocs.io/en/latest/format.html)
 - [ ] I have updated the documentation of the repository where
       appropriate
+- [ ] The header on my commit includes the issue number
 
 # Notes:
 <!-- Use this section to add anything you think worth mentioning to the
-reader of the ticket
+reader of the issue
 example:
 I noticed that values from LIMs query for pixel resolution are returning zero
-I have made a new ticket to address this error at #5678. I believe this is an 
+I have made a new issue to address this error at #5678. I believe this is an 
 error as all sessions should have a pixel resolution provided by the microscope.-->
