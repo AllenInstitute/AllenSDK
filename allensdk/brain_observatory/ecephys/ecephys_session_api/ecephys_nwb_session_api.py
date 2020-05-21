@@ -309,7 +309,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_optogenetic_stimulation(self) -> pd.DataFrame:
         mod = self.nwbfile.get_processing_module("optotagging")
-        table = mod.get_data_interface("optogenetic_stimuluation").to_dataframe()
+        table = mod.get_data_interface("optogenetic_stimulation").to_dataframe()
         table.drop(columns=["tags", "timeseries"], inplace=True)
         return table
 
