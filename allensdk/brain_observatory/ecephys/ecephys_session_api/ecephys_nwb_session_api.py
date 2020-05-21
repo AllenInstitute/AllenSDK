@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 import pynwb
+import isodate
 
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
@@ -309,7 +310,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_optogenetic_stimulation(self) -> pd.DataFrame:
         mod = self.nwbfile.get_processing_module("optotagging")
-        table = mod.get_data_interface("optogenetic_stimuluation").to_dataframe()
+        table = mod.get_data_interface("optogenetic_stimulation").to_dataframe()
         table.drop(columns=["tags", "timeseries"], inplace=True)
         return table
 
@@ -339,8 +340,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_metadata(self):
         nwb_subject = self.nwbfile.subject
         metadata = {
-            "specimen_name": nwb_subject.specimen_name,
-            "age_in_days": nwb_subject.age_in_days,
+            "specimen_name": nwb_subject.subject_id,
+            "age_in_days": isodate.parse_duration(nwb_subject.age).days,
             "full_genotype": nwb_subject.genotype,
             "strain": nwb_subject.strain,
             "sex": nwb_subject.sex,

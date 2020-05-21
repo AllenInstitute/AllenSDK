@@ -270,7 +270,13 @@ def add_metadata_to_nwbfile(nwbfile, input_metadata):
     if "stimulus_name" in metadata:
         nwbfile.stimulus_notes = metadata.pop("stimulus_name")
 
-    nwbfile.subject = EcephysSpecimen(**metadata)
+    if "specimen_name" in metadata:
+        metadata["subject_id"] = metadata.pop("specimen_name")
+
+    if 'age_in_days' in metadata:
+        metadata['age'] = 'P{}D'.format(int(metadata.pop("age_in_days")))
+
+    nwbfile.subject = EcephysSpecimen(species='Mus musculus', **metadata)
     return nwbfile
 
 
@@ -611,7 +617,8 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile = pynwb.NWBFile(
         session_description='EcephysProbe',
         identifier=f"{probe['id']}",
-        session_start_time=session_start_time
+        session_start_time=session_start_time,
+        institution='Allen Institute'
     )
 
     if probe.get("temporal_subsampling_factor", None) is not None:
@@ -835,7 +842,7 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
 
     if len(optotagging_table) > 0:
-        container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+        container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimulation")
         opto_mod.add_data_interface(container)
 
     return nwbfile
@@ -914,7 +921,8 @@ def write_ecephys_nwb(
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
         identifier='{}'.format(session_id),
-        session_start_time=session_start_time
+        session_start_time=session_start_time,
+        institution='Allen Institute'
     )
 
     if session_metadata is not None:
