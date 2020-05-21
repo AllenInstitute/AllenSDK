@@ -620,7 +620,8 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile = pynwb.NWBFile(
         session_description='EcephysProbe',
         identifier=f"{probe['id']}",
-        session_start_time=session_start_time
+        session_start_time=session_start_time,
+        institution="Allen Institute for Brain Science"
     )
 
     if probe.get("temporal_subsampling_factor", None) is not None:
@@ -923,7 +924,8 @@ def write_ecephys_nwb(
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
         identifier='{}'.format(session_id),
-        session_start_time=session_start_time
+        session_start_time=session_start_time,
+        institution="Allen Institute for Brain Science"
     )
 
     if session_metadata is not None:
