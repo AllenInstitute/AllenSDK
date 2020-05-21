@@ -83,26 +83,37 @@ def test_roundtrip_basic_metadata(roundtripper):
     assert dt == api.get_session_start_time()
 
 
-@pytest.mark.parametrize("metadata", [
-    {
+@pytest.mark.parametrize("metadata, expected_metadata", [
+    ({
         "specimen_name": "mouse_1",
         "age_in_days": 100.0,
         "full_genotype": "wt",
         "strain": "c57",
         "sex": "F",
-        "stimulus_name": "brain_observatory_2.0"
-    },
+        "stimulus_name": "brain_observatory_2.0",
+        "donor_id": 12345,
+        "species": "Mus musculus"},
+     {
+        "specimen_name": "mouse_1",
+        "age_in_days": 100.0,
+        "age": "P100D",
+        "full_genotype": "wt",
+        "strain": "c57",
+        "sex": "F",
+        "stimulus_name": "brain_observatory_2.0",
+        "subject_id": "12345",
+        "species": "Mus musculus"})
 ])
-def test_add_metadata(nwbfile, roundtripper, metadata):
+def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
     nwbfile = write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained = api.get_metadata()
 
-    assert set(metadata.keys()) == set(obtained.keys())
+    assert set(expected_metadata.keys()) == set(obtained.keys())
 
     misses = {}
-    for key, value in metadata.items():
+    for key, value in expected_metadata.items():
         if obtained[key] != value:
             misses[key] = {"expected": value, "obtained": obtained[key]}
 

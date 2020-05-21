@@ -151,6 +151,8 @@ class SessionMetadata(RaisingSchema):
     strain = String(required=True)
     sex = String(required=True)
     stimulus_name = String(required=True)
+    species = String(required=True)
+    donor_id = String(required=True)
 
 
 class InputSchema(ArgSchema):

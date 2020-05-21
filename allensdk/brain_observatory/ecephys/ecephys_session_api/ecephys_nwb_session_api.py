@@ -344,7 +344,10 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "full_genotype": nwb_subject.genotype,
             "strain": nwb_subject.strain,
             "sex": nwb_subject.sex,
-            "stimulus_name": self.nwbfile.stimulus_notes
+            "stimulus_name": self.nwbfile.stimulus_notes,
+            "subject_id": nwb_subject.subject_id,
+            "age": nwb_subject.age,
+            "species": nwb_subject.species
         }
         return metadata
 
