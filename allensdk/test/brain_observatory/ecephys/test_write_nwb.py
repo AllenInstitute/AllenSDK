@@ -207,7 +207,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
             "sampling_rate": [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
-            "location": [""]
+            "location": ["See electrode locations"]
         }, index=pd.Index([12], name="id"))
     ]
 ])
