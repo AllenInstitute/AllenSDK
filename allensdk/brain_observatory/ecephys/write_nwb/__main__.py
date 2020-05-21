@@ -279,6 +279,12 @@ def add_metadata_to_nwbfile(nwbfile, input_metadata):
     if "stimulus_name" in metadata:
         nwbfile.stimulus_notes = metadata.pop("stimulus_name")
 
+    if "age_in_days" in metadata:
+        metadata["age"] = f"P{int(metadata['age_in_days'])}D"
+
+    if "donor_id" in metadata:
+        metadata["subject_id"] = str(metadata.pop("donor_id"))
+
     nwbfile.subject = EcephysSpecimen(**metadata)
     return nwbfile
 
