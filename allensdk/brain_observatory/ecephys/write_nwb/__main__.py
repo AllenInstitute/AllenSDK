@@ -394,6 +394,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
     """
     probe_nwb_device = EcephysProbe(name=name,
                                     description="Neuropixels 1.0 Probe",  # required field
+                                    manufacturer="imec",
                                     probe_id=probe_id,
                                     sampling_rate=sampling_rate)
 
