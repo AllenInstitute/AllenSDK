@@ -356,7 +356,8 @@ def read_running_speed(path):
 
 
 def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
-                         has_lfp_data, name, location=""):
+                         has_lfp_data, name,
+                         location="See electrode locations"):
     """ Creates objects required for representation of a single
     extracellular ephys probe within an NWB file.
 
@@ -376,11 +377,11 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
         human-readable name for this probe.
         Practically, we use tags like "probeA" or "probeB"
     location : str, optional
-        unspecified information about the location of this probe.
-        Currently left blank, but in the future will probably contain
-        an expanded form of the information currently implicit in
-        'probeA' (ie targeting and insertion plan) while channels will
-        carry the results of ccf registration.
+        A required field for the `EcephysElectrodeGroup`. Because the group
+        contains a number of electrodes/channels along the neuropixels probe,
+        location will vary significantly. Thus by default this field is:
+        "See electrode locations" where the nwbfile.electrodes table will
+        provide much more detailed location information.
 
     Returns
     ------
