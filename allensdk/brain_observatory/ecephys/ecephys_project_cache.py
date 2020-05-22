@@ -74,7 +74,7 @@ class EcephysProjectCache(Cache):
             self,
             fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
             fetch_tries: int = 2,
-            stream_writer: Callable = write_from_stream,
+            stream_writer: Optional[Callable] = None,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
             cache: bool = True):
@@ -82,6 +82,9 @@ class EcephysProjectCache(Cache):
         access to cross-session data (like stimulus templates) and high-level 
         summaries of sessionwise data and provides tools for downloading detailed 
         sessionwise data (such as spike times).
+
+        To ensure correct configuration, it is recommended to use one of the
+        class constructors rather than to initialize this class directly.
 
         Parameters
         ==========
@@ -100,6 +103,14 @@ class EcephysProjectCache(Cache):
         fetch_tries : int
             Maximum number of times to attempt a download before giving up and
             raising an exception. Note that this is total tries, not retries
+        stream_writer: Callable
+            The method used to write from stream. Depends on whether the
+            engine is synchronous or asynchronous. If not set, will use the
+            `write_bytes` method native to the `fetch_api`'s `rma_engine`.
+            If the method is incompatible with the `fetch_api`'s `rma_engine`,
+            will likely encounter errors. For this reason it is recommended
+            to leave this field unspecified, or to use one of the class
+            constructors.
         manifest : str or Path
             full path at which manifest json will be stored (default =
             "ecephys_project_manifest.json" in the local directory.)
@@ -108,6 +119,43 @@ class EcephysProjectCache(Cache):
             recorded in the file at manifest, an error will be raised.
         cache: bool
             Whether to write to the cache (default=True)
+
+        Notes
+        =====
+        It is highly recommended to construct an instance of this class
+        using one of the following constructor methods:
+
+        from_warehouse(scheme: Optional[str] = None,
+                       host: Optional[str] = None,
+                       asynchronous: bool = True,
+                       manifest: Optional[Union[str, Path]] = None,
+                       version: Optional[str] = None,
+                       cache: bool = True,
+                       fetch_tries: int = 2)
+            Create an instance of EcephysProjectCache with an
+            EcephysProjectWarehouseApi. Retrieves released data stored
+            in the warehouse. Suitable for all users downloading
+            published Allen Institute data.
+        from_lims(lims_credentials: Optional[DbCredentials] = None,
+                  scheme: Optional[str] = None,
+                  host: Optional[str] = None,
+                  asynchronous: bool = True,
+                  manifest: Optional[str] = None,
+                  version: Optional[str] = None,
+                  cache: bool = True,
+                  fetch_tries: int = 2)
+            Create an instance of EcephysProjectCache with an
+            EcephysProjectLimsApi. Retrieves bleeding-edge data stored
+            locally on Allen Institute servers. Suitable for internal
+            users on-site at the Allen Institute or using the corporate
+            vpn. Requires Allen Institute database credentials.
+        fixed(manifest: Optional[Union[str, Path]] = None,
+              version: Optional[str] = None)
+            Create an instance of EcephysProjectCache that will only
+            use locally stored data, downloaded previously from LIMS
+            or warehouse using the EcephysProjectCache.
+            Suitable for users who want to analyze a fixed dataset they
+            have previously downloaded using EcephysProjectCache.
         """
         manifest_ = manifest or "ecephys_project_manifest.json"
         version_ = version or self.MANIFEST_VERSION
@@ -117,7 +165,9 @@ class EcephysProjectCache(Cache):
                                                   cache=cache)
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
-        self.stream_writer = stream_writer
+        self.stream_writer = (stream_writer
+                              or self.fetch_api.rma_engine.write_bytes)
+
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
@@ -532,7 +582,7 @@ class EcephysProjectCache(Cache):
                   scheme: Optional[str] = None,
                   host: Optional[str] = None, 
                   asynchronous: bool = True,
-                  manifest: Optional[str] = None, 
+                  manifest: Optional[Union[str, Path]] = None, 
                   version: Optional[str] = None, 
                   cache: bool = True,
                   fetch_tries: int = 2):
@@ -630,7 +680,8 @@ class EcephysProjectCache(Cache):
         )
 
     @classmethod
-    def fixed(cls, manifest=None, version=None):
+    def fixed(cls, manifest: Optional[Union[str, Path]] = None, 
+              version: Optional[str] = None):
         """
         Creates a EcephysProjectCache that refuses to fetch any data 
         - only the existing local cache is accessible. Useful if you
@@ -702,4 +753,3 @@ def read_nwb(path):
     nwbfile = reader.read()
     nwbfile.identifier  # if the file is corrupt, make sure an exception gets raised during read
     return nwbfile
-
