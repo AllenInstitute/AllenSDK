@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,6 @@ from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
-from pynwb.epoch import TimeIntervals
 
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -120,8 +119,8 @@ def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
     cr_params = eye_dlc_tracking_data["cr_params"]
     eye_params = eye_dlc_tracking_data["eye_params"]
 
-    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0]) and
-                        (cr_params.shape[0] == eye_params.shape[0]))
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
+                        and (cr_params.shape[0] == eye_params.shape[0]))
     if not num_frames_match:
         log.warn("The number of frames for ellipse fits don't "
                  "match when they should. No ellipse fits will be written! "
@@ -327,7 +326,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     v_sig = TimeSeries(
         name='v_sig',
         data=running_data_df['v_sig'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['v_sig']
     )
 
@@ -503,7 +502,9 @@ def setup_table_for_invalid_times(invalid_epochs):
 
         start_time = df['start_time'].values
         stop_time = df['end_time'].values
-        tags = [[t,str(id),l,] for t,id,l in zip(df['type'],df['id'],df['label'])]
+        tags = [[_type, str(_id), label]
+                for _type, _id, label
+                in zip(df['type'], df['id'], df['label'])]
 
         table = pd.DataFrame({'start_time': start_time,
                               'stop_time': stop_time,
@@ -662,6 +663,7 @@ def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None
 
     add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
+
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
     image_index = IndexSeries(
@@ -748,7 +750,6 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         conversion=1.0,
         unit='unknown',  # Should this be passed in for future support?
         reference_frame='unknown')  # Should this be passed in for future support?
-
 
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")
