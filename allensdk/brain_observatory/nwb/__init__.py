@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Dict, Iterable
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
+from pynwb.epoch import TimeIntervals
 
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -356,25 +358,71 @@ def add_stimulus_template(nwbfile, image_data, name):
     return nwbfile
 
 
-def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
-    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
+def create_stimulus_presentation_time_interval(name: str, description: str,
+                                               columns_to_add: Iterable) -> pynwb.epoch.TimeIntervals:
+    column_descriptions = {
+        "stimulus_name": "Name of stimulus",
+        "stimulus_block": "Index of contiguous presentations of one stimulus type",
+        "temporal_frequency": "Temporal frequency of stimulus",
+        "x_position": "Horizontal position of stimulus on screen",
+        "y_position": "Vertical position of stimulus on screen",
+        "mask": "Shape of mask applied to stimulus",
+        "opacity": "Opacity of stimulus",
+        "phase": "Phase of grating stimulus",
+        "size": "Size of stimulus (see ‘units’ field for units)",
+        "units": "Units of stimulus size",
+        "stimulus_index": "Index of stimulus type",
+        "orientation": "Orientation of stimulus",
+        "spatial_frequency": "Spatial frequency of stimulus",
+        "frame": "Frame of movie stimulus",
+        "contrast": "Contrast of stimulus",
+        "Speed": "Speed of moving dot field",
+        "Dir": "Direction of stimulus motion",
+        "coherence": "Coherence of moving dot field",
+        "dotLife": "Longevity of individual dots",
+        "dotSize": "Size of individual dots",
+        "fieldPos": "Position of moving dot field",
+        "fieldShape": "Shape of moving dot field",
+        "fieldSize": "Size of moving dot field",
+        "nDots": "Number of dots in moving dot field"
+    }
+
+    columns_to_ignore = {'start_time', 'stop_time', 'tags', 'timeseries'}
+
+    interval = pynwb.epoch.TimeIntervals(name=name,
+                                         description=description)
+
+    for column_name in columns_to_add:
+        if column_name not in columns_to_ignore:
+            description = column_descriptions.get(column_name, "No description")
+            interval.add_column(name=column_name, description=description)
+
+    return interval
+
+
+def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_interval'):
+    """Adds a stimulus table (defining stimulus characteristics for each
+    time point in a session) to an nwbfile as TimeIntervals.
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
     stimulus_table: pd.DataFrame
-        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
-        Nans will be replaced with the empty string. Required columns are:
-            start_time :: the time at which this epoch started
-            stop_time :: the time  at which this epoch ended
+        Each row corresponds to an interval of time. Columns define the interval
+        (start and stop time) and its characteristics.
+        Nans in columns with string data will be replaced with the empty strings.
+        Required columns are:
+            start_time :: the time at which this interval started
+            stop_time :: the time  at which this interval ended
     tag : str, optional
-        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
+        Each interval in an nwb file has one or more tags. This string will be
+        applied as a tag to all TimeIntervals created here
 
     Returns
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
+    """
     stimulus_table = stimulus_table.copy()
 
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
@@ -385,9 +433,23 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
             series.fillna('', inplace=True)
             stimulus_table[colname] = series.transform(str)
 
-    stimulus_table = setup_table_for_epochs(stimulus_table, ts, tag)
-    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
-    nwbfile.epochs = container
+    stimulus_names = stimulus_table['stimulus_name'].unique()
+    for stim_name in sorted(stimulus_names):
+        interval_description = (f"Presentation times and stimuli details "
+                                f"for '{stim_name}' stimuli")
+
+        presentation_interval = create_stimulus_presentation_time_interval(
+            name=f"{stim_name}_presentations",
+            description=interval_description,
+            columns_to_add=stimulus_table.columns
+        )
+
+        specific_stimulus_table = stimulus_table[stimulus_table['stimulus_name'] == stim_name]
+        for row in specific_stimulus_table.itertuples(index=False):
+            row = row._asdict()
+            presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
+
+        nwbfile.add_time_intervals(presentation_interval)
 
     return nwbfile
 

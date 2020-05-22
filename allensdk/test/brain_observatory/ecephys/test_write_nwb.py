@@ -65,6 +65,7 @@ def stimulus_presentations_color():
         "alpha": [0.5, 0.4, 0.3, 0.2, 0.1],
         "start_time": [1., 2., 4., 5., 6.],
         "stop_time": [2., 4., 5., 6., 8.],
+        "stimulus_name": ['gabors', 'gabors', 'random', 'movie', 'gabors'],
         "color": ["1.0", "", r"[1.0,-1.0, 10., -42.12, -.1]", "-1.0", ""]
     }, index=pd.Index(name="stimulus_presentations_id", data=[0, 1, 2, 3, 4]))
 
@@ -114,6 +115,9 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
+
+    print(stimulus_presentations)
+    print(obtained_stimulus_table)
 
     pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
 
@@ -354,14 +358,50 @@ def test_add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, roundtripper
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
-def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):
+@pytest.mark.parametrize("presentations, column_renames_map, columns_to_drop, expected", [
+    (pd.DataFrame({'alpha': [0.5, 0.4, 0.3, 0.2, 0.1],
+                   'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'start_time': [1., 2., 4., 5., 6.],
+                   'stop_time': [2., 4., 5., 6., 8.]}),
+     {"alpha": "beta"},
+     None,
+     pd.DataFrame({'beta': [0.5, 0.4, 0.3, 0.2, 0.1],
+                   'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'start_time': [1., 2., 4., 5., 6.],
+                   'stop_time': [2., 4., 5., 6., 8.]})),
+
+    (pd.DataFrame({'alpha': [0.5, 0.4, 0.3, 0.2, 0.1],
+                   'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'start_time': [1., 2., 4., 5., 6.],
+                   'stop_time': [2., 4., 5., 6., 8.]}),
+     {"alpha": "beta"},
+     ["Nonexistant_column_to_drop"],
+     pd.DataFrame({'beta': [0.5, 0.4, 0.3, 0.2, 0.1],
+                   'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'start_time': [1., 2., 4., 5., 6.],
+                   'stop_time': [2., 4., 5., 6., 8.]})),
+
+    (pd.DataFrame({'alpha': [0.5, 0.4, 0.3, 0.2, 0.1],
+                   'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'Start': [1., 2., 4., 5., 6.],
+                   'End': [2., 4., 5., 6., 8.]}),
+     None,
+     ["alpha"],
+     pd.DataFrame({'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+                   'start_time': [1., 2., 4., 5., 6.],
+                   'stop_time': [2., 4., 5., 6., 8.]})),
+])
+def test_read_stimulus_table(tmpdir_factory, presentations,
+                             column_renames_map, columns_to_drop, expected):
     dirname = str(tmpdir_factory.mktemp("ecephys_nwb_test"))
     stim_table_path = os.path.join(dirname, "stim_table.csv")
 
-    stimulus_presentations.to_csv(stim_table_path)
-    obt = write_nwb.read_stimulus_table(stim_table_path, column_renames_map={"alpha": "beta"})
+    presentations.to_csv(stim_table_path, index=False)
+    obt = write_nwb.read_stimulus_table(stim_table_path,
+                                        column_renames_map=column_renames_map,
+                                        columns_to_drop=columns_to_drop)
 
-    assert np.allclose(stimulus_presentations["alpha"].values, obt["beta"].values)
+    pd.testing.assert_frame_equal(obt, expected)
 
 
 # read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None)
