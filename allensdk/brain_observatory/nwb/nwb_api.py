@@ -2,6 +2,7 @@ import pandas as pd
 import pynwb
 import SimpleITK as sitk
 import os
+import collections
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -55,11 +56,20 @@ class NwbApi:
         )
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
-        
-        table = pd.DataFrame({
-            col.name: col.data for col in self.nwbfile.epochs.columns 
-            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
-        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
+
+        columns_to_ignore = set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+
+        presentations = collections.defaultdict(list)
+        for interval_name, interval in self.nwbfile.intervals.items():
+            if interval_name.endswith('_presentations'):
+                for col in interval.columns:
+                    if col.name not in columns_to_ignore:
+                        presentations[col.name].extend(col.data)
+
+        table = pd.DataFrame(presentations)
+        table = table.sort_values(by=["start_time"])
+        table = table.reset_index(drop=True)
+        table.index.name = 'stimulus_presentations_id'
         table.index = table.index.astype(int)
 
         return table[sorted(table.columns)]

@@ -29,7 +29,8 @@ def stimulus_presentations():
     return pd.DataFrame({
         'alpha': [0.5, 0.4, 0.3, 0.2, 0.1],
         'start_time': [1., 2., 4., 5., 6.],
-        'stop_time': [2., 4., 5., 6., 8.],
+        'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+        'stop_time': [2., 4., 5., 6., 8.]
     }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))
 
 

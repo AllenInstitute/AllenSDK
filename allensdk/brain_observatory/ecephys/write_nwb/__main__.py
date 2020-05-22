@@ -96,17 +96,23 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
     return data
 
 
-def read_stimulus_table(path, column_renames_map=None):
-    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB
-    epoch specifications.
+def read_stimulus_table(path: str,
+                        column_renames_map: Dict[str, str] = None,
+                        columns_to_drop: List[str] = None) -> pd.DataFrame:
+    """ Loads from a CSV on disk the stimulus table for this session.
+    Optionally renames columns to match NWB epoch specifications.
 
     Parameters
     ----------
     path : str
         path to stimulus table csv
-    column_renames_map : dict, optional
-        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and
-        'End' -> 'stop_time'
+    column_renames_map : Dict[str, str], optional
+        If provided, will be used to rename columns from keys -> values.
+        Default renames: ('Start' -> 'start_time') and ('End' -> 'stop_time')
+    columns_to_drop : List, optional
+        A list of column names to drop. Columns will be dropped BEFORE
+        any renaming occurs. If None, no columns are dropped.
+        By default None.
 
     Returns
     -------
@@ -114,7 +120,6 @@ def read_stimulus_table(path, column_renames_map=None):
         stimulus table with applied renames
 
     """
-
     if column_renames_map is None:
         column_renames_map = STIM_TABLE_RENAMES_MAP
 
@@ -124,6 +129,10 @@ def read_stimulus_table(path, column_renames_map=None):
         stimulus_table = pd.read_csv(path)
     else:
         raise IOError(f"unrecognized stimulus table extension: {ext}")
+
+    if columns_to_drop:
+        stimulus_table = stimulus_table.drop(errors='ignore',
+                                             columns=columns_to_drop)
 
     return stimulus_table.rename(columns=column_renames_map, index={})
 
@@ -920,7 +929,12 @@ def write_ecephys_nwb(
     if session_metadata is not None:
         nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
-    stimulus_table = read_stimulus_table(stimulus_table_path)
+    stimulus_columns_to_drop = [
+        "colorSpace", "depth", "interpolate", "pos", "rgbPedestal", "tex",
+        "texRes", "flipHoriz", "flipVert", "rgb", "signalDots"
+    ]
+    stimulus_table = read_stimulus_table(stimulus_table_path,
+                                         stimulus_columns_to_drop)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)  # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
