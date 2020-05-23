@@ -152,7 +152,7 @@ class SessionMetadata(RaisingSchema):
     sex = String(required=True)
     stimulus_name = String(required=True)
     species = String(required=True)
-    donor_id = String(required=True)
+    donor_id = Int(required=True)
 
 
 class InputSchema(ArgSchema):
