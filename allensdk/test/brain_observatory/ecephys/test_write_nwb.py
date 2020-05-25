@@ -948,7 +948,7 @@ def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
       "monitor_rotation_deg": [4., 5., 6.],
       "camera_position_mm": [7., 8., 9.],
       "camera_rotation_deg": [10., 11., 12.],
-      "led_position_mm": [13., 14., 15.],
+      "led_position": [13., 14., 15.],
       "equipment": "test_rig"},
 
      #  Expected

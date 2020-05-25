@@ -866,7 +866,7 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     monitor_rotation_deg: [x, y, z]
     camera_position_mm: [x, y, z]
     camera_rotation_deg: [x, y, z]
-    led_position_mm: [x, y, z]
+    led_position: [x, y, z]
     equipment: A string describing rig
     """
     eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
@@ -879,7 +879,7 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
         monitor_position__unit="mm",
         camera_position=eye_tracking_rig_geometry['camera_position_mm'],
         camera_position__unit="mm",
-        led_position=eye_tracking_rig_geometry['led_position_mm'],
+        led_position=eye_tracking_rig_geometry['led_position'],
         led_position__unit="mm",
         monitor_rotation=eye_tracking_rig_geometry['monitor_rotation_deg'],
         monitor_rotation__unit="deg",
@@ -944,7 +944,7 @@ def write_ecephys_nwb(
         "texRes", "flipHoriz", "flipVert", "rgb", "signalDots"
     ]
     stimulus_table = read_stimulus_table(stimulus_table_path,
-                                         stimulus_columns_to_drop)
+                                         columns_to_drop=stimulus_columns_to_drop)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)  # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
