@@ -617,7 +617,8 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
     return nwbfile
 
 
-def write_probe_lfp_file(session_id, session_start_time, log_level, probe):
+def write_probe_lfp_file(session_id, session_metadata, session_start_time,
+                         log_level, probe):
     """ Writes LFP data (and associated channel information) for one
     probe to a standalone nwb file
     """
@@ -632,6 +633,9 @@ def write_probe_lfp_file(session_id, session_start_time, log_level, probe):
         session_start_time=session_start_time,
         institution="Allen Institute for Brain Science"
     )
+
+    if session_metadata is not None:
+        nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
     if probe.get("temporal_subsampling_factor", None) is not None:
         probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
@@ -712,12 +716,14 @@ def add_csd_to_nwbfile(nwbfile, csd, times, csd_virt_channel_locs, unit="V/cm^2"
     return nwbfile
 
 
-def write_probewise_lfp_files(probes, session_id, session_start_time, pool_size=3):
+def write_probewise_lfp_files(probes, session_id, session_metadata,
+                              session_start_time, pool_size=3):
 
     output_paths = []
 
     pool = mp.Pool(processes=pool_size)
-    write = partial(write_probe_lfp_file, session_id, session_start_time, logging.getLogger("").getEffectiveLevel())
+    write = partial(write_probe_lfp_file, session_id, session_metadata,
+                    session_start_time, logging.getLogger("").getEffectiveLevel())
 
     for pout in pool.imap_unordered(write, probes):
         output_paths.append(pout)
@@ -985,6 +991,7 @@ def write_ecephys_nwb(
 
     probes_with_lfp = [p for p in probes if p["lfp"] is not None]
     probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_id,
+                                              session_metadata,
                                               session_start_time,
                                               pool_size=pool_size)
 
