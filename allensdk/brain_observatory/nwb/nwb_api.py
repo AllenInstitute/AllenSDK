@@ -4,6 +4,8 @@ import SimpleITK as sitk
 import os
 import collections
 
+import numpy as np
+
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
@@ -59,14 +61,17 @@ class NwbApi:
 
         columns_to_ignore = set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
 
-        presentations = collections.defaultdict(list)
+        presentation_dfs = []
         for interval_name, interval in self.nwbfile.intervals.items():
             if interval_name.endswith('_presentations'):
+                presentations = collections.defaultdict(list)
                 for col in interval.columns:
                     if col.name not in columns_to_ignore:
                         presentations[col.name].extend(col.data)
+                df = pd.DataFrame(presentations).replace({'N/A': np.nan})
+                presentation_dfs.append(df)
 
-        table = pd.DataFrame(presentations)
+        table = pd.concat(presentation_dfs, sort=False)
         table = table.sort_values(by=["start_time"])
         table = table.reset_index(drop=True)
         table.index.name = 'stimulus_presentations_id'

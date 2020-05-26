@@ -120,17 +120,31 @@ def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
     assert len(misses) == 0, f"the following metadata items were mismatched: {misses}"
 
 
-def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
+@pytest.mark.parametrize("presentations", [
+    (pd.DataFrame({
+        'alpha': [0.5, 0.4, 0.3, 0.2, 0.1],
+        'start_time': [1., 2., 4., 5., 6.],
+        'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+        'stop_time': [2., 4., 5., 6., 8.]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))),
+
+    (pd.DataFrame({
+        'gabor_specific_column': [1.0, 2.0, np.nan, np.nan, 3.0],
+        'mixed_column': ["a", np.nan, "b", np.nan, "c"],
+        'movie_specific_column': [np.nan, np.nan, np.nan, 1.0, np.nan],
+        'start_time': [1., 2., 4., 5., 6.],
+        'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
+        'stop_time': [2., 4., 5., 6., 8.]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))),
+])
+def test_add_stimulus_presentations(nwbfile, presentations, roundtripper):
     write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
-    write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations)
+    write_nwb.add_stimulus_presentations(nwbfile, presentations)
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
 
-    print(stimulus_presentations)
-    print(obtained_stimulus_table)
-
-    pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
+    pd.testing.assert_frame_equal(presentations, obtained_stimulus_table, check_dtype=False)
 
 
 def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color, roundtripper):

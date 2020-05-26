@@ -423,28 +423,29 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
 
     """
     stimulus_table = stimulus_table.copy()
-
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
-
-    for colname, series in stimulus_table.items():
-        types = set(series.map(type))
-        if len(types) > 1 and str in types:
-            series.fillna('', inplace=True)
-            stimulus_table[colname] = series.transform(str)
-
     stimulus_names = stimulus_table['stimulus_name'].unique()
+
     for stim_name in sorted(stimulus_names):
+        specific_stimulus_table = stimulus_table[stimulus_table['stimulus_name'] == stim_name]
+        # Drop columns where all values in column are NaN
+        cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
+        # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
+        for colname, series in cleaned_table.items():
+            types = set(series.map(type))
+            if len(types) > 1 and str in types:
+                series.fillna('N/A', inplace=True)
+                cleaned_table[colname] = series.transform(str)
+
         interval_description = (f"Presentation times and stimuli details "
                                 f"for '{stim_name}' stimuli")
-
         presentation_interval = create_stimulus_presentation_time_interval(
             name=f"{stim_name}_presentations",
             description=interval_description,
-            columns_to_add=stimulus_table.columns
+            columns_to_add=cleaned_table.columns
         )
 
-        specific_stimulus_table = stimulus_table[stimulus_table['stimulus_name'] == stim_name]
-        for row in specific_stimulus_table.itertuples(index=False):
+        for row in cleaned_table.itertuples(index=False):
             row = row._asdict()
             presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
 
