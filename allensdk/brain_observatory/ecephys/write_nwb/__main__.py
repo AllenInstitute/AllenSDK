@@ -626,7 +626,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     logging.info(f"writing lfp file for probe {probe['id']}")
 
     nwbfile = pynwb.NWBFile(
-        session_description='EcephysProbe',
+        session_description='LFP data and associated channel info for a single Ecephys probe',
         identifier=f"{probe['id']}",
         session_start_time=session_start_time,
         institution="Allen Institute for Brain Science"
@@ -930,7 +930,7 @@ def write_ecephys_nwb(
 ):
 
     nwbfile = pynwb.NWBFile(
-        session_description='EcephysSession',
+        session_description='Data and metadata for an Ecephys session',
         identifier='{}'.format(session_id),
         session_start_time=session_start_time,
         institution="Allen Institute for Brain Science"
