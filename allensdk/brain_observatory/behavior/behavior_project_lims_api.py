@@ -29,6 +29,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Typically want to construct an instance of this class by calling
             `BehaviorProjectLimsApi.default()`.
 
+        Set log level to debug to see SQL queries dumped by
+        "BehaviorProjectLimsApi" logger.
+
         Note -- Currently the app engine is unused because we aren't yet
         supporting the download of stimulus templates for visual behavior
         data. This feature will be added at a later date.
@@ -204,7 +207,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 g.name AS sex,
                 DATE_PART('day', bs.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
-                bs.foraging_id,
+                bs.foraging_id
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
@@ -217,6 +220,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN equipment ON equipment.id = bs.equipment_id
             {session_sub_query}
         """
+        self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
     def _get_foraging_ids_from_behavior_session(
