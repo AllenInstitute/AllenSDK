@@ -628,9 +628,12 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
 
         csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
 
-        assert np.allclose(csd_data["csd"], csd_series.data[:])
-        assert np.allclose(csd_data["relative_window"], csd_series.timestamps[:])
-        assert np.allclose([[1, 2], [3, 3]], csd_series.control[:])  # csd interpolated channel locations
+        assert np.allclose(csd_data["csd"], csd_series.time_series.data[:].T)
+        assert np.allclose(csd_data["relative_window"], csd_series.time_series.timestamps[:])
+        obt_channel_locations = np.stack((csd_series.virtual_electrode_x_positions,
+                                          csd_series.virtual_electrode_y_positions),
+                                         axis=1)
+        assert np.allclose([[1, 2], [3, 3]], obt_channel_locations)  # csd interpolated channel locations
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])

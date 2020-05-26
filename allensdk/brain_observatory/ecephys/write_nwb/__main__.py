@@ -35,7 +35,8 @@ from allensdk.brain_observatory.ecephys.file_io.continuous_file import Continuou
 from allensdk.brain_observatory.ecephys.nwb import (EcephysProbe,
                                                     EcephysElectrodeGroup,
                                                     EcephysSpecimen,
-                                                    EcephysEyeTrackingRigMetadata)
+                                                    EcephysEyeTrackingRigMetadata,
+                                                    EcephysCSD)
 from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
 
@@ -699,20 +700,52 @@ def read_csd_data_from_h5(csd_path):
                 csd_file["csd_locations"][:])
 
 
-def add_csd_to_nwbfile(nwbfile, csd, times, csd_virt_channel_locs, unit="V/cm^2"):
+def add_csd_to_nwbfile(nwbfile: pynwb.NWBFile, csd: np.ndarray,
+                       times: np.ndarray, csd_virt_channel_locs: np.ndarray,
+                       csd_unit="V/cm^2", position_unit="um") -> pynwb.NWBFile:
+    """Add current source density (CSD) data to an nwbfile
+
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+        nwbfile to add CSD data to
+    csd : np.ndarray
+        CSD data in the form of: (channels x timepoints)
+    times : np.ndarray
+        Timestamps for CSD data (timepoints)
+    csd_virt_channel_locs : np.ndarray
+        Location of interpolated channels
+    csd_unit : str, optional
+        Units of CSD data, by default "V/cm^2"
+    position_unit : str, optional
+        Units of virtual channel locations, by default "um" (micrometer)
+
+    Returns
+    -------
+    pynwb.NWBFiles
+        nwbfile which has had CSD data added
+    """
 
     csd_mod = pynwb.ProcessingModule("current_source_density", "Precalculated current source density from interpolated channel locations.")
     nwbfile.add_processing_module(csd_mod)
 
     csd_ts = pynwb.base.TimeSeries(
         name="current_source_density",
-        data=csd,
+        data=csd.T,  # TimeSeries should have data in (timepoints x channels) format
         timestamps=times,
-        control=csd_virt_channel_locs.astype(np.uint64),  # These are locations (x, y) of virtual interpolated electrodes
-        control_description="Virtual locations of electrodes from which csd was calculated",
-        unit=unit
+        unit=csd_unit
     )
-    csd_mod.add_data_interface(csd_ts)
+
+    x_locs, y_locs = np.split(csd_virt_channel_locs.astype(np.uint64), 2, axis=1)
+
+    csd = EcephysCSD(name="ecephys_csd",
+                     time_series=csd_ts,
+                     virtual_electrode_x_positions=x_locs.flatten(),
+                     virtual_electrode_x_positions__unit=position_unit,
+                     virtual_electrode_y_positions=y_locs.flatten(),
+                     virtual_electrode_y_positions__unit=position_unit)
+
+    csd_mod.add_data_interface(csd)
 
     return nwbfile
 
