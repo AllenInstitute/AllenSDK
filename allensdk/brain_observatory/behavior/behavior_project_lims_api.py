@@ -196,12 +196,15 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.ophys_session_id,
                 bs.behavior_training_id,
                 equipment.name as equipment_name,
+                bs.date_of_acquisition,
                 d.id as donor_id,
                 d.full_genotype,
                 reporter.reporter_line,
                 driver.driver_line,
                 g.name AS sex,
-                bs.foraging_id
+                DATE_PART('day', bs.date_of_acquisition - d.date_of_birth)
+                    AS age_in_days,
+                bs.foraging_id,
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
