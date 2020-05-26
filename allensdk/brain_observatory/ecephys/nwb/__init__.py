@@ -16,3 +16,5 @@ EcephysSpecimen = pynwb.get_class('EcephysSpecimen', 'ndx-aibs-ecephys')
 
 EcephysEyeTrackingRigMetadata = pynwb.get_class('EcephysEyeTrackingRigMetadata',
                                                 'ndx-aibs-ecephys')
+
+EcephysCSD = pynwb.get_class('EcephysCSD', 'ndx-aibs-ecephys')

@@ -70,7 +70,7 @@ ecephys_specimen_ext = NWBGroupSpec(doc="Metadata for ecephys specimen",
                                     neurodata_type_def="EcephysSpecimen",
                                     neurodata_type_inc="Subject")
 
-# Ecephys eye tracking rig metadata extension (inherits from `NWBContainer`)
+# Ecephys eye tracking rig metadata extension (inherits from `NWBDataInterface`)
 rig_equipment_attr = NWBAttributeSpec(name="equipment",
                                       doc="Description of rig",
                                       dtype="text")
@@ -119,11 +119,37 @@ ecephys_eye_tracking_rig_metadata_ext = NWBGroupSpec(
     neurodata_type_inc="NWBDataInterface"
 )
 
+# Ecephys CSD extension
+csd_timeseries_group = NWBGroupSpec(doc="A timeseries containing current source density (CSD) data",
+                                    neurodata_type_inc="TimeSeries")
+
+csd_virtual_electrode_vertical_positions = NWBDatasetSpec(name="virtual_electrode_y_positions",
+                                                          doc="Virtual vertical positions of electrodes from which CSD was calculated",
+                                                          attributes=[unit_attr],
+                                                          dtype='float32',
+                                                          shape=(None,))
+
+csd_virtual_electrode_horizontal_positions = NWBDatasetSpec(name="virtual_electrode_x_positions",
+                                                            doc="Virtual horizontal positions of electrodes from which CSD was calculated",
+                                                            attributes=[unit_attr],
+                                                            dtype='float32',
+                                                            shape=(None,))
+
+ecephys_csd_ext = NWBGroupSpec(
+    doc="A group containing current source density (CSD) data and virtual electrode locations",
+    groups=[csd_timeseries_group],
+    datasets=[csd_virtual_electrode_horizontal_positions,
+              csd_virtual_electrode_vertical_positions],
+    neurodata_type_def="EcephysCSD",
+    neurodata_type_inc="NWBDataInterface"
+)
+
 ext_source = "ndx-aibs-ecephys.extension.yaml"
 ns_builder.add_spec(ext_source, ecephys_probe_ext)
 ns_builder.add_spec(ext_source, ecephys_egroup_ext)
 ns_builder.add_spec(ext_source, ecephys_specimen_ext)
 ns_builder.add_spec(ext_source, ecephys_eye_tracking_rig_metadata_ext)
+ns_builder.add_spec(ext_source, ecephys_csd_ext)
 
 namespace_path = "ndx-aibs-ecephys.namespace.yaml"
 ns_builder.export(namespace_path)

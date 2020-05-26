@@ -292,17 +292,18 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_current_source_density(self, probe_id):
         csd_mod = self._probe_nwbfile(probe_id).get_processing_module("current_source_density")
-        csd_ts = csd_mod["current_source_density"]
+        nwb_csd = csd_mod["current_source_density"]
+        csd_data = nwb_csd.time_series.data[:].T  # csd data stored as (timepoints x channels) but we want (channels x timepoints)
 
         csd = xr.DataArray(
             name="CSD",
-            data=csd_ts.data[:],
+            data=csd_data,
             dims=["virtual_channel_index", "time"],
             coords={
-                "virtual_channel_index": np.arange(csd_ts.data.shape[0]),
-                "time": csd_ts.timestamps[:],
-                "vertical_position": (("virtual_channel_index",), csd_ts.control[:, 1]),
-                "horizontal_position": (("virtual_channel_index",), csd_ts.control[:, 0])
+                "virtual_channel_index": np.arange(csd_data.shape[0]),
+                "time": nwb_csd.time_series.timestamps[:],
+                "vertical_position": (("virtual_channel_index",), nwb_csd.virtual_electrode_y_positions),
+                "horizontal_position": (("virtual_channel_index",), nwb_csd.virtual_electrode_x_positions)
             }
         )
         return csd
