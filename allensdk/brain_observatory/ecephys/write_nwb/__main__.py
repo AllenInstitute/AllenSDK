@@ -568,7 +568,8 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, units=None):
     running_speed_end_timeseries = pynwb.base.TimeSeries(
         name="running_speed_end_times",
         data=np.full(running_speed["velocity"].shape, np.nan),
-        timestamps=running_speed["end_time"].values
+        timestamps=running_speed["end_time"].values,
+        unit=units["velocity"]
     )
 
     rotation_timeseries = pynwb.base.TimeSeries(
