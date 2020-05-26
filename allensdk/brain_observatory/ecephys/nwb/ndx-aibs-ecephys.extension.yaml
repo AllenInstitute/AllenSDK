@@ -98,3 +98,29 @@ groups:
     - name: unit
       dtype: text
       doc: Unit of measurement for the data
+- neurodata_type_def: EcephysCSD
+  neurodata_type_inc: NWBDataInterface
+  doc: A group containing current source density (CSD) data and virtual electrode
+    locations
+  datasets:
+  - name: virtual_electrode_x_positions
+    dtype: float32
+    shape:
+    - null
+    doc: Virtual horizontal positions of electrodes from which CSD was calculated
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: virtual_electrode_y_positions
+    dtype: float32
+    shape:
+    - null
+    doc: Virtual vertical positions of electrodes from which CSD was calculated
+    attributes:
+    - name: unit
+      dtype: text
+      doc: Unit of measurement for the data
+  groups:
+  - neurodata_type_inc: TimeSeries
+    doc: A timeseries containing current source density (CSD) data
