@@ -249,6 +249,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if behavior_session_ids:
             foraging_ids = self._get_foraging_ids_from_behavior_session(
                 behavior_session_ids)
+            foraging_ids = [f"'{fid}'" for fid in foraging_ids]
         # Otherwise just get the full table from mtrain
         else:
             foraging_ids = None
@@ -264,6 +265,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN stages ON stages.id = bs.state_id
             {foraging_ids_query};
         """
+        self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
         return self.mtrain_engine.select(query)
 
     def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:
