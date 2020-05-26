@@ -572,6 +572,17 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         "output_path": output_path
     }
 
+    test_session_metadata = {
+        "specimen_name": "A",
+        "age_in_days": 100.0,
+        "full_genotype": "wt",
+        "strain": "A strain",
+        "sex": "M",
+        "stimulus_name": "test_stim",
+        "species": "Mus musculus",
+        "donor_id": 42
+    }
+
     probe_data.update({"lfp": test_lfp_paths})
     probe_data.update({"csd_path": input_csd_path})
 
@@ -582,7 +593,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
 
-    write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
+    write_nwb.write_probe_lfp_file(4242, test_session_metadata, datetime.now(), logging.INFO, probe_data)
 
     exp_electrodes = pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
     exp_electrodes.rename(columns={"anterior_posterior_ccf_coordinate": "x",
@@ -603,6 +614,9 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
                 "valid_data", "x", "y", "z", "location", "impedence",
                 "filtering"]
         ]
+
+        assert obt_f.session_id == "4242"
+        assert obt_f.subject.subject_id == "42"
 
         # There is a difference in how int dtypes are being saved in Windows
         # that are causing tests to fail.
@@ -665,14 +679,12 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
 
-    write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
+    write_nwb.write_probe_lfp_file(4242, None, datetime.now(), logging.INFO, probe_data)
 
     obt = EcephysNwbSessionApi(path=None, probe_lfp_paths={12345: NWBHDF5IO(output_path, "r").read})
 
     obtained_lfp = obt.get_lfp(12345)
     obtained_csd = obt.get_current_source_density(12345)
-
-    print(obtained_lfp)
 
     xr.testing.assert_equal(obtained_lfp, expected_lfp)
     xr.testing.assert_equal(obtained_csd, expected_csd)
