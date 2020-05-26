@@ -167,7 +167,22 @@ class EcephysProjectCache(Cache):
         self.fetch_tries = fetch_tries
         self.stream_writer = (stream_writer
                               or self.fetch_api.rma_engine.write_bytes)
-
+        if stream_writer is not None:
+            self.stream_writer = stream_writer
+        else:
+            if hasattr(self.fetch_api, "rma_engine"):    # EcephysProjectWarehouseApi    # noqa
+                self.stream_writer = self.fetch_api.rma_engine.write_bytes
+            # TODO: Make these names consistent in the different fetch apis
+            elif hasattr(self.fetch_api, "app_engine"):    # EcephysProjectLimsApi    # noqa
+                self.stream_writer = self.fetch_api.app_engine.write_bytes
+            else:
+                raise ValueError(
+                    "Must either set value for `stream_writer`, or use a "
+                    "`fetch_api` with an rma_engine or app_engine attribute "
+                    "that implements `write_bytes`. See `HttpEngine` and "
+                    "`AsyncHttpEngine` from "
+                    "allensdk.brain_observatory.ecephys.ecephys_project_api."
+                    "http_engine for examples.")
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
@@ -581,7 +596,7 @@ class EcephysProjectCache(Cache):
     def from_lims(cls, lims_credentials: Optional[DbCredentials] = None,
                   scheme: Optional[str] = None,
                   host: Optional[str] = None, 
-                  asynchronous: bool = True,
+                  asynchronous: bool = False,
                   manifest: Optional[Union[str, Path]] = None, 
                   version: Optional[str] = None, 
                   cache: bool = True,
@@ -607,7 +622,7 @@ class EcephysProjectCache(Cache):
             value if unspecified. Will not be used unless `scheme` is
             also specified.
         asynchronous : bool
-            Whether to fetch file asynchronously. Defaults to True.
+            Whether to fetch file asynchronously. Defaults to False.
         manifest : str or Path
             full path at which manifest json will be stored
         version : str
@@ -636,7 +651,7 @@ class EcephysProjectCache(Cache):
     def from_warehouse(cls, 
                        scheme: Optional[str] = None, 
                        host: Optional[str] = None,
-                       asynchronous: bool = True,
+                       asynchronous: bool = False,
                        manifest: Optional[Union[str, Path]] = None, 
                        version: Optional[str] = None,
                        cache: bool = True, 
@@ -657,7 +672,7 @@ class EcephysProjectCache(Cache):
             value if unspecified. Will not be used unless `scheme` is also
             specified.
         asynchronous : bool
-            Whether to fetch file asynchronously. Defaults to True.
+            Whether to fetch file asynchronously. Defaults to False.
         manifest : str or Path
             full path at which manifest json will be stored
         version : str
@@ -673,7 +688,7 @@ class EcephysProjectCache(Cache):
             app_kwargs = {"scheme": scheme, "host": host, 
                           "asynchronous": asynchronous}
         else:
-            app_kwargs = None
+            app_kwargs = {"asynchronous": asynchronous}
         return cls._from_http_source_default(
             EcephysProjectWarehouseApi, app_kwargs, manifest=manifest,
              version=version, cache=cache, fetch_tries=fetch_tries
