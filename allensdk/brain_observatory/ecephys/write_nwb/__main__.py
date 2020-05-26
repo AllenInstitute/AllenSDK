@@ -617,7 +617,7 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
     return nwbfile
 
 
-def write_probe_lfp_file(session_start_time, log_level, probe):
+def write_probe_lfp_file(session_id, session_start_time, log_level, probe):
     """ Writes LFP data (and associated channel information) for one
     probe to a standalone nwb file
     """
@@ -628,6 +628,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile = pynwb.NWBFile(
         session_description='LFP data and associated channel info for a single Ecephys probe',
         identifier=f"{probe['id']}",
+        session_id=f"{session_id}",
         session_start_time=session_start_time,
         institution="Allen Institute for Brain Science"
     )
@@ -711,12 +712,12 @@ def add_csd_to_nwbfile(nwbfile, csd, times, csd_virt_channel_locs, unit="V/cm^2"
     return nwbfile
 
 
-def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
+def write_probewise_lfp_files(probes, session_id, session_start_time, pool_size=3):
 
     output_paths = []
 
     pool = mp.Pool(processes=pool_size)
-    write = partial(write_probe_lfp_file, session_start_time, logging.getLogger("").getEffectiveLevel())
+    write = partial(write_probe_lfp_file, session_id, session_start_time, logging.getLogger("").getEffectiveLevel())
 
     for pout in pool.imap_unordered(write, probes):
         output_paths.append(pout)
@@ -931,7 +932,8 @@ def write_ecephys_nwb(
 
     nwbfile = pynwb.NWBFile(
         session_description='Data and metadata for an Ecephys session',
-        identifier='{}'.format(session_id),
+        identifier=f"{session_id}",
+        session_id=f"{session_id}",
         session_start_time=session_start_time,
         institution="Allen Institute for Brain Science"
     )
@@ -982,7 +984,9 @@ def write_ecephys_nwb(
         io.write(nwbfile, cache_spec=True)
 
     probes_with_lfp = [p for p in probes if p["lfp"] is not None]
-    probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_start_time, pool_size=pool_size)
+    probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_id,
+                                              session_start_time,
+                                              pool_size=pool_size)
 
     return {
         'nwb_path': output_path,
