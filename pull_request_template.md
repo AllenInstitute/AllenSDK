@@ -5,10 +5,11 @@ guide on GitHub here, https://github.com/AllenInstitute/AllenSDK/blob/master/CON
 # Overview:
 <!-- Give a brief overview of the issue you are solving. Succinctly
 explain the GitHub issue you are addressing and the underlying problem
-of the ticket
+of the ticket. The commit header and body should also include this
+message, for good commit messages see the full contribution guidelines.
 example: 
 Science team is not able to load max or avg projections for experiment
-session #blah. A image cannot be created because input pixel
+session #x. A image cannot be created because input pixel
 resolution is (0,0). It was found through investigation that the
 experiment database query was returning a 0 pixel resolution for this
 experiment.-->
@@ -77,6 +78,9 @@ example:
 - [ ] I have updated the documentation of the repository where
       appropriate
 - [ ] The header on my commit includes the issue number
+- [ ] My Pull Request has the latest AllenSDK release candidate branch
+      rc/x.y.z as its merge target
+- [ ] My code passes all AllenSDK tests
 
 # Notes:
 <!-- Use this section to add anything you think worth mentioning to the
