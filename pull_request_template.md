@@ -40,7 +40,7 @@ from actual resolution that wasn't saved, images might appear very distorted.
 An alternative solution is to update the database to cover the missing 
 experiment resolutions.-->
 
-# Adds:
+# Changes:
 <!-- Include a bulleted list or check box list of the implemented changes
 in brief, as well as the addition of supplementary materials(unit tests,
 integration tests, etc
@@ -53,7 +53,7 @@ example:
 # Validation:
 <!-- Describe how you have validated that your solution addresses the
 root cause of the ticket. What have you done to ensure that your
-addition is bug free and works as expected. Please provide specific
+addition is bug free and works as expected? Please provide specific
 instructions so we can reproduce and list any relevant details about
 your configuration
 example:
