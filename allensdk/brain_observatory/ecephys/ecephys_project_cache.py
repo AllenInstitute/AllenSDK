@@ -45,7 +45,7 @@ class EcephysProjectCache(Cache):
     SESSION_ANALYSIS_METRICS_KEY = "session_analysis_metrics"
     TYPEWISE_ANALYSIS_METRICS_KEY = "typewise_analysis_metrics"
 
-    MANIFEST_VERSION = '0.2.1'
+    MANIFEST_VERSION = '0.3.0'
 
     SUPPRESS_FROM_UNITS = ("air_channel_index",
                            "surface_channel_index",
