@@ -251,25 +251,25 @@ class EcephysSession(LazyPropertyMixin):
         return self._spike_times
 
     def __init__(
-        self, 
-        api: EcephysSessionApi, 
-        test: bool = False, 
+        self,
+        api: EcephysSessionApi,
+        test: bool = False,
         **kwargs
     ):
-        """ Construct an EcephysSession object, which provides access to 
-        detailed data for a single extracellular electrophysiology 
+        """ Construct an EcephysSession object, which provides access to
+        detailed data for a single extracellular electrophysiology
         (neuropixels) session.
 
         Parameters
         ----------
-        api : 
-            Used to access data, which is then cached on this object. Must 
-            expose the EcephysSessionApi interface. Standard options include 
+        api :
+            Used to access data, which is then cached on this object. Must
+            expose the EcephysSessionApi interface. Standard options include
             instances of:
-                EcephysSessionNwbApi :: reads data from a neurodata without 
+                EcephysSessionNwbApi :: reads data from a neurodata without
                     borders 2.0 file.
-        test : 
-            If true, check during construction that this session's api is 
+        test :
+            If true, check during construction that this session's api is
             valid.
 
         """
@@ -288,7 +288,7 @@ class EcephysSession(LazyPropertyMixin):
         self.channels = self.LazyProperty(self.api.get_channels)
 
         self._stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations,
-                                                        wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
+                                                         wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
@@ -354,7 +354,6 @@ class EcephysSession(LazyPropertyMixin):
         else:
             return self.api.get_lfp(probe_id)
 
-
     def _get_valid_time_points(self, time_points, invalid_time_intevals):
 
         all_time_points = xr.DataArray(
@@ -370,7 +369,6 @@ class EcephysSession(LazyPropertyMixin):
             valid_time_points = np.logical_and(valid_time_points, np.logical_not(invalid_time_points))
 
         return valid_time_points
-
 
     def _filter_invalid_times_by_tags(self, tags):
         """
@@ -391,7 +389,6 @@ class EcephysSession(LazyPropertyMixin):
             invalid_times = invalid_times[mask]
 
         return invalid_times
-
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -1095,6 +1092,7 @@ flipVert
         if not invalid_time_intervals.empty:
             warnings.warn("Session includes invalid time intervals that could be accessed with the attribute 'invalid_times',"
                          "Spikes within these intervals are invalid and may need to be excluded from the analysis.")
+
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
 
