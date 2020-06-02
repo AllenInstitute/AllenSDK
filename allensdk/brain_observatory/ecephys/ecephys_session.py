@@ -1,6 +1,7 @@
 import warnings
 from collections.abc import Collection
 from collections import defaultdict
+from typing import Optional
 
 import xarray as xr
 import numpy as np
@@ -505,26 +506,19 @@ flipVert
 
         return self.invalid_times
 
-    def get_pupil_data(self, suppress_pupil_data: bool = True) -> pd.DataFrame:
-        """Return a dataframe with eye tracking data
+    def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
+        """Return a dataframe with estimated gaze position on screen.
 
         Parameters
         ----------
-        suppress_pupil_data : bool, optional
-            Whether or not to suppress eye gaze mapping data in output
-            dataframe, by default True.
+        include_filtered_data : bool, optional
+            Whether to include filtered version of data (where filtered
+            values are replaced by NaN), by default False.
 
         Returns
         -------
         pd.DataFrame
-            Contains columns for eye, pupil and cr ellipse fits:
-                *_center_x
-                *_center_y
-                *_height
-                *_width
-                *_phi
-            May also contain raw/filtered columns for gaze mapping if
-            suppress_pupil_data is set to False:
+            Contains columns for estimated gaze position:
                 *_eye_area
                 *_pupil_area
                 *_screen_coordinates_x_cm
@@ -532,7 +526,23 @@ flipVert
                 *_screen_coordinates_spherical_x_deg
                 *_screen_coorindates_spherical_y_deg
         """
-        return self.api.get_pupil_data(suppress_pupil_data=suppress_pupil_data)
+        return self.api.get_screen_gaze_data(include_filtered_data=include_filtered_data)
+
+    def get_pupil_data(self) -> Optional[pd.DataFrame]:
+        """Return a dataframe with eye tracking ellipse fit data
+
+
+        Returns
+        -------
+        pd.DataFrame
+            Contains eye, pupil and corneal reflection (cr) ellipse fits:
+                *_center_x
+                *_center_y
+                *_height
+                *_width
+                *_phi
+        """
+        return self.api.get_pupil_data()
 
     def _mask_invalid_stimulus_presentations(self, stimulus_presentations):
         """Mask invalid stimulus presentations
