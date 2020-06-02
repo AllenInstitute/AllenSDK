@@ -130,7 +130,7 @@ def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
 
     (pd.DataFrame({
         'gabor_specific_column': [1.0, 2.0, np.nan, np.nan, 3.0],
-        'mixed_column': ["a", np.nan, "b", np.nan, "c"],
+        'mixed_column': ["a", "", "b", "", "c"],
         'movie_specific_column': [np.nan, np.nan, np.nan, 1.0, np.nan],
         'start_time': [1., 2., 4., 5., 6.],
         'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
@@ -217,7 +217,7 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, exp
         2500.0,
         True,
         pd.DataFrame({
-            "name": ["a probe"],
+            "description": ["a probe"],
             "sampling_rate": [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
