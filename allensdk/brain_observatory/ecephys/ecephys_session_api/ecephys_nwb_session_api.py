@@ -89,16 +89,21 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             })
         probes = pd.DataFrame(probes)
         probes = probes.set_index(keys='id', drop=True)
+        probes = probes.rename(columns={"name": "description"})
         return probes
 
     def get_channels(self) -> pd.DataFrame:
         channels = self.nwbfile.electrodes.to_dataframe()
-        channels.drop(columns='group', inplace=True)
+        channels.drop(columns=['imp', 'group',
+                               'group_name', 'filtering'], inplace=True)
 
-        # Rename columns for clarity
+        # Rename columns for clarity/compatibility with example notebooks
         channels.rename(
-            columns={"manual_structure_id": "ecephys_structure_id",
-                     "manual_structure_acronym": "ecephys_structure_acronym"},
+            columns={"location": "ecephys_structure_acronym",
+                     "x": "anterior_posterior_ccf_coordinate",
+                     "y": "dorsal_ventral_ccf_coordinate",
+                     "z": "left_right_ccf_coordinate",
+                     "name": "description"},
             inplace=True)
 
         # these are stored as string in nwb 2, which is not ideal
