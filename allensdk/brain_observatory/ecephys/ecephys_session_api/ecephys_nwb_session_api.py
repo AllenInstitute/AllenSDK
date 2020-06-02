@@ -14,6 +14,25 @@ from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
+# TODO: If ecephys write_nwb is revisited, need to re-add `manual_structure_id`
+# column and add the structure ids to the nwbfile for the
+# add_ecephys_electrodes() function.
+STRUCTURE_ACRONYM_ID_MAP = {
+    "grey": 8, "SCig": 10, "SCiw": 17, "IGL": 27, "LT": 66, "VL": 81,
+    "MRN": 128, "LD": 155, "LGd": 170, "LGv": 178, "APN": 215, "LP": 218,
+    "RT": 262, "MB": 313, "SGN": 325, "BMAa": 327, "CA": 375, "CA1": 382,
+    "VISp": 385, "VISam": 394, "VISal": 402, "VISl": 409, "VISrl": 417,
+    "CA2": 423, "CA3": 463, "SUB": 502, "VISpm": 533, "TH": 549,
+    "NOT": 628, "COAa": 639, "COApm": 663, "VIS": 669, "CP": 672,
+    "OLF": 698, "OP": 706, "VPL": 718, "DG": 726, "VPM": 733, "ZI": 797,
+    "SCzo": 834, "SCsg": 842, "SCop": 851, "PF": 930, "PO": 1020,
+    "POL": 1029, "POST": 1037, "PP": 1044, "PPT": 1061, "MGd": 1072,
+    "MGv": 1079, "PRE": 1084, "MGm": 1088, "HPF": 1089,
+    "VISli": 312782574, "VISmma": 480149258, "VISmmp": 480149286,
+    "ProS": 484682470, "RPF": 549009203, "Eth": 560581551,
+    "PIL": 560581563, "PoT": 563807435, "IntG": 563807439
+}
+
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
@@ -68,7 +87,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def _probe_nwbfile(self, probe_id: int):
         if self.probe_lfp_paths is None:
             raise TypeError(
-                f"EcephysNwbSessionApi assumes a split NWB file, with probewise LFP stored in individual files. "
+                "EcephysNwbSessionApi assumes a split NWB file, with "
+                "probewise LFP stored in individual files. "
                 "this object was not configured with probe_lfp_paths"
             )
         elif probe_id not in self.probe_lfp_paths:
@@ -106,16 +126,14 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
                      "name": "description"},
             inplace=True)
 
-        # these are stored as string in nwb 2, which is not ideal
-        # float is also not ideal, but we have nans indicating out-of-brain structures
-        channels["ecephys_structure_id"] = [
-            float(chid) if chid != ""
-            else np.nan
-            for chid in channels["ecephys_structure_id"]
-        ]
         channels["ecephys_structure_acronym"] = [
             ch_acr if ch_acr not in set(["None", ""])
             else np.nan
+            for ch_acr in channels["ecephys_structure_acronym"]
+        ]
+
+        channels["ecephys_structure_id"] = [
+            np.nan if ch_acr is np.nan else STRUCTURE_ACRONYM_ID_MAP[ch_acr]
             for ch_acr in channels["ecephys_structure_acronym"]
         ]
 
