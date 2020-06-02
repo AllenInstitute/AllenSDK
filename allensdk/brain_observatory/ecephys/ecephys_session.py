@@ -171,14 +171,14 @@ class EcephysSession(LazyPropertyMixin):
     @property
     def rig_geometry_data(self):
         if self._rig_metadata:
-            return self._rig_metadata["rig_geometry_data"]
+            return self._rig_metadata["geometry"]
         else:
             return None
 
     @property
     def rig_equipment_name(self):
         if self._rig_metadata:
-            return self._rig_metadata["rig_equipment"]
+            return self._rig_metadata["equipment"]
         else:
             return None
 
