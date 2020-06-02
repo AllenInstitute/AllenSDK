@@ -270,7 +270,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "raw_screen_coordinates_x_cm": raw_screen_coordinates_ts.data[:, 1],
             "raw_screen_coordinates_y_cm": raw_screen_coordinates_ts.data[:, 0],
             "raw_screen_coordinates_spherical_x_deg": raw_screen_coordinates_spherical_ts.data[:, 1],
-            "raw_screen_coordinates_spherical_y_deg": raw_screen_coordinates_spherical_ts.data[:, 0],       
+            "raw_screen_coordinates_spherical_y_deg": raw_screen_coordinates_spherical_ts.data[:, 0]
         }
 
         if include_filtered_data:
@@ -281,7 +281,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
                     "filtered_screen_coordinates_x_cm": filtered_screen_coordinates_ts.data[:, 1],
                     "filtered_screen_coordinates_y_cm": filtered_screen_coordinates_ts.data[:, 0],
                     "filtered_screen_coordinates_spherical_x_deg": filtered_screen_coordinates_spherical_ts.data[:, 1],
-                    "filtered_screen_coordinates_spherical_y_deg": filtered_screen_coordinates_spherical_ts.data[:, 0]                
+                    "filtered_screen_coordinates_spherical_y_deg": filtered_screen_coordinates_spherical_ts.data[:, 0]
                 }
             )
 
