@@ -72,7 +72,7 @@ class EcephysProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(),
+            fetch_api: Optional[EcephysProjectApi] = None,
             fetch_tries: int = 2,
             stream_writer: Optional[Callable] = None,
             manifest: Optional[Union[str, Path]] = None,
@@ -88,7 +88,7 @@ class EcephysProjectCache(Cache):
 
         Parameters
         ==========
-        fetch_api :
+        fetch_api : Optional[EcephysProjectApi]
             Used to pull data from remote sources, after which it is locally
             cached. Any object exposing the EcephysProjectApi interface is
             suitable. Standard options are:
@@ -100,6 +100,8 @@ class EcephysProjectCache(Cache):
                 EcephysProjectLimsApi :: Fetches bleeding-edge data from the
                     Allen Institute's internal database. Only works if you are
                     on our internal network.
+            By default None. If None, then fetch_api will be set to:
+            EcephysProjectWarehouseApi.default()
         fetch_tries : int
             Maximum number of times to attempt a download before giving up and
             raising an exception. Note that this is total tries, not retries
@@ -163,7 +165,8 @@ class EcephysProjectCache(Cache):
         super(EcephysProjectCache, self).__init__(manifest=manifest_,
                                                   version=version_,
                                                   cache=cache)
-        self.fetch_api = fetch_api
+        self.fetch_api = (EcephysProjectWarehouseApi.default()
+                          if fetch_api is None else fetch_api)
         self.fetch_tries = fetch_tries
         self.stream_writer = (stream_writer
                               or self.fetch_api.rma_engine.write_bytes)
