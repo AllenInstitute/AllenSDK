@@ -1008,7 +1008,7 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
 
 @pytest.mark.parametrize("roundtrip", [True, False])
 @pytest.mark.parametrize(("eye_tracking_frame_times, eye_dlc_tracking_data, "
-                          "eye_gaze_data, expected"), [
+                          "eye_gaze_data, expected_pupil_data, expected_gaze_data"), [
     (
         # eye_tracking_frame_times
         pd.Series([3., 4., 5., 6., 7.]),
@@ -1026,23 +1026,25 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
          "new_screen_coordinates": pd.DataFrame({"y": [2., 4., np.nan, 8., 10.], "x": [3., 5., np.nan, 9., 11.]}),
          "new_screen_coordinates_spherical": pd.DataFrame({"y": [2., 4., np.nan, 8., 10.], "x": [3., 5., np.nan, 9., 11.]}),
          "synced_frame_timestamps": pd.Series([3., 4., 5., 6., 7.])},
-        # expected
+        # expected_pupil_data
         pd.DataFrame({"corneal_reflection_center_x": [2.] * 5,
                       "corneal_reflection_center_y": [2.] * 5,
-                      "corneal_reflection_height": [2.] * 5,
-                      "corneal_reflection_width": [2.] * 5,
+                      "corneal_reflection_height": [4.] * 5,
+                      "corneal_reflection_width": [4.] * 5,
                       "corneal_reflection_phi": [2.] * 5,
                       "pupil_center_x": [1.] * 5,
                       "pupil_center_y": [1.] * 5,
-                      "pupil_height": [1.] * 5,
-                      "pupil_width": [1.] * 5,
+                      "pupil_height": [2.] * 5,
+                      "pupil_width": [2.] * 5,
                       "pupil_phi": [1.] * 5,
                       "eye_center_x": [3.] * 5,
                       "eye_center_y": [3.] * 5,
-                      "eye_height": [3.] * 5,
-                      "eye_width": [3.] * 5,
-                      "eye_phi": [3.] * 5,
-                      "raw_eye_area": [3., 5., 7., 9., 11.],
+                      "eye_height": [6.] * 5,
+                      "eye_width": [6.] * 5,
+                      "eye_phi": [3.] * 5},
+                     index=[3., 4., 5., 6., 7.]),
+        # expected_gaze_data
+        pd.DataFrame({"raw_eye_area": [3., 5., 7., 9., 11.],
                       "raw_pupil_area": [2., 4., 6., 8., 10.],
                       "raw_screen_coordinates_x_cm": [3., 5., 7., 9., 11.],
                       "raw_screen_coordinates_y_cm": [2., 4., 6., 8., 10.],
@@ -1061,7 +1063,7 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip,
                                           eye_tracking_frame_times,
                                           eye_dlc_tracking_data,
                                           eye_gaze_data,
-                                          expected):
+                                          expected_pupil_data, expected_gaze_data):
     nwbfile = write_nwb.add_eye_tracking_data_to_nwbfile(nwbfile,
                                                          eye_tracking_frame_times,
                                                          eye_dlc_tracking_data,
@@ -1071,6 +1073,10 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip,
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
-    obtained = obt.get_pupil_data(suppress_pupil_data=False)
+    obtained_pupil_data = obt.get_pupil_data()
+    obtained_screen_gaze_data = obt.get_screen_gaze_data(include_filtered_data=True)
 
-    pd.testing.assert_frame_equal(obtained, expected, check_like=True)
+    pd.testing.assert_frame_equal(obtained_pupil_data,
+                                  expected_pupil_data, check_like=True)
+    pd.testing.assert_frame_equal(obtained_screen_gaze_data,
+                                  expected_gaze_data, check_like=True)
