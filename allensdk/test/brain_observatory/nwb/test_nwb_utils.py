@@ -29,3 +29,38 @@ def test_get_stimulus_name_column_exceptions(input_cols,
         nwb_utils.get_column_name(input_cols, possible_names)
     for expected_value in expected_excep_cols:
         assert expected_value in str(error.value)
+
+
+@pytest.mark.parametrize("stimulus_row, expected_stop_time", [
+    ({'image_index': 8,
+      'image_name': 'omitted',
+      'image_set': 'omitted',
+      'index': 201,
+      'omitted': True,
+      'start_frame': 231060,
+      'start_time': 0}, 0.250)
+])
+def test_set_omitted_stop_time(stimulus_row, expected_stop_time):
+    nwb_utils.set_omitted_stop_time(stimulus_row)
+    assert stimulus_row['stop_time'] == expected_stop_time
+
+
+@pytest.mark.parametrize("stimulus_row", [
+    ({'image_index': 8,
+      'image_name': 'omitted',
+      'image_set': 'omitted',
+      'index': 201,
+      'omitted': False,
+      'start_frame': 231060,
+      'start_time': 0}),
+    ({'image_index': 8,
+      'image_name': 'omitted',
+      'image_set': 'omitted',
+      'index': 201,
+      'start_frame': 231060,
+      'start_time': 0})
+])
+def test_set_omitted_stop_time_exceptions(stimulus_row):
+    regex = f".* \\{stimulus_row}"
+    with pytest.raises(ValueError, match=regex):
+        nwb_utils.set_omitted_stop_time(stimulus_row)

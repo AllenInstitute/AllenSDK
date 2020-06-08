@@ -15,7 +15,8 @@ from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
+from allensdk.brain_observatory.nwb.nwb_utils import (get_stimulus_name_column,
+                                                      set_omitted_stop_time)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -451,6 +452,12 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
 
         for row in cleaned_table.itertuples(index=False):
             row = row._asdict()
+
+            # if there is no stop time in the stimuli it is an 'omitted' stimuli
+            # row and therefore by design has no stop_time, we must add this in.
+            if 'stop_time' not in row.keys():
+                set_omitted_stop_time(row)
+
             presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
 
         nwbfile.add_time_intervals(presentation_interval)
