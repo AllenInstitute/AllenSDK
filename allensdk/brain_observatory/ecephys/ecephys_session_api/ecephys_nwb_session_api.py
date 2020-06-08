@@ -133,7 +133,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         ]
 
         channels["ecephys_structure_id"] = [
-            np.nan if ch_acr is np.nan else STRUCTURE_ACRONYM_ID_MAP[ch_acr]
+            np.nan if ch_acr is np.nan else STRUCTURE_ACRONYM_ID_MAP.get(ch_acr, np.nan)
             for ch_acr in channels["ecephys_structure_acronym"]
         ]
 
