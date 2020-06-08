@@ -55,22 +55,25 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Use Docker to build one of the images.
- 
-     Anaconda::
+ #. Use Docker to build the image::
 
-         docker pull alleninstitute/allensdk
+     docker pull alleninstitute/allensdk
  
-     Other docker configurations are also available under docker directory in the source repository.
+    Other docker configurations are also available under docker directory in the source repository.
  
  #. Run the docker image::
  
-     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk /bin/bash
+     docker run -i -t -p 8888:8888 alleninstitute/allensdk /bin/bash
+
+ #. Run the SDK tests::
+
      cd allensdk
      make test
  
  #. Start a Jupyter Notebook::
  
      cd allensdk/doc_template/examples_root/examples/nb
-     jupyter-notebook --ip=* --no-browser
+     jupyter notebook --ip=* --no-browser --allow-root
+
+    Using the browser on your host machine, navigate to the path provided by the output from the jupyter notebook command.
      

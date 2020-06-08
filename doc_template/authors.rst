@@ -29,6 +29,8 @@ Sergey Gratiy `@sgratiy <https://github.com/sgratiy>`_
 
 Xiaoxuan Jia `@jiaxx <https://github.com/jiaxx>`_
 
+Wesley Jones `@wesley-jones <https://github.com/wesley-jones>`_
+
 Justin Kiggins `@neuromusic <https://github.com/neuromusic>`_
 
 Joe Knox `@jknox13 <https://github.com/jknox13>`_
@@ -38,6 +40,8 @@ Peter Ledochowitsch `@ledochowitsch <https://github.com/ledochowitsch>`_
 Nicholas Mei `@njmei <https://github.com/njmei>`_
 
 Chris Mochizuki `@mochic <https://github.com/mochic>`_
+
+Ani Nandi `@anirban6908 <https://github.com/anirban6908>`_
 
 Gabe Ocker `@gocker <https://github.com/gocker>`_
 
@@ -64,5 +68,7 @@ Shreejoy Tripathy `@stripathy <https://github.com/stripathy>`_
 Werner Van Geit `@wvangeit <https://github.com/wvangeit>`_
 
 Michael Wang `@aimichaelwang <https://github.com/aimichaelwang>`_
+
+Isaak Willett `@isaak-willett <https://github.com/isaak-willett>`_
 
 Derric Williams `@derricw <https://github.com/derricw>`_

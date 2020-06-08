@@ -7,7 +7,12 @@ import allensdk.internal.brain_observatory.mask_set as mask_set
 import logging
 import matplotlib.colors as colors
 from allensdk.config.manifest import Manifest
+from allensdk.deprecated import deprecated
 
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "identify_valid_masks instead.")
 def identify_valid_masks(mask_array):
     ms = mask_set.MaskSet(masks=mask_array.astype(bool))
     valid_masks = np.ones(mask_array.shape[0]).astype(bool)
@@ -29,6 +34,9 @@ def identify_valid_masks(mask_array):
     return valid_masks
 
 
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "demix_time_dep_masks instead.")
 def demix_time_dep_masks(raw_traces, stack, masks):
     '''
 
@@ -80,6 +88,10 @@ def demix_time_dep_masks(raw_traces, stack, masks):
 
     return demix_traces, drop_frames
 
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "plot_traces instead.")
 def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
     fig, ax = plt.subplots()
 
@@ -90,11 +102,19 @@ def plot_traces(raw_trace, demix_trace, roi_id, roi_ind, save_file):
     plt.savefig(save_file)
     plt.close(fig)
 
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "find_zero_baselines instead.")
 def find_zero_baselines(traces):
     means = traces.mean(axis=1)
     stds =  traces.std(axis=1)
     return np.where((means-stds) < 0)
-    
+
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "plot_negative_baselines instead.")
 def plot_negative_baselines(raw_traces, demix_traces, mask_array, roi_ids_mask, plot_dir, ext='png'):
     N, T = raw_traces.shape
     _, x, y = mask_array.shape
@@ -121,10 +141,11 @@ def plot_negative_baselines(raw_traces, demix_traces, mask_array, roi_ids_mask, 
     overlap_inds.update(zero_inds)
 
     return list(overlap_inds)
-        
 
-    
-        
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "plot_negative_transients instead.")
 def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array, roi_ids_mask, plot_dir, ext='png'):
 
     N, T = raw_traces.shape
@@ -195,6 +216,9 @@ def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array, ro
     return rois_with_trans
 
 
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "rolling_window instead.") 
 def rolling_window(trace, window=500):
     '''
 
@@ -209,11 +233,18 @@ def rolling_window(trace, window=500):
     return np.lib.stride_tricks.as_strided(trace, shape=shape, strides=strides)
 
 
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "find_negative_baselines instead.")
 def find_negative_baselines(trace):
     means = trace.mean(axis=1)
     stds = trace.std(axis=1)
     return np.where((means+stds) < 0)
 
+
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "find_negative_transients_threshold instead.")
 def find_negative_transients_threshold(trace, window=500, length=10, std_devs=3):
     trace = np.pad(trace, pad_width=(window-1, 0), mode='constant', constant_values=[np.mean(trace[:window])])
     rolling_mean = np.mean(rolling_window(trace, window), -1)
@@ -229,6 +260,9 @@ def find_negative_transients_threshold(trace, window=500, length=10, std_devs=3)
     return trans_ind
 
 
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "plot_overlap_masks_lengthOne instead.")
 def plot_overlap_masks_lengthOne(roi_ind, masks, savefile=None, weighted=False):
 
     masks = np.array(masks).astype(float)
@@ -279,6 +313,9 @@ def plot_overlap_masks_lengthOne(roi_ind, masks, savefile=None, weighted=False):
     return ind_plot
 
 
+@deprecated("The internal demixer module is deprecated and will be removed. "
+            "Please use allensdk.brain_observatory.demixer."
+            "plot_transients instead.")
 def plot_transients(roi_ind, t_trans, masks, traces, demix_traces, savefile):
 
     masks = np.array(masks).astype(float)

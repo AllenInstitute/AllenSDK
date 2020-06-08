@@ -90,6 +90,21 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.8.0 (June 6, 2020)
+-----------------------------------------------------------------------
+
+As of the 1.8.0 release:
+
+- The biophysical module can now run both current and legacy all-active models.
+- A pull request template was added to the repository.
+- Duplicated demixer module was deprecated, and test coverage was added.
+- Docker image for AllenSDK was updated.
+
+For internal users:
+- The `date_of_acquisition` field is available for behavior-only Session data.
+- The CSV log was removed from `BehaviorProjectCache`
+- Fixed a bug so LIMS data served to `BehaviorDataSession` now all use the same timestamp source.
+
 What's New - 1.7.1 (May 5, 2020)
 -----------------------------------------------------------------------
 

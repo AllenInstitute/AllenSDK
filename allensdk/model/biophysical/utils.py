@@ -71,10 +71,12 @@ def create_utils(description, model_type=None):
         except KeyError as e:
             logging.error("Could not infer model type from description")
 
+    axon_type = description.data['biophys'][1]['axon_type']
+    
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)
     elif model_type == ALL_ACTIVE_TYPE:
-        return AllActiveUtils(description)
+        return AllActiveUtils(description, axon_type)
 
 
 class Utils(HocUtils):
@@ -93,7 +95,7 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description):                    
+    def __init__(self, description):
         self.update_default_cell_hoc(description)
 
         super(Utils, self).__init__(description)
@@ -196,7 +198,7 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
-        '''Assign a current waveform as input stimulus. 
+        '''Assign a current waveform as input stimulus.
 
         Parameters
         ----------
@@ -310,6 +312,21 @@ class Utils(HocUtils):
 
 
 class AllActiveUtils(Utils):
+    
+    def __init__(self, description, axon_type):
+        """
+        Parameters
+        ----------
+        description : Config
+            Configuration to run the simulation
+        axon_type : string
+                truncated - diameter of the axon segments is read from .swc (default)
+                stub - diameter of axon segments is 1 micron
+            How the axon is replaced within NEURON
+                
+        """
+        super(AllActiveUtils, self).__init__(description)
+        self.axon_type = axon_type
 
     def generate_morphology(self, morph_filename):
         '''Load a neurolucida or swc-format cell morphology file.
@@ -319,7 +336,12 @@ class AllActiveUtils(Utils):
         morph_filename : string
             Path to morphology.
         '''
-
+        if self.axon_type == 'stub':
+            self._log.info('Replacing axon with a stub : length 60 micron, diameter 1 micron')
+            super(AllActiveUtils, self).generate_morphology(morph_filename)
+            return
+        
+        self._log.info('Legacy model - Truncating reconstructed axon after 60 micron')
         morph_basename = os.path.basename(morph_filename)
         morph_extension = morph_basename.split('.')[-1]
         if morph_extension.lower() == 'swc':
