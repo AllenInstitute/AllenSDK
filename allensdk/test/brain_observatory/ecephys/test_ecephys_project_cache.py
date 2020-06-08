@@ -11,7 +11,7 @@ import pynwb
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    write_bytes_from_coroutine, AsyncHttpEngine
+    write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine, HttpEngine
 )
 
 
@@ -109,12 +109,18 @@ def shared_tmpdir(tmpdir_factory):
     return str(tmpdir_factory.mktemp('test_ecephys_project_cache'))
 
 
+class MockEngine:
+    def __init__(self):
+        self.write_bytes = write_from_stream
+
+
 @pytest.fixture
 def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_metrics):
     class MockApi:
 
         def __init__(self, **kwargs):
             self.accesses = collections.defaultdict(lambda: 1)
+            self.rma_engine = MockEngine()
 
         def __getattr__(self, name):
             self.accesses[name] += 1
@@ -375,5 +381,83 @@ def test_from_lims_default(tmpdir_factory):
     cache = epc.EcephysProjectCache.from_lims(
         manifest=os.path.join(tmpdir, "manifest.json")
     )
-    assert isinstance(cache.fetch_api.app_engine, AsyncHttpEngine)
-    assert cache.stream_writer is epc.write_bytes_from_coroutine
+    assert isinstance(cache.fetch_api.app_engine, HttpEngine)
+    assert cache.stream_writer is write_from_stream
+    assert cache.fetch_api.app_engine.scheme == "http"
+    assert cache.fetch_api.app_engine.host == "lims2"
+
+
+def test_from_warehouse_default(tmpdir_factory):
+    tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
+
+    cache = epc.EcephysProjectCache.from_warehouse(
+        manifest=os.path.join(tmpdir, "manifest.json")
+    )
+    assert isinstance(cache.fetch_api.rma_engine, HttpEngine)
+    assert cache.stream_writer is write_from_stream
+    assert cache.fetch_api.rma_engine.scheme == "http"
+    assert cache.fetch_api.rma_engine.host == "api.brain-map.org"
+
+
+def test_init_default(tmpdir_factory):
+    tmpdir = str(tmpdir_factory.mktemp("test_init_default"))
+    cache = epc.EcephysProjectCache(
+        manifest=os.path.join(tmpdir, "manifest.json")
+    )
+    assert isinstance(cache.fetch_api.rma_engine, HttpEngine)
+    assert cache.stream_writer is cache.fetch_api.rma_engine.write_bytes
+    assert cache.fetch_api.rma_engine.scheme == "http"
+    assert cache.fetch_api.rma_engine.host == "api.brain-map.org"
+
+
+@pytest.mark.parametrize(
+    ("cache_constructor, asynchronous, engine_attr, expected_engine,"
+     "expected_scheme, expected_host, expected_stream_writer"), [
+        (
+            epc.EcephysProjectCache.from_lims, True,
+            "app_engine", AsyncHttpEngine, "http", "lims2",
+            write_bytes_from_coroutine
+        ),
+        (
+            epc.EcephysProjectCache.from_warehouse, True,
+            "rma_engine", AsyncHttpEngine, "http", "api.brain-map.org",
+            write_bytes_from_coroutine
+        ),
+        (
+            epc.EcephysProjectCache.from_warehouse, False,
+            "rma_engine", HttpEngine, "http", "api.brain-map.org",
+            write_from_stream
+        ),
+        (
+            epc.EcephysProjectCache.from_lims, False,
+            "app_engine", HttpEngine, "http", "lims2",
+            write_from_stream
+        ),
+    ])
+def test_stream_asynchronous_arg(
+        cache_constructor, asynchronous, engine_attr, expected_engine,
+        expected_scheme, expected_host, expected_stream_writer,
+        tmpdir_factory):
+    """ Ensure the proper stream engine is chosen from the `asynchronous`
+    argument in the EcephysProjectCache constructors (using other default
+    values)."""
+    tmpdir = str(tmpdir_factory.mktemp("test_stream_async_args"))
+    cache = cache_constructor(
+        asynchronous=asynchronous,
+        manifest=os.path.join(tmpdir, "manifest.json")
+    )
+    engine = getattr(cache.fetch_api, engine_attr)
+    assert isinstance(engine, expected_engine)
+    assert cache.stream_writer is expected_stream_writer
+    assert engine.scheme == expected_scheme
+    assert engine.host == expected_host
+
+
+def test_stream_writer_method_default_correct(tmpdir_factory):
+    """Checks that the stream_writer contained in the rma engine is used
+    when one is not supplied to the __init__ method.
+    """
+    tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
+    manifest = os.path.join(tmpdir, "manifest.json")
+    cache = epc.EcephysProjectCache(stream_writer=None, manifest=manifest)
+    assert cache.stream_writer == cache.fetch_api.rma_engine.write_bytes
