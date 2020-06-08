@@ -1,7 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [ 1.8.0]
+## [1.8.0] = 2020-06-06
+
+### Added
+- The biophysical module can now run both current and legacy all-active models.
+- Internal users can now access `date_of_acquisition` for behavior-only Session data.
+- A pull request template was added to the repository.
+
+### Changed
+- The CSV log was removed from `BehaviorProjectCache` (internal users).
+- Duplicated demixer module was deprecated, and test coverage was added.
+- Docker image for AllenSDK was updated.
 
 ### Bug Fixes
 - Internal LIMS data served to `BehaviorDataSession` class now all use the same timestamp source
