@@ -1,8 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.8.0] = [UPDATE_DATE]
+## [ 1.8.0]
 
+### Bug Fixes
+- Internal LIMS data served to `BehaviorDataSession` class now all use the same timestamp source
 
 ## [1.7.1] = 2020-05-5
 

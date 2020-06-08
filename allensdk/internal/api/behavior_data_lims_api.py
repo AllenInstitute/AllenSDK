@@ -168,8 +168,7 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
-        offset = frame_time_offset(data)
-        stimulus_timestamps = self.get_stimulus_timestamps() + offset
+        stimulus_timestamps = self.get_stimulus_timestamps()
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
@@ -183,8 +182,10 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
             delivered rewards.
         """
         data = self._behavior_stimulus_file()
-        # No sync timestamps to rebase on, so pass dummy rebase function
-        return get_rewards(data, lambda x: x)
+        offset = frame_time_offset(data)
+        # No sync timestamps to rebase on, but do need to align to
+        # trial events, so add the offset as the "rebase" function
+        return get_rewards(data, lambda x: x + offset)
 
     def get_running_data_df(self) -> pd.DataFrame:
         """Get running speed data.
@@ -280,7 +281,8 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         return get_stimulus_templates(data)
 
     def get_stimulus_timestamps(self) -> np.ndarray:
-        """Get stimulus timestamps (vsyncs) from pkl file.
+        """Get stimulus timestamps (vsyncs) from pkl file. Align to the
+        (frame, time) points in the trial events.
 
         NOTE: Located with behavior_session_id. Does not use the sync_file
         which requires ophys_session_id.
@@ -293,7 +295,9 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         """
         data = self._behavior_stimulus_file()
         vsyncs = data["items"]["behavior"]["intervalsms"]
-        return np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
+        cum_sum = np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
+        offset = frame_time_offset(data)
+        return cum_sum + offset
 
     def get_task_parameters(self) -> dict:
         """Get task parameters from pkl file.
@@ -320,7 +324,9 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
         stimulus_presentations = self.get_stimulus_presentations()
-        # Pass a dummy rebase function since we don't have two time streams
+        # Pass a dummy rebase function since we don't have two time streams,
+        # and the frame times are already aligned to trial events in their
+        # respective getters
         trial_df = get_trials(data, licks, rewards, stimulus_presentations,
                               lambda x: x)
 
