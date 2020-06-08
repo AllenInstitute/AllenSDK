@@ -307,7 +307,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, asynchronous=True, **rma_kwargs):
+    def default(cls, asynchronous=False, **rma_kwargs):
         _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
         _rma_kwargs.update(rma_kwargs)
 

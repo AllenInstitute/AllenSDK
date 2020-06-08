@@ -79,6 +79,10 @@ class HttpEngine:
             if elapsed > self.timeout:
                 raise requests.Timeout(f"Download took {elapsed} seconds, but timeout was set to {self.timeout}")
 
+    @staticmethod
+    def write_bytes(path: str, stream: Iterable[bytes]):
+        write_from_stream(path, stream)
+
 
 AsyncStreamCallbackType = Callable[[AsyncIterator[bytes]], Awaitable[None]]
 
@@ -166,7 +170,13 @@ class AsyncHttpEngine(HttpEngine):
             nest_asyncio.apply()
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.session.close())
-        
+
+    @staticmethod
+    def write_bytes(
+            path: str,
+            coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]):
+        write_bytes_from_coroutine(path, coroutine)
+
 
 def write_bytes_from_coroutine(
     path: str, 
@@ -217,7 +227,6 @@ def write_from_stream(path: str, stream: Iterable[bytes]):
         iterable yielding bytes to be written
 
     """
-
     with open(path, "wb") as fil:
         for chunk in stream:
             fil.write(chunk)

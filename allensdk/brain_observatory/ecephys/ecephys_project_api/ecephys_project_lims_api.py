@@ -568,7 +568,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
     @classmethod
     def default(cls, lims_credentials: Optional[DbCredentials] = None, 
-                app_kwargs=None, asynchronous=True):
+                app_kwargs=None, asynchronous=False):
         """ Construct a "straightforward" lims api that can fetch data from 
         lims2.
 
