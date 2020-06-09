@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -118,8 +119,8 @@ def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
     cr_params = eye_dlc_tracking_data["cr_params"]
     eye_params = eye_dlc_tracking_data["eye_params"]
 
-    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0]) and
-                        (cr_params.shape[0] == eye_params.shape[0]))
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
+                        and (cr_params.shape[0] == eye_params.shape[0]))
     if not num_frames_match:
         log.warn("The number of frames for ellipse fits don't "
                  "match when they should. No ellipse fits will be written! "
@@ -325,7 +326,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     v_sig = TimeSeries(
         name='v_sig',
         data=running_data_df['v_sig'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['v_sig']
     )
 
@@ -356,38 +357,99 @@ def add_stimulus_template(nwbfile, image_data, name):
     return nwbfile
 
 
-def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
-    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
+def create_stimulus_presentation_time_interval(name: str, description: str,
+                                               columns_to_add: Iterable) -> pynwb.epoch.TimeIntervals:
+    column_descriptions = {
+        "stimulus_name": "Name of stimulus",
+        "stimulus_block": "Index of contiguous presentations of one stimulus type",
+        "temporal_frequency": "Temporal frequency of stimulus",
+        "x_position": "Horizontal position of stimulus on screen",
+        "y_position": "Vertical position of stimulus on screen",
+        "mask": "Shape of mask applied to stimulus",
+        "opacity": "Opacity of stimulus",
+        "phase": "Phase of grating stimulus",
+        "size": "Size of stimulus (see ‘units’ field for units)",
+        "units": "Units of stimulus size",
+        "stimulus_index": "Index of stimulus type",
+        "orientation": "Orientation of stimulus",
+        "spatial_frequency": "Spatial frequency of stimulus",
+        "frame": "Frame of movie stimulus",
+        "contrast": "Contrast of stimulus",
+        "Speed": "Speed of moving dot field",
+        "Dir": "Direction of stimulus motion",
+        "coherence": "Coherence of moving dot field",
+        "dotLife": "Longevity of individual dots",
+        "dotSize": "Size of individual dots",
+        "fieldPos": "Position of moving dot field",
+        "fieldShape": "Shape of moving dot field",
+        "fieldSize": "Size of moving dot field",
+        "nDots": "Number of dots in moving dot field"
+    }
+
+    columns_to_ignore = {'start_time', 'stop_time', 'tags', 'timeseries'}
+
+    interval = pynwb.epoch.TimeIntervals(name=name,
+                                         description=description)
+
+    for column_name in columns_to_add:
+        if column_name not in columns_to_ignore:
+            description = column_descriptions.get(column_name, "No description")
+            interval.add_column(name=column_name, description=description)
+
+    return interval
+
+
+def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_interval'):
+    """Adds a stimulus table (defining stimulus characteristics for each
+    time point in a session) to an nwbfile as TimeIntervals.
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
     stimulus_table: pd.DataFrame
-        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
-        Nans will be replaced with the empty string. Required columns are:
-            start_time :: the time at which this epoch started
-            stop_time :: the time  at which this epoch ended
+        Each row corresponds to an interval of time. Columns define the interval
+        (start and stop time) and its characteristics.
+        Nans in columns with string data will be replaced with the empty strings.
+        Required columns are:
+            start_time :: the time at which this interval started
+            stop_time :: the time  at which this interval ended
     tag : str, optional
-        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
+        Each interval in an nwb file has one or more tags. This string will be
+        applied as a tag to all TimeIntervals created here
 
     Returns
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
+    """
     stimulus_table = stimulus_table.copy()
-
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
+    stimulus_names = stimulus_table['stimulus_name'].unique()
 
-    for colname, series in stimulus_table.items():
-        types = set(series.map(type))
-        if len(types) > 1 and str in types:
-            series.fillna('', inplace=True)
-            stimulus_table[colname] = series.transform(str)
+    for stim_name in sorted(stimulus_names):
+        specific_stimulus_table = stimulus_table[stimulus_table['stimulus_name'] == stim_name]
+        # Drop columns where all values in column are NaN
+        cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
+        # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
+        for colname, series in cleaned_table.items():
+            types = set(series.map(type))
+            if len(types) > 1 and str in types:
+                series.fillna('N/A', inplace=True)
+                cleaned_table[colname] = series.transform(str)
 
-    stimulus_table = setup_table_for_epochs(stimulus_table, ts, tag)
-    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
-    nwbfile.epochs = container
+        interval_description = (f"Presentation times and stimuli details "
+                                f"for '{stim_name}' stimuli")
+        presentation_interval = create_stimulus_presentation_time_interval(
+            name=f"{stim_name}_presentations",
+            description=interval_description,
+            columns_to_add=cleaned_table.columns
+        )
+
+        for row in cleaned_table.itertuples(index=False):
+            row = row._asdict()
+            presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
+
+        nwbfile.add_time_intervals(presentation_interval)
 
     return nwbfile
 
@@ -441,7 +503,9 @@ def setup_table_for_invalid_times(invalid_epochs):
 
         start_time = df['start_time'].values
         stop_time = df['end_time'].values
-        tags = [[t,str(id),l,] for t,id,l in zip(df['type'],df['id'],df['label'])]
+        tags = [[_type, str(_id), label]
+                for _type, _id, label
+                in zip(df['type'], df['id'], df['label'])]
 
         table = pd.DataFrame({'start_time': start_time,
                               'stop_time': stop_time,
@@ -495,8 +559,8 @@ def add_trials(nwbfile, trials, description_dict={}):
 
     for c in [c for c in trials.columns if c not in ['start_time', 'stop_time']]:
         index, data = dict_to_indexed_array(trials[c].to_dict(), order)
-        if data.dtype == '<U1':
-            data = trials[c].values
+        if data.dtype == '<U1':  # data type is composed of unicode characters
+            data = trials[c].tolist()
         if not len(data) == len(order):
             if len(data) == 0:
                 data = ['']
@@ -600,6 +664,7 @@ def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None
 
     add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
+
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
     image_index = IndexSeries(
@@ -686,7 +751,6 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         conversion=1.0,
         unit='unknown',  # Should this be passed in for future support?
         reference_frame='unknown')  # Should this be passed in for future support?
-
 
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")

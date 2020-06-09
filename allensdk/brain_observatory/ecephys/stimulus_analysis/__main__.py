@@ -26,7 +26,7 @@ except ModuleNotFoundError as e:
     # Run without mpi4py installed
     MPI_rank = 0
     MPI_size = 1
-    barrier = lambda : None
+    barrier = lambda: None
     gather = lambda data, root: data
 
 
@@ -65,7 +65,7 @@ def load_session(nwb_path, stimulus_class, **session_params):
 NOTE: There are two version of caclulate_stimulus_metrics, both should produce the same results but have different ways
 of working across multiple cores. The best one to use will depend on the data and the limitations of lims/
 
-caclulate_stimulus_metrics_ondisk - each core calculates the individual metrics and saves them to a temporary csv file. 
+caclulate_stimulus_metrics_ondisk - each core calculates the individual metrics and saves them to a temporary csv file.
 Rank 0 then reads each csv and cobmines them into the final result. A more memory efficient way, however will be slower
 due to the cost of reading/writing to disk multiple times.
 
