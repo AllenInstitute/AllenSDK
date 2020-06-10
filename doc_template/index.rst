@@ -102,9 +102,7 @@ As of the 2.0.0 release:
 - Examples for accessing eye tracking ellipse fit and screen gaze location data have been added to ecephys example notebooks
 
 **Important Note**:
-Because newer versions of pynwb/hdmf have issues reading previously released ecephys NWB files and due to the significant reorganization of ecephys NWB file contents, this release represents a major version revision.
-In general, NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot easily redownload updated NWB files, you may want to stay on AllenSDK < 2.0.0. However, no further features or
-bugfixes for AllenSDK < 2.0.0 are planned.
+Due to newer versions of pynwb/hdmf having issues reading previously released Visual Coding Neuropixels NWB files and due to the significant reorganization of their NWB file contents, this release contains breaking changes that necessitate a major version revision. NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot or choose not to re-download the updated NWB files, you can continue using a prior version of AllenSDK (< 2.0.0) to access them. However, no further features or bugfixes for AllenSDK (< 2.0.0) are planned. Data released for other projects (Cell Types, Mouse Connectivity, etc.) are *NOT* affected and will *NOT* need to be re-downloaded
 
 What's New - 1.8.0 (June 6, 2020)
 -----------------------------------------------------------------------
