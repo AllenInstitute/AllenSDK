@@ -15,7 +15,7 @@ from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.nwb.nwb_utils import (get_stimulus_name_column)
+from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -426,8 +426,8 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
     stimulus_table = stimulus_table.copy()
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
     possible_names = {'stimulus_name', 'image_name'}
-    stimulus_name_column = get_stimulus_name_column(stimulus_table.columns,
-                                                    possible_names)
+    stimulus_name_column = get_column_name(stimulus_table.columns,
+                                           possible_names)
     stimulus_names = stimulus_table[stimulus_name_column].unique()
 
     for stim_name in sorted(stimulus_names):
