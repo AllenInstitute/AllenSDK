@@ -11,7 +11,7 @@ from allensdk.brain_observatory.nwb import nwb_utils
 ])
 def test_get_stimulus_name_column(input_cols, possible_names,
                                   expected_intersection):
-    column_name = nwb_utils.get_stimulus_name_column(input_cols, possible_names)
+    column_name = nwb_utils.get_column_name(input_cols, possible_names)
     assert column_name == expected_intersection
 
 
@@ -25,6 +25,7 @@ def test_get_stimulus_name_column(input_cols, possible_names,
 def test_get_stimulus_name_column_exceptions(input_cols,
                                              possible_names,
                                              expected_excep_cols):
-    regex = ".* \\" + str(expected_excep_cols)
-    with pytest.raises(KeyError, match=regex):
-        nwb_utils.get_stimulus_name_column(input_cols, possible_names)
+    with pytest.raises(KeyError) as error:
+        nwb_utils.get_column_name(input_cols, possible_names)
+    for expected_value in expected_excep_cols:
+        assert expected_value in str(error.value)
