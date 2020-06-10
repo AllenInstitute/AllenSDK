@@ -1,6 +1,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] = 2020-06-11
+
+### Added
+- CCF locations for ecephys neuropixels electrodes have been added to their respective nwb electrodes tables
+- Examples for accessing eye tracking ellipse fit and screen gaze location data have been added to ecephys example notebooks
+
+### Changed
+- pynwb and hdmf version pinning has been relaxed
+- The organization of data for ecephys neuropixels Neurodata Without Borders (NWB) files has been significantly changed to conform with NWB specifications and best practices
+
+**Important Note**:
+Because newer versions of pynwb/hdmf have issues reading previously released ecephys NWB files and due to the significant reorganization of ecephys NWB file contents, this release represents a major version revision.
+In general, NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot easily redownload updated NWB files, you may want to stay on AllenSDK < 2.0.0. However, no further features or
+bugfixes for AllenSDK < 2.0.0 are planned.
+
 ## [1.8.0] = 2020-06-06
 
 ### Added

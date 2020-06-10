@@ -90,6 +90,22 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+
+What's New - 2.0.0 (June 11, 2020)
+-----------------------------------------------------------------------
+
+As of the 2.0.0 release:
+
+- pynwb and hdmf version requirements have been made less strict
+- The organization of data for ecephys neuropixels Neurodata Without Borders (NWB) files has been significantly changed to conform with NWB specifications and best practices
+- CCF locations for ecephys neuropixels electrodes are now written to NWB files
+- Examples for accessing eye tracking ellipse fit and screen gaze location data have been added to ecephys example notebooks
+
+**Important Note**:
+Because newer versions of pynwb/hdmf have issues reading previously released ecephys NWB files and due to the significant reorganization of ecephys NWB file contents, this release represents a major version revision.
+In general, NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot easily redownload updated NWB files, you may want to stay on AllenSDK < 2.0.0. However, no further features or
+bugfixes for AllenSDK < 2.0.0 are planned.
+
 What's New - 1.8.0 (June 6, 2020)
 -----------------------------------------------------------------------
 
@@ -124,31 +140,10 @@ As of the 1.7.0 release:
 - Added support for additional sync file line labels
 - Fixed bug with loading line labels from sync files
 
-What's New - 1.6.0 (March 23, 2020)
------------------------------------------------------------------------
-
-As of the 1.6.0 release:
-
-- added get_receptive_field alias() for _get_rf() in allensdk/brain_observatory/ecephys/stimulus_analysis/receptive_field_mapping.py
-- Added required version to namespace and caches spec in ecephy nwb outputs in allensdk/brain_observatory/ecephys/nwb/AIBS_ecephys_namespace.yaml
-- Added version for ophys behavior nwb output to allensdk/brain_observatory/nwb/AIBS_ophys_behavior_namespace.yaml
-- Behavior and ECEphys project caches no longer accept arbitrary keywords to prevent confusion when user supplies incorrect kwargs to constructor.
-- New ecephys notebook for optotagging tutorial.
-
-
-What's New - 1.5.0 (February 10, 2020)
------------------------------------------------------------------------
-
-As of the 1.5.0 release:
-
-- users have an option to provide credentials for accessing the database either explicitly via public API or by setting up the environment variables
-- allow users to modify BehaviorDataSession and BehaviorOphysSession data
-- invalid extracellular electrophysiology spikes no longer show up as spikes at time -1
-- morphology.apply_affine correctly rescales radii
-
-
 Previous Release Notes
 ----------------------
+    * `1.6.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.6.0>`_
+    * `1.5.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.5.0>`_
     * `1.4.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.4.0>`_
     * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>`_
     * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>`_
