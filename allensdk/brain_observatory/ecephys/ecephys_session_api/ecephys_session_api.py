@@ -62,7 +62,10 @@ class EcephysSessionApi:
     def get_rig_metadata(self) -> Optional[dict]:
         raise NotImplementedError
 
-    def get_pupil_data(self, suppress_pupil_data: bool) -> Optional[pd.DataFrame]:
+    def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
+        raise NotImplementedError
+
+    def get_pupil_data(self) -> Optional[pd.DataFrame]:
         raise NotImplementedError
 
     def get_metadata(self):

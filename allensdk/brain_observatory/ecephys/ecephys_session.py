@@ -1,6 +1,7 @@
 import warnings
 from collections.abc import Collection
 from collections import defaultdict
+from typing import Optional
 
 import xarray as xr
 import numpy as np
@@ -171,14 +172,14 @@ class EcephysSession(LazyPropertyMixin):
     @property
     def rig_geometry_data(self):
         if self._rig_metadata:
-            return self._rig_metadata["rig_geometry_data"]
+            return self._rig_metadata["geometry"]
         else:
             return None
 
     @property
     def rig_equipment_name(self):
         if self._rig_metadata:
-            return self._rig_metadata["rig_equipment"]
+            return self._rig_metadata["equipment"]
         else:
             return None
 
@@ -250,25 +251,25 @@ class EcephysSession(LazyPropertyMixin):
         return self._spike_times
 
     def __init__(
-        self, 
-        api: EcephysSessionApi, 
-        test: bool = False, 
+        self,
+        api: EcephysSessionApi,
+        test: bool = False,
         **kwargs
     ):
-        """ Construct an EcephysSession object, which provides access to 
-        detailed data for a single extracellular electrophysiology 
+        """ Construct an EcephysSession object, which provides access to
+        detailed data for a single extracellular electrophysiology
         (neuropixels) session.
 
         Parameters
         ----------
-        api : 
-            Used to access data, which is then cached on this object. Must 
-            expose the EcephysSessionApi interface. Standard options include 
+        api :
+            Used to access data, which is then cached on this object. Must
+            expose the EcephysSessionApi interface. Standard options include
             instances of:
-                EcephysSessionNwbApi :: reads data from a neurodata without 
+                EcephysSessionNwbApi :: reads data from a neurodata without
                     borders 2.0 file.
-        test : 
-            If true, check during construction that this session's api is 
+        test :
+            If true, check during construction that this session's api is
             valid.
 
         """
@@ -287,7 +288,7 @@ class EcephysSession(LazyPropertyMixin):
         self.channels = self.LazyProperty(self.api.get_channels)
 
         self._stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations,
-                                                        wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
+                                                         wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
@@ -353,7 +354,6 @@ class EcephysSession(LazyPropertyMixin):
         else:
             return self.api.get_lfp(probe_id)
 
-
     def _get_valid_time_points(self, time_points, invalid_time_intevals):
 
         all_time_points = xr.DataArray(
@@ -369,7 +369,6 @@ class EcephysSession(LazyPropertyMixin):
             valid_time_points = np.logical_and(valid_time_points, np.logical_not(invalid_time_points))
 
         return valid_time_points
-
 
     def _filter_invalid_times_by_tags(self, tags):
         """
@@ -390,7 +389,6 @@ class EcephysSession(LazyPropertyMixin):
             invalid_times = invalid_times[mask]
 
         return invalid_times
-
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -505,26 +503,19 @@ flipVert
 
         return self.invalid_times
 
-    def get_pupil_data(self, suppress_pupil_data: bool = True) -> pd.DataFrame:
-        """Return a dataframe with eye tracking data
+    def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
+        """Return a dataframe with estimated gaze position on screen.
 
         Parameters
         ----------
-        suppress_pupil_data : bool, optional
-            Whether or not to suppress eye gaze mapping data in output
-            dataframe, by default True.
+        include_filtered_data : bool, optional
+            Whether to include filtered version of data (where filtered
+            values are replaced by NaN), by default False.
 
         Returns
         -------
         pd.DataFrame
-            Contains columns for eye, pupil and cr ellipse fits:
-                *_center_x
-                *_center_y
-                *_height
-                *_width
-                *_phi
-            May also contain raw/filtered columns for gaze mapping if
-            suppress_pupil_data is set to False:
+            Contains columns for estimated gaze position:
                 *_eye_area
                 *_pupil_area
                 *_screen_coordinates_x_cm
@@ -532,7 +523,23 @@ flipVert
                 *_screen_coordinates_spherical_x_deg
                 *_screen_coorindates_spherical_y_deg
         """
-        return self.api.get_pupil_data(suppress_pupil_data=suppress_pupil_data)
+        return self.api.get_screen_gaze_data(include_filtered_data=include_filtered_data)
+
+    def get_pupil_data(self) -> Optional[pd.DataFrame]:
+        """Return a dataframe with eye tracking ellipse fit data
+
+
+        Returns
+        -------
+        pd.DataFrame
+            Contains eye, pupil and corneal reflection (cr) ellipse fits:
+                *_center_x
+                *_center_y
+                *_height
+                *_width
+                *_phi
+        """
+        return self.api.get_pupil_data()
 
     def _mask_invalid_stimulus_presentations(self, stimulus_presentations):
         """Mask invalid stimulus presentations
@@ -1085,6 +1092,7 @@ flipVert
         if not invalid_time_intervals.empty:
             warnings.warn("Session includes invalid time intervals that could be accessed with the attribute 'invalid_times',"
                          "Spikes within these intervals are invalid and may need to be excluded from the analysis.")
+
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
 
