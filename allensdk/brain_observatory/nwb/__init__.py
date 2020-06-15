@@ -15,7 +15,7 @@ from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.nwb.nwb_utils import (get_stimulus_name_column,
+from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name,
                                                       set_omitted_stop_time)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
