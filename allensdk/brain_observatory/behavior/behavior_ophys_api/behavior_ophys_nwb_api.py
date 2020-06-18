@@ -61,10 +61,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         # search for omitted rows and add stop_time before writing to NWB file
-        stimulus_table = session_object.stimulus_presentations
-        omitted_row_indexs = stimulus_table.index[stimulus_table['omitted']].tolist()
-        for omitted_row_idx in omitted_row_indexs:
-            set_omitted_stop_time(stimulus_table.iloc[omitted_row_idx])
+        set_omitted_stop_time(stimulus_table=session_object.stimulus_presentations)
+
         # Add stimulus presentations data to NWB in-memory object:
         nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
 

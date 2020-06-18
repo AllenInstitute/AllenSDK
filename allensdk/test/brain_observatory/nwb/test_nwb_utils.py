@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 
 from allensdk.brain_observatory.nwb import nwb_utils
 
@@ -31,36 +32,17 @@ def test_get_stimulus_name_column_exceptions(input_cols,
         assert expected_value in str(error.value)
 
 
-@pytest.mark.parametrize("stimulus_row, expected_stop_time", [
-    ({'image_index': 8,
-      'image_name': 'omitted',
-      'image_set': 'omitted',
-      'index': 201,
-      'omitted': True,
-      'start_frame': 231060,
-      'start_time': 0}, 0.250)
+@pytest.mark.parametrize("stimulus_table, expected_stop_time", [
+    ({'image_index': [8, 9],
+      'image_name': ['omitted', 'not_omitted'],
+      'image_set': ['omitted', 'not_omitted'],
+      'index': [201, 202],
+      'omitted': [True, False],
+      'start_frame': [231060, 232340],
+      'start_time': [0, 250],
+      'stop_time': [None, 1340509]}, 0.250)
 ])
-def test_set_omitted_stop_time(stimulus_row, expected_stop_time):
-    nwb_utils.set_omitted_stop_time(stimulus_row)
-    assert stimulus_row['stop_time'] == expected_stop_time
-
-
-@pytest.mark.parametrize("stimulus_row", [
-    ({'image_index': 8,
-      'image_name': 'omitted',
-      'image_set': 'omitted',
-      'index': 201,
-      'omitted': False,
-      'start_frame': 231060,
-      'start_time': 0}),
-    ({'image_index': 8,
-      'image_name': 'omitted',
-      'image_set': 'omitted',
-      'index': 201,
-      'start_frame': 231060,
-      'start_time': 0})
-])
-def test_set_omitted_stop_time_exceptions(stimulus_row):
-    regex = f".* \\{stimulus_row}"
-    with pytest.raises(ValueError, match=regex):
-        nwb_utils.set_omitted_stop_time(stimulus_row)
+def test_set_omitted_stop_time(stimulus_table, expected_stop_time):
+    stimulus_table = pd.DataFrame.from_dict(data=stimulus_table)
+    nwb_utils.set_omitted_stop_time(stimulus_table)
+    assert stimulus_table.iloc[0]['stop_time'] == expected_stop_time

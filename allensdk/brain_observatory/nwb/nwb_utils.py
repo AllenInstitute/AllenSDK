@@ -1,3 +1,4 @@
+import pandas as pd
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.
@@ -25,7 +26,7 @@ def get_column_name(table_cols: list,
     return column_names[0]
 
 
-def set_omitted_stop_time(stimulus_table_row: dict) -> None:
+def set_omitted_stop_time(stimulus_table: pd.DataFrame) -> None:
     """
     This function sets the stop time for a row that of a stimuli table that
     is a omitted stimuli. A omitted stimuli is a stimuli where a mouse is
@@ -33,18 +34,17 @@ def set_omitted_stop_time(stimulus_table_row: dict) -> None:
     include a stop_time or end_frame as other stimuli in the stimulus table due
     to design choices. For these stimuli to be added they must have the
     stop_time calculated and put into the row as data before writing to NWB.
-    :param stimulus_table_row: dictionary representing the contents of the
-                               row in the stimuli table.
+    :param stimulus_table: pd.DataFrame that contains the stimuli presented to
+                           an experiment subject
     :return:
           stimulus_table_row: returns the same dictionary as inputted but with
                               an additional entry for stop_time.
     """
-    if 'omitted' in stimulus_table_row.keys() and stimulus_table_row['omitted']:
-            start_time = stimulus_table_row['start_time']
-            end_time = start_time + omitted_stimuli_duration
-            stimulus_table_row['stop_time'] = end_time
-            stimulus_table_row['duration'] = omitted_stimuli_duration
-    else:
-        raise ValueError("Row does not have omitted or omitted is False, this"
-                         "is not an omitted row and cannot have it's stop_time"
-                         f"set to omitted value. Row: {stimulus_table_row}")
+    omitted_row_indexs = stimulus_table.index[stimulus_table['omitted']].tolist()
+    for omitted_row_idx in omitted_row_indexs:
+        row = stimulus_table.iloc[omitted_row_idx]
+        start_time = row['start_time']
+        end_time = start_time + omitted_stimuli_duration
+        row['stop_time'] = end_time
+        row['duration'] = omitted_stimuli_duration
+        stimulus_table.iloc[omitted_row_idx] = row
