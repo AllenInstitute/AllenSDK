@@ -1,10 +1,10 @@
 def get_column_name(table_cols: list,
                     possible_names: set) -> str:
     """
-    This function acts a identifier for which column name is present in the
-    dataframe from the provided possibilities. This is used in NWB to identify
-    the correct column name for stimulus_name which differs from Behavior Ophys
-    to Eccephys.
+    This function returns a column name, given a table with unknown
+    column names and a set of possible column names which are expected.
+    The table column name returned should be the only name contained in
+    the "expected" possible names.
     :param table_cols: the table columns to search for the possible name within
     :param possible_names: the names that could exist within the data columns
     :return: the first entry of the intersection between the possible names
