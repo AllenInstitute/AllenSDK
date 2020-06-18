@@ -16,6 +16,7 @@ import pandas as pd
 
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
@@ -59,6 +60,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             stimulus_index = session_object.stimulus_presentations[session_object.stimulus_presentations['image_set'] == nwb_template.name]
             nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
+        # search for omitted rows and add stop_time before writing to NWB file
+        stimulus_table = session_object.stimulus_presentations
+        omitted_rows = stimulus_table[stimulus_table['omitted'] == True]
+        print(omitted_rows)
+        for omitted_row in omitted_rows:
+            set_omitted_stop_time(stimulus_table_row=omitted_row)
+        print(omitted_rows)
         # Add stimulus presentations data to NWB in-memory object:
         nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
 
