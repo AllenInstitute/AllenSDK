@@ -39,11 +39,12 @@ def set_omitted_stop_time(stimulus_table_row: dict) -> None:
           stimulus_table_row: returns the same dictionary as inputted but with
                               an additional entry for stop_time.
     """
-    print(stimulus_table_row)
     if 'omitted' in stimulus_table_row.keys() and stimulus_table_row['omitted']:
             start_time = stimulus_table_row['start_time']
             end_time = start_time + omitted_stimuli_duration
             stimulus_table_row['stop_time'] = end_time
+            stimulus_table_row['duration'] = omitted_stimuli_duration
+            print(stimulus_table_row)
     else:
         raise ValueError("Row does not have omitted or omitted is False, this"
                          "is not an omitted row and cannot have it's stop_time"
