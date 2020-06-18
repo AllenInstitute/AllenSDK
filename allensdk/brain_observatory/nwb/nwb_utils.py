@@ -44,7 +44,6 @@ def set_omitted_stop_time(stimulus_table_row: dict) -> None:
             end_time = start_time + omitted_stimuli_duration
             stimulus_table_row['stop_time'] = end_time
             stimulus_table_row['duration'] = omitted_stimuli_duration
-            print(stimulus_table_row)
     else:
         raise ValueError("Row does not have omitted or omitted is False, this"
                          "is not an omitted row and cannot have it's stop_time"
