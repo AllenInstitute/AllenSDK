@@ -544,7 +544,14 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, clipped=None, end=
     isi_types = []
 
     update_clipped = []
-    for peak, next_spk in zip(valid_peak_indexes, np.append(valid_spike_indexes[1:], end_index)):
+    
+    # If the last spike was clipped after the peak was achieved, we need to use the last spike's peak index instead of end_index
+    if clipped[-1]==False:
+        last_index = end_index
+    else:
+        last_index = peak_indexes[-1]
+        
+    for peak, next_spk in zip(valid_peak_indexes, np.append(valid_spike_indexes[1:], last_index)):
         downstroke = dvdt[peak:next_spk].argmin() + peak
         target = term_frac * dvdt[downstroke]
 
