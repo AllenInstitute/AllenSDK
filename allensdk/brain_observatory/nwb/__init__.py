@@ -451,6 +451,7 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
 
         for row in cleaned_table.itertuples(index=False):
             row = row._asdict()
+
             presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
 
         nwbfile.add_time_intervals(presentation_interval)
