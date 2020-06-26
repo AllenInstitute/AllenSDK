@@ -776,7 +776,7 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
 
     for c in cell_roi_table.columns:
         if c not in ['id', 'mask_matrix', 'image_mask']:
-            plane_segmentation.add_column(c, c)
+            plane_segmentation.add_column(c)
 
     for cell_roi_id, row in cell_roi_table.iterrows():
         sub_mask = np.array(row.pop('image_mask'))
