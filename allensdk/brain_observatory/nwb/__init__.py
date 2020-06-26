@@ -774,12 +774,8 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
-    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix']]:
-        print(c)
-        print(type(plane_segmentation))
-        print(plane_segmentation)
-        print(plane_segmentation.columns)
-        print(cell_roi_table[c])
+    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix',
+                                                             'image_mask']]:
         plane_segmentation.add_column(c, c)
 
     for cell_roi_id, row in cell_roi_table.iterrows():
