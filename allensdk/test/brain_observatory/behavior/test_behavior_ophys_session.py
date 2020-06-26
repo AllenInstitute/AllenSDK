@@ -41,8 +41,6 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected, get_from_
     compare_fields(expected, obtained)
 
 
-@pytest.mark.xfail
-@pytest.mark.requires_bamboo
 def test_nwb_end_to_end(tmpdir_factory):
     oeid = 789359614
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
