@@ -27,6 +27,21 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 log = logging.getLogger("allensdk.brain_observatory.nwb")
 
 
+cell_specimen_col_descriptions = {
+    'cell_specimen_id': 'Id of segmented cell',
+    'height': 'Height of ROI',
+    'width': 'Width of ROI',
+    'mask_image_plane': 'Image Plane of the ROI mask',
+    'max_correction_down': 'Max motion correction in down direction',
+    'max_correction_left': 'Max motion correction in left direction',
+    'max_correction_up': 'Max motion correction in up direction',
+    'max_correction_right': 'Max motion correction in right direction',
+    'valid_roi': 'Indicates if classifier found to be true or false',
+    'x': 'x position of ROI in Image Plane',
+    'y': 'y position of ROI in Image Plane'
+}
+
+
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
     """Reads eye tracking ellipse fit data from an h5 file.
 
@@ -795,15 +810,15 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
-    print(cell_roi_table.columns)
-
     for col_name in cell_roi_table.columns:
         # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
         # in the nwb.ophys::PlaneSegmentation Object
         if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
             # This builds the columns with name of column and description of column
             # both equal to the column name in the cell_roi_table
-            plane_segmentation.add_column(col_name, col_name)
+            plane_segmentation.add_column(col_name,
+                                          cell_specimen_col_descriptions[
+                                              col_name])
 
     # go through each roi and add it to the plan segmentation object
     for cell_roi_id, row in cell_roi_table.iterrows():
