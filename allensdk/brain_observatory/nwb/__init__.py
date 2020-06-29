@@ -795,6 +795,8 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
+    print(cell_roi_table.columns)
+
     for col_name in cell_roi_table.columns:
         # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
         # in the nwb.ophys::PlaneSegmentation Object
