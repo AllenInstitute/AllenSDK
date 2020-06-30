@@ -229,12 +229,12 @@ def test_get_cell_roi_table(ophys_experiment_id):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_lims_api, compare_val', [
-    pytest.param(OphysLimsApi(511458874), 0.785203),
-    pytest.param(OphysLimsApi(0), None)
+@pytest.mark.parametrize('ophys_lims_experiment_id, compare_val', [
+    pytest.param(511458874, 0.785203),
+    pytest.param(0, None)
 ])
-def test_get_surface_2p_pixel_size_um(ophys_lims_api, compare_val):
-
+def test_get_surface_2p_pixel_size_um(ophys_lims_experiment_id, compare_val):
+    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -247,12 +247,13 @@ def test_get_surface_2p_pixel_size_um(ophys_lims_api, compare_val):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_lims_api, compare_val', [
-    pytest.param(OphysLimsApi(511458874), '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/processed/ophys_cell_segmentation_run_572290131/maxInt_masks.tif'),
-    pytest.param(OphysLimsApi(0), None)
+@pytest.mark.parametrize('ophys_lims_experiment_id, compare_val', [
+    pytest.param(511458874, '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/processed/ophys_cell_segmentation_run_572290131/maxInt_masks.tif'),
+    pytest.param(0, None)
 ])
-def test_get_segmentation_mask_image_file(ophys_lims_api, compare_val):
+def test_get_segmentation_mask_image_file(ophys_lims_experiment_id, compare_val):
 
+    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -265,12 +266,13 @@ def test_get_segmentation_mask_image_file(ophys_lims_api, compare_val):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_lims_api, compare_val', [
-    pytest.param(OphysLimsApi(842510825), 'M'),
-    pytest.param(OphysLimsApi(0), None)
+@pytest.mark.parametrize('ophys_lims_experiment_id, compare_val', [
+    pytest.param(842510825, 'M'),
+    pytest.param(0, None)
 ])
-def test_get_sex(ophys_lims_api, compare_val):
+def test_get_sex(ophys_lims_experiment_id, compare_val):
 
+    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -283,12 +285,12 @@ def test_get_sex(ophys_lims_api, compare_val):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_lims_api, compare_val', [
-    pytest.param(OphysLimsApi(842510825), 'P157'),
-    pytest.param(OphysLimsApi(0), None)
+@pytest.mark.parametrize('ophys_lims_experiment_id, compare_val', [
+    pytest.param(842510825, 'P157'),
+    pytest.param(0, None)
 ])
-def test_get_age(ophys_lims_api, compare_val):
-
+def test_get_age(ophys_lims_experiment_id, compare_val):
+    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
