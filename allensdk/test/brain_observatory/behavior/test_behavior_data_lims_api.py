@@ -6,20 +6,28 @@ import pytz
 import math
 
 from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
+from allensdk.core.authentication import DbCredentials
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 
+mock_db_credentials = DbCredentials(dbname='mock_db', user='mock_user',
+                                      host='mock_host', port='mock_port',
+                                      password='mock')
+
 
 @pytest.fixture
 def MockBehaviorDataLimsApi():
+
     class MockBehaviorDataLimsApi(BehaviorDataLimsApi):
         """
         Mock class that overrides some functions to provide test data and
         initialize without calls to db.
         """
         def __init__(self):
-            super().__init__(behavior_session_id=8675309)
+            super().__init__(behavior_session_id=8675309,
+                             lims_credentials=mock_db_credentials,
+                             mtrain_credentials=mock_db_credentials)
 
         def _get_ids(self):
             return {}
@@ -73,7 +81,9 @@ def MockApiRunSpeedExpectedError():
         initialize without calls to db.
         """
         def __init__(self):
-            super().__init__(behavior_session_id=8675309)
+            super().__init__(behavior_session_id=8675309,
+                             mtrain_credentials=mock_db_credentials,
+                             lims_credentials=mock_db_credentials)
 
         def _get_ids(self):
             return {}
