@@ -215,7 +215,7 @@ def plot_negative_transients(raw_traces, demix_traces, valid_roi, mask_array,
 
     flat_masks = mask_array.reshape(N, x*y)
     overlap = flat_masks.dot(flat_masks.T)
-    overlap -= np.diag(np.diag(overlap))
+    overlap ^= np.diag(np.diag(overlap))
 
     for roi_ind in rois_with_trans:
 
