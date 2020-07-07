@@ -1,7 +1,9 @@
 import logging
+import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
+import h5py
 import numpy as np
 import pandas as pd
 import datetime
@@ -24,6 +26,33 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
+
+
+def check_nwbfile_version(nwbfile_path: str,
+                          desired_minimum_version: str,
+                          warning_msg: str):
+
+        with h5py.File(nwbfile_path, 'r') as f:
+            # nwb 2.x files store version as an attribute
+            try:
+                nwb_version = str(f.attrs["nwb_version"]).split(".")
+            except KeyError:
+                # nwb 1.x files store version as dataset
+                try:
+                    nwb_version = str(f["nwb_version"][...].astype(str))
+                    # Stored in the form: `NWB-x.y.z`
+                    nwb_version = nwb_version.split("-")[1].split(".")
+                except (KeyError, IndexError):
+                    nwb_version = None
+
+        if nwb_version is None:
+            warnings.warn(f"'{nwbfile_path}' doesn't appear to be a valid "
+                          f"Neurodata Without Borders (*.nwb) format file as "
+                          f"neither a 'nwb_version' field nor dataset could "
+                          f"be found!")
+        else:
+            if tuple(nwb_version) < tuple(desired_minimum_version.split(".")):
+                warnings.warn(warning_msg)
 
 
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:

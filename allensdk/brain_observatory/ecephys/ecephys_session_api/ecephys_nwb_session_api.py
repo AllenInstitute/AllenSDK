@@ -1,7 +1,9 @@
 from typing import Dict, Union, List, Optional, Callable
 import re
 import ast
+import warnings
 
+import h5py
 import pandas as pd
 import numpy as np
 import xarray as xr
@@ -11,6 +13,7 @@ from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
+from allensdk.brain_observatory.nwb import check_nwbfile_version
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
@@ -54,6 +57,18 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         self.additional_unit_metrics = additional_unit_metrics
         self.external_channel_columns = external_channel_columns
+
+        if hasattr(self, "path") and self.path:
+            check_nwbfile_version(
+                nwbfile_path=self.path,
+                desired_minimum_version="2.2.2",
+                warning_msg=(
+                    f"It looks like the Visual Coding Neuropixels nwbfile "
+                    f"you are trying to access ({self.path})"
+                    f"was created by a previous (and incompatible) version of "
+                    f"AllenSDK and pynwb. You will need to either 1) use "
+                    f"AllenSDK version < 2.0.0 or 2) re-download an updated "
+                    f"version of the nwbfile to access the desired data."))
 
     def test(self):
         """ A minimal test to make sure that this API's NWB file exists and is
