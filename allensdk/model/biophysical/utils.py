@@ -293,7 +293,7 @@ class Utils(HocUtils):
         t = np.array(vec["t"])
 
         if self.stimulus_sampling_rate < self.simulation_sampling_rate:
-            factor = self.simulation_sampling_rate / self.stimulus_sampling_rate
+            factor = int(self.simulation_sampling_rate / self.stimulus_sampling_rate)
                 
             Utils._log.debug("subsampling recorded traces by %dX", factor)
             v = block_reduce(v, (factor,), np.mean)[:len(self.stim_curr)]
