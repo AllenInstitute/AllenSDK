@@ -32,7 +32,8 @@ cell_specimen_col_descriptions = {
                         ' cell matching)',
     'height': 'Height of ROI in pixels',
     'width': 'Width of ROI in pixels',
-    'mask_image_plane': 'Image Plane of the ROI mask',
+    'mask_image_plane': 'Which image plane an ROI resides on. Overlapping ROIs '
+                        'are stored on different mask image planes.',
     'max_correction_down': 'Max motion correction in down direction in pixels',
     'max_correction_left': 'Max motion correction in left direction in pixels',
     'max_correction_up': 'Max motion correction in up direction in pixels',
