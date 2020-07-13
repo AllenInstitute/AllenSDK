@@ -27,7 +27,7 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 log = logging.getLogger("allensdk.brain_observatory.nwb")
 
 
-cell_specimen_col_descriptions = {
+CELL_SPECIMEN_COL_DESCRIPTIONS = {
     'cell_specimen_id': 'Unified id of segmented cell across experiments (after'
                         ' cell matching)',
     'height': 'Height of ROI in pixels',
@@ -821,8 +821,8 @@ def add_cell_specimen_table(nwbfile: NWBFile,
             # This builds the columns with name of column and description of column
             # both equal to the column name in the cell_roi_table
             plane_segmentation.add_column(col_name,
-                                          cell_specimen_col_descriptions[
-                                              col_name])
+                                          CELL_SPECIMEN_COL_DESCRIPTIONS.get(col_name,
+                                                                             "No Description Available"))
 
     # go through each roi and add it to the plan segmentation object
     for cell_roi_id, row in cell_roi_table.iterrows():
