@@ -28,7 +28,8 @@ log = logging.getLogger("allensdk.brain_observatory.nwb")
 
 
 cell_specimen_col_descriptions = {
-    'cell_specimen_id': 'Id of segmented cell',
+    'cell_specimen_id': 'Unified id of segmented cell across experiments (after'
+                        ' cell matching)',
     'height': 'Height of ROI',
     'width': 'Width of ROI',
     'mask_image_plane': 'Image Plane of the ROI mask',
@@ -36,7 +37,8 @@ cell_specimen_col_descriptions = {
     'max_correction_left': 'Max motion correction in left direction',
     'max_correction_up': 'Max motion correction in up direction',
     'max_correction_right': 'Max motion correction in right direction',
-    'valid_roi': 'Indicates if classifier found to be true or false',
+    'valid_roi': 'Indicates if cell classification found the ROI to be a cell '
+                 'or not',
     'x': 'x position of ROI in Image Plane',
     'y': 'y position of ROI in Image Plane'
 }
