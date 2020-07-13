@@ -12,7 +12,7 @@ import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
-from pynwb import ProcessingModule
+from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
@@ -28,6 +28,23 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
 
+CELL_SPECIMEN_COL_DESCRIPTIONS = {
+    'cell_specimen_id': 'Unified id of segmented cell across experiments (after'
+                        ' cell matching)',
+    'height': 'Height of ROI in pixels',
+    'width': 'Width of ROI in pixels',
+    'mask_image_plane': 'Which image plane an ROI resides on. Overlapping ROIs '
+                        'are stored on different mask image planes.',
+    'max_correction_down': 'Max motion correction in down direction in pixels',
+    'max_correction_left': 'Max motion correction in left direction in pixels',
+    'max_correction_up': 'Max motion correction in up direction in pixels',
+    'max_correction_right': 'Max motion correction in right direction in '
+                            'pixels',
+    'valid_roi': 'Indicates if cell classification found the ROI to be a cell '
+                 'or not',
+    'x': 'x position of ROI in Image Plane in pixels (top left corner)',
+    'y': 'y position of ROI in Image Plane in pixels (top left corner)'
+}
 
 def check_nwbfile_version(nwbfile_path: str,
                           desired_minimum_version: str,
@@ -743,7 +760,28 @@ def add_task_parameters(nwbfile, task_parameters):
     nwbfile.add_lab_meta_data(nwb_task_parameters)
 
 
-def add_cell_specimen_table(nwbfile, cell_specimen_table):
+def add_cell_specimen_table(nwbfile: NWBFile,
+                            cell_specimen_table: pd.DataFrame):
+    """
+    This function takes the cell specimen table and writes the ROIs
+    contained within. It writes these to a new NWB imaging plane
+    based off the previously supplied metadata
+    Parameters
+    ----------
+    nwbfile: NWBFile
+        this is the in memory NWBFile currently being written to which ROI data
+        is added
+    cell_specimen_table: pd.DataFrame
+        this is the DataFrame containing the cells segmented from a ophys
+        experiment, stored in json file and loaded.
+        example: /home/nicholasc/projects/allensdk/allensdk/test/
+                 brain_observatory/behavior/cell_specimen_table_789359614.json
+
+    Returns
+    -------
+    nwbfile: NWBFile
+        The altered in memory NWBFile object that now has a specimen table
+    """
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
@@ -803,12 +841,21 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
-    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix']]:
-        plane_segmentation.add_column(c, c)
+    for col_name in cell_roi_table.columns:
+        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # in the nwb.ophys::PlaneSegmentation Object
+        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+            # This builds the columns with name of column and description of column
+            # both equal to the column name in the cell_roi_table
+            plane_segmentation.add_column(col_name,
+                                          CELL_SPECIMEN_COL_DESCRIPTIONS.get(col_name,
+                                                                             "No Description Available"))
 
+    # go through each roi and add it to the plan segmentation object
     for cell_roi_id, row in cell_roi_table.iterrows():
         sub_mask = np.array(row.pop('image_mask'))
-        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=sub_mask)
+        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0],
+                                       roi_mask=sub_mask)
         mask = curr_roi.get_mask_plane()
         csid = row.pop('cell_specimen_id')
         row['cell_specimen_id'] = -1 if csid is None else csid
