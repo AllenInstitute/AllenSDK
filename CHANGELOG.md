@@ -1,5 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
+## [2.2.0]
+## Bug Fixes
+- `response_time` of a trial in behavior-only or behavior + ophys sessions is now the first lick of the trial (for non-"aborted" trials). If no lick occurred or if the trial is "aborted", `repsonse_time` is `NaN`.
 
 ## [2.1.0] = 2020-07-16
 
