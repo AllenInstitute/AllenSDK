@@ -90,6 +90,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.1.0 (July 16, 2020)
+-----------------------------------------------------------------------
+As of the 2.1.0 release:
+- behavior ophys nwb files can now be written using updated pynwb and hdmf
+- A warning has been added if you are using AllenSDK with outdated NWB files
+- A new documentation file has been added which will contain Visual Behavior specific terms for quick lookup
 
 What's New - 2.0.0 (June 11, 2020)
 -----------------------------------------------------------------------
