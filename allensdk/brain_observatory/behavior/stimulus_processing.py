@@ -30,8 +30,17 @@ def load_pickle(pstream):
     return pickle.load(pstream, encoding="bytes")
 
 
-def get_stimulus_presentations(data, stimulus_timestamps):
-
+def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
+    """
+    This function retrieves the stimulus presentation dataframe and
+    renames the columns, adds a stop_time column, and set's index to
+    stimulus_presentation_id before sorting and returning the dataframe.
+    :param data: stimulus file associated with experiment id
+    :param stimulus_timestamps: timestamps indicating when stimuli switched
+                                during experiment
+    :return: stimulus_table: dataframe containing the stimuli metadata as well
+                             as what stimuli was presented
+    """
     stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
@@ -159,7 +168,22 @@ def unpack_change_log(change):
         to_name=to_name,
     )
 
-def get_visual_stimuli_df(data, time):
+
+def get_visual_stimuli_df(data, time) -> pd.DataFrame:
+    """
+    This function loads the stimuli and the omitted stimuli into a dataframe.
+    These stimuli are loaded from the input data, where the set_log and
+    draw_log contained within are used to calculate the epochs. These epochs
+    are used as start_frame and end_frame and converted to times by input
+    stimulus timestamps. The omitted stimuli do not have a end_frame by design
+    though there duration is always 250ms.
+    :param data: the behavior data file
+    :param time: the stimulus timestamps indicating when each stimuli is
+                 displayed
+    :return: df: a pandas dataframe containing the stimuli and omitted stimuli
+                 that were displayed with their frame, end_frame, start_time,
+                 and duration
+    """
 
     stimuli = data['items']['behavior']['stimuli']
     n_frames = len(time)

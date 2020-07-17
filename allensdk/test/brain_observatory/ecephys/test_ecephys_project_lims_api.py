@@ -6,9 +6,14 @@ import pytest
 import pandas as pd
 import numpy as np
 
+from allensdk.core.authentication import DbCredentials
 from allensdk.brain_observatory.ecephys.ecephys_project_api import (
     ecephys_project_lims_api as epla,
 )
+
+mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
+                                      host='mock_host', port='mock_port',
+                                      password='mock')
 
 
 class MockSelector:
@@ -18,7 +23,7 @@ class MockSelector:
         self.response = response
 
     def __call__(self, query, *args, **kwargs):
-        self.passed  = {}
+        self.passed = {}
         self.query = query
         for name, check in self.checks.items():
             self.passed[name] = check(query)
@@ -143,12 +148,12 @@ class MockSelector:
         )
     ]
 ])
-def test_pg_query(method_name,kwargs, response, checks, expected):
+def test_pg_query(method_name, kwargs, response, checks, expected):
 
     selector = MockSelector(checks, response)
 
     with mock.patch("allensdk.internal.api.psycopg2_select", new=selector) as ptc:
-        api = epla.EcephysProjectLimsApi.default()
+        api = epla.EcephysProjectLimsApi.default(lims_credentials=mock_lims_credentials)
         obtained = getattr(api, method_name)(**kwargs)
         pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 

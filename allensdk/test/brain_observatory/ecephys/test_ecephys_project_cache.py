@@ -9,10 +9,15 @@ import SimpleITK as sitk
 import pynwb
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
+from allensdk.core.authentication import DbCredentials
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine, HttpEngine
 )
+
+mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
+                                      host='mock_host', port='mock_port',
+                                      password='mock')
 
 
 @pytest.fixture
@@ -382,7 +387,8 @@ def test_from_lims_default(tmpdir_factory):
     tmpdir = str(tmpdir_factory.mktemp("test_from_lims_default"))
 
     cache = epc.EcephysProjectCache.from_lims(
-        manifest=os.path.join(tmpdir, "manifest.json")
+        manifest=os.path.join(tmpdir, "manifest.json"),
+        lims_credentials=mock_lims_credentials
     )
     assert isinstance(cache.fetch_api.app_engine, HttpEngine)
     assert cache.stream_writer is write_from_stream
@@ -422,6 +428,34 @@ def test_init_default(tmpdir_factory):
             write_bytes_from_coroutine
         ),
         (
+            epc.EcephysProjectCache.from_lims, False,
+            "app_engine", HttpEngine, "http", "lims2",
+            write_from_stream
+        )
+    ])
+def test_stream_asynchronous_arg_from_lims(
+        cache_constructor, asynchronous, engine_attr, expected_engine,
+        expected_scheme, expected_host, expected_stream_writer,
+        tmpdir_factory):
+    """ Ensure the proper stream engine is chosen from the `asynchronous`
+    argument in the EcephysProjectCache constructors (using other default
+    values)."""
+    tmpdir = str(tmpdir_factory.mktemp("test_stream_async_args"))
+    cache = cache_constructor(
+        asynchronous=asynchronous,
+        manifest=os.path.join(tmpdir, "manifest.json"),
+        lims_credentials=mock_lims_credentials)
+    engine = getattr(cache.fetch_api, engine_attr)
+    assert isinstance(engine, expected_engine)
+    assert cache.stream_writer is expected_stream_writer
+    assert engine.scheme == expected_scheme
+    assert engine.host == expected_host
+
+
+@pytest.mark.parametrize(
+    ("cache_constructor, asynchronous, engine_attr, expected_engine,"
+     "expected_scheme, expected_host, expected_stream_writer"), [
+        (
             epc.EcephysProjectCache.from_warehouse, True,
             "rma_engine", AsyncHttpEngine, "http", "api.brain-map.org",
             write_bytes_from_coroutine
@@ -430,14 +464,9 @@ def test_init_default(tmpdir_factory):
             epc.EcephysProjectCache.from_warehouse, False,
             "rma_engine", HttpEngine, "http", "api.brain-map.org",
             write_from_stream
-        ),
-        (
-            epc.EcephysProjectCache.from_lims, False,
-            "app_engine", HttpEngine, "http", "lims2",
-            write_from_stream
-        ),
+        )
     ])
-def test_stream_asynchronous_arg(
+def test_stream_asynchronous_arg_from_warehouse(
         cache_constructor, asynchronous, engine_attr, expected_engine,
         expected_scheme, expected_host, expected_stream_writer,
         tmpdir_factory):
