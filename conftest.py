@@ -3,6 +3,8 @@ import os
 import matplotlib
 matplotlib.use('agg')
 import pytest  # noqa: E402
+import numpy as np  # noqa: E402
+
 from allensdk.test_utilities.temp_dir import temp_dir  # noqa: E402
 
 
@@ -73,3 +75,63 @@ def pytest_collection_modifyitems(config, items):
 
         if 'requires_bamboo' in item.keywords:
             item.add_marker(skip_outside_bamboo_test)
+
+
+@pytest.fixture()
+def behavior_stimuli_time_fixture(request):
+    """
+    Fixture that allows for parameterization of behavior_stimuli stimuli
+    time data.
+    """
+    timestamp_count = request.param.get("timestamp_count", 22)
+    time_step = request.param.get("time_step", 0.016)
+
+    fixture_params = {
+        "timestamp_count": timestamp_count,
+        "time_step": time_step
+    }
+
+    timestamps = np.array([time_step * i for i in range(timestamp_count)])
+
+    return timestamps, fixture_params
+
+
+@pytest.fixture()
+def behavior_stimuli_data_fixture(request):
+    """
+    This fixture mimicks the behavior experiment stimuli data logs and
+    allows parameterization for testing
+    """
+    images_set_log = request.param.get("images_set_log", [
+        ('Image', 'im065', 5.809, 0)])
+    images_draw_log = request.param.get("images_draw_log", [
+        ([0] + [1]*3 + [0]*3)
+    ])
+    grating_set_log = request.param.get("grating_set_log", [
+        ('Ori', 90, 3.585, 0)
+    ])
+    grating_draw_log = request.param.get("grating_draw_log", [
+        ([0] + [1]*3 + [0]*3)
+    ])
+    omitted_flash_frame_log = request.param.get("omitted_flash_frame_log", {
+        "grating_0": []
+    })
+
+    data = {
+        "items": {
+            "behavior": {
+                "stimuli": {
+                    "images": {
+                        "set_log": images_set_log,
+                        "draw_log": images_draw_log
+                    },
+                    "grating": {
+                        "set_log": grating_set_log,
+                        "draw_log": grating_draw_log
+                    }
+                },
+                "omitted_flash_frame_log": omitted_flash_frame_log
+            }
+        }
+    }
+    return data
