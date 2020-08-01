@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import pickle
-import json
 from typing import Dict, List, Tuple, Union
 
 from allensdk.brain_observatory.behavior import IMAGE_SETS
@@ -63,7 +62,26 @@ def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
     return stimulus_table
 
 
-def get_images_dict(pkl):
+def get_images_dict(pkl) -> Dict:
+    """
+    Gets the dictionary of images that were presented during an experiment
+    along with image set metadata and the image specific metadata. This
+    function uses the path to the image pkl file to read the images and their
+    metadata from the pkl file and return this dictionary.
+    Parameters
+    ----------
+    pkl: The pkl file containing the data for the stimuli presented during
+         experiment
+
+    Returns
+    -------
+    Dict:
+        A dictionary containing keys images, metadata, and image_attributes.
+        These correspond to paths to images to images presented, metadata
+        on the whole set of images, and metadata on specific images,
+        respectively.
+
+    """
     # Sometimes the source is a zipped pickle:
     metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
 
@@ -80,6 +98,8 @@ def get_images_dict(pkl):
             meta = dict(
                 image_category=cat.decode("utf-8"),
                 image_name=img_name.decode("utf-8"),
+                phase=np.NaN,
+                correct_frequency=np.NaN,
                 image_index=ii,
             )
 
@@ -97,24 +117,82 @@ def get_images_dict(pkl):
     return images_dict
 
 
-def get_stimulus_templates(pkl):
+def get_stimulus_templates(pkl) -> Dict:
+    """
+    Gets dictionary of images presented during experimentation
+    Parameters
+    ----------
+    pkl: pkl file containing the data for the presented stimuli
+
+    Returns
+    -------
+    Dict:
+        Dictionary of images that were presented during the experiment
+
+    """
     images = get_images_dict(pkl)
     image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
     return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
 
 
-def get_stimulus_metadata(pkl):
-    images = get_images_dict(pkl)
-    stimulus_index_df = pd.DataFrame(images['image_attributes'])
-    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-    stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+def get_stimulus_metadata(pkl) -> pd.DataFrame:
+    """
+    Gets the stimulus metadata for each type of stimulus presented during
+    the experiment. The metadata is return for gratings, images, and omitted
+    stimuli.
+    Parameters
+    ----------
+    pkl: the pkl file containing the information about what stimuli were
+         presented during the experiment
+
+    Returns
+    -------
+    pd.DataFrame:
+        The dataframe containing a row for every stimulus that was presented
+        during the experiment. The row contains the following data,
+        image_category, image_name, image_set, phase, correct_frequency,
+        and image index.
+
+    """
+    stimuli = pkl['items']['behavior']['stimuli']
+    if 'images' in stimuli:
+        images = get_images_dict(pkl)
+        stimulus_index_df = pd.DataFrame(images['image_attributes'])
+        image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+        stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+    else:
+        stimulus_index_df = pd.DataFrame(columns=[
+            'image_name', 'image_category', 'image_set', 'phase',
+            'correct_frequency', 'image_index'])
+
+    # if grating are in the pkl add an entry for each grating possible
+    if 'grating' in stimuli:
+        phase = stimuli['grating']['phase']
+        correct_freq = stimuli['grating']['correct_freq']
+        start_idx = len(stimulus_index_df)
+        grating_df = {'image_category': ['grating']*4,
+                      'image_name': ['gratings_0.0', 'gratings_90.0',
+                                     'gratings_180.0', 'gratings_270.0'],
+                      'image_set': ['grating']*4,
+                      'phase': [phase]*4,
+                      'correct_frequency': [correct_freq]*4,
+                      'image_index': [start_idx, start_idx+1, start_idx+2,
+                                       start_idx+3]}
+        grating_df = pd.DataFrame.from_dict(grating_df)
+
+        stimulus_index_df = stimulus_index_df.append(grating_df,
+                                                     ignore_index=True,
+                                                     sort=False)
 
     # Add an entry for omitted stimuli
     omitted_df = pd.DataFrame({'image_category': ['omitted'],
                                'image_name': ['omitted'],
                                'image_set': ['omitted'],
-                               'image_index': [stimulus_index_df['image_index'].max() + 1]})
-    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True, sort=False)
+                               'phase': np.NaN,
+                               'correct_frequency': np.NaN,
+                               'image_index': len(stimulus_index_df)})
+    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True,
+                                                 sort=False)
     stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
     return stimulus_index_df
 

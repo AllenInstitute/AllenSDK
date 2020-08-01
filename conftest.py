@@ -116,6 +116,9 @@ def behavior_stimuli_data_fixture(request):
     omitted_flash_frame_log = request.param.get("omitted_flash_frame_log", {
         "grating_0": []
     })
+    grating_phase = request.param.get("grating_phase", None)
+    grating_correct_frequency = request.param.get("grating_correct_frequency",
+                                                  None)
 
     data = {
         "items": {
@@ -127,7 +130,9 @@ def behavior_stimuli_data_fixture(request):
                     },
                     "grating": {
                         "set_log": grating_set_log,
-                        "draw_log": grating_draw_log
+                        "draw_log": grating_draw_log,
+                        "phase": grating_phase,
+                        "correct_freq": grating_correct_frequency
                     }
                 },
                 "omitted_flash_frame_log": omitted_flash_frame_log

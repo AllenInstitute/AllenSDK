@@ -3,7 +3,7 @@ import pytest
 
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
-    get_visual_stimuli_df)
+    get_visual_stimuli_df, get_stimulus_metadata)
 
 
 @pytest.mark.parametrize(
@@ -85,6 +85,46 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
 #     # TODO
 #     # This is too hard-coded to be testable right now.
 #     # convert_filepath_caseinsensitive prevents using any tempdirs/tempfiles
+
+
+@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
+                         "expected_metadata", [
+                             ({'grating_phase': 10.0,
+                               'grating_correct_frequency': 90.0},
+                              ['images'],
+                              {'image_index': [0, 1, 2, 3, 4],
+                               'image_name': ['gratings_0.0', 'gratings_90.0',
+                                              'gratings_180.0',
+                                              'gratings_270.0', 'omitted'],
+                               'image_category': ['grating', 'grating',
+                                                  'grating', 'grating',
+                                                  'omitted'],
+                               'image_set': ['grating', 'grating', 'grating',
+                                             'grating', 'omitted'],
+                               'phase': [10, 10, 10, 10, None],
+                               'correct_frequency': [90, 90, 90,
+                                                     90, None]}),
+                             ({}, ['images', 'grating'],
+                              {'image_index': [0],
+                               'image_name': ['omitted'],
+                               'image_category': ['omitted'],
+                               'image_set': ['omitted'],
+                               'phase': [None],
+                               'correct_frequency': [None]})],
+                         indirect=['behavior_stimuli_data_fixture'])
+def test_get_stimulus_metadata(behavior_stimuli_data_fixture,
+                               remove_stimuli, expected_metadata):
+    for key in remove_stimuli:
+        # do this because at current images are not tested and there's a
+        # hard coded path that prevents testing when this is fixed this can
+        # be removed.
+        del behavior_stimuli_data_fixture['items']['behavior']['stimuli'][key]
+    stimulus_metadata = get_stimulus_metadata(behavior_stimuli_data_fixture)
+
+    expected_df = pd.DataFrame.from_dict(expected_metadata)
+    expected_df.set_index(['image_index'], inplace=True, drop=True)
+
+    assert stimulus_metadata.equals(expected_df)
 
 
 @pytest.mark.parametrize("behavior_stimuli_time_fixture,"
