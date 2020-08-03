@@ -69,7 +69,7 @@ class HttpEngine:
         if "Content-length" in response.headers:
             response_b = float(response.headers["Content-length"])
 
-        size_message = f"{response_b / 1024 ** 2:3.3f}MB" if response_b is not None else "potentially large"
+        size_message = f"{response_b / 1024 ** 2:3.3f}MiB" if response_b is not None else "potentially large"
         logging.warning(f"downloading a {size_message} file from {url}")
         progress = tqdm( unit="B", total=response_b, unit_scale=True,  desc="Downloading")
 
