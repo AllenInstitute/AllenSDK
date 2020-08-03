@@ -62,17 +62,64 @@ def test_demix_raises_warning_for_singular_matrix(
 
 
 @pytest.mark.parametrize(
-    "raw_traces,stack,masks,expected",
+    "raw_traces,stack,masks,max_block_size,expected",
     [
         (
             np.array([[2.0, 0.0], [2.0, 2.0]]),
             np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]]]),
             np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            1, # max_block_size < stack length
             (np.array([[0, 0], [2, 0]]), [False, True])
+        ),
+        (
+            np.array([[2.0, 0.0], [2.0, 2.0]]),
+            np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]]]),
+            np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            2, # max_block_size = stack length
+            (np.array([[0, 0], [2, 0]]), [False, True])
+        ),
+        (
+            np.array([[2.0, 0.0], [2.0, 2.0]]),
+            np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]]]),
+            np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            1000,  # max_block_size > stack length
+            (np.array([[0, 0], [2, 0]]), [False, True])
+        ),
+        (
+            np.array([[2.0, 0.0], [2.0, 2.0]]),
+            np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]]]),
+            np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            -1,  # stack processed in one block
+            (np.array([[0, 0], [2, 0]]), [False, True])
+        ),
+        (
+            np.array([[2.0, 0.0, 1.0], [2.0, 2.0, 0.0]]),
+            np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]], [[1., 2.], [1., 2.]]]),
+            np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            2,  # stack length not divisible by max_block_size
+            (np.array([[0, 0, 0], [2, 0, 0]]), [False, True, True])
+        ),
+
+    ],
+)
+def test_demix_time_dep_masks(raw_traces, stack, masks, max_block_size, expected):
+    result = dmx.demix_time_dep_masks(raw_traces, stack, masks, max_block_size)
+    np.testing.assert_equal(result[0], expected[0])
+    assert result[1] == expected[1]
+
+
+@pytest.mark.parametrize(
+    "raw_traces,stack,masks,max_block_size",
+    [
+        (
+            np.array([[2.0, 0.0], [2.0, 2.0]]),
+            np.array([[[2., 2.], [2., 1.]], [[2., 2.], [2., 1.]]]),
+            np.array([[[1, 0], [0, 0]], [[1, 1], [0, 0]]]),
+            -2, # invalid max_block_size)
         ),
     ],
 )
-def test_demix_time_dep_masks(raw_traces, stack, masks, expected):
-    result = dmx.demix_time_dep_masks(raw_traces, stack, masks)
-    np.testing.assert_equal(result[0], expected[0])
-    assert result[1] == expected[1]
+def test_demix_invalid_max_block_size(raw_traces, stack, masks, max_block_size):
+    with pytest.raises(ValueError, match="Invalid maximum block size*"):
+        dmx.demix_time_dep_masks(raw_traces, stack, masks, max_block_size)
+
