@@ -255,7 +255,8 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
             .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
             .set_index(idx_name))
         stimulus_index_df = (
-            stimulus_index_df[["image_set", "image_index", "start_time"]]
+            stimulus_index_df[["image_set", "image_index", "start_time",
+                               "phase", "frequency"]]
             .rename(columns={"start_time": "timestamps"})
             .sort_index()
             .set_index("timestamps", drop=True))
