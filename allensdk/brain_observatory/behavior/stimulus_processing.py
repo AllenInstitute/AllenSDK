@@ -99,7 +99,7 @@ def get_images_dict(pkl) -> Dict:
                 image_category=cat.decode("utf-8"),
                 image_name=img_name.decode("utf-8"),
                 phase=np.NaN,
-                correct_frequency=np.NaN,
+                frequency=np.NaN,
                 image_index=ii,
             )
 
@@ -150,7 +150,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     pd.DataFrame:
         The dataframe containing a row for every stimulus that was presented
         during the experiment. The row contains the following data,
-        image_category, image_name, image_set, phase, correct_frequency,
+        image_category, image_name, image_set, phase, frequency,
         and image index.
 
     """
@@ -163,7 +163,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     else:
         stimulus_index_df = pd.DataFrame(columns=[
             'image_name', 'image_category', 'image_set', 'phase',
-            'correct_frequency', 'image_index'])
+            'frequency', 'image_index'])
 
     # if grating are in the pkl add an entry for each grating possible
     if 'grating' in stimuli:
@@ -175,7 +175,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
                                      'gratings_180.0', 'gratings_270.0'],
                       'image_set': ['grating']*4,
                       'phase': [phase]*4,
-                      'correct_frequency': [correct_freq]*4,
+                      'frequency': [correct_freq]*4,
                       'image_index': [start_idx, start_idx+1, start_idx+2,
                                        start_idx+3]}
         grating_df = pd.DataFrame.from_dict(grating_df)
@@ -189,7 +189,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
                                'image_name': ['omitted'],
                                'image_set': ['omitted'],
                                'phase': np.NaN,
-                               'correct_frequency': np.NaN,
+                               'frequency': np.NaN,
                                'image_index': len(stimulus_index_df)})
     stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True,
                                                  sort=False)

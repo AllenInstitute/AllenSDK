@@ -42,7 +42,7 @@ def behavior_stimuli_data_fixture(request):
         "grating_0": []
     })
     grating_phase = request.param.get("grating_phase", None)
-    grating_correct_frequency = request.param.get("grating_correct_frequency",
+    grating_frequency = request.param.get("grating_frequency",
                                                   None)
 
     data = {
@@ -57,7 +57,7 @@ def behavior_stimuli_data_fixture(request):
                         "set_log": grating_set_log,
                         "draw_log": grating_draw_log,
                         "phase": grating_phase,
-                        "correct_freq": grating_correct_frequency
+                        "correct_freq": grating_frequency
                     }
                 },
                 "omitted_flash_frame_log": omitted_flash_frame_log
@@ -151,7 +151,7 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
                          "expected_metadata", [
                              ({'grating_phase': 10.0,
-                               'grating_correct_frequency': 90.0},
+                               'grating_frequency': 90.0},
                               ['images'],
                               {'image_index': [0, 1, 2, 3, 4],
                                'image_name': ['gratings_0.0', 'gratings_90.0',
@@ -163,7 +163,7 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
                                'image_set': ['grating', 'grating', 'grating',
                                              'grating', 'omitted'],
                                'phase': [10, 10, 10, 10, None],
-                               'correct_frequency': [90, 90, 90,
+                               'frequency': [90, 90, 90,
                                                      90, None]}),
                              ({}, ['images', 'grating'],
                               {'image_index': [0],
@@ -171,7 +171,7 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
                                'image_category': ['omitted'],
                                'image_set': ['omitted'],
                                'phase': [None],
-                               'correct_frequency': [None]})],
+                               'frequency': [None]})],
                          indirect=['behavior_stimuli_data_fixture'])
 def test_get_stimulus_metadata(behavior_stimuli_data_fixture,
                                remove_stimuli, expected_metadata):
