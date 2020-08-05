@@ -13,17 +13,12 @@ def behavior_stimuli_time_fixture(request):
     Fixture that allows for parameterization of behavior_stimuli stimuli
     time data.
     """
-    timestamp_count = request.param.get("timestamp_count", 22)
-    time_step = request.param.get("time_step", 0.016)
-
-    fixture_params = {
-        "timestamp_count": timestamp_count,
-        "time_step": time_step
-    }
+    timestamp_count = request.param["timestamp_count"]
+    time_step = request.param["time_step"]
 
     timestamps = np.array([time_step * i for i in range(timestamp_count)])
 
-    return timestamps, fixture_params
+    return timestamps
 
 
 @pytest.fixture()
@@ -209,31 +204,26 @@ def test_get_stimulus_metadata(behavior_stimuli_data_fixture,
                                   ],
                                   "grating_draw_log": (([0] + [1] * 3 + [0] * 3)
                                                        * 2 + [0])},
-                              {"orientation": [90, None, 270, None],
-                               "image_name": [None, 'im065', None, 'im064'],
-                               "start_frame": [2.0, 3.0, 9.0, 10.0],
+                              {"duration": [3.0, 2.0, 3.0, 2.0],
                                "end_frame": [5.0, 5.0, 12.0, 12.0],
-                               "start_time": [2, 3, 9, 10],
-                               "stop_time": [5, 5, 12, 12],
-                               "duration": [3.0, 2.0, 3.0, 2.0],
+                               "image_name": [np.NaN, 'im065', np.NaN,
+                                              'im064'],
+                               "index": [2, 0, 3, 1],
                                "omitted": [False, False, False, False],
-                               "stimulus_presentations_id": [0, 1, 2, 3]})
+                               "orientation": [90, np.NaN, 270, np.NaN],
+                               "start_frame": [2.0, 3.0, 9.0, 10.0],
+                               "start_time": [2, 3, 9, 10],
+                               "stop_time": [5, 5, 12, 12]})
                          ], indirect=['behavior_stimuli_time_fixture',
                                       'behavior_stimuli_data_fixture'])
 def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
                                     behavior_stimuli_data_fixture,
                                     expected):
-    (behavior_stimuli_times,
-     behavior_fixture_params) = behavior_stimuli_time_fixture
     presentations_df = get_stimulus_presentations(
         behavior_stimuli_data_fixture,
-        behavior_stimuli_times)
-
-    presentations_df = presentations_df.drop('index', axis=1)
+        behavior_stimuli_time_fixture)
 
     expected_df = pd.DataFrame.from_dict(expected)
-    expected_df.set_index('stimulus_presentations_id', inplace=True)
-    expected_df = expected_df[sorted(expected_df.columns)]
 
     assert presentations_df.equals(expected_df)
 
@@ -267,10 +257,8 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
 def test_get_visual_stimuli_df(behavior_stimuli_time_fixture,
                                behavior_stimuli_data_fixture,
                                expected_data):
-    (behavior_stimuli_times,
-     behavior_fixture_params) = behavior_stimuli_time_fixture
     stimuli_df = get_visual_stimuli_df(behavior_stimuli_data_fixture,
-                                       behavior_stimuli_times)
+                                       behavior_stimuli_time_fixture)
     stimuli_df = stimuli_df.drop('index', axis=1)
 
     expected_df = pd.DataFrame.from_dict(expected_data)
