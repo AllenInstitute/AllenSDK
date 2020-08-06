@@ -4,7 +4,7 @@ import pytest
 
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
-    get_visual_stimuli_df, get_stimulus_metadata)
+    get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata)
 
 
 @pytest.fixture()
@@ -30,20 +30,20 @@ def behavior_stimuli_data_fixture(request):
     images_set_log = request.param.get("images_set_log", [
         ('Image', 'im065', 5.809, 0)])
     images_draw_log = request.param.get("images_draw_log", [
-        ([0] + [1]*3 + [0]*3)
+        ([0] + [1] * 3 + [0] * 3)
     ])
     grating_set_log = request.param.get("grating_set_log", [
-        ('Ori', 90, 3.585, 0)
+        ('Ori', 90.0, 3.585, 0)
     ])
     grating_draw_log = request.param.get("grating_draw_log", [
-        ([0] + [1]*3 + [0]*3)
+        ([0] + [1] * 3 + [0] * 3)
     ])
     omitted_flash_frame_log = request.param.get("omitted_flash_frame_log", {
         "grating_0": []
     })
     grating_phase = request.param.get("grating_phase", None)
     grating_frequency = request.param.get("grating_frequency",
-                                                  None)
+                                          None)
 
     data = {
         "items": {
@@ -120,9 +120,9 @@ def test_get_stimulus_epoch(behavior_stimuli_data_fixture,
              "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 6, [(1, 4)], 'grating'),
         ({"grating_set_log": [
-            ("Ori", 90, 3.585, 0),
-            ("Ori", 180, 40.847, 6),
-            ("Ori", 270, 62.633, 12)],
+            ("Ori", 90.0, 3.585, 0),
+            ("Ori", 180.0, 40.847, 6),
+            ("Ori", 270.0, 62.633, 12)],
              "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          6, 11, [(8, 11)], 'grating')
     ], indirect=['behavior_stimuli_data_fixture']
@@ -149,22 +149,97 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
 
 
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
+                         "starting_index, expected_metadata", [
+                             ({
+                                  "grating_set_log": []
+                              }, [], 0,
+                              {
+                                  'image_category': {},
+                                  'image_name': {},
+                                  'image_set': {},
+                                  'phase': {},
+                                  'frequency': {},
+                                  'image_index': {}
+                              }),
+                             ({}, [], 0,
+                              {
+                                  'image_category': {0: 'grating'},
+                                  'image_name': {0: 'gratings_90.0'},
+                                  'image_set': {0: 'grating'},
+                                  'phase': {0: None},
+                                  'frequency': {0: None},
+                                  'image_index': {0: 0}
+                              }),
+                             ({'grating_phase': 0.5,
+                               'grating_frequency': 12}, [], 0,
+                              {
+                                  'image_category': {0: 'grating'},
+                                  'image_name': {0: 'gratings_90.0'},
+                                  'image_set': {0: 'grating'},
+                                  'phase': {0: 0.5},
+                                  'frequency': {0: 12},
+                                  'image_index': {0: 0}
+                              }),
+                             ({"grating_set_log": [
+                                 ("Ori", 90.0, 3.5, 0),
+                                 ("Ori", 270.0, 15, 6)],
+                                  "grating_phase": 0.5,
+                                  "grating_frequency": 12},
+                              [], 12,
+                              {
+                                  'image_category': {0: 'grating',
+                                                     1: 'grating'},
+                                  'image_name': {0: 'gratings_90.0',
+                                                 1: 'gratings_270.0'},
+                                  'image_set': {0: 'grating',
+                                                1: 'grating'},
+                                  'phase': {0: 0.5, 1: 0.5},
+                                  'frequency': {0: 12, 1: 12},
+                                  'image_index': {0: 12, 1: 13}
+                              }),
+                             ({}, ['grating'], 0,
+                              {
+                                  'image_category': {},
+                                  'image_name': {},
+                                  'image_set': {},
+                                  'phase': {},
+                                  'frequency': {},
+                                  'image_index': {}
+                              })
+                         ],
+                         indirect=['behavior_stimuli_data_fixture'])
+def test_get_gratings_metadata(behavior_stimuli_data_fixture, remove_stimuli,
+                               starting_index, expected_metadata):
+    stimuli = behavior_stimuli_data_fixture['items']['behavior']['stimuli']
+    for remove_stim in remove_stimuli:
+        del stimuli[remove_stim]
+    grating_meta = get_gratings_metadata(stimuli, start_idx=starting_index)
+
+    assert grating_meta.to_dict() == expected_metadata
+
+
+@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
                          "expected_metadata", [
                              ({'grating_phase': 10.0,
-                               'grating_frequency': 90.0},
+                               'grating_frequency': 90.0,
+                               "grating_set_log": [
+                                   ("Ori", 90.0, 3.585, 0),
+                                   ("Ori", 180.0, 40.847, 6),
+                                   ("Ori", 270.0, 62.633, 12)]
+                               },
                               ['images'],
-                              {'image_index': [0, 1, 2, 3, 4],
-                               'image_name': ['gratings_0.0', 'gratings_90.0',
+                              {'image_index': [0, 1, 2, 3],
+                               'image_name': ['gratings_90.0',
                                               'gratings_180.0',
                                               'gratings_270.0', 'omitted'],
-                               'image_category': ['grating', 'grating',
+                               'image_category': ['grating',
                                                   'grating', 'grating',
                                                   'omitted'],
-                               'image_set': ['grating', 'grating', 'grating',
+                               'image_set': ['grating', 'grating',
                                              'grating', 'omitted'],
-                               'phase': [10, 10, 10, 10, None],
-                               'frequency': [90, 90, 90,
-                                                     90, None]}),
+                               'phase': [10, 10, 10, None],
+                               'frequency': [90, 90,
+                                             90, None]}),
                              ({}, ['images', 'grating'],
                               {'image_index': [0],
                                'image_name': ['omitted'],
