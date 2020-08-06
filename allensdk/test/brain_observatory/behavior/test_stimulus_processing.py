@@ -4,7 +4,8 @@ import pytest
 
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
-    get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata)
+    get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
+    get_stimulus_templates)
 
 
 @pytest.fixture()
@@ -135,10 +136,17 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
     assert actual == expected
 
 
-# def test_get_stimulus_templates():
-#     pass
-#     # TODO
-#     # See below (get_images_dict is a dependency)
+@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
+                         "expected_templates",
+                         [({}, ['images'], {})],
+                         indirect=["behavior_stimuli_data_fixture"])
+def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
+                                expected_templates):
+    for stimuli in remove_stimuli:
+        del (behavior_stimuli_data_fixture['items']['behavior']
+                                          ['stimuli'][stimuli])
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture)
+    assert templates == expected_templates
 
 
 # def test_get_images_dict():
