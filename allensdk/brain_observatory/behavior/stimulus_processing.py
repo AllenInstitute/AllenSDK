@@ -179,9 +179,13 @@ def get_stimulus_templates(pkl) -> Dict:
         Dictionary of images that were presented during the experiment
 
     """
-    images = get_images_dict(pkl)
-    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-    return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
+    templates = {}
+    if 'images' in pkl['items']['behavior']['stimuli']:
+        images = get_images_dict(pkl)
+        image_set_filename = convert_filepath_caseinsensitive(
+            images['metadata']['image_set'])
+        templates[IMAGE_SETS_REV[image_set_filename]] = np.array(images['images'])
+    return templates
 
 
 def get_stimulus_metadata(pkl) -> pd.DataFrame:
