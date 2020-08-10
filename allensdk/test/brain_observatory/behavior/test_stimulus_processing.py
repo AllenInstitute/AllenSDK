@@ -144,7 +144,7 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                 expected_templates):
     for stimuli in remove_stimuli:
         del (behavior_stimuli_data_fixture['items']['behavior']
-                                          ['stimuli'][stimuli])
+        ['stimuli'][stimuli])
     templates = get_stimulus_templates(behavior_stimuli_data_fixture)
     assert templates == expected_templates
 
@@ -213,6 +213,20 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                   'phase': {},
                                   'frequency': {},
                                   'image_index': {}
+                              }),
+                             ({"grating_set_log":
+                                 [
+                                     ("Ori", 90, 3, 0)],
+                                 "grating_phase": 0.5,
+                                 "grating_frequency": 0.25},
+                              [], 0,
+                              {
+                                  'image_category': {0: 'grating'},
+                                  'image_name': {0: 'gratings_90.0'},
+                                  'image_set': {0: 'grating'},
+                                  'phase': {0: 0.5},
+                                  'frequency': {0: 0.25},
+                                  'image_index': {0: 0}
                               })
                          ],
                          indirect=['behavior_stimuli_data_fixture'])

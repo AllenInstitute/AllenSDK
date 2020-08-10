@@ -145,7 +145,7 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
         image_names = []
 
         for unique_ori in unique_oris:
-            image_names.append('gratings_'+str(unique_ori))
+            image_names.append(f"gratings_{float(unique_ori)}")
 
         grating_dict = {
             'image_category': ['grating'] * len(unique_oris),
