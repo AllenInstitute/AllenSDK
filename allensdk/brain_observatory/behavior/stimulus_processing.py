@@ -140,7 +140,7 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     """
     if 'grating' in stimuli:
         phase = stimuli['grating']['phase']
-        correct_freq = stimuli['grating']['correct_freq']
+        correct_freq = stimuli['grating']['sf']
         set_logs = stimuli['grating']['set_log']
         unique_oris = set([set_log[1] for set_log in set_logs])
 

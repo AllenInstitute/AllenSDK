@@ -58,7 +58,7 @@ def behavior_stimuli_data_fixture(request):
                         "set_log": grating_set_log,
                         "draw_log": grating_draw_log,
                         "phase": grating_phase,
-                        "correct_freq": grating_spatial_frequency
+                        "sf": grating_spatial_frequency
                     }
                 },
                 "omitted_flash_frame_log": omitted_flash_frame_log
