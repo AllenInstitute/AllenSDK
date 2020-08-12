@@ -248,6 +248,7 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
                                  " are null.")
 
         stimulus_metadata_df = get_stimulus_metadata(data)
+        
         idx_name = raw_stim_pres_df.index.name
         stimulus_index_df = (
             raw_stim_pres_df
@@ -256,7 +257,7 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
             .set_index(idx_name))
         stimulus_index_df = (
             stimulus_index_df[["image_set", "image_index", "start_time",
-                               "phase", "frequency"]]
+                               "phase", "spatial_frequency"]]
             .rename(columns={"start_time": "timestamps"})
             .sort_index()
             .set_index("timestamps", drop=True))

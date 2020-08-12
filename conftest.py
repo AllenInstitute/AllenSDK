@@ -3,7 +3,6 @@ import os
 import matplotlib
 matplotlib.use('agg')
 import pytest  # noqa: E402
-
 from allensdk.test_utilities.temp_dir import temp_dir  # noqa: E402
 
 

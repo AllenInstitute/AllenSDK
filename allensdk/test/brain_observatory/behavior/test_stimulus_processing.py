@@ -34,7 +34,7 @@ def behavior_stimuli_data_fixture(request):
         ([0] + [1] * 3 + [0] * 3)
     ])
     grating_set_log = request.param.get("grating_set_log", [
-        ('Ori', 90.0, 3.585, 0)
+        ('Ori', 90, 3.585, 0)
     ])
     grating_draw_log = request.param.get("grating_draw_log", [
         ([0] + [1] * 3 + [0] * 3)
@@ -43,8 +43,8 @@ def behavior_stimuli_data_fixture(request):
         "grating_0": []
     })
     grating_phase = request.param.get("grating_phase", None)
-    grating_frequency = request.param.get("grating_frequency",
-                                          None)
+    grating_spatial_frequency = request.param.get("grating_spatial_frequency",
+                                                  None)
 
     data = {
         "items": {
@@ -58,7 +58,7 @@ def behavior_stimuli_data_fixture(request):
                         "set_log": grating_set_log,
                         "draw_log": grating_draw_log,
                         "phase": grating_phase,
-                        "correct_freq": grating_frequency
+                        "correct_freq": grating_spatial_frequency
                     }
                 },
                 "omitted_flash_frame_log": omitted_flash_frame_log
@@ -100,31 +100,31 @@ def test_get_stimulus_epoch(behavior_stimuli_data_fixture,
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
             ('Image', 'im062', 348.5941232265203, 12)],
-             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 6, [(1, 4)], 'images'),
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
             ('Image', 'im062', 348.5941232265203, 12)],
-             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 11, [(1, 4), (8, 11)], 'images'),
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
             ('Image', 'im062', 348.5941232265203, 12)],
-             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 22, [(1, 4), (8, 11), (15, 18)], 'images'),
         ({"grating_set_log": [
             ("Ori", 90, 3.585, 0),
             ("Ori", 180, 40.847, 6),
             ("Ori", 270, 62.633, 12)],
-             "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 6, [(1, 4)], 'grating'),
         ({"grating_set_log": [
             ("Ori", 90.0, 3.585, 0),
             ("Ori", 180.0, 40.847, 6),
             ("Ori", 270.0, 62.633, 12)],
-             "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          6, 11, [(8, 11)], 'grating')
     ], indirect=['behavior_stimuli_data_fixture']
 )
@@ -166,7 +166,8 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                   'image_name': {},
                                   'image_set': {},
                                   'phase': {},
-                                  'frequency': {},
+                                  'spatial_frequency': {},
+                                  'orientation': {},
                                   'image_index': {}
                               }),
                              ({}, [], 0,
@@ -175,24 +176,26 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                   'image_name': {0: 'gratings_90.0'},
                                   'image_set': {0: 'grating'},
                                   'phase': {0: None},
-                                  'frequency': {0: None},
+                                  'spatial_frequency': {0: None},
+                                  'orientation': {0: 90},
                                   'image_index': {0: 0}
                               }),
                              ({'grating_phase': 0.5,
-                               'grating_frequency': 12}, [], 0,
+                               'grating_spatial_frequency': 12}, [], 0,
                               {
                                   'image_category': {0: 'grating'},
                                   'image_name': {0: 'gratings_90.0'},
                                   'image_set': {0: 'grating'},
                                   'phase': {0: 0.5},
-                                  'frequency': {0: 12},
+                                  'spatial_frequency': {0: 12},
+                                  'orientation': {0: 90},
                                   'image_index': {0: 0}
                               }),
                              ({"grating_set_log": [
                                  ("Ori", 90.0, 3.5, 0),
                                  ("Ori", 270.0, 15, 6)],
                                   "grating_phase": 0.5,
-                                  "grating_frequency": 12},
+                                  "grating_spatial_frequency": 12},
                               [], 12,
                               {
                                   'image_category': {0: 'grating',
@@ -202,7 +205,8 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                   'image_set': {0: 'grating',
                                                 1: 'grating'},
                                   'phase': {0: 0.5, 1: 0.5},
-                                  'frequency': {0: 12, 1: 12},
+                                  'spatial_frequency': {0: 12, 1: 12},
+                                  'orientation': {0: 90, 1: 270},
                                   'image_index': {0: 12, 1: 13}
                               }),
                              ({}, ['grating'], 0,
@@ -211,21 +215,23 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
                                   'image_name': {},
                                   'image_set': {},
                                   'phase': {},
-                                  'frequency': {},
+                                  'spatial_frequency': {},
+                                  'orientation': {},
                                   'image_index': {}
                               }),
                              ({"grating_set_log":
                                  [
                                      ("Ori", 90, 3, 0)],
-                                 "grating_phase": 0.5,
-                                 "grating_frequency": 0.25},
+                                  "grating_phase": 0.5,
+                                  "grating_spatial_frequency": 0.25},
                               [], 0,
                               {
                                   'image_category': {0: 'grating'},
                                   'image_name': {0: 'gratings_90.0'},
                                   'image_set': {0: 'grating'},
                                   'phase': {0: 0.5},
-                                  'frequency': {0: 0.25},
+                                  'spatial_frequency': {0: 0.25},
+                                  'orientation': {0: 90},
                                   'image_index': {0: 0}
                               })
                          ],
@@ -243,7 +249,7 @@ def test_get_gratings_metadata(behavior_stimuli_data_fixture, remove_stimuli,
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
                          "expected_metadata", [
                              ({'grating_phase': 10.0,
-                               'grating_frequency': 90.0,
+                               'grating_spatial_frequency': 90.0,
                                "grating_set_log": [
                                    ("Ori", 90.0, 3.585, 0),
                                    ("Ori", 180.0, 40.847, 6),
@@ -260,15 +266,17 @@ def test_get_gratings_metadata(behavior_stimuli_data_fixture, remove_stimuli,
                                'image_set': ['grating', 'grating',
                                              'grating', 'omitted'],
                                'phase': [10, 10, 10, None],
-                               'frequency': [90, 90,
-                                             90, None]}),
+                               'spatial_frequency': [90, 90,
+                                             90, None],
+                               'orientation': [90, 180, 270, None]}),
                              ({}, ['images', 'grating'],
                               {'image_index': [0],
                                'image_name': ['omitted'],
                                'image_category': ['omitted'],
                                'image_set': ['omitted'],
                                'phase': [None],
-                               'frequency': [None]})],
+                               'spatial_frequency': [None],
+                               'orientation': [None]})],
                          indirect=['behavior_stimuli_data_fixture'])
 def test_get_stimulus_metadata(behavior_stimuli_data_fixture,
                                remove_stimuli, expected_metadata):

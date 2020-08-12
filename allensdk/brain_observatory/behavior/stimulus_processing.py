@@ -98,8 +98,9 @@ def get_images_dict(pkl) -> Dict:
             meta = dict(
                 image_category=cat.decode("utf-8"),
                 image_name=img_name.decode("utf-8"),
+                orientation=np.NaN,
                 phase=np.NaN,
-                frequency=np.NaN,
+                spatial_frequency=np.NaN,
                 image_index=ii,
             )
 
@@ -132,8 +133,9 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     pd.DataFrame:
         DataFrame containing the unique stimuli presented during an
         experiment. The columns contained in this DataFrame are
-        'image_category', 'image_name', 'image_set', 'phase', 'frequency',
-        and 'image_index'. This returns empty if no gratings were presented.
+        'image_category', 'image_name', 'image_set', 'phase',
+        'spatial_frequency', 'orientation', and 'image_index'.
+        This returns empty if no gratings were presented.
 
     """
     if 'grating' in stimuli:
@@ -150,9 +152,10 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
         grating_dict = {
             'image_category': ['grating'] * len(unique_oris),
             'image_name': image_names,
+            'orientation': list(unique_oris),
             'image_set': ['grating'] * len(unique_oris),
             'phase': [phase] * len(unique_oris),
-            'frequency': [correct_freq] * len(unique_oris),
+            'spatial_frequency': [correct_freq] * len(unique_oris),
             'image_index': range(start_idx, start_idx+len(unique_oris), 1)
         }
         grating_df = pd.DataFrame.from_dict(grating_dict)
@@ -161,7 +164,8 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
                                            'image_name',
                                            'image_set',
                                            'phase',
-                                           'frequency',
+                                           'spatial_frequency',
+                                           'orientation',
                                            'image_index'])
     return grating_df
 
@@ -203,8 +207,8 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     pd.DataFrame:
         The dataframe containing a row for every stimulus that was presented
         during the experiment. The row contains the following data,
-        image_category, image_name, image_set, phase, frequency,
-        and image index.
+        image_category, image_name, image_set, phase, spatial_frequency,
+        orientation, and image index.
 
     """
     stimuli = pkl['items']['behavior']['stimuli']
@@ -216,7 +220,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     else:
         stimulus_index_df = pd.DataFrame(columns=[
             'image_name', 'image_category', 'image_set', 'phase',
-            'frequency', 'image_index'])
+            'spatial_frequency', 'image_index'])
 
     # get the grating metadata will be empty if gratings are absent
     grating_df = get_gratings_metadata(stimuli,
@@ -229,8 +233,9 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     omitted_df = pd.DataFrame({'image_category': ['omitted'],
                                'image_name': ['omitted'],
                                'image_set': ['omitted'],
+                               'orientation': np.NaN,
                                'phase': np.NaN,
-                               'frequency': np.NaN,
+                               'spatial_frequency': np.NaN,
                                'image_index': len(stimulus_index_df)})
     stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True,
                                                  sort=False)
