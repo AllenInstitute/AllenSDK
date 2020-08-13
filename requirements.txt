@@ -25,4 +25,4 @@ tables==3.5.1 # pinning this because updates tend to not include wheels immediat
 seaborn<1.0.0
 aiohttp==3.6.2
 nest_asyncio==1.2.0
-
+tqdm>=4.27
