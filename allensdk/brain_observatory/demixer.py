@@ -117,10 +117,10 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     2p recording.
 
     :param raw_traces: 2d array of traces for each mask, of dimensions
-        (t, n), where `t` is the number of time points and `n` is the
+        (n, t), where `t` is the number of time points and `n` is the
         number of masks.
     :param stack: 3d array representing a 1p recording movie, of
-        dimensions (t, H, W).
+        dimensions (t, H, W) or corresponding hdf5 dataset.
     :param masks: 3d array of binary roi masks, of shape (n, H, W),
         where `n` is the number of masks, and HW are the dimensions of
         an individual frame in the movie `stack`.
@@ -131,9 +131,6 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     _, x, y = masks.shape
     P = x * y
 
-    if len(stack.shape) == 3:
-        stack = stack.reshape(T, P)
-
     num_pixels_in_mask = np.sum(masks, axis=(1, 2))
 
     flat_masks = masks.reshape(N, P)
@@ -143,8 +140,9 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     demix_traces = np.zeros((N, T))
 
     for t in range(T):
-        demixed_point = _demix_point(
-            stack[t], raw_traces[:, t], flat_masks, num_pixels_in_mask)
+        stack_at_timepoint_t = stack[t].flatten()
+        demixed_point = _demix_point(stack_at_timepoint_t, raw_traces[:, t],
+                                     flat_masks, num_pixels_in_mask)
         if demixed_point is not None:
             demix_traces[:, t] = demixed_point
             drop_frames.append(False)
