@@ -1,7 +1,9 @@
 import logging
+import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
+import h5py
 import numpy as np
 import pandas as pd
 import datetime
@@ -10,11 +12,12 @@ import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
-from pynwb import ProcessingModule
+from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -24,6 +27,50 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
+
+CELL_SPECIMEN_COL_DESCRIPTIONS = {
+    'cell_specimen_id': 'Unified id of segmented cell across experiments (after'
+                        ' cell matching)',
+    'height': 'Height of ROI in pixels',
+    'width': 'Width of ROI in pixels',
+    'mask_image_plane': 'Which image plane an ROI resides on. Overlapping ROIs '
+                        'are stored on different mask image planes.',
+    'max_correction_down': 'Max motion correction in down direction in pixels',
+    'max_correction_left': 'Max motion correction in left direction in pixels',
+    'max_correction_up': 'Max motion correction in up direction in pixels',
+    'max_correction_right': 'Max motion correction in right direction in '
+                            'pixels',
+    'valid_roi': 'Indicates if cell classification found the ROI to be a cell '
+                 'or not',
+    'x': 'x position of ROI in Image Plane in pixels (top left corner)',
+    'y': 'y position of ROI in Image Plane in pixels (top left corner)'
+}
+
+def check_nwbfile_version(nwbfile_path: str,
+                          desired_minimum_version: str,
+                          warning_msg: str):
+
+        with h5py.File(nwbfile_path, 'r') as f:
+            # nwb 2.x files store version as an attribute
+            try:
+                nwb_version = str(f.attrs["nwb_version"]).split(".")
+            except KeyError:
+                # nwb 1.x files store version as dataset
+                try:
+                    nwb_version = str(f["nwb_version"][...].astype(str))
+                    # Stored in the form: `NWB-x.y.z`
+                    nwb_version = nwb_version.split("-")[1].split(".")
+                except (KeyError, IndexError):
+                    nwb_version = None
+
+        if nwb_version is None:
+            warnings.warn(f"'{nwbfile_path}' doesn't appear to be a valid "
+                          f"Neurodata Without Borders (*.nwb) format file as "
+                          f"neither a 'nwb_version' field nor dataset could "
+                          f"be found!")
+        else:
+            if tuple(nwb_version) < tuple(desired_minimum_version.split(".")):
+                warnings.warn(warning_msg)
 
 
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
@@ -424,10 +471,13 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
     """
     stimulus_table = stimulus_table.copy()
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
-    stimulus_names = stimulus_table['stimulus_name'].unique()
+    possible_names = {'stimulus_name', 'image_name'}
+    stimulus_name_column = get_column_name(stimulus_table.columns,
+                                           possible_names)
+    stimulus_names = stimulus_table[stimulus_name_column].unique()
 
     for stim_name in sorted(stimulus_names):
-        specific_stimulus_table = stimulus_table[stimulus_table['stimulus_name'] == stim_name]
+        specific_stimulus_table = stimulus_table[stimulus_table[stimulus_name_column] == stim_name]
         # Drop columns where all values in column are NaN
         cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
         # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
@@ -447,6 +497,7 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
 
         for row in cleaned_table.itertuples(index=False):
             row = row._asdict()
+
             presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
 
         nwbfile.add_time_intervals(presentation_interval)
@@ -709,7 +760,28 @@ def add_task_parameters(nwbfile, task_parameters):
     nwbfile.add_lab_meta_data(nwb_task_parameters)
 
 
-def add_cell_specimen_table(nwbfile, cell_specimen_table):
+def add_cell_specimen_table(nwbfile: NWBFile,
+                            cell_specimen_table: pd.DataFrame):
+    """
+    This function takes the cell specimen table and writes the ROIs
+    contained within. It writes these to a new NWB imaging plane
+    based off the previously supplied metadata
+    Parameters
+    ----------
+    nwbfile: NWBFile
+        this is the in memory NWBFile currently being written to which ROI data
+        is added
+    cell_specimen_table: pd.DataFrame
+        this is the DataFrame containing the cells segmented from a ophys
+        experiment, stored in json file and loaded.
+        example: /home/nicholasc/projects/allensdk/allensdk/test/
+                 brain_observatory/behavior/cell_specimen_table_789359614.json
+
+    Returns
+    -------
+    nwbfile: NWBFile
+        The altered in memory NWBFile object that now has a specimen table
+    """
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
@@ -769,12 +841,21 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
-    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix']]:
-        plane_segmentation.add_column(c, c)
+    for col_name in cell_roi_table.columns:
+        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # in the nwb.ophys::PlaneSegmentation Object
+        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+            # This builds the columns with name of column and description of column
+            # both equal to the column name in the cell_roi_table
+            plane_segmentation.add_column(col_name,
+                                          CELL_SPECIMEN_COL_DESCRIPTIONS.get(col_name,
+                                                                             "No Description Available"))
 
+    # go through each roi and add it to the plan segmentation object
     for cell_roi_id, row in cell_roi_table.iterrows():
         sub_mask = np.array(row.pop('image_mask'))
-        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=sub_mask)
+        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0],
+                                       roi_mask=sub_mask)
         mask = curr_roi.get_mask_plane()
         csid = row.pop('cell_specimen_id')
         row['cell_specimen_id'] = -1 if csid is None else csid

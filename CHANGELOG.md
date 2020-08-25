@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] = 2020-07-16
+
+### Added
+- Behvaior Ophys NWB File writing capability fixes for updated PyNWB and HDMF versions
+- Added warning if using outdated Visual Coding Neuropixels NWB files
+- Added documentation file for Visual Behavior terms in AllenSDK for quick lookup
+
 ## [2.0.0] = 2020-06-11
 
 ### Added

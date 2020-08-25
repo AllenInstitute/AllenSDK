@@ -1,5 +1,8 @@
 # most of the tests for this functionality are actually in test_write_nwb
 
+import warnings
+
+import h5py
 import pytest
 import pandas as pd
 

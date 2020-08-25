@@ -8,9 +8,9 @@
                "nwb_c": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569494121.nwb"
         }, 
         "3": {
-               "analysis_a": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp/510859641_three_session_A_analysis.h5",
-               "analysis_b": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp/510698988_three_session_B_analysis.h5",
-               "analysis_c": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp/510532780_three_session_C_analysis.h5",
+               "analysis_a": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp-2020-07-07/510859641_three_session_A_analysis.h5",
+               "analysis_b": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp-2020-07-07/510698988_three_session_B_analysis.h5",
+               "analysis_c": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/new_ks_2samp-2020-07-07/510532780_three_session_C_analysis.h5",
                "nwb_a": "/allen/aibs/informatics/module_test_data/observatory//plots/510859641.nwb",
                "nwb_b": "/allen/aibs/informatics/module_test_data/observatory/plots/510698988.nwb",
                "nwb_c": "/allen/aibs/informatics/module_test_data/observatory/plots/510532780.nwb"
