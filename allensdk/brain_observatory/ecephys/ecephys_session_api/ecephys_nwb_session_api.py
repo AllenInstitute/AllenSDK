@@ -346,7 +346,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_current_source_density(self, probe_id):
         csd_mod = self._probe_nwbfile(probe_id).get_processing_module("current_source_density")
-        nwb_csd = csd_mod["current_source_density"]
+        nwb_csd = csd_mod["ecephys_csd"]
         csd_data = nwb_csd.time_series.data[:].T  # csd data stored as (timepoints x channels) but we want (channels x timepoints)
 
         csd = xr.DataArray(
