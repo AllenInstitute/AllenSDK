@@ -196,11 +196,9 @@ def cell_specimen_table_api():
                 }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
             )
 
-        def get_segmentation_mask_image(self):
-            data = roi_1  # useless image data here
-            spacing = (1, 1)
-            unit = 'index'
-            return ImageApi.serialize(data, spacing, unit)
+        def get_surface_2p_pixel_size_um(self):
+            return 1000
+
     return CellSpecimenTableApi()
 
 
