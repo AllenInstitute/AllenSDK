@@ -29,9 +29,6 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
     def get_max_projection_file(self):
         return self.data['max_projection_file']
 
-    def get_segmentation_mask_image_file(self):
-        return self.data['segmentation_mask_image_file']
-
     def get_sync_file(self):
         return self.data['sync_file']
 

@@ -626,7 +626,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         else:
             pd.testing.assert_frame_equal(obt_electrodes, exp_electrodes, check_like=True)
 
-        csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
+        csd_series = obt_f.get_processing_module("current_source_density")["ecephys_csd"]
 
         assert np.allclose(csd_data["csd"], csd_series.time_series.data[:].T)
         assert np.allclose(csd_data["relative_window"], csd_series.time_series.timestamps[:])

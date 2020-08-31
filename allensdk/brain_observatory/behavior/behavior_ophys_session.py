@@ -463,20 +463,20 @@ class BehaviorOphysSession(ParamsMixin):
         for ii, (_, row) in enumerate(table.iterrows()):
             output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
 
-        segmentation_mask_image = self.api.get_segmentation_mask_image()
-        spacing = segmentation_mask_image.GetSpacing()
-        unit = segmentation_mask_image.GetMetaData('unit')
+        pixel_size_um = self.api.get_surface_2p_pixel_size_um()
+        spacing_mm = (pixel_size_um / 1000., pixel_size_um / 1000.)
+        unit = 'mm'
 
         return xr.DataArray(
             data=output,
             dims=("cell_roi_id", "row", "column"),
             coords={
                 "cell_roi_id": cell_roi_ids,
-                "row": np.arange(full_image_shape[0]) * spacing[0],
-                "column": np.arange(full_image_shape[1]) * spacing[1]
+                "row": np.arange(full_image_shape[0]) * spacing_mm[0],
+                "column": np.arange(full_image_shape[1]) * spacing_mm[1]
             },
             attrs={
-                "spacing": spacing,
+                "spacing": spacing_mm,
                 "unit": unit
             }
         ).squeeze(drop=True)
