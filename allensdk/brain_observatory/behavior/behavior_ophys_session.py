@@ -463,20 +463,29 @@ class BehaviorOphysSession(ParamsMixin):
         for ii, (_, row) in enumerate(table.iterrows()):
             output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
 
-        pixel_size_um = self.api.get_surface_2p_pixel_size_um()
-        spacing_mm = (pixel_size_um / 1000., pixel_size_um / 1000.)
-        unit = 'mm'
+        # Pixel spacing and units of mask image will match either the
+        # max or avg projection image of 2P movie.
+        max_projection_image = self.get_max_projection()
+        # Spacing is in (col_spacing, row_spacing) order
+        # Coordinates also start spacing_dim / 2 for first element in a dimension
+        # See: https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html
+        pixel_spacing = max_projection_image.spacing
+        unit = max_projection_image.unit
 
         return xr.DataArray(
             data=output,
             dims=("cell_roi_id", "row", "column"),
             coords={
                 "cell_roi_id": cell_roi_ids,
-                "row": np.arange(full_image_shape[0]) * spacing_mm[0],
-                "column": np.arange(full_image_shape[1]) * spacing_mm[1]
+                "row": (np.arange(full_image_shape[0])
+                        * pixel_spacing[1]
+                        + (pixel_spacing[1] / 2)),
+                "column": (np.arange(full_image_shape[1])
+                           * pixel_spacing[0]
+                           + (pixel_spacing[0] / 2))
             },
             attrs={
-                "spacing": spacing_mm,
+                "spacing": pixel_spacing,
                 "unit": unit
             }
         ).squeeze(drop=True)

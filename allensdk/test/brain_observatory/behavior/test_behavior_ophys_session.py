@@ -196,8 +196,9 @@ def cell_specimen_table_api():
                 }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
             )
 
-        def get_surface_2p_pixel_size_um(self):
-            return 1000
+        def get_max_projection(self):
+            return ImageApi.serialize(roi_1 + roi_2,
+                                      [0.5, 1.], 'mm')
 
     return CellSpecimenTableApi()
 
@@ -237,6 +238,10 @@ def test_get_roi_masks_by_cell_roi_id(roi_ids, expected, cell_specimen_table_api
     ssn = BehaviorOphysSession(api=cell_specimen_table_api)
     obtained = ssn._get_roi_masks_by_cell_roi_id(roi_ids)
     assert np.allclose(expected, obtained.values)
+    assert np.allclose(obtained.coords['row'],
+                       [0.5, 1.5, 2.5, 3.5, 4.5])
+    assert np.allclose(obtained.coords['column'],
+                       [0.25, 0.75, 1.25, 1.75, 2.25])
 
 
 @pytest.mark.parametrize("cell_specimen_ids,expected", [
