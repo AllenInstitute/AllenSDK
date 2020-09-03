@@ -384,29 +384,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_segmentation_mask_image_file(self):
-        query = '''
-                SELECT obj.storage_directory || obj.filename AS OphysSegmentationMaskImage_filename
-                FROM ophys_experiments oe
-                LEFT JOIN ophys_cell_segmentation_runs ocsr ON ocsr.ophys_experiment_id = oe.id AND ocsr.current = 't'
-                LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationMaskImage')
-                WHERE oe.id= {};
-                '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.lims_db.fetchone(query, strict=True))
-
-
-    @memoize
-    def get_segmentation_mask_image(self, image_api=None):
-
-        if image_api is None:
-            image_api = ImageApi
-
-        segmentation_mask_image_file = self.get_segmentation_mask_image_file()
-        pixel_size = self.get_surface_2p_pixel_size_um()
-        segmentation_mask_image = mpimg.imread(segmentation_mask_image_file)
-        return ImageApi.serialize(segmentation_mask_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
-
-    @memoize
     def get_sex(self):
         query = '''
                 SELECT g.name as sex

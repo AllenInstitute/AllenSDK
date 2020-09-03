@@ -9,7 +9,7 @@ from typing import Optional, Iterable, Callable, AsyncIterator, Awaitable
 import requests
 import aiohttp
 import nest_asyncio
-
+from tqdm.auto import tqdm
 
 DEFAULT_TIMEOUT = 10 * 60  # seconds
 DEFAULT_CHUNKSIZE = 1024 * 10  # bytes
@@ -65,15 +65,18 @@ class HttpEngine:
         
         start_time = time.perf_counter()
         response = requests.get(url, stream=True)
-        response_mb = None
+        response_b = None
         if "Content-length" in response.headers:
-            response_mb = float(response.headers["Content-length"]) / 1024 ** 2
+            response_b = float(response.headers["Content-length"])
 
-        for ii, chunk in enumerate(response.iter_content(self.chunksize)):
-            if ii == 0:
-                size_message = f"{response_mb:3.3}mb" if response_mb is not None else "potentially large"
-                logging.warning(f"downloading a {size_message} file from {url}")
-            yield chunk
+        size_message = f"{response_b / 1024 ** 2:3.3f}MiB" if response_b is not None else "potentially large"
+        logging.warning(f"downloading a {size_message} file from {url}")
+        progress = tqdm( unit="B", total=response_b, unit_scale=True,  desc="Downloading")
+
+        for chunk in response.iter_content(self.chunksize):
+            if chunk: # filter out keep-alive new chunks
+                progress.update(len(chunk))
+                yield chunk
 
             elapsed = time.perf_counter() - start_time
             if elapsed > self.timeout:

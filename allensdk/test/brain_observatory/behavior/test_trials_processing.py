@@ -248,6 +248,31 @@ def test_trial_data_from_log(data_exp_getter):
     assert trials_processing.trial_data_from_log(data) == expectation
 
 
+@pytest.mark.parametrize(
+    "go,catch,auto_rewarded,hit,false_alarm,aborted,errortext", [
+        (False, False, False, True, False, True, 
+         "'aborted' trials cannot be"),    # aborted and hit
+        (False, False, False, False, True, True,
+         "'aborted' trials cannot be"),    # aborted and false alarm
+        (False, False, True, False, False, True, 
+         "'aborted' trials cannot be"),    # aborted and auto_rewarded
+        (False, False, False, True, True, False, 
+         "both `hit` and `false_alarm` cannot be True"),    # hit and false alarm
+        (True, True, False, False, False, False,
+         "both `go` and `catch` cannot be True"),    # go and catch
+        (True, False, True, False, False, False,
+         "both `go` and `auto_rewarded` cannot be True")    # go and auto_rewarded
+    ]
+)
+def test_get_trial_timing_exclusivity_assertions(
+    go, catch, auto_rewarded, hit, false_alarm, aborted, errortext):
+    with pytest.raises(AssertionError) as e:
+        trials_processing.get_trial_timing(
+            None, None, None, go, catch, auto_rewarded, hit, false_alarm, 
+            aborted)
+    assert errortext in str(e.value)
+
+
 def test_get_trial_timing():
     event_dict = {
         ('trial_start', ''): {'rebased_time': 306.4785879253758, 'frame': 18075},
@@ -464,13 +489,14 @@ def test_get_trial_timing():
         auto_rewarded=True,
         hit=False,
         false_alarm=False,
+        aborted=False
     )
 
     expected_result = {
         'start_time': 306.4785879253758,
         'stop_time': 315.23590438557534,
         'trial_length': 8.757316460199547,
-        'response_time': nan,
+        'response_time': 312.24876,
         'change_frame': 18345,
         'change_time': 311.77086,
         'response_latency': 0.4778999999999769
@@ -478,3 +504,17 @@ def test_get_trial_timing():
 
     # use assert_frame_equal to take advantage of the nice way it deals with NaNs
     pd.testing.assert_frame_equal(pd.DataFrame(result,index=[0]), pd.DataFrame(expected_result,index=[0]), check_names=False)
+
+
+@pytest.mark.parametrize(
+    "licks, aborted, expected", 
+    [
+        ([1.0, 2.0, 3.0], True, float("nan")),
+        ([1.0, 2.0, 3.0], False, 1.0),
+        ([], True, float("nan")),
+        ([], False, float("nan"))
+    ]
+)
+def test_get_response_time(licks, aborted, expected):
+    actual = trials_processing._get_response_time(licks, aborted)
+    np.testing.assert_equal(actual, expected)

@@ -111,19 +111,22 @@ def _demix_point(source_frame: np.ndarray, mask_traces: np.ndarray,
 
 
 def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
-                         masks: np.ndarray) -> Tuple[np.ndarray, list]:
+                         masks: np.ndarray,
+                         max_block_size: int = 1000) -> Tuple[np.ndarray, list]:
     """
     Demix traces of potentially overlapping masks extraced from a single
     2p recording.
 
     :param raw_traces: 2d array of traces for each mask, of dimensions
-        (t, n), where `t` is the number of time points and `n` is the
+        (n, t), where `t` is the number of time points and `n` is the
         number of masks.
     :param stack: 3d array representing a 1p recording movie, of
-        dimensions (t, H, W).
+        dimensions (t, H, W) or corresponding hdf5 dataset.
     :param masks: 3d array of binary roi masks, of shape (n, H, W),
         where `n` is the number of masks, and HW are the dimensions of
         an individual frame in the movie `stack`.
+    :max_block_size: int representing maximum number of movie frames to read
+        at a time (-1 for full length `t` of `stack`) (the default is 1000)
     :return: Tuple of demixed traces and whether each frame was skipped
         in the demixing calculation.
     """
@@ -131,8 +134,12 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     _, x, y = masks.shape
     P = x * y
 
-    if len(stack.shape) == 3:
-        stack = stack.reshape(T, P)
+    if max_block_size == -1:
+        max_block_size = T
+    elif max_block_size < 1:
+        raise ValueError("Invalid maximum block size {}. Must be strictly "
+                         "positive (>= 1), or -1 for full length block "
+                         "size.".format(max_block_size))
 
     num_pixels_in_mask = np.sum(masks, axis=(1, 2))
 
@@ -143,8 +150,15 @@ def demix_time_dep_masks(raw_traces: np.ndarray, stack: np.ndarray,
     demix_traces = np.zeros((N, T))
 
     for t in range(T):
+
+        block_t = t % max_block_size
+        if block_t == 0:  # load next block into memory and reshape
+            block_T = np.min([(T - t), max_block_size])
+            stack_block = stack[t : t+block_T].reshape(block_T, P)
+
         demixed_point = _demix_point(
-            stack[t], raw_traces[:, t], flat_masks, num_pixels_in_mask)
+            stack_block[block_t], raw_traces[:, t], flat_masks,
+            num_pixels_in_mask)
         if demixed_point is not None:
             demix_traces[:, t] = demixed_point
             drop_frames.append(False)
