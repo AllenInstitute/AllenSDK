@@ -1,13 +1,24 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-## [2.2.0]
-## Bug Fixes
-- `response_time` of a trial in behavior-only or behavior + ophys sessions is now the first lick of the trial (for non-"aborted" trials). If no lick occurred or if the trial is "aborted", `repsonse_time` is `NaN`.
+
+## [2.2.0] = 2020-09-03
+
+### Added
+- AllenSDK HTTP engine streaming requests now include a progress bar.
+
+### Changed
+- (Internal) Behavior Ophys Sessions no longer have a dependence on the `segmentation_mask_image` file (provided by LIMS) when trying to write NWB files.
+
+### Bug Fixes
+- (Internal) `response_time` of a trial in behavior-only or behavior + ophys sessions is now the first lick of the trial (for non-"aborted" trials). If no lick occurred or if the trial is "aborted", `response_time` is `NaN`.
+- Resolve `ImportError: cannot import name 'MultiContainerInterface' from 'hdmf.container'` errors by removing explicit version bounds on the `hdmf` package.
+- The optical physiology 2-photon trace demixer has been modified to be more memory friendly and should no longer result in out of memory errors when trying to demix very large movie stacks.
+- (Internal) Docker image definitions have been updated so that internal continuous integration tests can work properly
 
 ## [2.1.0] = 2020-07-16
 
 ### Added
-- Behvaior Ophys NWB File writing capability fixes for updated PyNWB and HDMF versions
+- Behavior Ophys NWB File writing capability fixes for updated PyNWB and HDMF versions
 - Added warning if using outdated Visual Coding Neuropixels NWB files
 - Added documentation file for Visual Behavior terms in AllenSDK for quick lookup
 
