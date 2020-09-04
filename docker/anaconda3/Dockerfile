@@ -1,17 +1,26 @@
-# DOCKER-VERSION 1.11.1
-#
 # docker build --tag alleninstitute/allensdk:anaconda3 .
 # docker run -it alleninstitute/allensdk:anaconda3 /bin/bash
 #
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:4.8.2
 
-MAINTAINER David Feng <davidf@alleninstitute.org>
+LABEL maintainer="nicholas.mei@alleninstitute.org"
 
-# neuron installation
-WORKDIR root
-COPY shared/apt_get_dependencies.sh ./shared/
-RUN /bin/bash shared/apt_get_dependencies.sh
-COPY shared/conda_27.sh ./shared/
-RUN /bin/bash shared/conda_27.sh
-COPY shared/conda_36.sh ./shared/
-RUN /bin/bash shared/conda_36.sh
+RUN apt-get update \
+    && apt-get install -y \
+        automake \
+        libopenjp2-7 \
+        make \
+        pkg-config \
+        rsync \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN conda update -y conda
+
+RUN conda create -y --name py36 python=3.6 ipykernel \
+    && conda clean --index-cache --tarballs
+
+RUN conda create -y --name py37 python=3.7 ipykernel \
+    && conda clean --index-cache --tarballs
+
+RUN conda create -y --name py38 python=3.8 ipykernel \
+    && conda clean --index-cache --tarballs

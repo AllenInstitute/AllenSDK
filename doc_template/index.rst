@@ -90,9 +90,20 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+
+What's New - 2.2.0 (September 3, 2020)
+-----------------------------------------------------------------------
+As of the 2.2.0 release:
+
+- AllenSDK HTTP engine streaming requests now include a progress bar
+- `ImportError: cannot import name 'MultiContainerInterface' from 'hdmf.container'` errors should now be resolved (by removing explicit version bounds on the `hdmf` package).
+- The optical physiology 2-photon trace demixer has been modified to be more memory friendly and should no longer result in out of memory errors when trying to demix very large movie stacks.
+
+
 What's New - 2.1.0 (July 16, 2020)
 -----------------------------------------------------------------------
 As of the 2.1.0 release:
+
 - behavior ophys nwb files can now be written using updated pynwb and hdmf
 - A warning has been added if you are using AllenSDK with outdated NWB files
 - A new documentation file has been added which will contain Visual Behavior specific terms for quick lookup
@@ -110,42 +121,11 @@ As of the 2.0.0 release:
 **Important Note**:
 Due to newer versions of pynwb/hdmf having issues reading previously released Visual Coding Neuropixels NWB files and due to the significant reorganization of their NWB file contents, this release contains breaking changes that necessitate a major version revision. NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot or choose not to re-download the updated NWB files, you can continue using a prior version of AllenSDK (< 2.0.0) to access them. However, no further features or bugfixes for AllenSDK (< 2.0.0) are planned. Data released for other projects (Cell Types, Mouse Connectivity, etc.) are *NOT* affected and will *NOT* need to be re-downloaded
 
-What's New - 1.8.0 (June 6, 2020)
------------------------------------------------------------------------
-
-As of the 1.8.0 release:
-
-- The biophysical module can now run both current and legacy all-active models.
-- A pull request template was added to the repository.
-- Duplicated demixer module was deprecated, and test coverage was added.
-- Docker image for AllenSDK was updated.
-
-For internal users:
-- The `date_of_acquisition` field is available for behavior-only Session data.
-- The CSV log was removed from `BehaviorProjectCache`
-- Fixed a bug so LIMS data served to `BehaviorDataSession` now all use the same timestamp source.
-
-What's New - 1.7.1 (May 5, 2020)
------------------------------------------------------------------------
-
-As of the 1.7.1 release:
-
-- Added a bug fix to correct nightly tests of AllenSDK and prevent failure
-- Added a bug fix to move nightly notebook tests to using production endpoint
-
-What's New - 1.7.0 (April 29, 2020)
------------------------------------------------------------------------
-
-As of the 1.7.0 release:
-
-- Added functionality so internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
-- Added a new mixin for managing processing parameters for Session objects
-- Update the monitor delay calculation to better handle edge cases; no longer provide a default delay value if encounter an error
-- Added support for additional sync file line labels
-- Fixed bug with loading line labels from sync files
-
 Previous Release Notes
 ----------------------
+    * `1.8.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.8.0>`_
+    * `1.7.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.7.1>`_
+    * `1.7.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.7.0>`_
     * `1.6.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.6.0>`_
     * `1.5.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.5.0>`_
     * `1.4.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.4.0>`_
