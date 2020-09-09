@@ -122,12 +122,14 @@ def _identify_wraps(vsig: Iterable, *,
     shifted_vsig = _shift(vsig)
     if not isinstance(vsig, np.ndarray):
         vsig = np.array(vsig)
-    pos_wraps = np.asarray(
-        np.logical_and(vsig < min_threshold, shifted_vsig > max_threshold)
-        ).nonzero()[0]
-    neg_wraps = np.asarray(
-        np.logical_and(vsig > max_threshold, shifted_vsig < min_threshold)
-        ).nonzero()[0]
+    # Suppress warnings for when comparing to nan values
+    with np.errstate(invalid='ignore'):
+        pos_wraps = np.asarray(
+            np.logical_and(vsig < min_threshold, shifted_vsig > max_threshold)
+            ).nonzero()[0]
+        neg_wraps = np.asarray(
+            np.logical_and(vsig > max_threshold, shifted_vsig < min_threshold)
+            ).nonzero()[0]
     return pos_wraps, neg_wraps
 
 
@@ -255,8 +257,10 @@ def _unwrap_voltage_signal(
     unwrapped_diff[other_ix] = vsig[other_ix] - vsig_last[other_ix]
     # Correct for wrap artifacts based on allowed `max_diff` value
     # (fill with nan)
-    unwrapped_diff = np.where(
-        np.abs(unwrapped_diff) <= max_diff, unwrapped_diff, np.nan)
+    # Suppress warnings when comparing with nan values to reduce noise
+    with np.errstate(invalid='ignore'):
+        unwrapped_diff = np.where(
+            np.abs(unwrapped_diff) <= max_diff, unwrapped_diff, np.nan)
     # Get nan indices to propogate to the cumulative sum (otherwise
     # treated as 0)
     unwrapped_nans = np.array(np.isnan(unwrapped_diff)).nonzero()
@@ -281,7 +285,9 @@ def _zscore_threshold_1d(data: np.ndarray,
     """
     corrected_data = data.copy().astype("float")
     scores = zscore(data, nan_policy="omit")
-    exceed = np.array(scores > threshold).nonzero()[0]
+    # Suppress warnings when comparing to nan values to reduce noise
+    with np.errstate(invalid='ignore'):
+        exceed = np.array(scores > threshold).nonzero()[0]
     corrected_data[exceed] = np.nan
     return corrected_data
 
