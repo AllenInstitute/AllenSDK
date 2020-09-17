@@ -44,6 +44,8 @@ import time
 import os
 import multiprocessing as mp
 from functools import partial
+import argschema as ags
+import argparse
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
@@ -53,19 +55,21 @@ def _init_lock(lock):
     global _lock
     _lock = lock
 
-def run(description, sweeps=None, procs=6):
+def run(args, sweeps=None, procs=6):
     '''Main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
-    description : Config
-        All information needed to run the experiment.
+    args : dict
+        Parsed arguments to run the experiment.
     procs : int
         number of sweeps to simulate simultaneously.
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
     '''
 
+    description = load_description(args)
+    
     prepare_nwb_output(description.manifest.get_path('stimulus_path'),
                        description.manifest.get_path('output_path'))
 
@@ -102,8 +106,9 @@ def run_sync(description, sweeps=None):
 
     # configure model
     manifest = description.manifest
-    morphology_path = description.manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    morphology_path = description.manifest.get_path('MORPHOLOGY').encode('ascii', 'ignore')
+    morphology_path = morphology_path.decode("utf-8")
+    utils.generate_morphology(morphology_path)
     utils.load_cell_parameters()
 
     # configure stimulus and recording
@@ -190,20 +195,31 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
-def load_description(manifest_json_path):
-    '''Read configuration file.
+def load_description(args_dict):
+    '''Read configurations.
 
     Parameters
     ----------
-    manifest_json_path : string
-        File containing the experiment configuration.
+    args_dict : dict
+        Parsed arguments dictionary with following keys.
+        
+        manifest_file : string
+            .json file with containing the experiment configuration
+        axon_type : string
+            Axon handling for the all-active models
 
     Returns
     -------
     Config
         Object with all information needed to run the experiment.
     '''
+    manifest_json_path = args_dict['manifest_file']
+    
     description = Config().load(manifest_json_path)
+    
+    # For newest all-active models update the axon replacement
+    axon_replacement_dict = {'axon_type': args_dict.get('axon_type', 'truncated')}
+    description.update_data(axon_replacement_dict, 'biophys')
 
     # fix nonstandard description sections
     fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
@@ -212,8 +228,13 @@ def load_description(manifest_json_path):
     return description
 
 
-if '__main__' == __name__:
-    import sys
+# Create the parser
+sim_parser = argparse.ArgumentParser(description='Run simulation for biophysical models with the provided configuration')
+sim_parser.add_argument('manifest_file',
+                        help='.json configurations for running the simulations')
+sim_parser.add_argument('--axon_type', default='truncated', choices=['stub', 'truncated'],
+                        help='axon replacement for all-active models; truncated: truncate reconstructed axon after 60 micron, stub: replace reconstructed axon with a uniform stub 60 micron long and 1 micron in diameter')
 
-    description = load_description(sys.argv[-1])
-    run(description)
+if '__main__' == __name__:
+    schema = sim_parser.parse_args()
+    run(vars(schema))

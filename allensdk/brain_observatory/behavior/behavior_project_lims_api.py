@@ -29,6 +29,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Typically want to construct an instance of this class by calling
             `BehaviorProjectLimsApi.default()`.
 
+        Set log level to debug to see SQL queries dumped by
+        "BehaviorProjectLimsApi" logger.
+
         Note -- Currently the app engine is unused because we aren't yet
         supporting the download of stimulus templates for visual behavior
         data. This feature will be added at a later date.
@@ -196,11 +199,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.ophys_session_id,
                 bs.behavior_training_id,
                 equipment.name as equipment_name,
+                bs.date_of_acquisition,
                 d.id as donor_id,
                 d.full_genotype,
                 reporter.reporter_line,
                 driver.driver_line,
                 g.name AS sex,
+                DATE_PART('day', bs.date_of_acquisition - d.date_of_birth)
+                    AS age_in_days,
                 bs.foraging_id
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
@@ -214,6 +220,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN equipment ON equipment.id = bs.equipment_id
             {session_sub_query}
         """
+        self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
     def _get_foraging_ids_from_behavior_session(
@@ -242,6 +249,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if behavior_session_ids:
             foraging_ids = self._get_foraging_ids_from_behavior_session(
                 behavior_session_ids)
+            foraging_ids = [f"'{fid}'" for fid in foraging_ids]
         # Otherwise just get the full table from mtrain
         else:
             foraging_ids = None
@@ -257,6 +265,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN stages ON stages.id = bs.state_id
             {foraging_ids_query};
         """
+        self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
         return self.mtrain_engine.select(query)
 
     def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:

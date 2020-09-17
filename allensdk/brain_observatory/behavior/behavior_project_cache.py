@@ -1,11 +1,8 @@
 import numpy as np
-import os.path
-import csv
 from functools import partial
-from typing import Type, Optional, List, Any, Dict, Union
+from typing import Type, Optional, List, Union
 from pathlib import Path
 import pandas as pd
-import time
 import logging
 
 from allensdk.api.cache import Cache
@@ -15,7 +12,6 @@ from allensdk.brain_observatory.behavior.behavior_project_lims_api import (
 from allensdk.brain_observatory.behavior.internal.behavior_project_base\
     import BehaviorProjectBase
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
-from allensdk.core.exceptions import MissingDataError
 from allensdk.core.authentication import DbCredentials
 
 BehaviorProjectApi = Type[BehaviorProjectBase]
@@ -23,14 +19,10 @@ BehaviorProjectApi = Type[BehaviorProjectBase]
 
 class BehaviorProjectCache(Cache):
 
-    MANIFEST_VERSION = "0.0.1-alpha"
+    MANIFEST_VERSION = "0.0.1-alpha.2"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
     OPHYS_EXPERIMENTS_KEY = "ophys_experiments"
-
-    # Temporary way for scientists to keep track of analyses
-    OPHYS_ANALYSIS_LOG_KEY = "ophys_analysis_log"
-    BEHAVIOR_ANALYSIS_LOG_KEY = "behavior_analysis_log"
 
     MANIFEST_CONFIG = {
         OPHYS_SESSIONS_KEY: {
@@ -47,18 +39,8 @@ class BehaviorProjectCache(Cache):
             "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
-        },
-        OPHYS_ANALYSIS_LOG_KEY: {
-            "spec": f"{OPHYS_ANALYSIS_LOG_KEY}.csv",
-            "parent_key": "BASEDIR",
-            "typename": "file"
-            },
-        BEHAVIOR_ANALYSIS_LOG_KEY: {
-            "spec": f"{BEHAVIOR_ANALYSIS_LOG_KEY}.csv",
-            "parent_key": "BASEDIR",
-            "typename": "file"
-            },
         }
+    }
 
     def __init__(
             self,
@@ -283,121 +265,43 @@ class BehaviorProjectCache(Cache):
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
         """
-        Note -- This method mocks the behavior of a cache. No files are
-        actually downloaded for local access. Instead, it adds the
-        session id to a csv log. If the "fixed" parameter is true,
-        then the API will first check to ensure that the log is present
-        in the record before pulling the data.
+        Note -- This method mocks the behavior of a cache. Future
+        development will include an NWB reader to read from
+        a true local cache (once nwb files are created).
+        TODO: Using `fixed` will raise a NotImplementedError since there
+        is no real cache.
         """
-        # TODO: Future development will include an NWB reader to read from
-        # a true local cache (once nwb files are created)
-        # For now just check the log if pass `fixed`
-        path = self.get_cache_path(None, self.OPHYS_ANALYSIS_LOG_KEY)
         if fixed:
-            self.logger.warning(
-                "Warning! Passing `fixed=True` does not ensure that the "
-                "underlying data has not changed, as no data are actually "
-                "cached locally. The log will be updated each time the data "
-                "are pulled from the database for tracking purposes.")
-            try:
-                record = pd.read_csv(path)
-            except FileNotFoundError:
-                raise MissingDataError(
-                    "No analysis log found! Add to the log by getting "
-                    "session data with fixed=False.")
-            if ophys_experiment_id not in record["ophys_experiment_id"].values:
-                raise MissingDataError(
-                    f"Data for ophys experiment {ophys_experiment_id} not "
-                    "found!")
-
+            raise NotImplementedError
         fetch_session = partial(self.fetch_api.get_session_data,
                                 ophys_experiment_id)
-        write_log = partial(_write_log, path=path,
-                            key_name="ophys_experiment_id",
-                            key_value=ophys_experiment_id)
         return call_caching(
             fetch_session,
-            write_log,
-            lazy=False,
+            lambda x: x,        # not writing anything
+            lazy=False,         # can't actually read from file cache
             read=fetch_session
         )
 
     def get_behavior_session_data(self, behavior_session_id: int,
                                   fixed: bool = False):
         """
-        Note -- This method mocks the behavior of a cache. No files are
-        actually downloaded for local access. Instead, it adds the
-        session id to a csv log. If the "fixed" parameter is true,
-        then the API will first check to ensure that the log is present
-        in the record before pulling the data.
+        Note -- This method mocks the behavior of a cache. Future
+        development will include an NWB reader to read from
+        a true local cache (once nwb files are created).
+        TODO: Using `fixed` will raise a NotImplementedError since there
+        is no real cache.
         """
-        # TODO: Future development will include an NWB reader to read from
-        # a true local cache (once nwb files are created)
-        # For now just check the log if pass `fixed`
-        path = self.get_cache_path(None, self.BEHAVIOR_ANALYSIS_LOG_KEY)
         if fixed:
-            self.logger.warning(
-                "Warning! Passing `fixed=True` does not ensure that the "
-                "underlying data has not changed, as no data are actually "
-                "cached locally. The log will be updated each time the data "
-                "are pulled from the database for tracking purposes.")
-            try:
-                record = pd.read_csv(path)
-            except FileNotFoundError:
-                raise MissingDataError(
-                    "No analysis log found! Add to the log by getting "
-                    "session data with fixed=False.")
-            if behavior_session_id not in record["behavior_session_id"].values:
-                raise MissingDataError(
-                    f"Data for ophys experiment {behavior_session_id} not "
-                    "found!")
+            raise NotImplementedError
 
         fetch_session = partial(self.fetch_api.get_behavior_only_session_data,
                                 behavior_session_id)
-        write_log = partial(_write_log, path=path,
-                            key_name="behavior_session_id",
-                            key_value=behavior_session_id)
         return call_caching(
             fetch_session,
-            write_log,
+            lambda x: x,       # not writing anything
             lazy=False,        # can't actually read from file cache
             read=fetch_session
         )
-
-
-def _write_log(data: Any, path: str, key_name: str, key_value: Any):
-    """
-    Helper method to create and add to a log. Invoked any time a session
-    object is created via BehaviorProjectCache.
-    :param data: Unused, required because call_caching method assumes
-    all writer functions have data as the first positional argument
-    :param path: Path to save the log file
-    :type path: str path
-    :param key_name: Name of the id used to track the session object.
-    Typically "behavior_session_id" or "ophys_session_id".
-    :type key_name: str
-    :param key_value: Value of the id used to track the session object.
-    Usually an int.
-    """
-    now = round(time.time())
-    keys = [key_name, "created_at", "updated_at"]
-    values = [key_value, now, now]
-    if os.path.exists(path):
-        record = (pd.read_csv(path, index_col=key_name)
-                    .to_dict(orient="index"))
-        experiment = record.get(key_value)
-        if experiment:
-            experiment.update({"updated_at": now})
-        else:
-            record.update({key_value: dict(zip(keys[1:], values[1:]))})
-        (pd.DataFrame.from_dict(record, orient="index")
-            .rename_axis(index=key_name)
-            .to_csv(path))
-    else:
-        with open(path, "w") as f:
-            w = csv.DictWriter(f, fieldnames=keys)
-            w.writeheader()
-            w.writerow(dict(zip(keys, values)))
 
 
 def _write_csv(path, df, array_fields=None):

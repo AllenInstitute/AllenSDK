@@ -3,10 +3,8 @@ import pytest
 import pandas as pd
 import tempfile
 import logging
-import time
 from allensdk.brain_observatory.behavior.behavior_project_cache import (
     BehaviorProjectCache)
-from allensdk.core.exceptions import MissingDataError
 
 
 @pytest.fixture
@@ -102,26 +100,6 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
     assert [expected_first[0]] == caplog.record_tuples
 
 
-def test_behavior_session_fails_fixed_if_no_cache(TempdirBehaviorCache):
-    cache = TempdirBehaviorCache
-    with pytest.raises(MissingDataError):
-        cache.get_behavior_session_data(1, fixed=True)
-    cache.get_behavior_session_data(1)
-    # Also fails if there is a cache, but the id is not contained therein
-    with pytest.raises(MissingDataError):
-        cache.get_behavior_session_data(2, fixed=True)
-
-
-def test_session_fails_fixed_if_no_cache(TempdirBehaviorCache):
-    cache = TempdirBehaviorCache
-    with pytest.raises(MissingDataError):
-        cache.get_session_data(1, fixed=True)
-    cache.get_session_data(1)
-    # Also fails if there is a cache, but the id is not contained therein
-    with pytest.raises(MissingDataError):
-        cache.get_session_data(2, fixed=True)
-
-
 def test_get_session_table_by_experiment(TempdirBehaviorCache):
     expected = (pd.DataFrame({"ophys_session_id": [1, 2, 2, 3],
                               "ophys_experiment_id": [4, 5, 6, 7]})
@@ -129,47 +107,3 @@ def test_get_session_table_by_experiment(TempdirBehaviorCache):
     actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
         ["ophys_session_id"]]
     pd.testing.assert_frame_equal(expected, actual)
-
-
-def test_write_behavior_log(TempdirBehaviorCache):
-    expected_cols = ["behavior_session_id", "created_at", "updated_at"]
-    expected_ids = [1, 2]
-    expected_times = [False, True]
-    cache = TempdirBehaviorCache
-    cache.get_behavior_session_data(1)
-    cache.get_behavior_session_data(2)
-    time.sleep(1)
-    cache.get_behavior_session_data(1)
-    path = cache.manifest.path_info.get("behavior_analysis_log").get("spec")
-    # Log exists
-    assert os.path.exists(path)
-    actual = pd.read_csv(path)
-    # columns exist
-    assert list(actual) == expected_cols
-    # ids exist
-    assert actual["behavior_session_id"].values.tolist() == expected_ids
-    # first one should have updated different than created since accessed 2x
-    assert ((actual["created_at"] == actual["updated_at"]).values.tolist()
-            == expected_times)
-
-
-def test_write_session_log(TempdirBehaviorCache):
-    expected_cols = ["ophys_experiment_id", "created_at", "updated_at"]
-    expected_ids = [1, 2]
-    expected_times = [False, True]
-    cache = TempdirBehaviorCache
-    cache.get_session_data(1)
-    cache.get_session_data(2)
-    time.sleep(1)
-    cache.get_session_data(1)
-    path = cache.manifest.path_info.get("ophys_analysis_log").get("spec")
-    # Log exists
-    assert os.path.exists(path)
-    actual = pd.read_csv(path)
-    # columns exist
-    assert list(actual) == expected_cols
-    # ids exist
-    assert actual["ophys_experiment_id"].values.tolist() == expected_ids
-    # first one should have updated different than created since accessed 2x
-    assert ((actual["created_at"] == actual["updated_at"]).values.tolist()
-            == expected_times)

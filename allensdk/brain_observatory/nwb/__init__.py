@@ -1,6 +1,9 @@
 import logging
+import warnings
 from pathlib import Path
+from typing import Iterable, Tuple
 
+import h5py
 import numpy as np
 import pandas as pd
 import datetime
@@ -9,11 +12,12 @@ import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
-from pynwb import ProcessingModule
+from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -23,6 +27,50 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
+
+CELL_SPECIMEN_COL_DESCRIPTIONS = {
+    'cell_specimen_id': 'Unified id of segmented cell across experiments (after'
+                        ' cell matching)',
+    'height': 'Height of ROI in pixels',
+    'width': 'Width of ROI in pixels',
+    'mask_image_plane': 'Which image plane an ROI resides on. Overlapping ROIs '
+                        'are stored on different mask image planes.',
+    'max_correction_down': 'Max motion correction in down direction in pixels',
+    'max_correction_left': 'Max motion correction in left direction in pixels',
+    'max_correction_up': 'Max motion correction in up direction in pixels',
+    'max_correction_right': 'Max motion correction in right direction in '
+                            'pixels',
+    'valid_roi': 'Indicates if cell classification found the ROI to be a cell '
+                 'or not',
+    'x': 'x position of ROI in Image Plane in pixels (top left corner)',
+    'y': 'y position of ROI in Image Plane in pixels (top left corner)'
+}
+
+def check_nwbfile_version(nwbfile_path: str,
+                          desired_minimum_version: str,
+                          warning_msg: str):
+
+        with h5py.File(nwbfile_path, 'r') as f:
+            # nwb 2.x files store version as an attribute
+            try:
+                nwb_version = str(f.attrs["nwb_version"]).split(".")
+            except KeyError:
+                # nwb 1.x files store version as dataset
+                try:
+                    nwb_version = str(f["nwb_version"][...].astype(str))
+                    # Stored in the form: `NWB-x.y.z`
+                    nwb_version = nwb_version.split("-")[1].split(".")
+                except (KeyError, IndexError):
+                    nwb_version = None
+
+        if nwb_version is None:
+            warnings.warn(f"'{nwbfile_path}' doesn't appear to be a valid "
+                          f"Neurodata Without Borders (*.nwb) format file as "
+                          f"neither a 'nwb_version' field nor dataset could "
+                          f"be found!")
+        else:
+            if tuple(nwb_version) < tuple(desired_minimum_version.split(".")):
+                warnings.warn(warning_msg)
 
 
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
@@ -118,8 +166,8 @@ def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
     cr_params = eye_dlc_tracking_data["cr_params"]
     eye_params = eye_dlc_tracking_data["eye_params"]
 
-    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0]) and
-                        (cr_params.shape[0] == eye_params.shape[0]))
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
+                        and (cr_params.shape[0] == eye_params.shape[0]))
     if not num_frames_match:
         log.warn("The number of frames for ellipse fits don't "
                  "match when they should. No ellipse fits will be written! "
@@ -325,7 +373,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     v_sig = TimeSeries(
         name='v_sig',
         data=running_data_df['v_sig'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['v_sig']
     )
 
@@ -356,38 +404,103 @@ def add_stimulus_template(nwbfile, image_data, name):
     return nwbfile
 
 
-def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
-    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
+def create_stimulus_presentation_time_interval(name: str, description: str,
+                                               columns_to_add: Iterable) -> pynwb.epoch.TimeIntervals:
+    column_descriptions = {
+        "stimulus_name": "Name of stimulus",
+        "stimulus_block": "Index of contiguous presentations of one stimulus type",
+        "temporal_frequency": "Temporal frequency of stimulus",
+        "x_position": "Horizontal position of stimulus on screen",
+        "y_position": "Vertical position of stimulus on screen",
+        "mask": "Shape of mask applied to stimulus",
+        "opacity": "Opacity of stimulus",
+        "phase": "Phase of grating stimulus",
+        "size": "Size of stimulus (see ‘units’ field for units)",
+        "units": "Units of stimulus size",
+        "stimulus_index": "Index of stimulus type",
+        "orientation": "Orientation of stimulus",
+        "spatial_frequency": "Spatial frequency of stimulus",
+        "frame": "Frame of movie stimulus",
+        "contrast": "Contrast of stimulus",
+        "Speed": "Speed of moving dot field",
+        "Dir": "Direction of stimulus motion",
+        "coherence": "Coherence of moving dot field",
+        "dotLife": "Longevity of individual dots",
+        "dotSize": "Size of individual dots",
+        "fieldPos": "Position of moving dot field",
+        "fieldShape": "Shape of moving dot field",
+        "fieldSize": "Size of moving dot field",
+        "nDots": "Number of dots in moving dot field"
+    }
+
+    columns_to_ignore = {'start_time', 'stop_time', 'tags', 'timeseries'}
+
+    interval = pynwb.epoch.TimeIntervals(name=name,
+                                         description=description)
+
+    for column_name in columns_to_add:
+        if column_name not in columns_to_ignore:
+            description = column_descriptions.get(column_name, "No description")
+            interval.add_column(name=column_name, description=description)
+
+    return interval
+
+
+def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_interval'):
+    """Adds a stimulus table (defining stimulus characteristics for each
+    time point in a session) to an nwbfile as TimeIntervals.
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
     stimulus_table: pd.DataFrame
-        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
-        Nans will be replaced with the empty string. Required columns are:
-            start_time :: the time at which this epoch started
-            stop_time :: the time  at which this epoch ended
+        Each row corresponds to an interval of time. Columns define the interval
+        (start and stop time) and its characteristics.
+        Nans in columns with string data will be replaced with the empty strings.
+        Required columns are:
+            start_time :: the time at which this interval started
+            stop_time :: the time  at which this interval ended
     tag : str, optional
-        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
+        Each interval in an nwb file has one or more tags. This string will be
+        applied as a tag to all TimeIntervals created here
 
     Returns
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
+    """
     stimulus_table = stimulus_table.copy()
-
     ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
+    possible_names = {'stimulus_name', 'image_name'}
+    stimulus_name_column = get_column_name(stimulus_table.columns,
+                                           possible_names)
+    stimulus_names = stimulus_table[stimulus_name_column].unique()
 
-    for colname, series in stimulus_table.items():
-        types = set(series.map(type))
-        if len(types) > 1 and str in types:
-            series.fillna('', inplace=True)
-            stimulus_table[colname] = series.transform(str)
+    for stim_name in sorted(stimulus_names):
+        specific_stimulus_table = stimulus_table[stimulus_table[stimulus_name_column] == stim_name]
+        # Drop columns where all values in column are NaN
+        cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
+        # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
+        for colname, series in cleaned_table.items():
+            types = set(series.map(type))
+            if len(types) > 1 and str in types:
+                series.fillna('N/A', inplace=True)
+                cleaned_table[colname] = series.transform(str)
 
-    stimulus_table = setup_table_for_epochs(stimulus_table, ts, tag)
-    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
-    nwbfile.epochs = container
+        interval_description = (f"Presentation times and stimuli details "
+                                f"for '{stim_name}' stimuli")
+        presentation_interval = create_stimulus_presentation_time_interval(
+            name=f"{stim_name}_presentations",
+            description=interval_description,
+            columns_to_add=cleaned_table.columns
+        )
+
+        for row in cleaned_table.itertuples(index=False):
+            row = row._asdict()
+
+            presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
+
+        nwbfile.add_time_intervals(presentation_interval)
 
     return nwbfile
 
@@ -441,7 +554,9 @@ def setup_table_for_invalid_times(invalid_epochs):
 
         start_time = df['start_time'].values
         stop_time = df['end_time'].values
-        tags = [[t,str(id),l,] for t,id,l in zip(df['type'],df['id'],df['label'])]
+        tags = [[_type, str(_id), label]
+                for _type, _id, label
+                in zip(df['type'], df['id'], df['label'])]
 
         table = pd.DataFrame({'start_time': start_time,
                               'stop_time': stop_time,
@@ -495,8 +610,8 @@ def add_trials(nwbfile, trials, description_dict={}):
 
     for c in [c for c in trials.columns if c not in ['start_time', 'stop_time']]:
         index, data = dict_to_indexed_array(trials[c].to_dict(), order)
-        if data.dtype == '<U1':
-            data = trials[c].values
+        if data.dtype == '<U1':  # data type is composed of unicode characters
+            data = trials[c].tolist()
         if not len(data) == len(order):
             if len(data) == 0:
                 data = ['']
@@ -600,6 +715,7 @@ def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None
 
     add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
+
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
     image_index = IndexSeries(
@@ -644,7 +760,28 @@ def add_task_parameters(nwbfile, task_parameters):
     nwbfile.add_lab_meta_data(nwb_task_parameters)
 
 
-def add_cell_specimen_table(nwbfile, cell_specimen_table):
+def add_cell_specimen_table(nwbfile: NWBFile,
+                            cell_specimen_table: pd.DataFrame):
+    """
+    This function takes the cell specimen table and writes the ROIs
+    contained within. It writes these to a new NWB imaging plane
+    based off the previously supplied metadata
+    Parameters
+    ----------
+    nwbfile: NWBFile
+        this is the in memory NWBFile currently being written to which ROI data
+        is added
+    cell_specimen_table: pd.DataFrame
+        this is the DataFrame containing the cells segmented from a ophys
+        experiment, stored in json file and loaded.
+        example: /home/nicholasc/projects/allensdk/allensdk/test/
+                 brain_observatory/behavior/cell_specimen_table_789359614.json
+
+    Returns
+    -------
+    nwbfile: NWBFile
+        The altered in memory NWBFile object that now has a specimen table
+    """
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
@@ -687,7 +824,6 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         unit='unknown',  # Should this be passed in for future support?
         reference_frame='unknown')  # Should this be passed in for future support?
 
-
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")
 
@@ -705,12 +841,21 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
         description="Segmented rois",
         imaging_plane=imaging_plane)
 
-    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix']]:
-        plane_segmentation.add_column(c, c)
+    for col_name in cell_roi_table.columns:
+        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # in the nwb.ophys::PlaneSegmentation Object
+        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+            # This builds the columns with name of column and description of column
+            # both equal to the column name in the cell_roi_table
+            plane_segmentation.add_column(col_name,
+                                          CELL_SPECIMEN_COL_DESCRIPTIONS.get(col_name,
+                                                                             "No Description Available"))
 
+    # go through each roi and add it to the plan segmentation object
     for cell_roi_id, row in cell_roi_table.iterrows():
         sub_mask = np.array(row.pop('image_mask'))
-        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=sub_mask)
+        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0],
+                                       roi_mask=sub_mask)
         mask = curr_roi.get_mask_plane()
         csid = row.pop('cell_specimen_id')
         row['cell_specimen_id'] = -1 if csid is None else csid

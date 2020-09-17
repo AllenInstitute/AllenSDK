@@ -74,6 +74,14 @@ A central aim of the Visual Coding – Neuropixels project is to measure the imp
 The remainder of the visual stimulus set either consisted of the same stimuli shown in the two-photon experiments ("Brain Observatory 1.1"), or a subset of those stimuli shown with a higher number of repeats. We also added a dot motion stimulus, to allow us to measure the speed tuning of units across the mouse visual system.
 
 
+AllenSDK 2.0 and Data Compatability
+-----------------------------------
+
+AllenSDK version 2.0 marks a major update to released Visual Coding Neuropixels datasets. Due to newer versions of pynwb/hdmf having issues reading previously released Visual Coding Neuropixels NWB files and due to the significant reorganization of updated NWB file contents, this release contains breaking changes that necessitate a major version revision. NWB files released prior to 6/11/2020 are not guaranteed to work with the 2.0.0 version of AllenSDK. If you cannot or choose not to re-download the updated NWB files, you can continue using a prior version of AllenSDK (< 2.0.0) to access them. However, no further features or bugfixes for AllenSDK (< 2.0.0) are planned. Data released for other projects (Cell Types, Mouse Connectivity, etc.) are *NOT* affected and will *NOT* need to be re-downloaded.
+
+When using the Visual Coding **EcephysProjectCache** from this updated AllenSDK version, if a **ManifestError** is encountered, this indicates that previously downloaded cached data files need to be removed and re-downloaded. The location these files as well as manifest are user defined and are set when instantiating an **EcephysProjectCache**.
+
+
 Quality Metrics
 ---------------
 

@@ -1,7 +1,0 @@
-namespaces:
-- doc: ""
-  version: 0.2.0
-  name: AIBS_ecephys
-  schema:
-  - namespace: core
-  - source: AIBS_ecephys_extension.yaml

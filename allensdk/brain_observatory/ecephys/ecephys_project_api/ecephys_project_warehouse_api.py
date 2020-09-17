@@ -9,14 +9,12 @@ from .rma_engine import RmaEngine, AsyncRmaEngine
 from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api.warehouse_patches import replace_bad_structure_assignments
-
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
     scene_re = re.compile(r".*/(?P<num>\d+).tiff")
-    
+
     def __init__(self, rma_engine=None):
         if rma_engine is None:
             rma_engine = RmaEngine(scheme="http", host="api.brain-map.org")
@@ -35,7 +33,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         if well_known_files.shape[0] != 1:
             raise ValueError(f"expected exactly 1 nwb file for session {session_id}, found: {well_known_files}")
-        
+
         download_link = well_known_files.iloc[0]["download_link"]
         return self.rma_engine.stream(download_link)
 
@@ -61,7 +59,6 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             self._stimulus_templates_list = self._list_stimulus_templates()
         return self._stimulus_templates_list
 
-
     def _list_stimulus_templates(self, ecephys_product_id=714914585):
         well_known_files = build_and_execute(
             (
@@ -70,7 +67,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 "[attachable_type$eq'Product']"
                 r"[attachable_id$eq{{ecephys_product_id}}]"
             ),
-            engine=self.rma_engine.get_rma_tabular, 
+            engine=self.rma_engine.get_rma_tabular,
             ecephys_product_id=ecephys_product_id
         )
 
@@ -92,7 +89,6 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         well_known_files["movie_number"] = movie_number
         return well_known_files
 
-
     def get_probe_lfp_data(self, probe_id):
         well_known_files = build_and_execute(
             (
@@ -106,10 +102,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         if well_known_files.shape[0] != 1:
             raise ValueError(f"expected exactly 1 LFP NWB file for probe {probe_id}, found: {well_known_files}")
-        
+
         download_link = well_known_files.loc[0, "download_link"]
         return self.rma_engine.stream(download_link)
-
 
     def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
         response = build_and_execute(
@@ -122,11 +117,11 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"
                 ",rma::include,specimen(donor(age))"
                 ",well_known_files(well_known_file_type)"
-            ), 
-            base=rma_macros(), 
-            engine=self.rma_engine.get_rma_tabular, 
-            session_ids=session_ids, 
-            has_eye_tracking=has_eye_tracking, 
+            ),
+            base=rma_macros(),
+            engine=self.rma_engine.get_rma_tabular,
+            session_ids=session_ids,
+            has_eye_tracking=has_eye_tracking,
             stimulus_names=stimulus_names
         )
 
@@ -162,19 +157,18 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         return response
 
-
     def get_probes(self, probe_ids=None, session_ids=None):
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
-                "{% import 'macros' as m %}"           
+                "{% import 'macros' as m %}"
                 "criteria=model::EcephysProbe"
                 r"{{rm.optional_contains('id',probe_ids)}}"
                 r"{{rm.optional_contains('ecephys_session_id',session_ids)}}"
             ),
-            base=rma_macros(), 
-            engine=self.rma_engine.get_rma_tabular, 
-            session_ids=session_ids, 
+            base=rma_macros(),
+            engine=self.rma_engine.get_rma_tabular,
+            session_ids=session_ids,
             probe_ids=probe_ids
         )
         response.set_index("id", inplace=True)
@@ -186,11 +180,11 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
-                "{% import 'macros' as m %}"           
+                "{% import 'macros' as m %}"
                 "criteria=model::EcephysChannel"
                 r"{{rm.optional_contains('id',channel_ids)}}"
                 r"{{rm.optional_contains('ecephys_probe_id',probe_ids)}}"
-                ",rma::include,structure"   
+                ",rma::include,structure"
                 ",rma::options[tabular$eq'"
                     "ecephys_channels.id"
                     ",ecephys_probe_id"
@@ -204,33 +198,32 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                     ",structures.acronym as ecephys_structure_acronym"
                 "']"
             ),
-            base=rma_macros(), 
-            engine=self.rma_engine.get_rma_tabular, 
+            base=rma_macros(),
+            engine=self.rma_engine.get_rma_tabular,
             probe_ids=probe_ids,
             channel_ids=channel_ids
         )
 
         response.set_index("id", inplace=True)
-        replace_bad_structure_assignments(response, inplace=True)
         return response
 
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):
-        response =  build_and_execute(
+        response = build_and_execute(
             (
-                "{% import 'macros' as m %}" 
+                "{% import 'macros' as m %}"
                 "criteria=model::EcephysUnit"
                 r"{% if unit_ids is not none %},rma::criteria[id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
                 r"{% if channel_ids is not none %},rma::criteria[ecephys_channel_id$in{{m.comma_sep(channel_ids)}}]{% endif %}"
                 r"{% if probe_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){% endif %}"
                 r"{% if session_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){% endif %}"
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, 
-            session_ids=session_ids, 
+            base=rma_macros(), engine=self.rma_engine.get_rma_tabular,
+            session_ids=session_ids,
             probe_ids=probe_ids,
-            channel_ids=channel_ids, 
+            channel_ids=channel_ids,
             unit_ids=unit_ids
         )
-        
+
         response.set_index("id", inplace=True)
 
         return response
@@ -241,32 +234,34 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         Parameters
         ----------
         unit_ids : array-like of int, optional
-            Unique identifiers for ecephys units. If supplied, only download metrics for these units.
+            Unique identifiers for ecephys units. If supplied, only download
+            metrics for these units.
         ecephys_session_ids : array-like of int, optional
-            Unique identifiers for ecephys sessions. If supplied, only download metrics for units collected during 
-            these sessions.
+            Unique identifiers for ecephys sessions. If supplied, only download
+            metrics for units collected during these sessions.
         session_types : array-like of str, optional
-            Names of session types. e.g. "brain_observatory_1.1" or "functional_connectivity". If supplied, only download 
+            Names of session types. e.g. "brain_observatory_1.1" or
+            "functional_connectivity". If supplied, only download
             metrics for units collected during sessions of these types
 
         Returns
         -------
-        pd.DataFrame : 
+        pd.DataFrame :
             A table of analysis metrics, indexed by unit_id.
 
         """
 
         response = build_and_execute(
             (
-                "{% import 'macros' as m %}" 
+                "{% import 'macros' as m %}"
                 "criteria=model::EcephysUnitMetricBundle"
                 r"{% if unit_ids is not none %},rma::criteria[ecephys_unit_id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
                 r"{% if session_ids is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}]))){% endif %}"
                 r"{% if session_types is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[stimulus_name$in{{m.comma_sep(session_types, True)}}]))){% endif %}"
             ),
-            base=rma_macros(), 
-            engine=self.rma_engine.get_rma_list, 
-            session_ids=ecephys_session_ids, 
+            base=rma_macros(),
+            engine=self.rma_engine.get_rma_list,
+            session_ids=ecephys_session_ids,
             unit_ids=unit_ids,
             session_types=session_types
         )
@@ -277,7 +272,6 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             item.update(data)
             output.append(item)
 
-        
         output = pd.DataFrame(output)
         output.set_index("ecephys_unit_id", inplace=True)
         output.drop(columns="id", inplace=True)
@@ -289,14 +283,16 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 pass
 
         # TODO: remove this
-        # on_screen_rf and p_value_rf were correctly calculated, but switched with one another. This snippet unswitches them.
+        # on_screen_rf and p_value_rf were correctly calculated,
+        # but switched with one another. This snippet unswitches them.
         columns = set(output.columns.values.tolist())
         if "p_value_rf" in columns and "on_screen_rf" in columns:
 
-            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
+            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], np.bool)
             on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
 
-            # this is not a good test, but it avoids the case where we fix these in the data for a future release, but 
+            # this is not a good test, but it avoids the case where we fix
+            # these in the data for a future release, but
             # reintroduce the bug by forgetting to update the code.
             if pv_is_bool and on_screen_is_float:
                 p_value_rf = output["p_value_rf"].copy()
@@ -305,9 +301,8 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         return output
 
-
     @classmethod
-    def default(cls, asynchronous=True, **rma_kwargs):
+    def default(cls, asynchronous=False, **rma_kwargs):
         _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
         _rma_kwargs.update(rma_kwargs)
 

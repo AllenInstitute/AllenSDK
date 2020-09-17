@@ -2,6 +2,7 @@ branches:
   only:
     - master
     - /rc\/.+/
+    - /feature\/.+/
 
 env:
   global:
