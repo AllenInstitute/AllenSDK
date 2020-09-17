@@ -23,7 +23,8 @@ def trim_discontiguous_times(times, threshold=100):
 
 
 def get_synchronized_frame_times(session_sync_file: Path,
-                                 sync_line_label_keys: Tuple[str, ...]) -> pd.Series:
+                                 sync_line_label_keys: Tuple[str, ...],
+                                 trim_after_spike: bool = True) -> pd.Series:
     """Get experimental frame times from an experiment session sync file.
 
     Parameters
@@ -37,6 +38,10 @@ def get_synchronized_frame_times(session_sync_file: Path,
         Line label keys to get times for. See class attributes of
         allensdk.brain_observatory.sync_dataset.Dataset for a listing of
         possible keys.
+    trim_after_spike : bool = True
+        If True, will calll trim_discontiguous_times on the frame times
+        before returning them, which will detect any spikes in the data
+        and remove all elements for the list which come after the spike.
 
     Returns
     -------
@@ -51,6 +56,6 @@ def get_synchronized_frame_times(session_sync_file: Path,
 
     # Occasionally an extra set of frame times are acquired after the rest of
     # the signals. We detect and remove these.
-    frame_times = trim_discontiguous_times(frame_times)
+    frame_times = trim_discontiguous_times(frame_times) if trim_after_spike else frame_times
 
     return pd.Series(frame_times)
