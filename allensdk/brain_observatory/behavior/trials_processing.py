@@ -1,13 +1,11 @@
-from typing import List
-import numpy as np
-import datetime
-import pandas as pd
-import scipy.stats as sps
+from typing import List, Dict
 import uuid
 from copy import deepcopy
 import collections
 import dateutil
-from scipy.stats import norm
+
+import pandas as pd
+import numpy as np
 
 from allensdk import one
 
@@ -92,6 +90,7 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 COMPUTER_NAME = dict((v, k) for k, v in RIG_NAME.items())
 
+
 def resolve_initial_image(stimuli, start_frame):
     """Attempts to resolve the initial image for a given start_frame for a trial
 
@@ -122,6 +121,8 @@ def resolve_initial_image(stimuli, start_frame):
             if set_frame <= start_frame and set_frame >= max_frame:
                 initial_image_group = initial_image_name = set_event[1]  # hack assumes initial_image_group == initial_image_name, only initial_image_name is present for natual_scenes
                 initial_image_category_name = stim_category_name
+                if initial_image_category_name == 'grating':
+                    initial_image_name = f'gratings_{initial_image_name}'
                 max_frame = set_frame
 
     return initial_image_category_name, initial_image_group, initial_image_name
@@ -366,13 +367,34 @@ def get_trial_timing(
     }
 
 
-def get_trial_image_names(trial, stimuli):
+def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
+    """
+    Gets the name of the stimulus presented at the beginning of the trial and
+    what is it changed to at the end of the trial.
+    Parameters
+    ----------
+    trial: A trial in a behavior ophys session
+    stimuli: The stimuli presentation log for the behavior session
+
+    Returns
+    -------
+        A dictionary indicating the starting_stimulus and what the stimulus is
+        changed to.
+
+    """
+    grating_oris = {'horizontal', 'vertical'}
     trial_start_frame = trial["events"][0][3]
-    _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
+    initial_image_category_name, _, initial_image_name = resolve_initial_image(
+        stimuli, trial_start_frame)
     if len(trial["stimulus_changes"]) == 0:
         change_image_name = initial_image_name
     else:
-        (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
+        (from_set, from_name), (to_set, to_name), _, _ = trial["stimulus_changes"][0]
+        # do this to fix names if the stimuli is a grating
+        if from_set in grating_oris:
+            from_name = f'gratings_{from_name}'
+        if to_set in grating_oris:
+            to_name = f'gratings_{to_name}'
         assert from_name == initial_image_name
         change_image_name = to_name
 
