@@ -54,11 +54,17 @@ def _shift(
     arr: Iterable (array-like)
         Iterable containing numeric data. If int, will be converted to
         float in returned object.
+    periods: int (default=1)
+        The number of elements to shift. 
+    fill_value: float (default=np.nan)
+        The value to fill at the beginning of the shifted array
     Returns
     -------
     np.ndarray (1d)
         Copy of input object as a 1d array, shifted.
     """
+    if periods <= 0:
+        raise ValueError("Can only shift for periods > 0.")
     if fill_value is None:
         fill_value = np.nan
     if isinstance(fill_value, float):
@@ -84,7 +90,7 @@ def deg_to_dist(angular_speed: np.ndarray) -> np.ndarray:
     np.ndarray (1d)
         Linear speed in cm/s at each time point.
     """
-    wheel_diameter = 6.5 * 2.54  # 6.5" wheel diameter
+    wheel_diameter = 6.5 * 2.54  # 6.5" wheel diameter, 2.54 = cm/in
     running_radius = 0.5 * (
         # assume the animal runs at 2/3 the distance from the wheel center
         2.0 * wheel_diameter / 3.0)
@@ -276,7 +282,10 @@ def _zscore_threshold_1d(data: np.ndarray,
     of SDs from the mean with NaN.
     Parameters
     ---------
-
+    data: np.ndarray
+        1d np array of values
+    threshold: float (default=5.0)
+        Z-score threshold to replace with NaN.
     Returns
     -------
     np.ndarray (1d)
@@ -287,8 +296,7 @@ def _zscore_threshold_1d(data: np.ndarray,
     scores = zscore(data, nan_policy="omit")
     # Suppress warnings when comparing to nan values to reduce noise
     with np.errstate(invalid='ignore'):
-        exceed = np.array(scores > threshold).nonzero()[0]
-    corrected_data[exceed] = np.nan
+        corrected_data[scores > threshold] = np.nan
     return corrected_data
 
 
@@ -369,8 +377,7 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
     angular_change_point = _angular_change(unwrapped_vsig, v_in)
     angular_change = np.nancumsum(angular_change_point)
     # Add the nans back in (get turned to 0 in nancumsum)
-    ang_change_nans = np.isnan(angular_change_point).nonzero()[0]
-    angular_change[ang_change_nans] = np.nan
+    angular_change[np.isnan(angular_change_point)] = np.nan
     angular_speed = calc_deriv(angular_change, time)  # speed in radians/s
     linear_speed = deg_to_dist(angular_speed)
     # Artifact correction to speed data

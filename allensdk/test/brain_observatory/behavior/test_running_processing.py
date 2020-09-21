@@ -87,6 +87,14 @@ def test_shift(arr, periods, fill, expected):
 
 
 @pytest.mark.parametrize(
+    "periods", [0, -2]
+)
+def test_shift_raises_error_periods_zero(periods):
+    with pytest.raises(ValueError, match="Can only shift"):
+        _shift(np.ones((5,)), periods)
+
+
+@pytest.mark.parametrize(
     "arr, min_threshold, max_threshold, expected",
     [
         (np.array(

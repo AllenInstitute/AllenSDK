@@ -175,7 +175,7 @@ class BehaviorOphysSession(ParamsMixin):
     @property
     def running_speed(self) -> RunningSpeed:
         """Running speed of mouse, filtered with 10Hz low pass filter,
-        To get the unfiltered running speed, use `rawrunning_speed`.
+        To get the unfiltered running speed, use `raw_running_speed`.
         Returns
         -------
         allensdk.brain_observatory.running_speed.RunningSpeed
