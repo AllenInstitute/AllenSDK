@@ -218,6 +218,19 @@ def test_local_boundaries_raises_warning(time, index, span):
 
 
 @pytest.mark.parametrize(
+    "time, index",
+    [
+        (np.array([5., 4., 3., 4., 5.]), 2),
+        (np.array([1., 2., 3., 2., 1.]), 2),
+        (np.array([3., 3., 3., 2., 1.]), 2),
+    ]
+)
+def test_local_boundaries_raises_error_non_monotonic(time, index):
+    with pytest.raises(ValueError, match="Data do not monotonically"):
+        rp._local_boundaries(time, index, 1.0)
+
+
+@pytest.mark.parametrize(
     "time, index, span, expected",
     [
         (np.arange(10.), 4, 2.0, (2.0, 6.0)),   # Spans > 1 element +/-

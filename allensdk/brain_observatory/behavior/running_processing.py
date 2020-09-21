@@ -143,11 +143,12 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     """
     Given a 1d array of monotonically increasing timestamps, and a
     point in that array (`index`), compute the indices that form the
-    boundary around `index` for timespan `span`.
+    inclusive boundary around `index` for timespan `span`.
 
-    If the values in `time` do not monotonically increase, this function
-    may return improper results. Flat lines (same value multiple times)
-    are OK.
+    Values in `time` must monotonically increase. Flat lines (same value
+    multiple times) are OK. The neighborhood may terminate around the
+    index if the `span` is too small for the sampling rate. A warning
+    will be raised in this case.
 
     Returns
     -------
@@ -162,13 +163,15 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     >>> (1, 6)
     ```
     """
+    if np.diff(time[~np.isnan(time)]).min() < 0:
+        raise ValueError("Data do not monotonically increase. This probably "
+                         "means there is an error in your time series.")
     t_val = time[index]
     max_val = t_val + abs(span)
     min_val = t_val - abs(span)
-    eligible_vals = np.array(
-        np.logical_and(time <= max_val, time >= min_val)).nonzero()[0]
-    max_ix = eligible_vals.max()
-    min_ix = eligible_vals.min()
+    eligible_indices = np.nonzero((time <= max_val) & (time >= min_val))[0]
+    max_ix = eligible_indices.max()
+    min_ix = eligible_indices.min()
     if (min_ix == index) or (max_ix == index):
         warnings.warn("Unable to find two data points around index "
                       f"for span={span} that do not include the index. "
