@@ -155,7 +155,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         idx_name = stimulus_presentations_df_pre.index.name
         stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
         stimulus_index_df.sort_index(inplace=True)
-        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
+        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time',
+                                               'phase', 'spatial_frequency']].rename(columns={'start_time': 'timestamps'})
         stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
         stimulus_presentations_df = stimulus_presentations_df_pre.merge(stimulus_index_df, left_on='start_time', right_index=True, how='left')
         assert len(stimulus_presentations_df_pre) == len(stimulus_presentations_df)
