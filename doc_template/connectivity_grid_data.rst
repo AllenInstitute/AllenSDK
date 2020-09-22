@@ -19,12 +19,12 @@ Reference
 ---------
 
 ========================= ===========================================
-Method                    Description                                
+Volume                    Description                                
 ========================= ===========================================
 projection_density        sum of detected projection pixels / sum of all pixels in voxel
 injection_fraction        fraction of pixels belonging to manually annotated injection site
 injection_density         density of detected projection pixels within the manually annotated injection site
 data_mask                 binary mask indicating if a voxel contains valid data. Only valid voxels should be used for analysis.
-
+========================= ===========================================
 
 Note that projection density reports detected AAV signal both within and outside the injection site.
