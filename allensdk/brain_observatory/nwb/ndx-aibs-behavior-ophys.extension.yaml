@@ -1,0 +1,114 @@
+groups:
+- neurodata_type_def: BehaviorTaskParameters
+  neurodata_type_inc: LabMetaData
+  doc: Metadata for behavior or behavior + ophys task parameters
+  attributes:
+  - name: omitted_flash_fraction
+    dtype: float
+    doc: omitted_flash_fraction
+  - name: stimulus_duration_sec
+    dtype: float
+    doc: duration of each stimulus presentation in seconds
+  - name: reward_volume
+    dtype: float
+    doc: reward_volume
+  - name: response_window_sec
+    dtype: text
+    shape:
+    - 2
+    doc: response_window in seconds
+  - name: blank_duration_sec
+    dtype: text
+    shape:
+    - 2
+    doc: blank duration in seconds
+  - name: stage
+    dtype: text
+    doc: stage
+  - name: stimulus_distribution
+    dtype: text
+    doc: stimulus_distribution
+  - name: n_stimulus_frames
+    dtype: int
+    doc: n_stimulus_frames
+  - name: task
+    dtype: text
+    doc: task
+  - name: stimulus
+    dtype: text
+    doc: stimulus
+- neurodata_type_def: BehaviorSubject
+  neurodata_type_inc: Subject
+  doc: Metadata for an AIBS behavior or behavior + ophys subject
+  attributes:
+  - name: genotype
+    dtype: text
+    doc: full genotype of subject
+  - name: reporter_line
+    dtype: text
+    shape:
+    - null
+    doc: Reporter line of subject
+  - name: sex
+    dtype: text
+    doc: Sex of the specimen donor/subject
+  - name: driver_line
+    dtype: text
+    shape:
+    - null
+    doc: Driver line of subject
+  - name: age
+    dtype: text
+    doc: Age of the specimen donor/subject
+  - name: subject_id
+    dtype: int
+    doc: LabTracks ID of subject
+- neurodata_type_def: OphysBehaviorMetadata
+  neurodata_type_inc: LabMetaData
+  doc: Metadata for behavior + ophys experiments
+  attributes:
+  - name: rig_name
+    dtype: text
+    doc: name of two-photon rig
+  - name: stimulus_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
+  - name: emission_lambda
+    dtype: float
+    doc: emission_lambda
+  - name: experiment_container_id
+    dtype: int
+    doc: Container ID for the container that contains this ophys session
+  - name: field_of_view_height
+    dtype: int
+    doc: field_of_view_height
+  - name: excitation_lambda
+    dtype: float
+    doc: excitation_lambda
+  - name: indicator
+    dtype: text
+    doc: indicator
+  - name: behavior_session_uuid
+    dtype: text
+    doc: MTrain record for session, also called foraging_id
+  - name: session_type
+    dtype: text
+    doc: Experimental session description
+  - name: field_of_view_width
+    dtype: int
+    doc: field_of_view_width
+  - name: targeted_structure
+    dtype: text
+    doc: Anatomical structure targeted for two-photon acquisition
+  - name: ophys_experiment_id
+    dtype: int
+    doc: Id for this ophys session
+  - name: experiment_datetime
+    dtype: text
+    doc: Date of the experiment (UTC, as string)
+  - name: imaging_depth
+    dtype: int
+    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: ophys_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the two-photon microscope

@@ -1,15 +1,15 @@
+from pathlib import Path
+
 import pandas as pd
 import pynwb
 import SimpleITK as sitk
-import os
 import collections
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
-from pynwb import load_namespaces
-namespace_path = os.path.join(os.path.dirname(__file__), 'AIBS_ophys_behavior_namespace.yaml')
-load_namespaces(namespace_path)
+namespace_path = Path(__file__).parent / 'ndx-aibs-behavior-ophys.namespace.yaml'
+pynwb.load_namespaces(str(namespace_path))
 
 
 class NwbApi:
