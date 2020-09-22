@@ -20,13 +20,8 @@ in more detail on the :doc:`structure unionizes page </unionizes>`.
 Voxel-Level Projection Data
 ---------------------------
 
-The CCF-registered AAV projection signal is also available for download as a set of 3D volumes for each experiment.  The following data volumes
-are available for download:
-
-    - **projection density**: sum of detected projection pixels / sum of all pixels in voxel
-    - **injection_fraction**: fraction of pixels belonging to manually annotated injection site
-    - **injection_density**: density of detected projection pixels within the manually annotated injection site
-    - **data_mask**: binary mask indicating if a voxel contains valid data. Only valid voxels should be used for analysis.
+The CCF-registered AAV projection signal is also available for download as a set of 3D volumes for each experiment. For 
+more information, see the :doc:`grid data page </connectivity_grid_data>`.
 
 
 Code Examples
