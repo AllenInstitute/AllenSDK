@@ -170,7 +170,7 @@ class OphysBehaviorTaskParametersSchema(RaisingSchema):
     )
 
     stimulus = fields.String(
-        doc='stage',
+        doc='stimulus',
         required=True,
     )
 
