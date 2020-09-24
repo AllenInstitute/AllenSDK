@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import numpy as np
 
 from allensdk.internal.api import OneResultExpectedError
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -55,3 +56,25 @@ def test_get_nwb_filepath(ophys_experiment_id):
 
     api = BehaviorOphysLimsApi(ophys_experiment_id)
     assert api.get_nwb_filepath() == '/allen/programs/braintv/production/visualbehavior/prod0/specimen_823826986/ophys_session_859701393/ophys_experiment_860030092/behavior_ophys_session_860030092.nwb'
+
+
+@pytest.mark.parametrize(
+    "timestamps,plane_group,group_count,expected",
+    [
+        (np.ones(10), 1, 0, np.ones(10)),
+        (np.ones(10), 1, 0, np.ones(10)),
+        # middle
+        (np.array([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0]), 1, 3, np.ones(4)),
+        # first
+        (np.array([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]), 0, 4, np.ones(3)),
+        # last
+        (np.array([0, 1, 0, 1, 0, 1, 0, 1]), 1, 2, np.ones(4)),
+        # only one group
+        (np.ones(10), 0, 1, np.ones(10))
+    ]
+)
+def test_process_ophys_plane_timestamps(
+        timestamps, plane_group, group_count, expected):
+    actual = BehaviorOphysLimsApi._process_ophys_plane_timestamps(
+        timestamps, plane_group, group_count)
+    np.testing.assert_array_equal(expected, actual)

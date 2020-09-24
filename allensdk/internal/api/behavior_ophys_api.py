@@ -49,6 +49,39 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                             .corrected_stim_timestamps)
         return timestamps
 
+    @staticmethod
+    def _process_ophys_plane_timestamps(
+            ophys_timestamps: np.ndarray, plane_group: Optional[int],
+            group_count: int):
+        """
+        On mesoscope rigs each frame corresponds to a different imaging plane;
+        the laser moves between N pairs of planes. So, every Nth 2P
+        frame time in the sync file corresponds to a given plane (and
+        its multiplexed pair). The order in which the planes are
+        acquired dictates which timestamps should be assigned to which
+        plane pairs. The planes are acquired in ascending order, where
+        plane_group=0 is the first group of planes.
+
+        If the plane group is None (indicating it does not belong to
+        a plane group), then the plane was not collected concurrently
+        and the data do not need to be resampled. This is the case for
+        Scientifica 2p data, for example.
+
+        Parameters
+        ----------
+        ophys_timestamps: np.ndarray
+            Array of timestamps for 2p data
+        plane_group: int
+            The plane group this experiment belongs to. Signals the
+            order of acquisition.
+        group_count: int
+            The total number of plane groups acquired.
+        """
+        if (group_count == 0) or (plane_group is None):
+            return ophys_timestamps
+        resampled = ophys_timestamps[plane_group::group_count]
+        return resampled
+
     @memoize
     def get_ophys_timestamps(self):
 
@@ -63,6 +96,12 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         else:
             raise RuntimeError('dff_frames is longer than timestamps')
 
+        # Resample if collecting multiple concurrent planes (e.g. mesoscope)
+        plane_group = self.get_imaging_plane_group()
+        if plane_group is not None:
+            group_count = self.get_plane_group_count()
+            ophys_timestamps = self._process_ophys_plane_timestamps(
+                ophys_timestamps, plane_group, group_count)
         return ophys_timestamps
 
     @memoize
@@ -118,6 +157,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         metadata['LabTracks_ID'] = self.get_external_specimen_name()
         metadata['full_genotype'] = self.get_full_genotype()
         metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
+        metadata["imaging_plane_group"] = self.get_imaging_plane_group()
 
         return metadata
 
