@@ -18,13 +18,13 @@ from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
-from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
-from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
+from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema
+from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
-load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
-load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
+load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
+load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
@@ -170,16 +170,26 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
     def get_metadata(self) -> dict:
 
         metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-        data = OphysBehaviorMetaDataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+        data = OphysBehaviorMetadataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+
+        # Add subject related metadata to behavior ophys metadata
+        nwb_subject = self.nwbfile.subject
+        data['LabTracks_ID'] = int(nwb_subject.subject_id)
+        data['sex'] = nwb_subject.sex
+        data['age'] = nwb_subject.age
+        data['full_genotype'] = nwb_subject.genotype
+        data['reporter_line'] = list(nwb_subject.reporter_line)
+        data['driver_line'] = list(nwb_subject.driver_line)
+
         experiment_datetime = metadata_nwb_obj.experiment_datetime
-        data['experiment_datetime'] = OphysBehaviorMetaDataSchema().load({'experiment_datetime': experiment_datetime}, partial=True)['experiment_datetime']            
+        data['experiment_datetime'] = OphysBehaviorMetadataSchema().load({'experiment_datetime': experiment_datetime}, partial=True)['experiment_datetime']            
         data['behavior_session_uuid'] = uuid.UUID(data['behavior_session_uuid'])
         return data
 
     def get_task_parameters(self) -> dict:
 
         metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
-        data = OphysBehaviorTaskParametersSchema().dump(metadata_nwb_obj)
+        data = BehaviorTaskParametersSchema().dump(metadata_nwb_obj)
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
