@@ -300,7 +300,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         eye_tracking_data = load_eye_tracking_hdf(filepath)
         frame_times = sync_utilities.get_synchronized_frame_times(
             session_sync_file=sync_path,
-            sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
+            sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
+            trim_after_spike=False)
 
         eye_tracking_data = process_eye_tracking_data(eye_tracking_data,
                                                       frame_times,
