@@ -132,15 +132,15 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return df
 
     @memoize
-    def get_running_data_df(self):
+    def get_running_data_df(self, lowpass=True):
         stimulus_timestamps = self.get_stimulus_timestamps()
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_running_df(data, stimulus_timestamps)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
 
     @memoize
-    def get_running_speed(self):
-        running_data_df = self.get_running_data_df()
+    def get_running_speed(self, lowpass=True):
+        running_data_df = self.get_running_data_df(lowpass=lowpass)
         assert running_data_df.index.name == 'timestamps'
         return RunningSpeed(timestamps=running_data_df.index.values,
                             values=running_data_df.speed.values)

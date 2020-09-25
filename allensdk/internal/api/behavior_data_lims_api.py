@@ -187,7 +187,7 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         # trial events, so add the offset as the "rebase" function
         return get_rewards(data, lambda x: x + offset)
 
-    def get_running_data_df(self) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
         """Get running speed data.
 
         :returns: pd.DataFrame -- dataframe containing various signals used
@@ -195,9 +195,9 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
 
-    def get_running_speed(self) -> RunningSpeed:
+    def get_running_speed(self, lowpass=True) -> RunningSpeed:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
@@ -206,7 +206,7 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         :returns: RunningSpeed -- a NamedTuple containing the subject's
             timestamps and running speeds (in cm/s)
         """
-        running_data_df = self.get_running_data_df()
+        running_data_df = self.get_running_data_df(lowpass=lowpass)
         if running_data_df.index.name != "timestamps":
             raise DataFrameIndexError(
                 f"Expected index to be named 'timestamps' but got "
