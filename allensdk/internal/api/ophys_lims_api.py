@@ -74,7 +74,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
             FROM ophys_experiments oe
             JOIN ophys_imaging_plane_groups pg
             ON pg.id = oe.ophys_imaging_plane_group_id
-            WHERE oe.id = {self.ophys_experiment_id}
+            WHERE oe.id = {self.get_ophys_experiment_id()}
         """
         # Non-mesoscope data will not have results
         group_order = self.lims_db.fetchall(query)
