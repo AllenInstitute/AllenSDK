@@ -95,6 +95,9 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
     def get_external_specimen_name(self):
         return self.data['external_specimen_name']
 
+    def get_imaging_plane_group(self):
+        return self.data["imaging_plane_group"]
+
 
 def write_behavior_ophys_nwb(session_data, nwb_filepath):
 
