@@ -98,7 +98,8 @@ def test_visbeh_ophys_data_set():
                                  'indicator': 'GCAMP6f',
                                  'rig_name': 'CAM2P.5',
                                  'age': 'P139',
-                                 'sex': 'F'}
+                                 'sex': 'F',
+                                 'imaging_plane_group': None}
 
     assert math.isnan(data_set.task_parameters.pop('omitted_flash_fraction'))
     assert data_set.task_parameters == {'reward_volume': 0.007,
