@@ -84,6 +84,26 @@ class OphysLimsApi(CachedInstanceMethodMixin):
             return None
 
     @memoize
+    def get_behavior_session_id(self) -> Optional[int]:
+        """Returns the behavior_session_id associated with this experiment,
+        if applicable.
+        """
+        query = f"""
+            SELECT bs.id
+            FROM ophys_experiments oe
+            -- every ophys_experiment should have an ophys_session
+            JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+            -- but not every ophys_session has a behavior_session
+            LEFT JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            WHERE oe.id = {self.get_ophys_experiment_id()}
+        """
+        response = self.lims_db.fetchall(query)     # Can be null
+        if not len(response):
+            return None
+        else:
+            return response[0]
+
+    @memoize
     def get_ophys_experiment_dir(self):
         query = '''
                 SELECT oe.storage_directory

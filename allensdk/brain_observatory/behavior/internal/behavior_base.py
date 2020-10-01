@@ -15,6 +15,13 @@ class BehaviorBase(abc.ABC):
     methods.
     """
     @abc.abstractmethod
+    def get_behavior_session_id(self) -> int:
+        """Returns the behavior_session_id associated with this experiment,
+        if applicable.
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def get_licks(self) -> pd.DataFrame:
         """Get lick data from pkl file.
 

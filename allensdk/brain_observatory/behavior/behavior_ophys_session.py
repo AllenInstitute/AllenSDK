@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-from typing import Any
+from typing import Any, Optional
 import logging
 
 
@@ -97,6 +97,13 @@ class BehaviorOphysSession(ParamsMixin):
         :rtype: int
         """
         return self.api.get_ophys_experiment_id()
+
+    @property
+    def behavior_session_id(self) -> Optional[int]:
+        """Returns the unique identifier for the behavior session
+        associated with this experiment, if applicable.
+        """
+        return self.api.get_behavior_session_id()
 
     @property
     def max_projection(self) -> Image:
