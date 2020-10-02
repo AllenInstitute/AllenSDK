@@ -1,4 +1,5 @@
 import abc
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -12,8 +13,16 @@ class BehaviorOphysBase(BehaviorBase):
     behavior+ophys session data.
 
     Child classes should be instantiated with a fetch API that implements these
-    methods. Both fetch API and session object should inherit from this base.
+    methods.
     """
+
+    @abc.abstractmethod
+    def get_ophys_session_id(self) -> Optional[int]:
+        """Returns the ophys_session_id associated with this experiment,
+        if applicable.
+        """
+        raise NotImplementedError()
+
     @abc.abstractmethod
     def get_average_projection(self) -> Image:
         """Get an image whose values are the average obtained values at
