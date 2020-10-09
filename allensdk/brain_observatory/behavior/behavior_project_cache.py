@@ -92,7 +92,10 @@ class BehaviorProjectCache(Cache):
         cache : bool
             Whether to write to the cache. Default=True.
         """
-        manifest_ = manifest or "behavior_project_manifest.json"
+        if cache:
+            manifest_ = manifest or "behavior_project_manifest.json"
+        else:
+            manifest_ = None
         version_ = version or self.MANIFEST_VERSION
 
         super().__init__(manifest=manifest_, version=version_, cache=cache)
@@ -103,7 +106,7 @@ class BehaviorProjectCache(Cache):
     @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
                   version: Optional[str] = None,
-                  cache: bool = True,
+                  cache: bool = False,
                   fetch_tries: int = 2,
                   lims_credentials: Optional[DbCredentials] = None,
                   mtrain_credentials: Optional[DbCredentials] = None,
@@ -174,20 +177,23 @@ class BehaviorProjectCache(Cache):
         :type by: str
         :rtype: pd.DataFrame
         """
-        write_csv = partial(
-            _write_csv,
-            array_fields=["reporter_line", "driver_line",
-                          "ophys_experiment_id"])
-        read_csv = partial(
-            _read_csv, index_col="ophys_session_id",
-            array_fields=["reporter_line", "driver_line",
-                          "ophys_experiment_id"],
-            array_types=[str, str, int])
-        path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
-        sessions = one_file_call_caching(
-            path,
-            self.fetch_api.get_session_table,
-            write_csv, read_csv)
+        if self.cache:
+            write_csv = partial(
+                _write_csv,
+                array_fields=["reporter_line", "driver_line",
+                              "ophys_experiment_id"])
+            read_csv = partial(
+                _read_csv, index_col="ophys_session_id",
+                array_fields=["reporter_line", "driver_line",
+                              "ophys_experiment_id"],
+                array_types=[str, str, int])
+            path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
+            sessions = one_file_call_caching(
+                path,
+                self.fetch_api.get_session_table,
+                write_csv, read_csv)
+        else:
+            sessions = self.fetch_api.get_session_table()
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
 
@@ -221,18 +227,21 @@ class BehaviorProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
-        write_csv = partial(
-            _write_csv,
-            array_fields=["reporter_line", "driver_line"])
-        read_csv = partial(
-            _read_csv, index_col="ophys_experiment_id",
-            array_fields=["reporter_line", "driver_line"],
-            array_types=[str, str])
-        path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
-        experiments = one_file_call_caching(
-            path,
-            self.fetch_api.get_experiment_table,
-            write_csv, read_csv)
+        if self.cache:
+            write_csv = partial(
+                _write_csv,
+                array_fields=["reporter_line", "driver_line"])
+            read_csv = partial(
+                _read_csv, index_col="ophys_experiment_id",
+                array_fields=["reporter_line", "driver_line"],
+                array_types=[str, str])
+            path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
+            experiments = one_file_call_caching(
+                path,
+                self.fetch_api.get_experiment_table,
+                write_csv, read_csv)
+        else:
+            experiments = self.fetch_api.get_experiment_table()
         if suppress:
             experiments.drop(columns=suppress, inplace=True, errors="ignore")
         return experiments
@@ -247,17 +256,21 @@ class BehaviorProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
-        read_csv = partial(
-            _read_csv, index_col="behavior_session_id",
-            array_fields=["reporter_line", "driver_line"],
-            array_types=[str, str])
-        write_csv = partial(
-            _write_csv, array_fields=["reporter_line", "driver_line"])
-        path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
-        sessions = one_file_call_caching(
-            path,
-            self.fetch_api.get_behavior_only_session_table,
-            write_csv, read_csv)
+
+        if self.cache:
+            read_csv = partial(
+                _read_csv, index_col="behavior_session_id",
+                array_fields=["reporter_line", "driver_line"],
+                array_types=[str, str])
+            write_csv = partial(
+                _write_csv, array_fields=["reporter_line", "driver_line"])
+            path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
+            sessions = one_file_call_caching(
+                path,
+                self.fetch_api.get_behavior_only_session_table,
+                write_csv, read_csv)
+        else:
+            sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
