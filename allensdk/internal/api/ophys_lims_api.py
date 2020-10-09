@@ -37,6 +37,73 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         return self.ophys_experiment_id
 
     @memoize
+    def get_plane_group_count(self) -> int:
+        """Gets the total number of plane groups in the session.
+        This is required for resampling ophys timestamps for mesoscope
+        data. Will be 0 if the scope did not capture multiple concurrent
+        frames. See `get_imaging_plane_group` for more info.
+        """
+        query = f"""
+            -- Get the session ID for an experiment
+            WITH sess AS (
+                SELECT os.id from ophys_experiments oe
+                JOIN ophys_sessions os ON os.id = oe.ophys_session_id
+                WHERE oe.id = {self.ophys_experiment_id}
+            )
+            SELECT  COUNT(DISTINCT(pg.group_order)) AS planes
+            FROM  ophys_sessions os
+            JOIN ophys_experiments oe ON os.id = oe.ophys_session_id
+            JOIN  ophys_imaging_plane_groups pg
+                ON pg.id = oe.ophys_imaging_plane_group_id
+            WHERE
+                -- only 1 session for an experiment
+                os.id = (SELECT id from sess limit 1)
+        """
+        return self.lims_db.fetchone(query, strict=True)
+
+    @memoize
+    def get_imaging_plane_group(self) -> Optional[int]:
+        """Get the imaging plane group number. This is a numeric index
+        that indicates the order that the frames were acquired when
+        there is more than one frame acquired concurrently. Relevant for
+        mesoscope data timestamps, as the laser jumps between plane
+        groups during the scan. Will be None for non-mesoscope data.
+        """
+        query = f"""
+            SELECT pg.group_order
+            FROM ophys_experiments oe
+            JOIN ophys_imaging_plane_groups pg
+            ON pg.id = oe.ophys_imaging_plane_group_id
+            WHERE oe.id = {self.get_ophys_experiment_id()}
+        """
+        # Non-mesoscope data will not have results
+        group_order = self.lims_db.fetchall(query)
+        if len(group_order):
+            return group_order[0]
+        else:
+            return None
+
+    @memoize
+    def get_behavior_session_id(self) -> Optional[int]:
+        """Returns the behavior_session_id associated with this experiment,
+        if applicable.
+        """
+        query = f"""
+            SELECT bs.id
+            FROM ophys_experiments oe
+            -- every ophys_experiment should have an ophys_session
+            JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+            -- but not every ophys_session has a behavior_session
+            LEFT JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            WHERE oe.id = {self.get_ophys_experiment_id()}
+        """
+        response = self.lims_db.fetchall(query)     # Can be null
+        if not len(response):
+            return None
+        else:
+            return response[0]
+
+    @memoize
     def get_ophys_experiment_dir(self):
         query = '''
                 SELECT oe.storage_directory

@@ -63,7 +63,7 @@ def MockBehaviorDataLimsApi():
             }
             return data
 
-        def get_running_data_df(self):
+        def get_running_data_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
@@ -88,7 +88,7 @@ def MockApiRunSpeedExpectedError():
         def _get_ids(self):
             return {}
 
-        def get_running_data_df(self):
+        def get_running_data_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]})
@@ -207,16 +207,16 @@ class TestBehaviorRegression:
     def test_get_running_speed_regression(self):
         """Can't test values because they're intrinsically linked to timestamps
         """
-        bd_speed = self.bd.get_running_speed()
-        od_speed = self.od.get_running_speed()
+        bd_speed = self.bd.get_running_speed(lowpass=False)
+        od_speed = self.od.get_running_speed(lowpass=False)
         assert len(bd_speed.values) == len(od_speed.values)
         assert len(bd_speed.timestamps) == len(od_speed.timestamps)
 
     def test_get_running_df_regression(self):
         """Can't test values because they're intrinsically linked to timestamps
         """
-        bd_running = self.bd.get_running_data_df()
-        od_running = self.od.get_running_data_df()
+        bd_running = self.bd.get_running_data_df(lowpass=False)
+        od_running = self.od.get_running_data_df(lowpass=False)
         assert len(bd_running) == len(od_running)
         assert list(bd_running) == list(od_running)
 

@@ -227,6 +227,53 @@ def session_data():
             "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
             "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",
             "sex": "F",
-            "age": "P139"}
+            "age": "P139",
+            "imaging_plane_group": None}
 
+    return data
+
+
+@pytest.fixture()
+def behavior_stimuli_data_fixture(request):
+    """
+    This fixture mimicks the behavior experiment stimuli data logs and
+    allows parameterization for testing
+    """
+    images_set_log = request.param.get("images_set_log", [
+        ('Image', 'im065', 5.809, 0)])
+    images_draw_log = request.param.get("images_draw_log", [
+        ([0] + [1] * 3 + [0] * 3)
+    ])
+    grating_set_log = request.param.get("grating_set_log", [
+        ('Ori', 90, 3.585, 0)
+    ])
+    grating_draw_log = request.param.get("grating_draw_log", [
+        ([0] + [1] * 3 + [0] * 3)
+    ])
+    omitted_flash_frame_log = request.param.get("omitted_flash_frame_log", {
+        "grating_0": []
+    })
+    grating_phase = request.param.get("grating_phase", None)
+    grating_spatial_frequency = request.param.get("grating_spatial_frequency",
+                                                  None)
+
+    data = {
+        "items": {
+            "behavior": {
+                "stimuli": {
+                    "images": {
+                        "set_log": images_set_log,
+                        "draw_log": images_draw_log
+                    },
+                    "grating": {
+                        "set_log": grating_set_log,
+                        "draw_log": grating_draw_log,
+                        "phase": grating_phase,
+                        "sf": grating_spatial_frequency
+                    }
+                },
+                "omitted_flash_frame_log": omitted_flash_frame_log
+            }
+        }
+    }
     return data

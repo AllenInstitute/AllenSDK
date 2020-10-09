@@ -22,8 +22,11 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
-from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
-from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
+from allensdk.brain_observatory.behavior.schemas import (
+    CompleteOphysBehaviorMetadataSchema, OphysBehaviorMetadataSchema,
+    BehaviorTaskParametersSchema, SubjectMetadataSchema
+)
+from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
@@ -728,11 +731,35 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
     nwbfile.add_stimulus(image_index)
 
 
-def add_metadata(nwbfile, metadata):
+def add_metadata(nwbfile, metadata: dict):
+    # Rename incoming metadata fields to conform with pynwb Subject fields
+    metadata = metadata.copy()
+    metadata["subject_id"] = metadata.pop("LabTracks_ID")
+    metadata["genotype"] = metadata.pop("full_genotype")
+    metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(metadata)
 
-    OphysBehaviorMetaData = load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
-    metadata_clean = OphysBehaviorMetaDataSchema().dump(metadata)
+    # Subject related metadata should be saved to our BehaviorSubject
+    # (augmented pyNWB 'Subject') NWB class
+    subject_fields = {"age", "driver_line", "genotype",
+                      "subject_id", "reporter_line", "sex"}
+    subject_metadata = {k: v for k, v in metadata_clean.items()
+                        if k in subject_fields}
+    for subject_key in subject_metadata.keys():
+        metadata_clean.pop(subject_key, None)
 
+    BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
+                                           'ndx-aibs-behavior-ophys')
+    nwb_subject = BehaviorSubject(
+        description="A visual behavior subject with a LabTracks ID",
+        age=subject_metadata["age"],
+        driver_line=subject_metadata["driver_line"],
+        genotype=subject_metadata["genotype"],
+        subject_id=str(subject_metadata["subject_id"]),
+        reporter_line=subject_metadata["reporter_line"],
+        sex=subject_metadata["sex"])
+    nwbfile.subject = nwb_subject
+
+    # Rest of metadata can go into our custom extension
     new_metadata_dict = {}
     for key, val in metadata_clean.items():
         if isinstance(val, list):
@@ -741,14 +768,21 @@ def add_metadata(nwbfile, metadata):
             new_metadata_dict[key] = str(val)
         else:
             new_metadata_dict[key] = val
-    nwb_metadata = OphysBehaviorMetaData(name='metadata', **new_metadata_dict)
+
+    OphysBehaviorMetadata = load_pynwb_extension(OphysBehaviorMetadataSchema,
+                                                 'ndx-aibs-behavior-ophys')
+    nwb_metadata = OphysBehaviorMetadata(name='metadata', **new_metadata_dict)
     nwbfile.add_lab_meta_data(nwb_metadata)
 
 
 def add_task_parameters(nwbfile, task_parameters):
 
-    OphysBehaviorTaskParameters = load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
-    task_parameters_clean = OphysBehaviorTaskParametersSchema().dump(task_parameters)
+    OphysBehaviorTaskParameters = load_pynwb_extension(
+        BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys'
+    )
+    task_parameters_clean = BehaviorTaskParametersSchema().dump(
+        task_parameters
+    )
 
     new_task_parameters_dict = {}
     for key, val in task_parameters_clean.items():

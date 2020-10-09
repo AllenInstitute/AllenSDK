@@ -1,6 +1,20 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] = 2020-10-09
+
+### Added
+- Adds load sync data for individual plane sets to relate accurate event timings to mesoscope data.
+- Adds public API method to access the behavior\_session\_id from an instance of BehaviorOphysSession.
+
+### Changes
+- Visual behavior running speed is now low-pass filtered at 10Hz. The raw running speed data is still available. The running speed is corrected for encoder threshold croissing artifacts.
+- Support for stimulus gratings for visual behavior.
+- Updates to some visual behavior pynwb implementations.
+
+### Bug Fixes
+- Fixed an eye-tracking sync problem.
+
 ## [2.2.0] = 2020-09-03
 
 ### Added

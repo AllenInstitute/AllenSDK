@@ -91,6 +91,18 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.3.0 (October 9, 2020)
+-----------------------------------------------------------------------
+As of the 2.3.0 release:
+
+- Visual behavior running speed is now low-pass filtered at 10Hz. The raw running speed data is still available. The running speed is corrected for encoder threshold croissing artifacts.
+- Support for stimulus gratings for visual behavior.
+- Fixed an eye-tracking sync problem.
+- Updates to some visual behavior pynwb implementations.
+- Adds load sync data for individual plane sets to relate accurate event timings to mesoscope data.
+- Adds public API method to access the behavior_session_id from an instance of BehaviorOphysSession.
+
+
 What's New - 2.2.0 (September 3, 2020)
 -----------------------------------------------------------------------
 As of the 2.2.0 release:
