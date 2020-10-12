@@ -60,9 +60,9 @@ def extract_running_speeds(
 
     durations = end_times - start_times
     if use_median_duration:
-        angular_velocity = dx_rad / durations
+        angular_velocity = dx_rad / np.median(durations)
     else:
-        angular_velocity = dx_rad = np.median(durations)
+        angular_velocity = dx_rad / durations
 
     radius = wheel_radius * subject_position
     linear_velocity = angular_to_linear_velocity(angular_velocity, radius)
