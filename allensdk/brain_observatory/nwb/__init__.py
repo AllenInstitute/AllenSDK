@@ -903,8 +903,9 @@ def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     dff_traces = dff_traces.reset_index().set_index('cell_roi_id')[['dff']]
 
     twop_module = nwbfile.modules['two_photon_imaging']
-    data = np.array([dff_traces.loc[cell_roi_id].dff for cell_roi_id in dff_traces.index.values])
-    # assert len(ophys_timestamps.timestamps) == len(data)
+    # trace data in the form of rois x timepoints
+    trace_data = np.array([dff_traces.loc[cell_roi_id].dff
+                           for cell_roi_id in dff_traces.index.values])
 
     cell_specimen_table = nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
@@ -918,7 +919,7 @@ def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
 
     dff_interface.create_roi_response_series(
         name='traces',
-        data=data,
+        data=trace_data.T,  # Should be stored as timepoints x rois
         unit='NA',
         rois=roi_table_region,
         timestamps=ophys_timestamps)
@@ -932,13 +933,18 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
     # Create/Add corrected_fluorescence_traces modules and interfaces:
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
     twop_module = nwbfile.modules['two_photon_imaging']
+    # trace data in the form of rois x timepoints
+    f_trace_data = np.array([corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence
+                             for cell_roi_id in corrected_fluorescence_traces.index.values])
+
     roi_table_region = nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
     ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
     f_interface = Fluorescence(name='corrected_fluorescence')
     twop_module.add_data_interface(f_interface)
+
     f_interface.create_roi_response_series(
         name='traces',
-        data=np.array([corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence for cell_roi_id in corrected_fluorescence_traces.index.values]),
+        data=f_trace_data.T,  # Should be stored as timepoints x rois
         unit='NA',
         rois=roi_table_region,
         timestamps=ophys_timestamps)

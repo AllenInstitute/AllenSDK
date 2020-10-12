@@ -207,20 +207,28 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def get_dff_traces(self) -> pd.DataFrame:
         dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
-        dff_traces = dff_nwb.data[:]
+        # dff traces stored as timepoints x rois in NWB
+        # We want rois x timepoints, hence the transpose
+        dff_traces = dff_nwb.data[:].T
         number_of_cells, number_of_dff_frames = dff_traces.shape
         num_of_timestamps = len(self.get_ophys_timestamps())
         assert num_of_timestamps == number_of_dff_frames
-        
-        df = pd.DataFrame({'dff': [x for x in dff_traces]}, index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
+
+        df = pd.DataFrame({'dff': dff_traces.tolist()},
+                          index=pd.Index(data=dff_nwb.rois.table.id[:],
+                                         name='cell_roi_id'))
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
         return df
 
     def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
         corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
-        df = pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
-                             index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:], name='cell_roi_id'))
+        # f traces stored as timepoints x rois in NWB
+        # We want rois x timepoints, hence the transpose
+        f_traces = corrected_fluorescence_nwb.data[:].T
+        df = pd.DataFrame({'corrected_fluorescence': f_traces.tolist()},
+                          index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:],
+                                         name='cell_roi_id'))
 
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
