@@ -1,4 +1,3 @@
-import numpy as np
 from functools import partial
 from typing import Type, Optional, List, Union
 from pathlib import Path
@@ -178,20 +177,12 @@ class BehaviorProjectCache(Cache):
         :rtype: pd.DataFrame
         """
         if self.cache:
-            write_csv = partial(
-                _write_csv,
-                array_fields=["reporter_line", "driver_line",
-                              "ophys_experiment_id"])
-            read_csv = partial(
-                _read_csv, index_col="ophys_session_id",
-                array_fields=["reporter_line", "driver_line",
-                              "ophys_experiment_id"],
-                array_types=[str, str, int])
             path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_session_table,
-                write_csv, read_csv)
+                _write_json, _read_json)
+            sessions.set_index("ophys_session_id")
         else:
             sessions = self.fetch_api.get_session_table()
         if suppress:
@@ -228,18 +219,12 @@ class BehaviorProjectCache(Cache):
         :rtype: pd.DataFrame
         """
         if self.cache:
-            write_csv = partial(
-                _write_csv,
-                array_fields=["reporter_line", "driver_line"])
-            read_csv = partial(
-                _read_csv, index_col="ophys_experiment_id",
-                array_fields=["reporter_line", "driver_line"],
-                array_types=[str, str])
             path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
                 path,
                 self.fetch_api.get_experiment_table,
-                write_csv, read_csv)
+                _write_json, _read_json)
+            experiments.set_index("ophys_experiment_id")
         else:
             experiments = self.fetch_api.get_experiment_table()
         if suppress:
@@ -258,17 +243,12 @@ class BehaviorProjectCache(Cache):
         """
 
         if self.cache:
-            read_csv = partial(
-                _read_csv, index_col="behavior_session_id",
-                array_fields=["reporter_line", "driver_line"],
-                array_types=[str, str])
-            write_csv = partial(
-                _write_csv, array_fields=["reporter_line", "driver_line"])
             path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_behavior_only_session_table,
-                write_csv, read_csv)
+                _write_json, _read_json)
+            sessions.set_index("behavior_session_id")
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
@@ -317,24 +297,26 @@ class BehaviorProjectCache(Cache):
         )
 
 
-def _write_csv(path, df, array_fields=None):
-    """Private writer that encodes array fields into pipe-delimited strings
-    for saving a csv.
-    """
-    df_ = df.copy()
-    for field in array_fields:
-        df_[field] = df_[field].apply(lambda x: "|".join(map(str, x)))
-    df_.to_csv(path)
+def _write_json(path, df):
+    """Wrapper to change the arguments for saving a pandas json
+    dataframe so that it conforms to expectations of the internal
+    cache methods. Can't use partial with the native `to_json` method
+    because the dataframe is not yet created at the time we need to
+    pass in the save method.
+    Saves a dataframe in json format to `path`, in split orientation
+    to save space on disk.
+    Converts dates to seconds from epoch.
+    NOTE: Date serialization is a big pain. Make sure if columns
+    are being added, the _read_json is updated to properly deserialize
+    them back to the expected format by adding them to `convert_dates`.
+    In the future we could schematize this data using marshmallow
+    or something similar."""
+    df.reset_index(inplace=True)
+    df.to_json(path, orient="split", date_unit="s", date_format="epoch")
 
 
-def _read_csv(path, index_col, array_fields=None, array_types=None):
-    """Private reader that can open a csv with pipe-delimited array
-    fields and convert them to array."""
-    df = pd.read_csv(path, index_col=index_col)
-    for field, type_ in zip(array_fields, array_types):
-        if type_ == str:
-            df[field] = df[field].apply(lambda x: x.split("|"))
-        else:
-            df[field] = df[field].apply(
-                lambda x: np.fromstring(x, sep="|", dtype=type_))
+def _read_json(path):
+    """Reads a dataframe file written to the cache by _write_json."""
+    df = pd.read_json(path, date_unit="s", orient="split",
+                      convert_dates=["date_of_acquisition"])
     return df

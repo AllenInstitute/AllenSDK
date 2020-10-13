@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pytest
 import pandas as pd
 import tempfile
@@ -11,6 +12,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache import (
 def session_table():
     return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
                           "ophys_experiment_id": [[4], [5, 6], [7]],
+                          "date_of_acquisition": np.datetime64('2020-02-20'),
                           "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
                           "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
             .set_index("ophys_session_id"))
@@ -19,6 +21,7 @@ def session_table():
 @pytest.fixture
 def behavior_table():
     return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
+                          "date_of_acquisition": np.datetime64("NAT"),
                           "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
                           "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
             .set_index("behavior_session_id"))
@@ -42,30 +45,36 @@ def mock_api(session_table, behavior_table):
 
 
 @pytest.fixture
-def TempdirBehaviorCache(mock_api):
+def TempdirBehaviorCache(mock_api, request):
     temp_dir = tempfile.TemporaryDirectory()
     manifest = os.path.join(temp_dir.name, "manifest.json")
     yield BehaviorProjectCache(fetch_api=mock_api(),
+                               cache=request.param,
                                manifest=manifest)
     temp_dir.cleanup()
 
 
+@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_session_table(TempdirBehaviorCache, session_table):
     cache = TempdirBehaviorCache
     actual = cache.get_session_table()
-    path = cache.manifest.path_info.get("ophys_sessions").get("spec")
-    assert os.path.exists(path)
+    if cache.cache:
+        path = cache.manifest.path_info.get("ophys_sessions").get("spec")
+        assert os.path.exists(path)
     pd.testing.assert_frame_equal(session_table, actual)
 
 
+@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_behavior_table(TempdirBehaviorCache, behavior_table):
     cache = TempdirBehaviorCache
     actual = cache.get_behavior_session_table()
-    path = cache.manifest.path_info.get("behavior_sessions").get("spec")
-    assert os.path.exists(path)
+    if cache.cache:
+        path = cache.manifest.path_info.get("behavior_sessions").get("spec")
+        assert os.path.exists(path)
     pd.testing.assert_frame_equal(behavior_table, actual)
 
 
+@pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
 def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
                                         caplog):
     caplog.set_level(logging.INFO, logger="call_caching")
@@ -83,6 +92,7 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
     assert [expected_first[0]] == caplog.record_tuples
 
 
+@pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
 def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
                                          caplog):
     caplog.set_level(logging.INFO, logger="call_caching")
@@ -100,6 +110,7 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
     assert [expected_first[0]] == caplog.record_tuples
 
 
+@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_session_table_by_experiment(TempdirBehaviorCache):
     expected = (pd.DataFrame({"ophys_session_id": [1, 2, 2, 3],
                               "ophys_experiment_id": [4, 5, 6, 7]})
