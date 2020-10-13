@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.3.1] = 2020-10-13
+
+### Bug Fixes
+- (Internal) Fixed a write_nwb bug for behavior ophys experiments involving the BehaviorOphysJsonApi expecting a mesoscope-specific method.
+
 ## [2.3.0] = 2020-10-09
 
 ### Added
