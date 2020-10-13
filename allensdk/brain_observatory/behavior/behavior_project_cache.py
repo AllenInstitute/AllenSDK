@@ -18,7 +18,7 @@ BehaviorProjectApi = Type[BehaviorProjectBase]
 
 class BehaviorProjectCache(Cache):
 
-    MANIFEST_VERSION = "0.0.1-alpha.2"
+    MANIFEST_VERSION = "0.0.1-alpha.3"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
     OPHYS_EXPERIMENTS_KEY = "ophys_experiments"

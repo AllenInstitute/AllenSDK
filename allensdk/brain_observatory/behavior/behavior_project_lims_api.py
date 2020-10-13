@@ -314,6 +314,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 os.date_of_acquisition,
                 os.isi_experiment_id,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
@@ -377,6 +378,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 equipment.name as equipment_name,
                 os.date_of_acquisition,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
