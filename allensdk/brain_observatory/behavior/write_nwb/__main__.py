@@ -16,6 +16,9 @@ from allensdk.brain_observatory.argschema_utilities import write_or_print_output
 
 
 class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
+    """
+        This class is used by both Scientifica and Mesoscope ophys experiments.
+    """
 
     def __init__(self, data):
         self.data = data
@@ -96,7 +99,12 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
         return self.data['external_specimen_name']
 
     def get_imaging_plane_group(self):
-        return self.data["imaging_plane_group"]
+        try:
+            # Will only contain the "imaging_plane_group" key if we are
+            # dealing with Mesoscope data
+            return self.data["imaging_plane_group"]
+        except KeyError:
+            return None
 
 
 def write_behavior_ophys_nwb(session_data, nwb_filepath):
@@ -118,7 +126,6 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
     except Exception as e:
         os.rename(nwb_filepath_inprogress, nwb_filepath_error)
         raise e
-
 
 
 def main():
