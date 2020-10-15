@@ -1,27 +1,27 @@
 import datetime
-from pynwb import NWBFile, NWBHDF5IO
-import pandas as pd
-import allensdk.brain_observatory.nwb as nwb
-import numpy as np
-import SimpleITK as sitk
-import pytz
-import uuid
-from pandas.util.testing import assert_frame_equal
-import os
 import math
+import uuid
+import warnings
+
 import numpy as np
-import xarray as xr
 import pandas as pd
+import pytz
+import SimpleITK as sitk
+import xarray as xr
 
-
-from allensdk.core.lazy_property import LazyProperty
+import allensdk.brain_observatory.nwb as nwb
+from allensdk.brain_observatory.behavior.behavior_ophys_api import \
+    BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.schemas import (
+    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
+from allensdk.brain_observatory.behavior.trials_processing import \
+    TRIAL_COLUMN_DESCRIPTION_DICT
+from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
-from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
-from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema
-from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
-from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
-
+from allensdk.core.lazy_property import LazyProperty
+from pandas.util.testing import assert_frame_equal
+from pynwb import NWBHDF5IO, NWBFile
 
 load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
@@ -29,11 +29,9 @@ load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
-
     def __init__(self, *args, **kwargs):
         self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)
         super(BehaviorOphysNwbApi, self).__init__(*args, **kwargs)
-
 
     def save(self, session_object):
 
@@ -93,7 +91,9 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         nwb.add_task_parameters(nwbfile, session_object.task_parameters)
 
         # Add roi metrics to NWB in-memory object:
-        nwb.add_cell_specimen_table(nwbfile, session_object.cell_specimen_table)
+        nwb.add_cell_specimen_table(nwbfile,
+                                    session_object.cell_specimen_table,
+                                    session_object.metadata)
 
         # Add dff to NWB in-memory object:
         nwb.add_dff_traces(nwbfile, session_object.dff_traces, session_object.ophys_timestamps)
@@ -122,8 +122,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
                 running_data_df[key] = self.nwbfile.get_acquisition(key).data
 
         for key in ['dx']:
-            if ('running' in self.nwbfile.modules) and (key in self.nwbfile.modules['running'].fields['data_interfaces']):
-                running_data_df[key] = self.nwbfile.modules['running'].get_data_interface(key).data
+            if ('running' in self.nwbfile.processing) and (key in self.nwbfile.processing['running'].fields['data_interfaces']):
+                running_data_df[key] = self.nwbfile.processing['running'].get_data_interface(key).data
 
         return running_data_df[['speed', 'dx', 'v_sig', 'v_in']]
 
@@ -131,10 +131,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
+        return self.nwbfile.processing['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
 
     def get_stimulus_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps[:]
+        return self.nwbfile.processing['stimulus'].get_data_interface('timestamps').timestamps[:]
 
     def get_trials(self) -> pd.DataFrame:
         trials = self.nwbfile.trials.to_dataframe()
@@ -144,16 +144,16 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return trials
 
     def get_licks(self) -> np.ndarray:
-        if 'licking' in self.nwbfile.modules:
-            return pd.DataFrame({'time': self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
+        if 'licking' in self.nwbfile.processing:
+            return pd.DataFrame({'time': self.nwbfile.processing['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
         else:
             return pd.DataFrame({'time': []})
 
     def get_rewards(self) -> np.ndarray:
-        if 'rewards' in self.nwbfile.modules:
-            time = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').timestamps[:]
-            autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
-            volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
+        if 'rewards' in self.nwbfile.processing:
+            time = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').timestamps[:]
+            autorewarded = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').data[:]
+            volume = self.nwbfile.processing['rewards'].get_data_interface('volume').data[:]
             return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
         else:
             return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
@@ -170,9 +170,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
     def get_metadata(self) -> dict:
 
         metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-        data = OphysBehaviorMetadataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+        data = OphysBehaviorMetadataSchema(
+            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
 
-        # Add subject related metadata to behavior ophys metadata
+        # Add pyNWB Subject metadata to behavior ophys session metadata
         nwb_subject = self.nwbfile.subject
         data['LabTracks_ID'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
@@ -181,9 +182,30 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         data['reporter_line'] = list(nwb_subject.reporter_line)
         data['driver_line'] = list(nwb_subject.driver_line)
 
-        experiment_datetime = metadata_nwb_obj.experiment_datetime
-        data['experiment_datetime'] = OphysBehaviorMetadataSchema().load({'experiment_datetime': experiment_datetime}, partial=True)['experiment_datetime']            
-        data['behavior_session_uuid'] = uuid.UUID(data['behavior_session_uuid'])
+        # Add pyNWB OpticalChannel and ImagingPlane metadata to behavior ophys
+        # session metadata
+        try:
+            two_photon_imaging_module = self.nwbfile.processing['two_photon_imaging']
+            image_seg = two_photon_imaging_module.data_interfaces['image_segmentation']
+            imaging_plane = image_seg.plane_segmentations['cell_specimen_table'].imaging_plane
+            optical_channel = imaging_plane.optical_channel[0]
+
+            data['ophys_frame_rate'] = imaging_plane.imaging_rate
+            data['indicator'] = imaging_plane.indicator
+            data['targeted_structure'] = imaging_plane.location
+            data['excitation_lambda'] = imaging_plane.excitation_lambda
+            data['emission_lambda'] = optical_channel.emission_lambda
+        except KeyError:
+            warnings.warn("Could not locate 'two_photon_imaging' module in "
+                          "NWB file. The following metadata fields will be "
+                          "missing: 'ophys_frame_rate', 'indicator', "
+                          "'targeted_structure', 'excitation_lambda', "
+                          "'emission_lambda'")
+
+        # Add other metadata stored in nwb file to behavior ophys session meta
+        data['experiment_datetime'] = self.nwbfile.session_start_time
+        data['behavior_session_uuid'] = uuid.UUID(
+            data['behavior_session_uuid'])
         return data
 
     def get_task_parameters(self) -> dict:
@@ -193,7 +215,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
-        df = self.nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
+        df = self.nwbfile.processing['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
         df.index.rename('cell_roi_id', inplace=True)
         df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
         df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
@@ -206,7 +228,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:
-        dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
+        dff_nwb = self.nwbfile.processing['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
         # dff traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
         dff_traces = dff_nwb.data[:].T
@@ -222,7 +244,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return df
 
     def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
-        corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
+        corrected_fluorescence_nwb = self.nwbfile.processing['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
         f_traces = corrected_fluorescence_nwb.data[:].T
@@ -237,8 +259,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
     def get_motion_correction(self) -> pd.DataFrame:
 
         motion_correction_data = {}
-        motion_correction_data['x'] = self.nwbfile.modules['motion_correction'].get_data_interface('x').data[:]
-        motion_correction_data['y'] = self.nwbfile.modules['motion_correction'].get_data_interface('y').data[:]
+        motion_correction_data['x'] = self.nwbfile.processing['motion_correction'].get_data_interface('x').data[:]
+        motion_correction_data['y'] = self.nwbfile.processing['motion_correction'].get_data_interface('y').data[:]
 
         return pd.DataFrame(motion_correction_data)
 

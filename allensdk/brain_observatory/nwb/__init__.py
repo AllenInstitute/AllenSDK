@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 import h5py
+import marshmallow
 import numpy as np
 import pandas as pd
 import datetime
@@ -23,8 +24,9 @@ from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import (
-    CompleteOphysBehaviorMetadataSchema, OphysBehaviorMetadataSchema,
-    BehaviorTaskParametersSchema, SubjectMetadataSchema
+    CompleteOphysBehaviorMetadataSchema, NwbOphysMetadataSchema,
+    OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema,
+    SubjectMetadataSchema
 )
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 
@@ -363,7 +365,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
 
     add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
 
-    running_mod = nwbfile.modules['running']
+    running_mod = nwbfile.processing['running']
     timestamps_ts = running_mod.get_data_interface('speed').timestamps
 
     running_dx_series = TimeSeries(
@@ -473,7 +475,7 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
 
     """
     stimulus_table = stimulus_table.copy()
-    ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
+    ts = nwbfile.processing['stimulus'].get_data_interface('timestamps')
     possible_names = {'stimulus_name', 'image_name'}
     stimulus_name_column = get_column_name(stimulus_table.columns,
                                            possible_names)
@@ -686,11 +688,11 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
 
     assert spacing[0] == spacing[1] and len(spacing) == 2 and unit == 'mm'
 
-    if module_name not in nwbfile.modules:
+    if module_name not in nwbfile.processing:
         ophys_mod = ProcessingModule(module_name, module_description)
         nwbfile.add_processing_module(ophys_mod)
     else:
-        ophys_mod = nwbfile.modules[module_name]
+        ophys_mod = nwbfile.processing[module_name]
 
     image = GrayscaleImage(image_name, data, resolution=spacing[0] / 10, description=description)
 
@@ -756,10 +758,15 @@ def add_metadata(nwbfile, metadata: dict):
         genotype=subject_metadata["genotype"],
         subject_id=str(subject_metadata["subject_id"]),
         reporter_line=subject_metadata["reporter_line"],
-        sex=subject_metadata["sex"])
+        sex=subject_metadata["sex"],
+        species='Mus musculus')
     nwbfile.subject = nwb_subject
 
-    # Rest of metadata can go into our custom extension
+    # Remove metadata that will go into pyNWB base classes
+    for key in OphysBehaviorMetadataSchema.neurodata_skip:
+        metadata_clean.pop(key, None)
+
+    # Remaining metadata can go into our custom extension
     new_metadata_dict = {}
     for key, val in metadata_clean.items():
         if isinstance(val, list):
@@ -795,11 +802,13 @@ def add_task_parameters(nwbfile, task_parameters):
 
 
 def add_cell_specimen_table(nwbfile: NWBFile,
-                            cell_specimen_table: pd.DataFrame):
+                            cell_specimen_table: pd.DataFrame,
+                            session_metadata: dict):
     """
     This function takes the cell specimen table and writes the ROIs
     contained within. It writes these to a new NWB imaging plane
     based off the previously supplied metadata
+
     Parameters
     ----------
     nwbfile: NWBFile
@@ -810,38 +819,40 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         experiment, stored in json file and loaded.
         example: /home/nicholasc/projects/allensdk/allensdk/test/
                  brain_observatory/behavior/cell_specimen_table_789359614.json
+    session_metadata: dict
+        Dictionary containing cell_specimen_table related metadata. Should
+        include at minimum the following fields:
+            "emission_lambda", "excitation_lambda", "indicator",
+            "targeted_structure", and ophys_frame_rate"
 
     Returns
     -------
     nwbfile: NWBFile
         The altered in memory NWBFile object that now has a specimen table
     """
+    cell_specimen_metadata = NwbOphysMetadataSchema().load(
+            session_metadata, unknown=marshmallow.EXCLUDE)
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
     device_name = nwbfile.lab_meta_data['metadata'].rig_name
     nwbfile.create_device(device_name,
-                          "Allen Brain Observatory")
+                          "Allen Brain Observatory - Scientifica 2P Rig")
     device = nwbfile.get_device(device_name)
-
-    # Location:
-    location_description = "Area: {}, Depth: {} um".format(
-        nwbfile.lab_meta_data['metadata'].targeted_structure,
-        nwbfile.lab_meta_data['metadata'].imaging_depth)
 
     # FOV:
     fov_width = nwbfile.lab_meta_data['metadata'].field_of_view_width
     fov_height = nwbfile.lab_meta_data['metadata'].field_of_view_height
     imaging_plane_description = "{} field of view in {} at depth {} um".format(
         (fov_width, fov_height),
-        nwbfile.lab_meta_data['metadata'].targeted_structure,
+        cell_specimen_metadata['targeted_structure'],
         nwbfile.lab_meta_data['metadata'].imaging_depth)
 
     # Optical Channel:
     optical_channel = OpticalChannel(
         name='channel_1',
         description='2P Optical Channel',
-        emission_lambda=nwbfile.lab_meta_data['metadata'].emission_lambda)
+        emission_lambda=cell_specimen_metadata['emission_lambda'])
 
     # Imaging Plane:
     imaging_plane = nwbfile.create_imaging_plane(
@@ -849,23 +860,19 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         optical_channel=optical_channel,
         description=imaging_plane_description,
         device=device,
-        excitation_lambda=nwbfile.lab_meta_data['metadata'].excitation_lambda,
-        imaging_rate=nwbfile.lab_meta_data['metadata'].ophys_frame_rate,
-        indicator=nwbfile.lab_meta_data['metadata'].indicator,
-        location=location_description,
-        manifold=[],  # Should this be passed in for future support?
-        conversion=1.0,
-        unit='unknown',  # Should this be passed in for future support?
-        reference_frame='unknown')  # Should this be passed in for future support?
+        excitation_lambda=cell_specimen_metadata['excitation_lambda'],
+        imaging_rate=cell_specimen_metadata['ophys_frame_rate'],
+        indicator=cell_specimen_metadata['indicator'],
+        location=cell_specimen_metadata['targeted_structure'])
 
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")
 
-    if 'two_photon_imaging' not in nwbfile.modules:
+    if 'two_photon_imaging' not in nwbfile.processing:
         two_photon_imaging_module = ProcessingModule('two_photon_imaging', '2P processing module')
         nwbfile.add_processing_module(two_photon_imaging_module)
     else:
-        two_photon_imaging_module = nwbfile.modules['two_photon_imaging']
+        two_photon_imaging_module = nwbfile.processing['two_photon_imaging']
 
     two_photon_imaging_module.add_data_interface(image_segmentation)
 
@@ -902,12 +909,12 @@ def add_cell_specimen_table(nwbfile: NWBFile,
 def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     dff_traces = dff_traces.reset_index().set_index('cell_roi_id')[['dff']]
 
-    twop_module = nwbfile.modules['two_photon_imaging']
+    twop_module = nwbfile.processing['two_photon_imaging']
     # trace data in the form of rois x timepoints
     trace_data = np.array([dff_traces.loc[cell_roi_id].dff
                            for cell_roi_id in dff_traces.index.values])
 
-    cell_specimen_table = nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
+    cell_specimen_table = nwbfile.processing['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
         region=slice(len(dff_traces)))
@@ -932,12 +939,12 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 
     # Create/Add corrected_fluorescence_traces modules and interfaces:
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
-    twop_module = nwbfile.modules['two_photon_imaging']
+    twop_module = nwbfile.processing['two_photon_imaging']
     # trace data in the form of rois x timepoints
     f_trace_data = np.array([corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence
                              for cell_roi_id in corrected_fluorescence_traces.index.values])
 
-    roi_table_region = nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
+    roi_table_region = nwbfile.processing['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
     ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
     f_interface = Fluorescence(name='corrected_fluorescence')
     twop_module.add_data_interface(f_interface)
@@ -954,7 +961,7 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 
 def add_motion_correction(nwbfile, motion_correction):
 
-    twop_module = nwbfile.modules['two_photon_imaging']
+    twop_module = nwbfile.processing['two_photon_imaging']
     ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
 
     t1 = TimeSeries(

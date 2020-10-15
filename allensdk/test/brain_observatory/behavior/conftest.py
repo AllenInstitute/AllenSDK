@@ -117,7 +117,7 @@ def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
 
 @pytest.fixture
 def metadata():
-
+    """Fixture that passes all possible behavior ophys session metadata"""
     return {"ophys_experiment_id": 1234,
             "experiment_container_id": 5678,
             "ophys_frame_rate": 31.0,
@@ -134,6 +134,29 @@ def metadata():
             "emission_lambda": 1.0,
             "excitation_lambda": 1.0,
             "indicator": 'HW',
+            "field_of_view_width": 2,
+            "field_of_view_height": 2,
+            "rig_name": 'my_device',
+            "sex": 'M',
+            "age": 'P139',
+            }
+
+
+@pytest.fixture
+def partial_metadata():
+    """Fixture that passes only metadata that will be saved in
+    custom pyNWB extension fields"""
+    return {"ophys_experiment_id": 1234,
+            "experiment_container_id": 5678,
+            "stimulus_frame_rate": 60.0,
+            "imaging_depth": 375,
+            "session_type": 'Unknown',
+            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+            "LabTracks_ID": 416369,
+            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+            "behavior_session_uuid": uuid.uuid4(),
             "field_of_view_width": 2,
             "field_of_view_height": 2,
             "rig_name": 'my_device',

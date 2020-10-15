@@ -73,17 +73,43 @@ class BehaviorMetadataSchema(RaisingSchema):
     )
 
 
-class OphysMetadataSchema(RaisingSchema):
+class NwbOphysMetadataSchema(RaisingSchema):
+    """This schema contains fields that will be stored in pyNWB base classes
+    pertaining to optical physiology."""
+    # 'emission_lambda' will be stored in
+    # pyNWB OpticalChannel 'emission_lambda' attr
+    emission_lambda = fields.Float(
+        doc='Emission lambda of fluorescent indicator',
+        required=True,
+    )
+    # 'excitation_lambda' will be stored in the pyNWB ImagingPlane
+    # 'excitation_lambda' attr
+    excitation_lambda = fields.Float(
+        doc='Excitation lambda of fluorescent indicator',
+        required=True,
+    )
+    # 'indicator' will be stored in the pyNWB ImagingPlane 'indicator' attr
+    indicator = fields.String(
+        doc='Name of optical physiology fluorescent indicator',
+        required=True,
+    )
+    # 'targeted_structure' will be stored in the pyNWB
+    # ImagingPlane 'location' attr
+    targeted_structure = fields.String(
+        doc='Anatomical structure targeted for two-photon acquisition',
+        required=True,
+    )
+    # 'ophys_frame_rate' will  be stored in the pyNWB ImagingPlane
+    # 'imaging_rate' attr
+    ophys_frame_rate = fields.Float(
+        doc='Frame rate (frames/second) of the two-photon microscope',
+        required=True,
+    )
+
+
+class OphysMetadataSchema(NwbOphysMetadataSchema):
     """This schema contains metadata pertaining to optical physiology (ophys).
     """
-    emission_lambda = fields.Float(
-        doc='emission_lambda',
-        required=True,
-    )
-    excitation_lambda = fields.Float(
-        doc='excitation_lambda',
-        required=True,
-    )
     experiment_container_id = fields.Int(
         doc='Container ID for the container that contains this ophys session',
         required=True,
@@ -93,24 +119,20 @@ class OphysMetadataSchema(RaisingSchema):
              'targeted for two-photon acquisition'),
         required=True,
     )
-    indicator = fields.String(
-        doc='indicator',
-        required=True,
-    )
     ophys_experiment_id = fields.Int(
         doc='Id for this ophys session',
         required=True,
     )
-    ophys_frame_rate = fields.Float(
-        doc='Frame rate (frames/second) of the two-photon microscope',
-        required=True,
-    )
     rig_name = fields.String(
-        doc='name of two-photon rig',
+        doc='Name of optical physiology experiment rig',
         required=True,
     )
-    targeted_structure = fields.String(
-        doc='Anatomical structure targeted for two-photon acquisition',
+    field_of_view_width = fields.Int(
+        doc='Width of optical physiology imaging plane in pixels',
+        required=True,
+    )
+    field_of_view_height = fields.Int(
+        doc='Height of optical physiology imaging plane in pixels',
         required=True,
     )
 
@@ -123,22 +145,22 @@ class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):
     neurodata_type = 'OphysBehaviorMetadata'
     neurodata_type_inc = 'LabMetaData'
     neurodata_doc = "Metadata for behavior + ophys experiments"
+    # Fields to skip converting to extension
+    # They already exist as attributes for the following pyNWB classes:
+    # OpticalChannel, ImagingPlane, NWBFile
+    neurodata_skip = {"emission_lambda", "excitation_lambda", "indicator",
+                      "targeted_structure", "experiment_datetime",
+                      "ophys_frame_rate"}
 
     session_type = fields.String(
         doc='Experimental session description',
         allow_none=True,
         required=True,
     )
+    # 'experiment_datetime' will be stored in
+    # pynwb NWBFile 'session_start_time' attr
     experiment_datetime = fields.DateTime(
         doc='Date of the experiment (UTC, as string)',
-        required=True,
-    )
-    field_of_view_width = fields.Int(
-        doc='field_of_view_width',
-        required=True,
-    )
-    field_of_view_height = fields.Int(
-        doc='field_of_view_height',
         required=True,
     )
 
@@ -162,46 +184,49 @@ class BehaviorTaskParametersSchema(RaisingSchema):
 
     blank_duration_sec = fields.List(
         fields.Float,
-        doc='blank duration in seconds',
+        doc=('The lower and upper bound (in seconds) for a randomly chosen '
+             'inter-stimulus interval duration for a trial'),
         required=True,
         shape=(2,),
     )
     stimulus_duration_sec = fields.Float(
-        doc='duration of each stimulus presentation in seconds',
+        doc='Duration of each stimulus presentation in seconds',
         required=True,
     )
     omitted_flash_fraction = fields.Float(
-        doc='omitted_flash_fraction',
+        doc='Fraction of flashes/image presentations that were omitted',
         required=True,
         allow_nan=True,
     )
     response_window_sec = fields.List(
         fields.Float,
-        doc='response_window in seconds',
+        doc=('The lower and upper bound (in seconds) for a randomly chosen '
+             'time window where subject response influences trial outcome'),
         required=True,
         shape=(2,),
     )
     reward_volume = fields.Float(
-        doc='reward_volume',
+        doc='Volume of water (in mL) delivered as reward',
         required=True,
     )
     stage = fields.String(
-        doc='stage',
+        doc='Stage of behavioral task',
         required=True,
     )
     stimulus = fields.String(
-        doc='stimulus',
+        doc='Stimulus type',
         required=True,
     )
     stimulus_distribution = fields.String(
-        doc='stimulus_distribution',
+        doc=("Distribution type of drawing change times "
+             "(e.g. 'geometric', 'exponential')"),
         required=True,
     )
     task = fields.String(
-        doc='task',
+        doc='The name of the behavioral task',
         required=True,
     )
     n_stimulus_frames = fields.Int(
-        doc='n_stimulus_frames',
+        doc='Total number of stimuli frames',
         required=True,
     )
