@@ -55,7 +55,7 @@ def _shift(
         Iterable containing numeric data. If int, will be converted to
         float in returned object.
     periods: int (default=1)
-        The number of elements to shift. 
+        The number of elements to shift.
     fill_value: float (default=np.nan)
         The value to fill at the beginning of the shifted array
     Returns
@@ -364,7 +364,9 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
     if len(v_in) == len(time) + 1:
         warnings.warn(
             "Time array is 1 value shorter than encoder array. Last encoder "
-            "value removed\n", stacklevel=1)
+            "value removed\n", UserWarning, stacklevel=1)
+        v_in = v_in[:-1]
+        v_sig = v_sig[:-1]
 
     # dx = 'd_theta' = angular change
     # There are some issues with angular change in the raw data so we
