@@ -652,14 +652,14 @@ def add_rewards(nwbfile, rewards_df):
         name='volume',
         data=rewards_df.volume.values,
         timestamps=rewards_df.index.values,
-        unit='ml'
+        unit='mL'
     )
 
     autorewarded_ts = TimeSeries(
         name='autorewarded',
         data=rewards_df.autorewarded.values,
         timestamps=reward_volume_ts.timestamps,
-        unit=None
+        unit='mL'
     )
 
     rewards_mod = ProcessingModule('rewards', 'Licking behavior processing module')
