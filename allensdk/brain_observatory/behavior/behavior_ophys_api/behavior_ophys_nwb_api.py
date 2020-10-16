@@ -9,6 +9,10 @@ import pytz
 import SimpleITK as sitk
 import xarray as xr
 
+from pandas.util.testing import assert_frame_equal
+from pynwb import NWBHDF5IO, NWBFile
+
+import allensdk.brain_observatory.roi_masks as roi
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.behavior_ophys_api import \
     BehaviorOphysApiBase
@@ -20,8 +24,6 @@ from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 from allensdk.core.lazy_property import LazyProperty
-from pandas.util.testing import assert_frame_equal
-from pynwb import NWBHDF5IO, NWBFile
 
 load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
@@ -215,10 +217,11 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
-        df = self.nwbfile.processing['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
+        # NOTE: ROI masks are stored in full frame width and height arrays
+        df = self.nwbfile.processing['ophys'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
         df.index.rename('cell_roi_id', inplace=True)
         df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
-        df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
+
         df.reset_index(inplace=True)
         df.set_index('cell_specimen_id', inplace=True)
 

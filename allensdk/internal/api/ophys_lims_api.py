@@ -418,10 +418,20 @@ class OphysLimsApi(CachedInstanceMethodMixin):
     def get_cell_specimen_table(self):
         cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id').sort_index()
         fov_width, fov_height = self.get_field_of_view_shape()['width'], self.get_field_of_view_shape()['height']
+
+        # Convert cropped ROI masks to uncropped versions
         image_mask_list = []
-        for sub_mask in cell_specimen_table['image_mask'].values:
-            curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=np.array(sub_mask, dtype=np.bool))
+        for cell_roi_id, table_row in cell_specimen_table.iterrows():
+            # Deserialize roi data into AllenSDK RoiMask object
+            curr_roi = roi.RoiMask(image_w=fov_width, image_h=fov_height,
+                                   label=None, mask_group=-1)
+            curr_roi.x = table_row['x']
+            curr_roi.y = table_row['y']
+            curr_roi.width = table_row['width']
+            curr_roi.height = table_row['height']
+            curr_roi.mask = np.array(table_row['image_mask'])
             image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
+
         cell_specimen_table['image_mask'] = image_mask_list
         cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
 

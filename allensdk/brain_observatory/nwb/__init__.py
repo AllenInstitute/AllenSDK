@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable
 
 import h5py
 import marshmallow
@@ -893,15 +893,19 @@ def add_cell_specimen_table(nwbfile: NWBFile,
                                                                              "No Description Available"))
 
     # go through each roi and add it to the plan segmentation object
-    for cell_roi_id, row in cell_roi_table.iterrows():
-        sub_mask = np.array(row.pop('image_mask'))
-        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0],
-                                       roi_mask=sub_mask)
-        mask = curr_roi.get_mask_plane()
-        csid = row.pop('cell_specimen_id')
-        row['cell_specimen_id'] = -1 if csid is None else csid
-        row['id'] = cell_roi_id
-        plane_segmentation.add_roi(image_mask=mask, **row.to_dict())
+    for cell_roi_id, table_row in cell_roi_table.iterrows():
+
+        # NOTE: The 'image_mask' in this cell_roi_table has already been
+        # processing by the allensdk.internal.api.ophys_lims_api
+        # get_cell_specimen_table() method. As a result, the ROI is stored in
+        # an array that is the same shape as the FULL field of view of the
+        # experiment (e.g. 512 x 512).
+        mask = table_row.pop('image_mask')
+
+        csid = table_row.pop('cell_specimen_id')
+        table_row['cell_specimen_id'] = -1 if csid is None else csid
+        table_row['id'] = cell_roi_id
+        plane_segmentation.add_roi(image_mask=mask, **table_row.to_dict())
 
     return nwbfile
 
