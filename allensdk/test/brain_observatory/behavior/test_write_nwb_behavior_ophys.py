@@ -193,7 +193,7 @@ def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
     else:
         with warnings.catch_warnings(record=True) as record:
             metadata_obt = obt.get_metadata()
-        exp_warn_msg = "Could not locate 'two_photon_imaging' module in NWB"
+        exp_warn_msg = "Could not locate 'ophys' module in NWB"
         print(record)
 
         assert record[0].message.args[0].startswith(exp_warn_msg)

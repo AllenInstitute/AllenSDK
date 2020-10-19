@@ -708,17 +708,17 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
 
 def add_max_projection(nwbfile, max_projection, image_api=None):
 
-    add_image(nwbfile, max_projection, 'max_projection', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
+    add_image(nwbfile, max_projection, 'max_projection', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_average_image(nwbfile, average_image, image_api=None):
 
-    add_image(nwbfile, average_image, 'average_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
+    add_image(nwbfile, average_image, 'average_image', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None):
 
-    add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
+    add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
@@ -868,13 +868,13 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")
 
-    if 'two_photon_imaging' not in nwbfile.processing:
-        two_photon_imaging_module = ProcessingModule('two_photon_imaging', '2P processing module')
-        nwbfile.add_processing_module(two_photon_imaging_module)
+    if 'ophys' not in nwbfile.processing:
+        ophys_module = ProcessingModule('ophys', 'Ophys processing module')
+        nwbfile.add_processing_module(ophys_module)
     else:
-        two_photon_imaging_module = nwbfile.processing['two_photon_imaging']
+        ophys_module = nwbfile.processing['ophys']
 
-    two_photon_imaging_module.add_data_interface(image_segmentation)
+    ophys_module.add_data_interface(image_segmentation)
 
     # Plane Segmentation:
     plane_segmentation = image_segmentation.create_plane_segmentation(
@@ -913,12 +913,12 @@ def add_cell_specimen_table(nwbfile: NWBFile,
 def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     dff_traces = dff_traces.reset_index().set_index('cell_roi_id')[['dff']]
 
-    twop_module = nwbfile.processing['two_photon_imaging']
+    ophys_module = nwbfile.processing['ophys']
     # trace data in the form of rois x timepoints
     trace_data = np.array([dff_traces.loc[cell_roi_id].dff
                            for cell_roi_id in dff_traces.index.values])
 
-    cell_specimen_table = nwbfile.processing['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
+    cell_specimen_table = nwbfile.processing['ophys'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
         region=slice(len(dff_traces)))
@@ -926,7 +926,7 @@ def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     # Create/Add dff modules and interfaces:
     assert dff_traces.index.name == 'cell_roi_id'
     dff_interface = DfOverF(name='dff')
-    twop_module.add_data_interface(dff_interface)
+    ophys_module.add_data_interface(dff_interface)
 
     dff_interface.create_roi_response_series(
         name='traces',
@@ -943,15 +943,15 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 
     # Create/Add corrected_fluorescence_traces modules and interfaces:
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
-    twop_module = nwbfile.processing['two_photon_imaging']
+    ophys_module = nwbfile.processing['ophys']
     # trace data in the form of rois x timepoints
     f_trace_data = np.array([corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence
                              for cell_roi_id in corrected_fluorescence_traces.index.values])
 
-    roi_table_region = nwbfile.processing['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
-    ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
+    roi_table_region = nwbfile.processing['ophys'].data_interfaces['dff'].roi_response_series['traces'].rois
+    ophys_timestamps = ophys_module.get_data_interface('dff').roi_response_series['traces'].timestamps
     f_interface = Fluorescence(name='corrected_fluorescence')
-    twop_module.add_data_interface(f_interface)
+    ophys_module.add_data_interface(f_interface)
 
     f_interface.create_roi_response_series(
         name='traces',
@@ -965,24 +965,22 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 
 def add_motion_correction(nwbfile, motion_correction):
 
-    twop_module = nwbfile.processing['two_photon_imaging']
-    ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
+    ophys_module = nwbfile.processing['ophys']
+    ophys_timestamps = ophys_module.get_data_interface('dff').roi_response_series['traces'].timestamps
 
     t1 = TimeSeries(
-        name='x',
+        name='ophys_motion_correction_x',
         data=motion_correction['x'].values,
         timestamps=ophys_timestamps,
         unit='pixels'
     )
 
     t2 = TimeSeries(
-        name='y',
+        name='ophys_motion_correction_y',
         data=motion_correction['y'].values,
         timestamps=ophys_timestamps,
         unit='pixels'
     )
 
-    motion_module = ProcessingModule('motion_correction', 'Motion Correction processing module')
-    motion_module.add_data_interface(t1)
-    motion_module.add_data_interface(t2)
-    nwbfile.add_processing_module(motion_module)
+    ophys_module.add_data_interface(t1)
+    ophys_module.add_data_interface(t2)
