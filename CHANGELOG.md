@@ -1,10 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.3.2] = 2020-10-19
+
+### Bug Fixes
+- (Internal) Fixed a running\_processing bug for behavior ophys experiments when the input data would have one more encoder entry than timestamp. The behavior of the code now matches what the warning says.
+
 ## [2.3.1] = 2020-10-13
 
 ### Bug Fixes
-- (Internal) Fixed a write_nwb bug for behavior ophys experiments involving the BehaviorOphysJsonApi expecting a mesoscope-specific method.
+- (Internal) Fixed a write\_nwb bug for behavior ophys experiments involving the BehaviorOphysJsonApi expecting a mesoscope-specific method.
 
 ## [2.3.0] = 2020-10-09
 

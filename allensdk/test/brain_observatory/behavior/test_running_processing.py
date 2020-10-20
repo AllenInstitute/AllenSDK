@@ -72,6 +72,43 @@ def test_get_running_df(running_data, timestamps, lowpass):
 
 
 @pytest.mark.parametrize(
+    "lowpass", [True, False]
+)
+def test_get_running_df_one_fewer_timestamp_check_warning(running_data,
+                                                          timestamps,
+                                                          lowpass):
+    with pytest.warns(
+        UserWarning,
+        match="Time array is 1 value shorter than encoder array.*"
+    ):
+        # Call with one fewer timestamp, check for a warning
+        _ = get_running_df(
+            data=running_data,
+            time=timestamps[:-1],
+            lowpass=lowpass
+        )
+
+
+@pytest.mark.parametrize(
+    "lowpass", [True, False]
+)
+def test_get_running_df_one_fewer_timestamp_check_truncation(running_data,
+                                                             timestamps,
+                                                             lowpass):
+    # Call with one fewer timestamp
+    output = get_running_df(
+        data=running_data,
+        time=timestamps[:-1],
+        lowpass=lowpass
+    )
+
+    # Check that the output is actually trimmed, and the values are the same
+    assert len(output) == len(timestamps) - 1
+    np.testing.assert_equal(output["v_sig"], running_data["items"]["behavior"]["encoders"][0]["vsig"][:-1])
+    np.testing.assert_equal(output["v_in"], running_data["items"]["behavior"]["encoders"][0]["vin"][:-1])
+
+
+@pytest.mark.parametrize(
     "arr, periods, fill, expected",
     [
         ([1, 2, 3], 1, None, np.array([np.nan, 1., 2.])),
