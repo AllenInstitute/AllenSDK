@@ -91,11 +91,19 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.3.2 (October 19, 2020)
+-----------------------------------------------------------------------
+As of the 2.3.2 release:
+
+- (Internal) Fixed a running_processing bug for behavior ophys experiments when the input data would have one more encoder entry than timestamp. The behavior of the code now matches what the warning says.
+
+
 What's New - 2.3.1 (October 13, 2020)
 -----------------------------------------------------------------------
 As of the 2.3.1 release:
 
 - (Internal) Fixed a write_nwb bug for behavior ophys experiments involving the BehaviorOphysJsonApi expecting a mesoscope-specific method.
+
 
 What's New - 2.3.0 (October 9, 2020)
 -----------------------------------------------------------------------
