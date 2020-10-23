@@ -198,6 +198,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         # session metadata
         try:
             ophys_module = self.nwbfile.processing['ophys']
+        except KeyError:
+            warnings.warn("Could not locate 'ophys' module in "
+                          "NWB file. The following metadata fields will be "
+                          "missing: 'ophys_frame_rate', 'indicator', "
+                          "'targeted_structure', 'excitation_lambda', "
+                          "'emission_lambda'")
+        else:
             image_seg = ophys_module.data_interfaces['image_segmentation']
             imaging_plane = image_seg.plane_segmentations['cell_specimen_table'].imaging_plane
             optical_channel = imaging_plane.optical_channel[0]
@@ -207,12 +214,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             data['targeted_structure'] = imaging_plane.location
             data['excitation_lambda'] = imaging_plane.excitation_lambda
             data['emission_lambda'] = optical_channel.emission_lambda
-        except KeyError:
-            warnings.warn("Could not locate 'ophys' module in "
-                          "NWB file. The following metadata fields will be "
-                          "missing: 'ophys_frame_rate', 'indicator', "
-                          "'targeted_structure', 'excitation_lambda', "
-                          "'emission_lambda'")
 
         # Add other metadata stored in nwb file to behavior ophys session meta
         data['experiment_datetime'] = self.nwbfile.session_start_time
