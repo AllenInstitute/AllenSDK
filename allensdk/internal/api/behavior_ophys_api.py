@@ -107,11 +107,13 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 raise RuntimeError('dff_frames is longer than timestamps')
         # Mesoscope data
         # Resample if collecting multiple concurrent planes (e.g. mesoscope)
-        # because the frames are interleaved 
+        # because the frames are interleaved
         else:
-            self.logger.info("Mesoscope data detected. Splitting timestamps "
-                             "over plane group(s).")
             group_count = self.get_plane_group_count()
+            self.logger.info(
+                "Mesoscope data detected. Splitting timestamps "
+                f"(len={len(ophys_timestamps)} over {group_count} "
+                "plane group(s).")
             ophys_timestamps = self._process_ophys_plane_timestamps(
                 ophys_timestamps, plane_group, group_count)
             if number_of_dff_frames != num_of_timestamps:
