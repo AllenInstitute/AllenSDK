@@ -36,6 +36,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):
         super().__init__(ophys_experiment_id, lims_credentials)
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     @memoize
     def get_sync_data(self):
@@ -87,21 +88,36 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         ophys_timestamps = self.get_sync_data()['ophys_frames']
         dff_traces = self.get_raw_dff_data()
+        plane_group = self.get_imaging_plane_group()
+
         number_of_cells, number_of_dff_frames = dff_traces.shape
         num_of_timestamps = len(ophys_timestamps)
-        if number_of_dff_frames < num_of_timestamps:
-            ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
-        elif number_of_dff_frames == num_of_timestamps:
-            pass
-        else:
-            raise RuntimeError('dff_frames is longer than timestamps')
-
+        # Scientifica data has extra frames in the sync file relative
+        # to the number of frames in the video. These sentinel frames
+        # should be removed.
+        # NOTE: This fix does not apply to mesoscope data.
+        # See http://confluence.corp.alleninstitute.org/x/9DVnAg
+        if plane_group is None:    # non-mesoscope
+            if (number_of_dff_frames < num_of_timestamps):
+                self.logger.info(
+                    "Truncating acquisition frames ('ophys_frames') to the "
+                    "number of frames in the df/f trace.")
+                ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
+            elif number_of_dff_frames > num_of_timestamps:
+                raise RuntimeError('dff_frames is longer than timestamps')
+        # Mesoscope data
         # Resample if collecting multiple concurrent planes (e.g. mesoscope)
-        plane_group = self.get_imaging_plane_group()
-        if plane_group is not None:
+        # because the frames are interleaved 
+        else:
+            self.logger.info("Mesoscope data detected. Splitting timestamps "
+                             "over plane group(s).")
             group_count = self.get_plane_group_count()
             ophys_timestamps = self._process_ophys_plane_timestamps(
                 ophys_timestamps, plane_group, group_count)
+            if number_of_dff_frames != num_of_timestamps:
+                raise RuntimeError(
+                    f"dff_frames (len={number_of_dff_frames}) is not equal to "
+                    f"number of split timestamps (len={num_of_timestamps}).")
         return ophys_timestamps
 
     @memoize

@@ -1,11 +1,22 @@
 import pytest
 import pandas as pd
 import numpy as np
+from contextlib import contextmanager
 
 from allensdk.internal.api import OneResultExpectedError
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
+
+
+@contextmanager
+def does_not_raise(enter_result=None):
+    """
+    Context to help parametrize tests that may raise errors.
+    If we start supporting only python 3.7+, switch to
+    contextlib.nullcontext
+    """
+    yield enter_result
 
 
 @pytest.mark.requires_bamboo
@@ -78,3 +89,38 @@ def test_process_ophys_plane_timestamps(
     actual = BehaviorOphysLimsApi._process_ophys_plane_timestamps(
         timestamps, plane_group, group_count)
     np.testing.assert_array_equal(expected, actual)
+
+
+@pytest.mark.parametrize(
+    "plane_group, ophys_timestamps, dff_traces, expected, context",
+    [
+        (None, np.arange(10), np.arange(5).reshape(1, 5),
+         np.arange(5), does_not_raise()),
+        (None, np.arange(10), np.arange(20).reshape(1, 20),
+         None, pytest.raises(RuntimeError)),
+        (2, np.arange(10), np.arange(10).reshape(1, 10),
+         np.arange(10), does_not_raise()),
+        (2, np.arange(10), np.arange(5).reshape(1, 5),
+         None, pytest.raises(RuntimeError))
+    ],
+    ids=["scientifica-trunate", "scientifica-raise", "mesoscope-good",
+         "mesoscope-raise"]
+)
+def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
+                              dff_traces, expected, context):
+    """Test the acquisition frame truncation only happens for
+    non-mesoscope data (and raises error for scientifica data with
+    longer trace frames than acquisition frames (ophys_timestamps))."""
+    api = BehaviorOphysLimsApi(123)
+    # Mocking any db calls
+    monkeypatch.setattr(api, "get_sync_data",
+                        lambda: {"ophys_frames": ophys_timestamps})
+    monkeypatch.setattr(api, "get_raw_dff_data", lambda: dff_traces)
+    monkeypatch.setattr(api, "get_imaging_plane_group", lambda: plane_group)
+    monkeypatch.setattr(api, "_process_ophys_plane_timestamps",
+                        lambda *x: ophys_timestamps)
+    monkeypatch.setattr(api, "get_plane_group_count", lambda: 4)
+    with context:
+        actual = api.get_ophys_timestamps()
+        if expected is not None:
+            np.testing.assert_array_equal(expected, actual)
