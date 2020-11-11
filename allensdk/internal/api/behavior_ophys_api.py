@@ -100,11 +100,14 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         if plane_group is None:    # non-mesoscope
             if (number_of_dff_frames < num_of_timestamps):
                 self.logger.info(
-                    "Truncating acquisition frames ('ophys_frames') to the "
-                    "number of frames in the df/f trace.")
+                    "Truncating acquisition frames ('ophys_frames') "
+                    f"(len={num_of_timestamps}) to the number of frames "
+                    f"in the df/f trace ({number_of_dff_frames}).")
                 ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
             elif number_of_dff_frames > num_of_timestamps:
-                raise RuntimeError('dff_frames is longer than timestamps')
+                raise RuntimeError(
+                    f"dff_frames (len={number_of_dff_frames}) is longer "
+                    f"than timestamps (len={num_of_timestamps}).")
         # Mesoscope data
         # Resample if collecting multiple concurrent planes (e.g. mesoscope)
         # because the frames are interleaved
