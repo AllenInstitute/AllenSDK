@@ -6,7 +6,7 @@ import logging
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.behavior.behavior_project_lims_api import (
+from allensdk.brain_observatory.behavior.project_apis.data_fetchers import (
     BehaviorProjectLimsApi)
 from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)

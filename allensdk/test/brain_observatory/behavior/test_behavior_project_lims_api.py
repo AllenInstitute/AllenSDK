@@ -1,6 +1,6 @@
 import pytest
 
-from allensdk.brain_observatory.behavior.behavior_project_lims_api import (
+from allensdk.brain_observatory.behavior.project_apis.data_fetchers import (
     BehaviorProjectLimsApi)
 from allensdk.test_utilities.custom_comparators import (
     WhitespaceStrippedString)
