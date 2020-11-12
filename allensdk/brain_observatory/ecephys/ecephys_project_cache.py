@@ -657,7 +657,7 @@ class EcephysProjectCache(Cache):
                        version: Optional[str] = None,
                        cache: bool = True,
                        fetch_tries: int = 2,
-                       timeout = 3000):
+                       timeout: int = 1200):
         """
         Create an instance of EcephysProjectCache with an
         EcephysProjectWarehouseApi. Retrieves released data stored in
@@ -685,8 +685,10 @@ class EcephysProjectCache(Cache):
         fetch_tries : int
             Maximum number of times to attempt a download before giving up and
             raising an exception. Note that this is total tries, not retries
-        timeout
-            Timeout for the RmaEngine constructor. Defaults to 50 minutes.
+        timeout : int
+            Amount of time (in seconds) to wait on an HTTP request before raising
+            an error. Increase this duration if you find that warehouse servers
+            are not responding quickly. Defaults to 1200 seconds (20 minutes).
         """
         if scheme and host:
             app_kwargs = {"scheme": scheme, "host": host,

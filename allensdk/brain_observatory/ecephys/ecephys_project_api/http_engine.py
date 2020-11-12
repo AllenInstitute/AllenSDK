@@ -11,7 +11,7 @@ import aiohttp
 import nest_asyncio
 from tqdm.auto import tqdm
 
-DEFAULT_TIMEOUT = 50 * 60  # set timeout to 50 minutes
+DEFAULT_TIMEOUT = 20 * 60  # seconds
 DEFAULT_CHUNKSIZE = 1024 * 10  # bytes
 
 
