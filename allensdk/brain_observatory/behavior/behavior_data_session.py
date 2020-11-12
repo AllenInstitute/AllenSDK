@@ -5,7 +5,7 @@ import numpy as np
 import inspect
 
 from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
-from allensdk.brain_observatory.behavior.internal import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 BehaviorDataApi = Type[BehaviorBase]

@@ -2,8 +2,8 @@ import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable
 import logging
 
-from allensdk.brain_observatory.behavior.internal.behavior_project_base\
-    import BehaviorProjectBase
+from allensdk.brain_observatory.behavior.project_apis.abcs import (
+    BehaviorProjectBase)
 from allensdk.brain_observatory.behavior.behavior_data_session import (
     BehaviorDataSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (

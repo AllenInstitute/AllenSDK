@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.internal.behavior_base import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
 from allensdk.brain_observatory.behavior.image_api import Image
 
 

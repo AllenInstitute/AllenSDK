@@ -7,7 +7,7 @@ import pytz
 from typing import Dict, Optional, Union, List, Any
 
 from allensdk.core.exceptions import DataFrameIndexError
-from allensdk.brain_observatory.behavior.internal.behavior_base import (
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase)
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import (
