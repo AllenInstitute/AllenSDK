@@ -12,7 +12,8 @@ import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 from allensdk.core.authentication import DbCredentials
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine, HttpEngine
+    write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine, HttpEngine,
+    DEFAULT_TIMEOUT as HTTP_ENGINE_DEFAULT_TIMEOUT
 )
 
 mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
@@ -493,3 +494,19 @@ def test_stream_writer_method_default_correct(tmpdir_factory):
     manifest = os.path.join(tmpdir, "manifest.json")
     cache = epc.EcephysProjectCache(stream_writer=None, manifest=manifest)
     assert cache.stream_writer == cache.fetch_api.rma_engine.write_bytes
+
+def test_default_timeout_from_warehouse(tmpdir_factory):
+    tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
+    cache = epc.EcephysProjectCache.from_warehouse(
+        manifest=os.path.join(tmpdir, "manifest.json")
+    )
+    assert cache.fetch_api.rma_engine.timeout == HTTP_ENGINE_DEFAULT_TIMEOUT
+
+def test_user_provided_timeout_from_warehouse(tmpdir_factory):
+    user_provided_timeout = 3
+    tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
+    cache = epc.EcephysProjectCache.from_warehouse(
+        manifest=os.path.join(tmpdir, "manifest.json"),
+        timeout = user_provided_timeout
+    )
+    assert cache.fetch_api.rma_engine.timeout == user_provided_timeout

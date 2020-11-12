@@ -656,7 +656,8 @@ class EcephysProjectCache(Cache):
                        manifest: Optional[Union[str, Path]] = None,
                        version: Optional[str] = None,
                        cache: bool = True,
-                       fetch_tries: int = 2):
+                       fetch_tries: int = 2,
+                       timeout: int = 1200):
         """
         Create an instance of EcephysProjectCache with an
         EcephysProjectWarehouseApi. Retrieves released data stored in
@@ -684,12 +685,17 @@ class EcephysProjectCache(Cache):
         fetch_tries : int
             Maximum number of times to attempt a download before giving up and
             raising an exception. Note that this is total tries, not retries
+        timeout : int
+            Amount of time (in seconds) to wait on an HTTP request before raising
+            an error. Increase this duration if you find that warehouse servers
+            are not responding quickly. Defaults to 1200 seconds (20 minutes).
         """
         if scheme and host:
             app_kwargs = {"scheme": scheme, "host": host,
                           "asynchronous": asynchronous}
         else:
             app_kwargs = {"asynchronous": asynchronous}
+        app_kwargs['timeout'] = timeout
         return cls._from_http_source_default(
             EcephysProjectWarehouseApi, app_kwargs, manifest=manifest,
             version=version, cache=cache, fetch_tries=fetch_tries
