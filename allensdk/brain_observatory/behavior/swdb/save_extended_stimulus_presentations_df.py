@@ -6,9 +6,8 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession,
 )
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import (
-    BehaviorOphysNwbApi,
-)
+from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
+    BehaviorOphysNwbApi)
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 import behavior_project_cache as bpc

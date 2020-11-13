@@ -16,8 +16,8 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_expt_description
 )
-from allensdk.brain_observatory.behavior.behavior_ophys_api import (
-    BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorOphysBase
 )
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
@@ -33,7 +33,7 @@ load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
-class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
+class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
 
     def __init__(self, *args, **kwargs):
         self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)

@@ -11,7 +11,8 @@ from unittest.mock import MagicMock
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals, compare_fields
+from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
+    BehaviorOphysNwbApi, equals, compare_fields)
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.image_api import ImageApi
