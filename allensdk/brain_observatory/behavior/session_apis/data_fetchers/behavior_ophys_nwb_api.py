@@ -1,5 +1,4 @@
 import datetime
-import math
 import uuid
 import warnings
 
@@ -7,9 +6,7 @@ import numpy as np
 import pandas as pd
 import pytz
 import SimpleITK as sitk
-import xarray as xr
 
-from pandas.util.testing import assert_frame_equal
 from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
@@ -27,7 +24,6 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
-from allensdk.core.lazy_property import LazyProperty
 
 load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
@@ -278,67 +274,3 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         motion_correction_data['y'] = ophys_module.get_data_interface('ophys_motion_correction_y').data[:]
 
         return pd.DataFrame(motion_correction_data)
-
-
-def equals(A, B, reraise=False):
-
-    field_set = set()
-    for key, val in A.__dict__.items():
-        if isinstance(val, LazyProperty):
-            field_set.add(key)
-    for key, val in B.__dict__.items():
-        if isinstance(val, LazyProperty):
-            field_set.add(key)
-
-    try:
-        for field in sorted(field_set):
-            x1, x2 = getattr(A, field), getattr(B, field)
-            err_msg = f"{field} on {A} did not equal {field} on {B} (\n{x1} vs\n{x2}\n)"
-            compare_fields(x1, x2, err_msg)
-
-    except NotImplementedError as e:
-        A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
-        B_implements_get_field = hasattr(B.api, getattr(type(B), field).getter_name)
-        assert A_implements_get_field == B_implements_get_field == False
-
-    except (AssertionError, AttributeError) as e:
-        if reraise:
-            raise
-        return False
-
-    return True
-
-
-
-def compare_fields(x1, x2, err_msg=""):
-    if isinstance(x1, pd.DataFrame):
-        try:
-            assert_frame_equal(x1, x2, check_like=True)
-        except:
-            print(err_msg)
-            raise
-    elif isinstance(x1, np.ndarray):
-        np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
-    elif isinstance(x1, xr.DataArray):
-        xr.testing.assert_allclose(x1, x2)
-    elif isinstance(x1, (list,)):
-        assert x1 == x2, err_msg
-    elif isinstance(x1, (sitk.Image,)):
-        assert x1.GetSize() == x2.GetSize(), err_msg
-        assert x1 == x2, err_msg
-    elif isinstance(x1, (dict,)):
-        for key in set(x1.keys()).union(set(x2.keys())):
-            key_err_msg = f"mismatch when checking key {key}. {err_msg}"
-
-            if isinstance(x1[key], (np.ndarray,)):
-                np.testing.assert_array_almost_equal(x1[key], x2[key], err_msg=key_err_msg)
-            elif isinstance(x1[key], (float,)):
-                if math.isnan(x1[key]) or math.isnan(x2[key]):
-                    assert math.isnan(x1[key]) and math.isnan(x2[key]), key_err_msg
-                else:
-                    assert x1[key] == x2[key], key_err_msg
-            else:
-                assert x1[key] == x2[key], key_err_msg
-
-    else:
-        assert x1 == x2, err_msg

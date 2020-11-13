@@ -12,9 +12,11 @@ from unittest.mock import MagicMock
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
-    BehaviorOphysNwbApi, equals, compare_fields)
+    BehaviorOphysNwbApi)
+from allensdk.brain_observatory.session_api_utils import (
+    sessions_are_equal, compare_session_fields)
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
@@ -39,7 +41,7 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected, get_from_
     expected = get_expected(session_data)
     obtained = get_from_session(session)
 
-    compare_fields(expected, obtained)
+    compare_session_fields(expected, obtained)
 
 
 @pytest.mark.requires_bamboo
@@ -51,7 +53,8 @@ def test_nwb_end_to_end(tmpdir_factory):
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
-    equals(d1, d2, reraise=True)
+
+    assert sessions_are_equal(d1, d2, reraise=True)
 
 
 @pytest.mark.nightly
@@ -186,7 +189,7 @@ def cell_specimen_table_api():
         [0, 0, 0, 0, 0]
     ])
 
-    class CellSpecimenTableApi(BehaviorOphysApiBase):
+    class CellSpecimenTableApi(BehaviorOphysBase):
 
         def get_cell_specimen_table(self):
             return pd.DataFrame(

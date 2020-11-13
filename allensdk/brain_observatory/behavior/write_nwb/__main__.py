@@ -9,11 +9,15 @@ import argschema
 import marshmallow
 
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_session import (
+    BehaviorOphysSession)
 from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
-    BehaviorOphysNwbApi, equals)
-from allensdk.brain_observatory.behavior.write_nwb._schemas import InputSchema, OutputSchema
-from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
+    BehaviorOphysNwbApi)
+from allensdk.brain_observatory.behavior.write_nwb._schemas import (
+    InputSchema, OutputSchema)
+from allensdk.brain_observatory.argschema_utilities import (
+    write_or_print_outputs)
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
 class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
@@ -121,7 +125,8 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
     try:
         session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
         BehaviorOphysNwbApi(nwb_filepath_inprogress).save(session)
-        assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath_inprogress)))
+        api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
+        assert sessions_are_equal(session, BehaviorOphysSession(api=api))
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
