@@ -118,6 +118,21 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
 
         return nwbfile
 
+    def get_ophys_experiment_id(self) -> int:
+        return int(self.nwbfile.identifier)
+
+    # TODO: Implement save and lod of behavior_session_id to/from NWB file
+    def get_behavior_session_id(self) -> int:
+        raise NotImplementedError()
+
+    # TODO: Implement save and load of ophys_session_id to/from NWB file 
+    def get_ophys_session_id(self) -> int:
+        raise NotImplementedError()
+
+    # TODO: Implement save and load of eye_tracking_data to/from NWB file
+    def get_eye_tracking_data(self) -> int:
+        raise NotImplementedError()
+
     def get_running_data_df(self, **kwargs):
 
         running_speed = self.get_running_speed()
@@ -135,11 +150,15 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
 
         return running_data_df[['speed', 'dx', 'v_sig', 'v_in']]
 
+    def get_ophys_timestamps(self) -> np.ndarray:
+        return self.nwbfile.processing['ophys'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
+
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
-    def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.processing['ophys'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
+    # TODO: Implement save and load of 'raw' unaligned stimulus timestamps to/from NWB file
+    def get_raw_stimulus_timestamps(self) -> np.ndarray:
+        raise NotImplementedError()
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing['stimulus'].get_data_interface('timestamps').timestamps[:]

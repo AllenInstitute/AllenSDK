@@ -24,14 +24,14 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import load_eye
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.core.authentication import credential_injector, DbCredentials
 
 
-class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
+class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysBase):
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):

@@ -10,16 +10,22 @@ from allensdk.brain_observatory.behavior.image_api import Image
 
 class BehaviorOphysBase(BehaviorBase):
     """Abstract base class implementing required methods for interacting with
-    behavior+ophys session data.
+    behavior + ophys session data.
 
     Child classes should be instantiated with a fetch API that implements these
     methods.
     """
 
     @abc.abstractmethod
+    def get_ophys_experiment_id(self) -> Optional[int]:
+        """Returns the ophys_experiment_id for the instantiated BehaviorOphys
+        Session (or BehaviorOphys data fetcher) if applicable."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def get_ophys_session_id(self) -> Optional[int]:
-        """Returns the ophys_session_id associated with this experiment,
-        if applicable.
+        """Returns the behavior + ophys_session_id associated with this
+        experiment, if applicable.
         """
         raise NotImplementedError()
 
@@ -154,5 +160,26 @@ class BehaviorOphysBase(BehaviorBase):
             Table whose rows are stimulus presentations
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_segmentation_mask_image(self) -> Image:
+        """Get the 'segmentation_mask_image'. This image contains pixels
+        with a value of 1 if they are included in ANY ROI segmented in the
+        behavior + ophys session and 0 otherwise.
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_eye_tracking_data(self) -> pd.DataFrame:
+        """Get eye tracking data from behavior + ophys session.
+
+        Returns
+        -------
+        pd.DataFrame
+            A refined eye tracking dataframe that contains information
+            about eye tracking ellipse fits, frame times, eye areas,
+            pupil areas, and frames with likely blinks/outliers.
         """
         raise NotImplementedError()

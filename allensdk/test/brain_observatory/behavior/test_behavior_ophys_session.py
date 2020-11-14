@@ -16,7 +16,6 @@ from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
 from allensdk.brain_observatory.session_api_utils import (
     sessions_are_equal, compare_session_fields)
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
@@ -189,7 +188,9 @@ def cell_specimen_table_api():
         [0, 0, 0, 0, 0]
     ])
 
-    class CellSpecimenTableApi(BehaviorOphysBase):
+    # Must implement at least the get_cell_specimen_table
+    # and get_max_projection methods from BehaviorOphysBase
+    class CellSpecimenTableApi:
 
         def get_cell_specimen_table(self):
             return pd.DataFrame(
