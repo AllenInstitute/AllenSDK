@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.3.3] = 2020-11-12
+### Bug Fixes
+- (Internal) Fixed a bug in mesoscope processing where the ophys acquisition frames were being truncated
+prior to splitting, resulting in many fewer than expected acquisition frames.
+
 ## [2.3.2] = 2020-10-19
 
 ### Bug Fixes
