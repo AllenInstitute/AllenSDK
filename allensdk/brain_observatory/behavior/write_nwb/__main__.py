@@ -11,7 +11,7 @@ import marshmallow
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
-from allensdk.brain_observatory.behavior.session_apis.data_fetchers import (
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.write_nwb._schemas import (
     InputSchema, OutputSchema)
