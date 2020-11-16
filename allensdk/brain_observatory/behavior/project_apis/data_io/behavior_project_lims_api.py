@@ -4,8 +4,8 @@ import logging
 
 from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)
-from allensdk.brain_observatory.behavior.behavior_data_session import (
-    BehaviorDataSession)
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
 from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
@@ -430,14 +430,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return table
 
     def get_behavior_only_session_data(
-            self, behavior_session_id: int) -> BehaviorDataSession:
-        """Returns a BehaviorDataSession object that contains methods to
+            self, behavior_session_id: int) -> BehaviorSession:
+        """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
         :type behavior_session_id: int
-        :rtype: BehaviorDataSession
+        :rtype: BehaviorSession
         """
-        return BehaviorDataSession(BehaviorDataLimsApi(behavior_session_id))
+        return BehaviorSession(BehaviorDataLimsApi(behavior_session_id))
 
     def get_experiment_table(
             self,

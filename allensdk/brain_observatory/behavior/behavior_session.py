@@ -11,7 +11,7 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 BehaviorDataApi = Type[BehaviorBase]
 
 
-class BehaviorDataSession(object):
+class BehaviorSession(object):
     def __init__(self, api: Optional[BehaviorDataApi] = None):
         self.api = api
         # Initialize attributes to be lazily evaluated
@@ -29,12 +29,12 @@ class BehaviorDataSession(object):
         self._metadata = None
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int) -> "BehaviorDataSession":
+    def from_lims(cls, behavior_session_id: int) -> "BehaviorSession":
         return cls(api=BehaviorDataLimsApi(behavior_session_id))
 
     @classmethod
     def from_nwb_path(
-            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorDataSession":
+            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorSession":
         return NotImplementedError
 
     @property
@@ -301,7 +301,7 @@ class BehaviorDataSession(object):
     def list_api_methods(self) -> List[Tuple[str, str]]:
         """Convenience method to expose list of API `get` methods. These methods
         can be accessed by referencing the API used to initialize this
-        BehaviorDataSession via its `api` instance attribute.
+        BehaviorSession via its `api` instance attribute.
         :rtype: list of tuples, where the first value in the tuple is the
         method name, and the second value is the method docstring.
         """

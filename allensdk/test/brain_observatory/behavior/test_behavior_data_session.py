@@ -1,7 +1,7 @@
 import logging
 
-from allensdk.brain_observatory.behavior.behavior_data_session import (
-    BehaviorDataSession)
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession)
 
 
 class DummyApi(object):
@@ -25,18 +25,18 @@ class DummyApiCache(object):
         pass
 
 
-class TestBehaviorDataSession:
-    """Tests for BehaviorDataSession.
-       The vast majority of methods in BehaviorDataSession are simply calling
+class TestBehaviorSession:
+    """Tests for BehaviorSession.
+       The vast majority of methods in BehaviorSession are simply calling
        functions from the underlying API. The API required for instantiating a
-       BehaviorDataSession is annotated to show that it requires an class that
+       BehaviorSession is annotated to show that it requires an class that
        inherits from BehaviorBase, it is ensured that those methods exist in
        the API class. These methods should be covered by unit tests on the
        API class and will not be re-tested here.
     """
     @classmethod
     def setup_class(cls):
-        cls.behavior_session = BehaviorDataSession(api=DummyApi())
+        cls.behavior_session = BehaviorSession(api=DummyApi())
 
     def test_list_api_methods(self):
         expected = [("get_method", "Method docstring"),
@@ -53,6 +53,6 @@ class TestBehaviorDataSession:
 
     def test_cache_clear_no_warning(self, caplog):
         caplog.clear()
-        bs = BehaviorDataSession(api=DummyApiCache())
+        bs = BehaviorSession(api=DummyApiCache())
         bs.cache_clear()
         assert len(caplog.record_tuples) == 0
