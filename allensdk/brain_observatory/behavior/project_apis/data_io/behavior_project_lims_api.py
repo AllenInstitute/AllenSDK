@@ -8,7 +8,8 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
-from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi)
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
@@ -437,7 +438,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
-        return BehaviorSession(BehaviorDataLimsApi(behavior_session_id))
+        return BehaviorSession(BehaviorLimsApi(behavior_session_id))
 
     def get_experiment_table(
             self,

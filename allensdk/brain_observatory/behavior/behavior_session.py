@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 import inspect
 
-from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
@@ -30,7 +31,7 @@ class BehaviorSession(object):
 
     @classmethod
     def from_lims(cls, behavior_session_id: int) -> "BehaviorSession":
-        return cls(api=BehaviorDataLimsApi(behavior_session_id))
+        return cls(api=BehaviorLimsApi(behavior_session_id))
 
     @classmethod
     def from_nwb_path(

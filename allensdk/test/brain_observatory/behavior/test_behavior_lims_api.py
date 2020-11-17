@@ -1,7 +1,8 @@
 import pytest
 
 from allensdk import OneResultExpectedError
-from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
 
@@ -30,18 +31,17 @@ def test_get_behavior_stimulus_file(behavior_experiment_id, compare_val):
     pytest.param('394a910e-94c7-4472-9838-5345aff59ed8'),
 ])
 def test_foraging_id_to_behavior_session_id(behavior_session_uuid):
-    behavior_session_id = BehaviorLimsApi.foraging_id_to_behavior_session_id(
-        behavior_session_uuid)
-    assert behavior_session_id == 823847007
+    session = BehaviorLimsApi.from_foraging_id(behavior_session_uuid)
+    assert session.behavior_session_id == 823847007
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('behavior_session_uuid', [
+@pytest.mark.parametrize('behavior_session_id', [
     pytest.param(823847007),
 ])
-def test_behavior_session_id_to_foraging_id(behavior_session_uuid):
-    foraging_id = BehaviorLimsApi.behavior_session_id_to_foraging_id(
-        behavior_session_uuid)
+def test_behavior_session_id_to_foraging_id(behavior_session_id):
+    session = BehaviorLimsApi(behavior_session_id=behavior_session_id)
+    foraging_id = session.get_behavior_session_uuid()
     assert foraging_id == '394a910e-94c7-4472-9838-5345aff59ed8'
 
 

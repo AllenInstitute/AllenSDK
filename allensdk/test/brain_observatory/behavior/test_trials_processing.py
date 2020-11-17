@@ -2,7 +2,8 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi)
 from allensdk.brain_observatory.behavior import trials_processing
 
 
@@ -22,7 +23,7 @@ def test_get_ori_info_from_trial(behavior_experiment_id, ti, expected, exception
     - i may be rewriting code here but its more a sanity check really...
     """
     stim_output = pd.read_pickle(
-        BehaviorLimsApi(behavior_experiment_id).get_behavior_stimulus_file()
+        BehaviorLimsApi(behavior_session_id=behavior_experiment_id).get_behavior_stimulus_file()
     )
     trial_log = stim_output['items']['behavior']['trial_log']
 
