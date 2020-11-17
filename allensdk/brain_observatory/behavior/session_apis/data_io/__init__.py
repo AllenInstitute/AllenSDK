@@ -3,3 +3,4 @@ from allensdk.brain_observatory.behavior.session_apis.data_io.behavior_lims_api 
 
 # data_io classes for behavior + ophys
 from allensdk.brain_observatory.behavior.session_apis.data_io.behavior_ophys_nwb_api import BehaviorOphysNwbApi  # noqa: F401, E501
+from allensdk.brain_observatory.behavior.session_apis.data_io.behavior_ophys_lims_api import BehaviorOphysLimsApi  # noqa: F401, E501

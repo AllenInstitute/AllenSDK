@@ -31,7 +31,7 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.core.authentication import credential_injector, DbCredentials
 
 
-class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysBase):
+class BehaviorOphysLimsApi(BehaviorOphysBase, OphysLimsApi):
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):

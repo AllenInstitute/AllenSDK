@@ -7,9 +7,7 @@ import itertools
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi)
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-
+    BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from importlib import reload; reload(bpc)
 from allensdk.brain_observatory.behavior.swdb.analysis_tools import get_nearest_frame, get_trace_around_timepoint, get_mean_in_window

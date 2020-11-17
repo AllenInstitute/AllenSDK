@@ -9,7 +9,8 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi
 )
 from allensdk.core.authentication import DbCredentials
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysLimsApi)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 

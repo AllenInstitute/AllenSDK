@@ -9,8 +9,7 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+    BehaviorLimsApi, BehaviorOphysLimsApi)
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     HttpEngine)

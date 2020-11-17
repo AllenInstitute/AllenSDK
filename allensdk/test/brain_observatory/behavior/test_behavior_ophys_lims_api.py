@@ -4,7 +4,8 @@ import numpy as np
 from contextlib import contextmanager
 
 from allensdk.internal.api import OneResultExpectedError
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
 
