@@ -9,7 +9,8 @@ import uuid
 import matplotlib.image as mpimg  # NOQA: E402
 
 from allensdk.api.cache import memoize
-from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
+    import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import (
     get_sync_data, get_stimulus_rebase_function, frame_time_offset)
 from allensdk.brain_observatory.sync_dataset import Dataset

@@ -3,7 +3,8 @@ import os
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError, OneOrMoreResultExpectedError
-from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
+    import OphysLimsApi
 
 
 @pytest.fixture(scope="function")
