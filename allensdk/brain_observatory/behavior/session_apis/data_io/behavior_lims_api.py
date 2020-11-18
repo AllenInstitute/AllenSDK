@@ -18,7 +18,8 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_task_parameters)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
+from allensdk.brain_observatory.behavior.trials_processing import (
+    get_trials, get_extended_trials)
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.api import db_connection_creator
 from allensdk.api.cache import memoize
@@ -30,7 +31,7 @@ from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
 
 
-class BehaviorLimsApi(BehaviorBase, CachedInstanceMethodMixin):
+class BehaviorLimsApi(CachedInstanceMethodMixin, BehaviorBase):
     """A data fetching class that serves as an API for filling
     'BehaviorSession' attributes from LIMS.
     """
@@ -372,6 +373,18 @@ class BehaviorLimsApi(BehaviorBase, CachedInstanceMethodMixin):
                               lambda x: x)
 
         return trial_df
+
+    def get_extended_trials(self) -> pd.DataFrame:
+        """Get extended trials from pkl file
+
+        Returns
+        -------
+        pd.DataFrame
+            A dataframe containing extended behavior trial information.
+        """
+        filename = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(filename)
+        return get_extended_trials(data)
 
     @memoize
     def get_birth_date(self) -> datetime.date:

@@ -16,23 +16,29 @@ from allensdk.brain_observatory.behavior.sync import (
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
-from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
-from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
-from allensdk.brain_observatory.behavior.running_processing import get_running_df
+from allensdk.brain_observatory.behavior.stimulus_processing import (
+    get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata)
+from allensdk.brain_observatory.behavior.metadata_processing import (
+    get_task_parameters)
+from allensdk.brain_observatory.behavior.running_processing import (
+    get_running_df)
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
-from allensdk.brain_observatory.behavior.eye_tracking_processing import load_eye_tracking_hdf, process_eye_tracking_data
+from allensdk.brain_observatory.behavior.eye_tracking_processing import (
+    load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorOphysBase
-from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorOphysBase)
+from allensdk.brain_observatory.behavior.trials_processing import (
+    get_extended_trials)
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.core.authentication import credential_injector, DbCredentials
 
 
-class BehaviorOphysLimsApi(BehaviorOphysBase, OphysLimsApi):
+class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysBase):
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):
