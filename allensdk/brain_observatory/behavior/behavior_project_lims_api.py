@@ -202,6 +202,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.date_of_acquisition,
                 d.id as donor_id,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line,
                 g.name AS sex,
@@ -288,7 +289,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line
+                        reporter_line, driver_line, mouse_id
 
         :param ophys_experiment_ids: optional list of ophys_experiment_ids
             to include
@@ -318,6 +319,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line,
                 id.depth as imaging_depth,
@@ -356,7 +358,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line
+                        reporter_line, driver_line, mouse_id
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
@@ -381,6 +383,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line
             FROM ophys_sessions os
