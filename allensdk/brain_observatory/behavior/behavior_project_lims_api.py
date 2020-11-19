@@ -108,9 +108,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         if mtrain_credentials:
             mtrain_engine = PostgresQueryMixin(
-                dbname=lims_credentials.dbname, user=lims_credentials.user,
-                host=lims_credentials.host, password=lims_credentials.password,
-                port=lims_credentials.port)
+                dbname=mtrain_credentials.dbname, user=mtrain_credentials.user,
+                host=mtrain_credentials.host, password=mtrain_credentials.password,
+                port=mtrain_credentials.port)
         else:
             # Currying is equivalent to decorator syntactic sugar
             mtrain_engine = (
