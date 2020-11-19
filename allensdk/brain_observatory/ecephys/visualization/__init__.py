@@ -97,7 +97,9 @@ def raster_plot(spike_times, figsize=(8,8), cmap=plt.cm.tab20, title='spike rast
 
     fig, ax = plt.subplots(figsize=figsize)
     plotter = _VlPlotter(ax, num_objects=len(spike_times['unit_id'].unique()), cmap=cmap, cycle_colors=cycle_colors)
-    spike_times.groupby('unit_id').agg(plotter)
+    # aggregate is called on each column, so pass only one (eg the stimulus_presentation_id)
+    # to plot each unit once
+    spike_times[['stimulus_presentation_id', 'unit_id']].groupby('unit_id').agg(plotter)
     
     ax.set_xlabel('time (s)', fontsize=16)
     ax.set_ylabel('unit', fontsize=16)

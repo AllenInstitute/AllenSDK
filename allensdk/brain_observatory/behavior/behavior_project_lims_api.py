@@ -212,13 +212,13 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query("reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query("driver")}
             ) driver on driver.donor_id = d.id
-            JOIN equipment ON equipment.id = bs.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = bs.equipment_id
             {session_sub_query}
         """
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
@@ -315,6 +315,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 os.date_of_acquisition,
                 os.isi_experiment_id,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
@@ -330,19 +331,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 ON oec.visual_behavior_experiment_container_id = vbc.id
             JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            JOIN projects pr ON pr.id = os.project_id
+            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            LEFT OUTER JOIN projects pr ON pr.id = os.project_id
             JOIN donors d ON d.id = bs.donor_id
             JOIN genders g ON g.id = d.gender_id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="driver")}
             ) driver on driver.donor_id = d.id
             LEFT JOIN imaging_depths id ON id.id = oe.imaging_depth_id
             JOIN structures st ON st.id = oe.targeted_structure_id
-            JOIN equipment ON equipment.id = os.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
             {experiment_query};
         """
         self.logger.debug(f"get_experiment_table query: \n{query}")
@@ -379,6 +380,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 equipment.name as equipment_name,
                 os.date_of_acquisition,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
@@ -387,20 +389,20 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 reporter.reporter_line,
                 driver.driver_line
             FROM ophys_sessions os
-            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            JOIN projects pr ON pr.id = os.project_id
+            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            LEFT OUTER JOIN projects pr ON pr.id = os.project_id
             JOIN donors d ON d.id = bs.donor_id
             JOIN genders g ON g.id = d.gender_id
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="driver")}
             ) driver on driver.donor_id = d.id
-            JOIN equipment ON equipment.id = os.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
             {session_query};
         """
         self.logger.debug(f"get_session_table query: \n{query}")
