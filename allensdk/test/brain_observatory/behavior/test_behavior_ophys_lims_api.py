@@ -98,9 +98,9 @@ def test_process_ophys_plane_timestamps(
          np.arange(5), does_not_raise()),
         (None, np.arange(10), np.arange(20).reshape(1, 20),
          None, pytest.raises(RuntimeError)),
-        (2, np.arange(10), np.arange(10).reshape(1, 10),
-         np.arange(10), does_not_raise()),
-        (2, np.arange(10), np.arange(5).reshape(1, 5),
+        (0, np.arange(10), np.arange(5).reshape(1, 5),
+         np.arange(0, 10, 2), does_not_raise()),
+        (0, np.arange(20), np.arange(5).reshape(1, 5),
          None, pytest.raises(RuntimeError))
     ],
     ids=["scientifica-trunate", "scientifica-raise", "mesoscope-good",
@@ -117,9 +117,7 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
                         lambda: {"ophys_frames": ophys_timestamps})
     monkeypatch.setattr(api, "get_raw_dff_data", lambda: dff_traces)
     monkeypatch.setattr(api, "get_imaging_plane_group", lambda: plane_group)
-    monkeypatch.setattr(api, "_process_ophys_plane_timestamps",
-                        lambda *x: ophys_timestamps)
-    monkeypatch.setattr(api, "get_plane_group_count", lambda: 4)
+    monkeypatch.setattr(api, "get_plane_group_count", lambda: 2)
     with context:
         actual = api.get_ophys_timestamps()
         if expected is not None:
