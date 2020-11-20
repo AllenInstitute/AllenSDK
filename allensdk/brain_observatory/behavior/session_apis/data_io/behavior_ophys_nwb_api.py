@@ -130,7 +130,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         raise NotImplementedError()
 
     # TODO: Implement save and load of eye_tracking_data to/from NWB file
-    def get_eye_tracking_data(self) -> int:
+    def get_eye_tracking(self) -> int:
         raise NotImplementedError()
 
     def get_running_data_df(self, **kwargs):

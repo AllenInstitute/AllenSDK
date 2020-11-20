@@ -282,12 +282,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
-    def get_cell_roi_ids(self):
-        cell_specimen_table = self.get_cell_specimen_table()
-        assert cell_specimen_table.index.name == 'cell_specimen_id'
-        return cell_specimen_table['cell_roi_id'].values
-
-    @memoize
     def get_objectlist_file(self):
         query = '''
                 SELECT obj.storage_directory || obj.filename AS obj_file

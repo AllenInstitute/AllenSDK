@@ -1,12 +1,11 @@
-import datetime
+from datetime import datetime
 import pytz
 
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
+    BehaviorOphysDataXforms)
 
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi)
 
-
-class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
+class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
     """
         This class is used by both Scientifica and Mesoscope ophys experiments.
     """
@@ -36,7 +35,8 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
         return self.data['age']
 
     def get_field_of_view_shape(self):
-        return {'height': self.data['movie_height'], 'width': self.data['movie_width']}
+        return {'height': self.data['movie_height'],
+                'width': self.data['movie_width']}
 
     def get_experiment_container_id(self):
         return self.data['container_id']
@@ -51,7 +51,9 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
         return self.data['stimulus_name']
 
     def get_experiment_date(self):
-        return pytz.utc.localize(datetime.datetime.strptime(self.data['date_of_acquisition'], "%Y-%m-%d %H:%M:%S"))
+        return pytz.utc.localize(
+            datetime.strptime(self.data['date_of_acquisition'],
+                              "%Y-%m-%d %H:%M:%S"))
 
     def get_reporter_line(self):
         return self.data['reporter_line']

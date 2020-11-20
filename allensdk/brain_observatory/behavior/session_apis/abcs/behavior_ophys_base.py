@@ -125,18 +125,6 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_raw_stimulus_timestamps(self) -> np.ndarray:
-        """Get raw stimulus timestamps.
-
-        Returns
-        -------
-        np.ndarray
-            Timestamps associated with stimulus presentations on the monitor
-            without accounting for monitor delay.
-        """
-        raise NotImplementedError()
-
-    @abc.abstractmethod
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps.
 
@@ -164,15 +152,7 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_segmentation_mask_image(self) -> Image:
-        """Get the 'segmentation_mask_image'. This image contains pixels
-        with a value of 1 if they are included in ANY ROI segmented in the
-        behavior + ophys session and 0 otherwise.
-        """
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_eye_tracking_data(self) -> pd.DataFrame:
+    def get_eye_tracking(self) -> pd.DataFrame:
         """Get eye tracking data from behavior + ophys session.
 
         Returns
