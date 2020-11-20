@@ -91,13 +91,13 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         plane_group = self.get_imaging_plane_group()
 
         number_of_cells, number_of_dff_frames = dff_traces.shape
-        num_of_timestamps = len(ophys_timestamps)
         # Scientifica data has extra frames in the sync file relative
         # to the number of frames in the video. These sentinel frames
         # should be removed.
         # NOTE: This fix does not apply to mesoscope data.
         # See http://confluence.corp.alleninstitute.org/x/9DVnAg
         if plane_group is None:    # non-mesoscope
+            num_of_timestamps = len(ophys_timestamps)
             if (number_of_dff_frames < num_of_timestamps):
                 self.logger.info(
                     "Truncating acquisition frames ('ophys_frames') "
@@ -119,6 +119,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 "plane group(s).")
             ophys_timestamps = self._process_ophys_plane_timestamps(
                 ophys_timestamps, plane_group, group_count)
+            num_of_timestamps = len(ophys_timestamps)
             if number_of_dff_frames != num_of_timestamps:
                 raise RuntimeError(
                     f"dff_frames (len={number_of_dff_frames}) is not equal to "
