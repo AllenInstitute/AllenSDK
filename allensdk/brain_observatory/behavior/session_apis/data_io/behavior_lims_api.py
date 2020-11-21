@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Optional, Union, List
 
 from datetime import datetime
@@ -23,6 +24,9 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
     def __init__(self, behavior_session_id: int,
                  lims_credentials: Optional[DbCredentials] = None,
                  mtrain_credentials: Optional[DbCredentials] = None):
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+
         self.mtrain_db = db_connection_creator(
             credentials=mtrain_credentials,
             default_credentials=MTRAIN_DB_CREDENTIAL_MAP)
@@ -90,7 +94,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
                 behavior_sessions.id = {self.behavior_session_id};
         """
         ids_response = self.lims_db.select(query)
-        if len(ids_response) > 1:
+        if len(ids_response) > 1 or len(ids_response) < 1:
             raise OneResultExpectedError
         ids_dict = ids_response.iloc[0].to_dict()
 
@@ -126,6 +130,10 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
             ids_dict.update({"ophys_experiment_ids": None,
                              "ophys_container_id": None})
         return ids_dict
+
+    def get_behavior_session_id(self) -> int:
+        """Getter to be consistent with BehaviorOphysLimsApi."""
+        return self.behavior_session_id
 
     def get_behavior_stimulus_file(self) -> str:
         """Return the path to the StimulusPickle file for a session.

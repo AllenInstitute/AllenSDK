@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import pytz
 
@@ -12,9 +13,20 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
 
     def __init__(self, data):
         self.data = data
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_experiment_id(self):
         return self.data['ophys_experiment_id']
+
+    # TODO: This should be replaced with a dict lookup after the
+    # behavior_ophys_write_nwb LIMS strategy has been updated
+    def get_behavior_session_id(self):
+        NotImplementedError()
+
+    # TODO: This should be replaced with a dict lookup after the
+    # behavior_ophys_write_nwb LIMS strategy has been updated
+    def get_ophys_session_id(self):
+        NotImplementedError()
 
     def get_surface_2p_pixel_size_um(self):
         return self.data['surface_2p_pixel_size_um']

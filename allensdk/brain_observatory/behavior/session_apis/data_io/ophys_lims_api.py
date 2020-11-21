@@ -1,8 +1,3 @@
-import matplotlib.image as mpimg  # NOQA: D102
-import json
-import numpy as np
-import os
-import h5py
 import pytz
 import pandas as pd
 from typing import Optional
@@ -10,8 +5,6 @@ from typing import Optional
 from allensdk.internal.api import (
     PostgresQueryMixin, OneOrMoreResultExpectedError)
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.image_api import ImageApi
-import allensdk.brain_observatory.roi_masks as roi
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 from allensdk.core.authentication import credential_injector, DbCredentials
@@ -143,17 +136,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
-
-    @memoize
-    def get_max_projection(self, image_api=None):
-
-        if image_api is None:
-            image_api = ImageApi
-
-        maxInt_a13_file = self.get_max_projection_file()
-        pixel_size = self.get_surface_2p_pixel_size_um()
-        max_projection = mpimg.imread(maxInt_a13_file)
-        return ImageApi.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
     @memoize
     def get_targeted_structure(self):
@@ -344,12 +326,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 '''.format(self.get_ophys_experiment_id())        
         return self.lims_db.fetchone(query, strict=True)
 
-    def get_raw_dff_data(self):
-        dff_path = self.get_dff_file()
-        with h5py.File(dff_path, 'r') as raw_file:
-            dff_traces = np.asarray(raw_file['data'])
-        return dff_traces
-
     @memoize
     def get_rig_name(self):
         query = '''
@@ -372,21 +348,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         return X
 
     @memoize
-    def get_metadata(self):
-
-        metadata = {}
-        metadata['rig_name'] = self.get_rig_name()
-        metadata['sex'] = self.get_sex()
-        metadata['age'] = self.get_age()
-        metadata['excitation_lambda'] = 910.
-        metadata['emission_lambda'] = 520.
-        metadata['indicator'] = 'GCAMP6f'
-        metadata['field_of_view_width'] = self.get_field_of_view_shape()['width']
-        metadata['field_of_view_height'] = self.get_field_of_view_shape()['height']
-
-        return metadata
-
-    @memoize
     def get_ophys_cell_segmentation_run_id(self):
         query = '''
                 select oseg.id
@@ -407,32 +368,6 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         cell_specimen_table = pd.read_sql(query, self.lims_db.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
         cell_specimen_table.drop(['ophys_experiment_id', 'ophys_cell_segmentation_run_id'], inplace=True, axis=1)
         return cell_specimen_table.to_dict()
-
-    @memoize
-    def get_cell_specimen_table(self):
-        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id').sort_index()
-        fov_width, fov_height = self.get_field_of_view_shape()['width'], self.get_field_of_view_shape()['height']
-
-        # Convert cropped ROI masks to uncropped versions
-        image_mask_list = []
-        for cell_roi_id, table_row in cell_specimen_table.iterrows():
-            # Deserialize roi data into AllenSDK RoiMask object
-            curr_roi = roi.RoiMask(image_w=fov_width, image_h=fov_height,
-                                   label=None, mask_group=-1)
-            curr_roi.x = table_row['x']
-            curr_roi.y = table_row['y']
-            curr_roi.width = table_row['width']
-            curr_roi.height = table_row['height']
-            curr_roi.mask = np.array(table_row['image_mask'])
-            image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
-
-        cell_specimen_table['image_mask'] = image_mask_list
-        cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
-
-        cell_specimen_table.index.rename('cell_roi_id', inplace=True)
-        cell_specimen_table.reset_index(inplace=True)
-        cell_specimen_table.set_index('cell_specimen_id', inplace=True)
-        return cell_specimen_table
 
     @memoize
     def get_surface_2p_pixel_size_um(self):

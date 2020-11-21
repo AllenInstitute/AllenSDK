@@ -15,8 +15,8 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
     BehaviorOphysDataXforms)
 
 
-class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi,
-                           BehaviorOphysDataXforms):
+class BehaviorOphysLimsApi(BehaviorOphysDataXforms, BehaviorLimsApi,
+                           OphysLimsApi):
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None,
@@ -29,52 +29,12 @@ class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi,
             default_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         self.ophys_experiment_id = ophys_experiment_id
-        super().__init__(behavior_session_id=self.get_behavior_session_id(),
+        super().__init__(self.get_behavior_session_id(),
                          lims_credentials=lims_credentials,
                          mtrain_credentials=mtrain_credentials)
 
-    @memoize
-    def get_ophys_timestamps(self):
-
-        ophys_timestamps = self.get_sync_data()['ophys_frames']
-        dff_traces = self.get_raw_dff_data()
-        plane_group = self.get_imaging_plane_group()
-
-        number_of_cells, number_of_dff_frames = dff_traces.shape
-        # Scientifica data has extra frames in the sync file relative
-        # to the number of frames in the video. These sentinel frames
-        # should be removed.
-        # NOTE: This fix does not apply to mesoscope data.
-        # See http://confluence.corp.alleninstitute.org/x/9DVnAg
-        if plane_group is None:    # non-mesoscope
-            num_of_timestamps = len(ophys_timestamps)
-            if (number_of_dff_frames < num_of_timestamps):
-                self.logger.info(
-                    "Truncating acquisition frames ('ophys_frames') "
-                    f"(len={num_of_timestamps}) to the number of frames "
-                    f"in the df/f trace ({number_of_dff_frames}).")
-                ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
-            elif number_of_dff_frames > num_of_timestamps:
-                raise RuntimeError(
-                    f"dff_frames (len={number_of_dff_frames}) is longer "
-                    f"than timestamps (len={num_of_timestamps}).")
-        # Mesoscope data
-        # Resample if collecting multiple concurrent planes (e.g. mesoscope)
-        # because the frames are interleaved
-        else:
-            group_count = self.get_plane_group_count()
-            self.logger.info(
-                "Mesoscope data detected. Splitting timestamps "
-                f"(len={len(ophys_timestamps)} over {group_count} "
-                "plane group(s).")
-            ophys_timestamps = self._process_ophys_plane_timestamps(
-                ophys_timestamps, plane_group, group_count)
-            num_of_timestamps = len(ophys_timestamps)
-            if number_of_dff_frames != num_of_timestamps:
-                raise RuntimeError(
-                    f"dff_frames (len={number_of_dff_frames}) is not equal to "
-                    f"number of split timestamps (len={num_of_timestamps}).")
-        return ophys_timestamps
+    def get_ophys_experiment_id(self):
+        return self.ophys_experiment_id
 
     def get_behavior_session_id(self):
         query = '''
@@ -83,7 +43,7 @@ class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi,
                 JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=False)
 
     @memoize
     def get_ophys_session_id(self):
@@ -92,7 +52,7 @@ class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi,
                 JOIN ophys_experiment oe ON oe.ophys_session_id = os.id
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=False)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_experiment_container_id(self):

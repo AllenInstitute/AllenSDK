@@ -25,10 +25,6 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 
 class BehaviorDataXforms(BehaviorBase):
 
-    def get_behavior_session_id(self) -> int:
-        """Getter to be consistent with BehaviorOphysLimsApi."""
-        return self.behavior_session_id
-
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
         """Helper method to cache stimulus file in memory since it takes about

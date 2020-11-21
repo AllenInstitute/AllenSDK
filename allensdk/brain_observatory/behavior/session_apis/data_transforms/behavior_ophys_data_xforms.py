@@ -31,9 +31,79 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+import allensdk.brain_observatory.roi_masks as roi
 
 
 class BehaviorOphysDataXforms(BehaviorOphysBase):
+
+    @memoize
+    def get_cell_specimen_table(self):
+        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id').sort_index()
+        fov_width = self.get_field_of_view_shape()['width']
+        fov_height = self.get_field_of_view_shape()['height']
+
+        # Convert cropped ROI masks to uncropped versions
+        image_mask_list = []
+        for cell_roi_id, table_row in cell_specimen_table.iterrows():
+            # Deserialize roi data into AllenSDK RoiMask object
+            curr_roi = roi.RoiMask(image_w=fov_width, image_h=fov_height,
+                                   label=None, mask_group=-1)
+            curr_roi.x = table_row['x']
+            curr_roi.y = table_row['y']
+            curr_roi.width = table_row['width']
+            curr_roi.height = table_row['height']
+            curr_roi.mask = np.array(table_row['image_mask'])
+            image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
+
+        cell_specimen_table['image_mask'] = image_mask_list
+        cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
+
+        cell_specimen_table.index.rename('cell_roi_id', inplace=True)
+        cell_specimen_table.reset_index(inplace=True)
+        cell_specimen_table.set_index('cell_specimen_id', inplace=True)
+        return cell_specimen_table
+
+    @memoize
+    def get_ophys_timestamps(self):
+        ophys_timestamps = self.get_sync_data()['ophys_frames']
+        dff_traces = self.get_raw_dff_data()
+        plane_group = self.get_imaging_plane_group()
+
+        number_of_cells, number_of_dff_frames = dff_traces.shape
+        # Scientifica data has extra frames in the sync file relative
+        # to the number of frames in the video. These sentinel frames
+        # should be removed.
+        # NOTE: This fix does not apply to mesoscope data.
+        # See http://confluence.corp.alleninstitute.org/x/9DVnAg
+        if plane_group is None:    # non-mesoscope
+            num_of_timestamps = len(ophys_timestamps)
+            if (number_of_dff_frames < num_of_timestamps):
+                self.logger.info(
+                    "Truncating acquisition frames ('ophys_frames') "
+                    f"(len={num_of_timestamps}) to the number of frames "
+                    f"in the df/f trace ({number_of_dff_frames}).")
+                ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
+            elif number_of_dff_frames > num_of_timestamps:
+                raise RuntimeError(
+                    f"dff_frames (len={number_of_dff_frames}) is longer "
+                    f"than timestamps (len={num_of_timestamps}).")
+        # Mesoscope data
+        # Resample if collecting multiple concurrent planes (e.g. mesoscope)
+        # because the frames are interleaved
+        else:
+            group_count = self.get_plane_group_count()
+            self.logger.info(
+                "Mesoscope data detected. Splitting timestamps "
+                f"(len={len(ophys_timestamps)} over {group_count} "
+                "plane group(s).")
+            ophys_timestamps = self._process_ophys_plane_timestamps(
+                ophys_timestamps, plane_group, group_count)
+            num_of_timestamps = len(ophys_timestamps)
+            if number_of_dff_frames != num_of_timestamps:
+                raise RuntimeError(
+                    f"dff_frames (len={number_of_dff_frames}) is not equal to "
+                    f"number of split timestamps (len={num_of_timestamps}).")
+        return ophys_timestamps
 
     @memoize
     def get_sync_data(self):
@@ -80,28 +150,6 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         resampled = ophys_timestamps[plane_group::group_count]
         return resampled
 
-    @memoize
-    def get_ophys_timestamps(self):
-
-        ophys_timestamps = self.get_sync_data()['ophys_frames']
-        dff_traces = self.get_raw_dff_data()
-        number_of_cells, number_of_dff_frames = dff_traces.shape
-        num_of_timestamps = len(ophys_timestamps)
-        if number_of_dff_frames < num_of_timestamps:
-            ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
-        elif number_of_dff_frames == num_of_timestamps:
-            pass
-        else:
-            raise RuntimeError('dff_frames is longer than timestamps')
-
-        # Resample if collecting multiple concurrent planes (e.g. mesoscope)
-        plane_group = self.get_imaging_plane_group()
-        if plane_group is not None:
-            group_count = self.get_plane_group_count()
-            ophys_timestamps = self._process_ophys_plane_timestamps(
-                ophys_timestamps, plane_group, group_count)
-        return ophys_timestamps
-
     def get_behavior_session_uuid(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
@@ -135,6 +183,14 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         behavior_session_uuid = self.get_behavior_session_uuid()
         mdata['behavior_session_uuid'] = uuid.UUID(behavior_session_uuid)
         mdata["imaging_plane_group"] = self.get_imaging_plane_group()
+        mdata['rig_name'] = self.get_rig_name()
+        mdata['sex'] = self.get_sex()
+        mdata['age'] = self.get_age()
+        mdata['excitation_lambda'] = 910.
+        mdata['emission_lambda'] = 520.
+        mdata['indicator'] = 'GCAMP6f'
+        mdata['field_of_view_width'] = self.get_field_of_view_shape()['width']
+        mdata['field_of_view_height'] = self.get_field_of_view_shape()['height']
 
         return mdata
 
@@ -143,6 +199,12 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         cell_specimen_table = self.get_cell_specimen_table()
         assert cell_specimen_table.index.name == 'cell_specimen_id'
         return cell_specimen_table['cell_roi_id'].values
+
+    def get_raw_dff_data(self):
+        dff_path = self.get_dff_file()
+        with h5py.File(dff_path, 'r') as raw_file:
+            dff_traces = np.asarray(raw_file['data'])
+        return dff_traces
 
     @memoize
     def get_dff_traces(self):
@@ -283,6 +345,18 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
         return df
+
+    @memoize
+    def get_max_projection(self, image_api=None):
+
+        if image_api is None:
+            image_api = ImageApi
+
+        maxInt_a13_file = self.get_max_projection_file()
+        pixel_size = self.get_surface_2p_pixel_size_um()
+        max_projection = mpimg.imread(maxInt_a13_file)
+        return ImageApi.serialize(max_projection, [pixel_size / 1000.,
+                                                   pixel_size / 1000.], 'mm')
 
     @memoize
     def get_average_projection(self, image_api=None):

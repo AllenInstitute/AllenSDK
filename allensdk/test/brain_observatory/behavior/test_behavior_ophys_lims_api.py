@@ -27,16 +27,16 @@ def does_not_raise(enter_result=None):
 ])
 def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
 
-    api = BehaviorOphysLimsApi(ophys_experiment_id)
-
     if compare_val is None:
         expected_fail = False
         try:
+            api = BehaviorOphysLimsApi(ophys_experiment_id)
             api.get_behavior_stimulus_file()
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail is True
     else:
+        api = BehaviorOphysLimsApi(ophys_experiment_id)
         assert api.get_behavior_stimulus_file() == compare_val
 
 
@@ -104,7 +104,7 @@ def test_process_ophys_plane_timestamps(
         (0, np.arange(20), np.arange(5).reshape(1, 5),
          None, pytest.raises(RuntimeError))
     ],
-    ids=["scientifica-trunate", "scientifica-raise", "mesoscope-good",
+    ids=["scientifica-truncate", "scientifica-raise", "mesoscope-good",
          "mesoscope-raise"]
 )
 def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
@@ -112,6 +112,11 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
     """Test the acquisition frame truncation only happens for
     non-mesoscope data (and raises error for scientifica data with
     longer trace frames than acquisition frames (ophys_timestamps))."""
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        "get_behavior_session_id", lambda x: 123)
+    monkeypatch.setattr(BehaviorOphysLimsApi, "_get_ids", lambda x: {})
+
     api = BehaviorOphysLimsApi(123)
     # Mocking any db calls
     monkeypatch.setattr(api, "get_sync_data",
