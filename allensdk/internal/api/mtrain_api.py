@@ -52,13 +52,14 @@ class MtrainApi:
         assert not all(v is None for v in [
                        behavior_session_uuid, behavior_session_id]), 'must enter either a behavior_session_uuid or a behavior_session_id'
 
-        behavior_data = BehaviorLimsApi(behavior_session_id)
-        if behavior_session_uuid is None and behavior_session_id is not None:
-            # get a behavior session uuid if a lims ID was entered
-            behavior_session_uuid = behavior_data.get_behavior_session_uuid()
         if behavior_session_uuid is not None and behavior_session_id is not None:
             # if both a behavior session uuid and a lims id are entered, ensure that they match
-            assert behavior_session_uuid == behavior_data.get_behavior_session_uuid(), 'behavior_session {} does not match behavior_session_id {}'.format(behavior_session_uuid, behavior_session_id)
+            behavior_api = BehaviorLimsApi(behavior_session_id)
+            assert behavior_session_uuid == behavior_api.get_behavior_session_uuid(), 'behavior_session {} does not match behavior_session_id {}'.format(behavior_session_uuid, behavior_session_id)
+        if behavior_session_uuid is None and behavior_session_id is not None:
+            # get a behavior session uuid if a lims ID was entered
+            behavior_api = BehaviorLimsApi(behavior_session_id)
+            behavior_session_uuid = behavior_api.get_behavior_session_uuid()
 
         filters = [{"name": "id", "op": "eq", "val": behavior_session_uuid}]
         behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id': 'behavior_session_uuid'})
