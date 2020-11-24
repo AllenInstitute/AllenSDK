@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Optional
 
 from allensdk.internal.api import (
-    PostgresQueryMixin, OneOrMoreResultExpectedError)
+    PostgresQueryMixin, OneOrMoreResultExpectedError, db_connection_creator)
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
@@ -16,15 +16,10 @@ class OphysLimsApi(CachedInstanceMethodMixin):
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):
         self.ophys_experiment_id = ophys_experiment_id
-        if lims_credentials:
-            self.lims_db = PostgresQueryMixin(
-                dbname=lims_credentials.dbname, user=lims_credentials.user,
-                host=lims_credentials.host, password=lims_credentials.password,
-                port=lims_credentials.port)
-        else:
-            # Currying is equivalent to decorator syntactic sugar
-            self.lims_db = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-                            (PostgresQueryMixin)())
+
+        self.lims_db = db_connection_creator(
+            credentials=lims_credentials,
+            default_credentials=LIMS_DB_CREDENTIAL_MAP)
 
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id

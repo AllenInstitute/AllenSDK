@@ -221,15 +221,6 @@ def test_get_ophys_segmentation_run_id(ophys_experiment_id):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [
-    pytest.param(511458874),
-])
-def test_get_cell_roi_table(ophys_experiment_id):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
-    assert len(ophys_lims_api.get_cell_specimen_table()) == 128
-
-
-@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_lims_experiment_id, compare_val', [
     pytest.param(511458874, 0.785203),
     pytest.param(0, None)

@@ -20,6 +20,16 @@ def does_not_raise(enter_result=None):
     yield enter_result
 
 
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(511458874),
+])
+def test_get_cell_roi_table(ophys_experiment_id):
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    assert len(api.get_cell_specimen_table()) == 128
+
+
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
     pytest.param(789359614, '/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl'),

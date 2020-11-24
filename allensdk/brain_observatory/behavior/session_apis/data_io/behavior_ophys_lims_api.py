@@ -9,14 +9,15 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi)
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.auth_config import (
+    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import credential_injector, DbCredentials
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
     BehaviorOphysDataXforms)
 
 
-class BehaviorOphysLimsApi(BehaviorOphysDataXforms, BehaviorLimsApi,
-                           OphysLimsApi):
+class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
+                           BehaviorLimsApi):
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None,
@@ -28,22 +29,15 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms, BehaviorLimsApi,
             credentials=lims_credentials,
             default_credentials=LIMS_DB_CREDENTIAL_MAP)
 
+        self.mtrain_db = db_connection_creator(
+            credentials=mtrain_credentials,
+            default_credentials=MTRAIN_DB_CREDENTIAL_MAP)
+
         self.ophys_experiment_id = ophys_experiment_id
-        super().__init__(self.get_behavior_session_id(),
-                         lims_credentials=lims_credentials,
-                         mtrain_credentials=mtrain_credentials)
+        self.behavior_session_id = self.get_behavior_session_id()
 
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id
-
-    def get_behavior_session_id(self):
-        query = '''
-                SELECT bs.id FROM behavior_sessions bs
-                JOIN ophys_sessions os ON os.id = bs.ophys_session_id
-                JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
-                WHERE oe.id = {};
-                '''.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=False)
 
     @memoize
     def get_ophys_session_id(self):

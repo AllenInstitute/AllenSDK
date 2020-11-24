@@ -13,16 +13,17 @@ from marshmallow.schema import ValidationError
     pytest.param(0, None)
 ])
 def test_get_behavior_stimulus_file(behavior_experiment_id, compare_val):
-    api = BehaviorLimsApi(behavior_experiment_id)
 
     if compare_val is None:
         expected_fail = False
         try:
+            api = BehaviorLimsApi(behavior_experiment_id)
             api.get_behavior_stimulus_file()
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail is True
     else:
+        api = BehaviorLimsApi(behavior_experiment_id)
         assert api.get_behavior_stimulus_file() == compare_val
 
 
