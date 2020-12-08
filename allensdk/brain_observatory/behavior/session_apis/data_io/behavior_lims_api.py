@@ -29,11 +29,11 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
 
         self.mtrain_db = db_connection_creator(
             credentials=mtrain_credentials,
-            default_credentials=MTRAIN_DB_CREDENTIAL_MAP)
+            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
 
         self.lims_db = db_connection_creator(
             credentials=lims_credentials,
-            default_credentials=LIMS_DB_CREDENTIAL_MAP)
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         self.behavior_session_id = behavior_session_id
         ids = self._get_ids()
@@ -59,7 +59,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
 
         lims_db = db_connection_creator(
             credentials=lims_credentials,
-            default_credentials=LIMS_DB_CREDENTIAL_MAP)
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         if isinstance(foraging_id, uuid.UUID):
             foraging_id = str(foraging_id)

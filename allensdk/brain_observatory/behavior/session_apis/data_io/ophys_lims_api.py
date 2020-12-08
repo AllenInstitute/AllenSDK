@@ -1,13 +1,14 @@
 import pytz
+from datetime import datetime
 import pandas as pd
 from typing import Optional
 
 from allensdk.internal.api import (
-    PostgresQueryMixin, OneOrMoreResultExpectedError, db_connection_creator)
+    OneOrMoreResultExpectedError, db_connection_creator)
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
-from allensdk.core.authentication import credential_injector, DbCredentials
+from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 
@@ -19,7 +20,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
 
         self.lims_db = db_connection_creator(
             credentials=lims_credentials,
-            default_credentials=LIMS_DB_CREDENTIAL_MAP)
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id

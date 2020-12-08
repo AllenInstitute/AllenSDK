@@ -75,33 +75,52 @@ class PostgresQueryMixin(object):
         return {}
 
 
-def db_connection_creator(default_credentials: dict,
-                          credentials: Optional[DbCredentials] = None,
+def db_connection_creator(credentials: Optional[DbCredentials] = None,
+                          fallback_credentials: Optional[dict] = None,
                           ) -> PostgresQueryMixin:
-    """Create a db connection using either default credentials or
-    custom credentials.
+    """Create a db connection using credentials. If credentials are not
+    provided then use fallback credentials (which attempt to read from
+    shell environment variables).
+
+    Note: Must provide one of either 'credentials' or 'fallback_credentials'.
+    If both are provided, 'credentials' will take precedence.
 
     Parameters
     ----------
-    default_credentials : dict
-        Default credentials to use for creating the DB connection.
-        Some options can be found in allensdk.core.auth_config.
     credentials : Optional[DbCredentials], optional
         User specified credentials, by default None
+    fallback_credentials : dict
+        Fallback credentials to use for creating the DB connection in the
+        case that no 'credentials' are provided, by default None.
+
+        Fallback credentials will attempt to get db connection info from
+        shell environment variables.
+
+        Some examples of environment variables that fallback credentials
+        will try to read from can be found in allensdk.core.auth_config.
 
     Returns
     -------
     PostgresQueryMixin
         A DB connection instance which can execute queries to the DB
-        specified by credentials or default_credentials.
+        specified by credentials or fallback_credentials.
+
+    Raises
+    ------
+    RuntimeError
+        If neither 'credentials' nor 'fallback_credentials' were provided.
     """
     if credentials:
         db_conn = PostgresQueryMixin(
             dbname=credentials.dbname, user=credentials.user,
             host=credentials.host, port=credentials.port,
             password=credentials.password)
-    else:
-        db_conn = (credential_injector(default_credentials)
+    elif fallback_credentials:
+        db_conn = (credential_injector(fallback_credentials)
                    (PostgresQueryMixin)())
+    else:
+        raise RuntimeError(
+            "Must provide either credentials or fallback credentials in "
+            "order to create a db connection!")
 
     return db_conn

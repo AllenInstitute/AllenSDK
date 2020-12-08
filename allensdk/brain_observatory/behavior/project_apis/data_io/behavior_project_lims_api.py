@@ -10,11 +10,11 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorOphysLimsApi)
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     HttpEngine)
 from allensdk.core.typing import SupportsStr
-from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
 
@@ -96,26 +96,13 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         _app_kwargs = {"scheme": "http", "host": "lims2"}
         if app_kwargs:
             _app_kwargs.update(app_kwargs)
-        if lims_credentials:
-            lims_engine = PostgresQueryMixin(
-                dbname=lims_credentials.dbname, user=lims_credentials.user,
-                host=lims_credentials.host, password=lims_credentials.password,
-                port=lims_credentials.port)
-        else:
-            # Currying is equivalent to decorator syntactic sugar
-            lims_engine = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-                           (PostgresQueryMixin)())
 
-        if mtrain_credentials:
-            mtrain_engine = PostgresQueryMixin(
-                dbname=mtrain_credentials.dbname, user=mtrain_credentials.user,
-                host=mtrain_credentials.host, password=mtrain_credentials.password,
-                port=mtrain_credentials.port)
-        else:
-            # Currying is equivalent to decorator syntactic sugar
-            mtrain_engine = (
-                credential_injector(MTRAIN_DB_CREDENTIAL_MAP)
-                (PostgresQueryMixin)())
+        lims_engine = db_connection_creator(
+            credentials=lims_credentials,
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        mtrain_engine = db_connection_creator(
+            credentials=mtrain_credentials,
+            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
 
         app_engine = HttpEngine(**_app_kwargs)
         return cls(lims_engine, mtrain_engine, app_engine)

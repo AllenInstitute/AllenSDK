@@ -27,11 +27,11 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
         self.lims_db = db_connection_creator(
             credentials=lims_credentials,
-            default_credentials=LIMS_DB_CREDENTIAL_MAP)
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
         self.mtrain_db = db_connection_creator(
             credentials=mtrain_credentials,
-            default_credentials=MTRAIN_DB_CREDENTIAL_MAP)
+            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
 
         self.ophys_experiment_id = ophys_experiment_id
         self.behavior_session_id = self.get_behavior_session_id()
