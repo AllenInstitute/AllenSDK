@@ -199,7 +199,20 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
     return True
 
 
-def compare_session_fields(x1, x2, err_msg=""):
+def compare_session_fields(x1: Any, x2: Any, err_msg=""):
+    """Helper function to compare if two fields (attributes) from a
+    Session object are equal to one another.
+
+    Parameters
+    ----------
+    x1 : Any
+        The field from the first session to compare
+    x2 : Any
+        The corresponding field from the second session to compare
+    err_msg : str, optional
+        The error message to display if two compared fields do not equal
+        one another, by default "" (an empty string)
+    """
     if isinstance(x1, pd.DataFrame):
         try:
             assert_frame_equal(x1, x2, check_like=True)
