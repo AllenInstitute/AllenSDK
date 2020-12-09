@@ -8,8 +8,15 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
 
 
 class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
-    """
-        This class is used by both Scientifica and Mesoscope ophys experiments.
+    """A data fetching class that serves as an API for fetching 'raw'
+    data from a json file necessary (but not sufficient) for filling
+    a 'BehaviorOphysSession'.
+
+    Most 'raw' data provided by this API needs to be processed by
+    BehaviorOphysDataXforms methods in order to usable by
+    'BehaviorOphysSession's.
+
+    This class is used by the write_nwb module for behavior ophys sessions.
     """
 
     def __init__(self, data):

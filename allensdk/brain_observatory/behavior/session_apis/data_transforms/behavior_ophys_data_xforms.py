@@ -35,6 +35,9 @@ import allensdk.brain_observatory.roi_masks as roi
 
 
 class BehaviorOphysDataXforms(BehaviorOphysBase):
+    """This class provides methods that transform (xform) 'raw' data provided
+    by LIMS data APIs to fill a BehaviorOphysSession.
+    """
 
     @memoize
     def get_cell_specimen_table(self):

@@ -30,6 +30,10 @@ load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
+    """A data fetching class that serves as an API for fetching 'raw'
+    data from an NWB file that is both necessary and sufficient for filling
+    a 'BehaviorOphysSession'.
+    """
 
     def __init__(self, *args, **kwargs):
         self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)

@@ -13,6 +13,15 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 
 class OphysLimsApi(CachedInstanceMethodMixin):
+    """A data fetching class that serves as an API for fetching 'raw'
+    data from LIMS for filling optical physiology data. This data is
+    is necessary (but not sufficient) to fill the 'Ophys' portion of a
+    BehaviorOphysSession.
+
+    This class needs to be inherited by the BehaviorOphysLimsApi and also
+    have methods from BehaviorOphysDataXforms in order to be usable by a
+    BehaviorOphysSession.
+    """
 
     def __init__(self, ophys_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):

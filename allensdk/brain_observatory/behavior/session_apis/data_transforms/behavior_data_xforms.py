@@ -24,6 +24,9 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 
 
 class BehaviorDataXforms(BehaviorBase):
+    """This class provides methods that transform (xform) 'raw' data provided
+    by LIMS data APIs to fill a BehaviorSession.
+    """
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:

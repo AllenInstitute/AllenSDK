@@ -18,8 +18,12 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
 
 
 class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
-    """A data fetching class that serves as an API for filling
-    'BehaviorSession' attributes from LIMS.
+    """A data fetching class that serves as an API for fetching 'raw'
+    data from LIMS necessary (but not sufficient) for filling a
+    'BehaviorSession'.
+
+    Most 'raw' data provided by this API needs to be processed by
+    BehaviorDataXforms methods in order to usable by 'BehaviorSession's
     """
     def __init__(self, behavior_session_id: int,
                  lims_credentials: Optional[DbCredentials] = None,
