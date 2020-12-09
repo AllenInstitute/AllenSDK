@@ -49,6 +49,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @memoize
     def get_ophys_session_id(self) -> int:
+        """Get the ophys session id associated with the ophys experiment
+        id used to initialize the API"""
         query = """
                 SELECT os.id FROM ophys_sessions os
                 JOIN ophys_experiment oe ON oe.ophys_session_id = os.id
@@ -58,6 +60,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @memoize
     def get_experiment_container_id(self) -> int:
+        """Get the experiment container id associated with the ophys
+        experiment id used to initialize the API"""
         query = """
                 SELECT visual_behavior_experiment_container_id
                 FROM ophys_experiments_visual_behavior_experiment_containers
@@ -67,6 +71,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @memoize
     def get_behavior_stimulus_file(self) -> str:
+        """Get the filepath to the StimulusPickle file for the session
+        associated with the ophys experiment id used to initialize the API"""
         query = """
                 SELECT wkf.storage_directory || wkf.filename AS stim_file
                 FROM ophys_experiments oe
@@ -83,6 +89,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @memoize
     def get_nwb_filepath(self) -> str:
+        """Get the filepath of the nwb file associated with the ophys
+        experiment"""
         query = """
                 SELECT wkf.storage_directory || wkf.filename AS nwb_file
                 FROM ophys_experiments oe
@@ -96,6 +104,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @memoize
     def get_eye_tracking_filepath(self) -> str:
+        """Get the filepath of the eye tracking file (*.h5) associated with the
+        ophys experiment"""
         query = """
                 SELECT wkf.storage_directory || wkf.filename
                 AS eye_tracking_file
@@ -112,7 +122,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @staticmethod
     def get_ophys_experiment_df() -> pd.DataFrame:
-
+        """Get a DataFrame of metadata for ophys experiments"""
         api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
                (PostgresQueryMixin)())
         query = """

@@ -106,8 +106,8 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         return self.data['driver_line']
 
     def external_specimen_name(self) -> int:
-        """Get the external specimen id for the subject associated with an
-        ophys experiment"""
+        """Get the external specimen id (LabTracks ID) for the subject
+        associated with an ophys experiment"""
         return self.data['external_specimen_name']
 
     def get_full_genotype(self) -> str:
@@ -116,6 +116,7 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         return self.data['full_genotype']
 
     def get_behavior_stimulus_file(self) -> str:
+        """Get the filepath to the StimulusPickle file for the session"""
         return self.data['behavior_stimulus_file']
 
     def get_dff_file(self) -> str:

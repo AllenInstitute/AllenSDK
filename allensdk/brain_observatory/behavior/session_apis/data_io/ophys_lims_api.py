@@ -55,7 +55,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 ON pg.id = oe.ophys_imaging_plane_group_id
             WHERE
                 -- only 1 session for an experiment
-                os.id = (SELECT id from sess limit 1)
+                os.id = (SELECT id from sess limit 1);
         """
         return self.lims_db.fetchone(query, strict=True)
 
@@ -72,7 +72,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
             FROM ophys_experiments oe
             JOIN ophys_imaging_plane_groups pg
             ON pg.id = oe.ophys_imaging_plane_group_id
-            WHERE oe.id = {self.get_ophys_experiment_id()}
+            WHERE oe.id = {self.get_ophys_experiment_id()};
         """
         # Non-mesoscope data will not have results
         group_order = self.lims_db.fetchall(query)
@@ -93,7 +93,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
             JOIN ophys_sessions os ON oe.ophys_session_id = os.id
             -- but not every ophys_session has a behavior_session
             LEFT JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            WHERE oe.id = {self.get_ophys_experiment_id()}
+            WHERE oe.id = {self.get_ophys_experiment_id()};
         """
         response = self.lims_db.fetchall(query)     # Can be null
         if not len(response):
@@ -260,8 +260,8 @@ class OphysLimsApi(CachedInstanceMethodMixin):
 
     @memoize
     def get_external_specimen_name(self) -> int:
-        """Get the external specimen id for the subject associated with an
-        ophys experiment"""
+        """Get the external specimen id (LabTracks ID) for the subject
+        associated with an ophys experiment"""
         query = """
                 SELECT sp.external_specimen_name
                 FROM ophys_experiments oe
@@ -454,7 +454,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
         query = """
                 SELECT *
                 FROM cell_rois cr
-                WHERE cr.ophys_cell_segmentation_run_id = {}
+                WHERE cr.ophys_cell_segmentation_run_id = {};
                 """.format(ophys_cell_seg_run_id)
         initial_cs_table = pd.read_sql(query, self.lims_db.get_connection())
         cell_specimen_table = initial_cs_table.rename(
