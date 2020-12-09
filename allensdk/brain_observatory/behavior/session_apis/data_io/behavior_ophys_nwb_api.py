@@ -51,11 +51,15 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         )
 
         # Add stimulus_timestamps to NWB in-memory object:
-        nwb.add_stimulus_timestamps(nwbfile, session_object.stimulus_timestamps)
+        nwb.add_stimulus_timestamps(nwbfile,
+                                    session_object.stimulus_timestamps)
 
         # Add running data to NWB in-memory object:
-        unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-        nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
+        unit_dict = {'v_sig': 'V', 'v_in': 'V',
+                     'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
+        nwb.add_running_data_df_to_nwbfile(nwbfile,
+                                           session_object.running_data_df,
+                                           unit_dict)
 
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
@@ -67,13 +71,16 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
             nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         # search for omitted rows and add stop_time before writing to NWB file
-        set_omitted_stop_time(stimulus_table=session_object.stimulus_presentations)
+        set_omitted_stop_time(
+            stimulus_table=session_object.stimulus_presentations)
 
         # Add stimulus presentations data to NWB in-memory object:
-        nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
+        nwb.add_stimulus_presentations(nwbfile,
+                                       session_object.stimulus_presentations)
 
         # Add trials data to NWB in-memory object:
-        nwb.add_trials(nwbfile, session_object.trials, TRIAL_COLUMN_DESCRIPTION_DICT)
+        nwb.add_trials(nwbfile, session_object.trials,
+                       TRIAL_COLUMN_DESCRIPTION_DICT)
 
         # Add licks data to NWB in-memory object:
         if len(session_object.licks) > 0:
@@ -90,7 +97,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         nwb.add_average_image(nwbfile, session_object.average_projection)
 
         # Add segmentation_mask_image image data to NWB in-memory object:
-        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
+        nwb.add_segmentation_mask_image(nwbfile,
+                                        session_object.segmentation_mask_image)
 
         # Add metadata to NWB in-memory object:
         nwb.add_metadata(nwbfile, session_object.metadata)
@@ -104,10 +112,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
                                     session_object.metadata)
 
         # Add dff to NWB in-memory object:
-        nwb.add_dff_traces(nwbfile, session_object.dff_traces, session_object.ophys_timestamps)
+        nwb.add_dff_traces(nwbfile, session_object.dff_traces,
+                           session_object.ophys_timestamps)
 
         # Add corrected_fluorescence to NWB in-memory object:
-        nwb.add_corrected_fluorescence_traces(nwbfile, session_object.corrected_fluorescence_traces)
+        nwb.add_corrected_fluorescence_traces(
+            nwbfile,
+            session_object.corrected_fluorescence_traces)
 
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
@@ -121,11 +132,11 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
     def get_ophys_experiment_id(self) -> int:
         return int(self.nwbfile.identifier)
 
-    # TODO: Implement save and lod of behavior_session_id to/from NWB file
+    # TODO: Implement save and load of behavior_session_id to/from NWB file
     def get_behavior_session_id(self) -> int:
         raise NotImplementedError()
 
-    # TODO: Implement save and load of ophys_session_id to/from NWB file 
+    # TODO: Implement save and load of ophys_session_id to/from NWB file
     def get_ophys_session_id(self) -> int:
         raise NotImplementedError()
 
@@ -133,12 +144,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
     def get_eye_tracking(self) -> int:
         raise NotImplementedError()
 
-    def get_running_data_df(self, **kwargs):
+    def get_running_data_df(self, **kwargs) -> pd.DataFrame:
 
         running_speed = self.get_running_speed()
 
         running_data_df = pd.DataFrame({'speed': running_speed.values},
-                                       index=pd.Index(running_speed.timestamps, name='timestamps'))
+                                       index=pd.Index(running_speed.timestamps,
+                                                      name='timestamps'))
 
         for key in ['v_in', 'v_sig']:
             if key in self.nwbfile.acquisition:
@@ -154,11 +166,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         return self.nwbfile.processing['ophys'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
 
     def get_stimulus_templates(self, **kwargs):
-        return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
-
-    # TODO: Implement save and load of 'raw' unaligned stimulus timestamps to/from NWB file
-    def get_raw_stimulus_timestamps(self) -> np.ndarray:
-        raise NotImplementedError()
+        return {key: val.data[:]
+                for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing['stimulus'].get_data_interface('timestamps').timestamps[:]
@@ -181,9 +190,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
             time = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').timestamps[:]
             autorewarded = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').data[:]
             volume = self.nwbfile.processing['rewards'].get_data_interface('volume').data[:]
-            return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
+            return pd.DataFrame({
+                'volume': volume, 'timestamps': time,
+                'autorewarded': autorewarded}).set_index('timestamps')
         else:
-            return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
+            return pd.DataFrame({
+                'volume': [], 'timestamps': [], 
+                'autorewarded': []}).set_index('timestamps')
 
     def get_max_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'ophys', image_api=image_api)
@@ -192,7 +205,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         return self.get_image('average_image', 'ophys', image_api=image_api)
 
     def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
-        return self.get_image('segmentation_mask_image', 'ophys', image_api=image_api)
+        return self.get_image('segmentation_mask_image',
+                              'ophys', image_api=image_api)
 
     def get_metadata(self) -> dict:
 
