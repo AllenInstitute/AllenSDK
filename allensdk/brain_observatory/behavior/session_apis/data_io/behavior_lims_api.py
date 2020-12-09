@@ -69,7 +69,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         query = f"""
             SELECT id
             FROM behavior_sessions
-            WHERE foraging_id = '{foraging_id}'
+            WHERE foraging_id = '{foraging_id};'
         """
         session_id = lims_db.fetchone(query, strict=True)
         return cls(session_id, lims_credentials=lims_credentials)
@@ -163,7 +163,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         SELECT d.date_of_birth
         FROM behavior_sessions bs
         JOIN donors d on d.id = bs.donor_id
-        WHERE bs.id = {self.behavior_session_id}
+        WHERE bs.id = {self.behavior_session_id};
         """
         return self.lims_db.fetchone(query, strict=True).date()
 
@@ -217,7 +217,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
             SELECT stages.name
             FROM behavior_sessions bs
             JOIN stages ON stages.id = bs.state_id
-            WHERE bs.id = '{self.foraging_id}'
+            WHERE bs.id = '{self.foraging_id};'
         """
         return self.mtrain_db.fetchone(query, strict=True)
 
