@@ -151,6 +151,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
 
     @staticmethod
     def get_containers_df(only_passed=True) -> pd.DataFrame:
+        """Get a DataFrame of experiment containers"""
 
         api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
                (PostgresQueryMixin)())
@@ -174,6 +175,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
     @classmethod
     def get_api_list_by_container_id(cls, container_id
                                      ) -> List["BehaviorOphysLimsApi"]:
+        """Return a list of BehaviorOphysLimsApi instances for all
+        ophys experiments"""
         df = cls.get_ophys_experiment_df()
         container_selector = df['container_id'] == container_id
         oeid_list = df[container_selector]['ophys_experiment_id'].values

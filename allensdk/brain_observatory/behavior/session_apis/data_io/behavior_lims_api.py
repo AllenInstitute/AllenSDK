@@ -99,7 +99,9 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         """
         ids_response = self.lims_db.select(query)
         if len(ids_response) > 1 or len(ids_response) < 1:
-            raise OneResultExpectedError
+            raise OneResultExpectedError(
+                f"Expected length one result, received: "
+                f"{ids_response} results from query")
         ids_dict = ids_response.iloc[0].to_dict()
 
         #  Get additional ids if also an ophys session
