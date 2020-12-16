@@ -4,22 +4,28 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.internal.behavior_base import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
 from allensdk.brain_observatory.behavior.image_api import Image
 
 
 class BehaviorOphysBase(BehaviorBase):
     """Abstract base class implementing required methods for interacting with
-    behavior+ophys session data.
+    behavior + ophys session data.
 
     Child classes should be instantiated with a fetch API that implements these
     methods.
     """
 
     @abc.abstractmethod
+    def get_ophys_experiment_id(self) -> Optional[int]:
+        """Returns the ophys_experiment_id for the instantiated BehaviorOphys
+        Session (or BehaviorOphys data fetcher) if applicable."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def get_ophys_session_id(self) -> Optional[int]:
-        """Returns the ophys_session_id associated with this experiment,
-        if applicable.
+        """Returns the behavior + ophys_session_id associated with this
+        experiment, if applicable.
         """
         raise NotImplementedError()
 
@@ -119,18 +125,6 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_raw_stimulus_timestamps(self) -> np.ndarray:
-        """Get raw stimulus timestamps.
-
-        Returns
-        -------
-        np.ndarray
-            Timestamps associated with stimulus presentations on the monitor
-            without accounting for monitor delay.
-        """
-        raise NotImplementedError()
-
-    @abc.abstractmethod
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps.
 
@@ -154,5 +148,18 @@ class BehaviorOphysBase(BehaviorBase):
             Table whose rows are stimulus presentations
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_eye_tracking(self) -> pd.DataFrame:
+        """Get eye tracking data from behavior + ophys session.
+
+        Returns
+        -------
+        pd.DataFrame
+            A refined eye tracking dataframe that contains information
+            about eye tracking ellipse fits, frame times, eye areas,
+            pupil areas, and frames with likely blinks/outliers.
         """
         raise NotImplementedError()

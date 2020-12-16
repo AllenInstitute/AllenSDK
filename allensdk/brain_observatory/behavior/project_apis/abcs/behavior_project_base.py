@@ -3,8 +3,8 @@ from typing import Iterable
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
-from allensdk.brain_observatory.behavior.behavior_data_session import (
-    BehaviorDataSession)
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession)
 import pandas as pd
 
 
@@ -27,12 +27,12 @@ class BehaviorProjectBase(ABC):
 
     @abstractmethod
     def get_behavior_only_session_data(
-            self, behavior_session_id: int) -> BehaviorDataSession:
-        """Returns a BehaviorDataSession object that contains methods to
+            self, behavior_session_id: int) -> BehaviorSession:
+        """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
         :type behavior_session_id: int
-        :rtype: BehaviorDataSession
+        :rtype: BehaviorSession
         """
         pass
 

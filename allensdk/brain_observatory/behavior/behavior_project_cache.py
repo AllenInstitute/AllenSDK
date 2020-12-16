@@ -6,10 +6,10 @@ import logging
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.behavior.behavior_project_lims_api import (
+from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.brain_observatory.behavior.internal.behavior_project_base\
-    import BehaviorProjectBase
+from allensdk.brain_observatory.behavior.project_apis.abcs import (
+    BehaviorProjectBase)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.core.authentication import DbCredentials
 

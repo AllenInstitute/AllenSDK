@@ -1,5 +1,4 @@
 import datetime
-import math
 import uuid
 import warnings
 
@@ -7,17 +6,15 @@ import numpy as np
 import pandas as pd
 import pytz
 import SimpleITK as sitk
-import xarray as xr
 
-from pandas.util.testing import assert_frame_equal
 from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_expt_description
 )
-from allensdk.brain_observatory.behavior.behavior_ophys_api import (
-    BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorOphysBase
 )
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
@@ -27,13 +24,16 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
-from allensdk.core.lazy_property import LazyProperty
 
 load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
-class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
+class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
+    """A data fetching class that serves as an API for fetching 'raw'
+    data from an NWB file that is both necessary and sufficient for filling
+    a 'BehaviorOphysSession'.
+    """
 
     def __init__(self, *args, **kwargs):
         self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)
@@ -55,11 +55,15 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         )
 
         # Add stimulus_timestamps to NWB in-memory object:
-        nwb.add_stimulus_timestamps(nwbfile, session_object.stimulus_timestamps)
+        nwb.add_stimulus_timestamps(nwbfile,
+                                    session_object.stimulus_timestamps)
 
         # Add running data to NWB in-memory object:
-        unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-        nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
+        unit_dict = {'v_sig': 'V', 'v_in': 'V',
+                     'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
+        nwb.add_running_data_df_to_nwbfile(nwbfile,
+                                           session_object.running_data_df,
+                                           unit_dict)
 
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
@@ -71,13 +75,16 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         # search for omitted rows and add stop_time before writing to NWB file
-        set_omitted_stop_time(stimulus_table=session_object.stimulus_presentations)
+        set_omitted_stop_time(
+            stimulus_table=session_object.stimulus_presentations)
 
         # Add stimulus presentations data to NWB in-memory object:
-        nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
+        nwb.add_stimulus_presentations(nwbfile,
+                                       session_object.stimulus_presentations)
 
         # Add trials data to NWB in-memory object:
-        nwb.add_trials(nwbfile, session_object.trials, TRIAL_COLUMN_DESCRIPTION_DICT)
+        nwb.add_trials(nwbfile, session_object.trials,
+                       TRIAL_COLUMN_DESCRIPTION_DICT)
 
         # Add licks data to NWB in-memory object:
         if len(session_object.licks) > 0:
@@ -94,7 +101,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         nwb.add_average_image(nwbfile, session_object.average_projection)
 
         # Add segmentation_mask_image image data to NWB in-memory object:
-        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
+        nwb.add_segmentation_mask_image(nwbfile,
+                                        session_object.segmentation_mask_image)
 
         # Add metadata to NWB in-memory object:
         nwb.add_metadata(nwbfile, session_object.metadata)
@@ -108,10 +116,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
                                     session_object.metadata)
 
         # Add dff to NWB in-memory object:
-        nwb.add_dff_traces(nwbfile, session_object.dff_traces, session_object.ophys_timestamps)
+        nwb.add_dff_traces(nwbfile, session_object.dff_traces,
+                           session_object.ophys_timestamps)
 
         # Add corrected_fluorescence to NWB in-memory object:
-        nwb.add_corrected_fluorescence_traces(nwbfile, session_object.corrected_fluorescence_traces)
+        nwb.add_corrected_fluorescence_traces(
+            nwbfile,
+            session_object.corrected_fluorescence_traces)
 
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
@@ -122,12 +133,28 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
         return nwbfile
 
-    def get_running_data_df(self, **kwargs):
+    def get_ophys_experiment_id(self) -> int:
+        return int(self.nwbfile.identifier)
+
+    # TODO: Implement save and load of behavior_session_id to/from NWB file
+    def get_behavior_session_id(self) -> int:
+        raise NotImplementedError()
+
+    # TODO: Implement save and load of ophys_session_id to/from NWB file
+    def get_ophys_session_id(self) -> int:
+        raise NotImplementedError()
+
+    # TODO: Implement save and load of eye_tracking_data to/from NWB file
+    def get_eye_tracking(self) -> int:
+        raise NotImplementedError()
+
+    def get_running_data_df(self, **kwargs) -> pd.DataFrame:
 
         running_speed = self.get_running_speed()
 
         running_data_df = pd.DataFrame({'speed': running_speed.values},
-                                       index=pd.Index(running_speed.timestamps, name='timestamps'))
+                                       index=pd.Index(running_speed.timestamps,
+                                                      name='timestamps'))
 
         for key in ['v_in', 'v_sig']:
             if key in self.nwbfile.acquisition:
@@ -139,11 +166,12 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
         return running_data_df[['speed', 'dx', 'v_sig', 'v_in']]
 
-    def get_stimulus_templates(self, **kwargs):
-        return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
-
     def get_ophys_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing['ophys'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
+
+    def get_stimulus_templates(self, **kwargs):
+        return {key: val.data[:]
+                for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing['stimulus'].get_data_interface('timestamps').timestamps[:]
@@ -166,9 +194,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             time = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').timestamps[:]
             autorewarded = self.nwbfile.processing['rewards'].get_data_interface('autorewarded').data[:]
             volume = self.nwbfile.processing['rewards'].get_data_interface('volume').data[:]
-            return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
+            return pd.DataFrame({
+                'volume': volume, 'timestamps': time,
+                'autorewarded': autorewarded}).set_index('timestamps')
         else:
-            return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
+            return pd.DataFrame({
+                'volume': [], 'timestamps': [], 
+                'autorewarded': []}).set_index('timestamps')
 
     def get_max_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'ophys', image_api=image_api)
@@ -177,7 +209,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return self.get_image('average_image', 'ophys', image_api=image_api)
 
     def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
-        return self.get_image('segmentation_mask_image', 'ophys', image_api=image_api)
+        return self.get_image('segmentation_mask_image',
+                              'ophys', image_api=image_api)
 
     def get_metadata(self) -> dict:
 
@@ -278,67 +311,3 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         motion_correction_data['y'] = ophys_module.get_data_interface('ophys_motion_correction_y').data[:]
 
         return pd.DataFrame(motion_correction_data)
-
-
-def equals(A, B, reraise=False):
-
-    field_set = set()
-    for key, val in A.__dict__.items():
-        if isinstance(val, LazyProperty):
-            field_set.add(key)
-    for key, val in B.__dict__.items():
-        if isinstance(val, LazyProperty):
-            field_set.add(key)
-
-    try:
-        for field in sorted(field_set):
-            x1, x2 = getattr(A, field), getattr(B, field)
-            err_msg = f"{field} on {A} did not equal {field} on {B} (\n{x1} vs\n{x2}\n)"
-            compare_fields(x1, x2, err_msg)
-
-    except NotImplementedError as e:
-        A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
-        B_implements_get_field = hasattr(B.api, getattr(type(B), field).getter_name)
-        assert A_implements_get_field == B_implements_get_field == False
-
-    except (AssertionError, AttributeError) as e:
-        if reraise:
-            raise
-        return False
-
-    return True
-
-
-
-def compare_fields(x1, x2, err_msg=""):
-    if isinstance(x1, pd.DataFrame):
-        try:
-            assert_frame_equal(x1, x2, check_like=True)
-        except:
-            print(err_msg)
-            raise
-    elif isinstance(x1, np.ndarray):
-        np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
-    elif isinstance(x1, xr.DataArray):
-        xr.testing.assert_allclose(x1, x2)
-    elif isinstance(x1, (list,)):
-        assert x1 == x2, err_msg
-    elif isinstance(x1, (sitk.Image,)):
-        assert x1.GetSize() == x2.GetSize(), err_msg
-        assert x1 == x2, err_msg
-    elif isinstance(x1, (dict,)):
-        for key in set(x1.keys()).union(set(x2.keys())):
-            key_err_msg = f"mismatch when checking key {key}. {err_msg}"
-
-            if isinstance(x1[key], (np.ndarray,)):
-                np.testing.assert_array_almost_equal(x1[key], x2[key], err_msg=key_err_msg)
-            elif isinstance(x1[key], (float,)):
-                if math.isnan(x1[key]) or math.isnan(x2[key]):
-                    assert math.isnan(x1[key]) and math.isnan(x2[key]), key_err_msg
-                else:
-                    assert x1[key] == x2[key], key_err_msg
-            else:
-                assert x1[key] == x2[key], key_err_msg
-
-    else:
-        assert x1 == x2, err_msg

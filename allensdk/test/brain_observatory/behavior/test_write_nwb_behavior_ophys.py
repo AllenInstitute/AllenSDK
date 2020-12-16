@@ -7,8 +7,8 @@ import pynwb
 import pytest
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import \
-    BehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 

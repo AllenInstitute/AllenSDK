@@ -1,8 +1,10 @@
 import h5py
 import os
 
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysLimsApi)
+from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
+    import OphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
 class ValidationError(AssertionError):
