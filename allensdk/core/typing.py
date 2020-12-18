@@ -1,8 +1,12 @@
 import sys
-if sys.version_info.minor <= 7:  
+try:
+    # for Python 3.8 and greater
+    from typing import Protocol
+except ImportError:
+    # for Python 3.7 and before
     from typing import _Protocol as Protocol
 else:
-    from typing import Protocol
+    
 from abc import abstractmethod
 
 
