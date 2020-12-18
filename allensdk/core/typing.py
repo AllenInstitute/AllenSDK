@@ -5,7 +5,6 @@ try:
 except ImportError:
     # for Python 3.7 and before
     from typing import _Protocol as Protocol
-else:
     
 from abc import abstractmethod
 
