@@ -91,6 +91,16 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.3.2 (December 21, 2020)
+-----------------------------------------------------------------------
+As of the 2.4.0 release:
+- When running raster_plot on a spike_times dataframe, the spike times from each unit are plotted twice. (thank you @dgmurx)
+- improvements and fixes to behavior ophys NWB files.
+- improvements and fixes to BehaviorProjectCache tables including new column "donor_id"
+- implemented a timeout to obtaining an ecephys session. (thank you @wesley-jones)
+- big overhaul of how Behavior and BehaviorOphys classes are structured for the visual behavior project. See https://github.com/AllenInstitute/AllenSDK/pull/1789
+
+
 What's New - 2.3.2 (October 19, 2020)
 -----------------------------------------------------------------------
 As of the 2.3.2 release:
