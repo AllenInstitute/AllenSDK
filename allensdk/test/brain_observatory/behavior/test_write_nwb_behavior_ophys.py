@@ -1,11 +1,16 @@
-import pytest
-import pandas as pd
-import numpy as np
 import math
+import warnings
+
+import numpy as np
+import pandas as pd
+import pynwb
+import pytest
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysNwbApi)
+from allensdk.brain_observatory.behavior.schemas import (
+    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -163,20 +168,38 @@ def test_segmentation_mask_image(nwbfile, roundtrip, roundtripper, segmentation_
     assert image_api.deserialize(segmentation_mask_image) == image_api.deserialize(obt.get_segmentation_mask_image())
 
 
+@pytest.mark.parametrize('test_partial_metadata', [True, False])
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
+def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
+                              cell_specimen_table, metadata, partial_metadata):
 
-    nwb.add_metadata(nwbfile, metadata)
+    meta = partial_metadata if test_partial_metadata else metadata
+    nwbfile = pynwb.NWBFile(
+        session_description='asession',
+        identifier='afile',
+        session_start_time=meta['experiment_datetime']
+    )
+    nwb.add_metadata(nwbfile, meta)
+    if not test_partial_metadata:
+        nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, meta)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
-    metadata_obt = obt.get_metadata()
+    if not test_partial_metadata:
+        metadata_obt = obt.get_metadata()
+    else:
+        with warnings.catch_warnings(record=True) as record:
+            metadata_obt = obt.get_metadata()
+        exp_warn_msg = "Could not locate 'ophys' module in NWB"
+        print(record)
 
-    assert len(metadata_obt) == len(metadata)
-    for key, val in metadata.items():
+        assert record[0].message.args[0].startswith(exp_warn_msg)
+
+    assert len(metadata_obt) == len(meta)
+    for key, val in meta.items():
         assert val == metadata_obt[key]
 
 
@@ -208,7 +231,7 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
-    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi, filter_invalid_rois=filter_invalid_rois)
@@ -226,7 +249,7 @@ def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_
 def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
-    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
 
     if roundtrip:
@@ -245,7 +268,7 @@ def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, 
 def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
-    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
 
@@ -264,7 +287,7 @@ def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_ro
 def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps, metadata, cell_specimen_table, dff_traces):
 
     nwb.add_metadata(nwbfile, metadata)
-    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_motion_correction(nwbfile, motion_correction)
 

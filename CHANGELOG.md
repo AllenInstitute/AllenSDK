@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] = 2020-12-21
+- When running raster_plot on a spike_times dataframe, the spike times from each unit are plotted twice. (thank you @dgmurx)
+- improvements and fixes to behavior ophys NWB files.
+- improvements and fixes to BehaviorProjectCache tables including new column "donor_id"
+- implemented a timeout to obtaining an ecephys session. (thank you @wesley-jones)
+- big overhaul of how Behavior and BehaviorOphys classes are structured for the visual behavior project. See https://github.com/AllenInstitute/AllenSDK/pull/1789
+
 ## [2.3.3] = 2020-11-12
 ### Bug Fixes
 - (Internal) Fixed a bug in mesoscope processing where the ophys acquisition frames were being truncated

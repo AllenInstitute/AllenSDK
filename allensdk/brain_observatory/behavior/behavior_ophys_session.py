@@ -6,9 +6,8 @@ import logging
 
 
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api\
-    .behavior_ophys_nwb_api import BehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import (
     calculate_reward_rate)

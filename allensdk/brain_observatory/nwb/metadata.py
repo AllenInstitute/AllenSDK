@@ -9,11 +9,20 @@ from allensdk.brain_observatory.behavior.schemas import STYPE_DICT, TYPE_DICT
 
 def extract_from_schema(schema):
 
+    if hasattr(schema, 'neurodata_skip'):
+        fields_to_skip = schema.neurodata_skip
+    else:
+        fields_to_skip = set()
+
     # Extract fields from Schema:
     docval_list = [{'name': 'name', 'type': str, 'doc': 'name'}]
     attributes = []
     nwbfields_list = []
     for name, val in schema().fields.items():
+
+        if name in fields_to_skip:
+            continue
+
         if type(val) == fields.List:
             attributes.append(NWBAttributeSpec(name=name,
                                                dtype=STYPE_DICT[type(val)],

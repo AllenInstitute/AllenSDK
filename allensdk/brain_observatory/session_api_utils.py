@@ -1,4 +1,5 @@
 import inspect
+import math
 import warnings
 
 from itertools import zip_longest
@@ -6,6 +7,12 @@ from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
+import xarray as xr
+import SimpleITK as sitk
+
+from pandas.util.testing import assert_frame_equal
+
+from allensdk.core.lazy_property import LazyProperty
 
 
 def is_equal(a: Any, b: Any) -> bool:
@@ -139,3 +146,103 @@ class ParamsMixin:
     def clear_updated_params(self, data_params: set):
         """This method clears 'updated params' whose data have been updated"""
         self._updated_params -= data_params
+
+
+def sessions_are_equal(A, B, reraise=False) -> bool:
+    """Check if two Session objects are equal (have same methods and
+    attributes).
+
+    Parameters
+    ----------
+    A : Session A
+        The first session to compare
+    B : Session B
+        The second session to compare
+    reraise : bool, optional
+        Whether to reraise when encountering an Assertion or AttributeError,
+        by default False
+
+    Returns
+    -------
+    bool
+        Whether the two sessions are equal to one another.
+    """
+
+    field_set = set()
+    for key, val in A.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+    for key, val in B.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+
+    try:
+        for field in sorted(field_set):
+            x1, x2 = getattr(A, field), getattr(B, field)
+            err_msg = (f"{field} on {A} did not equal {field} "
+                       f"on {B} (\n{x1} vs\n{x2}\n)")
+            compare_session_fields(x1, x2, err_msg)
+
+    except NotImplementedError:
+        A_implements_get_field = hasattr(A.api, getattr(type(A),
+                                         field).getter_name)
+        B_implements_get_field = hasattr(B.api, getattr(type(B),
+                                         field).getter_name)
+        assert ((A_implements_get_field is False)
+                and (B_implements_get_field is False))
+
+    except (AssertionError, AttributeError):
+        if reraise:
+            raise
+        return False
+
+    return True
+
+
+def compare_session_fields(x1: Any, x2: Any, err_msg=""):
+    """Helper function to compare if two fields (attributes) from a
+    Session object are equal to one another.
+
+    Parameters
+    ----------
+    x1 : Any
+        The field from the first session to compare
+    x2 : Any
+        The corresponding field from the second session to compare
+    err_msg : str, optional
+        The error message to display if two compared fields do not equal
+        one another, by default "" (an empty string)
+    """
+    if isinstance(x1, pd.DataFrame):
+        try:
+            assert_frame_equal(x1, x2, check_like=True)
+        except Exception:
+            print(err_msg)
+            raise
+    elif isinstance(x1, np.ndarray):
+        np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
+    elif isinstance(x1, xr.DataArray):
+        xr.testing.assert_allclose(x1, x2)
+    elif isinstance(x1, (list,)):
+        assert x1 == x2, err_msg
+    elif isinstance(x1, (sitk.Image,)):
+        assert x1.GetSize() == x2.GetSize(), err_msg
+        assert x1 == x2, err_msg
+    elif isinstance(x1, (dict,)):
+        for key in set(x1.keys()).union(set(x2.keys())):
+            key_err_msg = f"Mismatch when checking key {key}. {err_msg}"
+
+            if isinstance(x1[key], (np.ndarray,)):
+                np.testing.assert_array_almost_equal(x1[key], x2[key],
+                                                     err_msg=key_err_msg)
+            elif isinstance(x1[key], (float,)):
+                if math.isnan(x1[key]) or math.isnan(x2[key]):
+                    both_nan = (math.isnan(x1[key]) and math.isnan(x2[key]))
+                    assert both_nan, key_err_msg
+                else:
+                    assert x1[key] == x2[key], key_err_msg
+            else:
+                assert x1[key] == x2[key], key_err_msg
+
+    else:
+        assert x1 == x2, err_msg

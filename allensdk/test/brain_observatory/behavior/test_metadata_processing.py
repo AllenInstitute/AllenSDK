@@ -1,7 +1,9 @@
+import pytest
 import numpy as np
 
 from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_task_parameters)
+    OPHYS_1_3_DESCRIPTION, OPHYS_2_DESCRIPTION, OPHYS_4_6_DESCRIPTION,
+    OPHYS_5_DESCRIPTION, get_task_parameters, get_expt_description)
 
 
 def test_get_task_parameters():
@@ -54,3 +56,28 @@ def test_get_task_parameters():
         except (TypeError, ValueError):
             assert expected[k] == v
     assert list(actual.keys()) == list(expected.keys())
+
+
+@pytest.mark.parametrize("session_type, expected_description", [
+    ("OPHYS_1_images_A", OPHYS_1_3_DESCRIPTION),
+    ("OPHYS_2_images_B", OPHYS_2_DESCRIPTION),
+    ("OPHYS_3_images_C", OPHYS_1_3_DESCRIPTION),
+    ("OPHYS_4_images_D", OPHYS_4_6_DESCRIPTION),
+    ("OPHYS_5_images_E", OPHYS_5_DESCRIPTION),
+    ("OPHYS_6_images_F", OPHYS_4_6_DESCRIPTION)
+])
+def test_get_expt_description_with_valid_session_type(session_type,
+                                                      expected_description):
+    obt = get_expt_description(session_type)
+    assert obt == expected_description
+
+
+@pytest.mark.parametrize("session_type", [
+    ("bogus_session_type"),
+    ("stuff"),
+    ("OPHYS_7")
+])
+def test_get_expt_description_raises_with_invalid_session_type(session_type):
+    error_msg_match_phrase = r"Encountered an unknown session type*"
+    with pytest.raises(RuntimeError, match=error_msg_match_phrase):
+        _ = get_expt_description(session_type)

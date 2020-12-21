@@ -5,21 +5,24 @@ from datetime import datetime
 import pytz
 import math
 
-from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi
+)
 from allensdk.core.authentication import DbCredentials
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorOphysLimsApi)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 
 mock_db_credentials = DbCredentials(dbname='mock_db', user='mock_user',
-                                      host='mock_host', port='mock_port',
-                                      password='mock')
+                                    host='mock_host', port='mock_port',
+                                    password='mock')
 
 
 @pytest.fixture
-def MockBehaviorDataLimsApi():
+def MockBehaviorLimsApi():
 
-    class MockBehaviorDataLimsApi(BehaviorDataLimsApi):
+    class MockBehaviorLimsApi(BehaviorLimsApi):
         """
         Mock class that overrides some functions to provide test data and
         initialize without calls to db.
@@ -28,9 +31,13 @@ def MockBehaviorDataLimsApi():
             super().__init__(behavior_session_id=8675309,
                              lims_credentials=mock_db_credentials,
                              mtrain_credentials=mock_db_credentials)
+            self.foraging_id = 123456
 
         def _get_ids(self):
             return {}
+
+        def get_behavior_stimulus_file(self):
+            return "dummy_stimulus_file.pkl"
 
         def _behavior_stimulus_file(self):
             data = {
@@ -68,16 +75,16 @@ def MockBehaviorDataLimsApi():
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
 
-    api = MockBehaviorDataLimsApi()
+    api = MockBehaviorLimsApi()
     yield api
     api.cache_clear()
 
 
 @pytest.fixture
 def MockApiRunSpeedExpectedError():
-    class MockApiRunSpeedExpectedError(BehaviorDataLimsApi):
+    class MockApiRunSpeedExpectedError(BehaviorLimsApi):
         """
-        Mock class that overrides some functions to provide test data and 
+        Mock class that overrides some functions to provide test data and
         initialize without calls to db.
         """
         def __init__(self):
@@ -106,39 +113,39 @@ def MockApiRunSpeedExpectedError():
 #    get_trials
 # Does not include test for get_metadata since it just collects data from
 # methods covered in other unit tests, or data derived from sql queries.
-def test_get_stimulus_timestamps(MockBehaviorDataLimsApi):
-    api = MockBehaviorDataLimsApi
+def test_get_stimulus_timestamps(MockBehaviorLimsApi):
+    api = MockBehaviorLimsApi
     expected = np.array([0.016 * i for i in range(11)])
     assert np.allclose(expected, api.get_stimulus_timestamps())
 
 
-def test_get_licks(MockBehaviorDataLimsApi):
-    api = MockBehaviorDataLimsApi
+def test_get_licks(MockBehaviorLimsApi):
+    api = MockBehaviorLimsApi
     expected = pd.DataFrame({"time": [0.016 * i for i in [2., 6., 9.]]})
     pd.testing.assert_frame_equal(expected, api.get_licks())
 
 
-def test_get_behavior_session_uuid(MockBehaviorDataLimsApi):
-    api = MockBehaviorDataLimsApi
+def test_get_behavior_session_uuid(MockBehaviorLimsApi):
+    api = MockBehaviorLimsApi
     assert 123456 == api.get_behavior_session_uuid()
 
 
-def test_get_stimulus_frame_rate(MockBehaviorDataLimsApi):
-    api = MockBehaviorDataLimsApi
+def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
+    api = MockBehaviorLimsApi
     assert 62.0 == api.get_stimulus_frame_rate()
 
 
-def test_get_experiment_date(MockBehaviorDataLimsApi):
-    api = MockBehaviorDataLimsApi
+def test_get_experiment_date(MockBehaviorLimsApi):
+    api = MockBehaviorLimsApi
     expected = datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
     actual = api.get_experiment_date()
     assert expected == actual
 
 
-def test_get_running_speed(MockBehaviorDataLimsApi):
+def test_get_running_speed(MockBehaviorLimsApi):
     expected = RunningSpeed(timestamps=[0.0, 0.1, 0.2],
                             values=[8.0, 15.0, 16.0])
-    api = MockBehaviorDataLimsApi
+    api = MockBehaviorLimsApi
     actual = api.get_running_speed()
     assert expected == actual
 
@@ -148,8 +155,8 @@ def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):
         MockApiRunSpeedExpectedError.get_running_speed()
 
 
-# def test_get_stimulus_presentations(MockBehaviorDataLimsApi):
-#     api = MockBehaviorDataLimsApi
+# def test_get_stimulus_presentations(MockBehaviorLimsApi):
+#     api = MockBehaviorLimsApi
 #     #  TODO. This function is a monster with multiple dependencies,
 #     #  no tests, and no documentation (for any of its dependencies).
 #     #  Needs to be broken out into testable parts.
@@ -159,19 +166,19 @@ def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):
 class TestBehaviorRegression:
     """
     Test whether behavior sessions (that are also ophys) loaded with
-    BehaviorDataLimsApi return the same results as sessions loaded
+    BehaviorLimsApi return the same results as sessions loaded
     with BehaviorOphysLimsApi, for relevant functions. Do not check for
     timestamps, which are from different files so will not be the same.
     Also not checking for experiment_date, since they're from two different
     sources (and I'm not sure how it's uploaded in the database).
 
     Do not test `get_licks` regression because the licks come from two
-    different sources and are recorded differently (behavior pickle file in 
-    BehaviorDataLimsApi; sync file in BehaviorOphysLimeApi)
+    different sources and are recorded differently (behavior pickle file in
+    BehaviorLimsApi; sync file in BehaviorOphysLimeApi)
     """
     @classmethod
     def setup_class(cls):
-        cls.bd = BehaviorDataLimsApi(976012750)
+        cls.bd = BehaviorLimsApi(976012750)
         cls.od = BehaviorOphysLimsApi(976255949)
 
     @classmethod
@@ -287,7 +294,7 @@ class TestBehaviorRegression:
     def test_get_experiment_date_regression(self):
         """Just testing the date since it comes from two different sources;
         We expect that BehaviorOphysLimsApi will be earlier (more like when
-        rig was started up), while BehaviorDataLimsApi returns the start of
+        rig was started up), while BehaviorLimsApi returns the start of
         the actual behavior (from pkl file)"""
         assert (self.bd.get_experiment_date().date()
                 == self.od.get_experiment_date().date())

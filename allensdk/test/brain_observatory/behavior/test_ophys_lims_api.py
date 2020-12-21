@@ -3,7 +3,8 @@ import os
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError, OneOrMoreResultExpectedError
-from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
+    import OphysLimsApi
 
 
 @pytest.fixture(scope="function")
@@ -217,15 +218,6 @@ def test_get_nwb_filepath(ophys_experiment_id, compare_val):
 def test_get_ophys_segmentation_run_id(ophys_experiment_id):
     ophys_lims_api = OphysLimsApi(ophys_experiment_id)
     _ = ophys_lims_api.get_ophys_cell_segmentation_run_id()
-
-
-@pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [
-    pytest.param(511458874),
-])
-def test_get_cell_roi_table(ophys_experiment_id):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
-    assert len(ophys_lims_api.get_cell_specimen_table()) == 128
 
 
 @pytest.mark.requires_bamboo

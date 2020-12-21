@@ -117,7 +117,7 @@ def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
 
 @pytest.fixture
 def metadata():
-
+    """Fixture that passes all possible behavior ophys session metadata"""
     return {"ophys_experiment_id": 1234,
             "experiment_container_id": 5678,
             "ophys_frame_rate": 31.0,
@@ -134,8 +134,31 @@ def metadata():
             "emission_lambda": 1.0,
             "excitation_lambda": 1.0,
             "indicator": 'HW',
-            "field_of_view_width": 2,
-            "field_of_view_height": 2,
+            "field_of_view_width": 4,
+            "field_of_view_height": 4,
+            "rig_name": 'my_device',
+            "sex": 'M',
+            "age": 'P139',
+            }
+
+
+@pytest.fixture
+def partial_metadata():
+    """Fixture that passes only metadata that will be saved in
+    custom pyNWB extension fields"""
+    return {"ophys_experiment_id": 1234,
+            "experiment_container_id": 5678,
+            "stimulus_frame_rate": 60.0,
+            "imaging_depth": 375,
+            "session_type": 'Unknown',
+            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+            "LabTracks_ID": 416369,
+            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+            "behavior_session_uuid": uuid.uuid4(),
+            "field_of_view_width": 4,
+            "field_of_view_height": 4,
             "rig_name": 'my_device',
             "sex": 'M',
             "age": 'P139',
@@ -160,20 +183,25 @@ def task_parameters():
 
 @pytest.fixture
 def cell_specimen_table():
+
     return pd.DataFrame({'cell_roi_id': [123, 321],
-                         'x': [1, 1],
-                         'y': [1, 1],
-                         'width': [1, 1],
-                         'height': [1, 1],
-                         'valid_roi':[True, False],
-                         'max_correction_up':[1., 1.],
-                         'max_correction_down':[1., 1.],
-                         'max_correction_left':[1., 1.],
-                         'max_correction_right':[1., 1.],
-                         'mask_image_plane':[1, 1],
-                         'ophys_cell_segmentation_run_id':[1, 1],
-                         'image_mask': [np.array([[True, True], [False, False]]), np.array([[True, True], [False, False]])]},
-                          index=pd.Index([None, None], dtype=int, name='cell_specimen_id'))
+                         'x': [0, 2],
+                         'y': [0, 2],
+                         'width': [2, 2],
+                         'height': [2, 2],
+                         'valid_roi': [True, False],
+                         'max_correction_up': [1., 1.],
+                         'max_correction_down': [1., 1.],
+                         'max_correction_left': [1., 1.],
+                         'max_correction_right': [1., 1.],
+                         'mask_image_plane': [1, 1],
+                         'ophys_cell_segmentation_run_id': [1, 1],
+                         'image_mask': [np.array([[True, True],
+                                                  [True, False]]),
+                                        np.array([[True, True],
+                                                  [False, True]])]},
+                        index=pd.Index([None, None], dtype=int,
+                        name='cell_specimen_id'))
 
 
 @pytest.fixture

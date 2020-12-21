@@ -8,8 +8,8 @@ from allensdk.brain_observatory.argschema_utilities import check_read_access, ch
 class CellSpecimenTable(RaisingSchema):
     cell_roi_id = Dict(String, Int, required=True)
     cell_specimen_id = Dict(String, Int(allow_none=True), required=True)
-    x = Dict(String, Float, required=True)
-    y = Dict(String, Float, required=True)
+    x = Dict(String, Int, required=True)
+    y = Dict(String, Int, required=True)
     max_correction_up = Dict(String, Float, required=True)
     max_correction_right = Dict(String, Float, required=True)
     max_correction_down = Dict(String, Float, required=True)

@@ -2,19 +2,19 @@ import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable
 import logging
 
-from allensdk.brain_observatory.behavior.internal.behavior_project_base\
-    import BehaviorProjectBase
-from allensdk.brain_observatory.behavior.behavior_data_session import (
-    BehaviorDataSession)
+from allensdk.brain_observatory.behavior.project_apis.abcs import (
+    BehaviorProjectBase)
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
-from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorLimsApi, BehaviorOphysLimsApi)
+from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     HttpEngine)
 from allensdk.core.typing import SupportsStr
-from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
 
@@ -96,26 +96,13 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         _app_kwargs = {"scheme": "http", "host": "lims2"}
         if app_kwargs:
             _app_kwargs.update(app_kwargs)
-        if lims_credentials:
-            lims_engine = PostgresQueryMixin(
-                dbname=lims_credentials.dbname, user=lims_credentials.user,
-                host=lims_credentials.host, password=lims_credentials.password,
-                port=lims_credentials.port)
-        else:
-            # Currying is equivalent to decorator syntactic sugar
-            lims_engine = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-                           (PostgresQueryMixin)())
 
-        if mtrain_credentials:
-            mtrain_engine = PostgresQueryMixin(
-                dbname=lims_credentials.dbname, user=lims_credentials.user,
-                host=lims_credentials.host, password=lims_credentials.password,
-                port=lims_credentials.port)
-        else:
-            # Currying is equivalent to decorator syntactic sugar
-            mtrain_engine = (
-                credential_injector(MTRAIN_DB_CREDENTIAL_MAP)
-                (PostgresQueryMixin)())
+        lims_engine = db_connection_creator(
+            credentials=lims_credentials,
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        mtrain_engine = db_connection_creator(
+            credentials=mtrain_credentials,
+            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
 
         app_engine = HttpEngine(**_app_kwargs)
         return cls(lims_engine, mtrain_engine, app_engine)
@@ -202,6 +189,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.date_of_acquisition,
                 d.id as donor_id,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line,
                 g.name AS sex,
@@ -211,13 +199,13 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query("reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query("driver")}
             ) driver on driver.donor_id = d.id
-            JOIN equipment ON equipment.id = bs.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = bs.equipment_id
             {session_sub_query}
         """
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
@@ -288,7 +276,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line
+                        reporter_line, driver_line, mouse_id
 
         :param ophys_experiment_ids: optional list of ophys_experiment_ids
             to include
@@ -314,10 +302,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 os.date_of_acquisition,
                 os.isi_experiment_id,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line,
                 id.depth as imaging_depth,
@@ -328,19 +318,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 ON oec.visual_behavior_experiment_container_id = vbc.id
             JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            JOIN projects pr ON pr.id = os.project_id
+            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            LEFT OUTER JOIN projects pr ON pr.id = os.project_id
             JOIN donors d ON d.id = bs.donor_id
             JOIN genders g ON g.id = d.gender_id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="driver")}
             ) driver on driver.donor_id = d.id
             LEFT JOIN imaging_depths id ON id.id = oe.imaging_depth_id
             JOIN structures st ON st.id = oe.targeted_structure_id
-            JOIN equipment ON equipment.id = os.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
             {experiment_query};
         """
         self.logger.debug(f"get_experiment_table query: \n{query}")
@@ -356,7 +346,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line
+                        reporter_line, driver_line, mouse_id
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
@@ -377,27 +367,29 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 equipment.name as equipment_name,
                 os.date_of_acquisition,
                 os.specimen_id,
+                d.id as donor_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
                 d.full_genotype,
+                d.external_donor_name AS mouse_id,
                 reporter.reporter_line,
                 driver.driver_line
             FROM ophys_sessions os
-            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            JOIN projects pr ON pr.id = os.project_id
+            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            LEFT OUTER JOIN projects pr ON pr.id = os.project_id
             JOIN donors d ON d.id = bs.donor_id
             JOIN genders g ON g.id = d.gender_id
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="reporter")}
             ) reporter on reporter.donor_id = d.id
-            JOIN (
+            LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="driver")}
             ) driver on driver.donor_id = d.id
-            JOIN equipment ON equipment.id = os.equipment_id
+            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
             {session_query};
         """
         self.logger.debug(f"get_session_table query: \n{query}")
@@ -425,14 +417,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return table
 
     def get_behavior_only_session_data(
-            self, behavior_session_id: int) -> BehaviorDataSession:
-        """Returns a BehaviorDataSession object that contains methods to
+            self, behavior_session_id: int) -> BehaviorSession:
+        """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
         :type behavior_session_id: int
-        :rtype: BehaviorDataSession
+        :rtype: BehaviorSession
         """
-        return BehaviorDataSession(BehaviorDataLimsApi(behavior_session_id))
+        return BehaviorSession(BehaviorLimsApi(behavior_session_id))
 
     def get_experiment_table(
             self,

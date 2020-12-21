@@ -105,6 +105,10 @@ def call_caching(
     except Exception as e:
         if isinstance(e, FileNotFoundError):
             logger.info("No cache file found.")
+        # Pandas throws ValueError rather than FileNotFoundError
+        elif (isinstance(e, ValueError)
+              and str(e) == "Expected object or value"):
+            logger.info("No cache file found.")
         if cleanup is not None and not lazy:
             cleanup()
 
