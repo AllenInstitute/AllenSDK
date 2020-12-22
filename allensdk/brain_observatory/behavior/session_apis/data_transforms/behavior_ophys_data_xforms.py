@@ -340,7 +340,7 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         ophys_timestamps = self.get_ophys_timestamps()
 
         num_trace_timepoints = corrected_fluorescence_traces.shape[1]
-        assert num_trace_timepoints, ophys_timestamps.shape[0]
+        assert num_trace_timepoints == ophys_timestamps.shape[0]
         df = pd.DataFrame(
             {'corrected_fluorescence': list(corrected_fluorescence_traces)},
             index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
