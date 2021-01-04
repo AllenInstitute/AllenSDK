@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.4.1] = 2021-01-04
+-  update deprecated call to scipy.spatial.transform.Rotation.as_dcm() to .as_matrix()
+
 ## [2.4.0] = 2020-12-21
 - When running raster_plot on a spike_times dataframe, the spike times from each unit are plotted twice. (thank you @dgmurx)
 - improvements and fixes to behavior ophys NWB files.
