@@ -50,7 +50,7 @@ def rig_component_fixture(request):
 ], indirect=['rig_component_fixture'])
 def test_generate_self_to_eye_frame_xform(rig_component_fixture, expected):
     obtained = rig_component_fixture.generate_self_to_eye_frame_xform()
-    assert np.allclose(obtained.as_dcm(), expected)
+    assert np.allclose(obtained.as_matrix(), expected)
 
 
 # ======== GazeMapper tests ========
@@ -341,4 +341,4 @@ def test_project_to_plane(function_inputs, expected):
 ])
 def test_generate_object_rotation_xform(function_inputs, expected):
     obtained = gm.generate_object_rotation_xform(**function_inputs)
-    assert np.allclose(obtained.as_dcm(), expected)
+    assert np.allclose(obtained.as_matrix(), expected)
