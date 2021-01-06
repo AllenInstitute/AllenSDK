@@ -3,24 +3,6 @@ groups:
   neurodata_type_inc: LabMetaData
   doc: Metadata for behavior or behavior + ophys task parameters
   attributes:
-  - name: task
-    dtype: text
-    doc: The name of the behavioral task
-  - name: omitted_flash_fraction
-    dtype: float
-    doc: Fraction of flashes/image presentations that were omitted
-  - name: blank_duration_sec
-    dtype: text
-    shape:
-    - 2
-    doc: The lower and upper bound (in seconds) for a randomly chosen inter-stimulus
-      interval duration for a trial
-  - name: n_stimulus_frames
-    dtype: int
-    doc: Total number of stimuli frames
-  - name: stimulus
-    dtype: text
-    doc: Stimulus type
   - name: response_window_sec
     dtype: text
     shape:
@@ -33,9 +15,27 @@ groups:
   - name: reward_volume
     dtype: float
     doc: Volume of water (in mL) delivered as reward
+  - name: n_stimulus_frames
+    dtype: int
+    doc: Total number of stimuli frames
+  - name: stimulus
+    dtype: text
+    doc: Stimulus type
+  - name: blank_duration_sec
+    dtype: text
+    shape:
+    - 2
+    doc: The lower and upper bound (in seconds) for a randomly chosen inter-stimulus
+      interval duration for a trial
+  - name: omitted_flash_fraction
+    dtype: float
+    doc: Fraction of flashes/image presentations that were omitted
   - name: stimulus_duration_sec
     dtype: float
     doc: Duration of each stimulus presentation in seconds
+  - name: task
+    dtype: text
+    doc: The name of the behavioral task
   - name: stage
     dtype: text
     doc: Stage of behavioral task
@@ -53,34 +53,50 @@ groups:
     shape:
     - null
     doc: Reporter line of subject
-- neurodata_type_def: OphysBehaviorMetadata
+- neurodata_type_def: BehaviorMetadata
   neurodata_type_inc: LabMetaData
-  doc: Metadata for behavior + ophys experiments
+  doc: Metadata for behavior and behavior + ophys experiments
   attributes:
-  - name: imaging_depth
-    dtype: int
-    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: rig_name
+    dtype: text
+    doc: Name of behavior or optical physiology experiment rig
   - name: session_type
     dtype: text
     doc: Experimental session description
-  - name: rig_name
-    dtype: text
-    doc: Name of optical physiology experiment rig
-  - name: ophys_experiment_id
-    dtype: int
-    doc: Id for this ophys session
-  - name: experiment_container_id
-    dtype: int
-    doc: Container ID for the container that contains this ophys session
   - name: stimulus_frame_rate
     dtype: float
     doc: Frame rate (frames/second) of the visual_stimulus from the monitor
   - name: behavior_session_uuid
     dtype: text
     doc: MTrain record for session, also called foraging_id
+- neurodata_type_def: OphysBehaviorMetadata
+  neurodata_type_inc: BehaviorMetadata
+  doc: Metadata for behavior + ophys experiments
+  attributes:
   - name: field_of_view_height
     dtype: int
     doc: Height of optical physiology imaging plane in pixels
+  - name: stimulus_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
+  - name: rig_name
+    dtype: text
+    doc: Name of behavior or optical physiology experiment rig
+  - name: ophys_experiment_id
+    dtype: int
+    doc: Id for this ophys session
+  - name: experiment_container_id
+    dtype: int
+    doc: Container ID for the container that contains this ophys session
+  - name: imaging_depth
+    dtype: int
+    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: session_type
+    dtype: text
+    doc: Experimental session description
   - name: field_of_view_width
     dtype: int
     doc: Width of optical physiology imaging plane in pixels
+  - name: behavior_session_uuid
+    dtype: text
+    doc: MTrain record for session, also called foraging_id

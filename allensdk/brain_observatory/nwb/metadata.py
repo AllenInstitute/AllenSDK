@@ -54,12 +54,14 @@ def load_pynwb_extension(schema, prefix: str):
     return pynwb.get_class(neurodata_type, prefix)
 
 
-def create_pynwb_extension_from_schemas(schema_list, prefix: str):
+def create_pynwb_extension_from_schemas(schema_list, prefix: str,
+                                        save_dir: str):
 
     # Initializations:
-    outdir = os.path.abspath(os.path.dirname(__file__))
     ext_source = f'{prefix}.extension.yaml'
     ns_path = f'{prefix}.namespace.yaml'
+
+    print(f"Saving extensions to: {save_dir}")
 
     extension_doc = ("Allen Institute behavior and optical "
                      "physiology extensions")
@@ -87,4 +89,4 @@ def create_pynwb_extension_from_schemas(schema_list, prefix: str):
         ns_builder.add_spec(ext_source, ext_group_spec)
 
     # Export spec
-    ns_builder.export(ns_path, outdir=outdir)
+    ns_builder.export(ns_path, outdir=save_dir)

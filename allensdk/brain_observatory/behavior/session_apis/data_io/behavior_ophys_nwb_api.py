@@ -106,7 +106,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
                                         session_object.segmentation_mask_image)
 
         # Add metadata to NWB in-memory object:
-        nwb.add_metadata(nwbfile, session_object.metadata)
+        nwb.add_metadata(nwbfile, session_object.metadata,
+                         behavior_only=False)
 
         # Add task parameters to NWB in-memory object:
         nwb.add_task_parameters(nwbfile, session_object.task_parameters)

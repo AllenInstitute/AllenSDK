@@ -25,8 +25,8 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import (
     CompleteOphysBehaviorMetadataSchema, NwbOphysMetadataSchema,
-    OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema,
-    SubjectMetadataSchema
+    BehaviorMetadataSchema, OphysBehaviorMetadataSchema,
+    BehaviorTaskParametersSchema, SubjectMetadataSchema
 )
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 
@@ -740,7 +740,7 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
     nwbfile.add_stimulus(image_index)
 
 
-def add_metadata(nwbfile, metadata: dict):
+def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename incoming metadata fields to conform with pynwb Subject fields
     metadata = metadata.copy()
     metadata["subject_id"] = metadata.pop("LabTracks_ID")
@@ -783,9 +783,15 @@ def add_metadata(nwbfile, metadata: dict):
         else:
             new_metadata_dict[key] = val
 
-    OphysBehaviorMetadata = load_pynwb_extension(OphysBehaviorMetadataSchema,
-                                                 'ndx-aibs-behavior-ophys')
-    nwb_metadata = OphysBehaviorMetadata(name='metadata', **new_metadata_dict)
+    if behavior_only:
+        BehaviorMetadata = load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
+        nwb_metadata = BehaviorMetadata(name='metadata', **new_metadata_dict)
+    else:
+        OphysBehaviorMetadata = load_pynwb_extension(
+            OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
+        nwb_metadata = OphysBehaviorMetadata(name='metadata',
+                                             **new_metadata_dict)
     nwbfile.add_lab_meta_data(nwb_metadata)
 
 
@@ -903,7 +909,7 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     for cell_roi_id, table_row in cell_roi_table.iterrows():
 
         # NOTE: The 'roi_mask' in this cell_roi_table has already been
-        # processing by the function from 
+        # processing by the function from
         # allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api
         # get_cell_specimen_table() method. As a result, the ROI is stored in
         # an array that is the same shape as the FULL field of view of the
