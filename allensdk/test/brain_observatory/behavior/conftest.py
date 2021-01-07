@@ -116,6 +116,23 @@ def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
 
 
 @pytest.fixture
+def behavior_only_metadata():
+    """Fixture that provides mock behavior only session metadata"""
+    return {"session_type": 'Unknown',
+            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+            "LabTracks_ID": 416369,
+            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+            "behavior_session_uuid": uuid.uuid4(),
+            "stimulus_frame_rate": 60.0,
+            "rig_name": 'my_device',
+            "sex": 'M',
+            "age": 'P139'
+            }
+
+
+@pytest.fixture
 def metadata():
     """Fixture that passes all possible behavior ophys session metadata"""
     return {"ophys_experiment_id": 1234,

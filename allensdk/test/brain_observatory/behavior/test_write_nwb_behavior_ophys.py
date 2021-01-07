@@ -167,7 +167,7 @@ def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
         identifier='afile',
         session_start_time=meta['experiment_datetime']
     )
-    nwb.add_metadata(nwbfile, meta)
+    nwb.add_metadata(nwbfile, meta, behavior_only=False)
     if not test_partial_metadata:
         nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, meta)
 
@@ -218,7 +218,7 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
 def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
 
     if roundtrip:
@@ -236,7 +236,7 @@ def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
 def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
 
@@ -255,7 +255,7 @@ def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, 
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
 def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
@@ -274,7 +274,7 @@ def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_ro
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps, metadata, cell_specimen_table, dff_traces):
 
-    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_motion_correction(nwbfile, motion_correction)
