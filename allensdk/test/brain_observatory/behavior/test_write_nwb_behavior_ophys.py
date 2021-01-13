@@ -8,7 +8,8 @@ import pytest
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df, \
+    get_eye_gaze_data
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -323,67 +324,15 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-@pytest.mark.parametrize(("eye_tracking_frame_times, eye_dlc_tracking_data, "
-                          "eye_gaze_data, expected_pupil_data, expected_gaze_data"), [
-                             (
-                                     # eye_tracking_frame_times
-                                     pd.Series([3., 4., 5., 6., 7.]),
-                                     # eye_dlc_tracking_data
-                                     {"pupil_params": create_preload_eye_tracking_df(np.full((5, 5), 1.)),
-                                      "cr_params": create_preload_eye_tracking_df(np.full((5, 5), 2.)),
-                                      "eye_params": create_preload_eye_tracking_df(np.full((5, 5), 3.))},
-                                     # eye_gaze_data
-                                     {"raw_pupil_areas": pd.Series([2., 4., 6., 8., 10.]),
-                                      "raw_eye_areas": pd.Series([3., 5., 7., 9., 11.]),
-                                      "raw_screen_coordinates": pd.DataFrame(
-                                          {"y": [2., 4., 6., 8., 10.], "x": [3., 5., 7., 9., 11.]}),
-                                      "raw_screen_coordinates_spherical": pd.DataFrame(
-                                          {"y": [2., 4., 6., 8., 10.], "x": [3., 5., 7., 9., 11.]}),
-                                      "new_pupil_areas": pd.Series([2., 4., np.nan, 8., 10.]),
-                                      "new_eye_areas": pd.Series([3., 5., np.nan, 9., 11.]),
-                                      "new_screen_coordinates": pd.DataFrame(
-                                          {"y": [2., 4., np.nan, 8., 10.], "x": [3., 5., np.nan, 9., 11.]}),
-                                      "new_screen_coordinates_spherical": pd.DataFrame(
-                                          {"y": [2., 4., np.nan, 8., 10.], "x": [3., 5., np.nan, 9., 11.]}),
-                                      "synced_frame_timestamps": pd.Series([3., 4., 5., 6., 7.])},
-                                     # expected_pupil_data
-                                     pd.DataFrame({"corneal_reflection_center_x": [2.] * 5,
-                                                   "corneal_reflection_center_y": [2.] * 5,
-                                                   "corneal_reflection_height": [4.] * 5,
-                                                   "corneal_reflection_width": [4.] * 5,
-                                                   "corneal_reflection_phi": [2.] * 5,
-                                                   "pupil_center_x": [1.] * 5,
-                                                   "pupil_center_y": [1.] * 5,
-                                                   "pupil_height": [2.] * 5,
-                                                   "pupil_width": [2.] * 5,
-                                                   "pupil_phi": [1.] * 5,
-                                                   "eye_center_x": [3.] * 5,
-                                                   "eye_center_y": [3.] * 5,
-                                                   "eye_height": [6.] * 5,
-                                                   "eye_width": [6.] * 5,
-                                                   "eye_phi": [3.] * 5},
-                                                  index=[3., 4., 5., 6., 7.]),
-                                     # expected_gaze_data
-                                     pd.DataFrame({"raw_eye_area": [3., 5., 7., 9., 11.],
-                                                   "raw_pupil_area": [2., 4., 6., 8., 10.],
-                                                   "raw_screen_coordinates_x_cm": [3., 5., 7., 9., 11.],
-                                                   "raw_screen_coordinates_y_cm": [2., 4., 6., 8., 10.],
-                                                   "raw_screen_coordinates_spherical_x_deg": [3., 5., 7., 9., 11.],
-                                                   "raw_screen_coordinates_spherical_y_deg": [2., 4., 6., 8., 10.],
-                                                   "filtered_eye_area": [3., 5., np.nan, 9., 11.],
-                                                   "filtered_pupil_area": [2., 4., np.nan, 8., 10.],
-                                                   "filtered_screen_coordinates_x_cm": [3., 5., np.nan, 9., 11.],
-                                                   "filtered_screen_coordinates_y_cm": [2., 4., np.nan, 8., 10.],
-                                                   "filtered_screen_coordinates_spherical_x_deg": [3., 5., np.nan, 9., 11.],
-                                                   "filtered_screen_coordinates_spherical_y_deg": [2., 4., np.nan, 8., 10.]},
-                                                  index=[3., 4., 5., 6., 7.])
-                             ),
-                         ])
-def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip,
-                                          eye_tracking_frame_times,
-                                          eye_dlc_tracking_data,
-                                          eye_gaze_data,
-                                          expected_pupil_data, expected_gaze_data):
+def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip):
+    eye_tracking_frame_times = pd.Series([3., 4., 5., 6., 7.])
+    eye_dlc_tracking_data = {
+        "pupil_params": create_preload_eye_tracking_df(np.full((5, 5), 1.)),
+        "cr_params": create_preload_eye_tracking_df(np.full((5, 5), 2.)),
+        "eye_params": create_preload_eye_tracking_df(np.full((5, 5), 3.))
+    }
+    eye_gaze_data = get_eye_gaze_data()
+    
     nwbfile = nwb.add_eye_tracking_data_to_nwbfile(nwbfile,
                                                    eye_tracking_frame_times,
                                                    eye_dlc_tracking_data,
@@ -396,7 +345,43 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip,
     obtained_pupil_data = obt.get_pupil_data()
     obtained_screen_gaze_data = obt.get_screen_gaze_data(include_filtered_data=True)
 
+    expected_pupil_data = pd.DataFrame({
+        "corneal_reflection_center_x": [2.] * 5,
+        "corneal_reflection_center_y": [2.] * 5,
+        "corneal_reflection_height": [4.] * 5,
+        "corneal_reflection_width": [4.] * 5,
+        "corneal_reflection_phi": [2.] * 5,
+        "pupil_center_x": [1.] * 5,
+        "pupil_center_y": [1.] * 5,
+        "pupil_height": [2.] * 5,
+        "pupil_width": [2.] * 5,
+        "pupil_phi": [1.] * 5,
+        "eye_center_x": [3.] * 5,
+        "eye_center_y": [3.] * 5,
+        "eye_height": [6.] * 5,
+        "eye_width": [6.] * 5,
+        "eye_phi": [3.] * 5
+    },
+        index=[3., 4., 5., 6., 7.]
+    )
     pd.testing.assert_frame_equal(obtained_pupil_data,
                                   expected_pupil_data, check_like=True)
+
+    expected_gaze_data = pd.DataFrame({
+        "raw_eye_area": [3., 5., 7., 9., 11.],
+        "raw_pupil_area": [2., 4., 6., 8., 10.],
+        "raw_screen_coordinates_x_cm": [3., 5., 7., 9., 11.],
+        "raw_screen_coordinates_y_cm": [2., 4., 6., 8., 10.],
+        "raw_screen_coordinates_spherical_x_deg": [3., 5., 7., 9., 11.],
+        "raw_screen_coordinates_spherical_y_deg": [2., 4., 6., 8., 10.],
+        "filtered_eye_area": [3., 5., np.nan, 9., 11.],
+        "filtered_pupil_area": [2., 4., np.nan, 8., 10.],
+        "filtered_screen_coordinates_x_cm": [3., 5., np.nan, 9., 11.],
+        "filtered_screen_coordinates_y_cm": [2., 4., np.nan, 8., 10.],
+        "filtered_screen_coordinates_spherical_x_deg": [3., 5., np.nan, 9., 11.],
+        "filtered_screen_coordinates_spherical_y_deg": [2., 4., np.nan, 8., 10.]
+    },
+        index=[3., 4., 5., 6., 7.]
+    )
     pd.testing.assert_frame_equal(obtained_screen_gaze_data,
                                   expected_gaze_data, check_like=True)
