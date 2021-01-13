@@ -437,6 +437,29 @@ class BehaviorOphysSession(ParamsMixin):
     def eye_tracking(self, value):
         self._eye_tracking = value
 
+    @property
+    def eye_tracking_rig_geometry(self) -> dict:
+        """Get the eye tracking rig geometry associated with an ophys experiment"""
+        return self.api.get_eye_tracking_rig_geometry()
+
+    @property
+    def eye_dlc_ellipses_path(self) -> str:
+        """Get h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal
+        reflections during experiment
+        """
+        return self.api.get_eye_dlc_ellipses_path()
+
+    @property
+    def eye_gaze_mapping_file_path(self) -> str:
+        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
+        return self.api.get_eye_gaze_mapping_file_path()
+
+    @property
+    def sync_file(self) -> str:
+        """Get the filepath of the sync timing file associated with the
+        ophys experiment"""
+        return self.api.get_sync_file()
+
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:

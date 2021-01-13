@@ -84,3 +84,66 @@ groups:
   - name: field_of_view_width
     dtype: int
     doc: Width of optical physiology imaging plane in pixels
+- neurodata_type_def: OphysEyeTrackingRigMetadata
+  neurodata_type_inc: NWBDataInterface
+  doc: Metadata for ophys experiment rig
+  attributes:
+  - name: equipment
+    dtype: text
+    doc: Description of rig
+  datasets:
+  - name: monitor_position
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of monitor (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: camera_position
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of camera (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: camera_rotation
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: rotation of camera (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: led_position
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of LED (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: monitor_rotation
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: rotation of monitor (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data

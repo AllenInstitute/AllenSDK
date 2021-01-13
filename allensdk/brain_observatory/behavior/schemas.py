@@ -230,3 +230,54 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Total number of stimuli frames',
         required=True,
     )
+
+
+class EyeTrackingRigGeometry(RaisingSchema):
+    """Eye tracking rig geometry"""
+    values = fields.Float(
+        doc='position/rotation with respect to (x, y, z)',
+        required=True,
+        shape=(3,)
+    )
+    unit_of_measurement = fields.Str(
+        doc='Unit of measurement for the data',
+        required=True
+    )
+
+
+class OphysEyeTrackingRigMetadataSchema(RaisingSchema):
+    """This schema encompasses metadata for ophys experiment rig
+    """
+    neurodata_type = 'OphysEyeTrackingRigMetadata'
+    neurodata_type_inc = 'NWBDataInterface'
+    neurodata_doc = "Metadata for ophys experiment rig"
+
+    equipment = fields.Str(
+        doc='Description of rig',
+        required=True
+    )
+    monitor_position = fields.Nested(
+        EyeTrackingRigGeometry,
+        doc='position of monitor (x, y, z)',
+        required=True
+    )
+    camera_position = fields.Nested(
+        EyeTrackingRigGeometry,
+        doc='position of camera (x, y, z)',
+        required=True
+    )
+    led_position = fields.Nested(
+        EyeTrackingRigGeometry,
+        doc='position of LED (x, y, z)',
+        required=True
+    )
+    monitor_rotation = fields.Nested(
+        EyeTrackingRigGeometry,
+        doc='rotation of monitor (x, y, z)',
+        required=True
+    )
+    camera_rotation = fields.Nested(
+        EyeTrackingRigGeometry,
+        doc='rotation of camera (x, y, z)',
+        required=True
+    )

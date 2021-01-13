@@ -21,7 +21,6 @@ class CellSpecimenTable(RaisingSchema):
     image_mask = Dict(String, List(List(Boolean)), required=True)
 
 
-
 class SessionData(RaisingSchema):
     ophys_experiment_id = Int(required=True, description='unique identifier for this ophys session')
     rig_name = String(required=True, description='name of ophys device')
@@ -48,6 +47,21 @@ class SessionData(RaisingSchema):
     cell_specimen_table_dict = Nested(CellSpecimenTable, required=True, description='Table of cell specimen info')
     sex = String(required=True, description='sex')
     age = String(required=True, description='age')
+    eye_tracking_rig_geometry = Dict(
+        required=True,
+        description="Mapping containing information about session rig geometry used for eye gaze mapping."
+    )
+    eye_dlc_ellipses_path = String(
+        required=True,
+        validate=check_read_access,
+        description="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal "
+                    "reflections during experiment"
+    )
+    eye_gaze_mapping_path = String(
+        required=True,
+        validate=check_read_access,
+        description="h5 filepath containing eye gaze behavior of the experiment's subject"
+    )
 
 
 class InputSchema(ArgSchema):
