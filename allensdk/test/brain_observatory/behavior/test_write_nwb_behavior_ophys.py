@@ -8,8 +8,44 @@ import pytest
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df, \
-    get_eye_gaze_data
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df
+
+
+def get_eye_gaze_data():
+    """Returns mock eye gaze data"""
+    raw_pupil_areas = pd.Series([2., 4., 6., 8., 10.])
+    raw_eye_areas = pd.Series([3., 5., 7., 9., 11.])
+    raw_screen_coordinates = pd.DataFrame({
+        "y": [2., 4., 6., 8., 10.],
+        "x": [3., 5., 7., 9., 11.]
+    })
+    raw_screen_coordinates_spherical = pd.DataFrame({
+        "y": [2., 4., 6., 8., 10.],
+        "x": [3., 5., 7., 9., 11.]
+    })
+    new_pupil_areas = pd.Series([2., 4., np.nan, 8., 10.])
+    new_eye_areas = pd.Series([3., 5., np.nan, 9., 11.])
+    new_screen_coordinates = pd.DataFrame({
+        "y": [2., 4., np.nan, 8., 10.],
+        "x": [3., 5., np.nan, 9., 11.]
+    })
+    new_screen_coordinates_spherical = pd.DataFrame({
+        "y": [2., 4., np.nan, 8., 10.],
+        "x": [3., 5., np.nan, 9., 11.]
+    })
+    synced_frame_timestamps = pd.Series([3., 4., 5., 6., 7.])
+
+    return dict(
+        raw_pupil_areas=raw_pupil_areas,
+        raw_eye_areas=raw_eye_areas,
+        raw_screen_coordinates=raw_screen_coordinates,
+        raw_screen_coordinates_spherical=raw_screen_coordinates_spherical,
+        new_pupil_areas=new_pupil_areas,
+        new_eye_areas=new_eye_areas,
+        new_screen_coordinates=new_screen_coordinates,
+        new_screen_coordinates_spherical=new_screen_coordinates_spherical,
+        synced_frame_timestamps=synced_frame_timestamps
+    )
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -332,7 +368,7 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip):
         "eye_params": create_preload_eye_tracking_df(np.full((5, 5), 3.))
     }
     eye_gaze_data = get_eye_gaze_data()
-    
+
     nwbfile = nwb.add_eye_tracking_data_to_nwbfile(nwbfile,
                                                    eye_tracking_frame_times,
                                                    eye_dlc_tracking_data,

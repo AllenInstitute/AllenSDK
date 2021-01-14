@@ -356,6 +356,27 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         return returned_metadata
 
     def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
+        """
+        Gets screen gaze data
+
+        Parameters
+        ----------
+        include_filtered_data: bool
+            Includes new_* data
+
+        Returns
+        -------
+        pd.DataFrame
+            *_eye_areas: Area of eye (in pixels^2) over time
+            *_pupil_areas: Area of pupil (in pixels^2) over time
+            *_screen_coordinates: y, x screen coordinates (in cm) over time
+            *_screen_coordinates_spherical: y, x screen coordinates (in deg) over time
+            synced_frame_timestamps: synced timestamps for video frames (in sec)
+
+        or None if no eye tracking data
+
+
+        """
         try:
             rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
             fgm_mod = self.nwbfile.get_processing_module("filtered_gaze_mapping")
@@ -398,6 +419,22 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         return pd.DataFrame(gaze_data, index=index)
 
     def get_pupil_data(self) -> Optional[pd.DataFrame]:
+        """
+        Gets corneal, eye, and pupil ellipse fit data
+
+        Returns
+        -------
+        pd.DataFrame
+            *_center_x
+            *_center_y
+            *_height
+            *_phi
+            *_width
+
+            where "*" can be "corneal", "pupil" or "eye"
+
+        or None if no eye tracking data
+        """
         try:
             et_mod = self.nwbfile.get_processing_module("eye_tracking")
             rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")

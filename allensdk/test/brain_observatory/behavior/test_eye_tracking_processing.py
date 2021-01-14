@@ -44,42 +44,6 @@ def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
     return df
 
 
-def get_eye_gaze_data():
-    """Returns mock eye gaze data"""
-    raw_pupil_areas = pd.Series([2., 4., 6., 8., 10.])
-    raw_eye_areas = pd.Series([3., 5., 7., 9., 11.])
-    raw_screen_coordinates = pd.DataFrame({
-        "y": [2., 4., 6., 8., 10.],
-        "x": [3., 5., 7., 9., 11.]
-    })
-    raw_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4., 6., 8., 10.],
-        "x": [3., 5., 7., 9., 11.]
-    })
-    new_pupil_areas = pd.Series([2., 4., np.nan, 8., 10.])
-    new_eye_areas = pd.Series([3., 5., np.nan, 9., 11.])
-    new_screen_coordinates = pd.DataFrame({
-        "y": [2., 4., np.nan, 8., 10.],
-        "x": [3., 5., np.nan, 9., 11.]
-    })
-    new_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4., np.nan, 8., 10.],
-        "x": [3., 5., np.nan, 9., 11.]
-    })
-    synced_frame_timestamps = pd.Series([3., 4., 5., 6., 7.])
-
-    return dict(
-        raw_pupil_areas=raw_pupil_areas,
-        raw_eye_areas=raw_eye_areas,
-        raw_screen_coordinates=raw_screen_coordinates,
-        raw_screen_coordinates_spherical=raw_screen_coordinates_spherical,
-        new_pupil_areas=new_pupil_areas,
-        new_eye_areas=new_eye_areas,
-        new_screen_coordinates=new_screen_coordinates,
-        new_screen_coordinates_spherical=new_screen_coordinates_spherical,
-        synced_frame_timestamps=synced_frame_timestamps
-    )
-
 @pytest.fixture
 def hdf_fixture(request, tmp_path) -> Path:
     """Creates a mock eye tracking h5 file to test loading functionality"""
