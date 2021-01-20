@@ -41,14 +41,20 @@ class BehaviorDataXforms(BehaviorBase):
         """
         data = self._behavior_stimulus_file()
         behavior_pkl_uuid = data.get("session_uuid")
+
+        behavior_session_id = self.get_behavior_session_id()
+        foraging_id = self.get_foraging_id()
+
         # Sanity check to ensure that pkl file data matches up with
         # the behavior session that the pkl file has been associated with.
         assert_err_msg = (
-            f"The behavior session UUID ({behavior_pkl_uuid}) in the behavior "
-            f"stimulus *.pkl file ({self.get_behavior_stimulus_file()}) does "
-            f"does not match the LIMS UUID ({self.foraging_id}) for "
-            f"behavior session: {self.behavior_session_id}")
-        assert behavior_pkl_uuid == self.foraging_id, assert_err_msg
+            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
+            f"behavior stimulus *.pkl file "
+            f"({self.get_behavior_stimulus_file()}) does "
+            f"does not match the foraging UUID ({foraging_id}) for "
+            f"behavior session: {behavior_session_id}")
+        assert behavior_pkl_uuid == foraging_id, assert_err_msg
+
         return behavior_pkl_uuid
 
     def get_licks(self) -> pd.DataFrame:
@@ -269,8 +275,6 @@ class BehaviorDataXforms(BehaviorBase):
             "rig_name": self.get_rig_name(),
             "sex": self.get_sex(),
             "age": self.get_age(),
-            "ophys_experiment_id": self.ophys_experiment_ids,
-            "experiment_container_id": self.ophys_container_id,
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
             "session_type": self.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
@@ -279,8 +283,11 @@ class BehaviorDataXforms(BehaviorBase):
             "LabTracks_ID": self.get_external_specimen_name(),
             "full_genotype": self.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.foraging_id,
-            "behavior_session_id": self.behavior_session_id,
-            "behavior_training_id": self.behavior_training_id,
+            "foraging_id": self.get_foraging_id(),
+            "behavior_session_id": self.get_behavior_session_id()
         }
+        if hasattr(self, "ophys_experiment_ids"):
+            metadata["ophys_experiment_id"] = self.ophys_experiment_ids
+        if hasattr(self, "ophys_container_id"):
+            metadata["experiment_container_id"] = self.ophys_container_id
         return metadata

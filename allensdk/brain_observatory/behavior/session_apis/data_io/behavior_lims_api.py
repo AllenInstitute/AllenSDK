@@ -141,6 +141,22 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         """Getter to be consistent with BehaviorOphysLimsApi."""
         return self.behavior_session_id
 
+    def get_ophys_experiment_ids(self) -> Optional[List[int]]:
+        return self.ophys_experiment_ids
+
+    def get_ophys_session_id(self) -> Optional[int]:
+        return self.ophys_session_id
+
+    def get_behavior_training_id(self) -> int:
+        """Getter to be consistent with BehaviorDataXforms."""
+        return self.behavior_training_id
+
+    def get_foraging_id(self) -> int:
+        return self.foraging_id
+
+    def get_ophys_container_id(self) -> Optional[int]:
+        return self.ophys_container_id
+
     def get_behavior_stimulus_file(self) -> str:
         """Return the path to the StimulusPickle file for a session.
         :rtype: str
