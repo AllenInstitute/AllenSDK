@@ -443,13 +443,6 @@ class BehaviorOphysSession(ParamsMixin):
         return self.api.get_eye_tracking_rig_geometry()
 
     @property
-    def eye_dlc_ellipses_path(self) -> str:
-        """Get h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal
-        reflections during experiment
-        """
-        return self.api.get_eye_dlc_ellipses_path()
-
-    @property
     def eye_gaze_mapping_file_path(self) -> str:
         """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
         return self.api.get_eye_gaze_mapping_file_path()

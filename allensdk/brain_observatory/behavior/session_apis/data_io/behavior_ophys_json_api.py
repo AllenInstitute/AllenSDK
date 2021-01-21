@@ -167,12 +167,6 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         except KeyError:
             return None
 
-    def get_eye_dlc_ellipses_path(self) -> dict:
-        """Get h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal
-        reflections during experiment
-        """
-        return self.data['eye_dlc_ellipses_path']
-
     def get_eye_tracking_rig_geometry(self) -> dict:
         """Get the eye tracking rig geometry associated with an ophys experiment"""
         return self.data['eye_tracking_rig_geometry']

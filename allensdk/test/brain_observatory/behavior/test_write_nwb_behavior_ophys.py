@@ -8,32 +8,34 @@ import pytest
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df, \
+    create_refined_eye_tracking_df
 
 
-def get_eye_gaze_data():
+@pytest.fixture
+def eye_gaze_data():
     """Returns mock eye gaze data"""
-    raw_pupil_areas = pd.Series([2., 4., 6., 8., 10.])
-    raw_eye_areas = pd.Series([3., 5., 7., 9., 11.])
+    raw_pupil_areas = pd.Series([2., 4.])
+    raw_eye_areas = pd.Series([3., 5.])
     raw_screen_coordinates = pd.DataFrame({
-        "y": [2., 4., 6., 8., 10.],
-        "x": [3., 5., 7., 9., 11.]
+        "y": [2., 4.],
+        "x": [3., 5.]
     })
     raw_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4., 6., 8., 10.],
-        "x": [3., 5., 7., 9., 11.]
+        "y": [2., 4.],
+        "x": [3., 5.]
     })
-    new_pupil_areas = pd.Series([2., 4., np.nan, 8., 10.])
-    new_eye_areas = pd.Series([3., 5., np.nan, 9., 11.])
+    new_pupil_areas = pd.Series([2., 4.])
+    new_eye_areas = pd.Series([3., 5.])
     new_screen_coordinates = pd.DataFrame({
-        "y": [2., 4., np.nan, 8., 10.],
-        "x": [3., 5., np.nan, 9., 11.]
+        "y": [2., 4.],
+        "x": [3., 5.]
     })
     new_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4., np.nan, 8., 10.],
-        "x": [3., 5., np.nan, 9., 11.]
+        "y": [2., 4.],
+        "x": [3., 5.]
     })
-    synced_frame_timestamps = pd.Series([3., 4., 5., 6., 7.])
+    synced_frame_timestamps = pd.Series([.1, .2])
 
     return dict(
         raw_pupil_areas=raw_pupil_areas,
@@ -45,6 +47,16 @@ def get_eye_gaze_data():
         new_screen_coordinates=new_screen_coordinates,
         new_screen_coordinates_spherical=new_screen_coordinates_spherical,
         synced_frame_timestamps=synced_frame_timestamps
+    )
+
+
+@pytest.fixture
+def eye_tracking_data():
+    return create_refined_eye_tracking_df(
+        np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
+                   1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15.],
+                  [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
+                   2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]])
     )
 
 
@@ -360,19 +372,14 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip):
-    eye_tracking_frame_times = pd.Series([3., 4., 5., 6., 7.])
-    eye_dlc_tracking_data = {
-        "pupil_params": create_preload_eye_tracking_df(np.full((5, 5), 1.)),
-        "cr_params": create_preload_eye_tracking_df(np.full((5, 5), 2.)),
-        "eye_params": create_preload_eye_tracking_df(np.full((5, 5), 3.))
-    }
-    eye_gaze_data = get_eye_gaze_data()
+def test_add_eye_tracking_data_to_nwbfile(nwbfile, eye_gaze_data, eye_tracking_data, roundtripper, roundtrip):
+    eye_tracking_frame_times = pd.Series([.1, .2])
 
-    nwbfile = nwb.add_eye_tracking_data_to_nwbfile(nwbfile,
-                                                   eye_tracking_frame_times,
-                                                   eye_dlc_tracking_data,
-                                                   eye_gaze_data)
+    nwbfile = nwb.add_eye_tracking_data_to_nwbfile(
+        nwbfile=nwbfile,
+        eye_tracking_frame_times=eye_tracking_frame_times,
+        eye_dlc_tracking_data=eye_tracking_data,
+        eye_gaze_data=eye_gaze_data)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
@@ -381,43 +388,25 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile, roundtripper, roundtrip):
     obtained_pupil_data = obt.get_pupil_data()
     obtained_screen_gaze_data = obt.get_screen_gaze_data(include_filtered_data=True)
 
-    expected_pupil_data = pd.DataFrame({
-        "corneal_reflection_center_x": [2.] * 5,
-        "corneal_reflection_center_y": [2.] * 5,
-        "corneal_reflection_height": [4.] * 5,
-        "corneal_reflection_width": [4.] * 5,
-        "corneal_reflection_phi": [2.] * 5,
-        "pupil_center_x": [1.] * 5,
-        "pupil_center_y": [1.] * 5,
-        "pupil_height": [2.] * 5,
-        "pupil_width": [2.] * 5,
-        "pupil_phi": [1.] * 5,
-        "eye_center_x": [3.] * 5,
-        "eye_center_y": [3.] * 5,
-        "eye_height": [6.] * 5,
-        "eye_width": [6.] * 5,
-        "eye_phi": [3.] * 5
-    },
-        index=[3., 4., 5., 6., 7.]
-    )
     pd.testing.assert_frame_equal(obtained_pupil_data,
-                                  expected_pupil_data, check_like=True)
+                                  eye_tracking_data, check_like=True)
 
-    expected_gaze_data = pd.DataFrame({
-        "raw_eye_area": [3., 5., 7., 9., 11.],
-        "raw_pupil_area": [2., 4., 6., 8., 10.],
-        "raw_screen_coordinates_x_cm": [3., 5., 7., 9., 11.],
-        "raw_screen_coordinates_y_cm": [2., 4., 6., 8., 10.],
-        "raw_screen_coordinates_spherical_x_deg": [3., 5., 7., 9., 11.],
-        "raw_screen_coordinates_spherical_y_deg": [2., 4., 6., 8., 10.],
-        "filtered_eye_area": [3., 5., np.nan, 9., 11.],
-        "filtered_pupil_area": [2., 4., np.nan, 8., 10.],
-        "filtered_screen_coordinates_x_cm": [3., 5., np.nan, 9., 11.],
-        "filtered_screen_coordinates_y_cm": [2., 4., np.nan, 8., 10.],
-        "filtered_screen_coordinates_spherical_x_deg": [3., 5., np.nan, 9., 11.],
-        "filtered_screen_coordinates_spherical_y_deg": [2., 4., np.nan, 8., 10.]
-    },
-        index=[3., 4., 5., 6., 7.]
-    )
+    expected_gaze_data = pd.DataFrame(eye_gaze_data)
+    expected_gaze_data = expected_gaze_data.drop([c for c in expected_gaze_data if 'screen_coordinates' in c], axis=1)
+    expected_gaze_data = expected_gaze_data.drop('synced_frame_timestamps', axis=1)
+
+    expected_gaze_data = expected_gaze_data.rename(columns={c: c.replace('new_', 'filtered_') for c in expected_gaze_data})
+    expected_gaze_data = expected_gaze_data.rename(columns={c: c.replace('areas', 'area') for c in expected_gaze_data})
+    expected_gaze_data['raw_screen_coordinates_x_cm'] = eye_gaze_data['raw_screen_coordinates']['x']
+    expected_gaze_data['raw_screen_coordinates_y_cm'] = eye_gaze_data['raw_screen_coordinates']['y']
+    expected_gaze_data['raw_screen_coordinates_spherical_x_deg'] = eye_gaze_data['raw_screen_coordinates_spherical']['x']
+    expected_gaze_data['raw_screen_coordinates_spherical_y_deg'] = eye_gaze_data['raw_screen_coordinates_spherical']['y']
+
+    expected_gaze_data['filtered_screen_coordinates_x_cm'] = eye_gaze_data['new_screen_coordinates']['x']
+    expected_gaze_data['filtered_screen_coordinates_y_cm'] = eye_gaze_data['new_screen_coordinates']['y']
+    expected_gaze_data['filtered_screen_coordinates_spherical_x_deg'] = eye_gaze_data['new_screen_coordinates_spherical']['x']
+    expected_gaze_data['filtered_screen_coordinates_spherical_y_deg'] = eye_gaze_data['new_screen_coordinates_spherical']['y']
+
+    expected_gaze_data = expected_gaze_data.set_index(eye_gaze_data['synced_frame_timestamps'])
     pd.testing.assert_frame_equal(obtained_screen_gaze_data,
                                   expected_gaze_data, check_like=True)

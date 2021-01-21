@@ -135,7 +135,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
 
         # Add eye tracking to NWB in-memory object:
         self._add_eye_tracking_data_to_nwb(nwbfile=nwbfile,
-                                           eye_dlc_ellipses_path=session_object.eye_dlc_ellipses_path,
+                                           eye_tracking=session_object.eye_tracking,
                                            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
                                            eye_gaze_mapping_file_path=session_object.eye_gaze_mapping_file_path,
                                            session_sync_file=session_object.sync_file)
@@ -445,53 +445,56 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         cr_ellipse_fits = et_mod.get_data_interface("cr_ellipse_fits").to_dataframe()
         eye_ellipse_fits = et_mod.get_data_interface("eye_ellipse_fits").to_dataframe()
         pupil_ellipse_fits = et_mod.get_data_interface("pupil_ellipse_fits").to_dataframe()
+        likely_blink = et_mod.get_data_interface("likely_blink").data[()]
 
-        # NOTE: ellipse fit "height" and "width" parameters describe the
-        # "half-height" and "half-width" of fitted ellipse.
         eye_tracking_data = {
-            "corneal_reflection_center_x": cr_ellipse_fits["center_x"].values,
-            "corneal_reflection_center_y": cr_ellipse_fits["center_y"].values,
-            "corneal_reflection_height": 2 * cr_ellipse_fits["height"].values,
-            "corneal_reflection_width": 2 * cr_ellipse_fits["width"].values,
-            "corneal_reflection_phi": cr_ellipse_fits["phi"].values,
+            "cr_area": cr_ellipse_fits["cr_area"].values,
+            "cr_center_x": cr_ellipse_fits["cr_center_x"].values,
+            "cr_center_y": cr_ellipse_fits["cr_center_y"].values,
+            "cr_height": cr_ellipse_fits["cr_height"].values,
+            "cr_width": cr_ellipse_fits["cr_width"].values,
+            "cr_phi": cr_ellipse_fits["cr_phi"].values,
 
-            "pupil_center_x": pupil_ellipse_fits["center_x"].values,
-            "pupil_center_y": pupil_ellipse_fits["center_y"].values,
-            "pupil_height": 2 * pupil_ellipse_fits["height"].values,
-            "pupil_width": 2 * pupil_ellipse_fits["width"].values,
-            "pupil_phi": pupil_ellipse_fits["phi"].values,
+            "pupil_area": pupil_ellipse_fits["pupil_area"].values,
+            "pupil_center_x": pupil_ellipse_fits["pupil_center_x"].values,
+            "pupil_center_y": pupil_ellipse_fits["pupil_center_y"].values,
+            "pupil_height": pupil_ellipse_fits["pupil_height"].values,
+            "pupil_width": pupil_ellipse_fits["pupil_width"].values,
+            "pupil_phi": pupil_ellipse_fits["pupil_phi"].values,
 
-            "eye_center_x": eye_ellipse_fits["center_x"].values,
-            "eye_center_y": eye_ellipse_fits["center_y"].values,
-            "eye_height": 2 * eye_ellipse_fits["height"].values,
-            "eye_width": 2 * eye_ellipse_fits["width"].values,
-            "eye_phi": eye_ellipse_fits["phi"].values
+            "eye_area": eye_ellipse_fits["eye_area"].values,
+            "eye_center_x": eye_ellipse_fits["eye_center_x"].values,
+            "eye_center_y": eye_ellipse_fits["eye_center_y"].values,
+            "eye_height": eye_ellipse_fits["eye_height"].values,
+            "eye_width": eye_ellipse_fits["eye_width"].values,
+            "eye_phi": eye_ellipse_fits["eye_phi"].values,
+
+            "likely_blink": likely_blink
         }
 
         timestamps = rgm_mod.get_data_interface("eye_area").timestamps[:]
-        index = pd.Index(data=timestamps, name="Time (s)")
-        return pd.DataFrame(eye_tracking_data, index=index)
+        eye_tracking_data['time'] = timestamps
+        eye_tracking_data = pd.DataFrame(eye_tracking_data)
+        eye_tracking_data.index = eye_tracking_data.index.rename('frame')
+        return eye_tracking_data
 
     @staticmethod
-    def _add_eye_tracking_data_to_nwb(nwbfile: NWBFile,
-                                      eye_dlc_ellipses_path: str,
-                                      eye_tracking_rig_geometry: dict,
-                                      eye_gaze_mapping_file_path: str,
-                                      session_sync_file: Path):
+    def _add_eye_tracking_data_to_nwb(nwbfile: NWBFile, eye_tracking: pd.DataFrame, eye_tracking_rig_geometry: dict,
+                                      eye_gaze_mapping_file_path: str, session_sync_file: Path):
         nwb.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
                                                           eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
         # Collect eye tracking/gaze mapping data from files
         eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_file,
                                                                    sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
-        eye_dlc_tracking_data = nwb.read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
 
         if eye_gaze_mapping_file_path:
             eye_gaze_data = nwb.read_eye_gaze_mappings(Path(eye_gaze_mapping_file_path))
         else:
             eye_gaze_data = None
 
-        nwb.add_eye_tracking_data_to_nwbfile(nwbfile,
-                                             eye_tracking_frame_times,
-                                             eye_dlc_tracking_data,
-                                             eye_gaze_data)
+        nwb.add_eye_tracking_data_to_nwbfile(
+            nwbfile=nwbfile,
+            eye_tracking_frame_times=eye_tracking_frame_times,
+            eye_dlc_tracking_data=eye_tracking,
+            eye_gaze_data=eye_gaze_data)
