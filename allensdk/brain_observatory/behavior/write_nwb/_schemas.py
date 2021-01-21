@@ -51,12 +51,6 @@ class SessionData(RaisingSchema):
         required=True,
         description="Mapping containing information about session rig geometry used for eye gaze mapping."
     )
-    eye_dlc_ellipses_path = String(
-        required=True,
-        validate=check_read_access,
-        description="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal "
-                    "reflections during experiment"
-    )
     eye_gaze_mapping_path = String(
         required=True,
         validate=check_read_access,
