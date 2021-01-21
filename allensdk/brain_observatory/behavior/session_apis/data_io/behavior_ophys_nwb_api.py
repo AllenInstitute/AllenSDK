@@ -425,6 +425,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         Returns
         -------
         pd.DataFrame
+            *_area
             *_center_x
             *_center_y
             *_height
@@ -432,6 +433,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
             *_width
 
             where "*" can be "corneal", "pupil" or "eye"
+
+            likely_blink
 
         or None if no eye tracking data
         """
