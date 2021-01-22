@@ -13,10 +13,13 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_running_data_df_to_nwbfile(nwbfile, running_data_df, roundtrip, roundtripper):
+    # Just make it different from running_data_df
+    running_data_df_unfiltered = running_data_df.copy()
+    running_data_df_unfiltered['speed'] = running_data_df['speed'] * 2
 
     unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
     nwbfile = nwb.add_running_data_dfs_to_nwbfile(nwbfile, running_data_df=running_data_df,
-                                                  running_data_df_unfiltered=running_data_df, unit_dict=unit_dict)
+                                                  running_data_df_unfiltered=running_data_df_unfiltered, unit_dict=unit_dict)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
@@ -24,7 +27,7 @@ def test_add_running_data_df_to_nwbfile(nwbfile, running_data_df, roundtrip, rou
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(running_data_df, obt.get_running_data_df(lowpass=True))
-    pd.testing.assert_frame_equal(running_data_df, obt.get_running_data_df(lowpass=False))
+    pd.testing.assert_frame_equal(running_data_df_unfiltered, obt.get_running_data_df(lowpass=False))
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
