@@ -34,13 +34,13 @@ where cr.ophys_experiment_id = %d
 """ % experiment_id)
 
     nrois = { roi['id']: dict(width=roi['width'],
-                              height=roi['height'], 
+                              height=roi['height'],
                               x=roi['x'],
                               y=roi['y'],
                               id=roi['id'],
                               valid=roi['valid_roi'],
                               mask=roi['mask_matrix'],
-                              exclusion_labels=[]) 
+                              exclusion_labels=[])
               for roi in rois }
 
     for exc_label in exc_labels:
@@ -48,12 +48,12 @@ where cr.ophys_experiment_id = %d
 
     movie_path_response = lu.query('''
         select wkf.filename, wkf.storage_directory from well_known_files wkf
-        join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id 
+        join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
         where wkf.attachable_id = {} and wkf.attachable_type = 'OphysExperiment'
         and wkft.name = 'MotionCorrectedImageStack'
     '''.format(experiment_id))
     movie_h5_path = os.path.join(movie_path_response[0]['storage_directory'], movie_path_response[0]['filename'])
-        
+
     exp_dir = os.path.join(OUTPUT_DIRECTORY, str(experiment_id))
 
     input_data = {
@@ -62,9 +62,9 @@ where cr.ophys_experiment_id = %d
         "roi_masks": nrois.values(),
         "output_file": os.path.join(exp_dir, "demixed_traces.h5")
         }
- 
-    run_module(SCRIPT, 
-               input_data, 
+
+    run_module(SCRIPT,
+               input_data,
                exp_dir,
                sdk_path=SDK_PATH,
                pbs=dict(vmem=160,
@@ -135,7 +135,7 @@ def main():
     logging.debug("reading input")
 
     traces, masks, valid, trace_ids, movie_h5, output_h5 = parse_input(data, mod.args.exclude_labels)
-    
+
     logging.debug("excluded masks: %s", str(zip(np.where(~valid)[0], trace_ids[~valid])))
     output_dir = os.path.dirname(output_h5)
     plot_dir = os.path.join(output_dir, "demix_plots")
@@ -154,9 +154,9 @@ def main():
 
     logging.debug("demixing")
     demixed_traces, drop_frames = demixer.demix_time_dep_masks(demix_traces, movie, demix_masks)
-    
-    nt_inds = demixer.plot_negative_transients(demix_traces, 
-                                               demixed_traces, 
+
+    nt_inds = demixer.plot_negative_transients(demix_traces,
+                                               demixed_traces,
                                                valid[valid_idxs],
                                                demix_masks,
                                                trace_ids[valid_idxs],
@@ -164,17 +164,17 @@ def main():
 
     logging.debug("rois with negative transients: %s", str(trace_ids[valid_idxs][nt_inds]))
 
-    nb_inds = demixer.plot_negative_baselines(demix_traces, 
-                                              demixed_traces, 
+    nb_inds = demixer.plot_negative_baselines(demix_traces,
+                                              demixed_traces,
                                               demix_masks,
                                               trace_ids[valid_idxs],
                                               plot_dir)
 
-    # negative baseline rois (and those that overlap with them) become nans 
+    # negative baseline rois (and those that overlap with them) become nans
     logging.debug("rois with negative baselines (or overlap with them): %s", str(trace_ids[valid_idxs][nb_inds]))
     demixed_traces[nb_inds, :] = np.nan
 
-    logging.info("Saving output")    
+    logging.info("Saving output")
     out_traces = np.zeros(traces.shape, dtype=demix_traces.dtype)
     out_traces[:] = np.nan
     out_traces[valid_idxs] = demixed_traces
