@@ -16,7 +16,12 @@ from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import logging
 
-EXCLUDE_LABELS = ["union", "duplicate", "motion_border" ]
+EXCLUDE_LABELS = ["union", "duplicate", "motion_border",
+                  "decrosstalk_ghost",
+                  "decrosstalk_invalid_raw",
+                  "decrosstalk_invalid_raw_active",
+                  "decrosstalk_invalid_unmixed",
+                  "decrosstalk_invalid_unmixed_active" ]
 
 def debug(experiment_id, local=False):
     OUTPUT_DIRECTORY = "/data/informatics/CAM/demix"
