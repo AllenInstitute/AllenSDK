@@ -104,8 +104,8 @@ def parse_input(data, exclude_labels):
         movie_shape = f["data"].shape[1:]
 
     with h5py.File(traces_h5, "r") as f:
-        traces = f["data"].value
-        trace_ids = [ int(rid) for rid in f["roi_names"].value ]
+        traces = f["data"][()]
+        trace_ids = [ int(rid) for rid in f["roi_names"][()] ]
 
     rois = get_path(data, "roi_masks", False)
     masks = None
@@ -150,7 +150,7 @@ def main():
 
     logging.debug("reading movie")
     with h5py.File(movie_h5, 'r') as f:
-        movie = f['data'].value
+        movie = f['data'][()]
 
     # only demix non-union, non-duplicate ROIs
     valid_idxs = np.where(valid)
