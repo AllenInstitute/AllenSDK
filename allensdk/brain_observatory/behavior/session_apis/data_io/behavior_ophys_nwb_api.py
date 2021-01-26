@@ -61,9 +61,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         # Add running data to NWB in-memory object:
         unit_dict = {'v_sig': 'V', 'v_in': 'V',
                      'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-        nwb.add_running_data_df_to_nwbfile(nwbfile,
-                                           session_object.running_data_df,
-                                           unit_dict)
+        nwb.add_running_data_dfs_to_nwbfile(nwbfile,
+                                            session_object.running_data_df,
+                                            session_object.raw_running_data_df,
+                                            unit_dict)
 
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
@@ -148,9 +149,22 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
     def get_eye_tracking(self) -> int:
         raise NotImplementedError()
 
-    def get_running_data_df(self, **kwargs) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
+        """
+        Gets the running data df
+        Parameters
+        ----------
+        lowpass: bool
+            Whether to return running speed with or without low pass filter applied
 
-        running_speed = self.get_running_speed()
+        Returns
+        -------
+            pd.DataFrame:
+                Dataframe containing various signals used to compute running
+                speed, and the filtered or unfiltered speed.
+        """
+
+        running_speed = self.get_running_speed(lowpass=lowpass)
 
         running_data_df = pd.DataFrame({'speed': running_speed.values},
                                        index=pd.Index(running_speed.timestamps,
