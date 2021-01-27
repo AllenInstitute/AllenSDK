@@ -266,7 +266,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
 
         # Because pynwb stores this field as "image_mask", it is renamed here
         df = df.rename(columns={'image_mask': 'roi_mask'})
-        
+
         df.index.rename('cell_roi_id', inplace=True)
         df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
 
