@@ -70,8 +70,7 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
     def get_ophys_timestamps(self):
         ophys_timestamps = self.get_sync_data()['ophys_frames']
 
-        (dff_roi_names,
-         dff_traces) = self.get_raw_dff_data()
+        dff_traces = self.get_raw_dff_data()
 
         plane_group = self.get_imaging_plane_group()
 
@@ -209,10 +208,12 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
     def get_raw_dff_data(self):
         dff_path = self.get_dff_file()
         with h5py.File(dff_path, 'r') as raw_file:
-            dff_traces = np.asarray(raw_file['data'])
-            roi_names = np.asarray(raw_file['roi_names'])
+            raw_dff_traces = np.asarray(raw_file['data'])
+            roi_names = np.asarray(raw_file['roi_names']).astype(int)
 
-        cell_roi_id_list = self.get_cell_roi_ids()
+        # guarantee that DFF traces are ordered the same
+        # way as ROIs in the cell_specimen_table
+        cell_roi_id_list = self.get_cell_roi_ids().astype(int)
 
         if not np.in1d(roi_names, cell_roi_id_list).all():
             raise RuntimeError("DFF traces contains ROI IDs that "
@@ -221,15 +222,21 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
             raise RuntimeError("cell_specimen_table contains ROI IDs "
                                "that are not in DFF traces file")
 
-        return roi_names, dff_traces
+        dff_traces = np.zeros(raw_dff_traces.shape, dtype=float)
+        for ii in range(dff_traces.shape[0]):
+            idx = np.where(cell_roi_id_list==roi_names[ii])[0][0]
+            dff_traces[idx,:] = raw_dff_traces[ii, :]
+
+        return dff_traces
 
     @memoize
     def get_dff_traces(self):
-        (dff_roi_names,
-         dff_traces) = self.get_raw_dff_data()
+        dff_traces = self.get_raw_dff_data()
+
+        cell_roi_id_list = self.get_cell_roi_ids()
 
         df = pd.DataFrame({'dff': [x for x in dff_traces]},
-                          index=pd.Index(dff_roi_names.astype(int),
+                          index=pd.Index(cell_roi_id_list,
                           name='cell_roi_id'))
 
         cell_specimen_table = self.get_cell_specimen_table()
