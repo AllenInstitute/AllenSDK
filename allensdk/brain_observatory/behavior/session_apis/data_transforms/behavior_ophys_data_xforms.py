@@ -58,7 +58,7 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
             curr_roi.mask = np.array(table_row['image_mask'])
             image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
 
-        cell_specimen_table['image_mask'] = image_mask_list
+        cell_specimen_table['roi_mask'] = image_mask_list
         cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
 
         cell_specimen_table.index.rename('cell_roi_id', inplace=True)

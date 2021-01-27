@@ -196,7 +196,7 @@ def cell_specimen_table():
                          'max_correction_right': [1., 1.],
                          'mask_image_plane': [1, 1],
                          'ophys_cell_segmentation_run_id': [1, 1],
-                         'image_mask': [np.array([[True, True],
+                         'roi_mask': [np.array([[True, True],
                                                   [True, False]]),
                                         np.array([[True, True],
                                                   [False, True]])]},
