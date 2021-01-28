@@ -1,6 +1,8 @@
 import pytest
 import pandas as pd
 import numpy as np
+import h5py
+import os
 from contextlib import contextmanager
 
 from allensdk.internal.api import OneResultExpectedError
@@ -138,3 +140,34 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
         actual = api.get_ophys_timestamps()
         if expected is not None:
             np.testing.assert_array_equal(expected, actual)
+
+
+def test_dff_trace_order(monkeypatch, tmpdir):
+
+    out_fname = os.path.join(tmpdir, 'dummy_dff_data.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((5, n_t))
+    roi_names = np.array([5,3,4,2,1])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_roi_ids',
+                       lambda x: np.array([1,2,3,4,5]))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_dff_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    dff_traces = api.get_raw_dff_data()
+
+    # compare the returned traces with the input data
+    # mapping to the order of the monkeypatched cell_roi_id list
+    np.testing.assert_array_almost_equal(dff_traces[0,:], data[4,:], decimal=10)
+    np.testing.assert_array_almost_equal(dff_traces[1,:], data[3,:], decimal=10)
+    np.testing.assert_array_almost_equal(dff_traces[2,:], data[1,:], decimal=10)
+    np.testing.assert_array_almost_equal(dff_traces[3,:], data[2,:], decimal=10)
+    np.testing.assert_array_almost_equal(dff_traces[4,:], data[0,:], decimal=10)
