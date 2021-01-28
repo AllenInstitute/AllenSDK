@@ -277,3 +277,89 @@ def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
         np.testing.assert_array_almost_equal(cell[colname].values[0],
                                              data[roi_to_dex[roi_id]],
                                              decimal=10)
+
+
+def test_corrected_fluorescence_trace_exceptions(monkeypatch, tmpdir):
+    """
+    Test that BehaviorOphysLimsApi.get_corrected_fluorescence_traces
+    raises exceptions when the trace file and cell_specimen_table have
+    different ROI IDs
+
+    Check case where cell_specimen_table has an ROI that
+    the fluorescence traces do not
+    """
+
+    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data_exc.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((4, n_t))
+    roi_names = np.array([5,3,4,2])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    cell_data = {'junk':[6,7,8,9,10],
+                 'cell_roi_id':[b'1',b'2',b'3',b'4',b'5']}
+
+    cell_table = pd.DataFrame(data=cell_data,
+                              index=pd.Index([10,20,30,40,50],
+                                             name='cell_specimen_id'))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_ophys_timestamps',
+                        lambda x: np.zeros(n_t))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_specimen_table',
+                       lambda x: cell_table)
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_demix_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    with pytest.raises(RuntimeError):
+        f_traces = api.get_corrected_fluorescence_traces()
+
+
+def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
+    """
+    Test that BehaviorOphysLimsApi.get_corrected_fluorescence_traces
+    raises exceptions when the trace file and cell_specimen_table have
+    different ROI IDs
+
+    Check case where fluorescence traces have an ROI that
+    the cell_specimen_table does not
+    """
+
+    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data_exc2.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((5, n_t))
+    roi_names = np.array([1,5,3,4,2])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    cell_data = {'junk':[6,7,8,9,10,11],
+                 'cell_roi_id':[b'1',b'2',b'3',b'4',b'5',b'6']}
+
+    cell_table = pd.DataFrame(data=cell_data,
+                              index=pd.Index([10,20,30,40,50,60],
+                                             name='cell_specimen_id'))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_ophys_timestamps',
+                        lambda x: np.zeros(n_t))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_specimen_table',
+                       lambda x: cell_table)
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_demix_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    with pytest.raises(RuntimeError):
+        f_traces = api.get_corrected_fluorescence_traces()
