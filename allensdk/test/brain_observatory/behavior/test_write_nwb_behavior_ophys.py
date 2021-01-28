@@ -51,6 +51,17 @@ def eye_gaze_data():
 
 
 @pytest.fixture
+def rig_geometry():
+    """Returns mock rig geometry data"""
+    return {"monitor_position_mm": [1., 2., 3.],
+     "monitor_rotation_deg": [4., 5., 6.],
+     "camera_position_mm": [7., 8., 9.],
+     "camera_rotation_deg": [10., 11., 12.],
+     "led_position": [13., 14., 15.],
+     "equipment": "test_rig"}
+
+
+@pytest.fixture
 def eye_tracking_data():
     return create_refined_eye_tracking_df(
         np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
@@ -338,16 +349,8 @@ def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correcti
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-@pytest.mark.parametrize("eye_tracking_rig_geometry, expected", [
-    ({"monitor_position_mm": [1., 2., 3.],
-      "monitor_rotation_deg": [4., 5., 6.],
-      "camera_position_mm": [7., 8., 9.],
-      "camera_rotation_deg": [10., 11., 12.],
-      "led_position": [13., 14., 15.],
-      "equipment": "test_rig"},
-
-     #  Expected
-     {"geometry": pd.DataFrame({"monitor_position_mm": [1., 2., 3.],
+@pytest.mark.parametrize("expected", [
+    ({"geometry": pd.DataFrame({"monitor_position_mm": [1., 2., 3.],
                                 "monitor_rotation_deg": [4., 5., 6.],
                                 "camera_position_mm": [7., 8., 9.],
                                 "camera_rotation_deg": [10., 11., 12.],
@@ -357,10 +360,10 @@ def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correcti
 ])
 def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
                                                        roundtrip,
-                                                       eye_tracking_rig_geometry,
+                                                       rig_geometry,
                                                        expected):
     nwbfile = nwb.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
-                                                                eye_tracking_rig_geometry)
+                                                                rig_geometry)
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
@@ -372,41 +375,18 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-def test_add_eye_tracking_data_to_nwbfile(nwbfile, eye_gaze_data, eye_tracking_data, roundtripper, roundtrip):
-    eye_tracking_frame_times = pd.Series([.1, .2])
-
-    nwbfile = nwb.add_eye_tracking_data_to_nwbfile(
+def test_add_eye_tracking_data_to_nwbfile(tmp_path, nwbfile, eye_tracking_data, rig_geometry,
+                                          roundtripper, roundtrip):
+    nwbfile = BehaviorOphysNwbApi.add_eye_tracking_data_to_nwb(
         nwbfile=nwbfile,
-        eye_tracking_frame_times=eye_tracking_frame_times,
-        eye_dlc_tracking_data=eye_tracking_data,
-        eye_gaze_data=eye_gaze_data)
-
+        eye_tracking_df=eye_tracking_data,
+        eye_tracking_rig_geometry=rig_geometry
+    )
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-    obtained_pupil_data = obt.get_pupil_data()
-    obtained_screen_gaze_data = obt.get_screen_gaze_data(include_filtered_data=True)
+    obtained = obt.get_eye_tracking()
 
-    pd.testing.assert_frame_equal(obtained_pupil_data,
+    pd.testing.assert_frame_equal(obtained,
                                   eye_tracking_data, check_like=True)
-
-    expected_gaze_data = pd.DataFrame(eye_gaze_data)
-    expected_gaze_data = expected_gaze_data.drop([c for c in expected_gaze_data if 'screen_coordinates' in c], axis=1)
-    expected_gaze_data = expected_gaze_data.drop('synced_frame_timestamps', axis=1)
-
-    expected_gaze_data = expected_gaze_data.rename(columns={c: c.replace('new_', 'filtered_') for c in expected_gaze_data})
-    expected_gaze_data = expected_gaze_data.rename(columns={c: c.replace('areas', 'area') for c in expected_gaze_data})
-    expected_gaze_data['raw_screen_coordinates_x_cm'] = eye_gaze_data['raw_screen_coordinates']['x']
-    expected_gaze_data['raw_screen_coordinates_y_cm'] = eye_gaze_data['raw_screen_coordinates']['y']
-    expected_gaze_data['raw_screen_coordinates_spherical_x_deg'] = eye_gaze_data['raw_screen_coordinates_spherical']['x']
-    expected_gaze_data['raw_screen_coordinates_spherical_y_deg'] = eye_gaze_data['raw_screen_coordinates_spherical']['y']
-
-    expected_gaze_data['filtered_screen_coordinates_x_cm'] = eye_gaze_data['new_screen_coordinates']['x']
-    expected_gaze_data['filtered_screen_coordinates_y_cm'] = eye_gaze_data['new_screen_coordinates']['y']
-    expected_gaze_data['filtered_screen_coordinates_spherical_x_deg'] = eye_gaze_data['new_screen_coordinates_spherical']['x']
-    expected_gaze_data['filtered_screen_coordinates_spherical_y_deg'] = eye_gaze_data['new_screen_coordinates_spherical']['y']
-
-    expected_gaze_data = expected_gaze_data.set_index(eye_gaze_data['synced_frame_timestamps'])
-    pd.testing.assert_frame_equal(obtained_screen_gaze_data,
-                                  expected_gaze_data, check_like=True)

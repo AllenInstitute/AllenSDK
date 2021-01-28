@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable, Dict
+from typing import Iterable
 
 import h5py
 import marshmallow
@@ -347,31 +347,6 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: NWBFile,
 
     eye_tracking_rig_mod.add_data_interface(rig_metadata)
     nwbfile.add_processing_module(eye_tracking_rig_mod)
-
-    return nwbfile
-
-
-def add_eye_tracking_data_to_nwbfile(nwbfile: pynwb.NWBFile,
-                                     eye_tracking_frame_times: pd.Series,
-                                     eye_dlc_tracking_data: pd.DataFrame,
-                                     eye_gaze_data: Dict[str, pd.DataFrame]) -> pynwb.NWBFile:
-    eye_tracking = {
-        'pupil_params': eye_dlc_tracking_data[[c for c in eye_dlc_tracking_data if c.startswith('pupil')]],
-        'cr_params': eye_dlc_tracking_data[[c for c in eye_dlc_tracking_data if c.startswith('cr')]],
-        'eye_params': eye_dlc_tracking_data[[c for c in eye_dlc_tracking_data if c.startswith('eye')]]
-    }
-
-    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_tracking,
-                                  synced_timestamps=eye_tracking_frame_times):
-        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
-                                                     eye_dlc_tracking_data=eye_tracking,
-                                                     synced_timestamps=eye_tracking_frame_times,
-                                                     likely_blink=eye_dlc_tracking_data['likely_blink'].values)
-
-        # --- Add gaze mapped positions to nwb file ---
-        if eye_gaze_data:
-            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
-                                                 eye_gaze_data=eye_gaze_data)
 
     return nwbfile
 
