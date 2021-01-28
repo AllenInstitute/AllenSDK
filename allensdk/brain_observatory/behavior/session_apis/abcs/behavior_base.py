@@ -27,7 +27,7 @@ class BehaviorBase(abc.ABC):
 
         Returns
         -------
-        np.ndarray
+        pd.Dataframe
             A dataframe containing lick timestamps.
         """
         raise NotImplementedError()

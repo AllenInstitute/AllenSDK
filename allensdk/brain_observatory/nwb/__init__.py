@@ -16,8 +16,8 @@ from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
+from ndx_events import Events
 
-import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
@@ -627,19 +627,15 @@ def add_trials(nwbfile, trials, description_dict={}):
 
 def add_licks(nwbfile, licks):
 
-    licks_event_series = TimeSeries(
-        data=licks.time.values,
-        name='timestamps',
+    lick_events = Events(
         timestamps=licks.time.values,
-        unit='s'
+        name='licks',
+        description='Timestamps for lick events'
     )
-
-    # Add lick event timeseries to lick interface:
-    licks_interface = BehavioralEvents([licks_event_series], 'licks')
 
     # Add lick interface to nwb file, by way of a processing module:
     licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
-    licks_mod.add_data_interface(licks_interface)
+    licks_mod.add_data_interface(lick_events)
     nwbfile.add_processing_module(licks_mod)
 
     return nwbfile
