@@ -223,9 +223,9 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
                                "that are not in DFF traces file")
 
         dff_traces = np.zeros(raw_dff_traces.shape, dtype=float)
-        for ii in range(dff_traces.shape[0]):
-            idx = np.where(cell_roi_id_list==roi_names[ii])[0][0]
-            dff_traces[idx,:] = raw_dff_traces[ii, :]
+        for raw_trace, roi_id in zip(raw_dff_traces, roi_names):
+            idx = np.where(cell_roi_id_list==roi_id)[0][0]
+            dff_traces[idx,:] = raw_trace
 
         return dff_traces
 
