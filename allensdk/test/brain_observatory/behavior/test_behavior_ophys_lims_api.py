@@ -143,6 +143,10 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
 
 
 def test_dff_trace_order(monkeypatch, tmpdir):
+    """
+    Test that BehaviorOphysLimsApi.get_raw_dff_data can reorder
+    ROIs to align with what is in the cell_specimen_table
+    """
 
     out_fname = os.path.join(tmpdir, 'dummy_dff_data.h5')
     rng = np.random.RandomState(1234)
@@ -174,6 +178,10 @@ def test_dff_trace_order(monkeypatch, tmpdir):
 
 
 def test_dff_trace_exceptions(monkeypatch, tmpdir):
+    """
+    Test that BehaviorOphysLimsApi.get_raw_dff_data() raises exceptions when
+    dff trace file and cell_specimen_table contain different ROI IDs
+    """
 
     # check that an exception is raised if dff_traces has an ROI ID
     # that cell_specimen_table does not
