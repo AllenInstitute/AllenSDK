@@ -378,37 +378,48 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
         unit=unit
     )
 
-    running_mod = ProcessingModule('running', 'Running speed processing module')
-    nwbfile.add_processing_module(running_mod)
+    if 'running' in nwbfile.processing:
+        running_mod = nwbfile.processing['running']
+    else:
+        running_mod = ProcessingModule('running', 'Running speed processing module')
+        nwbfile.add_processing_module(running_mod)
 
     running_mod.add_data_interface(running_speed_series)
 
     return nwbfile
 
 
-def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_key='timestamps'):
-    ''' Adds running speed data to an NWBFile as timeseries in acquisition and processing
+def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_unfiltered, unit_dict):
+    """Adds both unfiltered (raw) and filtered running speed data to an NWBFile as timeseries in acquisition and processing
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : pandas.DataFrame
-        Contains 'speed' and 'times', 'v_in', 'vsig', 'dx'
-    unit : str, optional
+        File to which running speeds will be written
+    running_data_df : pandas.DataFrame
+        Filtered running data
+        Contains 'speed', 'v_in', 'vsig', 'dx'
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df_unfiltered
+    running_data_df_unfiltered : pandas.DataFrame
+        Unfiltered (raw) Running data
+        Contains 'speed', 'v_in', 'vsig', 'dx'
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df
+    unit_dict : dict, optional
         SI units of running speed values
 
     Returns
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
-    assert running_data_df.index.name == index_key
-
+    """
     running_speed = RunningSpeed(timestamps=running_data_df.index.values,
                                  values=running_data_df['speed'].values)
 
+    running_speed_unfiltered = RunningSpeed(timestamps=running_data_df_unfiltered.index.values,
+                                            values=running_data_df_unfiltered['speed'].values)
+
     add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered, name='speed_unfiltered', unit=unit_dict['speed'])
 
     running_mod = nwbfile.processing['running']
     timestamps_ts = running_mod.get_data_interface('speed').timestamps

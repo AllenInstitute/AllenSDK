@@ -447,12 +447,6 @@ class BehaviorOphysSession(ParamsMixin):
         """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
         return self.api.get_eye_gaze_mapping_file_path()
 
-    @property
-    def sync_file(self) -> str:
-        """Get the filepath of the sync timing file associated with the
-        ophys experiment"""
-        return self.api.get_sync_file()
-
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:
