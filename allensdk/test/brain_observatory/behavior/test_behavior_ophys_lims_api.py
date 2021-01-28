@@ -171,3 +171,52 @@ def test_dff_trace_order(monkeypatch, tmpdir):
     np.testing.assert_array_almost_equal(dff_traces[2,:], data[1,:], decimal=10)
     np.testing.assert_array_almost_equal(dff_traces[3,:], data[2,:], decimal=10)
     np.testing.assert_array_almost_equal(dff_traces[4,:], data[0,:], decimal=10)
+
+
+def test_dff_trace_exceptions(monkeypatch, tmpdir):
+
+    # check that an exception is raised if dff_traces has an ROI ID
+    # that cell_specimen_table does not
+    out_fname = os.path.join(tmpdir, 'dummy_dff_data_for_exceptions.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((5, n_t))
+    roi_names = np.array([5,3,4,2,1])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_roi_ids',
+                       lambda x: np.array([1,3,4,5]))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_dff_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    with pytest.raises(RuntimeError):
+        dff_traces = api.get_raw_dff_data()
+
+    # check that an exception is raised if the cell_specimen_table
+    # has an ROI ID that dff_traces does not
+    out_fname = os.path.join(tmpdir, 'dummy_dff_data_for_exceptions2.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((5, n_t))
+    roi_names = np.array([5,3,4,2,1])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_roi_ids',
+                       lambda x: np.array([1,2,3,4,5,6]))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_dff_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    with pytest.raises(RuntimeError):
+        dff_traces = api.get_raw_dff_data()
