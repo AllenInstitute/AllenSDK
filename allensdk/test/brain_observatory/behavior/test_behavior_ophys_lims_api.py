@@ -228,3 +228,52 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
     api = BehaviorOphysLimsApi(123)
     with pytest.raises(RuntimeError):
         dff_traces = api.get_raw_dff_data()
+
+
+def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
+    """
+    Test that BehaviorOphysLimsApi.get_corrected_fluorescence_traces
+    can reorder ROIs to align with what is in the cell_specimen_table
+    """
+
+    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data.h5')
+    rng = np.random.RandomState(1234)
+    n_t = 100
+    data = rng.random_sample((5, n_t))
+    roi_names = np.array([5,3,4,2,1])
+    with h5py.File(out_fname, 'w') as out_file:
+        out_file.create_dataset('data', data=data)
+        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    cell_data = {'junk':[6,7,8,9,10],
+                 'cell_roi_id':[b'1',b'2',b'3',b'4',b'5']}
+
+    cell_table = pd.DataFrame(data=cell_data,
+                              index=pd.Index([10,20,30,40,50],
+                                             name='cell_specimen_id'))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_ophys_timestamps',
+                        lambda x: np.zeros(n_t))
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                       'get_cell_specimen_table',
+                       lambda x: cell_table)
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        'get_demix_file',
+                       lambda x: out_fname)
+
+    api = BehaviorOphysLimsApi(123)
+    f_traces = api.get_corrected_fluorescence_traces()
+
+    # check that the f_traces data frame was correctly joined
+    # on roi_id
+    colname = 'corrected_fluorescence'
+    roi_to_dex = {1:4, 2:3, 3:1, 4:2, 5:0}
+    for ii, roi_id in enumerate([1,2,3,4,5]):
+        cell = f_traces.loc[f_traces.cell_roi_id==bytes('%s'%roi_id, 'utf-8')]
+        assert cell.index.values[0] == 10*roi_id
+        np.testing.assert_array_almost_equal(cell[colname].values[0],
+                                             data[roi_to_dex[roi_id]],
+                                             decimal=10)
