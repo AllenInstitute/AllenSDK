@@ -189,8 +189,7 @@ def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
 
 
 def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,
-                                              synced_timestamps: pd.Series,
-                                              likely_blink: np.array = None) -> pynwb.ProcessingModule:
+                                              synced_timestamps: pd.Series) -> pynwb.ProcessingModule:
     # Top level container for eye tracking processed data
     eye_tracking_mod = pynwb.ProcessingModule(name='eye_tracking',
                                               description='Eye tracking processing module')
@@ -211,15 +210,7 @@ def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,
     eye_tracking_mod.add_data_interface(pupil_params)
     eye_tracking_mod.add_data_interface(cr_params)
     eye_tracking_mod.add_data_interface(eye_params)
-
-    if likely_blink is not None:
-        likely_blink_ts = pynwb.base.TimeSeries(
-            name="likely_blink",
-            data=likely_blink,
-            timestamps=synced_timestamps.values
-        )
-        eye_tracking_mod.add_data_interface(likely_blink_ts)
-
+    
     return eye_tracking_mod
 
 
@@ -295,11 +286,9 @@ def create_gaze_mapping_nwb_processing_modules(eye_gaze_data: dict):
 
 def add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile: pynwb.NWBFile,
                                                  eye_dlc_tracking_data: dict,
-                                                 synced_timestamps: pd.Series,
-                                                 likely_blink: np.array = None) -> pynwb.NWBFile:
+                                                 synced_timestamps: pd.Series) -> pynwb.NWBFile:
     eye_tracking_mod = create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data,
-                                                                 synced_timestamps,
-                                                                 likely_blink=likely_blink)
+                                                                 synced_timestamps)
     nwbfile.add_processing_module(eye_tracking_mod)
 
     return nwbfile
