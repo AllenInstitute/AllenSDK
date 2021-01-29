@@ -157,6 +157,14 @@ def test_dff_trace_order(monkeypatch, tmpdir):
         out_file.create_dataset('data', data=data)
         out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
 
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
+
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
                        lambda x: np.array([1,2,3,4,5]))
@@ -194,6 +202,14 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
         out_file.create_dataset('data', data=data)
         out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
 
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
+
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
                        lambda x: np.array([1,3,4,5]))
@@ -216,6 +232,14 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
     with h5py.File(out_fname, 'w') as out_file:
         out_file.create_dataset('data', data=data)
         out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
@@ -251,6 +275,14 @@ def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
     cell_table = pd.DataFrame(data=cell_data,
                               index=pd.Index([10,20,30,40,50],
                                              name='cell_specimen_id'))
+
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_ophys_timestamps',
@@ -305,6 +337,14 @@ def test_corrected_fluorescence_trace_exceptions(monkeypatch, tmpdir):
                               index=pd.Index([10,20,30,40,50],
                                              name='cell_specimen_id'))
 
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
+
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_ophys_timestamps',
                         lambda x: np.zeros(n_t))
@@ -347,6 +387,14 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
     cell_table = pd.DataFrame(data=cell_data,
                               index=pd.Index([10,20,30,40,50,60],
                                              name='cell_specimen_id'))
+
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = 1
+        self.get_behavior_session_id = 2
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_ophys_timestamps',
