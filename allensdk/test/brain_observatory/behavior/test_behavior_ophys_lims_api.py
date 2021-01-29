@@ -167,7 +167,7 @@ def test_dff_trace_order(monkeypatch, tmpdir):
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
-                       lambda x: np.array([1,2,3,4,5]))
+                       lambda x: np.array([1,2,3,4,5]).astype(bytes))
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                         'get_dff_file',
@@ -212,7 +212,7 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
-                       lambda x: np.array([1,3,4,5]))
+                       lambda x: np.array([1,3,4,5]).astype(bytes))
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                         'get_dff_file',
@@ -243,7 +243,7 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                        'get_cell_roi_ids',
-                       lambda x: np.array([1,2,3,4,5,6]))
+                       lambda x: np.array([1,2,3,4,5,6]).astype(bytes))
 
     monkeypatch.setattr(BehaviorOphysLimsApi,
                         'get_dff_file',

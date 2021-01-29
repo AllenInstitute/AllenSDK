@@ -209,11 +209,11 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         dff_path = self.get_dff_file()
         with h5py.File(dff_path, 'r') as raw_file:
             raw_dff_traces = np.asarray(raw_file['data'])
-            roi_names = np.asarray(raw_file['roi_names']).astype(int)
+            roi_names = np.asarray(raw_file['roi_names'])
 
         # guarantee that DFF traces are ordered the same
         # way as ROIs in the cell_specimen_table
-        cell_roi_id_list = self.get_cell_roi_ids().astype(int)
+        cell_roi_id_list = self.get_cell_roi_ids()
 
         if not np.in1d(roi_names, cell_roi_id_list).all():
             raise RuntimeError("DFF traces contains ROI IDs that "
