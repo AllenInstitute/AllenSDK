@@ -197,7 +197,7 @@ def cell_specimen_table_api():
                     "cell_roi_id": [1, 2],
                     "y": [1, 1],
                     "x": [2, 1],
-                    "image_mask": [roi_1, roi_2]
+                    "roi_mask": [roi_1, roi_2]
                 }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
             )
 

@@ -516,11 +516,11 @@ class BehaviorOphysSession(ParamsMixin):
         table.set_index("cell_roi_id", inplace=True)
         table = table.loc[cell_roi_ids, :]
 
-        full_image_shape = table.iloc[0]["image_mask"].shape
+        full_image_shape = table.iloc[0]["roi_mask"].shape
 
         output = np.zeros((len(cell_roi_ids), full_image_shape[0], full_image_shape[1]), dtype=np.uint8)
         for ii, (_, row) in enumerate(table.iterrows()):
-            output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
+            output[ii, :, :] = _translate_roi_mask(row["roi_mask"], int(row["y"]), int(row["x"]))
 
         # Pixel spacing and units of mask image will match either the
         # max or avg projection image of 2P movie.

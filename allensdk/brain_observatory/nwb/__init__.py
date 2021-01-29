@@ -894,9 +894,9 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         imaging_plane=imaging_plane)
 
     for col_name in cell_roi_table.columns:
-        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # the columns 'roi_mask', 'pixel_mask', and 'voxel_mask' are already defined
         # in the nwb.ophys::PlaneSegmentation Object
-        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+        if col_name not in ['id', 'mask_matrix', 'roi_mask', 'pixel_mask', 'voxel_mask']:
             # This builds the columns with name of column and description of column
             # both equal to the column name in the cell_roi_table
             plane_segmentation.add_column(col_name,
@@ -906,13 +906,13 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     # go through each roi and add it to the plan segmentation object
     for cell_roi_id, table_row in cell_roi_table.iterrows():
 
-        # NOTE: The 'image_mask' in this cell_roi_table has already been
+        # NOTE: The 'roi_mask' in this cell_roi_table has already been
         # processing by the function from 
         # allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api
         # get_cell_specimen_table() method. As a result, the ROI is stored in
         # an array that is the same shape as the FULL field of view of the
         # experiment (e.g. 512 x 512).
-        mask = table_row.pop('image_mask')
+        mask = table_row.pop('roi_mask')
 
         csid = table_row.pop('cell_specimen_id')
         table_row['cell_specimen_id'] = -1 if csid is None else csid

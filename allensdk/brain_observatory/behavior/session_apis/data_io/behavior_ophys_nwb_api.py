@@ -277,6 +277,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
     def get_cell_specimen_table(self) -> pd.DataFrame:
         # NOTE: ROI masks are stored in full frame width and height arrays
         df = self.nwbfile.processing['ophys'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
+
+        # Because pynwb stores this field as "image_mask", it is renamed here
+        df = df.rename(columns={'image_mask': 'roi_mask'})
+
         df.index.rename('cell_roi_id', inplace=True)
         df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
 

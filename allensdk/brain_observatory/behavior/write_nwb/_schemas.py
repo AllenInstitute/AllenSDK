@@ -18,7 +18,7 @@ class CellSpecimenTable(RaisingSchema):
     height = Dict(String, Int, required=True)
     width = Dict(String, Int, required=True)
     mask_image_plane = Dict(String, Int, required=True)
-    image_mask = Dict(String, List(List(Boolean)), required=True)
+    roi_mask = Dict(String, List(List(Boolean)), required=True)
 
 
 
