@@ -115,6 +115,7 @@ def test_visbeh_ophys_data_set():
                                         'stage': u'OPHYS_6_images_B'}
 
 
+@pytest.mark.skip(reason="on-prem data source missing")
 @pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 
