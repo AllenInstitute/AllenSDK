@@ -333,37 +333,48 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
         unit=unit
     )
 
-    running_mod = ProcessingModule('running', 'Running speed processing module')
-    nwbfile.add_processing_module(running_mod)
+    if 'running' in nwbfile.processing:
+        running_mod = nwbfile.processing['running']
+    else:
+        running_mod = ProcessingModule('running', 'Running speed processing module')
+        nwbfile.add_processing_module(running_mod)
 
     running_mod.add_data_interface(running_speed_series)
 
     return nwbfile
 
 
-def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_key='timestamps'):
-    ''' Adds running speed data to an NWBFile as timeseries in acquisition and processing
+def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_unfiltered, unit_dict):
+    """Adds both unfiltered (raw) and filtered running speed data to an NWBFile as timeseries in acquisition and processing
 
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : pandas.DataFrame
-        Contains 'speed' and 'times', 'v_in', 'vsig', 'dx'
-    unit : str, optional
+        File to which running speeds will be written
+    running_data_df : pandas.DataFrame
+        Filtered running data
+        Contains 'speed', 'v_in', 'vsig', 'dx'
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df_unfiltered
+    running_data_df_unfiltered : pandas.DataFrame
+        Unfiltered (raw) Running data
+        Contains 'speed', 'v_in', 'vsig', 'dx'
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df
+    unit_dict : dict, optional
         SI units of running speed values
 
     Returns
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
-    assert running_data_df.index.name == index_key
-
+    """
     running_speed = RunningSpeed(timestamps=running_data_df.index.values,
                                  values=running_data_df['speed'].values)
 
+    running_speed_unfiltered = RunningSpeed(timestamps=running_data_df_unfiltered.index.values,
+                                            values=running_data_df_unfiltered['speed'].values)
+
     add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered, name='speed_unfiltered', unit=unit_dict['speed'])
 
     running_mod = nwbfile.processing['running']
     timestamps_ts = running_mod.get_data_interface('speed').timestamps
@@ -883,9 +894,9 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         imaging_plane=imaging_plane)
 
     for col_name in cell_roi_table.columns:
-        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # the columns 'roi_mask', 'pixel_mask', and 'voxel_mask' are already defined
         # in the nwb.ophys::PlaneSegmentation Object
-        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+        if col_name not in ['id', 'mask_matrix', 'roi_mask', 'pixel_mask', 'voxel_mask']:
             # This builds the columns with name of column and description of column
             # both equal to the column name in the cell_roi_table
             plane_segmentation.add_column(col_name,
@@ -895,13 +906,13 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     # go through each roi and add it to the plan segmentation object
     for cell_roi_id, table_row in cell_roi_table.iterrows():
 
-        # NOTE: The 'image_mask' in this cell_roi_table has already been
+        # NOTE: The 'roi_mask' in this cell_roi_table has already been
         # processing by the function from 
         # allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api
         # get_cell_specimen_table() method. As a result, the ROI is stored in
         # an array that is the same shape as the FULL field of view of the
         # experiment (e.g. 512 x 512).
-        mask = table_row.pop('image_mask')
+        mask = table_row.pop('roi_mask')
 
         csid = table_row.pop('cell_specimen_id')
         table_row['cell_specimen_id'] = -1 if csid is None else csid

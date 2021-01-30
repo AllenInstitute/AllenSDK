@@ -46,7 +46,7 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         fov_height = self.get_field_of_view_shape()['height']
 
         # Convert cropped ROI masks to uncropped versions
-        image_mask_list = []
+        roi_mask_list = []
         for cell_roi_id, table_row in cell_specimen_table.iterrows():
             # Deserialize roi data into AllenSDK RoiMask object
             curr_roi = roi.RoiMask(image_w=fov_width, image_h=fov_height,
@@ -55,10 +55,10 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
             curr_roi.y = table_row['y']
             curr_roi.width = table_row['width']
             curr_roi.height = table_row['height']
-            curr_roi.mask = np.array(table_row['image_mask'])
-            image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
+            curr_roi.mask = np.array(table_row['roi_mask'])
+            roi_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
 
-        cell_specimen_table['image_mask'] = image_mask_list
+        cell_specimen_table['roi_mask'] = roi_mask_list
         cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
 
         cell_specimen_table.index.rename('cell_roi_id', inplace=True)
@@ -340,7 +340,7 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         ophys_timestamps = self.get_ophys_timestamps()
 
         num_trace_timepoints = corrected_fluorescence_traces.shape[1]
-        assert num_trace_timepoints, ophys_timestamps.shape[0]
+        assert num_trace_timepoints == ophys_timestamps.shape[0]
         df = pd.DataFrame(
             {'corrected_fluorescence': list(corrected_fluorescence_traces)},
             index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
