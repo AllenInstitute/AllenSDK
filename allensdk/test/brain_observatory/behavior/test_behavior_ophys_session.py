@@ -115,6 +115,7 @@ def test_visbeh_ophys_data_set():
                                         'stage': u'OPHYS_6_images_B'}
 
 
+@pytest.mark.skip(reason="on-prem data source missing")
 @pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 
@@ -197,7 +198,7 @@ def cell_specimen_table_api():
                     "cell_roi_id": [1, 2],
                     "y": [1, 1],
                     "x": [2, 1],
-                    "image_mask": [roi_1, roi_2]
+                    "roi_mask": [roi_1, roi_2]
                 }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
             )
 

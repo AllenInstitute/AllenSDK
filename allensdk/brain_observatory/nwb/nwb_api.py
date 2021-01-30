@@ -45,10 +45,23 @@ class NwbApi:
 
         return cls(path=path, **kwargs)
 
-    def get_running_speed(self) -> RunningSpeed:
+    def get_running_speed(self, lowpass=True) -> RunningSpeed:
+        """
+        Gets the running speed
+        Parameters
+        ----------
+        lowpass: bool
+            Whether to return the running speed with lowpass filter applied or without
 
-        values = self.nwbfile.modules['running'].get_data_interface('speed').data[:]
-        timestamps = self.nwbfile.modules['running'].get_data_interface('speed').timestamps[:]
+        Returns
+        -------
+        RunningSpeed:
+            The running speed
+        """
+
+        interface_name = 'speed' if lowpass else 'speed_unfiltered'
+        values = self.nwbfile.modules['running'].get_data_interface(interface_name).data[:]
+        timestamps = self.nwbfile.modules['running'].get_data_interface(interface_name).timestamps[:]
 
         return RunningSpeed(
             timestamps=timestamps,
