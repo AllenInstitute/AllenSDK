@@ -91,7 +91,13 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
-What's New - 2.3.2 (December 21, 2020)
+What's New - 2.5.0 (January 29, 2021)
+-----------------------------------------------------------------------
+-  Adds unfiltered running speed as new data stream
+-  run_demixing gracefully ignores any ROIs that are not in the input trace file
+
+
+What's New - 2.4.0 (December 21, 2020)
 -----------------------------------------------------------------------
 As of the 2.4.0 release:
 - When running raster_plot on a spike_times dataframe, the spike times from each unit are plotted twice. (thank you @dgmurx)
