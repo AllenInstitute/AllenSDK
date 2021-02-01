@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] = TBD
+- Adds ability to write and read behavior only NWB files
+
 ## [2.5.0] = 2021-01-29
 -  Adds unfiltered running speed as new data stream
 -  run_demixing gracefully ignores any ROIs that are not in the input trace file
