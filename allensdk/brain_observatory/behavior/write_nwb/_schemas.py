@@ -51,6 +51,11 @@ class SessionData(RaisingSchema):
         required=True,
         description="Mapping containing information about session rig geometry used for eye gaze mapping."
     )
+    eye_tracking_filepath = String(
+        required=True,
+        validate=check_read_access,
+        description="h5 filepath containing eye tracking ellipses"
+    )
     eye_gaze_mapping_path = String(
         required=True,
         validate=check_read_access,
