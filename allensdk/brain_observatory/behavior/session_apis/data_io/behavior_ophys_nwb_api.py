@@ -197,9 +197,9 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysBase):
         trials.index = trials.index.rename('trials_id')
         return trials
 
-    def get_licks(self) -> np.ndarray:
+    def get_licks(self) -> pd.DataFrame:
         if 'licking' in self.nwbfile.processing:
-            return pd.DataFrame({'time': self.nwbfile.processing['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
+            return pd.DataFrame({'time': self.nwbfile.processing['licking'].get_data_interface('licks').timestamps[:]})
         else:
             return pd.DataFrame({'time': []})
 
