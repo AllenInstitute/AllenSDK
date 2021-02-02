@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 import uuid
 
 import h5py
@@ -161,34 +161,37 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
 
     @memoize
-    def get_metadata(self):
-        mdata = dict()
-        mdata['ophys_experiment_id'] = self.get_ophys_experiment_id()
-        mdata['experiment_container_id'] = self.get_experiment_container_id()
-        mdata['ophys_frame_rate'] = self.get_ophys_frame_rate()
-        mdata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
-        mdata['targeted_structure'] = self.get_targeted_structure()
-        mdata['imaging_depth'] = self.get_imaging_depth()
-        mdata['session_type'] = self.get_stimulus_name()
-        mdata['experiment_datetime'] = self.get_experiment_date()
-        mdata['reporter_line'] = self.get_reporter_line()
-        mdata['driver_line'] = self.get_driver_line()
-        mdata['LabTracks_ID'] = self.get_external_specimen_name()
-        mdata['full_genotype'] = self.get_full_genotype()
+    def get_metadata(self) -> Dict[str, Any]:
+        """Return metadata about the session.
+        :rtype: dict
+        """
         behavior_session_uuid = self.get_behavior_session_uuid()
-        mdata['behavior_session_uuid'] = uuid.UUID(behavior_session_uuid)
-        mdata["imaging_plane_group"] = self.get_imaging_plane_group()
-        mdata['rig_name'] = self.get_rig_name()
-        mdata['sex'] = self.get_sex()
-        mdata['age'] = self.get_age()
-        mdata['excitation_lambda'] = 910.
-        mdata['emission_lambda'] = 520.
-        mdata['indicator'] = 'GCAMP6f'
-        mdata['field_of_view_width'] = self.get_field_of_view_shape()['width']
-        mdata['field_of_view_height'] = (
-            self.get_field_of_view_shape()['height'])
 
-        return mdata
+        metadata = {
+            'ophys_experiment_id': self.get_ophys_experiment_id(),
+            'experiment_container_id': self.get_experiment_container_id(),
+            'ophys_frame_rate': self.get_ophys_frame_rate(),
+            'stimulus_frame_rate': self.get_stimulus_frame_rate(),
+            'targeted_structure': self.get_targeted_structure(),
+            'imaging_depth': self.get_imaging_depth(),
+            'session_type': self.get_stimulus_name(),
+            'experiment_datetime': self.get_experiment_date(),
+            'reporter_line': self.get_reporter_line(),
+            'driver_line': self.get_driver_line(),
+            'LabTracks_ID': self.get_external_specimen_name(),
+            'full_genotype': self.get_full_genotype(),
+            'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
+            'imaging_plane_group': self.get_imaging_plane_group(),
+            'rig_name': self.get_rig_name(),
+            'sex': self.get_sex(),
+            'age': self.get_age(),
+            'excitation_lambda': 910.0,
+            'emission_lambda': 520.0,
+            'indicator': 'GCAMP6f',
+            'field_of_view_width': self.get_field_of_view_shape()['width'],
+            'field_of_view_height': self.get_field_of_view_shape()['height']
+        }
+        return metadata
 
     @memoize
     def get_cell_roi_ids(self):

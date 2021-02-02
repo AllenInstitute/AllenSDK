@@ -285,8 +285,4 @@ class BehaviorDataXforms(BehaviorBase):
             "foraging_id": self.get_foraging_id(),
             "behavior_session_id": self.get_behavior_session_id()
         }
-        if hasattr(self, "ophys_experiment_ids"):
-            metadata["ophys_experiment_id"] = self.ophys_experiment_ids
-        if hasattr(self, "ophys_container_id"):
-            metadata["experiment_container_id"] = self.ophys_container_id
         return metadata
