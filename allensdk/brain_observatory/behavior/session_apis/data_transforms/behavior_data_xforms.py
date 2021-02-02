@@ -249,8 +249,7 @@ class BehaviorDataXforms(BehaviorBase):
         pd.DataFrame
             A dataframe containing extended behavior trial information.
         """
-        filename = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(filename)
+        data = self._behavior_stimulus_file()
         return get_extended_trials(data)
 
     @memoize
