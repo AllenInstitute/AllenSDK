@@ -43,7 +43,7 @@ class BehaviorSession(object):
         """Unique identifier for this experimental session.
         :rtype: int
         """
-        return self.api.get_behavior_session_id
+        return self.api.get_behavior_session_id()
 
     @property
     def ophys_session_id(self) -> Optional[int]:
@@ -51,7 +51,7 @@ class BehaviorSession(object):
         with this behavior session (if one exists)
         :rtype: int
         """
-        return self.api.get_ophys_session_id
+        return self.api.get_ophys_session_id()
 
     @property
     def ophys_experiment_ids(self) -> Optional[List[int]]:
@@ -59,7 +59,7 @@ class BehaviorSession(object):
         with this behavior session (if one exists)
         :rtype: int
         """
-        return self.api.get_ophys_experiment_ids
+        return self.api.get_ophys_experiment_ids()
 
     @property
     def licks(self) -> pd.DataFrame:
