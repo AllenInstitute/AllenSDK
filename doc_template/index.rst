@@ -90,6 +90,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.6.0 (TBD)
+-----------------------------------------------------------------------
+- Adds ability to write and read behavior only experiments
+
 
 What's New - 2.5.0 (January 29, 2021)
 -----------------------------------------------------------------------

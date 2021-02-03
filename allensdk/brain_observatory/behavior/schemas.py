@@ -61,6 +61,10 @@ class SubjectMetadataSchema(RaisingSchema):
 class BehaviorMetadataSchema(RaisingSchema):
     """This schema contains metadata pertaining to behavior.
     """
+    neurodata_type = 'BehaviorMetadata'
+    neurodata_type_inc = 'LabMetaData'
+    neurodata_doc = "Metadata for behavior and behavior + ophys experiments"
+    neurodata_skip = {"experiment_datetime"}
 
     behavior_session_uuid = fields.UUID(
         doc='MTrain record for session, also called foraging_id',
@@ -69,6 +73,21 @@ class BehaviorMetadataSchema(RaisingSchema):
     stimulus_frame_rate = fields.Float(
         doc=('Frame rate (frames/second) of the '
              'visual_stimulus from the monitor'),
+        required=True,
+    )
+    session_type = fields.String(
+        doc='Experimental session description',
+        allow_none=True,
+        required=True,
+    )
+    # 'experiment_datetime' will be stored in
+    # pynwb NWBFile 'session_start_time' attr
+    experiment_datetime = fields.DateTime(
+        doc='Date of the experiment (UTC, as string)',
+        required=True,
+    )
+    rig_name = fields.String(
+        doc='Name of behavior or optical physiology experiment rig',
         required=True,
     )
 
@@ -123,10 +142,6 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
         doc='Id for this ophys session',
         required=True,
     )
-    rig_name = fields.String(
-        doc='Name of optical physiology experiment rig',
-        required=True,
-    )
     field_of_view_width = fields.Int(
         doc='Width of optical physiology imaging plane in pixels',
         required=True,
@@ -143,7 +158,7 @@ class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):
     """
 
     neurodata_type = 'OphysBehaviorMetadata'
-    neurodata_type_inc = 'LabMetaData'
+    neurodata_type_inc = 'BehaviorMetadata'
     neurodata_doc = "Metadata for behavior + ophys experiments"
     # Fields to skip converting to extension
     # They already exist as attributes for the following pyNWB classes:
@@ -151,18 +166,6 @@ class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):
     neurodata_skip = {"emission_lambda", "excitation_lambda", "indicator",
                       "targeted_structure", "experiment_datetime",
                       "ophys_frame_rate"}
-
-    session_type = fields.String(
-        doc='Experimental session description',
-        allow_none=True,
-        required=True,
-    )
-    # 'experiment_datetime' will be stored in
-    # pynwb NWBFile 'session_start_time' attr
-    experiment_datetime = fields.DateTime(
-        doc='Date of the experiment (UTC, as string)',
-        required=True,
-    )
 
 
 class CompleteOphysBehaviorMetadataSchema(OphysBehaviorMetadataSchema,
