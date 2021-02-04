@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] = TBD
+- Adds ability to write and read behavior only NWB files
+- Adds eye tracking ellipse fits and metadata as new NWB data stream
+
+## [2.5.0] = 2021-01-29
+-  Adds unfiltered running speed as new data stream
+-  run_demixing gracefully ignores any ROIs that are not in the input trace file
+
 ## [2.4.1] = 2021-01-04
 -  update deprecated call to scipy.spatial.transform.Rotation.as_dcm() to .as_matrix()
 

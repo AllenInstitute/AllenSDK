@@ -15,7 +15,9 @@ from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
-from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
+from pynwb.ophys import (
+    DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
+from ndx_events import Events
 
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -24,10 +26,11 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import (
     CompleteOphysBehaviorMetadataSchema, NwbOphysMetadataSchema,
-    OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema,
-    SubjectMetadataSchema, OphysEyeTrackingRigMetadataSchema
+    BehaviorMetadataSchema, OphysBehaviorMetadataSchema,
+    BehaviorTaskParametersSchema, SubjectMetadataSchema
 )
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
+
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
 
@@ -49,31 +52,31 @@ CELL_SPECIMEN_COL_DESCRIPTIONS = {
     'y': 'y position of ROI in Image Plane in pixels (top left corner)'
 }
 
-
 def check_nwbfile_version(nwbfile_path: str,
                           desired_minimum_version: str,
                           warning_msg: str):
-    with h5py.File(nwbfile_path, 'r') as f:
-        # nwb 2.x files store version as an attribute
-        try:
-            nwb_version = str(f.attrs["nwb_version"]).split(".")
-        except KeyError:
-            # nwb 1.x files store version as dataset
-            try:
-                nwb_version = str(f["nwb_version"][...].astype(str))
-                # Stored in the form: `NWB-x.y.z`
-                nwb_version = nwb_version.split("-")[1].split(".")
-            except (KeyError, IndexError):
-                nwb_version = None
 
-    if nwb_version is None:
-        warnings.warn(f"'{nwbfile_path}' doesn't appear to be a valid "
-                      f"Neurodata Without Borders (*.nwb) format file as "
-                      f"neither a 'nwb_version' field nor dataset could "
-                      f"be found!")
-    else:
-        if tuple(nwb_version) < tuple(desired_minimum_version.split(".")):
-            warnings.warn(warning_msg)
+        with h5py.File(nwbfile_path, 'r') as f:
+            # nwb 2.x files store version as an attribute
+            try:
+                nwb_version = str(f.attrs["nwb_version"]).split(".")
+            except KeyError:
+                # nwb 1.x files store version as dataset
+                try:
+                    nwb_version = str(f["nwb_version"][...].astype(str))
+                    # Stored in the form: `NWB-x.y.z`
+                    nwb_version = nwb_version.split("-")[1].split(".")
+                except (KeyError, IndexError):
+                    nwb_version = None
+
+        if nwb_version is None:
+            warnings.warn(f"'{nwbfile_path}' doesn't appear to be a valid "
+                          f"Neurodata Without Borders (*.nwb) format file as "
+                          f"neither a 'nwb_version' field nor dataset could "
+                          f"be found!")
+        else:
+            if tuple(nwb_version) < tuple(desired_minimum_version.split(".")):
+                warnings.warn(warning_msg)
 
 
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
@@ -139,6 +142,7 @@ def read_eye_gaze_mappings(input_path: Path) -> dict:
 
 
 def create_eye_gaze_mapping_dataframe(eye_gaze_data: dict) -> pd.DataFrame:
+
     eye_gaze_mapping_df = pd.DataFrame(
         {
             "raw_eye_area": eye_gaze_data["raw_eye_areas"].values,
@@ -190,6 +194,7 @@ def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
 
 def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,
                                               synced_timestamps: pd.Series) -> pynwb.ProcessingModule:
+
     # Top level container for eye tracking processed data
     eye_tracking_mod = pynwb.ProcessingModule(name='eye_tracking',
                                               description='Eye tracking processing module')
@@ -210,7 +215,7 @@ def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,
     eye_tracking_mod.add_data_interface(pupil_params)
     eye_tracking_mod.add_data_interface(cr_params)
     eye_tracking_mod.add_data_interface(eye_params)
-    
+
     return eye_tracking_mod
 
 
@@ -220,6 +225,7 @@ def add_eye_gaze_data_interfaces(pynwb_container: pynwb.NWBContainer,
                                  screen_coordinates: pd.DataFrame,
                                  screen_coordinates_spherical: pd.DataFrame,
                                  synced_timestamps: pd.Series) -> pynwb.NWBContainer:
+
     pupil_area_ts = pynwb.base.TimeSeries(
         name="pupil_area",
         data=pupil_areas.values,
@@ -265,8 +271,7 @@ def create_gaze_mapping_nwb_processing_modules(eye_gaze_data: dict):
                                                         pupil_areas=eye_gaze_data["raw_pupil_areas"],
                                                         eye_areas=eye_gaze_data["raw_eye_areas"],
                                                         screen_coordinates=eye_gaze_data["raw_screen_coordinates"],
-                                                        screen_coordinates_spherical=eye_gaze_data[
-                                                            "raw_screen_coordinates_spherical"],
+                                                        screen_coordinates_spherical=eye_gaze_data["raw_screen_coordinates_spherical"],
                                                         synced_timestamps=eye_gaze_data["synced_frame_timestamps"])
 
     # Container for filtered gaze mapped data
@@ -277,8 +282,7 @@ def create_gaze_mapping_nwb_processing_modules(eye_gaze_data: dict):
                                                          pupil_areas=eye_gaze_data["new_pupil_areas"],
                                                          eye_areas=eye_gaze_data["new_eye_areas"],
                                                          screen_coordinates=eye_gaze_data["new_screen_coordinates"],
-                                                         screen_coordinates_spherical=eye_gaze_data[
-                                                             "new_screen_coordinates_spherical"],
+                                                         screen_coordinates_spherical=eye_gaze_data["new_screen_coordinates_spherical"],
                                                          synced_timestamps=eye_gaze_data["synced_frame_timestamps"])
 
     return (raw_gaze_mapping_mod, filt_gaze_mapping_mod)
@@ -303,44 +307,8 @@ def add_eye_gaze_mapping_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     return nwbfile
 
 
-def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: NWBFile,
-                                                  eye_tracking_rig_geometry: dict) -> NWBFile:
-    """ Rig geometry dict should consist of the following fields:
-    monitor_position_mm: [x, y, z]
-    monitor_rotation_deg: [x, y, z]
-    camera_position_mm: [x, y, z]
-    camera_rotation_deg: [x, y, z]
-    led_position: [x, y, z]
-    equipment: A string describing rig
-    """
-    eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
-                                                  description='Eye tracking rig metadata module')
-
-    ophys_eye_tracking_rig_metadata = load_pynwb_extension(OphysEyeTrackingRigMetadataSchema,
-                                                           'ndx-aibs-behavior-ophys')
-
-    rig_metadata = ophys_eye_tracking_rig_metadata(
-        name="eye_tracking_rig_metadata",
-        equipment=eye_tracking_rig_geometry['equipment'],
-        monitor_position=eye_tracking_rig_geometry['monitor_position_mm'],
-        monitor_position__unit_of_measurement="mm",
-        camera_position=eye_tracking_rig_geometry['camera_position_mm'],
-        camera_position__unit_of_measurement="mm",
-        led_position=eye_tracking_rig_geometry['led_position'],
-        led_position__unit_of_measurement="mm",
-        monitor_rotation=eye_tracking_rig_geometry['monitor_rotation_deg'],
-        monitor_rotation__unit_of_measurement="deg",
-        camera_rotation=eye_tracking_rig_geometry['camera_rotation_deg'],
-        camera_rotation__unit_of_measurement="deg"
-    )
-
-    eye_tracking_rig_mod.add_data_interface(rig_metadata)
-    nwbfile.add_processing_module(eye_tracking_rig_mod)
-
-    return nwbfile
-
-
-def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
+def add_running_speed_to_nwbfile(nwbfile, running_speed,
+                                 name='speed', unit='cm/s'):
     ''' Adds running speed data to an NWBFile as a timeseries in acquisition
 
     Parameters
@@ -378,8 +346,10 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
     return nwbfile
 
 
-def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_unfiltered, unit_dict):
-    """Adds both unfiltered (raw) and filtered running speed data to an NWBFile as timeseries in acquisition and processing
+def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
+                                    running_data_df_unfiltered, unit_dict):
+    """Adds both unfiltered (raw) and filtered running speed data to an
+    NWBFile as timeseries in acquisition and processing
 
     Parameters
     ----------
@@ -388,11 +358,13 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_un
     running_data_df : pandas.DataFrame
         Filtered running data
         Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df_unfiltered
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
+        running_data_df_unfiltered
     running_data_df_unfiltered : pandas.DataFrame
         Unfiltered (raw) Running data
         Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
+        running_data_df
     unit_dict : dict, optional
         SI units of running speed values
 
@@ -404,11 +376,15 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_un
     running_speed = RunningSpeed(timestamps=running_data_df.index.values,
                                  values=running_data_df['speed'].values)
 
-    running_speed_unfiltered = RunningSpeed(timestamps=running_data_df_unfiltered.index.values,
-                                            values=running_data_df_unfiltered['speed'].values)
+    running_speed_unfiltered = RunningSpeed(
+        timestamps=running_data_df_unfiltered.index.values,
+        values=running_data_df_unfiltered['speed'].values)
 
-    add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
-    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered, name='speed_unfiltered', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed,
+                                 name='speed', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered,
+                                 name='speed_unfiltered',
+                                 unit=unit_dict['speed'])
 
     running_mod = nwbfile.processing['running']
     timestamps_ts = running_mod.get_data_interface('speed').timestamps
@@ -442,6 +418,7 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_un
 
 
 def add_stimulus_template(nwbfile, image_data, name):
+
     image_index = list(range(image_data.shape[0]))
     visual_stimulus_image_series = ImageSeries(name=name,
                                                data=image_data,
@@ -573,6 +550,7 @@ def add_invalid_times(nwbfile, epochs):
         container = pynwb.epoch.TimeIntervals('invalid_times')
 
         for index, row in table.iterrows():
+
             container.add_interval(start_time=row['start_time'],
                                    stop_time=row['stop_time'],
                                    tags=row['tags'],
@@ -619,6 +597,7 @@ def setup_table_for_invalid_times(invalid_epochs):
 
 
 def setup_table_for_epochs(table, timeseries, tag):
+
     table = table.copy()
     indices = np.searchsorted(timeseries.timestamps[:], table['start_time'].values)
     if len(indices > 0):
@@ -632,6 +611,7 @@ def setup_table_for_epochs(table, timeseries, tag):
 
 
 def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'):
+
     stimulus_ts = TimeSeries(
         data=stimulus_timestamps,
         name='timestamps',
@@ -648,6 +628,7 @@ def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'
 
 
 def add_trials(nwbfile, trials, description_dict={}):
+
     order = list(trials.index)
     for _, row in trials[['start_time', 'stop_time']].iterrows():
         row_dict = row.to_dict()
@@ -660,26 +641,22 @@ def add_trials(nwbfile, trials, description_dict={}):
         if not len(data) == len(order):
             if len(data) == 0:
                 data = ['']
-            nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data,
-                                     index=index)
+            nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data, index=index)
         else:
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data)
 
 
 def add_licks(nwbfile, licks):
-    licks_event_series = TimeSeries(
-        data=licks.time.values,
-        name='timestamps',
-        timestamps=licks.time.values,
-        unit='s'
-    )
 
-    # Add lick event timeseries to lick interface:
-    licks_interface = BehavioralEvents([licks_event_series], 'licks')
+    lick_events = Events(
+        timestamps=licks.time.values,
+        name='licks',
+        description='Timestamps for lick events'
+    )
 
     # Add lick interface to nwb file, by way of a processing module:
     licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
-    licks_mod.add_data_interface(licks_interface)
+    licks_mod.add_data_interface(lick_events)
     nwbfile.add_processing_module(licks_mod)
 
     return nwbfile
@@ -711,6 +688,7 @@ def add_rewards(nwbfile, rewards_df):
 
 
 def add_image(nwbfile, image_data, image_name, module_name, module_description, image_api=None):
+
     description = '{} image at pixels/cm resolution'.format(image_name)
 
     if image_api is None:
@@ -746,19 +724,22 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
 
 
 def add_max_projection(nwbfile, max_projection, image_api=None):
+
     add_image(nwbfile, max_projection, 'max_projection', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_average_image(nwbfile, average_image, image_api=None):
+
     add_image(nwbfile, average_image, 'average_image', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None):
-    add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'ophys', 'Ophys processing module',
-              image_api=image_api)
+
+    add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'ophys', 'Ophys processing module', image_api=image_api)
 
 
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
+
     image_index = IndexSeries(
         name=nwb_template.name,
         data=stimulus_index['image_index'].values,
@@ -769,7 +750,7 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
     nwbfile.add_stimulus(image_index)
 
 
-def add_metadata(nwbfile, metadata: dict):
+def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename incoming metadata fields to conform with pynwb Subject fields
     metadata = metadata.copy()
     metadata["subject_id"] = metadata.pop("LabTracks_ID")
@@ -812,13 +793,20 @@ def add_metadata(nwbfile, metadata: dict):
         else:
             new_metadata_dict[key] = val
 
-    OphysBehaviorMetadata = load_pynwb_extension(OphysBehaviorMetadataSchema,
-                                                 'ndx-aibs-behavior-ophys')
-    nwb_metadata = OphysBehaviorMetadata(name='metadata', **new_metadata_dict)
+    if behavior_only:
+        BehaviorMetadata = load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
+        nwb_metadata = BehaviorMetadata(name='metadata', **new_metadata_dict)
+    else:
+        OphysBehaviorMetadata = load_pynwb_extension(
+            OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
+        nwb_metadata = OphysBehaviorMetadata(name='metadata',
+                                             **new_metadata_dict)
     nwbfile.add_lab_meta_data(nwb_metadata)
 
 
 def add_task_parameters(nwbfile, task_parameters):
+
     OphysBehaviorTaskParameters = load_pynwb_extension(
         BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys'
     )
@@ -866,7 +854,7 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         The altered in memory NWBFile object that now has a specimen table
     """
     cell_specimen_metadata = NwbOphysMetadataSchema().load(
-        session_metadata, unknown=marshmallow.EXCLUDE)
+            session_metadata, unknown=marshmallow.EXCLUDE)
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
@@ -918,9 +906,9 @@ def add_cell_specimen_table(nwbfile: NWBFile,
         imaging_plane=imaging_plane)
 
     for col_name in cell_roi_table.columns:
-        # the columns 'image_mask', 'pixel_mask', and 'voxel_mask' are already defined
+        # the columns 'roi_mask', 'pixel_mask', and 'voxel_mask' are already defined
         # in the nwb.ophys::PlaneSegmentation Object
-        if col_name not in ['id', 'mask_matrix', 'image_mask', 'pixel_mask', 'voxel_mask']:
+        if col_name not in ['id', 'mask_matrix', 'roi_mask', 'pixel_mask', 'voxel_mask']:
             # This builds the columns with name of column and description of column
             # both equal to the column name in the cell_roi_table
             plane_segmentation.add_column(col_name,
@@ -929,13 +917,14 @@ def add_cell_specimen_table(nwbfile: NWBFile,
 
     # go through each roi and add it to the plan segmentation object
     for cell_roi_id, table_row in cell_roi_table.iterrows():
-        # NOTE: The 'image_mask' in this cell_roi_table has already been
-        # processing by the function from 
+
+        # NOTE: The 'roi_mask' in this cell_roi_table has already been
+        # processing by the function from
         # allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api
         # get_cell_specimen_table() method. As a result, the ROI is stored in
         # an array that is the same shape as the FULL field of view of the
         # experiment (e.g. 512 x 512).
-        mask = table_row.pop('image_mask')
+        mask = table_row.pop('roi_mask')
 
         csid = table_row.pop('cell_specimen_id')
         table_row['cell_specimen_id'] = -1 if csid is None else csid
@@ -953,8 +942,7 @@ def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     trace_data = np.array([dff_traces.loc[cell_roi_id].dff
                            for cell_roi_id in dff_traces.index.values])
 
-    cell_specimen_table = nwbfile.processing['ophys'].data_interfaces['image_segmentation'].plane_segmentations[
-        'cell_specimen_table']
+    cell_specimen_table = nwbfile.processing['ophys'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
         region=slice(len(dff_traces)))
@@ -975,8 +963,7 @@ def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
 
 
 def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
-    corrected_fluorescence_traces = corrected_fluorescence_traces.reset_index().set_index('cell_roi_id')[
-        ['corrected_fluorescence']]
+    corrected_fluorescence_traces = corrected_fluorescence_traces.reset_index().set_index('cell_roi_id')[['corrected_fluorescence']]
 
     # Create/Add corrected_fluorescence_traces modules and interfaces:
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
@@ -1001,6 +988,7 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 
 
 def add_motion_correction(nwbfile, motion_correction):
+
     ophys_module = nwbfile.processing['ophys']
     ophys_timestamps = ophys_module.get_data_interface('dff').roi_response_series['traces'].timestamps
 
@@ -1020,3 +1008,5 @@ def add_motion_correction(nwbfile, motion_correction):
 
     ophys_module.add_data_interface(t1)
     ophys_module.add_data_interface(t2)
+
+

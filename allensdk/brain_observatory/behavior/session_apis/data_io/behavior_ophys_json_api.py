@@ -1,13 +1,13 @@
 import logging
-from datetime import datetime
-import pytz
 from typing import Optional
 
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorJsonApi)
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
     BehaviorOphysDataXforms)
 
 
-class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
+class BehaviorOphysJsonApi(BehaviorOphysDataXforms, BehaviorJsonApi):
     """A data fetching class that serves as an API for fetching 'raw'
     data from a json file necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.
@@ -50,18 +50,6 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         ophys experiment"""
         return self.data['sync_file']
 
-    def get_rig_name(self) -> str:
-        """Get the name of the experiment rig (ex: CAM2P.3)"""
-        return self.data['rig_name']
-
-    def get_sex(self) -> str:
-        """Get the sex of the subject (ex: 'M', 'F', or 'unknown')"""
-        return self.data['sex']
-
-    def get_age(self) -> str:
-        """Get the age of the subject (ex: 'P15', 'Adult', etc...)"""
-        return self.data['age']
-
     def get_field_of_view_shape(self) -> dict:
         """Get a field of view dictionary for a given ophys experiment.
            ex: {"width": int, "height": int}
@@ -83,41 +71,6 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         """Get the imaging depth for an ophys experiment
         (ex: 400, 500, etc.)"""
         return self.data['targeted_depth']
-
-    def get_stimulus_name(self) -> str:
-        """Get the name of the stimulus presented for an ophys experiment"""
-        return self.data['stimulus_name']
-
-    def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an ophys experiment"""
-        return pytz.utc.localize(
-            datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S"))
-
-    def get_reporter_line(self) -> str:
-        """Get the (gene) reporter line for the subject associated with an
-        ophys experiment
-        """
-        return self.data['reporter_line']
-
-    def get_driver_line(self) -> str:
-        """Get the (gene) driver line for the subject associated with an ophys
-        experiment"""
-        return self.data['driver_line']
-
-    def external_specimen_name(self) -> int:
-        """Get the external specimen id (LabTracks ID) for the subject
-        associated with an ophys experiment"""
-        return self.data['external_specimen_name']
-
-    def get_full_genotype(self) -> str:
-        """Get the full genotype of the subject associated with an ophys
-        experiment"""
-        return self.data['full_genotype']
-
-    def get_behavior_stimulus_file(self) -> str:
-        """Get the filepath to the StimulusPickle file for the session"""
-        return self.data['behavior_stimulus_file']
 
     def get_dff_file(self) -> str:
         """Get the filepath of the dff trace file associated with an ophys
@@ -147,11 +100,6 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         """Get the filepath for the motion transform file (.csv) associated
         with an ophys experiment"""
         return self.data['rigid_motion_transform_file']
-
-    def get_external_specimen_name(self) -> int:
-        """Get the external specimen id for the subject associated with an
-        ophys experiment"""
-        return int(self.data['external_specimen_name'])
 
     def get_imaging_plane_group(self) -> Optional[int]:
         """Get the imaging plane group number. This is a numeric index

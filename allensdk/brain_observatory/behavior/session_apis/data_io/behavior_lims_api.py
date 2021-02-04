@@ -43,7 +43,6 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         ids = self._get_ids()
         self.ophys_experiment_ids = ids.get("ophys_experiment_ids")
         self.ophys_session_id = ids.get("ophys_session_id")
-        self.behavior_training_id = ids.get("behavior_training_id")
         self.foraging_id = ids.get("foraging_id")
         self.ophys_container_id = ids.get("ophys_container_id")
 
@@ -82,8 +81,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         """Fetch ids associated with this behavior_session_id. If there is no
         id, return None.
         :returns: Dictionary of ids with the following keys:
-            behavior_training_id: int -- Only if was a training session
-            ophys_session_id: int -- None if have behavior_training_id
+            ophys_session_id: int
             ophys_experiment_ids: List[int] -- only if have ophys_session_id
             foraging_id: int
         :rtype: dict
@@ -91,7 +89,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         # Get all ids from the behavior_sessions table
         query = f"""
             SELECT
-                ophys_session_id, behavior_training_id, foraging_id
+                ophys_session_id, foraging_id
             FROM
                 behavior_sessions
             WHERE
@@ -140,6 +138,18 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
     def get_behavior_session_id(self) -> int:
         """Getter to be consistent with BehaviorOphysLimsApi."""
         return self.behavior_session_id
+
+    def get_ophys_experiment_ids(self) -> Optional[List[int]]:
+        return self.ophys_experiment_ids
+
+    def get_ophys_session_id(self) -> Optional[int]:
+        return self.ophys_session_id
+
+    def get_foraging_id(self) -> int:
+        return self.foraging_id
+
+    def get_ophys_container_id(self) -> Optional[int]:
+        return self.ophys_container_id
 
     def get_behavior_stimulus_file(self) -> str:
         """Return the path to the StimulusPickle file for a session.

@@ -458,7 +458,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 """.format(ophys_cell_seg_run_id)
         initial_cs_table = pd.read_sql(query, self.lims_db.get_connection())
         cell_specimen_table = initial_cs_table.rename(
-            columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
+            columns={'id': 'cell_roi_id', 'mask_matrix': 'roi_mask'})
         cell_specimen_table.drop(['ophys_experiment_id',
                                   'ophys_cell_segmentation_run_id'],
                                  inplace=True, axis=1)

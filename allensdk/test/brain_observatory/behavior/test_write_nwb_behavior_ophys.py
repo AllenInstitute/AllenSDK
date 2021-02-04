@@ -1,13 +1,14 @@
 import math
 import warnings
+
 import numpy as np
 import pandas as pd
 import pynwb
 import pytest
 
+import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
-import allensdk.brain_observatory.nwb as nwb
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df, \
     create_refined_eye_tracking_df
 
@@ -72,35 +73,27 @@ def eye_tracking_data():
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtrip, roundtripper):
-    nwbfile = nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    running_speed_obt = obt.get_running_speed()
-    assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
-    assert np.allclose(running_speed.values, running_speed_obt.values)
-
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_data_df_to_nwbfile(nwbfile, running_data_df, roundtrip, roundtripper):
+def test_add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, roundtrip, roundtripper):
     # Just make it different from running_data_df
     running_data_df_unfiltered = running_data_df.copy()
     running_data_df_unfiltered['speed'] = running_data_df['speed'] * 2
 
     unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-    nwbfile = nwb.add_running_data_dfs_to_nwbfile(nwbfile, running_data_df=running_data_df,
-                                                  running_data_df_unfiltered=running_data_df_unfiltered, unit_dict=unit_dict)
+    nwbfile = nwb.add_running_data_dfs_to_nwbfile(
+        nwbfile,
+        running_data_df=running_data_df,
+        running_data_df_unfiltered=running_data_df_unfiltered,
+        unit_dict=unit_dict)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(running_data_df, obt.get_running_data_df(lowpass=True))
-    pd.testing.assert_frame_equal(running_data_df_unfiltered, obt.get_running_data_df(lowpass=False))
+    pd.testing.assert_frame_equal(
+        running_data_df, obt.get_running_data_df(lowpass=True))
+    pd.testing.assert_frame_equal(
+        running_data_df_unfiltered, obt.get_running_data_df(lowpass=False))
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -119,8 +112,7 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates, roundtrip, roundtri
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior, stimulus_timestamps, roundtrip, roundtripper,
-                                    stimulus_templates):
+def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior, stimulus_timestamps, roundtrip, roundtripper, stimulus_templates):
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
     nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_behavior)
     for key, val in stimulus_templates.items():
@@ -141,6 +133,7 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior, st
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_timestamps(nwbfile, stimulus_timestamps, roundtrip, roundtripper):
+
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
 
     if roundtrip:
@@ -153,6 +146,7 @@ def test_add_stimulus_timestamps(nwbfile, stimulus_timestamps, roundtrip, roundt
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_trials(nwbfile, roundtrip, roundtripper, trials):
+
     nwb.add_trials(nwbfile, trials, {})
 
     if roundtrip:
@@ -165,6 +159,7 @@ def test_add_trials(nwbfile, roundtrip, roundtripper, trials):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_licks(nwbfile, roundtrip, roundtripper, licks):
+
     nwb.add_licks(nwbfile, licks)
 
     if roundtrip:
@@ -177,6 +172,7 @@ def test_add_licks(nwbfile, roundtrip, roundtripper, licks):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
+
     nwb.add_rewards(nwbfile, rewards)
 
     if roundtrip:
@@ -189,6 +185,7 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_max_projection(nwbfile, roundtrip, roundtripper, max_projection, image_api):
+
     nwb.add_max_projection(nwbfile, max_projection)
 
     if roundtrip:
@@ -201,6 +198,7 @@ def test_add_max_projection(nwbfile, roundtrip, roundtripper, max_projection, im
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_average_image(nwbfile, roundtrip, roundtripper, average_image, image_api):
+
     nwb.add_average_image(nwbfile, average_image)
 
     if roundtrip:
@@ -213,6 +211,7 @@ def test_add_average_image(nwbfile, roundtrip, roundtripper, average_image, imag
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_segmentation_mask_image(nwbfile, roundtrip, roundtripper, segmentation_mask_image, image_api):
+
     nwb.add_segmentation_mask_image(nwbfile, segmentation_mask_image)
 
     if roundtrip:
@@ -227,13 +226,14 @@ def test_segmentation_mask_image(nwbfile, roundtrip, roundtripper, segmentation_
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
                               cell_specimen_table, metadata, partial_metadata):
+
     meta = partial_metadata if test_partial_metadata else metadata
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',
         session_start_time=meta['experiment_datetime']
     )
-    nwb.add_metadata(nwbfile, meta)
+    nwb.add_metadata(nwbfile, meta, behavior_only=False)
     if not test_partial_metadata:
         nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, meta)
 
@@ -259,6 +259,7 @@ def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
+
     nwb.add_task_parameters(nwbfile, task_parameters)
 
     if roundtrip:
@@ -281,9 +282,9 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
-def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, cell_specimen_table,
-                                 metadata, ophys_timestamps):
-    nwb.add_metadata(nwbfile, metadata)
+def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
+
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
 
     if roundtrip:
@@ -294,14 +295,17 @@ def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_
     if filter_invalid_rois:
         cell_specimen_table = cell_specimen_table[cell_specimen_table["cell_roi_id"].isin(valid_roi_ids)]
 
+    print(cell_specimen_table)
+    print(obt.get_cell_specimen_table())
+
     pd.testing.assert_frame_equal(cell_specimen_table, obt.get_cell_specimen_table(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
-def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, cell_specimen_table,
-                        metadata, ophys_timestamps):
-    nwb.add_metadata(nwbfile, metadata)
+def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
+
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
 
@@ -313,34 +317,45 @@ def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, 
     if filter_invalid_rois:
         dff_traces = dff_traces[dff_traces["cell_roi_id"].isin(valid_roi_ids)]
 
+    print(dff_traces)
+
+    print(obt.get_dff_traces())
+
     pd.testing.assert_frame_equal(dff_traces, obt.get_dff_traces(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize("filter_invalid_rois", [True, False])
-def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces,
-                                           corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
-    nwb.add_metadata(nwbfile, metadata)
+def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
+
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
 
     if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi, filter_invalid_rois=filter_invalid_rois)
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi,
+                          filter_invalid_rois=filter_invalid_rois)
     else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile, filter_invalid_rois=filter_invalid_rois)
+        obt = BehaviorOphysNwbApi.from_nwbfile(
+            nwbfile, filter_invalid_rois=filter_invalid_rois)
 
     if filter_invalid_rois:
         corrected_fluorescence_traces = corrected_fluorescence_traces[
             corrected_fluorescence_traces["cell_roi_id"].isin(valid_roi_ids)]
 
-    pd.testing.assert_frame_equal(corrected_fluorescence_traces, obt.get_corrected_fluorescence_traces(), check_dtype=False)
+    print(corrected_fluorescence_traces)
+    print(obt.get_corrected_fluorescence_traces())
+
+    pd.testing.assert_frame_equal(
+        corrected_fluorescence_traces,
+        obt.get_corrected_fluorescence_traces(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps, metadata,
-                               cell_specimen_table, dff_traces):
-    nwb.add_metadata(nwbfile, metadata)
+def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps, metadata, cell_specimen_table, dff_traces):
+
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_motion_correction(nwbfile, motion_correction)
@@ -351,7 +366,6 @@ def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correcti
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(motion_correction, obt.get_motion_correction(), check_dtype=False)
-
 
 @pytest.mark.parametrize("roundtrip", [True, False])
 @pytest.mark.parametrize("expected", [
@@ -367,7 +381,8 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
                                                        roundtrip,
                                                        rig_geometry,
                                                        expected):
-    nwbfile = nwb.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+    api = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    nwbfile = api.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                                                                 rig_geometry)
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
@@ -382,15 +397,18 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
 @pytest.mark.parametrize("roundtrip", [True, False])
 def test_add_eye_tracking_data_to_nwbfile(tmp_path, nwbfile, eye_tracking_data, rig_geometry,
                                           roundtripper, roundtrip):
-    nwbfile = BehaviorOphysNwbApi.add_eye_tracking_data_to_nwb(
+    api = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    nwbfile = api.add_eye_tracking_data_to_nwb(
         nwbfile=nwbfile,
         eye_tracking_df=eye_tracking_data,
         eye_tracking_rig_geometry=rig_geometry
     )
+
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
     obtained = obt.get_eye_tracking()
 
     pd.testing.assert_frame_equal(obtained,
