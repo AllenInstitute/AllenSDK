@@ -437,6 +437,16 @@ class BehaviorOphysSession(ParamsMixin):
     def eye_tracking(self, value):
         self._eye_tracking = value
 
+    @property
+    def eye_tracking_rig_geometry(self) -> dict:
+        """Get the eye tracking rig geometry associated with an ophys experiment"""
+        return self.api.get_eye_tracking_rig_geometry()
+
+    @property
+    def eye_gaze_mapping_file_path(self) -> str:
+        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
+        return self.api.get_eye_gaze_mapping_file_path()
+
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:

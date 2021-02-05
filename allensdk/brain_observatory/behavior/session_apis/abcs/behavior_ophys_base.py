@@ -152,7 +152,7 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_eye_tracking(self) -> pd.DataFrame:
+    def get_eye_tracking(self) -> Optional[pd.DataFrame]:
         """Get eye tracking data from behavior + ophys session.
 
         Returns

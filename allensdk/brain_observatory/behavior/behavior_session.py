@@ -5,7 +5,7 @@ import numpy as np
 import inspect
 
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
+    BehaviorLimsApi, BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
@@ -36,14 +36,14 @@ class BehaviorSession(object):
     @classmethod
     def from_nwb_path(
             cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorSession":
-        return NotImplementedError
+        return cls(api=BehaviorNwbApi.from_path(path=nwb_path, **api_kwargs))
 
     @property
     def behavior_session_id(self) -> int:
         """Unique identifier for this experimental session.
         :rtype: int
         """
-        return self.api.behavior_session_id
+        return self.api.get_behavior_session_id()
 
     @property
     def ophys_session_id(self) -> Optional[int]:
@@ -51,7 +51,7 @@ class BehaviorSession(object):
         with this behavior session (if one exists)
         :rtype: int
         """
-        return self.api.ophys_session_id
+        return self.api.get_ophys_session_id()
 
     @property
     def ophys_experiment_ids(self) -> Optional[List[int]]:
@@ -59,7 +59,7 @@ class BehaviorSession(object):
         with this behavior session (if one exists)
         :rtype: int
         """
-        return self.api.ophys_experiment_ids
+        return self.api.get_ophys_experiment_ids()
 
     @property
     def licks(self) -> pd.DataFrame:

@@ -90,9 +90,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+
 What's New - 2.6.0
 -----------------------------------------------------------------------
--  OPhys Behavior data retrieval methods no longer depend on ROIs being ordered identically in different files.
+- Adds ability to write and read behavior only experiments
+- Adds eye tracking ellipse fits and metadata as new NWB data stream
+- OPhys Behavior data retrieval methods no longer depend on ROIs being ordered identically in different files.
 
 
 What's New - 2.5.0 (January 29, 2021)

@@ -25,3 +25,4 @@ seaborn<1.0.0
 aiohttp==3.6.2
 nest_asyncio==1.2.0
 tqdm>=4.27
+ndx-events<=0.2.0
