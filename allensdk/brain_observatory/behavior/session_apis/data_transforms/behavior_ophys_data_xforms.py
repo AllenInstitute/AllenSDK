@@ -203,13 +203,15 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
     def get_raw_dff_data(self):
         dff_path = self.get_dff_file()
-        with h5py.File(dff_path, 'r') as raw_file:
-            raw_dff_traces = np.asarray(raw_file['data'])
-            roi_names = np.asarray(raw_file['roi_names']).astype(bytes)
 
         # guarantee that DFF traces are ordered the same
         # way as ROIs in the cell_specimen_table
-        cell_roi_id_list = self.get_cell_roi_ids().astype(bytes)
+        cell_roi_id_list = self.get_cell_roi_ids()
+        dt = cell_roi_id_list.dtype
+
+        with h5py.File(dff_path, 'r') as raw_file:
+            raw_dff_traces = np.asarray(raw_file['data'])
+            roi_names = np.asarray(raw_file['roi_names']).astype(dt)
 
         if not np.in1d(roi_names, cell_roi_id_list).all():
             raise RuntimeError("DFF traces contains ROI IDs that "
@@ -287,11 +289,12 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
     def get_corrected_fluorescence_traces(self):
         demix_file = self.get_demix_file()
 
+        cell_roi_id_list = self.get_cell_roi_ids()
+        dt = cell_roi_id_list.dtype
+
         with h5py.File(demix_file, 'r') as in_file:
             corrected_fluorescence_traces = in_file['data'][()]
-            corrected_fluorescence_roi_id = in_file['roi_names'][()]
-
-        cell_roi_id_list = self.get_cell_roi_ids()
+            corrected_fluorescence_roi_id = in_file['roi_names'][()].astype(dt)
 
         if not np.in1d(corrected_fluorescence_roi_id, cell_roi_id_list).all():
             raise RuntimeError("corrected_fluorescence_traces contains ROI IDs "
