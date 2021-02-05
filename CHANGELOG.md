@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.6.0]
+## [2.5.1]
 -  OPhys Behavior data retrieval methods no longer depend on ROIs being ordered identically in different files.
 
 ## [2.5.0] = 2021-01-29
