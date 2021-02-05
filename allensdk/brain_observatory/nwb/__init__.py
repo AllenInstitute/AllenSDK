@@ -1008,3 +1008,5 @@ def add_motion_correction(nwbfile, motion_correction):
 
     ophys_module.add_data_interface(t1)
     ophys_module.add_data_interface(t2)
+
+

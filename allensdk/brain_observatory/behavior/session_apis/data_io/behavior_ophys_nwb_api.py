@@ -1,9 +1,12 @@
 import datetime
 import uuid
 import warnings
+from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
+import pynwb
 import pytz
 import SimpleITK as sitk
 
@@ -17,10 +20,12 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase
 )
 from allensdk.brain_observatory.behavior.schemas import (
-    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
+    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema, OphysEyeTrackingRigMetadataSchema)
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
+from allensdk.brain_observatory.nwb import TimeSeries
+from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import EllipseEyeTracking, EllipseSeries
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
@@ -146,14 +151,152 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
     def get_ophys_session_id(self) -> int:
         raise NotImplementedError()
 
-    # TODO: Implement save and load of eye_tracking_data to/from NWB file
-    def get_eye_tracking(self) -> int:
-        raise NotImplementedError()
+    def get_eye_tracking(self) -> Optional[pd.DataFrame]:
+        """
+        Gets corneal, eye, and pupil ellipse fit data
+
+        Returns
+        -------
+        pd.DataFrame
+            *_area
+            *_center_x
+            *_center_y
+            *_height
+            *_phi
+            *_width
+            where "*" can be "corneal", "pupil" or "eye"
+            likely_blink
+        or None if no eye tracking data
+        """
+        try:
+            eye_tracking_acquisition = self.nwbfile.acquisition['EyeTracking']
+        except KeyError as e:
+            warnings.warn(f"This ophys session '{int(self.nwbfile.identifier)}' has no eye tracking data. (NWB error: {e})")
+            return None
+
+        eye_tracking = eye_tracking_acquisition.eye_tracking
+        pupil_tracking = eye_tracking_acquisition.pupil_tracking
+        corneal_reflection_tracking = eye_tracking_acquisition.corneal_reflection_tracking
+
+        eye_tracking_data = {
+            "eye_center_x": eye_tracking.data[:, 0],
+            "eye_center_y": eye_tracking.data[:, 1],
+            "eye_area": eye_tracking.area[:],
+            "eye_height": eye_tracking.height[:],
+            "eye_width": eye_tracking.width[:],
+            "eye_phi": eye_tracking.angle[:],
+
+            "pupil_center_x": pupil_tracking.data[:, 0],
+            "pupil_center_y": pupil_tracking.data[:, 1],
+            "pupil_area": pupil_tracking.area[:],
+            "pupil_height": pupil_tracking.height[:],
+            "pupil_width": pupil_tracking.width[:],
+            "pupil_phi": pupil_tracking.angle[:],
+
+            "cr_center_x": corneal_reflection_tracking.data[:, 0],
+            "cr_center_y": corneal_reflection_tracking.data[:, 1],
+            "cr_area": corneal_reflection_tracking.area[:],
+            "cr_height": corneal_reflection_tracking.height[:],
+            "cr_width": corneal_reflection_tracking.width[:],
+            "cr_phi": corneal_reflection_tracking.angle[:],
+
+            "likely_blink": eye_tracking_acquisition.likely_blink.data[:],
+            "time": eye_tracking.timestamps[:]
+        }
+
+        eye_tracking_data = pd.DataFrame(eye_tracking_data)
+        eye_tracking_data.index = eye_tracking_data.index.rename('frame')
+        return eye_tracking_data
+
+    def get_rig_metadata(self) -> Optional[dict]:
+        try:
+            et_mod = self.nwbfile.get_processing_module("eye_tracking_rig_metadata")
+        except KeyError as e:
+            warnings.warn(f"This ophys session '{int(self.nwbfile.identifier)}' has no eye tracking rig metadata. "
+                          f"(NWB error: {e})")
+            return None
+
+        meta = et_mod.get_data_interface("eye_tracking_rig_metadata")
+
+        rig_geometry = pd.DataFrame({
+            f"monitor_position_{meta.monitor_position__unit_of_measurement}": meta.monitor_position,
+            f"camera_position_{meta.camera_position__unit_of_measurement}": meta.camera_position,
+            f"led_position_{meta.led_position__unit_of_measurement}": meta.led_position,
+            f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}": meta.monitor_rotation,
+            f"camera_rotation_{meta.camera_rotation__unit_of_measurement}": meta.camera_rotation
+        })
+
+        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
+
+        returned_metadata = {
+            "geometry": rig_geometry,
+            "equipment": meta.equipment
+        }
+
+        return returned_metadata
+
+    def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
+        """
+        Gets screen gaze data
+        Parameters
+        ----------
+        include_filtered_data: bool
+            Includes new_* data
+        Returns
+        -------
+        pd.DataFrame
+            *_eye_areas: Area of eye (in pixels^2) over time
+            *_pupil_areas: Area of pupil (in pixels^2) over time
+            *_screen_coordinates: y, x screen coordinates (in cm) over time
+            *_screen_coordinates_spherical: y, x screen coordinates (in deg) over time
+            synced_frame_timestamps: synced timestamps for video frames (in sec)
+        or None if no eye tracking data
+        """
+        try:
+            rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
+            fgm_mod = self.nwbfile.get_processing_module("filtered_gaze_mapping")
+        except KeyError as e:
+            warnings.warn(f"This ophys session '{int(self.nwbfile.identifier)}' has no eye tracking data. (NWB error: {e})")
+            return None
+
+        raw_eye_area_ts = rgm_mod.get_data_interface("eye_area")
+        raw_pupil_area_ts = rgm_mod.get_data_interface("pupil_area")
+        raw_screen_coordinates_ts = rgm_mod.get_data_interface("screen_coordinates")
+        raw_screen_coordinates_spherical_ts = rgm_mod.get_data_interface("screen_coordinates_spherical")
+
+        filtered_eye_area_ts = fgm_mod.get_data_interface("eye_area")
+        filtered_pupil_area_ts = fgm_mod.get_data_interface("pupil_area")
+        filtered_screen_coordinates_ts = fgm_mod.get_data_interface("screen_coordinates")
+        filtered_screen_coordinates_spherical_ts = fgm_mod.get_data_interface("screen_coordinates_spherical")
+
+        gaze_data = {
+            "raw_eye_area": raw_eye_area_ts.data[:],
+            "raw_pupil_area": raw_pupil_area_ts.data[:],
+            "raw_screen_coordinates_x_cm": raw_screen_coordinates_ts.data[:, 1],
+            "raw_screen_coordinates_y_cm": raw_screen_coordinates_ts.data[:, 0],
+            "raw_screen_coordinates_spherical_x_deg": raw_screen_coordinates_spherical_ts.data[:, 1],
+            "raw_screen_coordinates_spherical_y_deg": raw_screen_coordinates_spherical_ts.data[:, 0]
+        }
+
+        if include_filtered_data:
+            gaze_data.update(
+                {
+                    "filtered_eye_area": filtered_eye_area_ts.data[:],
+                    "filtered_pupil_area": filtered_pupil_area_ts.data[:],
+                    "filtered_screen_coordinates_x_cm": filtered_screen_coordinates_ts.data[:, 1],
+                    "filtered_screen_coordinates_y_cm": filtered_screen_coordinates_ts.data[:, 0],
+                    "filtered_screen_coordinates_spherical_x_deg": filtered_screen_coordinates_spherical_ts.data[:, 1],
+                    "filtered_screen_coordinates_spherical_y_deg": filtered_screen_coordinates_spherical_ts.data[:, 0]
+                }
+            )
+
+        index = pd.Index(data=raw_eye_area_ts.timestamps[:], name="Time (s)")
+        return pd.DataFrame(gaze_data, index=index)
 
     def get_ophys_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing[
-            'ophys'].get_data_interface('dff').roi_response_series[
-                'traces'].timestamps[:]
+                   'ophys'].get_data_interface('dff').roi_response_series[
+                   'traces'].timestamps[:]
 
     def get_max_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'ophys', image_api=image_api)
@@ -212,8 +355,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # NOTE: ROI masks are stored in full frame width and height arrays
         df = self.nwbfile.processing[
             'ophys'].data_interfaces[
-                'image_segmentation'].plane_segmentations[
-                    'cell_specimen_table'].to_dataframe()
+            'image_segmentation'].plane_segmentations[
+            'cell_specimen_table'].to_dataframe()
 
         # Because pynwb stores this field as "image_mask", it is renamed here
         df = df.rename(columns={'image_mask': 'roi_mask'})
@@ -250,14 +393,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
     def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
         corr_fluorescence_nwb = self.nwbfile.processing[
             'ophys'].data_interfaces[
-                'corrected_fluorescence'].roi_response_series['traces']
+            'corrected_fluorescence'].roi_response_series['traces']
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
         f_traces = corr_fluorescence_nwb.data[:].T
         df = pd.DataFrame({'corrected_fluorescence': f_traces.tolist()},
                           index=pd.Index(
-                                data=corr_fluorescence_nwb.rois.table.id[:],
-                                name='cell_roi_id'))
+                              data=corr_fluorescence_nwb.rois.table.id[:],
+                              name='cell_roi_id'))
 
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
@@ -273,3 +416,103 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             'ophys_motion_correction_y').data[:]
 
         return pd.DataFrame(motion_correction_data)
+
+    def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile, eye_tracking_df: pd.DataFrame, eye_tracking_rig_geometry: dict,
+                                     eye_gaze_mapping_file_path: Path = None) -> NWBFile:
+        # 1. Add rig geometry
+        self.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
+                                                           eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+
+        # 2. Add eye gaze mapping
+        if eye_gaze_mapping_file_path:
+            eye_gaze_data = nwb.read_eye_gaze_mappings(Path(eye_gaze_mapping_file_path))
+            nwb.add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
+                                                     eye_gaze_data=eye_gaze_data)
+
+        # 3. Add eye tracking
+        eye_tracking = EllipseSeries(
+            name='eye_tracking',
+            reference_frame='nose',
+            data=eye_tracking_df[['eye_center_x', 'eye_center_y']].values,
+            area=eye_tracking_df['eye_area'].values,
+            width=eye_tracking_df['eye_width'].values,
+            height=eye_tracking_df['eye_height'].values,
+            angle=eye_tracking_df['eye_phi'].values,
+            timestamps=eye_tracking_df['time'].values
+        )
+
+        pupil_tracking = EllipseSeries(
+            name='pupil_tracking',
+            reference_frame='nose',
+            data=eye_tracking_df[['pupil_center_x', 'pupil_center_y']].values,
+            area=eye_tracking_df['pupil_area'].values,
+            width=eye_tracking_df['pupil_width'].values,
+            height=eye_tracking_df['pupil_height'].values,
+            angle=eye_tracking_df['pupil_phi'].values,
+            timestamps=eye_tracking
+        )
+
+        corneal_reflection_tracking = EllipseSeries(
+            name='corneal_reflection_tracking',
+            reference_frame='nose',
+            data=eye_tracking_df[['cr_center_x', 'cr_center_y']].values,
+            area=eye_tracking_df['cr_area'].values,
+            width=eye_tracking_df['cr_width'].values,
+            height=eye_tracking_df['cr_height'].values,
+            angle=eye_tracking_df['cr_phi'].values,
+            timestamps=eye_tracking
+        )
+
+        likely_blink = TimeSeries(timestamps=eye_tracking,
+                                  data=eye_tracking_df['likely_blink'].values,
+                                  name='likely_blink',
+                                  description='blinks',
+                                  unit='N/A')
+
+        ellipse_eye_tracking = EllipseEyeTracking(
+            eye_tracking=eye_tracking,
+            pupil_tracking=pupil_tracking,
+            corneal_reflection_tracking=corneal_reflection_tracking,
+            likely_blink=likely_blink
+        )
+
+        nwbfile.add_acquisition(ellipse_eye_tracking)
+
+        return nwbfile
+
+    @staticmethod
+    def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: NWBFile,
+                                                      eye_tracking_rig_geometry: dict) -> NWBFile:
+        """ Rig geometry dict should consist of the following fields:
+        monitor_position_mm: [x, y, z]
+        monitor_rotation_deg: [x, y, z]
+        camera_position_mm: [x, y, z]
+        camera_rotation_deg: [x, y, z]
+        led_position: [x, y, z]
+        equipment: A string describing rig
+        """
+        eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
+                                                      description='Eye tracking rig metadata module')
+
+        ophys_eye_tracking_rig_metadata = load_pynwb_extension(OphysEyeTrackingRigMetadataSchema,
+                                                               'ndx-aibs-behavior-ophys')
+
+        rig_metadata = ophys_eye_tracking_rig_metadata(
+            name="eye_tracking_rig_metadata",
+            equipment=eye_tracking_rig_geometry['equipment'],
+            monitor_position=eye_tracking_rig_geometry['monitor_position_mm'],
+            monitor_position__unit_of_measurement="mm",
+            camera_position=eye_tracking_rig_geometry['camera_position_mm'],
+            camera_position__unit_of_measurement="mm",
+            led_position=eye_tracking_rig_geometry['led_position'],
+            led_position__unit_of_measurement="mm",
+            monitor_rotation=eye_tracking_rig_geometry['monitor_rotation_deg'],
+            monitor_rotation__unit_of_measurement="deg",
+            camera_rotation=eye_tracking_rig_geometry['camera_rotation_deg'],
+            camera_rotation__unit_of_measurement="deg"
+        )
+
+        eye_tracking_rig_mod.add_data_interface(rig_metadata)
+        nwbfile.add_processing_module(eye_tracking_rig_mod)
+
+        return nwbfile

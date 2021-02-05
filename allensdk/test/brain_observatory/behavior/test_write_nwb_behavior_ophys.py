@@ -9,6 +9,67 @@ import pytest
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_preload_eye_tracking_df, \
+    create_refined_eye_tracking_df
+
+
+@pytest.fixture
+def eye_gaze_data():
+    """Returns mock eye gaze data"""
+    raw_pupil_areas = pd.Series([2., 4.])
+    raw_eye_areas = pd.Series([3., 5.])
+    raw_screen_coordinates = pd.DataFrame({
+        "y": [2., 4.],
+        "x": [3., 5.]
+    })
+    raw_screen_coordinates_spherical = pd.DataFrame({
+        "y": [2., 4.],
+        "x": [3., 5.]
+    })
+    new_pupil_areas = pd.Series([2., 4.])
+    new_eye_areas = pd.Series([3., 5.])
+    new_screen_coordinates = pd.DataFrame({
+        "y": [2., 4.],
+        "x": [3., 5.]
+    })
+    new_screen_coordinates_spherical = pd.DataFrame({
+        "y": [2., 4.],
+        "x": [3., 5.]
+    })
+    synced_frame_timestamps = pd.Series([.1, .2])
+
+    return dict(
+        raw_pupil_areas=raw_pupil_areas,
+        raw_eye_areas=raw_eye_areas,
+        raw_screen_coordinates=raw_screen_coordinates,
+        raw_screen_coordinates_spherical=raw_screen_coordinates_spherical,
+        new_pupil_areas=new_pupil_areas,
+        new_eye_areas=new_eye_areas,
+        new_screen_coordinates=new_screen_coordinates,
+        new_screen_coordinates_spherical=new_screen_coordinates_spherical,
+        synced_frame_timestamps=synced_frame_timestamps
+    )
+
+
+@pytest.fixture
+def rig_geometry():
+    """Returns mock rig geometry data"""
+    return {"monitor_position_mm": [1., 2., 3.],
+     "monitor_rotation_deg": [4., 5., 6.],
+     "camera_position_mm": [7., 8., 9.],
+     "camera_rotation_deg": [10., 11., 12.],
+     "led_position": [13., 14., 15.],
+     "equipment": "test_rig"}
+
+
+@pytest.fixture
+def eye_tracking_data():
+    return create_refined_eye_tracking_df(
+        np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
+                   1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15.],
+                  [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
+                   2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]])
+    )
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -305,3 +366,50 @@ def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correcti
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(motion_correction, obt.get_motion_correction(), check_dtype=False)
+
+@pytest.mark.parametrize("roundtrip", [True, False])
+@pytest.mark.parametrize("expected", [
+    ({"geometry": pd.DataFrame({"monitor_position_mm": [1., 2., 3.],
+                                "monitor_rotation_deg": [4., 5., 6.],
+                                "camera_position_mm": [7., 8., 9.],
+                                "camera_rotation_deg": [10., 11., 12.],
+                                "led_position_mm": [13., 14., 15.]},
+                               index=["x", "y", "z"]),
+      "equipment": "test_rig"}),
+])
+def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
+                                                       roundtrip,
+                                                       rig_geometry,
+                                                       expected):
+    api = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    nwbfile = api.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+                                                                rig_geometry)
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    obtained_metadata = obt.get_rig_metadata()
+
+    pd.testing.assert_frame_equal(obtained_metadata["geometry"], expected["geometry"], check_like=True)
+    assert obtained_metadata["equipment"] == expected["equipment"]
+
+
+@pytest.mark.parametrize("roundtrip", [True, False])
+def test_add_eye_tracking_data_to_nwbfile(tmp_path, nwbfile, eye_tracking_data, rig_geometry,
+                                          roundtripper, roundtrip):
+    api = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    nwbfile = api.add_eye_tracking_data_to_nwb(
+        nwbfile=nwbfile,
+        eye_tracking_df=eye_tracking_data,
+        eye_tracking_rig_geometry=rig_geometry
+    )
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    obtained = obt.get_eye_tracking()
+
+    pd.testing.assert_frame_equal(obtained,
+                                  eye_tracking_data, check_like=True)

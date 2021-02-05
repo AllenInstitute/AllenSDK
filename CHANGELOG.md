@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.6.0] = TBD
 - Adds ability to write and read behavior only NWB files
+- Adds eye tracking ellipse fits and metadata as new NWB data stream
 
 ## [2.5.0] = 2021-01-29
 -  Adds unfiltered running speed as new data stream

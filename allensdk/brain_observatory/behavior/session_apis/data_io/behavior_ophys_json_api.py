@@ -114,3 +114,15 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms, BehaviorJsonApi):
             return self.data["imaging_plane_group"]
         except KeyError:
             return None
+
+    def get_eye_tracking_rig_geometry(self) -> dict:
+        """Get the eye tracking rig geometry associated with an ophys experiment"""
+        return self.data['eye_tracking_rig_geometry']
+
+    def get_eye_tracking_filepath(self) -> dict:
+        """Get the eye tracking filepath containing ellipse fits"""
+        return self.data['eye_tracking_filepath']
+
+    def get_eye_gaze_mapping_file_path(self) -> str:
+        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
+        return self.data['eye_gaze_mapping_path']
