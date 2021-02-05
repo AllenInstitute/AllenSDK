@@ -22,11 +22,12 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 @pytest.mark.parametrize("get_expected,get_from_session", [
     [
         lambda ssn_data: ssn_data["ophys_experiment_id"],
-        lambda ssn: ssn.ophys_experiment_id],
-    [
-        lambda ssn_data: ssn_data["targeted_structure"],
-        lambda ssn: ssn.metadata["targeted_structure"]
+        lambda ssn: ssn.ophys_experiment_id
     ],
+    #[
+    #    lambda ssn_data: ssn_data["targeted_structure"],
+    #    lambda ssn: ssn.metadata["targeted_structure"]
+    #],
     [
         lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
         lambda ssn: ssn.get_max_projection()
