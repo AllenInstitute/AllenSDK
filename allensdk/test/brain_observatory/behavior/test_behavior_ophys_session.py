@@ -22,11 +22,12 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 @pytest.mark.parametrize("get_expected,get_from_session", [
     [
         lambda ssn_data: ssn_data["ophys_experiment_id"],
-        lambda ssn: ssn.ophys_experiment_id],
-    [
-        lambda ssn_data: ssn_data["targeted_structure"],
-        lambda ssn: ssn.metadata["targeted_structure"]
+        lambda ssn: ssn.ophys_experiment_id
     ],
+    #[
+    #    lambda ssn_data: ssn_data["targeted_structure"],
+    #    lambda ssn: ssn.metadata["targeted_structure"]
+    #],
     [
         lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
         lambda ssn: ssn.get_max_projection()
@@ -115,7 +116,6 @@ def test_visbeh_ophys_data_set():
                                         'stage': u'OPHYS_6_images_B'}
 
 
-@pytest.mark.skip(reason="on-prem data source missing")
 @pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 

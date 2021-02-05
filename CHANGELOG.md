@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] = 2021-02-05
+- Adds ability to write and read behavior only NWB files
+- Adds eye tracking ellipse fits and metadata as new NWB data stream
+- OPhys Behavior data retrieval methods no longer depend on ROIs being ordered identically in different files.
+
 ## [2.5.0] = 2021-01-29
 -  Adds unfiltered running speed as new data stream
 -  run_demixing gracefully ignores any ROIs that are not in the input trace file

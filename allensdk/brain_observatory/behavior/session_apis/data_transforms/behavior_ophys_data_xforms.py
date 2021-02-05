@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 import uuid
 
 import h5py
@@ -12,36 +12,33 @@ from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase)
 
-from allensdk.brain_observatory.behavior.trials_processing import (
-    get_extended_trials)
+
 from allensdk.brain_observatory.behavior.sync import (
     get_sync_data, get_stimulus_rebase_function, frame_time_offset)
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
-from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata)
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_task_parameters)
-from allensdk.brain_observatory.behavior.running_processing import (
-    get_running_df)
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
+    BehaviorDataXforms
+)
 
 
-class BehaviorOphysDataXforms(BehaviorOphysBase):
+class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
     """This class provides methods that transform (xform) 'raw' data provided
     by LIMS data APIs to fill a BehaviorOphysSession.
     """
 
     @memoize
     def get_cell_specimen_table(self):
-        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id').sort_index()
+        cell_specimen_table = pd.DataFrame.from_dict(
+            self.get_raw_cell_specimen_table_dict()).set_index(
+                'cell_roi_id').sort_index()
         fov_width = self.get_field_of_view_shape()['width']
         fov_height = self.get_field_of_view_shape()['height']
 
@@ -59,7 +56,8 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
             roi_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
 
         cell_specimen_table['roi_mask'] = roi_mask_list
-        cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
+        cell_specimen_table = cell_specimen_table[
+            sorted(cell_specimen_table.columns)]
 
         cell_specimen_table.index.rename('cell_roi_id', inplace=True)
         cell_specimen_table.reset_index(inplace=True)
@@ -69,7 +67,9 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
     @memoize
     def get_ophys_timestamps(self):
         ophys_timestamps = self.get_sync_data()['ophys_frames']
+
         dff_traces = self.get_raw_dff_data()
+
         plane_group = self.get_imaging_plane_group()
 
         number_of_cells, number_of_dff_frames = dff_traces.shape
@@ -154,14 +154,8 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         return resampled
 
     def get_behavior_session_uuid(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
+        data = self._behavior_stimulus_file()
         return data['session_uuid']
-
-    @memoize
-    def get_stimulus_frame_rate(self):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        return np.round(1 / np.mean(np.diff(stimulus_timestamps)), 0)
 
     @memoize
     def get_ophys_frame_rate(self):
@@ -169,33 +163,37 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
 
     @memoize
-    def get_metadata(self):
-        mdata = dict()
-        mdata['ophys_experiment_id'] = self.get_ophys_experiment_id()
-        mdata['experiment_container_id'] = self.get_experiment_container_id()
-        mdata['ophys_frame_rate'] = self.get_ophys_frame_rate()
-        mdata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
-        mdata['targeted_structure'] = self.get_targeted_structure()
-        mdata['imaging_depth'] = self.get_imaging_depth()
-        mdata['session_type'] = self.get_stimulus_name()
-        mdata['experiment_datetime'] = self.get_experiment_date()
-        mdata['reporter_line'] = self.get_reporter_line()
-        mdata['driver_line'] = self.get_driver_line()
-        mdata['LabTracks_ID'] = self.get_external_specimen_name()
-        mdata['full_genotype'] = self.get_full_genotype()
+    def get_metadata(self) -> Dict[str, Any]:
+        """Return metadata about the session.
+        :rtype: dict
+        """
         behavior_session_uuid = self.get_behavior_session_uuid()
-        mdata['behavior_session_uuid'] = uuid.UUID(behavior_session_uuid)
-        mdata["imaging_plane_group"] = self.get_imaging_plane_group()
-        mdata['rig_name'] = self.get_rig_name()
-        mdata['sex'] = self.get_sex()
-        mdata['age'] = self.get_age()
-        mdata['excitation_lambda'] = 910.
-        mdata['emission_lambda'] = 520.
-        mdata['indicator'] = 'GCAMP6f'
-        mdata['field_of_view_width'] = self.get_field_of_view_shape()['width']
-        mdata['field_of_view_height'] = self.get_field_of_view_shape()['height']
 
-        return mdata
+        metadata = {
+            'ophys_experiment_id': self.get_ophys_experiment_id(),
+            'experiment_container_id': self.get_experiment_container_id(),
+            'ophys_frame_rate': self.get_ophys_frame_rate(),
+            'stimulus_frame_rate': self.get_stimulus_frame_rate(),
+            'targeted_structure': self.get_targeted_structure(),
+            'imaging_depth': self.get_imaging_depth(),
+            'session_type': self.get_stimulus_name(),
+            'experiment_datetime': self.get_experiment_date(),
+            'reporter_line': self.get_reporter_line(),
+            'driver_line': self.get_driver_line(),
+            'LabTracks_ID': self.get_external_specimen_name(),
+            'full_genotype': self.get_full_genotype(),
+            'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
+            'imaging_plane_group': self.get_imaging_plane_group(),
+            'rig_name': self.get_rig_name(),
+            'sex': self.get_sex(),
+            'age': self.get_age(),
+            'excitation_lambda': 910.0,
+            'emission_lambda': 520.0,
+            'indicator': 'GCAMP6f',
+            'field_of_view_width': self.get_field_of_view_shape()['width'],
+            'field_of_view_height': self.get_field_of_view_shape()['height']
+        }
+        return metadata
 
     @memoize
     def get_cell_roi_ids(self):
@@ -205,14 +203,36 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
 
     def get_raw_dff_data(self):
         dff_path = self.get_dff_file()
+
+        # guarantee that DFF traces are ordered the same
+        # way as ROIs in the cell_specimen_table
+        cell_roi_id_list = self.get_cell_roi_ids()
+        dt = cell_roi_id_list.dtype
+
         with h5py.File(dff_path, 'r') as raw_file:
-            dff_traces = np.asarray(raw_file['data'])
+            raw_dff_traces = np.asarray(raw_file['data'])
+            roi_names = np.asarray(raw_file['roi_names']).astype(dt)
+
+        if not np.in1d(roi_names, cell_roi_id_list).all():
+            raise RuntimeError("DFF traces contains ROI IDs that "
+                               "are not in cell_specimen_table.cell_roi_id")
+        if not np.in1d(cell_roi_id_list, roi_names).all():
+            raise RuntimeError("cell_specimen_table contains ROI IDs "
+                               "that are not in DFF traces file")
+
+        dff_traces = np.zeros(raw_dff_traces.shape, dtype=float)
+        for raw_trace, roi_id in zip(raw_dff_traces, roi_names):
+            idx = np.where(cell_roi_id_list==roi_id)[0][0]
+            dff_traces[idx,:] = raw_trace
+
         return dff_traces
 
     @memoize
     def get_dff_traces(self):
         dff_traces = self.get_raw_dff_data()
+
         cell_roi_id_list = self.get_cell_roi_ids()
+
         df = pd.DataFrame({'dff': [x for x in dff_traces]},
                           index=pd.Index(cell_roi_id_list,
                           name='cell_roi_id'))
@@ -222,69 +242,13 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         return df
 
     @memoize
-    def get_running_data_df(self, lowpass=True):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
-
-    @memoize
-    def get_running_speed(self, lowpass=True):
-        running_data_df = self.get_running_data_df(lowpass=lowpass)
-        assert running_data_df.index.name == 'timestamps'
-        return RunningSpeed(timestamps=running_data_df.index.values,
-                            values=running_data_df.speed.values)
-
-    @memoize
-    def get_stimulus_presentations(self):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        stim_presentations_df_pre = get_stimulus_presentations(
-            data, stimulus_timestamps)
-        stimulus_metadata_df = get_stimulus_metadata(data)
-        idx_name = stim_presentations_df_pre.index.name
-
-        stimulus_index_df = (
-            stim_presentations_df_pre.reset_index().merge(
-                stimulus_metadata_df.reset_index(),
-                on=['image_name']).set_index(idx_name))
-
-        stimulus_index_df.sort_index(inplace=True)
-
-        columns_to_select = ['image_set', 'image_index', 'start_time',
-                             'phase', 'spatial_frequency']
-
-        stimulus_index_df = (
-            stimulus_index_df[columns_to_select].rename(
-                columns={'start_time': 'timestamps'}))
-
-        stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
-        stim_presentations_df = (
-            stim_presentations_df_pre.merge(stimulus_index_df,
-                                            left_on='start_time',
-                                            right_index=True, how='left'))
-
-        assert len(stim_presentations_df_pre) == len(stim_presentations_df)
-
-        sorted_column_names = sorted(stim_presentations_df.columns)
-        return stim_presentations_df[sorted_column_names]
-
-    @memoize
-    def get_stimulus_templates(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_stimulus_templates(data)
-
-    @memoize
     def get_sync_licks(self):
         lick_times = self.get_sync_data()['lick_times']
         return pd.DataFrame({'time': lick_times})
 
     @memoize
     def get_licks(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
+        data = self._behavior_stimulus_file()
         rebase_function = self.get_stimulus_rebase_function()
         # Get licks from pickle file (need to add an offset to align with
         # the trial_log time stream)
@@ -303,26 +267,19 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
 
     @memoize
     def get_rewards(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
+        data = self._behavior_stimulus_file()
         rebase_function = self.get_stimulus_rebase_function()
         return get_rewards(data, rebase_function)
-
-    @memoize
-    def get_task_parameters(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_task_parameters(data)
 
     @memoize
     def get_trials(self):
 
         licks = self.get_licks()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
         rewards = self.get_rewards()
         stimulus_presentations = self.get_stimulus_presentations()
+        data = self._behavior_stimulus_file()
         rebase_function = self.get_stimulus_rebase_function()
+
         trial_df = get_trials(data, licks, rewards,
                               stimulus_presentations, rebase_function)
 
@@ -332,18 +289,28 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
     def get_corrected_fluorescence_traces(self):
         demix_file = self.get_demix_file()
 
-        g = h5py.File(demix_file)
-        corrected_fluorescence_traces = np.asarray(g['data'])
-        g.close()
-
         cell_roi_id_list = self.get_cell_roi_ids()
+        dt = cell_roi_id_list.dtype
+
+        with h5py.File(demix_file, 'r') as in_file:
+            corrected_fluorescence_traces = in_file['data'][()]
+            corrected_fluorescence_roi_id = in_file['roi_names'][()].astype(dt)
+
+        if not np.in1d(corrected_fluorescence_roi_id, cell_roi_id_list).all():
+            raise RuntimeError("corrected_fluorescence_traces contains ROI IDs "
+                               "not present in cell_specimen_table")
+        if not np.in1d(cell_roi_id_list, corrected_fluorescence_roi_id).all():
+            raise RuntimeError("cell_specimen_table contains ROI IDs "
+                               "not present in corrected_fluorescence_traces")
+
         ophys_timestamps = self.get_ophys_timestamps()
 
         num_trace_timepoints = corrected_fluorescence_traces.shape[1]
         assert num_trace_timepoints == ophys_timestamps.shape[0]
         df = pd.DataFrame(
             {'corrected_fluorescence': list(corrected_fluorescence_traces)},
-            index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
+            index=pd.Index(corrected_fluorescence_roi_id,
+                           name='cell_roi_id'))
 
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
@@ -383,17 +350,11 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         stimulus_timestamps_no_monitor_delay = (
             self.get_sync_data()['stimulus_times_no_delay'])
 
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
+        data = self._behavior_stimulus_file()
         stimulus_rebase_function = get_stimulus_rebase_function(
             data, stimulus_timestamps_no_monitor_delay)
 
         return stimulus_rebase_function
-
-    def get_extended_trials(self):
-        filename = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(filename)
-        return get_extended_trials(data)
 
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,

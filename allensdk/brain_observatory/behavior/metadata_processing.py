@@ -26,6 +26,11 @@ OPHYS_5_DESCRIPTION = (
     "previously trained, but with the lick-response "
     "sensor withdrawn (passive/open loop mode)."
 )
+TRAINING_DESCRIPTION = (
+    "A training session where a mouse performs a visual change detection task "
+    "with a set of natural scenes. Successfully completing the task delivers "
+    "a water reward via a lick spout."
+)
 
 
 def get_expt_description(session_type: str) -> str:
@@ -55,8 +60,11 @@ def get_expt_description(session_type: str) -> str:
     ophys_4_6 = dict.fromkeys(["OPHYS_4", "OPHYS_6"], OPHYS_4_6_DESCRIPTION)
     ophys_2_5 = {"OPHYS_2": OPHYS_2_DESCRIPTION,
                  "OPHYS_5": OPHYS_5_DESCRIPTION}
+    training = dict.fromkeys(
+        ["TRAINING_1", "TRAINING_2", "TRAINING_3", "TRAINING_4", "TRAINING_5"],
+        TRAINING_DESCRIPTION)
 
-    expt_description_dict = {**ophys_1_3, **ophys_2_5, **ophys_4_6}
+    expt_description_dict = {**ophys_1_3, **ophys_2_5, **ophys_4_6, **training}
 
     # Session type string will look something like: OPHYS_4_images_A
     truncated_session_type = "_".join(session_type.split("_")[:2])

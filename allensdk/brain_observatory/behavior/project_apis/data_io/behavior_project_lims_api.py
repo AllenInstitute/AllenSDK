@@ -184,7 +184,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 bs.id AS behavior_session_id,
                 bs.ophys_session_id,
-                bs.behavior_training_id,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
                 d.id as donor_id,

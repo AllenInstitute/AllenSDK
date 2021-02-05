@@ -15,9 +15,10 @@ from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
-from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
+from pynwb.ophys import (
+    DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
+from ndx_events import Events
 
-import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
@@ -25,8 +26,8 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import (
     CompleteOphysBehaviorMetadataSchema, NwbOphysMetadataSchema,
-    OphysBehaviorMetadataSchema, BehaviorTaskParametersSchema,
-    SubjectMetadataSchema
+    BehaviorMetadataSchema, OphysBehaviorMetadataSchema,
+    BehaviorTaskParametersSchema, SubjectMetadataSchema
 )
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 
@@ -306,7 +307,8 @@ def add_eye_gaze_mapping_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     return nwbfile
 
 
-def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
+def add_running_speed_to_nwbfile(nwbfile, running_speed,
+                                 name='speed', unit='cm/s'):
     ''' Adds running speed data to an NWBFile as a timeseries in acquisition
 
     Parameters
@@ -344,8 +346,10 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
     return nwbfile
 
 
-def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_unfiltered, unit_dict):
-    """Adds both unfiltered (raw) and filtered running speed data to an NWBFile as timeseries in acquisition and processing
+def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
+                                    running_data_df_unfiltered, unit_dict):
+    """Adds both unfiltered (raw) and filtered running speed data to an
+    NWBFile as timeseries in acquisition and processing
 
     Parameters
     ----------
@@ -354,11 +358,13 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_un
     running_data_df : pandas.DataFrame
         Filtered running data
         Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df_unfiltered
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
+        running_data_df_unfiltered
     running_data_df_unfiltered : pandas.DataFrame
         Unfiltered (raw) Running data
         Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in running_data_df
+        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
+        running_data_df
     unit_dict : dict, optional
         SI units of running speed values
 
@@ -370,11 +376,15 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, running_data_df_un
     running_speed = RunningSpeed(timestamps=running_data_df.index.values,
                                  values=running_data_df['speed'].values)
 
-    running_speed_unfiltered = RunningSpeed(timestamps=running_data_df_unfiltered.index.values,
-                                            values=running_data_df_unfiltered['speed'].values)
+    running_speed_unfiltered = RunningSpeed(
+        timestamps=running_data_df_unfiltered.index.values,
+        values=running_data_df_unfiltered['speed'].values)
 
-    add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
-    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered, name='speed_unfiltered', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed,
+                                 name='speed', unit=unit_dict['speed'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered,
+                                 name='speed_unfiltered',
+                                 unit=unit_dict['speed'])
 
     running_mod = nwbfile.processing['running']
     timestamps_ts = running_mod.get_data_interface('speed').timestamps
@@ -638,19 +648,15 @@ def add_trials(nwbfile, trials, description_dict={}):
 
 def add_licks(nwbfile, licks):
 
-    licks_event_series = TimeSeries(
-        data=licks.time.values,
-        name='timestamps',
+    lick_events = Events(
         timestamps=licks.time.values,
-        unit='s'
+        name='licks',
+        description='Timestamps for lick events'
     )
-
-    # Add lick event timeseries to lick interface:
-    licks_interface = BehavioralEvents([licks_event_series], 'licks')
 
     # Add lick interface to nwb file, by way of a processing module:
     licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
-    licks_mod.add_data_interface(licks_interface)
+    licks_mod.add_data_interface(lick_events)
     nwbfile.add_processing_module(licks_mod)
 
     return nwbfile
@@ -744,7 +750,7 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
     nwbfile.add_stimulus(image_index)
 
 
-def add_metadata(nwbfile, metadata: dict):
+def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename incoming metadata fields to conform with pynwb Subject fields
     metadata = metadata.copy()
     metadata["subject_id"] = metadata.pop("LabTracks_ID")
@@ -787,9 +793,15 @@ def add_metadata(nwbfile, metadata: dict):
         else:
             new_metadata_dict[key] = val
 
-    OphysBehaviorMetadata = load_pynwb_extension(OphysBehaviorMetadataSchema,
-                                                 'ndx-aibs-behavior-ophys')
-    nwb_metadata = OphysBehaviorMetadata(name='metadata', **new_metadata_dict)
+    if behavior_only:
+        BehaviorMetadata = load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
+        nwb_metadata = BehaviorMetadata(name='metadata', **new_metadata_dict)
+    else:
+        OphysBehaviorMetadata = load_pynwb_extension(
+            OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
+        nwb_metadata = OphysBehaviorMetadata(name='metadata',
+                                             **new_metadata_dict)
     nwbfile.add_lab_meta_data(nwb_metadata)
 
 
@@ -907,7 +919,7 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     for cell_roi_id, table_row in cell_roi_table.iterrows():
 
         # NOTE: The 'roi_mask' in this cell_roi_table has already been
-        # processing by the function from 
+        # processing by the function from
         # allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api
         # get_cell_specimen_table() method. As a result, the ROI is stored in
         # an array that is the same shape as the FULL field of view of the
@@ -996,3 +1008,5 @@ def add_motion_correction(nwbfile, motion_correction):
 
     ophys_module.add_data_interface(t1)
     ophys_module.add_data_interface(t2)
+
+
