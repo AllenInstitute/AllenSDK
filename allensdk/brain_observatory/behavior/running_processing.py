@@ -63,8 +63,8 @@ def _shift(
     np.ndarray (1d)
         Copy of input object as a 1d array, shifted.
     """
-    if periods <= 0:
-        raise ValueError("Can only shift for periods > 0.")
+    # if periods <= 0:
+    #     raise ValueError("Can only shift for periods > 0.")
     if fill_value is None:
         fill_value = np.nan
     if isinstance(fill_value, float):
