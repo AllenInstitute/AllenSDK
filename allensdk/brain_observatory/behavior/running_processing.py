@@ -7,13 +7,9 @@ from typing import Iterable, Union, Any, Optional
 
 
 def calc_deriv(x, time):
-    dx = np.diff(x)
-    dt = np.diff(time)
-    dxdt_rt = np.hstack((np.nan, dx / dt))
-    dxdt_lt = np.hstack((dx / dt, np.nan))
-    dxdt = np.vstack((dxdt_rt, dxdt_lt))
-    dxdt = np.nanmean(dxdt, axis=0)
-    return dxdt
+    dx = np.diff(x, prepend=np.nan)
+    dt = np.diff(time, prepend=np.nan)
+    return dx / dt
 
 
 def _angular_change(summed_voltage: np.ndarray,
@@ -63,8 +59,8 @@ def _shift(
     np.ndarray (1d)
         Copy of input object as a 1d array, shifted.
     """
-    # if periods <= 0:
-    #     raise ValueError("Can only shift for periods > 0.")
+    if periods <= 0:
+        raise ValueError("Can only shift for periods > 0.")
     if fill_value is None:
         fill_value = np.nan
     if isinstance(fill_value, float):
@@ -299,7 +295,7 @@ def _zscore_threshold_1d(data: np.ndarray,
     scores = zscore(data, nan_policy="omit")
     # Suppress warnings when comparing to nan values to reduce noise
     with np.errstate(invalid='ignore'):
-        corrected_data[scores > threshold] = np.nan
+        corrected_data[np.abs(scores) > threshold] = np.nan
     return corrected_data
 
 
@@ -394,13 +390,15 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
 
     # Final filtering (optional) for smoothing out the speed data
     if lowpass:
-        b, a = signal.butter(3, Wn=10, fs=60, btype="lowpass")
+        b, a = signal.butter(3, Wn=4, fs=60, btype="lowpass")
         outlier_corrected_linear_speed = signal.filtfilt(
             b, a, np.nan_to_num(outlier_corrected_linear_speed))
 
     return pd.DataFrame({
+        'speed_pre_noise_removal': linear_speed[:len(time)],
         'speed': outlier_corrected_linear_speed[:len(time)],
         'dx': dx_raw[:len(time)],
         'v_sig': v_sig[:len(time)],
+        'v_sig_unwrapped': unwrapped_vsig[:len(time)],
         'v_in': v_in[:len(time)],
     }, index=pd.Index(time, name='timestamps'))
