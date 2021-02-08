@@ -431,11 +431,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return pd.DataFrame(motion_correction_data)
 
-    def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile, eye_tracking_df: pd.DataFrame, eye_tracking_rig_geometry: dict,
+    def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile, eye_tracking_df: pd.DataFrame,
+                                     eye_tracking_rig_geometry: Optional[dict],
                                      eye_gaze_mapping_file_path: Path = None) -> NWBFile:
         # 1. Add rig geometry
-        self.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
-                                                           eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+        if eye_tracking_rig_geometry:
+            self.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
+                                                               eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
         # 2. Add eye gaze mapping
         if eye_gaze_mapping_file_path:

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import pandas as pd
 import numpy as np
@@ -411,3 +413,34 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
     api = BehaviorOphysLimsApi(123)
     with pytest.raises(RuntimeError):
         f_traces = api.get_corrected_fluorescence_traces()
+
+
+def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
+    """
+    This test tests that when there are multiple rig geometries for an experiment,
+    that only the most recent is returned
+    """
+    def dummy_init(self, ophys_experiment_id):
+        self.ophys_experiment_id = ophys_experiment_id
+
+    monkeypatch.setattr(BehaviorOphysLimsApi,
+                        '__init__',
+                        dummy_init)
+    api = BehaviorOphysLimsApi(123)
+
+    resources_dir = Path(os.path.dirname(__file__)) / 'resources'
+    rig_geometry = pd.read_pickle(resources_dir / 'rig_geometry_multiple_rig_configs.pkl')
+    rig_geometry = api._process_eye_tracking_rig_geometry(rig_geometry=rig_geometry)
+
+    expected = {
+        'camera_position_mm': [102.8, 74.7, 31.6],
+        'led_position': [246.0, 92.3, 52.6],
+        'monitor_position_mm': [118.6, 86.2, 31.6],
+        'camera_rotation_deg': [0.0, 0.0, 2.8],
+        'monitor_rotation_deg': [0.0, 0.0, 0.0],
+        'equipment': 'CAM2P.5'
+    }
+
+    assert rig_geometry == expected
+
+

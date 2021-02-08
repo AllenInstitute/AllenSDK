@@ -155,43 +155,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             # There is no rig geometry for this experiment
             return None
 
-        # Map the config types to new names
-        rig_geometry_config_type_map = {
-            'eye camera position': 'camera',
-            'screen position': 'monitor',
-            'led position': 'led'
-        }
-        rig_geometry['config_type'] = rig_geometry['config_type'].map(rig_geometry_config_type_map)
-
-        # Select the most recent config that precedes the date_of_acquisition for this experiment
-        rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
-        rig_geometry = rig_geometry.groupby('config_type').apply(lambda x: x.iloc[0])
-
-        # Construct dictionary for positions
-        position = rig_geometry[['center_x_mm', 'center_y_mm', 'center_z_mm']]
-        position.index = [f'{v}_position_mm' if v != 'led' else f'{v}_position' for v in position.index]
-        position = position.to_dict(orient='index')
-        position = {
-            config_type: [values['center_x_mm'], values['center_y_mm'], values['center_z_mm']]
-            for config_type, values in position.items()
-        }
-
-        # Construct dictionary for rotations
-        rotation = rig_geometry[['rotation_x_deg', 'rotation_y_deg', 'rotation_z_deg']]
-        rotation = rotation[rotation.index != 'led']
-        rotation.index = [f'{v}_rotation_deg' for v in rotation.index]
-        rotation = rotation.to_dict(orient='index')
-        rotation = {
-            config_type: [values['rotation_x_deg'], values['rotation_y_deg'], values['rotation_z_deg']]
-            for config_type, values in rotation.items()
-        }
-
-        # Combine the dictionaries
-        return {
-            **position,
-            **rotation,
-            'equipment': rig_geometry['equipment_name'].iloc[0]
-        }
+        return self._process_eye_tracking_rig_geometry(rig_geometry=rig_geometry)
 
     def get_ophys_experiment_df(self) -> pd.DataFrame:
         """Get a DataFrame of metadata for ophys experiments"""
@@ -237,6 +201,50 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             columns={'id': 'container_id'})[['container_id',
                                              'specimen_id',
                                              'workflow_state']]
+
+    @staticmethod
+    def _process_eye_tracking_rig_geometry(rig_geometry: pd.DataFrame) -> dict:
+        """
+        Processes the raw eye tracking rig geometry returned by LIMS
+        """
+        # Map the config types to new names
+        rig_geometry_config_type_map = {
+            'eye camera position': 'camera',
+            'screen position': 'monitor',
+            'led position': 'led'
+        }
+        rig_geometry['config_type'] = rig_geometry['config_type'].map(rig_geometry_config_type_map)
+
+        # Select the most recent config that precedes the date_of_acquisition for this experiment
+        rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
+        rig_geometry = rig_geometry.groupby('config_type').apply(lambda x: x.iloc[0])
+
+        # Construct dictionary for positions
+        position = rig_geometry[['center_x_mm', 'center_y_mm', 'center_z_mm']]
+        position.index = [f'{v}_position_mm' if v != 'led' else f'{v}_position' for v in position.index]
+        position = position.to_dict(orient='index')
+        position = {
+            config_type: [values['center_x_mm'], values['center_y_mm'], values['center_z_mm']]
+            for config_type, values in position.items()
+        }
+
+        # Construct dictionary for rotations
+        rotation = rig_geometry[['rotation_x_deg', 'rotation_y_deg', 'rotation_z_deg']]
+        rotation = rotation[rotation.index != 'led']
+        rotation.index = [f'{v}_rotation_deg' for v in rotation.index]
+        rotation = rotation.to_dict(orient='index')
+        rotation = {
+            config_type: [values['rotation_x_deg'], values['rotation_y_deg'], values['rotation_z_deg']]
+            for config_type, values in rotation.items()
+        }
+
+        # Combine the dictionaries
+        return {
+            **position,
+            **rotation,
+            'equipment': rig_geometry['equipment_name'].iloc[0]
+        }
+
 
     @classmethod
     def get_api_list_by_container_id(cls, container_id
