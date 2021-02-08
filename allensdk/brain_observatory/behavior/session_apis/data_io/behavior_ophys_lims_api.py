@@ -106,36 +106,30 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
     def get_eye_tracking_filepath(self) -> str:
         """Get the filepath of the eye tracking file (*.h5) associated with the
         ophys experiment"""
-        query = """
-                SELECT wkf.storage_directory || wkf.filename
-                AS eye_tracking_file
+        query = f"""
+                SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                 FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf
-                ON wkf.attachable_id = oe.ophys_session_id
-                JOIN well_known_file_types wkft
-                ON wkf.well_known_file_type_id = wkft.id
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
+                JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
                 WHERE wkf.attachable_type = 'OphysSession'
-                AND wkft.name = 'EyeTracking Ellipses'
-                AND oe.id = {};
-                """.format(self.get_ophys_experiment_id())
+                    AND wkft.name = 'EyeTracking Ellipses'
+                    AND oe.id = {self.get_ophys_experiment_id()};
+                """
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_eye_gaze_mapping_file_path(self) -> str:
         """Get the filepath of the eye gaze mapping file (*.h5) associated with the
         ophys experiment"""
-        query = """
-                SELECT wkf.storage_directory || wkf.filename
-                AS eye_tracking_file
+        query = f"""
+                SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                 FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf
-                ON wkf.attachable_id = oe.ophys_session_id
-                JOIN well_known_file_types wkft
-                ON wkf.well_known_file_type_id = wkft.id
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
+                JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
                 WHERE wkf.attachable_type = 'OphysSession'
-                AND wkft.name = 'EyeDlcScreenMapping'
-                AND oe.id = {};
-                """.format(self.get_ophys_experiment_id())
+                    AND wkft.name = 'EyeDlcScreenMapping'
+                    AND oe.id = {self.get_ophys_experiment_id()};
+                """
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
