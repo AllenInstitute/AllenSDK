@@ -6,6 +6,7 @@ import uuid
 import h5py
 import matplotlib.image as mpimg  # NOQA: E402
 import numpy as np
+import xarray as xr
 import pandas as pd
 
 from allensdk.api.cache import memoize
@@ -356,6 +357,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
         return stimulus_rebase_function
 
+    @memoize
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
                          dilation_frames: int = 2):
@@ -380,3 +382,84 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
                                                       dilation_frames)
 
         return eye_tracking_data
+
+    @memoize
+    def get_roi_masks_by_cell_roi_id(self, cell_roi_ids=None):
+        """ Obtains boolean masks indicating the location of one
+        or more ROIs in this session.
+
+        Parameters
+        ----------
+        cell_roi_ids : array-like of int, optional
+            ROI masks for these rois will be returned.
+            The default behavior is to return masks for all rois.
+
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - roi_id : which roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        Notes
+        -----
+        This method helps Allen Institute scientists to look at sessions
+        that have not yet had cell specimen ids assigned. You probably want
+        to use get_roi_masks instead.
+        """
+
+        cell_specimen_table = self.get_cell_specimen_table()
+
+        if cell_roi_ids is None:
+            cell_roi_ids = cell_specimen_table["cell_roi_id"].unique()
+        elif (isinstance(cell_roi_ids, int)
+              or np.issubdtype(type(cell_roi_ids), np.integer)):
+            cell_roi_ids = np.array([int(cell_roi_ids)])
+        else:
+            cell_roi_ids = np.array(cell_roi_ids)
+
+        table = cell_specimen_table.copy()
+        table.set_index("cell_roi_id", inplace=True)
+        table = table.loc[cell_roi_ids, :]
+
+        full_image_shape = table.iloc[0]["roi_mask"].shape
+        output = np.zeros((len(cell_roi_ids),
+                          full_image_shape[0],
+                          full_image_shape[1]), dtype=np.uint8)
+
+        for ii, (_, row) in enumerate(table.iterrows()):
+            translated_roi_mask = np.roll(
+                row["roi_mask"],
+                shift=(int(row["y"]), int(row["x"])),
+                axis=(0, 1))
+            output[ii, :, :] = translated_roi_mask
+
+        # Pixel spacing and units of mask image will match either the
+        # max or avg projection image of 2P movie.
+        max_projection_image = ImageApi.deserialize(self.get_max_projection())
+        # Spacing is in (col_spacing, row_spacing) order
+        # Coordinates also start spacing_dim / 2 for first element in a
+        # dimension. See:
+        # https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html
+        pixel_spacing = max_projection_image.spacing
+        unit = max_projection_image.unit
+
+        return xr.DataArray(
+            data=output,
+            dims=("cell_roi_id", "row", "column"),
+            coords={
+                "cell_roi_id": cell_roi_ids,
+                "row": (np.arange(full_image_shape[0])
+                        * pixel_spacing[1]
+                        + (pixel_spacing[1] / 2)),
+                "column": (np.arange(full_image_shape[1])
+                           * pixel_spacing[0]
+                           + (pixel_spacing[0] / 2))
+            },
+            attrs={
+                "spacing": pixel_spacing,
+                "unit": unit
+            }
+        ).squeeze(drop=True)
