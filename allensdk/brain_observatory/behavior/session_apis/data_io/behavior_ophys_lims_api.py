@@ -144,13 +144,12 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             JOIN observatory_experiment_config_types oect ON oect.id = oec.observatory_experiment_config_type_id
             JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
             JOIN equipment ON equipment.id = oec.equipment_id
-            WHERE oe.id = {ophys_experiment_id} AND oect.name IN ('eye camera position', 'led position', 
-                'screen position')
+            WHERE oe.id = {ophys_experiment_id} AND 
+                oec.active_date <= os.date_of_acquisition AND
+                oect.name IN ('eye camera position', 'led position', 'screen position')
         '''
-        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-               (PostgresQueryMixin)())
         # Get the raw data
-        rig_geometry = pd.read_sql(query, api.get_connection())
+        rig_geometry = pd.read_sql(query, self.lims_db.get_connection())
 
         if rig_geometry.empty:
             # There is no rig geometry for this experiment
@@ -164,7 +163,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
         }
         rig_geometry['config_type'] = rig_geometry['config_type'].map(rig_geometry_config_type_map)
 
-        # There are multiple entries for a given config type. Select the most recent one
+        # Select the most recent config that precedes the date_of_acquisition for this experiment
         rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
         rig_geometry = rig_geometry.groupby('config_type').apply(lambda x: x.iloc[0])
 
@@ -194,11 +193,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             'equipment': rig_geometry['equipment_name'].iloc[0]
         }
 
-    @staticmethod
-    def get_ophys_experiment_df() -> pd.DataFrame:
+    def get_ophys_experiment_df(self) -> pd.DataFrame:
         """Get a DataFrame of metadata for ophys experiments"""
-        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-               (PostgresQueryMixin)())
         query = """
             SELECT
 
@@ -221,14 +217,10 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             LEFT JOIN equipment ON equipment.id = os.equipment_id;
             """
 
-        return pd.read_sql(query, api.get_connection())
+        return pd.read_sql(query, self.lims_db.get_connection())
 
-    @staticmethod
-    def get_containers_df(only_passed=True) -> pd.DataFrame:
+    def get_containers_df(self, only_passed=True) -> pd.DataFrame:
         """Get a DataFrame of experiment containers"""
-
-        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-               (PostgresQueryMixin)())
         if only_passed is True:
             query = """
                     SELECT *
@@ -241,7 +233,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
                     FROM visual_behavior_experiment_containers vbc;
                     """
 
-        return pd.read_sql(query, api.get_connection()).rename(
+        return pd.read_sql(query, self.lims_db.get_connection()).rename(
             columns={'id': 'container_id'})[['container_id',
                                              'specimen_id',
                                              'workflow_state']]
