@@ -55,12 +55,6 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         behavior + ophys experiment"""
         return self.data['stimulus_name']
 
-    def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an ophys experiment"""
-        return pytz.utc.localize(
-            datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S"))
-
     def get_reporter_line(self) -> str:
         """Get the (gene) reporter line for the subject associated with a
         behavior or behavior + ophys experiment"""

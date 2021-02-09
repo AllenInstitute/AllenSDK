@@ -1,5 +1,4 @@
 import abc
-from datetime import datetime
 from typing import List
 
 
@@ -38,11 +37,6 @@ class BehaviorDataExtractorBase(abc.ABC):
     def get_stimulus_name(self) -> str:
         """Get the name of the stimulus presented for a behavior or
         behavior + ophys experiment"""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an ophys experiment"""
         raise NotImplementedError()
 
     @abc.abstractmethod
