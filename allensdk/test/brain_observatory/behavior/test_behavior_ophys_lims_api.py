@@ -444,3 +444,26 @@ def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
     assert rig_geometry == expected
 
 
+@pytest.mark.requires_bamboo
+def test_rig_geometry_newer_than_experiment():
+    """
+    This test ensures that if the experiment date_of_acquisition is before a rig activate_date
+    that it is not returned as the rig used for the experiment
+    """
+    # This experiment has rig config more recent than the experiment date_of_acquisition
+    ophys_experiment_id = 521405260
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    rig_geometry = api.get_eye_tracking_rig_geometry()
+
+    expected = {
+        'camera_position_mm': [130.0, 0.0, 0.0],
+        'led_position': [265.1, -39.3, 1.0],
+        'monitor_position_mm': [170.0, 0.0, 0.0],
+        'camera_rotation_deg': [0.0, 0.0, 13.1],
+        'monitor_rotation_deg': [0.0, 0.0, 0.0],
+        'equipment': 'CAM2P.1'
+    }
+    assert rig_geometry == expected
+
+
+
