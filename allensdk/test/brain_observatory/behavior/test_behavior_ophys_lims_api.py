@@ -47,13 +47,13 @@ def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
         expected_fail = False
         try:
             api = BehaviorOphysLimsApi(ophys_experiment_id)
-            api.raw_data_api.get_behavior_stimulus_file()
+            api.extractor.get_behavior_stimulus_file()
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail is True
     else:
         api = BehaviorOphysLimsApi(ophys_experiment_id)
-        assert api.raw_data_api.get_behavior_stimulus_file() == compare_val
+        assert api.extractor.get_behavior_stimulus_file() == compare_val
 
 
 @pytest.mark.requires_bamboo
@@ -84,7 +84,7 @@ def test_get_extended_trials(ophys_experiment_id):
 def test_get_nwb_filepath(ophys_experiment_id):
 
     api = BehaviorOphysLimsApi(ophys_experiment_id)
-    assert api.raw_data_api.get_nwb_filepath() == (
+    assert api.extractor.get_nwb_filepath() == (
         "/allen/programs/braintv/production/visualbehavior/prod0/"
         "specimen_823826986/ophys_session_859701393/"
         "ophys_experiment_860030092/behavior_ophys_session_860030092.nwb")
@@ -143,15 +143,15 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
         ctx.setattr(BehaviorOphysLimsRawApi, "_get_ids", lambda x: {})
         patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
     # Mocking any db calls
     monkeypatch.setattr(api, "get_sync_data",
                         lambda: {"ophys_frames": ophys_timestamps})
     monkeypatch.setattr(api, "get_raw_dff_data", lambda: dff_traces)
-    monkeypatch.setattr(api.raw_data_api, "get_imaging_plane_group",
+    monkeypatch.setattr(api.extractor, "get_imaging_plane_group",
                         lambda: plane_group)
-    monkeypatch.setattr(api.raw_data_api, "get_plane_group_count", lambda: 2)
+    monkeypatch.setattr(api.extractor, "get_plane_group_count", lambda: 2)
     with context:
         actual = api.get_ophys_timestamps()
         if expected is not None:
@@ -185,7 +185,7 @@ def test_dff_trace_order(monkeypatch, tmpdir):
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 2, 3, 4, 5]).astype(bytes))
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         dff_traces = api.get_raw_dff_data()
 
@@ -232,7 +232,7 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 3, 4, 5]).astype(bytes))
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         with pytest.raises(RuntimeError):
             _ = api.get_raw_dff_data()
@@ -260,7 +260,7 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 2, 3, 4, 5, 6]).astype(bytes))
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         with pytest.raises(RuntimeError):
             _ = api.get_raw_dff_data()
@@ -302,7 +302,7 @@ def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
                     lambda *args: np.zeros(n_t))
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
                     lambda *args: cell_table)
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         f_traces = api.get_corrected_fluorescence_traces()
 
@@ -359,7 +359,7 @@ def test_corrected_fluorescence_trace_exceptions(monkeypatch, tmpdir):
                     lambda *args: np.zeros(n_t))
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
                     lambda *args: cell_table)
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         with pytest.raises(RuntimeError):
             _ = api.get_corrected_fluorescence_traces()
@@ -405,7 +405,7 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
                     lambda *args: np.zeros(n_t))
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
                     lambda *args: cell_table)
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         with pytest.raises(RuntimeError):
             _ = api.get_corrected_fluorescence_traces()
@@ -423,7 +423,7 @@ def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
         ctx.setattr(BehaviorOphysLimsRawApi, '__init__', dummy_init)
         patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+        api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
         resources_dir = Path(os.path.dirname(__file__)) / 'resources'
         rig_geometry = (

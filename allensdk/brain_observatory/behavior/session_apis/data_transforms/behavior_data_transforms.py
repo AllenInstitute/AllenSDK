@@ -29,19 +29,19 @@ class BehaviorDataTransforms(BehaviorBase):
     populating a BehaviorSession.
     """
 
-    def __init__(self, raw_data_api: BehaviorDataExtractorBase):
-        self.raw_data_api: BehaviorDataExtractorBase = raw_data_api
+    def __init__(self, extractor: BehaviorDataExtractorBase):
+        self.extractor: BehaviorDataExtractorBase = extractor
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_behavior_session_id(self):
-        return self.raw_data_api.get_behavior_session_id()
+        return self.extractor.get_behavior_session_id()
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
         """Helper method to cache stimulus pkl file in memory since it takes
         about a second to load (and is used in many methods).
         """
-        return pd.read_pickle(self.raw_data_api.get_behavior_stimulus_file())
+        return pd.read_pickle(self.extractor.get_behavior_stimulus_file())
 
     def get_behavior_session_uuid(self) -> Optional[str]:
         """Get the universally unique identifier (UUID) number for the
@@ -50,15 +50,15 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         behavior_pkl_uuid = data.get("session_uuid")
 
-        behavior_session_id = self.raw_data_api.get_behavior_session_id()
-        foraging_id = self.raw_data_api.get_foraging_id()
+        behavior_session_id = self.extractor.get_behavior_session_id()
+        foraging_id = self.extractor.get_foraging_id()
 
         # Sanity check to ensure that pkl file data matches up with
         # the behavior session that the pkl file has been associated with.
         assert_err_msg = (
             f"The behavior session UUID ({behavior_pkl_uuid}) in the "
             f"behavior stimulus *.pkl file "
-            f"({self.raw_data_api.get_behavior_stimulus_file()}) does "
+            f"({self.extractor.get_behavior_stimulus_file()}) does "
             f"does not match the foraging UUID ({foraging_id}) for "
             f"behavior session: {behavior_session_id}")
         assert behavior_pkl_uuid == foraging_id, assert_err_msg
@@ -279,18 +279,18 @@ class BehaviorDataTransforms(BehaviorBase):
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
         metadata = {
-            "rig_name": self.raw_data_api.get_rig_name(),
-            "sex": self.raw_data_api.get_sex(),
-            "age": self.raw_data_api.get_age(),
+            "rig_name": self.extractor.get_rig_name(),
+            "sex": self.extractor.get_sex(),
+            "age": self.extractor.get_age(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
-            "session_type": self.raw_data_api.get_stimulus_name(),
+            "session_type": self.extractor.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": self.raw_data_api.get_reporter_line(),
-            "driver_line": self.raw_data_api.get_driver_line(),
-            "LabTracks_ID": self.raw_data_api.get_external_specimen_name(),
-            "full_genotype": self.raw_data_api.get_full_genotype(),
+            "reporter_line": self.extractor.get_reporter_line(),
+            "driver_line": self.extractor.get_driver_line(),
+            "LabTracks_ID": self.extractor.get_external_specimen_name(),
+            "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.raw_data_api.get_foraging_id(),
-            "behavior_session_id": self.raw_data_api.get_behavior_session_id()
+            "foraging_id": self.extractor.get_foraging_id(),
+            "behavior_session_id": self.extractor.get_behavior_session_id()
         }
         return metadata

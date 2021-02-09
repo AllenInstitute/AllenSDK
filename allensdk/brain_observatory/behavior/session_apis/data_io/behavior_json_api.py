@@ -10,12 +10,12 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
 
 class BehaviorJsonApi(BehaviorDataTransforms):
     """A data fetching and processing class that serves processed data from
-    a specified raw data source (raw_data_api). Contains all methods
+    a specified raw data source (extractor). Contains all methods
     needed to fill a BehaviorSession."""
 
     def __init__(self, data):
-        raw_data_api = BehaviorJsonRawApi(data=data)
-        super().__init__(raw_data_api=raw_data_api)
+        extractor = BehaviorJsonRawApi(data=data)
+        super().__init__(extractor=extractor)
 
 
 class BehaviorJsonRawApi(BehaviorDataExtractorBase):

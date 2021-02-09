@@ -36,25 +36,25 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     populating a BehaviorOphysSession.
     """
 
-    def __init__(self, raw_data_api: BehaviorOphysDataExtractorBase):
-        self.raw_data_api: BehaviorOphysDataExtractorBase = raw_data_api
+    def __init__(self, extractor: BehaviorOphysDataExtractorBase):
+        self.extractor: BehaviorOphysDataExtractorBase = extractor
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_experiment_id(self):
-        return self.raw_data_api.get_ophys_experiment_id()
+        return self.extractor.get_ophys_experiment_id()
 
     def get_ophys_session_id(self):
-        return self.raw_data_api.get_ophys_experiment_id()
+        return self.extractor.get_ophys_experiment_id()
 
     @memoize
     def get_cell_specimen_table(self):
         raw_cell_specimen_table = (
-            self.raw_data_api.get_raw_cell_specimen_table_dict())
+            self.extractor.get_raw_cell_specimen_table_dict())
 
         cell_specimen_table = pd.DataFrame.from_dict(
             raw_cell_specimen_table).set_index(
                 'cell_roi_id').sort_index()
-        fov_shape = self.raw_data_api.get_field_of_view_shape()
+        fov_shape = self.extractor.get_field_of_view_shape()
         fov_width = fov_shape['width']
         fov_height = fov_shape['height']
 
@@ -86,7 +86,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         dff_traces = self.get_raw_dff_data()
 
-        plane_group = self.raw_data_api.get_imaging_plane_group()
+        plane_group = self.extractor.get_imaging_plane_group()
 
         number_of_cells, number_of_dff_frames = dff_traces.shape
         # Scientifica data has extra frames in the sync file relative
@@ -110,7 +110,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         # Resample if collecting multiple concurrent planes (e.g. mesoscope)
         # because the frames are interleaved
         else:
-            group_count = self.raw_data_api.get_plane_group_count()
+            group_count = self.extractor.get_plane_group_count()
             self.logger.info(
                 "Mesoscope data detected. Splitting timestamps "
                 f"(len={len(ophys_timestamps)} over {group_count} "
@@ -126,12 +126,12 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
     @memoize
     def get_sync_data(self):
-        sync_path = self.raw_data_api.get_sync_file()
+        sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
     @memoize
     def get_stimulus_timestamps(self):
-        sync_path = self.raw_data_api.get_sync_file()
+        sync_path = self.extractor.get_sync_file()
         timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
                             .corrected_stim_timestamps)
         return timestamps
@@ -184,27 +184,27 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         :rtype: dict
         """
         behavior_session_uuid = self.get_behavior_session_uuid()
-        fov_shape = self.raw_data_api.get_field_of_view_shape()
-        expt_container_id = self.raw_data_api.get_experiment_container_id()
+        fov_shape = self.extractor.get_field_of_view_shape()
+        expt_container_id = self.extractor.get_experiment_container_id()
 
         metadata = {
-            'ophys_experiment_id': self.raw_data_api.get_ophys_experiment_id(),
+            'ophys_experiment_id': self.extractor.get_ophys_experiment_id(),
             'experiment_container_id': expt_container_id,
             'ophys_frame_rate': self.get_ophys_frame_rate(),
             'stimulus_frame_rate': self.get_stimulus_frame_rate(),
-            'targeted_structure': self.raw_data_api.get_targeted_structure(),
-            'imaging_depth': self.raw_data_api.get_imaging_depth(),
-            'session_type': self.raw_data_api.get_stimulus_name(),
-            'experiment_datetime': self.raw_data_api.get_experiment_date(),
-            'reporter_line': self.raw_data_api.get_reporter_line(),
-            'driver_line': self.raw_data_api.get_driver_line(),
-            'LabTracks_ID': self.raw_data_api.get_external_specimen_name(),
-            'full_genotype': self.raw_data_api.get_full_genotype(),
+            'targeted_structure': self.extractor.get_targeted_structure(),
+            'imaging_depth': self.extractor.get_imaging_depth(),
+            'session_type': self.extractor.get_stimulus_name(),
+            'experiment_datetime': self.extractor.get_experiment_date(),
+            'reporter_line': self.extractor.get_reporter_line(),
+            'driver_line': self.extractor.get_driver_line(),
+            'LabTracks_ID': self.extractor.get_external_specimen_name(),
+            'full_genotype': self.extractor.get_full_genotype(),
             'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
-            'imaging_plane_group': self.raw_data_api.get_imaging_plane_group(),
-            'rig_name': self.raw_data_api.get_rig_name(),
-            'sex': self.raw_data_api.get_sex(),
-            'age': self.raw_data_api.get_age(),
+            'imaging_plane_group': self.extractor.get_imaging_plane_group(),
+            'rig_name': self.extractor.get_rig_name(),
+            'sex': self.extractor.get_sex(),
+            'age': self.extractor.get_age(),
             'excitation_lambda': 910.0,
             'emission_lambda': 520.0,
             'indicator': 'GCAMP6f',
@@ -220,7 +220,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return cell_specimen_table['cell_roi_id'].values
 
     def get_raw_dff_data(self):
-        dff_path = self.raw_data_api.get_dff_file()
+        dff_path = self.extractor.get_dff_file()
 
         # guarantee that DFF traces are ordered the same
         # way as ROIs in the cell_specimen_table
@@ -305,7 +305,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
     @memoize
     def get_corrected_fluorescence_traces(self):
-        demix_file = self.raw_data_api.get_demix_file()
+        demix_file = self.extractor.get_demix_file()
 
         cell_roi_id_list = self.get_cell_roi_ids()
         dt = cell_roi_id_list.dtype
@@ -340,8 +340,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         if image_api is None:
             image_api = ImageApi
 
-        maxInt_a13_file = self.raw_data_api.get_max_projection_file()
-        pixel_size = self.raw_data_api.get_surface_2p_pixel_size_um()
+        maxInt_a13_file = self.extractor.get_max_projection_file()
+        pixel_size = self.extractor.get_surface_2p_pixel_size_um()
         max_projection = mpimg.imread(maxInt_a13_file)
         return ImageApi.serialize(max_projection, [pixel_size / 1000.,
                                                    pixel_size / 1000.], 'mm')
@@ -353,15 +353,15 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             image_api = ImageApi
 
         avgint_a1X_file = (
-            self.raw_data_api.get_average_intensity_projection_image_file())
-        pixel_size = self.raw_data_api.get_surface_2p_pixel_size_um()
+            self.extractor.get_average_intensity_projection_image_file())
+        pixel_size = self.extractor.get_surface_2p_pixel_size_um()
         average_image = mpimg.imread(avgint_a1X_file)
         return ImageApi.serialize(average_image, [pixel_size / 1000.,
                                                   pixel_size / 1000.], 'mm')
 
     @memoize
     def get_motion_correction(self):
-        motion_corr_file = self.raw_data_api.get_rigid_motion_transform_file()
+        motion_corr_file = self.extractor.get_rigid_motion_transform_file()
         motion_correction = pd.read_csv(motion_corr_file)
         return motion_correction[['x', 'y']]
 
@@ -385,8 +385,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
                     f"'z_threshold={z_threshold}', "
                     f"'dilation_frames={dilation_frames}'")
 
-        filepath = Path(self.raw_data_api.get_eye_tracking_filepath())
-        sync_path = Path(self.raw_data_api.get_sync_file())
+        filepath = Path(self.extractor.get_eye_tracking_filepath())
+        sync_path = Path(self.extractor.get_sync_file())
 
         eye_tracking_data = load_eye_tracking_hdf(filepath)
         frame_times = sync_utilities.get_synchronized_frame_times(

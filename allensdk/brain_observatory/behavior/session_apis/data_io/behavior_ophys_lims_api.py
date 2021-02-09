@@ -20,28 +20,27 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
                            CachedInstanceMethodMixin):
     """A data fetching and processing class that serves processed data from
-    a specified raw data source (raw_data_api). Contains all methods
+    a specified raw data source (extractor). Contains all methods
     needed to fill a BehaviorOphysSession."""
 
-    def __init__(
-        self,
-        ophys_experiment_id: Optional[int] = None,
-        lims_credentials: Optional[DbCredentials] = None,
-        mtrain_credentials: Optional[DbCredentials] = None,
-        raw_data_api: Optional[BehaviorOphysDataExtractorBase] = None):
+    def __init__(self,
+                 ophys_experiment_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 extractor: Optional[BehaviorOphysDataExtractorBase] = None):
 
-        if raw_data_api is None:
+        if extractor is None:
             if ophys_experiment_id is not None:
-                raw_data_api = BehaviorOphysLimsRawApi(
+                extractor = BehaviorOphysLimsRawApi(
                     ophys_experiment_id,
                     lims_credentials,
                     mtrain_credentials)
             else:
                 raise RuntimeError(
                     "BehaviorOphysLimsApi must be provided either an "
-                    "instantiated 'raw_data_api' or an 'ophys_experiment_id'!")
+                    "instantiated 'extractor' or an 'ophys_experiment_id'!")
 
-        super().__init__(raw_data_api=raw_data_api)
+        super().__init__(extractor=extractor)
 
 
 class BehaviorOphysLimsRawApi(OphysLimsRawApi, BehaviorLimsRawApi,

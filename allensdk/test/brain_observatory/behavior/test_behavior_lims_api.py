@@ -30,13 +30,13 @@ def test_get_behavior_stimulus_file(behavior_experiment_id, compare_val):
         expected_fail = False
         try:
             api = BehaviorLimsApi(behavior_experiment_id)
-            api.raw_data_api.get_behavior_stimulus_file()
+            api.extractor.get_behavior_stimulus_file()
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail is True
     else:
         api = BehaviorLimsApi(behavior_experiment_id)
-        assert api.raw_data_api.get_behavior_stimulus_file() == compare_val
+        assert api.extractor.get_behavior_stimulus_file() == compare_val
 
 
 @pytest.mark.requires_bamboo
@@ -149,7 +149,7 @@ def MockBehaviorLimsApi():
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
 
-    api = MockBehaviorLimsApi(raw_data_api=MockBehaviorLimsRawApi())
+    api = MockBehaviorLimsApi(extractor=MockBehaviorLimsRawApi())
     yield api
     api.cache_clear()
 
@@ -177,7 +177,7 @@ def MockApiRunSpeedExpectedError():
                  "speed": [8.0, 15.0, 16.0]})
 
     return MockBehaviorLimsApiRunSpeedExpectedError(
-        raw_data_api=MockApiRunSpeedExpectedError())
+        extractor=MockApiRunSpeedExpectedError())
 
 
 # Test the non-sql-query functions
@@ -265,8 +265,8 @@ class TestBehaviorRegression:
         cls.od.cache_clear()
 
     def test_stim_file_regression(self):
-        assert (self.bd.raw_data_api.get_behavior_stimulus_file()
-                == self.od.raw_data_api.get_behavior_stimulus_file())
+        assert (self.bd.extractor.get_behavior_stimulus_file()
+                == self.od.extractor.get_behavior_stimulus_file())
 
     def test_get_rewards_regression(self):
         """Index is timestamps here, so remove it before comparing."""
@@ -275,16 +275,16 @@ class TestBehaviorRegression:
         pd.testing.assert_frame_equal(bd_rewards, od_rewards)
 
     def test_ophys_experiment_id_regression(self):
-        assert (self.bd.raw_data_api.ophys_experiment_ids[0]
-                == self.od.raw_data_api.ophys_experiment_id)
+        assert (self.bd.extractor.ophys_experiment_ids[0]
+                == self.od.extractor.ophys_experiment_id)
 
     def test_behavior_uuid_regression(self):
         assert (self.bd.get_behavior_session_uuid()
                 == self.od.get_behavior_session_uuid())
 
     def test_container_id_regression(self):
-        assert (self.bd.raw_data_api.ophys_container_id
-                == self.od.raw_data_api.get_experiment_container_id())
+        assert (self.bd.extractor.ophys_container_id
+                == self.od.extractor.get_experiment_container_id())
 
     def test_stimulus_frame_rate_regression(self):
         assert (self.bd.get_stimulus_frame_rate()
@@ -349,31 +349,31 @@ class TestBehaviorRegression:
                                       check_less_precise=2)
 
     def test_get_sex_regression(self):
-        assert self.bd.raw_data_api.get_sex() == self.od.raw_data_api.get_sex()
+        assert self.bd.extractor.get_sex() == self.od.extractor.get_sex()
 
     def test_get_rig_name_regression(self):
-        assert (self.bd.raw_data_api.get_rig_name()
-                == self.od.raw_data_api.get_rig_name())
+        assert (self.bd.extractor.get_rig_name()
+                == self.od.extractor.get_rig_name())
 
     def test_get_stimulus_name_regression(self):
-        assert (self.bd.raw_data_api.get_stimulus_name()
-                == self.od.raw_data_api.get_stimulus_name())
+        assert (self.bd.extractor.get_stimulus_name()
+                == self.od.extractor.get_stimulus_name())
 
     def test_get_reporter_line_regression(self):
-        assert (self.bd.raw_data_api.get_reporter_line()
-                == self.od.raw_data_api.get_reporter_line())
+        assert (self.bd.extractor.get_reporter_line()
+                == self.od.extractor.get_reporter_line())
 
     def test_get_driver_line_regression(self):
-        assert (self.bd.raw_data_api.get_driver_line()
-                == self.od.raw_data_api.get_driver_line())
+        assert (self.bd.extractor.get_driver_line()
+                == self.od.extractor.get_driver_line())
 
     def test_get_external_specimen_name_regression(self):
-        assert (self.bd.raw_data_api.get_external_specimen_name()
-                == self.od.raw_data_api.get_external_specimen_name())
+        assert (self.bd.extractor.get_external_specimen_name()
+                == self.od.extractor.get_external_specimen_name())
 
     def test_get_full_genotype_regression(self):
-        assert (self.bd.raw_data_api.get_full_genotype()
-                == self.od.raw_data_api.get_full_genotype())
+        assert (self.bd.extractor.get_full_genotype()
+                == self.od.extractor.get_full_genotype())
 
     def test_get_experiment_date_regression(self):
         """Just testing the date since it comes from two different sources;
