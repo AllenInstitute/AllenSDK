@@ -457,7 +457,11 @@ class BehaviorOphysSession(ParamsMixin):
                 "Attempted to clear API cache, but method `cache_clear`"
                 f" does not exist on {self.api.__class__.__name__}")
 
-    def get_roi_masks(self, cell_specimen_ids=None) -> xr.DataArray:
+    @property
+    def roi_masks(self) -> pd.DataFrame:
+        return self.cell_specimen_table[['cell_roi_id', 'roi_mask']]
+
+    def get_roi_masks(self, cell_specimen_ids=None) -> pd.DataFrame:
         """ Obtains boolean masks indicating the location of one or
         more cell's ROIs in this session.
 
@@ -469,31 +473,24 @@ class BehaviorOphysSession(ParamsMixin):
 
         Returns
         -------
-        result : xr.DataArray
-            dimensions are:
-                - cell_specimen_id : which cell's roi is described by the mask
-                - row : index within the underlying image
-                - column : index within the image
-            values are 1 where an ROI was present, otherwise 0.
+        result : pd.DataFrame
+            - index is 'cell_specimen_id'
+            - columns are 'cell_roi_id' and 'roi_mask'
+            - mask values are 1 where an ROI was present, otherwise 0.
         """
         cell_specimen_table = self.cell_specimen_table
 
         if cell_specimen_ids is None:
-            cell_specimen_ids = cell_specimen_table.index.values
+            return self.roi_masks
         elif (isinstance(cell_specimen_ids, int)
               or np.issubdtype(type(cell_specimen_ids), np.integer)):
             cell_specimen_ids = np.array([int(cell_specimen_ids)])
         else:
             cell_specimen_ids = np.array(cell_specimen_ids)
 
-        cell_roi_ids = cell_specimen_table.loc[cell_specimen_ids,
-                                               "cell_roi_id"].values
-        result = self.api.get_roi_masks_by_cell_roi_id(cell_roi_ids)
-        if "cell_roi_id" in result.dims:
-            result = result.rename({"cell_roi_id": "cell_specimen_id"})
-            result.coords["cell_specimen_id"] = cell_specimen_ids
+        masks_subset = self.roi_masks.filter(cell_specimen_ids, axis='index')
 
-        return result
+        return masks_subset
 
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
