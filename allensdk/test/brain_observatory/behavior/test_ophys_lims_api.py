@@ -3,8 +3,8 @@ import os
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError, OneOrMoreResultExpectedError
-from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
-    import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.data_io \
+    import OphysLimsRawApi
 
 
 @pytest.fixture(scope="function")
@@ -41,7 +41,7 @@ def expected_fail(func, *args, **kwargs):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_ophys_experiment_dir(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_ophys_experiment_dir
     key = 'ophys_dir'
     if ophys_experiment_id in api_data:
@@ -53,7 +53,7 @@ def test_get_ophys_experiment_dir(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_demix_file(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_demix_file
     key = 'demix_file'
     if ophys_experiment_id in api_data:
@@ -65,7 +65,7 @@ def test_get_demix_file(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_maxint_file(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_max_projection_file
     key = 'maxint_file'
     if ophys_experiment_id in api_data:
@@ -77,7 +77,7 @@ def test_get_maxint_file(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_average_intensity_projection_image(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_average_intensity_projection_image_file
     key = 'avgint_a1X_file'
     if ophys_experiment_id in api_data:
@@ -89,7 +89,7 @@ def test_average_intensity_projection_image(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_rigid_motion_transform_file(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_rigid_motion_transform_file
     key = 'rigid_motion_transform_file'
     if ophys_experiment_id in api_data:
@@ -101,7 +101,7 @@ def test_get_rigid_motion_transform_file(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_targeted_structure(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_targeted_structure
     key = 'targeted_structure'
     if ophys_experiment_id in api_data:
@@ -113,7 +113,7 @@ def test_get_targeted_structure(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_imaging_depth(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_imaging_depth
     key = 'imaging_depth'
     if ophys_experiment_id in api_data:
@@ -125,7 +125,7 @@ def test_get_imaging_depth(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_stimulus_name(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_stimulus_name
     key = 'stimulus_name'
     if ophys_experiment_id in api_data:
@@ -137,7 +137,7 @@ def test_get_stimulus_name(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_reporter_line(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_reporter_line
     key = 'reporter_line'
     if ophys_experiment_id in api_data:
@@ -149,7 +149,7 @@ def test_get_reporter_line(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_driver_line(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_driver_line
     key = 'driver_line'
     if ophys_experiment_id in api_data:
@@ -161,7 +161,7 @@ def test_get_driver_line(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_LabTracks_ID(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_external_specimen_name
     key = 'LabTracks_ID'
     if ophys_experiment_id in api_data:
@@ -173,7 +173,7 @@ def test_get_LabTracks_ID(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_full_genotype(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_full_genotype
     key = 'full_genotype'
     if ophys_experiment_id in api_data:
@@ -184,7 +184,7 @@ def test_get_full_genotype(ophys_experiment_id, api_data):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_workflow_state(ophys_experiment_id, api_data):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     f = ophys_lims_api.get_workflow_state
     key = 'workflow_state'
     if ophys_experiment_id in api_data:
@@ -199,7 +199,7 @@ def test_get_workflow_state(ophys_experiment_id, api_data):
     pytest.param(0, None)
 ])
 def test_get_nwb_filepath(ophys_experiment_id, compare_val):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -216,7 +216,7 @@ def test_get_nwb_filepath(ophys_experiment_id, compare_val):
     pytest.param(511458874),
 ])
 def test_get_ophys_segmentation_run_id(ophys_experiment_id):
-    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_experiment_id)
     _ = ophys_lims_api.get_ophys_cell_segmentation_run_id()
 
 
@@ -226,7 +226,7 @@ def test_get_ophys_segmentation_run_id(ophys_experiment_id):
     pytest.param(0, None)
 ])
 def test_get_surface_2p_pixel_size_um(ophys_lims_experiment_id, compare_val):
-    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -245,7 +245,7 @@ def test_get_surface_2p_pixel_size_um(ophys_lims_experiment_id, compare_val):
 ])
 def test_get_sex(ophys_lims_experiment_id, compare_val):
 
-    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:
@@ -263,7 +263,7 @@ def test_get_sex(ophys_lims_experiment_id, compare_val):
     pytest.param(0, None)
 ])
 def test_get_age(ophys_lims_experiment_id, compare_val):
-    ophys_lims_api = OphysLimsApi(ophys_lims_experiment_id)
+    ophys_lims_api = OphysLimsRawApi(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
         try:

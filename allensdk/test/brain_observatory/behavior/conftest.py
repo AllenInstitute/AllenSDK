@@ -1,13 +1,16 @@
+import datetime
+import os
 import sys
+import uuid
+
+import numpy as np
 import pandas as pd
 import pytest
-import numpy as np
 import pytz
-import datetime
-import uuid
-import os
-import json
 
+from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorOphysDataXforms
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 
@@ -322,3 +325,46 @@ def behavior_stimuli_data_fixture(request):
         }
     }
     return data
+
+
+@pytest.fixture
+def cell_specimen_table_api():
+
+    roi_1 = np.array([
+        [1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    roi_2 = np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    # Must implement at least the get_cell_specimen_table
+    # and get_max_projection methods from BehaviorOphysBase
+    class CellSpecimenTableApi(BehaviorOphysDataXforms):
+
+        def __init__(self):
+            pass
+
+        def get_cell_specimen_table(self):
+            return pd.DataFrame(
+                {
+                    "cell_roi_id": [1, 2],
+                    "y": [1, 1],
+                    "x": [2, 1],
+                    "roi_mask": [roi_1, roi_2]
+                }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
+            )
+
+        def get_max_projection(self):
+            return ImageApi.serialize(roi_1 + roi_2,
+                                      [0.5, 1.], 'mm')
+
+    return CellSpecimenTableApi()
