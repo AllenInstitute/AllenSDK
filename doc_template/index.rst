@@ -95,6 +95,7 @@ What's New - 2.7.0
 -----------------------------------------------------------------------
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
+- Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
 
 What's New - 2.6.0
 -----------------------------------------------------------------------
