@@ -461,37 +461,6 @@ class BehaviorOphysSession(ParamsMixin):
     def roi_masks(self) -> pd.DataFrame:
         return self.cell_specimen_table[['cell_roi_id', 'roi_mask']]
 
-    def get_roi_masks(self, cell_specimen_ids=None) -> pd.DataFrame:
-        """ Obtains boolean masks indicating the location of one or
-        more cell's ROIs in this session.
-
-        Parameters
-        ----------
-        cell_specimen_ids : array-like of int, optional
-            ROI masks for these cell specimens will be returned. The default
-            behavior is to return masks for all cell specimens.
-
-        Returns
-        -------
-        result : pd.DataFrame
-            - index is 'cell_specimen_id'
-            - columns are 'cell_roi_id' and 'roi_mask'
-            - mask values are 1 where an ROI was present, otherwise 0.
-        """
-        cell_specimen_table = self.cell_specimen_table
-
-        if cell_specimen_ids is None:
-            return self.roi_masks
-        elif (isinstance(cell_specimen_ids, int)
-              or np.issubdtype(type(cell_specimen_ids), np.integer)):
-            cell_specimen_ids = np.array([int(cell_specimen_ids)])
-        else:
-            cell_specimen_ids = np.array(cell_specimen_ids)
-
-        masks_subset = self.roi_masks.filter(cell_specimen_ids, axis='index')
-
-        return masks_subset
-
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
 

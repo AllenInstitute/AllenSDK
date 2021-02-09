@@ -169,44 +169,6 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
                 assert lick_times[0] < reward_time
 
 
-@pytest.mark.parametrize("cell_specimen_ids,expected", [
-    [
-        10,
-        np.array([
-            [1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ])
-    ],
-    [
-        [11, 10],
-        np.array([
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 1, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ],
-            [
-                [1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ]
-        ])
-    ]
-])
-# cell_specimen_table_api fixture from allensdk.test.brain_observatory.conftest
-def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
-    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
-    obtained = ssn.get_roi_masks(cell_specimen_ids)
-    assert np.allclose(expected, obtained.values)
-
-
 @pytest.mark.parametrize("dilation_frames, z_threshold, eye_tracking_start_value", [
     (5, 9, None),
     (1, 2, None),
