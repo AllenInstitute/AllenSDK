@@ -4,7 +4,7 @@ from typing import Optional
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
-    BehaviorJsonRawApi
+    BehaviorJsonExtractor
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
 
@@ -15,17 +15,16 @@ class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
     needed to fill a BehaviorOphysSession."""
 
     def __init__(self, data):
-        extractor = BehaviorOphysJsonRawApi(data=data)
+        extractor = BehaviorOphysJsonExtractor(data=data)
         super().__init__(extractor=extractor)
 
 
-class BehaviorOphysJsonRawApi(BehaviorJsonRawApi,
-                              BehaviorOphysDataExtractorBase):
-    """A data fetching class that serves as an API for fetching 'raw'
-    data from a json file necessary (but not sufficient) for filling
-    a 'BehaviorOphysSession'.
+class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
+                                 BehaviorOphysDataExtractorBase):
+    """A class which 'extracts' data from a json file. The extracted data
+    is necessary (but not sufficient) for populating a 'BehaviorOphysSession'.
 
-    Most 'raw' data provided by this API needs to be processed by
+    Most data provided by this extractor needs to be processed by
     BehaviorOphysDataTransforms methods in order to usable by
     'BehaviorOphysSession's.
 

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, Optional, Union
 import uuid
 
 import h5py
@@ -37,7 +37,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     """
 
     def __init__(self, extractor: BehaviorOphysDataExtractorBase):
-        self.extractor: BehaviorOphysDataExtractorBase = extractor
+        super().__init__(extractor=extractor)
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_experiment_id(self):

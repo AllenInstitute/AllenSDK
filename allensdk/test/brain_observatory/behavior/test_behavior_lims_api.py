@@ -9,7 +9,7 @@ import pytz
 from allensdk import OneResultExpectedError
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi, BehaviorLimsRawApi, BehaviorOphysLimsApi)
+    BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.exceptions import DataFrameIndexError
@@ -44,7 +44,7 @@ def test_get_behavior_stimulus_file(behavior_experiment_id, compare_val):
     pytest.param('394a910e-94c7-4472-9838-5345aff59ed8'),
 ])
 def test_foraging_id_to_behavior_session_id(behavior_session_uuid):
-    session = BehaviorLimsRawApi.from_foraging_id(behavior_session_uuid)
+    session = BehaviorLimsExtractor.from_foraging_id(behavior_session_uuid)
     assert session.behavior_session_id == 823847007
 
 
@@ -94,7 +94,7 @@ mock_db_credentials = DbCredentials(dbname='mock_db', user='mock_user',
 @pytest.fixture
 def MockBehaviorLimsApi():
 
-    class MockBehaviorLimsRawApi(BehaviorLimsRawApi):
+    class MockBehaviorLimsRawApi(BehaviorLimsExtractor):
         """
         Mock class that overrides some functions to provide test data and
         initialize without calls to db.
@@ -156,7 +156,7 @@ def MockBehaviorLimsApi():
 
 @pytest.fixture
 def MockApiRunSpeedExpectedError():
-    class MockApiRunSpeedExpectedError(BehaviorLimsRawApi):
+    class MockApiRunSpeedExpectedError(BehaviorLimsExtractor):
         """
         Mock class that overrides some functions to provide test data and
         initialize without calls to db.
@@ -244,15 +244,15 @@ def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):
 class TestBehaviorRegression:
     """
     Test whether behavior sessions (that are also ophys) loaded with
-    BehaviorLimsRawApi return the same results as sessions loaded
-    with BehaviorOphysLimsRawApi, for relevant functions. Do not check for
+    BehaviorLimsExtractor return the same results as sessions loaded
+    with BehaviorOphysLimsExtractor, for relevant functions. Do not check for
     timestamps, which are from different files so will not be the same.
     Also not checking for experiment_date, since they're from two different
     sources (and I'm not sure how it's uploaded in the database).
 
     Do not test `get_licks` regression because the licks come from two
     different sources and are recorded differently (behavior pickle file in
-    BehaviorLimsRawApi; sync file in BehaviorOphysLimeApi)
+    BehaviorLimsExtractor; sync file in BehaviorOphysLimeApi)
     """
     @classmethod
     def setup_class(cls):
@@ -378,7 +378,7 @@ class TestBehaviorRegression:
     def test_get_experiment_date_regression(self):
         """Just testing the date since it comes from two different sources;
         We expect that BehaviorOphysLimsApi will be earlier (more like when
-        rig was started up), while BehaviorLimsRawApi returns the start of
+        rig was started up), while BehaviorLimsExtractor returns the start of
         the actual behavior (from pkl file)"""
         assert (self.bd.get_experiment_date().date()
                 == self.od.get_experiment_date().date())

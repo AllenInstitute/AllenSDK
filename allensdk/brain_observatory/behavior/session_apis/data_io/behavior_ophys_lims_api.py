@@ -6,7 +6,7 @@ from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsRawApi, OphysLimsRawApi)
+    BehaviorLimsExtractor, OphysLimsExtractor)
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
 from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
@@ -20,8 +20,8 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
                            CachedInstanceMethodMixin):
     """A data fetching and processing class that serves processed data from
-    a specified raw data source (extractor). Contains all methods
-    needed to fill a BehaviorOphysSession."""
+    a specified data source (extractor). Contains all methods
+    needed to populate a BehaviorOphysSession."""
 
     def __init__(self,
                  ophys_experiment_id: Optional[int] = None,
@@ -31,7 +31,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
 
         if extractor is None:
             if ophys_experiment_id is not None:
-                extractor = BehaviorOphysLimsRawApi(
+                extractor = BehaviorOphysLimsExtractor(
                     ophys_experiment_id,
                     lims_credentials,
                     mtrain_credentials)
@@ -43,7 +43,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
         super().__init__(extractor=extractor)
 
 
-class BehaviorOphysLimsRawApi(OphysLimsRawApi, BehaviorLimsRawApi,
+class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                               BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling

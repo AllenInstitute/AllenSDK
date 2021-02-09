@@ -14,16 +14,15 @@ class BehaviorJsonApi(BehaviorDataTransforms):
     needed to fill a BehaviorSession."""
 
     def __init__(self, data):
-        extractor = BehaviorJsonRawApi(data=data)
+        extractor = BehaviorJsonExtractor(data=data)
         super().__init__(extractor=extractor)
 
 
-class BehaviorJsonRawApi(BehaviorDataExtractorBase):
-    """A data fetching class that serves as an API for fetching 'raw'
-    data from a json file necessary (but not sufficient) for filling
-    a 'BehaviorSession'.
+class BehaviorJsonExtractor(BehaviorDataExtractorBase):
+    """A class which 'extracts' data from a json file. The extracted data
+    is necessary (but not sufficient) for populating a 'BehaviorSession'.
 
-    Most 'raw' data provided by this API needs to be processed by
+    Most data provided by this extractor needs to be processed by
     BehaviorDataTransforms methods in order to usable by 'BehaviorSession's.
 
     This class is used by the write_nwb module for behavior sessions.

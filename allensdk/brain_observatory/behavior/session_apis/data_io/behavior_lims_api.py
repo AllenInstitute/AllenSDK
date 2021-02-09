@@ -31,7 +31,7 @@ class BehaviorLimsApi(BehaviorDataTransforms, CachedInstanceMethodMixin):
 
         if extractor is None:
             if behavior_session_id is not None:
-                extractor = BehaviorLimsRawApi(
+                extractor = BehaviorLimsExtractor(
                     behavior_session_id,
                     lims_credentials,
                     mtrain_credentials)
@@ -43,7 +43,7 @@ class BehaviorLimsApi(BehaviorDataTransforms, CachedInstanceMethodMixin):
         super().__init__(extractor=extractor)
 
 
-class BehaviorLimsRawApi(BehaviorDataExtractorBase):
+class BehaviorLimsExtractor(BehaviorDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling a
     'BehaviorSession'.

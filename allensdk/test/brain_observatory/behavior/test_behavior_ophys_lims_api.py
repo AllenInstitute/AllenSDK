@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 from allensdk.internal.api import OneResultExpectedError
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi, BehaviorOphysLimsRawApi)
+    BehaviorOphysLimsApi, BehaviorOphysLimsExtractor)
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
 
@@ -137,11 +137,11 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
         self.ophys_experiment_id = ophys_experiment_id
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi,
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor,
                     "get_behavior_session_id", lambda x: 123)
-        ctx.setattr(BehaviorOphysLimsRawApi, "_get_ids", lambda x: {})
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        ctx.setattr(BehaviorOphysLimsExtractor, "_get_ids", lambda x: {})
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
@@ -178,10 +178,10 @@ def test_dff_trace_order(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor, "get_dff_file",
                     lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 2, 3, 4, 5]).astype(bytes))
@@ -225,10 +225,10 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor, "get_dff_file",
                     lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 3, 4, 5]).astype(bytes))
@@ -253,10 +253,10 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor, "get_dff_file",
                     lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
                     lambda *args: np.array([1, 2, 3, 4, 5, 6]).astype(bytes))
@@ -293,10 +293,10 @@ def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi,
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor,
                     "get_demix_file", lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
                     lambda *args: np.zeros(n_t))
@@ -350,10 +350,10 @@ def test_corrected_fluorescence_trace_exceptions(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi,
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor,
                     "get_demix_file", lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
                     lambda *args: np.zeros(n_t))
@@ -396,10 +396,10 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
         self.get_behavior_session_id = 2
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
-        ctx.setattr(BehaviorOphysLimsRawApi,
+        ctx.setattr(BehaviorOphysLimsExtractor, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsExtractor,
                     "get_demix_file", lambda *args: out_fname)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
                     lambda *args: np.zeros(n_t))
@@ -420,8 +420,8 @@ def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
         self.ophys_experiment_id = ophys_experiment_id
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysLimsRawApi, '__init__', dummy_init)
-        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+        ctx.setattr(BehaviorOphysLimsExtractor, '__init__', dummy_init)
+        patched_raw_data_api = BehaviorOphysLimsExtractor(123)
 
         api = BehaviorOphysLimsApi(extractor=patched_raw_data_api)
 
