@@ -163,3 +163,20 @@ class BehaviorOphysBase(BehaviorBase):
             pupil areas, and frames with likely blinks/outliers.
         """
         raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_events(self) -> pd.DataFrame:
+        """Get event detection data
+
+        Returns
+        -------
+        pd.DataFrame
+            index:
+                cell_specimen_id: int
+            cell_roi_id: int
+            events: np.array
+            filtered_events: np.array
+            lambdas: float64
+            noise_stds: float64
+        """
+        raise NotImplementedError()

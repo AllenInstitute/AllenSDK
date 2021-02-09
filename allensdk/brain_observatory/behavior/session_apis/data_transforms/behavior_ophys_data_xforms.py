@@ -380,3 +380,25 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
                                                       dilation_frames)
 
         return eye_tracking_data
+
+    def get_events(self) -> pd.DataFrame:
+        events_file = self.get_event_detection_raw_filepath()
+        with h5py.File(events_file, 'r') as f:
+            events = f['events'][:]
+            lambdas = f['lambdas'][:]
+            noise_stds = f['noise_stds'][:]
+            roi_ids = f['roi_names'][:]
+
+        # Convert matrix to list of 1d arrays so that it can be stored in a single column of the dataframe
+        events = [x for x in events]
+
+        df = pd.DataFrame({
+            'events': events,
+            'lambda': lambdas,
+            'noise_std': noise_stds,
+            'cell_roi_id': roi_ids
+        })
+
+        cell_specimen_table = self.get_cell_specimen_table()
+        df = cell_specimen_table[['cell_roi_id']].merge(df, on='cell_roi_id')
+        return df

@@ -182,6 +182,19 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
         oeid_list = df[container_selector]['ophys_experiment_id'].values
         return [cls(oeid) for oeid in oeid_list]
 
+    @memoize
+    def get_event_detection_raw_filepath(self) -> str:
+        """Gets the raw filepath to the event detection data"""
+        query = f'''
+            SELECT wkf.storage_directory || wkf.filename AS event_detection_filepath
+            FROM ophys_experiments oe
+            LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.id
+            JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
+            WHERE wkft.name = 'OphysEventTraceFile'
+                AND oe.id = {self.get_ophys_experiment_id()};
+        '''
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
+
 
 if __name__ == "__main__":
 

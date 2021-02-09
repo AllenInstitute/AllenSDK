@@ -67,6 +67,7 @@ class BehaviorOphysSession(ParamsMixin):
         self._ophys_timestamps = None
         self._metadata = None
         self._dff_traces = None
+        self._events = None
         self._cell_specimen_table = None
         self._running_speed = None
         self._running_data_df = None
@@ -159,6 +160,25 @@ class BehaviorOphysSession(ParamsMixin):
         if self._dff_traces is None:
             self._dff_traces = self.api.get_dff_traces()
         return self._dff_traces
+
+    @property
+    def events(self) -> pd.DataFrame:
+        """Get event detection data
+
+        Returns
+        -------
+        pd.DataFrame
+            index:
+                cell_specimen_id: int
+            cell_roi_id: int
+            events: np.array
+            filtered_events: np.array
+            lambdas: float64
+            noise_stds: float64
+        """
+        if self._events is None:
+            self._events = self.api.get_events()
+        return self._events
 
     @dff_traces.setter
     def dff_traces(self, value):
