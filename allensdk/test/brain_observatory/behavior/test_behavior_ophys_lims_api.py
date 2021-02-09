@@ -7,7 +7,7 @@ from contextlib import contextmanager
 
 from allensdk.internal.api import OneResultExpectedError
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi)
+    BehaviorOphysLimsApi, BehaviorOphysLimsRawApi)
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
 
@@ -22,9 +22,8 @@ def does_not_raise(enter_result=None):
     yield enter_result
 
 
-
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [
+@pytest.mark.parametrize("ophys_experiment_id", [
     pytest.param(511458874),
 ])
 def test_get_cell_roi_table(ophys_experiment_id):
@@ -33,7 +32,7 @@ def test_get_cell_roi_table(ophys_experiment_id):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id, compare_val', [
+@pytest.mark.parametrize("ophys_experiment_id, compare_val", [
     pytest.param(789359614,
                  ("/allen/programs/braintv/production/visualbehavior/prod0"
                   "/specimen_756577249/behavior_session_789295700/"
@@ -56,29 +55,30 @@ def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [789359614])
+@pytest.mark.parametrize("ophys_experiment_id", [789359614])
 def test_get_extended_trials(ophys_experiment_id):
 
     api = BehaviorOphysLimsApi(ophys_experiment_id)
     df = api.get_extended_trials()
     ets = ExtendedTrialSchema(partial=False, many=True)
-    data_list_cs = df.to_dict('records')
+    data_list_cs = df.to_dict("records")
     data_list_cs_sc = ets.dump(data_list_cs)
     ets.load(data_list_cs_sc)
 
-    df_fail = df.drop(['behavior_session_uuid'], axis=1)
+    df_fail = df.drop(["behavior_session_uuid"], axis=1)
     ets = ExtendedTrialSchema(partial=False, many=True)
-    data_list_cs = df_fail.to_dict('records')
+    data_list_cs = df_fail.to_dict("records")
     data_list_cs_sc = ets.dump(data_list_cs)
     try:
         ets.load(data_list_cs_sc)
-        raise RuntimeError('This should have failed with marshmallow.schema.ValidationError')
+        raise RuntimeError("This should have failed with "
+                           "marshmallow.schema.ValidationError")
     except ValidationError:
         pass
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [860030092])
+@pytest.mark.parametrize("ophys_experiment_id", [860030092])
 def test_get_nwb_filepath(ophys_experiment_id):
 
     api = BehaviorOphysLimsApi(ophys_experiment_id)
@@ -131,17 +131,22 @@ def test_get_ophys_timestamps(monkeypatch, plane_group, ophys_timestamps,
     non-mesoscope data (and raises error for scientifica data with
     longer trace frames than acquisition frames (ophys_timestamps))."""
 
-    api = BehaviorOphysLimsApi(123)
-    monkeypatch.setattr(api.raw_data_api,
-                        "get_behavior_session_id", lambda x: 123)
-    monkeypatch.setattr(api.raw_data_api,
-                        "_get_ids", lambda x: {})
+    def dummy_init(self, ophys_experiment_id, **kwargs):
+        self.ophys_experiment_id = ophys_experiment_id
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi,
+                    "get_behavior_session_id", lambda x: 123)
+        ctx.setattr(BehaviorOphysLimsRawApi, "_get_ids", lambda x: {})
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
     # Mocking any db calls
     monkeypatch.setattr(api, "get_sync_data",
                         lambda: {"ophys_frames": ophys_timestamps})
-    monkeypatch.setattr(api, "get_raw_dff_data",
-                        lambda: dff_traces)
+    monkeypatch.setattr(api, "get_raw_dff_data", lambda: dff_traces)
     monkeypatch.setattr(api.raw_data_api, "get_imaging_plane_group",
                         lambda: plane_group)
     monkeypatch.setattr(api.raw_data_api, "get_plane_group_count", lambda: 2)
@@ -157,39 +162,43 @@ def test_dff_trace_order(monkeypatch, tmpdir):
     ROIs to align with what is in the cell_specimen_table
     """
 
-    out_fname = os.path.join(tmpdir, 'dummy_dff_data.h5')
+    out_fname = os.path.join(tmpdir, "dummy_dff_data.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((5, n_t))
     roi_names = np.array([5, 3, 4, 2, 1])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_roi_ids',
-                        lambda x: np.array([1, 2, 3, 4, 5]).astype(bytes))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+                    lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    api = BehaviorOphysLimsApi(123)
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_dff_file',
-                        lambda: out_fname)
-    dff_traces = api.get_raw_dff_data()
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
+                    lambda *args: np.array([1, 2, 3, 4, 5]).astype(bytes))
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+
+        dff_traces = api.get_raw_dff_data()
 
     # compare the returned traces with the input data
     # mapping to the order of the monkeypatched cell_roi_id list
-    np.testing.assert_array_almost_equal(dff_traces[0,:], data[4,:], decimal=10)
-    np.testing.assert_array_almost_equal(dff_traces[1,:], data[3,:], decimal=10)
-    np.testing.assert_array_almost_equal(dff_traces[2,:], data[1,:], decimal=10)
-    np.testing.assert_array_almost_equal(dff_traces[3,:], data[2,:], decimal=10)
-    np.testing.assert_array_almost_equal(dff_traces[4,:], data[0,:], decimal=10)
+    np.testing.assert_array_almost_equal(
+        dff_traces[0, :], data[4, :], decimal=10)
+    np.testing.assert_array_almost_equal(
+        dff_traces[1, :], data[3, :], decimal=10)
+    np.testing.assert_array_almost_equal(
+        dff_traces[2, :], data[1, :], decimal=10)
+    np.testing.assert_array_almost_equal(
+        dff_traces[3, :], data[2, :], decimal=10)
+    np.testing.assert_array_almost_equal(
+        dff_traces[4, :], data[0, :], decimal=10)
 
 
 def test_dff_trace_exceptions(monkeypatch, tmpdir):
@@ -200,65 +209,59 @@ def test_dff_trace_exceptions(monkeypatch, tmpdir):
 
     # check that an exception is raised if dff_traces has an ROI ID
     # that cell_specimen_table does not
-    out_fname = os.path.join(tmpdir, 'dummy_dff_data_for_exceptions.h5')
+    out_fname = os.path.join(tmpdir, "dummy_dff_data_for_exceptions.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((5, n_t))
     roi_names = np.array([5, 3, 4, 2, 1])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_roi_ids',
-                        lambda x: np.array([1, 3, 4, 5]).astype(bytes))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+                    lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    api = BehaviorOphysLimsApi(123)
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
+                    lambda *args: np.array([1, 3, 4, 5]).astype(bytes))
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_dff_file',
-                        lambda: out_fname)
-
-    with pytest.raises(RuntimeError):
-        dff_traces = api.get_raw_dff_data()
+        with pytest.raises(RuntimeError):
+            _ = api.get_raw_dff_data()
 
     # check that an exception is raised if the cell_specimen_table
     # has an ROI ID that dff_traces does not
-    out_fname = os.path.join(tmpdir, 'dummy_dff_data_for_exceptions2.h5')
+    out_fname = os.path.join(tmpdir, "dummy_dff_data_for_exceptions2.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((5, n_t))
-    roi_names = np.array([5,3,4,2,1])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    roi_names = np.array([5, 3, 4, 2, 1])
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_roi_ids',
-                        lambda x: np.array([1,2,3,4,5,6]).astype(bytes))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi, "get_dff_file",
+                    lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    api = BehaviorOphysLimsApi(123)
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_dff_file',
-                        lambda: out_fname)
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_roi_ids",
+                    lambda *args: np.array([1, 2, 3, 4, 5, 6]).astype(bytes))
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
-    with pytest.raises(RuntimeError):
-        dff_traces = api.get_raw_dff_data()
+        with pytest.raises(RuntimeError):
+            _ = api.get_raw_dff_data()
 
 
 def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
@@ -267,50 +270,47 @@ def test_corrected_fluorescence_trace_order(monkeypatch, tmpdir):
     can reorder ROIs to align with what is in the cell_specimen_table
     """
 
-    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data.h5')
+    out_fname = os.path.join(tmpdir, "dummy_ftrace_data.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((5, n_t))
     roi_names = np.array([5, 3, 4, 2, 1])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
-    cell_data = {'junk':[6,7,8,9,10],
-                 'cell_roi_id':[b'1', b'2', b'3', b'4', b'5']}
+    cell_data = {"junk": [6, 7, 8, 9, 10],
+                 "cell_roi_id": [b"1", b"2", b"3", b"4", b"5"]}
 
     cell_table = pd.DataFrame(data=cell_data,
                               index=pd.Index([10, 20, 30, 40, 50],
-                                             name='cell_specimen_id'))
+                                             name="cell_specimen_id"))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_ophys_timestamps',
-                        lambda x: np.zeros(n_t))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi,
+                    "get_demix_file", lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_specimen_table',
-                        lambda x: cell_table)
+        ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
+                    lambda *args: np.zeros(n_t))
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
+                    lambda *args: cell_table)
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
-    api = BehaviorOphysLimsApi(123)
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_demix_file',
-                        lambda: out_fname)
-
-    f_traces = api.get_corrected_fluorescence_traces()
+        f_traces = api.get_corrected_fluorescence_traces()
 
     # check that the f_traces data frame was correctly joined
     # on roi_id
-    colname = 'corrected_fluorescence'
+    colname = "corrected_fluorescence"
     roi_to_dex = {1: 4, 2: 3, 3: 1, 4: 2, 5: 0}
     for ii, roi_id in enumerate([1, 2, 3, 4, 5]):
-        cell = f_traces.loc[f_traces.cell_roi_id == bytes(f"{roi_id}", 'utf-8')]
+        cell = (f_traces.loc[f_traces.cell_roi_id
+                == bytes(f"{roi_id}", "utf-8")])
         assert cell.index.values[0] == 10*roi_id
         np.testing.assert_array_almost_equal(cell[colname].values[0],
                                              data[roi_to_dex[roi_id]],
@@ -327,46 +327,40 @@ def test_corrected_fluorescence_trace_exceptions(monkeypatch, tmpdir):
     the fluorescence traces do not
     """
 
-    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data_exc.h5')
+    out_fname = os.path.join(tmpdir, "dummy_ftrace_data_exc.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((4, n_t))
-    roi_names = np.array([5,3,4,2])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    roi_names = np.array([5, 3, 4, 2])
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
-    cell_data = {'junk':[6, 7, 8, 9, 10],
-                 'cell_roi_id':[b'1',b'2',b'3',b'4',b'5']}
+    cell_data = {"junk": [6, 7, 8, 9, 10],
+                 "cell_roi_id": [b"1", b"2", b"3", b"4", b"5"]}
 
     cell_table = pd.DataFrame(data=cell_data,
                               index=pd.Index([10, 20, 30, 40, 50],
-                                             name='cell_specimen_id'))
+                                             name="cell_specimen_id"))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_ophys_timestamps',
-                        lambda x: np.zeros(n_t))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi,
+                    "get_demix_file", lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_specimen_table',
-                        lambda x: cell_table)
+        ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
+                    lambda *args: np.zeros(n_t))
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
+                    lambda *args: cell_table)
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
-    api = BehaviorOphysLimsApi(123)
-
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_demix_file',
-                        lambda: out_fname)
-
-    with pytest.raises(RuntimeError):
-        _ = api.get_corrected_fluorescence_traces()
+        with pytest.raises(RuntimeError):
+            _ = api.get_corrected_fluorescence_traces()
 
 
 def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
@@ -379,43 +373,37 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
     the cell_specimen_table does not
     """
 
-    out_fname = os.path.join(tmpdir, 'dummy_ftrace_data_exc2.h5')
+    out_fname = os.path.join(tmpdir, "dummy_ftrace_data_exc2.h5")
     rng = np.random.RandomState(1234)
     n_t = 100
     data = rng.random_sample((5, n_t))
-    roi_names = np.array([1,5,3,4,2])
-    with h5py.File(out_fname, 'w') as out_file:
-        out_file.create_dataset('data', data=data)
-        out_file.create_dataset('roi_names', data=roi_names.astype(bytes))
+    roi_names = np.array([1, 5, 3, 4, 2])
+    with h5py.File(out_fname, "w") as out_file:
+        out_file.create_dataset("data", data=data)
+        out_file.create_dataset("roi_names", data=roi_names.astype(bytes))
 
-    cell_data = {'junk':[6,7,8,9,10,11],
-                 'cell_roi_id':[b'1',b'2',b'3',b'4',b'5',b'6']}
+    cell_data = {"junk": [6, 7, 8, 9, 10, 11],
+                 "cell_roi_id": [b"1", b"2", b"3", b"4", b"5", b"6"]}
 
     cell_table = pd.DataFrame(data=cell_data,
-                              index=pd.Index([10,20,30,40,50,60],
-                                             name='cell_specimen_id'))
+                              index=pd.Index([10, 20, 30, 40, 50, 60],
+                                             name="cell_specimen_id"))
 
     def dummy_init(self, ophys_experiment_id, **kwargs):
-        self.ophys_experiment_id = 1
+        self.ophys_experiment_id = ophys_experiment_id
         self.get_behavior_session_id = 2
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_ophys_timestamps',
-                        lambda x: np.zeros(n_t))
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, "__init__", dummy_init)
+        ctx.setattr(BehaviorOphysLimsRawApi,
+                    "get_demix_file", lambda *args: out_fname)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
 
-    monkeypatch.setattr(BehaviorOphysLimsApi,
-                        'get_cell_specimen_table',
-                        lambda x: cell_table)
+        ctx.setattr(BehaviorOphysLimsApi, "get_ophys_timestamps",
+                    lambda *args: np.zeros(n_t))
+        ctx.setattr(BehaviorOphysLimsApi, "get_cell_specimen_table",
+                    lambda *args: cell_table)
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
 
-    api = BehaviorOphysLimsApi(123)
-
-    monkeypatch.setattr(api.raw_data_api,
-                        '__init__',
-                        dummy_init)
-
-    monkeypatch.setattr(api.raw_data_api,
-                        'get_demix_file',
-                        lambda: out_fname)
-
-    with pytest.raises(RuntimeError):
-        _ = api.get_corrected_fluorescence_traces()
+        with pytest.raises(RuntimeError):
+            _ = api.get_corrected_fluorescence_traces()
