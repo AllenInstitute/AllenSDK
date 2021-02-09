@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.7.0] = TBD
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
+- Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files
