@@ -26,13 +26,14 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import (
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms
+    BehaviorDataTransforms
 )
 
 
-class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
-    """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS or JSON data APIs to fill a BehaviorOphysSession.
+class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
+    """This class provides methods that transform data extracted from
+    LIMS or JSON data sources into final data products necessary for
+    populating a BehaviorOphysSession.
     """
 
     def __init__(self, raw_data_api: BehaviorOphysDataExtractorBase):

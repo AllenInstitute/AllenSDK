@@ -23,9 +23,10 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 
 
-class BehaviorDataXforms(BehaviorBase):
-    """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS or JSON data APIs to fill a BehaviorSession.
+class BehaviorDataTransforms(BehaviorBase):
+    """This class provides methods that transform data extracted from
+    LIMS or JSON data sources into final data products necessary for
+    populating a BehaviorSession.
     """
 
     def __init__(self, raw_data_api: BehaviorDataExtractorBase):

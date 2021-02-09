@@ -7,7 +7,7 @@ from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorDataXforms
+    BehaviorDataTransforms
 from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
                                        MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import DbCredentials
@@ -18,7 +18,7 @@ from allensdk.internal.api import (OneOrMoreResultExpectedError,
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
+class BehaviorLimsApi(BehaviorDataTransforms, CachedInstanceMethodMixin):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (raw_data_api). Contains all methods
     needed to fill a BehaviorSession."""
@@ -49,7 +49,7 @@ class BehaviorLimsRawApi(BehaviorDataExtractorBase):
     'BehaviorSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's
     """
     def __init__(self, behavior_session_id: int,
                  lims_credentials: Optional[DbCredentials] = None,

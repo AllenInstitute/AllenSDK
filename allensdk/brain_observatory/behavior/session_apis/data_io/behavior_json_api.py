@@ -5,10 +5,10 @@ import pytz
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorDataXforms
+    BehaviorDataTransforms
 
 
-class BehaviorJsonApi(BehaviorDataXforms):
+class BehaviorJsonApi(BehaviorDataTransforms):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (raw_data_api). Contains all methods
     needed to fill a BehaviorSession."""
@@ -24,7 +24,7 @@ class BehaviorJsonRawApi(BehaviorDataExtractorBase):
     a 'BehaviorSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's.
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's.
 
     This class is used by the write_nwb module for behavior sessions.
     """

@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import \
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsRawApi, OphysLimsRawApi)
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorOphysDataXforms
+    BehaviorOphysDataTransforms
 from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
                                        MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import DbCredentials, credential_injector
@@ -17,7 +17,8 @@ from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class BehaviorOphysLimsApi(BehaviorOphysDataXforms, CachedInstanceMethodMixin):
+class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
+                           CachedInstanceMethodMixin):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (raw_data_api). Contains all methods
     needed to fill a BehaviorOphysSession."""
@@ -50,7 +51,7 @@ class BehaviorOphysLimsRawApi(OphysLimsRawApi, BehaviorLimsRawApi,
     a 'BehaviorOphysSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorOphysDataXforms methods in order to usable by
+    BehaviorOphysDataTransforms methods in order to usable by
     'BehaviorOphysSession's.
     """
 

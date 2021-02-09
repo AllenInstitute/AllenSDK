@@ -10,7 +10,7 @@ import pytz
 
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorOphysDataXforms
+    BehaviorOphysDataTransforms
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 
@@ -348,7 +348,7 @@ def cell_specimen_table_api():
 
     # Must implement at least the get_cell_specimen_table
     # and get_max_projection methods from BehaviorOphysBase
-    class CellSpecimenTableApi(BehaviorOphysDataXforms):
+    class CellSpecimenTableApi(BehaviorOphysDataTransforms):
 
         def __init__(self):
             pass

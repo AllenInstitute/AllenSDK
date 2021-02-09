@@ -6,10 +6,10 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import \
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
     BehaviorJsonRawApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorOphysDataXforms
+    BehaviorOphysDataTransforms
 
 
-class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
+class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (raw_data_api). Contains all methods
     needed to fill a BehaviorOphysSession."""
@@ -26,7 +26,7 @@ class BehaviorOphysJsonRawApi(BehaviorJsonRawApi,
     a 'BehaviorOphysSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorOphysDataXforms methods in order to usable by
+    BehaviorOphysDataTransforms methods in order to usable by
     'BehaviorOphysSession's.
 
     This class is used by the write_nwb module for behavior ophys sessions.

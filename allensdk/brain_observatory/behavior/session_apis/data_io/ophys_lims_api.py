@@ -19,7 +19,7 @@ class OphysLimsRawApi(CachedInstanceMethodMixin):
     BehaviorOphysSession.
 
     This class needs to be inherited by the BehaviorOphysLimsApi and also
-    have methods from BehaviorOphysDataXforms in order to be usable by a
+    have methods from BehaviorOphysDataTransforms in order to be usable by a
     BehaviorOphysSession.
     """
 
