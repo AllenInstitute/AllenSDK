@@ -429,7 +429,7 @@ def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
         rig_geometry = (
             pd.read_pickle(resources_dir
                            / 'rig_geometry_multiple_rig_configs.pkl'))
-        rig_geometry = api._process_eye_tracking_rig_geometry(
+        rig_geometry = api.extractor._process_eye_tracking_rig_geometry(
             rig_geometry=rig_geometry)
 
     expected = {

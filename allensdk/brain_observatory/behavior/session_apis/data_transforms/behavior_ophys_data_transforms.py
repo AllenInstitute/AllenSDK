@@ -46,6 +46,9 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_ophys_session_id(self):
         return self.extractor.get_ophys_experiment_id()
 
+    def get_eye_tracking_rig_geometry(self) -> dict:
+        return self.extractor.get_eye_tracking_rig_geometry()
+
     @memoize
     def get_cell_specimen_table(self):
         raw_cell_specimen_table = (
