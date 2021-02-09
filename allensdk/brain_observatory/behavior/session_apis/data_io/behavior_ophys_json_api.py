@@ -127,6 +127,19 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         except KeyError:
             return None
 
+    def get_plane_group_count(self) -> int:
+        """Gets the total number of plane groups in the session.
+        This is required for resampling ophys timestamps for mesoscope
+        data. Will be 0 if the scope did not capture multiple concurrent
+        frames.
+        """
+        try:
+            # Will only contain the "plane_group_count" key if we are
+            # dealing with Mesoscope data
+            return self.data["plane_group_count"]
+        except KeyError:
+            return 0
+
     def get_eye_tracking_rig_geometry(self) -> dict:
         """Get the eye tracking rig geometry associated with an ophys
         experiment"""
