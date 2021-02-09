@@ -69,12 +69,8 @@ def determine_outliers(data_df: pd.DataFrame,
         A pandas boolean Series whose length == len(data_df.index).
         True denotes that a row in the data_df contains at least one outlier.
     """
-    # Dataframe must have NANs filled to prevent warning when performing
-    # comparisons against the z_threshold. NANs will be filtered out
-    # in determine_likely_blinks().
-    nan_filled_df = data_df.fillna(data_df.mean())
 
-    outliers = (nan_filled_df.apply(stats.zscore).apply(np.abs) > z_threshold)
+    outliers = (data_df.apply(stats.zscore, nan_policy='omit').apply(np.abs) > z_threshold)
     return pd.Series(outliers.any(axis=1))
 
 
@@ -202,7 +198,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     pupil_areas = (eye_data[["pupil_width", "pupil_height"]]
                    .apply(compute_circular_area, axis=1))
 
-    area_df = pd.concat([cr_areas, eye_areas, pupil_areas], axis=1)
+    area_df = pd.concat([eye_areas, pupil_areas], axis=1)
     outliers = determine_outliers(area_df, z_threshold=z_threshold)
 
     likely_blinks = determine_likely_blinks(eye_areas,
