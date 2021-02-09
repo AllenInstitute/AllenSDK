@@ -2,12 +2,13 @@ import abc
 from typing import Dict, Optional
 
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorRawDataBase)
+    BehaviorDataExtractorBase)
 
 
-class BehaviorOphysRawDataBase(BehaviorRawDataBase):
-    """Abstract base class implementing required methods for interacting with
-    raw (from LIMS or from JSON) behavior + ophys session data.
+class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
+    """Abstract base class implementing required methods for extracting
+    data (from LIMS or from JSON) that will be transformed or passed on to
+    fill behavior + ophys session data.
     """
 
     @abc.abstractmethod

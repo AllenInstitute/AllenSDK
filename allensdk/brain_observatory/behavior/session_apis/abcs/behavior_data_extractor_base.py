@@ -3,9 +3,10 @@ from datetime import datetime
 from typing import List
 
 
-class BehaviorRawDataBase(abc.ABC):
-    """Abstract base class implementing required methods for interacting with
-    raw (from LIMS or from JSON) behavior session data.
+class BehaviorDataExtractorBase(abc.ABC):
+    """Abstract base class implementing required methods for extracting
+    data (from LIMS or from JSON) that will be transformed or passed on to
+    fill behavior session data.
     """
 
     @abc.abstractmethod

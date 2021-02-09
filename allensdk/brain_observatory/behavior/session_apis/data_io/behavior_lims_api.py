@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Union
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
-    BehaviorRawDataBase
+    BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataXforms
 from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
@@ -27,7 +27,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
                  behavior_session_id: Optional[int] = None,
                  lims_credentials: Optional[DbCredentials] = None,
                  mtrain_credentials: Optional[DbCredentials] = None,
-                 raw_data_api: Optional[BehaviorRawDataBase] = None):
+                 raw_data_api: Optional[BehaviorDataExtractorBase] = None):
 
         if raw_data_api is None:
             if behavior_session_id is not None:
@@ -43,7 +43,7 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
         super().__init__(raw_data_api=raw_data_api)
 
 
-class BehaviorLimsRawApi(BehaviorRawDataBase):
+class BehaviorLimsRawApi(BehaviorDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling a
     'BehaviorSession'.

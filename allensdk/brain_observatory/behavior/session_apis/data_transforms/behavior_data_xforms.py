@@ -13,7 +13,7 @@ from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \
     get_running_df
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase, BehaviorRawDataBase)
+    BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
@@ -28,8 +28,8 @@ class BehaviorDataXforms(BehaviorBase):
     by LIMS or JSON data APIs to fill a BehaviorSession.
     """
 
-    def __init__(self, raw_data_api: BehaviorRawDataBase):
-        self.raw_data_api: BehaviorRawDataBase = raw_data_api
+    def __init__(self, raw_data_api: BehaviorDataExtractorBase):
+        self.raw_data_api: BehaviorDataExtractorBase = raw_data_api
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_behavior_session_id(self):

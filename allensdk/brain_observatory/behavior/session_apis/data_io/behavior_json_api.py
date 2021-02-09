@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytz
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
-    BehaviorRawDataBase
+    BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataXforms
 
@@ -18,7 +18,7 @@ class BehaviorJsonApi(BehaviorDataXforms):
         super().__init__(raw_data_api=raw_data_api)
 
 
-class BehaviorJsonRawApi(BehaviorRawDataBase):
+class BehaviorJsonRawApi(BehaviorDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from a json file necessary (but not sufficient) for filling
     a 'BehaviorSession'.

@@ -4,7 +4,7 @@ from typing import List, Optional
 import pandas as pd
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
-    BehaviorOphysRawDataBase
+    BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsRawApi, OphysLimsRawApi)
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
@@ -22,11 +22,12 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms, CachedInstanceMethodMixin):
     a specified raw data source (raw_data_api). Contains all methods
     needed to fill a BehaviorOphysSession."""
 
-    def __init__(self,
-                 ophys_experiment_id: Optional[int] = None,
-                 lims_credentials: Optional[DbCredentials] = None,
-                 mtrain_credentials: Optional[DbCredentials] = None,
-                 raw_data_api: Optional[BehaviorOphysRawDataBase] = None):
+    def __init__(
+        self,
+        ophys_experiment_id: Optional[int] = None,
+        lims_credentials: Optional[DbCredentials] = None,
+        mtrain_credentials: Optional[DbCredentials] = None,
+        raw_data_api: Optional[BehaviorOphysDataExtractorBase] = None):
 
         if raw_data_api is None:
             if ophys_experiment_id is not None:
@@ -43,7 +44,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms, CachedInstanceMethodMixin):
 
 
 class BehaviorOphysLimsRawApi(OphysLimsRawApi, BehaviorLimsRawApi,
-                              BehaviorOphysRawDataBase):
+                              BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.

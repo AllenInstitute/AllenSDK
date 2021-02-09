@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
-    BehaviorOphysRawDataBase
+    BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
     BehaviorJsonRawApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
@@ -19,7 +19,8 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
         super().__init__(raw_data_api=raw_data_api)
 
 
-class BehaviorOphysJsonRawApi(BehaviorJsonRawApi, BehaviorOphysRawDataBase):
+class BehaviorOphysJsonRawApi(BehaviorJsonRawApi,
+                              BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from a json file necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.

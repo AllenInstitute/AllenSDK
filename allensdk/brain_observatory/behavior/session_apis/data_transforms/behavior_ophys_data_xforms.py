@@ -11,7 +11,7 @@ import pandas as pd
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase, BehaviorOphysRawDataBase)
+    BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
 
 from allensdk.brain_observatory.behavior.sync import (
@@ -35,8 +35,8 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
     by LIMS or JSON data APIs to fill a BehaviorOphysSession.
     """
 
-    def __init__(self, raw_data_api: BehaviorOphysRawDataBase):
-        self.raw_data_api: BehaviorOphysRawDataBase = raw_data_api
+    def __init__(self, raw_data_api: BehaviorOphysDataExtractorBase):
+        self.raw_data_api: BehaviorOphysDataExtractorBase = raw_data_api
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_experiment_id(self):
