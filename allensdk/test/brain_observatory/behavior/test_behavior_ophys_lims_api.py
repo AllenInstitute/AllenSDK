@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import pandas as pd
 import numpy as np
@@ -407,3 +409,60 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
 
         with pytest.raises(RuntimeError):
             _ = api.get_corrected_fluorescence_traces()
+
+
+def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
+    """
+    This test tests that when there are multiple rig geometries for an experiment,
+    that only the most recent is returned
+    """
+    def dummy_init(self, ophys_experiment_id):
+        self.ophys_experiment_id = ophys_experiment_id
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysLimsRawApi, '__init__', dummy_init)
+        patched_raw_data_api = BehaviorOphysLimsRawApi(123)
+
+        api = BehaviorOphysLimsApi(raw_data_api=patched_raw_data_api)
+
+        resources_dir = Path(os.path.dirname(__file__)) / 'resources'
+        rig_geometry = (
+            pd.read_pickle(resources_dir
+                           / 'rig_geometry_multiple_rig_configs.pkl'))
+        rig_geometry = api._process_eye_tracking_rig_geometry(
+            rig_geometry=rig_geometry)
+
+    expected = {
+        'camera_position_mm': [102.8, 74.7, 31.6],
+        'led_position': [246.0, 92.3, 52.6],
+        'monitor_position_mm': [118.6, 86.2, 31.6],
+        'camera_rotation_deg': [0.0, 0.0, 2.8],
+        'monitor_rotation_deg': [0.0, 0.0, 0.0],
+        'equipment': 'CAM2P.5'
+    }
+
+    assert rig_geometry == expected
+
+
+@pytest.mark.requires_bamboo
+def test_rig_geometry_newer_than_experiment():
+    """
+    This test ensures that if the experiment date_of_acquisition
+    is before a rig activate_date that it is not returned as the rig
+    used for the experiment
+    """
+    # This experiment has rig config more recent than the
+    # experiment date_of_acquisition
+    ophys_experiment_id = 521405260
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    rig_geometry = api.get_eye_tracking_rig_geometry()
+
+    expected = {
+        'camera_position_mm': [130.0, 0.0, 0.0],
+        'led_position': [265.1, -39.3, 1.0],
+        'monitor_position_mm': [170.0, 0.0, 0.0],
+        'camera_rotation_deg': [0.0, 0.0, 13.1],
+        'monitor_rotation_deg': [0.0, 0.0, 0.0],
+        'equipment': 'CAM2P.1'
+    }
+    assert rig_geometry == expected
