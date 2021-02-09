@@ -369,13 +369,14 @@ def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correcti
 
 @pytest.mark.parametrize("roundtrip", [True, False])
 @pytest.mark.parametrize("expected", [
-    ({"geometry": pd.DataFrame({"monitor_position_mm": [1., 2., 3.],
-                                "monitor_rotation_deg": [4., 5., 6.],
-                                "camera_position_mm": [7., 8., 9.],
-                                "camera_rotation_deg": [10., 11., 12.],
-                                "led_position_mm": [13., 14., 15.]},
-                               index=["x", "y", "z"]),
-      "equipment": "test_rig"}),
+    ({
+        "monitor_position_mm": [1., 2., 3.],
+        "monitor_rotation_deg": [4., 5., 6.],
+        "camera_position_mm": [7., 8., 9.],
+        "camera_rotation_deg": [10., 11., 12.],
+        "led_position": [13., 14., 15.],
+        "equipment": "test_rig"
+     }),
 ])
 def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
                                                        roundtrip,
@@ -388,10 +389,9 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-    obtained_metadata = obt.get_rig_metadata()
+    obtained_metadata = obt.get_eye_tracking_rig_geometry()
 
-    pd.testing.assert_frame_equal(obtained_metadata["geometry"], expected["geometry"], check_like=True)
-    assert obtained_metadata["equipment"] == expected["equipment"]
+    assert obtained_metadata == expected
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
