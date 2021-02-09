@@ -138,10 +138,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
-        self.add_eye_tracking_data_to_nwb(nwbfile=nwbfile,
-                                          eye_tracking_df=session_object.eye_tracking,
-                                          eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
-                                          eye_gaze_mapping_file_path=session_object.eye_gaze_mapping_file_path)
+        # Add eye tracking, rig geometry, and gaze mapping data to NWB
+        # in-memory object.
+        self.add_eye_tracking_data_to_nwb(
+            nwbfile=nwbfile,
+            eye_tracking_df=session_object.eye_tracking,
+            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
+            eye_gaze_mapping_file_path=session_object.api.extractor.get_eye_gaze_mapping_file_path())
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:

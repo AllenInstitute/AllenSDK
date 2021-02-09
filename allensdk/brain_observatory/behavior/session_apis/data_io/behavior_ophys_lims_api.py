@@ -44,7 +44,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
 
 
 class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
-                              BehaviorOphysDataExtractorBase):
+                                 BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.
