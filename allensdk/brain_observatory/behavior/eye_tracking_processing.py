@@ -198,6 +198,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     pupil_areas = (eye_data[["pupil_width", "pupil_height"]]
                    .apply(compute_circular_area, axis=1))
 
+    # only use eye and pupil areas for outlier detection
     area_df = pd.concat([eye_areas, pupil_areas], axis=1)
     outliers = determine_outliers(area_df, z_threshold=z_threshold)
 
