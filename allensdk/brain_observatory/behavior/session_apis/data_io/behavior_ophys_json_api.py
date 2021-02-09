@@ -1,13 +1,25 @@
 import logging
 from typing import Optional
 
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorJsonApi)
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorOphysDataXforms)
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorOphysRawDataBase
+from allensdk.brain_observatory.behavior.session_apis.data_io import \
+    BehaviorJsonRawApi
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorOphysDataXforms
 
 
-class BehaviorOphysJsonApi(BehaviorOphysDataXforms, BehaviorJsonApi):
+class BehaviorOphysJsonApi(BehaviorOphysDataXforms):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (raw_data_api). Contains all methods
+    needed to fill a BehaviorOphysSession."""
+
+    def __init__(self, data):
+        raw_data_api = BehaviorOphysJsonRawApi(data=data)
+        super().__init__(raw_data_api=raw_data_api)
+
+
+class BehaviorOphysJsonRawApi(BehaviorJsonRawApi, BehaviorOphysRawDataBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from a json file necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.
@@ -116,7 +128,8 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms, BehaviorJsonApi):
             return None
 
     def get_eye_tracking_rig_geometry(self) -> dict:
-        """Get the eye tracking rig geometry associated with an ophys experiment"""
+        """Get the eye tracking rig geometry associated with an ophys
+        experiment"""
         return self.data['eye_tracking_rig_geometry']
 
     def get_eye_tracking_filepath(self) -> dict:
@@ -124,5 +137,6 @@ class BehaviorOphysJsonApi(BehaviorOphysDataXforms, BehaviorJsonApi):
         return self.data['eye_tracking_filepath']
 
     def get_eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
+        """Get h5 filepath containing eye gaze behavior of the experiment's
+        subject"""
         return self.data['eye_gaze_mapping_path']

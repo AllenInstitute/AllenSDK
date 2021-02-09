@@ -1,23 +1,49 @@
 import logging
 from typing import List, Optional
+
 import pandas as pd
-
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
-    import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorOphysRawDataBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
-from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
+    BehaviorLimsRawApi, OphysLimsRawApi)
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorOphysDataXforms
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
+from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.core.authentication import credential_injector, DbCredentials
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorOphysDataXforms)
 
 
-class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
-                           BehaviorLimsApi):
+class BehaviorOphysLimsApi(BehaviorOphysDataXforms, CachedInstanceMethodMixin):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (raw_data_api). Contains all methods
+    needed to fill a BehaviorOphysSession."""
+
+    def __init__(self,
+                 ophys_experiment_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 raw_data_api: Optional[BehaviorOphysRawDataBase] = None):
+
+        if raw_data_api is None:
+            if ophys_experiment_id is not None:
+                raw_data_api = BehaviorOphysLimsRawApi(
+                    ophys_experiment_id,
+                    lims_credentials,
+                    mtrain_credentials)
+            else:
+                raise RuntimeError(
+                    "BehaviorOphysLimsApi must be provided either an "
+                    "instantiated 'raw_data_api' or an 'ophys_experiment_id'!")
+
+        super().__init__(raw_data_api=raw_data_api)
+
+
+class BehaviorOphysLimsRawApi(OphysLimsRawApi, BehaviorLimsRawApi,
+                              BehaviorOphysRawDataBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.

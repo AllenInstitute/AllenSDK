@@ -1,12 +1,24 @@
 import logging
 from datetime import datetime
-import pytz
 
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms)
+import pytz
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorRawDataBase
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataXforms
 
 
 class BehaviorJsonApi(BehaviorDataXforms):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (raw_data_api). Contains all methods
+    needed to fill a BehaviorSession."""
+
+    def __init__(self, data):
+        raw_data_api = BehaviorJsonRawApi(data=data)
+        super().__init__(raw_data_api=raw_data_api)
+
+
+class BehaviorJsonRawApi(BehaviorRawDataBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from a json file necessary (but not sufficient) for filling
     a 'BehaviorSession'.

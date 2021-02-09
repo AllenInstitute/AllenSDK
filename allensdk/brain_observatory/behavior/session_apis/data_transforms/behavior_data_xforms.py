@@ -1,56 +1,63 @@
-from typing import Dict, Optional, Any
-from datetime import datetime
-import pytz
+import logging
 import uuid
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 import numpy as np
 import pandas as pd
-
-from allensdk.core.exceptions import DataFrameIndexError
+import pytz
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase)
+from allensdk.brain_observatory.behavior.metadata_processing import \
+    get_task_parameters
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.running_processing import (
-    get_running_df)
+from allensdk.brain_observatory.behavior.running_processing import \
+    get_running_df
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorBase, BehaviorRawDataBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata)
-from allensdk.brain_observatory.running_speed import RunningSpeed
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_task_parameters)
+    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_trials, get_extended_trials)
+    get_extended_trials, get_trials)
+from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.core.exceptions import DataFrameIndexError
 
 
 class BehaviorDataXforms(BehaviorBase):
     """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS data APIs to fill a BehaviorSession.
+    by LIMS or JSON data APIs to fill a BehaviorSession.
     """
+
+    def __init__(self, raw_data_api: BehaviorRawDataBase):
+        self.raw_data_api: BehaviorRawDataBase = raw_data_api
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def get_behavior_session_id(self):
+        return self.raw_data_api.get_behavior_session_id()
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
-        """Helper method to cache stimulus file in memory since it takes about
-        a second to load (and is used in many methods).
+        """Helper method to cache stimulus pkl file in memory since it takes
+        about a second to load (and is used in many methods).
         """
-        return pd.read_pickle(self.get_behavior_stimulus_file())
+        return pd.read_pickle(self.raw_data_api.get_behavior_stimulus_file())
 
-    def get_behavior_session_uuid(self) -> Optional[int]:
+    def get_behavior_session_uuid(self) -> Optional[str]:
         """Get the universally unique identifier (UUID) number for the
         current behavior session.
         """
         data = self._behavior_stimulus_file()
         behavior_pkl_uuid = data.get("session_uuid")
 
-        behavior_session_id = self.get_behavior_session_id()
-        foraging_id = self.get_foraging_id()
+        behavior_session_id = self.raw_data_api.get_behavior_session_id()
+        foraging_id = self.raw_data_api.get_foraging_id()
 
         # Sanity check to ensure that pkl file data matches up with
         # the behavior session that the pkl file has been associated with.
         assert_err_msg = (
             f"The behavior session UUID ({behavior_pkl_uuid}) in the "
             f"behavior stimulus *.pkl file "
-            f"({self.get_behavior_stimulus_file()}) does "
+            f"({self.raw_data_api.get_behavior_stimulus_file()}) does "
             f"does not match the foraging UUID ({foraging_id}) for "
             f"behavior session: {behavior_session_id}")
         assert behavior_pkl_uuid == foraging_id, assert_err_msg
@@ -271,18 +278,18 @@ class BehaviorDataXforms(BehaviorBase):
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
         metadata = {
-            "rig_name": self.get_rig_name(),
-            "sex": self.get_sex(),
-            "age": self.get_age(),
+            "rig_name": self.raw_data_api.get_rig_name(),
+            "sex": self.raw_data_api.get_sex(),
+            "age": self.raw_data_api.get_age(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
-            "session_type": self.get_stimulus_name(),
+            "session_type": self.raw_data_api.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": self.get_reporter_line(),
-            "driver_line": self.get_driver_line(),
-            "LabTracks_ID": self.get_external_specimen_name(),
-            "full_genotype": self.get_full_genotype(),
+            "reporter_line": self.raw_data_api.get_reporter_line(),
+            "driver_line": self.raw_data_api.get_driver_line(),
+            "LabTracks_ID": self.raw_data_api.get_external_specimen_name(),
+            "full_genotype": self.raw_data_api.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.get_foraging_id(),
-            "behavior_session_id": self.get_behavior_session_id()
+            "foraging_id": self.raw_data_api.get_foraging_id(),
+            "behavior_session_id": self.raw_data_api.get_behavior_session_id()
         }
         return metadata

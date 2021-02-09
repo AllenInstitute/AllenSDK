@@ -444,7 +444,8 @@ class BehaviorOphysSession(ParamsMixin):
 
     @property
     def eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
+        """Get h5 filepath containing eye gaze behavior of the experiment's
+        subject"""
         return self.api.get_eye_gaze_mapping_file_path()
 
     def cache_clear(self) -> None:
@@ -562,7 +563,7 @@ class BehaviorOphysSession(ParamsMixin):
         allensdk.brain_observatory.behavior.image_api.Image:
             array-like interface to segmentation_mask image data and metadata
         """
-        masks = self._get_roi_masks_by_cell_roi_id()
+        masks = self.api.get_roi_masks_by_cell_roi_id()
         mask_image_data = masks.any(dim='cell_roi_id').astype(int)
         mask_image = Image(
             data=mask_image_data.values,
