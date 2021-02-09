@@ -222,11 +222,11 @@ class BehaviorOphysDataXforms(BehaviorOphysBase):
         return df
 
     @memoize
-    def get_running_data_df(self, lowpass=True):
+    def get_running_data_df(self, lowpass=True, zscore_threshold=5.0):
         stimulus_timestamps = self.get_stimulus_timestamps()
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass, zscore_threshold=zscore_threshold)
 
     @memoize
     def get_running_speed(self, lowpass=True):

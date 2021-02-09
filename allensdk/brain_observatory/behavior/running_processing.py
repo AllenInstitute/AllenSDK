@@ -299,7 +299,7 @@ def _zscore_threshold_1d(data: np.ndarray,
     return corrected_data
 
 
-def get_running_df(data, time: np.ndarray, lowpass: bool = True):
+def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=5.0):
     """
     Given the data from the behavior 'pkl' file object and a 1d
     array of timestamps, compute the running speed. Returns a
@@ -317,6 +317,8 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
     lowpass: bool (default=True)
         Whether to apply a 10Hz low-pass filter to the running speed
         data.
+    zscore_threshold: float
+        The threshold to use for removing outlier running speeds which might be noise and not true signal
 
     Returns
     -------
@@ -386,7 +388,7 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
         linear_speed, time, np.concatenate([pos_wraps, neg_wraps]),
         t_span=0.25)
     outlier_corrected_linear_speed = _zscore_threshold_1d(
-        wrap_corrected_linear_speed, threshold=5.0)
+        wrap_corrected_linear_speed, threshold=zscore_threshold)
 
     # Final filtering (optional) for smoothing out the speed data
     if lowpass:

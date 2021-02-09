@@ -70,7 +70,7 @@ def MockBehaviorLimsApi():
             }
             return data
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_data_df(self, lowpass=True, zscore_threshold=5.0):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
@@ -95,7 +95,7 @@ def MockApiRunSpeedExpectedError():
         def _get_ids(self):
             return {}
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_data_df(self, lowpass=True, zscore_threshold=5.0):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]})
