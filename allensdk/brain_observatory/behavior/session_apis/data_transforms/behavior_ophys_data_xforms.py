@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, Optional, Union
 import uuid
 
 import h5py
@@ -449,11 +449,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
                           full_image_shape[1]), dtype=np.uint8)
 
         for ii, (_, row) in enumerate(table.iterrows()):
-            translated_roi_mask = np.roll(
-                row["roi_mask"],
-                shift=(int(row["y"]), int(row["x"])),
-                axis=(0, 1))
-            output[ii, :, :] = translated_roi_mask
+            output[ii, :, :] = row["roi_mask"]
 
         # Pixel spacing and units of mask image will match either the
         # max or avg projection image of 2P movie.
