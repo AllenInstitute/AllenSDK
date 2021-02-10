@@ -179,20 +179,25 @@ class BehaviorOphysSession(ParamsMixin):
         self._cell_specimen_table = value
 
     @property
-    def running_speed(self) -> RunningSpeed:
+    def running_speed(self) -> pd.DataFrame:
         """Running speed of mouse, filtered with 10Hz low pass filter,
-        To get the unfiltered running speed, use `raw_running_speed`.
+
         Returns
         -------
-        allensdk.brain_observatory.running_speed.RunningSpeed
-            NamedTuple with two fields:
-            timestamps : numpy.ndarray
-                Timestamps of running speed data samples
-            values : np.ndarray
-                Running speed of the experimental subject (in cm / s).
+        self._running_speed: pd.DataFrame
+            colums:
+            - timestamps [seconds]
+            - values [cm/s]
+
+        Notes
+        -----
+        To get the unfiltered running speed, use `raw_running_speed`.
         """
         if self._running_speed is None:
-            self._running_speed = self.api.get_running_speed()
+            rs_tuple = self.api.get_running_speed()
+            self._running_speed = pd.DataFrame(
+                    {"timestamps": rs_tuple.timestamps,
+                     "values": rs_tuple.values})
         return self._running_speed
 
     @running_speed.setter
@@ -200,64 +205,30 @@ class BehaviorOphysSession(ParamsMixin):
         self._running_speed = value
 
     @property
-    def raw_running_speed(self) -> RunningSpeed:
-        """Running speed of mouse, unfiltered.
+    def raw_running_speed(self) -> pd.DataFrame:
+        """Running speed of mouse, unfiltered
 
         Returns
         -------
-        allensdk.brain_observatory.running_speed.RunningSpeed
-            NamedTuple with two fields:
-            timestamps : numpy.ndarray
-                Timestamps of running speed data samples
-            values : np.ndarray
-                Running speed of the experimental subject (in cm / s).
+        self._running_speed: pd.DataFrame
+            colums:
+            - timestamps [seconds]
+            - values [cm/s]
+
+        Notes
+        -----
+        To get the filtered running speed, use `running_speed`.
         """
         if self._raw_running_speed is None:
-            self._raw_running_speed = self.api.get_running_speed(lowpass=False)
+            rs_tuple = self.api.get_running_speed(lowpass=False)
+            self._raw_running_speed = pd.DataFrame(
+                    {"timestamps": rs_tuple.timestamps,
+                     "values": rs_tuple.values})
         return self._raw_running_speed
 
     @raw_running_speed.setter
     def raw_running_speed(self, value):
         self._raw_running_speed = value
-
-    @property
-    def running_data_df(self) -> pd.DataFrame:
-        """Get running speed data. By default applies a 10Hz low pass
-        filter to the data. To get the running speed without the filter,
-        use `raw_running_data_df`.
-
-        Returns
-        -------
-        pd.DataFrame
-            Dataframe containing various signals used to compute running
-            speed, and the filtered speed.
-        """
-        if self._running_data_df is None:
-            self._running_data_df = self.api.get_running_data_df(lowpass=True)
-        return self._running_data_df
-
-    @running_data_df.setter
-    def running_data_df(self, value):
-        self._running_data_df = value
-
-    @property
-    def raw_running_data_df(self) -> pd.DataFrame:
-        """Get running speed  data. Does not apply the 10Hz filter.
-
-        Returns
-        -------
-        pd.DataFrame
-            Dataframe containing various signals used to compute running
-            speed, and the unfilteredfiltered speed.
-        """
-        if self._raw_running_data_df is None:
-            self._raw_running_data_df = self.api.get_running_data_df(
-                lowpass=False)
-        return self._raw_running_data_df
-
-    @raw_running_data_df.setter
-    def raw_running_data_df(self, value):
-        self._raw_running_data_df = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
