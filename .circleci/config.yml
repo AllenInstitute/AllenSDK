@@ -13,7 +13,7 @@ jobs:
           name: Install
       - run:
           command: |
-            python -m pytest --numprocesses 'auto' --cov allensdk --cov-report xml
+            python -m pytest -n 4 --durations=0 --cov allensdk --cov-report xml
             bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
           name: Test
     
