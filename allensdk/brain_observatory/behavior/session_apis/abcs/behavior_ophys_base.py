@@ -180,3 +180,14 @@ class BehaviorOphysBase(BehaviorBase):
             noise_stds: float64
         """
         raise NotImplementedError()
+
+    def get_eye_tracking_rig_geometry(self) -> dict:
+        """Get eye tracking rig metadata from behavior + ophys session.
+
+        Returns
+        -------
+        dict
+            Includes geometry of monitor, camera, LED
+        """
+        raise NotImplementedError()
+

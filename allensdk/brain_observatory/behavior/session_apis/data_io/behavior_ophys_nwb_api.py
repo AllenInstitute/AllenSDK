@@ -138,6 +138,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
+        # Add eye tracking, rig geometry, and gaze mapping data to NWB
+        # in-memory object.
+        self.add_eye_tracking_data_to_nwb(
+            nwbfile=nwbfile,
+            eye_tracking_df=session_object.eye_tracking,
+            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
+            eye_gaze_mapping_file_path=session_object.api.extractor.get_eye_gaze_mapping_file_path())
+
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -208,7 +216,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         eye_tracking_data.index = eye_tracking_data.index.rename('frame')
         return eye_tracking_data
 
-    def get_rig_metadata(self) -> Optional[dict]:
+    def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
         try:
             et_mod = self.nwbfile.get_processing_module("eye_tracking_rig_metadata")
         except KeyError as e:
@@ -218,22 +226,31 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         meta = et_mod.get_data_interface("eye_tracking_rig_metadata")
 
-        rig_geometry = pd.DataFrame({
-            f"monitor_position_{meta.monitor_position__unit_of_measurement}": meta.monitor_position,
-            f"camera_position_{meta.camera_position__unit_of_measurement}": meta.camera_position,
-            f"led_position_{meta.led_position__unit_of_measurement}": meta.led_position,
-            f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}": meta.monitor_rotation,
-            f"camera_rotation_{meta.camera_rotation__unit_of_measurement}": meta.camera_rotation
-        })
+        monitor_position = meta.monitor_position[:]
+        monitor_position = monitor_position.tolist() if isinstance(monitor_position, np.ndarray) else monitor_position
 
-        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
+        monitor_rotation = meta.monitor_rotation[:]
+        monitor_rotation = monitor_rotation.tolist() if isinstance(monitor_rotation, np.ndarray) else monitor_rotation
 
-        returned_metadata = {
-            "geometry": rig_geometry,
+        camera_position = meta.camera_position[:]
+        camera_position = camera_position.tolist() if isinstance(camera_position, np.ndarray) else camera_position
+
+        camera_rotation = meta.camera_rotation[:]
+        camera_rotation = camera_rotation.tolist() if isinstance(camera_rotation, np.ndarray) else camera_rotation
+
+        led_position = meta.led_position[:]
+        led_position = led_position.tolist() if isinstance(led_position, np.ndarray) else led_position
+
+        rig_geometry = {
+            f"monitor_position_{meta.monitor_position__unit_of_measurement}": monitor_position,
+            f"camera_position_{meta.camera_position__unit_of_measurement}": camera_position,
+            f"led_position": led_position,
+            f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}": monitor_rotation,
+            f"camera_rotation_{meta.camera_rotation__unit_of_measurement}": camera_rotation,
             "equipment": meta.equipment
         }
 
-        return returned_metadata
+        return rig_geometry
 
     def get_screen_gaze_data(self, include_filtered_data=False) -> Optional[pd.DataFrame]:
         """
@@ -417,11 +434,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return pd.DataFrame(motion_correction_data)
 
-    def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile, eye_tracking_df: pd.DataFrame, eye_tracking_rig_geometry: dict,
+    def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile, eye_tracking_df: pd.DataFrame,
+                                     eye_tracking_rig_geometry: Optional[dict],
                                      eye_gaze_mapping_file_path: Path = None) -> NWBFile:
         # 1. Add rig geometry
-        self.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
-                                                           eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+        if eye_tracking_rig_geometry:
+            self.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile=nwbfile,
+                                                               eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
         # 2. Add eye gaze mapping
         if eye_gaze_mapping_file_path:
@@ -516,3 +535,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         nwbfile.add_processing_module(eye_tracking_rig_mod)
 
         return nwbfile
+
+    def get_events(self):
+        pass

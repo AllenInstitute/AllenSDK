@@ -1,18 +1,29 @@
 import logging
 from datetime import datetime
+
 import pytz
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataTransforms
 
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms)
+
+class BehaviorJsonApi(BehaviorDataTransforms):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (extractor). Contains all methods
+    needed to fill a BehaviorSession."""
+
+    def __init__(self, data):
+        extractor = BehaviorJsonExtractor(data=data)
+        super().__init__(extractor=extractor)
 
 
-class BehaviorJsonApi(BehaviorDataXforms):
-    """A data fetching class that serves as an API for fetching 'raw'
-    data from a json file necessary (but not sufficient) for filling
-    a 'BehaviorSession'.
+class BehaviorJsonExtractor(BehaviorDataExtractorBase):
+    """A class which 'extracts' data from a json file. The extracted data
+    is necessary (but not sufficient) for populating a 'BehaviorSession'.
 
-    Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's.
+    Most data provided by this extractor needs to be processed by
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's.
 
     This class is used by the write_nwb module for behavior sessions.
     """
@@ -43,12 +54,6 @@ class BehaviorJsonApi(BehaviorDataXforms):
         """Get the name of the stimulus presented for a behavior or
         behavior + ophys experiment"""
         return self.data['stimulus_name']
-
-    def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an ophys experiment"""
-        return pytz.utc.localize(
-            datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S"))
 
     def get_reporter_line(self) -> str:
         """Get the (gene) reporter line for the subject associated with a
