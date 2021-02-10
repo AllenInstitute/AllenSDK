@@ -69,9 +69,7 @@ class BehaviorOphysSession(ParamsMixin):
         self._dff_traces = None
         self._cell_specimen_table = None
         self._running_speed = None
-        self._running_data_df = None
         self._raw_running_speed = None
-        self._raw_running_data_df = None
         self._stimulus_presentations = None
         self._stimulus_templates = None
         self._licks = None
