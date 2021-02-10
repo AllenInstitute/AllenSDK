@@ -21,6 +21,8 @@ jobs:
       MTRAIN_PASSWORD: password
     steps:
       - checkout
+      - run: sudo apt-get update
+      - run: sudo apt-get install rsync grsync
       - run:
           command: |
             pip install codecov
