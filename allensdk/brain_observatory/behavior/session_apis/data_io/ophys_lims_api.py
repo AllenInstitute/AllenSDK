@@ -12,14 +12,14 @@ from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 
-class OphysLimsApi(CachedInstanceMethodMixin):
+class OphysLimsExtractor(CachedInstanceMethodMixin):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS for filling optical physiology data. This data is
     is necessary (but not sufficient) to fill the 'Ophys' portion of a
     BehaviorOphysSession.
 
     This class needs to be inherited by the BehaviorOphysLimsApi and also
-    have methods from BehaviorOphysDataXforms in order to be usable by a
+    have methods from BehaviorOphysDataTransforms in order to be usable by a
     BehaviorOphysSession.
     """
 
@@ -516,5 +516,5 @@ class OphysLimsApi(CachedInstanceMethodMixin):
 
 if __name__ == "__main__":
 
-    api = OphysLimsApi(789359614)
+    api = OphysLimsExtractor(789359614)
     print(api.get_age())

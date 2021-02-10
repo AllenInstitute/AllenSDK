@@ -1,29 +1,56 @@
 import logging
 from typing import List, Optional
+
 import pandas as pd
-
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
-    import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
-from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
+    BehaviorLimsExtractor, OphysLimsExtractor)
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorOphysDataTransforms
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
+from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.core.authentication import credential_injector, DbCredentials
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorOphysDataXforms)
 
 
-class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
-                           BehaviorLimsApi):
+class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
+                           CachedInstanceMethodMixin):
+    """A data fetching and processing class that serves processed data from
+    a specified data source (extractor). Contains all methods
+    needed to populate a BehaviorOphysSession."""
+
+    def __init__(self,
+                 ophys_experiment_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 extractor: Optional[BehaviorOphysDataExtractorBase] = None):
+
+        if extractor is None:
+            if ophys_experiment_id is not None:
+                extractor = BehaviorOphysLimsExtractor(
+                    ophys_experiment_id,
+                    lims_credentials,
+                    mtrain_credentials)
+            else:
+                raise RuntimeError(
+                    "BehaviorOphysLimsApi must be provided either an "
+                    "instantiated 'extractor' or an 'ophys_experiment_id'!")
+
+        super().__init__(extractor=extractor)
+
+
+class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
+                                 BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorOphysDataXforms methods in order to usable by
+    BehaviorOphysDataTransforms methods in order to usable by
     'BehaviorOphysSession's.
     """
 
@@ -106,25 +133,59 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
     def get_eye_tracking_filepath(self) -> str:
         """Get the filepath of the eye tracking file (*.h5) associated with the
         ophys experiment"""
-        query = """
-                SELECT wkf.storage_directory || wkf.filename
-                AS eye_tracking_file
+        query = f"""
+                SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                 FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf
-                ON wkf.attachable_id = oe.ophys_session_id
-                JOIN well_known_file_types wkft
-                ON wkf.well_known_file_type_id = wkft.id
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
+                JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
                 WHERE wkf.attachable_type = 'OphysSession'
-                AND wkft.name = 'EyeTracking Ellipses'
-                AND oe.id = {};
-                """.format(self.get_ophys_experiment_id())
+                    AND wkft.name = 'EyeTracking Ellipses'
+                    AND oe.id = {self.get_ophys_experiment_id()};
+                """
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
-    @staticmethod
-    def get_ophys_experiment_df() -> pd.DataFrame:
+    @memoize
+    def get_eye_gaze_mapping_file_path(self) -> str:
+        """Get the filepath of the eye gaze mapping file (*.h5) associated with the
+        ophys experiment"""
+        query = f"""
+                SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
+                FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
+                JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
+                WHERE wkf.attachable_type = 'OphysSession'
+                    AND wkft.name = 'EyeDlcScreenMapping'
+                    AND oe.id = {self.get_ophys_experiment_id()};
+                """
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
+
+    @memoize
+    def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
+        """Get the eye tracking rig geometry metadata"""
+        ophys_experiment_id = self.get_ophys_experiment_id()
+
+        query = f'''
+            SELECT oec.*, oect.name as config_type, equipment.name as equipment_name
+            FROM ophys_sessions os
+            JOIN observatory_experiment_configs oec ON oec.equipment_id = os.equipment_id
+            JOIN observatory_experiment_config_types oect ON oect.id = oec.observatory_experiment_config_type_id
+            JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
+            JOIN equipment ON equipment.id = oec.equipment_id
+            WHERE oe.id = {ophys_experiment_id} AND 
+                oec.active_date <= os.date_of_acquisition AND
+                oect.name IN ('eye camera position', 'led position', 'screen position')
+        '''
+        # Get the raw data
+        rig_geometry = pd.read_sql(query, self.lims_db.get_connection())
+
+        if rig_geometry.empty:
+            # There is no rig geometry for this experiment
+            return None
+
+        return self._process_eye_tracking_rig_geometry(rig_geometry=rig_geometry)
+
+    def get_ophys_experiment_df(self) -> pd.DataFrame:
         """Get a DataFrame of metadata for ophys experiments"""
-        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-               (PostgresQueryMixin)())
         query = """
             SELECT
 
@@ -147,14 +208,10 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
             LEFT JOIN equipment ON equipment.id = os.equipment_id;
             """
 
-        return pd.read_sql(query, api.get_connection())
+        return pd.read_sql(query, self.lims_db.get_connection())
 
-    @staticmethod
-    def get_containers_df(only_passed=True) -> pd.DataFrame:
+    def get_containers_df(self, only_passed=True) -> pd.DataFrame:
         """Get a DataFrame of experiment containers"""
-
-        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
-               (PostgresQueryMixin)())
         if only_passed is True:
             query = """
                     SELECT *
@@ -167,10 +224,54 @@ class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
                     FROM visual_behavior_experiment_containers vbc;
                     """
 
-        return pd.read_sql(query, api.get_connection()).rename(
+        return pd.read_sql(query, self.lims_db.get_connection()).rename(
             columns={'id': 'container_id'})[['container_id',
                                              'specimen_id',
                                              'workflow_state']]
+
+    @staticmethod
+    def _process_eye_tracking_rig_geometry(rig_geometry: pd.DataFrame) -> dict:
+        """
+        Processes the raw eye tracking rig geometry returned by LIMS
+        """
+        # Map the config types to new names
+        rig_geometry_config_type_map = {
+            'eye camera position': 'camera',
+            'screen position': 'monitor',
+            'led position': 'led'
+        }
+        rig_geometry['config_type'] = rig_geometry['config_type'].map(rig_geometry_config_type_map)
+
+        # Select the most recent config that precedes the date_of_acquisition for this experiment
+        rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
+        rig_geometry = rig_geometry.groupby('config_type').apply(lambda x: x.iloc[0])
+
+        # Construct dictionary for positions
+        position = rig_geometry[['center_x_mm', 'center_y_mm', 'center_z_mm']]
+        position.index = [f'{v}_position_mm' if v != 'led' else f'{v}_position' for v in position.index]
+        position = position.to_dict(orient='index')
+        position = {
+            config_type: [values['center_x_mm'], values['center_y_mm'], values['center_z_mm']]
+            for config_type, values in position.items()
+        }
+
+        # Construct dictionary for rotations
+        rotation = rig_geometry[['rotation_x_deg', 'rotation_y_deg', 'rotation_z_deg']]
+        rotation = rotation[rotation.index != 'led']
+        rotation.index = [f'{v}_rotation_deg' for v in rotation.index]
+        rotation = rotation.to_dict(orient='index')
+        rotation = {
+            config_type: [values['rotation_x_deg'], values['rotation_y_deg'], values['rotation_z_deg']]
+            for config_type, values in rotation.items()
+        }
+
+        # Combine the dictionaries
+        return {
+            **position,
+            **rotation,
+            'equipment': rig_geometry['equipment_name'].iloc[0]
+        }
+
 
     @classmethod
     def get_api_list_by_container_id(cls, container_id

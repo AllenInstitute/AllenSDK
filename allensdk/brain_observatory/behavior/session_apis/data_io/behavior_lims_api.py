@@ -1,29 +1,55 @@
 import logging
-from typing import Dict, Optional, Union, List
-
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import Dict, List, Optional, Union
 
-from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.internal.api import db_connection_creator
 from allensdk.api.cache import memoize
-from allensdk.internal.api import (
-    OneResultExpectedError, OneOrMoreResultExpectedError)
-from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataTransforms
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import DbCredentials
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms)
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.internal.api import (OneOrMoreResultExpectedError,
+                                   OneResultExpectedError,
+                                   db_connection_creator)
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
+class BehaviorLimsApi(BehaviorDataTransforms, CachedInstanceMethodMixin):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (extractor). Contains all methods
+    needed to fill a BehaviorSession."""
+
+    def __init__(self,
+                 behavior_session_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 extractor: Optional[BehaviorDataExtractorBase] = None):
+
+        if extractor is None:
+            if behavior_session_id is not None:
+                extractor = BehaviorLimsExtractor(
+                    behavior_session_id,
+                    lims_credentials,
+                    mtrain_credentials)
+            else:
+                raise RuntimeError(
+                    "BehaviorLimsApi must be provided either an instantiated "
+                    "'extractor' or a 'behavior_session_id'!")
+
+        super().__init__(extractor=extractor)
+
+
+class BehaviorLimsExtractor(BehaviorDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling a
     'BehaviorSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's
     """
     def __init__(self, behavior_session_id: int,
                  lims_credentials: Optional[DbCredentials] = None,

@@ -442,11 +442,6 @@ class BehaviorOphysSession(ParamsMixin):
         """Get the eye tracking rig geometry associated with an ophys experiment"""
         return self.api.get_eye_tracking_rig_geometry()
 
-    @property
-    def eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's subject"""
-        return self.api.get_eye_gaze_mapping_file_path()
-
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:
@@ -456,108 +451,43 @@ class BehaviorOphysSession(ParamsMixin):
                 "Attempted to clear API cache, but method `cache_clear`"
                 f" does not exist on {self.api.__class__.__name__}")
 
-    def get_roi_masks(self, cell_specimen_ids=None):
-        """ Obtains boolean masks indicating the location of one or more cell's ROIs in this session.
+    def get_roi_masks(self, cell_specimen_ids=None) -> xr.DataArray:
+        """ Obtains boolean masks indicating the location of one or
+        more cell's ROIs in this session.
 
         Parameters
         ----------
         cell_specimen_ids : array-like of int, optional
-            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all
-            cell specimens.
+            ROI masks for these cell specimens will be returned. The default
+            behavior is to return masks for all cell specimens.
 
         Returns
         -------
         result : xr.DataArray
             dimensions are:
-                - cell_specimen_id : which cell's roi is described by this mask?
+                - cell_specimen_id : which cell's roi is described by the mask
                 - row : index within the underlying image
                 - column : index within the image
             values are 1 where an ROI was present, otherwise 0.
-
         """
+        cell_specimen_table = self.cell_specimen_table
 
         if cell_specimen_ids is None:
-            cell_specimen_ids = self.cell_specimen_table.index.values
-        elif isinstance(cell_specimen_ids, int) or np.issubdtype(type(cell_specimen_ids), np.integer):
+            cell_specimen_ids = cell_specimen_table.index.values
+        elif (isinstance(cell_specimen_ids, int)
+              or np.issubdtype(type(cell_specimen_ids), np.integer)):
             cell_specimen_ids = np.array([int(cell_specimen_ids)])
         else:
             cell_specimen_ids = np.array(cell_specimen_ids)
 
-        cell_roi_ids = self.cell_specimen_table.loc[cell_specimen_ids, "cell_roi_id"].values
-        result = self._get_roi_masks_by_cell_roi_id(cell_roi_ids)
+        cell_roi_ids = cell_specimen_table.loc[cell_specimen_ids,
+                                               "cell_roi_id"].values
+        result = self.api.get_roi_masks_by_cell_roi_id(cell_roi_ids)
         if "cell_roi_id" in result.dims:
             result = result.rename({"cell_roi_id": "cell_specimen_id"})
             result.coords["cell_specimen_id"] = cell_specimen_ids
 
         return result
-
-    def _get_roi_masks_by_cell_roi_id(self, cell_roi_ids=None):
-        """ Obtains boolean masks indicating the location of one or more ROIs in this session.
-
-        Parameters
-        ----------
-        cell_roi_ids : array-like of int, optional
-            ROI masks for these rois will be returned. The default behavior is to return masks for all rois.
-
-        Returns
-        -------
-        result : xr.DataArray
-            dimensions are:
-                - roi_id : which roi is described by this mask?
-                - row : index within the underlying image
-                - column : index within the image
-            values are 1 where an ROI was present, otherwise 0.
-
-        Notes
-        -----
-        This method helps Allen Institute scientists to look at sessions that have not yet had cell specimen ids assigned.
-        You probably want to use get_roi_masks instead.
-
-
-        """
-        if cell_roi_ids is None:
-            cell_roi_ids = self.cell_specimen_table["cell_roi_id"].unique()
-        elif isinstance(cell_roi_ids, int) or np.issubdtype(type(cell_roi_ids), np.integer):
-            cell_roi_ids = np.array([int(cell_roi_ids)])
-        else:
-            cell_roi_ids = np.array(cell_roi_ids)
-
-        table = self.cell_specimen_table.copy()
-        table.set_index("cell_roi_id", inplace=True)
-        table = table.loc[cell_roi_ids, :]
-
-        full_image_shape = table.iloc[0]["roi_mask"].shape
-
-        output = np.zeros((len(cell_roi_ids), full_image_shape[0], full_image_shape[1]), dtype=np.uint8)
-        for ii, (_, row) in enumerate(table.iterrows()):
-            output[ii, :, :] = _translate_roi_mask(row["roi_mask"], int(row["y"]), int(row["x"]))
-
-        # Pixel spacing and units of mask image will match either the
-        # max or avg projection image of 2P movie.
-        max_projection_image = self.get_max_projection()
-        # Spacing is in (col_spacing, row_spacing) order
-        # Coordinates also start spacing_dim / 2 for first element in a dimension
-        # See: https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html
-        pixel_spacing = max_projection_image.spacing
-        unit = max_projection_image.unit
-
-        return xr.DataArray(
-            data=output,
-            dims=("cell_roi_id", "row", "column"),
-            coords={
-                "cell_roi_id": cell_roi_ids,
-                "row": (np.arange(full_image_shape[0])
-                        * pixel_spacing[1]
-                        + (pixel_spacing[1] / 2)),
-                "column": (np.arange(full_image_shape[1])
-                           * pixel_spacing[0]
-                           + (pixel_spacing[0] / 2))
-            },
-            attrs={
-                "spacing": pixel_spacing,
-                "unit": unit
-            }
-        ).squeeze(drop=True)
 
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -627,7 +557,7 @@ class BehaviorOphysSession(ParamsMixin):
         allensdk.brain_observatory.behavior.image_api.Image:
             array-like interface to segmentation_mask image data and metadata
         """
-        masks = self._get_roi_masks_by_cell_roi_id()
+        masks = self.api.get_roi_masks_by_cell_roi_id()
         mask_image_data = masks.any(dim='cell_roi_id').astype(int)
         mask_image = Image(
             data=mask_image_data.values,
@@ -710,14 +640,6 @@ class BehaviorOphysSession(ParamsMixin):
         performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
         return performance_metrics
-
-
-def _translate_roi_mask(mask, row_offset, col_offset):
-    return np.roll(
-        mask,
-        shift=(row_offset, col_offset),
-        axis=(0, 1)
-    )
 
 
 if __name__ == "__main__":
