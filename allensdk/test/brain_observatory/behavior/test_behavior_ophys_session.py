@@ -309,3 +309,10 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
         assert obtained.equals(pd.DataFrame([1, 2, 3]))
         assert session.api.get_eye_tracking.called_with(z_threshold=z_threshold,
                                                         dilation_frames=dilation_frames)
+
+
+def test_event_detection():
+    ophys_experiment_id = 789359614
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id=ophys_experiment_id)
+    events = session.events
+    pass

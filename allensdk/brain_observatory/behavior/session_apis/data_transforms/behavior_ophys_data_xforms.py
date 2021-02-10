@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.api.cache import memoize
+from allensdk.brain_observatory.behavior.event_detection import filter_events_array
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase)
 
@@ -389,11 +390,15 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
             noise_stds = f['noise_stds'][:]
             roi_ids = f['roi_names'][:]
 
+        filtered_events = filter_events_array(arr=events)
+
         # Convert matrix to list of 1d arrays so that it can be stored in a single column of the dataframe
         events = [x for x in events]
-
+        filtered_events = [x for x in filtered_events]
+        
         df = pd.DataFrame({
             'events': events,
+            'filtered_events': filtered_events,
             'lambda': lambdas,
             'noise_std': noise_stds,
             'cell_roi_id': roi_ids
