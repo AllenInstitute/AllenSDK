@@ -397,10 +397,8 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshol
             b, a, np.nan_to_num(outlier_corrected_linear_speed))
 
     return pd.DataFrame({
-        'speed_pre_noise_removal': linear_speed[:len(time)],
         'speed': outlier_corrected_linear_speed[:len(time)],
         'dx': dx_raw[:len(time)],
         'v_sig': v_sig[:len(time)],
-        'v_sig_unwrapped': unwrapped_vsig[:len(time)],
         'v_in': v_in[:len(time)],
     }, index=pd.Index(time, name='timestamps'))
