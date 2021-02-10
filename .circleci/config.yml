@@ -8,7 +8,7 @@ jobs:
       - run:
           command: |
             pip install codecov
-            pip install -r test_requirements
+            pip install -r test_requirements.txt
             pip install .
           name: Install
       - run:
