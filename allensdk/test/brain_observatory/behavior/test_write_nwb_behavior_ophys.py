@@ -91,9 +91,9 @@ def test_add_running_data_dfs_to_nwbfile(nwbfile, running_data_df, roundtrip, ro
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(
-        running_data_df, obt.get_running_data_df(lowpass=True))
+        running_data_df, obt.get_running_data(lowpass=True))
     pd.testing.assert_frame_equal(
-        running_data_df_unfiltered, obt.get_running_data_df(lowpass=False))
+        running_data_df_unfiltered, obt.get_running_data(lowpass=False))
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
