@@ -31,13 +31,19 @@ def running_data():
 
 @pytest.mark.parametrize(
     "x,time,expected", [
-        ([1.0, 1.0], [1.0, 2.0], [0.0, 0.0]),
-        ([1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 1.0, 1.0]),
-        ([1.0, 2.0, 3.0], [1.0, 4.0, 6.0], [1/3, ((1/3)+0.5)/2, 0.5])
+        ([1.0, 1.0], [1.0, 2.0], [np.nan, 0.0]),
+        ([1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [np.nan, 1.0, 1.0]),
+        ([1.0, 2.0, 3.0], [1.0, 4.0, 6.0], [np.nan, 1.0/3.0, 1.0/2.0])
     ]
 )
 def test_calc_deriv(x, time, expected):
-    assert np.all(calc_deriv(x, time) == expected)
+    obtained = calc_deriv(x, time)
+
+    # np.nan == np.nan returns False so filter out the first values
+    obtained = obtained[1:]
+    expected = expected[1:]
+
+    assert np.all(obtained == expected)
 
 
 @pytest.mark.parametrize(
