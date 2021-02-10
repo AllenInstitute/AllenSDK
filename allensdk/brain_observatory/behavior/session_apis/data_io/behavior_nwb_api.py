@@ -110,7 +110,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         return int(self.nwbfile.identifier)
 
     def get_running_data_df(self,
-                            lowpass: bool = True, zscore_threshold=5.0) -> pd.DataFrame:
+                            lowpass: bool = True, zscore_threshold=10.0) -> pd.DataFrame:
         """
         Gets the running data df
         Parameters

@@ -44,7 +44,7 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_running_data_df(self, lowpass=True, zscore_threshold=5.0) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
 
         Parameters

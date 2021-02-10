@@ -94,7 +94,7 @@ class BehaviorDataXforms(BehaviorBase):
         # trial events, so add the offset as the "rebase" function
         return get_rewards(data, lambda x: x + offset)
 
-    def get_running_data_df(self, lowpass=True, zscore_threshold=5.0) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
 
         :returns: pd.DataFrame -- dataframe containing various signals used

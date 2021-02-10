@@ -299,7 +299,7 @@ def _zscore_threshold_1d(data: np.ndarray,
     return corrected_data
 
 
-def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=5.0):
+def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0):
     """
     Given the data from the behavior 'pkl' file object and a 1d
     array of timestamps, compute the running speed. Returns a
