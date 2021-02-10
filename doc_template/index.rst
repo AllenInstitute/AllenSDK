@@ -93,7 +93,8 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.7.0
 -----------------------------------------------------------------------
-- 
+- Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
+- Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 
 What's New - 2.6.0
 -----------------------------------------------------------------------

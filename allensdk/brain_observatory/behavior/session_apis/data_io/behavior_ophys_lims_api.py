@@ -1,29 +1,56 @@
 import logging
 from typing import List, Optional
+
 import pandas as pd
-
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
-    import OphysLimsApi
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
-from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
+    BehaviorLimsExtractor, OphysLimsExtractor)
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorOphysDataTransforms
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
+from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.core.authentication import credential_injector, DbCredentials
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorOphysDataXforms)
 
 
-class BehaviorOphysLimsApi(BehaviorOphysDataXforms,  OphysLimsApi,
-                           BehaviorLimsApi):
+class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
+                           CachedInstanceMethodMixin):
+    """A data fetching and processing class that serves processed data from
+    a specified data source (extractor). Contains all methods
+    needed to populate a BehaviorOphysSession."""
+
+    def __init__(self,
+                 ophys_experiment_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 extractor: Optional[BehaviorOphysDataExtractorBase] = None):
+
+        if extractor is None:
+            if ophys_experiment_id is not None:
+                extractor = BehaviorOphysLimsExtractor(
+                    ophys_experiment_id,
+                    lims_credentials,
+                    mtrain_credentials)
+            else:
+                raise RuntimeError(
+                    "BehaviorOphysLimsApi must be provided either an "
+                    "instantiated 'extractor' or an 'ophys_experiment_id'!")
+
+        super().__init__(extractor=extractor)
+
+
+class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
+                                 BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
     a 'BehaviorOphysSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorOphysDataXforms methods in order to usable by
+    BehaviorOphysDataTransforms methods in order to usable by
     'BehaviorOphysSession's.
     """
 
