@@ -9,6 +9,7 @@ import pandas as pd
 import pynwb
 import pytz
 import SimpleITK as sitk
+from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
@@ -636,8 +637,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         traces = ophys_module.data_interfaces['dff'].roi_response_series['traces']
 
         events = EventDetection(
-            # time x rois instead of rois x time,
-            data=events_data.T,
+            # time x rois instead of rois x time
+            # store using compression since sparse
+            data=H5DataIO(events_data.T, compression=True),
 
             lambdas=events['lambda'].values,
             noise_stds=events['noise_std'].values,
