@@ -409,7 +409,13 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         return eye_tracking_data
 
-    def get_events(self) -> pd.DataFrame:
+    def get_events(self, filter_scale: float = 2, filter_n_time_steps: int = 20) -> pd.DataFrame:
+        """
+        filter_scale: float
+            See filter_events_array for description
+        filter_n_time_steps: int
+            See filter_events_array for description
+        """
         events_file = self.extractor.get_event_detection_raw_filepath()
         with h5py.File(events_file, 'r') as f:
             events = f['events'][:]
@@ -417,7 +423,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             noise_stds = f['noise_stds'][:]
             roi_ids = f['roi_names'][:]
 
-        filtered_events = filter_events_array(arr=events)
+        filtered_events = filter_events_array(arr=events, scale=filter_scale, n_time_steps=filter_n_time_steps)
 
         # Convert matrix to list of 1d arrays so that it can be stored in a single column of the dataframe
         events = [x for x in events]

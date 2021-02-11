@@ -558,7 +558,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             'cell_roi_id': cell_specimen_table.index
         }, index=pd.Index(cell_specimen_table['cell_specimen_id']))
 
-
     @staticmethod
     def add_events(nwbfile: NWBFile, events: pd.DataFrame) -> NWBFile:
         events_data = np.vstack(events['events'])

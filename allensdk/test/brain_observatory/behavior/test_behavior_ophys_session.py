@@ -231,7 +231,7 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
                                                         dilation_frames=dilation_frames)
 
 
-@pytest.mark.requires_bamboo
+# @pytest.mark.requires_bamboo
 def test_event_detection():
     ophys_experiment_id = 789359614
     session = BehaviorOphysSession.from_lims(ophys_experiment_id=ophys_experiment_id)
