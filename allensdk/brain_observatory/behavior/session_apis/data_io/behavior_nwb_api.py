@@ -110,7 +110,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         return int(self.nwbfile.identifier)
 
     def get_running_data_df(self,
-                            lowpass: bool = True) -> pd.DataFrame:
+                            lowpass: bool = True, zscore_threshold=10.0) -> pd.DataFrame:
         """
         Gets the running data df
         Parameters
@@ -118,6 +118,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         lowpass: bool
             Whether to return running speed with or without low pass filter
             applied
+        zscore_threshold: float
+            The threshold to use for removing outlier running speeds which might be noise and not true signal
 
         Returns
         -------

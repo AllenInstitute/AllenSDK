@@ -44,13 +44,15 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
 
         Parameters
         ----------
         lowpass: bool
             Whether to return running speed with low pass filter applied or without
+        zscore_threshold: float
+            The threshold to use for removing outlier running speeds which might be noise and not true signal
 
         Returns
         -------
