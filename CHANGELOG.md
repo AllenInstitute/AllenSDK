@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 - Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
+- Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
 
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files

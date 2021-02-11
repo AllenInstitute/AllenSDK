@@ -399,19 +399,6 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
-    draw_log_rising_edges = 0
-    draw_log_gratings = 0
-    # if images are contained in stimuli
-    if 'images' in stimuli.keys():
-        # ensure that every rising edge in the draw_log is accounted for in the visual_stimuli_df
-        draw_log_rising_edges = len(np.where(np.diff(stimuli['images']['draw_log']) == 1)[0])
-    if 'grating' in stimuli.keys():
-        draw_log_gratings = len(np.where(np.diff(stimuli['grating']['draw_log']) == 1)[0])
-
-    discrete_flashes = len(visual_stimuli_data)
-    assert (draw_log_rising_edges +
-            draw_log_gratings) == discrete_flashes, "the number of rising edges in the draw log is expected to match the number of flashes in the stimulus table"
-
     # Add omitted flash info:
     omitted_flash_list = []
     omitted_flash_frame_log = data['items']['behavior']['omitted_flash_frame_log']
