@@ -308,7 +308,8 @@ def add_eye_gaze_mapping_data_to_nwbfile(nwbfile: pynwb.NWBFile,
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed,
-                                 name='speed', unit='cm/s'):
+                                 name='speed', unit='cm/s',
+                                 from_dataframe=False):
     ''' Adds running speed data to an NWBFile as a timeseries in acquisition
 
     Parameters
@@ -328,12 +329,18 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
 
     '''
 
+    if from_dataframe:
+        data = running_speed['values'].values
+        timestamps = running_speed['timestamps'].values
+    else:
+        data=running_speed.values
+        timestamps=running_speed.timestamps
+
     running_speed_series = pynwb.base.TimeSeries(
         name=name,
-        data=running_speed.values,
-        timestamps=running_speed.timestamps,
-        unit=unit
-    )
+        data=data,
+        timestamps=timestamps,
+        unit=unit)
 
     if 'running' in nwbfile.processing:
         running_mod = nwbfile.processing['running']
@@ -342,77 +349,6 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
         nwbfile.add_processing_module(running_mod)
 
     running_mod.add_data_interface(running_speed_series)
-
-    return nwbfile
-
-
-def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
-                                    running_data_df_unfiltered, unit_dict):
-    """Adds both unfiltered (raw) and filtered running speed data to an
-    NWBFile as timeseries in acquisition and processing
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        File to which running speeds will be written
-    running_data_df : pandas.DataFrame
-        Filtered running data
-        Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
-        running_data_df_unfiltered
-    running_data_df_unfiltered : pandas.DataFrame
-        Unfiltered (raw) Running data
-        Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
-        running_data_df
-    unit_dict : dict, optional
-        SI units of running speed values
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    """
-    running_speed = RunningSpeed(timestamps=running_data_df.index.values,
-                                 values=running_data_df['speed'].values)
-
-    running_speed_unfiltered = RunningSpeed(
-        timestamps=running_data_df_unfiltered.index.values,
-        values=running_data_df_unfiltered['speed'].values)
-
-    add_running_speed_to_nwbfile(nwbfile, running_speed,
-                                 name='speed', unit=unit_dict['speed'])
-    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered,
-                                 name='speed_unfiltered',
-                                 unit=unit_dict['speed'])
-
-    running_mod = nwbfile.processing['running']
-    timestamps_ts = running_mod.get_data_interface('speed').timestamps
-
-    running_dx_series = TimeSeries(
-        name='dx',
-        data=running_data_df['dx'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['dx']
-    )
-
-    v_sig = TimeSeries(
-        name='v_sig',
-        data=running_data_df['v_sig'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['v_sig']
-    )
-
-    v_in = TimeSeries(
-        name='v_in',
-        data=running_data_df['v_in'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['v_in']
-    )
-
-    running_mod.add_data_interface(running_dx_series)
-    nwbfile.add_acquisition(v_sig)
-    nwbfile.add_acquisition(v_in)
 
     return nwbfile
 

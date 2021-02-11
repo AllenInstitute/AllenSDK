@@ -95,6 +95,9 @@ What's New - 2.7.0
 -----------------------------------------------------------------------
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
+- Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
+- Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
+
 
 What's New - 2.6.0
 -----------------------------------------------------------------------

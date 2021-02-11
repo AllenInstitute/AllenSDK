@@ -7,13 +7,9 @@ from typing import Iterable, Union, Any, Optional
 
 
 def calc_deriv(x, time):
-    dx = np.diff(x)
-    dt = np.diff(time)
-    dxdt_rt = np.hstack((np.nan, dx / dt))
-    dxdt_lt = np.hstack((dx / dt, np.nan))
-    dxdt = np.vstack((dxdt_rt, dxdt_lt))
-    dxdt = np.nanmean(dxdt, axis=0)
-    return dxdt
+    dx = np.diff(x, prepend=np.nan)
+    dt = np.diff(time, prepend=np.nan)
+    return dx / dt
 
 
 def _angular_change(summed_voltage: np.ndarray,
@@ -299,11 +295,11 @@ def _zscore_threshold_1d(data: np.ndarray,
     scores = zscore(data, nan_policy="omit")
     # Suppress warnings when comparing to nan values to reduce noise
     with np.errstate(invalid='ignore'):
-        corrected_data[scores > threshold] = np.nan
+        corrected_data[np.abs(scores) > threshold] = np.nan
     return corrected_data
 
 
-def get_running_df(data, time: np.ndarray, lowpass: bool = True):
+def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0):
     """
     Given the data from the behavior 'pkl' file object and a 1d
     array of timestamps, compute the running speed. Returns a
@@ -321,6 +317,8 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
     lowpass: bool (default=True)
         Whether to apply a 10Hz low-pass filter to the running speed
         data.
+    zscore_threshold: float
+        The threshold to use for removing outlier running speeds which might be noise and not true signal
 
     Returns
     -------
@@ -390,11 +388,11 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True):
         linear_speed, time, np.concatenate([pos_wraps, neg_wraps]),
         t_span=0.25)
     outlier_corrected_linear_speed = _zscore_threshold_1d(
-        wrap_corrected_linear_speed, threshold=5.0)
+        wrap_corrected_linear_speed, threshold=zscore_threshold)
 
     # Final filtering (optional) for smoothing out the speed data
     if lowpass:
-        b, a = signal.butter(3, Wn=10, fs=60, btype="lowpass")
+        b, a = signal.butter(3, Wn=4, fs=60, btype="lowpass")
         outlier_corrected_linear_speed = signal.filtfilt(
             b, a, np.nan_to_num(outlier_corrected_linear_speed))
 

@@ -309,6 +309,27 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
                                "end_frame": [5.0, 5.0, 12.0, 12.0],
                                "time": [2.0, 3.0, 9.0, 10.0],
                                "duration": [3.0, 2.0, 3.0, 2.0],
+                               "omitted": [False, False, False, False]}),
+
+                              # test case with images and a static grating
+                              ({"timestamp_count": 30, "time_step": 1},
+                              {"images_set_log": [
+                                  ('Image', 'im065', 5, 0),
+                                  ('Image', 'im064', 25, 6)
+                              ],
+                                  "images_draw_log": (([0] * 2 + [1] * 2 +
+                                                       [0] * 3) * 2 + [0]*16),
+                                  "grating_set_log": [
+                                      ("Ori", 90, -1, 12),  # -1 because that element is not used
+                                      ("Ori", 270, -1, 24)
+                                  ],
+                                  "grating_draw_log": ([0]*17 + [1]*11 + [0, 0])},
+                              {"orientation": [None, None, 90, 270],
+                               "image_name": ['im065', 'im064', None, None],
+                               "frame": [3.0, 10.0, 18.0, 25.0],
+                               "end_frame": [5.0, 12.0, 25.0, 29.0],
+                               "time": [3.0, 10.0, 18.0, 25.0],
+                               "duration": [2.0, 2.0, 7.0, 4.0],
                                "omitted": [False, False, False, False]})
                          ],
                          indirect=["behavior_stimuli_time_fixture",

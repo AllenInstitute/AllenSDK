@@ -30,7 +30,7 @@ class BehaviorDataTransforms(BehaviorBase):
     """
 
     def __init__(self, extractor: BehaviorDataExtractorBase):
-        self.extractor = extractor
+        self.extractor: BehaviorDataExtractorBase = extractor
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_behavior_session_id(self):
@@ -102,7 +102,7 @@ class BehaviorDataTransforms(BehaviorBase):
         # trial events, so add the offset as the "rebase" function
         return get_rewards(data, lambda x: x + offset)
 
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
 
         :returns: pd.DataFrame -- dataframe containing various signals used
@@ -110,7 +110,7 @@ class BehaviorDataTransforms(BehaviorBase):
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass, zscore_threshold=zscore_threshold)
 
     def get_running_speed(self, lowpass=True) -> RunningSpeed:
         """Get running speed using timestamps from
