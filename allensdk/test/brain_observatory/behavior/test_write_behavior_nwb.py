@@ -27,30 +27,6 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
-                                         roundtrip, roundtripper):
-    running_data_df_unfiltered = running_data_df.copy()
-    running_data_df_unfiltered['speed'] = running_data_df['speed'] * 2
-
-    unit_dict = {'v_sig': 'V', 'v_in': 'V',
-                 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-    nwbfile = nwb.add_running_data_dfs_to_nwbfile(nwbfile,
-                                                  running_data_df,
-                                                  running_data_df_unfiltered,
-                                                  unit_dict)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorNwbApi)
-    else:
-        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
-
-    pd.testing.assert_frame_equal(
-        running_data_df, obt.get_running_data(lowpass=True))
-    pd.testing.assert_frame_equal(
-        running_data_df_unfiltered, obt.get_running_data(lowpass=False))
-
-
-@pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_templates(nwbfile, stimulus_templates,
                                 roundtrip, roundtripper):
     for key, val in stimulus_templates.items():

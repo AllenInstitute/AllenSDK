@@ -55,12 +55,14 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                     session_object.stimulus_timestamps)
 
         # Add running data to NWB in-memory object:
-        unit_dict = {'v_sig': 'V', 'v_in': 'V',
-                     'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-        nwb.add_running_data_dfs_to_nwbfile(nwbfile,
-                                            session_object.running_data,
-                                            session_object.raw_running_data,
-                                            unit_dict)
+        nwb.add_running_speed_to_nwbfile(nwbfile,
+                                         session_object.running_speed,
+                                         name="speed",
+                                         from_dataframe=True)
+        nwb.add_running_speed_to_nwbfile(nwbfile,
+                                         session_object.raw_running_speed,
+                                         name="speed_unfiltered",
+                                         from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
@@ -109,7 +111,6 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
     def get_behavior_session_id(self) -> int:
         return int(self.nwbfile.identifier)
 
-
     def get_running_data(self,
                          lowpass: bool = True) -> pd.DataFrame:
         """
@@ -120,7 +121,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             Whether to return running speed with or without low pass filter
             applied
         zscore_threshold: float
-            The threshold to use for removing outlier running speeds which might be noise and not true signal
+            The threshold to use for removing outlier running speeds which
+            might be noise and not true signal
 
         Returns
         -------
