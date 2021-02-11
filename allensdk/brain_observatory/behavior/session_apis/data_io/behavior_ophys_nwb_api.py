@@ -26,7 +26,8 @@ from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
 from allensdk.brain_observatory.nwb import TimeSeries
-from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import EllipseEyeTracking, EllipseSeries
+from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
+        EllipseEyeTracking, EllipseSeries)
 from allensdk.brain_observatory.behavior.nwb.extensions.event_detection.ndx_events import EventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -586,7 +587,21 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return nwbfile
 
-    def get_events(self):
+    def get_events(self) -> pd.DataFrame:
+        """
+        Returns
+        -------
+        Events dataframe:
+            columns:
+            events: np.array
+            lambda: float
+            noise_std: float
+            cell_roi_id: int
+
+            index:
+            cell_specimen_id: int
+
+        """
         event_detection = self.nwbfile.processing['ophys']['event_detection']
         cell_specimen_table = event_detection.rois.to_dataframe()
 
@@ -607,6 +622,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
     @staticmethod
     def add_events(nwbfile: NWBFile, events: pd.DataFrame) -> NWBFile:
+        """
+        Adds events to NWB file from dataframe
+
+        Returns
+        -------
+        NWBFile:
+            The NWBFile with events added
+        """
         events_data = np.vstack(events['events'])
 
         ophys_module = nwbfile.processing['ophys']

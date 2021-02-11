@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="0" hostname="ibs-adama-ux1.corp.alleninstitute.org" name="pytest" skipped="0" tests="1" time="4.602" timestamp="2021-02-11T14:19:26.604277"><testcase classname="allensdk.test.brain_observatory.behavior.test_behavior_ophys_session" name="test_event_detection" time="3.208" /></testsuite></testsuites>
