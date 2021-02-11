@@ -231,8 +231,21 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
                                                         dilation_frames=dilation_frames)
 
 
+@pytest.mark.requires_bamboo
 def test_event_detection():
     ophys_experiment_id = 789359614
     session = BehaviorOphysSession.from_lims(ophys_experiment_id=ophys_experiment_id)
     events = session.events
-    pass
+
+    assert len(events) > 0
+
+    expected_columns = ['events', 'filtered_events', 'lambda', 'noise_std', 'cell_roi_id']
+    assert len(events.columns) == len(expected_columns)
+    # Assert they contain the same columns
+    assert len(set(expected_columns).intersection(events.columns)) == len(expected_columns)
+
+    assert events.index.name == 'cell_specimen_id'
+
+    # All events are the same length
+    event_length = len(set([len(x) for x in events['events']]))
+    assert event_length == 1

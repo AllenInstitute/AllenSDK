@@ -431,8 +431,12 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             'cell_roi_id': roi_ids
         })
 
+        # Set index as cell_specimen_id from cell_specimen_table
         cell_specimen_table = self.get_cell_specimen_table()
-        df = cell_specimen_table[['cell_roi_id']].merge(df, on='cell_roi_id')
+        cell_specimen_table = cell_specimen_table.reset_index()
+        df = cell_specimen_table[['cell_roi_id', 'cell_specimen_id']].merge(df, on='cell_roi_id')
+        df = df.set_index('cell_specimen_id')
+
         return df
 
     def get_roi_masks_by_cell_roi_id(

@@ -9,7 +9,7 @@ def filter_events_array(arr: np.ndarray, scale: float = 2, t_scale: int = 20) ->
 
     Uses a halfnorm distribution as weights to the filter
 
-    Author: Nick Ponvert
+    Modified from initial implementation by Nick Ponvert
 
     Parameters
     ----------
@@ -25,6 +25,12 @@ def filter_events_array(arr: np.ndarray, scale: float = 2, t_scale: int = 20) ->
     np.ndarray:
         Output of the convolution operation
     """
+    if len(arr.shape) == 1:
+        raise ValueError('Expected a 2d array but received a 1d array')
+
+    if t_scale < 1:
+        raise ValueError(f't_scale must be a minimum of 1 but received {t_scale}')
+
     filt = stats.halfnorm(loc=0, scale=scale).pdf(np.arange(t_scale))
     filt = filt / np.sum(filt)  # normalize filter
     filtered_arr = np.zeros(arr.shape)
