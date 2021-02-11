@@ -413,3 +413,34 @@ def test_add_eye_tracking_data_to_nwbfile(tmp_path, nwbfile, eye_tracking_data, 
 
     pd.testing.assert_frame_equal(obtained,
                                   eye_tracking_data, check_like=True)
+
+
+@pytest.mark.parametrize("roundtrip", [True, False])
+def test_add_events(tmp_path, nwbfile, roundtripper, roundtrip, cell_specimen_table, metadata, dff_traces,
+                    ophys_timestamps):
+    # Need to add metadata, cell specimen table, dff traces first
+    nwb.add_metadata(nwbfile, metadata, behavior_only=False)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, metadata)
+    nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
+
+    events = pd.DataFrame({
+        'events': [np.array([0., 0., .69]), np.array([.3, 0.0, .2])],
+        'lambda': [0., 1.0],
+        'noise_std': [.25, .3],
+        'cell_roi_id': [123, 321]
+    }, index=pd.Index([-1, -1], name='cell_specimen_id'))
+
+    api = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+    nwbfile = api.add_events(
+        nwbfile=nwbfile,
+        events=events
+    )
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    obtained = obt.get_events()
+
+    pd.testing.assert_frame_equal(obtained, events, check_like=True)

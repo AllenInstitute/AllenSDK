@@ -66,13 +66,7 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
 
     @abc.abstractmethod
     def get_event_detection_raw_filepath(self) -> str:
-        """Get the filepath of the events file associated with an ophys experiment
-        Contains:
-            events
-            lambdas
-            noise_stds
-            roi_names
-        """
+        """Get the filepath of the .h5 events file associated with an ophys experiment"""
         raise NotImplementedError()
 
     @abc.abstractmethod

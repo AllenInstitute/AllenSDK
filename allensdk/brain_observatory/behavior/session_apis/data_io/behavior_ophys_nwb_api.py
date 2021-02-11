@@ -11,7 +11,6 @@ import pytz
 import SimpleITK as sitk
 
 from pynwb import NWBHDF5IO, NWBFile
-
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_expt_description
@@ -26,6 +25,7 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 )
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import EllipseEyeTracking, EllipseSeries
+from allensdk.brain_observatory.behavior.nwb.extensions.event_detection.ndx_events import EventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
@@ -145,6 +145,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             eye_tracking_df=session_object.eye_tracking,
             eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
             eye_gaze_mapping_file_path=session_object.api.extractor.get_eye_gaze_mapping_file_path())
+
+        # Add events
+        self.add_events(nwbfile=nwbfile, events=session_object.events)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -537,4 +540,43 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         return nwbfile
 
     def get_events(self):
-        pass
+        event_detection = self.nwbfile.processing['ophys']['event_detection']
+        cell_specimen_table = event_detection.rois.to_dataframe()
+
+        events = event_detection.data[:]
+
+        # events stored time x roi. Change back to roi x time
+        events = events.T
+
+        # Convert to list to that it can be stored in a single column
+        events = [x for x in events]
+
+        return pd.DataFrame({
+            'events': events,
+            'lambda': event_detection.lambdas[:],
+            'noise_std': event_detection.noise_stds[:],
+            'cell_roi_id': cell_specimen_table.index
+        }, index=pd.Index(cell_specimen_table['cell_specimen_id']))
+
+
+    @staticmethod
+    def add_events(nwbfile: NWBFile, events: pd.DataFrame) -> NWBFile:
+        events_data = np.vstack(events['events'])
+
+        ophys_module = nwbfile.processing['ophys']
+        traces = ophys_module.data_interfaces['dff'].roi_response_series['traces']
+
+        events = EventDetection(
+            # time x rois instead of rois x time,
+            data=events_data.T,
+
+            lambdas=events['lambda'].values,
+            noise_stds=events['noise_std'].values,
+            unit='N/A',
+            rois=traces.rois,
+            timestamps=traces.timestamps
+        )
+
+        ophys_module.add_data_interface(events)
+
+        return nwbfile

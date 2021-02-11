@@ -56,7 +56,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert sessions_are_equal(d1, d2, reraise=True)
 
 
-# @pytest.mark.nightly
+@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
 
     ophys_experiment_id = 789359614
