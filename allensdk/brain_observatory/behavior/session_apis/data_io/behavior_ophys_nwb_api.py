@@ -68,12 +68,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                                     session_object.stimulus_timestamps)
 
         # Add running data to NWB in-memory object:
-        unit_dict = {'v_sig': 'V', 'v_in': 'V',
-                     'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-        nwb.add_running_data_dfs_to_nwbfile(nwbfile,
-                                            session_object.running_speed,
-                                            session_object.raw_running_speed,
-                                            unit_dict)
+        nwb.add_running_speed_to_nwbfile(nwbfile,
+                                         session_object.running_speed,
+                                         name="speed",
+                                         from_dataframe=True)
+        nwb.add_running_speed_to_nwbfile(nwbfile,
+                                         session_object.raw_running_speed,
+                                         name="speed_unfiltered",
+                                         from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
