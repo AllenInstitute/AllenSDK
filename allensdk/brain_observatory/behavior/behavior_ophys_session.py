@@ -171,6 +171,7 @@ class BehaviorOphysSession(ParamsMixin):
             cell_roi_id: int
             events: np.array
             filtered_events: np.array
+                Events, convolved with filter to smooth it for visualization
             lambdas: float64
             noise_stds: float64
         """

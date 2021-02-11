@@ -411,10 +411,16 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
     def get_events(self, filter_scale: float = 2, filter_n_time_steps: int = 20) -> pd.DataFrame:
         """
+        Returns events in dataframe format
+
+        Parameters
+        ----------
         filter_scale: float
             See filter_events_array for description
         filter_n_time_steps: int
             See filter_events_array for description
+
+        See behavior_ophys_session.events for return type
         """
         events_file = self.extractor.get_event_detection_raw_filepath()
         with h5py.File(events_file, 'r') as f:
