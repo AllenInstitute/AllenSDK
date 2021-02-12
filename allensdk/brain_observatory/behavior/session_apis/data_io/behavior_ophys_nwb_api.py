@@ -152,7 +152,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             nwbfile=nwbfile,
             eye_tracking_df=session_object.eye_tracking,
             eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
-            eye_gaze_mapping_file_path=session_object.api.extractor.get_eye_gaze_mapping_file_path())
+            eye_gaze_mapping_file_path=eye_gaze_fpath)
 
         # Add events
         self.add_events(nwbfile=nwbfile, events=session_object.events)
