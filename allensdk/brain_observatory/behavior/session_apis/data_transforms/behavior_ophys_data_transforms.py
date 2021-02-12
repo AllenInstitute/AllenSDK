@@ -205,7 +205,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             'targeted_structure': self.extractor.get_targeted_structure(),
             'imaging_depth': self.extractor.get_imaging_depth(),
             'session_type': self.extractor.get_stimulus_name(),
-            'experiment_datetime': self.get_experiment_date(),
+            'experiment_datetime': self.extractor.get_experiment_date(),
             'reporter_line': self.extractor.get_reporter_line(),
             'driver_line': self.extractor.get_driver_line(),
             'LabTracks_ID': self.extractor.get_external_specimen_name(),
