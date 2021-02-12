@@ -29,7 +29,8 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
         EllipseEyeTracking, EllipseSeries)
-from allensdk.brain_observatory.behavior.nwb.extensions.event_detection.ndx_events import EventDetection
+from allensdk.brain_observatory.behavior.nwb.extensions.event_detection.\
+    ndx_events import EventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
@@ -272,7 +273,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             monitor_position,
             f"camera_position_{meta.camera_position__unit_of_measurement}":
             camera_position,
-            f"led_position": led_position,
+            "led_position": led_position,
             f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
             monitor_rotation,
             f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
@@ -634,7 +635,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         events_data = np.vstack(events['events'])
 
         ophys_module = nwbfile.processing['ophys']
-        traces = ophys_module.data_interfaces['dff'].roi_response_series['traces']
+        traces = (ophys_module.data_interfaces['dff'].roi_response_series[
+            'traces'])
 
         events = EventDetection(
             # time x rois instead of rois x time

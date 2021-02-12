@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
 
-from allensdk.brain_observatory.behavior.event_detection import filter_events_array
+from allensdk.brain_observatory.behavior.event_detection import \
+    filter_events_array
 
 
 def test_filter_events_array():

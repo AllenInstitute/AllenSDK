@@ -2,7 +2,8 @@ import numpy as np
 from scipy import stats
 
 
-def filter_events_array(arr: np.ndarray, scale: float = 2, n_time_steps: int = 20) -> np.ndarray:
+def filter_events_array(arr: np.ndarray, scale: float = 2,
+                        n_time_steps: int = 20) -> np.ndarray:
     """
     Convolve the trace array with a 1d causal half-gaussian filter
     to smooth it for visualization
@@ -29,7 +30,8 @@ def filter_events_array(arr: np.ndarray, scale: float = 2, n_time_steps: int = 2
         raise ValueError('Expected a 2d array but received a 1d array')
 
     if n_time_steps < 1:
-        raise ValueError(f't_scale must be a minimum of 1 but received {n_time_steps}')
+        raise ValueError(f'n_time_steps must be a minimum of 1 but received '
+                         f'{n_time_steps}')
 
     filt = stats.halfnorm(loc=0, scale=scale).pdf(np.arange(n_time_steps))
     filt = filt / np.sum(filt)  # normalize filter

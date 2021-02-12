@@ -438,7 +438,8 @@ def test_add_eye_tracking_data_to_nwbfile(
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-def test_add_events(tmp_path, nwbfile, roundtripper, roundtrip, cell_specimen_table, metadata, dff_traces,
+def test_add_events(tmp_path, nwbfile, roundtripper, roundtrip,
+                    cell_specimen_table, metadata, dff_traces, 
                     ophys_timestamps):
     # Need to add metadata, cell specimen table, dff traces first
     nwb.add_metadata(nwbfile, metadata, behavior_only=False)

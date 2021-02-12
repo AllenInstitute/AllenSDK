@@ -1,6 +1,7 @@
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBDatasetSpec
+from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, \
+    NWBDatasetSpec
 
 NAMESPACE = 'ndx-event-detection'
 
@@ -11,8 +12,9 @@ def main():
         doc="""Store the event detection output""",
         name=f"""{NAMESPACE}""",
         version="""0.1.0""",
-        author=list(map(str.strip, """Adam Amster""".split(','))),
-        contact=list(map(str.strip, """aamster@alleninstitute.org""".split(',')))
+        author=list(map(str.strip, """Wayne Wakeman""".split(','))),
+        contact=list(
+            map(str.strip, """waynew@alleninstitute.org""".split(',')))
     )
 
     ns_builder.include_type('RoiResponseSeries', namespace='core')

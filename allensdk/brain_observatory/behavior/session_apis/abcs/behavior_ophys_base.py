@@ -190,4 +190,3 @@ class BehaviorOphysBase(BehaviorBase):
             Includes geometry of monitor, camera, LED
         """
         raise NotImplementedError()
-

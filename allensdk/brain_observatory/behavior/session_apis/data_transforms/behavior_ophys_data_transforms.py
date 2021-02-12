@@ -10,7 +10,8 @@ import xarray as xr
 import pandas as pd
 
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.event_detection import filter_events_array
+from allensdk.brain_observatory.behavior.event_detection import \
+    filter_events_array
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
@@ -39,8 +40,9 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def __init__(self, extractor: BehaviorOphysDataExtractorBase):
         super().__init__(extractor=extractor)
 
-        # Type checker not able to resolve that self.extractor is a BehaviorOphysDataExtractorBase.
-        # Explicitly setting it fixes it
+        # Type checker not able to resolve that self.extractor is a
+        # BehaviorOphysDataExtractorBase. Explicitly adding as instance
+        # attribute fixes the issue.
         self.extractor = extractor
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -409,7 +411,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         return eye_tracking_data
 
-    def get_events(self, filter_scale: float = 2, filter_n_time_steps: int = 20) -> pd.DataFrame:
+    def get_events(self, filter_scale: float = 2,
+                   filter_n_time_steps: int = 20) -> pd.DataFrame:
         """
         Returns events in dataframe format
 
@@ -429,9 +432,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             noise_stds = f['noise_stds'][:]
             roi_ids = f['roi_names'][:]
 
-        filtered_events = filter_events_array(arr=events, scale=filter_scale, n_time_steps=filter_n_time_steps)
+        filtered_events = filter_events_array(
+            arr=events, scale=filter_scale, n_time_steps=filter_n_time_steps)
 
-        # Convert matrix to list of 1d arrays so that it can be stored in a single column of the dataframe
+        # Convert matrix to list of 1d arrays so that it can be stored
+        # in a single column of the dataframe
         events = [x for x in events]
         filtered_events = [x for x in filtered_events]
 
@@ -446,7 +451,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         # Set index as cell_specimen_id from cell_specimen_table
         cell_specimen_table = self.get_cell_specimen_table()
         cell_specimen_table = cell_specimen_table.reset_index()
-        df = cell_specimen_table[['cell_roi_id', 'cell_specimen_id']].merge(df, on='cell_roi_id')
+        df = cell_specimen_table[['cell_roi_id', 'cell_specimen_id']]\
+            .merge(df, on='cell_roi_id')
         df = df.set_index('cell_specimen_id')
 
         return df
