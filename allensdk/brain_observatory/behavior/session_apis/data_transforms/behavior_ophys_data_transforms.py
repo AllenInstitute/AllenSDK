@@ -144,7 +144,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
                             .corrected_stim_timestamps)
-        return timestamps
+        return np.array(timestamps)
 
     @staticmethod
     def _process_ophys_plane_timestamps(
