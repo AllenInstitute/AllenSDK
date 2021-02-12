@@ -345,32 +345,32 @@ def test_get_trial_timing_exclusivity_assertions(
     with pytest.raises(AssertionError) as e:
         trials_processing.get_trial_timing(
             None, None, None, go, catch, auto_rewarded, hit, false_alarm,
-            aborted)
+            aborted, np.array([]))
     assert errortext in str(e.value)
 
 
 def test_get_trial_timing():
     event_dict = {
-        ('trial_start', ''): {'rebased_time': 306.4785879253758, 'frame': 18075},
-        ('initial_blank', 'enter'): {'rebased_time': 306.47868008512637,
+        ('trial_start', ''): {'timestamp': 306.4785879253758, 'frame': 18075},
+        ('initial_blank', 'enter'): {'timestamp': 306.47868008512637,
                                      'frame': 18075},
-        ('initial_blank', 'exit'): {'rebased_time': 306.4787637603285,
+        ('initial_blank', 'exit'): {'timestamp': 306.4787637603285,
                                     'frame': 18075},
-        ('pre_change', 'enter'): {'rebased_time': 306.47883573270514, 'frame': 18075},
-        ('pre_change', 'exit'): {'rebased_time': 306.4789062422286, 'frame': 18075},
-        ('stimulus_window', 'enter'): {'rebased_time': 306.478977629464,
+        ('pre_change', 'enter'): {'timestamp': 306.47883573270514, 'frame': 18075},
+        ('pre_change', 'exit'): {'timestamp': 306.4789062422286, 'frame': 18075},
+        ('stimulus_window', 'enter'): {'timestamp': 306.478977629464,
                                        'frame': 18075},
-        ('stimulus_changed', ''): {'rebased_time': 310.9827406729944, 'frame': 18345},
-        ('auto_reward', ''): {'rebased_time': 310.98279450599154, 'frame': 18345},
-        ('response_window', 'enter'): {'rebased_time': 311.13223900212347,
+        ('stimulus_changed', ''): {'timestamp': 310.9827406729944, 'frame': 18345},
+        ('auto_reward', ''): {'timestamp': 310.98279450599154, 'frame': 18345},
+        ('response_window', 'enter'): {'timestamp': 311.13223900212347,
                                        'frame': 18354},
-        ('response_window', 'exit'): {'rebased_time': 311.73284526699706,
+        ('response_window', 'exit'): {'timestamp': 311.73284526699706,
                                       'frame': 18390},
-        ('miss', ''): {'rebased_time': 311.7330193465259, 'frame': 18390},
-        ('stimulus_window', 'exit'): {'rebased_time': 315.2356723770604,
+        ('miss', ''): {'timestamp': 311.7330193465259, 'frame': 18390},
+        ('stimulus_window', 'exit'): {'timestamp': 315.2356723770604,
                                       'frame': 18600},
-        ('no_lick', 'exit'): {'rebased_time': 315.23582480636213, 'frame': 18600},
-        ('trial_end', ''): {'rebased_time': 315.23590438557534, 'frame': 18600}
+        ('no_lick', 'exit'): {'timestamp': 315.23582480636213, 'frame': 18600},
+        ('trial_end', ''): {'timestamp': 315.23590438557534, 'frame': 18600}
     }
 
     licks = [
@@ -556,6 +556,14 @@ def test_get_trial_timing():
         }
     })
 
+    # Only need to worry about the timestamp
+    # value at change_frame
+    # because get_trial_timing will only use
+    # timestamps to lookup the timestamp of
+    # change_frame
+    timestamps = np.zeros(20000, dtype=float)
+    timestamps[18345] = 311.77086
+
     result = trials_processing.get_trial_timing(
         event_dict,
         stimulus_presentations_df,
@@ -565,7 +573,8 @@ def test_get_trial_timing():
         auto_rewarded=True,
         hit=False,
         false_alarm=False,
-        aborted=False
+        aborted=False,
+        timestamps=timestamps
     )
 
     expected_result = {

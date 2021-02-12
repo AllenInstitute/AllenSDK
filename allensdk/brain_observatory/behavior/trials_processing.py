@@ -251,7 +251,8 @@ def _get_response_time(licks: List[float], aborted: bool) -> float:
 def get_trial_timing(
         event_dict: dict, stimulus_presentations_df: pd.DataFrame,
         licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
-        hit: bool, false_alarm: bool, aborted: bool):
+        hit: bool, false_alarm: bool, aborted: bool,
+        timestamps: np.ndarray):
     """
     Extract a dictionary of trial timing data.
     See trial_data_from_log for a description of the trial types.
@@ -281,6 +282,9 @@ def get_trial_timing(
         True if "false_alarm" trial, False otherwise
     aborted: bool
         True if "aborted" trial, False otherwise
+    timestamps: np.ndarray[1d]
+        Array of ground truth timestamps for the session
+        (sync times, if available)
 
     Returns
     =======
@@ -330,21 +334,12 @@ def get_trial_timing(
 
     response_time = _get_response_time(licks, aborted)
 
-    def get_change_time(change_frame, stimulus_presentations_df):
-        # get the first stimulus in the log after the current change frame:
-        query = stimulus_presentations_df.query('start_frame >= @change_frame')
-        if len(query) > 0:
-            return query['start_time'].iloc[0]
-        else:
-            # return NaN if the query is empty
-            return np.nan
-
     if go or auto_rewarded:
         change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-        change_time = get_change_time(change_frame, stimulus_presentations_df)
+        change_time = timestamps[change_frame]
     elif catch:
         change_frame = event_dict.get(('sham_change', ''))['frame']
-        change_time = get_change_time(change_frame, stimulus_presentations_df)
+        change_time = timestamps[change_frame]
     else:
         change_time = float("nan")
         change_frame = float("nan")
@@ -478,7 +473,8 @@ def get_trials(data: Dict,
             tr_data['auto_rewarded'],
             tr_data['hit'],
             tr_data['false_alarm'],
-            tr_data["aborted"]
+            tr_data["aborted"],
+            timestamps
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
