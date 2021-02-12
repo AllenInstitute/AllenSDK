@@ -422,7 +422,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         See behavior_ophys_session.events for return type
         """
-        events_file = self.extractor.get_event_detection_raw_filepath()
+        events_file = self.extractor.get_event_detection_filepath()
         with h5py.File(events_file, 'r') as f:
             events = f['events'][:]
             lambdas = f['lambdas'][:]

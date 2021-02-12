@@ -284,7 +284,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         return [cls(oeid) for oeid in oeid_list]
 
     @memoize
-    def get_event_detection_raw_filepath(self) -> str:
+    def get_event_detection_filepath(self) -> str:
         """Gets the raw filepath to the event detection data"""
         query = f'''
             SELECT wkf.storage_directory || wkf.filename AS event_detection_filepath

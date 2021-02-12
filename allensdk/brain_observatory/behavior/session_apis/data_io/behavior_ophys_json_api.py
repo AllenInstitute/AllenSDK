@@ -154,6 +154,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         subject"""
         return self.data['eye_gaze_mapping_path']
 
-    def get_event_detection_raw_filepath(self) -> str:
+    def get_event_detection_filepath(self) -> str:
         """Get the filepath of the .h5 events file associated with an ophys experiment"""
         return self.data['event_detection_filepath']
