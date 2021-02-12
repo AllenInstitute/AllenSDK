@@ -285,7 +285,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
 
     @memoize
     def get_event_detection_filepath(self) -> str:
-        """Gets the raw filepath to the event detection data"""
+        """Gets the filepath to the event detection data"""
         query = f'''
             SELECT wkf.storage_directory || wkf.filename AS event_detection_filepath
             FROM ophys_experiments oe
