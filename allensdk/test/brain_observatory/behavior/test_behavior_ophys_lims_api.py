@@ -413,8 +413,8 @@ def test_corrected_fluorescence_trace_exceptions2(monkeypatch, tmpdir):
 
 def test_eye_tracking_rig_geometry_returns_single_rig(monkeypatch):
     """
-    This test tests that when there are multiple rig geometries for an experiment,
-    that only the most recent is returned
+    This test tests that when there are multiple rig geometries for ani
+    experiment, that only the most recent is returned
     """
     def dummy_init(self, ophys_experiment_id):
         self.ophys_experiment_id = ophys_experiment_id

@@ -44,7 +44,8 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
 
     # Values in the hdf5 may be complex (likely an artifact of the ellipse
     # fitting process). Take only the real component.
-    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))
+    eye_tracking_data = eye_tracking_data.apply(
+            lambda x: np.real(x.to_numpy()))
 
     return eye_tracking_data.astype(float)
 
@@ -70,7 +71,9 @@ def determine_outliers(data_df: pd.DataFrame,
         True denotes that a row in the data_df contains at least one outlier.
     """
 
-    outliers = (data_df.apply(stats.zscore, nan_policy='omit').apply(np.abs) > z_threshold)
+    outliers = (data_df.apply(
+        stats.zscore,
+        nan_policy='omit').apply(np.abs) > z_threshold)
     return pd.Series(outliers.any(axis=1))
 
 

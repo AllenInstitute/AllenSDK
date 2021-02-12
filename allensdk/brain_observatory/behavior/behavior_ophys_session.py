@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
 from typing import Any, Optional
 import logging
 
@@ -522,8 +521,8 @@ class BehaviorOphysSession(ParamsMixin):
         response_latency_list = []
         for _, t in self.trials.iterrows():
             valid_response_licks = \
-                    [l for l in t.lick_times
-                     if l - t.change_time >
+                    [lick_time for lick_time in t.lick_times
+                     if lick_time - t.change_time >
                         self.task_parameters['response_window_sec'][0]]
             response_latency = (
                     float('inf')

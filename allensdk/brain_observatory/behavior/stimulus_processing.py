@@ -9,20 +9,41 @@ IMAGE_SETS_REV = {val: key for key, val in IMAGE_SETS.items()}
 
 
 def convert_filepath_caseinsensitive(filename_in):
-    if filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl'
+    if (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl"  # noqa: E501
+    elif (
+        filename_in
+        == "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl"  # noqa: E501
+    ):
+        return "//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl"  # noqa: E501
     else:
         raise NotImplementedError(filename_in)
 
@@ -43,21 +64,31 @@ def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
                              as what stimuli was presented
     """
     stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
-    # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
-    stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
+    # workaround to rename columns to harmonize with visual coding and
+    # rebase timestamps to sync time
+    stimulus_table.insert(
+        loc=0, column="flash_number", value=np.arange(0, len(stimulus_table))
+    )
     stimulus_table = stimulus_table.rename(
-        columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number': 'stimulus_presentations_id'})
-    stimulus_table.start_time = [stimulus_timestamps[int(start_frame)] for start_frame in
-                                 stimulus_table.start_frame.values]
+        columns={
+            "frame": "start_frame",
+            "time": "start_time",
+            "flash_number": "stimulus_presentations_id",
+        }
+    )
+    stimulus_table.start_time = [
+        stimulus_timestamps[int(start_frame)]
+        for start_frame in stimulus_table.start_frame.values
+    ]
     end_time = []
     for end_frame in stimulus_table.end_frame.values:
         if not np.isnan(end_frame):
             end_time.append(stimulus_timestamps[int(end_frame)])
         else:
-            end_time.append(float('nan'))
+            end_time.append(float("nan"))
 
-    stimulus_table.insert(loc=4, column='stop_time', value=end_time)
-    stimulus_table.set_index('stimulus_presentations_id', inplace=True)
+    stimulus_table.insert(loc=4, column="stop_time", value=end_time)
+    stimulus_table.set_index("stimulus_presentations_id", inplace=True)
     stimulus_table = stimulus_table[sorted(stimulus_table.columns)]
     return stimulus_table
 
@@ -83,12 +114,17 @@ def get_images_dict(pkl) -> Dict:
 
     """
     # Sometimes the source is a zipped pickle:
-    metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
+    metadata = {
+        "image_set": pkl["items"]["behavior"]["stimuli"]["images"][
+            "image_path"
+        ]
+    }
 
-    # Get image file name; these are encoded case-insensitive in the pickle file :/
-    filename = convert_filepath_caseinsensitive(metadata['image_set'])
+    # Get image file name; these are encoded case-insensitive
+    # in the pickle file :/
+    filename = convert_filepath_caseinsensitive(metadata["image_set"])
 
-    image_set = load_pickle(open(filename, 'rb'))
+    image_set = load_pickle(open(filename, "rb"))
     images = []
     images_meta = []
 
@@ -138,10 +174,10 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
         This returns empty if no gratings were presented.
 
     """
-    if 'grating' in stimuli:
-        phase = stimuli['grating']['phase']
-        correct_freq = stimuli['grating']['sf']
-        set_logs = stimuli['grating']['set_log']
+    if "grating" in stimuli:
+        phase = stimuli["grating"]["phase"]
+        correct_freq = stimuli["grating"]["sf"]
+        set_logs = stimuli["grating"]["set_log"]
         unique_oris = set([set_log[1] for set_log in set_logs])
 
         image_names = []
@@ -150,23 +186,27 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
             image_names.append(f"gratings_{float(unique_ori)}")
 
         grating_dict = {
-            'image_category': ['grating'] * len(unique_oris),
-            'image_name': image_names,
-            'orientation': list(unique_oris),
-            'image_set': ['grating'] * len(unique_oris),
-            'phase': [phase] * len(unique_oris),
-            'spatial_frequency': [correct_freq] * len(unique_oris),
-            'image_index': range(start_idx, start_idx+len(unique_oris), 1)
+            "image_category": ["grating"] * len(unique_oris),
+            "image_name": image_names,
+            "orientation": list(unique_oris),
+            "image_set": ["grating"] * len(unique_oris),
+            "phase": [phase] * len(unique_oris),
+            "spatial_frequency": [correct_freq] * len(unique_oris),
+            "image_index": range(start_idx, start_idx + len(unique_oris), 1),
         }
         grating_df = pd.DataFrame.from_dict(grating_dict)
     else:
-        grating_df = pd.DataFrame(columns=['image_category',
-                                           'image_name',
-                                           'image_set',
-                                           'phase',
-                                           'spatial_frequency',
-                                           'orientation',
-                                           'image_index'])
+        grating_df = pd.DataFrame(
+            columns=[
+                "image_category",
+                "image_name",
+                "image_set",
+                "phase",
+                "spatial_frequency",
+                "orientation",
+                "image_index",
+            ]
+        )
     return grating_df
 
 
@@ -184,11 +224,14 @@ def get_stimulus_templates(pkl) -> Dict:
 
     """
     templates = {}
-    if 'images' in pkl['items']['behavior']['stimuli']:
+    if "images" in pkl["items"]["behavior"]["stimuli"]:
         images = get_images_dict(pkl)
         image_set_filename = convert_filepath_caseinsensitive(
-            images['metadata']['image_set'])
-        templates[IMAGE_SETS_REV[image_set_filename]] = np.array(images['images'])
+            images["metadata"]["image_set"]
+        )
+        templates[IMAGE_SETS_REV[image_set_filename]] = np.array(
+            images["images"]
+        )
     return templates
 
 
@@ -211,49 +254,67 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         orientation, and image index.
 
     """
-    stimuli = pkl['items']['behavior']['stimuli']
-    if 'images' in stimuli:
+    stimuli = pkl["items"]["behavior"]["stimuli"]
+    if "images" in stimuli:
         images = get_images_dict(pkl)
-        stimulus_index_df = pd.DataFrame(images['image_attributes'])
-        image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-        stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+        stimulus_index_df = pd.DataFrame(images["image_attributes"])
+        image_set_filename = convert_filepath_caseinsensitive(
+            images["metadata"]["image_set"]
+        )
+        stimulus_index_df["image_set"] = IMAGE_SETS_REV[image_set_filename]
     else:
-        stimulus_index_df = pd.DataFrame(columns=[
-            'image_name', 'image_category', 'image_set', 'phase',
-            'spatial_frequency', 'image_index'])
+        stimulus_index_df = pd.DataFrame(
+            columns=[
+                "image_name",
+                "image_category",
+                "image_set",
+                "phase",
+                "spatial_frequency",
+                "image_index",
+            ]
+        )
 
     # get the grating metadata will be empty if gratings are absent
-    grating_df = get_gratings_metadata(stimuli,
-                                       start_idx=len(stimulus_index_df))
-    stimulus_index_df = stimulus_index_df.append(grating_df,
-                                                 ignore_index=True,
-                                                 sort=False)
+    grating_df = get_gratings_metadata(
+        stimuli, start_idx=len(stimulus_index_df)
+    )
+    stimulus_index_df = stimulus_index_df.append(
+        grating_df, ignore_index=True, sort=False
+    )
 
     # Add an entry for omitted stimuli
-    omitted_df = pd.DataFrame({'image_category': ['omitted'],
-                               'image_name': ['omitted'],
-                               'image_set': ['omitted'],
-                               'orientation': np.NaN,
-                               'phase': np.NaN,
-                               'spatial_frequency': np.NaN,
-                               'image_index': len(stimulus_index_df)})
-    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True,
-                                                 sort=False)
-    stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+    omitted_df = pd.DataFrame(
+        {
+            "image_category": ["omitted"],
+            "image_name": ["omitted"],
+            "image_set": ["omitted"],
+            "orientation": np.NaN,
+            "phase": np.NaN,
+            "spatial_frequency": np.NaN,
+            "image_index": len(stimulus_index_df),
+        }
+    )
+    stimulus_index_df = stimulus_index_df.append(
+        omitted_df, ignore_index=True, sort=False
+    )
+    stimulus_index_df.set_index(["image_index"], inplace=True, drop=True)
     return stimulus_index_df
 
 
 def _resolve_image_category(change_log, frame):
     for change in (unpack_change_log(c) for c in change_log):
-        if frame < change['frame']:
-            return change['from_category']
+        if frame < change["frame"]:
+            return change["from_category"]
 
-    return change['to_category']
+    return change["to_category"]
 
 
-def _get_stimulus_epoch(set_log: List[Tuple[str, Union[str, int], int, int]],
-                        current_set_index: int, start_frame: int,
-                        n_frames: int) -> Tuple[int, int]:
+def _get_stimulus_epoch(
+    set_log: List[Tuple[str, Union[str, int], int, int]],
+    current_set_index: int,
+    start_frame: int,
+    n_frames: int,
+) -> Tuple[int, int]:
     """
     Gets the frame range for which a stimuli was presented and the transition
     to the next stimuli was ongoing. Returns this in the form of a tuple.
@@ -282,13 +343,19 @@ def _get_stimulus_epoch(set_log: List[Tuple[str, Union[str, int], int, int]],
     try:
         next_set_event = set_log[current_set_index + 1]
     except IndexError:  # assume this is the last set event
-        next_set_event = (None, None, None, n_frames,)
+        next_set_event = (
+            None,
+            None,
+            None,
+            n_frames,
+        )
 
     return start_frame, next_set_event[3]  # end frame isn't inclusive
 
 
-def _get_draw_epochs(draw_log: List[int], start_frame: int,
-                     stop_frame: int) -> List[Tuple[int, int]]:
+def _get_draw_epochs(
+    draw_log: List[int], start_frame: int, stop_frame: int
+) -> List[Tuple[int, int]]:
     """
     Gets the frame numbers of the active frames within a stimulus window.
     Stimulus epochs come in the form [0, 0, 1, 1, 0, 0] where the stimulus is
@@ -324,14 +391,25 @@ def _get_draw_epochs(draw_log: List[int], start_frame: int,
 
         if epoch_length:
             draw_epochs.append(
-                (current_frame - epoch_length - 1, current_frame - 1,)
+                (
+                    current_frame - epoch_length - 1,
+                    current_frame - 1,
+                )
             )
 
     return draw_epochs
 
 
 def unpack_change_log(change):
-    (from_category, from_name), (to_category, to_name,), time, frame = change
+    (
+        (from_category, from_name),
+        (
+            to_category,
+            to_name,
+        ),
+        time,
+        frame,
+    ) = change
 
     return dict(
         frame=frame,
@@ -359,12 +437,16 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                  and duration
     """
 
-    stimuli = data['items']['behavior']['stimuli']
+    stimuli = data["items"]["behavior"]["stimuli"]
     n_frames = len(time)
     visual_stimuli_data = []
     for stimuli_group_name, stim_dict in stimuli.items():
-        for idx, (attr_name, attr_value, _time, frame,) in \
-                enumerate(stim_dict["set_log"]):
+        for idx, (
+            attr_name,
+            attr_value,
+            _time,
+            frame,
+        ) in enumerate(stim_dict["set_log"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
 
@@ -375,41 +457,57 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                 n_frames,
             )
             draw_epochs = _get_draw_epochs(
-                stim_dict["draw_log"],
-                *stimulus_epoch
+                stim_dict["draw_log"], *stimulus_epoch
             )
 
-            for idx, (epoch_start, epoch_end,) in enumerate(draw_epochs):
+            for idx, (
+                epoch_start,
+                epoch_end,
+            ) in enumerate(draw_epochs):
                 # visual stimulus doesn't actually change until start of
-                # following frame, so we need to bump the epoch_start & epoch_end
-                # to get the timing right
+                # following frame, so we need to bump the epoch_start
+                # & epoch_end to get the timing right
                 epoch_start += 1
                 epoch_end += 1
 
-                visual_stimuli_data.append({
-                    "orientation": orientation,
-                    "image_name": image_name,
-                    "frame": epoch_start,
-                    "end_frame": epoch_end,
-                    "time": time[epoch_start],
-                    "duration": time[epoch_end] - time[epoch_start],
-                    # this will always work because an epoch will never occur near the end of time
-                    "omitted": False,
-                })
+                visual_stimuli_data.append(
+                    {
+                        "orientation": orientation,
+                        "image_name": image_name,
+                        "frame": epoch_start,
+                        "end_frame": epoch_end,
+                        "time": time[epoch_start],
+                        "duration": time[epoch_end] - time[epoch_start],
+                        # this will always work because an epoch will never
+                        # occur near the end of time
+                        "omitted": False,
+                    }
+                )
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
     # Add omitted flash info:
     omitted_flash_list = []
-    omitted_flash_frame_log = data['items']['behavior']['omitted_flash_frame_log']
+    omitted_flash_frame_log = data["items"]["behavior"][
+        "omitted_flash_frame_log"
+    ]
 
-    for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
-        stim_frames = visual_stimuli_df['frame'].values
+    for (
+        stimuli_group_name,
+        omitted_flash_frames,
+    ) in omitted_flash_frame_log.items():
+        stim_frames = visual_stimuli_df["frame"].values
         omitted_flash_frames = np.array(omitted_flash_frames)
 
-        #  Test offsets of omitted flash frames to see if they are in the stim log
+        # Test offsets of omitted flash frames to see if they are
+        # in the stim log
         offsets = np.arange(-3, 4)
-        offset_arr = np.add(np.repeat(omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1), offsets)
+        offset_arr = np.add(
+            np.repeat(
+                omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1
+            ),
+            offsets,
+        )
         matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
 
         #  Remove omitted flashes that also exist in the stimulus log
@@ -421,8 +519,18 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
 
     omitted = np.ones_like(omitted_flash_list).astype(bool)
     time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time,
-                               'image_name': 'omitted'})
+    omitted_df = pd.DataFrame(
+        {
+            "omitted": omitted,
+            "frame": omitted_flash_list,
+            "time": time,
+            "image_name": "omitted",
+        }
+    )
 
-    df = pd.concat((visual_stimuli_df, omitted_df), sort=False).sort_values('frame').reset_index()
+    df = (
+        pd.concat((visual_stimuli_df, omitted_df), sort=False)
+        .sort_values("frame")
+        .reset_index()
+    )
     return df
