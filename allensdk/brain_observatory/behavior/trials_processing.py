@@ -404,29 +404,69 @@ def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
     }
 
 
-def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
+def get_trials(data: Dict,
+               licks_df: pd.DataFrame,
+               rewards_df: pd.DataFrame,
+               stimulus_presentations_df: pd.DataFrame,
+               timestamps: np.ndarray) -> pd.DataFrame:
+    """
+    Create and return a pandas DataFrame containing data about
+    the trials associated with this session
+
+    Parameters
+    ----------
+    data: dict
+          The dict resulting from reading in this session's
+          stimulus_data pickle file
+
+    licks_df: pd.DataFrame
+           A dataframe whose only column is the timestamps
+           of licks.
+
+    rewards_df: pd.DataFrame
+           A dataframe containing data about rewards given
+           during this session. Output of
+           allensdk/brain_observatory/behavior/rewards_processing.get_rewards
+
+    stimulus_presentations_df: pd.DataFrame
+           A dataframe containing data pertaining to the stimuli
+           presented in this session.
+
+    timestamps: np.ndarray[1d]
+           An ndarray containing the timestamps associated with each
+           stimulus frame in this session. Should be the sync timestamps
+           if available.
+
+    Returns
+    -------
+    pd.DataFrame
+           A dataframe containing data pertaining to the trials that
+           make up this session
+    """
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
     all_trial_data = [None] * len(trial_log)
-    sync_lick_times = licks_df.time.values 
-    rebased_reward_times = rewards_df.index.values
+    sync_lick_times = licks_df.time.values
+    reward_times = rewards_df.index.values
 
     for idx, trial in enumerate(trial_log):
-        # extract rebased time and frame for each event in the trial log:
-        event_dict = {(e[0], e[1]): {'rebased_time':rebase(e[2]),'frame':e[3]} for e in trial['events']}
+        # match each event in the trial log to the sync timestamps
+        event_dict = {(e[0], e[1]): {'timestamp':timestamps[e[3]],
+                                     'frame':e[3]}
+                                    for e in trial['events']}
 
         tr_data = {"trial": trial["index"]}
         tr_data["lick_times"] = get_trial_lick_times(
-            sync_lick_times, 
-            event_dict[('trial_start', '')]['rebased_time'], 
-            event_dict[('trial_end', '')]['rebased_time']
+            sync_lick_times,
+            event_dict[('trial_start', '')]['timestamp'],
+            event_dict[('trial_end', '')]['timestamp']
         )
         tr_data["reward_time"] = get_trial_reward_time(
-            rebased_reward_times,
-            event_dict[('trial_start', '')]['rebased_time'], 
-            event_dict[('trial_end', '')]['rebased_time']
+            reward_times,
+            event_dict[('trial_start', '')]['timestamp'],
+            event_dict[('trial_end', '')]['timestamp']
         )
         tr_data.update(trial_data_from_log(trial))
         tr_data.update(get_trial_timing(

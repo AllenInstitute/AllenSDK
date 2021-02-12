@@ -235,15 +235,17 @@ class BehaviorDataTransforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
+        timestamps = self.get_stimulus_timestamps()
         licks = self.get_licks()
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
         stimulus_presentations = self.get_stimulus_presentations()
-        # Pass a dummy rebase function since we don't have two time streams,
-        # and the frame times are already aligned to trial events in their
-        # respective getters
-        trial_df = get_trials(data, licks, rewards, stimulus_presentations,
-                              lambda x: x)
+
+        trial_df = get_trials(data,
+                              licks,
+                              rewards,
+                              stimulus_presentations,
+                              timestamps)
 
         return trial_df
 

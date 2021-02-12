@@ -302,14 +302,17 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     @memoize
     def get_trials(self):
 
+        timestamps = self.get_stimulus_timestamps()
         licks = self.get_licks()
         rewards = self.get_rewards()
         stimulus_presentations = self.get_stimulus_presentations()
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
 
-        trial_df = get_trials(data, licks, rewards,
-                              stimulus_presentations, rebase_function)
+        trial_df = get_trials(data,
+                              licks,
+                              rewards,
+                              stimulus_presentations,
+                              timestamps)
 
         return trial_df
 
