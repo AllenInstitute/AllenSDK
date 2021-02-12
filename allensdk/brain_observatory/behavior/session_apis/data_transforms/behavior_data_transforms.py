@@ -214,8 +214,7 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         vsyncs = data["items"]["behavior"]["intervalsms"]
         cum_sum = np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
-        offset = frame_time_offset(data)
-        return cum_sum + offset
+        return cum_sum
 
     def get_task_parameters(self) -> dict:
         """Get task parameters from pkl file.
