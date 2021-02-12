@@ -1,8 +1,8 @@
 namespaces:
 - author:
-  - Adam Amster
+  - Wayne Wakeman
   contact:
-  - aamster@alleninstitute.org
+  - waynew@alleninstitute.org
   doc: Store the event detection output
   name: ndx-event-detection
   schema:
