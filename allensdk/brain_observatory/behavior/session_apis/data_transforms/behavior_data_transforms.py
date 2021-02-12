@@ -97,10 +97,8 @@ class BehaviorDataTransforms(BehaviorBase):
             delivered rewards.
         """
         data = self._behavior_stimulus_file()
-        offset = frame_time_offset(data)
-        # No sync timestamps to rebase on, but do need to align to
-        # trial events, so add the offset as the "rebase" function
-        return get_rewards(data, lambda x: x + offset)
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
     def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.

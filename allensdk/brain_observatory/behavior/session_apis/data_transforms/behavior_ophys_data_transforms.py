@@ -296,8 +296,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     @memoize
     def get_rewards(self):
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
-        return get_rewards(data, rebase_function)
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
     @memoize
     def get_trials(self):
