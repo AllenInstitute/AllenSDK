@@ -1,24 +1,27 @@
+env-vars: &env-vars
+  TEST_NWB_FILES: skip
+  TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA: skip
+  TEST_API_ENDPOINT: http://api.brain-map.org
+  TEST_COMPLETE: false
+  TEST_BAMBOO: false
+  LIMS_DBNAME: db
+  LIMS_PORT: 1234
+  LIMS_PASSWORD: password
+  LIMS_HOST: host
+  LIMS_USER: user
+  MTRAIN_DBNAME: db
+  MTRAIN_USER: user
+  MTRAIN_HOST: host
+  MTRAIN_PORT: 1234
+  MTRAIN_PASSWORD: password
+
 jobs:
   linux-py36: &linux-template
     executor:
       name: python/default
       tag: "3.6.12"
     environment:
-      TEST_NWB_FILES: skip
-      TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA: skip
-      TEST_API_ENDPOINT: http://api.brain-map.org
-      TEST_COMPLETE: false
-      TEST_BAMBOO: false
-      LIMS_DBNAME: db
-      LIMS_PORT: 1234
-      LIMS_PASSWORD: password
-      LIMS_HOST: host
-      LIMS_USER: user
-      MTRAIN_DBNAME: db
-      MTRAIN_USER: user
-      MTRAIN_HOST: host
-      MTRAIN_PORT: 1234
-      MTRAIN_PASSWORD: password
+      <<: *env-vars
     steps:
       - checkout
       - run: sudo apt-get update
@@ -40,7 +43,48 @@ jobs:
     executor:
       name: python/default
       tag: "3.7.7"
- 
+
+  osx-py36:
+    parameters:
+      pyversion:
+        default: "3.6.12"
+        type: string
+    macos:
+      xcode: 11.3.0
+    environment:
+      <<: *env-vars
+    steps:
+      - checkout
+      - run:
+          command: |
+            brew install wget
+          name: Install Wget
+      - run:
+          command: |
+            wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
+            bash miniconda.sh -b -p $HOME/miniconda
+            export PATH="$HOME/miniconda/bin:$PATH"
+            hash -r
+            conda config --set always_yes yes --set changeps1 no
+            conda update -q conda
+            conda create -q -n test-environment python=<<parameters.pyversion>> pip
+            source activate test-environment
+          name: Create conda test environment
+      - run:
+          command: |
+            export PATH="$HOME/miniconda/bin:$PATH"
+            source activate test-environment
+            pip install codecov
+            pip install -r test_requirements.txt
+            pip install .
+          name: Install Allensdk
+      - run:
+          command: |
+            export PATH="$HOME/miniconda/bin:$PATH"
+            source activate test-environment
+            python -m pytest -n 4 --cov allensdk --cov-report xml
+          name: Test
+    
   lint:
     executor: python/default
     steps:
@@ -64,3 +108,4 @@ workflows:
       - lint
       - linux-py36
       - linux-py37
+      - osx-py36
