@@ -325,8 +325,8 @@ def get_trial_timing(
         "both `go` and `auto_rewarded` cannot be True, they are mutually "
         "exclusive categories")
 
-    start_time = event_dict["trial_start", ""]['rebased_time']
-    stop_time = event_dict["trial_end", ""]['rebased_time']
+    start_time = event_dict["trial_start", ""]['timestamp']
+    stop_time = event_dict["trial_end", ""]['timestamp']
 
     response_time = _get_response_time(licks, aborted)
 
