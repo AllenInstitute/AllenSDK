@@ -201,14 +201,6 @@ def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
         raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
 
 
-def get_trial_lick_times(lick_times, start_time, stop_time):
-    '''extract lick times in time range'''
-    return lick_times[np.where(np.logical_and(
-        lick_times >= start_time, 
-        lick_times <= stop_time
-    ))]
-
-
 def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     '''extract reward times in time range'''
     reward_times = rebased_reward_times[np.where(np.logical_and(
@@ -480,8 +472,10 @@ def get_trials(data: Dict,
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
+    trial_bounds = get_trial_bounds(trial_log)
+
     all_trial_data = [None] * len(trial_log)
-    sync_lick_times = licks_df.time.values
+    lick_frames = licks_df.frame.values
     reward_times = rewards_df.index.values
 
     for idx, trial in enumerate(trial_log):
@@ -491,11 +485,23 @@ def get_trials(data: Dict,
                                     for e in trial['events']}
 
         tr_data = {"trial": trial["index"]}
-        tr_data["lick_times"] = get_trial_lick_times(
-            sync_lick_times,
-            event_dict[('trial_start', '')]['timestamp'],
-            event_dict[('trial_end', '')]['timestamp']
-        )
+
+        trial_start = trial_bounds[idx][0]
+        trial_end = trial_bounds[idx][1]
+
+        # select licks that fall between trial_start and trial_end;
+        # licks on the boundary get assigned to the trial that is ending,
+        # rather than the trial that is starting
+        if trial_end > 0:
+            valid_idx = np.where(np.logical_and(lick_frames>trial_start,
+                                                lick_frames<=trial_end))
+        else:
+            valid_idx = np.where(lick_frames>trial_start)
+
+        valid_licks = lick_frames[valid_idx]
+
+        tr_data["lick_times"] = timestamps[valid_licks]
+
         tr_data["reward_time"] = get_trial_reward_time(
             reward_times,
             event_dict[('trial_start', '')]['timestamp'],
