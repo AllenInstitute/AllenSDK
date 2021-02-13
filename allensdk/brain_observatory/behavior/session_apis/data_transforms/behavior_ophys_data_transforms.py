@@ -275,7 +275,15 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return pd.DataFrame({'time': lick_times})
 
     @memoize
-    def get_licks(self):
+    def get_licks(self) -> pd.DataFrame:
+        """
+        Returns
+        -------
+        pd.DataFrame
+            Two columns: "time", which contains the sync time
+            of the licks that occurred in this session and "frame",
+            the frame numbers of licks that occurred in this session
+        """
         data = self._behavior_stimulus_file()
         timestamps = self.get_stimulus_timestamps()
         # Get licks from pickle file (need to add an offset to align with
@@ -283,7 +291,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = timestamps[lick_frames]
-        return pd.DataFrame({"time": lick_times})
+        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
     @memoize
     def get_rewards(self):

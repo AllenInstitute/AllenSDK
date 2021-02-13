@@ -79,7 +79,10 @@ class BehaviorDataTransforms(BehaviorBase):
         `start_trial` and `end_trial` events in the `trial_log`, to true
         up these time streams.
 
-        :returns: pd.DataFrame -- A dataframe containing lick timestamps
+        :returns: pd.DataFrame
+            Two columns: "time", which contains the sync time
+            of the licks that occurred in this session and "frame",
+            the frame numbers of licks that occurred in this session
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
@@ -87,7 +90,7 @@ class BehaviorDataTransforms(BehaviorBase):
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"time": lick_times})
+        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
