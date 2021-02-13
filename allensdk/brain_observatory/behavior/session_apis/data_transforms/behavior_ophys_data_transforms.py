@@ -277,21 +277,13 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     @memoize
     def get_licks(self):
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
+        timestamps = self.get_stimulus_timestamps()
         # Get licks from pickle file (need to add an offset to align with
         # the trial_log time stream)
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
-        vsyncs = data["items"]["behavior"]["intervalsms"]
-
-        # Cumulative time
-        vsync_times_raw = np.hstack((0, vsyncs)).cumsum() / 1000.0
-
-        vsync_offset = frame_time_offset(data)
-        vsync_times = vsync_times_raw + vsync_offset
-        lick_times = [vsync_times[frame] for frame in lick_frames]
-        # Align pickle data with sync time stream
-        return pd.DataFrame({"time": list(map(rebase_function, lick_times))})
+        lick_times = timestamps[lick_frames]
+        return pd.DataFrame({"time": lick_times})
 
     @memoize
     def get_rewards(self):
