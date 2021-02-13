@@ -399,6 +399,44 @@ def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
     }
 
 
+def get_trial_bounds(trial_log: List) -> List:
+    """
+    Adjust trial boundaries from a trial_log so that there is no dead time
+    between trials.
+
+    Parameters
+    ----------
+    trial_log: list
+        The trial_log read in from the well known behavior stimulus pickle file
+
+    Returns
+    -------
+    list
+        Each element in the list is a tuple of the form (start_frame, end_frame)
+        so that the ith element of the list gives the start and end frames of
+        the ith trial. The endframe of the last trial will be -1, indicating that
+        it should map to the last timestamp in the session
+    """
+    start_frames = []
+
+    for trial in trial_log:
+        start_f = None
+        for event in trial['events']:
+            if event[0] == 'trial_start':
+                start_f = event[-1]
+                break
+        if start_f is None:
+            msg = "Could not find a 'trial_start' event "
+            msg += "for all trials in the trial log\n"
+            msg += f"{trial}"
+            raise ValueError(msg)
+
+        start_frames.append(start_f)
+
+    end_frames = [idx for idx in start_frames[1:]+[-1]]
+    return list([(s, e) for s, e in zip(start_frames, end_frames)])
+
+
 def get_trials(data: Dict,
                licks_df: pd.DataFrame,
                rewards_df: pd.DataFrame,
