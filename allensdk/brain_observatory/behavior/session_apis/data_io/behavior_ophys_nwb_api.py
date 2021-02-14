@@ -181,6 +181,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             where "*" can be "corneal", "pupil" or "eye"
             likely_blink
         or None if no eye tracking data
+        Note: `pupil_area` is set to NaN where `likely_blink` == True
+              use `pupil_area_raw` column to access unfiltered pupil data
         """
         try:
             eye_tracking_acquisition = self.nwbfile.acquisition['EyeTracking']
@@ -205,7 +207,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
             "pupil_center_x": pupil_tracking.data[:, 0],
             "pupil_center_y": pupil_tracking.data[:, 1],
-            "pupil_area": pupil_tracking.area[:],
+            "pupil_area_raw": pupil_tracking.area[:],
             "pupil_height": pupil_tracking.height[:],
             "pupil_width": pupil_tracking.width[:],
             "pupil_phi": pupil_tracking.angle[:],
@@ -218,6 +220,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             "cr_phi": corneal_reflection_tracking.angle[:],
 
             "likely_blink": eye_tracking_acquisition.likely_blink.data[:],
+            "pupil_area": pupil_tracking.area[:] * (eye_tracking_acquisition.likely_blink.data[:] == False),
             "time": eye_tracking.timestamps[:]
         }
 
