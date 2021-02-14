@@ -385,7 +385,9 @@ class BehaviorOphysSession(ParamsMixin):
           gaze location), with (0, 0) being the upper-left corner of the
           eye-tracking image.
         - The 'likely_blink' column is True for any row (frame) where the pupil
-          fit failed OR eye fit failed OR an outlier fit was identified.
+          fit failed OR eye fit failed OR an outlier fit was identified on the pupil or eye fit.
+        - The pupil_area column is set to NaN wherever 'likely_blink' == True
+        - The pupil_area_raw column contains all pupil fit values (including where 'likely_blink' == True)
         - All ellipse fits are derived from tracking points that were output by
           a DeepLabCut model that was trained on hand-annotated data frome a
           subset of imaging sessions on optical physiology rigs.

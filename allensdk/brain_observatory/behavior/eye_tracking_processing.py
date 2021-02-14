@@ -207,10 +207,16 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                                             outliers,
                                             dilation_frames=dilation_frames)
 
+    # remove outliers/likely blinks from default `pupil_area` column
+    # maintain full fits in the `pupil_area_raw` column
+    pupil_area_raw = pupil_areas.copy()
+    pupil_areas[likely_blinks == True] = np.nan
+
     eye_data.insert(0, "time", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)
     eye_data.insert(2, "eye_area", eye_areas)
     eye_data.insert(3, "pupil_area", pupil_areas)
     eye_data.insert(4, "likely_blink", likely_blinks)
+    eye_data.insert(5, "pupil_area_raw", pupil_area_raw)
 
     return eye_data
