@@ -16,6 +16,7 @@ from allensdk.brain_observatory.behavior.dprime import (
 from allensdk.brain_observatory.behavior.dprime import (
     get_hit_rate, get_false_alarm_rate)
 from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
 class BehaviorOphysSession(ParamsMixin):
@@ -212,10 +213,17 @@ class BehaviorOphysSession(ParamsMixin):
         To get the unfiltered running speed, use `raw_running_speed`.
         """
         if self._running_speed is None:
-            rs_tuple = self.api.get_running_speed()
-            self._running_speed = pd.DataFrame(
-                    {"timestamps": rs_tuple.timestamps,
-                     "values": rs_tuple.values})
+            rspeed = self.api.get_running_speed()
+            # this is a crude patch.
+            # running speed needs to be refactored throughout
+            if isinstance(rspeed, RunningSpeed):
+                self._running_speed = pd.DataFrame(
+                        {
+                            "timestamps": rspeed.timestamps,
+                            "values": rspeed.values})
+            else:
+                # presumably, this is a dataframe here
+                self._running_speed = rspeed
         return self._running_speed
 
     @running_speed.setter
@@ -238,10 +246,17 @@ class BehaviorOphysSession(ParamsMixin):
         To get the filtered running speed, use `running_speed`.
         """
         if self._raw_running_speed is None:
-            rs_tuple = self.api.get_running_speed(lowpass=False)
-            self._raw_running_speed = pd.DataFrame(
-                    {"timestamps": rs_tuple.timestamps,
-                     "values": rs_tuple.values})
+            rspeed = self.api.get_running_speed(lowpass=False)
+            # this is a crude patch.
+            # running speed needs to be refactored throughout
+            if isinstance(rspeed, RunningSpeed):
+                self._raw_running_speed = pd.DataFrame(
+                        {
+                            "timestamps": rspeed.timestamps,
+                            "values": rspeed.values})
+            else:
+                # presumably, this is a dataframe here
+                self._raw_running_speed = rspeed
         return self._raw_running_speed
 
     @raw_running_speed.setter
