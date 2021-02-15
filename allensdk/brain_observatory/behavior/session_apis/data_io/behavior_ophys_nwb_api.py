@@ -29,8 +29,8 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
         EllipseEyeTracking, EllipseSeries)
-from allensdk.brain_observatory.behavior.nwb.extensions.event_detection.\
-    ndx_events import EventDetection
+from allensdk.brain_observatory.behavior.write_nwb.extensions\
+    .event_detection.ndx_events import EventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
