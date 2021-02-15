@@ -221,11 +221,12 @@ def test_get_experiment_date(MockBehaviorLimsApi):
 
 
 def test_get_running_speed(MockBehaviorLimsApi):
-    expected = RunningSpeed(timestamps=[0.0, 0.1, 0.2],
-                            values=[8.0, 15.0, 16.0])
+    expected = pd.DataFrame({
+        "timestamps": [0.0, 0.1, 0.2],
+        "values": [8.0, 15.0, 16.0]})
     api = MockBehaviorLimsApi
     actual = api.get_running_speed()
-    assert expected == actual
+    pd.testing.assert_frame_equal(expected, actual)
 
 
 def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):

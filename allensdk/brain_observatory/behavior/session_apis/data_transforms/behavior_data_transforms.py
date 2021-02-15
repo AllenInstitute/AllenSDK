@@ -126,8 +126,9 @@ class BehaviorDataTransforms(BehaviorBase):
             raise DataFrameIndexError(
                 f"Expected index to be named 'timestamps' but got "
                 f"'{running_data_df.index.name}'.")
-        return RunningSpeed(timestamps=running_data_df.index.values,
-                            values=running_data_df.speed.values)
+        return pd.DataFrame({
+            "timestamps": running_data_df.index.values,
+            "values": running_data_df.speed.values})
 
     def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()
