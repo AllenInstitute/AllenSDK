@@ -226,7 +226,7 @@ def test_get_running_speed(MockBehaviorLimsApi):
         "values": [8.0, 15.0, 16.0]})
     api = MockBehaviorLimsApi
     actual = api.get_running_speed()
-    assert expected.to_dict() == actual.to_dict()
+    pd.testing.assert_frame_equal(expected, actual)
 
 
 def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):
