@@ -423,6 +423,12 @@ def get_trial_bounds(trial_log: List) -> List:
             msg += f"{trial}"
             raise ValueError(msg)
 
+        if len(start_frames) > 0 and start_f < start_frames[-1]:
+            msg = "'trial_start' frames in trial log "
+            msg += "are not in ascending order"
+            msg += f"\ntrial_log: {trial_log}"
+            raise ValueError(msg)
+
         start_frames.append(start_f)
 
     # find the frame of 'trial_end' in the laste event
@@ -433,6 +439,15 @@ def get_trial_bounds(trial_log: List) -> List:
     if end_f is None:
         msg = "Could not find a 'trial_end' event "
         msg += "for the last trial in the trial_log"
+        raise ValueError(msg)
+
+    if end_f < start_frames[-1]:
+        msg = "Trial bounding frames out of order\n"
+        msg += "'trial_end' frame for last trial "
+        msg += "is less than 'trial_start' frame "
+        msg += "\n"
+        msg += f"end_frame: {end_f}\n"
+        msg += f"start_frames: {start_frames}"
         raise ValueError(msg)
 
     end_frames = [idx for idx in start_frames[1:]+[end_f]]

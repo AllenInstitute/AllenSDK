@@ -717,3 +717,21 @@ def test_get_trial_bounds_exception():
 
     with pytest.raises(ValueError):
         bounds = trials_processing.get_trial_bounds(trial_log)
+
+
+@pytest.mark.parametrize("trial_log",
+                         [([{'events':[('trial_start', 4), ('trial_end', 5)]},
+                            {'events':[('trial_start', 2), ('trial_end', 9)]}]),
+                          ([{'events':[('trial_start', 2), ('trial_end', 9)]},
+                            {'events':[('trial_start', 5), ('trial_end', 11)]},
+                            {'events':[('junk', 4), ('trial_start', 7), ('trial_end', 14)]},
+                            {'events':[('trial_start', 13), ('trial_end', 11)]}])
+                          ])
+def test_get_trial_bounds_order_exceptions(trial_log):
+    """
+    Test that, when trial_start and trial_end are out of order,
+    exceptions are raised
+    """
+    with pytest.raises(ValueError) as error:
+        _ = trials_processing.get_trial_bounds(trial_log)
+    assert 'order' in error.value.args[0]
