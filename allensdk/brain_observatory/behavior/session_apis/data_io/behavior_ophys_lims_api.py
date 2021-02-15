@@ -11,9 +11,9 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
 from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
                                        MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.authentication import DbCredentials
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
-from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
+from allensdk.internal.api import db_connection_creator
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
@@ -141,7 +141,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                 WHERE wkf.attachable_type = 'OphysSession'
                     AND wkft.name = 'EyeTracking Ellipses'
                     AND oe.id = {self.get_ophys_experiment_id()};
-                """
+                """ # noqa E501
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
@@ -156,7 +156,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                 WHERE wkf.attachable_type = 'OphysSession'
                     AND wkft.name = 'EyeDlcScreenMapping'
                     AND oe.id = {self.get_ophys_experiment_id()};
-                """
+                """ # noqa E501
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
@@ -174,7 +174,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             WHERE oe.id = {ophys_experiment_id} AND 
                 oec.active_date <= os.date_of_acquisition AND
                 oect.name IN ('eye camera position', 'led position', 'screen position')
-        '''
+        ''' # noqa E501
         # Get the raw data
         rig_geometry = pd.read_sql(query, self.lims_db.get_connection())
 
@@ -182,7 +182,9 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             # There is no rig geometry for this experiment
             return None
 
-        return self._process_eye_tracking_rig_geometry(rig_geometry=rig_geometry)
+        return self._process_eye_tracking_rig_geometry(
+            rig_geometry=rig_geometry
+        )
 
     def get_ophys_experiment_df(self) -> pd.DataFrame:
         """Get a DataFrame of metadata for ophys experiments"""
@@ -240,29 +242,42 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             'screen position': 'monitor',
             'led position': 'led'
         }
-        rig_geometry['config_type'] = rig_geometry['config_type'].map(rig_geometry_config_type_map)
+        rig_geometry['config_type'] = rig_geometry['config_type']\
+            .map(rig_geometry_config_type_map)
 
-        # Select the most recent config that precedes the date_of_acquisition for this experiment
+        # Select the most recent config
+        # that precedes the date_of_acquisition for this experiment
         rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
-        rig_geometry = rig_geometry.groupby('config_type').apply(lambda x: x.iloc[0])
+        rig_geometry = rig_geometry.groupby('config_type')\
+            .apply(lambda x: x.iloc[0])
 
         # Construct dictionary for positions
         position = rig_geometry[['center_x_mm', 'center_y_mm', 'center_z_mm']]
-        position.index = [f'{v}_position_mm' if v != 'led' else f'{v}_position' for v in position.index]
+        position.index = [
+            f'{v}_position_mm' if v != 'led'
+            else f'{v}_position' for v in position.index]
         position = position.to_dict(orient='index')
         position = {
-            config_type: [values['center_x_mm'], values['center_y_mm'], values['center_z_mm']]
+            config_type: [
+                values['center_x_mm'],
+                values['center_y_mm'],
+                values['center_z_mm']
+            ]
             for config_type, values in position.items()
         }
 
         # Construct dictionary for rotations
-        rotation = rig_geometry[['rotation_x_deg', 'rotation_y_deg', 'rotation_z_deg']]
+        rotation = rig_geometry[['rotation_x_deg', 'rotation_y_deg',
+                                 'rotation_z_deg']]
         rotation = rotation[rotation.index != 'led']
         rotation.index = [f'{v}_rotation_deg' for v in rotation.index]
         rotation = rotation.to_dict(orient='index')
         rotation = {
-            config_type: [values['rotation_x_deg'], values['rotation_y_deg'], values['rotation_z_deg']]
-            for config_type, values in rotation.items()
+            config_type: [
+                values['rotation_x_deg'],
+                values['rotation_y_deg'],
+                values['rotation_z_deg']
+            ] for config_type, values in rotation.items()
         }
 
         # Combine the dictionaries
@@ -271,7 +286,6 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             **rotation,
             'equipment': rig_geometry['equipment_name'].iloc[0]
         }
-
 
     @classmethod
     def get_api_list_by_container_id(cls, container_id
@@ -282,6 +296,19 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         container_selector = df['container_id'] == container_id
         oeid_list = df[container_selector]['ophys_experiment_id'].values
         return [cls(oeid) for oeid in oeid_list]
+
+    @memoize
+    def get_event_detection_filepath(self) -> str:
+        """Gets the filepath to the event detection data"""
+        query = f'''
+            SELECT wkf.storage_directory || wkf.filename AS event_detection_filepath
+            FROM ophys_experiments oe
+            LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.id
+            JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
+            WHERE wkft.name = 'OphysEventTraceFile'
+                AND oe.id = {self.get_ophys_experiment_id()};
+        ''' # noqa E501
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
 
 if __name__ == "__main__":

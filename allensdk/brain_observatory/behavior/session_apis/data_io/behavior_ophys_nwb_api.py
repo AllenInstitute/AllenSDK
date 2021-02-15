@@ -9,6 +9,7 @@ import pandas as pd
 import pynwb
 import pytz
 import SimpleITK as sitk
+from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
@@ -28,6 +29,8 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
         EllipseEyeTracking, EllipseSeries)
+from allensdk.brain_observatory.behavior.write_nwb.extensions\
+    .event_detection.ndx_events import EventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
@@ -152,6 +155,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
             eye_gaze_mapping_file_path=eye_gaze_fpath)
 
+        # Add events
+        self.add_events(nwbfile=nwbfile, events=session_object.events)
+
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -267,7 +273,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             monitor_position,
             f"camera_position_{meta.camera_position__unit_of_measurement}":
             camera_position,
-            f"led_position": led_position,
+            "led_position": led_position,
             f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
             monitor_rotation,
             f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
@@ -580,5 +586,70 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         eye_tracking_rig_mod.add_data_interface(rig_metadata)
         nwbfile.add_processing_module(eye_tracking_rig_mod)
+
+        return nwbfile
+
+    def get_events(self) -> pd.DataFrame:
+        """
+        Returns
+        -------
+        Events dataframe:
+            columns:
+            events: np.array
+            lambda: float
+            noise_std: float
+            cell_roi_id: int
+
+            index:
+            cell_specimen_id: int
+
+        """
+        event_detection = self.nwbfile.processing['ophys']['event_detection']
+        cell_specimen_table = event_detection.rois.to_dataframe()
+
+        events = event_detection.data[:]
+
+        # events stored time x roi. Change back to roi x time
+        events = events.T
+
+        # Convert to list to that it can be stored in a single column
+        events = [x for x in events]
+
+        return pd.DataFrame({
+            'events': events,
+            'lambda': event_detection.lambdas[:],
+            'noise_std': event_detection.noise_stds[:],
+            'cell_roi_id': cell_specimen_table.index
+        }, index=pd.Index(cell_specimen_table['cell_specimen_id']))
+
+    @staticmethod
+    def add_events(nwbfile: NWBFile, events: pd.DataFrame) -> NWBFile:
+        """
+        Adds events to NWB file from dataframe
+
+        Returns
+        -------
+        NWBFile:
+            The NWBFile with events added
+        """
+        events_data = np.vstack(events['events'])
+
+        ophys_module = nwbfile.processing['ophys']
+        traces = (ophys_module.data_interfaces['dff'].roi_response_series[
+            'traces'])
+
+        events = EventDetection(
+            # time x rois instead of rois x time
+            # store using compression since sparse
+            data=H5DataIO(events_data.T, compression=True),
+
+            lambdas=events['lambda'].values,
+            noise_stds=events['noise_std'].values,
+            unit='N/A',
+            rois=traces.rois,
+            timestamps=traces.timestamps
+        )
+
+        ophys_module.add_data_interface(events)
 
         return nwbfile

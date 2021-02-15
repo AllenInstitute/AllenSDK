@@ -1,0 +1,16 @@
+namespaces:
+- author:
+  - Wayne Wakeman
+  contact:
+  - waynew@alleninstitute.org
+  doc: Store the event detection output
+  name: ndx-event-detection
+  schema:
+  - namespace: core
+    neurodata_types:
+    - RoiResponseSeries
+    - DynamicTableRegion
+    - TimeSeries
+    - NWBDataInterface
+  - source: ndx-event-detection.extensions.yaml
+  version: 0.1.0

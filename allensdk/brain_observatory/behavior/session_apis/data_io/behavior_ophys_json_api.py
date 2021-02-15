@@ -32,7 +32,7 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
     """
 
     def __init__(self, data):
-        self.data = data
+        super().__init__(data)
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_experiment_id(self) -> int:
@@ -153,3 +153,8 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         """Get h5 filepath containing eye gaze behavior of the experiment's
         subject"""
         return self.data['eye_gaze_mapping_path']
+
+    def get_event_detection_filepath(self) -> str:
+        """Get the filepath of the .h5 events file associated with an ophys
+        experiment"""
+        return self.data['events_file']

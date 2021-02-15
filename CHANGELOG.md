@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 - Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
 - Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
+- Return event detection data through session API
+- Read/write event detection data from/to NWB
 
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files

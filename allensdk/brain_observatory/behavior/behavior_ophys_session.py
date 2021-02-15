@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
 from typing import Any, Optional
 import logging
 
@@ -67,6 +66,7 @@ class BehaviorOphysSession(ParamsMixin):
         self._ophys_timestamps = None
         self._metadata = None
         self._dff_traces = None
+        self._events = None
         self._cell_specimen_table = None
         self._running_speed = None
         self._raw_running_speed = None
@@ -157,6 +157,26 @@ class BehaviorOphysSession(ParamsMixin):
         if self._dff_traces is None:
             self._dff_traces = self.api.get_dff_traces()
         return self._dff_traces
+
+    @property
+    def events(self) -> pd.DataFrame:
+        """Get event detection data
+
+        Returns
+        -------
+        pd.DataFrame
+            index:
+                cell_specimen_id: int
+            cell_roi_id: int
+            events: np.array
+            filtered_events: np.array
+                Events, convolved with filter to smooth it for visualization
+            lambdas: float64
+            noise_stds: float64
+        """
+        if self._events is None:
+            self._events = self.api.get_events()
+        return self._events
 
     @dff_traces.setter
     def dff_traces(self, value):
@@ -522,8 +542,8 @@ class BehaviorOphysSession(ParamsMixin):
         response_latency_list = []
         for _, t in self.trials.iterrows():
             valid_response_licks = \
-                    [l for l in t.lick_times
-                     if l - t.change_time >
+                    [x for x in t.lick_times
+                     if x - t.change_time >
                         self.task_parameters['response_window_sec'][0]]
             response_latency = (
                     float('inf')
