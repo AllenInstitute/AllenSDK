@@ -100,6 +100,21 @@ class SessionData(RaisingSchema):
         required=True,
         description='h5 filepath to events data'
     )
+    imaging_plane_group = Int(
+        required=True,
+        allow_none=True,
+        description="A numeric index that indicates the order that the "
+                    "frames were acquired when dealing with an imaging plane "
+                    "in a mesoscope experiment. Will be None for Scientifica "
+                    "experiments."
+    )
+    plane_group_count = Int(
+        required=True,
+        description="The total number of plane groups associated with the "
+                    "ophys session that the experiment belongs to. Will be 0 "
+                    "for Scientifica experiments and nonzero for Mesoscope "
+                    "experiments."
+    )
 
 
 class InputSchema(ArgSchema):
