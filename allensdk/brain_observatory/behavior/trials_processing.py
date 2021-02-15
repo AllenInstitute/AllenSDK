@@ -406,8 +406,8 @@ def get_trial_bounds(trial_log: List) -> List:
     list
         Each element in the list is a tuple of the form (start_frame, end_frame)
         so that the ith element of the list gives the start and end frames of
-        the ith trial. The endframe of the last trial will be the frame
-        associated with 'trial_end' for that trial in the trial_log.
+        the ith trial. The endframe of the last trial will be -1, indicating that
+        it should map to the last timestamp in the session
     """
     start_frames = []
 
@@ -431,26 +431,7 @@ def get_trial_bounds(trial_log: List) -> List:
 
         start_frames.append(start_f)
 
-    # find the frame of 'trial_end' in the laste event
-    end_f = None
-    for event in trial_log[-1]['events']:
-        if event[0] == 'trial_end':
-            end_f = event[-1]
-    if end_f is None:
-        msg = "Could not find a 'trial_end' event "
-        msg += "for the last trial in the trial_log"
-        raise ValueError(msg)
-
-    if end_f < start_frames[-1]:
-        msg = "Trial bounding frames out of order\n"
-        msg += "'trial_end' frame for last trial "
-        msg += "is less than 'trial_start' frame "
-        msg += "\n"
-        msg += f"end_frame: {end_f}\n"
-        msg += f"start_frames: {start_frames}"
-        raise ValueError(msg)
-
-    end_frames = [idx for idx in start_frames[1:]+[end_f]]
+    end_frames = [idx for idx in start_frames[1:]+[-1]]
     return list([(s, e) for s, e in zip(start_frames, end_frames)])
 
 
@@ -517,8 +498,11 @@ def get_trials(data: Dict,
         # select licks that fall between trial_start and trial_end;
         # licks on the boundary get assigned to the trial that is ending,
         # rather than the trial that is starting
-        valid_idx = np.where(np.logical_and(lick_frames>trial_start,
-                                            lick_frames<=trial_end))
+        if trial_end > 0:
+            valid_idx = np.where(np.logical_and(lick_frames>trial_start,
+                                                lick_frames<=trial_end))
+        else:
+            valid_idx = np.where(lick_frames>trial_start)
 
         valid_licks = lick_frames[valid_idx]
 

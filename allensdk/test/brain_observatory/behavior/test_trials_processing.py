@@ -690,12 +690,12 @@ def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
 @pytest.mark.parametrize("trial_log,expected",
                          [([{'events':[('trial_start', 4), ('trial_end', 5)]},
                             {'events':[('trial_start', 6), ('trial_end', 9)]}],
-                           [(4, 6), (6, 9)]),
+                           [(4, 6), (6, -1)]),
                           ([{'events':[('trial_start', 2), ('trial_end', 9)]},
                             {'events':[('trial_start', 5), ('trial_end', 11)]},
                             {'events':[('junk', 4), ('trial_start', 7), ('trial_end', 14)]},
                             {'events':[('trial_start', 13), ('trial_end', 22)]}],
-                           [(2, 5), (5, 7), (7, 13), (13, 22)])])
+                           [(2, 5), (5, 7), (7, 13), (13, -1)])])
 def test_get_trial_bounds(trial_log, expected):
     bounds = trials_processing.get_trial_bounds(trial_log)
     assert bounds == expected
@@ -704,7 +704,7 @@ def test_get_trial_bounds(trial_log, expected):
 def test_get_trial_bounds_exception():
     """
     Test that, if a trial does not have a trial_start event, a ValueError
-    is raised. Same test if last trial does not have a trial_end
+    is raised
     """
     trial_log = [{'events': [('trial_start', 9), ('trial_end', 4)]},
                  {'events': [('trial_end', 2)]}]
@@ -712,21 +712,12 @@ def test_get_trial_bounds_exception():
     with pytest.raises(ValueError):
         bounds = trials_processing.get_trial_bounds(trial_log)
 
-    trial_log = [{'events': [('trial_start', 9), ('trial_end', 4)]},
-                 {'events': [('trial_start', 22)]}]
-
-    with pytest.raises(ValueError):
-        bounds = trials_processing.get_trial_bounds(trial_log)
-
 
 @pytest.mark.parametrize("trial_log",
                          [([{'events':[('trial_start', 4), ('trial_end', 5)]},
-                            {'events':[('trial_start', 2), ('trial_end', 9)]}]),
-                          ([{'events':[('trial_start', 2), ('trial_end', 9)]},
-                            {'events':[('trial_start', 5), ('trial_end', 11)]},
-                            {'events':[('junk', 4), ('trial_start', 7), ('trial_end', 14)]},
-                            {'events':[('trial_start', 13), ('trial_end', 11)]}])
-                          ])
+                            {'events':[('trial_start', 2), ('trial_end', 9)]},
+                            {'events':[('trial_start', 6), ('trial_end', 11)]}])]
+                          )
 def test_get_trial_bounds_order_exceptions(trial_log):
     """
     Test that, when trial_start and trial_end are out of order,
