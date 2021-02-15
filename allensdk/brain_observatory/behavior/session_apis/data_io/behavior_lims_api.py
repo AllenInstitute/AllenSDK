@@ -2,6 +2,7 @@ import logging
 import uuid
 from datetime import datetime
 from typing import Dict, List, Optional, Union
+import pytz
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
@@ -338,3 +339,16 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
                 WHERE bs.id= {self.behavior_session_id};
                 """
         return self.lims_db.fetchone(query, strict=True)
+
+    @memoize
+    def get_experiment_date(self) -> datetime:
+        """Get the acquisition date of a behavior_session in UTC
+        :rtype: datetime"""
+        query = """
+                SELECT bs.date_of_acquisition
+                FROM behavior_sessions bs
+                WHERE bs.id = {};
+                """.format(self.behavior_session_id)
+
+        experiment_date = self.lims_db.fetchone(query, strict=True)
+        return pytz.utc.localize(experiment_date).astimezone(pytz.utc)

@@ -76,7 +76,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         return int(self.data['external_specimen_name'])
 
     def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an experiment"""
+        """Get the acquisition date of an experiment in UTC"""
         return pytz.utc.localize(
             datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S"))
+                              "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)

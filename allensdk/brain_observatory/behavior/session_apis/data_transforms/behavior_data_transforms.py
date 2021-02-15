@@ -2,6 +2,7 @@ import logging
 import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -261,13 +262,52 @@ class BehaviorDataTransforms(BehaviorBase):
 
     @memoize
     def get_experiment_date(self) -> datetime:
-        """Return timestamp the behavior stimulus file began recording in UTC
+        """Return the timestamp for when experiment was started in UTC
+
+        NOTE: This method will only get acquisition datetime from
+        extractor (data from LIMS) methods. As a sanity check,
+        it will also read the acquisition datetime from the behavior stimulus
+        (*.pkl) file and raise a warning if the date differs too much from the
+        datetime obtained from the behavior stimulus (*.pkl) file.
+
         :rtype: datetime
         """
-        data = self._behavior_stimulus_file()
-        # Assuming file has local time of computer (Seattle)
+        extractor_acq_date = self.extractor.get_experiment_date()
+
+        pkl_data = self._behavior_stimulus_file()
+        pkl_raw_acq_date = pkl_data["start_time"]
         tz = pytz.timezone("America/Los_Angeles")
-        return tz.localize(data["start_time"]).astimezone(pytz.utc)
+        if isinstance(pkl_raw_acq_date, datetime):
+            pkl_acq_date = tz.localize(pkl_raw_acq_date).astimezone(pytz.utc)
+
+        elif isinstance(pkl_raw_acq_date, (int, float)):
+            # We are dealing with an older pkl file where the acq time is
+            # stored as a Unix style timestamp string
+            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
+            pkl_acq_date = tz.localize(
+                parsed_pkl_acq_date).astimezone(pytz.utc)
+        else:
+            pkl_acq_date = None
+            warnings.warn(
+                "Could not parse the acquisition datetime "
+                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
+                f"{self.extractor.get_behavior_stimulus_file()}"
+            )
+
+        if pkl_acq_date:
+            acq_start_diff = (
+                extractor_acq_date - pkl_acq_date).total_seconds()
+            # If acquisition dates differ by more than 12 hours (43200 seconds)
+            if abs(acq_start_diff) > 43200:
+                warnings.warn(
+                    "The `date_of_acquisition` field in LIMS "
+                    f"({extractor_acq_date}) for behavior session "
+                    f"({self.get_behavior_session_id()}) deviates by more than"
+                    f"12 hours from the `start_time` ({pkl_acq_date}) "
+                    "specified in the associated stimulus *.pkl file: "
+                    f"{self.extractor.get_behavior_stimulus_file()}"
+                )
+        return extractor_acq_date
 
     def get_metadata(self) -> Dict[str, Any]:
         """Return metadata about the session.
