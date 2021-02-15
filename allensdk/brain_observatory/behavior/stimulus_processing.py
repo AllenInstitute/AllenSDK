@@ -400,12 +400,13 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
     # Add omitted flash info:
-    if 'flash_omit_probability' not in data['items']['behavior']['params']:
-        # For sessions for which there were no omitted flashes
-        omitted_flash_frame_log = dict()
-    else:
+    try:
         omitted_flash_frame_log = \
             data['items']['behavior']['omitted_flash_frame_log']
+    except KeyError:
+        # For sessions for which there were no omitted flashes
+        omitted_flash_frame_log = dict()
+
     omitted_flash_list = []
 
     for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
