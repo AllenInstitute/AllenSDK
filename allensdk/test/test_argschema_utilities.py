@@ -1,5 +1,6 @@
 import os
 import stat
+import platform
 from pathlib import Path
 
 import pytest
@@ -165,6 +166,9 @@ class TestOutputFile(object):
         # is run as root, skip it as it will always successfully create the
         # output file.
         if os.getuid() == 0:
+            pytest.skip()
+        if platform.system() == "Darwin":
+            # this should improve when we update to current argschema
             pytest.skip()
 
         with pytest.raises(ValidationError, match="Can't build path to requested location"):

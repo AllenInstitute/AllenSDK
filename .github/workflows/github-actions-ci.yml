@@ -43,4 +43,4 @@ jobs:
           pip install .
       - name: Test
         run: |
-          py.test --cov=allensdk -n 4 --durations=0
+          py.test --cov=allensdk -n 4
