@@ -3,7 +3,9 @@ import numpy as np
 
 from allensdk.brain_observatory.behavior.metadata_processing import (
     OPHYS_1_3_DESCRIPTION, OPHYS_2_DESCRIPTION, OPHYS_4_6_DESCRIPTION,
-    OPHYS_5_DESCRIPTION, get_task_parameters, get_expt_description)
+    OPHYS_5_DESCRIPTION, TRAINING_GRATINGS_0, TRAINING_GRATINGS_1,
+    TRAINING_GRATINGS_2, TRAINING_IMAGES_3, TRAINING_IMAGES_4,
+    OPHYS_0_HABITUATION, get_task_parameters, get_expt_description)
 
 
 def test_get_task_parameters():
@@ -59,12 +61,18 @@ def test_get_task_parameters():
 
 
 @pytest.mark.parametrize("session_type, expected_description", [
+    ("OPHYS_0_images_Z", OPHYS_0_HABITUATION),
     ("OPHYS_1_images_A", OPHYS_1_3_DESCRIPTION),
     ("OPHYS_2_images_B", OPHYS_2_DESCRIPTION),
     ("OPHYS_3_images_C", OPHYS_1_3_DESCRIPTION),
     ("OPHYS_4_images_D", OPHYS_4_6_DESCRIPTION),
     ("OPHYS_5_images_E", OPHYS_5_DESCRIPTION),
-    ("OPHYS_6_images_F", OPHYS_4_6_DESCRIPTION)
+    ("OPHYS_6_images_F", OPHYS_4_6_DESCRIPTION),
+    ("TRAINING_GRATINGS_0_A", TRAINING_GRATINGS_0),
+    ("TRAINING_GRATINGS_1_B", TRAINING_GRATINGS_1),
+    ("TRAINING_GRATINGS_2_C", TRAINING_GRATINGS_2),
+    ("TRAINING_IMAGES_3_D", TRAINING_IMAGES_3),
+    ("TRAINING_IMAGES_4_E", TRAINING_IMAGES_4)
 ])
 def test_get_expt_description_with_valid_session_type(session_type,
                                                       expected_description):
