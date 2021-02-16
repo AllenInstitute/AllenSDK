@@ -242,12 +242,10 @@ class BehaviorDataTransforms(BehaviorBase):
         licks = self.get_licks()
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
-        stimulus_presentations = self.get_stimulus_presentations()
 
         trial_df = get_trials(data,
                               licks,
                               rewards,
-                              stimulus_presentations,
                               timestamps)
 
         return trial_df

@@ -241,7 +241,7 @@ def _get_response_time(licks: List[float], aborted: bool) -> float:
 
 
 def get_trial_timing(
-        event_dict: dict, stimulus_presentations_df: pd.DataFrame,
+        event_dict: dict,
         licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
         hit: bool, false_alarm: bool, aborted: bool,
         timestamps: np.ndarray):
@@ -253,10 +253,6 @@ def get_trial_timing(
     ==========
     event_dict: dict
         Dictionary of trial events in the well-known `pkl` file
-    stimulus_presentations_df: pd.DataFrame
-        pandas dataframe of stimulus presentations, from the
-        `get_stimulus_presentations` response for the
-        BehaviorOphysSession.api.
     licks: List[float]
         list of lick timestamps, from the `get_licks` response for
         the BehaviorOphysSession.api.
@@ -438,7 +434,6 @@ def get_trial_bounds(trial_log: List) -> List:
 def get_trials(data: Dict,
                licks_df: pd.DataFrame,
                rewards_df: pd.DataFrame,
-               stimulus_presentations_df: pd.DataFrame,
                timestamps: np.ndarray) -> pd.DataFrame:
     """
     Create and return a pandas DataFrame containing data about
@@ -458,10 +453,6 @@ def get_trials(data: Dict,
            A dataframe containing data about rewards given
            during this session. Output of
            allensdk/brain_observatory/behavior/rewards_processing.get_rewards
-
-    stimulus_presentations_df: pd.DataFrame
-           A dataframe containing data pertaining to the stimuli
-           presented in this session.
 
     timestamps: np.ndarray[1d]
            An ndarray containing the timestamps associated with each
@@ -531,7 +522,6 @@ def get_trials(data: Dict,
         tr_data.update(trial_data_from_log(trial))
         tr_data.update(get_trial_timing(
             event_dict,
-            stimulus_presentations_df,
             tr_data['lick_times'],
             tr_data['go'],
             tr_data['catch'],
