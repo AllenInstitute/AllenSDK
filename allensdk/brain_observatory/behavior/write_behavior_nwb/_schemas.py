@@ -60,7 +60,7 @@ class BehaviorSessionData(RaisingSchema):
                     f'create NWB file.'
                 )
 
-            params = items['behavior']['params']
+            params = items['behavior']['cl_params']
 
             if not params:
                 raise mm.ValidationError(
