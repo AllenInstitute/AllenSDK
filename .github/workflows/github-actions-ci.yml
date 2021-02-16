@@ -1,4 +1,4 @@
-name: osx-builds
+name: ci/github-actions
 on: [pull_request]
 env:
   TEST_NWB_FILES: skip
