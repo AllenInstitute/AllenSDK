@@ -28,6 +28,17 @@ class SessionData(RaisingSchema):
     ophys_experiment_id = Int(required=True,
                               description='unique identifier for this ophys '
                                           'session')
+    ophys_session_id = Int(required=True,
+                           description='The ophys session id that the ophys '
+                                       'experiment to be written to NWB is '
+                                       'from')
+    behavior_session_id = Int(required=True,
+                              description='The behavior session id that the '
+                                          'ophys experiment to be written to '
+                                          'written to NWB is from')
+    foraging_id = String(required=True,
+                         description='The foraging id associated with the '
+                                     'ophys session')
     rig_name = String(required=True, description='name of ophys device')
     movie_height = Int(required=True,
                        description='height of field-of-view for 2p movie')

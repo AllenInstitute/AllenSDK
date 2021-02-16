@@ -38,15 +38,8 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
     def get_ophys_experiment_id(self) -> int:
         return self.data['ophys_experiment_id']
 
-    # TODO: This should be replaced with a dict lookup after the
-    # behavior_ophys_write_nwb LIMS strategy has been updated
-    def get_behavior_session_id(self):
-        NotImplementedError()
-
-    # TODO: This should be replaced with a dict lookup after the
-    # behavior_ophys_write_nwb LIMS strategy has been updated
     def get_ophys_session_id(self):
-        NotImplementedError()
+        return self.data['ophys_session_id']
 
     def get_surface_2p_pixel_size_um(self) -> float:
         """Get the pixel size for 2-photon movies in micrometers"""

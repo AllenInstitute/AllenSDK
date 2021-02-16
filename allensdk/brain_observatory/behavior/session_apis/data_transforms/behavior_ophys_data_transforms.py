@@ -50,7 +50,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return self.extractor.get_ophys_experiment_id()
 
     def get_ophys_session_id(self):
-        return self.extractor.get_ophys_experiment_id()
+        return self.extractor.get_ophys_session_id()
 
     def get_eye_tracking_rig_geometry(self) -> dict:
         return self.extractor.get_eye_tracking_rig_geometry()
@@ -177,10 +177,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             return ophys_timestamps
         resampled = ophys_timestamps[plane_group::group_count]
         return resampled
-
-    def get_behavior_session_uuid(self):
-        data = self._behavior_stimulus_file()
-        return data['session_uuid']
 
     @memoize
     def get_ophys_frame_rate(self):
