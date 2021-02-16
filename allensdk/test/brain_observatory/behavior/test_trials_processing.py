@@ -726,31 +726,3 @@ def test_get_trial_bounds_order_exceptions(trial_log):
     with pytest.raises(ValueError) as error:
         _ = trials_processing.get_trial_bounds(trial_log)
     assert 'order' in error.value.args[0]
-
-
-def test_get_target_key():
-    d1 = {}
-    d1['my_key'] = 2
-    d1['my_other_key'] = 14
-    d2 = {}
-    d2['my_key'] = 3
-    d2['my_other_key'] = 9
-    d3 = {}
-    d3['my_key'] = 2
-    d3['my_other_key'] = 5
-
-    data = {}
-    data['a'] = {}
-    data['a']['b'] = {}
-    data['a']['b']['c'] = {}
-    data['a']['b']['c']['d'] = d1
-    d1['e'] = d2
-    data['a']['b']['f'] = d3
-
-    output = trials_processing._get_target_key(data,
-                                               target_key='my_key')
-
-    assert len(output) == 3
-    assert 3 in output
-    assert 2 in output
-    assert (np.array(output)==2).sum() == 2

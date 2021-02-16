@@ -435,53 +435,6 @@ def get_trial_bounds(trial_log: List) -> List:
     return list([(s, e) for s, e in zip(start_frames, end_frames)])
 
 
-def _get_target_key(in_dict: Dict,
-                    target_key: str = 'starting_frame') -> List:
-    """
-    Loop over a nested dict, returning a list of all
-    of the instances of target_key that occur within
-    the structure.
-
-    Parameters
-    ----------
-    in_dict: dict
-        A possibly nested dict. Meant to be the result
-        of loading the stimulus_behavior pickle file.
-
-    target_key: str
-        The key to look for. Default= 'starting_frame'
-
-    Returns
-    -------
-    list
-        A list of all of the values associated with the
-        target_key anywhere within the nested
-        dict structure.
-    """
-    # This method is meant to mimic the behavior of
-    # the VBA code
-    # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/__init__.py#L377-L381
-    # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract_movies.py#L59-L94
-    # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/core/annotate.py#L11-L36
-    # which essentially detects the starts of any movies shown
-    # after the stimulus trials and truncates the final
-    # trial of the session so that it effectively
-    # ends before the first epilog movie begins.
-    #
-    # See also
-    # https://github.com/AllenInstitute/visual_behavior_analysis/issues/482
-    output = []
-    for k1 in in_dict.keys():
-        v = in_dict[k1]
-        if k1 == target_key:
-            output.append(v)
-            continue
-        if not hasattr(v, 'keys'):
-            continue
-        output += _get_target_key(v, target_key=target_key)
-    return output
-
-
 def get_trials(data: Dict,
                licks_df: pd.DataFrame,
                rewards_df: pd.DataFrame,
@@ -525,8 +478,6 @@ def get_trials(data: Dict,
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
-    start_frame_array = np.array(_get_target_key(data))
-
     trial_bounds = get_trial_bounds(trial_log)
 
     all_trial_data = [None] * len(trial_log)
@@ -545,6 +496,8 @@ def get_trials(data: Dict,
         trial_end = trial_bounds[idx][1]
 
         # this block of code is trying to mimic
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/__init__.py#L377-L381
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract_movies.py#L59-L94
         # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/core/annotate.py#L11-L36
         #
         # In summary: there are cases where an "epilogue movie" is shown
@@ -554,16 +507,8 @@ def get_trials(data: Dict,
         # https://github.com/AllenInstitute/visual_behavior_analysis/issues/482
 
         if trial_end < 0:
-
-            log_end = None
-            for event in trial['events']:
-                if event[0] == 'trial_end':
-                    nominal_end = event[-1]
-
-            if nominal_end is not None:
-                cut_off = start_frame_array[np.where(start_frame_array>=nominal_end)]
-                if len(cut_off) > 0:
-                    trial_end = cut_off.min()
+            if 'fingerprint' in data['items']['behavior']['items'].keys():
+                trial_end = data['items']['behavior']['items']['fingerprint']['starting_frame']
 
         # select licks that fall between trial_start and trial_end;
         # licks on the boundary get assigned to the trial that is ending,
