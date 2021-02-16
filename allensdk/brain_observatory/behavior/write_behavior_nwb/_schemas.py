@@ -64,7 +64,7 @@ class BehaviorSessionData(RaisingSchema):
 
             if not params:
                 raise mm.ValidationError(
-                    f'The stimuls file is missing cl_params. '
+                    f'The stimulus file is missing cl_params. '
                     f'Cannot create NWB file.'
                 )
 
