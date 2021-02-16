@@ -1,3 +1,5 @@
+from enum import Enum
+
 from argschema import ArgSchema
 from argschema.fields import (LogLevel, String, Int, Nested, List)
 import marshmallow as mm
@@ -5,6 +7,10 @@ import pandas as pd
 
 from allensdk.brain_observatory.argschema_utilities import (
     check_read_access, check_write_access_overwrite, RaisingSchema)
+
+
+class STIMULUS_NAME(Enum):
+    OPHYS_7_receptive_field_mapping = 'OPHYS_7_receptive_field_mapping'
 
 
 class BehaviorSessionData(RaisingSchema):
@@ -46,19 +52,37 @@ class BehaviorSessionData(RaisingSchema):
     @mm.pre_load
     def set_stimulus_name(self, data, **kwargs):
         if data.get("stimulus_name") is None:
-            pkl = pd.read_pickle(data["behavior_stimulus_file"])
-            try:
-                stimulus_name = pkl["items"]["behavior"]["cl_params"]["stage"]
-            except KeyError:
+            stimulus_file = data["behavior_stimulus_file"]
+            pkl = pd.read_pickle(stimulus_file)
+
+            items = pkl['items']
+
+            # Due to historical reasons, most sessions have stimulus name
+            # stored Under the "behavior" key but "session 7" sessions have it
+            # stored under "foraging"
+            params = items.get('behavior', items.get('foraging'))['cl_params']
+
+            if not params:
                 raise mm.ValidationError(
-                    f"Could not obtain stimulus_name/stage information from "
-                    f"the *.pkl file ({data['behavior_stimulus_file']}) "
-                    f"for the behavior session to save as NWB! The "
-                    f"following series of nested keys did not work: "
-                    f"['items']['behavior']['cl_params']['stage']"
+                    f'The stimuls file is missing cl_params. '
+                    f'Cannot create NWB file.'
                 )
-            data["stimulus_name"] = stimulus_name
+
+            data["stimulus_name"] = params['stage']
+
+            self.__validate_stimulus_name(data=data)
+
         return data
+
+    @staticmethod
+    def __validate_stimulus_name(data):
+        session_7 = STIMULUS_NAME.OPHYS_7_receptive_field_mapping.value
+        if data['stimulus_name'] == session_7:
+            behavior_session_id = data['behavior_session_id']
+            raise mm.ValidationError(
+                f'Behavior session id {behavior_session_id} is {session_7}. '
+                f'Cannot create NWB file because it is missing behavior data.'
+            )
 
 
 class InputSchema(ArgSchema):
