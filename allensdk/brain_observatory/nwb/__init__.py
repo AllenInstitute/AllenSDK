@@ -12,7 +12,6 @@ import uuid
 import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
-from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import (
@@ -22,7 +21,6 @@ from ndx_events import Events
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
     StimulusImage, StimulusTemplate
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -956,5 +954,3 @@ def add_motion_correction(nwbfile, motion_correction):
 
     ophys_module.add_data_interface(t1)
     ophys_module.add_data_interface(t2)
-
-

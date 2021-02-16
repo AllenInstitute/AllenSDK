@@ -10,7 +10,6 @@ from allensdk import OneResultExpectedError
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.exceptions import DataFrameIndexError
 from marshmallow.schema import ValidationError
@@ -107,6 +106,9 @@ def MockBehaviorLimsApi():
 
         def _get_ids(self):
             return {}
+
+        def get_experiment_date(self):
+            return datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
 
         def get_behavior_stimulus_file(self):
             return "dummy_stimulus_file.pkl"

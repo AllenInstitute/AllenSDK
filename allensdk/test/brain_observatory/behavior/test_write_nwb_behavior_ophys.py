@@ -13,44 +13,6 @@ from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing impor
 
 
 @pytest.fixture
-def eye_gaze_data():
-    """Returns mock eye gaze data"""
-    raw_pupil_areas = pd.Series([2., 4.])
-    raw_eye_areas = pd.Series([3., 5.])
-    raw_screen_coordinates = pd.DataFrame({
-        "y": [2., 4.],
-        "x": [3., 5.]
-    })
-    raw_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4.],
-        "x": [3., 5.]
-    })
-    new_pupil_areas = pd.Series([2., 4.])
-    new_eye_areas = pd.Series([3., 5.])
-    new_screen_coordinates = pd.DataFrame({
-        "y": [2., 4.],
-        "x": [3., 5.]
-    })
-    new_screen_coordinates_spherical = pd.DataFrame({
-        "y": [2., 4.],
-        "x": [3., 5.]
-    })
-    synced_frame_timestamps = pd.Series([.1, .2])
-
-    return dict(
-        raw_pupil_areas=raw_pupil_areas,
-        raw_eye_areas=raw_eye_areas,
-        raw_screen_coordinates=raw_screen_coordinates,
-        raw_screen_coordinates_spherical=raw_screen_coordinates_spherical,
-        new_pupil_areas=new_pupil_areas,
-        new_eye_areas=new_eye_areas,
-        new_screen_coordinates=new_screen_coordinates,
-        new_screen_coordinates_spherical=new_screen_coordinates_spherical,
-        synced_frame_timestamps=synced_frame_timestamps
-    )
-
-
-@pytest.fixture
 def rig_geometry():
     """Returns mock rig geometry data"""
     return {

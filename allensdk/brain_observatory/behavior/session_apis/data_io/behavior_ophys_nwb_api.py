@@ -1,7 +1,6 @@
 import datetime
 import uuid
 import warnings
-from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -140,15 +139,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
-        # Add eye tracking, rig geometry, and gaze mapping data to NWB
-        # in-memory object.
-        eye_gaze_fpath = \
-            session_object.api.extractor.get_eye_gaze_mapping_file_path()
+        # Add eye tracking and rig geometry to NWB in-memory object.
         self.add_eye_tracking_data_to_nwb(
             nwbfile=nwbfile,
             eye_tracking_df=session_object.eye_tracking,
-            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry,
-            eye_gaze_mapping_file_path=eye_gaze_fpath)
+            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry)
 
         # Add events
         self.add_events(nwbfile=nwbfile, events=session_object.events)
@@ -283,81 +278,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return rig_geometry
 
-    def get_screen_gaze_data(self, include_filtered_data=False
-                             ) -> Optional[pd.DataFrame]:
-        """
-        Gets screen gaze data
-        Parameters
-        ----------
-        include_filtered_data: bool
-            Includes new_* data
-        Returns
-        -------
-        pd.DataFrame
-            *_eye_areas: Area of eye (in pixels^2) over time
-            *_pupil_areas: Area of pupil (in pixels^2) over time
-            *_screen_coordinates: y, x screen coordinates (in cm) over time
-            *_screen_coordinates_spherical: y, x screen coordinates (in deg)
-            over time synced_frame_timestamps: synced timestamps for video
-            frames (in sec)
-        or None if no eye tracking data
-        """
-        try:
-            rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
-            fgm_mod = \
-                self.nwbfile.get_processing_module("filtered_gaze_mapping")
-        except KeyError as e:
-            warnings.warn("This ophys session "
-                          f"'{int(self.nwbfile.identifier)}' has no eye "
-                          f"tracking data. (NWB error: {e})")
-            return None
-
-        raw_eye_area_ts = rgm_mod.get_data_interface("eye_area")
-        raw_pupil_area_ts = rgm_mod.get_data_interface("pupil_area")
-        raw_screen_coordinates_ts = \
-            rgm_mod.get_data_interface("screen_coordinates")
-        raw_screen_coordinates_spherical_ts = \
-            rgm_mod.get_data_interface("screen_coordinates_spherical")
-
-        filtered_eye_area_ts = fgm_mod.get_data_interface("eye_area")
-        filtered_pupil_area_ts = fgm_mod.get_data_interface("pupil_area")
-        filtered_screen_coordinates_ts = \
-            fgm_mod.get_data_interface("screen_coordinates")
-        filtered_screen_coordinates_spherical_ts = \
-            fgm_mod.get_data_interface("screen_coordinates_spherical")
-
-        gaze_data = {
-            "raw_eye_area": raw_eye_area_ts.data[:],
-            "raw_pupil_area": raw_pupil_area_ts.data[:],
-            "raw_screen_coordinates_x_cm":
-            raw_screen_coordinates_ts.data[:, 1],
-            "raw_screen_coordinates_y_cm":
-            raw_screen_coordinates_ts.data[:, 0],
-            "raw_screen_coordinates_spherical_x_deg":
-            raw_screen_coordinates_spherical_ts.data[:, 1],
-            "raw_screen_coordinates_spherical_y_deg":
-            raw_screen_coordinates_spherical_ts.data[:, 0]
-        }
-
-        if include_filtered_data:
-            gaze_data.update(
-                {
-                    "filtered_eye_area": filtered_eye_area_ts.data[:],
-                    "filtered_pupil_area": filtered_pupil_area_ts.data[:],
-                    "filtered_screen_coordinates_x_cm":
-                    filtered_screen_coordinates_ts.data[:, 1],
-                    "filtered_screen_coordinates_y_cm":
-                    filtered_screen_coordinates_ts.data[:, 0],
-                    "filtered_screen_coordinates_spherical_x_deg":
-                    filtered_screen_coordinates_spherical_ts.data[:, 1],
-                    "filtered_screen_coordinates_spherical_y_deg":
-                    filtered_screen_coordinates_spherical_ts.data[:, 0]
-                }
-            )
-
-        index = pd.Index(data=raw_eye_area_ts.timestamps[:], name="Time (s)")
-        return pd.DataFrame(gaze_data, index=index)
-
     def get_ophys_timestamps(self) -> np.ndarray:
         return self.nwbfile.processing[
                    'ophys'].get_data_interface('dff').roi_response_series[
@@ -484,8 +404,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
     def add_eye_tracking_data_to_nwb(self, nwbfile: NWBFile,
                                      eye_tracking_df: pd.DataFrame,
-                                     eye_tracking_rig_geometry: Optional[dict],
-                                     eye_gaze_mapping_file_path: Path = None
+                                     eye_tracking_rig_geometry: Optional[dict]
                                      ) -> NWBFile:
         # 1. Add rig geometry
         if eye_tracking_rig_geometry:
@@ -493,14 +412,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                     nwbfile=nwbfile,
                     eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
-        # 2. Add eye gaze mapping
-        if eye_gaze_mapping_file_path:
-            eye_gaze_data = nwb.read_eye_gaze_mappings(
-                    Path(eye_gaze_mapping_file_path))
-            nwb.add_eye_gaze_mapping_data_to_nwbfile(
-                    nwbfile, eye_gaze_data=eye_gaze_data)
-
-        # 3. Add eye tracking
+        # 2. Add eye tracking
         eye_tracking = EllipseSeries(
             name='eye_tracking',
             reference_frame='nose',

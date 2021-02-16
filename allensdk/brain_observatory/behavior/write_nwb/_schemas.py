@@ -90,12 +90,6 @@ class SessionData(RaisingSchema):
         validate=check_read_access,
         description="h5 filepath containing eye tracking ellipses"
     )
-    eye_gaze_mapping_path = String(
-        required=True,
-        validate=check_read_access,
-        description="h5 filepath containing eye gaze behavior of the "
-                    "experiment's subject"
-    )
     events_file = InputFile(
         required=True,
         description='h5 filepath to events data'

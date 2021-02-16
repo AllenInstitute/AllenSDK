@@ -160,6 +160,10 @@ class BehaviorOphysSession(ParamsMixin):
             self._dff_traces = self.api.get_dff_traces()
         return self._dff_traces
 
+    @dff_traces.setter
+    def dff_traces(self, value):
+        self._dff_traces = value
+
     @property
     def events(self) -> pd.DataFrame:
         """Get event detection data
@@ -179,10 +183,6 @@ class BehaviorOphysSession(ParamsMixin):
         if self._events is None:
             self._events = self.api.get_events()
         return self._events
-
-    @dff_traces.setter
-    def dff_traces(self, value):
-        self._dff_traces = value
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
@@ -449,12 +449,6 @@ class BehaviorOphysSession(ParamsMixin):
         """Get the eye tracking rig geometry
         associated with an ophys experiment"""
         return self.api.get_eye_tracking_rig_geometry()
-
-    @property
-    def eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of
-        the experiment's subject"""
-        return self.api.get_eye_gaze_mapping_file_path()
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""

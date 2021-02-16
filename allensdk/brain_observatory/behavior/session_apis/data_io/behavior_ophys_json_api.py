@@ -139,11 +139,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         """Get the eye tracking filepath containing ellipse fits"""
         return self.data['eye_tracking_filepath']
 
-    def get_eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's
-        subject"""
-        return self.data['eye_gaze_mapping_path']
-
     def get_event_detection_filepath(self) -> str:
         """Get the filepath of the .h5 events file associated with an ophys
         experiment"""
