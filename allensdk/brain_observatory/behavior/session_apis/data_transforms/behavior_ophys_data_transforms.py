@@ -380,6 +380,30 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
                          dilation_frames: int = 2):
+        """Gets corneal, eye, and pupil ellipse fit data
+
+        Parameters
+        ----------
+        z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        dilation_frames : int, optional
+             Determines the number of additional adjacent frames to mark as
+            'likely_blink', by default 2.
+
+        Returns
+        -------
+        pd.DataFrame
+            *_area
+            *_center_x
+            *_center_y
+            *_height
+            *_phi
+            *_width
+            likely_blink
+        where "*" can be "corneal", "pupil" or "eye"
+        """
         logger = logging.getLogger("BehaviorOphysLimsApi")
 
         logger.info(f"Getting eye_tracking_data with "

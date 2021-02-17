@@ -37,6 +37,10 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
 )
 from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
+from allensdk.brain_observatory.behavior.eye_tracking_processing import (
+    determine_outliers, determine_likely_blinks
+)
+
 
 load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
@@ -176,8 +180,21 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
     def get_ophys_experiment_id(self) -> int:
         return int(self.nwbfile.identifier)
 
+    def get_eye_tracking(self,
+                         z_threshold: float = 3.0,
+                         dilation_frames: int = 2) -> Optional[pd.DataFrame]:
         """
         Gets corneal, eye, and pupil ellipse fit data
+
+        Parameters
+        ----------
+        z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        dilation_frames : int, optional
+             Determines the number of additional adjacent frames to mark as
+            'likely_blink', by default 2.
 
         Returns
         -------
@@ -188,8 +205,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             *_height
             *_phi
             *_width
-            where "*" can be "corneal", "pupil" or "eye"
             likely_blink
+        where "*" can be "corneal", "pupil" or "eye"
         or None if no eye tracking data
         Note: `pupil_area` is set to NaN where `likely_blink` == True
               use `pupil_area_raw` column to access unfiltered pupil data
@@ -207,7 +224,10 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         corneal_reflection_tracking = \
             eye_tracking_acquisition.corneal_reflection_tracking
 
-        eye_tracking_data = {
+        eye_tracking_dict = {
+            "time": eye_tracking.timestamps[:],
+            "likely_blink": eye_tracking_acquisition.likely_blink.data[:],
+
             "eye_center_x": eye_tracking.data[:, 0],
             "eye_center_y": eye_tracking.data[:, 1],
             "eye_area": eye_tracking.area[:],
@@ -231,13 +251,23 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             "cr_height": corneal_reflection_tracking.height[:],
             "cr_width": corneal_reflection_tracking.width[:],
             "cr_phi": corneal_reflection_tracking.angle[:],
-
-            "likely_blink": eye_tracking_acquisition.likely_blink.data[:],
-            "time": eye_tracking.timestamps[:]
         }
 
-        eye_tracking_data = pd.DataFrame(eye_tracking_data)
+        eye_tracking_data = pd.DataFrame(eye_tracking_dict)
         eye_tracking_data.index = eye_tracking_data.index.rename('frame')
+
+        # Calculate likely blinks for new z_threshold and dilate_frames
+        area_df = eye_tracking_data[['eye_area', 'pupil_area']]
+        outliers = determine_outliers(area_df,
+                                      z_threshold=z_threshold)
+        likely_blinks = determine_likely_blinks(
+            eye_tracking_data['eye_area'],
+            eye_tracking_data['pupil_area'],
+            outliers,
+            dilation_frames=dilation_frames)
+
+        eye_tracking_data["likely_blink"] = likely_blinks
+
         return eye_tracking_data
 
     def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
