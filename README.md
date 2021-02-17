@@ -2,6 +2,8 @@
 
 [![Join the chat at https://gitter.im/AllenInstitute/AllenSDK](https://badges.gitter.im/AllenInstitute/AllenSDK.svg)](https://gitter.im/AllenInstitute/AllenSDK?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Documentation Status](https://readthedocs.org/projects/allensdk/badge/?version=latest)](https://allensdk.readthedocs.io/en/latest/?badge=latest)
+[![AllenInstitute](https://circleci.com/gh/AllenInstitute/AllenSDK.svg?style=svg)](https://app.circleci.com/pipelines/github/AllenInstitute/AllenSDK)
+[![Actions Status](https://github.com/AllenInstitute/AllenSDK/workflows/ci/github-actions/badge.svg)](https://github.com/AllenInstitute/AllenSDK/actions)
 
 
 This repository contains code for processing and analyzing data
