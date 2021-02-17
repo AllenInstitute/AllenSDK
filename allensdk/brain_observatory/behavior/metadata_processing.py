@@ -63,7 +63,7 @@ TRAINING_GRATINGS_0 = (
     "An associative training session where a mouse is automatically rewarded "
     "when a grating stimulus changes orientation. Grating stimuli are "
     "full-field, square-wave static gratings with a spatial frequency of "
-    "0.02 cycles per degree, with orientation changes between 0 and 90 "
+    "0.04 cycles per degree, with orientation changes between 0 and 90 "
     "degrees, at two spatial phases. Delivered rewards are 5ul in volume, "
     "and the session lasts for 15 minutes."
 )
@@ -72,7 +72,7 @@ TRAINING_GRATINGS_1 = (
     "An operant behavior training session where a mouse must lick following "
     "a change in stimulus identity to earn rewards. Stimuli consist of "
     "full-field, square-wave static gratings with a spatial frequency of "
-    "0.02 cycles per degree. Orientation changes between 0 and 90 degrees "
+    "0.04 cycles per degree. Orientation changes between 0 and 90 degrees "
     "occur with no intervening gray period. Delivered rewards are 10ul in "
     "volume, and the session lasts 60 minutes"
 )
@@ -81,7 +81,7 @@ TRAINING_GRATINGS_2 = (
     "An operant behavior training session where a mouse must lick following "
     "a change in stimulus identity to earn rewards. Stimuli consist of "
     "full-field, square-wave static gratings with a spatial frequency of "
-    "0.02 cycles per degree. Gratings of 0 or 90 degrees are presented for "
+    "0.04 cycles per degree. Gratings of 0 or 90 degrees are presented for "
     "250 ms with a 500 ms intervening gray period. Delivered rewards are "
     "10ul in volume, and the session lasts 60 minutes."
 )
