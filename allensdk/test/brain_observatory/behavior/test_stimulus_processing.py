@@ -6,6 +6,8 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
     get_stimulus_templates, StimulusTemplates)
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusImage
 
 
 @pytest.fixture()
@@ -98,8 +100,17 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
 
     assert templates.image_set_name == 'test_image_set'
     assert len(templates) == 2
-    assert (templates['im000']['unwarped'] == images[0]).all()
-    assert (templates['im106']['unwarped'] == images[1]).all()
+    assert list(templates.keys()) == ['im000', 'im106']
+
+    for img in templates.values():
+        assert isinstance(img, StimulusImage)
+
+    for i, img_name in enumerate(templates):
+        img = templates[img_name]
+        assert np.array_equal(a1=images[i], a2=img['unwarped'])
+
+    for i, (img_name, img) in enumerate(templates.items()):
+        assert np.array_equal(a1=images[i], a2=img['unwarped'])
 
 
 # def test_get_images_dict():
