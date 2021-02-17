@@ -76,7 +76,10 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         return int(self.data['external_specimen_name'])
 
     def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an experiment in UTC"""
-        return pytz.utc.localize(
-            datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)
+        """Get the acquisition date of an experiment (in UTC)
+
+        NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
+        """
+        tz = pytz.timezone("America/Los_Angeles")
+        return tz.localize(datetime.strptime(self.data['date_of_acquisition'],
+                           "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)

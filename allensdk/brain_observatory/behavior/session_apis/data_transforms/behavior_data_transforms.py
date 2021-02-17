@@ -276,16 +276,14 @@ class BehaviorDataTransforms(BehaviorBase):
 
         pkl_data = self._behavior_stimulus_file()
         pkl_raw_acq_date = pkl_data["start_time"]
-        tz = pytz.timezone("America/Los_Angeles")
         if isinstance(pkl_raw_acq_date, datetime):
-            pkl_acq_date = tz.localize(pkl_raw_acq_date).astimezone(pytz.utc)
+            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
 
         elif isinstance(pkl_raw_acq_date, (int, float)):
             # We are dealing with an older pkl file where the acq time is
             # stored as a Unix style timestamp string
             parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
-            pkl_acq_date = tz.localize(
-                parsed_pkl_acq_date).astimezone(pytz.utc)
+            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
         else:
             pkl_acq_date = None
             warnings.warn(
@@ -297,13 +295,13 @@ class BehaviorDataTransforms(BehaviorBase):
         if pkl_acq_date:
             acq_start_diff = (
                 extractor_acq_date - pkl_acq_date).total_seconds()
-            # If acquisition dates differ by more than 12 hours (43200 seconds)
-            if abs(acq_start_diff) > 43200:
+            # If acquisition dates differ by more than an hour
+            if abs(acq_start_diff) > 360:
                 warnings.warn(
                     "The `date_of_acquisition` field in LIMS "
                     f"({extractor_acq_date}) for behavior session "
                     f"({self.get_behavior_session_id()}) deviates by more than"
-                    f"12 hours from the `start_time` ({pkl_acq_date}) "
+                    f"an hour from the `start_time` ({pkl_acq_date}) "
                     "specified in the associated stimulus *.pkl file: "
                     f"{self.extractor.get_behavior_stimulus_file()}"
                 )
