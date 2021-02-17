@@ -15,8 +15,7 @@ from allensdk.brain_observatory.behavior.event_detection import \
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
-from allensdk.brain_observatory.behavior.sync import (
-    get_sync_data, get_stimulus_rebase_function, frame_time_offset)
+from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
@@ -375,16 +374,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         motion_corr_file = self.extractor.get_rigid_motion_transform_file()
         motion_correction = pd.read_csv(motion_corr_file)
         return motion_correction[['x', 'y']]
-
-    def get_stimulus_rebase_function(self):
-        stimulus_timestamps_no_monitor_delay = (
-            self.get_sync_data()['stimulus_times_no_delay'])
-
-        data = self._behavior_stimulus_file()
-        stimulus_rebase_function = get_stimulus_rebase_function(
-            data, stimulus_timestamps_no_monitor_delay)
-
-        return stimulus_rebase_function
 
     @memoize
     def get_eye_tracking(self,
