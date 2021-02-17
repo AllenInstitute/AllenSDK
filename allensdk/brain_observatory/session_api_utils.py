@@ -1,4 +1,5 @@
 import inspect
+import logging
 import math
 import warnings
 
@@ -13,6 +14,8 @@ import SimpleITK as sitk
 from pandas.util.testing import assert_frame_equal
 
 from allensdk.core.lazy_property import LazyProperty
+
+logger = logging.getLogger(__name__)
 
 
 def is_equal(a: Any, b: Any) -> bool:
@@ -176,25 +179,28 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
         if isinstance(val, LazyProperty):
             field_set.add(key)
 
-    try:
-        for field in sorted(field_set):
+    logger.info(f"Comparing the following fields: {field_set}")
+
+    for field in sorted(field_set):
+        try:
+            logger.info(f"Comparing field: {field}")
             x1, x2 = getattr(A, field), getattr(B, field)
             err_msg = (f"{field} on {A} did not equal {field} "
                        f"on {B} (\n{x1} vs\n{x2}\n)")
             compare_session_fields(x1, x2, err_msg)
 
-    except NotImplementedError:
-        A_implements_get_field = hasattr(A.api, getattr(type(A),
-                                         field).getter_name)
-        B_implements_get_field = hasattr(B.api, getattr(type(B),
-                                         field).getter_name)
-        assert ((A_implements_get_field is False)
-                and (B_implements_get_field is False))
+        except NotImplementedError:
+            A_implements_get_field = hasattr(
+                A.api, getattr(type(A), field).getter_name)
+            B_implements_get_field = hasattr(
+                B.api, getattr(type(B), field).getter_name)
+            assert ((A_implements_get_field is False)
+                    and (B_implements_get_field is False))
 
-    except (AssertionError, AttributeError):
-        if reraise:
-            raise
-        return False
+        except (AssertionError, AttributeError):
+            if reraise:
+                raise
+            return False
 
     return True
 
