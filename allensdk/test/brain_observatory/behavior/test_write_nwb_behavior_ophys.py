@@ -66,9 +66,11 @@ def rig_geometry():
 def eye_tracking_data():
     return create_refined_eye_tracking_df(
         np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
+                   196 * np.pi, 12 * np.pi, 72 * np.pi,
                    1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.,
                    13., 14., 15.],
                   [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
+                   225 * np.pi, 20 * np.pi, 90 * np.pi,
                    2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13.,
                    14., 15., 16.]])
     )
@@ -415,6 +417,9 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
     assert obtained_metadata == expected
 
 
+# NOTE: uses fixtures
+# 'nwbfile' and 'roundtripper'
+# from allensdk/test/brain_observatory/conftest.py
 @pytest.mark.parametrize("roundtrip", [True, False])
 def test_add_eye_tracking_data_to_nwbfile(
         tmp_path, nwbfile, eye_tracking_data,

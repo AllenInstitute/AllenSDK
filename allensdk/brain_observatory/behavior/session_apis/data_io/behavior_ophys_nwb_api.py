@@ -187,6 +187,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             where "*" can be "corneal", "pupil" or "eye"
             likely_blink
         or None if no eye tracking data
+        Note: `pupil_area` is set to NaN where `likely_blink` == True
+              use `pupil_area_raw` column to access unfiltered pupil data
         """
         try:
             eye_tracking_acquisition = self.nwbfile.acquisition['EyeTracking']
@@ -205,6 +207,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             "eye_center_x": eye_tracking.data[:, 0],
             "eye_center_y": eye_tracking.data[:, 1],
             "eye_area": eye_tracking.area[:],
+            "eye_area_raw": eye_tracking.area_raw[:],
             "eye_height": eye_tracking.height[:],
             "eye_width": eye_tracking.width[:],
             "eye_phi": eye_tracking.angle[:],
@@ -212,6 +215,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             "pupil_center_x": pupil_tracking.data[:, 0],
             "pupil_center_y": pupil_tracking.data[:, 1],
             "pupil_area": pupil_tracking.area[:],
+            "pupil_area_raw": pupil_tracking.area_raw[:],
             "pupil_height": pupil_tracking.height[:],
             "pupil_width": pupil_tracking.width[:],
             "pupil_phi": pupil_tracking.angle[:],
@@ -219,6 +223,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             "cr_center_x": corneal_reflection_tracking.data[:, 0],
             "cr_center_y": corneal_reflection_tracking.data[:, 1],
             "cr_area": corneal_reflection_tracking.area[:],
+            "cr_area_raw": corneal_reflection_tracking.area_raw[:],
             "cr_height": corneal_reflection_tracking.height[:],
             "cr_width": corneal_reflection_tracking.width[:],
             "cr_phi": corneal_reflection_tracking.angle[:],
@@ -506,6 +511,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             reference_frame='nose',
             data=eye_tracking_df[['eye_center_x', 'eye_center_y']].values,
             area=eye_tracking_df['eye_area'].values,
+            area_raw=eye_tracking_df['eye_area_raw'].values,
             width=eye_tracking_df['eye_width'].values,
             height=eye_tracking_df['eye_height'].values,
             angle=eye_tracking_df['eye_phi'].values,
@@ -517,6 +523,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             reference_frame='nose',
             data=eye_tracking_df[['pupil_center_x', 'pupil_center_y']].values,
             area=eye_tracking_df['pupil_area'].values,
+            area_raw=eye_tracking_df['pupil_area_raw'].values,
             width=eye_tracking_df['pupil_width'].values,
             height=eye_tracking_df['pupil_height'].values,
             angle=eye_tracking_df['pupil_phi'].values,
@@ -528,6 +535,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             reference_frame='nose',
             data=eye_tracking_df[['cr_center_x', 'cr_center_y']].values,
             area=eye_tracking_df['cr_area'].values,
+            area_raw=eye_tracking_df['cr_area_raw'].values,
             width=eye_tracking_df['cr_width'].values,
             height=eye_tracking_df['cr_height'].values,
             angle=eye_tracking_df['cr_phi'].values,
