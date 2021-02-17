@@ -17,6 +17,11 @@ groups:
     shape:
     - null
     doc: ellipse area
+  - name: area_raw
+    dtype: float
+    shape:
+    - null
+    doc: ellipse area
   - name: width
     dtype: float
     shape:
