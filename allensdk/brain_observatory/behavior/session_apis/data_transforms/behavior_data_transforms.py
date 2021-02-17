@@ -213,7 +213,9 @@ class BehaviorDataTransforms(BehaviorBase):
             raise ValueError("Length of `stim_pres_df` should not change after"
                              f" merge; was {len(raw_stim_pres_df)}, now "
                              f" {len(stim_pres_df)}.")
-        return stim_pres_df[sorted(stim_pres_df)]
+
+        # Sort columns then drop columns which contain only all NaN values
+        return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
 
     def get_stimulus_templates(self) -> Optional[StimulusTemplate]:
         """Get stimulus templates (movies, scenes) for behavior session.
