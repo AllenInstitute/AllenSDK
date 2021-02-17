@@ -90,3 +90,65 @@ def test_get_rewards(monkeypatch):
         expected_df = pd.DataFrame(expected_dict)
         expected_df = expected_df.set_index('timestamps', drop=True)
         assert expected_df.equals(rewards)
+
+
+def test_get_licks(monkeypatch):
+    """
+    Test that BehaviorDataTransforms.get_licks() a dataframe
+    of licks whose timestamps are based on their frame number
+    with respect to the stimulus_timestamps
+    """
+
+    def dummy_init(self):
+        pass
+
+    def dummy_stimulus_timestamps(self):
+        return np.arange(0, 2.0, 0.01)
+
+    def dummy_stimulus_file(self):
+
+        # in this test, the trial log exists to make sure
+        # that get_licks is *not* reading the licks from
+        # here
+        trial_log = []
+        trial_log.append({'licks': [(-1.0, 100), (-1.0, 200)]})
+        trial_log.append({'licks': [(-1.0, 300), (-1.0, 400)]})
+        trial_log.append({'licks': [(-1.0, 500), (-1.0, 600)]})
+
+        lick_events = [12, 15, 90, 136]
+        lick_events = [{'lick_events': lick_events}]
+
+        data = {}
+        data['items'] = {}
+        data['items']['behavior'] = {}
+        data['items']['behavior']['trial_log'] = trial_log
+        data['items']['behavior']['lick_sensors'] = lick_events
+        return data
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorDataTransforms,
+                    '__init__',
+                    dummy_init)
+
+        ctx.setattr(BehaviorDataTransforms,
+                    'get_stimulus_timestamps',
+                    dummy_stimulus_timestamps)
+
+        ctx.setattr(BehaviorDataTransforms,
+                    '_behavior_stimulus_file',
+                    dummy_stimulus_file)
+
+        xforms = BehaviorDataTransforms()
+
+        licks = xforms.get_licks()
+
+        expected_dict = {'time': [0.12, 0.15, 0.90, 1.36],
+                         'frame': [12, 15, 90, 136]}
+        expected_df = pd.DataFrame(expected_dict)
+        assert expected_df.columns.equals(licks.columns)
+        np.testing.assert_array_almost_equal(expected_df.time.to_numpy(),
+                                             licks.time.to_numpy(),
+                                             decimal=10)
+        np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
+                                             licks.frame.to_numpy(),
+                                             decimal=10)
