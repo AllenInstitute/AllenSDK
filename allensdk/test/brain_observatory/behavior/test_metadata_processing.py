@@ -5,6 +5,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
     OPHYS_1_3_DESCRIPTION, OPHYS_2_DESCRIPTION, OPHYS_4_6_DESCRIPTION,
     OPHYS_5_DESCRIPTION, TRAINING_GRATINGS_0, TRAINING_GRATINGS_1,
     TRAINING_GRATINGS_2, TRAINING_IMAGES_3, TRAINING_IMAGES_4,
+    TRAINING_IMAGES_5,
     OPHYS_0_HABITUATION, get_task_parameters, get_expt_description)
 
 
@@ -68,11 +69,21 @@ def test_get_task_parameters():
     ("OPHYS_4_images_D", OPHYS_4_6_DESCRIPTION),
     ("OPHYS_5_images_E", OPHYS_5_DESCRIPTION),
     ("OPHYS_6_images_F", OPHYS_4_6_DESCRIPTION),
-    ("TRAINING_GRATINGS_0_A", TRAINING_GRATINGS_0),
-    ("TRAINING_GRATINGS_1_B", TRAINING_GRATINGS_1),
-    ("TRAINING_GRATINGS_2_C", TRAINING_GRATINGS_2),
-    ("TRAINING_IMAGES_3_D", TRAINING_IMAGES_3),
-    ("TRAINING_IMAGES_4_E", TRAINING_IMAGES_4)
+    ("TRAINING_0_gratings_A", TRAINING_GRATINGS_0),
+    ("TRAINING_1_gratings_B", TRAINING_GRATINGS_1),
+    ("TRAINING_2_gratings_C", TRAINING_GRATINGS_2),
+    ("TRAINING_3_images_D", TRAINING_IMAGES_3),
+    ("TRAINING_4_images_E", TRAINING_IMAGES_4),
+    # some more real examples:
+    ('OPHYS_0_images_A_habituation', OPHYS_0_HABITUATION),
+    ('OPHYS_2_images_A_passive', OPHYS_2_DESCRIPTION),
+    ('TRAINING_0_gratings_autorewards_15min', TRAINING_GRATINGS_0),
+    ('TRAINING_1_gratings', TRAINING_GRATINGS_1),
+    ('TRAINING_2_gratings_flashed', TRAINING_GRATINGS_2),
+    ('TRAINING_3_images_A_10uL_reward', TRAINING_IMAGES_3),
+    ('TRAINING_4_images_A_handoff_ready', TRAINING_IMAGES_4),
+    ('TRAINING_5_images_A_epilogue', TRAINING_IMAGES_5),
+    ('TRAINING_5_images_A_handoff_lapsed', TRAINING_IMAGES_5)
 ])
 def test_get_expt_description_with_valid_session_type(session_type,
                                                       expected_description):

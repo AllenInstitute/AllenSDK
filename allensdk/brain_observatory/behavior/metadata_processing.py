@@ -104,6 +104,17 @@ TRAINING_IMAGES_4 = (
     "lasts for 60 minutes"
 )
 
+TRAINING_IMAGES_5 = (
+    "An operant behavior training session where a mouse must lick a spout "
+    "following a change in stimulus identity to earn rewards. Stimuli consist "
+    "of 8 natural scene images, for a total of 64 possible pairwise "
+    "transitions. Images are shown for 250 ms with a 500 ms intervening gray "
+    "period. Delivered rewards are 7ul in volume. The session is 75 minutes "
+    "long, with 5 minutes of gray screen before and after 60 minutes of "
+    "behavior, followed by 10 repeats of a 30 second natural movie stimulus "
+    "at the end of the session."
+)
+
 
 def get_expt_description(session_type: str) -> str:
     """Determine a behavior ophys session's experiment description based on
@@ -136,11 +147,12 @@ def get_expt_description(session_type: str) -> str:
         dict.fromkeys(["OPHYS_4", "OPHYS_6"], OPHYS_4_6_DESCRIPTION))
     description_dict.update({"OPHYS_2": OPHYS_2_DESCRIPTION})
     description_dict.update({"OPHYS_5": OPHYS_5_DESCRIPTION})
-    description_dict.update({"TRAINING_GRATINGS_0": TRAINING_GRATINGS_0})
-    description_dict.update({"TRAINING_GRATINGS_1": TRAINING_GRATINGS_1})
-    description_dict.update({"TRAINING_GRATINGS_2": TRAINING_GRATINGS_2})
-    description_dict.update({"TRAINING_IMAGES_3": TRAINING_IMAGES_3})
-    description_dict.update({"TRAINING_IMAGES_4": TRAINING_IMAGES_4})
+    description_dict.update({"TRAINING_0_gratings": TRAINING_GRATINGS_0})
+    description_dict.update({"TRAINING_1_gratings": TRAINING_GRATINGS_1})
+    description_dict.update({"TRAINING_2_gratings": TRAINING_GRATINGS_2})
+    description_dict.update({"TRAINING_3_images": TRAINING_IMAGES_3})
+    description_dict.update({"TRAINING_4_images": TRAINING_IMAGES_4})
+    description_dict.update({"TRAINING_5_images": TRAINING_IMAGES_5})
 
     # Session type string will look something like: OPHYS_4_images_A
     n_match_str = 2
