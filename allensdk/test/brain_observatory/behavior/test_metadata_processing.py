@@ -26,6 +26,7 @@ def test_get_task_parameters():
                 },
                 "params": {
                     "stage": "TRAINING_3_images_A",
+                    "flash_omit_probability": 0.05
                 },
                 "stimuli": {
                     "images": {"draw_log": [1]*10}
@@ -37,7 +38,7 @@ def test_get_task_parameters():
     expected = {
         "blank_duration_sec": [0.5, 0.6],
         "stimulus_duration_sec": 6.0,
-        "omitted_flash_fraction": np.nan,
+        "omitted_flash_fraction": 0.05,
         "response_window_sec": [0.15, 0.75],
         "reward_volume": 0.007,
         "stage": "TRAINING_3_images_A",
