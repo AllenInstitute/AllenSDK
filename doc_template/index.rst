@@ -99,6 +99,8 @@ What's New - 2.7.0
 - Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
 - Return event detection data through session API
 - Read/write event detection data from/to NWB
+- Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
+- For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
 
 What's New - 2.6.0
 -----------------------------------------------------------------------

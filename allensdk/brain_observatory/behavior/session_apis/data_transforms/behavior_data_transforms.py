@@ -16,7 +16,6 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates)
-from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials)
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -79,7 +78,10 @@ class BehaviorDataTransforms(BehaviorBase):
         `start_trial` and `end_trial` events in the `trial_log`, to true
         up these time streams.
 
-        :returns: pd.DataFrame -- A dataframe containing lick timestamps
+        :returns: pd.DataFrame
+            Two columns: "time", which contains the sync time
+            of the licks that occurred in this session and "frame",
+            the frame numbers of licks that occurred in this session
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
@@ -87,7 +89,7 @@ class BehaviorDataTransforms(BehaviorBase):
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"time": lick_times})
+        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
@@ -97,10 +99,8 @@ class BehaviorDataTransforms(BehaviorBase):
             delivered rewards.
         """
         data = self._behavior_stimulus_file()
-        offset = frame_time_offset(data)
-        # No sync timestamps to rebase on, but do need to align to
-        # trial events, so add the offset as the "rebase" function
-        return get_rewards(data, lambda x: x + offset)
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
     def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
@@ -214,8 +214,7 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         vsyncs = data["items"]["behavior"]["intervalsms"]
         cum_sum = np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
-        offset = frame_time_offset(data)
-        return cum_sum + offset
+        return cum_sum
 
     def get_task_parameters(self) -> dict:
         """Get task parameters from pkl file.
@@ -238,15 +237,15 @@ class BehaviorDataTransforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
+        timestamps = self.get_stimulus_timestamps()
         licks = self.get_licks()
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
-        stimulus_presentations = self.get_stimulus_presentations()
-        # Pass a dummy rebase function since we don't have two time streams,
-        # and the frame times are already aligned to trial events in their
-        # respective getters
-        trial_df = get_trials(data, licks, rewards, stimulus_presentations,
-                              lambda x: x)
+
+        trial_df = get_trials(data,
+                              licks,
+                              rewards,
+                              timestamps)
 
         return trial_df
 

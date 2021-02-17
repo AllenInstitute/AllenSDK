@@ -201,14 +201,6 @@ def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
         raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
 
 
-def get_trial_lick_times(lick_times, start_time, stop_time):
-    '''extract lick times in time range'''
-    return lick_times[np.where(np.logical_and(
-        lick_times >= start_time, 
-        lick_times <= stop_time
-    ))]
-
-
 def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     '''extract reward times in time range'''
     reward_times = rebased_reward_times[np.where(np.logical_and(
@@ -249,9 +241,10 @@ def _get_response_time(licks: List[float], aborted: bool) -> float:
 
 
 def get_trial_timing(
-        event_dict: dict, stimulus_presentations_df: pd.DataFrame,
+        event_dict: dict,
         licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
-        hit: bool, false_alarm: bool, aborted: bool):
+        hit: bool, false_alarm: bool, aborted: bool,
+        timestamps: np.ndarray):
     """
     Extract a dictionary of trial timing data.
     See trial_data_from_log for a description of the trial types.
@@ -260,10 +253,6 @@ def get_trial_timing(
     ==========
     event_dict: dict
         Dictionary of trial events in the well-known `pkl` file
-    stimulus_presentations_df: pd.DataFrame
-        pandas dataframe of stimulus presentations, from the
-        `get_stimulus_presentations` response for the
-        BehaviorOphysSession.api.
     licks: List[float]
         list of lick timestamps, from the `get_licks` response for
         the BehaviorOphysSession.api.
@@ -281,6 +270,9 @@ def get_trial_timing(
         True if "false_alarm" trial, False otherwise
     aborted: bool
         True if "aborted" trial, False otherwise
+    timestamps: np.ndarray[1d]
+        Array of ground truth timestamps for the session
+        (sync times, if available)
 
     Returns
     =======
@@ -325,26 +317,17 @@ def get_trial_timing(
         "both `go` and `auto_rewarded` cannot be True, they are mutually "
         "exclusive categories")
 
-    start_time = event_dict["trial_start", ""]['rebased_time']
-    stop_time = event_dict["trial_end", ""]['rebased_time']
+    start_time = event_dict["trial_start", ""]['timestamp']
+    stop_time = event_dict["trial_end", ""]['timestamp']
 
     response_time = _get_response_time(licks, aborted)
 
-    def get_change_time(change_frame, stimulus_presentations_df):
-        # get the first stimulus in the log after the current change frame:
-        query = stimulus_presentations_df.query('start_frame >= @change_frame')
-        if len(query) > 0:
-            return query['start_time'].iloc[0]
-        else:
-            # return NaN if the query is empty
-            return np.nan
-
     if go or auto_rewarded:
         change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-        change_time = get_change_time(change_frame, stimulus_presentations_df)
+        change_time = timestamps[change_frame]
     elif catch:
         change_frame = event_dict.get(('sham_change', ''))['frame']
-        change_time = get_change_time(change_frame, stimulus_presentations_df)
+        change_time = timestamps[change_frame]
     else:
         change_time = float("nan")
         change_frame = float("nan")
@@ -404,41 +387,149 @@ def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
     }
 
 
-def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
+def get_trial_bounds(trial_log: List) -> List:
+    """
+    Adjust trial boundaries from a trial_log so that there is no dead time
+    between trials.
+
+    Parameters
+    ----------
+    trial_log: list
+        The trial_log read in from the well known behavior stimulus pickle file
+
+    Returns
+    -------
+    list
+        Each element in the list is a tuple of the form (start_frame, end_frame)
+        so that the ith element of the list gives the start and end frames of
+        the ith trial. The endframe of the last trial will be -1, indicating that
+        it should map to the last timestamp in the session
+    """
+    start_frames = []
+
+    for trial in trial_log:
+        start_f = None
+        for event in trial['events']:
+            if event[0] == 'trial_start':
+                start_f = event[-1]
+                break
+        if start_f is None:
+            msg = "Could not find a 'trial_start' event "
+            msg += "for all trials in the trial log\n"
+            msg += f"{trial}"
+            raise ValueError(msg)
+
+        if len(start_frames) > 0 and start_f < start_frames[-1]:
+            msg = "'trial_start' frames in trial log "
+            msg += "are not in ascending order"
+            msg += f"\ntrial_log: {trial_log}"
+            raise ValueError(msg)
+
+        start_frames.append(start_f)
+
+    end_frames = [idx for idx in start_frames[1:]+[-1]]
+    return list([(s, e) for s, e in zip(start_frames, end_frames)])
+
+
+def get_trials(data: Dict,
+               licks_df: pd.DataFrame,
+               rewards_df: pd.DataFrame,
+               timestamps: np.ndarray) -> pd.DataFrame:
+    """
+    Create and return a pandas DataFrame containing data about
+    the trials associated with this session
+
+    Parameters
+    ----------
+    data: dict
+          The dict resulting from reading in this session's
+          stimulus_data pickle file
+
+    licks_df: pd.DataFrame
+           A dataframe whose only column is the timestamps
+           of licks.
+
+    rewards_df: pd.DataFrame
+           A dataframe containing data about rewards given
+           during this session. Output of
+           allensdk/brain_observatory/behavior/rewards_processing.get_rewards
+
+    timestamps: np.ndarray[1d]
+           An ndarray containing the timestamps associated with each
+           stimulus frame in this session. Should be the sync timestamps
+           if available.
+
+    Returns
+    -------
+    pd.DataFrame
+           A dataframe containing data pertaining to the trials that
+           make up this session
+    """
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
+    trial_bounds = get_trial_bounds(trial_log)
+
     all_trial_data = [None] * len(trial_log)
-    sync_lick_times = licks_df.time.values 
-    rebased_reward_times = rewards_df.index.values
+    lick_frames = licks_df.frame.values
+    reward_times = rewards_df.index.values
 
     for idx, trial in enumerate(trial_log):
-        # extract rebased time and frame for each event in the trial log:
-        event_dict = {(e[0], e[1]): {'rebased_time':rebase(e[2]),'frame':e[3]} for e in trial['events']}
+        # match each event in the trial log to the sync timestamps
+        event_dict = {(e[0], e[1]): {'timestamp':timestamps[e[3]],
+                                     'frame':e[3]}
+                                    for e in trial['events']}
 
         tr_data = {"trial": trial["index"]}
-        tr_data["lick_times"] = get_trial_lick_times(
-            sync_lick_times, 
-            event_dict[('trial_start', '')]['rebased_time'], 
-            event_dict[('trial_end', '')]['rebased_time']
-        )
+
+        trial_start = trial_bounds[idx][0]
+        trial_end = trial_bounds[idx][1]
+
+        # this block of code is trying to mimic
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/__init__.py#L377-L381
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract_movies.py#L59-L94
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/core/annotate.py#L11-L36
+        #
+        # In summary: there are cases where an "epilogue movie" is shown
+        # after the proper stimuli; we do not want licks that occur
+        # during this epilogue movie to be counted as belonging to
+        # the last trial
+        # https://github.com/AllenInstitute/visual_behavior_analysis/issues/482
+
+        if trial_end < 0:
+            if 'fingerprint' in data['items']['behavior']['items'].keys():
+                trial_end = data['items']['behavior']['items']['fingerprint']['starting_frame']
+
+        # select licks that fall between trial_start and trial_end;
+        # licks on the boundary get assigned to the trial that is ending,
+        # rather than the trial that is starting
+        if trial_end > 0:
+            valid_idx = np.where(np.logical_and(lick_frames>trial_start,
+                                                lick_frames<=trial_end))
+        else:
+            valid_idx = np.where(lick_frames>trial_start)
+
+        valid_licks = lick_frames[valid_idx]
+
+        tr_data["lick_times"] = timestamps[valid_licks]
+
         tr_data["reward_time"] = get_trial_reward_time(
-            rebased_reward_times,
-            event_dict[('trial_start', '')]['rebased_time'], 
-            event_dict[('trial_end', '')]['rebased_time']
+            reward_times,
+            event_dict[('trial_start', '')]['timestamp'],
+            event_dict[('trial_end', '')]['timestamp']
         )
         tr_data.update(trial_data_from_log(trial))
         tr_data.update(get_trial_timing(
             event_dict,
-            stimulus_presentations_df,
             tr_data['lick_times'],
             tr_data['go'],
             tr_data['catch'],
             tr_data['auto_rewarded'],
             tr_data['hit'],
             tr_data['false_alarm'],
-            tr_data["aborted"]
+            tr_data["aborted"],
+            timestamps
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 

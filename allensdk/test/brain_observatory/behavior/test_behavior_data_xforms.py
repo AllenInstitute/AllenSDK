@@ -1,56 +1,48 @@
-import pytest
-
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorDataTransforms  # noqa: E501
 
 
-@pytest.mark.parametrize("roi_ids,expected", [
-    [
-        1,
-        np.array([
-            [1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ])
-    ],
-    [
-        None,
-        np.array([
-            [
-                [1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ],
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 1, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ]
-        ])
-    ]
-])
-# cell_specimen_table_api fixture from allensdk.test.brain_observatory.conftest
-def test_get_roi_masks_by_cell_roi_id(roi_ids, expected,
-                                      cell_specimen_table_api):
-    api = cell_specimen_table_api
-    obtained = api.get_roi_masks_by_cell_roi_id(roi_ids)
-    assert np.allclose(expected, obtained.values)
-    assert np.allclose(obtained.coords['row'],
-                       [0.5, 1.5, 2.5, 3.5, 4.5])
-    assert np.allclose(obtained.coords['column'],
-                       [0.25, 0.75, 1.25, 1.75, 2.25])
+def test_get_stimulus_timestamps(monkeypatch):
+    """
+    Test that BehaviorDataTransforms.get_stimulus_timestamps()
+    just returns the sum of the intervalsms field in the
+    behavior stimulus pickle file, padded with a zero at the
+    first timestamp.
+    """
+
+    expected = np.array([0., 0.0001, 0.0003, 0.0006, 0.001])
+
+    def dummy_init(self):
+        pass
+
+    def dummy_stimulus_file(self):
+        intervalsms = [0.1, 0.2, 0.3, 0.4]
+        data = {}
+        data['items'] = {}
+        data['items']['behavior'] = {}
+        data['items']['behavior']['intervalsms'] = intervalsms
+        return data
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorDataTransforms,
+                    '__init__',
+                    dummy_init)
+
+        ctx.setattr(BehaviorDataTransforms,
+                    '_behavior_stimulus_file',
+                    dummy_stimulus_file)
+
+        xform = BehaviorDataTransforms()
+        timestamps = xform.get_stimulus_timestamps()
+        np.testing.assert_array_almost_equal(timestamps,
+                                             expected,
+                                             decimal=10)
 
 
 def test_get_rewards(monkeypatch):
     """
-    Test that BehaviorOphysDataTransforms.get_rewards() returns
+    Test that BehaviorDataTransforms.get_rewards() returns
     expected results (main nuance is that timestamps should be
     determined by applying the reward frame as an index to
     stimulus_timestamps)
@@ -76,19 +68,19 @@ def test_get_rewards(monkeypatch):
         return data
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     '__init__',
                     dummy_init)
 
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     'get_stimulus_timestamps',
                     dummy_stimulus_timestamps)
 
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     '_behavior_stimulus_file',
                     dummy_stimulus_file)
 
-        xforms = BehaviorOphysDataTransforms()
+        xforms = BehaviorDataTransforms()
 
         rewards = xforms.get_rewards()
 
@@ -134,19 +126,19 @@ def test_get_licks(monkeypatch):
         return data
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     '__init__',
                     dummy_init)
 
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     'get_stimulus_timestamps',
                     dummy_stimulus_timestamps)
 
-        ctx.setattr(BehaviorOphysDataTransforms,
+        ctx.setattr(BehaviorDataTransforms,
                     '_behavior_stimulus_file',
                     dummy_stimulus_file)
 
-        xforms = BehaviorOphysDataTransforms()
+        xforms = BehaviorDataTransforms()
 
         licks = xforms.get_licks()
 

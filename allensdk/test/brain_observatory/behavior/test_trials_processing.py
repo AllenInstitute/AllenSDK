@@ -344,33 +344,33 @@ def test_get_trial_timing_exclusivity_assertions(
         go, catch, auto_rewarded, hit, false_alarm, aborted, errortext):
     with pytest.raises(AssertionError) as e:
         trials_processing.get_trial_timing(
-            None, None, None, go, catch, auto_rewarded, hit, false_alarm,
-            aborted)
+            None, None, go, catch, auto_rewarded, hit, false_alarm,
+            aborted, np.array([]))
     assert errortext in str(e.value)
 
 
 def test_get_trial_timing():
     event_dict = {
-        ('trial_start', ''): {'rebased_time': 306.4785879253758, 'frame': 18075},
-        ('initial_blank', 'enter'): {'rebased_time': 306.47868008512637,
+        ('trial_start', ''): {'timestamp': 306.4785879253758, 'frame': 18075},
+        ('initial_blank', 'enter'): {'timestamp': 306.47868008512637,
                                      'frame': 18075},
-        ('initial_blank', 'exit'): {'rebased_time': 306.4787637603285,
+        ('initial_blank', 'exit'): {'timestamp': 306.4787637603285,
                                     'frame': 18075},
-        ('pre_change', 'enter'): {'rebased_time': 306.47883573270514, 'frame': 18075},
-        ('pre_change', 'exit'): {'rebased_time': 306.4789062422286, 'frame': 18075},
-        ('stimulus_window', 'enter'): {'rebased_time': 306.478977629464,
+        ('pre_change', 'enter'): {'timestamp': 306.47883573270514, 'frame': 18075},
+        ('pre_change', 'exit'): {'timestamp': 306.4789062422286, 'frame': 18075},
+        ('stimulus_window', 'enter'): {'timestamp': 306.478977629464,
                                        'frame': 18075},
-        ('stimulus_changed', ''): {'rebased_time': 310.9827406729944, 'frame': 18345},
-        ('auto_reward', ''): {'rebased_time': 310.98279450599154, 'frame': 18345},
-        ('response_window', 'enter'): {'rebased_time': 311.13223900212347,
+        ('stimulus_changed', ''): {'timestamp': 310.9827406729944, 'frame': 18345},
+        ('auto_reward', ''): {'timestamp': 310.98279450599154, 'frame': 18345},
+        ('response_window', 'enter'): {'timestamp': 311.13223900212347,
                                        'frame': 18354},
-        ('response_window', 'exit'): {'rebased_time': 311.73284526699706,
+        ('response_window', 'exit'): {'timestamp': 311.73284526699706,
                                       'frame': 18390},
-        ('miss', ''): {'rebased_time': 311.7330193465259, 'frame': 18390},
-        ('stimulus_window', 'exit'): {'rebased_time': 315.2356723770604,
+        ('miss', ''): {'timestamp': 311.7330193465259, 'frame': 18390},
+        ('stimulus_window', 'exit'): {'timestamp': 315.2356723770604,
                                       'frame': 18600},
-        ('no_lick', 'exit'): {'rebased_time': 315.23582480636213, 'frame': 18600},
-        ('trial_end', ''): {'rebased_time': 315.23590438557534, 'frame': 18600}
+        ('no_lick', 'exit'): {'timestamp': 315.23582480636213, 'frame': 18600},
+        ('trial_end', ''): {'timestamp': 315.23590438557534, 'frame': 18600}
     }
 
     licks = [
@@ -387,185 +387,24 @@ def test_get_trial_timing():
         314.75495,
     ]
 
-    nan = np.nan
-    stimulus_presentations_df = pd.DataFrame({
-        'duration': {
-            2: 0.2499599999999873,
-            3: nan,
-            4: 0.24966999999998052,
-            5: 0.24990999999999985,
-            6: 0.2499800000000505,
-            7: 0.2499300000000062,
-            8: 0.24996999999996206,
-            9: 0.24968999999998687,
-            10: 0.25983999999999696,
-            11: nan,
-            12: 0.24995000000001255,
-            13: 0.2500800000000254,
-            14: 0.2500800000000254
-        },
-        'end_frame': {
-            2: 18091.0,
-            3: nan,
-            4: 18181.0,
-            5: 18226.0,
-            6: 18271.0,
-            7: 18316.0,
-            8: 18361.0,
-            9: 18406.0,
-            10: 18451.0,
-            11: nan,
-            12: 18541.0,
-            13: 18586.0,
-            14: 18631.0
-        },
-        'image_index': {
-            2: 0,
-            3: 8,
-            4: 0,
-            5: 0,
-            6: 0,
-            7: 0,
-            8: 5,
-            9: 5,
-            10: 5,
-            11: 8,
-            12: 5,
-            13: 5,
-            14: 5
-        },
-        'image_name': {
-            2: 'im065',
-            3: 'omitted',
-            4: 'im065',
-            5: 'im065',
-            6: 'im065',
-            7: 'im065',
-            8: 'im062',
-            9: 'im062',
-            10: 'im062',
-            11: 'omitted',
-            12: 'im062',
-            13: 'im062',
-            14: 'im062'
-        },
-        'image_set': {
-            2: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            3: 'omitted',
-            4: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            5: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            6: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            7: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            8: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            9: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            10: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            11: 'omitted',
-            12: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            13: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
-            14: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2'
-        },
-        'index': {
-            2: 2,
-            3: 0,
-            4: 3,
-            5: 4,
-            6: 5,
-            7: 6,
-            8: 7,
-            9: 8,
-            10: 9,
-            11: 1,
-            12: 10,
-            13: 11,
-            14: 12
-        },
-        'omitted': {
-            2: False,
-            3: True,
-            4: False,
-            5: False,
-            6: False,
-            7: False,
-            8: False,
-            9: False,
-            10: False,
-            11: True,
-            12: False,
-            13: False,
-            14: False
-        },
-        'orientation': {
-            2: nan,
-            3: nan,
-            4: nan,
-            5: nan,
-            6: nan,
-            7: nan,
-            8: nan,
-            9: nan,
-            10: nan,
-            11: nan,
-            12: nan,
-            13: nan,
-            14: nan
-        },
-        'start_frame': {
-            2: 18076,
-            3: 18120,
-            4: 18166,
-            5: 18211,
-            6: 18256,
-            7: 18301,
-            8: 18346,
-            9: 18391,
-            10: 18436,
-            11: 18480,
-            12: 18526,
-            13: 18571,
-            14: 18616
-        },
-        'start_time': {
-            2: 307.2712,
-            3: 308.00111,
-            4: 308.77121,
-            5: 309.52094,
-            6: 310.27088,
-            7: 311.02089,
-            8: 311.77086,
-            9: 312.52112,
-            10: 313.27098,
-            11: 314.01115,
-            12: 314.78083,
-            13: 315.53094,
-            14: 316.2808
-        },
-        'stop_time': {
-            2: 307.52116,
-            3: nan,
-            4: 309.02088,
-            5: 309.77085,
-            6: 310.52086,
-            7: 311.27082,
-            8: 312.02083,
-            9: 312.77081,
-            10: 313.53082,
-            11: nan,
-            12: 315.03078,
-            13: 315.78102,
-            14: 316.53088
-        }
-    })
+    # Only need to worry about the timestamp
+    # value at change_frame
+    # because get_trial_timing will only use
+    # timestamps to lookup the timestamp of
+    # change_frame
+    timestamps = np.zeros(20000, dtype=float)
+    timestamps[18345] = 311.77086
 
     result = trials_processing.get_trial_timing(
         event_dict,
-        stimulus_presentations_df,
         licks,
         go=False,
         catch=False,
         auto_rewarded=True,
         hit=False,
         false_alarm=False,
-        aborted=False
+        aborted=False,
+        timestamps=timestamps
     )
 
     expected_result = {
@@ -677,3 +516,43 @@ def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
     stimuli = behavior_stimuli_data_fixture['items']['behavior']['stimuli']
     trial_image_names = trials_processing.get_trial_image_names(trial, stimuli)
     assert trial_image_names == expected
+
+@pytest.mark.parametrize("trial_log,expected",
+                         [([{'events':[('trial_start', 4), ('trial_end', 5)]},
+                            {'events':[('trial_start', 6), ('trial_end', 9)]}],
+                           [(4, 6), (6, -1)]),
+                          ([{'events':[('trial_start', 2), ('trial_end', 9)]},
+                            {'events':[('trial_start', 5), ('trial_end', 11)]},
+                            {'events':[('junk', 4), ('trial_start', 7), ('trial_end', 14)]},
+                            {'events':[('trial_start', 13), ('trial_end', 22)]}],
+                           [(2, 5), (5, 7), (7, 13), (13, -1)])])
+def test_get_trial_bounds(trial_log, expected):
+    bounds = trials_processing.get_trial_bounds(trial_log)
+    assert bounds == expected
+
+
+def test_get_trial_bounds_exception():
+    """
+    Test that, if a trial does not have a trial_start event, a ValueError
+    is raised
+    """
+    trial_log = [{'events': [('trial_start', 9), ('trial_end', 4)]},
+                 {'events': [('trial_end', 2)]}]
+
+    with pytest.raises(ValueError):
+        bounds = trials_processing.get_trial_bounds(trial_log)
+
+
+@pytest.mark.parametrize("trial_log",
+                         [([{'events':[('trial_start', 4), ('trial_end', 5)]},
+                            {'events':[('trial_start', 2), ('trial_end', 9)]},
+                            {'events':[('trial_start', 6), ('trial_end', 11)]}])]
+                          )
+def test_get_trial_bounds_order_exceptions(trial_log):
+    """
+    Test that, when trial_start and trial_end are out of order,
+    exceptions are raised
+    """
+    with pytest.raises(ValueError) as error:
+        _ = trials_processing.get_trial_bounds(trial_log)
+    assert 'order' in error.value.args[0]
