@@ -346,8 +346,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         data['sex'] = nwb_subject.sex
         data['age'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = list(nwb_subject.reporter_line)
-        data['driver_line'] = list(nwb_subject.driver_line)
+        data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
+        data['driver_line'] = sorted(list(nwb_subject.driver_line))
 
         # Add pyNWB OpticalChannel and ImagingPlane metadata to behavior ophys
         # session metadata

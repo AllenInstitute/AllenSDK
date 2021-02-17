@@ -234,8 +234,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['sex'] = nwb_subject.sex
         data['age'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = list(nwb_subject.reporter_line)
-        data['driver_line'] = list(nwb_subject.driver_line)
+        data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
+        data['driver_line'] = sorted(list(nwb_subject.driver_line))
 
         # Add other metadata stored in nwb file to behavior session meta
         data['experiment_datetime'] = self.nwbfile.session_start_time
