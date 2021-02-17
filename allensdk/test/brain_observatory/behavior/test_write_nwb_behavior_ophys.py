@@ -65,10 +65,10 @@ def rig_geometry():
 @pytest.fixture
 def eye_tracking_data():
     return create_refined_eye_tracking_df(
-        np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
+        np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False, 196 * np.pi,
                    1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.,
                    13., 14., 15.],
-                  [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
+                  [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False, 225 * np.pi,
                    2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13.,
                    14., 15., 16.]])
     )

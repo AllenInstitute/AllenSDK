@@ -31,7 +31,7 @@ def create_area_df(data: np.ndarray) -> pd.DataFrame:
 
 
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
-    columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink",
+    columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink", "pupil_area_raw",
                "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
                "eye_center_x", "eye_center_y", "eye_width", "eye_height",
                "eye_phi", "pupil_center_x", "pupil_center_y", "pupil_width",
@@ -180,9 +180,9 @@ def test_process_eye_tracking_data_raises_on_sync_error(eye_tracking_df,
                   [2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]])),
      pd.Series([0.1, 0.2]),
      create_refined_eye_tracking_df(
-         np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
+         np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False, 196 * np.pi,
                     1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15.],
-                   [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
+                   [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False, 225 * np.pi,
                     2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]]))
      ),
 ])
