@@ -8,37 +8,33 @@ from allensdk.brain_observatory.behavior.stimulus_processing.util import \
 
 class StimulusImage:
     """Container class for image stimuli"""
-    def __init__(self, name: str, unwarped: np.ndarray):
+    def __init__(self, name: str, values: np.ndarray):
         """
         Parameters
         ----------
         name:
             Name of the image
-        unwarped
-            The unwarped image data
+        values
+            The unwarped image values
         """
         self._name = name
-        self._unwarped = unwarped
+        self._values = values
+        self._shape = values.shape
 
     @property
     def name(self):
         return self._name
 
     @property
-    def unwarped(self):
-        return self._unwarped
+    def values(self):
+        return self._values
 
-    def __getitem__(self, item: str) -> np.ndarray:
-        """
-        Takes "unwarped" as input and returns the unwarped array
-        """
-        return self._unwarped
+    @property
+    def shape(self):
+        return self._shape
 
     def __repr__(self):
-        d = {
-            'unwarped': f'numpy array {self._unwarped.shape}'
-        }
-        return f'{d}'
+        return f'numpy array {self.values.shape}'
 
 
 class StimulusTemplates:
@@ -66,7 +62,7 @@ class StimulusTemplates:
 
         for attr, image in zip(image_attributes, images):
             image_name = attr['image_name']
-            self.__add_image(name=image_name, unwarped=image)
+            self.__add_image(name=image_name, values=image)
 
     @property
     def image_set_name(self):
@@ -81,16 +77,16 @@ class StimulusTemplates:
     def items(self):
         return self._images.items()
 
-    def __add_image(self, name, unwarped: np.ndarray):
+    def __add_image(self, name, values: np.ndarray):
         """
         Parameters
         ----------
         name:
             Name of the image
-        unwarped
-            The unwarped image array
+        values
+            The unwarped image values
         """
-        image = StimulusImage(name=name, unwarped=unwarped)
+        image = StimulusImage(name=name, values=values)
         self._images[name] = image
 
     def __getitem__(self, item) -> StimulusImage:

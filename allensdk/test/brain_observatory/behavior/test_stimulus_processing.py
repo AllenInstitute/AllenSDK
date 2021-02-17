@@ -107,10 +107,10 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
 
     for i, img_name in enumerate(templates):
         img = templates[img_name]
-        assert np.array_equal(a1=images[i], a2=img['unwarped'])
+        assert np.array_equal(a1=images[i], a2=img.values)
 
     for i, (img_name, img) in enumerate(templates.items()):
-        assert np.array_equal(a1=images[i], a2=img['unwarped'])
+        assert np.array_equal(a1=images[i], a2=img.values)
 
 
 # def test_get_images_dict():
