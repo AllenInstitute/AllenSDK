@@ -69,6 +69,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         nwb.add_stimulus_timestamps(nwbfile,
                                     session_object.stimulus_timestamps)
 
+        # Add running acquisition ('dx', 'v_sig', 'v_in') data to NWB
+        nwb.add_running_acquisition_to_nwbfile(
+            nwbfile,
+            session_object.api.get_running_acquisition_df())
+
         # Add running data to NWB in-memory object:
         nwb.add_running_speed_to_nwbfile(nwbfile,
                                          session_object.running_speed,

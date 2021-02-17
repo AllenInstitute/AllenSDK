@@ -104,26 +104,53 @@ class BehaviorDataTransforms(BehaviorBase):
         timestamps = self.get_stimulus_timestamps()
         return get_rewards(data, timestamps)
 
-    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
-        """Get running speed data.
+    def get_running_acquisition_df(self, lowpass=True,
+                                   zscore_threshold=10.0) -> pd.DataFrame:
+        """Get running speed acquisition data from a behavior pickle file.
 
-        :returns: pd.DataFrame -- dataframe containing various signals used
-            to compute running speed.
+        NOTE: Rebases timestamps with the self.get_stimulus_timestamps()
+        method which varies between the BehaviorDataTransformer and the
+        BehaviorOphysDataTransformer.
+
+        Parameters
+        ----------
+        lowpass: bool (default=True)
+            Whether to apply a 10Hz low-pass filter to the running speed
+            data.
+        zscore_threshold: float
+            The threshold to use for removing outlier running speeds which
+            might be noise and not true signal
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe with an index of timestamps and the following columns:
+                "speed": computed running speed
+                "dx": angular change, computed during data collection
+                "v_sig": voltage signal from the encoder
+                "v_in": the theoretical maximum voltage that the encoder
+                    will reach prior to "wrapping". This should
+                    theoretically be 5V (after crossing 5V goes to 0V, or
+                    vice versa). In practice the encoder does not always
+                    reach this value before wrapping, which can cause
+                    transient spikes in speed at the voltage "wraps".
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass, zscore_threshold=zscore_threshold)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass,
+                              zscore_threshold=zscore_threshold)
 
-    def get_running_speed(self, lowpass=True) -> RunningSpeed:
+    def get_running_speed(self, lowpass=True) -> pd.DataFrame:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
         NOTE: Do not correct for monitor delay.
 
-        :returns: RunningSpeed -- a NamedTuple containing the subject's
-            timestamps and running speeds (in cm/s)
+        :returns: pd.DataFrame
+            index: timestamps
+            speed : subject's running speeds (in cm/s)
         """
-        running_data_df = self.get_running_data_df(lowpass=lowpass)
+        running_data_df = self.get_running_acquisition_df(lowpass=lowpass)
         if running_data_df.index.name != "timestamps":
             raise DataFrameIndexError(
                 f"Expected index to be named 'timestamps' but got "
