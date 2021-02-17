@@ -2,6 +2,7 @@ import inspect
 import logging
 import math
 import warnings
+import datetime
 
 from itertools import zip_longest
 from typing import Any, Dict, List
@@ -234,21 +235,19 @@ def compare_session_fields(x1: Any, x2: Any, err_msg=""):
     elif isinstance(x1, (sitk.Image,)):
         assert x1.GetSize() == x2.GetSize(), err_msg
         assert x1 == x2, err_msg
+    elif isinstance(x1, (datetime.datetime, pd.Timestamp)):
+        time_delta = (x1 - x2).total_seconds()
+        # Timestamp differences should be less than 60 seconds
+        assert abs(time_delta) < 60
+    elif isinstance(x1, (float,)):
+        if math.isnan(x1) or math.isnan(x2):
+            both_nan = (math.isnan(x1) and math.isnan(x2))
+            assert both_nan, err_msg
+        else:
+            assert x1 == x2, err_msg
     elif isinstance(x1, (dict,)):
         for key in set(x1.keys()).union(set(x2.keys())):
             key_err_msg = f"Mismatch when checking key {key}. {err_msg}"
-
-            if isinstance(x1[key], (np.ndarray,)):
-                np.testing.assert_array_almost_equal(x1[key], x2[key],
-                                                     err_msg=key_err_msg)
-            elif isinstance(x1[key], (float,)):
-                if math.isnan(x1[key]) or math.isnan(x2[key]):
-                    both_nan = (math.isnan(x1[key]) and math.isnan(x2[key]))
-                    assert both_nan, key_err_msg
-                else:
-                    assert x1[key] == x2[key], key_err_msg
-            else:
-                assert x1[key] == x2[key], key_err_msg
-
+            compare_session_fields(x1[key], x2[key], err_msg=key_err_msg)
     else:
         assert x1 == x2, err_msg
