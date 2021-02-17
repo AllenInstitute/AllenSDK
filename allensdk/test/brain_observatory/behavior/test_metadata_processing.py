@@ -2,8 +2,7 @@ import pytest
 import numpy as np
 
 from allensdk.brain_observatory.behavior.metadata_processing import (
-    OPHYS_1_3_DESCRIPTION, OPHYS_2_DESCRIPTION, OPHYS_4_6_DESCRIPTION,
-    OPHYS_5_DESCRIPTION, get_task_parameters, get_expt_description)
+    description_dict, get_task_parameters, get_expt_description)
 
 
 def test_get_task_parameters():
@@ -60,12 +59,22 @@ def test_get_task_parameters():
 
 
 @pytest.mark.parametrize("session_type, expected_description", [
-    ("OPHYS_1_images_A", OPHYS_1_3_DESCRIPTION),
-    ("OPHYS_2_images_B", OPHYS_2_DESCRIPTION),
-    ("OPHYS_3_images_C", OPHYS_1_3_DESCRIPTION),
-    ("OPHYS_4_images_D", OPHYS_4_6_DESCRIPTION),
-    ("OPHYS_5_images_E", OPHYS_5_DESCRIPTION),
-    ("OPHYS_6_images_F", OPHYS_4_6_DESCRIPTION)
+    ("OPHYS_0_images_Z", description_dict[r"\AOPHYS_0_images"]),
+    ("OPHYS_1_images_A", description_dict[r"\AOPHYS_[1|3]_images"]),
+    ("OPHYS_2_images_B", description_dict[r"\AOPHYS_2_images"]),
+    ("OPHYS_3_images_C", description_dict[r"\AOPHYS_[1|3]_images"]),
+    ("OPHYS_4_images_D", description_dict[r"\AOPHYS_[4|6]_images"]),
+    ("OPHYS_5_images_E", description_dict[r"\AOPHYS_5_images"]),
+    ("OPHYS_6_images_F", description_dict[r"\AOPHYS_[4|6]_images"]),
+    ("TRAINING_0_gratings_A", description_dict[r"\ATRAINING_0_gratings"]),
+    ("TRAINING_1_gratings_B", description_dict[r"\ATRAINING_1_gratings"]),
+    ("TRAINING_2_gratings_C", description_dict[r"\ATRAINING_2_gratings"]),
+    ("TRAINING_3_images_D", description_dict[r"\ATRAINING_3_images"]),
+    ("TRAINING_4_images_E", description_dict[r"\ATRAINING_4_images"]),
+    ('TRAINING_3_images_A_10uL_reward',
+     description_dict[r"\ATRAINING_3_images"]),
+    ('TRAINING_5_images_A_handoff_lapsed',
+     description_dict[r"\ATRAINING_5_images"])
 ])
 def test_get_expt_description_with_valid_session_type(session_type,
                                                       expected_description):
@@ -79,6 +88,5 @@ def test_get_expt_description_with_valid_session_type(session_type,
     ("OPHYS_7")
 ])
 def test_get_expt_description_raises_with_invalid_session_type(session_type):
-    error_msg_match_phrase = r"Encountered an unknown session type*"
-    with pytest.raises(RuntimeError, match=error_msg_match_phrase):
-        _ = get_expt_description(session_type)
+    with pytest.raises(RuntimeError, match=f"session type should match.*"):
+        get_expt_description(session_type)
