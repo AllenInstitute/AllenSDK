@@ -15,7 +15,8 @@ from allensdk.brain_observatory.behavior.running_processing import \
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates)
+    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
+    StimulusTemplates)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials)
@@ -186,17 +187,15 @@ class BehaviorDataTransforms(BehaviorBase):
                              f" {len(stim_pres_df)}.")
         return stim_pres_df[sorted(stim_pres_df)]
 
-    def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
+    def get_stimulus_templates(self) -> Optional[StimulusTemplates]:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        Dict[str, np.ndarray]
-            A dictionary containing the stimulus images presented during the
-            session. Keys are data set names, and values are 3D numpy arrays.
+        StimulusTemplates or None if there are no images for the experiment
         """
-        data = self._behavior_stimulus_file()
-        return get_stimulus_templates(data)
+        pkl = self._behavior_stimulus_file()
+        return get_stimulus_templates(pkl=pkl)
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the

@@ -5,7 +5,7 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates)
+    get_stimulus_templates, StimulusTemplates)
 
 
 @pytest.fixture()
@@ -90,17 +90,16 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
     assert actual == expected
 
 
-@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
-                         "expected_templates",
-                         [({}, ['images'], {})],
+@pytest.mark.parametrize("behavior_stimuli_data_fixture", ({},),
                          indirect=["behavior_stimuli_data_fixture"])
-def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
-                                expected_templates):
-    for stimuli in remove_stimuli:
-        del (behavior_stimuli_data_fixture['items']['behavior']
-        ['stimuli'][stimuli])
+def test_get_stimulus_templates(behavior_stimuli_data_fixture):
     templates = get_stimulus_templates(behavior_stimuli_data_fixture)
-    assert templates == expected_templates
+    images = [np.ones((4, 4)) * 127, np.ones((4, 4)) * 127]
+
+    assert templates.image_set_name == 'test_image_set'
+    assert len(templates) == 2
+    assert (templates['im000']['unwarped'] == images[0]).all()
+    assert (templates['im106']['unwarped'] == images[1]).all()
 
 
 # def test_get_images_dict():

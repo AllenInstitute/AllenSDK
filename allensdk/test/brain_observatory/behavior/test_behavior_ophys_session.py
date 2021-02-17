@@ -71,8 +71,13 @@ def test_visbeh_ophys_data_set():
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
            str(data_set.api.get_behavior_session_uuid())
-    assert list(data_set.stimulus_templates.values())[0].shape == (
-        8, 918, 1174)
+
+    stimulus_templates = data_set.stimulus_templates
+    image_set_name = 'Natural_Images_Lum_Matched_set_ophys_6_2017.07.14'
+    assert stimulus_templates.image_set_name == image_set_name
+    assert len(stimulus_templates) == 8
+    assert stimulus_templates['im000']['unwarped'].shape == (918, 1174)
+
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
            == ['time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == \
@@ -143,7 +148,7 @@ def test_legacy_dff_api():
     assert dff_array.shape[0] == session.dff_traces.shape[0]
 
 
-@pytest.mark.requires_bamboo
+# @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
     pytest.param(789359614, 153),
     pytest.param(792813858, 129)

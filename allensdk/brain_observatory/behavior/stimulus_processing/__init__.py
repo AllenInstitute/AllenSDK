@@ -1,30 +1,12 @@
 import numpy as np
 import pandas as pd
 import pickle
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Optional
 
-from allensdk.brain_observatory.behavior import IMAGE_SETS
-
-IMAGE_SETS_REV = {val: key for key, val in IMAGE_SETS.items()}
-
-
-def convert_filepath_caseinsensitive(filename_in):
-    if filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl'
-    else:
-        raise NotImplementedError(filename_in)
+from allensdk.brain_observatory.behavior.stimulus_processing.util import \
+    convert_filepath_caseinsensitive, get_image_set_name
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusTemplates
 
 
 def load_pickle(pstream):
@@ -170,26 +152,28 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     return grating_df
 
 
-def get_stimulus_templates(pkl) -> Dict:
+def get_stimulus_templates(pkl) -> Optional[StimulusTemplates]:
     """
-    Gets dictionary of images presented during experimentation
+    Gets images presented during experimentation
     Parameters
     ----------
     pkl: pkl file containing the data for the presented stimuli
 
     Returns
     -------
-    Dict:
-        Dictionary of images that were presented during the experiment
+    StimulusTemplates:
+        StimulusTemplates object containing images that were presented during
+        the experiment
 
     """
-    templates = {}
-    if 'images' in pkl['items']['behavior']['stimuli']:
-        images = get_images_dict(pkl)
-        image_set_filename = convert_filepath_caseinsensitive(
-            images['metadata']['image_set'])
-        templates[IMAGE_SETS_REV[image_set_filename]] = np.array(images['images'])
-    return templates
+    if 'images' not in pkl['items']['behavior']['stimuli']:
+        return None
+
+    images = get_images_dict(pkl)
+    image_set_name = images['metadata']['image_set']
+    return StimulusTemplates(
+        image_set_filepath=image_set_name,
+        image_attributes=images['image_attributes'], images=images['images'])
 
 
 def get_stimulus_metadata(pkl) -> pd.DataFrame:
@@ -216,7 +200,8 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         images = get_images_dict(pkl)
         stimulus_index_df = pd.DataFrame(images['image_attributes'])
         image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-        stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+        stimulus_index_df['image_set'] = get_image_set_name(
+            image_set_path=image_set_filename)
     else:
         stimulus_index_df = pd.DataFrame(columns=[
             'image_name', 'image_category', 'image_set', 'phase',

@@ -304,6 +304,7 @@ def behavior_stimuli_data_fixture(request):
     grating_phase = request.param.get("grating_phase", None)
     grating_spatial_frequency = request.param.get("grating_spatial_frequency",
                                                   None)
+    resources_dir = os.path.join(os.path.dirname(__file__), 'resources')
 
     data = {
         "items": {
@@ -311,7 +312,9 @@ def behavior_stimuli_data_fixture(request):
                 "stimuli": {
                     "images": {
                         "set_log": images_set_log,
-                        "draw_log": images_draw_log
+                        "draw_log": images_draw_log,
+                        "image_path": os.path.join(resources_dir,
+                                                   'test_image_set.pkl')
                     },
                     "grating": {
                         "set_log": grating_set_log,

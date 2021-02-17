@@ -3,7 +3,8 @@ import pandas as pd
 from typing import Any, Optional
 import logging
 
-
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplates
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
@@ -280,10 +281,9 @@ class BehaviorOphysSession(ParamsMixin):
         self._stimulus_presentations = value
 
     @property
-    def stimulus_templates(self) -> dict:
-        """A dictionary containing the stimulus images presented during the
-        session keys are data set names, and values are 3D numpy arrays.
-        :rtype: dict
+    def stimulus_templates(self) -> StimulusTemplates:
+        """A StimulusTemplates object containing the stimulus images
+        for the experiment
         """
         if self._stimulus_templates is None:
             self._stimulus_templates = self.api.get_stimulus_templates()
