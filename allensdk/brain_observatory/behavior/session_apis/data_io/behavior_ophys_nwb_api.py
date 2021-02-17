@@ -12,6 +12,8 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
+from allensdk.brain_observatory.behavior.event_detection import \
+    filter_events_array
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_expt_description
@@ -520,8 +522,16 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return nwbfile
 
-    def get_events(self) -> pd.DataFrame:
+    def get_events(self, filter_scale: float = 2,
+                   filter_n_time_steps: int = 20) -> pd.DataFrame:
         """
+        Parameters
+        ----------
+        filter_scale: float
+            See filter_events_array for description
+        filter_n_time_steps: int
+            See filter_events_array for description
+
         Returns
         -------
         Events dataframe:
@@ -536,22 +546,28 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         """
         event_detection = self.nwbfile.processing['ophys']['event_detection']
-        cell_specimen_table = event_detection.rois.to_dataframe()
+        # NOTE: The rois with events are stored in event detection
+        partial_cell_specimen_table = event_detection.rois.to_dataframe()
 
         events = event_detection.data[:]
 
         # events stored time x roi. Change back to roi x time
         events = events.T
 
+        filtered_events = filter_events_array(
+            arr=events, scale=filter_scale, n_time_steps=filter_n_time_steps)
+
         # Convert to list to that it can be stored in a single column
         events = [x for x in events]
+        filtered_events = [x for x in filtered_events]
 
         return pd.DataFrame({
+            'cell_roi_id': partial_cell_specimen_table.index,
             'events': events,
+            'filtered_events': filtered_events,
             'lambda': event_detection.lambdas[:],
-            'noise_std': event_detection.noise_stds[:],
-            'cell_roi_id': cell_specimen_table.index
-        }, index=pd.Index(cell_specimen_table['cell_specimen_id']))
+            'noise_std': event_detection.noise_stds[:]
+        }, index=pd.Index(partial_cell_specimen_table['cell_specimen_id']))
 
     @staticmethod
     def add_events(nwbfile: NWBFile, events: pd.DataFrame) -> NWBFile:
@@ -566,8 +582,20 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         events_data = np.vstack(events['events'])
 
         ophys_module = nwbfile.processing['ophys']
-        traces = (ophys_module.data_interfaces['dff'].roi_response_series[
-            'traces'])
+        dff_interface = ophys_module.data_interfaces['dff']
+        traces = dff_interface.roi_response_series['traces']
+        seg_interface = ophys_module.data_interfaces['image_segmentation']
+
+        cell_specimen_table = (
+            seg_interface.plane_segmentations['cell_specimen_table'])
+        cell_specimen_df = cell_specimen_table.to_dataframe()
+        cell_specimen_df = cell_specimen_df.set_index('cell_specimen_id')
+        # We only want to store the subset of rois that have events data
+        rois_with_events_indices = [cell_specimen_df.index.get_loc(label)
+                                    for label in events.index]
+        roi_table_region = cell_specimen_table.create_roi_table_region(
+            description="Cells with detected events",
+            region=rois_with_events_indices)
 
         events = EventDetection(
             # time x rois instead of rois x time
@@ -577,7 +605,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             lambdas=events['lambda'].values,
             noise_stds=events['noise_std'].values,
             unit='N/A',
-            rois=traces.rois,
+            rois=roi_table_region,
             timestamps=traces.timestamps
         )
 
