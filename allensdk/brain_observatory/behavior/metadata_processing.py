@@ -1,124 +1,25 @@
-OPHYS_0_HABITUATION = (
-    "A behavior training session performed on the 2-photon calcium imaging "
-    "setup but without recording neural activity, with the goal of "
-    "habituating the mouse to the experimental setup before commencing "
-    "imaging of neural activity. Habituation sessions are change detection "
-    "with the same image set on which the mouse was trained. The session is "
-    "75 minutes long, with 5 minutes of gray screen before and after 60 "
-    "minutes of behavior, followed by 10 repeats of a 30 second natural "
-    "movie stimulus at the end of the session."
-)
+import re
 
-OPHYS_1_3_DESCRIPTION = (
-    "2-photon calcium imaging in the visual cortex of the mouse brain as the "
-    "mouse performs a visual change detection task with a set of natural "
-    "images upon which it has been previously trained. Image stimuli are "
-    "displayed for 250 ms with a 500 ms intervening gray period. 5% of "
-    "non-change image presentations are randomly omitted. The session is "
-    "75 minutes long, with 5 minutes of gray screen before and after 60 "
-    "minutes of behavior, followed by 10 repeats of a 30 second natural "
-    "movie stimulus at the end of the session."
-)
-
-OPHYS_2_DESCRIPTION = (
-    "2-photon calcium imaging in the visual cortex of the mouse brain as "
-    "the mouse is passively shown changes in natural scene images upon which "
-    "it was previously trained as the change detection task is played in "
-    "open loop mode, with the lick-response sensory withdrawn and the mouse "
-    "is unable to respond to changes or receive reward feedback. Image "
-    "stimuli are displayed for 250 ms with a 500 ms intervening gray period. "
-    "5% of non-change image presentations are randomly omitted. The session "
-    "is 75 minutes long, with 5 minutes of gray screen before and after 60 "
-    "minutes of behavior, followed by 10 repeats of a 30 second natural "
-    "movie stimulus at the end of the session."
-)
-
-OPHYS_4_6_DESCRIPTION = (
-    "2-photon calcium imaging in the visual cortex of the mouse brain as the "
-    "mouse performs a visual change detection task with natural scene images "
-    "that are unique from those on which the mouse was trained prior to the "
-    "imaging phase of the experiment. Image stimuli are displayed for 250 ms "
-    "with a 500 ms intervening gray period. 5% of non-change image "
-    "presentations are randomly omitted. The session is 75 minutes long, with "
-    "5 minutes of gray screen before and after 60 minutes of behavior, "
-    "followed by 10 repeats of a 30 second natural movie stimulus at the end "
-    "of the session."
-)
-
-OPHYS_5_DESCRIPTION = (
-    "2-photon calcium imaging in the visual cortex of the mouse brain as the "
-    "mouse is passively shown changes in natural scene images that are unique "
-    "from those on which the mouse was trained prior to the imaging phase of "
-    "the experiment. In this session, the change detection task is played in "
-    "open loop mode, with the lick-response sensory withdrawn and the mouse "
-    "is unable to respond to changes or receive reward feedback. Image "
-    "stimuli are displayed for 250 ms with a 500 ms intervening gray period. "
-    "5% of non-change image presentations are randomly omitted. The session "
-    "is 75 minutes long, with 5 minutes of gray screen before and after 60 "
-    "minutes of behavior, followed by 10 repeats of a 30 second natural movie "
-    "stimulus at the end of the session."
-)
-
-TRAINING_GRATINGS_0 = (
-    "An associative training session where a mouse is automatically rewarded "
-    "when a grating stimulus changes orientation. Grating stimuli are "
-    "full-field, square-wave static gratings with a spatial frequency of "
-    "0.04 cycles per degree, with orientation changes between 0 and 90 "
-    "degrees, at two spatial phases. Delivered rewards are 5ul in volume, "
-    "and the session lasts for 15 minutes."
-)
-
-TRAINING_GRATINGS_1 = (
-    "An operant behavior training session where a mouse must lick following "
-    "a change in stimulus identity to earn rewards. Stimuli consist of "
-    "full-field, square-wave static gratings with a spatial frequency of "
-    "0.04 cycles per degree. Orientation changes between 0 and 90 degrees "
-    "occur with no intervening gray period. Delivered rewards are 10ul in "
-    "volume, and the session lasts 60 minutes"
-)
-
-TRAINING_GRATINGS_2 = (
-    "An operant behavior training session where a mouse must lick following "
-    "a change in stimulus identity to earn rewards. Stimuli consist of "
-    "full-field, square-wave static gratings with a spatial frequency of "
-    "0.04 cycles per degree. Gratings of 0 or 90 degrees are presented for "
-    "250 ms with a 500 ms intervening gray period. Delivered rewards are "
-    "10ul in volume, and the session lasts 60 minutes."
-)
-
-TRAINING_IMAGES_3 = (
-    "An operant behavior training session where a mouse must lick following "
-    "a change in stimulus identity to earn rewards. Stimuli consist of 8 "
-    "natural scene images, for a total of 64 possible pairwise transitions. "
-    "Images are shown for 250 ms with a 500 ms intervening gray period. "
-    "Delivered rewards are 10ul in volume, and the session lasts for 60 "
-    "minutes"
-)
-
-TRAINING_IMAGES_4 = (
-    "An operant behavior training session where a mouse must lick a spout "
-    "following a change in stimulus identity to earn rewards. Stimuli "
-    "consist of 8 natural scene images, for a total of 64 possible pairwise "
-    "transitions. Images are shown for 250 ms with a 500 ms intervening "
-    "gray period. Delivered rewards are 7ul in volume, and the session "
-    "lasts for 60 minutes"
-)
-
-TRAINING_IMAGES_5 = (
-    "An operant behavior training session where a mouse must lick a spout "
-    "following a change in stimulus identity to earn rewards. Stimuli consist "
-    "of 8 natural scene images, for a total of 64 possible pairwise "
-    "transitions. Images are shown for 250 ms with a 500 ms intervening gray "
-    "period. Delivered rewards are 7ul in volume. The session is 75 minutes "
-    "long, with 5 minutes of gray screen before and after 60 minutes of "
-    "behavior, followed by 10 repeats of a 30 second natural movie stimulus "
-    "at the end of the session."
-)
+description_dict = {
+    # key is a regex and value is returned on match
+    r"\AOPHYS_0_images": "A behavior training session performed on the 2-photon calcium imaging setup but without recording neural activity, with the goal of habituating the mouse to the experimental setup before commencing imaging of neural activity. Habituation sessions are change detection with the same image set on which the mouse was trained. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session.",  # noqa: E501
+    r"\AOPHYS_[1|3]_images": "2-photon calcium imaging in the visual cortex of the mouse brain as the mouse performs a visual change detection task with a set of natural images upon which it has been previously trained. Image stimuli are displayed for 250 ms with a 500 ms intervening gray period. 5% of non-change image presentations are randomly omitted. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session.",  # noqa: E501
+    r"\AOPHYS_2_images": "2-photon calcium imaging in the visual cortex of the mouse brain as the mouse is passively shown changes in natural scene images upon which it was previously trained as the change detection task is played in open loop mode, with the lick-response sensory withdrawn and the mouse is unable to respond to changes or receive reward feedback. Image stimuli are displayed for 250 ms with a 500 ms intervening gray period. 5% of non-change image presentations are randomly omitted. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session.",  # noqa: E501
+    r"\AOPHYS_[4|6]_images": "2-photon calcium imaging in the visual cortex of the mouse brain as the mouse performs a visual change detection task with natural scene images that are unique from those on which the mouse was trained prior to the imaging phase of the experiment. Image stimuli are displayed for 250 ms with a 500 ms intervening gray period. 5% of non-change image presentations are randomly omitted. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session.",  # noqa: E501
+    r"\AOPHYS_5_images": "2-photon calcium imaging in the visual cortex of the mouse brain as the mouse is passively shown changes in natural scene images that are unique from those on which the mouse was trained prior to the imaging phase of the experiment. In this session, the change detection task is played in open loop mode, with the lick-response sensory withdrawn and the mouse is unable to respond to changes or receive reward feedback. Image stimuli are displayed for 250 ms with a 500 ms intervening gray period. 5% of non-change image presentations are randomly omitted. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session.",  # noqa: E501
+    r"\ATRAINING_0_gratings": "An associative training session where a mouse is automatically rewarded when a grating stimulus changes orientation. Grating stimuli are  full-field, square-wave static gratings with a spatial frequency of 0.04 cycles per degree, with orientation changes between 0 and 90 degrees, at two spatial phases. Delivered rewards are 5ul in volume, and the session lasts for 15 minutes.",  # noqa: E501
+    r"\ATRAINING_1_gratings": "An operant behavior training session where a mouse must lick following a change in stimulus identity to earn rewards. Stimuli consist of  full-field, square-wave static gratings with a spatial frequency of 0.04 cycles per degree. Orientation changes between 0 and 90 degrees occur with no intervening gray period. Delivered rewards are 10ul in volume, and the session lasts 60 minutes",  # noqa: E501
+    r"\ATRAINING_2_gratings": "An operant behavior training session where a mouse must lick following a change in stimulus identity to earn rewards. Stimuli consist of full-field, square-wave static gratings with a spatial frequency of 0.04 cycles per degree. Gratings of 0 or 90 degrees are presented for 250 ms with a 500 ms intervening gray period. Delivered rewards are 10ul in volume, and the session lasts 60 minutes.",  # noqa: E501
+    r"\ATRAINING_3_images": "An operant behavior training session where a mouse must lick following a change in stimulus identity to earn rewards. Stimuli consist of 8 natural scene images, for a total of 64 possible pairwise transitions. Images are shown for 250 ms with a 500 ms intervening gray period. Delivered rewards are 10ul in volume, and the session lasts for 60 minutes",  # noqa: E501
+    r"\ATRAINING_4_images": "An operant behavior training session where a mouse must lick a spout following a change in stimulus identity to earn rewards. Stimuli consist of 8 natural scene images, for a total of 64 possible pairwise transitions. Images are shown for 250 ms with a 500 ms intervening gray period. Delivered rewards are 7ul in volume, and the session lasts for 60 minutes",  # noqa: E501
+    r"\ATRAINING_5_images": "An operant behavior training session where a mouse must lick a spout following a change in stimulus identity to earn rewards. Stimuli consist of 8 natural scene images, for a total of 64 possible pairwise transitions. Images are shown for 250 ms with a 500 ms intervening gray period. Delivered rewards are 7ul in volume. The session is 75 minutes long, with 5 minutes of gray screen before and after 60 minutes of behavior, followed by 10 repeats of a 30 second natural movie stimulus at the end of the session."  # noqa: E501
+    }
 
 
 def get_expt_description(session_type: str) -> str:
     """Determine a behavior ophys session's experiment description based on
-    session type.
+    session type. Matches the regex patterns defined as the keys in
+    description_dict
 
     Parameters
     ----------
@@ -137,38 +38,21 @@ def get_expt_description(session_type: str) -> str:
         Unknown session types (or malformed session_type strings) will raise
         an error.
     """
-    # Experiment descriptions for different session types:
-    # OPHYS_1 -> OPHYS_6
-    description_dict = dict()
-    description_dict.update({"OPHYS_0": OPHYS_0_HABITUATION})
-    description_dict.update(
-        dict.fromkeys(["OPHYS_1", "OPHYS_3"], OPHYS_1_3_DESCRIPTION))
-    description_dict.update(
-        dict.fromkeys(["OPHYS_4", "OPHYS_6"], OPHYS_4_6_DESCRIPTION))
-    description_dict.update({"OPHYS_2": OPHYS_2_DESCRIPTION})
-    description_dict.update({"OPHYS_5": OPHYS_5_DESCRIPTION})
-    description_dict.update({"TRAINING_0_gratings": TRAINING_GRATINGS_0})
-    description_dict.update({"TRAINING_1_gratings": TRAINING_GRATINGS_1})
-    description_dict.update({"TRAINING_2_gratings": TRAINING_GRATINGS_2})
-    description_dict.update({"TRAINING_3_images": TRAINING_IMAGES_3})
-    description_dict.update({"TRAINING_4_images": TRAINING_IMAGES_4})
-    description_dict.update({"TRAINING_5_images": TRAINING_IMAGES_5})
+    match = dict()
+    for k, v in description_dict.items():
+        if re.match(k, session_type) is not None:
+            match.update({k: v})
 
-    # Session type string will look something like: OPHYS_4_images_A
-    n_match_str = 2
-    if session_type.startswith("TRAINING"):
-        n_match_str = 3
-    truncated_session_type = "_".join(session_type.split("_")[:n_match_str])
+    if len(match) != 1:
+        emsg = (f"session type should match one and only one possible pattern "
+                f"template. '{session_type}' matched {len(match)} pattern "
+                "templates.")
+        if len(match) > 1:
+            emsg += f"{list(match.keys())}"
+        emsg += f"the regex pattern templates are {list(description_dict)}"
+        raise RuntimeError(emsg)
 
-    try:
-        return description_dict[truncated_session_type]
-    except KeyError as e:
-        e_msg = (
-            f"Encountered an unknown session type "
-            f"({truncated_session_type}) when trying to determine "
-            f"experiment descriptions. Valid session types are: "
-            f"{description_dict.keys()}")
-        raise RuntimeError(e_msg) from e
+    return match.popitem()[1]
 
 
 def get_task_parameters(data):
