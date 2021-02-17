@@ -46,11 +46,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def get_ophys_experiment_id(self):
-        return self.extractor.get_ophys_experiment_id()
-
     def get_ophys_session_id(self):
         return self.extractor.get_ophys_session_id()
+
+    def get_ophys_experiment_id(self):
+        return self.extractor.get_ophys_experiment_id()
 
     def get_eye_tracking_rig_geometry(self) -> dict:
         return self.extractor.get_eye_tracking_rig_geometry()

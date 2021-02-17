@@ -108,35 +108,13 @@ groups:
     dtype: text
     doc: Description of rig
   datasets:
-  - name: monitor_rotation
+  - name: camera_position
     dtype: float
     dims:
     - 3
     shape:
     - null
-    doc: rotation of monitor (x, y, z)
-    attributes:
-    - name: unit_of_measurement
-      dtype: text
-      doc: Unit of measurement for the data
-  - name: camera_rotation
-    dtype: float
-    dims:
-    - 3
-    shape:
-    - null
-    doc: rotation of camera (x, y, z)
-    attributes:
-    - name: unit_of_measurement
-      dtype: text
-      doc: Unit of measurement for the data
-  - name: monitor_position
-    dtype: float
-    dims:
-    - 3
-    shape:
-    - null
-    doc: position of monitor (x, y, z)
+    doc: position of camera (x, y, z)
     attributes:
     - name: unit_of_measurement
       dtype: text
@@ -152,13 +130,35 @@ groups:
     - name: unit_of_measurement
       dtype: text
       doc: Unit of measurement for the data
-  - name: camera_position
+  - name: monitor_rotation
     dtype: float
     dims:
     - 3
     shape:
     - null
-    doc: position of camera (x, y, z)
+    doc: rotation of monitor (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: monitor_position
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: position of monitor (x, y, z)
+    attributes:
+    - name: unit_of_measurement
+      dtype: text
+      doc: Unit of measurement for the data
+  - name: camera_rotation
+    dtype: float
+    dims:
+    - 3
+    shape:
+    - null
+    doc: rotation of camera (x, y, z)
     attributes:
     - name: unit_of_measurement
       dtype: text

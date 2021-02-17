@@ -80,7 +80,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         id used to initialize the API"""
         query = """
                 SELECT os.id FROM ophys_sessions os
-                JOIN ophys_experiment oe ON oe.ophys_session_id = os.id
+                JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
                 WHERE oe.id = {};
                 """.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=True)

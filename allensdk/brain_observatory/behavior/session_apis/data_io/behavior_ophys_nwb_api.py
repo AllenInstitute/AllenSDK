@@ -154,14 +154,21 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return nwbfile
 
+    def get_nwb_metadata(self) -> dict:
+        metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
+        data = OphysBehaviorMetadataSchema(
+            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+        return data
+
+    def get_behavior_session_id(self) -> int:
+        return self.get_nwb_metadata()['behavior_session_id']
+
+    def get_ophys_session_id(self) -> int:
+        return self.get_nwb_metadata()['ophys_session_id']
+
     def get_ophys_experiment_id(self) -> int:
         return int(self.nwbfile.identifier)
 
-    # TODO: Implement save and load of ophys_session_id to/from NWB file
-    def get_ophys_session_id(self) -> int:
-        raise NotImplementedError()
-
-    def get_eye_tracking(self) -> Optional[pd.DataFrame]:
         """
         Gets corneal, eye, and pupil ellipse fit data
 
@@ -294,10 +301,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                               'ophys', image_api=image_api)
 
     def get_metadata(self) -> dict:
-
-        metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-        data = OphysBehaviorMetadataSchema(
-            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+        data = self.get_nwb_metadata()
 
         # Add pyNWB Subject metadata to behavior ophys session metadata
         nwb_subject = self.nwbfile.subject

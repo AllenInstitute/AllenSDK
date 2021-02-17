@@ -66,6 +66,10 @@ class BehaviorMetadataSchema(RaisingSchema):
     neurodata_doc = "Metadata for behavior and behavior + ophys experiments"
     neurodata_skip = {"experiment_datetime"}
 
+    behavior_session_id = fields.Int(
+        doc='The unique ID for the behavior session',
+        required=True
+    )
     behavior_session_uuid = fields.UUID(
         doc='MTrain record for session, also called foraging_id',
         required=True,
@@ -129,6 +133,14 @@ class NwbOphysMetadataSchema(RaisingSchema):
 class OphysMetadataSchema(NwbOphysMetadataSchema):
     """This schema contains metadata pertaining to optical physiology (ophys).
     """
+    ophys_experiment_id = fields.Int(
+        doc='Unique ID for the ophys experiment (aka imaging plane)',
+        required=True
+    )
+    ophys_session_id = fields.Int(
+        doc='Unique ID for the ophys session',
+        required=True
+    )
     experiment_container_id = fields.Int(
         doc='Container ID for the container that contains this ophys session',
         required=True,
@@ -136,10 +148,6 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
     imaging_depth = fields.Int(
         doc=('Depth (microns) below the cortical surface '
              'targeted for two-photon acquisition'),
-        required=True,
-    )
-    ophys_experiment_id = fields.Int(
-        doc='Id for this ophys session',
         required=True,
     )
     field_of_view_width = fields.Int(
