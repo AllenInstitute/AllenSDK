@@ -334,6 +334,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             data['excitation_lambda'] = imaging_plane.excitation_lambda
             data['emission_lambda'] = optical_channel.emission_lambda
 
+        # Because nwb can't store imaging_plane_group as None
+        nwb_imaging_plane_group = data['imaging_plane_group']
+        if nwb_imaging_plane_group == -1:
+            data["imaging_plane_group"] = None
+        else:
+            data["imaging_plane_group"] = nwb_imaging_plane_group
+
         # Add other metadata stored in nwb file to behavior ophys session meta
         data['experiment_datetime'] = self.nwbfile.session_start_time
         data['behavior_session_uuid'] = uuid.UUID(

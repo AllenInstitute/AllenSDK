@@ -158,6 +158,18 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
         doc='Height of optical physiology imaging plane in pixels',
         required=True,
     )
+    imaging_plane_group = fields.Int(
+        doc=('A numeric index which indicates the order that an imaging plane '
+             'was acquired for a mesoscope experiment. Will be -1 for '
+             'non-mesoscope data'),
+        required=True
+    )
+    imaging_plane_group_count = fields.Int(
+        doc=('The total number of plane groups collected in a session '
+             'for a mesoscope experiment. Will be 0 if the scope did not '
+             'capture multiple concurrent imaging planes.'),
+        required=True
+    )
 
 
 class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):

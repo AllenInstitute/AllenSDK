@@ -697,11 +697,17 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
 
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
-    # Rename incoming metadata fields to conform with pynwb Subject fields
-    metadata = metadata.copy()
-    metadata["subject_id"] = metadata.pop("LabTracks_ID")
-    metadata["genotype"] = metadata.pop("full_genotype")
-    metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(metadata)
+    # Rename or reformat incoming metadata fields to conform with pynwb fields
+    imaging_plane_group = metadata["imaging_plane_group"]
+    
+    tmp_metadata = metadata.copy()
+    tmp_metadata["subject_id"] = tmp_metadata.pop("LabTracks_ID")
+    tmp_metadata["genotype"] = tmp_metadata.pop("full_genotype")
+    if imaging_plane_group is None:
+        tmp_metadata["imaging_plane_group"] = -1
+    else:
+        tmp_metadata["imaging_plane_group"] = imaging_plane_group
+    metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(tmp_metadata)
 
     # Subject related metadata should be saved to our BehaviorSubject
     # (augmented pyNWB 'Subject') NWB class
@@ -804,9 +810,19 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
-    device_name = nwbfile.lab_meta_data['metadata'].rig_name
-    nwbfile.create_device(device_name,
-                          "Allen Brain Observatory - Scientifica 2P Rig")
+    device_name: str = nwbfile.lab_meta_data['metadata'].rig_name
+    if device_name.startswith("MESO"):
+        device_config = {
+            "name": device_name,
+            "description": "Allen Brain Observatory - Mesoscope 2P Rig"
+        }
+    else:
+        device_config = {
+            "name": device_name,
+            "description": "Allen Brain Observatory - Scientifica 2P Rig",
+            "manufacturer": "Scientifica"
+        }
+    nwbfile.create_device(**device_config)
     device = nwbfile.get_device(device_name)
 
     # FOV:

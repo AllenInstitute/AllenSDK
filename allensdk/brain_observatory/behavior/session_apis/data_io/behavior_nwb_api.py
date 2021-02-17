@@ -198,7 +198,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data = OphysBehaviorMetadataSchema(
             exclude=['experiment_datetime']).dump(metadata_nwb_obj)
 
-        # Add pyNWB Subject metadata to behavior ophys session metadata
+        # Add pyNWB Subject metadata to behavior session metadata
         nwb_subject = self.nwbfile.subject
         data['LabTracks_ID'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
@@ -207,7 +207,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['reporter_line'] = list(nwb_subject.reporter_line)
         data['driver_line'] = list(nwb_subject.driver_line)
 
-        # Add other metadata stored in nwb file to behavior ophys session meta
+        # Add other metadata stored in nwb file to behavior session meta
         data['experiment_datetime'] = self.nwbfile.session_start_time
         data['behavior_session_uuid'] = uuid.UUID(
             data['behavior_session_uuid'])
