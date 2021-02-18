@@ -236,6 +236,10 @@ def compare_session_fields(x1: Any, x2: Any, err_msg=""):
         assert x1.GetSize() == x2.GetSize(), err_msg
         assert x1 == x2, err_msg
     elif isinstance(x1, (datetime.datetime, pd.Timestamp)):
+        if isinstance(x1, pd.Timestamp):
+            x1 = x1.to_pydatetime()
+        if isinstance(x2, pd.Timestamp):
+            x2 = x2.to_pydatetime()
         time_delta = (x1 - x2).total_seconds()
         # Timestamp differences should be less than 60 seconds
         assert abs(time_delta) < 60
