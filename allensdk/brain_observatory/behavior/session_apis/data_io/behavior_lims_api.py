@@ -360,4 +360,4 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
                 """.format(self.behavior_session_id)
 
         experiment_date = self.lims_db.fetchone(query, strict=True)
-        return pytz.utc.localize(experiment_date).astimezone(pytz.utc)
+        return pytz.utc.localize(experiment_date)

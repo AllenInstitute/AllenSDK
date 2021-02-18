@@ -27,9 +27,8 @@ from allensdk.brain_observatory.session_api_utils import (
     ],
     [
         lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
-        lambda ssn: ssn.get_max_projection()
+        lambda ssn: ssn.max_projection
     ]
-
 ])
 def test_session_from_json(tmpdir_factory, session_data, get_expected,
                            get_from_session):
@@ -43,7 +42,11 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected,
 
 @pytest.mark.requires_bamboo
 def test_nwb_end_to_end(tmpdir_factory):
-    oeid = 789359614
+    # NOTE: old test oeid 789359614 had no cell specimen ids due to not being
+    #       part of the 2021 Visual Behavior release set which broke a ton
+    #       of things...
+
+    oeid = 795073741
     tmpdir = 'test_nwb_end_to_end'
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp(tmpdir)),
                                 'nwbfile.nwb')

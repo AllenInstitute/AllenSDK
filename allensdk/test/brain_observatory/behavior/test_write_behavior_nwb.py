@@ -157,9 +157,9 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_behavior_only_metadata(roundtrip, roundtripper,
-                                    behavior_only_metadata):
+                                    behavior_only_metadata_fixture):
 
-    metadata = behavior_only_metadata
+    metadata = behavior_only_metadata_fixture
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',

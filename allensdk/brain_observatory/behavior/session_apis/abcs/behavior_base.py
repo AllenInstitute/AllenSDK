@@ -142,3 +142,14 @@ class BehaviorBase(abc.ABC):
             and trial data
         """
         raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_metadata(self) -> dict:
+        """Get metadata for Session
+
+        Returns
+        -------
+        dict
+            A dictionary containing various metadata
+        """
+        raise NotImplementedError()
