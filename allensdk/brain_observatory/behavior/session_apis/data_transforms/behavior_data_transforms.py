@@ -227,6 +227,13 @@ class BehaviorDataTransforms(BehaviorBase):
         pkl = self._behavior_stimulus_file()
         return get_stimulus_templates(pkl=pkl)
 
+    def get_monitor_delay(self) -> float:
+        """
+        Return monitor delay for behavior only sessions
+        (in seconds)
+        """
+        return 0.0
+
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the
         (frame, time) points in the trial events.

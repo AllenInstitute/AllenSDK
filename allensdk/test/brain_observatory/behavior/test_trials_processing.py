@@ -345,7 +345,7 @@ def test_get_trial_timing_exclusivity_assertions(
     with pytest.raises(AssertionError) as e:
         trials_processing.get_trial_timing(
             None, None, go, catch, auto_rewarded, hit, false_alarm,
-            aborted, np.array([]))
+            aborted, np.array([]), 0.0)
     assert errortext in str(e.value)
 
 
@@ -404,7 +404,8 @@ def test_get_trial_timing():
         hit=False,
         false_alarm=False,
         aborted=False,
-        timestamps=timestamps
+        timestamps=timestamps,
+        monitor_delay=0.0
     )
 
     expected_result = {

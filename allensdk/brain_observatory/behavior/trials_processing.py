@@ -244,7 +244,8 @@ def get_trial_timing(
         event_dict: dict,
         licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
         hit: bool, false_alarm: bool, aborted: bool,
-        timestamps: np.ndarray):
+        timestamps: np.ndarray,
+        monitor_delay: float):
     """
     Extract a dictionary of trial timing data.
     See trial_data_from_log for a description of the trial types.
@@ -273,6 +274,8 @@ def get_trial_timing(
     timestamps: np.ndarray[1d]
         Array of ground truth timestamps for the session
         (sync times, if available)
+    monitor_delay: float
+        The monitor delay in seconds associated with the session
 
     Returns
     =======
@@ -324,10 +327,10 @@ def get_trial_timing(
 
     if go or auto_rewarded:
         change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-        change_time = timestamps[change_frame]
+        change_time = timestamps[change_frame] + monitor_delay
     elif catch:
         change_frame = event_dict.get(('sham_change', ''))['frame']
-        change_time = timestamps[change_frame]
+        change_time = timestamps[change_frame] + monitor_delay
     else:
         change_time = float("nan")
         change_frame = float("nan")
@@ -454,6 +457,7 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     rewards_df = input_transform.get_rewards()
     licks_df = input_transform.get_licks()
     timestamps = input_transform.get_stimulus_timestamps()
+    monitor_delay = input_transform.get_monitor_delay()
     data = input_transform._behavior_stimulus_file()
 
     assert rewards_df.index.name == 'timestamps'
@@ -520,7 +524,8 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
             tr_data['hit'],
             tr_data['false_alarm'],
             tr_data["aborted"],
-            timestamps
+            timestamps,
+            monitor_delay
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
