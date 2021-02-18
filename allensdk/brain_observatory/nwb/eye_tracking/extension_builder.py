@@ -1,6 +1,7 @@
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBDatasetSpec, NWBAttributeSpec
+from pynwb.spec import (NWBNamespaceBuilder, export_spec,
+                        NWBGroupSpec, NWBDatasetSpec)
 
 NAMESPACE = 'ndx-ellipse-eye-tracking'
 
@@ -34,7 +35,13 @@ def main():
             NWBDatasetSpec(
                 name='area',
                 dtype='float',
-                doc='ellipse area',
+                doc='ellipse area, with nan values in likely blink times',
+                shape=(None, )
+            ),
+            NWBDatasetSpec(
+                name='area_raw',
+                dtype='float',
+                doc='ellipse area, with no regard to likely blink times',
                 shape=(None, )
             ),
             NWBDatasetSpec(

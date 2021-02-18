@@ -157,6 +157,7 @@ def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
     assert df['omitted'].sum() == number_omitted
 
 
+@pytest.mark.skip
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [
     pytest.param(789359614),

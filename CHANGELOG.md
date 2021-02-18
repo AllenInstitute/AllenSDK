@@ -8,7 +8,10 @@ All notable changes to this project will be documented in this file.
 - Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
 - Return event detection data through session API
 - Read/write event detection data from/to NWB
+- Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
+- For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
 - stimulus_templates in Session API returns new object with key of image name
+
 
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files

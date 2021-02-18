@@ -15,8 +15,7 @@ from allensdk.brain_observatory.behavior.event_detection import \
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
-from allensdk.brain_observatory.behavior.sync import (
-    get_sync_data, get_stimulus_rebase_function, frame_time_offset)
+from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
@@ -144,7 +143,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
                             .corrected_stim_timestamps)
-        return timestamps
+        return np.array(timestamps)
 
     @staticmethod
     def _process_ophys_plane_timestamps(
@@ -275,41 +274,42 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return pd.DataFrame({'time': lick_times})
 
     @memoize
-    def get_licks(self):
+    def get_licks(self) -> pd.DataFrame:
+        """
+        Returns
+        -------
+        pd.DataFrame
+            Two columns: "time", which contains the sync time
+            of the licks that occurred in this session and "frame",
+            the frame numbers of licks that occurred in this session
+        """
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
+        timestamps = self.get_stimulus_timestamps()
         # Get licks from pickle file (need to add an offset to align with
         # the trial_log time stream)
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
-        vsyncs = data["items"]["behavior"]["intervalsms"]
-
-        # Cumulative time
-        vsync_times_raw = np.hstack((0, vsyncs)).cumsum() / 1000.0
-
-        vsync_offset = frame_time_offset(data)
-        vsync_times = vsync_times_raw + vsync_offset
-        lick_times = [vsync_times[frame] for frame in lick_frames]
-        # Align pickle data with sync time stream
-        return pd.DataFrame({"time": list(map(rebase_function, lick_times))})
+        lick_times = timestamps[lick_frames]
+        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
     @memoize
     def get_rewards(self):
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
-        return get_rewards(data, rebase_function)
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
     @memoize
     def get_trials(self):
 
+        timestamps = self.get_stimulus_timestamps()
         licks = self.get_licks()
         rewards = self.get_rewards()
-        stimulus_presentations = self.get_stimulus_presentations()
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
 
-        trial_df = get_trials(data, licks, rewards,
-                              stimulus_presentations, rebase_function)
+        trial_df = get_trials(data,
+                              licks,
+                              rewards,
+                              timestamps)
 
         return trial_df
 
@@ -374,16 +374,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         motion_corr_file = self.extractor.get_rigid_motion_transform_file()
         motion_correction = pd.read_csv(motion_corr_file)
         return motion_correction[['x', 'y']]
-
-    def get_stimulus_rebase_function(self):
-        stimulus_timestamps_no_monitor_delay = (
-            self.get_sync_data()['stimulus_times_no_delay'])
-
-        data = self._behavior_stimulus_file()
-        stimulus_rebase_function = get_stimulus_rebase_function(
-            data, stimulus_timestamps_no_monitor_delay)
-
-        return stimulus_rebase_function
 
     @memoize
     def get_eye_tracking(self,

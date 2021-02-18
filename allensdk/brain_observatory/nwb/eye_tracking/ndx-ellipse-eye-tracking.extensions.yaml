@@ -16,7 +16,12 @@ groups:
     dtype: float
     shape:
     - null
-    doc: ellipse area
+    doc: ellipse area, with nan values in likely blink times
+  - name: area_raw
+    dtype: float
+    shape:
+    - null
+    doc: ellipse area, with no regard to likely blink times
   - name: width
     dtype: float
     shape:
