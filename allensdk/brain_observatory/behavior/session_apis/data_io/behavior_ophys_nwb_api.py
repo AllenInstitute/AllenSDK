@@ -81,15 +81,10 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        for name, image_data in session_object.stimulus_templates.items():
-            nwb.add_stimulus_template(nwbfile, image_data, name)
-
-            # Add index for this template to NWB in-memory object:
-            nwb_template = nwbfile.stimulus_template[name]
-            stimulus_index = session_object.stimulus_presentations[
-                session_object.stimulus_presentations[
-                    'image_set'] == nwb_template.name]
-            nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
+        self._add_stimulus_templates(
+            nwbfile=nwbfile,
+            stimulus_templates=session_object.stimulus_templates,
+            stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(

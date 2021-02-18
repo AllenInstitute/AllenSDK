@@ -11,6 +11,8 @@ import pytz
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 
@@ -50,11 +52,13 @@ def running_data_df(running_speed):
 @pytest.fixture
 def stimulus_templates():
 
-    image_template = np.zeros((3, 4, 5))
-    image_template[1, :, :] = image_template[1, :, :] + 1
-    image_template[2, :, :] = image_template[2, :, :] + 2
+    images = [np.zeros((4, 4)), np.ones((4, 4))]
 
-    return {'test1': image_template, 'test2': np.zeros((5, 2, 2))}
+    image_attributes = [{'image_name': 'test1'}, {'image_name': 'test2'}]
+    stimulus_templates = StimulusTemplate(
+        image_set_name='test', image_attributes=image_attributes,
+        images=images)
+    return stimulus_templates
 
 
 @pytest.fixture
@@ -304,6 +308,7 @@ def behavior_stimuli_data_fixture(request):
     grating_phase = request.param.get("grating_phase", None)
     grating_spatial_frequency = request.param.get("grating_spatial_frequency",
                                                   None)
+    resources_dir = os.path.join(os.path.dirname(__file__), 'resources')
 
     data = {
         "items": {
@@ -311,7 +316,9 @@ def behavior_stimuli_data_fixture(request):
                 "stimuli": {
                     "images": {
                         "set_log": images_set_log,
-                        "draw_log": images_draw_log
+                        "draw_log": images_draw_log,
+                        "image_path": os.path.join(resources_dir,
+                                                   'test_image_set.pkl')
                     },
                     "grating": {
                         "set_log": grating_set_log,

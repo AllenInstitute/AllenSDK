@@ -75,52 +75,6 @@ def eye_tracking_data():
                    14., 15., 16.]])
     )
 
-
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_templates(nwbfile, stimulus_templates,
-                                roundtrip, roundtripper):
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    stimulus_templates_obt = obt.get_stimulus_templates()
-    uset = set(stimulus_templates.keys()).union(
-            set(stimulus_templates_obt.keys()))
-    for key in uset:
-        np.testing.assert_array_almost_equal(stimulus_templates[key],
-                                             stimulus_templates_obt[key])
-
-
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior,
-                                    stimulus_timestamps, roundtrip,
-                                    roundtripper, stimulus_templates):
-    nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
-    nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_behavior)
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
-
-        # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[key]
-        compare = (stimulus_presentations_behavior['image_set'] ==
-                   nwb_template.name)
-        curr_stimulus_index = stimulus_presentations_behavior[compare]
-        nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    pd.testing.assert_frame_equal(stimulus_presentations_behavior,
-                                  obt.get_stimulus_presentations(),
-                                  check_dtype=False)
-
-
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_timestamps(nwbfile, stimulus_timestamps,
                                  roundtrip, roundtripper):

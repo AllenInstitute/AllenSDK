@@ -16,6 +16,8 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
 )
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -65,15 +67,10 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        for name, image_data in session_object.stimulus_templates.items():
-            nwb.add_stimulus_template(nwbfile, image_data, name)
-
-            # Add index for this template to NWB in-memory object:
-            nwb_template = nwbfile.stimulus_template[name]
-            stimulus_index = session_object.stimulus_presentations[
-                session_object.stimulus_presentations[
-                    'image_set'] == nwb_template.name]
-            nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
+        self._add_stimulus_templates(
+            nwbfile=nwbfile,
+            stimulus_templates=session_object.stimulus_templates,
+            stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(
@@ -148,9 +145,18 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
         return running_data_df[['speed', 'dx', 'v_sig', 'v_in']]
 
-    def get_stimulus_templates(self, **kwargs):
-        return {key: val.data[:]
-                for key, val in self.nwbfile.stimulus_template.items()}
+    def get_stimulus_templates(self, **kwargs) -> StimulusTemplate:
+        image_set_name = list(self.nwbfile.stimulus_template.keys())[0]
+        image_data = list(self.nwbfile.stimulus_template.values())[0]
+
+        image_attributes = [{'image_name': image_name}
+                            for image_name in image_data.control_description]
+        stimulus_templates = StimulusTemplate(
+            image_set_name=image_set_name,
+            image_attributes=image_attributes,
+            images=image_data.data[:]
+        )
+        return stimulus_templates
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         stim_module = self.nwbfile.processing['stimulus']
@@ -212,3 +218,20 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
         data = BehaviorTaskParametersSchema().dump(metadata_nwb_obj)
         return data
+
+    @staticmethod
+    def _add_stimulus_templates(nwbfile: NWBFile,
+                                stimulus_templates: StimulusTemplate,
+                                stimulus_presentations: pd.DataFrame):
+        nwb.add_stimulus_template(
+            nwbfile=nwbfile, stimulus_template=stimulus_templates)
+
+        # Add index for this template to NWB in-memory object:
+        nwb_template = nwbfile.stimulus_template[
+            stimulus_templates.image_set_name]
+        stimulus_index = stimulus_presentations[
+            stimulus_presentations[
+                'image_set'] == nwb_template.name]
+        nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
+
+        return nwbfile

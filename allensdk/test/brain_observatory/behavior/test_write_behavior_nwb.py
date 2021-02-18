@@ -8,6 +8,8 @@ import pytest
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi)
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -27,10 +29,9 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_templates(nwbfile, stimulus_templates,
+def test_add_stimulus_templates(nwbfile, stimulus_templates: StimulusTemplate,
                                 roundtrip, roundtripper):
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
+    nwb.add_stimulus_template(nwbfile, stimulus_templates)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorNwbApi)
@@ -38,27 +39,29 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates,
         obt = BehaviorNwbApi.from_nwbfile(nwbfile)
 
     stimulus_templates_obt = obt.get_stimulus_templates()
-    template_union = (
-        set(stimulus_templates.keys()) | set(stimulus_templates_obt.keys()))
-    for key in template_union:
-        np.testing.assert_array_almost_equal(stimulus_templates[key],
-                                             stimulus_templates_obt[key])
+
+    for img_name in stimulus_templates_obt:
+        assert np.array_equal(
+            a1=stimulus_templates[img_name],
+            a2=stimulus_templates_obt[img_name])
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior,
                                     stimulus_timestamps, roundtrip,
-                                    roundtripper, stimulus_templates):
+                                    roundtripper,
+                                    stimulus_templates: StimulusTemplate):
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
     nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_behavior)
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
+    nwb.add_stimulus_template(nwbfile=nwbfile,
+                              stimulus_template=stimulus_templates)
 
-        # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[key]
-        curr_stimulus_index = stimulus_presentations_behavior[
-            stimulus_presentations_behavior['image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
+    # Add index for this template to NWB in-memory object:
+    nwb_template = nwbfile.stimulus_template[stimulus_templates.image_set_name]
+    compare = (stimulus_presentations_behavior['image_set'] ==
+               nwb_template.name)
+    curr_stimulus_index = stimulus_presentations_behavior[compare]
+    nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorNwbApi)
