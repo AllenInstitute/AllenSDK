@@ -56,7 +56,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert sessions_are_equal(d1, d2, reraise=True)
 
 
-#@pytest.mark.nightly
+@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
     ophys_experiment_id = 789359614
     data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
@@ -115,12 +115,11 @@ def test_visbeh_ophys_data_set():
         'sex': 'F',
         'imaging_plane_group': None}
     assert data_set.metadata == expected
-
-    assert math.isnan(data_set.task_parameters.pop('omitted_flash_fraction'))
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
                                         'stimulus_duration_sec': 6.0,
                                         'stimulus': 'images',
+                                        'omitted_flash_fraction': 0.05,
                                         'blank_duration_sec': [0.5, 0.5],
                                         'n_stimulus_frames': 69882,
                                         'task': 'DoC_untranslated',
