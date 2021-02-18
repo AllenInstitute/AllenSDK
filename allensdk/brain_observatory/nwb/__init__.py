@@ -16,7 +16,6 @@ from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
-from ndx_events import Events
 
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
     StimulusImage, StimulusTemplate
@@ -646,15 +645,18 @@ def add_trials(nwbfile, trials, description_dict={}):
 
 def add_licks(nwbfile, licks):
 
-    lick_events = Events(
-        timestamps=licks.time.values,
+    lick_timeseries = TimeSeries(
         name='licks',
-        description='Timestamps for lick events'
+        data=licks.frame.values,
+        timestamps=licks.time.values,
+        description=('Timestamps and stimulus presentation '
+                     'frame indices for lick events')
     )
 
     # Add lick interface to nwb file, by way of a processing module:
-    licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
-    licks_mod.add_data_interface(lick_events)
+    licks_mod = ProcessingModule('licking',
+                                 'Licking behavior processing module')
+    licks_mod.add_data_interface(lick_timeseries)
     nwbfile.add_processing_module(licks_mod)
 
     return nwbfile

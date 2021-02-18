@@ -209,12 +209,15 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
     def get_licks(self) -> np.ndarray:
         if 'licking' in self.nwbfile.processing:
-            licks = (
-                self.nwbfile.processing['licking'].get_data_interface('licks'))
-            lick_timestamps = licks.timestamps[:]
-            return pd.DataFrame({'time': lick_timestamps})
+            lick_module = self.nwbfile.processing['licking']
+            licks = lick_module.get_data_interface('licks')
+
+            return pd.DataFrame({
+                'time': licks.timestamps[:],
+                'frame': licks.data[:]
+            })
         else:
-            return pd.DataFrame({'time': []})
+            return pd.DataFrame({'time': [], 'frame': []})
 
     def get_rewards(self) -> np.ndarray:
         if 'rewards' in self.nwbfile.processing:
