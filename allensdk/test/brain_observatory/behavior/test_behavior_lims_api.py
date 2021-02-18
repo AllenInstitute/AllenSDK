@@ -146,7 +146,7 @@ def MockBehaviorLimsApi():
             }
             return data
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
@@ -173,7 +173,7 @@ def MockApiRunSpeedExpectedError():
 
     class MockBehaviorLimsApiRunSpeedExpectedError(BehaviorLimsApi):
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]})

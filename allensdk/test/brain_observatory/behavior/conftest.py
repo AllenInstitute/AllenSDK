@@ -36,17 +36,17 @@ def pytest_ignore_collect(path, config):
 
 
 @pytest.fixture
-def running_data_df(running_speed):
+def running_acquisition_df_fixture(running_speed):
 
     v_sig = np.ones_like(running_speed.values)
     v_in = np.ones_like(running_speed.values)
     dx = np.ones_like(running_speed.values)
 
-    return pd.DataFrame({'speed': running_speed.values,
-                         'dx': dx,
-                         'v_sig': v_sig,
-                         'v_in': v_in,
-                         }, index=pd.Index(running_speed.timestamps, name='timestamps'))
+    return pd.DataFrame({
+        'dx': dx,
+        'v_sig': v_sig,
+        'v_in': v_in,
+    }, index=pd.Index(running_speed.timestamps, name='timestamps'))
 
 
 @pytest.fixture

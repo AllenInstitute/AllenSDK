@@ -363,13 +363,16 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     Parameters
     ----------
     nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : RunningSpeed
+        File to which running speeds will be written
+    running_speed : Union[RunningSpeed, pd.DataFrame]
+        Either a RunningSpeed object or pandas DataFrame.
         Contains attributes 'values' and 'timestamps'
     name : str, optional
-        used as name of timeseries object
+        Used as name of timeseries object
     unit : str, optional
         SI units of running speed values
+    from_dataframe : bool, optional
+        Whether `running_speed` is a dataframe or not. Default is False.
 
     Returns
     -------
@@ -381,8 +384,8 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
         data = running_speed['values'].values
         timestamps = running_speed['timestamps'].values
     else:
-        data=running_speed.values
-        timestamps=running_speed.timestamps
+        data = running_speed.values
+        timestamps = running_speed.timestamps
 
     running_speed_series = pynwb.base.TimeSeries(
         name=name,
@@ -393,7 +396,8 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     if 'running' in nwbfile.processing:
         running_mod = nwbfile.processing['running']
     else:
-        running_mod = ProcessingModule('running', 'Running speed processing module')
+        running_mod = ProcessingModule('running',
+                                       'Running speed processing module')
         nwbfile.add_processing_module(running_mod)
 
     running_mod.add_data_interface(running_speed_series)
