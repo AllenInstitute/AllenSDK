@@ -282,7 +282,7 @@ class BehaviorOphysSession(ParamsMixin):
 
     @property
     def stimulus_templates(self) -> StimulusTemplate:
-        """A StimulusTemplates object containing the stimulus images
+        """A StimulusTemplate object containing the stimulus images
         for the experiment
         """
         if self._stimulus_templates is None:

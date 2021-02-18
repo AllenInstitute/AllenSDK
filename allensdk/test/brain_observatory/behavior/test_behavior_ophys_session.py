@@ -146,7 +146,7 @@ def test_legacy_dff_api():
     assert dff_array.shape[0] == session.dff_traces.shape[0]
 
 
-# @pytest.mark.requires_bamboo
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
     pytest.param(789359614, 153),
     pytest.param(792813858, 129)

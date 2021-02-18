@@ -161,8 +161,8 @@ def get_stimulus_templates(pkl) -> Optional[StimulusTemplate]:
 
     Returns
     -------
-    StimulusTemplates:
-        StimulusTemplates object containing images that were presented during
+    StimulusTemplate:
+        StimulusTemplate object containing images that were presented during
         the experiment
 
     """

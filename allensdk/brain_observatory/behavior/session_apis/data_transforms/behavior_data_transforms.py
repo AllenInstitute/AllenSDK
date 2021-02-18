@@ -192,7 +192,7 @@ class BehaviorDataTransforms(BehaviorBase):
 
         Returns
         -------
-        StimulusTemplates or None if there are no images for the experiment
+        StimulusTemplate or None if there are no images for the experiment
         """
         pkl = self._behavior_stimulus_file()
         return get_stimulus_templates(pkl=pkl)
