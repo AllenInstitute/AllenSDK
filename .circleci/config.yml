@@ -108,4 +108,5 @@ workflows:
       - lint
       - linux-py36
       - linux-py37
-      - osx-py36
+      # disabled osx build. covered by github-actions
+      # - osx-py36
