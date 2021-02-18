@@ -56,7 +56,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert sessions_are_equal(d1, d2, reraise=True)
 
 
-@pytest.mark.nightly
+#@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
     ophys_experiment_id = 789359614
     data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
@@ -74,7 +74,7 @@ def test_visbeh_ophys_data_set():
     assert list(data_set.stimulus_templates.values())[0].shape == (
         8, 918, 1174)
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
-           == ['time']
+           == ['time', 'frame']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == \
            ['volume', 'autorewarded']
     assert len(data_set.corrected_fluorescence_traces) == 269 and \
