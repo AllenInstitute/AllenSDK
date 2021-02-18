@@ -74,10 +74,10 @@ def test_visbeh_ophys_data_set():
     assert list(data_set.stimulus_templates.values())[0].shape == (
         8, 918, 1174)
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
-           == ['time']
+           == ['time', 'frame']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == \
            ['volume', 'autorewarded']
-    assert len(data_set.corrected_fluorescence_traces) == 269 and \
+    assert len(data_set.corrected_fluorescence_traces) == 258 and \
            sorted(data_set.corrected_fluorescence_traces.columns) == \
            ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps,
@@ -115,12 +115,11 @@ def test_visbeh_ophys_data_set():
         'sex': 'F',
         'imaging_plane_group': None}
     assert data_set.metadata == expected
-
-    assert math.isnan(data_set.task_parameters.pop('omitted_flash_fraction'))
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
                                         'stimulus_duration_sec': 6.0,
                                         'stimulus': 'images',
+                                        'omitted_flash_fraction': 0.05,
                                         'blank_duration_sec': [0.5, 0.5],
                                         'n_stimulus_frames': 69882,
                                         'task': 'DoC_untranslated',
