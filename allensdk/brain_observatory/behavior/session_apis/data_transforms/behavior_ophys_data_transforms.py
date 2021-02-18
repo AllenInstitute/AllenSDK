@@ -20,7 +20,7 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
+from allensdk.brain_observatory.behavior.trials_processing import get_trials_from_data_transform
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -331,10 +331,10 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         rewards = self.get_rewards()
         data = self._behavior_stimulus_file()
 
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
+        trial_df = get_trials_from_data_transform(data,
+                                                  licks,
+                                                  rewards,
+                                                  timestamps)
 
         return trial_df
 

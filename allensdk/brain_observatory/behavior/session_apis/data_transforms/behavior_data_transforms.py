@@ -19,7 +19,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
     StimulusTemplate)
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_extended_trials, get_trials)
+    get_extended_trials, get_trials_from_data_transform)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 
@@ -271,10 +271,10 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
 
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
+        trial_df = get_trials_from_data_transform(data,
+                                                  licks,
+                                                  rewards,
+                                                  timestamps)
 
         return trial_df
 

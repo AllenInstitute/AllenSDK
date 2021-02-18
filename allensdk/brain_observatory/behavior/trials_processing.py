@@ -431,10 +431,10 @@ def get_trial_bounds(trial_log: List) -> List:
     return list([(s, e) for s, e in zip(start_frames, end_frames)])
 
 
-def get_trials(data: Dict,
-               licks_df: pd.DataFrame,
-               rewards_df: pd.DataFrame,
-               timestamps: np.ndarray) -> pd.DataFrame:
+def get_trials_from_data_transform(data: Dict,
+                                   licks_df: pd.DataFrame,
+                                   rewards_df: pd.DataFrame,
+                                   timestamps: np.ndarray) -> pd.DataFrame:
     """
     Create and return a pandas DataFrame containing data about
     the trials associated with this session
