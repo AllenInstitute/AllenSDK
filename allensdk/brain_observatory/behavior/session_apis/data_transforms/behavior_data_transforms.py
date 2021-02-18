@@ -66,6 +66,7 @@ class BehaviorDataTransforms(BehaviorBase):
 
         return behavior_pkl_uuid
 
+    @memoize
     def get_licks(self) -> pd.DataFrame:
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
@@ -93,6 +94,7 @@ class BehaviorDataTransforms(BehaviorBase):
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
         return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
+    @memoize
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
         (not sync file).
@@ -267,6 +269,7 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         return get_task_parameters(data)
 
+    @memoize
     def get_trials(self) -> pd.DataFrame:
         """Get trials from pkl file
 

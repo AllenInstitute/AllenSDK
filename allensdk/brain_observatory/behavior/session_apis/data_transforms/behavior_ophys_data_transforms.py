@@ -324,13 +324,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return get_rewards(data, timestamps)
 
     @memoize
-    def get_trials(self):
-
-        trial_df = get_trials_from_data_transform(self)
-
-        return trial_df
-
-    @memoize
     def get_corrected_fluorescence_traces(self):
         demix_file = self.extractor.get_demix_file()
 
