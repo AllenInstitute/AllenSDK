@@ -316,6 +316,23 @@ class OphysTimeAligner(object):
 
     @property
     def corrected_stim_timestamps(self):
+        """
+        The stimulus timestamps corrected for monitor delay
+
+        Returns
+        -------
+        timestamps: np.ndarray
+            An array of stimulus timestamps in seconds with th emonitor delay
+            added
+
+        delta: int
+            Difference between the length of timestamps and the number of frames
+            reported in the stimulus pickle file, i.e.
+            len(timestamps) - len(pkl_file['items']['behavior']['intervalsms']
+
+        delay: float
+            The monitor delay in seconds
+        """
         timestamps = self.stim_timestamps
 
         delta = 0
