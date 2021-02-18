@@ -9,8 +9,6 @@ import pytest
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
-from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import create_refined_eye_tracking_df  # noqa: E501
 
 
