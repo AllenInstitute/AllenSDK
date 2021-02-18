@@ -65,6 +65,7 @@ def test_add_trials(nwbfile, roundtrip, roundtripper, trials):
     pd.testing.assert_frame_equal(trials, obt.get_trials(), check_dtype=False)
 
 
+# licks fixture from test.brain_observatory.behavior.conftest
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_licks(nwbfile, roundtrip, roundtripper, licks):
 
