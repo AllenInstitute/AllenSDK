@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Union
 
 import h5py
 import marshmallow
@@ -19,6 +19,8 @@ from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
 from ndx_events import Events
 
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusImage, StimulusTemplate
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
@@ -353,14 +355,24 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     return nwbfile
 
 
-def add_stimulus_template(nwbfile, image_data, name):
+def add_stimulus_template(nwbfile: NWBFile,
+                          stimulus_template: StimulusTemplate):
+    images = []
+    image_names = []
+    for image_name, image_data in stimulus_template.items():
+        image_names.append(image_name)
+        images.append(image_data)
 
-    image_index = list(range(image_data.shape[0]))
-    visual_stimulus_image_series = ImageSeries(name=name,
-                                               data=image_data,
-                                               unit='NA',
-                                               format='raw',
-                                               timestamps=image_index)
+    image_index = list(range(len(images)))
+    visual_stimulus_image_series = \
+        ImageSeries(
+            name=stimulus_template.image_set_name,
+            data=images,
+            control=list(range(len(image_names))),
+            control_description=image_names,
+            unit='NA',
+            format='raw',
+            timestamps=image_index)
 
     nwbfile.add_stimulus_template(visual_stimulus_image_series)
     return nwbfile

@@ -5,7 +5,7 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates, StimulusTemplates)
+    get_stimulus_templates, StimulusTemplate)
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
     StimulusImage
 
@@ -107,10 +107,10 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
 
     for i, img_name in enumerate(templates):
         img = templates[img_name]
-        assert np.array_equal(a1=images[i], a2=img.values)
+        assert np.array_equal(a1=images[i], a2=img)
 
     for i, (img_name, img) in enumerate(templates.items()):
-        assert np.array_equal(a1=images[i], a2=img.values)
+        assert np.array_equal(a1=images[i], a2=img)
 
 
 # def test_get_images_dict():

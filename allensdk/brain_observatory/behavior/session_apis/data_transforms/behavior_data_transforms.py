@@ -16,7 +16,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
-    StimulusTemplates)
+    StimulusTemplate)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials)
@@ -187,7 +187,7 @@ class BehaviorDataTransforms(BehaviorBase):
                              f" {len(stim_pres_df)}.")
         return stim_pres_df[sorted(stim_pres_df)]
 
-    def get_stimulus_templates(self) -> Optional[StimulusTemplates]:
+    def get_stimulus_templates(self) -> Optional[StimulusTemplate]:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns

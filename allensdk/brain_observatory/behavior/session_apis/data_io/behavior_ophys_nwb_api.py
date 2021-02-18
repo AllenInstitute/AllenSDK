@@ -23,8 +23,6 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema,
     OphysEyeTrackingRigMetadataSchema)
-from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplates
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -83,7 +81,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        self.__add_stimulus_templates(
+        self._add_stimulus_templates(
             nwbfile=nwbfile,
             stimulus_templates=session_object.stimulus_templates,
             stimulus_presentations=session_object.stimulus_presentations)
@@ -648,25 +646,5 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         )
 
         ophys_module.add_data_interface(events)
-
-        return nwbfile
-
-    @staticmethod
-    def __add_stimulus_templates(nwbfile: NWBFile,
-                                 stimulus_templates: StimulusTemplates,
-                                 stimulus_presentations: pd.DataFrame):
-        image_data = [img.values for img in stimulus_templates.values()]
-        image_data = np.array(image_data)
-        nwb.add_stimulus_template(
-            nwbfile=nwbfile, image_data=image_data,
-            name=stimulus_templates.image_set_name)
-
-        # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[
-            stimulus_templates.image_set_name]
-        stimulus_index = stimulus_presentations[
-            stimulus_presentations[
-                'image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         return nwbfile

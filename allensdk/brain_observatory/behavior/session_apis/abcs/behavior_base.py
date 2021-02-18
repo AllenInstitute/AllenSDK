@@ -4,6 +4,9 @@ from typing import Dict
 
 import numpy as np
 import pandas as pd
+
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
@@ -76,14 +79,12 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
+    def get_stimulus_templates(self) -> StimulusTemplate:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        Dict[str, np.ndarray]
-            A dictionary containing the stimulus images presented during the
-            session. Keys are data set names, and values are 3D numpy arrays.
+        StimulusTemplate
         """
         raise NotImplementedError()
 

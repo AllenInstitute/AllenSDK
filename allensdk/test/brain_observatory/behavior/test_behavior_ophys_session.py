@@ -73,8 +73,6 @@ def test_visbeh_ophys_data_set():
            str(data_set.api.get_behavior_session_uuid())
 
     stimulus_templates = data_set.stimulus_templates
-    image_set_name = 'Natural_Images_Lum_Matched_set_ophys_6_2017.07.14'
-    assert stimulus_templates.image_set_name == image_set_name
     assert len(stimulus_templates) == 8
     assert stimulus_templates['im000'].shape == (918, 1174)
 

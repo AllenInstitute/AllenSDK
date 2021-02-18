@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union, Optional
 from allensdk.brain_observatory.behavior.stimulus_processing.util import \
     convert_filepath_caseinsensitive, get_image_set_name
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
-    StimulusTemplates
+    StimulusTemplate
 
 
 def load_pickle(pstream):
@@ -152,7 +152,7 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     return grating_df
 
 
-def get_stimulus_templates(pkl) -> Optional[StimulusTemplates]:
+def get_stimulus_templates(pkl) -> Optional[StimulusTemplate]:
     """
     Gets images presented during experimentation
     Parameters
@@ -170,9 +170,12 @@ def get_stimulus_templates(pkl) -> Optional[StimulusTemplates]:
         return None
 
     images = get_images_dict(pkl)
-    image_set_name = images['metadata']['image_set']
-    return StimulusTemplates(
-        image_set_filepath=image_set_name,
+    image_set_filepath = images['metadata']['image_set']
+    image_set_name = get_image_set_name(image_set_path=image_set_filepath)
+    image_set_name = convert_filepath_caseinsensitive(
+        image_set_name)
+    return StimulusTemplate(
+        image_set_name=image_set_name,
         image_attributes=images['image_attributes'], images=images['images'])
 
 
