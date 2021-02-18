@@ -266,15 +266,8 @@ class BehaviorDataTransforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
-        timestamps = self.get_stimulus_timestamps()
-        licks = self.get_licks()
-        data = self._behavior_stimulus_file()
-        rewards = self.get_rewards()
 
-        trial_df = get_trials_from_data_transform(data,
-                                                  licks,
-                                                  rewards,
-                                                  timestamps)
+        trial_df = get_trials_from_data_transform(self)
 
         return trial_df
 

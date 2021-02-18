@@ -431,33 +431,18 @@ def get_trial_bounds(trial_log: List) -> List:
     return list([(s, e) for s, e in zip(start_frames, end_frames)])
 
 
-def get_trials_from_data_transform(data: Dict,
-                                   licks_df: pd.DataFrame,
-                                   rewards_df: pd.DataFrame,
-                                   timestamps: np.ndarray) -> pd.DataFrame:
+def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     """
     Create and return a pandas DataFrame containing data about
     the trials associated with this session
 
     Parameters
     ----------
-    data: dict
-          The dict resulting from reading in this session's
-          stimulus_data pickle file
-
-    licks_df: pd.DataFrame
-           A dataframe whose only column is the timestamps
-           of licks.
-
-    rewards_df: pd.DataFrame
-           A dataframe containing data about rewards given
-           during this session. Output of
-           allensdk/brain_observatory/behavior/rewards_processing.get_rewards
-
-    timestamps: np.ndarray[1d]
-           An ndarray containing the timestamps associated with each
-           stimulus frame in this session. Should be the sync timestamps
-           if available.
+    input_transform:
+        An instantiation of a class that inherits from either
+        BehaviorDataTransform or BehaviorOphysDataTransform.
+        This object will be used to get at the data needed by
+        this method to create the trials dataframe.
 
     Returns
     -------
@@ -465,6 +450,12 @@ def get_trials_from_data_transform(data: Dict,
            A dataframe containing data pertaining to the trials that
            make up this session
     """
+
+    rewards_df = input_transform.get_rewards()
+    licks_df = input_transform.get_licks()
+    timestamps = input_transform.get_stimulus_timestamps()
+    data = input_transform._behavior_stimulus_file()
+
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
