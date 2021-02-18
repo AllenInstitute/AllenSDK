@@ -7,7 +7,6 @@ import inspect
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
-from allensdk.brain_observatory.running_speed import RunningSpeed
 
 BehaviorDataApi = Type[BehaviorBase]
 
@@ -96,7 +95,7 @@ class BehaviorSession(object):
         self._rewards = value
 
     @property
-    def raw_running_data_df(self) -> pd.DataFrame:
+    def raw_running_speed(self) -> pd.DataFrame:
         """Get running speed data without the 10Hz low pass filter.
 
             Returns
@@ -105,17 +104,17 @@ class BehaviorSession(object):
                 Dataframe containing various signals used to compute running
                 speed, and the unfiltered speed.
         """
-        if self._raw_running_data_df is None:
-            self._raw_running_data_df = self.api.get_running_data_df(
+        if self._raw_running_speed is None:
+            self._raw_running_speed = self.api.get_running_speed(
                 lowpass=False)
-        return self._raw_running_data_df
+        return self._raw_running_speed
 
-    @raw_running_data_df.setter
-    def raw_running_data_df(self, value):
-        self._raw_running_data_df = value
+    @raw_running_speed.setter
+    def raw_running_speed(self, value):
+        self._raw_running_speed = value
 
     @property
-    def running_data_df(self) -> pd.DataFrame:
+    def running_speed(self) -> pd.DataFrame:
         """Get running speed data. By default applies a 10Hz low pass
         filter to the data. To get the running speed without the filter,
         use `raw_running_data_df`.
@@ -126,30 +125,6 @@ class BehaviorSession(object):
             Dataframe containing various signals used to compute running
             speed, and the filtered speed.
         """
-        if self._running_data_df is None:
-            self._running_data_df = self.api.get_running_data_df(lowpass=True)
-        return self._running_data_df
-
-    @running_data_df.setter
-    def running_data_df(self, value):
-        self._running_data_df = value
-
-    @property
-    def running_speed(self) -> RunningSpeed:
-        """Get running speed using timestamps from
-        self.get_stimulus_timestamps. Applies a 10Hz filter to the 
-        speed. To get the unfiltered speed, use `raw_running_speed`.
-
-        NOTE: Do not correct for monitor delay.
-
-        Returns
-        -------
-        RunningSpeed (NamedTuple with two fields)
-            timestamps : np.ndarray
-                Timestamps of running speed data samples
-            values : np.ndarray
-                Running speed of the experimental subject (in cm / s).
-        """
         if self._running_speed is None:
             self._running_speed = self.api.get_running_speed(lowpass=True)
         return self._running_speed
@@ -157,29 +132,6 @@ class BehaviorSession(object):
     @running_speed.setter
     def running_speed(self, value):
         self._running_speed = value
-
-    @property
-    def raw_running_speed(self) -> RunningSpeed:
-        """Get running speed using timestamps from
-        self.get_stimulus_timestamps. Does not apply the 10Hz filter.
-
-        NOTE: Do not correct for monitor delay.
-
-        Returns
-        -------
-        RunningSpeed (NamedTuple with two fields)
-            timestamps : np.ndarray
-                Timestamps of running speed data samples
-            values : np.ndarray
-                Running speed of the experimental subject (in cm / s).
-        """
-        if self._raw_running_speed is None:
-            self._raw_running_speed = self.api.get_running_speed(lowpass=False)
-        return self._raw_running_speed
-
-    @raw_running_speed.setter
-    def raw_running_speed(self, value):
-        self._raw_running_speed = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:

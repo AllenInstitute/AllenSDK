@@ -1,56 +1,64 @@
-from typing import Dict, Optional, Any
-from datetime import datetime
-import pytz
+import logging
 import uuid
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 import numpy as np
 import pandas as pd
-
-from allensdk.core.exceptions import DataFrameIndexError
+import pytz
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase)
+from allensdk.brain_observatory.behavior.metadata_processing import \
+    get_task_parameters
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.running_processing import (
-    get_running_df)
+from allensdk.brain_observatory.behavior.running_processing import \
+    get_running_df
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata)
-from allensdk.brain_observatory.running_speed import RunningSpeed
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_task_parameters)
+    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates)
 from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_trials, get_extended_trials)
+    get_extended_trials, get_trials)
+from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.core.exceptions import DataFrameIndexError
 
 
-class BehaviorDataXforms(BehaviorBase):
-    """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS data APIs to fill a BehaviorSession.
+class BehaviorDataTransforms(BehaviorBase):
+    """This class provides methods that transform data extracted from
+    LIMS or JSON data sources into final data products necessary for
+    populating a BehaviorSession.
     """
+
+    def __init__(self, extractor: BehaviorDataExtractorBase):
+        self.extractor: BehaviorDataExtractorBase = extractor
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def get_behavior_session_id(self):
+        return self.extractor.get_behavior_session_id()
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
-        """Helper method to cache stimulus file in memory since it takes about
-        a second to load (and is used in many methods).
+        """Helper method to cache stimulus pkl file in memory since it takes
+        about a second to load (and is used in many methods).
         """
-        return pd.read_pickle(self.get_behavior_stimulus_file())
+        return pd.read_pickle(self.extractor.get_behavior_stimulus_file())
 
-    def get_behavior_session_uuid(self) -> Optional[int]:
+    def get_behavior_session_uuid(self) -> Optional[str]:
         """Get the universally unique identifier (UUID) number for the
         current behavior session.
         """
         data = self._behavior_stimulus_file()
         behavior_pkl_uuid = data.get("session_uuid")
 
-        behavior_session_id = self.get_behavior_session_id()
-        foraging_id = self.get_foraging_id()
+        behavior_session_id = self.extractor.get_behavior_session_id()
+        foraging_id = self.extractor.get_foraging_id()
 
         # Sanity check to ensure that pkl file data matches up with
         # the behavior session that the pkl file has been associated with.
         assert_err_msg = (
             f"The behavior session UUID ({behavior_pkl_uuid}) in the "
             f"behavior stimulus *.pkl file "
-            f"({self.get_behavior_stimulus_file()}) does "
+            f"({self.extractor.get_behavior_stimulus_file()}) does "
             f"does not match the foraging UUID ({foraging_id}) for "
             f"behavior session: {behavior_session_id}")
         assert behavior_pkl_uuid == foraging_id, assert_err_msg
@@ -94,7 +102,7 @@ class BehaviorDataXforms(BehaviorBase):
         # trial events, so add the offset as the "rebase" function
         return get_rewards(data, lambda x: x + offset)
 
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
+    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
         """Get running speed data.
 
         :returns: pd.DataFrame -- dataframe containing various signals used
@@ -102,7 +110,7 @@ class BehaviorDataXforms(BehaviorBase):
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass, zscore_threshold=zscore_threshold)
 
     def get_running_speed(self, lowpass=True) -> RunningSpeed:
         """Get running speed using timestamps from
@@ -271,18 +279,18 @@ class BehaviorDataXforms(BehaviorBase):
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
         metadata = {
-            "rig_name": self.get_rig_name(),
-            "sex": self.get_sex(),
-            "age": self.get_age(),
+            "rig_name": self.extractor.get_rig_name(),
+            "sex": self.extractor.get_sex(),
+            "age": self.extractor.get_age(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
-            "session_type": self.get_stimulus_name(),
+            "session_type": self.extractor.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": self.get_reporter_line(),
-            "driver_line": self.get_driver_line(),
-            "LabTracks_ID": self.get_external_specimen_name(),
-            "full_genotype": self.get_full_genotype(),
+            "reporter_line": self.extractor.get_reporter_line(),
+            "driver_line": self.extractor.get_driver_line(),
+            "LabTracks_ID": self.extractor.get_external_specimen_name(),
+            "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.get_foraging_id(),
-            "behavior_session_id": self.get_behavior_session_id()
+            "foraging_id": self.extractor.get_foraging_id(),
+            "behavior_session_id": self.extractor.get_behavior_session_id()
         }
         return metadata

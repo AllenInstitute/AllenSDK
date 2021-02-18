@@ -1,16 +1,17 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional, Union
 import uuid
 
 import h5py
 import matplotlib.image as mpimg  # NOQA: E402
 import numpy as np
+import xarray as xr
 import pandas as pd
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase)
+    BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
 
 from allensdk.brain_observatory.behavior.sync import (
@@ -25,22 +26,40 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import (
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms
+    BehaviorDataTransforms
 )
 
 
-class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
-    """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS data APIs to fill a BehaviorOphysSession.
+class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
+    """This class provides methods that transform data extracted from
+    LIMS or JSON data sources into final data products necessary for
+    populating a BehaviorOphysSession.
     """
+
+    def __init__(self, extractor: BehaviorOphysDataExtractorBase):
+        super().__init__(extractor=extractor)
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def get_ophys_experiment_id(self):
+        return self.extractor.get_ophys_experiment_id()
+
+    def get_ophys_session_id(self):
+        return self.extractor.get_ophys_experiment_id()
+
+    def get_eye_tracking_rig_geometry(self) -> dict:
+        return self.extractor.get_eye_tracking_rig_geometry()
 
     @memoize
     def get_cell_specimen_table(self):
+        raw_cell_specimen_table = (
+            self.extractor.get_raw_cell_specimen_table_dict())
+
         cell_specimen_table = pd.DataFrame.from_dict(
-            self.get_raw_cell_specimen_table_dict()).set_index(
+            raw_cell_specimen_table).set_index(
                 'cell_roi_id').sort_index()
-        fov_width = self.get_field_of_view_shape()['width']
-        fov_height = self.get_field_of_view_shape()['height']
+        fov_shape = self.extractor.get_field_of_view_shape()
+        fov_width = fov_shape['width']
+        fov_height = fov_shape['height']
 
         # Convert cropped ROI masks to uncropped versions
         roi_mask_list = []
@@ -70,7 +89,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
         dff_traces = self.get_raw_dff_data()
 
-        plane_group = self.get_imaging_plane_group()
+        plane_group = self.extractor.get_imaging_plane_group()
 
         number_of_cells, number_of_dff_frames = dff_traces.shape
         # Scientifica data has extra frames in the sync file relative
@@ -94,7 +113,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         # Resample if collecting multiple concurrent planes (e.g. mesoscope)
         # because the frames are interleaved
         else:
-            group_count = self.get_plane_group_count()
+            group_count = self.extractor.get_plane_group_count()
             self.logger.info(
                 "Mesoscope data detected. Splitting timestamps "
                 f"(len={len(ophys_timestamps)} over {group_count} "
@@ -110,12 +129,12 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
     @memoize
     def get_sync_data(self):
-        sync_path = self.get_sync_file()
+        sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
     @memoize
     def get_stimulus_timestamps(self):
-        sync_path = self.get_sync_file()
+        sync_path = self.extractor.get_sync_file()
         timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
                             .corrected_stim_timestamps)
         return timestamps
@@ -168,30 +187,32 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         :rtype: dict
         """
         behavior_session_uuid = self.get_behavior_session_uuid()
+        fov_shape = self.extractor.get_field_of_view_shape()
+        expt_container_id = self.extractor.get_experiment_container_id()
 
         metadata = {
-            'ophys_experiment_id': self.get_ophys_experiment_id(),
-            'experiment_container_id': self.get_experiment_container_id(),
+            'ophys_experiment_id': self.extractor.get_ophys_experiment_id(),
+            'experiment_container_id': expt_container_id,
             'ophys_frame_rate': self.get_ophys_frame_rate(),
             'stimulus_frame_rate': self.get_stimulus_frame_rate(),
-            'targeted_structure': self.get_targeted_structure(),
-            'imaging_depth': self.get_imaging_depth(),
-            'session_type': self.get_stimulus_name(),
-            'experiment_datetime': self.get_experiment_date(),
-            'reporter_line': self.get_reporter_line(),
-            'driver_line': self.get_driver_line(),
-            'LabTracks_ID': self.get_external_specimen_name(),
-            'full_genotype': self.get_full_genotype(),
+            'targeted_structure': self.extractor.get_targeted_structure(),
+            'imaging_depth': self.extractor.get_imaging_depth(),
+            'session_type': self.extractor.get_stimulus_name(),
+            'experiment_datetime': self.extractor.get_experiment_date(),
+            'reporter_line': self.extractor.get_reporter_line(),
+            'driver_line': self.extractor.get_driver_line(),
+            'LabTracks_ID': self.extractor.get_external_specimen_name(),
+            'full_genotype': self.extractor.get_full_genotype(),
             'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
-            'imaging_plane_group': self.get_imaging_plane_group(),
-            'rig_name': self.get_rig_name(),
-            'sex': self.get_sex(),
-            'age': self.get_age(),
+            'imaging_plane_group': self.extractor.get_imaging_plane_group(),
+            'rig_name': self.extractor.get_rig_name(),
+            'sex': self.extractor.get_sex(),
+            'age': self.extractor.get_age(),
             'excitation_lambda': 910.0,
             'emission_lambda': 520.0,
             'indicator': 'GCAMP6f',
-            'field_of_view_width': self.get_field_of_view_shape()['width'],
-            'field_of_view_height': self.get_field_of_view_shape()['height']
+            'field_of_view_width': fov_shape['width'],
+            'field_of_view_height': fov_shape['height']
         }
         return metadata
 
@@ -202,7 +223,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         return cell_specimen_table['cell_roi_id'].values
 
     def get_raw_dff_data(self):
-        dff_path = self.get_dff_file()
+        dff_path = self.extractor.get_dff_file()
 
         # guarantee that DFF traces are ordered the same
         # way as ROIs in the cell_specimen_table
@@ -222,8 +243,8 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
         dff_traces = np.zeros(raw_dff_traces.shape, dtype=float)
         for raw_trace, roi_id in zip(raw_dff_traces, roi_names):
-            idx = np.where(cell_roi_id_list==roi_id)[0][0]
-            dff_traces[idx,:] = raw_trace
+            idx = np.where(cell_roi_id_list == roi_id)[0][0]
+            dff_traces[idx, :] = raw_trace
 
         return dff_traces
 
@@ -287,7 +308,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
     @memoize
     def get_corrected_fluorescence_traces(self):
-        demix_file = self.get_demix_file()
+        demix_file = self.extractor.get_demix_file()
 
         cell_roi_id_list = self.get_cell_roi_ids()
         dt = cell_roi_id_list.dtype
@@ -297,8 +318,8 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
             corrected_fluorescence_roi_id = in_file['roi_names'][()].astype(dt)
 
         if not np.in1d(corrected_fluorescence_roi_id, cell_roi_id_list).all():
-            raise RuntimeError("corrected_fluorescence_traces contains ROI IDs "
-                               "not present in cell_specimen_table")
+            raise RuntimeError("corrected_fluorescence_traces contains ROI "
+                               "IDs not present in cell_specimen_table")
         if not np.in1d(cell_roi_id_list, corrected_fluorescence_roi_id).all():
             raise RuntimeError("cell_specimen_table contains ROI IDs "
                                "not present in corrected_fluorescence_traces")
@@ -322,8 +343,8 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         if image_api is None:
             image_api = ImageApi
 
-        maxInt_a13_file = self.get_max_projection_file()
-        pixel_size = self.get_surface_2p_pixel_size_um()
+        maxInt_a13_file = self.extractor.get_max_projection_file()
+        pixel_size = self.extractor.get_surface_2p_pixel_size_um()
         max_projection = mpimg.imread(maxInt_a13_file)
         return ImageApi.serialize(max_projection, [pixel_size / 1000.,
                                                    pixel_size / 1000.], 'mm')
@@ -334,16 +355,17 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
         if image_api is None:
             image_api = ImageApi
 
-        avgint_a1X_file = self.get_average_intensity_projection_image_file()
-        pixel_size = self.get_surface_2p_pixel_size_um()
+        avgint_a1X_file = (
+            self.extractor.get_average_intensity_projection_image_file())
+        pixel_size = self.extractor.get_surface_2p_pixel_size_um()
         average_image = mpimg.imread(avgint_a1X_file)
         return ImageApi.serialize(average_image, [pixel_size / 1000.,
                                                   pixel_size / 1000.], 'mm')
 
     @memoize
     def get_motion_correction(self):
-        motion_correction_filepath = self.get_rigid_motion_transform_file()
-        motion_correction = pd.read_csv(motion_correction_filepath)
+        motion_corr_file = self.extractor.get_rigid_motion_transform_file()
+        motion_correction = pd.read_csv(motion_corr_file)
         return motion_correction[['x', 'y']]
 
     def get_stimulus_rebase_function(self):
@@ -356,6 +378,7 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
 
         return stimulus_rebase_function
 
+    @memoize
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
                          dilation_frames: int = 2):
@@ -365,8 +388,8 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
                     f"'z_threshold={z_threshold}', "
                     f"'dilation_frames={dilation_frames}'")
 
-        filepath = Path(self.get_eye_tracking_filepath())
-        sync_path = Path(self.get_sync_file())
+        filepath = Path(self.extractor.get_eye_tracking_filepath())
+        sync_path = Path(self.extractor.get_sync_file())
 
         eye_tracking_data = load_eye_tracking_hdf(filepath)
         frame_times = sync_utilities.get_synchronized_frame_times(
@@ -380,3 +403,82 @@ class BehaviorOphysDataXforms(BehaviorDataXforms, BehaviorOphysBase):
                                                       dilation_frames)
 
         return eye_tracking_data
+
+    def get_roi_masks_by_cell_roi_id(
+            self,
+            cell_roi_ids: Optional[Union[int, Iterable[int]]] = None):
+        """ Obtains boolean masks indicating the location of one
+        or more ROIs in this session.
+
+        Parameters
+        ----------
+        cell_roi_ids : array-like of int, optional
+            ROI masks for these rois will be returned.
+            The default behavior is to return masks for all rois.
+
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - roi_id : which roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        Notes
+        -----
+        This method helps Allen Institute scientists to look at sessions
+        that have not yet had cell specimen ids assigned. You probably want
+        to use get_roi_masks instead.
+        """
+
+        cell_specimen_table = self.get_cell_specimen_table()
+
+        if cell_roi_ids is None:
+            cell_roi_ids = cell_specimen_table["cell_roi_id"].unique()
+        elif isinstance(cell_roi_ids, int):
+            cell_roi_ids = np.array([int(cell_roi_ids)])
+        elif np.issubdtype(type(cell_roi_ids), np.integer):
+            cell_roi_ids = np.array([int(cell_roi_ids)])
+        else:
+            cell_roi_ids = np.array(cell_roi_ids)
+
+        table = cell_specimen_table.copy()
+        table.set_index("cell_roi_id", inplace=True)
+        table = table.loc[cell_roi_ids, :]
+
+        full_image_shape = table.iloc[0]["roi_mask"].shape
+        output = np.zeros((len(cell_roi_ids),
+                          full_image_shape[0],
+                          full_image_shape[1]), dtype=np.uint8)
+
+        for ii, (_, row) in enumerate(table.iterrows()):
+            output[ii, :, :] = row["roi_mask"]
+
+        # Pixel spacing and units of mask image will match either the
+        # max or avg projection image of 2P movie.
+        max_projection_image = ImageApi.deserialize(self.get_max_projection())
+        # Spacing is in (col_spacing, row_spacing) order
+        # Coordinates also start spacing_dim / 2 for first element in a
+        # dimension. See:
+        # https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html
+        pixel_spacing = max_projection_image.spacing
+        unit = max_projection_image.unit
+
+        return xr.DataArray(
+            data=output,
+            dims=("cell_roi_id", "row", "column"),
+            coords={
+                "cell_roi_id": cell_roi_ids,
+                "row": (np.arange(full_image_shape[0])
+                        * pixel_spacing[1]
+                        + (pixel_spacing[1] / 2)),
+                "column": (np.arange(full_image_shape[1])
+                           * pixel_spacing[0]
+                           + (pixel_spacing[0] / 2))
+            },
+            attrs={
+                "spacing": pixel_spacing,
+                "unit": unit
+            }
+        ).squeeze(drop=True)

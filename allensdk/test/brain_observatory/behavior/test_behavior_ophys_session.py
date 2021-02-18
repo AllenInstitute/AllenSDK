@@ -70,7 +70,7 @@ def test_visbeh_ophys_data_set():
     #     print(np.array(row.to_dict()['mask']).sum())
 
     # All sorts of assert relationships:
-    assert data_set.api.get_foraging_id() == str(data_set.api.get_behavior_session_uuid())
+    assert data_set.api.extractor.get_foraging_id() == str(data_set.api.get_behavior_session_uuid())
     assert list(data_set.stimulus_templates.values())[0].shape == (8, 918, 1174)
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) == ['time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['volume', 'autorewarded']
@@ -167,124 +167,6 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
             assert reward_time < response_window[1] + 1 / 60
             if len(session.licks) > 0:
                 assert lick_times[0] < reward_time
-
-
-@pytest.fixture
-def cell_specimen_table_api():
-
-    roi_1 = np.array([
-        [1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-    ])
-
-    roi_2 = np.array([
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-    ])
-
-    # Must implement at least the get_cell_specimen_table
-    # and get_max_projection methods from BehaviorOphysBase
-    class CellSpecimenTableApi:
-
-        def get_cell_specimen_table(self):
-            return pd.DataFrame(
-                {
-                    "cell_roi_id": [1, 2],
-                    "y": [1, 1],
-                    "x": [2, 1],
-                    "roi_mask": [roi_1, roi_2]
-                }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
-            )
-
-        def get_max_projection(self):
-            return ImageApi.serialize(roi_1 + roi_2,
-                                      [0.5, 1.], 'mm')
-
-    return CellSpecimenTableApi()
-
-
-@pytest.mark.parametrize("roi_ids,expected", [
-    [
-        1,
-        np.array([
-            [0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ])
-    ],
-    [
-        None,
-        np.array([
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ],
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0]
-            ]
-        ])
-    ]
-])
-def test_get_roi_masks_by_cell_roi_id(roi_ids, expected, cell_specimen_table_api):
-    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
-    obtained = ssn._get_roi_masks_by_cell_roi_id(roi_ids)
-    assert np.allclose(expected, obtained.values)
-    assert np.allclose(obtained.coords['row'],
-                       [0.5, 1.5, 2.5, 3.5, 4.5])
-    assert np.allclose(obtained.coords['column'],
-                       [0.25, 0.75, 1.25, 1.75, 2.25])
-
-
-@pytest.mark.parametrize("cell_specimen_ids,expected", [
-    [
-        10,
-        np.array([
-            [0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ])
-    ],
-    [
-        [11, 10],
-        np.array([
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0]
-            ],
-            [
-                [0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ]
-        ])
-    ]
-])
-def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
-    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
-    obtained = ssn.get_roi_masks(cell_specimen_ids)
-    assert np.allclose(expected, obtained.values)
 
 
 @pytest.mark.parametrize("dilation_frames, z_threshold, eye_tracking_start_value", [

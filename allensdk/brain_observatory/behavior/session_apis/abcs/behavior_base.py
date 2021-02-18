@@ -44,22 +44,6 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
-        """Get running speed data.
-
-        Parameters
-        ----------
-        lowpass: bool
-            Whether to return running speed with low pass filter applied or without
-
-        Returns
-        -------
-        pd.DataFrame
-            Dataframe containing various signals used to compute running speed.
-        """
-        raise NotImplementedError()
-
-    @abc.abstractmethod
     def get_running_speed(self) -> RunningSpeed:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
