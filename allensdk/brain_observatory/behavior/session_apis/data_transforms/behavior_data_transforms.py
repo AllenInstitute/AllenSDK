@@ -232,7 +232,10 @@ class BehaviorDataTransforms(BehaviorBase):
         Return monitor delay for behavior only sessions
         (in seconds)
         """
-        return 0.0
+        # This is the median estimate across all rigs
+        # as discussed in
+        # https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/1318
+        return 0.02115
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the
