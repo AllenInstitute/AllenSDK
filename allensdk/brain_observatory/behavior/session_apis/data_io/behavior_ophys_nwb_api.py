@@ -226,11 +226,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         eye_tracking_dict = {
             "time": eye_tracking.timestamps[:],
+            "cr_area": corneal_reflection_tracking.area_raw[:],
+            "eye_area": eye_tracking.area_raw[:],
+            "pupil_area": pupil_tracking.area_raw[:],
             "likely_blink": eye_tracking_acquisition.likely_blink.data[:],
 
             "eye_center_x": eye_tracking.data[:, 0],
             "eye_center_y": eye_tracking.data[:, 1],
-            "eye_area": eye_tracking.area[:],
             "eye_area_raw": eye_tracking.area_raw[:],
             "eye_height": eye_tracking.height[:],
             "eye_width": eye_tracking.width[:],
@@ -238,7 +240,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
             "pupil_center_x": pupil_tracking.data[:, 0],
             "pupil_center_y": pupil_tracking.data[:, 1],
-            "pupil_area": pupil_tracking.area[:],
             "pupil_area_raw": pupil_tracking.area_raw[:],
             "pupil_height": pupil_tracking.height[:],
             "pupil_width": pupil_tracking.width[:],
@@ -246,7 +247,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
             "cr_center_x": corneal_reflection_tracking.data[:, 0],
             "cr_center_y": corneal_reflection_tracking.data[:, 1],
-            "cr_area": corneal_reflection_tracking.area[:],
             "cr_area_raw": corneal_reflection_tracking.area_raw[:],
             "cr_height": corneal_reflection_tracking.height[:],
             "cr_width": corneal_reflection_tracking.width[:],
@@ -256,17 +256,19 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         eye_tracking_data = pd.DataFrame(eye_tracking_dict)
         eye_tracking_data.index = eye_tracking_data.index.rename('frame')
 
-        # Calculate likely blinks for new z_threshold and dilate_frames
-        area_df = eye_tracking_data[['eye_area', 'pupil_area']]
-        outliers = determine_outliers(area_df,
-                                      z_threshold=z_threshold)
+        # re-calculate likely blinks for new z_threshold and dilate_frames
+        area_df = eye_tracking_data[['eye_area_raw', 'pupil_area_raw']]
+        outliers = determine_outliers(area_df, z_threshold=z_threshold)
         likely_blinks = determine_likely_blinks(
-            eye_tracking_data['eye_area'],
-            eye_tracking_data['pupil_area'],
+            eye_tracking_data['eye_area_raw'],
+            eye_tracking_data['pupil_area_raw'],
             outliers,
             dilation_frames=dilation_frames)
 
         eye_tracking_data["likely_blink"] = likely_blinks
+        eye_tracking_data["eye_area"][likely_blinks] = np.nan
+        eye_tracking_data["pupil_area"][likely_blinks] = np.nan
+        eye_tracking_data["cr_area"][likely_blinks] = np.nan
 
         return eye_tracking_data
 

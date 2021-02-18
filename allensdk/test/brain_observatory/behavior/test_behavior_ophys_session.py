@@ -197,9 +197,9 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
         eye_tracking_dilation_frames=dilation_frames)
 
     if eye_tracking_start_value is not None:
+        # Tests that eye_tracking can be set
         session.eye_tracking = eye_tracking_start_value
         obtained = session.eye_tracking
-        assert not session.api.get_eye_tracking.called
         assert obtained.equals(eye_tracking_start_value)
     else:
         obtained = session.eye_tracking

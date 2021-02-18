@@ -80,7 +80,7 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
         self._segmentation_mask_image = LazyProperty(
             self.get_segmentation_mask_image)
         self._eye_tracking = LazyProperty(
-            self.api.get_eye_tracking,
+            self.api.get_eye_tracking, settable=True,
             z_threshold=self._eye_tracking_z_threshold,
             dilation_frames=self._eye_tracking_dilation_frames)
         self._eye_tracking_rig_geometry = LazyProperty(
