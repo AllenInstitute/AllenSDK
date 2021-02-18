@@ -138,12 +138,36 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
-    @memoize
-    def get_stimulus_timestamps(self):
+    def _load_stimulus_timestamps_and_delay(self):
+        """
+        Load the stimulus timestamps (uncorrected for
+        monitor delay) and the monitor delay
+        """
         sync_path = self.extractor.get_sync_file()
-        timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
-                            .corrected_stim_timestamps)
-        return np.array(timestamps)
+        (timestamps,
+         delta,
+         monitor_delay) = (OphysTimeAligner(sync_file=sync_path)
+                           .corrected_stim_timestamps)
+
+        self._stimulus_timestamps = timestamps-monitor_delay
+        self._monitor_delay = monitor_delay
+
+    def get_stimulus_timestamps(self):
+        """
+        Return a numpy array of stimulus timestamps uncorrected
+        for monitor delay (in seconds)
+        """
+        if not hasattr(self, '_stimulus_timestamps'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._stimulus_timestamps
+
+    def get_monitor_delay(self):
+        """
+        Return the monitor delay (in seconds)
+        """
+        if not hasattr(self, '_monitor_delay'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._monitor_delay
 
     @staticmethod
     def _process_ophys_plane_timestamps(

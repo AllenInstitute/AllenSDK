@@ -160,3 +160,36 @@ def test_get_licks(monkeypatch):
         np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
                                              licks.frame.to_numpy(),
                                              decimal=10)
+
+
+def test_timestamps_and_delay(monkeypatch):
+    """
+    Test that BehaviorOphysDataTransforms returns the right values
+    with get_stimulus_timestamps and get_monitor_delay
+    """
+    def dummy_loader(self):
+        self._stimulus_timestamps = np.array([2, 3, 7])
+        self._monitor_delay = 99.3
+
+    def dummy_init(self):
+        pass
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysDataTransforms,
+                    "__init__",
+                    dummy_init)
+        ctx.setattr(BehaviorOphysDataTransforms,
+                    "_load_stimulus_timestamps_and_delay",
+                    dummy_loader)
+
+        xforms = BehaviorOphysDataTransforms()
+        np.testing.assert_array_equal(xforms.get_stimulus_timestamps(),
+                                      np.array([2, 3, 7]))
+        assert abs(xforms.get_monitor_delay() - 99.3) < 1.0e-10
+
+        # need to reverse order to make sure loader works
+        # correctly
+        xforms = BehaviorOphysDataTransforms()
+        assert abs(xforms.get_monitor_delay() - 99.3) < 1.0e-10
+        np.testing.assert_array_equal(xforms.get_stimulus_timestamps(),
+                                      np.array([2, 3, 7]))
