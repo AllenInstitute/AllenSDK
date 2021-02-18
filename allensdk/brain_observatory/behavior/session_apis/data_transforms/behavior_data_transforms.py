@@ -356,7 +356,6 @@ class BehaviorDataTransforms(BehaviorBase):
             "LabTracks_ID": self.extractor.get_external_specimen_name(),
             "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.extractor.get_foraging_id(),
             "behavior_session_id": self.extractor.get_behavior_session_id()
         }
         return metadata

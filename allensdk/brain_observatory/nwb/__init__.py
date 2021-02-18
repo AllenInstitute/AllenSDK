@@ -746,15 +746,17 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename or reformat incoming metadata fields to conform with pynwb fields
-    imaging_plane_group = metadata["imaging_plane_group"]
-    
     tmp_metadata = metadata.copy()
     tmp_metadata["subject_id"] = tmp_metadata.pop("LabTracks_ID")
     tmp_metadata["genotype"] = tmp_metadata.pop("full_genotype")
-    if imaging_plane_group is None:
-        tmp_metadata["imaging_plane_group"] = -1
-    else:
-        tmp_metadata["imaging_plane_group"] = imaging_plane_group
+
+    if not behavior_only:
+        imaging_plane_group = metadata["imaging_plane_group"]
+        if imaging_plane_group is None:
+            tmp_metadata["imaging_plane_group"] = -1
+        else:
+            tmp_metadata["imaging_plane_group"] = imaging_plane_group
+
     metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(tmp_metadata)
 
     # Subject related metadata should be saved to our BehaviorSubject
