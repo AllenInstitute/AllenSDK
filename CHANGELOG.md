@@ -1,7 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.7.0] = TBD
+## [2.8.0] = TBD
+-
+
+## [2.7.0] = 2021-02-19
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 - Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
