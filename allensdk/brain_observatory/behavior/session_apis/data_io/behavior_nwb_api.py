@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -74,10 +75,12 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        self._add_stimulus_templates(
-            nwbfile=nwbfile,
-            stimulus_templates=session_object.stimulus_templates,
-            stimulus_presentations=session_object.stimulus_presentations)
+        # Not all sessions will have stimulus_templates (e.g. gratings)
+        if session_object.stimulus_templates:
+            self._add_stimulus_templates(
+                nwbfile=nwbfile,
+                stimulus_templates=session_object.stimulus_templates,
+                stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(
@@ -185,7 +188,13 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         )
         return running_speed_df
 
-    def get_stimulus_templates(self, **kwargs) -> StimulusTemplate:
+    def get_stimulus_templates(self, **kwargs) -> Optional[StimulusTemplate]:
+
+        # If we have a session where only gratings were presented
+        # there will be no stimulus_template dict in the nwbfile
+        if len(self.nwbfile.stimulus_template) == 0:
+            return None
+
         image_set_name = list(self.nwbfile.stimulus_template.keys())[0]
         image_data = list(self.nwbfile.stimulus_template.values())[0]
 
