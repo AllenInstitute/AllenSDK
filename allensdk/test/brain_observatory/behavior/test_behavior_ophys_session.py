@@ -94,11 +94,14 @@ def test_visbeh_ophys_data_set():
     assert list(data_set.motion_correction.columns) == ['x', 'y']
     assert len(data_set.trials) == 602
 
-    expected = {
+    expected_metadata = {
         'stimulus_frame_rate': 60.0,
         'full_genotype': 'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93('
                          'TITL-GCaMP6f)/wt',
         'ophys_experiment_id': 789359614,
+        'behavior_session_id': 789295700,
+        'imaging_plane_group_count': 0,
+        'ophys_session_id': 789220000,
         'session_type': 'OPHYS_6_images_B',
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
         'behavior_session_uuid': uuid.UUID(
@@ -120,7 +123,7 @@ def test_visbeh_ophys_data_set():
         'age': 'P139',
         'sex': 'F',
         'imaging_plane_group': None}
-    assert data_set.metadata == expected
+    assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
                                         'stimulus_duration_sec': 6.0,
