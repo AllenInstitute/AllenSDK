@@ -38,15 +38,8 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
     def get_ophys_experiment_id(self) -> int:
         return self.data['ophys_experiment_id']
 
-    # TODO: This should be replaced with a dict lookup after the
-    # behavior_ophys_write_nwb LIMS strategy has been updated
-    def get_behavior_session_id(self):
-        NotImplementedError()
-
-    # TODO: This should be replaced with a dict lookup after the
-    # behavior_ophys_write_nwb LIMS strategy has been updated
     def get_ophys_session_id(self):
-        NotImplementedError()
+        return self.data['ophys_session_id']
 
     def get_surface_2p_pixel_size_um(self) -> float:
         """Get the pixel size for 2-photon movies in micrometers"""
@@ -120,25 +113,15 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         mesoscope data timestamps, as the laser jumps between plane
         groups during the scan. Will be None for non-mesoscope data.
         """
-        try:
-            # Will only contain the "imaging_plane_group" key if we are
-            # dealing with Mesoscope data
-            return self.data["imaging_plane_group"]
-        except KeyError:
-            return None
+        return self.data["imaging_plane_group"]
 
     def get_plane_group_count(self) -> int:
         """Gets the total number of plane groups in the session.
         This is required for resampling ophys timestamps for mesoscope
         data. Will be 0 if the scope did not capture multiple concurrent
-        frames.
+        frames (e.g. data from Scientifica microscope).
         """
-        try:
-            # Will only contain the "plane_group_count" key if we are
-            # dealing with Mesoscope data
-            return self.data["plane_group_count"]
-        except KeyError:
-            return 0
+        return self.data["plane_group_count"]
 
     def get_eye_tracking_rig_geometry(self) -> dict:
         """Get the eye tracking rig geometry associated with an ophys
@@ -148,11 +131,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
     def get_eye_tracking_filepath(self) -> dict:
         """Get the eye tracking filepath containing ellipse fits"""
         return self.data['eye_tracking_filepath']
-
-    def get_eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's
-        subject"""
-        return self.data['eye_gaze_mapping_path']
 
     def get_event_detection_filepath(self) -> str:
         """Get the filepath of the .h5 events file associated with an ophys

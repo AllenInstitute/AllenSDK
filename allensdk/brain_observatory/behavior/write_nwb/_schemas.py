@@ -28,6 +28,17 @@ class SessionData(RaisingSchema):
     ophys_experiment_id = Int(required=True,
                               description='unique identifier for this ophys '
                                           'session')
+    ophys_session_id = Int(required=True,
+                           description='The ophys session id that the ophys '
+                                       'experiment to be written to NWB is '
+                                       'from')
+    behavior_session_id = Int(required=True,
+                              description='The behavior session id that the '
+                                          'ophys experiment to be written to '
+                                          'written to NWB is from')
+    foraging_id = String(required=True,
+                         description='The foraging id associated with the '
+                                     'ophys session')
     rig_name = String(required=True, description='name of ophys device')
     movie_height = Int(required=True,
                        description='height of field-of-view for 2p movie')
@@ -90,15 +101,24 @@ class SessionData(RaisingSchema):
         validate=check_read_access,
         description="h5 filepath containing eye tracking ellipses"
     )
-    eye_gaze_mapping_path = String(
-        required=True,
-        validate=check_read_access,
-        description="h5 filepath containing eye gaze behavior of the "
-                    "experiment's subject"
-    )
     events_file = InputFile(
         required=True,
         description='h5 filepath to events data'
+    )
+    imaging_plane_group = Int(
+        required=True,
+        allow_none=True,
+        description="A numeric index that indicates the order that the "
+                    "frames were acquired when dealing with an imaging plane "
+                    "in a mesoscope experiment. Will be None for Scientifica "
+                    "experiments."
+    )
+    plane_group_count = Int(
+        required=True,
+        description="The total number of plane groups associated with the "
+                    "ophys session that the experiment belongs to. Will be 0 "
+                    "for Scientifica experiments and nonzero for Mesoscope "
+                    "experiments."
     )
 
 

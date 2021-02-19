@@ -36,17 +36,17 @@ def pytest_ignore_collect(path, config):
 
 
 @pytest.fixture
-def running_data_df(running_speed):
+def running_acquisition_df_fixture(running_speed):
 
     v_sig = np.ones_like(running_speed.values)
     v_in = np.ones_like(running_speed.values)
     dx = np.ones_like(running_speed.values)
 
-    return pd.DataFrame({'speed': running_speed.values,
-                         'dx': dx,
-                         'v_sig': v_sig,
-                         'v_in': v_in,
-                         }, index=pd.Index(running_speed.timestamps, name='timestamps'))
+    return pd.DataFrame({
+        'dx': dx,
+        'v_sig': v_sig,
+        'v_in': v_in,
+    }, index=pd.Index(running_speed.timestamps, name='timestamps'))
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ def trials():
 
 @pytest.fixture
 def licks():
-    return pd.DataFrame({'time': [1., 2., 3.]})
+    return pd.DataFrame({'time': [1., 2., 3.], 'frame': [4., 5., 6.]})
 
 
 @pytest.fixture
@@ -123,70 +123,85 @@ def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
 
 
 @pytest.fixture
-def behavior_only_metadata():
+def behavior_only_metadata_fixture():
     """Fixture that provides mock behavior only session metadata"""
-    return {"session_type": 'Unknown',
-            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
-            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-            "LabTracks_ID": 416369,
-            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
-            "behavior_session_uuid": uuid.uuid4(),
-            "stimulus_frame_rate": 60.0,
-            "rig_name": 'my_device',
-            "sex": 'M',
-            "age": 'P139'
-            }
+    return {
+        "behavior_session_id": 4242,
+        "session_type": 'Unknown',
+        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "LabTracks_ID": 416369,
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
+                          "Ai93(TITL-GCaMP6f)/wt",
+        "behavior_session_uuid": uuid.uuid4(),
+        "stimulus_frame_rate": 60.0,
+        "rig_name": 'my_device',
+        "sex": 'M',
+        "age": 'P139'
+    }
 
 
 @pytest.fixture
-def metadata():
+def metadata_fixture():
     """Fixture that passes all possible behavior ophys session metadata"""
-    return {"ophys_experiment_id": 1234,
-            "experiment_container_id": 5678,
-            "ophys_frame_rate": 31.0,
-            "stimulus_frame_rate": 60.0,
-            "targeted_structure": "VISp",
-            "imaging_depth": 375,
-            "session_type": 'Unknown',
-            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
-            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-            "LabTracks_ID": 416369,
-            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
-            "behavior_session_uuid": uuid.uuid4(),
-            "emission_lambda": 1.0,
-            "excitation_lambda": 1.0,
-            "indicator": 'HW',
-            "field_of_view_width": 4,
-            "field_of_view_height": 4,
-            "rig_name": 'my_device',
-            "sex": 'M',
-            "age": 'P139',
-            }
+    return {
+        "behavior_session_id": 777,
+        "ophys_session_id": 999,
+        "ophys_experiment_id": 1234,
+        "experiment_container_id": 5678,
+        "ophys_frame_rate": 31.0,
+        "stimulus_frame_rate": 60.0,
+        "targeted_structure": "VISp",
+        "imaging_depth": 375,
+        "session_type": 'Unknown',
+        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "LabTracks_ID": 416369,
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
+                         "Ai93(TITL-GCaMP6f)/wt",
+        "behavior_session_uuid": uuid.uuid4(),
+        "emission_lambda": 1.0,
+        "excitation_lambda": 1.0,
+        "indicator": 'HW',
+        "field_of_view_width": 4,
+        "field_of_view_height": 4,
+        "rig_name": 'my_device',
+        "sex": 'M',
+        "age": 'P139',
+        "imaging_plane_group": None,
+        "imaging_plane_group_count": 0
+    }
 
 
 @pytest.fixture
-def partial_metadata():
+def partial_metadata_fixture():
     """Fixture that passes only metadata that will be saved in
     custom pyNWB extension fields"""
-    return {"ophys_experiment_id": 1234,
-            "experiment_container_id": 5678,
-            "stimulus_frame_rate": 60.0,
-            "imaging_depth": 375,
-            "session_type": 'Unknown',
-            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
-            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-            "LabTracks_ID": 416369,
-            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
-            "behavior_session_uuid": uuid.uuid4(),
-            "field_of_view_width": 4,
-            "field_of_view_height": 4,
-            "rig_name": 'my_device',
-            "sex": 'M',
-            "age": 'P139',
-            }
+    return {
+        "behavior_session_id": 777,
+        "ophys_session_id": 999,
+        "ophys_experiment_id": 1234,
+        "experiment_container_id": 5678,
+        "stimulus_frame_rate": 60.0,
+        "imaging_depth": 375,
+        "session_type": 'Unknown',
+        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "LabTracks_ID": 416369,
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
+                         "Ai93(TITL-GCaMP6f)/wt",
+        "behavior_session_uuid": uuid.uuid4(),
+        "field_of_view_width": 4,
+        "field_of_view_height": 4,
+        "rig_name": 'my_device',
+        "sex": 'M',
+        "age": 'P139',
+        "imaging_plane_group": None,
+        "imaging_plane_group_count": 0
+    }
 
 
 @pytest.fixture
@@ -221,16 +236,17 @@ def cell_specimen_table():
                          'mask_image_plane': [1, 1],
                          'ophys_cell_segmentation_run_id': [1, 1],
                          'roi_mask': [np.array([[True, True],
-                                                  [True, False]]),
-                                        np.array([[True, True],
-                                                  [False, True]])]},
-                        index=pd.Index([None, None], dtype=int,
+                                                [True, False]]),
+                                      np.array([[True, True],
+                                                [False, True]])]},
+                        index=pd.Index([42, 84], dtype=int,
                         name='cell_specimen_id'))
 
 
 @pytest.fixture
 def valid_roi_ids(cell_specimen_table):
-    return set(cell_specimen_table.loc[cell_specimen_table["valid_roi"], "cell_roi_id"].values.tolist())
+    return set(cell_specimen_table.loc[cell_specimen_table["valid_roi"],
+                                       "cell_roi_id"].values.tolist())
 
 
 @pytest.fixture
@@ -254,33 +270,39 @@ def motion_correction(ophys_timestamps):
 @pytest.fixture
 def session_data():
 
-    data = {'ophys_experiment_id': 789359614,
-            'surface_2p_pixel_size_um': 0.78125,
-            "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
-            "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
-            "rig_name": "CAM2P.5",
-            "movie_width": 447,
-            "movie_height": 512,
-            "container_id": 814796558,
-            "targeted_structure": "VISp",
-            "targeted_depth": 375,
-            "stimulus_name": "Unknown",
-            "date_of_acquisition": '2018-11-30 23:28:37',
-            "reporter_line": ["Ai93(TITL-GCaMP6f)"],
-            "driver_line": ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
-            "external_specimen_name": 416369,
-            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
-            "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",
-            "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",
-            "ophys_cell_segmentation_run_id": 789410052,
-            "cell_specimen_table_dict": pd.read_json(os.path.join("/allen", "aibs", "informatics", "nileg", "module_test_data", 'cell_specimen_table_789359614.json'), 'r'), # TODO: I can't write to /allen/aibs/informatics/module_test_data/behavior
-            "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
-            "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
-            "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
-            "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",
-            "sex": "F",
-            "age": "P139",
-            "imaging_plane_group": None}
+    data = {
+        'behavior_session_id': 789295700,
+        'ophys_session_id': 789220000,
+        'ophys_experiment_id': 789359614,
+        'surface_2p_pixel_size_um': 0.78125,
+        'foraging_id': '69cdbe09-e62b-4b42-aab1-54b5773dfe78',
+        "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
+        "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
+        "rig_name": "CAM2P.5",
+        "movie_width": 447,
+        "movie_height": 512,
+        "container_id": 814796558,
+        "targeted_structure": "VISp",
+        "targeted_depth": 375,
+        "stimulus_name": "Unknown",
+        "date_of_acquisition": '2018-11-30 23:28:37',
+        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "driver_line": ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
+        "external_specimen_name": 416369,
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+        "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",
+        "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",
+        "ophys_cell_segmentation_run_id": 789410052,
+        "cell_specimen_table_dict": pd.read_json(os.path.join("/allen", "aibs", "informatics", "nileg", "module_test_data", 'cell_specimen_table_789359614.json'), 'r'), # TODO: I can't write to /allen/aibs/informatics/module_test_data/behavior
+        "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
+        "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
+        "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
+        "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",
+        "sex": "F",
+        "age": "P139",
+        "imaging_plane_group": None,
+        "imaging_plane_group_count": 0
+    }
 
     return data
 

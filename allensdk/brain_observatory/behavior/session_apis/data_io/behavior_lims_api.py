@@ -2,6 +2,9 @@ import logging
 import uuid
 from datetime import datetime
 from typing import Dict, List, Optional, Union
+import pytz
+
+import pandas as pd
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs import \
@@ -252,16 +255,23 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
 
     @memoize
     def get_stimulus_name(self) -> str:
-        """Returns the name of the stimulus set used for the session.
+        """Get the stimulus set used from the behavior session pkl file
         :rtype: str
         """
-        query = f"""
-            SELECT stages.name
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            WHERE bs.id = '{self.foraging_id}';
-        """
-        return self.mtrain_db.fetchone(query, strict=True)
+        behavior_stimulus_path = self.get_behavior_stimulus_file()
+        pkl = pd.read_pickle(behavior_stimulus_path)
+
+        try:
+            stimulus_name = pkl["items"]["behavior"]["cl_params"]["stage"]
+        except KeyError:
+            raise RuntimeError(
+                f"Could not obtain stimulus_name/stage information from "
+                f"the *.pkl file ({behavior_stimulus_path}) "
+                f"for the behavior session to save as NWB! The "
+                f"following series of nested keys did not work: "
+                f"['items']['behavior']['cl_params']['stage']"
+            )
+        return stimulus_name
 
     @memoize
     def get_reporter_line(self) -> List[str]:
@@ -338,3 +348,16 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
                 WHERE bs.id= {self.behavior_session_id};
                 """
         return self.lims_db.fetchone(query, strict=True)
+
+    @memoize
+    def get_experiment_date(self) -> datetime:
+        """Get the acquisition date of a behavior_session in UTC
+        :rtype: datetime"""
+        query = """
+                SELECT bs.date_of_acquisition
+                FROM behavior_sessions bs
+                WHERE bs.id = {};
+                """.format(self.behavior_session_id)
+
+        experiment_date = self.lims_db.fetchone(query, strict=True)
+        return pytz.utc.localize(experiment_date)

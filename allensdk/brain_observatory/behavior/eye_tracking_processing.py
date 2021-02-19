@@ -70,7 +70,8 @@ def determine_outliers(data_df: pd.DataFrame,
         True denotes that a row in the data_df contains at least one outlier.
     """
 
-    outliers = (data_df.apply(stats.zscore, nan_policy='omit').apply(np.abs) > z_threshold)
+    outliers = data_df.apply(stats.zscore,
+                             nan_policy='omit').apply(np.abs) > z_threshold
     return pd.Series(outliers.any(axis=1))
 
 

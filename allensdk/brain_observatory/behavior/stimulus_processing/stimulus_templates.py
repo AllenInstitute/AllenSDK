@@ -1,10 +1,11 @@
 from typing import Dict, List
+import warnings
 
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.stimulus_processing.util import \
-    get_image_set_name, convert_filepath_caseinsensitive
+    convert_filepath_caseinsensitive
 
 
 class StimulusImage(np.ndarray):
@@ -41,7 +42,6 @@ class StimulusTemplate:
         images
             List of images as returned by the stimulus pkl
         """
-        image_set_name = get_image_set_name(image_set_path=image_set_name)
         self._image_set_name = image_set_name
 
         image_set_name = convert_filepath_caseinsensitive(
@@ -55,15 +55,15 @@ class StimulusTemplate:
             self.__add_image(name=image_name, values=image)
 
     @property
-    def image_set_name(self):
+    def image_set_name(self) -> str:
         return self._image_set_name
 
     @property
-    def image_names(self):
+    def image_names(self) -> List[str]:
         return list(self.keys())
 
     @property
-    def images(self):
+    def images(self) -> List[StimulusImage]:
         return list(self.values())
 
     def keys(self):
@@ -75,9 +75,11 @@ class StimulusTemplate:
     def items(self):
         return self._images.items()
 
-    def to_dataframe(self):
+    def to_dataframe(self) -> pd.DataFrame:
         index = pd.Index(self.image_names, name='image_name')
-        return pd.DataFrame({'image': self.images}, index=index)
+        df = pd.DataFrame({'image': self.images}, index=index)
+        df.name = self._image_set_name
+        return df
 
     def __add_image(self, name: str, values: np.ndarray):
         """
@@ -105,3 +107,22 @@ class StimulusTemplate:
 
     def __repr__(self):
         return f'{self._images}'
+
+    def __eq__(self, other: object):
+        if isinstance(other, StimulusTemplate):
+            if self.image_set_name != other.image_set_name:
+                return False
+
+            if sorted(self.image_names) != sorted(other.image_names):
+                return False
+
+            for (img_name, self_img) in self.items():
+                other_img = other._images[img_name]
+                if not np.array_equal(self_img, other_img):
+                    return False
+
+            return True
+        else:
+            raise NotImplementedError(
+                "Cannot compare a StimulusTemplate with an object of type: "
+                f"{type(other)}!")

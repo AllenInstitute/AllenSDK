@@ -11,7 +11,8 @@ All notable changes to this project will be documented in this file.
 - Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
 - For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
 - stimulus_templates in Session API returns new object with key of image name
-
+- Refactored BehaviorOphysSession to inherit methods and properties from BehaviorSession
+- Fixed a test for checking that Behavior and BehaviorOphysSessions contain the same data regardless of which API (LIMS/JSON/NWB) is used. Also fixed resulting failure cases.
 
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files

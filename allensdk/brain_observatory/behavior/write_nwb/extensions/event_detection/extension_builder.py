@@ -3,18 +3,17 @@ import os.path
 from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, \
     NWBDatasetSpec
 
-NAMESPACE = 'ndx-event-detection'
+NAMESPACE = 'ndx-aibs-ophys-event-detection'
 
 
 def main():
-    # these arguments were auto-generated from your cookiecutter inputs
+
     ns_builder = NWBNamespaceBuilder(
-        doc="""Store the event detection output""",
+        doc="Detected events from optical physiology ROI fluorescence traces",
         name=f"""{NAMESPACE}""",
         version="""0.1.0""",
-        author=list(map(str.strip, """Wayne Wakeman""".split(','))),
-        contact=list(
-            map(str.strip, """waynew@alleninstitute.org""".split(',')))
+        author="""Allen Institute for Brain Science""",
+        contact="""waynew@alleninstitute.org"""
     )
 
     ns_builder.include_type('RoiResponseSeries', namespace='core')
@@ -22,8 +21,8 @@ def main():
     ns_builder.include_type('TimeSeries', namespace='core')
     ns_builder.include_type('NWBDataInterface', namespace='core')
 
-    events_spec = NWBGroupSpec(
-        neurodata_type_def='EventDetection',
+    ophys_events_spec = NWBGroupSpec(
+        neurodata_type_def='OphysEventDetection',
         neurodata_type_inc='RoiResponseSeries',
         name='event_detection',
         doc='Stores event detection output',
@@ -43,7 +42,7 @@ def main():
         ]
     )
 
-    new_data_types = [events_spec]
+    new_data_types = [ophys_events_spec]
 
     # export the spec to yaml files in the spec folder
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))

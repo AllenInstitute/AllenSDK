@@ -80,7 +80,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         id used to initialize the API"""
         query = """
                 SELECT os.id FROM ophys_sessions os
-                JOIN ophys_experiment oe ON oe.ophys_session_id = os.id
+                JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
                 WHERE oe.id = {};
                 """.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=True)
@@ -140,21 +140,6 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                 JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
                 WHERE wkf.attachable_type = 'OphysSession'
                     AND wkft.name = 'EyeTracking Ellipses'
-                    AND oe.id = {self.get_ophys_experiment_id()};
-                """ # noqa E501
-        return safe_system_path(self.lims_db.fetchone(query, strict=True))
-
-    @memoize
-    def get_eye_gaze_mapping_file_path(self) -> str:
-        """Get the filepath of the eye gaze mapping file (*.h5) associated with the
-        ophys experiment"""
-        query = f"""
-                SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
-                FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
-                JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
-                WHERE wkf.attachable_type = 'OphysSession'
-                    AND wkft.name = 'EyeDlcScreenMapping'
                     AND oe.id = {self.get_ophys_experiment_id()};
                 """ # noqa E501
         return safe_system_path(self.lims_db.fetchone(query, strict=True))

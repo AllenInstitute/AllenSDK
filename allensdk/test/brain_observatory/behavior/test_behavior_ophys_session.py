@@ -27,9 +27,8 @@ from allensdk.brain_observatory.session_api_utils import (
     ],
     [
         lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
-        lambda ssn: ssn.get_max_projection()
+        lambda ssn: ssn.max_projection
     ]
-
 ])
 def test_session_from_json(tmpdir_factory, session_data, get_expected,
                            get_from_session):
@@ -43,7 +42,11 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected,
 
 @pytest.mark.requires_bamboo
 def test_nwb_end_to_end(tmpdir_factory):
-    oeid = 789359614
+    # NOTE: old test oeid 789359614 had no cell specimen ids due to not being
+    #       part of the 2021 Visual Behavior release set which broke a ton
+    #       of things...
+
+    oeid = 795073741
     tmpdir = 'test_nwb_end_to_end'
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp(tmpdir)),
                                 'nwbfile.nwb')
@@ -91,11 +94,14 @@ def test_visbeh_ophys_data_set():
     assert list(data_set.motion_correction.columns) == ['x', 'y']
     assert len(data_set.trials) == 602
 
-    expected = {
+    expected_metadata = {
         'stimulus_frame_rate': 60.0,
         'full_genotype': 'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93('
                          'TITL-GCaMP6f)/wt',
         'ophys_experiment_id': 789359614,
+        'behavior_session_id': 789295700,
+        'imaging_plane_group_count': 0,
+        'ophys_session_id': 789220000,
         'session_type': 'OPHYS_6_images_B',
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
         'behavior_session_uuid': uuid.UUID(
@@ -117,7 +123,7 @@ def test_visbeh_ophys_data_set():
         'age': 'P139',
         'sex': 'F',
         'imaging_plane_group': None}
-    assert data_set.metadata == expected
+    assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
                                         'stimulus_duration_sec': 6.0,
@@ -197,9 +203,9 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
         eye_tracking_dilation_frames=dilation_frames)
 
     if eye_tracking_start_value is not None:
+        # Tests that eye_tracking can be set
         session.eye_tracking = eye_tracking_start_value
         obtained = session.eye_tracking
-        assert not session.api.get_eye_tracking.called
         assert obtained.equals(eye_tracking_start_value)
     else:
         obtained = session.eye_tracking

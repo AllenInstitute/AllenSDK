@@ -46,10 +46,10 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def get_ophys_experiment_id(self):
-        return self.extractor.get_ophys_experiment_id()
-
     def get_ophys_session_id(self):
+        return self.extractor.get_ophys_session_id()
+
+    def get_ophys_experiment_id(self):
         return self.extractor.get_ophys_experiment_id()
 
     def get_eye_tracking_rig_geometry(self) -> dict:
@@ -178,10 +178,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         resampled = ophys_timestamps[plane_group::group_count]
         return resampled
 
-    def get_behavior_session_uuid(self):
-        data = self._behavior_stimulus_file()
-        return data['session_uuid']
-
     @memoize
     def get_ophys_frame_rate(self):
         ophys_timestamps = self.get_ophys_timestamps()
@@ -192,28 +188,33 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         """Return metadata about the session.
         :rtype: dict
         """
+        extractor = self.extractor
+
         behavior_session_uuid = self.get_behavior_session_uuid()
-        fov_shape = self.extractor.get_field_of_view_shape()
-        expt_container_id = self.extractor.get_experiment_container_id()
+        fov_shape = extractor.get_field_of_view_shape()
+        expt_container_id = extractor.get_experiment_container_id()
 
         metadata = {
-            'ophys_experiment_id': self.extractor.get_ophys_experiment_id(),
+            'behavior_session_id': extractor.get_behavior_session_id(),
+            'ophys_session_id': extractor.get_ophys_session_id(),
+            'ophys_experiment_id': extractor.get_ophys_experiment_id(),
             'experiment_container_id': expt_container_id,
             'ophys_frame_rate': self.get_ophys_frame_rate(),
             'stimulus_frame_rate': self.get_stimulus_frame_rate(),
-            'targeted_structure': self.extractor.get_targeted_structure(),
-            'imaging_depth': self.extractor.get_imaging_depth(),
-            'session_type': self.extractor.get_stimulus_name(),
-            'experiment_datetime': self.extractor.get_experiment_date(),
-            'reporter_line': self.extractor.get_reporter_line(),
-            'driver_line': self.extractor.get_driver_line(),
-            'LabTracks_ID': self.extractor.get_external_specimen_name(),
-            'full_genotype': self.extractor.get_full_genotype(),
+            'targeted_structure': extractor.get_targeted_structure(),
+            'imaging_depth': extractor.get_imaging_depth(),
+            'session_type': extractor.get_stimulus_name(),
+            'experiment_datetime': extractor.get_experiment_date(),
+            'full_genotype': extractor.get_full_genotype(),
+            'reporter_line': sorted(extractor.get_reporter_line()),
+            'driver_line': sorted(extractor.get_driver_line()),
+            'LabTracks_ID': extractor.get_external_specimen_name(),
             'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
-            'imaging_plane_group': self.extractor.get_imaging_plane_group(),
-            'rig_name': self.extractor.get_rig_name(),
-            'sex': self.extractor.get_sex(),
-            'age': self.extractor.get_age(),
+            'imaging_plane_group': extractor.get_imaging_plane_group(),
+            'imaging_plane_group_count': extractor.get_plane_group_count(),
+            'rig_name': extractor.get_rig_name(),
+            'sex': extractor.get_sex(),
+            'age': extractor.get_age(),
             'excitation_lambda': 910.0,
             'emission_lambda': 520.0,
             'indicator': 'GCAMP6f',
@@ -379,6 +380,30 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
                          dilation_frames: int = 2):
+        """Gets corneal, eye, and pupil ellipse fit data
+
+        Parameters
+        ----------
+        z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        dilation_frames : int, optional
+             Determines the number of additional adjacent frames to mark as
+            'likely_blink', by default 2.
+
+        Returns
+        -------
+        pd.DataFrame
+            *_area
+            *_center_x
+            *_center_y
+            *_height
+            *_phi
+            *_width
+            likely_blink
+        where "*" can be "corneal", "pupil" or "eye"
+        """
         logger = logging.getLogger("BehaviorOphysLimsApi")
 
         logger.info(f"Getting eye_tracking_data with "

@@ -7,7 +7,7 @@ import marshmallow
 from allensdk.brain_observatory.behavior.behavior_ophys_session import (
     BehaviorOphysSession)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi, BehaviorOphysJsonApi)
+    BehaviorOphysNwbApi, BehaviorOphysJsonApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.write_nwb._schemas import (
     InputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
@@ -21,15 +21,31 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
     nwb_filepath_error = nwb_filepath+'.error'
 
     # Clean out files from previous runs:
-    for filename in [nwb_filepath_inprogress, nwb_filepath_error, nwb_filepath]:
+    for filename in [nwb_filepath_inprogress,
+                     nwb_filepath_error,
+                     nwb_filepath]:
         if os.path.exists(filename):
             os.remove(filename)
 
     try:
-        session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(session)
-        api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
-        assert sessions_are_equal(session, BehaviorOphysSession(api=api))
+        json_session = BehaviorOphysSession(
+            api=BehaviorOphysJsonApi(session_data))
+        lims_api = BehaviorOphysLimsApi(
+            ophys_experiment_id=session_data['ophys_experiment_id'])
+        lims_session = BehaviorOphysSession(api=lims_api)
+
+        logging.info("Comparing a BehaviorOphysSession created from JSON "
+                     "with a BehaviorOphysSession created from LIMS")
+        assert sessions_are_equal(json_session, lims_session, reraise=True)
+
+        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(json_session)
+
+        logging.info("Comparing a BehaviorOphysSession created from JSON "
+                     "with a BehaviorOphysSession created from NWB")
+        nwb_api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
+        nwb_session = BehaviorOphysSession(api=nwb_api)
+        assert sessions_are_equal(json_session, nwb_session, reraise=True)
+
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
@@ -39,7 +55,8 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
 
 def main():
 
-    logging.basicConfig(format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
 
     args = sys.argv[1:]
     try:
@@ -55,7 +72,8 @@ def main():
         raise err
 
     try:
-        output = write_behavior_ophys_nwb(parser.args['session_data'], parser.args['output_path'])
+        output = write_behavior_ophys_nwb(parser.args['session_data'],
+                                          parser.args['output_path'])
         logging.info('File successfully created')
     except Exception as err:
         logging.error('NWB write failure')

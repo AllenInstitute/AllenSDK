@@ -10,7 +10,6 @@ from allensdk import OneResultExpectedError
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.exceptions import DataFrameIndexError
 from marshmallow.schema import ValidationError
@@ -108,6 +107,9 @@ def MockBehaviorLimsApi():
         def _get_ids(self):
             return {}
 
+        def get_experiment_date(self):
+            return datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
+
         def get_behavior_stimulus_file(self):
             return "dummy_stimulus_file.pkl"
 
@@ -144,7 +146,7 @@ def MockBehaviorLimsApi():
             }
             return data
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
@@ -171,7 +173,7 @@ def MockApiRunSpeedExpectedError():
 
     class MockBehaviorLimsApiRunSpeedExpectedError(BehaviorLimsApi):
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]})
@@ -224,7 +226,7 @@ def test_get_experiment_date(MockBehaviorLimsApi):
 def test_get_running_speed(MockBehaviorLimsApi):
     expected = pd.DataFrame({
         "timestamps": [0.0, 0.1, 0.2],
-        "values": [8.0, 15.0, 16.0]})
+        "speed": [8.0, 15.0, 16.0]})
     api = MockBehaviorLimsApi
     actual = api.get_running_speed()
     pd.testing.assert_frame_equal(expected, actual)
@@ -297,14 +299,16 @@ class TestBehaviorRegression:
         """
         bd_speed = self.bd.get_running_speed(lowpass=False)
         od_speed = self.od.get_running_speed(lowpass=False)
+
         assert len(bd_speed.values) == len(od_speed.values)
         assert len(bd_speed.timestamps) == len(od_speed.timestamps)
 
-    def test_get_running_df_regression(self):
+    def test_get_running_acquisition_df_regression(self):
         """Can't test values because they're intrinsically linked to timestamps
         """
-        bd_running = self.bd.get_running_data_df(lowpass=False)
-        od_running = self.od.get_running_data_df(lowpass=False)
+        bd_running = self.bd.get_running_acquisition_df(lowpass=False)
+        od_running = self.od.get_running_acquisition_df(lowpass=False)
+
         assert len(bd_running) == len(od_running)
         assert list(bd_running) == list(od_running)
 

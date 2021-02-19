@@ -241,7 +241,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # RunningSpeed object. This will improve consistency for students. For SWDB we have also opted to 
         # have columns for both 'timestamps' and 'values' of things, since this is more intuitive for students
         running_speed = super(ExtendedNwbApi, self).get_running_speed()
-        return pd.DataFrame({'speed': running_speed.values,
+        return pd.DataFrame({'speed': running_speed.speed,
                              'timestamps': running_speed.timestamps})
 
     def get_trials(self, filter_aborted_trials=True):

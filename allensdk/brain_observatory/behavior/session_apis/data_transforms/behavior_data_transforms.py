@@ -2,6 +2,7 @@ import logging
 import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -103,33 +104,60 @@ class BehaviorDataTransforms(BehaviorBase):
         timestamps = self.get_stimulus_timestamps()
         return get_rewards(data, timestamps)
 
-    def get_running_data_df(self, lowpass=True, zscore_threshold=10.0) -> pd.DataFrame:
-        """Get running speed data.
+    def get_running_acquisition_df(self, lowpass=True,
+                                   zscore_threshold=10.0) -> pd.DataFrame:
+        """Get running speed acquisition data from a behavior pickle file.
 
-        :returns: pd.DataFrame -- dataframe containing various signals used
-            to compute running speed.
+        NOTE: Rebases timestamps with the self.get_stimulus_timestamps()
+        method which varies between the BehaviorDataTransformer and the
+        BehaviorOphysDataTransformer.
+
+        Parameters
+        ----------
+        lowpass: bool (default=True)
+            Whether to apply a 10Hz low-pass filter to the running speed
+            data.
+        zscore_threshold: float
+            The threshold to use for removing outlier running speeds which
+            might be noise and not true signal
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe with an index of timestamps and the following columns:
+                "speed": computed running speed
+                "dx": angular change, computed during data collection
+                "v_sig": voltage signal from the encoder
+                "v_in": the theoretical maximum voltage that the encoder
+                    will reach prior to "wrapping". This should
+                    theoretically be 5V (after crossing 5V goes to 0V, or
+                    vice versa). In practice the encoder does not always
+                    reach this value before wrapping, which can cause
+                    transient spikes in speed at the voltage "wraps".
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass, zscore_threshold=zscore_threshold)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass,
+                              zscore_threshold=zscore_threshold)
 
-    def get_running_speed(self, lowpass=True) -> RunningSpeed:
+    def get_running_speed(self, lowpass=True) -> pd.DataFrame:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
         NOTE: Do not correct for monitor delay.
 
-        :returns: RunningSpeed -- a NamedTuple containing the subject's
-            timestamps and running speeds (in cm/s)
+        :returns: pd.DataFrame
+            index: timestamps
+            speed : subject's running speeds (in cm/s)
         """
-        running_data_df = self.get_running_data_df(lowpass=lowpass)
+        running_data_df = self.get_running_acquisition_df(lowpass=lowpass)
         if running_data_df.index.name != "timestamps":
             raise DataFrameIndexError(
                 f"Expected index to be named 'timestamps' but got "
                 f"'{running_data_df.index.name}'.")
         return pd.DataFrame({
             "timestamps": running_data_df.index.values,
-            "values": running_data_df.speed.values})
+            "speed": running_data_df.speed.values})
 
     def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()
@@ -185,7 +213,9 @@ class BehaviorDataTransforms(BehaviorBase):
             raise ValueError("Length of `stim_pres_df` should not change after"
                              f" merge; was {len(raw_stim_pres_df)}, now "
                              f" {len(stim_pres_df)}.")
-        return stim_pres_df[sorted(stim_pres_df)]
+
+        # Sort columns then drop columns which contain only all NaN values
+        return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
 
     def get_stimulus_templates(self) -> Optional[StimulusTemplate]:
         """Get stimulus templates (movies, scenes) for behavior session.
@@ -261,13 +291,50 @@ class BehaviorDataTransforms(BehaviorBase):
 
     @memoize
     def get_experiment_date(self) -> datetime:
-        """Return timestamp the behavior stimulus file began recording in UTC
+        """Return the timestamp for when experiment was started in UTC
+
+        NOTE: This method will only get acquisition datetime from
+        extractor (data from LIMS) methods. As a sanity check,
+        it will also read the acquisition datetime from the behavior stimulus
+        (*.pkl) file and raise a warning if the date differs too much from the
+        datetime obtained from the behavior stimulus (*.pkl) file.
+
         :rtype: datetime
         """
-        data = self._behavior_stimulus_file()
-        # Assuming file has local time of computer (Seattle)
-        tz = pytz.timezone("America/Los_Angeles")
-        return tz.localize(data["start_time"]).astimezone(pytz.utc)
+        extractor_acq_date = self.extractor.get_experiment_date()
+
+        pkl_data = self._behavior_stimulus_file()
+        pkl_raw_acq_date = pkl_data["start_time"]
+        if isinstance(pkl_raw_acq_date, datetime):
+            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
+
+        elif isinstance(pkl_raw_acq_date, (int, float)):
+            # We are dealing with an older pkl file where the acq time is
+            # stored as a Unix style timestamp string
+            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
+            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
+        else:
+            pkl_acq_date = None
+            warnings.warn(
+                "Could not parse the acquisition datetime "
+                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
+                f"{self.extractor.get_behavior_stimulus_file()}"
+            )
+
+        if pkl_acq_date:
+            acq_start_diff = (
+                extractor_acq_date - pkl_acq_date).total_seconds()
+            # If acquisition dates differ by more than an hour
+            if abs(acq_start_diff) > 360:
+                warnings.warn(
+                    "The `date_of_acquisition` field in LIMS "
+                    f"({extractor_acq_date}) for behavior session "
+                    f"({self.get_behavior_session_id()}) deviates by more "
+                    f"than an hour from the `start_time` ({pkl_acq_date}) "
+                    "specified in the associated stimulus *.pkl file: "
+                    f"{self.extractor.get_behavior_stimulus_file()}"
+                )
+        return extractor_acq_date
 
     def get_metadata(self) -> Dict[str, Any]:
         """Return metadata about the session.
@@ -284,12 +351,11 @@ class BehaviorDataTransforms(BehaviorBase):
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
             "session_type": self.extractor.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": self.extractor.get_reporter_line(),
-            "driver_line": self.extractor.get_driver_line(),
+            "reporter_line": sorted(self.extractor.get_reporter_line()),
+            "driver_line": sorted(self.extractor.get_driver_line()),
             "LabTracks_ID": self.extractor.get_external_specimen_name(),
             "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.extractor.get_foraging_id(),
             "behavior_session_id": self.extractor.get_behavior_session_id()
         }
         return metadata

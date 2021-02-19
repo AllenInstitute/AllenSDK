@@ -283,6 +283,10 @@ class EcephysNwb1Api(EcephysSessionApi):
         units_df.set_index('unit_id', inplace=True)
         return units_df
 
+    def get_invalid_times(self) -> pd.DataFrame:
+        # ecephys nwb v1 files do not appear to contain any
+        # info on invalid_times
+        return pd.DataFrame()
 
     def get_ecephys_session_id(self) -> int:
         # Doesn't look like the session_id is stored

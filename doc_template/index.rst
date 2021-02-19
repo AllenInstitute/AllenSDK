@@ -101,6 +101,8 @@ What's New - 2.7.0
 - Read/write event detection data from/to NWB
 - Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
 - For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
+- Refactored BehaviorOphysSession to inherit methods and properties from BehaviorSession
+- Fixed a test for checking that Behavior and BehaviorOphysSessions contain the same data regardless of which API (LIMS/JSON/NWB) is used. Also fixed resulting failure cases.
 
 What's New - 2.6.0
 -----------------------------------------------------------------------

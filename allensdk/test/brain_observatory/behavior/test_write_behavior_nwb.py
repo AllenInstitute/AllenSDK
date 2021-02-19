@@ -11,6 +11,30 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate
 
+# pytest fixtures:
+# nwbfile: test.brain_observatory.conftest
+# roundtripper: test.brain_observatory.conftest
+# running_speed: test.brain_observatory.conftest
+# running_acquisition_df_fixture: test.brain_observatory.behavior.conftest
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_running_acquisition_to_nwbfile(nwbfile, roundtrip, roundtripper,
+                                            running_acquisition_df_fixture):
+    nwbfile = nwb.add_running_acquisition_to_nwbfile(
+        nwbfile, running_acquisition_df_fixture)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorNwbApi)
+    else:
+        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
+
+    obt_running_acq_df = obt.get_running_acquisition_df()
+
+    pd.testing.assert_frame_equal(running_acquisition_df_fixture,
+                                  obt_running_acq_df,
+                                  check_like=True)
+
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
@@ -23,9 +47,12 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
     else:
         obt = BehaviorNwbApi.from_nwbfile(nwbfile)
 
-    running_speed_obt = obt.get_running_speed()
-    assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
-    assert np.allclose(running_speed.values, running_speed_obt.values)
+    obt_running_speed = obt.get_running_speed()
+
+    assert np.allclose(running_speed.timestamps,
+                       obt_running_speed['timestamps'])
+    assert np.allclose(running_speed.values,
+                       obt_running_speed['speed'])
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -130,9 +157,9 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_behavior_only_metadata(roundtrip, roundtripper,
-                                    behavior_only_metadata):
+                                    behavior_only_metadata_fixture):
 
-    metadata = behavior_only_metadata
+    metadata = behavior_only_metadata_fixture
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',
