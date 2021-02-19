@@ -35,9 +35,6 @@
 #
 import logging
 
-
-
-
 __version__ = '2.8.0'
 
 
@@ -61,7 +58,8 @@ def one(x):
     except TypeError:
         return x
     if xlen != 1:
-        raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
+        raise OneResultExpectedError("Expected length one result, received: "
+                                     f"{x} results from queryr")
     if isinstance(x, set):
         return list(x)[0]
     else:
@@ -75,6 +73,7 @@ if True:
         'allensdk.api.api.retrieve_file_over_http')
     file_download_log.setLevel(logging.INFO)
     console = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(asctime)s %(name)-12s "
+                                  "%(levelname)-8s %(message)s")
     console.setFormatter(formatter)
     file_download_log.addHandler(console)
