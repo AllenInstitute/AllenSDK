@@ -171,17 +171,17 @@ def test_load_truncated_timestamps(monkeypatch):
             pass
 
         def get_edges(self, kind, keys, units='seconds'):
-            return np.array([1, 2, 3, 4, 500, 501, 502, 503])
+            return pd.Series([1, 2, 3, 4, 500, 501, 502, 503], dtype=np.int64)
 
 
     with monkeypatch.context() as ctx:
         ctx.setattr(su, "Dataset", MockDataset)
         timestamps = main.load_sync_file_timings("", 8, False)
-        expected = pd.Series([1, 2, 3, 4, 500, 501, 502, 503])
+        expected = pd.Series([1, 2, 3, 4, 500, 501, 502, 503], dtype=np.int64)
         assert timestamps.equals(expected)
 
         timestamps = main.load_sync_file_timings("", 4, True)
-        expected = pd.Series([1, 2, 3, 4])
+        expected = pd.Series([1, 2, 3, 4], dtype=np.int64)
         assert timestamps.equals(expected)
 
         with pytest.raises(RuntimeError):
