@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.8.0] = TBD
 -
+-
 
 ## [2.7.0] = 2021-02-19
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
