@@ -650,7 +650,8 @@ def add_licks(nwbfile, licks):
         data=licks.frame.values,
         timestamps=licks.time.values,
         description=('Timestamps and stimulus presentation '
-                     'frame indices for lick events')
+                     'frame indices for lick events'),
+        unit='N/A'
     )
 
     # Add lick interface to nwb file, by way of a processing module:
