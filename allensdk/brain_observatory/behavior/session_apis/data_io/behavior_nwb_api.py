@@ -183,7 +183,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         running_speed_df = pd.DataFrame(
             {
                 'timestamps': timestamps,
-                'values': values
+                'speed': values
             },
         )
         return running_speed_df

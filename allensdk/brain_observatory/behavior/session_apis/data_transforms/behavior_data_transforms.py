@@ -157,7 +157,7 @@ class BehaviorDataTransforms(BehaviorBase):
                 f"'{running_data_df.index.name}'.")
         return pd.DataFrame({
             "timestamps": running_data_df.index.values,
-            "values": running_data_df.speed.values})
+            "speed": running_data_df.speed.values})
 
     def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()

@@ -52,7 +52,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
     assert np.allclose(running_speed.timestamps,
                        obt_running_speed['timestamps'])
     assert np.allclose(running_speed.values,
-                       obt_running_speed['values'])
+                       obt_running_speed['speed'])
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
