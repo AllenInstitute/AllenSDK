@@ -159,7 +159,7 @@ def get_extended_stimulus_presentations(session):
     # Average running speed on each flash
     flash_running_speed = intermediate_df.apply(
         lambda row: trace_average(
-            session.running_speed.speed,
+            session.running_speed.values,
             session.running_speed.timestamps,
             row["start_time"],
             row["start_time"]+0.25,
