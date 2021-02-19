@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pickle
+import warnings
 from typing import Dict, List, Tuple, Union, Optional
 
 from allensdk.brain_observatory.behavior.stimulus_processing.util import \
@@ -152,12 +153,29 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     return grating_df
 
 
-def get_stimulus_templates(pkl) -> Optional[StimulusTemplate]:
+def get_stimulus_templates(pkl: dict,
+                           pkl_path: str,
+                           grating_images_dict: dict
+                           ) -> Optional[StimulusTemplate]:
     """
-    Gets images presented during experimentation
+    Gets images presented during experiments from the behavior stimulus file
+    (*.pkl)
+
     Parameters
     ----------
-    pkl: pkl file containing the data for the presented stimuli
+    pkl : dict
+        Loaded pkl dict containing data for the presented stimuli.
+    pkl_path : str
+        The filepath of the *.pkl file which the pkl data was loaded from.
+    grating_images_dict : Optional[dict]
+        Because behavior pkl files do not contain image versions of grating
+        stimuli, they must be obtained an external source. The
+        grating_images_dict is a nested dictionary where top level keys
+        correspond to grating image names (e.g. 'gratings_0.0',
+        'gratings_270.0') as they would appear in table returned by
+        get_gratings_metadata(). Sub-nested dicts are expected to have 'warped'
+        and 'unwarped' keys where values are numpy image arrays
+        of aforementioned warped or unwarped grating stimuli.
 
     Returns
     -------
@@ -166,19 +184,49 @@ def get_stimulus_templates(pkl) -> Optional[StimulusTemplate]:
         the experiment
 
     """
-    if 'images' not in pkl['items']['behavior']['stimuli']:
-        return None
 
-    images = get_images_dict(pkl)
-    image_set_filepath = images['metadata']['image_set']
-    image_set_name = get_image_set_name(image_set_path=image_set_filepath)
-    image_set_name = convert_filepath_caseinsensitive(
-        image_set_name)
-    factory = StimulusTemplateFactory()
-    return factory.from_pkl(
-        image_set_name=image_set_name,
-        image_attributes=images['image_attributes'], images=images['images']
-    )
+    pkl_stimuli = pkl['items']['behavior']['stimuli']
+    if 'images' in pkl_stimuli:
+        images = get_images_dict(pkl)
+        image_set_filepath = images['metadata']['image_set']
+        image_set_name = get_image_set_name(image_set_path=image_set_filepath)
+        image_set_name = convert_filepath_caseinsensitive(
+            image_set_name)
+
+        return StimulusTemplateFactory.from_unprocessed(
+            image_set_name=image_set_name,
+            image_attributes=images['image_attributes'],
+            images=images['images']
+        )
+    elif 'grating' in pkl_stimuli:
+        gratings_metadata = get_gratings_metadata(
+            pkl_stimuli).to_dict(orient='records')
+
+        unwarped_images = []
+        warped_images = []
+        for image_attrs in gratings_metadata:
+            image_name = image_attrs['image_name']
+            grating_imgs_sub_dict = grating_images_dict[image_name]
+            unwarped_array = imageio.imread(grating_imgs_sub_dict['unwarped'])
+            warped_array = imageio.imread(grating_imgs_sub_dict['warped'])
+            unwarped_images.append(np.asarray(unwarped_array))
+            warped_images.append(np.asarray(warped_array))
+
+        return StimulusTemplateFactory.from_processed(
+            image_set_name='grating',
+            image_attributes=gratings_metadata,
+            unwarped=unwarped_images,
+            warped=warped_images
+        )
+    else:
+        warnings.warn(
+                "Could not determine stimulus template images from pkl file "
+                f"({pkl_path}). The pkl stimuli nested dict "
+                "(pkl['items']['behavior']['stimuli']) contained neither "
+                "'images' nor 'grating' but instead: "
+                f"'{pkl_stimuli.keys()}'"
+            )
+        return None
 
 
 def get_stimulus_metadata(pkl) -> pd.DataFrame:

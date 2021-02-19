@@ -60,7 +60,7 @@ def stimulus_templates():
     images = [np.zeros((4, 4)), np.ones((4, 4))]
 
     image_attributes = [{'image_name': 'test1'}, {'image_name': 'test2'}]
-    stimulus_templates = StimulusTemplateFactory.from_pkl(
+    stimulus_templates = StimulusTemplateFactory.from_unprocessed(
         image_set_name='test', image_attributes=image_attributes,
         images=images)
     return stimulus_templates

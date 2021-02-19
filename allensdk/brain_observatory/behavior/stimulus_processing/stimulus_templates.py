@@ -35,8 +35,9 @@ class StimulusImageFactory:
     """Factory for StimulusImage"""
     _monitor = BrainObservatoryMonitor()
 
-    def from_pkl(self, input_array: np.ndarray, name: str) -> StimulusImage:
-        """Creates a StimulusImage from pkl input.
+    def from_unprocessed(self, input_array: np.ndarray,
+                         name: str) -> StimulusImage:
+        """Creates a StimulusImage from unprocessed input (usually pkl).
         Image needs to be warped and preprocessed"""
         resized, unwarped = self._get_unwarped(arr=input_array)
         warped = self._get_warped(arr=resized)
@@ -44,9 +45,9 @@ class StimulusImageFactory:
         return image
 
     @staticmethod
-    def from_nwb(warped: np.ndarray, unwarped: np.ndarray,
-                 name: str) -> StimulusImage:
-        """Creates a StimulusImage from nwb input.
+    def from_processed(warped: np.ndarray, unwarped: np.ndarray,
+                       name: str) -> StimulusImage:
+        """Creates a StimulusImage from processed input (usually nwb).
         Image has already been warped and preprocessed"""
         image = StimulusImage(name=name, warped=warped, unwarped=unwarped)
         return image
@@ -137,16 +138,23 @@ class StimulusTemplate:
         df.name = self._image_set_name
         return df
 
-    def __add_image(self, name: str, values: np.ndarray):
+    def __add_image(self, warped_values: np.ndarray,
+                    unwarped_values: np.ndarray, name: str):
         """
         Parameters
         ----------
-        name:
+        name : str
             Name of the image
-        values
-            The image values
+        warped_values : np.ndarray
+            The image array corresponding to the 'warped' version of the
+            stimuli.
+        unwarped_values : np.ndarray
+            The image array corresponding to the 'unwarped' version of the
+            stimuli.
         """
-        image = StimulusImage(input_array=values, name=name)
+        image = StimulusImage(warped=warped_values,
+                              unwarped=unwarped_values,
+                              name=name)
         self._images[name] = image
 
     def __getitem__(self, item) -> StimulusImage:
@@ -191,30 +199,91 @@ class StimulusTemplate:
 
 class StimulusTemplateFactory:
     """Factory for StimulusTemplate"""
+
     @staticmethod
-    def from_pkl(image_set_name: str, image_attributes: List[dict],
-                 images: List[np.ndarray]) -> StimulusTemplate:
-        """Create StimulusTemplate from pkl input"""
+    def from_unprocessed(image_set_name: str, image_attributes: List[dict],
+                         images: List[np.ndarray]) -> StimulusTemplate:
+        """Create StimulusTemplate from pkl or unprocessed input. Stimulus
+        templates created this way need to be processed to acquire unwarped
+        versions of the images presented.
+
+        NOTE: The ordering of image_attributes and images matter!
+
+        NOTE: Warped images display what was seen on a monitor by a subject.
+        Unwarped images display a 'diagnostic' version of the stimuli to be
+        presented.
+
+        Parameters
+        ----------
+        image_set_name : str
+            The name of the image set. Example:
+                Natural_Images_Lum_Matched_set_TRAINING_2017.07.14
+        image_attributes : List[dict]
+            A list of dictionaries containing image metadata. Must at least
+            contain the key:
+                image_name
+            But will usually also contain:
+                image_category, orientation, phase,
+                spatial_frequency, image_index
+        images : List[np.ndarray]
+            A list of image arrays
+
+        Returns
+        -------
+        StimulusTemplate
+            A StimulusTemplate object
+        """
         stimulus_images = []
         for i, image in enumerate(images):
-            factory = StimulusImageFactory()
             name = image_attributes[i]['image_name']
-            stimulus_image = factory.from_pkl(name=name, input_array=image)
+            stimulus_image = StimulusImageFactory().from_unprocessed(
+                name=name, input_array=image)
             stimulus_images.append(stimulus_image)
         return StimulusTemplate(image_set_name=image_set_name,
                                 images=stimulus_images)
 
     @staticmethod
-    def from_nwb(image_set_name: str, image_attributes: List[dict],
-                 unwarped: List[np.ndarray], warped: List[np.ndarray]) -> \
-            StimulusTemplate:
-        """Create StimulusTemplate from nwb input."""
+    def from_processed(image_set_name: str, image_attributes: List[dict],
+                       unwarped: List[np.ndarray],
+                       warped: List[np.ndarray]) -> StimulusTemplate:
+        """Create StimulusTemplate from nwb or other processed input.
+        Stimulus templates created this way DO NOT need to be processed
+        to acquire unwarped versions of the images presented.
+
+        NOTE: The ordering of image_attributes, unwarped, and warped matter!
+
+        NOTE: Warped images display what was seen on a monitor by a subject.
+        Unwarped images display a 'diagnostic' version of the stimuli to be
+        presented.
+
+        Parameters
+        ----------
+        image_set_name : str
+            The name of the image set. Example:
+                Natural_Images_Lum_Matched_set_TRAINING_2017.07.14
+        image_attributes : List[dict]
+            A list of dictionaries containing image metadata. Must at least
+            contain the key:
+                image_name
+            But will usually also contain:
+                image_category, orientation, phase,
+                spatial_frequency, image_index
+        unwarped : List[np.ndarray]
+            A list of unwarped image arrays
+        warped : List[np.ndarray]
+            A list of warped image arrays
+
+        Returns
+        -------
+        StimulusTemplate
+            A StimulusTemplate object
+        """
         stimulus_images = []
         for i, attrs in enumerate(image_attributes):
             warped_image = warped[i]
             unwarped_image = unwarped[i]
             name = attrs['image_name']
-            stimulus_image = StimulusImageFactory.from_nwb(
+            stimulus_image = StimulusImageFactory.from_processed(
                 name=name, warped=warped_image, unwarped=unwarped_image)
             stimulus_images.append(stimulus_image)
         return StimulusTemplate(image_set_name=image_set_name,

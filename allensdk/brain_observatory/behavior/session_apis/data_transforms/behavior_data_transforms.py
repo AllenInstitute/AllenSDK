@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 import warnings
 
+import imageio
 import numpy as np
 import pandas as pd
 import pytz
@@ -243,8 +244,54 @@ class BehaviorDataTransforms(BehaviorBase):
         -------
         StimulusTemplate or None if there are no images for the experiment
         """
+
+        # TODO: Eventually the `grating_images_dict` should be provided by the
+        #       BehaviorLimsExtractor/BehaviorJsonExtractor classes.
+        #       - NJM 2021/2/23
+        grating_images_dict = {
+            "gratings_0.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_0.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/"
+                    "masked_unwarped_grating_0.png"))
+            },
+            "gratings_90.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_90.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior"
+                    "/masked_unwarped_grating_90.png"))
+            },
+            "gratings_180.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_180.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/"
+                    "masked_unwarped_grating_180.png"))
+            },
+            "gratings_270.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_270.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior"
+                    "/masked_unwarped_grating_270.png"))
+            }
+        }
+
         pkl = self._behavior_stimulus_file()
-        return get_stimulus_templates(pkl=pkl)
+        pkl_path = self.extractor.get_behavior_stimulus_file()
+        return get_stimulus_templates(pkl=pkl,
+                                      pkl_path=pkl_path,
+                                      grating_images_dict=grating_images_dict)
 
     def get_monitor_delay(self) -> float:
         """

@@ -200,7 +200,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
         image_attributes = [{'image_name': image_name}
                             for image_name in image_data.control_description]
-        return StimulusTemplateFactory.from_nwb(
+        return StimulusTemplateFactory.from_processed(
             image_set_name=image_set_name, image_attributes=image_attributes,
             warped=image_data.data[:], unwarped=image_data.unwarped[:]
         )
