@@ -380,7 +380,7 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     '''
 
     if from_dataframe:
-        data = running_speed['values'].values
+        data = running_speed['speed'].values
         timestamps = running_speed['timestamps'].values
     else:
         data = running_speed.values
