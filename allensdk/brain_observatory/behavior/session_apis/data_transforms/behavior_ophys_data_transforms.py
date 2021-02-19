@@ -9,6 +9,8 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
+import warnings
+
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
@@ -144,13 +146,37 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         monitor delay) and the monitor delay
         """
         sync_path = self.extractor.get_sync_file()
-        (timestamps,
-         delta,
-         monitor_delay) = (OphysTimeAligner(sync_file=sync_path)
-                           .corrected_stim_timestamps)
+        aligner = OphysTimeAligner(sync_file=sync_path)
+        (self._stimulus_timestamps,
+         delta) = aligner.clipped_stim_timestamps
 
-        self._stimulus_timestamps = timestamps-monitor_delay
-        self._monitor_delay = monitor_delay
+        try:
+            delay = aligner.monitor_delay
+        except ValueError as ee:
+            err_msg = ee.args[0]
+            warning_msg = 'Monitory delay calculation failed '
+            warning_msg += 'with ValueError\n'
+            warning_msg += f'    "{ee}"'
+            warning_msg += '\nlooking monitor delay up from table'
+            warnings.warn(warning_msg)
+
+            # see
+            # https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/1916#issuecomment-782297075
+            delay_lookup = {'CAM2P.1': 0.020842,
+                            'CAM2P.2': 0.037566,
+                            'CAM2P.3': 0.021390,
+                            'CAM2P.4': 0.021102,
+                            'CAM2P.5': 0.021192,
+                            'MESO.1': 0.03613}
+
+            rig_name = self.get_metadata()['rig_name']
+            if rig_name not in delay_lookup:
+                msg = warning_msg
+                msg += f'\nrig_name {rig_name} not in lookup table'
+                raise RuntimeError(msg)
+            delay = delay_lookup[rig_name]
+
+        self._monitor_delay = delay
 
     def get_stimulus_timestamps(self):
         """
