@@ -1,18 +1,29 @@
 import logging
 from datetime import datetime
+
 import pytz
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataTransforms
 
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms)
+
+class BehaviorJsonApi(BehaviorDataTransforms):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (extractor). Contains all methods
+    needed to fill a BehaviorSession."""
+
+    def __init__(self, data):
+        extractor = BehaviorJsonExtractor(data=data)
+        super().__init__(extractor=extractor)
 
 
-class BehaviorJsonApi(BehaviorDataXforms):
-    """A data fetching class that serves as an API for fetching 'raw'
-    data from a json file necessary (but not sufficient) for filling
-    a 'BehaviorSession'.
+class BehaviorJsonExtractor(BehaviorDataExtractorBase):
+    """A class which 'extracts' data from a json file. The extracted data
+    is necessary (but not sufficient) for populating a 'BehaviorSession'.
 
-    Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's.
+    Most data provided by this extractor needs to be processed by
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's.
 
     This class is used by the write_nwb module for behavior sessions.
     """
@@ -40,29 +51,19 @@ class BehaviorJsonApi(BehaviorDataXforms):
         return self.data['age']
 
     def get_stimulus_name(self) -> str:
-        """Get the name of the stimulus presented for a behavior or
-        behavior + ophys experiment"""
+        """Get the name of the stimulus presented for the experiment"""
         return self.data['stimulus_name']
 
-    def get_experiment_date(self) -> datetime:
-        """Get the acquisition date of an ophys experiment"""
-        return pytz.utc.localize(
-            datetime.strptime(self.data['date_of_acquisition'],
-                              "%Y-%m-%d %H:%M:%S"))
-
     def get_reporter_line(self) -> str:
-        """Get the (gene) reporter line for the subject associated with a
-        behavior or behavior + ophys experiment"""
+        """Get the (gene) reporter line for the subject associated with an experiment"""
         return self.data['reporter_line']
 
     def get_driver_line(self) -> str:
-        """Get the (gene) driver line for the subject associated with a
-        behavior or behavior + ophys experiment"""
+        """Get the (gene) driver line for the subject associated with an experiment"""
         return self.data['driver_line']
 
     def get_full_genotype(self) -> str:
-        """Get the full genotype of the subject associated with a
-        behavior or behavior + ophys experiment"""
+        """Get the full genotype of the subject associated with an experiment"""
         return self.data['full_genotype']
 
     def get_behavior_stimulus_file(self) -> str:
@@ -73,3 +74,12 @@ class BehaviorJsonApi(BehaviorDataXforms):
         """Get the external specimen id (LabTracks ID) for the subject
         associated with a behavior experiment"""
         return int(self.data['external_specimen_name'])
+
+    def get_experiment_date(self) -> datetime:
+        """Get the acquisition date of an experiment (in UTC)
+
+        NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
+        """
+        tz = pytz.timezone("America/Los_Angeles")
+        return tz.localize(datetime.strptime(self.data['date_of_acquisition'],
+                           "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)

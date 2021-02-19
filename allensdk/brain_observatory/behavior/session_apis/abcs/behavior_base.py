@@ -1,10 +1,10 @@
 import abc
 
-from typing import Dict
-
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.running_speed import RunningSpeed
+
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 
 
 class BehaviorBase(abc.ABC):
@@ -44,23 +44,27 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
-        """Get running speed data.
-
-        Parameters
-        ----------
-        lowpass: bool
-            Whether to return running speed with low pass filter applied or without
+    def get_running_acquisition_df(self) -> pd.DataFrame:
+        """Get running speed acquisition data from a behavior pickle file.
 
         Returns
         -------
         pd.DataFrame
-            Dataframe containing various signals used to compute running speed.
+            Dataframe with an index of timestamps and the following columns:
+                "speed": computed running speed
+                "dx": angular change, computed during data collection
+                "v_sig": voltage signal from the encoder
+                "v_in": the theoretical maximum voltage that the encoder
+                    will reach prior to "wrapping". This should
+                    theoretically be 5V (after crossing 5V goes to 0V, or
+                    vice versa). In practice the encoder does not always
+                    reach this value before wrapping, which can cause
+                    transient spikes in speed at the voltage "wraps".
         """
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_running_speed(self) -> RunningSpeed:
+    def get_running_speed(self) -> pd.DataFrame:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
@@ -68,10 +72,10 @@ class BehaviorBase(abc.ABC):
 
         Returns
         -------
-        RunningSpeed (NamedTuple with two fields)
+        pd.DataFrame
             timestamps : np.ndarray
-                Timestamps of running speed data samples
-            values : np.ndarray
+                index consisting of timestamps of running speed data samples
+            speed : np.ndarray
                 Running speed of the experimental subject (in cm / s).
         """
         raise NotImplementedError()
@@ -92,14 +96,12 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
+    def get_stimulus_templates(self) -> StimulusTemplate:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        Dict[str, np.ndarray]
-            A dictionary containing the stimulus images presented during the
-            session. Keys are data set names, and values are 3D numpy arrays.
+        StimulusTemplate
         """
         raise NotImplementedError()
 
@@ -138,5 +140,16 @@ class BehaviorBase(abc.ABC):
         pd.DataFrame
             A dataframe containing behavioral trial start/stop times,
             and trial data
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_metadata(self) -> dict:
+        """Get metadata for Session
+
+        Returns
+        -------
+        dict
+            A dictionary containing various metadata
         """
         raise NotImplementedError()

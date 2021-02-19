@@ -1,6 +1,19 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.7.0] = TBD
+- Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
+- Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
+- Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
+- Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
+- Return event detection data through session API
+- Read/write event detection data from/to NWB
+- Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
+- For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
+- stimulus_templates in Session API returns new object with key of image name
+- Refactored BehaviorOphysSession to inherit methods and properties from BehaviorSession
+- Fixed a test for checking that Behavior and BehaviorOphysSessions contain the same data regardless of which API (LIMS/JSON/NWB) is used. Also fixed resulting failure cases.
+
 ## [2.6.0] = 2021-02-05
 - Adds ability to write and read behavior only NWB files
 - Adds eye tracking ellipse fits and metadata as new NWB data stream

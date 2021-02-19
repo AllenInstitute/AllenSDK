@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Union
 
 import h5py
 import marshmallow
@@ -12,15 +12,14 @@ import uuid
 import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
-from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule, NWBFile
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
-from ndx_events import Events
 
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusImage, StimulusTemplate
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -307,108 +306,46 @@ def add_eye_gaze_mapping_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     return nwbfile
 
 
-def add_running_speed_to_nwbfile(nwbfile, running_speed,
-                                 name='speed', unit='cm/s'):
-    ''' Adds running speed data to an NWBFile as a timeseries in acquisition
+def add_running_acquisition_to_nwbfile(nwbfile,
+                                       running_acquisition_df: pd.DataFrame):
 
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : RunningSpeed
-        Contains attributes 'values' and 'timestamps'
-    name : str, optional
-        used as name of timeseries object
-    unit : str, optional
-        SI units of running speed values
+    running_dx_series = TimeSeries(
+        name='dx',
+        data=running_acquisition_df['dx'].values,
+        timestamps=running_acquisition_df.index.values,
+        unit='cm',
+        description=(
+            'Running wheel angular change, computed during data collection')
+    )
 
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
+    v_sig = TimeSeries(
+        name='v_sig',
+        data=running_acquisition_df['v_sig'].values,
+        timestamps=running_acquisition_df.index.values,
+        unit='V',
+        description='Voltage signal from the running wheel encoder'
+    )
 
-    '''
-
-    running_speed_series = pynwb.base.TimeSeries(
-        name=name,
-        data=running_speed.values,
-        timestamps=running_speed.timestamps,
-        unit=unit
+    v_in = TimeSeries(
+        name='v_in',
+        data=running_acquisition_df['v_in'].values,
+        timestamps=running_acquisition_df.index.values,
+        unit='V',
+        description=(
+            'The theoretical maximum voltage that the running wheel encoder '
+            'will reach prior to "wrapping". This should '
+            'theoretically be 5V (after crossing 5V goes to 0V, or '
+            'vice versa). In practice the encoder does not always '
+            'reach this value before wrapping, which can cause '
+            'transient spikes in speed at the voltage "wraps".')
     )
 
     if 'running' in nwbfile.processing:
         running_mod = nwbfile.processing['running']
     else:
-        running_mod = ProcessingModule('running', 'Running speed processing module')
+        running_mod = ProcessingModule('running',
+                                       'Running speed processing module')
         nwbfile.add_processing_module(running_mod)
-
-    running_mod.add_data_interface(running_speed_series)
-
-    return nwbfile
-
-
-def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
-                                    running_data_df_unfiltered, unit_dict):
-    """Adds both unfiltered (raw) and filtered running speed data to an
-    NWBFile as timeseries in acquisition and processing
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        File to which running speeds will be written
-    running_data_df : pandas.DataFrame
-        Filtered running data
-        Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
-        running_data_df_unfiltered
-    running_data_df_unfiltered : pandas.DataFrame
-        Unfiltered (raw) Running data
-        Contains 'speed', 'v_in', 'vsig', 'dx'
-        Note that 'v_in', 'vsig', 'dx' are expected to be the same as in
-        running_data_df
-    unit_dict : dict, optional
-        SI units of running speed values
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    """
-    running_speed = RunningSpeed(timestamps=running_data_df.index.values,
-                                 values=running_data_df['speed'].values)
-
-    running_speed_unfiltered = RunningSpeed(
-        timestamps=running_data_df_unfiltered.index.values,
-        values=running_data_df_unfiltered['speed'].values)
-
-    add_running_speed_to_nwbfile(nwbfile, running_speed,
-                                 name='speed', unit=unit_dict['speed'])
-    add_running_speed_to_nwbfile(nwbfile, running_speed_unfiltered,
-                                 name='speed_unfiltered',
-                                 unit=unit_dict['speed'])
-
-    running_mod = nwbfile.processing['running']
-    timestamps_ts = running_mod.get_data_interface('speed').timestamps
-
-    running_dx_series = TimeSeries(
-        name='dx',
-        data=running_data_df['dx'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['dx']
-    )
-
-    v_sig = TimeSeries(
-        name='v_sig',
-        data=running_data_df['v_sig'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['v_sig']
-    )
-
-    v_in = TimeSeries(
-        name='v_in',
-        data=running_data_df['v_in'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['v_in']
-    )
 
     running_mod.add_data_interface(running_dx_series)
     nwbfile.add_acquisition(v_sig)
@@ -417,14 +354,74 @@ def add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
     return nwbfile
 
 
-def add_stimulus_template(nwbfile, image_data, name):
+def add_running_speed_to_nwbfile(nwbfile, running_speed,
+                                 name='speed', unit='cm/s',
+                                 from_dataframe=False):
+    ''' Adds running speed data to an NWBFile as a timeseries in acquisition
 
-    image_index = list(range(image_data.shape[0]))
-    visual_stimulus_image_series = ImageSeries(name=name,
-                                               data=image_data,
-                                               unit='NA',
-                                               format='raw',
-                                               timestamps=image_index)
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+        File to which running speeds will be written
+    running_speed : Union[RunningSpeed, pd.DataFrame]
+        Either a RunningSpeed object or pandas DataFrame.
+        Contains attributes 'values' and 'timestamps'
+    name : str, optional
+        Used as name of timeseries object
+    unit : str, optional
+        SI units of running speed values
+    from_dataframe : bool, optional
+        Whether `running_speed` is a dataframe or not. Default is False.
+
+    Returns
+    -------
+    nwbfile : pynwb.NWBFile
+
+    '''
+
+    if from_dataframe:
+        data = running_speed['speed'].values
+        timestamps = running_speed['timestamps'].values
+    else:
+        data = running_speed.values
+        timestamps = running_speed.timestamps
+
+    running_speed_series = pynwb.base.TimeSeries(
+        name=name,
+        data=data,
+        timestamps=timestamps,
+        unit=unit)
+
+    if 'running' in nwbfile.processing:
+        running_mod = nwbfile.processing['running']
+    else:
+        running_mod = ProcessingModule('running',
+                                       'Running speed processing module')
+        nwbfile.add_processing_module(running_mod)
+
+    running_mod.add_data_interface(running_speed_series)
+
+    return nwbfile
+
+
+def add_stimulus_template(nwbfile: NWBFile,
+                          stimulus_template: StimulusTemplate):
+    images = []
+    image_names = []
+    for image_name, image_data in stimulus_template.items():
+        image_names.append(image_name)
+        images.append(image_data)
+
+    image_index = list(range(len(images)))
+    visual_stimulus_image_series = \
+        ImageSeries(
+            name=stimulus_template.image_set_name,
+            data=images,
+            control=list(range(len(image_names))),
+            control_description=image_names,
+            unit='NA',
+            format='raw',
+            timestamps=image_index)
 
     nwbfile.add_stimulus_template(visual_stimulus_image_series)
     return nwbfile
@@ -648,15 +645,19 @@ def add_trials(nwbfile, trials, description_dict={}):
 
 def add_licks(nwbfile, licks):
 
-    lick_events = Events(
-        timestamps=licks.time.values,
+    lick_timeseries = TimeSeries(
         name='licks',
-        description='Timestamps for lick events'
+        data=licks.frame.values,
+        timestamps=licks.time.values,
+        description=('Timestamps and stimulus presentation '
+                     'frame indices for lick events'),
+        unit='N/A'
     )
 
     # Add lick interface to nwb file, by way of a processing module:
-    licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
-    licks_mod.add_data_interface(lick_events)
+    licks_mod = ProcessingModule('licking',
+                                 'Licking behavior processing module')
+    licks_mod.add_data_interface(lick_timeseries)
     nwbfile.add_processing_module(licks_mod)
 
     return nwbfile
@@ -751,11 +752,19 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
 
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
-    # Rename incoming metadata fields to conform with pynwb Subject fields
-    metadata = metadata.copy()
-    metadata["subject_id"] = metadata.pop("LabTracks_ID")
-    metadata["genotype"] = metadata.pop("full_genotype")
-    metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(metadata)
+    # Rename or reformat incoming metadata fields to conform with pynwb fields
+    tmp_metadata = metadata.copy()
+    tmp_metadata["subject_id"] = tmp_metadata.pop("LabTracks_ID")
+    tmp_metadata["genotype"] = tmp_metadata.pop("full_genotype")
+
+    if not behavior_only:
+        imaging_plane_group = metadata["imaging_plane_group"]
+        if imaging_plane_group is None:
+            tmp_metadata["imaging_plane_group"] = -1
+        else:
+            tmp_metadata["imaging_plane_group"] = imaging_plane_group
+
+    metadata_clean = CompleteOphysBehaviorMetadataSchema().dump(tmp_metadata)
 
     # Subject related metadata should be saved to our BehaviorSubject
     # (augmented pyNWB 'Subject') NWB class
@@ -858,9 +867,19 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
-    device_name = nwbfile.lab_meta_data['metadata'].rig_name
-    nwbfile.create_device(device_name,
-                          "Allen Brain Observatory - Scientifica 2P Rig")
+    device_name: str = nwbfile.lab_meta_data['metadata'].rig_name
+    if device_name.startswith("MESO"):
+        device_config = {
+            "name": device_name,
+            "description": "Allen Brain Observatory - Mesoscope 2P Rig"
+        }
+    else:
+        device_config = {
+            "name": device_name,
+            "description": "Allen Brain Observatory - Scientifica 2P Rig",
+            "manufacturer": "Scientifica"
+        }
+    nwbfile.create_device(**device_config)
     device = nwbfile.get_device(device_name)
 
     # FOV:
@@ -1008,5 +1027,3 @@ def add_motion_correction(nwbfile, motion_correction):
 
     ophys_module.add_data_interface(t1)
     ophys_module.add_data_interface(t2)
-
-

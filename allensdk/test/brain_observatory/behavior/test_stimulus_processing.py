@@ -5,7 +5,9 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates)
+    get_stimulus_templates, StimulusTemplate)
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusImage
 
 
 @pytest.fixture()
@@ -90,17 +92,25 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
     assert actual == expected
 
 
-@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
-                         "expected_templates",
-                         [({}, ['images'], {})],
+@pytest.mark.parametrize("behavior_stimuli_data_fixture", ({},),
                          indirect=["behavior_stimuli_data_fixture"])
-def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
-                                expected_templates):
-    for stimuli in remove_stimuli:
-        del (behavior_stimuli_data_fixture['items']['behavior']
-        ['stimuli'][stimuli])
+def test_get_stimulus_templates(behavior_stimuli_data_fixture):
     templates = get_stimulus_templates(behavior_stimuli_data_fixture)
-    assert templates == expected_templates
+    images = [np.ones((4, 4)) * 127, np.ones((4, 4)) * 127]
+
+    assert templates.image_set_name == 'test_image_set'
+    assert len(templates) == 2
+    assert list(templates.keys()) == ['im000', 'im106']
+
+    for img in templates.values():
+        assert isinstance(img, StimulusImage)
+
+    for i, img_name in enumerate(templates):
+        img = templates[img_name]
+        assert np.array_equal(a1=images[i], a2=img)
+
+    for i, (img_name, img) in enumerate(templates.items()):
+        assert np.array_equal(a1=images[i], a2=img)
 
 
 # def test_get_images_dict():
@@ -309,6 +319,27 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
                                "end_frame": [5.0, 5.0, 12.0, 12.0],
                                "time": [2.0, 3.0, 9.0, 10.0],
                                "duration": [3.0, 2.0, 3.0, 2.0],
+                               "omitted": [False, False, False, False]}),
+
+                              # test case with images and a static grating
+                              ({"timestamp_count": 30, "time_step": 1},
+                              {"images_set_log": [
+                                  ('Image', 'im065', 5, 0),
+                                  ('Image', 'im064', 25, 6)
+                              ],
+                                  "images_draw_log": (([0] * 2 + [1] * 2 +
+                                                       [0] * 3) * 2 + [0]*16),
+                                  "grating_set_log": [
+                                      ("Ori", 90, -1, 12),  # -1 because that element is not used
+                                      ("Ori", 270, -1, 24)
+                                  ],
+                                  "grating_draw_log": ([0]*17 + [1]*11 + [0, 0])},
+                              {"orientation": [None, None, 90, 270],
+                               "image_name": ['im065', 'im064', None, None],
+                               "frame": [3.0, 10.0, 18.0, 25.0],
+                               "end_frame": [5.0, 12.0, 25.0, 29.0],
+                               "time": [3.0, 10.0, 18.0, 25.0],
+                               "duration": [2.0, 2.0, 7.0, 4.0],
                                "omitted": [False, False, False, False]})
                          ],
                          indirect=["behavior_stimuli_time_fixture",

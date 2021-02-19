@@ -69,12 +69,9 @@ def determine_outliers(data_df: pd.DataFrame,
         A pandas boolean Series whose length == len(data_df.index).
         True denotes that a row in the data_df contains at least one outlier.
     """
-    # Dataframe must have NANs filled to prevent warning when performing
-    # comparisons against the z_threshold. NANs will be filtered out
-    # in determine_likely_blinks().
-    nan_filled_df = data_df.fillna(data_df.mean())
 
-    outliers = (nan_filled_df.apply(stats.zscore).apply(np.abs) > z_threshold)
+    outliers = data_df.apply(stats.zscore,
+                             nan_policy='omit').apply(np.abs) > z_threshold
     return pd.Series(outliers.any(axis=1))
 
 
@@ -202,7 +199,8 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     pupil_areas = (eye_data[["pupil_width", "pupil_height"]]
                    .apply(compute_circular_area, axis=1))
 
-    area_df = pd.concat([cr_areas, eye_areas, pupil_areas], axis=1)
+    # only use eye and pupil areas for outlier detection
+    area_df = pd.concat([eye_areas, pupil_areas], axis=1)
     outliers = determine_outliers(area_df, z_threshold=z_threshold)
 
     likely_blinks = determine_likely_blinks(eye_areas,
@@ -210,10 +208,22 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                                             outliers,
                                             dilation_frames=dilation_frames)
 
+    # remove outliers/likely blinks `pupil_area`, `cr_area`, `eye_area`
+    pupil_areas_raw = pupil_areas.copy()
+    cr_areas_raw = cr_areas.copy()
+    eye_areas_raw = eye_areas.copy()
+
+    pupil_areas[likely_blinks] = np.nan
+    cr_areas[likely_blinks] = np.nan
+    eye_areas[likely_blinks] = np.nan
+
     eye_data.insert(0, "time", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)
     eye_data.insert(2, "eye_area", eye_areas)
     eye_data.insert(3, "pupil_area", pupil_areas)
     eye_data.insert(4, "likely_blink", likely_blinks)
+    eye_data.insert(5, "pupil_area_raw", pupil_areas_raw)
+    eye_data.insert(6, "cr_area_raw", cr_areas_raw)
+    eye_data.insert(7, "eye_area_raw", eye_areas_raw)
 
     return eye_data

@@ -1,56 +1,65 @@
-from typing import Dict, Optional, Any
-from datetime import datetime
-import pytz
+import logging
 import uuid
+from datetime import datetime
+from typing import Any, Dict, Optional
+import warnings
 
 import numpy as np
 import pandas as pd
-
-from allensdk.core.exceptions import DataFrameIndexError
+import pytz
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase)
+from allensdk.brain_observatory.behavior.metadata_processing import \
+    get_task_parameters
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.running_processing import (
-    get_running_df)
+from allensdk.brain_observatory.behavior.running_processing import \
+    get_running_df
+from allensdk.brain_observatory.behavior.session_apis.abcs import (
+    BehaviorBase, BehaviorDataExtractorBase)
 from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata)
-from allensdk.brain_observatory.running_speed import RunningSpeed
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_task_parameters)
-from allensdk.brain_observatory.behavior.sync import frame_time_offset
+    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
+    StimulusTemplate)
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_trials, get_extended_trials)
+    get_extended_trials, get_trials)
+from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.core.exceptions import DataFrameIndexError
 
 
-class BehaviorDataXforms(BehaviorBase):
-    """This class provides methods that transform (xform) 'raw' data provided
-    by LIMS data APIs to fill a BehaviorSession.
+class BehaviorDataTransforms(BehaviorBase):
+    """This class provides methods that transform data extracted from
+    LIMS or JSON data sources into final data products necessary for
+    populating a BehaviorSession.
     """
+
+    def __init__(self, extractor: BehaviorDataExtractorBase):
+        self.extractor: BehaviorDataExtractorBase = extractor
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def get_behavior_session_id(self):
+        return self.extractor.get_behavior_session_id()
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
-        """Helper method to cache stimulus file in memory since it takes about
-        a second to load (and is used in many methods).
+        """Helper method to cache stimulus pkl file in memory since it takes
+        about a second to load (and is used in many methods).
         """
-        return pd.read_pickle(self.get_behavior_stimulus_file())
+        return pd.read_pickle(self.extractor.get_behavior_stimulus_file())
 
-    def get_behavior_session_uuid(self) -> Optional[int]:
+    def get_behavior_session_uuid(self) -> Optional[str]:
         """Get the universally unique identifier (UUID) number for the
         current behavior session.
         """
         data = self._behavior_stimulus_file()
         behavior_pkl_uuid = data.get("session_uuid")
 
-        behavior_session_id = self.get_behavior_session_id()
-        foraging_id = self.get_foraging_id()
+        behavior_session_id = self.extractor.get_behavior_session_id()
+        foraging_id = self.extractor.get_foraging_id()
 
         # Sanity check to ensure that pkl file data matches up with
         # the behavior session that the pkl file has been associated with.
         assert_err_msg = (
             f"The behavior session UUID ({behavior_pkl_uuid}) in the "
             f"behavior stimulus *.pkl file "
-            f"({self.get_behavior_stimulus_file()}) does "
+            f"({self.extractor.get_behavior_stimulus_file()}) does "
             f"does not match the foraging UUID ({foraging_id}) for "
             f"behavior session: {behavior_session_id}")
         assert behavior_pkl_uuid == foraging_id, assert_err_msg
@@ -71,7 +80,10 @@ class BehaviorDataXforms(BehaviorBase):
         `start_trial` and `end_trial` events in the `trial_log`, to true
         up these time streams.
 
-        :returns: pd.DataFrame -- A dataframe containing lick timestamps
+        :returns: pd.DataFrame
+            Two columns: "time", which contains the sync time
+            of the licks that occurred in this session and "frame",
+            the frame numbers of licks that occurred in this session
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
@@ -79,7 +91,7 @@ class BehaviorDataXforms(BehaviorBase):
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"time": lick_times})
+        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
@@ -89,37 +101,63 @@ class BehaviorDataXforms(BehaviorBase):
             delivered rewards.
         """
         data = self._behavior_stimulus_file()
-        offset = frame_time_offset(data)
-        # No sync timestamps to rebase on, but do need to align to
-        # trial events, so add the offset as the "rebase" function
-        return get_rewards(data, lambda x: x + offset)
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
-    def get_running_data_df(self, lowpass=True) -> pd.DataFrame:
-        """Get running speed data.
+    def get_running_acquisition_df(self, lowpass=True,
+                                   zscore_threshold=10.0) -> pd.DataFrame:
+        """Get running speed acquisition data from a behavior pickle file.
 
-        :returns: pd.DataFrame -- dataframe containing various signals used
-            to compute running speed.
+        NOTE: Rebases timestamps with the self.get_stimulus_timestamps()
+        method which varies between the BehaviorDataTransformer and the
+        BehaviorOphysDataTransformer.
+
+        Parameters
+        ----------
+        lowpass: bool (default=True)
+            Whether to apply a 10Hz low-pass filter to the running speed
+            data.
+        zscore_threshold: float
+            The threshold to use for removing outlier running speeds which
+            might be noise and not true signal
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe with an index of timestamps and the following columns:
+                "speed": computed running speed
+                "dx": angular change, computed during data collection
+                "v_sig": voltage signal from the encoder
+                "v_in": the theoretical maximum voltage that the encoder
+                    will reach prior to "wrapping". This should
+                    theoretically be 5V (after crossing 5V goes to 0V, or
+                    vice versa). In practice the encoder does not always
+                    reach this value before wrapping, which can cause
+                    transient spikes in speed at the voltage "wraps".
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass)
+        return get_running_df(data, stimulus_timestamps, lowpass=lowpass,
+                              zscore_threshold=zscore_threshold)
 
-    def get_running_speed(self, lowpass=True) -> RunningSpeed:
+    def get_running_speed(self, lowpass=True) -> pd.DataFrame:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
         NOTE: Do not correct for monitor delay.
 
-        :returns: RunningSpeed -- a NamedTuple containing the subject's
-            timestamps and running speeds (in cm/s)
+        :returns: pd.DataFrame
+            index: timestamps
+            speed : subject's running speeds (in cm/s)
         """
-        running_data_df = self.get_running_data_df(lowpass=lowpass)
+        running_data_df = self.get_running_acquisition_df(lowpass=lowpass)
         if running_data_df.index.name != "timestamps":
             raise DataFrameIndexError(
                 f"Expected index to be named 'timestamps' but got "
                 f"'{running_data_df.index.name}'.")
-        return RunningSpeed(timestamps=running_data_df.index.values,
-                            values=running_data_df.speed.values)
+        return pd.DataFrame({
+            "timestamps": running_data_df.index.values,
+            "speed": running_data_df.speed.values})
 
     def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()
@@ -175,19 +213,19 @@ class BehaviorDataXforms(BehaviorBase):
             raise ValueError("Length of `stim_pres_df` should not change after"
                              f" merge; was {len(raw_stim_pres_df)}, now "
                              f" {len(stim_pres_df)}.")
-        return stim_pres_df[sorted(stim_pres_df)]
 
-    def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
+        # Sort columns then drop columns which contain only all NaN values
+        return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
+
+    def get_stimulus_templates(self) -> Optional[StimulusTemplate]:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        Dict[str, np.ndarray]
-            A dictionary containing the stimulus images presented during the
-            session. Keys are data set names, and values are 3D numpy arrays.
+        StimulusTemplate or None if there are no images for the experiment
         """
-        data = self._behavior_stimulus_file()
-        return get_stimulus_templates(data)
+        pkl = self._behavior_stimulus_file()
+        return get_stimulus_templates(pkl=pkl)
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the
@@ -205,8 +243,7 @@ class BehaviorDataXforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         vsyncs = data["items"]["behavior"]["intervalsms"]
         cum_sum = np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
-        offset = frame_time_offset(data)
-        return cum_sum + offset
+        return cum_sum
 
     def get_task_parameters(self) -> dict:
         """Get task parameters from pkl file.
@@ -229,15 +266,15 @@ class BehaviorDataXforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
+        timestamps = self.get_stimulus_timestamps()
         licks = self.get_licks()
         data = self._behavior_stimulus_file()
         rewards = self.get_rewards()
-        stimulus_presentations = self.get_stimulus_presentations()
-        # Pass a dummy rebase function since we don't have two time streams,
-        # and the frame times are already aligned to trial events in their
-        # respective getters
-        trial_df = get_trials(data, licks, rewards, stimulus_presentations,
-                              lambda x: x)
+
+        trial_df = get_trials(data,
+                              licks,
+                              rewards,
+                              timestamps)
 
         return trial_df
 
@@ -254,13 +291,50 @@ class BehaviorDataXforms(BehaviorBase):
 
     @memoize
     def get_experiment_date(self) -> datetime:
-        """Return timestamp the behavior stimulus file began recording in UTC
+        """Return the timestamp for when experiment was started in UTC
+
+        NOTE: This method will only get acquisition datetime from
+        extractor (data from LIMS) methods. As a sanity check,
+        it will also read the acquisition datetime from the behavior stimulus
+        (*.pkl) file and raise a warning if the date differs too much from the
+        datetime obtained from the behavior stimulus (*.pkl) file.
+
         :rtype: datetime
         """
-        data = self._behavior_stimulus_file()
-        # Assuming file has local time of computer (Seattle)
-        tz = pytz.timezone("America/Los_Angeles")
-        return tz.localize(data["start_time"]).astimezone(pytz.utc)
+        extractor_acq_date = self.extractor.get_experiment_date()
+
+        pkl_data = self._behavior_stimulus_file()
+        pkl_raw_acq_date = pkl_data["start_time"]
+        if isinstance(pkl_raw_acq_date, datetime):
+            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
+
+        elif isinstance(pkl_raw_acq_date, (int, float)):
+            # We are dealing with an older pkl file where the acq time is
+            # stored as a Unix style timestamp string
+            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
+            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
+        else:
+            pkl_acq_date = None
+            warnings.warn(
+                "Could not parse the acquisition datetime "
+                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
+                f"{self.extractor.get_behavior_stimulus_file()}"
+            )
+
+        if pkl_acq_date:
+            acq_start_diff = (
+                extractor_acq_date - pkl_acq_date).total_seconds()
+            # If acquisition dates differ by more than an hour
+            if abs(acq_start_diff) > 360:
+                warnings.warn(
+                    "The `date_of_acquisition` field in LIMS "
+                    f"({extractor_acq_date}) for behavior session "
+                    f"({self.get_behavior_session_id()}) deviates by more "
+                    f"than an hour from the `start_time` ({pkl_acq_date}) "
+                    "specified in the associated stimulus *.pkl file: "
+                    f"{self.extractor.get_behavior_stimulus_file()}"
+                )
+        return extractor_acq_date
 
     def get_metadata(self) -> Dict[str, Any]:
         """Return metadata about the session.
@@ -271,18 +345,17 @@ class BehaviorDataXforms(BehaviorBase):
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
         metadata = {
-            "rig_name": self.get_rig_name(),
-            "sex": self.get_sex(),
-            "age": self.get_age(),
+            "rig_name": self.extractor.get_rig_name(),
+            "sex": self.extractor.get_sex(),
+            "age": self.extractor.get_age(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
-            "session_type": self.get_stimulus_name(),
+            "session_type": self.extractor.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": self.get_reporter_line(),
-            "driver_line": self.get_driver_line(),
-            "LabTracks_ID": self.get_external_specimen_name(),
-            "full_genotype": self.get_full_genotype(),
+            "reporter_line": sorted(self.extractor.get_reporter_line()),
+            "driver_line": sorted(self.extractor.get_driver_line()),
+            "LabTracks_ID": self.extractor.get_external_specimen_name(),
+            "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
-            "foraging_id": self.get_foraging_id(),
-            "behavior_session_id": self.get_behavior_session_id()
+            "behavior_session_id": self.extractor.get_behavior_session_id()
         }
         return metadata

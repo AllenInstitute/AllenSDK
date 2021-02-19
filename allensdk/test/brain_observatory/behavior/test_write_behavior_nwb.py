@@ -8,6 +8,32 @@ import pytest
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi)
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
+
+# pytest fixtures:
+# nwbfile: test.brain_observatory.conftest
+# roundtripper: test.brain_observatory.conftest
+# running_speed: test.brain_observatory.conftest
+# running_acquisition_df_fixture: test.brain_observatory.behavior.conftest
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_running_acquisition_to_nwbfile(nwbfile, roundtrip, roundtripper,
+                                            running_acquisition_df_fixture):
+    nwbfile = nwb.add_running_acquisition_to_nwbfile(
+        nwbfile, running_acquisition_df_fixture)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorNwbApi)
+    else:
+        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
+
+    obt_running_acq_df = obt.get_running_acquisition_df()
+
+    pd.testing.assert_frame_equal(running_acquisition_df_fixture,
+                                  obt_running_acq_df,
+                                  check_like=True)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -21,40 +47,18 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
     else:
         obt = BehaviorNwbApi.from_nwbfile(nwbfile)
 
-    running_speed_obt = obt.get_running_speed()
-    assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
-    assert np.allclose(running_speed.values, running_speed_obt.values)
+    obt_running_speed = obt.get_running_speed()
+
+    assert np.allclose(running_speed.timestamps,
+                       obt_running_speed['timestamps'])
+    assert np.allclose(running_speed.values,
+                       obt_running_speed['speed'])
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_data_dfs_to_nwbfile(nwbfile, running_data_df,
-                                         roundtrip, roundtripper):
-    running_data_df_unfiltered = running_data_df.copy()
-    running_data_df_unfiltered['speed'] = running_data_df['speed'] * 2
-
-    unit_dict = {'v_sig': 'V', 'v_in': 'V',
-                 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
-    nwbfile = nwb.add_running_data_dfs_to_nwbfile(nwbfile,
-                                                  running_data_df,
-                                                  running_data_df_unfiltered,
-                                                  unit_dict)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorNwbApi)
-    else:
-        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
-
-    pd.testing.assert_frame_equal(
-        running_data_df, obt.get_running_data_df(lowpass=True))
-    pd.testing.assert_frame_equal(
-        running_data_df_unfiltered, obt.get_running_data_df(lowpass=False))
-
-
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_templates(nwbfile, stimulus_templates,
+def test_add_stimulus_templates(nwbfile, stimulus_templates: StimulusTemplate,
                                 roundtrip, roundtripper):
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
+    nwb.add_stimulus_template(nwbfile, stimulus_templates)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorNwbApi)
@@ -62,27 +66,29 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates,
         obt = BehaviorNwbApi.from_nwbfile(nwbfile)
 
     stimulus_templates_obt = obt.get_stimulus_templates()
-    template_union = (
-        set(stimulus_templates.keys()) | set(stimulus_templates_obt.keys()))
-    for key in template_union:
-        np.testing.assert_array_almost_equal(stimulus_templates[key],
-                                             stimulus_templates_obt[key])
+
+    for img_name in stimulus_templates_obt:
+        assert np.array_equal(
+            a1=stimulus_templates[img_name],
+            a2=stimulus_templates_obt[img_name])
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior,
                                     stimulus_timestamps, roundtrip,
-                                    roundtripper, stimulus_templates):
+                                    roundtripper,
+                                    stimulus_templates: StimulusTemplate):
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
     nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_behavior)
-    for key, val in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, val, key)
+    nwb.add_stimulus_template(nwbfile=nwbfile,
+                              stimulus_template=stimulus_templates)
 
-        # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[key]
-        curr_stimulus_index = stimulus_presentations_behavior[
-            stimulus_presentations_behavior['image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
+    # Add index for this template to NWB in-memory object:
+    nwb_template = nwbfile.stimulus_template[stimulus_templates.image_set_name]
+    compare = (stimulus_presentations_behavior['image_set'] ==
+               nwb_template.name)
+    curr_stimulus_index = stimulus_presentations_behavior[compare]
+    nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorNwbApi)
@@ -151,9 +157,9 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_behavior_only_metadata(roundtrip, roundtripper,
-                                    behavior_only_metadata):
+                                    behavior_only_metadata_fixture):
 
-    metadata = behavior_only_metadata
+    metadata = behavior_only_metadata_fixture
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',

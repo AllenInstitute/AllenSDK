@@ -25,6 +25,16 @@ class DummyApiCache(object):
         pass
 
 
+class SimpleBehaviorSession(BehaviorSession):
+    """For the purposes of testing, this class overrides the default
+    __init__ of the BehaviorSession. The default __init__ uses
+    LazyProperties which expect certain api methods to exist that
+    DummyApi and DummyApiCache don't have.
+    """
+    def __init__(self, api):
+        self.api = api
+
+
 class TestBehaviorSession:
     """Tests for BehaviorSession.
        The vast majority of methods in BehaviorSession are simply calling
@@ -36,7 +46,7 @@ class TestBehaviorSession:
     """
     @classmethod
     def setup_class(cls):
-        cls.behavior_session = BehaviorSession(api=DummyApi())
+        cls.behavior_session = SimpleBehaviorSession(api=DummyApi())
 
     def test_list_api_methods(self):
         expected = [("get_method", "Method docstring"),
@@ -53,6 +63,6 @@ class TestBehaviorSession:
 
     def test_cache_clear_no_warning(self, caplog):
         caplog.clear()
-        bs = BehaviorSession(api=DummyApiCache())
+        bs = SimpleBehaviorSession(api=DummyApiCache())
         bs.cache_clear()
         assert len(caplog.record_tuples) == 0

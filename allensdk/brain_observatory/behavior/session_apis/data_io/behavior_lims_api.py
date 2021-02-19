@@ -1,29 +1,58 @@
 import logging
-from typing import Dict, Optional, Union, List
-
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import Dict, List, Optional, Union
+import pytz
 
-from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.internal.api import db_connection_creator
+import pandas as pd
+
 from allensdk.api.cache import memoize
-from allensdk.internal.api import (
-    OneResultExpectedError, OneOrMoreResultExpectedError)
-from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.brain_observatory.behavior.session_apis.abcs import \
+    BehaviorDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataTransforms
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import DbCredentials
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
-    BehaviorDataXforms)
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.internal.api import (OneOrMoreResultExpectedError,
+                                   OneResultExpectedError,
+                                   db_connection_creator)
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
+class BehaviorLimsApi(BehaviorDataTransforms, CachedInstanceMethodMixin):
+    """A data fetching and processing class that serves processed data from
+    a specified raw data source (extractor). Contains all methods
+    needed to fill a BehaviorSession."""
+
+    def __init__(self,
+                 behavior_session_id: Optional[int] = None,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None,
+                 extractor: Optional[BehaviorDataExtractorBase] = None):
+
+        if extractor is None:
+            if behavior_session_id is not None:
+                extractor = BehaviorLimsExtractor(
+                    behavior_session_id,
+                    lims_credentials,
+                    mtrain_credentials)
+            else:
+                raise RuntimeError(
+                    "BehaviorLimsApi must be provided either an instantiated "
+                    "'extractor' or a 'behavior_session_id'!")
+
+        super().__init__(extractor=extractor)
+
+
+class BehaviorLimsExtractor(BehaviorDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling a
     'BehaviorSession'.
 
     Most 'raw' data provided by this API needs to be processed by
-    BehaviorDataXforms methods in order to usable by 'BehaviorSession's
+    BehaviorDataTransforms methods in order to usable by 'BehaviorSession's
     """
     def __init__(self, behavior_session_id: int,
                  lims_credentials: Optional[DbCredentials] = None,
@@ -226,16 +255,23 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
 
     @memoize
     def get_stimulus_name(self) -> str:
-        """Returns the name of the stimulus set used for the session.
+        """Get the stimulus set used from the behavior session pkl file
         :rtype: str
         """
-        query = f"""
-            SELECT stages.name
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            WHERE bs.id = '{self.foraging_id}';
-        """
-        return self.mtrain_db.fetchone(query, strict=True)
+        behavior_stimulus_path = self.get_behavior_stimulus_file()
+        pkl = pd.read_pickle(behavior_stimulus_path)
+
+        try:
+            stimulus_name = pkl["items"]["behavior"]["cl_params"]["stage"]
+        except KeyError:
+            raise RuntimeError(
+                f"Could not obtain stimulus_name/stage information from "
+                f"the *.pkl file ({behavior_stimulus_path}) "
+                f"for the behavior session to save as NWB! The "
+                f"following series of nested keys did not work: "
+                f"['items']['behavior']['cl_params']['stage']"
+            )
+        return stimulus_name
 
     @memoize
     def get_reporter_line(self) -> List[str]:
@@ -312,3 +348,16 @@ class BehaviorLimsApi(BehaviorDataXforms, CachedInstanceMethodMixin):
                 WHERE bs.id= {self.behavior_session_id};
                 """
         return self.lims_db.fetchone(query, strict=True)
+
+    @memoize
+    def get_experiment_date(self) -> datetime:
+        """Get the acquisition date of a behavior_session in UTC
+        :rtype: datetime"""
+        query = """
+                SELECT bs.date_of_acquisition
+                FROM behavior_sessions bs
+                WHERE bs.id = {};
+                """.format(self.behavior_session_id)
+
+        experiment_date = self.lims_db.fetchone(query, strict=True)
+        return pytz.utc.localize(experiment_date)

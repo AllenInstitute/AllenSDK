@@ -1,30 +1,12 @@
 import numpy as np
 import pandas as pd
 import pickle
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Optional
 
-from allensdk.brain_observatory.behavior import IMAGE_SETS
-
-IMAGE_SETS_REV = {val: key for key, val in IMAGE_SETS.items()}
-
-
-def convert_filepath_caseinsensitive(filename_in):
-    if filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_G_2019.05.26.pkl'
-    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl':
-        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_H_2019.05.26.pkl'
-    else:
-        raise NotImplementedError(filename_in)
+from allensdk.brain_observatory.behavior.stimulus_processing.util import \
+    convert_filepath_caseinsensitive, get_image_set_name
+from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
+    StimulusTemplate
 
 
 def load_pickle(pstream):
@@ -170,26 +152,31 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     return grating_df
 
 
-def get_stimulus_templates(pkl) -> Dict:
+def get_stimulus_templates(pkl) -> Optional[StimulusTemplate]:
     """
-    Gets dictionary of images presented during experimentation
+    Gets images presented during experimentation
     Parameters
     ----------
     pkl: pkl file containing the data for the presented stimuli
 
     Returns
     -------
-    Dict:
-        Dictionary of images that were presented during the experiment
+    StimulusTemplate:
+        StimulusTemplate object containing images that were presented during
+        the experiment
 
     """
-    templates = {}
-    if 'images' in pkl['items']['behavior']['stimuli']:
-        images = get_images_dict(pkl)
-        image_set_filename = convert_filepath_caseinsensitive(
-            images['metadata']['image_set'])
-        templates[IMAGE_SETS_REV[image_set_filename]] = np.array(images['images'])
-    return templates
+    if 'images' not in pkl['items']['behavior']['stimuli']:
+        return None
+
+    images = get_images_dict(pkl)
+    image_set_filepath = images['metadata']['image_set']
+    image_set_name = get_image_set_name(image_set_path=image_set_filepath)
+    image_set_name = convert_filepath_caseinsensitive(
+        image_set_name)
+    return StimulusTemplate(
+        image_set_name=image_set_name,
+        image_attributes=images['image_attributes'], images=images['images'])
 
 
 def get_stimulus_metadata(pkl) -> pd.DataFrame:
@@ -216,7 +203,8 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         images = get_images_dict(pkl)
         stimulus_index_df = pd.DataFrame(images['image_attributes'])
         image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-        stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+        stimulus_index_df['image_set'] = get_image_set_name(
+            image_set_path=image_set_filename)
     else:
         stimulus_index_df = pd.DataFrame(columns=[
             'image_name', 'image_category', 'image_set', 'phase',
@@ -399,22 +387,15 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
-    draw_log_rising_edges = 0
-    draw_log_gratings = 0
-    # if images are contained in stimuli
-    if 'images' in stimuli.keys():
-        # ensure that every rising edge in the draw_log is accounted for in the visual_stimuli_df
-        draw_log_rising_edges = len(np.where(np.diff(stimuli['images']['draw_log']) == 1)[0])
-    if 'grating' in stimuli.keys():
-        draw_log_gratings = len(np.where(np.diff(stimuli['grating']['draw_log']) == 1)[0])
-
-    discrete_flashes = len(visual_stimuli_data)
-    assert (draw_log_rising_edges +
-            draw_log_gratings) == discrete_flashes, "the number of rising edges in the draw log is expected to match the number of flashes in the stimulus table"
-
     # Add omitted flash info:
+    try:
+        omitted_flash_frame_log = \
+            data['items']['behavior']['omitted_flash_frame_log']
+    except KeyError:
+        # For sessions for which there were no omitted flashes
+        omitted_flash_frame_log = dict()
+
     omitted_flash_list = []
-    omitted_flash_frame_log = data['items']['behavior']['omitted_flash_frame_log']
 
     for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
         stim_frames = visual_stimuli_df['frame'].values
