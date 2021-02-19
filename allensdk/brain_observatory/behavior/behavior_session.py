@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import inspect
 
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    StimulusTemplate
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
@@ -311,14 +313,22 @@ class BehaviorSession(LazyPropertyMixin):
         self._stimulus_presentations = value
 
     @property
-    def stimulus_templates(self) -> Dict[str, np.ndarray]:
+    def stimulus_templates(self) -> StimulusTemplate:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        Dict[str, np.ndarray]
-            A dictionary containing the stimulus images presented during the
-            session. Keys are data set names, and values are 3D numpy arrays.
+        StimulusTemplate
+            A StimulusTemplate object containing the stimulus images for the
+            experiment. Relevant properties include:
+                image_set_name: The name of the image set that the
+                    StimulusTemplate encapsulates
+                image_names: A list of individual image names in the image set
+                images: A list of StimulusImage (inherits from np.ndarray)
+                    objects.
+            Also has a to_dataframe() method to convert to a dataframe
+            where indices are image names, an 'image' column contains image
+            arrays, and the df.name is the image set.
         """
         return self._stimulus_templates
 
