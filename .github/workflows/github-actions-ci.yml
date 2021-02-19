@@ -1,5 +1,9 @@
 name: ci/github-actions
-on: [pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 env:
   TEST_NWB_FILES: skip
   TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA: skip
