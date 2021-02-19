@@ -6,6 +6,9 @@ import pandas as pd
 
 import allensdk.brain_observatory.gaze_mapping.__main__ as main
 
+from allensdk.brain_observatory import sync_utilities as su
+from allensdk.brain_observatory.sync_dataset import Dataset
+
 
 def create_sample_ellipse_hdf(output_file: Path,
                               cr_data: pd.DataFrame,
@@ -150,8 +153,36 @@ def test_load_sync_file_timings(monkeypatch, pupil_params_rows, expected, expect
 
     if expect_fail:
         with pytest.raises(RuntimeError, match="number of camera sync pulses"):
-            main.load_sync_file_timings(Path("."), pupil_params_rows)
+            main.load_sync_file_timings(Path("."), pupil_params_rows, True)
 
     else:
-        obtained = main.load_sync_file_timings(Path("."), pupil_params_rows)
+        obtained = main.load_sync_file_timings(Path("."), pupil_params_rows, True)
         assert expected.equals(obtained)
+
+
+def test_load_truncated_timestamps(monkeypatch):
+    """
+    Test that load_sync_file_timings handles the truncate_timestamps
+    arg correctly
+    """
+
+    class MockDataset(Dataset):
+        def __init__(self, path):
+            pass
+
+        def get_edges(self, kind, keys, units='seconds'):
+            return np.array([1, 2, 3, 4, 500, 501, 502, 503])
+
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(su, "Dataset", MockDataset)
+        timestamps = main.load_sync_file_timings("", 8, False)
+        expected = pd.Series([1, 2, 3, 4, 500, 501, 502, 503])
+        assert timestamps.equals(expected)
+
+        timestamps = main.load_sync_file_timings("", 4, True)
+        expected = pd.Series([1, 2, 3, 4])
+        assert timestamps.equals(expected)
+
+        with pytest.raises(RuntimeError):
+            timestamps = main.load_sync_file_timings("", 8, True)
