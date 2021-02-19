@@ -1,5 +1,5 @@
 from argschema import ArgSchema
-from argschema.fields import Float, LogLevel, String
+from argschema.fields import Float, LogLevel, String, Boolean
 
 from allensdk.brain_observatory.argschema_utilities import (
     InputFile,
@@ -93,6 +93,12 @@ class InputSchema(ArgSchema):
                                       'ratio.'))
     log_level = LogLevel(default='INFO',
                          description='Set the logging level of the module.')
+
+    truncate_timestamps = Boolean(default=True,
+                                  description=('If True, truncate sync '
+                                               'timestamps whenever unusually '
+                                               'large gapes occur; '
+                                               'Default=True'))
 
 
 class OutputSchema(RaisingSchema):

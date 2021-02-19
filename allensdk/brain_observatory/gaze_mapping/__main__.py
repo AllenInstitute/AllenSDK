@@ -274,7 +274,8 @@ def write_gaze_mapping_output_to_h5(output_savepath: Path,
 
 
 def load_sync_file_timings(sync_file: Path,
-                           pupil_params_rows: int) -> pd.Series:
+                           pupil_params_rows: int,
+                           truncate_timestamps: bool) -> pd.Series:
     """Load sync file timings from .h5 file.
 
     Parameters
@@ -283,6 +284,8 @@ def load_sync_file_timings(sync_file: Path,
         Path to .h5 sync file.
     pupil_params_rows : int
         Number of rows in pupil params.
+    truncate_timestamps: bool
+        When True, sync time array gets truncated at large gaps
 
     Returns
     -------
@@ -298,7 +301,8 @@ def load_sync_file_timings(sync_file: Path,
     """
     # Add synchronized frame times
     frame_times = su.get_synchronized_frame_times(session_sync_file=sync_file,
-                                                  sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
+                                                  sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
+                                                  trim_after_spike=truncate_timestamps)
     if (pupil_params_rows != len(frame_times)):
         raise RuntimeError("The number of camera sync pulses in the "
                            f"sync file ({len(frame_times)}) do not match "
@@ -330,7 +334,8 @@ def main():
                               cm_per_pixel=args["cm_per_pixel"])
 
     output["synced_frame_timestamps_sec"] = load_sync_file_timings(args["session_sync_file"],
-                                                                   args["pupil_params"].shape[0])
+                                                                   args["pupil_params"].shape[0],
+                                                                   parser.args["truncate_timestamps"])
 
     write_gaze_mapping_output_to_h5(args["output_file"], output)
     module_output = {"screen_mapping_file": str(args["output_file"])}
