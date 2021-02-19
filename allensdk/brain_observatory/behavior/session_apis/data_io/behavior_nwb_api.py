@@ -57,6 +57,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                     session_object.stimulus_timestamps)
 
         # Add running acquisition ('dx', 'v_sig', 'v_in') data to NWB
+        # This data should be saved to NWB but not accessible directly from
+        # Sessions
         nwb.add_running_acquisition_to_nwbfile(
             nwbfile,
             session_object.api.get_running_acquisition_df())
