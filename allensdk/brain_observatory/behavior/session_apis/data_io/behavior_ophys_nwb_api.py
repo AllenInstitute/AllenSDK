@@ -31,7 +31,7 @@ from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
         EllipseEyeTracking, EllipseSeries)
 from allensdk.brain_observatory.behavior.write_nwb.extensions\
-    .event_detection.ndx_events import EventDetection
+    .event_detection.ndx_ophys_events import OphysEventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi
@@ -631,7 +631,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             description="Cells with detected events",
             region=rois_with_events_indices)
 
-        events = EventDetection(
+        events = OphysEventDetection(
             # time x rois instead of rois x time
             # store using compression since sparse
             data=H5DataIO(events_data.T, compression=True),

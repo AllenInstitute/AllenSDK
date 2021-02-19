@@ -1,5 +1,5 @@
 groups:
-- neurodata_type_def: EventDetection
+- neurodata_type_def: OphysEventDetection
   neurodata_type_inc: RoiResponseSeries
   name: event_detection
   doc: Stores event detection output
