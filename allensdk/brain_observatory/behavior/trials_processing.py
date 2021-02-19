@@ -506,8 +506,10 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
             valid_idx = np.where(lick_frames>trial_start)
 
         valid_licks = lick_frames[valid_idx]
-
-        tr_data["lick_times"] = timestamps[valid_licks]
+        if len(valid_licks)>0:
+            tr_data["lick_times"] = timestamps[valid_licks]
+        else:
+            tr_data["lick_times"] = np.array([], dtype=float)
 
         tr_data["reward_time"] = get_trial_reward_time(
             reward_times,
