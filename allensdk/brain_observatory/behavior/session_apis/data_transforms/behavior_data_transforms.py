@@ -329,8 +329,8 @@ class BehaviorDataTransforms(BehaviorBase):
                 warnings.warn(
                     "The `date_of_acquisition` field in LIMS "
                     f"({extractor_acq_date}) for behavior session "
-                    f"({self.get_behavior_session_id()}) deviates by more than"
-                    f"an hour from the `start_time` ({pkl_acq_date}) "
+                    f"({self.get_behavior_session_id()}) deviates by more "
+                    f"than an hour from the `start_time` ({pkl_acq_date}) "
                     "specified in the associated stimulus *.pkl file: "
                     f"{self.extractor.get_behavior_stimulus_file()}"
                 )
