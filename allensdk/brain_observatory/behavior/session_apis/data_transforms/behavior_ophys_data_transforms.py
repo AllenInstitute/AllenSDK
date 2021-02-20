@@ -163,7 +163,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             warning_msg += f'for rig: {rig_name} '
 
             # see
-            # https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/1916#issuecomment-782297075
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            # https://github.com/AllenInstitute/AllenSDK/issues/1916
             delay_lookup = {'CAM2P.1': 0.020842,
                             'CAM2P.2': 0.037566,
                             'CAM2P.3': 0.021390,
