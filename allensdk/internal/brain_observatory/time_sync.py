@@ -64,9 +64,9 @@ def get_keys(sync_dset: Dataset) -> dict:
     return key_dict
 
 
-def monitor_delay(sync_dset, stim_times, photodiode_key,
-                  transition_frame_interval=TRANSITION_FRAME_INTERVAL,
-                  max_monitor_delay=MAX_MONITOR_DELAY):
+def calculate_monitor_delay(sync_dset, stim_times, photodiode_key,
+                             transition_frame_interval=TRANSITION_FRAME_INTERVAL,
+                             max_monitor_delay=MAX_MONITOR_DELAY):
     """Calculate monitor delay."""
     transitions = stim_times[::transition_frame_interval]
     photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
@@ -372,7 +372,9 @@ class OphysTimeAligner(object):
     def _get_monitor_delay(self):
         timestamps, delta = self.clipped_stim_timestamps
         photodiode_key = self._keys["photodiode"]
-        delay = monitor_delay(self.dataset, timestamps, photodiode_key)
+        delay = calculate_monitor_delay(self.dataset,
+                                        timestamps,
+                                        photodiode_key)
         return delay
 
     @property
