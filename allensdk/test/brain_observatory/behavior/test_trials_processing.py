@@ -1,6 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
+from itertools import combinations
 
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi)
@@ -557,3 +558,51 @@ def test_get_trial_bounds_order_exceptions(trial_log):
     with pytest.raises(ValueError) as error:
         _ = trials_processing.get_trial_bounds(trial_log)
     assert 'order' in error.value.args[0]
+
+
+def test_input_validation(monkeypatch):
+    """
+    Test that get_trials raises the appropriate errors when input object
+    is malformed
+
+    Note: this test does not test the case in which get_trials runs through
+    to completion. That is covered by the smoke tests in
+    allensdk/test/brain_observatory/behavior/test_get_trials_methods
+    """
+
+    class DummyObj(object):
+        def __init__(self):
+            pass
+
+    def dummy_method(self):
+        pass
+
+    # loop over all of the incomplete subsets of
+    # methods that the argument in get_trials_from_data_transform
+    # must have; make sure that the correct error with
+    # the correct error message is raised
+
+    method_names_tuple = ('_behavior_stimulus_file',
+                          'get_rewards', 'get_licks',
+                          'get_stimulus_timestamps',
+                          'get_monitor_delay')
+
+    for n_methods in range(1, 5):
+        method_iterator = combinations(method_names_tuple,
+                                      n_methods)
+        for local_method_name_tuple in method_iterator:
+            with monkeypatch.context() as ctx:
+                for method_name in local_method_name_tuple:
+                    ctx.setattr(DummyObj,
+                                method_name,
+                                dummy_method,
+                                raising=False)
+
+                obj = DummyObj()
+                with pytest.raises(ValueError) as error:
+                    _ = trials_processing.get_trials_from_data_transform(obj)
+                for method_name in method_names_tuple:
+                    if method_name not in local_method_name_tuple:
+                        assert method_name in error.value.args[0]
+                    else:
+                        assert method_name not in error.value.args[0]

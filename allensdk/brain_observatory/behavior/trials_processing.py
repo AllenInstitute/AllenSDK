@@ -452,7 +452,48 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     pd.DataFrame
            A dataframe containing data pertaining to the trials that
            make up this session
+
+    Notes
+    -----
+    The input_transform object must have the following methods:
+
+    input_transform._behavior_stimulus_file
+        Which returns the dict resulting from reading in this session's
+        stimulus_data pickle file
+
+    input_transform.get_rewards
+        Which returns a dataframe containing data about rewards given
+        during this session, i.e. the output of
+        allensdk/brain_observatory/behavior/rewards_processing.get_rewards
+
+    input_transform.get_licks
+        Which returns a dataframe containing the columns `time` and `frame`
+        denoting the time (in seconds) and frame number at which licks
+        occurred during this session
+
+    input_transform.get_stimulus_timestamps
+        Which returns a numpy.ndarray of timestamps (in seconds) associated
+        with the frames presented in this session.
+
+    input_transform.get_monitor_delay
+        Which returns the monitory delay (in seconds) associated with the
+        experimental rig
     """
+
+    missing_data_streams = []
+    for method_name in ('get_rewards', 'get_licks',
+                        'get_stimulus_timestamps',
+                        'get_monitor_delay',
+                        '_behavior_stimulus_file'):
+        if not hasattr(input_transform, method_name):
+            missing_data_streams.append(method_name)
+    if len(missing_data_streams) > 0:
+        msg = 'Cannot run trials_processing.get_trials\n'
+        msg += 'The object you passed as input is missing '
+        msg += 'the following required methods:\n'
+        for method_name in missing_data_streams:
+            msg += f'{method_name}\n'
+        raise ValueError(msg)
 
     rewards_df = input_transform.get_rewards()
     licks_df = input_transform.get_licks()
