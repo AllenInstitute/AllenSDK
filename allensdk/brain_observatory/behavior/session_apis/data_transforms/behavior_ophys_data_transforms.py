@@ -22,7 +22,6 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials_from_data_transform
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -155,7 +154,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         except ValueError as ee:
             rig_name = self.get_metadata()['rig_name']
 
-            err_msg = ee.args[0]
             warning_msg = 'Monitory delay calculation failed '
             warning_msg += 'with ValueError\n'
             warning_msg += f'    "{ee}"'
