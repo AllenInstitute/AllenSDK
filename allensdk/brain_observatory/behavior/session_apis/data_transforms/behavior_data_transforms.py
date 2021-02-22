@@ -20,7 +20,6 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     StimulusTemplate)
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials_from_data_transform)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.exceptions import DataFrameIndexError
 
 
