@@ -768,7 +768,7 @@ def get_trials_v0(data, time):
 
         trials['index'].append(trial["index"])
         trials['lick_times'].append([lick[0] for lick in trial["licks"]])
-        trials['auto_rewarded'].append(trial["trial_params"]["auto_reward"] if trial['trial_params']['catch'] == False else None)
+        trials['auto_rewarded'].append(trial["trial_params"]["auto_reward"] if not trial['trial_params']['catch'] else None)
         trials['cumulative_volume'].append(trial["cumulative_volume"])
         trials['cumulative_reward_number'].append(trial["cumulative_rewards"])
         trials['reward_volume'].append(sum([r[0] for r in trial.get("rewards", [])]))
@@ -885,13 +885,13 @@ def get_response_type(trials):
     for idx in trials.index:
         if trials.loc[idx].trial_type.lower() == 'aborted':
             response_type.append('EARLY_RESPONSE')
-        elif (trials.loc[idx].rewarded == True) & (trials.loc[idx].response == 1):
+        elif (trials.loc[idx].rewarded) & (trials.loc[idx].response == 1):
             response_type.append('HIT')
-        elif (trials.loc[idx].rewarded == True) & (trials.loc[idx].response != 1):
+        elif (trials.loc[idx].rewarded) & (trials.loc[idx].response != 1):
             response_type.append('MISS')
-        elif (trials.loc[idx].rewarded == False) & (trials.loc[idx].response == 1):
+        elif (not trials.loc[idx].rewarded) & (trials.loc[idx].response == 1):
             response_type.append('FA')
-        elif (trials.loc[idx].rewarded == False) & (trials.loc[idx].response != 1):
+        elif (not trials.loc[idx].rewarded) & (trials.loc[idx].response != 1):
             response_type.append('CR')
         else:
             response_type.append('other')
