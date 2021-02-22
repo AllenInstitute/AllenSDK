@@ -17,6 +17,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.session_api_utils import (
     sessions_are_equal, compare_session_fields)
+from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 
 
 @pytest.mark.requires_bamboo
@@ -77,7 +78,8 @@ def test_visbeh_ophys_data_set():
 
     stimulus_templates = data_set.stimulus_templates
     assert len(stimulus_templates) == 8
-    assert stimulus_templates['im000'].shape == (918, 1174)
+    assert stimulus_templates['im000'].warped.shape == MONITOR_DIMENSIONS
+    assert stimulus_templates['im000'].unwarped.shape == MONITOR_DIMENSIONS
 
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
            == ['time', 'frame']

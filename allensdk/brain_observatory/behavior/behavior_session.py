@@ -324,11 +324,11 @@ class BehaviorSession(LazyPropertyMixin):
                 image_set_name: The name of the image set that the
                     StimulusTemplate encapsulates
                 image_names: A list of individual image names in the image set
-                images: A list of StimulusImage (inherits from np.ndarray)
+                images: A list of StimulusImage
                     objects.
             Also has a to_dataframe() method to convert to a dataframe
-            where indices are image names, an 'image' column contains image
-            arrays, and the df.name is the image set.
+            where indices are image names, 'warped' and 'unwarped' columns
+            contains image arrays, and the df.name is the image set.
         """
         return self._stimulus_templates
 

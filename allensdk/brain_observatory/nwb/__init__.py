@@ -19,6 +19,8 @@ from pynwb.ophys import (
 
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
     StimulusImage, StimulusTemplate
+from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import \
+    StimulusTemplateExtension
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -406,17 +408,21 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
 
 def add_stimulus_template(nwbfile: NWBFile,
                           stimulus_template: StimulusTemplate):
-    images = []
+    unwarped_images = []
+    warped_images = []
     image_names = []
     for image_name, image_data in stimulus_template.items():
         image_names.append(image_name)
-        images.append(image_data)
+        unwarped_images.append(image_data.unwarped)
+        warped_images.append(image_data.warped)
 
-    image_index = list(range(len(images)))
+    image_index = list(range(len(image_names)))
+
     visual_stimulus_image_series = \
-        ImageSeries(
+        StimulusTemplateExtension(
             name=stimulus_template.image_set_name,
-            data=images,
+            data=warped_images,
+            unwarped=unwarped_images,
             control=list(range(len(image_names))),
             control_description=image_names,
             unit='NA',
