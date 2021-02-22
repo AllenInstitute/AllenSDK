@@ -241,7 +241,6 @@ def test_monitor_delay(monkeypatch):
         np.testing.assert_array_equal(xforms.get_stimulus_timestamps(),
                                       np.array([1, 2, 3, 4, 5], dtype=int))
 
-
     # now try case where monitor delay fails, but value can
     # be looked up
     def dummy_delay(self):
