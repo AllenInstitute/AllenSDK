@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable, Any, Dict, Set
+from typing import Optional, Callable, Any
 
 import numpy as np
 import h5py
@@ -65,8 +65,8 @@ def get_keys(sync_dset: Dataset) -> dict:
 
 
 def calculate_monitor_delay(sync_dset, stim_times, photodiode_key,
-                             transition_frame_interval=TRANSITION_FRAME_INTERVAL,
-                             max_monitor_delay=MAX_MONITOR_DELAY):
+                            transition_frame_interval=TRANSITION_FRAME_INTERVAL,  # noqa: E501
+                            max_monitor_delay=MAX_MONITOR_DELAY):
     """Calculate monitor delay."""
     transitions = stim_times[::transition_frame_interval]
     photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
@@ -270,7 +270,6 @@ class OphysTimeAligner(object):
     def dataset(self):
         return self._dataset
 
-
     @property
     def ophys_timestamps(self):
         """Get the timestamps for the ophys data."""
@@ -358,8 +357,9 @@ class OphysTimeAligner(object):
             added
 
         delta: int
-            Difference between the length of timestamps and the number of frames
-            reported in the stimulus pickle file, i.e.
+            Difference between the length of timestamps
+            and the number of frames reported in the stimulus
+            pickle file, i.e.
             len(timestamps) - len(pkl_file['items']['behavior']['intervalsms']
         """
         if self._clipped_stim_ts_delta is None:
@@ -398,8 +398,9 @@ class OphysTimeAligner(object):
             added
 
         delta: int
-            Difference between the length of timestamps and the number of frames
-            reported in the stimulus pickle file, i.e.
+            Difference between the length of timestamps and
+            the number of frames reported in the stimulus
+            pickle file, i.e.
             len(timestamps) - len(pkl_file['items']['behavior']['intervalsms']
 
         delay: float
