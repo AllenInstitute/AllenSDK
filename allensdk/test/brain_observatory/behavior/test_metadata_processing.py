@@ -5,7 +5,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
     description_dict, get_task_parameters, get_expt_description)
 
 @pytest.mark.parametrize("data, expected",
-    [({
+    [pytest.param({
         "items": {
             "behavior": {
                 "config": {
@@ -43,7 +43,47 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "DoC_untranslated",
          "n_stimulus_frames": 10
-     })
+     }, id='basic'),
+    pytest.param({
+        "items": {
+            "behavior": {
+                "config": {
+                    "DoC": {
+                        "blank_duration_range": (0.5, 0.5),
+                        "stimulus_window": 6.0,
+                        "response_window": [0.15, 0.75],
+                        "change_time_dist": "geometric",
+                    },
+                    "reward": {
+                        "reward_volume": 0.007,
+                    },
+                    "behavior": {
+                        "task_id": "DoC_untranslated",
+                    },
+                },
+                "params": {
+                    "stage": "TRAINING_3_images_A",
+                    "flash_omit_probability": 0.05
+                },
+                "stimuli": {
+                    "images": {"draw_log": [1]*10}
+                },
+            }
+        }
+     },
+     {
+         "blank_duration_sec": 0.5,
+         "stimulus_duration_sec": 6.0,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "stage": "TRAINING_3_images_A",
+         "stimulus": "images",
+         "stimulus_distribution": "geometric",
+         "task": "DoC_untranslated",
+         "n_stimulus_frames": 10
+     }, id='scalar_blank_duration')
+
     ]
 )
 def test_get_task_parameters(data, expected):
