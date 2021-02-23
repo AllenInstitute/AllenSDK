@@ -44,7 +44,7 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
 
     # Values in the hdf5 may be complex (likely an artifact of the ellipse
     # fitting process). Take only the real component.
-    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))
+    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))  # noqa: E501
 
     return eye_tracking_data.astype(float)
 
@@ -186,9 +186,23 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
         eye tracking frames.
     """
 
-    if len(frame_times) != len(eye_data.index):
+    n_sync = len(frame_times)
+    n_eye_frames = len(eye_data.index)
+
+    # If n_sync exceeds n_eye_frames by <= 15,
+    # just trim the excess sync pulses from the end
+    # of the timestamps array.
+    #
+    # This solution was discussed in
+    # https://github.com/AllenInstitute/AllenSDK/issues/1545
+
+    if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
+        frame_times = frame_times[:n_eye_frames]
+        n_sync = len(frame_times)
+
+    if n_sync != n_eye_frames:
         raise RuntimeError(f"Error! The number of sync file frame times "
-                           f"({len(frame_times)} does not match the "
+                           f"({len(frame_times)}) does not match the "
                            f"number of eye tracking frames "
                            f"({len(eye_data.index)})!")
 
