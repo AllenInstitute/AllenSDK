@@ -195,7 +195,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
 
     if n_sync != n_eye_frames:
         raise RuntimeError(f"Error! The number of sync file frame times "
-                           f"({len(frame_times)} does not match the "
+                           f"({len(frame_times)}) does not match the "
                            f"number of eye tracking frames "
                            f"({len(eye_data.index)})!")
 
