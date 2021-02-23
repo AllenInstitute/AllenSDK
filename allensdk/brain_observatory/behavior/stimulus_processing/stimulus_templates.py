@@ -32,7 +32,7 @@ class StimulusImage:
 
 
 class StimulusImageFactory:
-    """Factor for StimulusImage"""
+    """Factory for StimulusImage"""
     _monitor = BrainObservatoryMonitor()
 
     def from_pkl(self, input_array: np.ndarray, name: str) -> StimulusImage:
