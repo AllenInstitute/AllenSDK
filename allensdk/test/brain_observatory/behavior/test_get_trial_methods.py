@@ -59,14 +59,18 @@ def test_behavior_ophys_get_trials(monkeypatch):
     n_t = len(pkl_data['items']['behavior']['intervalsms']) + 1
     timestamps = np.linspace(0, 1, n_t)
 
+    def dummy_loader(self):
+        self._stimulus_timestamps = np.copy(timestamps)
+        self._monitor_delay = 0.021
+
     with monkeypatch.context() as ctx:
         ctx.setattr(BehaviorOphysDataTransforms,
                     '__init__',
                     dummy_init)
 
         ctx.setattr(BehaviorOphysDataTransforms,
-                    'get_stimulus_timestamps',
-                    lambda x: timestamps)
+                    '_load_stimulus_timestamps_and_delay',
+                    dummy_loader)
 
         ctx.setattr(BehaviorOphysDataTransforms,
                     '_behavior_stimulus_file',

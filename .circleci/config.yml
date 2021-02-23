@@ -105,9 +105,7 @@ version: 2.1
 workflows:
   main:
     jobs:
-      # disable lint build, for merge to default branch
-      # turn back on when rc/2.8.0 is started
-      # - lint
+      - lint
       - linux-py36
       - linux-py37
       # disabled osx build. covered by github-actions
