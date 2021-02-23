@@ -44,7 +44,7 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
 
     # Values in the hdf5 may be complex (likely an artifact of the ellipse
     # fitting process). Take only the real component.
-    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))
+    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))  # noqa: E501
 
     return eye_tracking_data.astype(float)
 
