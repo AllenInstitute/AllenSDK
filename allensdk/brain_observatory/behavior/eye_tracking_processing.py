@@ -189,6 +189,13 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     n_sync = len(frame_times)
     n_eye_frames = len(eye_data.index)
 
+    # If n_sync exceeds n_eye_frames by <= 15,
+    # just trim the excess sync pulses from the end
+    # of the timestamps array.
+    #
+    # This solution was discussed in
+    # https://github.com/AllenInstitute/AllenSDK/issues/1545
+
     if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
         frame_times = frame_times[:n_eye_frames]
         n_sync = len(frame_times)
