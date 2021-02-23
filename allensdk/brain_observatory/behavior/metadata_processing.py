@@ -61,8 +61,14 @@ def get_task_parameters(data):
     doc = config["DoC"]
 
     task_parameters = {}
-    task_parameters['blank_duration_sec'] = \
-        [float(x) for x in doc['blank_duration_range']]
+
+    blank_duration = doc['blank_duration_range']
+    if len(set(blank_duration)) == 1:
+        task_parameters['blank_duration_sec'] = float(blank_duration[0])
+    else:
+        task_parameters['blank_duration_sec'] = \
+            [float(x) for x in doc['blank_duration_range']]
+
     task_parameters['stimulus_duration_sec'] = doc['stimulus_window']
     task_parameters['omitted_flash_fraction'] = \
         behavior['params'].get('flash_omit_probability', float('nan'))
