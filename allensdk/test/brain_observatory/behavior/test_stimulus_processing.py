@@ -7,9 +7,9 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates, StimulusTemplate)
-from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
-    StimulusImage
+    get_stimulus_templates)
+from allensdk.brain_observatory.behavior.stimulus_processing\
+    .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
 

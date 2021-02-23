@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate, StimulusTemplateFactory
+    StimulusTemplateFactory
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 

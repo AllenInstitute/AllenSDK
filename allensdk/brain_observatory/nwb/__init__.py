@@ -13,12 +13,12 @@ import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb import ProcessingModule, NWBFile
-from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
+from pynwb.image import GrayscaleImage, IndexSeries
 from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
 
 from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
-    StimulusImage, StimulusTemplate
+    StimulusTemplate
 from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import \
     StimulusTemplateExtension
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
