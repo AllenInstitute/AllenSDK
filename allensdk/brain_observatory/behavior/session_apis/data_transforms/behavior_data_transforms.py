@@ -19,8 +19,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
     StimulusTemplate)
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_extended_trials, get_trials)
-from allensdk.brain_observatory.running_speed import RunningSpeed
+    get_extended_trials, get_trials_from_data_transform)
 from allensdk.core.exceptions import DataFrameIndexError
 
 
@@ -66,6 +65,7 @@ class BehaviorDataTransforms(BehaviorBase):
 
         return behavior_pkl_uuid
 
+    @memoize
     def get_licks(self) -> pd.DataFrame:
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
@@ -93,6 +93,7 @@ class BehaviorDataTransforms(BehaviorBase):
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
         return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
+    @memoize
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
         (not sync file).
@@ -227,6 +228,16 @@ class BehaviorDataTransforms(BehaviorBase):
         pkl = self._behavior_stimulus_file()
         return get_stimulus_templates(pkl=pkl)
 
+    def get_monitor_delay(self) -> float:
+        """
+        Return monitor delay for behavior only sessions
+        (in seconds)
+        """
+        # This is the median estimate across all rigs
+        # as discussed in
+        # https://github.com/AllenInstitute/AllenSDK/issues/1318
+        return 0.02115
+
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the
         (frame, time) points in the trial events.
@@ -257,6 +268,7 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         return get_task_parameters(data)
 
+    @memoize
     def get_trials(self) -> pd.DataFrame:
         """Get trials from pkl file
 
@@ -266,15 +278,8 @@ class BehaviorDataTransforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
-        timestamps = self.get_stimulus_timestamps()
-        licks = self.get_licks()
-        data = self._behavior_stimulus_file()
-        rewards = self.get_rewards()
 
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
+        trial_df = get_trials_from_data_transform(self)
 
         return trial_df
 

@@ -93,6 +93,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.8.0
 -----------------------------------------------------------------------
+- Created lookup table to get monitor_delay for cases where calculation from data fails
 -
 
 What's New - 2.7.0

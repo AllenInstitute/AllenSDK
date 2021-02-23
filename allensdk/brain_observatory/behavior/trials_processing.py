@@ -13,21 +13,24 @@ from allensdk import one
 TRIAL_COLUMN_DESCRIPTION_DICT = {}
 
 EDF_COLUMNS = ['index', 'lick_times', 'auto_rewarded', 'cumulative_volume',
-       'cumulative_reward_number', 'reward_volume', 'reward_times',
-       'reward_frames', 'rewarded', 'optogenetics', 'response_type',
-       'response_time', 'change_time', 'change_frame', 'response_latency',
-       'starttime', 'startframe', 'trial_length', 'scheduled_change_time',
-       'endtime', 'endframe', 'initial_image_category', 'initial_image_name',
-       'change_image_name', 'change_image_category', 'change_ori',
-       'change_contrast', 'initial_ori', 'initial_contrast', 'delta_ori',
-       'mouse_id', 'response_window', 'task', 'stage', 'session_duration',
-       'user_id', 'LDT_mode', 'blank_screen_timeout', 'stim_duration',
-       'blank_duration_range', 'prechange_minimum', 'stimulus_distribution',
-       'stimulus', 'distribution_mean', 'computer_name',
-       'behavior_session_uuid', 'startdatetime', 'date', 'year', 'month',
-       'day', 'hour', 'dayofweek', 'number_of_rewards', 'rig_id', 'trial_type',
-       'lick_frames', 'reward_licks', 'reward_lick_count',
-       'reward_lick_latency', 'reward_rate', 'response', 'color']
+               'cumulative_reward_number', 'reward_volume', 'reward_times',
+               'reward_frames', 'rewarded', 'optogenetics', 'response_type',
+               'response_time', 'change_time', 'change_frame',
+               'response_latency', 'starttime', 'startframe', 'trial_length',
+               'scheduled_change_time', 'endtime', 'endframe',
+               'initial_image_category', 'initial_image_name',
+               'change_image_name', 'change_image_category', 'change_ori',
+               'change_contrast', 'initial_ori', 'initial_contrast',
+               'delta_ori', 'mouse_id', 'response_window', 'task', 'stage',
+               'session_duration', 'user_id', 'LDT_mode',
+               'blank_screen_timeout', 'stim_duration',
+               'blank_duration_range', 'prechange_minimum',
+               'stimulus_distribution', 'stimulus', 'distribution_mean',
+               'computer_name', 'behavior_session_uuid', 'startdatetime',
+               'date', 'year', 'month', 'day', 'hour', 'dayofweek',
+               'number_of_rewards', 'rig_id', 'trial_type',
+               'lick_frames', 'reward_licks', 'reward_lick_count',
+               'reward_lick_latency', 'reward_rate', 'response', 'color']
 
 RIG_NAME = {
     'W7DTMJ19R2F': 'A1',
@@ -119,7 +122,9 @@ def resolve_initial_image(stimuli, start_frame):
         for set_event in stim_dict["set_log"]:
             set_frame = set_event[3]
             if set_frame <= start_frame and set_frame >= max_frame:
-                initial_image_group = initial_image_name = set_event[1]  # hack assumes initial_image_group == initial_image_name, only initial_image_name is present for natual_scenes
+                # hack assumes initial_image_group == initial_image_name,
+                # only initial_image_name is present for natual_scenes
+                initial_image_group = initial_image_name = set_event[1]
                 initial_image_category_name = stim_category_name
                 if initial_image_category_name == 'grating':
                     initial_image_name = f'gratings_{initial_image_name}'
@@ -131,7 +136,7 @@ def resolve_initial_image(stimuli, start_frame):
 def trial_data_from_log(trial):
     '''
     Infer trial logic from trial log. Returns a dictionary.
-    
+
     * reward volume: volume of water delivered on the trial, in mL
 
     Each of the following values is boolean:
@@ -142,17 +147,20 @@ def trial_data_from_log(trial):
 
     stimulus_change/sham_change are mutually exclusive
     * stimulus_change: did the stimulus change (True on 'go' trials)
-    * sham_change: stimulus did not change, but response was evaluated (True on 'catch' trials)
+    * sham_change: stimulus did not change, but response was evaluated
+                   (True on 'catch' trials)
 
     Each trial can be one (and only one) of the following:
     * hit (stimulus changed, animal responded in response window)
     * miss (stimulus changed, animal did not respond in response window)
-    * false_alarm (stimulus did not change, animal responded in response window)
-    * correct_reject (stimulus did not change, animal did not respond in response window)
+    * false_alarm (stimulus did not change,
+                   animal responded in response window)
+    * correct_reject (stimulus did not change,
+                      animal did not respond in response window)
     * aborted (animal responded before change time)
-    * auto_rewarded (reward was automatically delivered following the change. This will bias the animals choice and should not be categorized as hit/miss)
-    
-    
+    * auto_rewarded (reward was automatically delivered following the change.
+                     This will bias the animals choice and should not be
+                     categorized as hit/miss)
     '''
     trial_event_names = [val[0] for val in trial['events']]
     hit = 'hit' in trial_event_names
@@ -190,21 +198,26 @@ def trial_data_from_log(trial):
 
 
 def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
-    '''ensure that only one of N possible mutually exclusive trial conditions is True'''
+    '''ensure that only one of N possible mutually
+    exclusive trial conditions is True'''
     on = []
     for condition, value in trial_conditions.items():
         if value:
             on.append(condition)
-    
+
     if len(on) != 1:
         all_conditions = list(trial_conditions.keys())
-        raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
+        msg = f"expected exactly 1 trial condition out of {all_conditions} "
+        msg += f"to be True, instead {on} were True (trial {trial_index})"
+        raise AssertionError(msg)
 
 
-def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
+def get_trial_reward_time(rebased_reward_times,
+                          start_time,
+                          stop_time):
     '''extract reward times in time range'''
     reward_times = rebased_reward_times[np.where(np.logical_and(
-        rebased_reward_times >= start_time, 
+        rebased_reward_times >= start_time,
         rebased_reward_times <= stop_time
     ))]
     return float('nan') if len(reward_times) == 0 else one(reward_times)
@@ -244,7 +257,8 @@ def get_trial_timing(
         event_dict: dict,
         licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
         hit: bool, false_alarm: bool, aborted: bool,
-        timestamps: np.ndarray):
+        timestamps: np.ndarray,
+        monitor_delay: float):
     """
     Extract a dictionary of trial timing data.
     See trial_data_from_log for a description of the trial types.
@@ -273,6 +287,8 @@ def get_trial_timing(
     timestamps: np.ndarray[1d]
         Array of ground truth timestamps for the session
         (sync times, if available)
+    monitor_delay: float
+        The monitor delay in seconds associated with the session
 
     Returns
     =======
@@ -324,10 +340,10 @@ def get_trial_timing(
 
     if go or auto_rewarded:
         change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-        change_time = timestamps[change_frame]
+        change_time = timestamps[change_frame] + monitor_delay
     elif catch:
         change_frame = event_dict.get(('sham_change', ''))['frame']
-        change_time = timestamps[change_frame]
+        change_time = timestamps[change_frame] + monitor_delay
     else:
         change_time = float("nan")
         change_frame = float("nan")
@@ -372,7 +388,10 @@ def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
     if len(trial["stimulus_changes"]) == 0:
         change_image_name = initial_image_name
     else:
-        (from_set, from_name), (to_set, to_name), _, _ = trial["stimulus_changes"][0]
+        ((from_set, from_name),
+         (to_set, to_name),
+         _, _) = trial["stimulus_changes"][0]
+
         # do this to fix names if the stimuli is a grating
         if from_set in grating_oris:
             from_name = f'gratings_{from_name}'
@@ -400,10 +419,12 @@ def get_trial_bounds(trial_log: List) -> List:
     Returns
     -------
     list
-        Each element in the list is a tuple of the form (start_frame, end_frame)
-        so that the ith element of the list gives the start and end frames of
-        the ith trial. The endframe of the last trial will be -1, indicating that
-        it should map to the last timestamp in the session
+        Each element in the list is a tuple of the form
+        (start_frame, end_frame) so that the ith element
+        of the list gives the start and end frames of
+        the ith trial. The endframe of the last trial will
+        be -1, indicating that it should map to the last
+        timestamp in the session
     """
     start_frames = []
 
@@ -431,40 +452,73 @@ def get_trial_bounds(trial_log: List) -> List:
     return list([(s, e) for s, e in zip(start_frames, end_frames)])
 
 
-def get_trials(data: Dict,
-               licks_df: pd.DataFrame,
-               rewards_df: pd.DataFrame,
-               timestamps: np.ndarray) -> pd.DataFrame:
+def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     """
     Create and return a pandas DataFrame containing data about
     the trials associated with this session
 
     Parameters
     ----------
-    data: dict
-          The dict resulting from reading in this session's
-          stimulus_data pickle file
-
-    licks_df: pd.DataFrame
-           A dataframe whose only column is the timestamps
-           of licks.
-
-    rewards_df: pd.DataFrame
-           A dataframe containing data about rewards given
-           during this session. Output of
-           allensdk/brain_observatory/behavior/rewards_processing.get_rewards
-
-    timestamps: np.ndarray[1d]
-           An ndarray containing the timestamps associated with each
-           stimulus frame in this session. Should be the sync timestamps
-           if available.
+    input_transform:
+        An instantiation of a class that inherits from either
+        BehaviorDataTransform or BehaviorOphysDataTransform.
+        This object will be used to get at the data needed by
+        this method to create the trials dataframe.
 
     Returns
     -------
     pd.DataFrame
            A dataframe containing data pertaining to the trials that
            make up this session
+
+    Notes
+    -----
+    The input_transform object must have the following methods:
+
+    input_transform._behavior_stimulus_file
+        Which returns the dict resulting from reading in this session's
+        stimulus_data pickle file
+
+    input_transform.get_rewards
+        Which returns a dataframe containing data about rewards given
+        during this session, i.e. the output of
+        allensdk/brain_observatory/behavior/rewards_processing.get_rewards
+
+    input_transform.get_licks
+        Which returns a dataframe containing the columns `time` and `frame`
+        denoting the time (in seconds) and frame number at which licks
+        occurred during this session
+
+    input_transform.get_stimulus_timestamps
+        Which returns a numpy.ndarray of timestamps (in seconds) associated
+        with the frames presented in this session.
+
+    input_transform.get_monitor_delay
+        Which returns the monitory delay (in seconds) associated with the
+        experimental rig
     """
+
+    missing_data_streams = []
+    for method_name in ('get_rewards', 'get_licks',
+                        'get_stimulus_timestamps',
+                        'get_monitor_delay',
+                        '_behavior_stimulus_file'):
+        if not hasattr(input_transform, method_name):
+            missing_data_streams.append(method_name)
+    if len(missing_data_streams) > 0:
+        msg = 'Cannot run trials_processing.get_trials\n'
+        msg += 'The object you passed as input is missing '
+        msg += 'the following required methods:\n'
+        for method_name in missing_data_streams:
+            msg += f'{method_name}\n'
+        raise ValueError(msg)
+
+    rewards_df = input_transform.get_rewards()
+    licks_df = input_transform.get_licks()
+    timestamps = input_transform.get_stimulus_timestamps()
+    monitor_delay = input_transform.get_monitor_delay()
+    data = input_transform._behavior_stimulus_file()
+
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
@@ -477,9 +531,9 @@ def get_trials(data: Dict,
 
     for idx, trial in enumerate(trial_log):
         # match each event in the trial log to the sync timestamps
-        event_dict = {(e[0], e[1]): {'timestamp':timestamps[e[3]],
-                                     'frame':e[3]}
-                                    for e in trial['events']}
+        event_dict = {(e[0], e[1]): {'timestamp': timestamps[e[3]],
+                                     'frame': e[3]}
+                      for e in trial['events']}
 
         tr_data = {"trial": trial["index"]}
 
@@ -498,21 +552,24 @@ def get_trials(data: Dict,
         # https://github.com/AllenInstitute/visual_behavior_analysis/issues/482
 
         if trial_end < 0:
-            if 'fingerprint' in data['items']['behavior']['items'].keys():
-                trial_end = data['items']['behavior']['items']['fingerprint']['starting_frame']
+            bhv = data['items']['behavior']['items']
+            if 'fingerprint' in bhv.keys():
+                trial_end = bhv['fingerprint']['starting_frame']
 
         # select licks that fall between trial_start and trial_end;
         # licks on the boundary get assigned to the trial that is ending,
         # rather than the trial that is starting
         if trial_end > 0:
-            valid_idx = np.where(np.logical_and(lick_frames>trial_start,
-                                                lick_frames<=trial_end))
+            valid_idx = np.where(np.logical_and(lick_frames > trial_start,
+                                                lick_frames <= trial_end))
         else:
-            valid_idx = np.where(lick_frames>trial_start)
+            valid_idx = np.where(lick_frames > trial_start)
 
         valid_licks = lick_frames[valid_idx]
-
-        tr_data["lick_times"] = timestamps[valid_licks]
+        if len(valid_licks) > 0:
+            tr_data["lick_times"] = timestamps[valid_licks]
+        else:
+            tr_data["lick_times"] = np.array([], dtype=float)
 
         tr_data["reward_time"] = get_trial_reward_time(
             reward_times,
@@ -529,15 +586,22 @@ def get_trials(data: Dict,
             tr_data['hit'],
             tr_data['false_alarm'],
             tr_data["aborted"],
-            timestamps
+            timestamps,
+            monitor_delay
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
-        # ensure that only one trial condition is True (they are mutually exclusive)
+        # ensure that only one trial condition is True
+        # (they are mutually exclusive)
         condition_dict = {}
-        for key in ['hit','miss','false_alarm','correct_reject','auto_rewarded','aborted']:
+        for key in ['hit',
+                    'miss',
+                    'false_alarm',
+                    'correct_reject',
+                    'auto_rewarded',
+                    'aborted']:
             condition_dict[key] = tr_data[key]
-        validate_trial_condition_exclusivity(idx,**condition_dict)
+        validate_trial_condition_exclusivity(idx, **condition_dict)
 
         all_trial_data[idx] = tr_data
 
@@ -551,7 +615,8 @@ def get_trials(data: Dict,
 def local_time(iso_timestamp, timezone=None):
     datetime = pd.to_datetime(iso_timestamp)
     if not datetime.tzinfo:
-        datetime = datetime.replace(tzinfo=dateutil.tz.gettz('America/Los_Angeles'))
+        tzinfo = dateutil.tz.gettz('America/Los_Angeles')
+        datetime = datetime.replace(tzinfo=tzinfo)
     return datetime.isoformat()
 
 
@@ -576,7 +641,8 @@ def get_params(exp_data):
     params.update(exp_data["items"]["behavior"].get("cl_params", {}))
 
     if "response_window" in params:
-        params["response_window"] = list(params["response_window"])  # tuple to list
+        # tuple to list
+        params["response_window"] = list(params["response_window"])
 
     return params
 
@@ -597,50 +663,60 @@ def get_even_sampling(data):
 
     stimuli = data['items']['behavior']['stimuli']
     for stimuli_group_name, stim in stimuli.items():
-        if stim['obj_type'].lower() == 'docimagestimulus' and stim['sampling'] in ['even', 'file']:
+        if (stim['obj_type'].lower() == 'docimagestimulus'
+           and stim['sampling'] in ['even', 'file']):
+
             return True
+
     return False
 
 
 def data_to_metadata(data, time):
 
+    config = data['items']['behavior']['config']
+    doc = config['DoC']
+    stimuli = data['items']['behavior']['stimuli']
+
     metadata = {
-        "startdatetime": local_time(data["start_time"], timezone='America/Los_Angeles'),
-        "rig_id": RIG_NAME.get(data['platform_info']['computer_name'].lower(), 'unknown'),
+        "startdatetime": local_time(data["start_time"],
+                                    timezone='America/Los_Angeles'),
+        "rig_id": RIG_NAME.get(data['platform_info']['computer_name'].lower(),
+                               'unknown'),
         "computer_name": data['platform_info']['computer_name'],
-        "reward_vol": data["items"]["behavior"]["config"]["reward"]["reward_volume"],
-        "auto_reward_vol": data["items"]["behavior"]["config"]["DoC"]["auto_reward_volume"],
+        "reward_vol": config["reward"]["reward_volume"],
+        "auto_reward_vol": doc["auto_reward_volume"],
         "params": get_params(data),
-        "mouseid": data["items"]["behavior"]['config']['behavior']['mouse_id'],
-        "response_window": list(data["items"]["behavior"].get("config", {}).get("DoC", {}).get("response_window")),
-        "task": data["items"]["behavior"]["config"]["behavior"]['task_id'],
+        "mouseid": config['behavior']['mouse_id'],
+        "response_window": list(data["items"]["behavior"].get("config", {}).get("DoC", {}).get("response_window")),  # noqa: E501
+        "task": config["behavior"]['task_id'],
         "stage": data["items"]["behavior"]["params"]["stage"],
         "stoptime": time[-1] - time[0],
         "userid": data["items"]["behavior"]['cl_params']['user_id'],
         "lick_detect_training_mode": "single",
         "blankscreen_on_timeout": False,
-        "stim_duration": data["items"]["behavior"]["config"]['DoC']['stimulus_window'] * 1000,
-        "blank_duration_range": list(data["items"]["behavior"]["config"]['DoC']['blank_duration_range']),
-        "delta_minimum": data["items"]["behavior"]["config"]['DoC']['pre_change_time'],
-        "stimulus_distribution": data["items"]["behavior"]["config"]["DoC"]["change_time_dist"],
-        "delta_mean": data["items"]["behavior"]['config']["DoC"]["change_time_scale"],
+        "stim_duration": doc['stimulus_window'] * 1000,
+        "blank_duration_range": list(doc['blank_duration_range']),
+        "delta_minimum": doc['pre_change_time'],
+        "stimulus_distribution": doc["change_time_dist"],
+        "delta_mean": doc["change_time_scale"],
         "trial_duration": None,
-        "n_stimulus_frames": sum([sum(s.get("draw_log", [])) for s in data["items"]["behavior"]["stimuli"].values()]),
-        "stimulus": list(data["items"]["behavior"]["stimuli"].keys())[0],
-        "warm_up_trials": data["items"]["behavior"]["config"]["DoC"]["warm_up_trials"],
-        "stimulus_window": data["items"]["behavior"]["config"]["DoC"]["stimulus_window"],
-        "volume_limit": data["items"]["behavior"]["config"]["behavior"]["volume_limit"],
-        "failure_repeats": data["items"]["behavior"]["config"]["DoC"]["failure_repeats"],
-        "catch_frequency": data["items"]["behavior"]["config"]["DoC"]["catch_freq"],
-        "auto_reward_delay": data["items"]["behavior"]["config"]["DoC"].get("auto_reward_delay", 0.0),
-        "free_reward_trials": data["items"]["behavior"]["config"]["DoC"]["free_reward_trials"],
-        "min_no_lick_time": data["items"]["behavior"]["config"]["DoC"]["min_no_lick_time"],
-        "max_session_duration": data["items"]["behavior"]["config"]["DoC"]["max_task_duration_min"],
-        "abort_on_early_response": data["items"]["behavior"]["config"]["DoC"]["abort_on_early_response"],
-        "initial_blank_duration": data["items"]["behavior"]["config"]["DoC"]["initial_blank"],
+        "n_stimulus_frames": sum([sum(s.get("draw_log", []))
+                                 for s in stimuli.values()]),
+        "stimulus": list(stimuli.keys())[0],
+        "warm_up_trials": doc["warm_up_trials"],
+        "stimulus_window": doc["stimulus_window"],
+        "volume_limit": config["behavior"]["volume_limit"],
+        "failure_repeats": doc["failure_repeats"],
+        "catch_frequency": doc["catch_freq"],
+        "auto_reward_delay": doc.get("auto_reward_delay", 0.0),
+        "free_reward_trials": doc["free_reward_trials"],
+        "min_no_lick_time": doc["min_no_lick_time"],
+        "max_session_duration": doc["max_task_duration_min"],
+        "abort_on_early_response": doc["abort_on_early_response"],
+        "initial_blank_duration": doc["initial_blank"],
         "even_sampling_enabled": get_even_sampling(data),
         "behavior_session_uuid": uuid.UUID(data["session_uuid"]),
-        "periodic_flash": data['items']['behavior']['config']['DoC']['periodic_flash'],
+        "periodic_flash": doc['periodic_flash'],
         "platform_info": data['platform_info']
     }
 
@@ -659,10 +735,16 @@ def get_change_time_frame_response_latency(trial):
 
     for change_event in trial['events']:
         if change_event[0] in ['stimulus_changed', 'sham_change']:
-            return change_event[2], change_event[3], get_response_latency(change_event, trial)
+            return (change_event[2],
+                    change_event[3],
+                    get_response_latency(change_event, trial))
     return None, None, None
 
-def get_stimulus_attr_changes(stim_dict, change_frame, first_frame, last_frame):
+
+def get_stimulus_attr_changes(stim_dict,
+                              change_frame,
+                              first_frame,
+                              last_frame):
     """
     Notes
     -----
@@ -690,19 +772,31 @@ def get_image_info_from_trial(trial_log, ti):
         raise RuntimeError('Should not have been possible')
 
     if len(trial_log[ti]["stimulus_changes"]) == 1:
-        (from_group, from_name, ), (to_group, to_name), _, _ = trial_log[ti]["stimulus_changes"][0]
+
+        ((from_group, from_name, ),
+         (to_group, to_name),
+         _, _) = trial_log[ti]["stimulus_changes"][0]
+
         return from_group, from_name, to_group, to_name
     else:
-        _, _, prev_group, prev_name = get_image_info_from_trial(trial_log, ti - 1)
+
+        (_, _,
+         prev_group,
+         prev_name) = get_image_info_from_trial(trial_log, ti - 1)
+
         return prev_group, prev_name, prev_group, prev_name
 
 
 def get_ori_info_from_trial(trial_log, ti, ):
     if ti == -1:
         raise IndexError('No change on first trial.')
-    
+
     if len(trial_log[ti]["stimulus_changes"]) == 1:
-        (initial_group, initial_orientation), (change_group, change_orientation, ), _, _ = trial_log[ti]["stimulus_changes"][0]
+
+        ((initial_group, initial_orientation),
+         (change_group, change_orientation, ),
+         _, _) = trial_log[ti]["stimulus_changes"][0]
+
         return change_orientation, change_orientation, None
     else:
         return get_ori_info_from_trial(trial_log, ti - 1)
@@ -712,50 +806,70 @@ def get_trials_v0(data, time):
     stimuli = data["items"]["behavior"]["stimuli"]
     if len(list(stimuli.keys())) != 1:
         raise ValueError('Only one stimuli supported.')
-    
+
     stim_name, stim = next(iter(stimuli.items()))
     if stim_name not in ['images', 'grating', ]:
         raise ValueError('Unsupported stimuli name: {}.'.format(stim_name))
 
+    doc = data["items"]["behavior"]["config"]["DoC"]
+
     implied_type = stim["obj_type"]
     trial_log = data["items"]["behavior"]["trial_log"]
-    pre_change_time = data["items"]["behavior"]["config"]['DoC']['pre_change_time']
-    initial_blank_duration = data["items"]["behavior"]["config"]["DoC"]["initial_blank"]
+    pre_change_time = doc['pre_change_time']
+    initial_blank_duration = doc["initial_blank"]
 
-    initial_stim = stim['set_log'][0]  # we need this for the situations where a change doesn't occur on the first trial
+    # we need this for the situations where a
+    # change doesn't occur in the first trial
+    initial_stim = stim['set_log'][0]
 
     trials = collections.defaultdict(list)
     for ti, trial in enumerate(trial_log):
 
         trials['index'].append(trial["index"])
         trials['lick_times'].append([lick[0] for lick in trial["licks"]])
-        trials['auto_rewarded'].append(trial["trial_params"]["auto_reward"] if trial['trial_params']['catch'] == False else None)
+        trials['auto_rewarded'].append(trial["trial_params"]["auto_reward"]
+                                       if not trial['trial_params']['catch']
+                                       else None)
+
         trials['cumulative_volume'].append(trial["cumulative_volume"])
         trials['cumulative_reward_number'].append(trial["cumulative_rewards"])
-        trials['reward_volume'].append(sum([r[0] for r in trial.get("rewards", [])]))
-        trials['reward_times'].append([reward[1] for reward in trial["rewards"]])
-        trials['reward_frames'].append([reward[2] for reward in trial["rewards"]])
+
+        trials['reward_volume'].append(sum([r[0]
+                                       for r in trial.get("rewards", [])]))
+
+        trials['reward_times'].append([reward[1]
+                                       for reward in trial["rewards"]])
+
+        trials['reward_frames'].append([reward[2]
+                                        for reward in trial["rewards"]])
+
         trials['rewarded'].append(trial["trial_params"]["catch"] is False)
-        trials['optogenetics'].append(trial["trial_params"].get("optogenetics", False))
+        trials['optogenetics'].append(trial["trial_params"].get("optogenetics", False))  # noqa: E501
         trials['response_type'].append([])
         trials['response_time'].append([])
-        trials['change_time'].append(get_change_time_frame_response_latency(trial)[0])
-        trials['change_frame'].append(get_change_time_frame_response_latency(trial)[1])
-        trials['response_latency'].append(get_change_time_frame_response_latency(trial)[2])
+        trials['change_time'].append(get_change_time_frame_response_latency(trial)[0])  # noqa: E501
+        trials['change_frame'].append(get_change_time_frame_response_latency(trial)[1])  # noqa: E501
+        trials['response_latency'].append(get_change_time_frame_response_latency(trial)[2])  # noqa: E501
         trials['starttime'].append(trial["events"][0][2])
         trials['startframe'].append(trial["events"][0][3])
-        trials['trial_length'].append(trial["events"][-1][2] - trial["events"][0][2])
-        trials['scheduled_change_time'].append(pre_change_time + initial_blank_duration + trial["trial_params"]["change_time"])
+        trials['trial_length'].append(trial["events"][-1][2] -
+                                      trial["events"][0][2])
+        trials['scheduled_change_time'].append(pre_change_time +
+                                               initial_blank_duration +
+                                               trial["trial_params"]["change_time"])  # noqa: E501
         trials['endtime'].append(trial["events"][-1][2])
         trials['endframe'].append(trial["events"][-1][3])
 
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
-            from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
+            (from_group,
+             from_name,
+             to_group,
+             to_name) = get_image_info_from_trial(trial_log, ti)
             trials['initial_image_name'].append(from_name)
             trials['initial_image_category'].append(from_group)
             trials['change_image_name'].append(to_name)
-            trials['change_image_category'].append(to_group) 
+            trials['change_image_category'].append(to_group)
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)
@@ -763,9 +877,13 @@ def get_trials_v0(data, time):
             trials['delta_ori'].append(None)
         elif implied_type == 'DoCGratingStimulus':
             try:
-                change_orientation, initial_orientation, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+                (change_orientation,
+                 initial_orientation,
+                 delta_orientation) = get_ori_info_from_trial(trial_log, ti)
             except IndexError:
-                orientation = initial_stim[1]  # shape: group_name, orientation, stimulus time relative to start, frame
+                # shape: group_name, orientation,
+                #        stimulus time relative to start, frame
+                orientation = initial_stim[1]
                 change_orientation = orientation
                 initial_orientation = orientation
                 delta_orientation = None
@@ -779,7 +897,8 @@ def get_trials_v0(data, time):
             trials['initial_contrast'].append(None)
             trials['delta_ori'].append(delta_orientation)
         else:
-            raise NotImplementedError('Unsupported stimulus type: {}'.format(implied_type), )
+            msg = 'Unsupported stimulus type: {}'.format(implied_type)
+            raise NotImplementedError(msg)
 
     return pd.DataFrame(trials)
 
@@ -807,34 +926,51 @@ def find_licks(reward_times, licks, window=3.5):
         return []
     else:
         reward_time = one(reward_times)
-        reward_lick_mask = ((licks['time'] > reward_time) & (licks['time'] < (reward_time + window)))
+        reward_lick_mask = ((licks['time'] > reward_time) &
+                            (licks['time'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
         tr_licks['time'] -= reward_time
         return tr_licks['time'].values
 
 
-def calculate_reward_rate(response_latency=None, starttime=None, window=0.75, trial_window=25, initial_trials=10):
+def calculate_reward_rate(response_latency=None,
+                          starttime=None,
+                          window=0.75,
+                          trial_window=25,
+                          initial_trials=10):
+
     assert len(response_latency) == len(starttime)
 
-    df = pd.DataFrame({'response_latency': response_latency, 'starttime':starttime})
+    df = pd.DataFrame({'response_latency': response_latency,
+                       'starttime': starttime})
 
     # adds a column called reward_rate to the input dataframe
     # the reward_rate column contains a rolling average of rewards/min
-    # window sets the window in which a response is considered correct, so a window of 1.0 means licks before 1.0 second are considered correct
+    # window sets the window in which a response is considered correct,
+    # so a window of 1.0 means licks before 1.0 second are considered correct
+    #
     # Reorganized into this unit-testable form by Nick Cain April 25 2019
 
     reward_rate = np.zeros(len(df))
-    reward_rate[:initial_trials] = np.inf  # make the initial reward rate infinite, so that you include the first trials automatically.
+    # make the initial reward rate infinite,
+    # so that you include the first trials automatically.
+    reward_rate[:initial_trials] = np.inf
+
     for trial_number in range(initial_trials, len(df)):
 
         min_index = np.max((0, trial_number - trial_window))
         max_index = np.min((trial_number + trial_window, len(df)))
         df_roll = df.iloc[min_index:max_index]
 
-        correct = len(df_roll[df_roll.response_latency < window])  # get a rolling number of correct trials
-        time_elapsed = df_roll.starttime.iloc[-1] - df_roll.starttime.iloc[0]  # get the time elapsed over the trials
-        reward_rate_on_this_lap = correct / time_elapsed * 60 # calculate the reward rate, rewards/min
+        # get a rolling number of correct trials
+        correct = len(df_roll[df_roll.response_latency < window])
+
+        # get the time elapsed over the trials
+        time_elapsed = df_roll.starttime.iloc[-1] - df_roll.starttime.iloc[0]
+
+        # calculate the reward rate, rewards/min
+        reward_rate_on_this_lap = correct / time_elapsed * 60
 
         reward_rate[trial_number] = reward_rate_on_this_lap
     return reward_rate
@@ -846,13 +982,13 @@ def get_response_type(trials):
     for idx in trials.index:
         if trials.loc[idx].trial_type.lower() == 'aborted':
             response_type.append('EARLY_RESPONSE')
-        elif (trials.loc[idx].rewarded == True) & (trials.loc[idx].response == 1):
+        elif (trials.loc[idx].rewarded) & (trials.loc[idx].response == 1):
             response_type.append('HIT')
-        elif (trials.loc[idx].rewarded == True) & (trials.loc[idx].response != 1):
+        elif (trials.loc[idx].rewarded) & (trials.loc[idx].response != 1):
             response_type.append('MISS')
-        elif (trials.loc[idx].rewarded == False) & (trials.loc[idx].response == 1):
+        elif (not trials.loc[idx].rewarded) & (trials.loc[idx].response == 1):
             response_type.append('FA')
-        elif (trials.loc[idx].rewarded == False) & (trials.loc[idx].response != 1):
+        elif (not trials.loc[idx].rewarded) & (trials.loc[idx].response != 1):
             response_type.append('CR')
         else:
             response_type.append('other')
@@ -882,32 +1018,71 @@ def colormap(trial_type, response_type):
 def create_extended_trials(trials=None, metadata=None, time=None, licks=None):
 
     startdatetime = dateutil.parser.parse(metadata['startdatetime'])
-    edf = trials[~pd.isnull(trials['reward_times'])].reset_index(drop=True).copy()
+    edf = trials[~pd.isnull(trials['reward_times'])].reset_index(drop=True).copy()  # noqa: E501
 
     # Buggy computation of trial_length (for backwards compatibility)
     edf.drop(['trial_length'], axis=1, inplace=True)
-    edf['endtime_buggy'] = [edf['starttime'].iloc[ti + 1] if ti < len(edf) - 1 else time[-1] for ti in range(len(edf))]
+
+    edf['endtime_buggy'] = [edf['starttime'].iloc[ti + 1]
+                            if ti < len(edf) - 1
+                            else time[-1]
+                            for ti in range(len(edf))]
+
     edf['trial_length'] = edf['endtime_buggy'] - edf['starttime']
     edf.drop(['endtime_buggy'], axis=1, inplace=True)
 
     # Make trials contiguous, and rebase time:
-    edf.drop(['endframe', 'starttime', 'endtime', 'change_time', 'lick_times', 'reward_times'], axis=1, inplace=True)
-    edf['endframe'] = [edf['startframe'].iloc[ti + 1] if ti < len(edf) - 1 else len(time) - 1 for ti in range(len(edf))]
-    edf['lick_frames'] = [licks['frame'][np.logical_and(licks['frame'] > int(row['startframe']), licks['frame'] <= int(row['endframe']))].values for _, row in edf.iterrows()]
-    edf['starttime'] = [time[edf['startframe'].iloc[ti]] for ti in range(len(edf))]
-    edf['endtime'] = [time[edf['endframe'].iloc[ti]] for ti in range(len(edf))]
-    
+    edf.drop(['endframe',
+              'starttime',
+              'endtime',
+              'change_time',
+              'lick_times',
+              'reward_times'], axis=1, inplace=True)
+
+    edf['endframe'] = [edf['startframe'].iloc[ti + 1]
+                       if ti < len(edf) - 1
+                       else len(time) - 1
+                       for ti in range(len(edf))]
+
+    _lks = licks['frame']
+    edf['lick_frames'] = [_lks[np.logical_and(_lks > int(row['startframe']),
+                               _lks <= int(row['endframe']))].values
+                          for _, row in edf.iterrows()]
+
+    # this variable was created to bring code into
+    # line with pep8; deleting to protect against
+    # changing logic
+    del _lks
+
+    edf['starttime'] = [time[edf['startframe'].iloc[ti]]
+                        for ti in range(len(edf))]
+
+    edf['endtime'] = [time[edf['endframe'].iloc[ti]]
+                      for ti in range(len(edf))]
+
     # Proper computation of trial_length:
     # edf['trial_length'] = edf['endtime'] - edf['starttime']
 
-    edf['change_time'] = [time[int(cf)] if not np.isnan(cf) else float('nan') for cf in edf['change_frame']]
-    edf['lick_times'] = [[time[fi] for fi in frame_arr] for frame_arr in edf['lick_frames']]
+    edf['change_time'] = [time[int(cf)]
+                          if not np.isnan(cf)
+                          else float('nan')
+                          for cf in edf['change_frame']]
+
+    edf['lick_times'] = [[time[fi] for fi in frame_arr]
+                         for frame_arr in edf['lick_frames']]
+
     edf['trial_type'] = edf.apply(categorize_one_trial, axis=1)
-    edf['reward_times'] = [[time[fi] for fi in frame_list] for frame_list in edf['reward_frames']]
+
+    edf['reward_times'] = [[time[fi] for fi in frame_list]
+                           for frame_list in edf['reward_frames']]
+
     edf['number_of_rewards'] = edf['reward_times'].map(len)
     edf['reward_licks'] = edf['reward_times'].apply(find_licks, args=(licks,))
     edf['reward_lick_count'] = edf['reward_licks'].map(len)
-    edf['reward_lick_latency'] = edf['reward_licks'].map(lambda ll: None if len(ll) == 0 else np.min(ll))
+
+    edf['reward_lick_latency'] = edf['reward_licks'].map(lambda ll: None
+                                                         if len(ll) == 0
+                                                         else np.min(ll))
 
     # Things that dont depend on time/trial:
     edf['mouse_id'] = metadata['mouseid']
@@ -937,25 +1112,55 @@ def create_extended_trials(trials=None, metadata=None, time=None, licks=None):
     edf['cumulative_volume'] = edf['reward_volume'].cumsum()
 
     # Compute response latency (kinda tricky):
-    edf['valid_response_licks'] = [[l for l in t.lick_times if l - t.change_time > t.response_window[0]] for _, t in edf.iterrows()]
-    edf['response_latency'] = edf['valid_response_licks'].map(lambda x: float('inf') if len(x) == 0 else x[0]) - edf['change_time']
+    edf['valid_response_licks'] = [[lk for lk in tt.lick_times
+                                   if lk - tt.change_time > tt.response_window[0]]  # noqa: E50
+                                   for _, tt in edf.iterrows()]
+
+    edf['response_latency'] = edf['valid_response_licks'].map(lambda x: float('inf')  # noqa: E501
+                                                              if len(x) == 0
+                                                              else x[0])
+    edf['response_latency'] -= edf['change_time']
+
     edf.drop('valid_response_licks', axis=1, inplace=True)
 
     # Complicated:
     assert len(edf.startdatetime.unique()) == 1
     np.testing.assert_array_equal(list(edf.index.values), np.arange(len(edf)))
-    edf['reward_rate'] = calculate_reward_rate(response_latency=edf['response_latency'].values, starttime=edf['starttime'].values)
+
+    _latency = edf['response_latency'].values
+    _starttime = edf['starttime'].values
+    edf['reward_rate'] = calculate_reward_rate(response_latency=_latency,
+                                               starttime=_starttime)
+
+    # this variable was created to bring code into
+    # line with pep8; deleting to protect against
+    # changing logic
+    del _latency
+    del _starttime
 
     # Response/trial metadata encoding:
+    _lt = edf['response_latency'] <= metadata['response_window'][1]
+    _gt = edf['response_latency'] >= metadata['response_window'][0]
     edf['response'] = (~pd.isnull(edf['change_time']) &
                        ~pd.isnull(edf['response_latency']) &
-                       (edf['response_latency'] >= metadata['response_window'][0]) &
-                       (edf['response_latency'] <= metadata['response_window'][1])).astype(np.float64)
-    edf['response_type'] = get_response_type(edf[['trial_type', 'response', 'rewarded']])
-    edf['color'] = [colormap(trial.trial_type, trial.response_type) for _, trial in edf.iterrows()]
+                       _gt &
+                       _lt).astype(np.float64)
+
+    # this variable was created to bring code into
+    # line with pep8; deleting to protect against
+    # changing logic
+    del _lt
+    del _gt
+
+    edf['response_type'] = get_response_type(edf[['trial_type',
+                                                  'response',
+                                                  'rewarded']])
+    edf['color'] = [colormap(trial.trial_type, trial.response_type)
+                    for _, trial in edf.iterrows()]
 
     # Reorder columns for backwards-compatibility:
     return edf[EDF_COLUMNS]
+
 
 def get_extended_trials(data, time=None):
     if time is None:
@@ -965,5 +1170,3 @@ def get_extended_trials(data, time=None):
                                   metadata=data_to_metadata(data, time),
                                   time=time,
                                   licks=data_to_licks(data, time))
-
-

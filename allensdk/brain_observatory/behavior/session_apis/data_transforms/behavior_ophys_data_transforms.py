@@ -9,6 +9,8 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
+import warnings
+
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
@@ -20,7 +22,6 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -138,12 +139,63 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
-    @memoize
-    def get_stimulus_timestamps(self):
+    def _load_stimulus_timestamps_and_delay(self):
+        """
+        Load the stimulus timestamps (uncorrected for
+        monitor delay) and the monitor delay
+        """
         sync_path = self.extractor.get_sync_file()
-        timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
-                            .corrected_stim_timestamps)
-        return np.array(timestamps)
+        aligner = OphysTimeAligner(sync_file=sync_path)
+        (self._stimulus_timestamps,
+         delta) = aligner.clipped_stim_timestamps
+
+        try:
+            delay = aligner.monitor_delay
+        except ValueError as ee:
+            rig_name = self.get_metadata()['rig_name']
+
+            warning_msg = 'Monitory delay calculation failed '
+            warning_msg += 'with ValueError\n'
+            warning_msg += f'    "{ee}"'
+            warning_msg += '\nlooking monitor delay up from table '
+            warning_msg += f'for rig: {rig_name} '
+
+            # see
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            # https://github.com/AllenInstitute/AllenSDK/issues/1916
+            delay_lookup = {'CAM2P.1': 0.020842,
+                            'CAM2P.2': 0.037566,
+                            'CAM2P.3': 0.021390,
+                            'CAM2P.4': 0.021102,
+                            'CAM2P.5': 0.021192,
+                            'MESO.1': 0.03613}
+
+            if rig_name not in delay_lookup:
+                msg = warning_msg
+                msg += f'\nrig_name {rig_name} not in lookup table'
+                raise RuntimeError(msg)
+            delay = delay_lookup[rig_name]
+            warning_msg += f'\ndelay: {delay} seconds'
+            warnings.warn(warning_msg)
+
+        self._monitor_delay = delay
+
+    def get_stimulus_timestamps(self):
+        """
+        Return a numpy array of stimulus timestamps uncorrected
+        for monitor delay (in seconds)
+        """
+        if not hasattr(self, '_stimulus_timestamps'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._stimulus_timestamps
+
+    def get_monitor_delay(self):
+        """
+        Return the monitor delay (in seconds)
+        """
+        if not hasattr(self, '_monitor_delay'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._monitor_delay
 
     @staticmethod
     def _process_ophys_plane_timestamps(
@@ -298,21 +350,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         data = self._behavior_stimulus_file()
         timestamps = self.get_stimulus_timestamps()
         return get_rewards(data, timestamps)
-
-    @memoize
-    def get_trials(self):
-
-        timestamps = self.get_stimulus_timestamps()
-        licks = self.get_licks()
-        rewards = self.get_rewards()
-        data = self._behavior_stimulus_file()
-
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
-
-        return trial_df
 
     @memoize
     def get_corrected_fluorescence_traces(self):
