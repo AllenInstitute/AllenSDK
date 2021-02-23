@@ -1,46 +1,100 @@
 from typing import Dict, List
-import warnings
 
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.stimulus_processing.util import \
     convert_filepath_caseinsensitive
+from allensdk.brain_observatory.stimulus_info import BrainObservatoryMonitor
 
 
-class StimulusImage(np.ndarray):
+class StimulusImage:
     """Container class for image stimuli"""
-    def __new__(cls, input_array: np.ndarray, name: str):
+
+    def __init__(self, warped: np.ndarray, unwarped: np.ndarray, name: str):
         """
         Parameters
         ----------
+        warped:
+            The warped stimulus image
+        unwarped:
+            The unwarped stimulus image
         name:
-            Name of the image
-        values
-            The unwarped image values
+            Name of the stimulus image
         """
-        obj = np.asarray(input_array).view(cls)
-        obj._name = name
-        return obj
+        self._name = name
+        self.warped = warped
+        self.unwarped = unwarped
 
     @property
     def name(self):
         return self._name
 
 
+class StimulusImageFactory:
+    """Factory for StimulusImage"""
+    _monitor = BrainObservatoryMonitor()
+
+    def from_pkl(self, input_array: np.ndarray, name: str) -> StimulusImage:
+        """Creates a StimulusImage from pkl input.
+        Image needs to be warped and preprocessed"""
+        resized, unwarped = self._get_unwarped(arr=input_array)
+        warped = self._get_warped(arr=resized)
+        image = StimulusImage(name=name, warped=warped, unwarped=unwarped)
+        return image
+
+    @staticmethod
+    def from_nwb(warped: np.ndarray, unwarped: np.ndarray,
+                 name: str) -> StimulusImage:
+        """Creates a StimulusImage from nwb input.
+        Image has already been warped and preprocessed"""
+        image = StimulusImage(name=name, warped=warped, unwarped=unwarped)
+        return image
+
+    def _get_warped(self, arr: np.ndarray):
+        """Note: The Stimulus image is warped when shown to the mice to account
+        "for distance of the flat screen to the eye at each point on
+        the monitor."""
+        return self._monitor.warp_image(img=arr)
+
+    def _get_unwarped(self, arr: np.ndarray):
+        """This produces the pixels that would be visible in the unwarped image
+        post-warping"""
+        # 1. Resize image to the same size as the monitor
+        resized_array = self._monitor.natural_scene_image_to_screen(
+            arr, origin='upper')
+        # 2. Remove unseen pixels
+        arr = self._exclude_unseen_pixels(arr=resized_array)
+
+        return resized_array, arr
+
+    def _exclude_unseen_pixels(self, arr: np.ndarray):
+        """After warping, some pixels are not visible on the screen.
+        This sets those pixels to nan to make downstream analysis easier."""
+        mask = self._monitor.get_mask()
+        arr = arr.astype(np.float)
+        arr *= mask
+        arr[arr == 0] = np.nan
+        return arr
+
+    def _warp(self, arr: np.ndarray) -> np.ndarray:
+        """The Stimulus image is warped when shown to the mice to account
+        "for distance of the flat screen to the eye at each point on
+        the monitor." This applies the warping."""
+        return self._monitor.warp_image(img=arr)
+
+
 class StimulusTemplate:
     """Container class for a collection of image stimuli"""
-    def __init__(self, image_set_name: str, image_attributes: List[dict],
-                 images: List[np.ndarray]):
+
+    def __init__(self, image_set_name: str, images: List[StimulusImage]):
         """
         Parameters
         ----------
         image_set_name:
             the name of the image set
-        image_attributes
-            List of image attributes as returned by the stimulus pkl
         images
-            List of images as returned by the stimulus pkl
+            List of images
         """
         self._image_set_name = image_set_name
 
@@ -50,9 +104,8 @@ class StimulusTemplate:
 
         self._images: Dict[str, StimulusImage] = {}
 
-        for attr, image in zip(image_attributes, images):
-            image_name = attr['image_name']
-            self.__add_image(name=image_name, values=image)
+        for image in images:
+            self._images[image.name] = image
 
     @property
     def image_set_name(self) -> str:
@@ -77,7 +130,10 @@ class StimulusTemplate:
 
     def to_dataframe(self) -> pd.DataFrame:
         index = pd.Index(self.image_names, name='image_name')
-        df = pd.DataFrame({'image': self.images}, index=index)
+        warped = [img.warped for img in self.images]
+        unwarped = [img.unwarped for img in self.images]
+        df = pd.DataFrame({'unwarped': unwarped, 'warped': warped},
+                          index=index)
         df.name = self._image_set_name
         return df
 
@@ -88,7 +144,7 @@ class StimulusTemplate:
         name:
             Name of the image
         values
-            The unwarped image values
+            The image values
         """
         image = StimulusImage(input_array=values, name=name)
         self._images[name] = image
@@ -118,7 +174,12 @@ class StimulusTemplate:
 
             for (img_name, self_img) in self.items():
                 other_img = other._images[img_name]
-                if not np.array_equal(self_img, other_img):
+                warped_equal = np.array_equal(
+                    self_img.warped, other_img.warped)
+                unwarped_equal = np.allclose(self_img.unwarped,
+                                             other_img.unwarped,
+                                             equal_nan=True)
+                if not (warped_equal and unwarped_equal):
                     return False
 
             return True
@@ -126,3 +187,35 @@ class StimulusTemplate:
             raise NotImplementedError(
                 "Cannot compare a StimulusTemplate with an object of type: "
                 f"{type(other)}!")
+
+
+class StimulusTemplateFactory:
+    """Factory for StimulusTemplate"""
+    @staticmethod
+    def from_pkl(image_set_name: str, image_attributes: List[dict],
+                 images: List[np.ndarray]) -> StimulusTemplate:
+        """Create StimulusTemplate from pkl input"""
+        stimulus_images = []
+        for i, image in enumerate(images):
+            factory = StimulusImageFactory()
+            name = image_attributes[i]['image_name']
+            stimulus_image = factory.from_pkl(name=name, input_array=image)
+            stimulus_images.append(stimulus_image)
+        return StimulusTemplate(image_set_name=image_set_name,
+                                images=stimulus_images)
+
+    @staticmethod
+    def from_nwb(image_set_name: str, image_attributes: List[dict],
+                 unwarped: List[np.ndarray], warped: List[np.ndarray]) -> \
+            StimulusTemplate:
+        """Create StimulusTemplate from nwb input."""
+        stimulus_images = []
+        for i, attrs in enumerate(image_attributes):
+            warped_image = warped[i]
+            unwarped_image = unwarped[i]
+            name = attrs['image_name']
+            stimulus_image = StimulusImageFactory.from_nwb(
+                name=name, warped=warped_image, unwarped=unwarped_image)
+            stimulus_images.append(stimulus_image)
+        return StimulusTemplate(image_set_name=image_set_name,
+                                images=stimulus_images)

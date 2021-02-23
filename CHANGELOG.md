@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [2.8.0] = TBD
 - Created lookup table to get monitor_delay for cases where calculation from data fails
 - If sync timestamp file has more timestamps than eye tracking moving has frame, trim excess timestamps (up to 15)
--
+- Session API returns both warped and unwarped stimulus images, and both are written to NWB
 
 ## [2.7.0] = 2021-02-19
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue

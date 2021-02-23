@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+    StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -200,12 +200,10 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
         image_attributes = [{'image_name': image_name}
                             for image_name in image_data.control_description]
-        stimulus_templates = StimulusTemplate(
-            image_set_name=image_set_name,
-            image_attributes=image_attributes,
-            images=image_data.data[:]
+        return StimulusTemplateFactory.from_nwb(
+            image_set_name=image_set_name, image_attributes=image_attributes,
+            warped=image_data.data[:], unwarped=image_data.unwarped[:]
         )
-        return stimulus_templates
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         stim_module = self.nwbfile.processing['stimulus']

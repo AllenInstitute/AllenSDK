@@ -9,7 +9,8 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+    StimulusTemplate, get_stimulus_templates
+
 
 # pytest fixtures:
 # nwbfile: test.brain_observatory.conftest
@@ -55,9 +56,13 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
                        obt_running_speed['speed'])
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_templates(nwbfile, stimulus_templates: StimulusTemplate,
+@pytest.mark.parametrize('roundtrip,behavior_stimuli_data_fixture',
+                         [(True, {}), (False, {})],
+                         indirect=["behavior_stimuli_data_fixture"])
+def test_add_stimulus_templates(nwbfile, behavior_stimuli_data_fixture,
                                 roundtrip, roundtripper):
+    stimulus_templates = get_stimulus_templates(behavior_stimuli_data_fixture)
+
     nwb.add_stimulus_template(nwbfile, stimulus_templates)
 
     if roundtrip:
@@ -67,10 +72,7 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates: StimulusTemplate,
 
     stimulus_templates_obt = obt.get_stimulus_templates()
 
-    for img_name in stimulus_templates_obt:
-        assert np.array_equal(
-            a1=stimulus_templates[img_name],
-            a2=stimulus_templates_obt[img_name])
+    assert stimulus_templates_obt == stimulus_templates
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])

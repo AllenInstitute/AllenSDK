@@ -12,8 +12,13 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+    StimulusTemplateFactory
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
+
+
+def get_resources_dir():
+    behavior_dir = os.path.dirname(__file__)
+    return os.path.join(behavior_dir, 'resources')
 
 
 def pytest_assertrepr_compare(config, op, left, right):
@@ -55,7 +60,7 @@ def stimulus_templates():
     images = [np.zeros((4, 4)), np.ones((4, 4))]
 
     image_attributes = [{'image_name': 'test1'}, {'image_name': 'test2'}]
-    stimulus_templates = StimulusTemplate(
+    stimulus_templates = StimulusTemplateFactory.from_pkl(
         image_set_name='test', image_attributes=image_attributes,
         images=images)
     return stimulus_templates
@@ -330,7 +335,7 @@ def behavior_stimuli_data_fixture(request):
     grating_phase = request.param.get("grating_phase", None)
     grating_spatial_frequency = request.param.get("grating_spatial_frequency",
                                                   None)
-    resources_dir = os.path.join(os.path.dirname(__file__), 'resources')
+    resources_dir = get_resources_dir()
 
     data = {
         "items": {
@@ -340,6 +345,8 @@ def behavior_stimuli_data_fixture(request):
                         "set_log": images_set_log,
                         "draw_log": images_draw_log,
                         "image_path": os.path.join(resources_dir,
+                                                   'stimulus_template',
+                                                   'input',
                                                    'test_image_set.pkl')
                     },
                     "grating": {
