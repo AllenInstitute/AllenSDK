@@ -94,6 +94,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - 2.8.0
 -----------------------------------------------------------------------
 - Created lookup table to get monitor_delay for cases where calculation from data fails
+- If sync timestamp file has more timestamps than eye tracking moving has frame, trim excess timestamps (up to 15)
 -
 
 What's New - 2.7.0
