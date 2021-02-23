@@ -228,6 +228,66 @@ def test_get_licks_excess(monkeypatch):
                                              decimal=10)
 
 
+def test_empty_licks(monkeypatch):
+    """
+    Test that BehaviorOphysDataTransforms.get_licks() in the case where
+    there are no licks
+    """
+
+    def dummy_init(self):
+        self.logger = logging.getLogger('dummy')
+        pass
+
+    def dummy_stimulus_timestamps(self):
+        return np.arange(0, 2.0, 0.01)
+
+    def dummy_stimulus_file(self):
+
+        # in this test, the trial log exists to make sure
+        # that get_licks is *not* reading the licks from
+        # here
+        trial_log = []
+        trial_log.append({'licks': [(-1.0, 100), (-1.0, 200)]})
+        trial_log.append({'licks': [(-1.0, 300), (-1.0, 400)]})
+        trial_log.append({'licks': [(-1.0, 500), (-1.0, 600)]})
+
+        lick_events = []
+        lick_events = [{'lick_events': lick_events}]
+
+        data = {}
+        data['items'] = {}
+        data['items']['behavior'] = {}
+        data['items']['behavior']['trial_log'] = trial_log
+        data['items']['behavior']['lick_sensors'] = lick_events
+        return data
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysDataTransforms,
+                    '__init__',
+                    dummy_init)
+
+        ctx.setattr(BehaviorOphysDataTransforms,
+                    'get_stimulus_timestamps',
+                    dummy_stimulus_timestamps)
+
+        ctx.setattr(BehaviorOphysDataTransforms,
+                    '_behavior_stimulus_file',
+                    dummy_stimulus_file)
+
+        xforms = BehaviorOphysDataTransforms()
+
+        licks = xforms.get_licks()
+
+        expected_dict = {'time': [],
+                         'frame': []}
+        expected_df = pd.DataFrame(expected_dict)
+        assert expected_df.columns.equals(licks.columns)
+        np.testing.assert_array_equal(expected_df.time.to_numpy(),
+                                      licks.time.to_numpy())
+        np.testing.assert_array_equal(expected_df.frame.to_numpy(),
+                                      licks.frame.to_numpy())
+
+
 def test_get_licks_failure(monkeypatch):
     """
     Test that BehaviorOphysDataTransforms.get_licks() fails if the last lick

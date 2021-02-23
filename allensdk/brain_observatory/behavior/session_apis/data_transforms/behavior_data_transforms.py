@@ -101,11 +101,12 @@ class BehaviorDataTransforms(BehaviorBase):
         # This bugfix copied from
         # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract.py#L640-L647
 
-        if lick_frames[-1] == len(stimulus_timestamps):
-            lick_frames = lick_frames[:-1]
-            self.logger.error('removed last lick - '
-                              'it fell outside of stimulus_timestamps '
-                              'range')
+        if len(lick_frames) > 0:
+            if lick_frames[-1] == len(stimulus_timestamps):
+                lick_frames = lick_frames[:-1]
+                self.logger.error('removed last lick - '
+                                  'it fell outside of stimulus_timestamps '
+                                  'range')
 
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
         return pd.DataFrame({"time": lick_times, "frame": lick_frames})
