@@ -4,9 +4,8 @@ import numpy as np
 from allensdk.brain_observatory.behavior.metadata_processing import (
     description_dict, get_task_parameters, get_expt_description)
 
-
-def test_get_task_parameters():
-    data = {
+@pytest.mark.parametrize("data, expected",
+    [({
         "items": {
             "behavior": {
                 "config": {
@@ -32,20 +31,23 @@ def test_get_task_parameters():
                 },
             }
         }
-    }
+     },
+     {
+         "blank_duration_sec": [0.5, 0.6],
+         "stimulus_duration_sec": 6.0,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "stage": "TRAINING_3_images_A",
+         "stimulus": "images",
+         "stimulus_distribution": "geometric",
+         "task": "DoC_untranslated",
+         "n_stimulus_frames": 10
+     })
+    ]
+)
+def test_get_task_parameters(data, expected):
     actual = get_task_parameters(data)
-    expected = {
-        "blank_duration_sec": [0.5, 0.6],
-        "stimulus_duration_sec": 6.0,
-        "omitted_flash_fraction": 0.05,
-        "response_window_sec": [0.15, 0.75],
-        "reward_volume": 0.007,
-        "stage": "TRAINING_3_images_A",
-        "stimulus": "images",
-        "stimulus_distribution": "geometric",
-        "task": "DoC_untranslated",
-        "n_stimulus_frames": 10
-    }
     for k, v in actual.items():
         # Special nan checking since pytest doesn't do it well
         try:
