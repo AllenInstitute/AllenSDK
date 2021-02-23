@@ -90,6 +90,23 @@ class BehaviorDataTransforms(BehaviorBase):
         stimulus_timestamps = self.get_stimulus_timestamps()
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
+
+        # there's an occasional bug where the number of logged
+        # frames is one greater than the number of vsync intervals.
+        # If the animal licked on this last frame it will cause an
+        # error here. This fixes the problem.
+        # see: https://github.com/AllenInstitute/visual_behavior_analysis/issues/572  # noqa: E501
+        #    & https://github.com/AllenInstitute/visual_behavior_analysis/issues/379  # noqa:E501
+        #
+        # This bugfix copied from
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract.py#L640-L647
+
+        if lick_frames[-1] == len(stimulus_timestamps):
+            lick_frames = lick_frames[:-1]
+            self.logger.error('removed last lick - '
+                              'it fell outside of stimulus_timestamps '
+                              'range')
+
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
         return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
