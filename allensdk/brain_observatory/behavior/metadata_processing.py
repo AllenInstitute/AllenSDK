@@ -57,23 +57,22 @@ def get_expt_description(session_type: str) -> str:
 
 def get_task_parameters(data):
     behavior = data["items"]["behavior"]
+    config = behavior["config"]
+    doc = config["DoC"]
 
     task_parameters = {}
     task_parameters['blank_duration_sec'] = \
-        [float(x) for x in behavior['config']['DoC']['blank_duration_range']]
-    task_parameters['stimulus_duration_sec'] = \
-        behavior['config']['DoC']['stimulus_window']
+        [float(x) for x in doc['blank_duration_range']]
+    task_parameters['stimulus_duration_sec'] = doc['stimulus_window']
     task_parameters['omitted_flash_fraction'] = \
         behavior['params'].get('flash_omit_probability', float('nan'))
     task_parameters['response_window_sec'] = \
-        [float(x) for x in behavior["config"]["DoC"]["response_window"]]
-    task_parameters['reward_volume'] = \
-        behavior["config"]["reward"]["reward_volume"]
+        [float(x) for x in doc["response_window"]]
+    task_parameters['reward_volume'] = config["reward"]["reward_volume"]
     task_parameters['stage'] = behavior["params"]["stage"]
     task_parameters['stimulus'] = next(iter(behavior["stimuli"]))
-    task_parameters['stimulus_distribution'] = \
-        behavior["config"]["DoC"]["change_time_dist"]
-    task_parameters['task'] = behavior["config"]["behavior"]["task_id"]
+    task_parameters['stimulus_distribution'] = doc["change_time_dist"]
+    task_parameters['task'] = config["behavior"]["task_id"]
     n_stimulus_frames = 0
     for stim_type, stim_table in behavior["stimuli"].items():
         n_stimulus_frames += sum(stim_table.get("draw_log", []))
