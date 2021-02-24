@@ -416,7 +416,8 @@ def add_stimulus_template(nwbfile: NWBFile,
         unwarped_images.append(image_data.unwarped)
         warped_images.append(image_data.warped)
 
-    image_index = list(range(len(image_names)))
+    image_index = np.zeros(len(image_names))
+    image_index[:] = np.nan
 
     visual_stimulus_image_series = \
         StimulusTemplateExtension(
@@ -517,7 +518,10 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
                 cleaned_table[colname] = series.transform(str)
 
         interval_description = (f"Presentation times and stimuli details "
-                                f"for '{stim_name}' stimuli")
+                                f"for '{stim_name}' stimuli. "
+                                f"\n"
+                                f"Note: image_name references "
+                                f"control_description in stimulus/templates")
         presentation_interval = create_stimulus_presentation_time_interval(
             name=f"{stim_name}_presentations",
             description=interval_description,

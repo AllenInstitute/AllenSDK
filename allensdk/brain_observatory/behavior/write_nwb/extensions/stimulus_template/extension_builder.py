@@ -23,7 +23,10 @@ def main():
     stimulus_template_spec = NWBGroupSpec(
         neurodata_type_def='StimulusTemplate',
         neurodata_type_inc='ImageSeries',
-        doc='Each image shown to the animals is warped to account for '
+        doc='Note: image names in control_description are referenced by '
+            'stimulus/presentation table as well as intervals '
+            '\n'
+            'Each image shown to the animals is warped to account for '
             'distance and eye position relative to the monitor. This  '
             'extension stores the warped images that were shown to the animal '
             'as well as an unwarped version of each image in which a mask has '
