@@ -41,7 +41,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stage": "TRAINING_3_images_A",
          "stimulus": "images",
          "stimulus_distribution": "geometric",
-         "task": "DoC_untranslated",
+         "task": "change detection",
          "n_stimulus_frames": 10
      }, id='basic'),
     pytest.param({
@@ -80,7 +80,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stage": "TRAINING_3_images_A",
          "stimulus": "images",
          "stimulus_distribution": "geometric",
-         "task": "DoC_untranslated",
+         "task": "change detection",
          "n_stimulus_frames": 10
      }, id='single_value_blank_duration'),
      pytest.param({
@@ -119,7 +119,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stage": "TRAINING_3_images_A",
          "stimulus": "grating",
          "stimulus_distribution": "geometric",
-         "task": "DoC_untranslated",
+         "task": "change detection",
          "n_stimulus_frames": 10
      }, id='stimulus_duration_from_grating'),
      pytest.param({
@@ -158,7 +158,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stage": "TRAINING_3_images_A",
          "stimulus": "grating",
          "stimulus_distribution": "geometric",
-         "task": "DoC_untranslated",
+         "task": "change detection",
          "n_stimulus_frames": 10
      }, id='stimulus_duration_none')
     ]
@@ -175,6 +175,44 @@ def test_get_task_parameters(data, expected):
         except (TypeError, ValueError):
             assert expected[k] == v
     assert list(actual.keys()) == list(expected.keys())
+
+
+def test_get_task_parameters_task_id_exception():
+    """
+    Test that, when task_id has an unexpected value,
+    get_task_parameters throws the correct exception
+    """
+    input_data = {
+                  "items": {
+                      "behavior": {
+                          "config": {
+                               "DoC": {
+                                   "blank_duration_range": (0.5, 0.6),
+                                   "response_window": [0.15, 0.75],
+                                   "change_time_dist": "geometric",
+                               },
+                              "reward": {
+                                  "reward_volume": 0.007,
+                               },
+                               "behavior": {
+                                   "task_id": "junk",
+                               },
+                          },
+                           "params": {
+                               "stage": "TRAINING_3_images_A",
+                               "flash_omit_probability": 0.05
+                           },
+                           "stimuli": {
+                               "images": {"draw_log": [1]*10,
+                                          "flash_interval_sec": [0.32, -1.0]}
+                           },
+                       }
+                   }
+                }
+
+    with pytest.raises(RuntimeError) as error:
+        _ = get_task_parameters(input_data)
+    assert "does not know how to parse 'task_id'" in error.value.args[0]
 
 
 @pytest.mark.parametrize("session_type, expected_description", [

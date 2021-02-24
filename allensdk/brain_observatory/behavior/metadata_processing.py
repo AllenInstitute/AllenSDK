@@ -95,7 +95,15 @@ def get_task_parameters(data):
     task_parameters['stage'] = behavior["params"]["stage"]
     task_parameters['stimulus'] = next(iter(behavior["stimuli"]))
     task_parameters['stimulus_distribution'] = doc["change_time_dist"]
-    task_parameters['task'] = config["behavior"]["task_id"]
+
+    task_id = config['behavior']['task_id']
+    if 'DoC' in task_id:
+        task_parameters['task'] = 'change detection'
+    else:
+        msg = "metadata_processing.get_task_parameters does not "
+        msg += f"know how to parse 'task_id' = {task_id}"
+        raise RuntimeError(msg)
+
     n_stimulus_frames = 0
     for stim_type, stim_table in behavior["stimuli"].items():
         n_stimulus_frames += sum(stim_table.get("draw_log", []))
