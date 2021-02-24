@@ -98,7 +98,9 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
 @pytest.mark.parametrize("behavior_stimuli_data_fixture", ({},),
                          indirect=["behavior_stimuli_data_fixture"])
 def test_get_stimulus_templates(behavior_stimuli_data_fixture):
-    templates = get_stimulus_templates(behavior_stimuli_data_fixture)
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture,
+                                       pkl_path="mock_path",
+                                       grating_images_dict={})
 
     assert templates.image_set_name == 'test_image_set'
     assert len(templates) == 1
