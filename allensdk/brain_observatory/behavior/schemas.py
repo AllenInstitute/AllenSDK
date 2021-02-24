@@ -232,7 +232,7 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Volume of water (in mL) delivered as reward',
         required=True,
     )
-    autoreward_volume = fields.Float(
+    auto_reward_volume = fields.Float(
         doc='Volume of water (in mL) delivered as an automatic reward',
         required=True,
     )

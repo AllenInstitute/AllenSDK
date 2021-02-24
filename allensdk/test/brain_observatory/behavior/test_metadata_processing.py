@@ -44,7 +44,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "change detection",
          "n_stimulus_frames": 10,
-         "autoreward_volume": 0.002
+         "auto_reward_volume": 0.002
      }, id='basic'),
     pytest.param({
         "items": {
@@ -85,7 +85,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "change detection",
          "n_stimulus_frames": 10,
-         "autoreward_volume": 0.002
+         "auto_reward_volume": 0.002
      }, id='single_value_blank_duration'),
      pytest.param({
         "items": {
@@ -126,7 +126,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "change detection",
          "n_stimulus_frames": 10,
-         "autoreward_volume": 0.002
+         "auto_reward_volume": 0.002
      }, id='stimulus_duration_from_grating'),
      pytest.param({
         "items": {
@@ -167,7 +167,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "change detection",
          "n_stimulus_frames": 10,
-         "autoreward_volume": 0.002
+         "auto_reward_volume": 0.002
      }, id='stimulus_duration_none')
     ]
 )
