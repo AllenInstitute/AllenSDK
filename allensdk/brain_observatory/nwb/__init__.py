@@ -520,7 +520,7 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_time_inter
         interval_description = (f"Presentation times and stimuli details "
                                 f"for '{stim_name}' stimuli."
                                 f""
-                                f"Note: image_name reference "
+                                f"Note: image_name references "
                                 f"control_description in stimulus/templates")
         presentation_interval = create_stimulus_presentation_time_interval(
             name=f"{stim_name}_presentations",
