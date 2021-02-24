@@ -96,6 +96,18 @@ def get_task_parameters(data: Dict) -> Dict:
         raise RuntimeError(msg) 
 
     stim_duration = stimuli[stim_key]['flash_interval_sec']
+
+    # from discussion in
+    # https://github.com/AllenInstitute/AllenSDK/issues/1572
+    #
+    # 'flash_interval' contains (stimulus_duration, gray_screen_duration)
+    # (as @matchings said above). That second value is redundant with
+    # 'blank_duration_range'. I'm not sure what would happen if they were
+    # set to be conflicting values in the params. But it looks like
+    # they're always consistent. It should always be (0.25, 0.5),
+    # except for TRAINING_0 and TRAINING_1, which have statically
+    # displayed stimuli (no flashes).
+
     if stim_duration is None:
         stim_duration = np.NaN
     else:
