@@ -1,4 +1,5 @@
 import re
+import numpy as np
 
 description_dict = {
     # key is a regex and value is returned on match
