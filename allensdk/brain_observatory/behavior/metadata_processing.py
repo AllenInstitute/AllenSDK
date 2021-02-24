@@ -64,12 +64,8 @@ def get_task_parameters(data):
 
     task_parameters = {}
 
-    blank_duration = doc['blank_duration_range']
-    if len(set(blank_duration)) == 1:
-        task_parameters['blank_duration_sec'] = float(blank_duration[0])
-    else:
-        task_parameters['blank_duration_sec'] = \
-            [float(x) for x in doc['blank_duration_range']]
+    task_parameters['blank_duration_sec'] = \
+        [float(x) for x in doc['blank_duration_range']]
 
     if 'images' in stimuli:
         stim_key = 'images'

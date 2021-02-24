@@ -72,7 +72,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
         }
      },
      {
-         "blank_duration_sec": 0.5,
+         "blank_duration_sec": [0.5, 0.5],
          "stimulus_duration_sec": 0.32,
          "omitted_flash_fraction": 0.05,
          "response_window_sec": [0.15, 0.75],
@@ -82,7 +82,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus_distribution": "geometric",
          "task": "DoC_untranslated",
          "n_stimulus_frames": 10
-     }, id='scalar_blank_duration'),
+     }, id='single_value_blank_duration'),
      pytest.param({
         "items": {
             "behavior": {
@@ -111,7 +111,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
         }
      },
      {
-         "blank_duration_sec": 0.5,
+         "blank_duration_sec": [0.5, 0.5],
          "stimulus_duration_sec": 0.34,
          "omitted_flash_fraction": 0.05,
          "response_window_sec": [0.15, 0.75],
@@ -150,7 +150,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
         }
      },
      {
-         "blank_duration_sec": 0.5,
+         "blank_duration_sec": [0.5, 0.5],
          "stimulus_duration_sec": np.NaN,
          "omitted_flash_fraction": 0.05,
          "response_window_sec": [0.15, 0.75],
