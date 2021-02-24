@@ -57,6 +57,7 @@ def get_expt_description(session_type: str) -> str:
 
 def get_task_parameters(data):
     behavior = data["items"]["behavior"]
+    stimuli = behavior['stimuli']
     config = behavior["config"]
     doc = config["DoC"]
 
@@ -69,7 +70,26 @@ def get_task_parameters(data):
         task_parameters['blank_duration_sec'] = \
             [float(x) for x in doc['blank_duration_range']]
 
-    task_parameters['stimulus_duration_sec'] = doc['stimulus_window']
+    if 'images' in stimuli:
+        stim_key = 'images'
+    elif 'grating' in stimuli:
+        stim_key = 'grating'
+    else:
+        msg = "Cannot get stimulus_duration_sec\n"
+        msg += "'images' and/or 'grating' not a valid "
+        msg += "key in pickle file under "
+        msg += "['items']['behavior']['stimuli']\n"
+        msg += f"keys: {list(stimuli.keys())}"
+        raise RuntimeError(msg) 
+
+    stim_duration = stimuli[stim_key]['flash_interval_sec']
+    if stim_duration is None:
+        stim_duration = np.NaN
+    else:
+        stim_duration = stim_duration[0]
+
+    task_parameters['stimulus_duration_sec'] = stim_duration
+
     task_parameters['omitted_flash_fraction'] = \
         behavior['params'].get('flash_omit_probability', float('nan'))
     task_parameters['response_window_sec'] = \

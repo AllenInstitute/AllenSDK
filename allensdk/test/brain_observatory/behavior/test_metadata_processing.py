@@ -11,7 +11,6 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                 "config": {
                     "DoC": {
                         "blank_duration_range": (0.5, 0.6),
-                        "stimulus_window": 6.0,
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
                     },
@@ -27,14 +26,15 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                     "flash_omit_probability": 0.05
                 },
                 "stimuli": {
-                    "images": {"draw_log": [1]*10}
+                    "images": {"draw_log": [1]*10,
+                               "flash_interval_sec": [0.32, -1.0]}
                 },
             }
         }
      },
      {
          "blank_duration_sec": [0.5, 0.6],
-         "stimulus_duration_sec": 6.0,
+         "stimulus_duration_sec": 0.32,
          "omitted_flash_fraction": 0.05,
          "response_window_sec": [0.15, 0.75],
          "reward_volume": 0.007,
@@ -50,7 +50,6 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                 "config": {
                     "DoC": {
                         "blank_duration_range": (0.5, 0.5),
-                        "stimulus_window": 6.0,
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
                     },
@@ -66,14 +65,15 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                     "flash_omit_probability": 0.05
                 },
                 "stimuli": {
-                    "images": {"draw_log": [1]*10}
+                    "images": {"draw_log": [1]*10,
+                               "flash_interval_sec": [0.32, -1.0]}
                 },
             }
         }
      },
      {
          "blank_duration_sec": 0.5,
-         "stimulus_duration_sec": 6.0,
+         "stimulus_duration_sec": 0.32,
          "omitted_flash_fraction": 0.05,
          "response_window_sec": [0.15, 0.75],
          "reward_volume": 0.007,
