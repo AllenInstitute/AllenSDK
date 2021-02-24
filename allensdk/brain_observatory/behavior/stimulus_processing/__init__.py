@@ -164,8 +164,7 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
 
 
 def get_stimulus_templates(pkl: dict,
-                           pkl_path: str,
-                           grating_images_dict: dict
+                           grating_images_dict: Optional[dict] = None
                            ) -> Optional[StimulusTemplate]:
     """
     Gets images presented during experiments from the behavior stimulus file
@@ -175,11 +174,9 @@ def get_stimulus_templates(pkl: dict,
     ----------
     pkl : dict
         Loaded pkl dict containing data for the presented stimuli.
-    pkl_path : str
-        The filepath of the *.pkl file which the pkl data was loaded from.
     grating_images_dict : Optional[dict]
         Because behavior pkl files do not contain image versions of grating
-        stimuli, they must be obtained an external source. The
+        stimuli, they must be obtained from an external source. The
         grating_images_dict is a nested dictionary where top level keys
         correspond to grating image names (e.g. 'gratings_0.0',
         'gratings_270.0') as they would appear in table returned by
@@ -209,6 +206,11 @@ def get_stimulus_templates(pkl: dict,
             images=images['images']
         )
     elif 'grating' in pkl_stimuli:
+        if (grating_images_dict is None) or (not grating_images_dict):
+            raise RuntimeError("The 'grating_images_dict' param MUST "
+                               "be provided to get stimulus templates "
+                               "because this pkl data contains "
+                               "gratings presentations.")
         gratings_metadata = get_gratings_metadata(
             pkl_stimuli).to_dict(orient='records')
 
@@ -228,8 +230,8 @@ def get_stimulus_templates(pkl: dict,
         )
     else:
         warnings.warn(
-                "Could not determine stimulus template images from pkl file "
-                f"({pkl_path}). The pkl stimuli nested dict "
+                "Could not determine stimulus template images from pkl file. "
+                f"The pkl stimuli nested dict "
                 "(pkl['items']['behavior']['stimuli']) contained neither "
                 "'images' nor 'grating' but instead: "
                 f"'{pkl_stimuli.keys()}'"

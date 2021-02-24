@@ -62,7 +62,6 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed,
 def test_add_stimulus_templates(nwbfile, behavior_stimuli_data_fixture,
                                 roundtrip, roundtripper):
     stimulus_templates = get_stimulus_templates(behavior_stimuli_data_fixture,
-                                                pkl_path="mock_path",
                                                 grating_images_dict={})
 
     nwb.add_stimulus_template(nwbfile, stimulus_templates)

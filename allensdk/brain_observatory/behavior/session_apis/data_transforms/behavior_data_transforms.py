@@ -288,9 +288,7 @@ class BehaviorDataTransforms(BehaviorBase):
         }
 
         pkl = self._behavior_stimulus_file()
-        pkl_path = self.extractor.get_behavior_stimulus_file()
         return get_stimulus_templates(pkl=pkl,
-                                      pkl_path=pkl_path,
                                       grating_images_dict=grating_images_dict)
 
     def get_monitor_delay(self) -> float:
