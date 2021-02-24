@@ -174,7 +174,7 @@ class BehaviorSession(LazyPropertyMixin):
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
-        rpdf = self.get_rpdf()
+        rpdf = self.get_rolling_performance_df()
         engaged_trial_mask = (
                 rpdf['reward_rate'] >
                 engaged_trial_reward_rate_threshold)
