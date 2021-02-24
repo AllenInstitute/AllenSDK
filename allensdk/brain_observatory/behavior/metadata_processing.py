@@ -1,3 +1,4 @@
+from typing import Dict
 import re
 import numpy as np
 
@@ -56,7 +57,22 @@ def get_expt_description(session_type: str) -> str:
     return match.popitem()[1]
 
 
-def get_task_parameters(data):
+def get_task_parameters(data: Dict) -> Dict:
+    """
+    Read task_parameters metadata from the behavior stimulus pickle file.
+
+    Parameters
+    ----------
+    data: dict
+        The nested dict read in from the behavior stimulus pickle file.
+        All of the data expected by this method lives under
+        data['items']['behavior']
+
+    Returns
+    -------
+    dict
+        A dict containing the task_parameters associated with this session.
+    """
     behavior = data["items"]["behavior"]
     stimuli = behavior['stimuli']
     config = behavior["config"]
