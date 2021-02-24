@@ -26,11 +26,16 @@ def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
                              as what stimuli was presented
     """
     stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
-    # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
-    stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
+    # workaround to rename columns to harmonize with visual
+    # coding and rebase timestamps to sync time
+    stimulus_table.insert(loc=0, column='flash_number',
+                          value=np.arange(0, len(stimulus_table)))
     stimulus_table = stimulus_table.rename(
-        columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number': 'stimulus_presentations_id'})
-    stimulus_table.start_time = [stimulus_timestamps[int(start_frame)] for start_frame in
+        columns={'frame': 'start_frame',
+                 'time': 'start_time',
+                 'flash_number': 'stimulus_presentations_id'})
+    stimulus_table.start_time = [stimulus_timestamps[int(start_frame)]
+                                 for start_frame in
                                  stimulus_table.start_frame.values]
     end_time = []
     for end_frame in stimulus_table.end_frame.values:
@@ -60,15 +65,17 @@ def get_images_dict(pkl) -> Dict:
     -------
     Dict:
         A dictionary containing keys images, metadata, and image_attributes.
-        These correspond to paths to images to images presented, metadata
+        These correspond to paths to image arrays presented, metadata
         on the whole set of images, and metadata on specific images,
         respectively.
 
     """
     # Sometimes the source is a zipped pickle:
-    metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
+    pkl_stimuli = pkl["items"]["behavior"]["stimuli"]
+    metadata = {'image_set': pkl_stimuli["images"]["image_path"]}
 
-    # Get image file name; these are encoded case-insensitive in the pickle file :/
+    # Get image file name;
+    # These are encoded case-insensitive in the pickle file :/
     filename = convert_filepath_caseinsensitive(metadata['image_set'])
 
     image_set = load_pickle(open(filename, 'rb'))
@@ -108,8 +115,11 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
     this experiment it returns an empty dataframe with the expected columns.
     Parameters
     ----------
-    stimuli: the stimuli loaded from the experiment pkl file
-    start_idx: the index to start index column
+    stimuli:
+        The stimuli field (pkl['items']['behavior']['stimuli']) loaded
+        from the experiment pkl file.
+    start_idx:
+        The index to start index column
 
     Returns
     -------
@@ -207,10 +217,8 @@ def get_stimulus_templates(pkl: dict,
         for image_attrs in gratings_metadata:
             image_name = image_attrs['image_name']
             grating_imgs_sub_dict = grating_images_dict[image_name]
-            unwarped_array = imageio.imread(grating_imgs_sub_dict['unwarped'])
-            warped_array = imageio.imread(grating_imgs_sub_dict['warped'])
-            unwarped_images.append(np.asarray(unwarped_array))
-            warped_images.append(np.asarray(warped_array))
+            unwarped_images.append(grating_imgs_sub_dict['unwarped'])
+            warped_images.append(grating_imgs_sub_dict['warped'])
 
         return StimulusTemplateFactory.from_processed(
             image_set_name='grating',
@@ -252,7 +260,8 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
     if 'images' in stimuli:
         images = get_images_dict(pkl)
         stimulus_index_df = pd.DataFrame(images['image_attributes'])
-        image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+        image_set_filename = convert_filepath_caseinsensitive(
+            images['metadata']['image_set'])
         stimulus_index_df['image_set'] = get_image_set_name(
             image_set_path=image_set_filename)
     else:
@@ -419,8 +428,8 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
 
             for idx, (epoch_start, epoch_end,) in enumerate(draw_epochs):
                 # visual stimulus doesn't actually change until start of
-                # following frame, so we need to bump the epoch_start & epoch_end
-                # to get the timing right
+                # following frame, so we need to bump the
+                # epoch_start & epoch_end to get the timing right
                 epoch_start += 1
                 epoch_end += 1
 
@@ -431,7 +440,8 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                     "end_frame": epoch_end,
                     "time": time[epoch_start],
                     "duration": time[epoch_end] - time[epoch_start],
-                    # this will always work because an epoch will never occur near the end of time
+                    # this will always work because an epoch
+                    # will never occur near the end of time
                     "omitted": False,
                 })
 
@@ -446,14 +456,17 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
         omitted_flash_frame_log = dict()
 
     omitted_flash_list = []
-
-    for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
+    for _, omitted_flash_frames in omitted_flash_frame_log.items():
         stim_frames = visual_stimuli_df['frame'].values
         omitted_flash_frames = np.array(omitted_flash_frames)
 
-        #  Test offsets of omitted flash frames to see if they are in the stim log
+        # Test offsets of omitted flash frames
+        # to see if they are in the stim log
         offsets = np.arange(-3, 4)
-        offset_arr = np.add(np.repeat(omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1), offsets)
+        offset_arr = np.add(
+            np.repeat(omitted_flash_frames[:, np.newaxis],
+                      offsets.shape[0], axis=1),
+            offsets)
         matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
 
         #  Remove omitted flashes that also exist in the stimulus log
@@ -465,8 +478,11 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
 
     omitted = np.ones_like(omitted_flash_list).astype(bool)
     time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time,
+    omitted_df = pd.DataFrame({'omitted': omitted,
+                               'frame': omitted_flash_list,
+                               'time': time,
                                'image_name': 'omitted'})
 
-    df = pd.concat((visual_stimuli_df, omitted_df), sort=False).sort_values('frame').reset_index()
+    df = pd.concat((visual_stimuli_df, omitted_df),
+                   sort=False).sort_values('frame').reset_index()
     return df
