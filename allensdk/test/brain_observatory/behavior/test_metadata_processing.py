@@ -215,6 +215,45 @@ def test_get_task_parameters_task_id_exception():
     assert "does not know how to parse 'task_id'" in error.value.args[0]
 
 
+def test_get_task_parameters_flash_duration_exception():
+    """
+    Test that, when 'images' or 'grating' not present in 'stimuli',
+    get_task_parameters throws the correct exception
+    """
+    input_data = {
+                  "items": {
+                      "behavior": {
+                          "config": {
+                               "DoC": {
+                                   "blank_duration_range": (0.5, 0.6),
+                                   "response_window": [0.15, 0.75],
+                                   "change_time_dist": "geometric",
+                               },
+                              "reward": {
+                                  "reward_volume": 0.007,
+                               },
+                               "behavior": {
+                                   "task_id": "DoC",
+                               },
+                          },
+                           "params": {
+                               "stage": "TRAINING_3_images_A",
+                               "flash_omit_probability": 0.05
+                           },
+                           "stimuli": {
+                               "junk": {"draw_log": [1]*10,
+                                        "flash_interval_sec": [0.32, -1.0]}
+                           },
+                       }
+                   }
+                }
+
+    with pytest.raises(RuntimeError) as error:
+        _ = get_task_parameters(input_data)
+    shld_be = "'images' and/or 'grating' not a valid key"
+    assert shld_be in error.value.args[0]
+
+
 @pytest.mark.parametrize("session_type, expected_description", [
     ("OPHYS_0_images_Z", description_dict[r"\AOPHYS_0_images"]),
     ("OPHYS_1_images_A", description_dict[r"\AOPHYS_[1|3]_images"]),
