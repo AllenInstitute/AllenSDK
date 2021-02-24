@@ -217,7 +217,7 @@ def task_parameters():
             "omitted_flash_fraction": float('nan'),
             "response_window_sec": [0.15, 0.75],
             "reward_volume": 0.007,
-            "stage": "OPHYS_6_images_B",
+            "session_type": "OPHYS_6_images_B",
             "stimulus": "images",
             "stimulus_distribution": "geometric",
             "task": "DoC_untranslated",

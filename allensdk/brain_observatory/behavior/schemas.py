@@ -232,7 +232,7 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Volume of water (in mL) delivered as reward',
         required=True,
     )
-    stage = fields.String(
+    session_type = fields.String(
         doc='Stage of behavioral task',
         required=True,
     )
