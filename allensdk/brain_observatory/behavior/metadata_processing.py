@@ -93,7 +93,7 @@ def get_task_parameters(data: Dict) -> Dict:
         msg += "key in pickle file under "
         msg += "['items']['behavior']['stimuli']\n"
         msg += f"keys: {list(stimuli.keys())}"
-        raise RuntimeError(msg) 
+        raise RuntimeError(msg)
 
     stim_duration = stimuli[stim_key]['flash_interval_sec']
 
