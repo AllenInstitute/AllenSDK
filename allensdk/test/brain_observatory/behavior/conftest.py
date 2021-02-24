@@ -221,7 +221,8 @@ def task_parameters():
             "stimulus": "images",
             "stimulus_distribution": "geometric",
             "task": "DoC_untranslated",
-            "n_stimulus_frames": 69882
+            "n_stimulus_frames": 69882,
+            "autoreward_volume": 0.005
             }
 
 

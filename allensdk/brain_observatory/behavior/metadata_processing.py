@@ -92,6 +92,7 @@ def get_task_parameters(data):
     task_parameters['response_window_sec'] = \
         [float(x) for x in doc["response_window"]]
     task_parameters['reward_volume'] = config["reward"]["reward_volume"]
+    task_parameters['autoreward_volume'] = doc['auto_reward_volume']
     task_parameters['session_type'] = behavior["params"]["stage"]
     task_parameters['stimulus'] = next(iter(behavior["stimuli"]))
     task_parameters['stimulus_distribution'] = doc["change_time_dist"]

@@ -13,6 +13,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                         "blank_duration_range": (0.5, 0.6),
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002,
                     },
                     "reward": {
                         "reward_volume": 0.007,
@@ -42,7 +43,8 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus": "images",
          "stimulus_distribution": "geometric",
          "task": "change detection",
-         "n_stimulus_frames": 10
+         "n_stimulus_frames": 10,
+         "autoreward_volume": 0.002
      }, id='basic'),
     pytest.param({
         "items": {
@@ -52,6 +54,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                         "blank_duration_range": (0.5, 0.5),
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
                     },
                     "reward": {
                         "reward_volume": 0.007,
@@ -81,7 +84,8 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus": "images",
          "stimulus_distribution": "geometric",
          "task": "change detection",
-         "n_stimulus_frames": 10
+         "n_stimulus_frames": 10,
+         "autoreward_volume": 0.002
      }, id='single_value_blank_duration'),
      pytest.param({
         "items": {
@@ -91,6 +95,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                         "blank_duration_range": (0.5, 0.5),
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
                     },
                     "reward": {
                         "reward_volume": 0.007,
@@ -120,7 +125,8 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus": "grating",
          "stimulus_distribution": "geometric",
          "task": "change detection",
-         "n_stimulus_frames": 10
+         "n_stimulus_frames": 10,
+         "autoreward_volume": 0.002
      }, id='stimulus_duration_from_grating'),
      pytest.param({
         "items": {
@@ -130,6 +136,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                         "blank_duration_range": (0.5, 0.5),
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
                     },
                     "reward": {
                         "reward_volume": 0.007,
@@ -159,7 +166,8 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "stimulus": "grating",
          "stimulus_distribution": "geometric",
          "task": "change detection",
-         "n_stimulus_frames": 10
+         "n_stimulus_frames": 10,
+         "autoreward_volume": 0.002
      }, id='stimulus_duration_none')
     ]
 )
@@ -174,7 +182,12 @@ def test_get_task_parameters(data, expected):
                 assert expected[k] == v
         except (TypeError, ValueError):
             assert expected[k] == v
-    assert list(actual.keys()) == list(expected.keys())
+
+    actual_keys = list(actual.keys())
+    actual_keys.sort()
+    expected_keys = list(expected.keys())
+    expected_keys.sort()
+    assert actual_keys == expected_keys
 
 
 def test_get_task_parameters_task_id_exception():
@@ -190,6 +203,7 @@ def test_get_task_parameters_task_id_exception():
                                    "blank_duration_range": (0.5, 0.6),
                                    "response_window": [0.15, 0.75],
                                    "change_time_dist": "geometric",
+                                   "auto_reward_volume": 0.002
                                },
                               "reward": {
                                   "reward_volume": 0.007,
@@ -228,6 +242,7 @@ def test_get_task_parameters_flash_duration_exception():
                                    "blank_duration_range": (0.5, 0.6),
                                    "response_window": [0.15, 0.75],
                                    "change_time_dist": "geometric",
+                                   "auto_reward_volume": 0.002
                                },
                               "reward": {
                                   "reward_volume": 0.007,
