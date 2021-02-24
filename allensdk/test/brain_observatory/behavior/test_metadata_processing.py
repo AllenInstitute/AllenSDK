@@ -4,8 +4,9 @@ import numpy as np
 from allensdk.brain_observatory.behavior.metadata_processing import (
     description_dict, get_task_parameters, get_expt_description)
 
+
 @pytest.mark.parametrize("data, expected",
-    [pytest.param({
+    [pytest.param({  # noqa: E128
         "items": {
             "behavior": {
                 "config": {
@@ -46,7 +47,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "n_stimulus_frames": 10,
          "auto_reward_volume": 0.002
      }, id='basic'),
-    pytest.param({
+     pytest.param({
         "items": {
             "behavior": {
                 "config": {
@@ -110,7 +111,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                 },
                 "stimuli": {
                     "grating": {"draw_log": [1]*10,
-                               "flash_interval_sec": [0.34, -1.0]}
+                                "flash_interval_sec": [0.34, -1.0]}
                 },
             }
         }
@@ -151,7 +152,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
                 },
                 "stimuli": {
                     "grating": {"draw_log": [1]*10,
-                               "flash_interval_sec": None}
+                                "flash_interval_sec": None}
                 },
             }
         }
@@ -169,7 +170,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
          "n_stimulus_frames": 10,
          "auto_reward_volume": 0.002
      }, id='stimulus_duration_none')
-    ]
+     ]
 )
 def test_get_task_parameters(data, expected):
     actual = get_task_parameters(data)
@@ -205,21 +206,21 @@ def test_get_task_parameters_task_id_exception():
                                    "change_time_dist": "geometric",
                                    "auto_reward_volume": 0.002
                                },
-                              "reward": {
-                                  "reward_volume": 0.007,
+                               "reward": {
+                                   "reward_volume": 0.007,
                                },
                                "behavior": {
                                    "task_id": "junk",
                                },
                           },
-                           "params": {
-                               "stage": "TRAINING_3_images_A",
-                               "flash_omit_probability": 0.05
-                           },
-                           "stimuli": {
-                               "images": {"draw_log": [1]*10,
-                                          "flash_interval_sec": [0.32, -1.0]}
-                           },
+                          "params": {
+                              "stage": "TRAINING_3_images_A",
+                              "flash_omit_probability": 0.05
+                          },
+                          "stimuli": {
+                              "images": {"draw_log": [1]*10,
+                                         "flash_interval_sec": [0.32, -1.0]}
+                          },
                        }
                    }
                 }
@@ -244,21 +245,21 @@ def test_get_task_parameters_flash_duration_exception():
                                    "change_time_dist": "geometric",
                                    "auto_reward_volume": 0.002
                                },
-                              "reward": {
+                               "reward": {
                                   "reward_volume": 0.007,
                                },
                                "behavior": {
                                    "task_id": "DoC",
                                },
                           },
-                           "params": {
-                               "stage": "TRAINING_3_images_A",
-                               "flash_omit_probability": 0.05
-                           },
-                           "stimuli": {
-                               "junk": {"draw_log": [1]*10,
-                                        "flash_interval_sec": [0.32, -1.0]}
-                           },
+                          "params": {
+                              "stage": "TRAINING_3_images_A",
+                              "flash_omit_probability": 0.05
+                          },
+                          "stimuli": {
+                              "junk": {"draw_log": [1]*10,
+                                       "flash_interval_sec": [0.32, -1.0]}
+                          },
                        }
                    }
                 }
@@ -299,5 +300,5 @@ def test_get_expt_description_with_valid_session_type(session_type,
     ("OPHYS_7")
 ])
 def test_get_expt_description_raises_with_invalid_session_type(session_type):
-    with pytest.raises(RuntimeError, match=f"session type should match.*"):
+    with pytest.raises(RuntimeError, match="session type should match.*"):
         get_expt_description(session_type)
