@@ -75,12 +75,14 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        # Not all sessions will have stimulus_templates (e.g. gratings)
-        if session_object.stimulus_templates:
-            self._add_stimulus_templates(
-                nwbfile=nwbfile,
-                stimulus_templates=session_object.stimulus_templates,
-                stimulus_presentations=session_object.stimulus_presentations)
+        # Use the semi-private _stimulus_templates attribute because it is
+        # a StimulusTemplate object. The public stimulus_templates property
+        # of the session_object returns a DataFrame.
+        session_stimulus_templates = session_object._stimulus_templates
+        self._add_stimulus_templates(
+            nwbfile=nwbfile,
+            stimulus_templates=session_stimulus_templates,
+            stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(
