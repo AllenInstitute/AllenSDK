@@ -128,14 +128,15 @@ def test_visbeh_ophys_data_set():
     assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
-                                        'stimulus_duration_sec': 6.0,
+                                        'stimulus_duration_sec': 0.25,
                                         'stimulus': 'images',
                                         'omitted_flash_fraction': 0.05,
                                         'blank_duration_sec': [0.5, 0.5],
                                         'n_stimulus_frames': 69882,
-                                        'task': 'DoC_untranslated',
+                                        'task': 'change detection',
                                         'response_window_sec': [0.15, 0.75],
-                                        'stage': u'OPHYS_6_images_B'}
+                                        'session_type': u'OPHYS_6_images_B',
+                                        'auto_reward_volume': 0.005}
 
 
 @pytest.mark.requires_bamboo
