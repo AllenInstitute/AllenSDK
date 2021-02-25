@@ -313,24 +313,17 @@ class BehaviorSession(LazyPropertyMixin):
         self._stimulus_presentations = value
 
     @property
-    def stimulus_templates(self) -> StimulusTemplate:
+    def stimulus_templates(self) -> pd.DataFrame:
         """Get stimulus templates (movies, scenes) for behavior session.
 
         Returns
         -------
-        StimulusTemplate
-            A StimulusTemplate object containing the stimulus images for the
-            experiment. Relevant properties include:
-                image_set_name: The name of the image set that the
-                    StimulusTemplate encapsulates
-                image_names: A list of individual image names in the image set
-                images: A list of StimulusImage
-                    objects.
-            Also has a to_dataframe() method to convert to a dataframe
-            where indices are image names, 'warped' and 'unwarped' columns
-            contains image arrays, and the df.name is the image set.
+        pd.DataFrame
+            A pandas DataFrame object containing the stimulus images for the
+            experiment. Indices are image names, 'warped' and 'unwarped'
+            columns contains image arrays, and the df.name is the image set.
         """
-        return self._stimulus_templates
+        return self._stimulus_templates.to_dataframe()
 
     @stimulus_templates.setter
     def stimulus_templates(self, value):

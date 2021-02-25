@@ -98,7 +98,8 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
 @pytest.mark.parametrize("behavior_stimuli_data_fixture", ({},),
                          indirect=["behavior_stimuli_data_fixture"])
 def test_get_stimulus_templates(behavior_stimuli_data_fixture):
-    templates = get_stimulus_templates(behavior_stimuli_data_fixture)
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture,
+                                       grating_images_dict={})
 
     assert templates.image_set_name == 'test_image_set'
     assert len(templates) == 1
@@ -131,6 +132,26 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
                            b=img.unwarped, equal_nan=True)
         assert np.allclose(a=expected_warped,
                            b=img.warped, equal_nan=True)
+
+
+@pytest.mark.parametrize(("behavior_stimuli_data_fixture, "
+                          "grating_images_dict, expected"), [
+    ({"has_images": False},
+     {"gratings_90.0": {"warped": np.ones((2, 2)),
+                        "unwarped": np.ones((2, 2)) * 2}},
+     {}),
+], indirect=["behavior_stimuli_data_fixture"])
+def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture,
+                                             grating_images_dict, expected):
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture,
+                                       grating_images_dict=grating_images_dict)
+
+    assert templates.image_set_name == 'grating'
+    assert list(templates.keys()) == ['gratings_90.0']
+    assert np.allclose(templates['gratings_90.0'].warped,
+                       np.array([[1, 1], [1, 1]]))
+    assert np.allclose(templates['gratings_90.0'].unwarped,
+                       np.array([[2, 2], [2, 2]]))
 
 
 # def test_get_images_dict():

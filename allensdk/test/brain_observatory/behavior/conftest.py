@@ -61,7 +61,7 @@ def stimulus_templates():
     images = [np.zeros((4, 4)), np.ones((4, 4))]
 
     image_attributes = [{'image_name': 'test1'}, {'image_name': 'test2'}]
-    stimulus_templates = StimulusTemplateFactory.from_pkl(
+    stimulus_templates = StimulusTemplateFactory.from_unprocessed(
         image_set_name='test', image_attributes=image_attributes,
         images=images)
     return stimulus_templates
@@ -350,31 +350,43 @@ def behavior_stimuli_data_fixture(request):
     grating_phase = request.param.get("grating_phase", None)
     grating_spatial_frequency = request.param.get("grating_spatial_frequency",
                                                   None)
+
+    has_images = request.param.get("has_images", True)
+    has_grating = request.param.get("has_grating", True)
+
     resources_dir = get_resources_dir()
+
+    image_data = {
+        "set_log": images_set_log,
+        "draw_log": images_draw_log,
+        "image_path": os.path.join(resources_dir,
+                                   'stimulus_template',
+                                   'input',
+                                   'test_image_set.pkl')
+    }
+
+    grating_data = {
+        "set_log": grating_set_log,
+        "draw_log": grating_draw_log,
+        "phase": grating_phase,
+        "sf": grating_spatial_frequency
+    }
 
     data = {
         "items": {
             "behavior": {
-                "stimuli": {
-                    "images": {
-                        "set_log": images_set_log,
-                        "draw_log": images_draw_log,
-                        "image_path": os.path.join(resources_dir,
-                                                   'stimulus_template',
-                                                   'input',
-                                                   'test_image_set.pkl')
-                    },
-                    "grating": {
-                        "set_log": grating_set_log,
-                        "draw_log": grating_draw_log,
-                        "phase": grating_phase,
-                        "sf": grating_spatial_frequency
-                    }
-                },
+                "stimuli": {},
                 "omitted_flash_frame_log": omitted_flash_frame_log
             }
         }
     }
+
+    if has_images:
+        data["items"]["behavior"]["stimuli"]["images"] = image_data
+
+    if has_grating:
+        data["items"]["behavior"]["stimuli"]["grating"] = grating_data
+
     return data
 
 

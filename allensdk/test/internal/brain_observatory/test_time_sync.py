@@ -347,7 +347,8 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
             aligner = ts.OphysTimeAligner("test")
 
     aligner.stim_data_length = stim_data_length
-    with patch.object(ts, "monitor_delay", return_value=ASSUMED_DELAY):
+    with patch.object(ts, "calculate_monitor_delay",
+                      return_value=ASSUMED_DELAY):
         with patch.object(ts.Dataset, "get_falling_edges",
                           return_value=true_falling) as mock_falling:
             with patch.object(ts.Dataset, "get_rising_edges",
@@ -462,15 +463,18 @@ def test_monitor_delay(sync_dset, stim_times, transition_interval, expected,
                        monkeypatch):
     monkeypatch.setattr(ts, "get_real_photodiode_events",
                         mock_get_real_photodiode_events)
-    pytest.approx(expected, ts.monitor_delay(sync_dset, stim_times, "key",
+    pytest.approx(expected,
+                  ts.calculate_monitor_delay(sync_dset, stim_times, "key",
                                              transition_interval))
 
 
 @pytest.mark.parametrize(
     "sync_dset,stim_times,transition_interval",
     [
-        (np.array([1.0, 2.0, 3.0]), np.array([0.9, 1.9, 2.9]), 1,),    # negative
-        (np.array([1.0, 2.0, 3.0, 4.0]), np.array([1.1, 2.1, 3.1, 4.1]), 1,),  # too big
+        # Negative
+        (np.array([1.0, 2.0, 3.0]), np.array([0.9, 1.9, 2.9]), 1,),
+        # Too big
+        (np.array([1.0, 2.0, 3.0, 4.0]), np.array([1.1, 2.1, 3.1, 4.1]), 1,),
     ],
 )
 def test_monitor_delay_raises_error(
@@ -479,7 +483,8 @@ def test_monitor_delay_raises_error(
     monkeypatch.setattr(ts, "get_real_photodiode_events",
                         mock_get_real_photodiode_events)
     with pytest.raises(ValueError):
-        ts.monitor_delay(sync_dset, stim_times, "key", transition_interval)
+        ts.calculate_monitor_delay(sync_dset, stim_times,
+                                   "key", transition_interval)
 
 
 @pytest.mark.parametrize(

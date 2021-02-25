@@ -76,7 +76,7 @@ def test_visbeh_ophys_data_set():
     assert data_set.api.extractor.get_foraging_id() == \
            str(data_set.api.get_behavior_session_uuid())
 
-    stimulus_templates = data_set.stimulus_templates
+    stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
     assert stimulus_templates['im000'].warped.shape == MONITOR_DIMENSIONS
     assert stimulus_templates['im000'].unwarped.shape == MONITOR_DIMENSIONS
