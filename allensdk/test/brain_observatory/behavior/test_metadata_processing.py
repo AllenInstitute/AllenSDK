@@ -5,16 +5,16 @@ from allensdk.brain_observatory.behavior.metadata_processing import (
     description_dict, get_task_parameters, get_expt_description)
 
 
-def test_get_task_parameters():
-    data = {
+@pytest.mark.parametrize("data, expected",
+    [pytest.param({  # noqa: E128
         "items": {
             "behavior": {
                 "config": {
                     "DoC": {
                         "blank_duration_range": (0.5, 0.6),
-                        "stimulus_window": 6.0,
                         "response_window": [0.15, 0.75],
                         "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002,
                     },
                     "reward": {
                         "reward_volume": 0.007,
@@ -28,24 +28,152 @@ def test_get_task_parameters():
                     "flash_omit_probability": 0.05
                 },
                 "stimuli": {
-                    "images": {"draw_log": [1]*10}
+                    "images": {"draw_log": [1]*10,
+                               "flash_interval_sec": [0.32, -1.0]}
                 },
             }
         }
-    }
+     },
+     {
+         "blank_duration_sec": [0.5, 0.6],
+         "stimulus_duration_sec": 0.32,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "session_type": "TRAINING_3_images_A",
+         "stimulus": "images",
+         "stimulus_distribution": "geometric",
+         "task": "change detection",
+         "n_stimulus_frames": 10,
+         "auto_reward_volume": 0.002
+     }, id='basic'),
+     pytest.param({
+        "items": {
+            "behavior": {
+                "config": {
+                    "DoC": {
+                        "blank_duration_range": (0.5, 0.5),
+                        "response_window": [0.15, 0.75],
+                        "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
+                    },
+                    "reward": {
+                        "reward_volume": 0.007,
+                    },
+                    "behavior": {
+                        "task_id": "DoC_untranslated",
+                    },
+                },
+                "params": {
+                    "stage": "TRAINING_3_images_A",
+                    "flash_omit_probability": 0.05
+                },
+                "stimuli": {
+                    "images": {"draw_log": [1]*10,
+                               "flash_interval_sec": [0.32, -1.0]}
+                },
+            }
+        }
+     },
+     {
+         "blank_duration_sec": [0.5, 0.5],
+         "stimulus_duration_sec": 0.32,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "session_type": "TRAINING_3_images_A",
+         "stimulus": "images",
+         "stimulus_distribution": "geometric",
+         "task": "change detection",
+         "n_stimulus_frames": 10,
+         "auto_reward_volume": 0.002
+     }, id='single_value_blank_duration'),
+     pytest.param({
+        "items": {
+            "behavior": {
+                "config": {
+                    "DoC": {
+                        "blank_duration_range": (0.5, 0.5),
+                        "response_window": [0.15, 0.75],
+                        "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
+                    },
+                    "reward": {
+                        "reward_volume": 0.007,
+                    },
+                    "behavior": {
+                        "task_id": "DoC_untranslated",
+                    },
+                },
+                "params": {
+                    "stage": "TRAINING_3_images_A",
+                    "flash_omit_probability": 0.05
+                },
+                "stimuli": {
+                    "grating": {"draw_log": [1]*10,
+                                "flash_interval_sec": [0.34, -1.0]}
+                },
+            }
+        }
+     },
+     {
+         "blank_duration_sec": [0.5, 0.5],
+         "stimulus_duration_sec": 0.34,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "session_type": "TRAINING_3_images_A",
+         "stimulus": "grating",
+         "stimulus_distribution": "geometric",
+         "task": "change detection",
+         "n_stimulus_frames": 10,
+         "auto_reward_volume": 0.002
+     }, id='stimulus_duration_from_grating'),
+     pytest.param({
+        "items": {
+            "behavior": {
+                "config": {
+                    "DoC": {
+                        "blank_duration_range": (0.5, 0.5),
+                        "response_window": [0.15, 0.75],
+                        "change_time_dist": "geometric",
+                        "auto_reward_volume": 0.002
+                    },
+                    "reward": {
+                        "reward_volume": 0.007,
+                    },
+                    "behavior": {
+                        "task_id": "DoC_untranslated",
+                    },
+                },
+                "params": {
+                    "stage": "TRAINING_3_images_A",
+                    "flash_omit_probability": 0.05
+                },
+                "stimuli": {
+                    "grating": {"draw_log": [1]*10,
+                                "flash_interval_sec": None}
+                },
+            }
+        }
+     },
+     {
+         "blank_duration_sec": [0.5, 0.5],
+         "stimulus_duration_sec": np.NaN,
+         "omitted_flash_fraction": 0.05,
+         "response_window_sec": [0.15, 0.75],
+         "reward_volume": 0.007,
+         "session_type": "TRAINING_3_images_A",
+         "stimulus": "grating",
+         "stimulus_distribution": "geometric",
+         "task": "change detection",
+         "n_stimulus_frames": 10,
+         "auto_reward_volume": 0.002
+     }, id='stimulus_duration_none')
+     ]
+)
+def test_get_task_parameters(data, expected):
     actual = get_task_parameters(data)
-    expected = {
-        "blank_duration_sec": [0.5, 0.6],
-        "stimulus_duration_sec": 6.0,
-        "omitted_flash_fraction": 0.05,
-        "response_window_sec": [0.15, 0.75],
-        "reward_volume": 0.007,
-        "stage": "TRAINING_3_images_A",
-        "stimulus": "images",
-        "stimulus_distribution": "geometric",
-        "task": "DoC_untranslated",
-        "n_stimulus_frames": 10
-    }
     for k, v in actual.items():
         # Special nan checking since pytest doesn't do it well
         try:
@@ -55,7 +183,91 @@ def test_get_task_parameters():
                 assert expected[k] == v
         except (TypeError, ValueError):
             assert expected[k] == v
-    assert list(actual.keys()) == list(expected.keys())
+
+    actual_keys = list(actual.keys())
+    actual_keys.sort()
+    expected_keys = list(expected.keys())
+    expected_keys.sort()
+    assert actual_keys == expected_keys
+
+
+def test_get_task_parameters_task_id_exception():
+    """
+    Test that, when task_id has an unexpected value,
+    get_task_parameters throws the correct exception
+    """
+    input_data = {
+                  "items": {
+                      "behavior": {
+                          "config": {
+                               "DoC": {
+                                   "blank_duration_range": (0.5, 0.6),
+                                   "response_window": [0.15, 0.75],
+                                   "change_time_dist": "geometric",
+                                   "auto_reward_volume": 0.002
+                               },
+                               "reward": {
+                                   "reward_volume": 0.007,
+                               },
+                               "behavior": {
+                                   "task_id": "junk",
+                               },
+                          },
+                          "params": {
+                              "stage": "TRAINING_3_images_A",
+                              "flash_omit_probability": 0.05
+                          },
+                          "stimuli": {
+                              "images": {"draw_log": [1]*10,
+                                         "flash_interval_sec": [0.32, -1.0]}
+                          },
+                       }
+                   }
+                }
+
+    with pytest.raises(RuntimeError) as error:
+        _ = get_task_parameters(input_data)
+    assert "does not know how to parse 'task_id'" in error.value.args[0]
+
+
+def test_get_task_parameters_flash_duration_exception():
+    """
+    Test that, when 'images' or 'grating' not present in 'stimuli',
+    get_task_parameters throws the correct exception
+    """
+    input_data = {
+                  "items": {
+                      "behavior": {
+                          "config": {
+                               "DoC": {
+                                   "blank_duration_range": (0.5, 0.6),
+                                   "response_window": [0.15, 0.75],
+                                   "change_time_dist": "geometric",
+                                   "auto_reward_volume": 0.002
+                               },
+                               "reward": {
+                                  "reward_volume": 0.007,
+                               },
+                               "behavior": {
+                                   "task_id": "DoC",
+                               },
+                          },
+                          "params": {
+                              "stage": "TRAINING_3_images_A",
+                              "flash_omit_probability": 0.05
+                          },
+                          "stimuli": {
+                              "junk": {"draw_log": [1]*10,
+                                       "flash_interval_sec": [0.32, -1.0]}
+                          },
+                       }
+                   }
+                }
+
+    with pytest.raises(RuntimeError) as error:
+        _ = get_task_parameters(input_data)
+    shld_be = "'images' and/or 'grating' not a valid key"
+    assert shld_be in error.value.args[0]
 
 
 @pytest.mark.parametrize("session_type, expected_description", [
@@ -88,5 +300,5 @@ def test_get_expt_description_with_valid_session_type(session_type,
     ("OPHYS_7")
 ])
 def test_get_expt_description_raises_with_invalid_session_type(session_type):
-    with pytest.raises(RuntimeError, match=f"session type should match.*"):
+    with pytest.raises(RuntimeError, match="session type should match.*"):
         get_expt_description(session_type)

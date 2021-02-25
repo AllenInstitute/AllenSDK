@@ -32,7 +32,8 @@ def pytest_assertrepr_compare(config, op, left, right):
 
 
 def pytest_ignore_collect(path, config):
-    ''' The brain_observatory.ecephys submodule uses python 3.6 features that may not be backwards compatible!
+    ''' The brain_observatory.ecephys submodule uses
+    python 3.6 features that may not be backwards compatible!
     '''
 
     if sys.version_info < (3, 6):
@@ -79,7 +80,11 @@ def trials():
         'a': [0.5, 0.4, 0.3, 0.2, 0.1],
         'b': [[], [1], [2, 2], [3], []],
         'c': ['a', 'bb', 'ccc', 'dddd', 'eeeee'],
-        'd': [np.array([1]), np.array([1, 2]), np.array([1, 2, 3]), np.array([1, 2, 3, 4]), np.array([1, 2, 3, 4, 5])],
+        'd': [np.array([1]),
+              np.array([1, 2]),
+              np.array([1, 2, 3]),
+              np.array([1, 2, 3, 4]),
+              np.array([1, 2, 3, 4, 5])],
     }, index=pd.Index(name='trials_id', data=[0, 1, 2, 3, 4]))
 
 
@@ -90,7 +95,8 @@ def licks():
 
 @pytest.fixture
 def rewards():
-    return pd.DataFrame({'volume': [.01, .01, .01], 'autorewarded': [True, False, False]},
+    return pd.DataFrame({'volume': [.01, .01, .01],
+                         'autorewarded': [True, False, False]},
                         index=pd.Index(data=[1., 2., 3.], name='timestamps'))
 
 
@@ -116,14 +122,20 @@ def segmentation_mask_image(max_projection):
 
 
 @pytest.fixture
-def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
+def stimulus_presentations_behavior(stimulus_templates,
+                                    stimulus_presentations):
 
-    image_sets = ['test1','test1', 'test1', 'test2', 'test2' ]
+    image_sets = ['test1', 'test1', 'test1', 'test2', 'test2']
+    start_time = stimulus_presentations['start_time']
     stimulus_index_df = pd.DataFrame({'image_set': image_sets,
                                       'image_index': [0] * len(image_sets)},
-                                       index=pd.Index(stimulus_presentations['start_time'], dtype=np.float64, name='timestamps'))
+                                     index=pd.Index(start_time,
+                                                    dtype=np.float64,
+                                                    name='timestamps'))
 
-    df = stimulus_presentations.merge(stimulus_index_df, left_on='start_time', right_index=True)
+    df = stimulus_presentations.merge(stimulus_index_df,
+                                      left_on='start_time',
+                                      right_index=True)
     return df[sorted(df.columns)]
 
 
@@ -138,7 +150,7 @@ def behavior_only_metadata_fixture():
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
         "LabTracks_ID": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
-                          "Ai93(TITL-GCaMP6f)/wt",
+                         "Ai93(TITL-GCaMP6f)/wt",
         "behavior_session_uuid": uuid.uuid4(),
         "stimulus_frame_rate": 60.0,
         "rig_name": 'my_device',
@@ -217,11 +229,12 @@ def task_parameters():
             "omitted_flash_fraction": float('nan'),
             "response_window_sec": [0.15, 0.75],
             "reward_volume": 0.007,
-            "stage": "OPHYS_6_images_B",
+            "session_type": "OPHYS_6_images_B",
             "stimulus": "images",
             "stimulus_distribution": "geometric",
             "task": "DoC_untranslated",
-            "n_stimulus_frames": 69882
+            "n_stimulus_frames": 69882,
+            "auto_reward_volume": 0.005
             }
 
 
@@ -258,13 +271,15 @@ def valid_roi_ids(cell_specimen_table):
 def dff_traces(ophys_timestamps, cell_specimen_table):
     return pd.DataFrame({'cell_roi_id': cell_specimen_table['cell_roi_id'],
                          'dff': [np.ones_like(ophys_timestamps)]},
-                         index=cell_specimen_table.index)
+                        index=cell_specimen_table.index)
+
 
 @pytest.fixture
 def corrected_fluorescence_traces(ophys_timestamps, cell_specimen_table):
     return pd.DataFrame({'cell_roi_id': cell_specimen_table['cell_roi_id'],
-                         'corrected_fluorescence': [np.ones_like(ophys_timestamps)]},
-                         index=cell_specimen_table.index)
+                         'corrected_fluorescence': [np.ones_like(ophys_timestamps)]},  # noqa: E501
+                        index=cell_specimen_table.index)
+
 
 @pytest.fixture
 def motion_correction(ophys_timestamps):
@@ -281,8 +296,8 @@ def session_data():
         'ophys_experiment_id': 789359614,
         'surface_2p_pixel_size_um': 0.78125,
         'foraging_id': '69cdbe09-e62b-4b42-aab1-54b5773dfe78',
-        "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
-        "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
+        "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",  # noqa: E501
+        "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",  # noqa: E501
         "rig_name": "CAM2P.5",
         "movie_width": 447,
         "movie_height": 512,
@@ -294,15 +309,15 @@ def session_data():
         "reporter_line": ["Ai93(TITL-GCaMP6f)"],
         "driver_line": ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
         "external_specimen_name": 416369,
-        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
-        "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",
-        "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",  # noqa: E501
+        "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",  # noqa: E501
+        "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",  # noqa: E501
         "ophys_cell_segmentation_run_id": 789410052,
-        "cell_specimen_table_dict": pd.read_json(os.path.join("/allen", "aibs", "informatics", "nileg", "module_test_data", 'cell_specimen_table_789359614.json'), 'r'), # TODO: I can't write to /allen/aibs/informatics/module_test_data/behavior
-        "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
-        "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
-        "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
-        "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",
+        "cell_specimen_table_dict": pd.read_json(os.path.join("/allen", "aibs", "informatics", "nileg", "module_test_data", 'cell_specimen_table_789359614.json'), 'r'),  # TODO: I can't write to /allen/aibs/informatics/module_test_data/behavior  # noqa: E501
+        "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",  # noqa: E501
+        "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",  # noqa: E501
+        "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",  # noqa: E501
+        "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",  # noqa: E501
         "sex": "F",
         "age": "P139",
         "imaging_plane_group": None,
