@@ -273,9 +273,8 @@ class TestBehaviorRegression:
                 == self.od.extractor.get_behavior_stimulus_file())
 
     def test_get_rewards_regression(self):
-        """Index is timestamps here, so remove it before comparing."""
-        bd_rewards = self.bd.get_rewards().reset_index(drop=True)
-        od_rewards = self.od.get_rewards().reset_index(drop=True)
+        bd_rewards = self.bd.get_rewards().drop(columns=['timestamps'])
+        od_rewards = self.od.get_rewards().drop(columns=['timestamps'])
         pd.testing.assert_frame_equal(bd_rewards, od_rewards)
 
     def test_ophys_experiment_id_regression(self):
