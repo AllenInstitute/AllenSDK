@@ -215,6 +215,7 @@ class BehaviorTaskParametersSchema(RaisingSchema):
     stimulus_duration_sec = fields.Float(
         doc='Duration of each stimulus presentation in seconds',
         required=True,
+        allow_nan=True
     )
     omitted_flash_fraction = fields.Float(
         doc='Fraction of flashes/image presentations that were omitted',

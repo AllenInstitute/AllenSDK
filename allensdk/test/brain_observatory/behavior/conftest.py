@@ -239,6 +239,23 @@ def task_parameters():
 
 
 @pytest.fixture
+def task_parameters_nan_stimulus_duration():
+
+    return {"blank_duration_sec": [0.5, 0.5],
+            "stimulus_duration_sec": np.NaN,
+            "omitted_flash_fraction": float('nan'),
+            "response_window_sec": [0.15, 0.75],
+            "reward_volume": 0.007,
+            "session_type": "OPHYS_6_images_B",
+            "stimulus": "images",
+            "stimulus_distribution": "geometric",
+            "task": "DoC_untranslated",
+            "n_stimulus_frames": 69882,
+            "auto_reward_volume": 0.005
+            }
+
+
+@pytest.fixture
 def cell_specimen_table():
 
     return pd.DataFrame({'cell_roi_id': [123, 321],
