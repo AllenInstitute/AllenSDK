@@ -627,7 +627,8 @@ def get_time(exp_data):
 def data_to_licks(data, time):
     lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
     lick_times = time[lick_frames]
-    return pd.DataFrame(data={"frame": lick_frames, 'timestamps': lick_times})
+    return pd.DataFrame(data={"timestamps": lick_times,
+                              "frame": lick_frames})
 
 
 def get_mouse_id(exp_data):
