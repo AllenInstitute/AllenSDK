@@ -27,7 +27,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
                  ophys_experiment_id: Optional[int] = None,
                  lims_credentials: Optional[DbCredentials] = None,
                  mtrain_credentials: Optional[DbCredentials] = None,
-                 extractor: Optional[BehaviorOphysDataExtractorBase] = None):
+                 extractor: Optional[BehaviorOphysDataExtractorBase] = None,
+                 skip_eye_tracking: bool = False):
 
         if extractor is None:
             if ophys_experiment_id is not None:
@@ -40,7 +41,8 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
                     "BehaviorOphysLimsApi must be provided either an "
                     "instantiated 'extractor' or an 'ophys_experiment_id'!")
 
-        super().__init__(extractor=extractor)
+        super().__init__(extractor=extractor,
+                         skip_eye_tracking=skip_eye_tracking)
 
 
 class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,

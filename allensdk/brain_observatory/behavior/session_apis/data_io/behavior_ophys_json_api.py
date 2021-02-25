@@ -14,9 +14,10 @@ class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
     a specified raw data source (extractor). Contains all methods
     needed to fill a BehaviorOphysSession."""
 
-    def __init__(self, data):
+    def __init__(self, data: dict, skip_eye_tracking: bool = False):
         extractor = BehaviorOphysJsonExtractor(data=data)
-        super().__init__(extractor=extractor)
+        super().__init__(extractor=extractor,
+                         skip_eye_tracking=skip_eye_tracking)
 
 
 class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,

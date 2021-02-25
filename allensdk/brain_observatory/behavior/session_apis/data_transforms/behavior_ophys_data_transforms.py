@@ -37,14 +37,16 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     populating a BehaviorOphysSession.
     """
 
-    def __init__(self, extractor: BehaviorOphysDataExtractorBase):
+    def __init__(self,
+                 extractor: BehaviorOphysDataExtractorBase,
+                 skip_eye_tracking: bool):
         super().__init__(extractor=extractor)
 
         # Type checker not able to resolve that self.extractor is a
         # BehaviorOphysDataExtractorBase. Explicitly adding as instance
         # attribute fixes the issue.
         self.extractor = extractor
-
+        self._skip_eye_tracking = skip_eye_tracking
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_session_id(self):
@@ -53,8 +55,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_ophys_experiment_id(self):
         return self.extractor.get_ophys_experiment_id()
 
-    def get_eye_tracking_rig_geometry(self) -> dict:
-        return self.extractor.get_eye_tracking_rig_geometry()
+    def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
+        if self._skip_eye_tracking:
+            return None
+        else:
+            return self.extractor.get_eye_tracking_rig_geometry()
 
     @memoize
     def get_cell_specimen_table(self):
@@ -397,7 +402,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     @memoize
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
-                         dilation_frames: int = 2):
+                         dilation_frames: int = 2) -> Optional[pd.DataFrame]:
         """Gets corneal, eye, and pupil ellipse fit data
 
         Parameters
@@ -412,7 +417,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         Returns
         -------
-        pd.DataFrame
+        Optional[pd.DataFrame]
             *_area
             *_center_x
             *_center_y
@@ -421,12 +426,15 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             *_width
             likely_blink
         where "*" can be "corneal", "pupil" or "eye"
-        """
-        logger = logging.getLogger("BehaviorOphysLimsApi")
 
-        logger.info(f"Getting eye_tracking_data with "
-                    f"'z_threshold={z_threshold}', "
-                    f"'dilation_frames={dilation_frames}'")
+        Will return None if class attr _skip_eye_tracking is True.
+        """
+        if self._skip_eye_tracking:
+            return None
+
+        self.logger.info(f"Getting eye_tracking_data with "
+                         f"'z_threshold={z_threshold}', "
+                         f"'dilation_frames={dilation_frames}'")
 
         filepath = Path(self.extractor.get_eye_tracking_filepath())
         sync_path = Path(self.extractor.get_sync_file())
