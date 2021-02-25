@@ -158,7 +158,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         # Add eye tracking and rig geometry to NWB in-memory object
         # if eye_tracking data exists.
-        if session_object.eye_tracking:
+        if session_object.eye_tracking is not None:
             self.add_eye_tracking_data_to_nwb(
                 nwbfile,
                 session_object.eye_tracking,
