@@ -15,7 +15,9 @@ from allensdk.brain_observatory.argschema_utilities import (
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
-def write_behavior_ophys_nwb(session_data, nwb_filepath):
+def write_behavior_ophys_nwb(session_data: dict,
+                             nwb_filepath: str,
+                             skip_eye_tracking: bool):
 
     nwb_filepath_inprogress = nwb_filepath+'.inprogress'
     nwb_filepath_error = nwb_filepath+'.error'
@@ -28,10 +30,12 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
-        json_session = BehaviorOphysSession(
-            api=BehaviorOphysJsonApi(session_data))
+        json_api = BehaviorOphysJsonApi(data=session_data,
+                                        skip_eye_tracking=skip_eye_tracking)
+        json_session = BehaviorOphysSession(api=json_api)
         lims_api = BehaviorOphysLimsApi(
-            ophys_experiment_id=session_data['ophys_experiment_id'])
+            ophys_experiment_id=session_data['ophys_experiment_id'],
+            skip_eye_tracking=skip_eye_tracking)
         lims_session = BehaviorOphysSession(api=lims_api)
 
         logging.info("Comparing a BehaviorOphysSession created from JSON "
@@ -72,8 +76,10 @@ def main():
         raise err
 
     try:
+        skip_eye_tracking = parser.args['skip_eye_tracking']
         output = write_behavior_ophys_nwb(parser.args['session_data'],
-                                          parser.args['output_path'])
+                                          parser.args['output_path'],
+                                          skip_eye_tracking)
         logging.info('File successfully created')
     except Exception as err:
         logging.error('NWB write failure')
