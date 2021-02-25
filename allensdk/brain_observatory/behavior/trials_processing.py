@@ -519,7 +519,6 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     monitor_delay = input_transform.get_monitor_delay()
     data = input_transform._behavior_stimulus_file()
 
-    assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
@@ -527,7 +526,7 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
 
     all_trial_data = [None] * len(trial_log)
     lick_frames = licks_df.frame.values
-    reward_times = rewards_df.index.values
+    reward_times = rewards_df['timestamps'].values
 
     for idx, trial in enumerate(trial_log):
         # match each event in the trial log to the sync timestamps

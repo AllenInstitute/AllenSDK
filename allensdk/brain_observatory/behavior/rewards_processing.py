@@ -38,6 +38,6 @@ def get_rewards(data: Dict,
             auto_rwrd = trial["trial_params"]["auto_reward"]
             rewards_dict["autorewarded"].append(auto_rwrd)
 
-    df = pd.DataFrame(rewards_dict).set_index("timestamps", drop=True)
+    df = pd.DataFrame(rewards_dict)
 
     return df

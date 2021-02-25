@@ -90,7 +90,7 @@ def test_get_rewards(monkeypatch):
                          'timestamps': [0.04, 0.1],
                          'autorewarded': [True, False]}
         expected_df = pd.DataFrame(expected_dict)
-        expected_df = expected_df.set_index('timestamps', drop=True)
+        expected_df = expected_df
         assert expected_df.equals(rewards)
 
 

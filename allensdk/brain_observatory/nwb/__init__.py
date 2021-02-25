@@ -674,12 +674,10 @@ def add_licks(nwbfile, licks):
 
 
 def add_rewards(nwbfile, rewards_df):
-    assert rewards_df.index.name == 'timestamps'
-
     reward_volume_ts = TimeSeries(
         name='volume',
         data=rewards_df.volume.values,
-        timestamps=rewards_df.index.values,
+        timestamps=rewards_df['timestamps'].values,
         unit='mL'
     )
 
