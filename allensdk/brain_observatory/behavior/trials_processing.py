@@ -627,7 +627,7 @@ def get_time(exp_data):
 def data_to_licks(data, time):
     lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
     lick_times = time[lick_frames]
-    return pd.DataFrame(data={"frame": lick_frames, 'time': lick_times})
+    return pd.DataFrame(data={"frame": lick_frames, 'timestamps': lick_times})
 
 
 def get_mouse_id(exp_data):
@@ -925,12 +925,12 @@ def find_licks(reward_times, licks, window=3.5):
         return []
     else:
         reward_time = one(reward_times)
-        reward_lick_mask = ((licks['time'] > reward_time) &
-                            (licks['time'] < (reward_time + window)))
+        reward_lick_mask = ((licks['timestamps'] > reward_time) &
+                            (licks['timestamps'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
-        tr_licks['time'] -= reward_time
-        return tr_licks['time'].values
+        tr_licks['timestamps'] -= reward_time
+        return tr_licks['timestamps'].values
 
 
 def calculate_reward_rate(response_latency=None,

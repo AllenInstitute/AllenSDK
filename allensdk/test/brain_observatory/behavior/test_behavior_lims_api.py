@@ -201,7 +201,7 @@ def test_get_stimulus_timestamps(MockBehaviorLimsApi):
 
 def test_get_licks(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
-    expected = pd.DataFrame({"time": [0.016 * i for i in [2., 6., 9.]],
+    expected = pd.DataFrame({"timestamps": [0.016 * i for i in [2., 6., 9.]],
                              "frame": [2, 6, 9]})
     pd.testing.assert_frame_equal(expected, api.get_licks())
 

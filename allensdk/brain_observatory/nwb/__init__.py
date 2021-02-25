@@ -658,7 +658,7 @@ def add_licks(nwbfile, licks):
     lick_timeseries = TimeSeries(
         name='licks',
         data=licks.frame.values,
-        timestamps=licks.time.values,
+        timestamps=licks.timestamps.values,
         description=('Timestamps and stimulus presentation '
                      'frame indices for lick events'),
         unit='N/A'

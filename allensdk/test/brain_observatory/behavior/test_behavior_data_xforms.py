@@ -144,12 +144,12 @@ def test_get_licks(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [0.12, 0.15, 0.90, 1.36],
+        expected_dict = {'timestamps': [0.12, 0.15, 0.90, 1.36],
                          'frame': [12, 15, 90, 136]}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_almost_equal(expected_df.time.to_numpy(),
-                                             licks.time.to_numpy(),
+        np.testing.assert_array_almost_equal(expected_df.timestamps.to_numpy(),
+                                             licks.timestamps.to_numpy(),
                                              decimal=10)
         np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
                                              licks.frame.to_numpy(),
@@ -206,12 +206,12 @@ def test_empty_licks(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [],
+        expected_dict = {'timestamps': [],
                          'frame': []}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_equal(expected_df.time.to_numpy(),
-                                      licks.time.to_numpy())
+        np.testing.assert_array_equal(expected_df.timestamps.to_numpy(),
+                                      licks.timestamps.to_numpy())
         np.testing.assert_array_equal(expected_df.frame.to_numpy(),
                                       licks.frame.to_numpy())
 
@@ -269,12 +269,12 @@ def test_get_licks_excess(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [0.12, 0.15, 0.90, 1.36],
+        expected_dict = {'timestamps': [0.12, 0.15, 0.90, 1.36],
                          'frame': [12, 15, 90, 136]}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_almost_equal(expected_df.time.to_numpy(),
-                                             licks.time.to_numpy(),
+        np.testing.assert_array_almost_equal(expected_df.timestamps.to_numpy(),
+                                             licks.timestamps.to_numpy(),
                                              decimal=10)
         np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
                                              licks.frame.to_numpy(),

@@ -90,7 +90,8 @@ def trials():
 
 @pytest.fixture
 def licks():
-    return pd.DataFrame({'time': [1., 2., 3.], 'frame': [4., 5., 6.]})
+    return pd.DataFrame({'timestamps': [1., 2., 3.],
+                         'frame': [4., 5., 6.]})
 
 
 @pytest.fixture

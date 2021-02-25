@@ -224,7 +224,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             licks = lick_module.get_data_interface('licks')
 
             return pd.DataFrame({
-                'time': licks.timestamps[:],
+                'timestamps': licks.timestamps[:],
                 'frame': licks.data[:]
             })
         else:
