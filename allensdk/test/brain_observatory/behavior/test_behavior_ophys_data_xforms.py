@@ -336,7 +336,7 @@ def test_get_licks_failure(monkeypatch):
 
         xforms = BehaviorOphysDataTransforms()
         with pytest.raises(IndexError):
-            _ = xforms.get_licks()
+            xforms.get_licks()
 
 
 def test_timestamps_and_delay(monkeypatch):
@@ -493,4 +493,4 @@ def test_monitor_delay(monkeypatch):
 
         xforms = BehaviorOphysDataTransforms()
         with pytest.raises(RuntimeError):
-            _ = xforms.get_monitor_delay()
+            xforms.get_monitor_delay()

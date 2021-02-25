@@ -32,8 +32,8 @@ def create_area_df(data: np.ndarray) -> pd.DataFrame:
 
 
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
-    columns = ["timestamps", "cr_area", "eye_area", "pupil_area", "likely_blink",
-               "pupil_area_raw", "cr_area_raw", "eye_area_raw",
+    columns = ["timestamps", "cr_area", "eye_area", "pupil_area",
+               "likely_blink", "pupil_area_raw", "cr_area_raw", "eye_area_raw",
                "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
                "eye_center_x", "eye_center_y", "eye_width", "eye_height",
                "eye_phi", "pupil_center_x", "pupil_center_y", "pupil_width",

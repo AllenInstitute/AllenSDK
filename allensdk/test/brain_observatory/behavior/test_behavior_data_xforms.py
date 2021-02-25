@@ -329,4 +329,4 @@ def test_get_licks_failure(monkeypatch):
 
         xforms = BehaviorDataTransforms()
         with pytest.raises(IndexError):
-            _ = xforms.get_licks()
+            xforms.get_licks()
