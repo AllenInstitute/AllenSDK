@@ -32,7 +32,7 @@ def create_area_df(data: np.ndarray) -> pd.DataFrame:
 
 
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
-    columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink",
+    columns = ["timestamps", "cr_area", "eye_area", "pupil_area", "likely_blink",
                "pupil_area_raw", "cr_area_raw", "eye_area_raw",
                "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
                "eye_center_x", "eye_center_y", "eye_width", "eye_height",
@@ -200,7 +200,7 @@ def test_process_eye_tracking_data_truncation(eye_tracking_df,
     by <= 15
     """
     df = process_eye_tracking_data(eye_tracking_df, frame_times)
-    np.testing.assert_array_almost_equal(df.time.to_numpy(),
+    np.testing.assert_array_almost_equal(df.timestamps.to_numpy(),
                                          np.array([0.0, 0.1]),
                                          decimal=10)
 

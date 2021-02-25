@@ -231,7 +231,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     cr_areas[likely_blinks] = np.nan
     eye_areas[likely_blinks] = np.nan
 
-    eye_data.insert(0, "time", frame_times)
+    eye_data.insert(0, "timestamps", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)
     eye_data.insert(2, "eye_area", eye_areas)
     eye_data.insert(3, "pupil_area", pupil_areas)

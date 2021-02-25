@@ -233,7 +233,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             eye_tracking_acquisition.corneal_reflection_tracking
 
         eye_tracking_dict = {
-            "time": eye_tracking.timestamps[:],
+            "timestamps": eye_tracking.timestamps[:],
             "cr_area": corneal_reflection_tracking.area_raw[:],
             "eye_area": eye_tracking.area_raw[:],
             "pupil_area": pupil_tracking.area_raw[:],
@@ -480,7 +480,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             width=eye_tracking_df['eye_width'].values,
             height=eye_tracking_df['eye_height'].values,
             angle=eye_tracking_df['eye_phi'].values,
-            timestamps=eye_tracking_df['time'].values
+            timestamps=eye_tracking_df['timestamps'].values
         )
 
         pupil_tracking = EllipseSeries(
