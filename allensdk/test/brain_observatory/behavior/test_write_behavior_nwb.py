@@ -204,3 +204,32 @@ def test_add_task_parameters(nwbfile, roundtrip,
                 assert math.isnan(val)
         else:
             assert val == task_parameters_obt[key]
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_task_parameters_stim_nan(nwbfile, roundtrip,
+                                      roundtripper,
+                                      task_parameters_nan_stimulus_duration):
+    """
+    Same as test_add_task_parameters, but stimulus_duration_sec is NaN
+    """
+    task_params = task_parameters_nan_stimulus_duration
+    nwb.add_task_parameters(nwbfile, task_params)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorNwbApi)
+    else:
+        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
+
+    task_parameters_obt = obt.get_task_parameters()
+
+    assert len(task_parameters_obt) == len(task_params)
+    for key, val in task_params.items():
+        if key in ('omitted_flash_fraction',
+                   'stimulus_duration_sec'):
+            if math.isnan(val):
+                assert math.isnan(task_parameters_obt[key])
+            if math.isnan(task_parameters_obt[key]):
+                assert math.isnan(val)
+        else:
+            assert val == task_parameters_obt[key]
