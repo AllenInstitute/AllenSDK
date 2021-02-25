@@ -15,8 +15,7 @@ from allensdk.brain_observatory.argschema_utilities import (
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
-def write_behavior_ophys_nwb(session_data, nwb_filepath):
-
+def write_behavior_ophys_nwb(session_data, nwb_filepath, skip_eye_tracking=False):
     nwb_filepath_inprogress = nwb_filepath+'.inprogress'
     nwb_filepath_error = nwb_filepath+'.error'
 
@@ -38,13 +37,24 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
                      "with a BehaviorOphysSession created from LIMS")
         assert sessions_are_equal(json_session, lims_session, reraise=True)
 
-        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(json_session)
+        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(json_session,
+                                                          skip_eye_tracking=skip_eye_tracking)
 
         logging.info("Comparing a BehaviorOphysSession created from JSON "
                      "with a BehaviorOphysSession created from NWB")
         nwb_api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
         nwb_session = BehaviorOphysSession(api=nwb_api)
-        assert sessions_are_equal(json_session, nwb_session, reraise=True)
+
+        skip_field = set()
+        if skip_eye_tracking:
+            skip_field.add('_eye_tracking')
+            skip_field.add('_eye_tracking_rig_geometry')
+            skip_field.add('_pupil_tracking')
+            skip_field.add('_corneal_reflection_tracking')
+            skip_field.add('_likely_blink')
+
+        assert sessions_are_equal(json_session, nwb_session, reraise=True,
+                                  skip_field=skip_field)
 
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
@@ -73,7 +83,8 @@ def main():
 
     try:
         output = write_behavior_ophys_nwb(parser.args['session_data'],
-                                          parser.args['output_path'])
+                                          parser.args['output_path'],
+                                          skip_eye_tracking=parser.args['skip_eye_tracking'])
         logging.info('File successfully created')
     except Exception as err:
         logging.error('NWB write failure')

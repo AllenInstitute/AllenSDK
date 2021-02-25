@@ -134,6 +134,8 @@ class InputSchema(ArgSchema):
     output_path = String(required=True, validate=check_write_access_overwrite,
                          description='write outputs to here')
 
+    skip_eye_tracking = Boolean(required=True, default=False,
+                                description='Skip eye tracking data')
 
 class OutputSchema(RaisingSchema):
     output_path = String(required=True, description='write outputs to here')

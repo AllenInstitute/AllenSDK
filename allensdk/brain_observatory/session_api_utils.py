@@ -152,7 +152,7 @@ class ParamsMixin:
         self._updated_params -= data_params
 
 
-def sessions_are_equal(A, B, reraise=False) -> bool:
+def sessions_are_equal(A, B, reraise=False, skip_field=None) -> bool:
     """Check if two Session objects are equal (have same methods and
     attributes).
 
@@ -165,6 +165,9 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
     reraise : bool, optional
         Whether to reraise when encountering an Assertion or AttributeError,
         by default False
+    skip_field: iterable, optional
+        A list or set containing keys to skip when comparing sessions
+        (Default is None)
 
     Returns
     -------
@@ -172,11 +175,18 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
         Whether the two sessions are equal to one another.
     """
 
+    if skip_field is None:
+        skip_field = set()
+
     field_set = set()
     for key, val in A.__dict__.items():
+        if key in skip_field:
+            continue
         if isinstance(val, LazyProperty):
             field_set.add(key)
     for key, val in B.__dict__.items():
+        if key in skip_field:
+            continue
         if isinstance(val, LazyProperty):
             field_set.add(key)
 

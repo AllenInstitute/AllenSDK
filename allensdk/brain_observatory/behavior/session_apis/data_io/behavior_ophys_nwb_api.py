@@ -56,7 +56,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)
         super().__init__(*args, **kwargs)
 
-    def save(self, session_object):
+    def save(self,
+             session_object,
+             skip_eye_tracking=False):
 
         session_type = str(session_object.metadata['session_type'])
 
@@ -156,11 +158,12 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
-        # Add eye tracking and rig geometry to NWB in-memory object.
-        self.add_eye_tracking_data_to_nwb(
-            nwbfile=nwbfile,
-            eye_tracking_df=session_object.eye_tracking,
-            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry)
+        if not skip_eye_tracking:
+            # Add eye tracking and rig geometry to NWB in-memory object.
+            self.add_eye_tracking_data_to_nwb(
+                nwbfile=nwbfile,
+                eye_tracking_df=session_object.eye_tracking,
+                eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry)
 
         # Add events
         self.add_events(nwbfile=nwbfile, events=session_object.events)
