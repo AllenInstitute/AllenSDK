@@ -32,8 +32,8 @@ def create_area_df(data: np.ndarray) -> pd.DataFrame:
 
 
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
-    columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink",
-               "pupil_area_raw", "cr_area_raw", "eye_area_raw",
+    columns = ["timestamps", "cr_area", "eye_area", "pupil_area",
+               "likely_blink", "pupil_area_raw", "cr_area_raw", "eye_area_raw",
                "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
                "eye_center_x", "eye_center_y", "eye_width", "eye_height",
                "eye_phi", "pupil_center_x", "pupil_center_y", "pupil_width",
@@ -174,12 +174,35 @@ def test_determine_likely_blinks(eye_areas, pupil_areas, outliers,
     (create_loaded_eye_tracking_df(
         np.array([[1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1],
                   [2, 2, 1, 1, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2]])),
-     pd.Series([0.1, 0.2, 0.3])),
+     pd.Series(np.arange(0, 1.8, 0.1))),
 ])
 def test_process_eye_tracking_data_raises_on_sync_error(eye_tracking_df,
                                                         frame_times):
+    """
+    Test that an error is raised when the number of sync timestamps exceeds
+    the number of eye tracking frames by more than 15
+    """
     with pytest.raises(RuntimeError, match='Error! The number of sync file'):
         process_eye_tracking_data(eye_tracking_df, frame_times)
+
+
+@pytest.mark.parametrize("eye_tracking_df, frame_times", [
+    (create_loaded_eye_tracking_df(
+        np.array([[1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1],
+                  [2, 2, 1, 1, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2]])),
+     pd.Series(np.arange(0, 1.7, 0.1))),
+])
+def test_process_eye_tracking_data_truncation(eye_tracking_df,
+                                              frame_times):
+    """
+    Test that the array of sync times is truncated when the number
+    of raw sync timestamps exceeds the numer of eye tracking frames
+    by <= 15
+    """
+    df = process_eye_tracking_data(eye_tracking_df, frame_times)
+    np.testing.assert_array_almost_equal(df.timestamps.to_numpy(),
+                                         np.array([0.0, 0.1]),
+                                         decimal=10)
 
 
 @pytest.mark.parametrize("eye_tracking_df, frame_times, expected", [

@@ -30,7 +30,7 @@ def test_get_rewards():
     expected = pd.DataFrame(
         {"volume": [0.007, 0.008],
          "timestamps": [14.0, 15.0],
-         "autorewarded": [False, True]}).set_index("timestamps", drop=True)
+         "autorewarded": [False, True]})
 
     timesteps = -1*np.ones(100, dtype=float)
     timesteps[55] = 14.0

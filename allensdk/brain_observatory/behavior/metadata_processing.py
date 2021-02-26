@@ -1,4 +1,6 @@
+from typing import Dict
 import re
+import numpy as np
 
 description_dict = {
     # key is a regex and value is returned on match
@@ -55,25 +57,82 @@ def get_expt_description(session_type: str) -> str:
     return match.popitem()[1]
 
 
-def get_task_parameters(data):
+def get_task_parameters(data: Dict) -> Dict:
+    """
+    Read task_parameters metadata from the behavior stimulus pickle file.
+
+    Parameters
+    ----------
+    data: dict
+        The nested dict read in from the behavior stimulus pickle file.
+        All of the data expected by this method lives under
+        data['items']['behavior']
+
+    Returns
+    -------
+    dict
+        A dict containing the task_parameters associated with this session.
+    """
     behavior = data["items"]["behavior"]
+    stimuli = behavior['stimuli']
+    config = behavior["config"]
+    doc = config["DoC"]
 
     task_parameters = {}
+
     task_parameters['blank_duration_sec'] = \
-        [float(x) for x in behavior['config']['DoC']['blank_duration_range']]
-    task_parameters['stimulus_duration_sec'] = \
-        behavior['config']['DoC']['stimulus_window']
+        [float(x) for x in doc['blank_duration_range']]
+
+    if 'images' in stimuli:
+        stim_key = 'images'
+    elif 'grating' in stimuli:
+        stim_key = 'grating'
+    else:
+        msg = "Cannot get stimulus_duration_sec\n"
+        msg += "'images' and/or 'grating' not a valid "
+        msg += "key in pickle file under "
+        msg += "['items']['behavior']['stimuli']\n"
+        msg += f"keys: {list(stimuli.keys())}"
+        raise RuntimeError(msg)
+
+    stim_duration = stimuli[stim_key]['flash_interval_sec']
+
+    # from discussion in
+    # https://github.com/AllenInstitute/AllenSDK/issues/1572
+    #
+    # 'flash_interval' contains (stimulus_duration, gray_screen_duration)
+    # (as @matchings said above). That second value is redundant with
+    # 'blank_duration_range'. I'm not sure what would happen if they were
+    # set to be conflicting values in the params. But it looks like
+    # they're always consistent. It should always be (0.25, 0.5),
+    # except for TRAINING_0 and TRAINING_1, which have statically
+    # displayed stimuli (no flashes).
+
+    if stim_duration is None:
+        stim_duration = np.NaN
+    else:
+        stim_duration = stim_duration[0]
+
+    task_parameters['stimulus_duration_sec'] = stim_duration
+
     task_parameters['omitted_flash_fraction'] = \
         behavior['params'].get('flash_omit_probability', float('nan'))
     task_parameters['response_window_sec'] = \
-        [float(x) for x in behavior["config"]["DoC"]["response_window"]]
-    task_parameters['reward_volume'] = \
-        behavior["config"]["reward"]["reward_volume"]
-    task_parameters['stage'] = behavior["params"]["stage"]
+        [float(x) for x in doc["response_window"]]
+    task_parameters['reward_volume'] = config["reward"]["reward_volume"]
+    task_parameters['auto_reward_volume'] = doc['auto_reward_volume']
+    task_parameters['session_type'] = behavior["params"]["stage"]
     task_parameters['stimulus'] = next(iter(behavior["stimuli"]))
-    task_parameters['stimulus_distribution'] = \
-        behavior["config"]["DoC"]["change_time_dist"]
-    task_parameters['task'] = behavior["config"]["behavior"]["task_id"]
+    task_parameters['stimulus_distribution'] = doc["change_time_dist"]
+
+    task_id = config['behavior']['task_id']
+    if 'DoC' in task_id:
+        task_parameters['task'] = 'change detection'
+    else:
+        msg = "metadata_processing.get_task_parameters does not "
+        msg += f"know how to parse 'task_id' = {task_id}"
+        raise RuntimeError(msg)
+
     n_stimulus_frames = 0
     for stim_type, stim_table in behavior["stimuli"].items():
         n_stimulus_frames += sum(stim_table.get("draw_log", []))

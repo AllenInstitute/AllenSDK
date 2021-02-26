@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 import warnings
 
+import imageio
 import numpy as np
 import pandas as pd
 import pytz
@@ -19,8 +20,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
     StimulusTemplate)
 from allensdk.brain_observatory.behavior.trials_processing import (
-    get_extended_trials, get_trials)
-from allensdk.brain_observatory.running_speed import RunningSpeed
+    get_extended_trials, get_trials_from_data_transform)
 from allensdk.core.exceptions import DataFrameIndexError
 
 
@@ -66,6 +66,7 @@ class BehaviorDataTransforms(BehaviorBase):
 
         return behavior_pkl_uuid
 
+    @memoize
     def get_licks(self) -> pd.DataFrame:
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
@@ -90,9 +91,28 @@ class BehaviorDataTransforms(BehaviorBase):
         stimulus_timestamps = self.get_stimulus_timestamps()
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
-        lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
 
+        # there's an occasional bug where the number of logged
+        # frames is one greater than the number of vsync intervals.
+        # If the animal licked on this last frame it will cause an
+        # error here. This fixes the problem.
+        # see: https://github.com/AllenInstitute/visual_behavior_analysis/issues/572  # noqa: E501
+        #    & https://github.com/AllenInstitute/visual_behavior_analysis/issues/379  # noqa:E501
+        #
+        # This bugfix copied from
+        # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract.py#L640-L647
+
+        if len(lick_frames) > 0:
+            if lick_frames[-1] == len(stimulus_timestamps):
+                lick_frames = lick_frames[:-1]
+                self.logger.error('removed last lick - '
+                                  'it fell outside of stimulus_timestamps '
+                                  'range')
+
+        lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
+        return pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
+
+    @memoize
     def get_rewards(self) -> pd.DataFrame:
         """Get reward data from pkl file, based on pkl file timestamps
         (not sync file).
@@ -224,8 +244,62 @@ class BehaviorDataTransforms(BehaviorBase):
         -------
         StimulusTemplate or None if there are no images for the experiment
         """
+
+        # TODO: Eventually the `grating_images_dict` should be provided by the
+        #       BehaviorLimsExtractor/BehaviorJsonExtractor classes.
+        #       - NJM 2021/2/23
+        grating_images_dict = {
+            "gratings_0.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_0.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/"
+                    "masked_unwarped_grating_0.png"))
+            },
+            "gratings_90.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_90.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior"
+                    "/masked_unwarped_grating_90.png"))
+            },
+            "gratings_180.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_180.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/"
+                    "masked_unwarped_grating_180.png"))
+            },
+            "gratings_270.0": {
+                "warped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior/warped_grating_270.png")),
+                "unwarped": np.asarray(imageio.imread(
+                    "/allen/programs/braintv/production/visualbehavior"
+                    "/prod5/project_VisualBehavior"
+                    "/masked_unwarped_grating_270.png"))
+            }
+        }
+
         pkl = self._behavior_stimulus_file()
-        return get_stimulus_templates(pkl=pkl)
+        return get_stimulus_templates(pkl=pkl,
+                                      grating_images_dict=grating_images_dict)
+
+    def get_monitor_delay(self) -> float:
+        """
+        Return monitor delay for behavior only sessions
+        (in seconds)
+        """
+        # This is the median estimate across all rigs
+        # as discussed in
+        # https://github.com/AllenInstitute/AllenSDK/issues/1318
+        return 0.02115
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file. Align to the
@@ -257,6 +331,7 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         return get_task_parameters(data)
 
+    @memoize
     def get_trials(self) -> pd.DataFrame:
         """Get trials from pkl file
 
@@ -266,15 +341,8 @@ class BehaviorDataTransforms(BehaviorBase):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
-        timestamps = self.get_stimulus_timestamps()
-        licks = self.get_licks()
-        data = self._behavior_stimulus_file()
-        rewards = self.get_rewards()
 
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
+        trial_df = get_trials_from_data_transform(self)
 
         return trial_df
 

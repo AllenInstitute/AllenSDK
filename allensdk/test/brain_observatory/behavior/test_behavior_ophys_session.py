@@ -1,7 +1,6 @@
 import os
 import datetime
 import uuid
-import math
 import pytest
 import pandas as pd
 import pytz
@@ -17,6 +16,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.session_api_utils import (
     sessions_are_equal, compare_session_fields)
+from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 
 
 @pytest.mark.requires_bamboo
@@ -73,25 +73,26 @@ def test_visbeh_ophys_data_set():
 
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
-           str(data_set.api.get_behavior_session_uuid())
+        str(data_set.api.get_behavior_session_uuid())
 
-    stimulus_templates = data_set.stimulus_templates
+    stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
-    assert stimulus_templates['im000'].shape == (918, 1174)
+    assert stimulus_templates['im000'].warped.shape == MONITOR_DIMENSIONS
+    assert stimulus_templates['im000'].unwarped.shape == MONITOR_DIMENSIONS
 
-    assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
-           == ['time', 'frame']
-    assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == \
-           ['volume', 'autorewarded']
+    assert len(data_set.licks) == 2421 and set(data_set.licks.columns) \
+        == set(['timestamps', 'frame'])
+    assert len(data_set.rewards) == 85 and set(data_set.rewards.columns) == \
+        set(['timestamps', 'volume', 'autorewarded'])
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
-           sorted(data_set.corrected_fluorescence_traces.columns) == \
-           ['cell_roi_id', 'corrected_fluorescence']
+        set(data_set.corrected_fluorescence_traces.columns) == \
+        set(['cell_roi_id', 'corrected_fluorescence'])
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps,
                                          data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
     assert data_set.average_projection.data.shape == \
-           data_set.max_projection.data.shape
-    assert list(data_set.motion_correction.columns) == ['x', 'y']
+        data_set.max_projection.data.shape
+    assert set(data_set.motion_correction.columns) == set(['x', 'y'])
     assert len(data_set.trials) == 602
 
     expected_metadata = {
@@ -126,14 +127,15 @@ def test_visbeh_ophys_data_set():
     assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
-                                        'stimulus_duration_sec': 6.0,
+                                        'stimulus_duration_sec': 0.25,
                                         'stimulus': 'images',
                                         'omitted_flash_fraction': 0.05,
                                         'blank_duration_sec': [0.5, 0.5],
                                         'n_stimulus_frames': 69882,
-                                        'task': 'DoC_untranslated',
+                                        'task': 'change detection',
                                         'response_window_sec': [0.15, 0.75],
-                                        'stage': u'OPHYS_6_images_B'}
+                                        'session_type': u'OPHYS_6_images_B',
+                                        'auto_reward_volume': 0.005}
 
 
 @pytest.mark.requires_bamboo

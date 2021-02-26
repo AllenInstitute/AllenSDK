@@ -9,6 +9,8 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
+import warnings
+
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
@@ -20,7 +22,6 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -36,14 +37,16 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     populating a BehaviorOphysSession.
     """
 
-    def __init__(self, extractor: BehaviorOphysDataExtractorBase):
+    def __init__(self,
+                 extractor: BehaviorOphysDataExtractorBase,
+                 skip_eye_tracking: bool):
         super().__init__(extractor=extractor)
 
         # Type checker not able to resolve that self.extractor is a
         # BehaviorOphysDataExtractorBase. Explicitly adding as instance
         # attribute fixes the issue.
         self.extractor = extractor
-
+        self._skip_eye_tracking = skip_eye_tracking
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_ophys_session_id(self):
@@ -52,8 +55,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_ophys_experiment_id(self):
         return self.extractor.get_ophys_experiment_id()
 
-    def get_eye_tracking_rig_geometry(self) -> dict:
-        return self.extractor.get_eye_tracking_rig_geometry()
+    def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
+        if self._skip_eye_tracking:
+            return None
+        else:
+            return self.extractor.get_eye_tracking_rig_geometry()
 
     @memoize
     def get_cell_specimen_table(self):
@@ -138,12 +144,63 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
-    @memoize
-    def get_stimulus_timestamps(self):
+    def _load_stimulus_timestamps_and_delay(self):
+        """
+        Load the stimulus timestamps (uncorrected for
+        monitor delay) and the monitor delay
+        """
         sync_path = self.extractor.get_sync_file()
-        timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
-                            .corrected_stim_timestamps)
-        return np.array(timestamps)
+        aligner = OphysTimeAligner(sync_file=sync_path)
+        (self._stimulus_timestamps,
+         delta) = aligner.clipped_stim_timestamps
+
+        try:
+            delay = aligner.monitor_delay
+        except ValueError as ee:
+            rig_name = self.get_metadata()['rig_name']
+
+            warning_msg = 'Monitory delay calculation failed '
+            warning_msg += 'with ValueError\n'
+            warning_msg += f'    "{ee}"'
+            warning_msg += '\nlooking monitor delay up from table '
+            warning_msg += f'for rig: {rig_name} '
+
+            # see
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            # https://github.com/AllenInstitute/AllenSDK/issues/1916
+            delay_lookup = {'CAM2P.1': 0.020842,
+                            'CAM2P.2': 0.037566,
+                            'CAM2P.3': 0.021390,
+                            'CAM2P.4': 0.021102,
+                            'CAM2P.5': 0.021192,
+                            'MESO.1': 0.03613}
+
+            if rig_name not in delay_lookup:
+                msg = warning_msg
+                msg += f'\nrig_name {rig_name} not in lookup table'
+                raise RuntimeError(msg)
+            delay = delay_lookup[rig_name]
+            warning_msg += f'\ndelay: {delay} seconds'
+            warnings.warn(warning_msg)
+
+        self._monitor_delay = delay
+
+    def get_stimulus_timestamps(self):
+        """
+        Return a numpy array of stimulus timestamps uncorrected
+        for monitor delay (in seconds)
+        """
+        if not hasattr(self, '_stimulus_timestamps'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._stimulus_timestamps
+
+    def get_monitor_delay(self):
+        """
+        Return the monitor delay (in seconds)
+        """
+        if not hasattr(self, '_monitor_delay'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._monitor_delay
 
     @staticmethod
     def _process_ophys_plane_timestamps(
@@ -275,44 +332,10 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return pd.DataFrame({'time': lick_times})
 
     @memoize
-    def get_licks(self) -> pd.DataFrame:
-        """
-        Returns
-        -------
-        pd.DataFrame
-            Two columns: "time", which contains the sync time
-            of the licks that occurred in this session and "frame",
-            the frame numbers of licks that occurred in this session
-        """
-        data = self._behavior_stimulus_file()
-        timestamps = self.get_stimulus_timestamps()
-        # Get licks from pickle file (need to add an offset to align with
-        # the trial_log time stream)
-        lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
-                       ["lick_events"])
-        lick_times = timestamps[lick_frames]
-        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
-
-    @memoize
     def get_rewards(self):
         data = self._behavior_stimulus_file()
         timestamps = self.get_stimulus_timestamps()
         return get_rewards(data, timestamps)
-
-    @memoize
-    def get_trials(self):
-
-        timestamps = self.get_stimulus_timestamps()
-        licks = self.get_licks()
-        rewards = self.get_rewards()
-        data = self._behavior_stimulus_file()
-
-        trial_df = get_trials(data,
-                              licks,
-                              rewards,
-                              timestamps)
-
-        return trial_df
 
     @memoize
     def get_corrected_fluorescence_traces(self):
@@ -379,7 +402,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     @memoize
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
-                         dilation_frames: int = 2):
+                         dilation_frames: int = 2) -> Optional[pd.DataFrame]:
         """Gets corneal, eye, and pupil ellipse fit data
 
         Parameters
@@ -394,7 +417,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         Returns
         -------
-        pd.DataFrame
+        Optional[pd.DataFrame]
             *_area
             *_center_x
             *_center_y
@@ -403,12 +426,15 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             *_width
             likely_blink
         where "*" can be "corneal", "pupil" or "eye"
-        """
-        logger = logging.getLogger("BehaviorOphysLimsApi")
 
-        logger.info(f"Getting eye_tracking_data with "
-                    f"'z_threshold={z_threshold}', "
-                    f"'dilation_frames={dilation_frames}'")
+        Will return None if class attr _skip_eye_tracking is True.
+        """
+        if self._skip_eye_tracking:
+            return None
+
+        self.logger.info(f"Getting eye_tracking_data with "
+                         f"'z_threshold={z_threshold}', "
+                         f"'dilation_frames={dilation_frames}'")
 
         filepath = Path(self.extractor.get_eye_tracking_filepath())
         sync_path = Path(self.extractor.get_sync_file())

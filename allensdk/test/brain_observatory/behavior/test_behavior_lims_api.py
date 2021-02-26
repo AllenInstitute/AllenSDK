@@ -201,7 +201,7 @@ def test_get_stimulus_timestamps(MockBehaviorLimsApi):
 
 def test_get_licks(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
-    expected = pd.DataFrame({"time": [0.016 * i for i in [2., 6., 9.]],
+    expected = pd.DataFrame({"timestamps": [0.016 * i for i in [2., 6., 9.]],
                              "frame": [2, 6, 9]})
     pd.testing.assert_frame_equal(expected, api.get_licks())
 
@@ -273,9 +273,8 @@ class TestBehaviorRegression:
                 == self.od.extractor.get_behavior_stimulus_file())
 
     def test_get_rewards_regression(self):
-        """Index is timestamps here, so remove it before comparing."""
-        bd_rewards = self.bd.get_rewards().reset_index(drop=True)
-        od_rewards = self.od.get_rewards().reset_index(drop=True)
+        bd_rewards = self.bd.get_rewards().drop(columns=['timestamps'])
+        od_rewards = self.od.get_rewards().drop(columns=['timestamps'])
         pd.testing.assert_frame_equal(bd_rewards, od_rewards)
 
     def test_ophys_experiment_id_regression(self):
@@ -324,7 +323,15 @@ class TestBehaviorRegression:
         od_template = self.od.get_stimulus_templates()
         assert bd_template.keys() == od_template.keys()
         for k in bd_template.keys():
-            assert np.array_equal(bd_template[k], od_template[k])
+            bd_template_img = bd_template[k]
+            od_template_img = od_template[k]
+
+            assert np.allclose(bd_template_img.unwarped,
+                               od_template_img.unwarped,
+                               equal_nan=True)
+            assert np.allclose(bd_template_img.warped,
+                               od_template_img.warped,
+                               equal_nan=True)
 
     def test_get_task_parameters_regression(self):
         bd_params = self.bd.get_task_parameters()

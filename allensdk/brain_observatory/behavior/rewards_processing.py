@@ -1,7 +1,6 @@
 from typing import Dict
 import numpy as np
 import pandas as pd
-from collections import defaultdict
 
 
 def get_rewards(data: Dict,
@@ -31,13 +30,14 @@ def get_rewards(data: Dict,
     trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])
     rewards_dict = {"volume": [], "timestamps": [], "autorewarded": []}
     for idx, trial in trial_df.iterrows():
-        rewards = trial["rewards"]  # as i write this there can only ever be one reward per trial
+        rewards = trial["rewards"]
+        # as i write this there can only ever be one reward per trial
         if rewards:
             rewards_dict["volume"].append(rewards[0][0])
             rewards_dict["timestamps"].append(timestamps[rewards[0][2]])
             auto_rwrd = trial["trial_params"]["auto_reward"]
             rewards_dict["autorewarded"].append(auto_rwrd)
 
-    df = pd.DataFrame(rewards_dict).set_index("timestamps", drop=True)
+    df = pd.DataFrame(rewards_dict)
 
     return df

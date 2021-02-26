@@ -93,12 +93,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        # Not all sessions will have stimulus_templates (e.g. gratings)
-        if session_object.stimulus_templates:
-            self._add_stimulus_templates(
-                nwbfile=nwbfile,
-                stimulus_templates=session_object.stimulus_templates,
-                stimulus_presentations=session_object.stimulus_presentations)
+        # Use the semi-private _stimulus_templates attribute because it is
+        # a StimulusTemplate object. The public stimulus_templates property
+        # of the session_object returns a DataFrame.
+        session_stimulus_templates = session_object._stimulus_templates
+        self._add_stimulus_templates(
+            nwbfile=nwbfile,
+            stimulus_templates=session_stimulus_templates,
+            stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(
@@ -154,11 +156,13 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add motion correction to NWB in-memory object:
         nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
-        # Add eye tracking and rig geometry to NWB in-memory object.
-        self.add_eye_tracking_data_to_nwb(
-            nwbfile=nwbfile,
-            eye_tracking_df=session_object.eye_tracking,
-            eye_tracking_rig_geometry=session_object.eye_tracking_rig_geometry)
+        # Add eye tracking and rig geometry to NWB in-memory object
+        # if eye_tracking data exists.
+        if session_object.eye_tracking is not None:
+            self.add_eye_tracking_data_to_nwb(
+                nwbfile,
+                session_object.eye_tracking,
+                session_object.eye_tracking_rig_geometry)
 
         # Add events
         self.add_events(nwbfile=nwbfile, events=session_object.events)
@@ -229,7 +233,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             eye_tracking_acquisition.corneal_reflection_tracking
 
         eye_tracking_dict = {
-            "time": eye_tracking.timestamps[:],
+            "timestamps": eye_tracking.timestamps[:],
             "cr_area": corneal_reflection_tracking.area_raw[:],
             "eye_area": eye_tracking.area_raw[:],
             "pupil_area": pupil_tracking.area_raw[:],
@@ -476,7 +480,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             width=eye_tracking_df['eye_width'].values,
             height=eye_tracking_df['eye_height'].values,
             angle=eye_tracking_df['eye_phi'].values,
-            timestamps=eye_tracking_df['time'].values
+            timestamps=eye_tracking_df['timestamps'].values
         )
 
         pupil_tracking = EllipseSeries(

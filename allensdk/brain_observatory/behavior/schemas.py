@@ -215,6 +215,7 @@ class BehaviorTaskParametersSchema(RaisingSchema):
     stimulus_duration_sec = fields.Float(
         doc='Duration of each stimulus presentation in seconds',
         required=True,
+        allow_nan=True
     )
     omitted_flash_fraction = fields.Float(
         doc='Fraction of flashes/image presentations that were omitted',
@@ -232,7 +233,11 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Volume of water (in mL) delivered as reward',
         required=True,
     )
-    stage = fields.String(
+    auto_reward_volume = fields.Float(
+        doc='Volume of water (in mL) delivered as an automatic reward',
+        required=True,
+    )
+    session_type = fields.String(
         doc='Stage of behavioral task',
         required=True,
     )

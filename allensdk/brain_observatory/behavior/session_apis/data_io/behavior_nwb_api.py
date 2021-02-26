@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+    StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -75,12 +75,14 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
                                          from_dataframe=True)
 
         # Add stimulus template data to NWB in-memory object:
-        # Not all sessions will have stimulus_templates (e.g. gratings)
-        if session_object.stimulus_templates:
-            self._add_stimulus_templates(
-                nwbfile=nwbfile,
-                stimulus_templates=session_object.stimulus_templates,
-                stimulus_presentations=session_object.stimulus_presentations)
+        # Use the semi-private _stimulus_templates attribute because it is
+        # a StimulusTemplate object. The public stimulus_templates property
+        # of the session_object returns a DataFrame.
+        session_stimulus_templates = session_object._stimulus_templates
+        self._add_stimulus_templates(
+            nwbfile=nwbfile,
+            stimulus_templates=session_stimulus_templates,
+            stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
         set_omitted_stop_time(
@@ -200,12 +202,10 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
         image_attributes = [{'image_name': image_name}
                             for image_name in image_data.control_description]
-        stimulus_templates = StimulusTemplate(
-            image_set_name=image_set_name,
-            image_attributes=image_attributes,
-            images=image_data.data[:]
+        return StimulusTemplateFactory.from_processed(
+            image_set_name=image_set_name, image_attributes=image_attributes,
+            warped=image_data.data[:], unwarped=image_data.unwarped[:]
         )
-        return stimulus_templates
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         stim_module = self.nwbfile.processing['stimulus']
@@ -224,7 +224,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             licks = lick_module.get_data_interface('licks')
 
             return pd.DataFrame({
-                'time': licks.timestamps[:],
+                'timestamps': licks.timestamps[:],
                 'frame': licks.data[:]
             })
         else:
@@ -238,11 +238,11 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             volume = rewards.get_data_interface('volume').data[:]
             return pd.DataFrame({
                 'volume': volume, 'timestamps': time,
-                'autorewarded': autorewarded}).set_index('timestamps')
+                'autorewarded': autorewarded})
         else:
             return pd.DataFrame({
                 'volume': [], 'timestamps': [],
-                'autorewarded': []}).set_index('timestamps')
+                'autorewarded': []})
 
     def get_metadata(self) -> dict:
 

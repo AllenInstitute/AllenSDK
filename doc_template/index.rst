@@ -91,6 +91,13 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.8.0
+-----------------------------------------------------------------------
+- Created lookup table to get monitor_delay for cases where calculation from data fails
+- If sync timestamp file has more timestamps than eye tracking moving has frame, trim excess timestamps (up to 15)
+- Session API returns both warped and unwarped stimulus images, and both are written to NWB
+
+
 What's New - 2.7.0
 -----------------------------------------------------------------------
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue

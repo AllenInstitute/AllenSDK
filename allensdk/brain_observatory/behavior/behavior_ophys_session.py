@@ -234,7 +234,7 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
 
     @events.setter
     def events(self, value):
-        self_events = value
+        self._events = value
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
