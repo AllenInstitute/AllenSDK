@@ -381,8 +381,8 @@ class TestBehaviorRegression:
                 == self.od.extractor.get_driver_line())
 
     def test_get_external_specimen_name_regression(self):
-        assert (self.bd.extractor.get_external_specimen_name()
-                == self.od.extractor.get_external_specimen_name())
+        assert (self.bd.extractor.get_mouse_id()
+                == self.od.extractor.get_mouse_id())
 
     def test_get_full_genotype_regression(self):
         assert (self.bd.extractor.get_full_genotype()

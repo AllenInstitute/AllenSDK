@@ -64,8 +64,8 @@ class BehaviorDataExtractorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_external_specimen_name(self) -> int:
-        """Get the external specimen id (LabTracks ID) for the subject
+    def get_mouse_id(self) -> int:
+        """Get the mouse id (LabTracks ID) for the subject
         associated with a behavior experiment"""
         raise NotImplementedError()
 

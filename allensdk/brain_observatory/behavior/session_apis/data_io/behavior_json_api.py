@@ -70,7 +70,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         """Get the filepath to the StimulusPickle file for the session"""
         return self.data['behavior_stimulus_file']
 
-    def get_external_specimen_name(self) -> int:
+    def get_mouse_id(self) -> int:
         """Get the external specimen id (LabTracks ID) for the subject
         associated with a behavior experiment"""
         return int(self.data['external_specimen_name'])

@@ -352,7 +352,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         # Add pyNWB Subject metadata to behavior ophys session metadata
         nwb_subject = self.nwbfile.subject
-        data['LabTracks_ID'] = int(nwb_subject.subject_id)
+        data['mouse_id'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
         data['age'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype

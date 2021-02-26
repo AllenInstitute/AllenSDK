@@ -825,7 +825,7 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename or reformat incoming metadata fields to conform with pynwb fields
     tmp_metadata = metadata.copy()
-    tmp_metadata["subject_id"] = tmp_metadata.pop("LabTracks_ID")
+    tmp_metadata["subject_id"] = tmp_metadata.pop("mouse_id")
     tmp_metadata["genotype"] = tmp_metadata.pop("full_genotype")
 
     if not behavior_only:

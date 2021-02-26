@@ -41,9 +41,9 @@ class SubjectMetadataSchema(RaisingSchema):
         doc='full genotype of subject',
         required=True,
     )
-    # 'LabTracks_ID' will be stored in pynwb Subject 'subject_id' attr
+    # 'mouse_id' will be stored in pynwb Subject 'subject_id' attr
     subject_id = fields.Int(
-        doc='LabTracks ID of subject',
+        doc='Mouse ID of subject',
         required=True,
     )
     reporter_line = fields.List(

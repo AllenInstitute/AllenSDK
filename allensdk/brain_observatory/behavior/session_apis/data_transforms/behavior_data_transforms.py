@@ -421,7 +421,7 @@ class BehaviorDataTransforms(BehaviorBase):
             "experiment_datetime": self.get_experiment_date(),
             "reporter_line": sorted(self.extractor.get_reporter_line()),
             "driver_line": sorted(self.extractor.get_driver_line()),
-            "LabTracks_ID": self.extractor.get_external_specimen_name(),
+            "mouse_id": self.extractor.get_mouse_id(),
             "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
             "behavior_session_id": self.extractor.get_behavior_session_id()

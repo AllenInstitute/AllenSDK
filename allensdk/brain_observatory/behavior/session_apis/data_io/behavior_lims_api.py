@@ -318,7 +318,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return result
 
     @memoize
-    def get_external_specimen_name(self) -> int:
+    def get_mouse_id(self) -> int:
         """Returns the LabTracks ID
         :rtype: int
         """

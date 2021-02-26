@@ -21,7 +21,7 @@ def api_data():
                        'stimulus_name': 'Unknown',
                        'reporter_line': ['Ai148(TIT2L-GC6f-ICL-tTA2)'],
                        'driver_line': ['Vip-IRES-Cre'],
-                       'LabTracks_ID': 363887,
+                       'mouse_id': 363887,
                        'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                        'workflow_state': 'passed',
                        }
@@ -160,10 +160,10 @@ def test_get_driver_line(ophys_experiment_id, api_data):
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
-def test_get_LabTracks_ID(ophys_experiment_id, api_data):
+def test_get_mouse_ID(ophys_experiment_id, api_data):
     ophys_lims_api = OphysLimsExtractor(ophys_experiment_id)
     f = ophys_lims_api.get_external_specimen_name
-    key = 'LabTracks_ID'
+    key = 'mouse_id'
     if ophys_experiment_id in api_data:
         assert f() == api_data[ophys_experiment_id][key]
     else:
