@@ -22,8 +22,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase
 )
 from allensdk.brain_observatory.behavior.schemas import (
-    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema,
-    OphysEyeTrackingRigMetadataSchema)
+    BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -42,7 +41,6 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import (
 )
 
 
-load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
@@ -173,17 +171,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return nwbfile
 
-    def get_nwb_metadata(self) -> dict:
-        metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-        data = OphysBehaviorMetadataSchema(
-            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
-        return data
-
     def get_behavior_session_id(self) -> int:
-        return self.get_nwb_metadata()['behavior_session_id']
+        return self.get_metadata()['behavior_session_id']
 
     def get_ophys_session_id(self) -> int:
-        return self.get_nwb_metadata()['ophys_session_id']
+        return self.get_metadata()['ophys_session_id']
 
     def get_ophys_experiment_id(self) -> int:
         return int(self.nwbfile.identifier)
@@ -348,16 +340,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                               'ophys', image_api=image_api)
 
     def get_metadata(self) -> dict:
-        data = self.get_nwb_metadata()
-
-        # Add pyNWB Subject metadata to behavior ophys session metadata
-        nwb_subject = self.nwbfile.subject
-        data['mouse_id'] = int(nwb_subject.subject_id)
-        data['sex'] = nwb_subject.sex
-        data['age_in_days'] = nwb_subject.age_in_days
-        data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
-        data['driver_line'] = sorted(list(nwb_subject.driver_line))
+        data = super().get_metadata()
 
         # Add pyNWB OpticalChannel and ImagingPlane metadata to behavior ophys
         # session metadata
@@ -388,10 +371,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         else:
             data["imaging_plane_group"] = nwb_imaging_plane_group
 
-        # Add other metadata stored in nwb file to behavior ophys session meta
-        data['experiment_datetime'] = self.nwbfile.session_start_time
-        data['behavior_session_uuid'] = uuid.UUID(
-            data['behavior_session_uuid'])
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
