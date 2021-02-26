@@ -9,18 +9,19 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
+import warnings
+
 from allensdk.api.cache import memoize
+from allensdk.brain_observatory.behavior.event_detection import \
+    filter_events_array
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorOphysBase, BehaviorOphysDataExtractorBase)
 
-
-from allensdk.brain_observatory.behavior.sync import (
-    get_sync_data, get_stimulus_rebase_function, frame_time_offset)
+from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, process_eye_tracking_data)
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -36,18 +37,29 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     populating a BehaviorOphysSession.
     """
 
-    def __init__(self, extractor: BehaviorOphysDataExtractorBase):
+    def __init__(self,
+                 extractor: BehaviorOphysDataExtractorBase,
+                 skip_eye_tracking: bool):
         super().__init__(extractor=extractor)
+
+        # Type checker not able to resolve that self.extractor is a
+        # BehaviorOphysDataExtractorBase. Explicitly adding as instance
+        # attribute fixes the issue.
+        self.extractor = extractor
+        self._skip_eye_tracking = skip_eye_tracking
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    def get_ophys_session_id(self):
+        return self.extractor.get_ophys_session_id()
 
     def get_ophys_experiment_id(self):
         return self.extractor.get_ophys_experiment_id()
 
-    def get_ophys_session_id(self):
-        return self.extractor.get_ophys_experiment_id()
-
-    def get_eye_tracking_rig_geometry(self) -> dict:
-        return self.extractor.get_eye_tracking_rig_geometry()
+    def get_eye_tracking_rig_geometry(self) -> Optional[dict]:
+        if self._skip_eye_tracking:
+            return None
+        else:
+            return self.extractor.get_eye_tracking_rig_geometry()
 
     @memoize
     def get_cell_specimen_table(self):
@@ -132,12 +144,63 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         sync_path = self.extractor.get_sync_file()
         return get_sync_data(sync_path)
 
-    @memoize
-    def get_stimulus_timestamps(self):
+    def _load_stimulus_timestamps_and_delay(self):
+        """
+        Load the stimulus timestamps (uncorrected for
+        monitor delay) and the monitor delay
+        """
         sync_path = self.extractor.get_sync_file()
-        timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
-                            .corrected_stim_timestamps)
-        return timestamps
+        aligner = OphysTimeAligner(sync_file=sync_path)
+        (self._stimulus_timestamps,
+         delta) = aligner.clipped_stim_timestamps
+
+        try:
+            delay = aligner.monitor_delay
+        except ValueError as ee:
+            rig_name = self.get_metadata()['rig_name']
+
+            warning_msg = 'Monitory delay calculation failed '
+            warning_msg += 'with ValueError\n'
+            warning_msg += f'    "{ee}"'
+            warning_msg += '\nlooking monitor delay up from table '
+            warning_msg += f'for rig: {rig_name} '
+
+            # see
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            # https://github.com/AllenInstitute/AllenSDK/issues/1916
+            delay_lookup = {'CAM2P.1': 0.020842,
+                            'CAM2P.2': 0.037566,
+                            'CAM2P.3': 0.021390,
+                            'CAM2P.4': 0.021102,
+                            'CAM2P.5': 0.021192,
+                            'MESO.1': 0.03613}
+
+            if rig_name not in delay_lookup:
+                msg = warning_msg
+                msg += f'\nrig_name {rig_name} not in lookup table'
+                raise RuntimeError(msg)
+            delay = delay_lookup[rig_name]
+            warning_msg += f'\ndelay: {delay} seconds'
+            warnings.warn(warning_msg)
+
+        self._monitor_delay = delay
+
+    def get_stimulus_timestamps(self):
+        """
+        Return a numpy array of stimulus timestamps uncorrected
+        for monitor delay (in seconds)
+        """
+        if not hasattr(self, '_stimulus_timestamps'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._stimulus_timestamps
+
+    def get_monitor_delay(self):
+        """
+        Return the monitor delay (in seconds)
+        """
+        if not hasattr(self, '_monitor_delay'):
+            self._load_stimulus_timestamps_and_delay()
+        return self._monitor_delay
 
     @staticmethod
     def _process_ophys_plane_timestamps(
@@ -172,10 +235,6 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         resampled = ophys_timestamps[plane_group::group_count]
         return resampled
 
-    def get_behavior_session_uuid(self):
-        data = self._behavior_stimulus_file()
-        return data['session_uuid']
-
     @memoize
     def get_ophys_frame_rate(self):
         ophys_timestamps = self.get_ophys_timestamps()
@@ -186,28 +245,33 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         """Return metadata about the session.
         :rtype: dict
         """
+        extractor = self.extractor
+
         behavior_session_uuid = self.get_behavior_session_uuid()
-        fov_shape = self.extractor.get_field_of_view_shape()
-        expt_container_id = self.extractor.get_experiment_container_id()
+        fov_shape = extractor.get_field_of_view_shape()
+        expt_container_id = extractor.get_experiment_container_id()
 
         metadata = {
-            'ophys_experiment_id': self.extractor.get_ophys_experiment_id(),
+            'behavior_session_id': extractor.get_behavior_session_id(),
+            'ophys_session_id': extractor.get_ophys_session_id(),
+            'ophys_experiment_id': extractor.get_ophys_experiment_id(),
             'experiment_container_id': expt_container_id,
             'ophys_frame_rate': self.get_ophys_frame_rate(),
             'stimulus_frame_rate': self.get_stimulus_frame_rate(),
-            'targeted_structure': self.extractor.get_targeted_structure(),
-            'imaging_depth': self.extractor.get_imaging_depth(),
-            'session_type': self.extractor.get_stimulus_name(),
-            'experiment_datetime': self.extractor.get_experiment_date(),
-            'reporter_line': self.extractor.get_reporter_line(),
-            'driver_line': self.extractor.get_driver_line(),
-            'LabTracks_ID': self.extractor.get_external_specimen_name(),
-            'full_genotype': self.extractor.get_full_genotype(),
+            'targeted_structure': extractor.get_targeted_structure(),
+            'imaging_depth': extractor.get_imaging_depth(),
+            'session_type': extractor.get_stimulus_name(),
+            'experiment_datetime': extractor.get_experiment_date(),
+            'full_genotype': extractor.get_full_genotype(),
+            'reporter_line': sorted(extractor.get_reporter_line()),
+            'driver_line': sorted(extractor.get_driver_line()),
+            'LabTracks_ID': extractor.get_external_specimen_name(),
             'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
-            'imaging_plane_group': self.extractor.get_imaging_plane_group(),
-            'rig_name': self.extractor.get_rig_name(),
-            'sex': self.extractor.get_sex(),
-            'age': self.extractor.get_age(),
+            'imaging_plane_group': extractor.get_imaging_plane_group(),
+            'imaging_plane_group_count': extractor.get_plane_group_count(),
+            'rig_name': extractor.get_rig_name(),
+            'sex': extractor.get_sex(),
+            'age': extractor.get_age(),
             'excitation_lambda': 910.0,
             'emission_lambda': 520.0,
             'indicator': 'GCAMP6f',
@@ -268,43 +332,10 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return pd.DataFrame({'time': lick_times})
 
     @memoize
-    def get_licks(self):
-        data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
-        # Get licks from pickle file (need to add an offset to align with
-        # the trial_log time stream)
-        lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
-                       ["lick_events"])
-        vsyncs = data["items"]["behavior"]["intervalsms"]
-
-        # Cumulative time
-        vsync_times_raw = np.hstack((0, vsyncs)).cumsum() / 1000.0
-
-        vsync_offset = frame_time_offset(data)
-        vsync_times = vsync_times_raw + vsync_offset
-        lick_times = [vsync_times[frame] for frame in lick_frames]
-        # Align pickle data with sync time stream
-        return pd.DataFrame({"time": list(map(rebase_function, lick_times))})
-
-    @memoize
     def get_rewards(self):
         data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
-        return get_rewards(data, rebase_function)
-
-    @memoize
-    def get_trials(self):
-
-        licks = self.get_licks()
-        rewards = self.get_rewards()
-        stimulus_presentations = self.get_stimulus_presentations()
-        data = self._behavior_stimulus_file()
-        rebase_function = self.get_stimulus_rebase_function()
-
-        trial_df = get_trials(data, licks, rewards,
-                              stimulus_presentations, rebase_function)
-
-        return trial_df
+        timestamps = self.get_stimulus_timestamps()
+        return get_rewards(data, timestamps)
 
     @memoize
     def get_corrected_fluorescence_traces(self):
@@ -368,25 +399,42 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         motion_correction = pd.read_csv(motion_corr_file)
         return motion_correction[['x', 'y']]
 
-    def get_stimulus_rebase_function(self):
-        stimulus_timestamps_no_monitor_delay = (
-            self.get_sync_data()['stimulus_times_no_delay'])
-
-        data = self._behavior_stimulus_file()
-        stimulus_rebase_function = get_stimulus_rebase_function(
-            data, stimulus_timestamps_no_monitor_delay)
-
-        return stimulus_rebase_function
-
     @memoize
     def get_eye_tracking(self,
                          z_threshold: float = 3.0,
-                         dilation_frames: int = 2):
-        logger = logging.getLogger("BehaviorOphysLimsApi")
+                         dilation_frames: int = 2) -> Optional[pd.DataFrame]:
+        """Gets corneal, eye, and pupil ellipse fit data
 
-        logger.info(f"Getting eye_tracking_data with "
-                    f"'z_threshold={z_threshold}', "
-                    f"'dilation_frames={dilation_frames}'")
+        Parameters
+        ----------
+        z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        dilation_frames : int, optional
+             Determines the number of additional adjacent frames to mark as
+            'likely_blink', by default 2.
+
+        Returns
+        -------
+        Optional[pd.DataFrame]
+            *_area
+            *_center_x
+            *_center_y
+            *_height
+            *_phi
+            *_width
+            likely_blink
+        where "*" can be "corneal", "pupil" or "eye"
+
+        Will return None if class attr _skip_eye_tracking is True.
+        """
+        if self._skip_eye_tracking:
+            return None
+
+        self.logger.info(f"Getting eye_tracking_data with "
+                         f"'z_threshold={z_threshold}', "
+                         f"'dilation_frames={dilation_frames}'")
 
         filepath = Path(self.extractor.get_eye_tracking_filepath())
         sync_path = Path(self.extractor.get_sync_file())
@@ -403,6 +451,52 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
                                                       dilation_frames)
 
         return eye_tracking_data
+
+    def get_events(self, filter_scale: float = 2,
+                   filter_n_time_steps: int = 20) -> pd.DataFrame:
+        """
+        Returns events in dataframe format
+
+        Parameters
+        ----------
+        filter_scale: float
+            See filter_events_array for description
+        filter_n_time_steps: int
+            See filter_events_array for description
+
+        See behavior_ophys_session.events for return type
+        """
+        events_file = self.extractor.get_event_detection_filepath()
+        with h5py.File(events_file, 'r') as f:
+            events = f['events'][:]
+            lambdas = f['lambdas'][:]
+            noise_stds = f['noise_stds'][:]
+            roi_ids = f['roi_names'][:]
+
+        filtered_events = filter_events_array(
+            arr=events, scale=filter_scale, n_time_steps=filter_n_time_steps)
+
+        # Convert matrix to list of 1d arrays so that it can be stored
+        # in a single column of the dataframe
+        events = [x for x in events]
+        filtered_events = [x for x in filtered_events]
+
+        df = pd.DataFrame({
+            'events': events,
+            'filtered_events': filtered_events,
+            'lambda': lambdas,
+            'noise_std': noise_stds,
+            'cell_roi_id': roi_ids
+        })
+
+        # Set index as cell_specimen_id from cell_specimen_table
+        cell_specimen_table = self.get_cell_specimen_table()
+        cell_specimen_table = cell_specimen_table.reset_index()
+        df = cell_specimen_table[['cell_roi_id', 'cell_specimen_id']]\
+            .merge(df, on='cell_roi_id')
+        df = df.set_index('cell_specimen_id')
+
+        return df
 
     def get_roi_masks_by_cell_roi_id(
             self,

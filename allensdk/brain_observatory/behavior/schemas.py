@@ -66,6 +66,10 @@ class BehaviorMetadataSchema(RaisingSchema):
     neurodata_doc = "Metadata for behavior and behavior + ophys experiments"
     neurodata_skip = {"experiment_datetime"}
 
+    behavior_session_id = fields.Int(
+        doc='The unique ID for the behavior session',
+        required=True
+    )
     behavior_session_uuid = fields.UUID(
         doc='MTrain record for session, also called foraging_id',
         required=True,
@@ -129,6 +133,14 @@ class NwbOphysMetadataSchema(RaisingSchema):
 class OphysMetadataSchema(NwbOphysMetadataSchema):
     """This schema contains metadata pertaining to optical physiology (ophys).
     """
+    ophys_experiment_id = fields.Int(
+        doc='Unique ID for the ophys experiment (aka imaging plane)',
+        required=True
+    )
+    ophys_session_id = fields.Int(
+        doc='Unique ID for the ophys session',
+        required=True
+    )
     experiment_container_id = fields.Int(
         doc='Container ID for the container that contains this ophys session',
         required=True,
@@ -138,10 +150,6 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
              'targeted for two-photon acquisition'),
         required=True,
     )
-    ophys_experiment_id = fields.Int(
-        doc='Id for this ophys session',
-        required=True,
-    )
     field_of_view_width = fields.Int(
         doc='Width of optical physiology imaging plane in pixels',
         required=True,
@@ -149,6 +157,18 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
     field_of_view_height = fields.Int(
         doc='Height of optical physiology imaging plane in pixels',
         required=True,
+    )
+    imaging_plane_group = fields.Int(
+        doc=('A numeric index which indicates the order that an imaging plane '
+             'was acquired for a mesoscope experiment. Will be -1 for '
+             'non-mesoscope data'),
+        required=True
+    )
+    imaging_plane_group_count = fields.Int(
+        doc=('The total number of plane groups collected in a session '
+             'for a mesoscope experiment. Will be 0 if the scope did not '
+             'capture multiple concurrent imaging planes.'),
+        required=True
     )
 
 
@@ -195,6 +215,7 @@ class BehaviorTaskParametersSchema(RaisingSchema):
     stimulus_duration_sec = fields.Float(
         doc='Duration of each stimulus presentation in seconds',
         required=True,
+        allow_nan=True
     )
     omitted_flash_fraction = fields.Float(
         doc='Fraction of flashes/image presentations that were omitted',
@@ -212,7 +233,11 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Volume of water (in mL) delivered as reward',
         required=True,
     )
-    stage = fields.String(
+    auto_reward_volume = fields.Float(
+        doc='Volume of water (in mL) delivered as an automatic reward',
+        required=True,
+    )
+    session_type = fields.String(
         doc='Stage of behavioral task',
         required=True,
     )

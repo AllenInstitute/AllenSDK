@@ -80,7 +80,7 @@ def plot_behavior_events_trace(session, xmin=360, length=3, ax=None, save_dir=No
     if ax is None:
         figsize = (15, 4)
         fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(session.running_speed.timestamps, session.running_speed.values, color=sns.color_palette()[0])
+    ax.plot(session.running_speed.timestamps, session.running_speed.speed, color=sns.color_palette()[0])
     ax = add_stim_color_span(session, ax, xlim=[xmin, xmax])
     ax = plot_behavior_events(session, ax)
     ax = restrict_axes(xmin, xmax, interval, ax)
@@ -113,7 +113,7 @@ def plot_traces_heatmap(session, ax=None):
 def plot_behavior_segment(session, xlims=[620, 640], ax=None):
     if ax is None:
         fig, ax = plt.subplots()
-    ax.plot(session.running_speed.timestamps, session.running_speed.values)
+    ax.plot(session.running_speed.timestamps, session.running_speed.speed)
     ax.set_ylabel('running speed\ncm/s')
     ax.set_xlabel('time (s)')
     ax.set_xlim(xlims)
@@ -232,7 +232,7 @@ def plot_example_traces_and_behavior(session, xmin_seconds, length_mins, cell_la
 
     i += 1
     ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, labeltop=False)
-    ax[i].plot(session.running_speed.timestamps, session.running_speed.values, color=sns.color_palette()[0])
+    ax[i].plot(session.running_speed.timestamps, session.running_speed.speed, color=sns.color_palette()[0])
     ax[i] = plot_behavior_events(session, ax=ax[i])
     ax[i] = add_stim_color_span(session, ax=ax[i], xlim=xlim)
     ax[i] = restrict_axes(xmin_seconds, xmax_seconds, interval_seconds, ax=ax[i])
@@ -467,7 +467,7 @@ def plot_experiment_summary_figure(session, save_dir=None):
     ax.set_title(title)
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(.28, .92), yspan=(.32, .44))
-    ax.plot(session.running_speed.timestamps, session.running_speed.values)
+    ax.plot(session.running_speed.timestamps, session.running_speed.speed)
     ax.set_xlabel('time (seconds)')
     ax.set_ylabel('running speed\n(cm/s)')
 

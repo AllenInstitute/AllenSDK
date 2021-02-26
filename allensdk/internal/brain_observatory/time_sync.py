@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable, Any, Dict, Set
+from typing import Optional, Callable, Any
 
 import numpy as np
 import h5py
@@ -64,9 +64,9 @@ def get_keys(sync_dset: Dataset) -> dict:
     return key_dict
 
 
-def monitor_delay(sync_dset, stim_times, photodiode_key,
-                  transition_frame_interval=TRANSITION_FRAME_INTERVAL,
-                  max_monitor_delay=MAX_MONITOR_DELAY):
+def calculate_monitor_delay(sync_dset, stim_times, photodiode_key,
+                            transition_frame_interval=TRANSITION_FRAME_INTERVAL,  # noqa: E501
+                            max_monitor_delay=MAX_MONITOR_DELAY):
     """Calculate monitor delay."""
     transitions = stim_times[::transition_frame_interval]
     photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
@@ -244,6 +244,11 @@ class OphysTimeAligner(object):
         self._dataset = Dataset(sync_file)
         self._keys = get_keys(self._dataset)
         self.long_stim_threshold = long_stim_threshold
+
+        self._monitor_delay = None
+        self._clipped_stim_ts_delta = None
+        self._clipped_stim_timestamp_values = None
+
         if dff_file is not None:
             self.ophys_data_length = get_ophys_data_length(dff_file)
         else:
@@ -264,7 +269,6 @@ class OphysTimeAligner(object):
     @property
     def dataset(self):
         return self._dataset
-
 
     @property
     def ophys_timestamps(self):
@@ -314,8 +318,7 @@ class OphysTimeAligner(object):
 
         return self.dataset.get_falling_edges(stim_key, units="seconds")
 
-    @property
-    def corrected_stim_timestamps(self):
+    def _get_clipped_stim_timestamps(self):
         timestamps = self.stim_timestamps
 
         delta = 0
@@ -339,8 +342,72 @@ class OphysTimeAligner(object):
         elif self.stim_data_length is None:
             logging.info("No data length provided for stim stream")
 
+        return timestamps, delta
+
+    @property
+    def clipped_stim_timestamps(self):
+        """
+        Return the stimulus timestamps with the erroneous initial spike
+        removed (if relevant)
+
+        Returns
+        -------
+        timestamps: np.ndarray
+            An array of stimulus timestamps in seconds with th emonitor delay
+            added
+
+        delta: int
+            Difference between the length of timestamps
+            and the number of frames reported in the stimulus
+            pickle file, i.e.
+            len(timestamps) - len(pkl_file['items']['behavior']['intervalsms']
+        """
+        if self._clipped_stim_ts_delta is None:
+            (self._clipped_stim_timestamp_values,
+             self._clipped_stim_ts_delta) = self._get_clipped_stim_timestamps()
+
+        return (self._clipped_stim_timestamp_values,
+                self._clipped_stim_ts_delta)
+
+    def _get_monitor_delay(self):
+        timestamps, delta = self.clipped_stim_timestamps
         photodiode_key = self._keys["photodiode"]
-        delay = monitor_delay(self.dataset, timestamps, photodiode_key)
+        delay = calculate_monitor_delay(self.dataset,
+                                        timestamps,
+                                        photodiode_key)
+        return delay
+
+    @property
+    def monitor_delay(self):
+        """
+        The monitor delay (in seconds) associated with the session
+        """
+        if self._monitor_delay is None:
+            self._monitor_delay = self._get_monitor_delay()
+        return self._monitor_delay
+
+    @property
+    def corrected_stim_timestamps(self):
+        """
+        The stimulus timestamps corrected for monitor delay
+
+        Returns
+        -------
+        timestamps: np.ndarray
+            An array of stimulus timestamps in seconds with th emonitor delay
+            added
+
+        delta: int
+            Difference between the length of timestamps and
+            the number of frames reported in the stimulus
+            pickle file, i.e.
+            len(timestamps) - len(pkl_file['items']['behavior']['intervalsms']
+
+        delay: float
+            The monitor delay in seconds
+        """
+        timestamps, delta = self.clipped_stim_timestamps
+        delay = self.monitor_delay
 
         return timestamps + delay, delta, delay
 

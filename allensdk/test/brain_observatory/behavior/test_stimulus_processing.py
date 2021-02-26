@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import numpy as np
 import pytest
@@ -6,6 +8,9 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
     get_stimulus_templates)
+from allensdk.brain_observatory.behavior.stimulus_processing\
+    .stimulus_templates import StimulusImage
+from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
 
 @pytest.fixture()
@@ -90,17 +95,63 @@ def test_get_draw_epochs(behavior_stimuli_data_fixture,
     assert actual == expected
 
 
-@pytest.mark.parametrize("behavior_stimuli_data_fixture, remove_stimuli, "
-                         "expected_templates",
-                         [({}, ['images'], {})],
+@pytest.mark.parametrize("behavior_stimuli_data_fixture", ({},),
                          indirect=["behavior_stimuli_data_fixture"])
-def test_get_stimulus_templates(behavior_stimuli_data_fixture, remove_stimuli,
-                                expected_templates):
-    for stimuli in remove_stimuli:
-        del (behavior_stimuli_data_fixture['items']['behavior']
-        ['stimuli'][stimuli])
-    templates = get_stimulus_templates(behavior_stimuli_data_fixture)
-    assert templates == expected_templates
+def test_get_stimulus_templates(behavior_stimuli_data_fixture):
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture,
+                                       grating_images_dict={})
+
+    assert templates.image_set_name == 'test_image_set'
+    assert len(templates) == 1
+    assert list(templates.keys()) == ['im065']
+
+    for img in templates.values():
+        assert isinstance(img, StimulusImage)
+
+    expected_path = os.path.join(get_resources_dir(), 'stimulus_template',
+                                 'expected')
+
+    expected_unwarped_path = os.path.join(
+        expected_path, 'im065_unwarped.pkl')
+    expected_unwarped = pd.read_pickle(expected_unwarped_path)
+
+    expected_warped_path = os.path.join(
+        expected_path, 'im065_warped.pkl')
+    expected_warped = pd.read_pickle(expected_warped_path)
+
+    for img_name in templates:
+        img = templates[img_name]
+        assert np.allclose(a=expected_unwarped,
+                           b=img.unwarped, equal_nan=True)
+        assert np.allclose(a=expected_warped,
+                           b=img.warped, equal_nan=True)
+
+    for img_name, img in templates.items():
+        img = templates[img_name]
+        assert np.allclose(a=expected_unwarped,
+                           b=img.unwarped, equal_nan=True)
+        assert np.allclose(a=expected_warped,
+                           b=img.warped, equal_nan=True)
+
+
+@pytest.mark.parametrize(("behavior_stimuli_data_fixture, "
+                          "grating_images_dict, expected"), [
+    ({"has_images": False},
+     {"gratings_90.0": {"warped": np.ones((2, 2)),
+                        "unwarped": np.ones((2, 2)) * 2}},
+     {}),
+], indirect=["behavior_stimuli_data_fixture"])
+def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture,
+                                             grating_images_dict, expected):
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture,
+                                       grating_images_dict=grating_images_dict)
+
+    assert templates.image_set_name == 'grating'
+    assert list(templates.keys()) == ['gratings_90.0']
+    assert np.allclose(templates['gratings_90.0'].warped,
+                       np.array([[1, 1], [1, 1]]))
+    assert np.allclose(templates['gratings_90.0'].unwarped,
+                       np.array([[2, 2], [2, 2]]))
 
 
 # def test_get_images_dict():

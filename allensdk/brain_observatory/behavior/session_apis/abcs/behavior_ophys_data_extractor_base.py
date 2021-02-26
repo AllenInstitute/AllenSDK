@@ -65,6 +65,12 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def get_event_detection_filepath(self) -> str:
+        """Get the filepath of the .h5 events file associated with an ophys
+        experiment"""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def get_ophys_cell_segmentation_run_id(self) -> int:
         """Get the ophys cell segmentation run id associated with an
         ophys experiment id"""
@@ -127,10 +133,4 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
     @abc.abstractmethod
     def get_eye_tracking_filepath(self) -> dict:
         """Get the eye tracking filepath containing ellipse fits"""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_eye_gaze_mapping_file_path(self) -> str:
-        """Get h5 filepath containing eye gaze behavior of the experiment's
-        subject"""
         raise NotImplementedError()

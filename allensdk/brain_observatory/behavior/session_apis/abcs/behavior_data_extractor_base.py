@@ -1,4 +1,5 @@
 import abc
+from datetime import datetime
 from typing import List
 
 
@@ -66,4 +67,9 @@ class BehaviorDataExtractorBase(abc.ABC):
     def get_external_specimen_name(self) -> int:
         """Get the external specimen id (LabTracks ID) for the subject
         associated with a behavior experiment"""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_experiment_date(self) -> datetime:
+        """Get the acquisition date of an experiment in UTC"""
         raise NotImplementedError()

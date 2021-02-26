@@ -91,13 +91,25 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.8.0
+-----------------------------------------------------------------------
+- Created lookup table to get monitor_delay for cases where calculation from data fails
+- If sync timestamp file has more timestamps than eye tracking moving has frame, trim excess timestamps (up to 15)
+- Session API returns both warped and unwarped stimulus images, and both are written to NWB
+
+
 What's New - 2.7.0
 -----------------------------------------------------------------------
 - Refactored behavior and ophys session and data APIs to remove a circular inheritance issue
 - Fixed segmentation mask and roi_mask misregistration in 'BehaviorOphysSession'
 - Replaces BehaviorOphysSession.get_roi_masks() method with roi_masks property
 - Fixes bug which prevented the SDK from loading stimuli dataframes for static gratings
-
+- Return event detection data through session API
+- Read/write event detection data from/to NWB
+- Time stamps for events in trial_log are set to the exact sync timestamp of the corresponding frame.
+- For behavior-only sessions, sync-like timestamp of the first frame is set to zero.
+- Refactored BehaviorOphysSession to inherit methods and properties from BehaviorSession
+- Fixed a test for checking that Behavior and BehaviorOphysSessions contain the same data regardless of which API (LIMS/JSON/NWB) is used. Also fixed resulting failure cases.
 
 What's New - 2.6.0
 -----------------------------------------------------------------------

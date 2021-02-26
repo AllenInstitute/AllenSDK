@@ -10,7 +10,6 @@ from allensdk import OneResultExpectedError
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.exceptions import DataFrameIndexError
 from marshmallow.schema import ValidationError
@@ -108,6 +107,9 @@ def MockBehaviorLimsApi():
         def _get_ids(self):
             return {}
 
+        def get_experiment_date(self):
+            return datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
+
         def get_behavior_stimulus_file(self):
             return "dummy_stimulus_file.pkl"
 
@@ -144,7 +146,7 @@ def MockBehaviorLimsApi():
             }
             return data
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]}).set_index("timestamps")
@@ -171,7 +173,7 @@ def MockApiRunSpeedExpectedError():
 
     class MockBehaviorLimsApiRunSpeedExpectedError(BehaviorLimsApi):
 
-        def get_running_data_df(self, lowpass=True):
+        def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
                 {"timestamps": [0.0, 0.1, 0.2],
                  "speed": [8.0, 15.0, 16.0]})
@@ -199,7 +201,8 @@ def test_get_stimulus_timestamps(MockBehaviorLimsApi):
 
 def test_get_licks(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
-    expected = pd.DataFrame({"time": [0.016 * i for i in [2., 6., 9.]]})
+    expected = pd.DataFrame({"timestamps": [0.016 * i for i in [2., 6., 9.]],
+                             "frame": [2, 6, 9]})
     pd.testing.assert_frame_equal(expected, api.get_licks())
 
 
@@ -221,11 +224,12 @@ def test_get_experiment_date(MockBehaviorLimsApi):
 
 
 def test_get_running_speed(MockBehaviorLimsApi):
-    expected = RunningSpeed(timestamps=[0.0, 0.1, 0.2],
-                            values=[8.0, 15.0, 16.0])
+    expected = pd.DataFrame({
+        "timestamps": [0.0, 0.1, 0.2],
+        "speed": [8.0, 15.0, 16.0]})
     api = MockBehaviorLimsApi
     actual = api.get_running_speed()
-    assert expected == actual
+    pd.testing.assert_frame_equal(expected, actual)
 
 
 def test_get_running_speed_raises_index_error(MockApiRunSpeedExpectedError):
@@ -269,9 +273,8 @@ class TestBehaviorRegression:
                 == self.od.extractor.get_behavior_stimulus_file())
 
     def test_get_rewards_regression(self):
-        """Index is timestamps here, so remove it before comparing."""
-        bd_rewards = self.bd.get_rewards().reset_index(drop=True)
-        od_rewards = self.od.get_rewards().reset_index(drop=True)
+        bd_rewards = self.bd.get_rewards().drop(columns=['timestamps'])
+        od_rewards = self.od.get_rewards().drop(columns=['timestamps'])
         pd.testing.assert_frame_equal(bd_rewards, od_rewards)
 
     def test_ophys_experiment_id_regression(self):
@@ -295,14 +298,16 @@ class TestBehaviorRegression:
         """
         bd_speed = self.bd.get_running_speed(lowpass=False)
         od_speed = self.od.get_running_speed(lowpass=False)
+
         assert len(bd_speed.values) == len(od_speed.values)
         assert len(bd_speed.timestamps) == len(od_speed.timestamps)
 
-    def test_get_running_df_regression(self):
+    def test_get_running_acquisition_df_regression(self):
         """Can't test values because they're intrinsically linked to timestamps
         """
-        bd_running = self.bd.get_running_data_df(lowpass=False)
-        od_running = self.od.get_running_data_df(lowpass=False)
+        bd_running = self.bd.get_running_acquisition_df(lowpass=False)
+        od_running = self.od.get_running_acquisition_df(lowpass=False)
+
         assert len(bd_running) == len(od_running)
         assert list(bd_running) == list(od_running)
 
@@ -318,7 +323,15 @@ class TestBehaviorRegression:
         od_template = self.od.get_stimulus_templates()
         assert bd_template.keys() == od_template.keys()
         for k in bd_template.keys():
-            assert np.array_equal(bd_template[k], od_template[k])
+            bd_template_img = bd_template[k]
+            od_template_img = od_template[k]
+
+            assert np.allclose(bd_template_img.unwarped,
+                               od_template_img.unwarped,
+                               equal_nan=True)
+            assert np.allclose(bd_template_img.warped,
+                               od_template_img.warped,
+                               equal_nan=True)
 
     def test_get_task_parameters_regression(self):
         bd_params = self.bd.get_task_parameters()

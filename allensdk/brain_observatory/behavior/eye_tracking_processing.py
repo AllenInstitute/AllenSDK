@@ -44,7 +44,7 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
 
     # Values in the hdf5 may be complex (likely an artifact of the ellipse
     # fitting process). Take only the real component.
-    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))
+    eye_tracking_data = eye_tracking_data.apply(lambda x: np.real(x.to_numpy()))  # noqa: E501
 
     return eye_tracking_data.astype(float)
 
@@ -70,7 +70,8 @@ def determine_outliers(data_df: pd.DataFrame,
         True denotes that a row in the data_df contains at least one outlier.
     """
 
-    outliers = (data_df.apply(stats.zscore, nan_policy='omit').apply(np.abs) > z_threshold)
+    outliers = data_df.apply(stats.zscore,
+                             nan_policy='omit').apply(np.abs) > z_threshold
     return pd.Series(outliers.any(axis=1))
 
 
@@ -185,9 +186,23 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
         eye tracking frames.
     """
 
-    if len(frame_times) != len(eye_data.index):
+    n_sync = len(frame_times)
+    n_eye_frames = len(eye_data.index)
+
+    # If n_sync exceeds n_eye_frames by <= 15,
+    # just trim the excess sync pulses from the end
+    # of the timestamps array.
+    #
+    # This solution was discussed in
+    # https://github.com/AllenInstitute/AllenSDK/issues/1545
+
+    if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
+        frame_times = frame_times[:n_eye_frames]
+        n_sync = len(frame_times)
+
+    if n_sync != n_eye_frames:
         raise RuntimeError(f"Error! The number of sync file frame times "
-                           f"({len(frame_times)} does not match the "
+                           f"({len(frame_times)}) does not match the "
                            f"number of eye tracking frames "
                            f"({len(eye_data.index)})!")
 
@@ -207,10 +222,22 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                                             outliers,
                                             dilation_frames=dilation_frames)
 
-    eye_data.insert(0, "time", frame_times)
+    # remove outliers/likely blinks `pupil_area`, `cr_area`, `eye_area`
+    pupil_areas_raw = pupil_areas.copy()
+    cr_areas_raw = cr_areas.copy()
+    eye_areas_raw = eye_areas.copy()
+
+    pupil_areas[likely_blinks] = np.nan
+    cr_areas[likely_blinks] = np.nan
+    eye_areas[likely_blinks] = np.nan
+
+    eye_data.insert(0, "timestamps", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)
     eye_data.insert(2, "eye_area", eye_areas)
     eye_data.insert(3, "pupil_area", pupil_areas)
     eye_data.insert(4, "likely_blink", likely_blinks)
+    eye_data.insert(5, "pupil_area_raw", pupil_areas_raw)
+    eye_data.insert(6, "cr_area_raw", cr_areas_raw)
+    eye_data.insert(7, "eye_area_raw", eye_areas_raw)
 
     return eye_data
