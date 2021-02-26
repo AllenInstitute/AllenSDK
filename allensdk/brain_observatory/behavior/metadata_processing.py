@@ -1,5 +1,5 @@
 import warnings
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import re
 import numpy as np
 
@@ -154,7 +154,7 @@ def get_cre_line(driver_line: List[str]) -> Optional[str]:
     ---------
     cre_line, or None on error
     """
-    if not driver_line:
+    if len(driver_line) == 0:
         warnings.warn('Could not parse cre_line because there are no '
                       'driver lines')
         return
@@ -169,3 +169,32 @@ def get_cre_line(driver_line: List[str]) -> Optional[str]:
                       'line. Returning the first one.')
 
     return cre_line[0]
+
+
+def get_reporter_line(reporter_line: Union[str, List[str]]) -> Optional[str]:
+    """There can be multiple reporter lines, so it is returned from LIMS
+    as a list. But there shouldn't be more than 1 for behavior. This
+    tries to convert to str
+
+    Parameters
+    ----------
+    reporter_line
+        List of reporter lines, or a single reporter line string
+
+    Returns
+    ---------
+    single reporter line, or None if not possible
+    """
+
+    if isinstance(reporter_line, str):
+        return reporter_line
+
+    if len(reporter_line) == 0:
+        warnings.warn('No reporter line')
+        return
+
+    if len(reporter_line) > 1:
+        warnings.warn('More than 1 reporter line. Returning the first one')
+
+    return reporter_line[0]
+

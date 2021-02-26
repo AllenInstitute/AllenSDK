@@ -2,7 +2,8 @@ import pytest
 import numpy as np
 
 from allensdk.brain_observatory.behavior.metadata_processing import (
-    description_dict, get_task_parameters, get_expt_description, get_cre_line)
+    description_dict, get_task_parameters, get_expt_description, get_cre_line,
+    get_reporter_line)
 
 
 @pytest.mark.parametrize("data, expected",
@@ -332,3 +333,31 @@ def test_cre_line_multiple_cre_line():
     driver_line = ['fooCre', 'barCre']
     cre_line = get_cre_line(driver_line=driver_line)
     assert cre_line == 'fooCre'
+
+
+def test_reporter_line():
+    """Test that reporter line properly parsed from list"""
+    reporter_line = ['foo']
+    reporter_line = get_reporter_line(reporter_line=reporter_line)
+    assert reporter_line == 'foo'
+
+
+def test_reporter_line_str():
+    """Test that reporter line returns itself if str"""
+    reporter_line = 'foo'
+    reporter_line = get_reporter_line(reporter_line=reporter_line)
+    assert reporter_line == 'foo'
+
+
+def test_reporter_line_multiple():
+    """Test that if multiple reporter lines, the first is returned"""
+    reporter_line = ['foo', 'bar']
+    reporter_line = get_reporter_line(reporter_line=reporter_line)
+    assert reporter_line == 'foo'
+
+
+def test_reporter_line_no_reporter_line():
+    """Test that if no reporter line, returns None"""
+    reporter_line = []
+    reporter_line = get_reporter_line(reporter_line=reporter_line)
+    assert reporter_line is None

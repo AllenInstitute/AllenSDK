@@ -10,7 +10,7 @@ from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_expt_description
+    get_expt_description, get_cre_line, get_reporter_line
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase
@@ -258,10 +258,11 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['sex'] = nwb_subject.sex
         data['age_in_days'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
+        data['reporter_line'] = get_reporter_line(
+            reporter_line=nwb_subject.reporter_line)
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
-        data['cre_line'] = BehaviorDataTransforms.get_cre_line(
-            driver_line=data['driver_line'])
+        data['cre_line'] = get_cre_line(
+            driver_line=nwb_subject.driver_line)
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time

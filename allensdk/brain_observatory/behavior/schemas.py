@@ -46,11 +46,9 @@ class SubjectMetadataSchema(RaisingSchema):
         doc='Mouse ID of subject',
         required=True,
     )
-    reporter_line = fields.List(
-        fields.String,
+    reporter_line = fields.String(
         doc="Reporter line of subject",
         required=True,
-        shape=(None,),
     )
     sex = fields.String(
         doc='Sex of the specimen donor/subject',
