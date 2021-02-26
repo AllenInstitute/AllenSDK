@@ -1066,7 +1066,8 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
     ophys_module = nwbfile.processing['ophys']
     # trace data in the form of rois x timepoints
     f_trace_data = np.array(
-            corrected_fluorescence_traces.corrected_fluorescence)
+        [corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence
+         for cell_roi_id in corrected_fluorescence_traces.index.values])
 
     roi_table_region = nwbfile.processing['ophys'].data_interfaces['dff'].roi_response_series['traces'].rois  # noqa: E501
     ophys_timestamps = ophys_module.get_data_interface(
