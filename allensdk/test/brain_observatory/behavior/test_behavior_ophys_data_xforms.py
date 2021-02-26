@@ -429,11 +429,11 @@ def test_monitor_delay(monkeypatch):
                     'CAM2P.5': 0.021192,
                     'MESO.1': 0.03613}
 
-    for rig_name in delay_lookup.keys():
-        expected_delay = delay_lookup[rig_name]
+    for equipment_name in delay_lookup.keys():
+        expected_delay = delay_lookup[equipment_name]
 
         def dummy_get_metadata(self):
-            return {'rig_name': rig_name}
+            return {'equipment_name': equipment_name}
 
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorOphysDataTransforms,
@@ -465,7 +465,7 @@ def test_monitor_delay(monkeypatch):
 
     # finally, try case with unknown rig name
     def dummy_get_metadata(self):
-        return {'rig_name': 'spam'}
+        return {'equipment_name': 'spam'}
 
     def dummy_delay(self):
         raise ValueError("that did not work")

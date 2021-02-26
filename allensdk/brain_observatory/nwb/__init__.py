@@ -939,7 +939,7 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
-    device_name: str = nwbfile.lab_meta_data['metadata'].rig_name
+    device_name: str = nwbfile.lab_meta_data['metadata'].equipment_name
     if device_name.startswith("MESO"):
         device_config = {
             "name": device_name,

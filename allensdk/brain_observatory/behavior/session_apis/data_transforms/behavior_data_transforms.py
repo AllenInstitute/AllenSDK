@@ -413,7 +413,7 @@ class BehaviorDataTransforms(BehaviorBase):
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
         metadata = {
-            "rig_name": self.extractor.get_rig_name(),
+            "equipment_name": self.extractor.get_equipment_name(),
             "sex": self.extractor.get_sex(),
             "age_in_days": self.extractor.get_age_in_days(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),

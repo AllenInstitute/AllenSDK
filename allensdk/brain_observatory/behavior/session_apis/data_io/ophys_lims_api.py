@@ -402,18 +402,6 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_rig_name(self) -> str:
-        """Get the name of the experiment rig (ex: CAM2P.3)"""
-        query = """
-                SELECT e.name AS device_name
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-                JOIN equipment e ON e.id = os.equipment_id
-                WHERE oe.id = {};
-                """.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=True)
-
-    @memoize
     def get_field_of_view_shape(self) -> dict:
         """Get a field of view dictionary for a given ophys experiment.
            ex: {"width": int, "height": int}

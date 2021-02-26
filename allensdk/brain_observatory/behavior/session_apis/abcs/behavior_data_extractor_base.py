@@ -20,7 +20,7 @@ class BehaviorDataExtractorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_rig_name(self) -> str:
+    def get_equipment_name(self) -> str:
         """Get the name of the experiment rig (ex: CAM2P.3)"""
         raise NotImplementedError()
 

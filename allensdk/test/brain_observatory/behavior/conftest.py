@@ -154,7 +154,7 @@ def behavior_only_metadata_fixture():
                          "Ai93(TITL-GCaMP6f)/wt",
         "behavior_session_uuid": uuid.uuid4(),
         "stimulus_frame_rate": 60.0,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
         "age_in_days": 'P139'
     }
@@ -185,7 +185,7 @@ def metadata_fixture():
         "indicator": 'HW',
         "field_of_view_width": 4,
         "field_of_view_height": 4,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
         "age_in_days": 'P139',
         "imaging_plane_group": None,
@@ -214,7 +214,7 @@ def partial_metadata_fixture():
         "behavior_session_uuid": uuid.uuid4(),
         "field_of_view_width": 4,
         "field_of_view_height": 4,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
         "age_in_days": 'P139',
         "imaging_plane_group": None,
@@ -316,7 +316,7 @@ def session_data():
         'foraging_id': '69cdbe09-e62b-4b42-aab1-54b5773dfe78',
         "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",  # noqa: E501
         "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",  # noqa: E501
-        "rig_name": "CAM2P.5",
+        "equipment_name": "CAM2P.5",
         "movie_width": 447,
         "movie_height": 512,
         "container_id": 814796558,

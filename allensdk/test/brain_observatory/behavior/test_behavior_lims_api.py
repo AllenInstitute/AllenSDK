@@ -364,9 +364,9 @@ class TestBehaviorRegression:
     def test_get_sex_regression(self):
         assert self.bd.extractor.get_sex() == self.od.extractor.get_sex()
 
-    def test_get_rig_name_regression(self):
-        assert (self.bd.extractor.get_rig_name()
-                == self.od.extractor.get_rig_name())
+    def test_get_equipment_name_regression(self):
+        assert (self.bd.extractor.get_equipment_name()
+                == self.od.extractor.get_equipment_name())
 
     def test_get_stimulus_name_regression(self):
         assert (self.bd.extractor.get_stimulus_name()

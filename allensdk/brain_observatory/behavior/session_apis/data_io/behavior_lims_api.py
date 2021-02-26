@@ -241,7 +241,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_rig_name(self) -> str:
+    def get_equipment_name(self) -> str:
         """Returns the name of the experimental rig.
         :rtype: str
         """

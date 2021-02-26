@@ -38,7 +38,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
     def get_foraging_id(self) -> int:
         return self.data['foraging_id']
 
-    def get_rig_name(self) -> str:
+    def get_equipment_name(self) -> str:
         """Get the name of the experiment rig (ex: CAM2P.3)"""
         return self.data['rig_name']
 

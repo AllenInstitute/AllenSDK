@@ -157,13 +157,13 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         try:
             delay = aligner.monitor_delay
         except ValueError as ee:
-            rig_name = self.get_metadata()['rig_name']
+            equipment_name = self.get_metadata()['equipment_name']
 
             warning_msg = 'Monitory delay calculation failed '
             warning_msg += 'with ValueError\n'
             warning_msg += f'    "{ee}"'
             warning_msg += '\nlooking monitor delay up from table '
-            warning_msg += f'for rig: {rig_name} '
+            warning_msg += f'for rig: {equipment_name} '
 
             # see
             # https://github.com/AllenInstitute/AllenSDK/issues/1318
@@ -175,11 +175,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
                             'CAM2P.5': 0.021192,
                             'MESO.1': 0.03613}
 
-            if rig_name not in delay_lookup:
+            if equipment_name not in delay_lookup:
                 msg = warning_msg
-                msg += f'\nrig_name {rig_name} not in lookup table'
+                msg += f'\nequipment_name {equipment_name} not in lookup table'
                 raise RuntimeError(msg)
-            delay = delay_lookup[rig_name]
+            delay = delay_lookup[equipment_name]
             warning_msg += f'\ndelay: {delay} seconds'
             warnings.warn(warning_msg)
 

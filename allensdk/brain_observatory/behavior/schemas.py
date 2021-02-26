@@ -90,7 +90,7 @@ class BehaviorMetadataSchema(RaisingSchema):
         doc='Date of the experiment (UTC, as string)',
         required=True,
     )
-    rig_name = fields.String(
+    equipment_name = fields.String(
         doc='Name of behavior or optical physiology experiment rig',
         required=True,
     )
