@@ -149,6 +149,7 @@ def behavior_only_metadata_fixture():
         "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
         "reporter_line": ["Ai93(TITL-GCaMP6f)"],
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "cre_line": "Slc17a7-IRES2-Cre",
         "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",
@@ -176,6 +177,7 @@ def metadata_fixture():
         "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
         "reporter_line": ["Ai93(TITL-GCaMP6f)"],
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "cre_line": "Slc17a7-IRES2-Cre",
         "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",
@@ -208,6 +210,7 @@ def partial_metadata_fixture():
         "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
         "reporter_line": ["Ai93(TITL-GCaMP6f)"],
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+        "cre_line": "Slc17a7-IRES2-Cre",
         "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",

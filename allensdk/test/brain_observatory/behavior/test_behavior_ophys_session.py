@@ -105,6 +105,7 @@ def test_visbeh_ophys_data_set():
         'ophys_session_id': 789220000,
         'session_type': 'OPHYS_6_images_B',
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
+        'cre_line': 'Slc17a7-IRES2-Cre',
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
         'date_of_acquisition': pytz.utc.localize(

@@ -17,6 +17,8 @@ from allensdk.brain_observatory.behavior.session_apis.abcs import (
 )
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
+from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
+    BehaviorDataTransforms
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.trials_processing import (
@@ -258,6 +260,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
+        data['cre_line'] = BehaviorDataTransforms.get_cre_line(
+            driver_line=data['driver_line'])
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time

@@ -1,4 +1,5 @@
-from typing import Dict
+import warnings
+from typing import Dict, List, Optional
 import re
 import numpy as np
 
@@ -139,3 +140,32 @@ def get_task_parameters(data: Dict) -> Dict:
     task_parameters['n_stimulus_frames'] = n_stimulus_frames
 
     return task_parameters
+
+
+def get_cre_line(driver_line: List[str]) -> Optional[str]:
+    """Parses cre_line from a list of driver_lines
+
+    Parameters
+    ----------
+    driver_line
+        The list of driver lines
+
+    Returns
+    ---------
+    cre_line, or None on error
+    """
+    if not driver_line:
+        warnings.warn('Could not parse cre_line because there are no '
+                      'driver lines')
+        return
+    cre_line = [d for d in driver_line if d.endswith('Cre')]
+
+    if not cre_line:
+        warnings.warn('Could not parse cre_line from driver_line')
+        return
+
+    if len(cre_line) > 1:
+        warnings.warn('Multiple cre_lines were parsed from the driver '
+                      'line. Returning the first one.')
+
+    return cre_line[0]

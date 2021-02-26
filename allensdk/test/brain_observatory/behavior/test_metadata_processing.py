@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from allensdk.brain_observatory.behavior.metadata_processing import (
-    description_dict, get_task_parameters, get_expt_description)
+    description_dict, get_task_parameters, get_expt_description, get_cre_line)
 
 
 @pytest.mark.parametrize("data, expected",
@@ -302,3 +302,33 @@ def test_get_expt_description_with_valid_session_type(session_type,
 def test_get_expt_description_raises_with_invalid_session_type(session_type):
     with pytest.raises(RuntimeError, match="session type should match.*"):
         get_expt_description(session_type)
+
+
+def test_cre_line_parsed_from_driver_line():
+    """Tests that cre_line properly parsed from driver_line"""
+    driver_line = ['foo', 'Slc-Cre']
+    cre_line = get_cre_line(driver_line=driver_line)
+    assert cre_line == 'Slc-Cre'
+
+
+def test_cre_line_no_driver_line():
+    """Test that cre_line is None and no error raised"""
+    driver_line = []
+    cre_line = get_cre_line(driver_line=driver_line)
+    assert cre_line is None
+
+
+def test_cre_line_no_cre_line():
+    """Tests that if driver_line does not contain anything ending in 'Cre'
+     That None is returned"""
+    driver_line = ['foo']
+    cre_line = get_cre_line(driver_line=driver_line)
+    assert cre_line is None
+
+
+def test_cre_line_multiple_cre_line():
+    """Tests that if the driver_line contains multiple things ending in 'Cre'
+     that the first one is returned"""
+    driver_line = ['fooCre', 'barCre']
+    cre_line = get_cre_line(driver_line=driver_line)
+    assert cre_line == 'fooCre'

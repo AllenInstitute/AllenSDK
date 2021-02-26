@@ -10,7 +10,7 @@ import pandas as pd
 import pytz
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.metadata_processing import \
-    get_task_parameters
+    get_task_parameters, get_cre_line
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \
     get_running_df
@@ -412,6 +412,9 @@ class BehaviorDataTransforms(BehaviorBase):
             bs_uuid = None
         else:
             bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
+
+        driver_line = sorted(self.extractor.get_driver_line())
+
         metadata = {
             "equipment_name": self.extractor.get_equipment_name(),
             "sex": self.extractor.get_sex(),
@@ -420,7 +423,8 @@ class BehaviorDataTransforms(BehaviorBase):
             "session_type": self.extractor.get_stimulus_name(),
             "date_of_acquisition": self.get_date_of_acquisition(),
             "reporter_line": sorted(self.extractor.get_reporter_line()),
-            "driver_line": sorted(self.extractor.get_driver_line()),
+            "driver_line": driver_line,
+            "cre_line": get_cre_line(driver_line=driver_line),
             "mouse_id": self.extractor.get_mouse_id(),
             "full_genotype": self.extractor.get_full_genotype(),
             "behavior_session_uuid": bs_uuid,
