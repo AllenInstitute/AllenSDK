@@ -519,7 +519,6 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
     monitor_delay = input_transform.get_monitor_delay()
     data = input_transform._behavior_stimulus_file()
 
-    assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
@@ -527,7 +526,7 @@ def get_trials_from_data_transform(input_transform) -> pd.DataFrame:
 
     all_trial_data = [None] * len(trial_log)
     lick_frames = licks_df.frame.values
-    reward_times = rewards_df.index.values
+    reward_times = rewards_df['timestamps'].values
 
     for idx, trial in enumerate(trial_log):
         # match each event in the trial log to the sync timestamps
@@ -628,7 +627,8 @@ def get_time(exp_data):
 def data_to_licks(data, time):
     lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
     lick_times = time[lick_frames]
-    return pd.DataFrame(data={"frame": lick_frames, 'time': lick_times})
+    return pd.DataFrame(data={"timestamps": lick_times,
+                              "frame": lick_frames})
 
 
 def get_mouse_id(exp_data):
@@ -926,12 +926,12 @@ def find_licks(reward_times, licks, window=3.5):
         return []
     else:
         reward_time = one(reward_times)
-        reward_lick_mask = ((licks['time'] > reward_time) &
-                            (licks['time'] < (reward_time + window)))
+        reward_lick_mask = ((licks['timestamps'] > reward_time) &
+                            (licks['timestamps'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
-        tr_licks['time'] -= reward_time
-        return tr_licks['time'].values
+        tr_licks['timestamps'] -= reward_time
+        return tr_licks['timestamps'].values
 
 
 def calculate_reward_rate(response_latency=None,

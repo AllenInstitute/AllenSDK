@@ -90,14 +90,15 @@ def trials():
 
 @pytest.fixture
 def licks():
-    return pd.DataFrame({'time': [1., 2., 3.], 'frame': [4., 5., 6.]})
+    return pd.DataFrame({'timestamps': [1., 2., 3.],
+                         'frame': [4., 5., 6.]})
 
 
 @pytest.fixture
 def rewards():
     return pd.DataFrame({'volume': [.01, .01, .01],
-                         'autorewarded': [True, False, False]},
-                        index=pd.Index(data=[1., 2., 3.], name='timestamps'))
+                         'timestamps': [1., 2., 3.],
+                         'autorewarded': [True, False, False]})
 
 
 @pytest.fixture

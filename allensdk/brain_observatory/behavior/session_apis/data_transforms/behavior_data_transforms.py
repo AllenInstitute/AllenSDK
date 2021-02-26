@@ -110,7 +110,7 @@ class BehaviorDataTransforms(BehaviorBase):
                                   'range')
 
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"time": lick_times, "frame": lick_frames})
+        return pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
 
     @memoize
     def get_rewards(self) -> pd.DataFrame:

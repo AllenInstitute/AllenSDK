@@ -97,7 +97,7 @@ def test_get_rewards(monkeypatch):
                          'timestamps': [0.04, 0.1],
                          'autorewarded': [True, False]}
         expected_df = pd.DataFrame(expected_dict)
-        expected_df = expected_df.set_index('timestamps', drop=True)
+        expected_df = expected_df
         assert expected_df.equals(rewards)
 
 
@@ -151,12 +151,12 @@ def test_get_licks(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [0.12, 0.15, 0.90, 1.36],
+        expected_dict = {'timestamps': [0.12, 0.15, 0.90, 1.36],
                          'frame': [12, 15, 90, 136]}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_almost_equal(expected_df.time.to_numpy(),
-                                             licks.time.to_numpy(),
+        np.testing.assert_array_almost_equal(expected_df.timestamps.to_numpy(),
+                                             licks.timestamps.to_numpy(),
                                              decimal=10)
         np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
                                              licks.frame.to_numpy(),
@@ -216,12 +216,12 @@ def test_get_licks_excess(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [0.12, 0.15, 0.90, 1.36],
+        expected_dict = {'timestamps': [0.12, 0.15, 0.90, 1.36],
                          'frame': [12, 15, 90, 136]}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_almost_equal(expected_df.time.to_numpy(),
-                                             licks.time.to_numpy(),
+        np.testing.assert_array_almost_equal(expected_df.timestamps.to_numpy(),
+                                             licks.timestamps.to_numpy(),
                                              decimal=10)
         np.testing.assert_array_almost_equal(expected_df.frame.to_numpy(),
                                              licks.frame.to_numpy(),
@@ -278,12 +278,12 @@ def test_empty_licks(monkeypatch):
 
         licks = xforms.get_licks()
 
-        expected_dict = {'time': [],
+        expected_dict = {'timestamps': [],
                          'frame': []}
         expected_df = pd.DataFrame(expected_dict)
         assert expected_df.columns.equals(licks.columns)
-        np.testing.assert_array_equal(expected_df.time.to_numpy(),
-                                      licks.time.to_numpy())
+        np.testing.assert_array_equal(expected_df.timestamps.to_numpy(),
+                                      licks.timestamps.to_numpy())
         np.testing.assert_array_equal(expected_df.frame.to_numpy(),
                                       licks.frame.to_numpy())
 
@@ -336,7 +336,7 @@ def test_get_licks_failure(monkeypatch):
 
         xforms = BehaviorOphysDataTransforms()
         with pytest.raises(IndexError):
-            _ = xforms.get_licks()
+            xforms.get_licks()
 
 
 def test_timestamps_and_delay(monkeypatch):
@@ -493,4 +493,4 @@ def test_monitor_delay(monkeypatch):
 
         xforms = BehaviorOphysDataTransforms()
         with pytest.raises(RuntimeError):
-            _ = xforms.get_monitor_delay()
+            xforms.get_monitor_delay()

@@ -1,7 +1,6 @@
 import os
 import datetime
 import uuid
-import math
 import pytest
 import pandas as pd
 import pytz
@@ -74,26 +73,26 @@ def test_visbeh_ophys_data_set():
 
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
-           str(data_set.api.get_behavior_session_uuid())
+        str(data_set.api.get_behavior_session_uuid())
 
     stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
     assert stimulus_templates['im000'].warped.shape == MONITOR_DIMENSIONS
     assert stimulus_templates['im000'].unwarped.shape == MONITOR_DIMENSIONS
 
-    assert len(data_set.licks) == 2421 and list(data_set.licks.columns) \
-           == ['time', 'frame']
-    assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == \
-           ['volume', 'autorewarded']
+    assert len(data_set.licks) == 2421 and set(data_set.licks.columns) \
+        == set(['timestamps', 'frame'])
+    assert len(data_set.rewards) == 85 and set(data_set.rewards.columns) == \
+        set(['timestamps', 'volume', 'autorewarded'])
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
-           sorted(data_set.corrected_fluorescence_traces.columns) == \
-           ['cell_roi_id', 'corrected_fluorescence']
+        set(data_set.corrected_fluorescence_traces.columns) == \
+        set(['cell_roi_id', 'corrected_fluorescence'])
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps,
                                          data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
     assert data_set.average_projection.data.shape == \
-           data_set.max_projection.data.shape
-    assert list(data_set.motion_correction.columns) == ['x', 'y']
+        data_set.max_projection.data.shape
+    assert set(data_set.motion_correction.columns) == set(['x', 'y'])
     assert len(data_set.trials) == 602
 
     expected_metadata = {

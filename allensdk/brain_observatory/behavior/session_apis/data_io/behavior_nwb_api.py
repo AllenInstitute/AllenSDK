@@ -224,7 +224,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             licks = lick_module.get_data_interface('licks')
 
             return pd.DataFrame({
-                'time': licks.timestamps[:],
+                'timestamps': licks.timestamps[:],
                 'frame': licks.data[:]
             })
         else:
@@ -238,11 +238,11 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             volume = rewards.get_data_interface('volume').data[:]
             return pd.DataFrame({
                 'volume': volume, 'timestamps': time,
-                'autorewarded': autorewarded}).set_index('timestamps')
+                'autorewarded': autorewarded})
         else:
             return pd.DataFrame({
                 'volume': [], 'timestamps': [],
-                'autorewarded': []}).set_index('timestamps')
+                'autorewarded': []})
 
     def get_metadata(self) -> dict:
 
