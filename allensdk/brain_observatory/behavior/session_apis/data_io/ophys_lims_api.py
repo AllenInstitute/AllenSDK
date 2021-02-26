@@ -201,7 +201,7 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
         return stimulus_name
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an ophys experiment"""
         query = """
                 SELECT os.date_of_acquisition

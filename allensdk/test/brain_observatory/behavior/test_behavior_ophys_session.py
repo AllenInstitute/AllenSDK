@@ -107,7 +107,7 @@ def test_visbeh_ophys_data_set():
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
-        'experiment_datetime': pytz.utc.localize(
+        'date_of_acquisition': pytz.utc.localize(
             datetime.datetime(2018, 11, 30, 23, 28, 37)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,

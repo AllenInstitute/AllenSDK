@@ -1,5 +1,4 @@
 import datetime
-import uuid
 import warnings
 from typing import Optional
 
@@ -61,7 +60,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.ophys_experiment_id),
-            session_start_time=session_object.metadata['experiment_datetime'],
+            session_start_time=session_object.metadata['date_of_acquisition'],
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["2-photon", "calcium imaging", "visual cortex",

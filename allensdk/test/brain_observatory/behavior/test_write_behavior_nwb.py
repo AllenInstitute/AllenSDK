@@ -166,7 +166,7 @@ def test_add_behavior_only_metadata(roundtrip, roundtripper,
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',
-        session_start_time=metadata['experiment_datetime']
+        session_start_time=metadata['date_of_acquisition']
     )
     nwb.add_metadata(nwbfile, metadata, behavior_only=True)
 

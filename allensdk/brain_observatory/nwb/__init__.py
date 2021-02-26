@@ -850,7 +850,7 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
                                            'ndx-aibs-behavior-ophys')
     nwb_subject = BehaviorSubject(
         description="A visual behavior subject with a LabTracks ID",
-        age_in_days=subject_metadata["age_in_days"],
+        age=subject_metadata["age_in_days"],
         driver_line=subject_metadata["driver_line"],
         genotype=subject_metadata["genotype"],
         subject_id=str(subject_metadata["subject_id"]),

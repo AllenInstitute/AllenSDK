@@ -358,7 +358,7 @@ class BehaviorDataTransforms(BehaviorBase):
         return get_extended_trials(data)
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Return the timestamp for when experiment was started in UTC
 
         NOTE: This method will only get acquisition datetime from
@@ -369,7 +369,7 @@ class BehaviorDataTransforms(BehaviorBase):
 
         :rtype: datetime
         """
-        extractor_acq_date = self.extractor.get_experiment_date()
+        extractor_acq_date = self.extractor.get_date_of_acquisition()
 
         pkl_data = self._behavior_stimulus_file()
         pkl_raw_acq_date = pkl_data["start_time"]
@@ -418,7 +418,7 @@ class BehaviorDataTransforms(BehaviorBase):
             "age_in_days": self.extractor.get_age_in_days(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
             "session_type": self.extractor.get_stimulus_name(),
-            "experiment_datetime": self.get_experiment_date(),
+            "date_of_acquisition": self.get_date_of_acquisition(),
             "reporter_line": sorted(self.extractor.get_reporter_line()),
             "driver_line": sorted(self.extractor.get_driver_line()),
             "mouse_id": self.extractor.get_mouse_id(),

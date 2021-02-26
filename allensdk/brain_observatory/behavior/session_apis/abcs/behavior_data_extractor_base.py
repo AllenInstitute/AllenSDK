@@ -70,6 +70,6 @@ class BehaviorDataExtractorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an experiment in UTC"""
         raise NotImplementedError()

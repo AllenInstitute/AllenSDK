@@ -107,7 +107,7 @@ def MockBehaviorLimsApi():
         def _get_ids(self):
             return {}
 
-        def get_experiment_date(self):
+        def get_date_of_acquisition(self):
             return datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
 
         def get_behavior_stimulus_file(self):
@@ -216,10 +216,10 @@ def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
     assert 62.0 == api.get_stimulus_frame_rate()
 
 
-def test_get_experiment_date(MockBehaviorLimsApi):
+def test_get_date_of_acquisition(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
     expected = datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    actual = api.get_experiment_date()
+    actual = api.get_date_of_acquisition()
     assert expected == actual
 
 
@@ -388,10 +388,10 @@ class TestBehaviorRegression:
         assert (self.bd.extractor.get_full_genotype()
                 == self.od.extractor.get_full_genotype())
 
-    def test_get_experiment_date_regression(self):
+    def test_get_date_of_acquisition_regression(self):
         """Just testing the date since it comes from two different sources;
         We expect that BehaviorOphysLimsApi will be earlier (more like when
         rig was started up), while BehaviorLimsExtractor returns the start of
         the actual behavior (from pkl file)"""
-        assert (self.bd.get_experiment_date().date()
-                == self.od.get_experiment_date().date())
+        assert (self.bd.get_date_of_acquisition().date()
+                == self.od.get_date_of_acquisition().date())

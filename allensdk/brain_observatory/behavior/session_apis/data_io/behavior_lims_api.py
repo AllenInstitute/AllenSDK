@@ -350,7 +350,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of a behavior_session in UTC
         :rtype: datetime"""
         query = """

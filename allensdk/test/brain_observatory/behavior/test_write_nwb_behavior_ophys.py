@@ -151,7 +151,7 @@ def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
     nwbfile = pynwb.NWBFile(
         session_description='asession',
         identifier='afile',
-        session_start_time=meta['experiment_datetime']
+        session_start_time=meta['date_of_acquisition']
     )
     nwb.add_metadata(nwbfile, meta, behavior_only=False)
     if not test_partial_metadata:

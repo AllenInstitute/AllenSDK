@@ -50,7 +50,7 @@ from allensdk.brain_observatory.behavior.session_apis\
      "Could not parse the acquisition datetime *"
      ),
 ])
-def test_get_experiment_date(tmp_path, test_params, expected_warn_msg):
+def test_get_date_of_acquisition(tmp_path, test_params, expected_warn_msg):
 
     mock_session_id = test_params["behavior_session_id"]
 
@@ -63,7 +63,7 @@ def test_get_experiment_date(tmp_path, test_params, expected_warn_msg):
         test_params['extractor_expt_date']).astimezone(pytz.utc)
 
     class MockExtractor():
-        def get_experiment_date(self):
+        def get_date_of_acquisition(self):
             return extractor_expt_date
 
         def get_behavior_session_id(self):
@@ -77,8 +77,8 @@ def test_get_experiment_date(tmp_path, test_params, expected_warn_msg):
 
     if expected_warn_msg:
         with pytest.warns(Warning, match=expected_warn_msg):
-            obt_date = transformer_instance.get_experiment_date()
+            obt_date = transformer_instance.get_date_of_acquisition()
     else:
-        obt_date = transformer_instance.get_experiment_date()
+        obt_date = transformer_instance.get_date_of_acquisition()
 
     assert(obt_date == extractor_expt_date)

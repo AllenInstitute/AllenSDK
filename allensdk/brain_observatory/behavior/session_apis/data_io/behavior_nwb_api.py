@@ -46,7 +46,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.behavior_session_id),
-            session_start_time=session_object.metadata['experiment_datetime'],
+            session_start_time=session_object.metadata['date_of_acquisition'],
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["visual", "behavior", "task"],
@@ -248,19 +248,19 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
         metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
         data = OphysBehaviorMetadataSchema(
-            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+            exclude=['date_of_acquisition']).dump(metadata_nwb_obj)
 
         # Add pyNWB Subject metadata to behavior session metadata
         nwb_subject = self.nwbfile.subject
         data['mouse_id'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
-        data['age_in_days'] = nwb_subject.age_in_days
+        data['age_in_days'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
 
         # Add other metadata stored in nwb file to behavior session meta
-        data['experiment_datetime'] = self.nwbfile.session_start_time
+        data['date_of_acquisition'] = self.nwbfile.session_start_time
         data['behavior_session_uuid'] = uuid.UUID(
             data['behavior_session_uuid'])
         return data

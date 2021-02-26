@@ -75,7 +75,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         associated with a behavior experiment"""
         return int(self.data['external_specimen_name'])
 
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an experiment (in UTC)
 
         NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
