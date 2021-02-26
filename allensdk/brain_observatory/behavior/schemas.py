@@ -24,10 +24,10 @@ class SubjectMetadataSchema(RaisingSchema):
     neurodata_doc = "Metadata for an AIBS behavior or behavior + ophys subject"
     # Fields to skip converting to extension
     # In this case they already exist in the 'Subject' builtin pyNWB class
-    neurodata_skip = {"age", "genotype", "sex", "subject_id"}
+    neurodata_skip = {"age_in_days", "genotype", "sex", "subject_id"}
 
-    age = fields.String(
-        doc='Age of the specimen donor/subject',
+    age_in_days = fields.String(
+        doc='Age of the specimen donor/subject (in days)',
         required=True,
     )
     driver_line = fields.List(

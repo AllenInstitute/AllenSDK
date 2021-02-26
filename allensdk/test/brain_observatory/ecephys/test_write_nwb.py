@@ -96,7 +96,7 @@ def test_roundtrip_basic_metadata(roundtripper):
      {
         "specimen_name": "mouse_1",
         "age_in_days": 100.0,
-        "age": "P100D",
+        "age_in_days": "P100D",
         "full_genotype": "wt",
         "strain": "c57",
         "sex": "F",

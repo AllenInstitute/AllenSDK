@@ -839,7 +839,7 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
 
     # Subject related metadata should be saved to our BehaviorSubject
     # (augmented pyNWB 'Subject') NWB class
-    subject_fields = {"age", "driver_line", "genotype",
+    subject_fields = {"age_in_days", "driver_line", "genotype",
                       "subject_id", "reporter_line", "sex"}
     subject_metadata = {k: v for k, v in metadata_clean.items()
                         if k in subject_fields}
@@ -850,7 +850,7 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
                                            'ndx-aibs-behavior-ophys')
     nwb_subject = BehaviorSubject(
         description="A visual behavior subject with a LabTracks ID",
-        age=subject_metadata["age"],
+        age_in_days=subject_metadata["age_in_days"],
         driver_line=subject_metadata["driver_line"],
         genotype=subject_metadata["genotype"],
         subject_id=str(subject_metadata["subject_id"]),

@@ -354,7 +354,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         nwb_subject = self.nwbfile.subject
         data['mouse_id'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
-        data['age'] = nwb_subject.age
+        data['age_in_days'] = nwb_subject.age_in_days
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
         data['driver_line'] = sorted(list(nwb_subject.driver_line))

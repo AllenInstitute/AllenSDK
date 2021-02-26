@@ -415,7 +415,7 @@ class BehaviorDataTransforms(BehaviorBase):
         metadata = {
             "rig_name": self.extractor.get_rig_name(),
             "sex": self.extractor.get_sex(),
-            "age": self.extractor.get_age(),
+            "age_in_days": self.extractor.get_age_in_days(),
             "stimulus_frame_rate": self.get_stimulus_frame_rate(),
             "session_type": self.extractor.get_stimulus_name(),
             "experiment_datetime": self.get_experiment_date(),
