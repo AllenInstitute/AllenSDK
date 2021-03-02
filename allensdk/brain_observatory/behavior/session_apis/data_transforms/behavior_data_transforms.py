@@ -4,9 +4,11 @@ from typing import Optional
 import imageio
 import numpy as np
 import pandas as pd
-from allensdk.api.cache import memoize
+import os
 from allensdk.brain_observatory.behavior.behavior_metadata import \
     get_task_parameters, BehaviorMetadata
+from allensdk.api.cache import memoize
+from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \
     get_running_df
@@ -222,42 +224,42 @@ class BehaviorDataTransforms(BehaviorBase):
         # TODO: Eventually the `grating_images_dict` should be provided by the
         #       BehaviorLimsExtractor/BehaviorJsonExtractor classes.
         #       - NJM 2021/2/23
+
+        gratings_dir = "/allen/programs/braintv/production/visualbehavior"
+        gratings_dir = os.path.join(gratings_dir,
+                                    "prod5/project_VisualBehavior")
         grating_images_dict = {
             "gratings_0.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_0.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "warped_grating_0.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/"
-                    "masked_unwarped_grating_0.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_0.png"))))
             },
             "gratings_90.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_90.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_90.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior"
-                    "/masked_unwarped_grating_90.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_90.png"))))
             },
             "gratings_180.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_180.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_180.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/"
-                    "masked_unwarped_grating_180.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_180.png"))))
             },
             "gratings_270.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_270.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_270.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior"
-                    "/masked_unwarped_grating_270.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_270.png"))))
             }
         }
 
