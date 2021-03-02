@@ -401,7 +401,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "sex": nwb_subject.sex,
             "stimulus_name": self.nwbfile.stimulus_notes,
             "subject_id": nwb_subject.subject_id,
-            "age_in_days": nwb_subject.age,
+            "age": nwb_subject.age,
             "species": nwb_subject.species
         }
         return metadata
