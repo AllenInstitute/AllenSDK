@@ -2,6 +2,9 @@ import pytest
 import logging
 import numpy as np
 import pandas as pd
+
+from allensdk.brain_observatory.behavior.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
@@ -379,10 +382,14 @@ def test_monitor_delay(monkeypatch):
     """
 
     # first test case where monitor delay calculation succeeds
+    class DummyExtractor(object):
+        def get_sync_file(self):
+            return ''
+
+        def get_equipment_name(self):
+            return 'spam'
+
     def xform_init(self):
-        class DummyExtractor(object):
-            def get_sync_file(self):
-                return ''
         self.extractor = DummyExtractor()
 
     def aligner_init(self, sync_file=None):
@@ -429,11 +436,27 @@ def test_monitor_delay(monkeypatch):
                     'CAM2P.5': 0.021192,
                     'MESO.1': 0.03613}
 
+    def dummy_get_metadata(self):
+        def dummy_metadata_init(self, extractor):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_metadata_init)
+
+        class DummyExtractor:
+            def get_sync_file(self):
+                return ''
+
+            def get_equipment_name(self):
+                return equipment_name
+
+        metadata = BehaviorMetadata(
+            extractor=DummyExtractor())
+        return metadata
+
     for equipment_name in delay_lookup.keys():
         expected_delay = delay_lookup[equipment_name]
-
-        def dummy_get_metadata(self):
-            return {'equipment_name': equipment_name}
 
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorOphysDataTransforms,
@@ -464,9 +487,6 @@ def test_monitor_delay(monkeypatch):
                                           np.array([1, 2, 3, 4, 5], dtype=int))
 
     # finally, try case with unknown rig name
-    def dummy_get_metadata(self):
-        return {'equipment_name': 'spam'}
-
     def dummy_delay(self):
         raise ValueError("that did not work")
 
@@ -474,7 +494,7 @@ def test_monitor_delay(monkeypatch):
         ctx.setattr(BehaviorOphysDataTransforms,
                     '__init__',
                     xform_init)
-
+        equipment_name = 'spam'
         ctx.setattr(BehaviorOphysDataTransforms,
                     'get_metadata',
                     dummy_get_metadata)
