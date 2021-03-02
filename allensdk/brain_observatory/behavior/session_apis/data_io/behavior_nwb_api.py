@@ -10,7 +10,7 @@ from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.behavior_metadata import (
-    get_expt_description
+    get_expt_description, BehaviorMetadata
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase
@@ -41,12 +41,15 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
     def save(self, session_object):
 
-        session_type = str(session_object.metadata.session_type)
+        session_metadata: BehaviorMetadata = \
+            session_object.api.get_metadata()
+
+        session_type = str(session_metadata.session_type)
 
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.behavior_session_id),
-            session_start_time=session_object.metadata.date_of_acquisition,
+            session_start_time=session_metadata.date_of_acquisition,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["visual", "behavior", "task"],

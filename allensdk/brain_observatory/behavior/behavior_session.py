@@ -385,7 +385,13 @@ class BehaviorSession(LazyPropertyMixin):
         """Return metadata about the session.
         :rtype: dict
         """
-        return self._metadata.to_dict()
+        if isinstance(self._metadata, BehaviorMetadata):
+            metadata = self._metadata.to_dict()
+        else:
+            # NWB API returns as dict
+            metadata = self._metadata
+
+        return metadata
 
     @metadata.setter
     def metadata(self, value):

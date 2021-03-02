@@ -1,4 +1,5 @@
 import abc
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -146,11 +147,12 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_metadata(self) -> BehaviorMetadata:
+    def get_metadata(self) -> Union[BehaviorMetadata, dict]:
         """Get metadata for Session
 
         Returns
         -------
-        BehaviorMetadata
+        dict if NWB
+        BehaviorMetadata otherwise
         """
         raise NotImplementedError()
