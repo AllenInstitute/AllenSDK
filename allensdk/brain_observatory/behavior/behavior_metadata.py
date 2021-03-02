@@ -162,7 +162,7 @@ class BehaviorMetadata:
         self._extractor = extractor
         self._stimulus_timestamps = stimulus_timestamps
         self._behavior_stimulus_file = behavior_stimulus_file
-        self._exclude_from_equals = None
+        self._exclude_from_equals = set()
 
     @property
     def equipment_name(self) -> str:
@@ -327,6 +327,7 @@ class BehaviorMetadata:
 
     @abc.abstractmethod
     def to_dict(self) -> dict:
+        """Returns dict representation of all properties in class"""
         vars_ = vars(BehaviorMetadata)
         return self._get_properties(vars_=vars_)
 
@@ -344,11 +345,6 @@ class BehaviorMetadata:
             msg = f'Do not know how to compare with type {type(other)}'
             raise NotImplementedError(msg)
 
-        if self._exclude_from_equals:
-            exclude_from_equals = self._exclude_from_equals
-        else:
-            exclude_from_equals = set()
-
         properties_self = self.to_dict()
 
         if isinstance(other, dict):
@@ -357,7 +353,7 @@ class BehaviorMetadata:
             properties_other = other.to_dict()
 
         for p in properties_self:
-            if p in exclude_from_equals:
+            if p in self._exclude_from_equals:
                 continue
 
             x1 = properties_self[p]

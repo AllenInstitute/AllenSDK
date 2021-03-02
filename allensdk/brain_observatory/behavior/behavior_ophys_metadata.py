@@ -88,7 +88,8 @@ class BehaviorOphysMetadata(BehaviorMetadata):
     def targeted_structure(self) -> str:
         return self._extractor.get_targeted_structure()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """Returns dict representation of all properties in class"""
         vars_ = vars(BehaviorOphysMetadata)
         d = self._get_properties(vars_=vars_)
         return {**super().to_dict(), **d}

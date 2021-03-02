@@ -158,7 +158,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         try:
             delay = aligner.monitor_delay
         except ValueError as ee:
-            equipment_name = self.get_metadata()['equipment_name']
+            equipment_name = self.get_metadata().equipment_name
 
             warning_msg = 'Monitory delay calculation failed '
             warning_msg += 'with ValueError\n'
