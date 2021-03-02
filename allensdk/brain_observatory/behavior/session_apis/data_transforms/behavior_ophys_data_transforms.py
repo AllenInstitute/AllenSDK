@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Union
-import uuid
+from typing import Iterable, Optional, Union
 
 import h5py
 import matplotlib.image as mpimg  # NOQA: E402
@@ -12,6 +11,8 @@ import pandas as pd
 import warnings
 
 from allensdk.api.cache import memoize
+from allensdk.brain_observatory.behavior.behavior_ophys_metadata import \
+    BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
@@ -236,39 +237,16 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return resampled
 
     @memoize
-    def get_ophys_frame_rate(self):
-        ophys_timestamps = self.get_ophys_timestamps()
-        return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
-
-    @memoize
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> BehaviorOphysMetadata:
         """Return metadata about the session.
-        :rtype: dict
+        :rtype: BehaviorOphysMetadata
         """
-        extractor = self.extractor
-
-        fov_shape = extractor.get_field_of_view_shape()
-        expt_container_id = extractor.get_experiment_container_id()
-
-        behavior_metadata = super().get_metadata()
-
-        ophys_metadata = {
-            'emission_lambda': 520.0,
-            'excitation_lambda': 910.0,
-            'experiment_container_id': expt_container_id,
-            'field_of_view_height': fov_shape['height'],
-            'field_of_view_width': fov_shape['width'],
-            'imaging_depth': extractor.get_imaging_depth(),
-            'imaging_plane_group': extractor.get_imaging_plane_group(),
-            'imaging_plane_group_count': extractor.get_plane_group_count(),
-            'indicator': 'GCAMP6f',
-            'ophys_experiment_id': extractor.get_ophys_experiment_id(),
-            'ophys_frame_rate': self.get_ophys_frame_rate(),
-            'ophys_session_id': extractor.get_ophys_session_id(),
-            'targeted_structure': extractor.get_targeted_structure()
-        }
-
-        metadata = {**behavior_metadata, **ophys_metadata}
+        metadata = BehaviorOphysMetadata(
+            extractor=self.extractor,
+            stimulus_timestamps=self.get_stimulus_timestamps(),
+            ophys_timestamps=self.get_ophys_timestamps(),
+            behavior_stimulus_file=self._behavior_stimulus_file()
+        )
 
         return metadata
 

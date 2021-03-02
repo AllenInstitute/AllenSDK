@@ -9,16 +9,14 @@ import pytz
 from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    get_expt_description, get_cre_line, get_reporter_line
+from allensdk.brain_observatory.behavior.behavior_metadata import (
+    get_expt_description
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase
 )
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorDataTransforms
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.trials_processing import (
@@ -43,12 +41,12 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
     def save(self, session_object):
 
-        session_type = str(session_object.metadata['session_type'])
+        session_type = str(session_object.metadata.session_type)
 
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.behavior_session_id),
-            session_start_time=session_object.metadata['date_of_acquisition'],
+            session_start_time=session_object.metadata.date_of_acquisition,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["visual", "behavior", "task"],
@@ -258,11 +256,10 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['sex'] = nwb_subject.sex
         data['age_in_days'] = nwb_subject.age
         data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = get_reporter_line(
-            reporter_line=nwb_subject.reporter_line)
+        data['reporter_line'] = nwb_subject.reporter_line
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
-        data['cre_line'] = get_cre_line(
-            driver_line=nwb_subject.driver_line)
+        data['cre_line'] = [
+            d for d in nwb_subject.driver_line if d.endswith('Cre')][0]
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time

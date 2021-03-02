@@ -1,7 +1,14 @@
+import abc
+import uuid
 import warnings
-from typing import Dict, List, Optional, Union
+from datetime import datetime
+from typing import Dict, List, Optional, Any
 import re
 import numpy as np
+import pandas as pd
+import pytz
+
+from allensdk.brain_observatory.session_api_utils import compare_session_fields
 
 description_dict = {
     # key is a regex and value is returned on match
@@ -142,59 +149,222 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-def get_cre_line(driver_line: List[str]) -> Optional[str]:
-    """Parses cre_line from a list of driver_lines
+class BehaviorMetadata:
+    """Container class for behavior metadata"""
+    def __init__(self, extractor: Any,
+                 stimulus_timestamps: np.ndarray,
+                 behavior_stimulus_file: pd.DataFrame):
 
-    Parameters
-    ----------
-    driver_line
-        The list of driver lines
+        """Note: cannot properly type extractor due to circular dependency
+        between extractor and transformer.
+        TODO fix circular dependency and update type"""
 
-    Returns
-    ---------
-    cre_line, or None on error
-    """
-    if len(driver_line) == 0:
-        warnings.warn('Could not parse cre_line because there are no '
-                      'driver lines')
-        return
-    cre_line = [d for d in driver_line if d.endswith('Cre')]
+        self._extractor = extractor
+        self._stimulus_timestamps = stimulus_timestamps
+        self._behavior_stimulus_file = behavior_stimulus_file
+        self._exclude_from_equals = None
 
-    if not cre_line:
-        warnings.warn('Could not parse cre_line from driver_line')
-        return
+    @property
+    def equipment_name(self) -> str:
+        return self._extractor.get_equipment_name()
 
-    if len(cre_line) > 1:
-        warnings.warn('Multiple cre_lines were parsed from the driver '
-                      'line. Returning the first one.')
+    @property
+    def sex(self) -> str:
+        return self._extractor.get_sex()
 
-    return cre_line[0]
+    @property
+    def age_in_days(self) -> str:
+        return self._extractor.get_age_in_days()
 
+    @property
+    def stimulus_frame_rate(self) -> float:
+        return self._get_frame_rate(timestamps=self._stimulus_timestamps)
 
-def get_reporter_line(reporter_line: Union[str, List[str]]) -> Optional[str]:
-    """There can be multiple reporter lines, so it is returned from LIMS
-    as a list. But there shouldn't be more than 1 for behavior. This
-    tries to convert to str
+    @property
+    def session_type(self) -> str:
+        return self._extractor.get_stimulus_name()
 
-    Parameters
-    ----------
-    reporter_line
-        List of reporter lines, or a single reporter line string
+    @property
+    def date_of_acquisition(self) -> datetime:
+        """Return the timestamp for when experiment was started in UTC
 
-    Returns
-    ---------
-    single reporter line, or None if not possible
-    """
+        NOTE: This method will only get acquisition datetime from
+        extractor (data from LIMS) methods. As a sanity check,
+        it will also read the acquisition datetime from the behavior stimulus
+        (*.pkl) file and raise a warning if the date differs too much from the
+        datetime obtained from the behavior stimulus (*.pkl) file.
 
-    if isinstance(reporter_line, str):
-        return reporter_line
+        :rtype: datetime
+        """
+        extractor_acq_date = self._extractor.get_date_of_acquisition()
 
-    if len(reporter_line) == 0:
-        warnings.warn('No reporter line')
-        return
+        pkl_data = self._behavior_stimulus_file
+        pkl_raw_acq_date = pkl_data["start_time"]
+        if isinstance(pkl_raw_acq_date, datetime):
+            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
 
-    if len(reporter_line) > 1:
-        warnings.warn('More than 1 reporter line. Returning the first one')
+        elif isinstance(pkl_raw_acq_date, (int, float)):
+            # We are dealing with an older pkl file where the acq time is
+            # stored as a Unix style timestamp string
+            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
+            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
+        else:
+            pkl_acq_date = None
+            warnings.warn(
+                "Could not parse the acquisition datetime "
+                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
+                f"{self._extractor.get_behavior_stimulus_file()}"
+            )
 
-    return reporter_line[0]
+        if pkl_acq_date:
+            acq_start_diff = (
+                    extractor_acq_date - pkl_acq_date).total_seconds()
+            # If acquisition dates differ by more than an hour
+            if abs(acq_start_diff) > 360:
+                session_id = self._extractor.get_behavior_session_id()
+                warnings.warn(
+                    "The `date_of_acquisition` field in LIMS "
+                    f"({extractor_acq_date}) for behavior session "
+                    f"({session_id}) deviates by more "
+                    f"than an hour from the `start_time` ({pkl_acq_date}) "
+                    "specified in the associated stimulus *.pkl file: "
+                    f"{self._extractor.get_behavior_stimulus_file()}"
+                )
+        return extractor_acq_date
 
+    @property
+    def reporter_line(self) -> Optional[str]:
+        """There can be multiple reporter lines, so it is returned from LIMS
+        as a list. But there shouldn't be more than 1 for behavior. This
+        tries to convert to str
+
+        Returns
+        ---------
+        single reporter line, or None if not possible
+        """
+        reporter_line = self._extractor.get_reporter_line()
+
+        if isinstance(reporter_line, str):
+            return reporter_line
+
+        if len(reporter_line) == 0:
+            warnings.warn('No reporter line')
+            return
+
+        if len(reporter_line) > 1:
+            warnings.warn('More than 1 reporter line. Returning the first one')
+
+        return reporter_line[0]
+
+    @property
+    def cre_line(self) -> Optional[str]:
+        """Parses cre_line from a list of driver_lines
+
+        Returns
+        ---------
+        cre_line, or None on error
+        """
+        if len(self.driver_line) == 0:
+            warnings.warn('Could not parse cre_line because there are no '
+                          'driver lines')
+            return
+        cre_line = [d for d in self.driver_line if d.endswith('Cre')]
+
+        if not cre_line:
+            warnings.warn('Could not parse cre_line from driver_line')
+            return
+
+        if len(cre_line) > 1:
+            warnings.warn('Multiple cre_lines were parsed from the driver '
+                          'line. Returning the first one.')
+
+        return cre_line[0]
+
+    @property
+    def behavior_session_uuid(self) -> Optional[uuid.UUID]:
+        """Get the universally unique identifier (UUID)
+        """
+        data = self._behavior_stimulus_file
+        behavior_pkl_uuid = data.get("session_uuid")
+
+        behavior_session_id = self._extractor.get_behavior_session_id()
+        foraging_id = self._extractor.get_foraging_id()
+
+        # Sanity check to ensure that pkl file data matches up with
+        # the behavior session that the pkl file has been associated with.
+        assert_err_msg = (
+            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
+            f"behavior stimulus *.pkl file "
+            f"({self._extractor.get_behavior_stimulus_file()}) does "
+            f"does not match the foraging UUID ({foraging_id}) for "
+            f"behavior session: {behavior_session_id}")
+        assert behavior_pkl_uuid == foraging_id, assert_err_msg
+
+        if behavior_pkl_uuid is None:
+            bs_uuid = None
+        else:
+            bs_uuid = uuid.UUID(behavior_pkl_uuid)
+        return bs_uuid
+
+    @property
+    def driver_line(self) -> List[str]:
+        return sorted(self._extractor.get_driver_line())
+
+    @property
+    def mouse_id(self) -> int:
+        return self._extractor.get_mouse_id()
+
+    @property
+    def full_genotype(self) -> str:
+        return self._extractor.get_full_genotype()
+
+    @property
+    def behavior_session_id(self) -> int:
+        return self._extractor.get_behavior_session_id()
+
+    def get_extractor(self):
+        return self._extractor
+
+    @abc.abstractmethod
+    def to_dict(self) -> dict:
+        vars_ = vars(BehaviorMetadata)
+        return self._get_properties(vars_=vars_)
+
+    @staticmethod
+    def _get_frame_rate(timestamps: np.ndarray):
+        return np.round(1 / np.mean(np.diff(timestamps)), 0)
+
+    def _get_properties(self, vars_: dict):
+        """Returns all property names and values"""
+        return {name: getattr(self, name) for name, value in vars_.items()
+                if isinstance(value, property)}
+
+    def __eq__(self, other):
+        if not isinstance(other, (BehaviorMetadata, dict)):
+            msg = f'Do not know how to compare with type {type(other)}'
+            raise NotImplementedError(msg)
+
+        if self._exclude_from_equals:
+            exclude_from_equals = self._exclude_from_equals
+        else:
+            exclude_from_equals = set()
+
+        properties_self = self.to_dict()
+
+        if isinstance(other, dict):
+            properties_other = other
+        else:
+            properties_other = other.to_dict()
+
+        for p in properties_self:
+            if p in exclude_from_equals:
+                continue
+
+            x1 = properties_self[p]
+            x2 = properties_other[p]
+
+            try:
+                compare_session_fields(x1=x1, x2=x2)
+            except AssertionError:
+                return False
+        return True

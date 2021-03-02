@@ -59,7 +59,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert sessions_are_equal(d1, d2, reraise=True)
 
 
-# @pytest.mark.nightly
+@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
     ophys_experiment_id = 789359614
     data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
@@ -73,7 +73,7 @@ def test_visbeh_ophys_data_set():
 
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
-        str(data_set.api.get_behavior_session_uuid())
+        str(data_set.api.get_metadata().behavior_session_uuid)
 
     stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
@@ -124,7 +124,9 @@ def test_visbeh_ophys_data_set():
         'equipment_name': 'CAM2P.5',
         'age_in_days': 'P139',
         'sex': 'F',
-        'imaging_plane_group': None}
+        'imaging_plane_group': None,
+        'project_code': 'VisualBehavior'
+    }
     assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',

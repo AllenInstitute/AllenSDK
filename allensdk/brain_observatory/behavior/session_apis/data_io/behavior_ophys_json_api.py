@@ -137,3 +137,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         """Get the filepath of the .h5 events file associated with an ophys
         experiment"""
         return self.data['events_file']
+
+    def get_project_code(self) -> str:
+        raise NotImplementedError('Not exposed externally')

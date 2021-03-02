@@ -88,6 +88,18 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
+    def get_project_code(self) -> str:
+        """Get the project code"""
+        query = f"""
+            SELECT projects.code AS project_code
+            FROM ophys_sessions 
+            JOIN projects ON projects.id = ophys_sessions.project_id
+            WHERE ophys_sessions.id = {self.get_ophys_session_id()}
+        """
+        return self.lims_db.fetchone(query, strict=True)
+
+
+    @memoize
     def get_experiment_container_id(self) -> int:
         """Get the experiment container id associated with the ophys
         experiment id used to initialize the API"""

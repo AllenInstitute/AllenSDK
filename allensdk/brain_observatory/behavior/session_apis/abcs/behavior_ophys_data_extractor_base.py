@@ -134,3 +134,8 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
     def get_eye_tracking_filepath(self) -> dict:
         """Get the eye tracking filepath containing ellipse fits"""
         raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_project_code(self) -> str:
+        """Get the project code."""
+        raise NotImplementedError()

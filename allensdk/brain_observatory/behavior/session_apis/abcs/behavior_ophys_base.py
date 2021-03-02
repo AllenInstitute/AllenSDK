@@ -90,16 +90,16 @@ class BehaviorOphysBase(BehaviorBase):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
-    def get_metadata(self) -> dict:
-        """Get behavior+ophys session metadata.
-
-        Returns
-        -------
-        dict
-            A dictionary of session-specific metadata.
-        """
-        raise NotImplementedError()
+    # @abc.abstractmethod
+    # def get_metadata(self) -> dict:
+    #     """Get behavior+ophys session metadata.
+    #
+    #     Returns
+    #     -------
+    #     dict
+    #         A dictionary of session-specific metadata.
+    #     """
+    #     raise NotImplementedError()
 
     @abc.abstractmethod
     def get_motion_correction(self) -> pd.DataFrame:

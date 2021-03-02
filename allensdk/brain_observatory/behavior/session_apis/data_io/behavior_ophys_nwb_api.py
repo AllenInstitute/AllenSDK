@@ -11,10 +11,12 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
+from allensdk.brain_observatory.behavior.behavior_ophys_metadata import \
+    BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.metadata_processing import (
+from allensdk.brain_observatory.behavior.behavior_metadata import (
     get_expt_description
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
@@ -54,13 +56,18 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         super().__init__(*args, **kwargs)
 
     def save(self, session_object):
+        # Cannot type session_object due to a circular dependency
+        # TODO fix circular dependency and add type
 
-        session_type = str(session_object.metadata['session_type'])
+        session_metadata: BehaviorOphysMetadata = \
+            session_object.api.get_metadata()
+
+        session_type = session_metadata.session_type
 
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.ophys_experiment_id),
-            session_start_time=session_object.metadata['date_of_acquisition'],
+            session_start_time=session_metadata.date_of_acquisition,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["2-photon", "calcium imaging", "visual cortex",

@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 import inspect
 
-from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+from allensdk.brain_observatory.behavior.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
@@ -385,7 +385,7 @@ class BehaviorSession(LazyPropertyMixin):
         """Return metadata about the session.
         :rtype: dict
         """
-        return self._metadata
+        return self._metadata.to_dict()
 
     @metadata.setter
     def metadata(self, value):
