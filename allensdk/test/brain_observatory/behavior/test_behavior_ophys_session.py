@@ -238,3 +238,12 @@ def test_event_detection():
     # All events are the same length
     event_length = len(set([len(x) for x in events['events']]))
     assert event_length == 1
+
+
+@pytest.mark.requires_bamboo
+def test_parameter_datatypes():
+    ophys_experiment_id = 960410026
+    dataset = BehaviorOphysSession.from_lims(ophys_experiment_id)
+
+    assert isinstance(dataset.ophys_session_id, int)
+    assert isinstance(dataset.ophys_experiment_id, int)
