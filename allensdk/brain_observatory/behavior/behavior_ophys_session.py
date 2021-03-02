@@ -169,6 +169,13 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
         return self._ophys_experiment_id
 
     @property
+    def ophys_session_id(self) -> int:
+        """Unique identifier for this ophys session.
+        :rtype: int
+        """
+        return self._ophys_session_id
+
+    @property
     def max_projection(self) -> Image:
         """2D max projection image.
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
