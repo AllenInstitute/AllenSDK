@@ -241,9 +241,9 @@ def test_event_detection():
 
 
 @pytest.mark.requires_bamboo
-def test_parameter_datatypes():
+def test_BehaviorOphysSession_property_data():
     ophys_experiment_id = 960410026
     dataset = BehaviorOphysSession.from_lims(ophys_experiment_id)
 
-    assert isinstance(dataset.ophys_session_id, int)
-    assert isinstance(dataset.ophys_experiment_id, int)
+    assert dataset.ophys_session_id == 959458018
+    assert dataset.ophys_experiment_id == 960410026
