@@ -11,12 +11,12 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.behavior.behavior_ophys_metadata import \
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.behavior_metadata import (
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs import (

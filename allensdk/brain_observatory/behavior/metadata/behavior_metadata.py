@@ -7,6 +7,8 @@ import re
 import numpy as np
 import pytz
 
+from allensdk.brain_observatory.behavior.metadata.util import \
+    parse_cre_line
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 
 description_dict = {
@@ -136,7 +138,7 @@ def get_task_parameters(data: Dict) -> Dict:
     if 'DoC' in task_id:
         task_parameters['task'] = 'change detection'
     else:
-        msg = "metadata_processing.get_task_parameters does not "
+        msg = "metadata.get_task_parameters does not "
         msg += f"know how to parse 'task_id' = {task_id}"
         raise RuntimeError(msg)
 
@@ -257,27 +259,11 @@ class BehaviorMetadata:
 
     @property
     def cre_line(self) -> Optional[str]:
-        """Parses cre_line from a list of driver_lines
-
-        Returns
-        ---------
-        cre_line, or None on error
-        """
-        if len(self.driver_line) == 0:
-            warnings.warn('Could not parse cre_line because there are no '
-                          'driver lines')
-            return None
-        cre_line = [d for d in self.driver_line if d.endswith('Cre')]
-
-        if not cre_line:
-            warnings.warn('Could not parse cre_line from driver_line')
-            return None
-
-        if len(cre_line) > 1:
-            warnings.warn('Multiple cre_lines were parsed from the driver '
-                          'line. Returning the first one.')
-
-        return cre_line[0]
+        """Parses cre_line from full_genotype"""
+        cre_line = parse_cre_line(full_genotype=self.full_genotype)
+        if cre_line is None:
+            warnings.warn('Unable to parse cre_line from full_genotype')
+        return cre_line
 
     @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:

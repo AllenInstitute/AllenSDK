@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import inspect
 
-from allensdk.brain_observatory.behavior.behavior_metadata import \
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (

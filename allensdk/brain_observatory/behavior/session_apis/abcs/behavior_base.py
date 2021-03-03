@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_metadata import \
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate

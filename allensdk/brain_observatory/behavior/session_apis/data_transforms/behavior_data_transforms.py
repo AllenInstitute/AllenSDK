@@ -5,7 +5,7 @@ import imageio
 import numpy as np
 import pandas as pd
 import os
-from allensdk.brain_observatory.behavior.behavior_metadata import \
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     get_task_parameters, BehaviorMetadata
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path

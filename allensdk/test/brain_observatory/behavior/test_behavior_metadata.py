@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytz
 
-from allensdk.brain_observatory.behavior.behavior_metadata import (
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     description_dict, get_task_parameters, get_expt_description,
     BehaviorMetadata)
 
@@ -310,90 +310,46 @@ def test_get_expt_description_raises_with_invalid_session_type(session_type):
         get_expt_description(session_type)
 
 
-def test_cre_line_parsed_from_driver_line(monkeypatch):
+def test_cre_line(monkeypatch):
     """Tests that cre_line properly parsed from driver_line"""
     with monkeypatch.context() as ctx:
         def dummy_init(self):
             pass
 
-        def driver_line(self):
-            return ['foo', 'Slc-Cre']
+        def full_genotype(self):
+            return 'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
 
         ctx.setattr(BehaviorMetadata,
                     '__init__',
                     dummy_init)
         ctx.setattr(BehaviorMetadata,
-                    'driver_line',
-                    property(driver_line))
+                    'full_genotype',
+                    property(full_genotype))
 
         metadata = BehaviorMetadata()
 
-        assert metadata.cre_line == 'Slc-Cre'
+        assert metadata.cre_line == 'Sst-IRES-Cre'
 
 
-def test_cre_line_no_driver_line(monkeypatch):
+def test_cre_line_bad_full_genotype(monkeypatch):
     """Test that cre_line is None and no error raised"""
     with monkeypatch.context() as ctx:
         def dummy_init(self):
             pass
 
-        def driver_line(self):
-            return []
+        def full_genotype(self):
+            return 'foo'
 
         ctx.setattr(BehaviorMetadata,
                     '__init__',
                     dummy_init)
         ctx.setattr(BehaviorMetadata,
-                    'driver_line',
-                    property(driver_line))
+                    'full_genotype',
+                    property(full_genotype))
 
         metadata = BehaviorMetadata()
 
         assert metadata.cre_line is None
-
-
-def test_cre_line_no_cre_line(monkeypatch):
-    """Tests that if driver_line does not contain anything ending in 'Cre'
-     That None is returned"""
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            pass
-
-        def driver_line(self):
-            return ['foo']
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        ctx.setattr(BehaviorMetadata,
-                    'driver_line',
-                    property(driver_line))
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.cre_line is None
-
-
-def test_cre_line_multiple_cre_line(monkeypatch):
-    """Tests that if the driver_line contains multiple things ending in 'Cre'
-     that the first one is returned"""
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            pass
-
-        def driver_line(self):
-            return ['fooCre', 'barCre']
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        ctx.setattr(BehaviorMetadata,
-                    'driver_line',
-                    property(driver_line))
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.cre_line == 'fooCre'
 
 
 def test_reporter_line(monkeypatch):

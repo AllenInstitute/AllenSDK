@@ -5,12 +5,13 @@ import json
 import re
 
 from allensdk import one
+from allensdk.brain_observatory.behavior.metadata.util import \
+    parse_cre_line
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
-from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.deprecated import deprecated
 
 csv_io = {
@@ -139,16 +140,6 @@ class BehaviorProjectCache(object):
                 {row['stage_name']: self.get_session(row['ophys_experiment_id'])}
             )
         return container_stages
-
-
-def parse_cre_line(full_genotype):
-    '''
-    Args:
-        full_genotype (str): formatted from LIMS, e.g. Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt
-    Returns:
-        cre_line (str): just the Cre line, e.g. Vip-IRES-Cre
-    '''
-    return full_genotype.split(';')[0].split('/')[0]  # Drop the /wt
 
 
 def parse_passive(behavior_stage):

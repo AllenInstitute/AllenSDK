@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Optional, Any
 
-from allensdk.brain_observatory.behavior.behavior_metadata import \
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 
 
