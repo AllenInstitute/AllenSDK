@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 import re
 import numpy as np
-import pandas as pd
 import pytz
 
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
@@ -153,7 +152,7 @@ class BehaviorMetadata:
     """Container class for behavior metadata"""
     def __init__(self, extractor: Any,
                  stimulus_timestamps: np.ndarray,
-                 behavior_stimulus_file: pd.DataFrame):
+                 behavior_stimulus_file: dict):
 
         """Note: cannot properly type extractor due to circular dependency
         between extractor and transformer.
@@ -220,7 +219,7 @@ class BehaviorMetadata:
             acq_start_diff = (
                     extractor_acq_date - pkl_acq_date).total_seconds()
             # If acquisition dates differ by more than an hour
-            if abs(acq_start_diff) > 360:
+            if abs(acq_start_diff) > 3600:
                 session_id = self._extractor.get_behavior_session_id()
                 warnings.warn(
                     "The `date_of_acquisition` field in LIMS "
@@ -249,7 +248,7 @@ class BehaviorMetadata:
 
         if len(reporter_line) == 0:
             warnings.warn('No reporter line')
-            return
+            return None
 
         if len(reporter_line) > 1:
             warnings.warn('More than 1 reporter line. Returning the first one')
@@ -267,12 +266,12 @@ class BehaviorMetadata:
         if len(self.driver_line) == 0:
             warnings.warn('Could not parse cre_line because there are no '
                           'driver lines')
-            return
+            return None
         cre_line = [d for d in self.driver_line if d.endswith('Cre')]
 
         if not cre_line:
             warnings.warn('Could not parse cre_line from driver_line')
-            return
+            return None
 
         if len(cre_line) > 1:
             warnings.warn('Multiple cre_lines were parsed from the driver '

@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from typing import Optional, Any
 
 from allensdk.brain_observatory.behavior.behavior_metadata import \
@@ -11,7 +10,7 @@ class BehaviorOphysMetadata(BehaviorMetadata):
     def __init__(self, extractor: Any,
                  stimulus_timestamps: np.ndarray,
                  ophys_timestamps: np.ndarray,
-                 behavior_stimulus_file: pd.DataFrame):
+                 behavior_stimulus_file: dict):
 
         """Note: cannot properly type extractor due to circular dependency
         between extractor and transformer.

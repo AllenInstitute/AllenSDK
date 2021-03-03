@@ -36,7 +36,7 @@ class BehaviorDataTransforms(BehaviorBase):
         return self.extractor.get_behavior_session_id()
 
     @memoize
-    def _behavior_stimulus_file(self) -> pd.DataFrame:
+    def _behavior_stimulus_file(self) -> dict:
         """Helper method to cache stimulus pkl file in memory since it takes
         about a second to load (and is used in many methods).
         """
