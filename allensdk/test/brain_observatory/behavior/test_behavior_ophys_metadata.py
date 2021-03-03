@@ -23,7 +23,7 @@ def test_indicator(monkeypatch):
 
 
 def test_indicator_invalid_reporter_line(monkeypatch):
-    """Test that indicator is parsed from full_genotype"""
+    """Test that indicator is None if it can't be parsed from reporter line"""
     class MockExtractor:
         def get_reporter_line(self):
             return 'foo'
