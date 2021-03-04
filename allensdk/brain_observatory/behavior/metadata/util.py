@@ -27,9 +27,9 @@ def parse_age_in_days(age: str):
     age
         String representation of age (ie P123)
     """
-    if not age:
+    if len(age) == 0:
         return None
-    
+
     if age[0] != 'P':
         return None
     try:
