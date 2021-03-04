@@ -30,8 +30,8 @@ class BehaviorDataExtractorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_age_in_days(self) -> str:
-        """Get the age (in days) of the subject"""
+    def get_age(self) -> str:
+        """Get the age code of the subject (ie P123)"""
         raise NotImplementedError()
 
     @abc.abstractmethod

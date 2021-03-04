@@ -157,7 +157,7 @@ def behavior_only_metadata_fixture():
         "stimulus_frame_rate": 60.0,
         "equipment_name": 'my_device',
         "sex": 'M',
-        "age_in_days": 'P139'
+        "age_in_days": 139
     }
 
 
@@ -189,7 +189,7 @@ def metadata_fixture():
         "field_of_view_height": 4,
         "equipment_name": 'my_device',
         "sex": 'M',
-        "age_in_days": 'P139',
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }
@@ -219,7 +219,7 @@ def partial_metadata_fixture():
         "field_of_view_height": 4,
         "equipment_name": 'my_device',
         "sex": 'M',
-        "age_in_days": 'P139',
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }
@@ -340,7 +340,7 @@ def session_data():
         "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",  # noqa: E501
         "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",  # noqa: E501
         "sex": "F",
-        "age_in_days": "P139",
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }

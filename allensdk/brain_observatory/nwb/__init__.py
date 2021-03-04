@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 import h5py
 import marshmallow
@@ -848,9 +848,16 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
 
     BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
                                            'ndx-aibs-behavior-ophys')
+
+    def _get_age(age_in_days: Optional[int]) -> Optional[str]:
+        """Convert numeric age_in_days to ISO 8601"""
+        if age_in_days is None:
+            return 'null'
+        return f'P{age_in_days}D'
+
     nwb_subject = BehaviorSubject(
         description="A visual behavior subject with a LabTracks ID",
-        age=subject_metadata["age_in_days"],
+        age=_get_age(age_in_days=subject_metadata['age_in_days']),
         driver_line=subject_metadata["driver_line"],
         genotype=subject_metadata["genotype"],
         subject_id=str(subject_metadata["subject_id"]),

@@ -228,8 +228,8 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_age_in_days(self) -> str:
-        """Returns age code of the subject.
+    def get_age(self) -> str:
+        """Return the age code of the subject (ie P123)
         :rtype: str
         """
         query = f"""

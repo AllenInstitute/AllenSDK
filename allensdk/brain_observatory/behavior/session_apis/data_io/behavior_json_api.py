@@ -47,8 +47,8 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         """Get the sex of the subject (ex: 'M', 'F', or 'unknown')"""
         return self.data['sex']
 
-    def get_age_in_days(self) -> str:
-        """Get the age of the subject (ex: 'P15', 'Adult', etc...)"""
+    def get_age(self) -> str:
+        """Get the age code of the subject (ie P123)"""
         return self.data['age']
 
     def get_stimulus_name(self) -> str:

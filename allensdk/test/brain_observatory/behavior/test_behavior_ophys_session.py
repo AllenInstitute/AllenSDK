@@ -122,7 +122,7 @@ def test_visbeh_ophys_data_set():
         'field_of_view_width': 447,
         'indicator': 'GCAMP6f',
         'equipment_name': 'CAM2P.5',
-        'age_in_days': 'P139',
+        'age_in_days': 139,
         'sex': 'F',
         'imaging_plane_group': None,
         'project_code': 'VisualBehavior'
