@@ -12,6 +12,7 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description, BehaviorMetadata
 )
+from allensdk.brain_observatory.behavior.metadata.util import parse_cre_line
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase
 )
@@ -261,8 +262,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = nwb_subject.reporter_line
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
-        data['cre_line'] = [
-            d for d in nwb_subject.driver_line if d.endswith('Cre')][0]
+        data['cre_line'] = parse_cre_line(full_genotype=nwb_subject.genotype)
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time
