@@ -1,6 +1,5 @@
 import pytest
 
-from allensdk.internal.api import OneResultExpectedError
 from allensdk.internal.api.mtrain_api import MtrainApi, MtrainSqlApi
 
 
