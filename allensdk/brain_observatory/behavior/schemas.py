@@ -26,8 +26,8 @@ class SubjectMetadataSchema(RaisingSchema):
     # In this case they already exist in the 'Subject' builtin pyNWB class
     neurodata_skip = {"age_in_days", "genotype", "sex", "subject_id"}
 
-    age_in_days = fields.String(
-        doc='Age of the specimen donor/subject (in days)',
+    age = fields.String(
+        doc='Age code of the specimen donor/subject',
         required=True,
     )
     driver_line = fields.List(

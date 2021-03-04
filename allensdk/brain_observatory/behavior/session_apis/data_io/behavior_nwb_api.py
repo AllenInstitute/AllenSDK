@@ -12,6 +12,7 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description, BehaviorMetadata
 )
+from allensdk.brain_observatory.behavior.metadata.util import parse_age_in_days
 from allensdk.brain_observatory.behavior.session_apis.abcs import (
     BehaviorBase
 )
@@ -257,7 +258,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         nwb_subject = self.nwbfile.subject
         data['mouse_id'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
-        data['age_in_days'] = nwb_subject.age
+        data['age'] = nwb_subject.age
+        data['age_in_days'] = parse_age_in_days(age=nwb_subject.age)
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = nwb_subject.reporter_line
         data['driver_line'] = sorted(list(nwb_subject.driver_line))

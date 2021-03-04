@@ -8,7 +8,7 @@ import numpy as np
 import pytz
 
 from allensdk.brain_observatory.behavior.metadata.util import \
-    parse_cre_line
+    parse_cre_line, parse_age_in_days
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 
 description_dict = {
@@ -174,8 +174,16 @@ class BehaviorMetadata:
         return self._extractor.get_sex()
 
     @property
-    def age_in_days(self) -> str:
-        return self._extractor.get_age_in_days()
+    def age(self) -> str:
+        return self._extractor.get_age()
+
+    @property
+    def age_in_days(self) -> Optional[int]:
+        """Converts the age string into a numeric days representation"""
+        age_in_days = parse_age_in_days(age=self.age)
+        if age_in_days is None:
+            warnings.warn('Unable to parse age_in_days from age')
+        return age_in_days
 
     @property
     def stimulus_frame_rate(self) -> float:

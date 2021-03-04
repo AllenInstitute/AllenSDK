@@ -432,6 +432,66 @@ def test_reporter_line_no_reporter_line(monkeypatch):
         assert metadata.reporter_line is None
 
 
+def test_age_in_days(monkeypatch):
+    """Test that age_in_days properly parsed from age"""
+    class MockExtractor:
+        def get_age(self):
+            return 'P123'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days == 123
+
+
+def test_age_in_days_unkown_age(monkeypatch):
+    """Test age in days is None if age is unkown"""
+    class MockExtractor:
+        def get_age(self):
+            return 'unkown'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days is None
+
+
+def test_age_in_days_invalid_age(monkeypatch):
+    """Test that age_in_days is None if age not prefixed with P"""
+    class MockExtractor:
+        def get_age(self):
+            return 'Q123'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days is None
+
+
 @pytest.mark.parametrize("test_params, expected_warn_msg", [
     # Vanilla test case
     ({
