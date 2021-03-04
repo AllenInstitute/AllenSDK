@@ -22,12 +22,12 @@ env:
   MTRAIN_PASSWORD: password
 
 jobs:
-  osx:
+  allensdk:
     name: ${{ matrix.python-version }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "windows-latest"]
+        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
         python-version: ["3.6", "3.7"]
     defaults:
       run:
