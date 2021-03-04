@@ -2,13 +2,16 @@ import abc
 import uuid
 import warnings
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 import re
 import numpy as np
 import pytz
 
 from allensdk.brain_observatory.behavior.metadata.util import \
     parse_cre_line
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 
 description_dict = {
@@ -152,13 +155,9 @@ def get_task_parameters(data: Dict) -> Dict:
 
 class BehaviorMetadata:
     """Container class for behavior metadata"""
-    def __init__(self, extractor: Any,
+    def __init__(self, extractor: BehaviorDataExtractorBase,
                  stimulus_timestamps: np.ndarray,
                  behavior_stimulus_file: dict):
-
-        """Note: cannot properly type extractor due to circular dependency
-        between extractor and transformer.
-        TODO fix circular dependency and update type"""
 
         self._extractor = extractor
         self._stimulus_timestamps = stimulus_timestamps

@@ -1,22 +1,21 @@
 import warnings
 
 import numpy as np
-from typing import Optional, Any
+from typing import Optional
 
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
+    BehaviorOphysDataExtractorBase
 
 
 class BehaviorOphysMetadata(BehaviorMetadata):
     """Container class for behavior ophys metadata"""
-    def __init__(self, extractor: Any,
+    def __init__(self, extractor: BehaviorOphysDataExtractorBase,
                  stimulus_timestamps: np.ndarray,
                  ophys_timestamps: np.ndarray,
                  behavior_stimulus_file: dict):
-
-        """Note: cannot properly type extractor due to circular dependency
-        between extractor and transformer.
-        TODO fix circular dependency and update type"""
 
         super().__init__(extractor=extractor,
                          stimulus_timestamps=stimulus_timestamps,
@@ -111,8 +110,3 @@ class BehaviorOphysMetadata(BehaviorMetadata):
         vars_ = vars(BehaviorOphysMetadata)
         d = self._get_properties(vars_=vars_)
         return {**super().to_dict(), **d}
-
-
-
-
-
