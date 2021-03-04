@@ -1,8 +1,9 @@
 import abc
 from typing import Dict, Optional
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
 
 
 class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):

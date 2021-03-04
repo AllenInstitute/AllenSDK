@@ -15,8 +15,12 @@ from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata import
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase, BehaviorOphysDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
+    BehaviorOphysDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_ophys_base import \
+    BehaviorOphysBase
 
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.sync_dataset import Dataset

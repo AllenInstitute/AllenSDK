@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
     BehaviorJsonExtractor

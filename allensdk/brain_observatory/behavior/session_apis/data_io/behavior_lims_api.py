@@ -7,7 +7,8 @@ import pytz
 import pandas as pd
 
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataTransforms

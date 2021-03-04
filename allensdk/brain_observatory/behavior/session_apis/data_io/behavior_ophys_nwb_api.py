@@ -19,9 +19,8 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description
 )
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase
-)
+from allensdk.brain_observatory.behavior.session_apis.abcs.session_base.\
+    behavior_ophys_base import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
 from allensdk.brain_observatory.behavior.trials_processing import (

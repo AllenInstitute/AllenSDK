@@ -2,7 +2,8 @@ import logging
 from datetime import datetime
 
 import pytz
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataTransforms

@@ -3,7 +3,8 @@ from typing import List, Optional
 
 import pandas as pd
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsExtractor, OphysLimsExtractor)

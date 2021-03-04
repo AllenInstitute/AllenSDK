@@ -13,9 +13,8 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description, BehaviorMetadata
 )
 from allensdk.brain_observatory.behavior.metadata.util import parse_cre_line
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase
-)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 from allensdk.brain_observatory.behavior.stimulus_processing import \

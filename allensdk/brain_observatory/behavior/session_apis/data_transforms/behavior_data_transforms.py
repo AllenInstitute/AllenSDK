@@ -12,8 +12,11 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \
     get_running_df
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase, BehaviorDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
     StimulusTemplate)

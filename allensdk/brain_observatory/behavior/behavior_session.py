@@ -9,7 +9,8 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
-from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
     calculate_reward_rate)
 from allensdk.brain_observatory.behavior.dprime import (
