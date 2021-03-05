@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 import pytz
-from allensdk.brain_observatory.behavior.session_apis.abcs.\
+from allensdk.brain_observatory.behavior.session_apis.abcs. \
     data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
@@ -56,15 +56,18 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         return self.data['stimulus_name']
 
     def get_reporter_line(self) -> str:
-        """Get the (gene) reporter line for the subject associated with an experiment"""
+        """Get the (gene) reporter line for the subject associated with an
+        experiment"""
         return self.data['reporter_line']
 
     def get_driver_line(self) -> str:
-        """Get the (gene) driver line for the subject associated with an experiment"""
+        """Get the (gene) driver line for the subject associated with an
+        experiment"""
         return self.data['driver_line']
 
     def get_full_genotype(self) -> str:
-        """Get the full genotype of the subject associated with an experiment"""
+        """Get the full genotype of the subject associated with an
+        experiment"""
         return self.data['full_genotype']
 
     def get_behavior_stimulus_file(self) -> str:
@@ -83,4 +86,5 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         """
         tz = pytz.timezone("America/Los_Angeles")
         return tz.localize(datetime.strptime(self.data['date_of_acquisition'],
-                           "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)
+                                             "%Y-%m-%d %H:%M:%S")).astimezone(
+            pytz.utc)

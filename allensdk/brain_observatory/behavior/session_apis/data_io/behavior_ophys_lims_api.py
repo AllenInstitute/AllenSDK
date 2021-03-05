@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import pandas as pd
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs.\
+from allensdk.brain_observatory.behavior.session_apis.abcs. \
     data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -93,12 +93,11 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
         """Get the project code"""
         query = f"""
             SELECT projects.code AS project_code
-            FROM ophys_sessions 
+            FROM ophys_sessions
             JOIN projects ON projects.id = ophys_sessions.project_id
             WHERE ophys_sessions.id = {self.get_ophys_session_id()}
         """
         return self.lims_db.fetchone(query, strict=True)
-
 
     @memoize
     def get_experiment_container_id(self) -> int:
@@ -156,7 +155,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                 WHERE wkf.attachable_type = 'OphysSession'
                     AND wkft.name = 'EyeTracking Ellipses'
                     AND oe.id = {self.get_ophys_experiment_id()};
-                """ # noqa E501
+                """  # noqa E501
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
@@ -174,7 +173,7 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             WHERE oe.id = {ophys_experiment_id} AND 
                 oec.active_date <= os.date_of_acquisition AND
                 oect.name IN ('eye camera position', 'led position', 'screen position')
-        ''' # noqa E501
+        '''  # noqa E501
         # Get the raw data
         rig_geometry = pd.read_sql(query, self.lims_db.get_connection())
 
@@ -242,13 +241,13 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             'screen position': 'monitor',
             'led position': 'led'
         }
-        rig_geometry['config_type'] = rig_geometry['config_type']\
+        rig_geometry['config_type'] = rig_geometry['config_type'] \
             .map(rig_geometry_config_type_map)
 
         # Select the most recent config
         # that precedes the date_of_acquisition for this experiment
         rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
-        rig_geometry = rig_geometry.groupby('config_type')\
+        rig_geometry = rig_geometry.groupby('config_type') \
             .apply(lambda x: x.iloc[0])
 
         # Construct dictionary for positions
@@ -307,10 +306,9 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
             JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
             WHERE wkft.name = 'OphysEventTraceFile'
                 AND oe.id = {self.get_ophys_experiment_id()};
-        ''' # noqa E501
+        '''  # noqa E501
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
 
 if __name__ == "__main__":
-
     print(BehaviorOphysLimsApi.get_ophys_experiment_df())

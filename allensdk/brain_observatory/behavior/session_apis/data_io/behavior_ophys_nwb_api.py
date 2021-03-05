@@ -11,15 +11,15 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata import \
-    BehaviorOphysMetadata
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+    import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description
 )
-from allensdk.brain_observatory.behavior.session_apis.abcs.session_base.\
+from allensdk.brain_observatory.behavior.session_apis.abcs.session_base. \
     behavior_ophys_base import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
@@ -28,8 +28,8 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 )
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
-        EllipseEyeTracking, EllipseSeries)
-from allensdk.brain_observatory.behavior.write_nwb.extensions\
+    EllipseEyeTracking, EllipseSeries)
+from allensdk.brain_observatory.behavior.write_nwb.extensions \
     .event_detection.ndx_ophys_events import OphysEventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -39,7 +39,6 @@ from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     determine_outliers, determine_likely_blinks
 )
-
 
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
@@ -316,14 +315,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         rig_geometry = {
             f"monitor_position_{meta.monitor_position__unit_of_measurement}":
-            monitor_position,
+                monitor_position,
             f"camera_position_{meta.camera_position__unit_of_measurement}":
-            camera_position,
+                camera_position,
             "led_position": led_position,
             f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
-            monitor_rotation,
+                monitor_rotation,
             f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
-            camera_rotation,
+                camera_rotation,
             "equipment": meta.equipment
         }
 
@@ -451,8 +450,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # 1. Add rig geometry
         if eye_tracking_rig_geometry:
             self.add_eye_tracking_rig_geometry_data_to_nwbfile(
-                    nwbfile=nwbfile,
-                    eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+                nwbfile=nwbfile,
+                eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
         # 2. Add eye tracking
         eye_tracking = EllipseSeries(
@@ -520,11 +519,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         equipment: A string describing rig
         """
         eye_tracking_rig_mod = pynwb.ProcessingModule(
-                name='eye_tracking_rig_metadata',
-                description='Eye tracking rig metadata module')
+            name='eye_tracking_rig_metadata',
+            description='Eye tracking rig metadata module')
 
         ophys_eye_tracking_rig_metadata = load_pynwb_extension(
-                OphysEyeTrackingRigMetadataSchema, 'ndx-aibs-behavior-ophys')
+            OphysEyeTrackingRigMetadataSchema, 'ndx-aibs-behavior-ophys')
 
         rig_metadata = ophys_eye_tracking_rig_metadata(
             name="eye_tracking_rig_metadata",
