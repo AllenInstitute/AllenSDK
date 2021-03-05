@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [2.9.0] = TBD
-- 
+- Updates to Session metadata; refactors implementation to use class rather than dict internally
 
 ## [2.8.0] = 2021-02-25
 - Created lookup table to get monitor_delay for cases where calculation from data fails

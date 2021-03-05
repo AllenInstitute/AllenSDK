@@ -1,10 +1,13 @@
 import abc
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+    import BehaviorOphysMetadata
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.image_api import Image
 
 
@@ -91,13 +94,13 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_metadata(self) -> dict:
+    def get_metadata(self) -> Union[BehaviorOphysMetadata, dict]:
         """Get behavior+ophys session metadata.
 
         Returns
         -------
-        dict
-            A dictionary of session-specific metadata.
+        dict if NWB
+        BehaviorOphysMetadata otherwise
         """
         raise NotImplementedError()
 

@@ -1,8 +1,11 @@
 import abc
+from typing import Union
 
 import numpy as np
 import pandas as pd
 
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate
 
@@ -144,12 +147,12 @@ class BehaviorBase(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_metadata(self) -> dict:
+    def get_metadata(self) -> Union[BehaviorMetadata, dict]:
         """Get metadata for Session
 
         Returns
         -------
-        dict
-            A dictionary containing various metadata
+        dict if NWB
+        BehaviorMetadata otherwise
         """
         raise NotImplementedError()

@@ -24,10 +24,10 @@ class SubjectMetadataSchema(RaisingSchema):
     neurodata_doc = "Metadata for an AIBS behavior or behavior + ophys subject"
     # Fields to skip converting to extension
     # In this case they already exist in the 'Subject' builtin pyNWB class
-    neurodata_skip = {"age", "genotype", "sex", "subject_id"}
+    neurodata_skip = {"age_in_days", "genotype", "sex", "subject_id"}
 
-    age = fields.String(
-        doc='Age of the specimen donor/subject',
+    age_in_days = fields.String(
+        doc='Age of the specimen donor/subject (in days)',
         required=True,
     )
     driver_line = fields.List(
@@ -41,16 +41,14 @@ class SubjectMetadataSchema(RaisingSchema):
         doc='full genotype of subject',
         required=True,
     )
-    # 'LabTracks_ID' will be stored in pynwb Subject 'subject_id' attr
+    # 'mouse_id' will be stored in pynwb Subject 'subject_id' attr
     subject_id = fields.Int(
-        doc='LabTracks ID of subject',
+        doc='Mouse ID of subject',
         required=True,
     )
-    reporter_line = fields.List(
-        fields.String,
+    reporter_line = fields.String(
         doc="Reporter line of subject",
         required=True,
-        shape=(None,),
     )
     sex = fields.String(
         doc='Sex of the specimen donor/subject',
@@ -64,7 +62,7 @@ class BehaviorMetadataSchema(RaisingSchema):
     neurodata_type = 'BehaviorMetadata'
     neurodata_type_inc = 'LabMetaData'
     neurodata_doc = "Metadata for behavior and behavior + ophys experiments"
-    neurodata_skip = {"experiment_datetime"}
+    neurodata_skip = {"date_of_acquisition"}
 
     behavior_session_id = fields.Int(
         doc='The unique ID for the behavior session',
@@ -84,13 +82,13 @@ class BehaviorMetadataSchema(RaisingSchema):
         allow_none=True,
         required=True,
     )
-    # 'experiment_datetime' will be stored in
+    # 'date_of_acquisition' will be stored in
     # pynwb NWBFile 'session_start_time' attr
-    experiment_datetime = fields.DateTime(
+    date_of_acquisition = fields.DateTime(
         doc='Date of the experiment (UTC, as string)',
         required=True,
     )
-    rig_name = fields.String(
+    equipment_name = fields.String(
         doc='Name of behavior or optical physiology experiment rig',
         required=True,
     )
@@ -184,7 +182,7 @@ class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):
     # They already exist as attributes for the following pyNWB classes:
     # OpticalChannel, ImagingPlane, NWBFile
     neurodata_skip = {"emission_lambda", "excitation_lambda", "indicator",
-                      "targeted_structure", "experiment_datetime",
+                      "targeted_structure", "date_of_acquisition",
                       "ophys_frame_rate"}
 
 

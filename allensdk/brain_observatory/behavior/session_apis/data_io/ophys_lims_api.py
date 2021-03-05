@@ -201,7 +201,7 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
         return stimulus_name
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an ophys experiment"""
         query = """
                 SELECT os.date_of_acquisition
@@ -398,18 +398,6 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
                 FROM ophys_experiments oe
                 LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
-                """.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=True)
-
-    @memoize
-    def get_rig_name(self) -> str:
-        """Get the name of the experiment rig (ex: CAM2P.3)"""
-        query = """
-                SELECT e.name AS device_name
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-                JOIN equipment e ON e.id = os.equipment_id
-                WHERE oe.id = {};
                 """.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=True)
 

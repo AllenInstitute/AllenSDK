@@ -2,7 +2,8 @@ import logging
 from datetime import datetime
 
 import pytz
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs. \
+    data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataTransforms
@@ -38,7 +39,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
     def get_foraging_id(self) -> int:
         return self.data['foraging_id']
 
-    def get_rig_name(self) -> str:
+    def get_equipment_name(self) -> str:
         """Get the name of the experiment rig (ex: CAM2P.3)"""
         return self.data['rig_name']
 
@@ -47,7 +48,7 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         return self.data['sex']
 
     def get_age(self) -> str:
-        """Get the age of the subject (ex: 'P15', 'Adult', etc...)"""
+        """Get the age code of the subject (ie P123)"""
         return self.data['age']
 
     def get_stimulus_name(self) -> str:
@@ -55,31 +56,35 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         return self.data['stimulus_name']
 
     def get_reporter_line(self) -> str:
-        """Get the (gene) reporter line for the subject associated with an experiment"""
+        """Get the (gene) reporter line for the subject associated with an
+        experiment"""
         return self.data['reporter_line']
 
     def get_driver_line(self) -> str:
-        """Get the (gene) driver line for the subject associated with an experiment"""
+        """Get the (gene) driver line for the subject associated with an
+        experiment"""
         return self.data['driver_line']
 
     def get_full_genotype(self) -> str:
-        """Get the full genotype of the subject associated with an experiment"""
+        """Get the full genotype of the subject associated with an
+        experiment"""
         return self.data['full_genotype']
 
     def get_behavior_stimulus_file(self) -> str:
         """Get the filepath to the StimulusPickle file for the session"""
         return self.data['behavior_stimulus_file']
 
-    def get_external_specimen_name(self) -> int:
+    def get_mouse_id(self) -> int:
         """Get the external specimen id (LabTracks ID) for the subject
         associated with a behavior experiment"""
         return int(self.data['external_specimen_name'])
 
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an experiment (in UTC)
 
         NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
         """
         tz = pytz.timezone("America/Los_Angeles")
         return tz.localize(datetime.strptime(self.data['date_of_acquisition'],
-                           "%Y-%m-%d %H:%M:%S")).astimezone(pytz.utc)
+                                             "%Y-%m-%d %H:%M:%S")).astimezone(
+            pytz.utc)

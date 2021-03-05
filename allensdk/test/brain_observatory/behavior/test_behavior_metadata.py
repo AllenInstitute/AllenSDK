@@ -1,8 +1,14 @@
+import pickle
+from datetime import datetime
+
 import pytest
 import numpy as np
+import pandas as pd
+import pytz
 
-from allensdk.brain_observatory.behavior.metadata_processing import (
-    description_dict, get_task_parameters, get_expt_description)
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
+    description_dict, get_task_parameters, get_expt_description,
+    BehaviorMetadata)
 
 
 @pytest.mark.parametrize("data, expected",
@@ -302,3 +308,276 @@ def test_get_expt_description_with_valid_session_type(session_type,
 def test_get_expt_description_raises_with_invalid_session_type(session_type):
     with pytest.raises(RuntimeError, match="session type should match.*"):
         get_expt_description(session_type)
+
+
+def test_cre_line(monkeypatch):
+    """Tests that cre_line properly parsed from driver_line"""
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            pass
+
+        def full_genotype(self):
+            return 'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+        ctx.setattr(BehaviorMetadata,
+                    'full_genotype',
+                    property(full_genotype))
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.cre_line == 'Sst-IRES-Cre'
+
+
+def test_cre_line_bad_full_genotype(monkeypatch):
+    """Test that cre_line is None and no error raised"""
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            pass
+
+        def full_genotype(self):
+            return 'foo'
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+        ctx.setattr(BehaviorMetadata,
+                    'full_genotype',
+                    property(full_genotype))
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.cre_line is None
+
+
+def test_reporter_line(monkeypatch):
+    """Test that reporter line properly parsed from list"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return ['foo']
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.reporter_line == 'foo'
+
+
+def test_reporter_line_str(monkeypatch):
+    """Test that reporter line returns itself if str"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return 'foo'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.reporter_line == 'foo'
+
+
+def test_reporter_line_multiple(monkeypatch):
+    """Test that if multiple reporter lines, the first is returned"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return ['foo', 'bar']
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.reporter_line == 'foo'
+
+
+def test_age_in_days(monkeypatch):
+    """Test that age_in_days properly parsed from age"""
+    class MockExtractor:
+        def get_age(self):
+            return 'P123'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days == 123
+
+
+def test_age_in_days_unkown_age(monkeypatch):
+    """Test age in days is None if age is unknown"""
+    class MockExtractor:
+        def get_age(self):
+            return 'unkown'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days is None
+
+
+def test_age_in_days_invalid_age(monkeypatch):
+    """Test that age_in_days is None if age not prefixed with P"""
+    class MockExtractor:
+        def get_age(self):
+            return 'Q123'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.age_in_days is None
+
+
+def test_reporter_line_no_reporter_line(monkeypatch):
+    """Test that if no reporter line, returns None"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return []
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.reporter_line is None
+
+
+@pytest.mark.parametrize("test_params, expected_warn_msg", [
+    # Vanilla test case
+    ({
+        "extractor_expt_date": datetime.strptime("2021-03-14 03:14:15",
+                                                 "%Y-%m-%d %H:%M:%S"),
+        "pkl_expt_date": datetime.strptime("2021-03-14 03:14:15",
+                                           "%Y-%m-%d %H:%M:%S"),
+        "behavior_session_id": 1
+     },
+     None
+     ),
+
+    # pkl expt date stored in unix format
+    ({
+        "extractor_expt_date": datetime.strptime("2021-03-14 03:14:15",
+                                                 "%Y-%m-%d %H:%M:%S"),
+        "pkl_expt_date": 1615716855.0,
+        "behavior_session_id": 2
+     },
+     None
+     ),
+
+    # Extractor and pkl dates differ significantly
+    ({
+        "extractor_expt_date": datetime.strptime("2021-03-14 03:14:15",
+                                                 "%Y-%m-%d %H:%M:%S"),
+        "pkl_expt_date": datetime.strptime("2021-03-14 20:14:15",
+                                           "%Y-%m-%d %H:%M:%S"),
+        "behavior_session_id": 3
+     },
+     "The `date_of_acquisition` field in LIMS *"
+     ),
+
+    # pkl file contains an unparseable datetime
+    ({
+        "extractor_expt_date": datetime.strptime("2021-03-14 03:14:15",
+                                                 "%Y-%m-%d %H:%M:%S"),
+        "pkl_expt_date": None,
+        "behavior_session_id": 4
+     },
+     "Could not parse the acquisition datetime *"
+     ),
+])
+def test_get_date_of_acquisition(monkeypatch, tmp_path, test_params,
+                                 expected_warn_msg):
+
+    mock_session_id = test_params["behavior_session_id"]
+
+    pkl_save_path = tmp_path / f"mock_pkl_{mock_session_id}.pkl"
+    with open(pkl_save_path, 'wb') as handle:
+        pickle.dump({"start_time": test_params['pkl_expt_date']}, handle)
+    behavior_stimulus_file = pd.read_pickle(pkl_save_path)
+
+    tz = pytz.timezone("America/Los_Angeles")
+    extractor_expt_date = tz.localize(
+        test_params['extractor_expt_date']).astimezone(pytz.utc)
+
+    class MockExtractor():
+        def get_date_of_acquisition(self):
+            return extractor_expt_date
+
+        def get_behavior_session_id(self):
+            return test_params['behavior_session_id']
+
+        def get_behavior_stimulus_file(self):
+            return pkl_save_path
+
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self, extractor, behavior_stimulus_file):
+            self._extractor = extractor
+            self._behavior_stimulus_file = behavior_stimulus_file
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata(
+            extractor=extractor,
+            behavior_stimulus_file=behavior_stimulus_file)
+
+        if expected_warn_msg:
+            with pytest.warns(Warning, match=expected_warn_msg):
+                obt_date = metadata.date_of_acquisition
+        else:
+            obt_date = metadata.date_of_acquisition
+
+        assert obt_date == extractor_expt_date

@@ -2,37 +2,60 @@ import os
 
 import pytest
 
-from allensdk.internal.api import OneResultExpectedError, OneOrMoreResultExpectedError
+from allensdk.internal.api import OneResultExpectedError, \
+    OneOrMoreResultExpectedError
 from allensdk.brain_observatory.behavior.session_apis.data_io \
     import OphysLimsExtractor
 
 
 @pytest.fixture(scope="function")
 def api_data():
-     return {702134928:
-                      {'ophys_dir': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/',
-                       'demix_file': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/demix/702134928_demixed_traces.h5',
-                       'maxint_file': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/ophys_cell_segmentation_run_814561221/maxInt_a13a.png',
-                       'avgint_a1X_file': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/ophys_cell_segmentation_run_814561221/avgInt_a1X.png',
-                       'rigid_motion_transform_file': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/702134928_rigid_motion_transform.csv',
-                       'input_extract_traces_file': '/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/702134928_input_extract_traces.json',
-                       'targeted_structure': 'VISal',
-                       'imaging_depth': 175,
-                       'stimulus_name': 'Unknown',
-                       'reporter_line': ['Ai148(TIT2L-GC6f-ICL-tTA2)'],
-                       'driver_line': ['Vip-IRES-Cre'],
-                       'LabTracks_ID': 363887,
-                       'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
-                       'workflow_state': 'passed',
-                       }
-            }
+    return {
+        702134928: {
+            'ophys_dir': '/allen/programs/braintv/production/neuralcoding'
+                         '/prod0/specimen_652073919/ophys_session_702013508'
+                         '/ophys_experiment_702134928/',
+            'demix_file': '/allen/programs/braintv/production/neuralcoding'
+                          '/prod0/specimen_652073919/ophys_session_702013508'
+                          '/ophys_experiment_702134928/demix/'
+                          '702134928_demixed_traces.h5',
+            'maxint_file': '/allen/programs/braintv/production/neuralcoding'
+                           '/prod0/specimen_652073919/ophys_session_702013508/'
+                           'ophys_experiment_702134928/processed/'
+                           'ophys_cell_segmentation_run_814561221/'
+                           'maxInt_a13a.png',
+            'avgint_a1X_file':
+                '/allen/programs/braintv/production/neuralcoding/prod0'
+                '/specimen_652073919/ophys_session_702013508'
+                '/ophys_experiment_702134928/processed'
+                '/ophys_cell_segmentation_run_814561221/avgInt_a1X.png',
+            'rigid_motion_transform_file':
+                '/allen/programs/braintv/production/neuralcoding/prod0'
+                '/specimen_652073919/ophys_session_702013508'
+                '/ophys_experiment_702134928/processed'
+                '/702134928_rigid_motion_transform.csv',
+            'input_extract_traces_file':
+                '/allen/programs/braintv/production/neuralcoding/prod0'
+                '/specimen_652073919/ophys_session_702013508'
+                '/ophys_experiment_702134928/processed'
+                '/702134928_input_extract_traces.json',
+            'targeted_structure': 'VISal',
+            'imaging_depth': 175,
+            'stimulus_name': 'Unknown',
+            'reporter_line': ['Ai148(TIT2L-GC6f-ICL-tTA2)'],
+            'driver_line': ['Vip-IRES-Cre'],
+            'mouse_id': 363887,
+            'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+            'workflow_state': 'passed',
+        }
+    }
 
 
 def expected_fail(func, *args, **kwargs):
     expected_fail = False
     try:
         func(*args, **kwargs)
-    except (OneResultExpectedError, OneOrMoreResultExpectedError) as e:
+    except (OneResultExpectedError, OneOrMoreResultExpectedError):
         expected_fail = True
 
     assert expected_fail is True
@@ -160,10 +183,10 @@ def test_get_driver_line(ophys_experiment_id, api_data):
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
-def test_get_LabTracks_ID(ophys_experiment_id, api_data):
+def test_get_mouse_ID(ophys_experiment_id, api_data):
     ophys_lims_api = OphysLimsExtractor(ophys_experiment_id)
     f = ophys_lims_api.get_external_specimen_name
-    key = 'LabTracks_ID'
+    key = 'mouse_id'
     if ophys_experiment_id in api_data:
         assert f() == api_data[ophys_experiment_id][key]
     else:
@@ -181,6 +204,7 @@ def test_get_full_genotype(ophys_experiment_id, api_data):
     else:
         expected_fail(f)
 
+
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_workflow_state(ophys_experiment_id, api_data):
@@ -195,7 +219,10 @@ def test_get_workflow_state(ophys_experiment_id, api_data):
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
-    pytest.param(511458874, '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/511458874.nwb'),
+    pytest.param(511458874,
+                 '/allen/programs/braintv/production/neuralcoding/prod6'
+                 '/specimen_503292442/ophys_experiment_511458874/511458874'
+                 '.nwb'),
     pytest.param(0, None)
 ])
 def test_get_nwb_filepath(ophys_experiment_id, compare_val):
@@ -244,7 +271,6 @@ def test_get_surface_2p_pixel_size_um(ophys_lims_experiment_id, compare_val):
     pytest.param(0, None)
 ])
 def test_get_sex(ophys_lims_experiment_id, compare_val):
-
     ophys_lims_api = OphysLimsExtractor(ophys_lims_experiment_id)
     if compare_val is None:
         expected_fail = False
