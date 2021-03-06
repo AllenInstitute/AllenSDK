@@ -1,19 +1,19 @@
+import re
 from functools import partial
-from typing import Type, Optional, List, Union
+from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
 import logging
 
 from allensdk.api.cache import Cache
-
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+    import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.brain_observatory.behavior.project_apis.abcs import (
-    BehaviorProjectBase)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.core.authentication import DbCredentials
-
-BehaviorProjectApi = Type[BehaviorProjectBase]
 
 
 class BehaviorProjectCache(Cache):
@@ -43,7 +43,7 @@ class BehaviorProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: Optional[BehaviorProjectApi] = None,
+            fetch_api: Optional[BehaviorProjectLimsApi] = None,
             fetch_tries: int = 2,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
@@ -185,6 +185,8 @@ class BehaviorProjectCache(Cache):
             sessions.set_index("ophys_session_id")
         else:
             sessions = self.fetch_api.get_session_table()
+        sessions = self._postprocess_table(df=sessions)
+        sessions = self._postprocess_behavior_ophys_table(df=sessions)
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
 
@@ -227,6 +229,9 @@ class BehaviorProjectCache(Cache):
             experiments.set_index("ophys_experiment_id")
         else:
             experiments = self.fetch_api.get_experiment_table()
+        experiments = self._postprocess_table(df=experiments)
+        experiments = self._postprocess_behavior_ophys_table(df=experiments)
+        experiments = self._postprocess_experiments_table(df=experiments)
         if suppress:
             experiments.drop(columns=suppress, inplace=True, errors="ignore")
         return experiments
@@ -252,6 +257,7 @@ class BehaviorProjectCache(Cache):
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
+        sessions = self._postprocess_table(df=sessions)
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
         return sessions
@@ -295,6 +301,44 @@ class BehaviorProjectCache(Cache):
             lazy=False,        # can't actually read from file cache
             read=fetch_session
         )
+
+    @staticmethod
+    def _postprocess_table(df: pd.DataFrame) -> pd.DataFrame:
+        """Performs postprocessing on session table"""
+
+        df['reporter_line'] = df['reporter_line'].apply(
+            BehaviorMetadata.parse_reporter_line)
+        df['cre_line'] = df['full_genotype'].apply(
+            BehaviorMetadata.parse_cre_line)
+        return df
+
+    @staticmethod
+    def _postprocess_behavior_ophys_table(df: pd.DataFrame) -> pd.DataFrame:
+        """Performs postprocessing on behavior ophys session table"""
+
+        def get_session_number(session_type: pd.Series):
+            """Parses session number from session_type series"""
+
+            def parse_session_number(session_type: str):
+                match = re.match(r'OPHYS_(?P<session_number>\d+)',
+                                 session_type)
+                if match is None:
+                    return None
+                return int(match.group('session_number'))
+
+            session_type = session_type[session_type.notnull()]
+            return session_type.apply(parse_session_number)
+
+        df.loc[df['session_type'].notnull(), 'session_number'] = \
+            get_session_number(session_type=df['session_type'])
+        return df
+
+    @staticmethod
+    def _postprocess_experiments_table(df: pd.DataFrame) -> pd.DataFrame:
+        """Performs postprocessing on behavior ophys experiments table"""
+        df['indicator'] = df['reporter_line'].apply(
+            BehaviorOphysMetadata.parse_indicator)
+        return df
 
 
 def _write_json(path, df):

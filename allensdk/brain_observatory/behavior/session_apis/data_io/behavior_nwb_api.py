@@ -12,8 +12,6 @@ import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description, BehaviorMetadata
 )
-from allensdk.brain_observatory.behavior.metadata.util import parse_cre_line, \
-    parse_age_in_days
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.schemas import (
@@ -258,11 +256,13 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         nwb_subject = self.nwbfile.subject
         data['mouse_id'] = int(nwb_subject.subject_id)
         data['sex'] = nwb_subject.sex
-        data['age_in_days'] = parse_age_in_days(age=nwb_subject.age)
+        data['age_in_days'] = BehaviorMetadata.parse_age_in_days(
+            age=nwb_subject.age)
         data['full_genotype'] = nwb_subject.genotype
         data['reporter_line'] = nwb_subject.reporter_line
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
-        data['cre_line'] = parse_cre_line(full_genotype=nwb_subject.genotype)
+        data['cre_line'] = BehaviorMetadata.parse_cre_line(
+            full_genotype=nwb_subject.genotype)
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time

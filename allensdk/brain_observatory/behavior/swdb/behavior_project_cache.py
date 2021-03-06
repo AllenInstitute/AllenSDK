@@ -5,8 +5,8 @@ import json
 import re
 
 from allensdk import one
-from allensdk.brain_observatory.behavior.metadata.util import \
-    parse_cre_line
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.behavior_ophys_session import \
@@ -72,7 +72,7 @@ class BehaviorProjectCache(object):
             self.cache_paths['manifest_path'])
 
         self.experiment_table['cre_line'] = self.experiment_table[
-            'full_genotype'].apply(parse_cre_line)
+            'full_genotype'].apply(BehaviorMetadata.parse_cre_line)
         self.experiment_table['passive_session'] = self.experiment_table[
             'stage_name'].apply(parse_passive)
         self.experiment_table['image_set'] = self.experiment_table[

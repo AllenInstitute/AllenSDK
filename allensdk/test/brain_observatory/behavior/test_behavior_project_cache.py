@@ -13,8 +13,18 @@ def session_table():
     return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
                           "ophys_experiment_id": [[4], [5, 6], [7]],
                           "date_of_acquisition": np.datetime64('2020-02-20'),
-                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
-                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
+                          "reporter_line": ["aa", "bb", "cc"],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          'full_genotype': [
+                              'foo-SlcCre',
+                              'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+                              'bar'],
+                          'cre_line': [None, 'Vip-IRES-Cre', None],
+                          'session_type': ['OPHYS_1_session',
+                                           'OPHYS_2_session',
+                                           'foo_1_session'],
+                          'session_number': [1, 2, None]
+                          })
             .set_index("ophys_session_id"))
 
 
@@ -22,8 +32,14 @@ def session_table():
 def behavior_table():
     return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
                           "date_of_acquisition": np.datetime64("NAT"),
-                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
-                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
+                          "reporter_line": ["aa", "bb", "cc"],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          'full_genotype': [
+                              'foo-SlcCre',
+                              'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+                              'bar'],
+                          'cre_line': [None, 'Vip-IRES-Cre', None]
+                          })
             .set_index("behavior_session_id"))
 
 
