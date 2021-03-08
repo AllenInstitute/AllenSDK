@@ -1,6 +1,18 @@
-from typing import Dict
+import abc
+import uuid
+import warnings
+from datetime import datetime
+from typing import Dict, List, Optional
 import re
 import numpy as np
+import pytz
+
+from allensdk.brain_observatory.behavior.metadata.util import \
+    parse_cre_line, parse_age_in_days
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
+from allensdk.brain_observatory.session_api_utils import compare_session_fields
 
 description_dict = {
     # key is a regex and value is returned on match
@@ -129,7 +141,7 @@ def get_task_parameters(data: Dict) -> Dict:
     if 'DoC' in task_id:
         task_parameters['task'] = 'change detection'
     else:
-        msg = "metadata_processing.get_task_parameters does not "
+        msg = "metadata.get_task_parameters does not "
         msg += f"know how to parse 'task_id' = {task_id}"
         raise RuntimeError(msg)
 
@@ -139,3 +151,203 @@ def get_task_parameters(data: Dict) -> Dict:
     task_parameters['n_stimulus_frames'] = n_stimulus_frames
 
     return task_parameters
+
+
+class BehaviorMetadata:
+    """Container class for behavior metadata"""
+    def __init__(self, extractor: BehaviorDataExtractorBase,
+                 stimulus_timestamps: np.ndarray,
+                 behavior_stimulus_file: dict):
+
+        self._extractor = extractor
+        self._stimulus_timestamps = stimulus_timestamps
+        self._behavior_stimulus_file = behavior_stimulus_file
+        self._exclude_from_equals = set()
+
+    @property
+    def equipment_name(self) -> str:
+        return self._extractor.get_equipment_name()
+
+    @property
+    def sex(self) -> str:
+        return self._extractor.get_sex()
+
+    @property
+    def age_in_days(self) -> Optional[int]:
+        """Converts the age cod into a numeric days representation"""
+
+        age = self._extractor.get_age()
+        return parse_age_in_days(age=age)
+
+    @property
+    def stimulus_frame_rate(self) -> float:
+        return self._get_frame_rate(timestamps=self._stimulus_timestamps)
+
+    @property
+    def session_type(self) -> str:
+        return self._extractor.get_stimulus_name()
+
+    @property
+    def date_of_acquisition(self) -> datetime:
+        """Return the timestamp for when experiment was started in UTC
+
+        NOTE: This method will only get acquisition datetime from
+        extractor (data from LIMS) methods. As a sanity check,
+        it will also read the acquisition datetime from the behavior stimulus
+        (*.pkl) file and raise a warning if the date differs too much from the
+        datetime obtained from the behavior stimulus (*.pkl) file.
+
+        :rtype: datetime
+        """
+        extractor_acq_date = self._extractor.get_date_of_acquisition()
+
+        pkl_data = self._behavior_stimulus_file
+        pkl_raw_acq_date = pkl_data["start_time"]
+        if isinstance(pkl_raw_acq_date, datetime):
+            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
+
+        elif isinstance(pkl_raw_acq_date, (int, float)):
+            # We are dealing with an older pkl file where the acq time is
+            # stored as a Unix style timestamp string
+            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
+            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
+        else:
+            pkl_acq_date = None
+            warnings.warn(
+                "Could not parse the acquisition datetime "
+                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
+                f"{self._extractor.get_behavior_stimulus_file()}"
+            )
+
+        if pkl_acq_date:
+            acq_start_diff = (
+                    extractor_acq_date - pkl_acq_date).total_seconds()
+            # If acquisition dates differ by more than an hour
+            if abs(acq_start_diff) > 3600:
+                session_id = self._extractor.get_behavior_session_id()
+                warnings.warn(
+                    "The `date_of_acquisition` field in LIMS "
+                    f"({extractor_acq_date}) for behavior session "
+                    f"({session_id}) deviates by more "
+                    f"than an hour from the `start_time` ({pkl_acq_date}) "
+                    "specified in the associated stimulus *.pkl file: "
+                    f"{self._extractor.get_behavior_stimulus_file()}"
+                )
+        return extractor_acq_date
+
+    @property
+    def reporter_line(self) -> Optional[str]:
+        """There can be multiple reporter lines, so it is returned from LIMS
+        as a list. But there shouldn't be more than 1 for behavior. This
+        tries to convert to str
+
+        Returns
+        ---------
+        single reporter line, or None if not possible
+        """
+        reporter_line = self._extractor.get_reporter_line()
+
+        if isinstance(reporter_line, str):
+            return reporter_line
+
+        if len(reporter_line) == 0:
+            warnings.warn('No reporter line')
+            return None
+
+        if len(reporter_line) > 1:
+            warnings.warn('More than 1 reporter line. Returning the first one')
+
+        return reporter_line[0]
+
+    @property
+    def cre_line(self) -> Optional[str]:
+        """Parses cre_line from full_genotype"""
+        cre_line = parse_cre_line(full_genotype=self.full_genotype)
+        if cre_line is None:
+            warnings.warn('Unable to parse cre_line from full_genotype')
+        return cre_line
+
+    @property
+    def behavior_session_uuid(self) -> Optional[uuid.UUID]:
+        """Get the universally unique identifier (UUID)
+        """
+        data = self._behavior_stimulus_file
+        behavior_pkl_uuid = data.get("session_uuid")
+
+        behavior_session_id = self._extractor.get_behavior_session_id()
+        foraging_id = self._extractor.get_foraging_id()
+
+        # Sanity check to ensure that pkl file data matches up with
+        # the behavior session that the pkl file has been associated with.
+        assert_err_msg = (
+            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
+            f"behavior stimulus *.pkl file "
+            f"({self._extractor.get_behavior_stimulus_file()}) does "
+            f"does not match the foraging UUID ({foraging_id}) for "
+            f"behavior session: {behavior_session_id}")
+        assert behavior_pkl_uuid == foraging_id, assert_err_msg
+
+        if behavior_pkl_uuid is None:
+            bs_uuid = None
+        else:
+            bs_uuid = uuid.UUID(behavior_pkl_uuid)
+        return bs_uuid
+
+    @property
+    def driver_line(self) -> List[str]:
+        return sorted(self._extractor.get_driver_line())
+
+    @property
+    def mouse_id(self) -> int:
+        return self._extractor.get_mouse_id()
+
+    @property
+    def full_genotype(self) -> str:
+        return self._extractor.get_full_genotype()
+
+    @property
+    def behavior_session_id(self) -> int:
+        return self._extractor.get_behavior_session_id()
+
+    def get_extractor(self):
+        return self._extractor
+
+    @abc.abstractmethod
+    def to_dict(self) -> dict:
+        """Returns dict representation of all properties in class"""
+        vars_ = vars(BehaviorMetadata)
+        return self._get_properties(vars_=vars_)
+
+    @staticmethod
+    def _get_frame_rate(timestamps: np.ndarray):
+        return np.round(1 / np.mean(np.diff(timestamps)), 0)
+
+    def _get_properties(self, vars_: dict):
+        """Returns all property names and values"""
+        return {name: getattr(self, name) for name, value in vars_.items()
+                if isinstance(value, property)}
+
+    def __eq__(self, other):
+        if not isinstance(other, (BehaviorMetadata, dict)):
+            msg = f'Do not know how to compare with type {type(other)}'
+            raise NotImplementedError(msg)
+
+        properties_self = self.to_dict()
+
+        if isinstance(other, dict):
+            properties_other = other
+        else:
+            properties_other = other.to_dict()
+
+        for p in properties_self:
+            if p in self._exclude_from_equals:
+                continue
+
+            x1 = properties_self[p]
+            x2 = properties_other[p]
+
+            try:
+                compare_session_fields(x1=x1, x2=x2)
+            except AssertionError:
+                return False
+        return True

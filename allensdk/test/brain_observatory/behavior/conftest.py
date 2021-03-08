@@ -146,17 +146,18 @@ def behavior_only_metadata_fixture():
     return {
         "behavior_session_id": 4242,
         "session_type": 'Unknown',
-        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": "Ai93(TITL-GCaMP6f)",
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-        "LabTracks_ID": 416369,
+        "cre_line": "Slc17a7-IRES2-Cre",
+        "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",
         "behavior_session_uuid": uuid.uuid4(),
         "stimulus_frame_rate": 60.0,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
-        "age": 'P139'
+        "age_in_days": 139
     }
 
 
@@ -173,10 +174,11 @@ def metadata_fixture():
         "targeted_structure": "VISp",
         "imaging_depth": 375,
         "session_type": 'Unknown',
-        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": "Ai93(TITL-GCaMP6f)",
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-        "LabTracks_ID": 416369,
+        "cre_line": "Slc17a7-IRES2-Cre",
+        "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",
         "behavior_session_uuid": uuid.uuid4(),
@@ -185,9 +187,9 @@ def metadata_fixture():
         "indicator": 'HW',
         "field_of_view_width": 4,
         "field_of_view_height": 4,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
-        "age": 'P139',
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }
@@ -205,18 +207,19 @@ def partial_metadata_fixture():
         "stimulus_frame_rate": 60.0,
         "imaging_depth": 375,
         "session_type": 'Unknown',
-        "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
-        "reporter_line": ["Ai93(TITL-GCaMP6f)"],
+        "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
+        "reporter_line": "Ai93(TITL-GCaMP6f)",
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-        "LabTracks_ID": 416369,
+        "cre_line": "Slc17a7-IRES2-Cre",
+        "mouse_id": 416369,
         "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
                          "Ai93(TITL-GCaMP6f)/wt",
         "behavior_session_uuid": uuid.uuid4(),
         "field_of_view_width": 4,
         "field_of_view_height": 4,
-        "rig_name": 'my_device',
+        "equipment_name": 'my_device',
         "sex": 'M',
-        "age": 'P139',
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }
@@ -316,7 +319,7 @@ def session_data():
         'foraging_id': '69cdbe09-e62b-4b42-aab1-54b5773dfe78',
         "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",  # noqa: E501
         "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",  # noqa: E501
-        "rig_name": "CAM2P.5",
+        "equipment_name": "CAM2P.5",
         "movie_width": 447,
         "movie_height": 512,
         "container_id": 814796558,
@@ -337,7 +340,7 @@ def session_data():
         "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",  # noqa: E501
         "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",  # noqa: E501
         "sex": "F",
-        "age": "P139",
+        "age_in_days": 139,
         "imaging_plane_group": None,
         "imaging_plane_group_count": 0
     }

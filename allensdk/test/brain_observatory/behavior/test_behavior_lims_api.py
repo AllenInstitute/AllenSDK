@@ -1,5 +1,6 @@
 import math
 from datetime import datetime
+from uuid import UUID
 
 import numpy as np
 import pandas as pd
@@ -7,6 +8,8 @@ import pytest
 import pytz
 
 from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
@@ -53,8 +56,9 @@ def test_foraging_id_to_behavior_session_id(behavior_session_uuid):
 ])
 def test_behavior_session_id_to_foraging_id(behavior_session_id):
     session = BehaviorLimsApi(behavior_session_id=behavior_session_id)
-    foraging_id = session.get_behavior_session_uuid()
-    assert foraging_id == '394a910e-94c7-4472-9838-5345aff59ed8'
+    behavior_session_uuid = session.get_metadata().behavior_session_uuid
+    expected = UUID('394a910e-94c7-4472-9838-5345aff59ed8')
+    assert behavior_session_uuid == expected
 
 
 @pytest.mark.requires_bamboo
@@ -102,16 +106,19 @@ def MockBehaviorLimsApi():
             super().__init__(behavior_session_id=8675309,
                              lims_credentials=mock_db_credentials,
                              mtrain_credentials=mock_db_credentials)
-            self.foraging_id = 123456
+            self.foraging_id = '138531ab-fe59-4523-9154-07c8d97bbe03'
 
         def _get_ids(self):
             return {}
 
-        def get_experiment_date(self):
+        def get_date_of_acquisition(self):
             return datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
 
         def get_behavior_stimulus_file(self):
             return "dummy_stimulus_file.pkl"
+
+        def get_foraging_id(self) -> str:
+            return self.foraging_id
 
     class MockBehaviorLimsApi(BehaviorLimsApi):
 
@@ -141,7 +148,7 @@ def MockBehaviorLimsApi():
                         ],
                     },
                 },
-                "session_uuid": 123456,
+                "session_uuid": '138531ab-fe59-4523-9154-07c8d97bbe03',
                 "start_time": datetime(2019, 9, 26, 9),
             }
             return data
@@ -206,9 +213,22 @@ def test_get_licks(MockBehaviorLimsApi):
     pd.testing.assert_frame_equal(expected, api.get_licks())
 
 
-def test_get_behavior_session_uuid(MockBehaviorLimsApi):
-    api = MockBehaviorLimsApi
-    assert 123456 == api.get_behavior_session_uuid()
+def test_get_behavior_session_uuid(MockBehaviorLimsApi, monkeypatch):
+    with monkeypatch.context() as ctx:
+        def dummy_init(self, extractor, behavior_stimulus_file):
+            self._extractor = extractor
+            self._behavior_stimulus_file = behavior_stimulus_file
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+        stimulus_file = MockBehaviorLimsApi._behavior_stimulus_file()
+        metadata = BehaviorMetadata(
+            extractor=MockBehaviorLimsApi.extractor,
+            behavior_stimulus_file=stimulus_file)
+
+    expected = UUID('138531ab-fe59-4523-9154-07c8d97bbe03')
+    assert expected == metadata.behavior_session_uuid
 
 
 def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
@@ -216,10 +236,10 @@ def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
     assert 62.0 == api.get_stimulus_frame_rate()
 
 
-def test_get_experiment_date(MockBehaviorLimsApi):
+def test_get_date_of_acquisition(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
     expected = datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    actual = api.get_experiment_date()
+    actual = api.get_metadata().date_of_acquisition
     assert expected == actual
 
 
@@ -282,8 +302,8 @@ class TestBehaviorRegression:
                 == self.od.extractor.ophys_experiment_id)
 
     def test_behavior_uuid_regression(self):
-        assert (self.bd.get_behavior_session_uuid()
-                == self.od.get_behavior_session_uuid())
+        assert (self.bd.get_metadata().behavior_session_uuid
+                == self.od.get_metadata().behavior_session_uuid)
 
     def test_container_id_regression(self):
         assert (self.bd.extractor.ophys_container_id
@@ -364,9 +384,9 @@ class TestBehaviorRegression:
     def test_get_sex_regression(self):
         assert self.bd.extractor.get_sex() == self.od.extractor.get_sex()
 
-    def test_get_rig_name_regression(self):
-        assert (self.bd.extractor.get_rig_name()
-                == self.od.extractor.get_rig_name())
+    def test_get_equipment_name_regression(self):
+        assert (self.bd.extractor.get_equipment_name()
+                == self.od.extractor.get_equipment_name())
 
     def test_get_stimulus_name_regression(self):
         assert (self.bd.extractor.get_stimulus_name()
@@ -381,17 +401,17 @@ class TestBehaviorRegression:
                 == self.od.extractor.get_driver_line())
 
     def test_get_external_specimen_name_regression(self):
-        assert (self.bd.extractor.get_external_specimen_name()
-                == self.od.extractor.get_external_specimen_name())
+        assert (self.bd.extractor.get_mouse_id()
+                == self.od.extractor.get_mouse_id())
 
     def test_get_full_genotype_regression(self):
         assert (self.bd.extractor.get_full_genotype()
                 == self.od.extractor.get_full_genotype())
 
-    def test_get_experiment_date_regression(self):
+    def test_get_date_of_acquisition_regression(self):
         """Just testing the date since it comes from two different sources;
         We expect that BehaviorOphysLimsApi will be earlier (more like when
         rig was started up), while BehaviorLimsExtractor returns the start of
         the actual behavior (from pkl file)"""
-        assert (self.bd.get_experiment_date().date()
-                == self.od.get_experiment_date().date())
+        assert (self.bd.get_metadata().date_of_acquisition.date()
+                == self.od.get_metadata().date_of_acquisition.date())

@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.8.0] = TBD
+## [2.9.0] = 2021-03-08
+- Updates to Session metadata; refactors implementation to use class rather than dict internally
+- Fixes a bug that was preventing Allen Institute Windows users from accessing gratings images
+
+## [2.8.0] = 2021-02-25
 - Created lookup table to get monitor_delay for cases where calculation from data fails
 - If sync timestamp file has more timestamps than eye tracking moving has frame, trim excess timestamps (up to 15)
 - Session API returns both warped and unwarped stimulus images, and both are written to NWB

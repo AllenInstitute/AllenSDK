@@ -73,7 +73,7 @@ def test_visbeh_ophys_data_set():
 
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
-        str(data_set.api.get_behavior_session_uuid())
+        str(data_set.api.get_metadata().behavior_session_uuid)
 
     stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
@@ -105,25 +105,28 @@ def test_visbeh_ophys_data_set():
         'ophys_session_id': 789220000,
         'session_type': 'OPHYS_6_images_B',
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
+        'cre_line': 'Slc17a7-IRES2-Cre',
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
-        'experiment_datetime': pytz.utc.localize(
+        'date_of_acquisition': pytz.utc.localize(
             datetime.datetime(2018, 11, 30, 23, 28, 37)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
-        'LabTracks_ID': 416369,
+        'mouse_id': 416369,
         'experiment_container_id': 814796558,
         'targeted_structure': 'VISp',
-        'reporter_line': ['Ai93(TITL-GCaMP6f)'],
+        'reporter_line': 'Ai93(TITL-GCaMP6f)',
         'emission_lambda': 520.0,
         'excitation_lambda': 910.0,
         'field_of_view_height': 512,
         'field_of_view_width': 447,
-        'indicator': 'GCAMP6f',
-        'rig_name': 'CAM2P.5',
-        'age': 'P139',
+        'indicator': 'GCaMP6f',
+        'equipment_name': 'CAM2P.5',
+        'age_in_days': 139,
         'sex': 'F',
-        'imaging_plane_group': None}
+        'imaging_plane_group': None,
+        'project_code': 'VisualBehavior'
+    }
     assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
@@ -238,3 +241,12 @@ def test_event_detection():
     # All events are the same length
     event_length = len(set([len(x) for x in events['events']]))
     assert event_length == 1
+
+
+@pytest.mark.requires_bamboo
+def test_BehaviorOphysSession_property_data():
+    ophys_experiment_id = 960410026
+    dataset = BehaviorOphysSession.from_lims(ophys_experiment_id)
+
+    assert dataset.ophys_session_id == 959458018
+    assert dataset.ophys_experiment_id == 960410026

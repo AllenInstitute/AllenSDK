@@ -7,7 +7,8 @@ import pytz
 import pandas as pd
 
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorDataTransforms
@@ -228,7 +229,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
 
     @memoize
     def get_age(self) -> str:
-        """Returns age code of the subject.
+        """Return the age code of the subject (ie P123)
         :rtype: str
         """
         query = f"""
@@ -241,7 +242,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_rig_name(self) -> str:
+    def get_equipment_name(self) -> str:
         """Returns the name of the experimental rig.
         :rtype: str
         """
@@ -318,7 +319,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return result
 
     @memoize
-    def get_external_specimen_name(self) -> int:
+    def get_mouse_id(self) -> int:
         """Returns the LabTracks ID
         :rtype: int
         """
@@ -350,7 +351,7 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
         return self.lims_db.fetchone(query, strict=True)
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of a behavior_session in UTC
         :rtype: datetime"""
         query = """

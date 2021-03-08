@@ -22,12 +22,28 @@ env:
   MTRAIN_PASSWORD: password
 
 jobs:
-  osx:
+  lint:
+    name: Lint
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+      - name: flake8 linting
+        run: |
+          pip install flake8
+          export PATH="/home/runner/.local/bin:${PATH}"
+          git fetch origin master
+          # `|| true` to force exit code 0 even if no files found
+          CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master | grep .py || true)
+          echo "List of changed files:"
+          echo ${CHANGED_PYFILES}
+          flake8 ${CHANGED_PYFILES} --count
+
+  allensdk:
     name: ${{ matrix.python-version }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "windows-latest"]
+        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
         python-version: ["3.6", "3.7"]
     defaults:
       run:

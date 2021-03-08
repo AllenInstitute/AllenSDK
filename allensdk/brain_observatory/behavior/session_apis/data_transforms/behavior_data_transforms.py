@@ -1,21 +1,22 @@
 import logging
-import uuid
-from datetime import datetime
-from typing import Any, Dict, Optional
-import warnings
+from typing import Optional
 
 import imageio
 import numpy as np
 import pandas as pd
-import pytz
+import os
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    get_task_parameters, BehaviorMetadata
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.behavior.metadata_processing import \
-    get_task_parameters
+from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \
     get_running_df
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorBase, BehaviorDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
     StimulusTemplate)
@@ -38,33 +39,11 @@ class BehaviorDataTransforms(BehaviorBase):
         return self.extractor.get_behavior_session_id()
 
     @memoize
-    def _behavior_stimulus_file(self) -> pd.DataFrame:
+    def _behavior_stimulus_file(self) -> dict:
         """Helper method to cache stimulus pkl file in memory since it takes
         about a second to load (and is used in many methods).
         """
         return pd.read_pickle(self.extractor.get_behavior_stimulus_file())
-
-    def get_behavior_session_uuid(self) -> Optional[str]:
-        """Get the universally unique identifier (UUID) number for the
-        current behavior session.
-        """
-        data = self._behavior_stimulus_file()
-        behavior_pkl_uuid = data.get("session_uuid")
-
-        behavior_session_id = self.extractor.get_behavior_session_id()
-        foraging_id = self.extractor.get_foraging_id()
-
-        # Sanity check to ensure that pkl file data matches up with
-        # the behavior session that the pkl file has been associated with.
-        assert_err_msg = (
-            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
-            f"behavior stimulus *.pkl file "
-            f"({self.extractor.get_behavior_stimulus_file()}) does "
-            f"does not match the foraging UUID ({foraging_id}) for "
-            f"behavior session: {behavior_session_id}")
-        assert behavior_pkl_uuid == foraging_id, assert_err_msg
-
-        return behavior_pkl_uuid
 
     @memoize
     def get_licks(self) -> pd.DataFrame:
@@ -248,42 +227,42 @@ class BehaviorDataTransforms(BehaviorBase):
         # TODO: Eventually the `grating_images_dict` should be provided by the
         #       BehaviorLimsExtractor/BehaviorJsonExtractor classes.
         #       - NJM 2021/2/23
+
+        gratings_dir = "/allen/programs/braintv/production/visualbehavior"
+        gratings_dir = os.path.join(gratings_dir,
+                                    "prod5/project_VisualBehavior")
         grating_images_dict = {
             "gratings_0.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_0.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "warped_grating_0.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/"
-                    "masked_unwarped_grating_0.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_0.png"))))
             },
             "gratings_90.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_90.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_90.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior"
-                    "/masked_unwarped_grating_90.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_90.png"))))
             },
             "gratings_180.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_180.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_180.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/"
-                    "masked_unwarped_grating_180.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_180.png"))))
             },
             "gratings_270.0": {
                 "warped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior/warped_grating_270.png")),
+                    safe_system_path(os.path.join(gratings_dir,
+                                                  "warped_grating_270.png")))),
                 "unwarped": np.asarray(imageio.imread(
-                    "/allen/programs/braintv/production/visualbehavior"
-                    "/prod5/project_VisualBehavior"
-                    "/masked_unwarped_grating_270.png"))
+                    safe_system_path(os.path.join(gratings_dir,
+                                     "masked_unwarped_grating_270.png"))))
             }
         }
 
@@ -357,73 +336,13 @@ class BehaviorDataTransforms(BehaviorBase):
         data = self._behavior_stimulus_file()
         return get_extended_trials(data)
 
-    @memoize
-    def get_experiment_date(self) -> datetime:
-        """Return the timestamp for when experiment was started in UTC
-
-        NOTE: This method will only get acquisition datetime from
-        extractor (data from LIMS) methods. As a sanity check,
-        it will also read the acquisition datetime from the behavior stimulus
-        (*.pkl) file and raise a warning if the date differs too much from the
-        datetime obtained from the behavior stimulus (*.pkl) file.
-
-        :rtype: datetime
-        """
-        extractor_acq_date = self.extractor.get_experiment_date()
-
-        pkl_data = self._behavior_stimulus_file()
-        pkl_raw_acq_date = pkl_data["start_time"]
-        if isinstance(pkl_raw_acq_date, datetime):
-            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
-
-        elif isinstance(pkl_raw_acq_date, (int, float)):
-            # We are dealing with an older pkl file where the acq time is
-            # stored as a Unix style timestamp string
-            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
-            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
-        else:
-            pkl_acq_date = None
-            warnings.warn(
-                "Could not parse the acquisition datetime "
-                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
-                f"{self.extractor.get_behavior_stimulus_file()}"
-            )
-
-        if pkl_acq_date:
-            acq_start_diff = (
-                extractor_acq_date - pkl_acq_date).total_seconds()
-            # If acquisition dates differ by more than an hour
-            if abs(acq_start_diff) > 360:
-                warnings.warn(
-                    "The `date_of_acquisition` field in LIMS "
-                    f"({extractor_acq_date}) for behavior session "
-                    f"({self.get_behavior_session_id()}) deviates by more "
-                    f"than an hour from the `start_time` ({pkl_acq_date}) "
-                    "specified in the associated stimulus *.pkl file: "
-                    f"{self.extractor.get_behavior_stimulus_file()}"
-                )
-        return extractor_acq_date
-
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> BehaviorMetadata:
         """Return metadata about the session.
-        :rtype: dict
+        :rtype: BehaviorMetadata
         """
-        if self.get_behavior_session_uuid() is None:
-            bs_uuid = None
-        else:
-            bs_uuid = uuid.UUID(self.get_behavior_session_uuid())
-        metadata = {
-            "rig_name": self.extractor.get_rig_name(),
-            "sex": self.extractor.get_sex(),
-            "age": self.extractor.get_age(),
-            "stimulus_frame_rate": self.get_stimulus_frame_rate(),
-            "session_type": self.extractor.get_stimulus_name(),
-            "experiment_datetime": self.get_experiment_date(),
-            "reporter_line": sorted(self.extractor.get_reporter_line()),
-            "driver_line": sorted(self.extractor.get_driver_line()),
-            "LabTracks_ID": self.extractor.get_external_specimen_name(),
-            "full_genotype": self.extractor.get_full_genotype(),
-            "behavior_session_uuid": bs_uuid,
-            "behavior_session_id": self.extractor.get_behavior_session_id()
-        }
+        metadata = BehaviorMetadata(
+            extractor=self.extractor,
+            stimulus_timestamps=self.get_stimulus_timestamps(),
+            behavior_stimulus_file=self._behavior_stimulus_file()
+        )
         return metadata

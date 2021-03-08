@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
     BehaviorJsonExtractor
@@ -137,3 +138,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         """Get the filepath of the .h5 events file associated with an ophys
         experiment"""
         return self.data['events_file']
+
+    def get_project_code(self) -> str:
+        raise NotImplementedError('Not exposed externally')

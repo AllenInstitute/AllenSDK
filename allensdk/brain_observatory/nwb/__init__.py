@@ -1,7 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 import h5py
 import marshmallow
@@ -825,7 +825,7 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
     # Rename or reformat incoming metadata fields to conform with pynwb fields
     tmp_metadata = metadata.copy()
-    tmp_metadata["subject_id"] = tmp_metadata.pop("LabTracks_ID")
+    tmp_metadata["subject_id"] = tmp_metadata.pop("mouse_id")
     tmp_metadata["genotype"] = tmp_metadata.pop("full_genotype")
 
     if not behavior_only:
@@ -839,7 +839,7 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
 
     # Subject related metadata should be saved to our BehaviorSubject
     # (augmented pyNWB 'Subject') NWB class
-    subject_fields = {"age", "driver_line", "genotype",
+    subject_fields = {"age_in_days", "driver_line", "genotype",
                       "subject_id", "reporter_line", "sex"}
     subject_metadata = {k: v for k, v in metadata_clean.items()
                         if k in subject_fields}
@@ -848,9 +848,16 @@ def add_metadata(nwbfile, metadata: dict, behavior_only: bool):
 
     BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
                                            'ndx-aibs-behavior-ophys')
+
+    def _get_age(age_in_days: Optional[int]) -> Optional[str]:
+        """Convert numeric age_in_days to ISO 8601"""
+        if age_in_days is None:
+            return 'null'
+        return f'P{age_in_days}D'
+
     nwb_subject = BehaviorSubject(
         description="A visual behavior subject with a LabTracks ID",
-        age=subject_metadata["age"],
+        age=_get_age(age_in_days=subject_metadata['age_in_days']),
         driver_line=subject_metadata["driver_line"],
         genotype=subject_metadata["genotype"],
         subject_id=str(subject_metadata["subject_id"]),
@@ -939,7 +946,7 @@ def add_cell_specimen_table(nwbfile: NWBFile,
     cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
-    device_name: str = nwbfile.lab_meta_data['metadata'].rig_name
+    device_name: str = nwbfile.lab_meta_data['metadata'].equipment_name
     if device_name.startswith("MESO"):
         device_config = {
             "name": device_name,

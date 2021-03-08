@@ -4,12 +4,13 @@ import pandas as pd
 import numpy as np
 import inspect
 
-from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
-from allensdk.brain_observatory.behavior.session_apis.abcs import BehaviorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
     calculate_reward_rate)
 from allensdk.brain_observatory.behavior.dprime import (
@@ -385,7 +386,13 @@ class BehaviorSession(LazyPropertyMixin):
         """Return metadata about the session.
         :rtype: dict
         """
-        return self._metadata
+        if isinstance(self._metadata, BehaviorMetadata):
+            metadata = self._metadata.to_dict()
+        else:
+            # NWB API returns as dict
+            metadata = self._metadata
+
+        return metadata
 
     @metadata.setter
     def metadata(self, value):

@@ -1,8 +1,9 @@
 import abc
 from typing import Dict, Optional
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_data_extractor_base import \
+    BehaviorDataExtractorBase
 
 
 class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
@@ -133,4 +134,9 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
     @abc.abstractmethod
     def get_eye_tracking_filepath(self) -> dict:
         """Get the eye tracking filepath containing ellipse fits"""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_project_code(self) -> str:
+        """Get the project code."""
         raise NotImplementedError()

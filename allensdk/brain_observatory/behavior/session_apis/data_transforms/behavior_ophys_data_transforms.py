@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Union
-import uuid
+from typing import Iterable, Optional, Union
 
 import h5py
 import matplotlib.image as mpimg  # NOQA: E402
@@ -12,10 +11,16 @@ import pandas as pd
 import warnings
 
 from allensdk.api.cache import memoize
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+    import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase, BehaviorOphysDataExtractorBase)
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
+    BehaviorOphysDataExtractorBase
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    session_base.behavior_ophys_base import \
+    BehaviorOphysBase
 
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.sync_dataset import Dataset
@@ -157,13 +162,13 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         try:
             delay = aligner.monitor_delay
         except ValueError as ee:
-            rig_name = self.get_metadata()['rig_name']
+            equipment_name = self.get_metadata().equipment_name
 
             warning_msg = 'Monitory delay calculation failed '
             warning_msg += 'with ValueError\n'
             warning_msg += f'    "{ee}"'
             warning_msg += '\nlooking monitor delay up from table '
-            warning_msg += f'for rig: {rig_name} '
+            warning_msg += f'for rig: {equipment_name} '
 
             # see
             # https://github.com/AllenInstitute/AllenSDK/issues/1318
@@ -175,11 +180,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
                             'CAM2P.5': 0.021192,
                             'MESO.1': 0.03613}
 
-            if rig_name not in delay_lookup:
+            if equipment_name not in delay_lookup:
                 msg = warning_msg
-                msg += f'\nrig_name {rig_name} not in lookup table'
+                msg += f'\nequipment_name {equipment_name} not in lookup table'
                 raise RuntimeError(msg)
-            delay = delay_lookup[rig_name]
+            delay = delay_lookup[equipment_name]
             warning_msg += f'\ndelay: {delay} seconds'
             warnings.warn(warning_msg)
 
@@ -236,48 +241,17 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return resampled
 
     @memoize
-    def get_ophys_frame_rate(self):
-        ophys_timestamps = self.get_ophys_timestamps()
-        return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
-
-    @memoize
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> BehaviorOphysMetadata:
         """Return metadata about the session.
-        :rtype: dict
+        :rtype: BehaviorOphysMetadata
         """
-        extractor = self.extractor
+        metadata = BehaviorOphysMetadata(
+            extractor=self.extractor,
+            stimulus_timestamps=self.get_stimulus_timestamps(),
+            ophys_timestamps=self.get_ophys_timestamps(),
+            behavior_stimulus_file=self._behavior_stimulus_file()
+        )
 
-        behavior_session_uuid = self.get_behavior_session_uuid()
-        fov_shape = extractor.get_field_of_view_shape()
-        expt_container_id = extractor.get_experiment_container_id()
-
-        metadata = {
-            'behavior_session_id': extractor.get_behavior_session_id(),
-            'ophys_session_id': extractor.get_ophys_session_id(),
-            'ophys_experiment_id': extractor.get_ophys_experiment_id(),
-            'experiment_container_id': expt_container_id,
-            'ophys_frame_rate': self.get_ophys_frame_rate(),
-            'stimulus_frame_rate': self.get_stimulus_frame_rate(),
-            'targeted_structure': extractor.get_targeted_structure(),
-            'imaging_depth': extractor.get_imaging_depth(),
-            'session_type': extractor.get_stimulus_name(),
-            'experiment_datetime': extractor.get_experiment_date(),
-            'full_genotype': extractor.get_full_genotype(),
-            'reporter_line': sorted(extractor.get_reporter_line()),
-            'driver_line': sorted(extractor.get_driver_line()),
-            'LabTracks_ID': extractor.get_external_specimen_name(),
-            'behavior_session_uuid': uuid.UUID(behavior_session_uuid),
-            'imaging_plane_group': extractor.get_imaging_plane_group(),
-            'imaging_plane_group_count': extractor.get_plane_group_count(),
-            'rig_name': extractor.get_rig_name(),
-            'sex': extractor.get_sex(),
-            'age': extractor.get_age(),
-            'excitation_lambda': 910.0,
-            'emission_lambda': 520.0,
-            'indicator': 'GCAMP6f',
-            'field_of_view_width': fov_shape['width'],
-            'field_of_view_height': fov_shape['height']
-        }
         return metadata
 
     @memoize
