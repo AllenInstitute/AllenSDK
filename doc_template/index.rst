@@ -91,6 +91,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.10.0
+-----------------------------------------------------------------------
+
+
 What's New - 2.9.0
 -----------------------------------------------------------------------
 - Updates to Session metadata; refactors implementation to use class rather than dict internally

@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.10.0] = TBD
+-
+
 ## [2.9.0] = 2021-03-08
 - Updates to Session metadata; refactors implementation to use class rather than dict internally
 - Fixes a bug that was preventing Allen Institute Windows users from accessing gratings images
