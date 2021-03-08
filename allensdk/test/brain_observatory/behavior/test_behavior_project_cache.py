@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 import tempfile
 import logging
-from allensdk.brain_observatory.behavior.behavior_project_cache import (
+from allensdk.brain_observatory.behavior.project_cache.behavior_project_cache import (
     BehaviorProjectCache)
 
 
