@@ -5,7 +5,7 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
     import \
     BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.project_cache.cache_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.cache_table import \
     CacheTable
 
 

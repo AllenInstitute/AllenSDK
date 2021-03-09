@@ -30,7 +30,8 @@ class CacheTable:
         self.postprocess_additional()
 
         if self._suppress:
-            self._df.drop(columns=self._suppress, inplace=True, errors="ignore")
+            self._df.drop(columns=self._suppress, inplace=True,
+                          errors="ignore")
 
     @abstractmethod
     def postprocess_additional(self):
