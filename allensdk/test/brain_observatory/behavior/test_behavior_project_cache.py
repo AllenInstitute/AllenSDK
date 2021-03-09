@@ -44,13 +44,42 @@ def behavior_table():
 
 
 @pytest.fixture
-def mock_api(session_table, behavior_table):
+def experiments_table():
+    return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
+                          "behavior_session_id": [1, 2, 3],
+                          "ophys_experiment_id": [[4], [5, 6], [7]],
+                          "date_of_acquisition": np.datetime64('2020-02-20'),
+                          "reporter_line": ["Ai93(TITL-GCaMP6f)",
+                                            "Ai93(TITL-GCaMP6f)",
+                                            "Ai93(TITL-GCaMP6f)"],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          'full_genotype': [
+                              'foo-SlcCre',
+                              'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+                              'bar'],
+                          'cre_line': [None, 'Vip-IRES-Cre', None],
+                          'session_type': ['OPHYS_1_session',
+                                           'OPHYS_2_session',
+                                           'foo_1_session'],
+                          'session_number': [1, 2, None],
+                          'imaging_depth': [75, 75, 75],
+                          'targeted_structure': ['VISp', 'VISp', 'VISp'],
+                          'indicator': ['GCaMP6f', 'GCaMP6f', 'GCaMP6f']
+                          })
+            .set_index("ophys_session_id"))
+
+
+@pytest.fixture
+def mock_api(session_table, behavior_table, experiments_table):
     class MockApi:
         def get_session_table(self):
             return session_table
 
         def get_behavior_only_session_table(self):
             return behavior_table
+
+        def get_experiment_table(self):
+            return experiments_table
 
         def get_session_data(self, ophys_session_id):
             return ophys_session_id
@@ -88,6 +117,16 @@ def test_get_behavior_table(TempdirBehaviorCache, behavior_table):
         path = cache.manifest.path_info.get("behavior_sessions").get("spec")
         assert os.path.exists(path)
     pd.testing.assert_frame_equal(behavior_table, actual)
+
+
+@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
+def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
+    cache = TempdirBehaviorCache
+    obtained = cache.get_experiment_table()
+    if cache.cache:
+        path = cache.manifest.path_info.get("ophys_experiments").get("spec")
+        assert os.path.exists(path)
+    pd.testing.assert_frame_equal(experiments_table, obtained)
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
