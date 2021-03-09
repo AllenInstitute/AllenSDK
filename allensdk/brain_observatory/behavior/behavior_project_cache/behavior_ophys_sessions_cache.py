@@ -18,20 +18,6 @@ class BehaviorOphysSessionsCacheTable(CacheTable):
         super().__init__(df=df, suppress=suppress)
 
     def postprocess_additional(self):
-        def parse_session_number(session_type: str):
-            """Parse the session number from session type"""
-            match = re.match(r'OPHYS_(?P<session_number>\d+)',
-                             session_type)
-            if match is None:
-                return None
-            return int(match.group('session_number'))
-
-        session_type = self._df['session_type']
-        session_type = session_type[session_type.notnull()]
-
-        self._df.loc[session_type.index, 'session_number'] = \
-            session_type.apply(parse_session_number)
-
         # Possibly explode and reindex
         self.__explode()
 
