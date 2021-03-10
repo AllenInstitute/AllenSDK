@@ -5,18 +5,18 @@ import pandas as pd
 import logging
 
 from allensdk.api.cache import Cache
+from allensdk.brain_observatory.behavior.behavior_project_cache\
+    .postprocessing.tables.behavior_sessions_cache import \
+    BehaviorSessionsCacheTable
+from allensdk.brain_observatory.behavior.behavior_project_cache\
+    .postprocessing.tables.experiments_cache import \
+    BehaviorExperimentsCacheTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .behavior_ophys_sessions_cache import \
+    .postprocessing.tables.behavior_ophys_sessions_cache import \
     BehaviorOphysSessionsCacheTable
-from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .behavior_sessions_cache import \
-    BehaviorSessionsCacheTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.experiments_cache \
-    import \
-    BehaviorExperimentsCacheTable
 from allensdk.core.authentication import DbCredentials
 
 

@@ -2,7 +2,8 @@ from typing import Optional, List
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.cache_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache\
+    .postprocessing.tables.cache_table import \
     CacheTable
 
 

@@ -20,10 +20,12 @@ def session_table():
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                               'bar'],
                           'cre_line': [None, 'Vip-IRES-Cre', None],
-                          'session_type': ['OPHYS_1_session',
-                                           'OPHYS_2_session',
-                                           'foo_1_session'],
-                          'session_number': [1, 2, None]
+                          'session_type': ['OPHYS_1_session_A',
+                                           'OPHYS_1_session_A',
+                                           'OPHYS_1_session_B'],
+                          'specimen_id': [1, 1, 1],
+                          'prior_exposures_to_session_type': [0, 1, 0],
+                          'session_number': [1, 1, 1]
                           })
             .set_index("ophys_session_id"))
 
@@ -31,14 +33,23 @@ def session_table():
 @pytest.fixture
 def behavior_table():
     return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
-                          "date_of_acquisition": np.datetime64("NAT"),
+                          "date_of_acquisition": [
+                              np.datetime64('2020-02-20'),
+                              np.datetime64('2020-02-21'),
+                              np.datetime64('2020-02-22')
+                          ],
                           "reporter_line": ["aa", "bb", "cc"],
                           "driver_line": [["aa"], ["aa", "bb"], ["cc"]],
                           'full_genotype': [
                               'foo-SlcCre',
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                               'bar'],
-                          'cre_line': [None, 'Vip-IRES-Cre', None]
+                          'cre_line': [None, 'Vip-IRES-Cre', None],
+                          'session_type': ['TRAINING_1_gratings',
+                                           'TRAINING_1_gratings',
+                                           'TRAINING_1_gratings'],
+                          'specimen_id': [1, 1, 1],
+                          'prior_exposures_to_session_type': [0, 1, 2]
                           })
             .set_index("behavior_session_id"))
 
@@ -48,7 +59,11 @@ def experiments_table():
     return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
                           "behavior_session_id": [1, 2, 3],
                           "ophys_experiment_id": [[4], [5, 6], [7]],
-                          "date_of_acquisition": np.datetime64('2020-02-20'),
+                          "date_of_acquisition": [
+                              np.datetime64('2020-02-20'),
+                              np.datetime64('2020-02-21'),
+                              np.datetime64('2020-02-22')
+                          ],
                           "reporter_line": ["Ai93(TITL-GCaMP6f)",
                                             "Ai93(TITL-GCaMP6f)",
                                             "Ai93(TITL-GCaMP6f)"],
@@ -58,10 +73,13 @@ def experiments_table():
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                               'bar'],
                           'cre_line': [None, 'Vip-IRES-Cre', None],
-                          'session_type': ['OPHYS_1_session',
-                                           'OPHYS_2_session',
-                                           'foo_1_session'],
-                          'session_number': [1, 2, None],
+                          'session_type': ['OPHYS_1_session_A',
+                                           'OPHYS_1_session_A',
+                                           'OPHYS_1_session_B'],
+                          'container_id': [1, 1, 3],
+                          'specimen_id': [1, 1, 1],
+                          'prior_exposures_to_session_type': [0, 1, 0],
+                          'session_number': [1, 1, 1],
                           'imaging_depth': [75, 75, 75],
                           'targeted_structure': ['VISp', 'VISp', 'VISp'],
                           'indicator': ['GCaMP6f', 'GCaMP6f', 'GCaMP6f']
