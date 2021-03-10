@@ -20,11 +20,12 @@ def session_table():
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                               'bar'],
                           'cre_line': [None, 'Vip-IRES-Cre', None],
-                          'session_type': ['OPHYS_1_session_A',
-                                           'OPHYS_1_session_A',
-                                           'OPHYS_1_session_B'],
-                          'specimen_id': [1, 1, 1],
+                          'session_type': ['OPHYS_1_images_A',
+                                           'OPHYS_1_images_A',
+                                           'OPHYS_1_images_B'],
+                          'mouse_id': [1, 1, 1],
                           'prior_exposures_to_session_type': [0, 1, 0],
+                          'prior_exposures_to_image_set': [0, 1, 0],
                           'session_number': [1, 1, 1]
                           })
             .set_index("ophys_session_id"))
@@ -48,8 +49,10 @@ def behavior_table():
                           'session_type': ['TRAINING_1_gratings',
                                            'TRAINING_1_gratings',
                                            'TRAINING_1_gratings'],
-                          'specimen_id': [1, 1, 1],
-                          'prior_exposures_to_session_type': [0, 1, 2]
+                          'mouse_id': [1, 1, 1],
+                          'prior_exposures_to_session_type': [0, 1, 2],
+                          'prior_exposures_to_image_set': [
+                              np.nan, np.nan, np.nan]
                           })
             .set_index("behavior_session_id"))
 
@@ -73,12 +76,12 @@ def experiments_table():
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
                               'bar'],
                           'cre_line': [None, 'Vip-IRES-Cre', None],
-                          'session_type': ['OPHYS_1_session_A',
-                                           'OPHYS_1_session_A',
-                                           'OPHYS_1_session_B'],
-                          'container_id': [1, 1, 3],
-                          'specimen_id': [1, 1, 1],
+                          'session_type': ['OPHYS_1_images_A',
+                                           'OPHYS_1_images_A',
+                                           'OPHYS_1_images_B'],
+                          'mouse_id': [1, 1, 1],
                           'prior_exposures_to_session_type': [0, 1, 0],
+                          'prior_exposures_to_image_set': [0, 1, 0],
                           'session_number': [1, 1, 1],
                           'imaging_depth': [75, 75, 75],
                           'targeted_structure': ['VISp', 'VISp', 'VISp'],
