@@ -26,3 +26,4 @@ aiohttp==3.7.4
 nest_asyncio==1.2.0
 tqdm>=4.27
 ndx-events<=0.2.0
+boto3==1.17.21
