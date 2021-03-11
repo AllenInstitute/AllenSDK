@@ -73,7 +73,8 @@ class Manifest(object):
                                 version_id: str,
                                 file_hash: str) -> CacheFileAttributes:
         """
-        Create the cache_file_attributes describing a file
+        Create the cache_file_attributes describing a file.
+        This method does the work of assigning a local_path to a remote file.
 
         Parameters
         ----------
