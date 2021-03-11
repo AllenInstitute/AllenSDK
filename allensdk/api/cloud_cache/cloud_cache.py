@@ -48,6 +48,13 @@ class CloudCache(object):
         return self._manifest.version
 
     @property
+    def metadata_flie_names(self) -> list:
+        """
+        List of metadata file names associated with this dataset
+        """
+        return self._manifest.metadata_file_names
+
+    @property
     def s3_client(self):
         if self._s3_client is None:
             s3_config = Config(signature_version=UNSIGNED)
