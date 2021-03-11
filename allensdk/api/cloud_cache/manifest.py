@@ -8,7 +8,7 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 
 class Manifest(object):
     """
-    A class for loading and manipulating the on line manifest.json associated
+    A class for loading and manipulating the online manifest.json associated
     with a dataset release
 
     Parameters
@@ -120,6 +120,9 @@ class Manifest(object):
         RuntimeError
             If you try to run this method when self._data is None (meaning
             you haven't yet loaded a manifest.json)
+
+        ValueError
+            If the metadata_file_name is not a valid option
         """
         if self._data is None:
             raise RuntimeError("You cannot retrieve "
@@ -155,6 +158,9 @@ class Manifest(object):
         RuntimeError
             If you try to run this method when self._data is None (meaning
             you haven't yet loaded a manifest.json file)
+
+        ValueError
+            If the file_id is not a valid option
         """
         if self._data is None:
             raise RuntimeError("You cannot retrieve data_file_attributes;\n"
