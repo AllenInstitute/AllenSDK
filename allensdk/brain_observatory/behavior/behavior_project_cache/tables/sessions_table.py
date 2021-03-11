@@ -66,9 +66,6 @@ class SessionsTable(ProjectTable):
         gratings, which will be set to null
         """
         def __get_image_set_name(session_type: Optional[str]):
-            if not session_type:
-                return None
-
             if 'images' not in session_type:
                 return None
 
@@ -77,5 +74,7 @@ class SessionsTable(ProjectTable):
             except IndexError:
                 image_set = None
             return image_set
-        image_set = self._df['session_type'].apply(__get_image_set_name)
+        session_type = self._df['session_type'][
+            self._df['session_type'].notnull()]
+        image_set = session_type.apply(__get_image_set_name)
         return self.__get_prior_exposure_count(to=image_set)
