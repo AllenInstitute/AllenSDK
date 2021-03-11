@@ -10,7 +10,7 @@ import pandas as pd
 
 import warnings
 
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
     import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \

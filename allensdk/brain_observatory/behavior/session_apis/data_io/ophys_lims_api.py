@@ -5,7 +5,7 @@ from typing import Optional
 
 from allensdk.internal.api import (
     OneOrMoreResultExpectedError, db_connection_creator)
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 from allensdk.core.authentication import DbCredentials

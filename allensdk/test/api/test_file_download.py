@@ -35,7 +35,7 @@
 #
 import pytest
 from mock import Mock, patch
-from allensdk.api.cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj

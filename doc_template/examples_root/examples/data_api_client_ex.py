@@ -119,7 +119,7 @@ for id, name, parent_structure_id in summary_structures[['name',
 # example 11
 #===============================================================================
 
-from allensdk.api.cache import Cache
+from allensdk.api.warehouse_cache.cache import Cache
 
 cache_writer = Cache()
 do_cache=True

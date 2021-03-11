@@ -35,7 +35,7 @@
 #
 from .reference_space_api import ReferenceSpaceApi
 from .grid_data_api import GridDataApi
-from ..cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import cacheable, Cache
 import numpy as np
 import nrrd
 import six

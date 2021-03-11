@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache, get_default_manifest_file
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.deprecated import deprecated
 

@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_api import RmaApi
-from ..cache import cacheable
+from allensdk.api.warehouse_cache.cache import cacheable
 
 
 class AnnotatedSectionDataSetsApi(RmaApi):

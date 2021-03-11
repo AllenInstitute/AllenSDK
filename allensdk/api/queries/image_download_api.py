@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_template import RmaTemplate
-from ..cache import cacheable
+from allensdk.api.warehouse_cache.cache import cacheable
 from six import string_types
 
 

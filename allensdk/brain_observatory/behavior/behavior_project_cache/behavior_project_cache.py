@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import logging
 
-from allensdk.api.cache import Cache
+from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .experiments_table import \
     ExperimentsTable
@@ -13,7 +13,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.api.caching_utilities import one_file_call_caching, call_caching
+from allensdk.api.warehouse_cache.caching_utilities import one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable

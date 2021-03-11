@@ -1,5 +1,5 @@
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
-from allensdk.api.cache import cacheable
+from allensdk.api.warehouse_cache.cache import cacheable
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 import allensdk.internal.core.lims_utilities as lu
 import os
