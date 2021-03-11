@@ -42,6 +42,9 @@ class CloudCache(object):
 
     @property
     def version(self) -> str:
+        """
+        The version of the dataset currently loaded
+        """
         return self._manifest.version
 
     @property
