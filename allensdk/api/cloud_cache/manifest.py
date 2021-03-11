@@ -136,7 +136,7 @@ class Manifest(object):
 
         file_data = self._data['metadata_files'][metadata_file_name]
         return self._create_file_attributes(file_data['uri'],
-                                            file_data['s3_version'],
+                                            file_data['version_id'],
                                             file_data['file_hash'])
 
     def data_file_attributes(self, file_id) -> CacheFileAttributes:
@@ -175,5 +175,5 @@ class Manifest(object):
 
         file_data = self._data['data_files'][file_id]
         return self._create_file_attributes(file_data['uri'],
-                                            file_data['s3_version'],
+                                            file_data['version_id'],
                                             file_data['file_hash'])

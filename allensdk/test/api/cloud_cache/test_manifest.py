@@ -106,10 +106,10 @@ def test_metadata_file_attributes():
     manifest = {}
     metadata_files = {}
     metadata_files['a.txt'] = {'uri': 'http://my.url.com/path/to/a.txt',
-                               's3_version': '12345',
+                               'version_id': '12345',
                                'file_hash': 'abcde'}
     metadata_files['b.txt'] = {'uri': 'http://my.other.url.com/different/path/to/b.txt',  # noqa: E501
-                               's3_version': '67890',
+                               'version_id': '67890',
                                'file_hash': 'fghijk'}
 
     manifest['metadata_files'] = metadata_files
@@ -156,10 +156,10 @@ def test_data_file_attributes():
     manifest['dataset_version'] = '0'
     data_files = {}
     data_files['a'] = {'uri': 'http://my.url.com/path/to/a.nwb',
-                       's3_version': '12345',
+                       'version_id': '12345',
                        'file_hash': 'abcde'}
     data_files['b'] = {'uri': 'http://my.other.url.com/different/path/b.nwb',
-                       's3_version': '67890',
+                       'version_id': '67890',
                        'file_hash': 'fghijk'}
     manifest['data_files'] = data_files
 
@@ -202,18 +202,18 @@ def test_loading_two_manifests():
     manifest_1 = {}
     metadata_1 = {}
     metadata_1['metadata_a.csv'] = {'uri': 'http://aaa.com/path/to/a.csv',
-                                    's3_version': '12345',
+                                    'version_id': '12345',
                                     'file_hash': 'abcde'}
     metadata_1['metadata_b.csv'] = {'uri': 'http://bbb.com/other/path/b.csv',
-                                    's3_version': '67890',
+                                    'version_id': '67890',
                                     'file_hash': 'fghijk'}
     manifest_1['metadata_files'] = metadata_1
     data_1 = {}
     data_1['c'] = {'uri': 'http://ccc.com/third/path/c.csv',
-                   's3_version': '11121',
+                   'version_id': '11121',
                    'file_hash': 'lmnopq'}
     data_1['d'] = {'uri': 'http://ddd.com/fourth/path/d.csv',
-                   's3_version': '31415',
+                   'version_id': '31415',
                    'file_hash': 'rstuvw'}
 
     manifest_1['data_files'] = data_1
@@ -226,18 +226,18 @@ def test_loading_two_manifests():
     manifest_2 = {}
     metadata_2 = {}
     metadata_2['metadata_a.csv'] = {'uri': 'http://aaa.com/path/to/a.csv',
-                                    's3_version': '161718',
+                                    'version_id': '161718',
                                     'file_hash': 'xyzab'}
     metadata_2['metadata_f.csv'] = {'uri': 'http://fff.com/fifth/path/f.csv',
-                                    's3_version': '192021',
+                                    'version_id': '192021',
                                     'file_hash': 'cdefghi'}
     manifest_2['metadata_files'] = metadata_2
     data_2 = {}
     data_2['c'] = {'uri': 'http://ccc.com/third/path/c.csv',
-                   's3_version': '222324',
+                   'version_id': '222324',
                    'file_hash': 'jklmnop'}
     data_2['g'] = {'uri': 'http://ggg.com/sixth/path/g.csv',
-                   's3_version': '25262728',
+                   'version_id': '25262728',
                    'file_hash': 'qrstuvwxy'}
 
     manifest_2['data_files'] = data_2

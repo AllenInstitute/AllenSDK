@@ -87,18 +87,18 @@ def test_loading_manifest():
 
     manifest_1 = {'dataset_version': '1',
                   'metadata_files': {'a.csv': {'uri': 'http://www.junk.com',
-                                               's3_version': '1111',
+                                               'version_id': '1111',
                                                'file_hash': 'abcde'},
                                      'b.csv': {'uri': 'http://silly.com',
-                                               's3_version': '2222',
+                                               'version_id': '2222',
                                                'file_hash': 'fghijk'}}}
 
     manifest_2 = {'dataset_version': '2',
                   'metadata_files': {'c.csv': {'uri': 'http://www.absurd.com',
-                                               's3_version': '3333',
+                                               'version_id': '3333',
                                                'file_hash': 'lmnop'},
                                      'd.csv': {'uri': 'http://nonsense.com',
-                                               's3_version': '4444',
+                                               'version_id': '4444',
                                                'file_hash': 'qrstuv'}}}
 
     client.put_object(Bucket=test_bucket_name,
@@ -441,7 +441,7 @@ def test_data_path(tmpdir):
     manifest['metadata_files'] = {}
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
     data_file = {'uri': uri,
-                 's3_version': version_id,
+                 'version_id': version_id,
                  'file_hash': true_checksum}
 
     manifest['data_files'] = {'only_data_file': data_file}
@@ -502,7 +502,7 @@ def test_metadata_path(tmpdir):
     manifest['dataset_version'] = '1'
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'uri': uri,
-                     's3_version': version_id,
+                     'version_id': version_id,
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
@@ -572,7 +572,7 @@ def test_metadata(tmpdir):
     manifest['dataset_version'] = '1'
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'uri': uri,
-                     's3_version': version_id,
+                     'version_id': version_id,
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
