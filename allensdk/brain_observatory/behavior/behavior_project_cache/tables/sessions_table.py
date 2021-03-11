@@ -18,7 +18,10 @@ class SessionsTable(ProjectTable):
         self._df['prior_exposures_to_image_set'] = \
             self.__get_prior_exposures_to_image_set()
 
-    def get_prior_exposures(self):
+    @property
+    def prior_exposures(self) -> pd.DataFrame:
+        """Returns all the prior exposure values,
+        with index of behavior_session_id"""
         return self._df[['prior_exposures_to_session_type',
                          'prior_exposures_to_image_set']]
 

@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 class OphysMixin:
     @staticmethod
     def _add_prior_exposures(sessions_table: SessionsTable, df: pd.DataFrame):
-        prior_exposures = sessions_table.get_prior_exposures()
+        prior_exposures = sessions_table.prior_exposures
         df = df.merge(prior_exposures,
                       left_on='behavior_session_id',
                       right_index=True)
