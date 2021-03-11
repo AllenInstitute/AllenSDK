@@ -145,12 +145,14 @@ class CloudCache(object):
 
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
         """
-        Check if a file exiss and is in the expected state.
+        Check if a file exists and is in the expected state.
 
         If it is, return True.
 
-        If it is, download the file. If the download is successful,
-        return True.
+        If it is not, download the file, creating the directory
+        where the file is to be stored if necessary.
+
+        If the download is successful, return True.
 
         If the download fails (file hash does not match expectation),
         return False.
@@ -167,7 +169,8 @@ class CloudCache(object):
         Raises
         ------
         RuntimeError
-            If the directory where the file is to be saved is not a directory.
+            If the path to the directory where the file is to be saved
+            points to something that is not a directory.
         """
 
         local_path = file_attributes.local_path
