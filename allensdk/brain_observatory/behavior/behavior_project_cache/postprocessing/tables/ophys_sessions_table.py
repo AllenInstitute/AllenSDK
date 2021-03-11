@@ -4,11 +4,11 @@ from typing import Optional, List
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.cache_table import \
-    CacheTable
+    .postprocessing.tables.project_table import \
+    ProjectTable
 
 
-class BehaviorOphysSessionsCacheTable(CacheTable):
+class OphysSessionsTable(ProjectTable):
     def __init__(self, df: pd.DataFrame,
                  suppress: Optional[List[str]] = None,
                  by: str = 'ophys_session_id'):

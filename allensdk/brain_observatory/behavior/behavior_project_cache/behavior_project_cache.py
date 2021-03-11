@@ -6,17 +6,17 @@ import logging
 
 from allensdk.api.cache import Cache
 from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.behavior_sessions_cache import \
-    BehaviorSessionsCacheTable
+    .postprocessing.tables.sessions_table import \
+    SessionsTable
 from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.experiments_cache import \
-    BehaviorExperimentsCacheTable
+    .postprocessing.tables.experiments_table import \
+    ExperimentsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.behavior_ophys_sessions_cache import \
-    BehaviorOphysSessionsCacheTable
+    .postprocessing.tables.ophys_sessions_table import \
+    OphysSessionsTable
 from allensdk.core.authentication import DbCredentials
 
 
@@ -189,9 +189,9 @@ class BehaviorProjectCache(Cache):
             sessions.set_index("ophys_session_id")
         else:
             sessions = self.fetch_api.get_session_table()
-        sessions = BehaviorOphysSessionsCacheTable(df=sessions,
-                                                   suppress=suppress,
-                                                   by=by)
+        sessions = OphysSessionsTable(df=sessions,
+                                      suppress=suppress,
+                                      by=by)
         return sessions.table
 
     def add_manifest_paths(self, manifest_builder):
@@ -219,8 +219,8 @@ class BehaviorProjectCache(Cache):
             experiments.set_index("ophys_experiment_id")
         else:
             experiments = self.fetch_api.get_experiment_table()
-        experiments = BehaviorExperimentsCacheTable(df=experiments,
-                                                    suppress=suppress)
+        experiments = ExperimentsTable(df=experiments,
+                                       suppress=suppress)
         return experiments.table
 
     def get_behavior_session_table(
@@ -244,7 +244,7 @@ class BehaviorProjectCache(Cache):
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
-        sessions = BehaviorSessionsCacheTable(df=sessions, suppress=suppress)
+        sessions = SessionsTable(df=sessions, suppress=suppress)
         return sessions.table
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):

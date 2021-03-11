@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 
 
-class CacheTable:
+class ProjectTable:
     def __init__(self, df: pd.DataFrame,
                  suppress: Optional[List[str]] = None,
                  behavior_only=False,
