@@ -323,3 +323,17 @@ def test_loading_two_manifests():
 
     with pytest.raises(ValueError):
         _ = mfest.data_file_attributes('d')
+
+
+def test_file_attribute_errors():
+    """
+    Test that Manifest raises the correct error if you try to get file
+    attributes before loading a manifest.json
+    """
+    mfest = Manifest("/my/cache/dir")
+    with pytest.raises(RuntimeError) as context:
+        _ = mfest.metadata_file_attributes('some_file.txt')
+    assert 'cannot retrieve metadata_file_attributes' in context.value.args[0]
+    with pytest.raises(RuntimeError) as context:
+        _ = mfest.data_file_attributes('other_file.txt')
+    assert 'cannot retrieve data_file_attributes' in context.value.args[0]

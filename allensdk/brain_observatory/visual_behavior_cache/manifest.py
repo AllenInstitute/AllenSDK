@@ -113,7 +113,18 @@ class Manifest(object):
         Return
         ------
         CacheFileAttributes
+
+        Raises
+        ------
+        RuntimeError
+            If you try to run this method when self._data is None (meaning
+            you haven't yet loaded a manifest.json)
         """
+        if self._data is None:
+            raise RuntimeError("You cannot retrieve "
+                               "metadata_file_attributes;\n"
+                               "you have not yet loaded a manifest.json file")
+
         if metadata_file_name not in self._metadata_file_names:
             raise ValueError(f"{metadata_file_name}\n"
                              "is not in self.metadata_file_names:\n"
@@ -137,7 +148,17 @@ class Manifest(object):
         Return
         ------
         CacheFileAttributes
+
+        Raises
+        ------
+        RuntimeError
+            If you try to run this method when self._data is None (meaning
+            you haven't yet loaded a manifest.json file)
         """
+        if self._data is None:
+            raise RuntimeError("You cannot retrieve data_file_attributes;\n"
+                               "you have not yet loaded a manifest.json file")
+
         if file_id not in self._data['data_files']:
             valid_keys = list(self._data['data_files'].keys())
             valid_keys.sort()
