@@ -11,6 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.behavior_project
 @pytest.fixture
 def session_table():
     return (pd.DataFrame({"behavior_session_id": [3],
+                          "foraging_id": [1],
                           "ophys_experiment_id": [[5, 6]],
                           "date_of_acquisition": np.datetime64('2020-02-20'),
                           "reporter_line": ["aa"],
@@ -29,6 +30,7 @@ def session_table():
 @pytest.fixture
 def behavior_table():
     return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
+                          "foraging_id": [1, 2, 3],
                           "date_of_acquisition": [
                               np.datetime64('2020-02-20'),
                               np.datetime64('2020-02-21'),
@@ -48,7 +50,10 @@ def behavior_table():
                           'mouse_id': [1, 1, 1],
                           'prior_exposures_to_session_type': [0, 1, 0],
                           'prior_exposures_to_image_set': [
-                              np.nan, np.nan, 0]
+                              np.nan, np.nan, 0],
+                          'prior_exposures_to_omissions': [
+                              np.nan, np.nan, 0
+                          ]
                           })
             .set_index("behavior_session_id"))
 
@@ -57,6 +62,7 @@ def behavior_table():
 def experiments_table():
     return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
                           "behavior_session_id": [1, 2, 3],
+                          "foraging_id": [1, 2, 3],
                           "ophys_experiment_id": [1, 2, 3],
                           "date_of_acquisition": [
                               np.datetime64('2020-02-20'),
@@ -101,6 +107,9 @@ def mock_api(session_table, behavior_table, experiments_table):
 
         def get_behavior_only_session_data(self, behavior_session_id):
             return behavior_session_id
+
+        def get_behavior_stage_parameters(self, foraging_ids):
+            return {x: {} for x in foraging_ids}
     return MockApi
 
 
@@ -125,6 +134,7 @@ def test_get_session_table(TempdirBehaviorCache, session_table):
     # These get merged in
     session_table['prior_exposures_to_session_type'] = [0]
     session_table['prior_exposures_to_image_set'] = [0.0]
+    session_table['prior_exposures_to_omissions'] = [0.0]
 
     pd.testing.assert_frame_equal(session_table, obtained)
 
@@ -150,6 +160,7 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     # These get merged in
     experiments_table['prior_exposures_to_session_type'] = [0, 1, 0]
     experiments_table['prior_exposures_to_image_set'] = [np.nan, np.nan, 0]
+    experiments_table['prior_exposures_to_omissions'] = [np.nan, np.nan, 0]
 
     pd.testing.assert_frame_equal(experiments_table, obtained)
 

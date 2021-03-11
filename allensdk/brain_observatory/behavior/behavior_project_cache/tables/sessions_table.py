@@ -5,11 +5,15 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .project_table import \
     ProjectTable
+from allensdk.brain_observatory.behavior.project_apis.data_io import \
+    BehaviorProjectLimsApi
 
 
 class SessionsTable(ProjectTable):
     def __init__(self, df: pd.DataFrame,
+                 fetch_api: BehaviorProjectLimsApi,
                  suppress: Optional[List[str]] = None):
+        self._fetch_api = fetch_api
         super().__init__(df=df, suppress=suppress, all_sessions=True)
 
     def postprocess_additional(self):
@@ -17,13 +21,16 @@ class SessionsTable(ProjectTable):
             self.__get_prior_exposures_to_session_type()
         self._df['prior_exposures_to_image_set'] = \
             self.__get_prior_exposures_to_image_set()
+        self._df['prior_exposures_to_omissions'] = \
+            self.__get_prior_exposures_to_omissions()
 
     @property
     def prior_exposures(self) -> pd.DataFrame:
         """Returns all the prior exposure values,
         with index of behavior_session_id"""
-        return self._df[['prior_exposures_to_session_type',
-                         'prior_exposures_to_image_set']]
+        return self._df[
+            [c for c in self._df if c.startswith('prior_exposures_to')]
+        ]
 
     def __get_prior_exposure_count(self, to: pd.Series) -> pd.Series:
         """Returns prior exposures a subject had to something
@@ -81,3 +88,59 @@ class SessionsTable(ProjectTable):
             self._df['session_type'].notnull()]
         image_set = session_type.apply(__get_image_set_name)
         return self.__get_prior_exposure_count(to=image_set)
+
+    def __get_prior_exposures_to_omissions(self):
+        df = self._df[self._df['session_type'].notnull()]
+
+        contains_omissions = pd.Series(False, index=df.index)
+
+        def __get_habituation_sessions(df: pd.DataFrame):
+            """Returns all habituation sessions"""
+            return df[
+                df['session_type'].str.lower().str.contains('habituation')]
+
+        def __get_habituation_sessions_contain_omissions(
+                habituation_sessions: pd.DataFrame) -> pd.Series:
+            """Habituation sessions are not supposed to include omissions but
+            because of a mistake omissions were included for some habituation
+            sessions.
+
+            This queries mtrain to figure out if omissions were included
+            for any of the habituation sessions
+
+            Parameters
+            ----------
+            habituation_sessions
+                the habituation sessions
+
+            Returns
+            ---------
+            series where index is same as habituation sessions and values
+                indicate whether omissions were included
+            """
+            def __session_contains_omissions(
+                    mtrain_stage_parameters: dict) -> bool:
+                return 'flash_omit_probability' in mtrain_stage_parameters \
+                       and \
+                       mtrain_stage_parameters['flash_omit_probability'] > 0
+            foraging_ids = habituation_sessions['foraging_id'].tolist()
+            foraging_ids = [f'\'{x}\'' for x in foraging_ids]
+            mtrain_stage_parameters = self._fetch_api.\
+                get_behavior_stage_parameters(foraging_ids=foraging_ids)
+            return habituation_sessions.apply(
+                lambda session: __session_contains_omissions(
+                    mtrain_stage_parameters=mtrain_stage_parameters.loc[
+                        session['foraging_id']]), axis=1)
+
+        habituation_sessions = __get_habituation_sessions(df=df)
+        if not habituation_sessions.empty:
+            contains_omissions.loc[habituation_sessions.index] = \
+                __get_habituation_sessions_contain_omissions(
+                    habituation_sessions=habituation_sessions)
+
+        contains_omissions.loc[
+            (df['session_type'].str.lower().str.contains('ophys')) &
+            (~df.index.isin(habituation_sessions.index))
+        ] = True
+        contains_omissions = contains_omissions[contains_omissions]
+        return self.__get_prior_exposure_count(to=contains_omissions)

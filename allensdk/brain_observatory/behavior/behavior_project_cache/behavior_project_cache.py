@@ -254,7 +254,8 @@ class BehaviorProjectCache(Cache):
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
-        sessions = SessionsTable(df=sessions, suppress=suppress)
+        sessions = SessionsTable(df=sessions, suppress=suppress,
+                                 fetch_api=self.fetch_api)
         if as_df:
             return sessions.table
         else:
