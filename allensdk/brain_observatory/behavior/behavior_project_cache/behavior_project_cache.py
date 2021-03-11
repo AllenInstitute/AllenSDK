@@ -5,17 +5,17 @@ import pandas as pd
 import logging
 
 from allensdk.api.cache import Cache
-from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.sessions_table import \
-    SessionsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.experiments_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .experiments_table import \
     ExperimentsTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .sessions_table import \
+    SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
-from allensdk.brain_observatory.behavior.behavior_project_cache\
-    .postprocessing.tables.ophys_sessions_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .ophys_sessions_table import \
     OphysSessionsTable
 from allensdk.core.authentication import DbCredentials
 
@@ -185,13 +185,16 @@ class BehaviorProjectCache(Cache):
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_session_table,
-                _write_json, _read_json)
-            sessions.set_index("ophys_session_id")
+                _write_json,
+                lambda path: _read_json(path, index_name='ophys_session_id'))
         else:
             sessions = self.fetch_api.get_session_table()
+        sessions_table = self.get_behavior_session_table(suppress=suppress,
+                                                         as_df=False)
         sessions = OphysSessionsTable(df=sessions,
                                       suppress=suppress,
-                                      by=by)
+                                      by=by,
+                                      sessions_table=sessions_table)
         return sessions.table
 
     def add_manifest_paths(self, manifest_builder):
@@ -215,21 +218,27 @@ class BehaviorProjectCache(Cache):
             experiments = one_file_call_caching(
                 path,
                 self.fetch_api.get_experiment_table,
-                _write_json, _read_json)
-            experiments.set_index("ophys_experiment_id")
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='ophys_experiment_id'))
         else:
             experiments = self.fetch_api.get_experiment_table()
+        sessions_table = self.get_behavior_session_table(suppress=suppress,
+                                                         as_df=False)
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress)
+                                       suppress=suppress,
+                                       sessions_table=sessions_table)
         return experiments.table
 
     def get_behavior_session_table(
             self,
-            suppress: Optional[List[str]] = None) -> pd.DataFrame:
+            suppress: Optional[List[str]] = None,
+            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
+        :param as_df: whether to return as df or as SessionsTable
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -239,13 +248,17 @@ class BehaviorProjectCache(Cache):
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_behavior_only_session_table,
-                _write_json, _read_json)
-            sessions.set_index("behavior_session_id")
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='behavior_session_id'))
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         sessions = SessionsTable(df=sessions, suppress=suppress)
-        return sessions.table
+        if as_df:
+            return sessions.table
+        else:
+            return sessions
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
         """
@@ -302,12 +315,14 @@ def _write_json(path, df):
     them back to the expected format by adding them to `convert_dates`.
     In the future we could schematize this data using marshmallow
     or something similar."""
-    df.reset_index(inplace=True)
+    # df.reset_index(inplace=True)
     df.to_json(path, orient="split", date_unit="s", date_format="epoch")
 
 
-def _read_json(path):
+def _read_json(path, index_name: Optional[str] = None):
     """Reads a dataframe file written to the cache by _write_json."""
     df = pd.read_json(path, date_unit="s", orient="split",
                       convert_dates=["date_of_acquisition"])
+    if index_name:
+        df = df.rename_axis(index=index_name)
     return df
