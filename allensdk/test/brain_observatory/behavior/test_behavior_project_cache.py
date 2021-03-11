@@ -164,23 +164,28 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
 
     pd.testing.assert_frame_equal(experiments_table, obtained)
 
-# Failing TODO need to support?
-# @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
-# def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
-#                                         caplog):
-#     caplog.set_level(logging.INFO, logger="call_caching")
-#     cache = TempdirBehaviorCache
-#     cache.get_session_table()
-#     expected_first = [
-#         ("call_caching", logging.INFO, "Reading data from cache"),
-#         ("call_caching", logging.INFO, "No cache file found."),
-#         ("call_caching", logging.INFO, "Fetching data from remote"),
-#         ("call_caching", logging.INFO, "Writing data to cache"),
-#         ("call_caching", logging.INFO, "Reading data from cache")]
-#     assert expected_first == caplog.record_tuples
-#     caplog.clear()
-#     cache.get_session_table()
-#     assert [expected_first[0]] == caplog.record_tuples
+
+@pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
+def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
+                                        caplog):
+    caplog.set_level(logging.INFO, logger="call_caching")
+    cache = TempdirBehaviorCache
+    cache.get_session_table()
+    expected_first = [
+        ('call_caching', 20, 'Reading data from cache'),
+        ('call_caching', 20, 'No cache file found.'),
+        ('call_caching', 20, 'Fetching data from remote'),
+        ('call_caching', 20, 'Writing data to cache'),
+        ('call_caching', 20, 'Reading data from cache'),
+        ('call_caching', 20, 'Reading data from cache'),
+        ('call_caching', 20, 'No cache file found.'),
+        ('call_caching', 20, 'Fetching data from remote'),
+        ('call_caching', 20, 'Writing data to cache'),
+        ('call_caching', 20, 'Reading data from cache')]
+    assert expected_first == caplog.record_tuples
+    caplog.clear()
+    cache.get_session_table()
+    assert [expected_first[0], expected_first[-1]] == caplog.record_tuples
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
@@ -200,12 +205,12 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
     cache.get_behavior_session_table()
     assert [expected_first[0]] == caplog.record_tuples
 
-# Failing TODO need to support?
-# @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-# def test_get_session_table_by_experiment(TempdirBehaviorCache):
-#     expected = (pd.DataFrame({"ophys_session_id": [1, 2, 2, 3],
-#                               "ophys_experiment_id": [4, 5, 6, 7]})
-#                 .set_index("ophys_experiment_id"))
-#     actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
-#         ["ophys_session_id"]]
-#     pd.testing.assert_frame_equal(expected, actual)
+
+@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
+def test_get_session_table_by_experiment(TempdirBehaviorCache):
+    expected = (pd.DataFrame({"ophys_session_id": [1, 1],
+                              "ophys_experiment_id": [5, 6]})
+                .set_index("ophys_experiment_id"))
+    actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
+        ["ophys_session_id"]]
+    pd.testing.assert_frame_equal(expected, actual)
