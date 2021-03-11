@@ -6,8 +6,8 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
-from allensdk.brain_observatory.visual_behavior_cache.cloud_cache import CloudCache  # noqa: E501
-from allensdk.brain_observatory.visual_behavior_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.api.cloud_cache.cloud_cache import CloudCache  # noqa: E501
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 @mock_s3

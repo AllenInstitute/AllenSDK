@@ -2,7 +2,7 @@ import pytest
 import pathlib
 import hashlib
 import numpy as np
-import allensdk.brain_observatory.visual_behavior_cache.utils as utils
+import allensdk.api.cloud_cache.utils as utils
 
 
 def test_bucket_name_from_uri():

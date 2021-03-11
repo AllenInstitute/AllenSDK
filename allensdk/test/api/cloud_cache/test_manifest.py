@@ -2,8 +2,8 @@ import pytest
 import json
 import io
 import pathlib
-from allensdk.brain_observatory.visual_behavior_cache.manifest import Manifest
-from allensdk.brain_observatory.visual_behavior_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.api.cloud_cache.manifest import Manifest
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 def test_constructor():

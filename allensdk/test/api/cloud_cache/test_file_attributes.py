@@ -1,6 +1,6 @@
 import pytest
 import pathlib
-from allensdk.brain_observatory.visual_behavior_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 def test_cache_file_attributes():

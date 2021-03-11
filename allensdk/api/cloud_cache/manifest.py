@@ -2,8 +2,8 @@ import json
 import pathlib
 import copy
 from typing import Union
-from allensdk.brain_observatory.visual_behavior_cache.utils import relative_path_from_uri  # noqa: E501
-from allensdk.brain_observatory.visual_behavior_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.api.cloud_cache.utils import relative_path_from_uri  # noqa: E501
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 class Manifest(object):
