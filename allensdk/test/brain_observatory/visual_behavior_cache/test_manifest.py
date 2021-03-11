@@ -91,7 +91,7 @@ def test_create_file_attributes():
     assert isinstance(attr, CacheFileAttributes)
     assert attr.uri == 'http://my.url.com/path/to/file.txt'
     assert attr.version_id == '12345'
-    assert attr.md5_checksum == 'aaabbbcccddd'
+    assert attr.file_hash == 'aaabbbcccddd'
     expected_path = '/my/cache/dir/aaabbbcccddd/path/to/file.txt'
     assert attr.local_path == pathlib.Path(expected_path)
 
@@ -107,10 +107,10 @@ def test_metadata_file_attributes():
     metadata_files = {}
     metadata_files['a.txt'] = {'uri': 'http://my.url.com/path/to/a.txt',
                                's3_version': '12345',
-                               'md5_hash': 'abcde'}
+                               'file_hash': 'abcde'}
     metadata_files['b.txt'] = {'uri': 'http://my.other.url.com/different/path/to/b.txt',  # noqa: E501
                                's3_version': '67890',
-                               'md5_hash': 'fghijk'}
+                               'file_hash': 'fghijk'}
 
     manifest['metadata_files'] = metadata_files
     manifest['dataset_version'] = '000'
@@ -125,14 +125,14 @@ def test_metadata_file_attributes():
     a_obj = mfest.metadata_file_attributes('a.txt')
     assert a_obj.uri == 'http://my.url.com/path/to/a.txt'
     assert a_obj.version_id == '12345'
-    assert a_obj.md5_checksum == 'abcde'
+    assert a_obj.file_hash == 'abcde'
     expected = pathlib.Path('/my/cache/dir/abcde/path/to/a.txt')
     assert a_obj.local_path == expected
 
     b_obj = mfest.metadata_file_attributes('b.txt')
     assert b_obj.uri == 'http://my.other.url.com/different/path/to/b.txt'
     assert b_obj.version_id == '67890'
-    assert b_obj.md5_checksum == 'fghijk'
+    assert b_obj.file_hash == 'fghijk'
     expected = pathlib.Path('/my/cache/dir/fghijk/different/path/to/b.txt')
     assert b_obj.local_path == expected
 
@@ -157,10 +157,10 @@ def test_data_file_attributes():
     data_files = {}
     data_files['a'] = {'uri': 'http://my.url.com/path/to/a.nwb',
                        's3_version': '12345',
-                       'md5_hash': 'abcde'}
+                       'file_hash': 'abcde'}
     data_files['b'] = {'uri': 'http://my.other.url.com/different/path/b.nwb',
                        's3_version': '67890',
-                       'md5_hash': 'fghijk'}
+                       'file_hash': 'fghijk'}
     manifest['data_files'] = data_files
 
     stream = io.StringIO()
@@ -173,14 +173,14 @@ def test_data_file_attributes():
     a_obj = mfest.data_file_attributes('a')
     assert a_obj.uri == 'http://my.url.com/path/to/a.nwb'
     assert a_obj.version_id == '12345'
-    assert a_obj.md5_checksum == 'abcde'
+    assert a_obj.file_hash == 'abcde'
     expected = '/my/cache/dir/abcde/path/to/a.nwb'
     assert a_obj.local_path == pathlib.Path(expected)
 
     b_obj = mfest.data_file_attributes('b')
     assert b_obj.uri == 'http://my.other.url.com/different/path/b.nwb'
     assert b_obj.version_id == '67890'
-    assert b_obj.md5_checksum == 'fghijk'
+    assert b_obj.file_hash == 'fghijk'
     expected = '/my/cache/dir/fghijk/different/path/b.nwb'
     assert b_obj.local_path == pathlib.Path(expected)
 
@@ -203,18 +203,18 @@ def test_loading_two_manifests():
     metadata_1 = {}
     metadata_1['metadata_a.csv'] = {'uri': 'http://aaa.com/path/to/a.csv',
                                     's3_version': '12345',
-                                    'md5_hash': 'abcde'}
+                                    'file_hash': 'abcde'}
     metadata_1['metadata_b.csv'] = {'uri': 'http://bbb.com/other/path/b.csv',
                                     's3_version': '67890',
-                                    'md5_hash': 'fghijk'}
+                                    'file_hash': 'fghijk'}
     manifest_1['metadata_files'] = metadata_1
     data_1 = {}
     data_1['c'] = {'uri': 'http://ccc.com/third/path/c.csv',
                    's3_version': '11121',
-                   'md5_hash': 'lmnopq'}
+                   'file_hash': 'lmnopq'}
     data_1['d'] = {'uri': 'http://ddd.com/fourth/path/d.csv',
                    's3_version': '31415',
-                   'md5_hash': 'rstuvw'}
+                   'file_hash': 'rstuvw'}
 
     manifest_1['data_files'] = data_1
     manifest_1['dataset_version'] = '1'
@@ -227,18 +227,18 @@ def test_loading_two_manifests():
     metadata_2 = {}
     metadata_2['metadata_a.csv'] = {'uri': 'http://aaa.com/path/to/a.csv',
                                     's3_version': '161718',
-                                    'md5_hash': 'xyzab'}
+                                    'file_hash': 'xyzab'}
     metadata_2['metadata_f.csv'] = {'uri': 'http://fff.com/fifth/path/f.csv',
                                     's3_version': '192021',
-                                    'md5_hash': 'cdefghi'}
+                                    'file_hash': 'cdefghi'}
     manifest_2['metadata_files'] = metadata_2
     data_2 = {}
     data_2['c'] = {'uri': 'http://ccc.com/third/path/c.csv',
                    's3_version': '222324',
-                   'md5_hash': 'jklmnop'}
+                   'file_hash': 'jklmnop'}
     data_2['g'] = {'uri': 'http://ggg.com/sixth/path/g.csv',
                    's3_version': '25262728',
-                   'md5_hash': 'qrstuvwxy'}
+                   'file_hash': 'qrstuvwxy'}
 
     manifest_2['data_files'] = data_2
     manifest_2['dataset_version'] = '2'
@@ -258,28 +258,28 @@ def test_loading_two_manifests():
     m_obj = mfest.metadata_file_attributes('metadata_a.csv')
     assert m_obj.uri == 'http://aaa.com/path/to/a.csv'
     assert m_obj.version_id == '12345'
-    assert m_obj.md5_checksum == 'abcde'
+    assert m_obj.file_hash == 'abcde'
     expected = '/my/cache/dir/abcde/path/to/a.csv'
     assert m_obj.local_path == pathlib.Path(expected)
 
     m_obj = mfest.metadata_file_attributes('metadata_b.csv')
     assert m_obj.uri == 'http://bbb.com/other/path/b.csv'
     assert m_obj.version_id == '67890'
-    assert m_obj.md5_checksum == 'fghijk'
+    assert m_obj.file_hash == 'fghijk'
     expected = '/my/cache/dir/fghijk/other/path/b.csv'
     assert m_obj.local_path == pathlib.Path(expected)
 
     d_obj = mfest.data_file_attributes('c')
     assert d_obj.uri == 'http://ccc.com/third/path/c.csv'
     assert d_obj.version_id == '11121'
-    assert d_obj.md5_checksum == 'lmnopq'
+    assert d_obj.file_hash == 'lmnopq'
     expected = '/my/cache/dir/lmnopq/third/path/c.csv'
     assert d_obj.local_path == pathlib.Path(expected)
 
     d_obj = mfest.data_file_attributes('d')
     assert d_obj.uri == 'http://ddd.com/fourth/path/d.csv'
     assert d_obj.version_id == '31415'
-    assert d_obj.md5_checksum == 'rstuvw'
+    assert d_obj.file_hash == 'rstuvw'
     expected = '/my/cache/dir/rstuvw/fourth/path/d.csv'
     assert d_obj.local_path == pathlib.Path(expected)
 
@@ -293,14 +293,14 @@ def test_loading_two_manifests():
     m_obj = mfest.metadata_file_attributes('metadata_a.csv')
     assert m_obj.uri == 'http://aaa.com/path/to/a.csv'
     assert m_obj.version_id == '161718'
-    assert m_obj.md5_checksum == 'xyzab'
+    assert m_obj.file_hash == 'xyzab'
     expected = '/my/cache/dir/xyzab/path/to/a.csv'
     assert m_obj.local_path == pathlib.Path(expected)
 
     m_obj = mfest.metadata_file_attributes('metadata_f.csv')
     assert m_obj.uri == 'http://fff.com/fifth/path/f.csv'
     assert m_obj.version_id == '192021'
-    assert m_obj.md5_checksum == 'cdefghi'
+    assert m_obj.file_hash == 'cdefghi'
     expected = '/my/cache/dir/cdefghi/fifth/path/f.csv'
     assert m_obj.local_path == pathlib.Path(expected)
 
@@ -310,14 +310,14 @@ def test_loading_two_manifests():
     d_obj = mfest.data_file_attributes('c')
     assert d_obj.uri == 'http://ccc.com/third/path/c.csv'
     assert d_obj.version_id == '222324'
-    assert d_obj.md5_checksum == 'jklmnop'
+    assert d_obj.file_hash == 'jklmnop'
     expected = '/my/cache/dir/jklmnop/third/path/c.csv'
     assert d_obj.local_path == pathlib.Path(expected)
 
     d_obj = mfest.data_file_attributes('g')
     assert d_obj.uri == 'http://ggg.com/sixth/path/g.csv'
     assert d_obj.version_id == '25262728'
-    assert d_obj.md5_checksum == 'qrstuvwxy'
+    assert d_obj.file_hash == 'qrstuvwxy'
     expected = '/my/cache/dir/qrstuvwxy/sixth/path/g.csv'
     assert d_obj.local_path == pathlib.Path(expected)
 

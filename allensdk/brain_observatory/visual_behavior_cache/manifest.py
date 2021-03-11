@@ -71,7 +71,7 @@ class Manifest(object):
     def _create_file_attributes(self,
                                 remote_path: str,
                                 version_id: str,
-                                md5_checksum: str) -> CacheFileAttributes:
+                                file_hash: str) -> CacheFileAttributes:
         """
         Create the cache_file_attributes describing a file
 
@@ -81,21 +81,21 @@ class Manifest(object):
             The full URL to a file
         version_id: str
             The string specifying the version of the file
-        md5_checksum: str
-            The (hexadecimal) md5 hash of the file
+        file_hash: str
+            The (hexadecimal) file hash of the file
 
         Returns
         -------
         CacheFileAttributes
         """
 
-        local_dir = self._cache_dir / md5_checksum
+        local_dir = self._cache_dir / file_hash
         relative_path = relative_path_from_uri(remote_path)
         local_path = local_dir / relative_path
 
         obj = CacheFileAttributes(remote_path,
                                   version_id,
-                                  md5_checksum,
+                                  file_hash,
                                   local_path)
 
         return obj
@@ -122,7 +122,7 @@ class Manifest(object):
         file_data = self._data['metadata_files'][metadata_file_name]
         return self._create_file_attributes(file_data['uri'],
                                             file_data['s3_version'],
-                                            file_data['md5_hash'])
+                                            file_data['file_hash'])
 
     def data_file_attributes(self, file_id) -> CacheFileAttributes:
         """
@@ -148,4 +148,4 @@ class Manifest(object):
         file_data = self._data['data_files'][file_id]
         return self._create_file_attributes(file_data['uri'],
                                             file_data['s3_version'],
-                                            file_data['md5_hash'])
+                                            file_data['file_hash'])

@@ -46,9 +46,9 @@ def relative_path_from_uri(uri: str) -> pathlib.Path:
     return pathlib.Path(url_params.path[1:])
 
 
-def md5_hash_from_path(file_path: str) -> str:
+def file_hash_from_path(file_path: str) -> str:
     """
-    Return the hexadecimal md5 checksum for a file
+    Return the hexadecimal file hash for a file
 
     Parameters
     ----------
@@ -58,12 +58,12 @@ def md5_hash_from_path(file_path: str) -> str:
     Returns
     -------
     str:
-        The md5 checksum (hexadecimal) of the file
+        The file hash (Blake2b; hexadecimal) of the file
     """
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(file_path, 'rb') as in_file:
         chunk = in_file.read(1000000)
         while len(chunk) > 0:
-            md5sum.update(chunk)
+            hasher.update(chunk)
             chunk = in_file.read(1000000)
-    return md5sum.hexdigest()
+    return hasher.hexdigest()

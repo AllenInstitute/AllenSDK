@@ -14,8 +14,8 @@ class CacheFileAttributes(object):
     version_id: str
         A string specifying the version of the file (probably calculated
         by S3)
-    md5_checksum: str
-        The (hexadecimal) md5 checksum of the file
+    file_hash: str
+        The (hexadecimal) file hash of the file
     local_path: pathlib.Path
         The path to the location where the file's local copy should be stored
         (probably computed by the Manifest class)
@@ -24,23 +24,23 @@ class CacheFileAttributes(object):
     def __init__(self,
                  uri: str,
                  version_id: str,
-                 md5_checksum: str,
+                 file_hash: str,
                  local_path: str):
 
         if not isinstance(uri, str):
             raise ValueError(f"uri must be str; got {type(uri)}")
         if not isinstance(version_id, str):
             raise ValueError(f"version_id must be str; got {type(version_id)}")
-        if not isinstance(md5_checksum, str):
-            raise ValueError(f"md5_checksum must be str; "
-                             f"got {type(md5_checksum)}")
+        if not isinstance(file_hash, str):
+            raise ValueError(f"file_hash must be str; "
+                             f"got {type(file_hash)}")
         if not isinstance(local_path, pathlib.Path):
             raise ValueError(f"local_path must be pathlib.Path; "
                              f"got {type(local_path)}")
 
         self._uri = uri
         self._version_id = version_id
-        self._md5_checksum = md5_checksum
+        self._file_hash = file_hash
         self._local_path = local_path
 
     @property
@@ -52,8 +52,8 @@ class CacheFileAttributes(object):
         return self._version_id
 
     @property
-    def md5_checksum(self) -> str:
-        return self._md5_checksum
+    def file_hash(self) -> str:
+        return self._file_hash
 
     @property
     def local_path(self) -> pathlib.Path:
@@ -63,7 +63,7 @@ class CacheFileAttributes(object):
         output = "CacheFileAttributes{\n"
         output += f"    uri: {self.uri}\n"
         output += f"    version_id: {self.version_id}\n"
-        output += f"    md5_checkusm: {self.md5_checksum}\n"
+        output += f"    file_hash: {self.file_hash}\n"
         output += f"    local_path: {self.local_path}\n"
         output += "}\n"
         return output

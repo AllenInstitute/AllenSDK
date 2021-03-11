@@ -86,18 +86,18 @@ def test_loading_manifest():
     manifest_1 = {'dataset_version': '1',
                   'metadata_files': {'a.csv': {'uri': 'http://www.junk.com',
                                                's3_version': '1111',
-                                               'md5_hash': 'abcde'},
+                                               'file_hash': 'abcde'},
                                      'b.csv': {'uri': 'http://silly.com',
                                                's3_version': '2222',
-                                               'md5_hash': 'fghijk'}}}
+                                               'file_hash': 'fghijk'}}}
 
     manifest_2 = {'dataset_version': '2',
                   'metadata_files': {'c.csv': {'uri': 'http://www.absurd.com',
                                                's3_version': '3333',
-                                               'md5_hash': 'lmnop'},
+                                               'file_hash': 'lmnop'},
                                      'd.csv': {'uri': 'http://nonsense.com',
                                                's3_version': '4444',
-                                               'md5_hash': 'qrstuv'}}}
+                                               'file_hash': 'qrstuv'}}}
 
     client.put_object(Bucket=test_bucket_name,
                       Key='manifests/manifest_1.csv',
@@ -132,9 +132,9 @@ def test_file_exists(tmpdir):
     """
 
     data = b'aakderasjklsafetss77123523asf'
-    md5sum = hashlib.md5()
-    md5sum.update(data)
-    true_checksum = md5sum.hexdigest()
+    hasher = hashlib.blake2b()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
     test_file_path = pathlib.Path(tmpdir)/'junk.txt'
     with open(test_file_path, 'wb') as out_file:
         out_file.write(data)
@@ -189,10 +189,10 @@ def test_download_file(tmpdir):
     Test that CloudCache._download_file behaves as expected
     """
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data = b'11235813kjlssergwesvsdd'
-    md5sum.update(data)
-    true_checksum = md5sum.hexdigest()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
 
     test_bucket_name = 'bucket_for_download'
     conn = boto3.resource('s3', region_name='us-east-1')
@@ -228,10 +228,10 @@ def test_download_file(tmpdir):
     assert not expected_path.exists()
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum
 
 
 @mock_s3
@@ -245,15 +245,15 @@ def test_download_file_multiple_versions(tmpdir):
     way we think it does)
     """
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data_1 = b'11235813kjlssergwesvsdd'
-    md5sum.update(data_1)
-    true_checksum_1 = md5sum.hexdigest()
+    hasher.update(data_1)
+    true_checksum_1 = hasher.hexdigest()
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data_2 = b'zzzzxxxxyyyywwwwjjjj'
-    md5sum.update(data_2)
-    true_checksum_2 = md5sum.hexdigest()
+    hasher.update(data_2)
+    true_checksum_2 = hasher.hexdigest()
 
     assert true_checksum_2 != true_checksum_1
 
@@ -306,10 +306,10 @@ def test_download_file_multiple_versions(tmpdir):
     assert not expected_path.exists()
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum_1
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum_1
 
     # download second version of file
     expected_path = cache_dir / true_checksum_2 / 'data/data_file.txt'
@@ -322,10 +322,10 @@ def test_download_file_multiple_versions(tmpdir):
     assert not expected_path.exists()
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum_2
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum_2
 
 
 @mock_s3
@@ -335,10 +335,10 @@ def test_re_download_file(tmpdir):
     when it has been altered locally
     """
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data = b'11235813kjlssergwesvsdd'
-    md5sum.update(data)
-    true_checksum = md5sum.hexdigest()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
 
     test_bucket_name = 'bucket_for_re_download'
     conn = boto3.resource('s3', region_name='us-east-1')
@@ -374,10 +374,10 @@ def test_re_download_file(tmpdir):
     assert not expected_path.exists()
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum
 
     # now, remove the file, and see if it gets re-downloaded
     expected_path.unlink()
@@ -385,25 +385,25 @@ def test_re_download_file(tmpdir):
 
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum
 
     # now, alter the file, and see if it gets re-downloaded
     with open(expected_path, 'wb') as out_file:
         out_file.write(b'778899')
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() != true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() != true_checksum
 
     assert cache._download_file(good_attributes)
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum
 
 
 @mock_s3
@@ -412,10 +412,10 @@ def test_data_path(tmpdir):
     Test that CloudCache.data_path() correctly downloads files from S3
     """
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data = b'11235813kjlssergwesvsdd'
-    md5sum.update(data)
-    true_checksum = md5sum.hexdigest()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
 
     test_bucket_name = 'bucket_for_data_path'
     conn = boto3.resource('s3', region_name='us-east-1')
@@ -440,7 +440,7 @@ def test_data_path(tmpdir):
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
     data_file = {'uri': uri,
                  's3_version': version_id,
-                 'md5_hash': true_checksum}
+                 'file_hash': true_checksum}
 
     manifest['data_files'] = {'only_data_file': data_file}
 
@@ -462,10 +462,10 @@ def test_data_path(tmpdir):
     result_path = cache.data_path('only_data_file')
     assert result_path == expected_path
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum
 
 
 @mock_s3
@@ -474,10 +474,10 @@ def test_metadata_path(tmpdir):
     Test that CloudCache.metadata_path() correctly downloads files from S3
     """
 
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     data = b'11235813kjlssergwesvsdd'
-    md5sum.update(data)
-    true_checksum = md5sum.hexdigest()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
 
     test_bucket_name = 'bucket_for_metadata_path'
     conn = boto3.resource('s3', region_name='us-east-1')
@@ -501,7 +501,7 @@ def test_metadata_path(tmpdir):
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'uri': uri,
                      's3_version': version_id,
-                     'md5_hash': true_checksum}
+                     'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
 
@@ -523,7 +523,7 @@ def test_metadata_path(tmpdir):
     result_path = cache.metadata_path('metadata_file.csv')
     assert result_path == expected_path
     assert expected_path.exists()
-    md5sum = hashlib.md5()
+    hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
-        md5sum.update(in_file.read())
-    assert md5sum.hexdigest() == true_checksum
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_checksum

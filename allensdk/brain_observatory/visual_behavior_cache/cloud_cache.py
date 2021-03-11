@@ -9,7 +9,7 @@ from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.visual_behavior_cache.manifest import Manifest
 from allensdk.brain_observatory.visual_behavior_cache.file_attributes import CacheFileAttributes  # noqa: E501
-from allensdk.brain_observatory.visual_behavior_cache.utils import md5_hash_from_path  # noqa: E501
+from allensdk.brain_observatory.visual_behavior_cache.utils import file_hash_from_path  # noqa: E501
 from allensdk.brain_observatory.visual_behavior_cache.utils import bucket_name_from_uri  # noqa: E501
 from allensdk.brain_observatory.visual_behavior_cache.utils import relative_path_from_uri  # noqa: E501
 
@@ -110,7 +110,7 @@ class CloudCache(object):
         """
         Given a CacheFileAttributes describing a file, assess whether or
         not that file exists locally and is valid (i.e. has the expected
-        md5 checksum)
+        file hash)
 
         Parameters
         ----------
@@ -137,8 +137,8 @@ class CloudCache(object):
                                "unsure how to proceed")
 
         full_path = str(file_attributes.local_path.resolve())
-        test_checksum = md5_hash_from_path(full_path)
-        if test_checksum != file_attributes.md5_checksum:
+        test_checksum = file_hash_from_path(full_path)
+        if test_checksum != file_attributes.file_hash:
             return False
 
         return True
@@ -152,7 +152,7 @@ class CloudCache(object):
         If it is, download the file. If the download is successful,
         return True.
 
-        If the download fails (md5 checksum does not match expectation),
+        If the download fails (file hash does not match expectation),
         return False.
 
         Parameters
