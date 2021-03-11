@@ -86,6 +86,7 @@ def test_loading_manifest():
     client = boto3.client('s3', region_name='us-east-1')
 
     manifest_1 = {'dataset_version': '1',
+                  'file_id_column': 'file_id',
                   'metadata_files': {'a.csv': {'uri': 'http://www.junk.com',
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -94,6 +95,7 @@ def test_loading_manifest():
                                                'file_hash': 'fghijk'}}}
 
     manifest_2 = {'dataset_version': '2',
+                  'file_id_column': 'file_id',
                   'metadata_files': {'c.csv': {'uri': 'http://www.absurd.com',
                                                'version_id': '3333',
                                                'file_hash': 'lmnop'},
@@ -438,6 +440,7 @@ def test_data_path(tmpdir):
 
     manifest = {}
     manifest['dataset_version'] = '1'
+    manifest['file_id_column'] = 'file_id'
     manifest['metadata_files'] = {}
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
     data_file = {'uri': uri,
@@ -500,6 +503,7 @@ def test_metadata_path(tmpdir):
 
     manifest = {}
     manifest['dataset_version'] = '1'
+    manifest['file_id_column'] = 'file_id'
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'uri': uri,
                      'version_id': version_id,
@@ -570,6 +574,7 @@ def test_metadata(tmpdir):
 
     manifest = {}
     manifest['dataset_version'] = '1'
+    manifest['file_id_column'] = 'file_id'
     uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'uri': uri,
                      'version_id': version_id,

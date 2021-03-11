@@ -137,6 +137,7 @@ def test_full_cache_system(tmpdir):
 
     manifest_1 = {}
     manifest_1['dataset_version'] = 'A'
+    manifest_1['file_id_column'] = 'file_id'
     data_files_1 = {}
     for k in ('data1', 'data2', 'data3'):
         obj = {}
@@ -156,6 +157,7 @@ def test_full_cache_system(tmpdir):
 
     manifest_2 = {}
     manifest_2['dataset_version'] = 'B'
+    manifest_2['file_id_column'] = 'file_id'
     data_files_2 = {}
     for k in ('data1', 'data2'):
         obj = {}

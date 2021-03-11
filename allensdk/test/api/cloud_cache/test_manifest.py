@@ -28,6 +28,7 @@ def test_load(tmpdir):
 
     good_manifest = {}
     good_manifest['dataset_version'] = 'A'
+    good_manifest['file_id_column'] = 'file_id'
     metadata_files = {}
     metadata_files['z.txt'] = []
     metadata_files['x.txt'] = []
@@ -49,6 +50,7 @@ def test_load(tmpdir):
     # test that you can load a new manifest.json into the same Manifest
     good_manifest = {}
     good_manifest['dataset_version'] = 'B'
+    good_manifest['file_id_column'] = 'file_id'
     metadata_files = {}
     metadata_files['n.txt'] = []
     metadata_files['k.txt'] = []
@@ -114,6 +116,7 @@ def test_metadata_file_attributes():
 
     manifest['metadata_files'] = metadata_files
     manifest['dataset_version'] = '000'
+    manifest['file_id_column'] = 'file_id'
 
     stream = io.StringIO()
     stream.write(json.dumps(manifest))
@@ -154,6 +157,7 @@ def test_data_file_attributes():
     manifest = {}
     manifest['metadata_files'] = {}
     manifest['dataset_version'] = '0'
+    manifest['file_id_column'] = 'file_id'
     data_files = {}
     data_files['a'] = {'uri': 'http://my.url.com/path/to/a.nwb',
                        'version_id': '12345',
@@ -218,6 +222,7 @@ def test_loading_two_manifests():
 
     manifest_1['data_files'] = data_1
     manifest_1['dataset_version'] = '1'
+    manifest_1['file_id_column'] = 'file_id'
 
     stream_1 = io.StringIO()
     stream_1.write(json.dumps(manifest_1))
@@ -242,6 +247,7 @@ def test_loading_two_manifests():
 
     manifest_2['data_files'] = data_2
     manifest_2['dataset_version'] = '2'
+    manifest_2['file_id_column'] = 'file_id'
 
     stream_2 = io.StringIO()
     stream_2.write(json.dumps(manifest_2))

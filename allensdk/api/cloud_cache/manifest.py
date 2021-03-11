@@ -29,6 +29,7 @@ class Manifest(object):
 
         self._data = None
         self._version = None
+        self._file_id_column = None
         self._metadata_file_names = None
 
     @property
@@ -37,6 +38,14 @@ class Manifest(object):
         The version of the dataset currently loaded
         """
         return self._version
+
+    @property
+    def file_id_column(self):
+        """
+        The column in the metadata files used to uniquely
+        identify data files
+        """
+        return self._file_id_column
 
     @property
     def metadata_file_names(self):
@@ -62,6 +71,7 @@ class Manifest(object):
                              f"instead got {type(self._data)}")
 
         self._version = copy.deepcopy(self._data['dataset_version'])
+        self._file_id_column = copy.deepcopy(self._data['file_id_column'])
 
         self._metadata_file_names = []
         for file_name in self._data['metadata_files'].keys():

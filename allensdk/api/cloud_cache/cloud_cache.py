@@ -33,6 +33,14 @@ class CloudCache(object):
         self._manifest_file_names = self._list_all_manifests()
 
     @property
+    def file_id_column(self) -> str:
+        """
+        The column in the metadata files used to uniquely
+        identify data files
+        """
+        return self._manifest.file_id_column
+
+    @property
     def version(self) -> str:
         return self._manifest.version
 
