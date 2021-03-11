@@ -2,6 +2,8 @@ import pytest
 import json
 import hashlib
 import pathlib
+import pandas as pd
+import io
 import boto3
 from moto import mock_s3
 from allensdk.brain_observatory.visual_behavior_cache.cloud_cache import CloudCache  # noqa: E501
@@ -527,3 +529,64 @@ def test_metadata_path(tmpdir):
     with open(expected_path, 'rb') as in_file:
         hasher.update(in_file.read())
     assert hasher.hexdigest() == true_checksum
+
+
+@mock_s3
+def test_metadata(tmpdir):
+    """
+    Test that CloudCache.metadata() returns the expected pandas DataFrame
+    """
+    data = {}
+    data['mouse_id'] = [1, 4, 6, 8]
+    data['sex'] = ['F', 'F', 'M', 'M']
+    data['age'] = ['P50', 'P46', 'P23', 'P40']
+    true_df = pd.DataFrame(data)
+
+    stream = io.StringIO()
+    true_df.to_csv(stream, index=False)
+    stream.seek(0)
+    data = bytes(stream.read(), 'utf-8')
+
+    hasher = hashlib.blake2b()
+    hasher.update(data)
+    true_checksum = hasher.hexdigest()
+
+    test_bucket_name = 'bucket_for_metadata'
+    conn = boto3.resource('s3', region_name='us-east-1')
+    conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
+
+    # turn on bucket versioning
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#bucketversioning
+    bucket_versioning = conn.BucketVersioning(test_bucket_name)
+    bucket_versioning.enable()
+
+    client = boto3.client('s3', region_name='us-east-1')
+    client.put_object(Bucket=test_bucket_name,
+                      Key='metadata_file.csv',
+                      Body=data)
+
+    response = client.list_object_versions(Bucket=test_bucket_name)
+    version_id = response['Versions'][0]['VersionId']
+
+    manifest = {}
+    manifest['dataset_version'] = '1'
+    uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
+    metadata_file = {'uri': uri,
+                     's3_version': version_id,
+                     'file_hash': true_checksum}
+
+    manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
+
+    client.put_object(Bucket=test_bucket_name,
+                      Key='manifests/manifest_1.json',
+                      Body=bytes(json.dumps(manifest), 'utf-8'))
+
+    class MetadataCache(CloudCache):
+        _bucket_name = test_bucket_name
+
+    cache_dir = pathlib.Path(tmpdir) / "metadata/cache"
+    cache = MetadataCache(cache_dir)
+    cache.load_manifest('manifest_1.json')
+
+    metadata_df = cache.metadata('metadata_file.csv')
+    assert true_df.equals(metadata_df)
