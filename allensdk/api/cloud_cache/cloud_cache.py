@@ -89,7 +89,7 @@ class CloudCache(object):
 
             if 'Contents' in subset:
                 for obj in subset['Contents']:
-                    output.append(os.path.basename(obj['Key']))
+                    output.append(pathlib.Path(obj['Key']).name)
 
             if 'NextContinuationToken' in subset:
                 continuation_token = subset['NextContinuationToken']
@@ -147,9 +147,9 @@ class CloudCache(object):
             It would be unclear how the cache should proceed in this case.
         """
 
-        if not os.path.exists(file_attributes.local_path):
+        if not file_attributes.local_path.exists():
             return False
-        if not os.path.isfile(file_attributes.local_path):
+        if not file_attributes.local_path.is_file():
             raise RuntimeError(f"{file_attributes.local_path}\n"
                                "exists, but is not a file;\n"
                                "unsure how to proceed")
@@ -192,7 +192,10 @@ class CloudCache(object):
         """
 
         local_path = file_attributes.local_path
-        local_dir = safe_system_path(str(local_path.parents[0]))
+        local_dir = safe_system_path(local_path.parents[0])
+
+        # using os here rather than pathlib because safe_system_path
+        # returns a str
         if not os.path.exists(local_dir):
             os.makedirs(local_dir)
         if not os.path.isdir(local_dir):
