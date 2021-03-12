@@ -1,3 +1,4 @@
+from typing import Dict, List, Any
 import json
 import pathlib
 import copy
@@ -27,10 +28,10 @@ class Manifest(object):
                              "or a pathlib.Path; "
                              f"got {type(cache_dir)}")
 
-        self._data = None
-        self._version = None
-        self._file_id_column = None
-        self._metadata_file_names = None
+        self._data: Dict[str, Any] = None
+        self._version: str = None
+        self._file_id_column: str = None
+        self._metadata_file_names: List[str] = None
 
     @property
     def version(self):
