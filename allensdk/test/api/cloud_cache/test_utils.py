@@ -1,5 +1,4 @@
 import pytest
-import pathlib
 import hashlib
 import numpy as np
 import allensdk.api.cloud_cache.utils as utils

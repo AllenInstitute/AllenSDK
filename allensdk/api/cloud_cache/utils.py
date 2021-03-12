@@ -1,7 +1,6 @@
 from typing import Optional
 import warnings
 import urllib.parse as url_parse
-import pathlib
 import hashlib
 
 
