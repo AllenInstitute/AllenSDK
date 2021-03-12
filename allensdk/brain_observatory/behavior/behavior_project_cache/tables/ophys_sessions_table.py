@@ -13,10 +13,24 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
 
 
 class OphysSessionsTable(ProjectTable, OphysMixin):
+    """Class for storing and manipulating project-level data
+    at the behavior-ophys session level"""
     def __init__(self, df: pd.DataFrame,
                  sessions_table: SessionsTable,
                  suppress: Optional[List[str]] = None,
                  by: str = 'ophys_session_id'):
+        """
+        Parameters
+        ----------
+        df
+            The behavior-ophys session-level data
+        sessions_table
+            All session-level data (needed to calculate exposure counts)
+        suppress
+            columns to drop from table
+        by
+            See description in BehaviorProjectCache.get_session_table
+        """
 
         self._logger = logging.getLogger(self.__class__.__name__)
         self._by = by

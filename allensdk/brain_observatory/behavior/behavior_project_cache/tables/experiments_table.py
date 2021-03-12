@@ -15,12 +15,25 @@ from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
 
 
 class ExperimentsTable(ProjectTable, OphysMixin):
+    """Class for storing and manipulating project-level data
+    at the behavior-ophys experiment level"""
     def __init__(self, df: pd.DataFrame,
                  sessions_table: SessionsTable,
                  suppress: Optional[List[str]] = None):
+        """
+        Parameters
+        ----------
+        df
+            The behavior-ophys experiment-level data
+        sessions_table
+            All session-level data (needed to calculate exposure counts)
+        suppress
+            columns to drop from table
+        """
+
         self._sessions_table = sessions_table
 
-        super().__init__(df=df, suppress=suppress, experiment_level=True)
+        ProjectTable.__init__(self, df=df, suppress=suppress)
 
     def postprocess_additional(self):
         self._df['indicator'] = self._df['reporter_line'].apply(

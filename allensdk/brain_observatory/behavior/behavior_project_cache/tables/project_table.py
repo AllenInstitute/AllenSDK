@@ -9,14 +9,20 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
 
 
 class ProjectTable:
+    """Class for storing and manipulating project-level data"""
     def __init__(self, df: pd.DataFrame,
-                 suppress: Optional[List[str]] = None,
-                 all_sessions=False,
-                 experiment_level=False):
+                 suppress: Optional[List[str]] = None):
+        """
+        Parameters
+        ----------
+        df
+            The project-level data
+        suppress
+            columns to drop from table
+
+        """
         self._df = df
         self._suppress = suppress
-        self._all_sessions = all_sessions
-        self._experiment_level = experiment_level
 
         self.postprocess()
 
@@ -25,6 +31,7 @@ class ProjectTable:
         return self._df
 
     def postprocess_base(self):
+        """Postprocessing to apply to all project-level data"""
         # Make sure the index is not duplicated (it is rare)
         self._df = self._df[~self._df.index.duplicated()]
 
@@ -36,6 +43,7 @@ class ProjectTable:
         self.__add_session_number()
 
     def postprocess(self):
+        """Postprocess loop"""
         self.postprocess_base()
         self.postprocess_additional()
 
@@ -45,9 +53,11 @@ class ProjectTable:
 
     @abstractmethod
     def postprocess_additional(self):
+        """Additional postprocessing should be overridden by subclassess"""
         raise NotImplemented()
 
     def __add_session_number(self):
+        """Parses session number from session type and and adds to dataframe"""
         def parse_session_number(session_type: str):
             """Parse the session number from session type"""
             match = re.match(r'OPHYS_(?P<session_number>\d+)',
