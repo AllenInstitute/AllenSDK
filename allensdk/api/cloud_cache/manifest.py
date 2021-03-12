@@ -74,9 +74,8 @@ class Manifest(object):
         self._version = copy.deepcopy(self._data['dataset_version'])
         self._file_id_column = copy.deepcopy(self._data['file_id_column'])
 
-        self._metadata_file_names = []
-        for file_name in self._data['metadata_files'].keys():
-            self._metadata_file_names.append(file_name)
+        self._metadata_file_names = [file_name for file_name
+                                     in self._data['metadata_files']]
         self._metadata_file_names.sort()
 
     def _create_file_attributes(self,
