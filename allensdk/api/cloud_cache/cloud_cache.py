@@ -154,7 +154,7 @@ class CloudCache(object):
                                "exists, but is not a file;\n"
                                "unsure how to proceed")
 
-        full_path = str(file_attributes.local_path.resolve())
+        full_path = file_attributes.local_path.resolve()
         test_checksum = file_hash_from_path(full_path)
         if test_checksum != file_attributes.file_hash:
             return False
