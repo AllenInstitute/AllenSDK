@@ -3,6 +3,7 @@ import copy
 import io
 import pathlib
 import pandas as pd
+from typing import TypedDict
 import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
@@ -12,6 +13,12 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 from allensdk.api.cloud_cache.utils import file_hash_from_path  # noqa: E501
 from allensdk.api.cloud_cache.utils import bucket_name_from_uri  # noqa: E501
 from allensdk.api.cloud_cache.utils import relative_path_from_uri  # noqa: E501
+
+
+class LocalFileDescription(TypedDict):
+    local_path: pathlib.Path
+    exists: bool
+    file_attributes: CacheFileAttributes
 
 
 class CloudCache(object):
@@ -225,7 +232,43 @@ class CloudCache(object):
                 return False
         return True
 
-    def data_path(self, file_id) -> pathlib.Path:
+    def data_path(self, file_id) -> LocalFileDescription:
+        """
+        Return the local path to a data file, and test for the
+        file's existence/validity
+
+        Parameters
+        ----------
+        file_id:
+            The unique identifier of the file to be accessed
+
+        Returns
+        -------
+        LocalFileDescription: a TypedDict
+
+            'path' will be a pathlib.Path pointing to the file's location
+
+            'exists' will be a boolean indicating if the file
+            exists in a valid state
+
+            'file_attributes' is a CacheFileAttributes describing the file
+            in more detail
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be downloaded
+        """
+        file_attributes = self._manifest.data_file_attributes(file_id)
+        exists = self._file_exists(file_attributes)
+        local_path = file_attributes.local_path
+        output: LocalFileDescription = {'local_path': local_path,
+                                        'exists': exists,
+                                        'file_attributes': file_attributes}
+
+        return output
+
+    def download_data(self, file_id) -> pathlib.Path:
         """
         Return the local path to a data file, downloading the file
         if necessary
@@ -246,7 +289,8 @@ class CloudCache(object):
         RuntimeError
             If the file cannot be downloaded
         """
-        file_attributes = self._manifest.data_file_attributes(file_id)
+        super_attributes = self.data_path(file_id)
+        file_attributes = super_attributes['file_attributes']
         is_valid = self._download_file(file_attributes)
         if not is_valid:
             raise RuntimeError("Unable to download file\n"
@@ -255,7 +299,43 @@ class CloudCache(object):
 
         return file_attributes.local_path
 
-    def metadata_path(self, fname: str) -> pathlib.Path:
+    def metadata_path(self, fname: str) -> LocalFileDescription:
+        """
+        Return the local path to a metadata file, and test for the
+        file's existence/validity
+
+        Parameters
+        ----------
+        fname: str
+            The name of the metadata file to be accessed
+
+        Returns
+        -------
+        LocalFileDescription: a TypedDict
+
+            'path' will be a pathlib.Path pointing to the file's location
+
+            'exists' will be a boolean indicating if the file
+            exists in a valid state
+
+            'file_attributes' is a CacheFileAttributes describing the file
+            in more detail
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be downloaded
+        """
+        file_attributes = self._manifest.metadata_file_attributes(fname)
+        exists = self._file_exists(file_attributes)
+        local_path = file_attributes.local_path
+        output: LocalFileDescription = {'local_path': local_path,
+                                        'exists': exists,
+                                        'file_attributes': file_attributes}
+
+        return output
+
+    def download_metadata(self, fname: str) -> pathlib.Path:
         """
         Return the local path to a metadata file, downloading the
         file if necessary
@@ -276,7 +356,8 @@ class CloudCache(object):
         RuntimeError
             If the file cannot be downloaded
         """
-        file_attributes = self._manifest.metadata_file_attributes(fname)
+        super_attributes = self.metadata_path(fname)
+        file_attributes = super_attributes['file_attributes']
         is_valid = self._download_file(file_attributes)
         if not is_valid:
             raise RuntimeError("Unable to download file\n"
@@ -304,5 +385,5 @@ class CloudCache(object):
         locally. If it does not, the method will download the file. Use
         self.metadata_path() to find where the file is stored
         """
-        local_path = self.metadata_path(fname)
+        local_path = self.download_metadata(fname)
         return pd.read_csv(local_path)

@@ -411,9 +411,9 @@ def test_re_download_file(tmpdir):
 
 
 @mock_s3
-def test_data_path(tmpdir):
+def test_download_data(tmpdir):
     """
-    Test that CloudCache.data_path() correctly downloads files from S3
+    Test that CloudCache.download_data() correctly downloads files from S3
     """
 
     hasher = hashlib.blake2b()
@@ -421,7 +421,7 @@ def test_data_path(tmpdir):
     hasher.update(data)
     true_checksum = hasher.hexdigest()
 
-    test_bucket_name = 'bucket_for_data_path'
+    test_bucket_name = 'bucket_for_download_data'
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
@@ -464,7 +464,12 @@ def test_data_path(tmpdir):
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
     assert not expected_path.exists()
 
-    result_path = cache.data_path('only_data_file')
+    # test data_path
+    attr = cache.data_path('only_data_file')
+    assert attr['local_path'] == expected_path
+    assert not attr['exists']
+
+    result_path = cache.download_data('only_data_file')
     assert result_path == expected_path
     assert expected_path.exists()
     hasher = hashlib.blake2b()
@@ -472,11 +477,16 @@ def test_data_path(tmpdir):
         hasher.update(in_file.read())
     assert hasher.hexdigest() == true_checksum
 
+    # test that data_path detects that the file now exists
+    attr = cache.data_path('only_data_file')
+    assert attr['local_path'] == expected_path
+    assert attr['exists']
+
 
 @mock_s3
-def test_metadata_path(tmpdir):
+def test_download_metadata(tmpdir):
     """
-    Test that CloudCache.metadata_path() correctly downloads files from S3
+    Test that CloudCache.download_metadata() correctly downloads files from S3
     """
 
     hasher = hashlib.blake2b()
@@ -484,7 +494,7 @@ def test_metadata_path(tmpdir):
     hasher.update(data)
     true_checksum = hasher.hexdigest()
 
-    test_bucket_name = 'bucket_for_metadata_path'
+    test_bucket_name = 'bucket_for_download_metadata'
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
@@ -526,13 +536,23 @@ def test_metadata_path(tmpdir):
     expected_path = cache_dir / true_checksum / 'metadata_file.csv'
     assert not expected_path.exists()
 
-    result_path = cache.metadata_path('metadata_file.csv')
+    # test that metadata_path also works
+    attr = cache.metadata_path('metadata_file.csv')
+    assert attr['local_path'] == expected_path
+    assert not attr['exists']
+
+    result_path = cache.download_metadata('metadata_file.csv')
     assert result_path == expected_path
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
         hasher.update(in_file.read())
     assert hasher.hexdigest() == true_checksum
+
+    # test that metadata_path detects that the file now exists
+    attr = cache.metadata_path('metadata_file.csv')
+    assert attr['local_path'] == expected_path
+    assert attr['exists']
 
 
 @mock_s3

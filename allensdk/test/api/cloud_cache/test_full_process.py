@@ -206,12 +206,19 @@ def test_full_cache_system(tmpdir):
 
     # check that data files have expected hashes
     for k in ('data1', 'data2', 'data3'):
-        local_path = cache.data_path(k)
+
+        attr = cache.data_path(k)
+        assert not attr['exists']
+
+        local_path = cache.download_data(k)
         assert local_path.exists()
         hasher = hashlib.blake2b()
         with open(local_path, 'rb') as in_file:
             hasher.update(in_file.read())
         assert hasher.hexdigest() == true_hashes['v1'][k]
+
+        attr = cache.data_path(k)
+        assert attr['exists']
 
     # now load the second version of the dataset
 
@@ -229,14 +236,24 @@ def test_full_cache_system(tmpdir):
 
     # data3 should not exist in this version of the dataset
     with pytest.raises(ValueError) as context:
+        _ = cache.download_data('data3')
+    assert 'not a data file listed' in context.value.args[0]
+
+    with pytest.raises(ValueError) as context:
         _ = cache.data_path('data3')
     assert 'not a data file listed' in context.value.args[0]
 
     # check that data1, data2 have expected hashes
     for k in ('data1', 'data2'):
-        local_path = cache.data_path(k)
+        attr = cache.data_path(k)
+        assert not attr['exists']
+
+        local_path = cache.download_data(k)
         assert local_path.exists()
         hasher = hashlib.blake2b()
         with open(local_path, 'rb') as in_file:
             hasher.update(in_file.read())
         assert hasher.hexdigest() == true_hashes['v2'][k]
+
+        attr = cache.data_path(k)
+        assert attr['exists']
