@@ -10,7 +10,17 @@ def test_bucket_name_from_uri():
     bucket_name = utils.bucket_name_from_uri(uri)
     assert bucket_name == "dummy_bucket"
 
+    uri = 'https://dummy_bucket2.s3-us-west-3.amazonaws.com/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
+    bucket_name = utils.bucket_name_from_uri(uri)
+    assert bucket_name == "dummy_bucket2"
+
     uri = 'https://dummy_bucket/txt_file.txt?versionId="jklaafdaerew"'
+    with pytest.warns(UserWarning):
+        bucket_name = utils.bucket_name_from_uri(uri)
+    assert bucket_name is None
+
+    # make sure we are actualy detecting '.' in .amazonaws.com
+    uri = 'https://dummy_bucket2.s3-us-west-3XamazonawsYcom/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
     with pytest.warns(UserWarning):
         bucket_name = utils.bucket_name_from_uri(uri)
     assert bucket_name is None

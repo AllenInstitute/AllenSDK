@@ -1,30 +1,43 @@
 from typing import Optional
 import warnings
+import re
 import urllib.parse as url_parse
 import hashlib
 
 
 def bucket_name_from_uri(uri: str) -> Optional[str]:
     """
-    Read in a URI and return the name of the AWS S3 bucket it points towards
+    Read in a URI and return the name of the AWS S3 bucket it points towards.
 
     Parameters
     ----------
     uri: str
-        A generic URI
+        A generic URI, suitable for retrieving an S3 object via an
+        HTTP GET request.
 
     Returns
     -------
     str
         An AWS S3 bucket name. Note: if 's3.amazonaws.com' does not occur in
         the URI, this method will return None and emit a warning.
+
+    Note
+    -----
+    URLs passed to this method should conform to the "new" scheme as described
+    here
+    https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
     """
-    s3_pattern = '.s3.amazonaws.com'
+    s3_pattern = re.compile('\.s3[a-z,0-9,\-]*\.amazonaws.com')  # noqa: W605
     url_params = url_parse.urlparse(uri)
-    if s3_pattern not in url_params.netloc:
+    raw_location = url_params.netloc
+    s3_match = s3_pattern.search(raw_location)
+
+    if s3_match is None:
         warnings.warn(f"{s3_pattern} does not occur in URI {uri}")
         return None
-    return url_params.netloc.replace(s3_pattern, '')
+
+    s3_match = raw_location[s3_match.start():s3_match.end()]
+    return url_params.netloc.replace(s3_match, '')
 
 
 def relative_path_from_uri(uri: str) -> str:
