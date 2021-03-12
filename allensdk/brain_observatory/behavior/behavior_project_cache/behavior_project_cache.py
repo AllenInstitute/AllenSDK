@@ -316,7 +316,6 @@ def _write_json(path, df):
     them back to the expected format by adding them to `convert_dates`.
     In the future we could schematize this data using marshmallow
     or something similar."""
-    # df.reset_index(inplace=True)
     df.to_json(path, orient="split", date_unit="s", date_format="epoch")
 
 
