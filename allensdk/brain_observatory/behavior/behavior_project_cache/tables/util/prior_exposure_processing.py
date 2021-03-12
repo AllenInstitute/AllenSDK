@@ -1,6 +1,5 @@
 from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.project_apis.data_io import \
@@ -174,7 +173,7 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
         df['to'] = to
 
         def cumsum(x):
-            return x.cumsum().shift(fill_value=0).astype(np.int)
+            return x.cumsum().shift(fill_value=0).astype('int64')
 
         counts = df.groupby(['mouse_id'])['to'].apply(cumsum)
         counts.name = None
