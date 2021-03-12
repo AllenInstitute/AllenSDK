@@ -115,7 +115,7 @@ def get_prior_exposures_to_omissions(df: pd.DataFrame,
             get_behavior_stage_parameters(foraging_ids=foraging_ids)
         return habituation_sessions.apply(
             lambda session: __session_contains_omissions(
-                mtrain_stage_parameters=mtrain_stage_parameters.loc[
+                mtrain_stage_parameters=mtrain_stage_parameters[
                     session['foraging_id']]), axis=1)
 
     habituation_sessions = __get_habituation_sessions(df=df)
@@ -129,11 +129,12 @@ def get_prior_exposures_to_omissions(df: pd.DataFrame,
         (df['session_type'].str.lower().str.contains('ophys')) &
         (~df.index.isin(habituation_sessions.index))
         ] = True
-    contains_omissions = contains_omissions[contains_omissions]
-    return __get_prior_exposure_count(df=df, to=contains_omissions)
+    return __get_prior_exposure_count(df=df, to=contains_omissions,
+                                      agg_method='cumsum')
 
 
-def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series) -> pd.Series:
+def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
+                               agg_method='cumcount') -> pd.Series:
     """Returns prior exposures a subject had to something
     i.e can be prior exposures to a stimulus type, a image_set or
     omission
@@ -145,12 +146,15 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series) -> pd.Series:
     to
         The array to calculate prior exposures to
         Needs to have the same index as self._df
+    agg_method
+        The aggregation method to apply on the groups (cumcount or cumsum)
 
     Returns
     ---------
     Series with index same as self._df and with values of prior
     exposure counts
     """
+    index = df.index
     df = df.sort_values('date_of_acquisition')
     df = df[df['session_type'].notnull()]
 
@@ -163,4 +167,18 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series) -> pd.Series:
     # reindex df to match "to" index with missing values removed
     df = df.loc[to.index]
 
-    return df.groupby(['mouse_id', to]).cumcount()
+    if agg_method == 'cumcount':
+        counts = df.groupby(['mouse_id', to]).cumcount()
+    elif agg_method == 'cumsum':
+        df['to'] = to
+
+        def cumsum(x):
+            return x.cumsum().shift(fill_value=0)
+
+        counts = df.groupby(['mouse_id'])['to'].apply(cumsum)
+        counts.name = None
+    else:
+        raise ValueError(f'agg method {agg_method} not supported')
+
+    # reindex to original index
+    return counts.reindex(index)

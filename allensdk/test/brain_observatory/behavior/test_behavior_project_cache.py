@@ -51,9 +51,7 @@ def behavior_table():
                           'prior_exposures_to_session_type': [0, 1, 0],
                           'prior_exposures_to_image_set': [
                               np.nan, np.nan, 0],
-                          'prior_exposures_to_omissions': [
-                              np.nan, np.nan, 0
-                          ]
+                          'prior_exposures_to_omissions': [0, 0, 0]
                           })
             .set_index("behavior_session_id"))
 
@@ -134,7 +132,7 @@ def test_get_session_table(TempdirBehaviorCache, session_table):
     # These get merged in
     session_table['prior_exposures_to_session_type'] = [0]
     session_table['prior_exposures_to_image_set'] = [0.0]
-    session_table['prior_exposures_to_omissions'] = [0.0]
+    session_table['prior_exposures_to_omissions'] = [0]
 
     pd.testing.assert_frame_equal(session_table, obtained)
 
@@ -160,7 +158,7 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     # These get merged in
     experiments_table['prior_exposures_to_session_type'] = [0, 1, 0]
     experiments_table['prior_exposures_to_image_set'] = [np.nan, np.nan, 0]
-    experiments_table['prior_exposures_to_omissions'] = [np.nan, np.nan, 0]
+    experiments_table['prior_exposures_to_omissions'] = [0, 0, 0]
 
     pd.testing.assert_frame_equal(experiments_table, obtained)
 
