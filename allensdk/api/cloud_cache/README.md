@@ -96,6 +96,6 @@ they will not lose the old version of `data_file_1` that they previously
 downloaded, the `CloudCache` will merely redirect them to using the newer
 version of the data file.
 
-The `version_id` entry in the `manifest.json` descriptoin if resources is
+The `version_id` entry in the `manifest.json` description of resources is
 necessary to disambiguate different versions of the same file when downloading
 the resources from the cloud service.

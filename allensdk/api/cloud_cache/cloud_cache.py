@@ -55,7 +55,7 @@ class CloudCache(object):
         return self._manifest.version
 
     @property
-    def metadata_flie_names(self) -> list:
+    def metadata_file_names(self) -> list:
         """
         List of metadata file names associated with this dataset
         """
