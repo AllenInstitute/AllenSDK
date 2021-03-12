@@ -96,7 +96,7 @@ def test_create_file_attributes():
     assert attr.version_id == '12345'
     assert attr.file_hash == 'aaabbbcccddd'
     expected_path = '/my/cache/dir/aaabbbcccddd/path/to/file.txt'
-    assert attr.local_path == pathlib.Path(expected_path)
+    assert attr.local_path == pathlib.Path(expected_path).resolve()
 
 
 def test_metadata_file_attributes():
@@ -131,7 +131,7 @@ def test_metadata_file_attributes():
     assert a_obj.version_id == '12345'
     assert a_obj.file_hash == 'abcde'
     expected = safe_system_path('/my/cache/dir/abcde/path/to/a.txt')
-    expected = pathlib.Path(expected)
+    expected = pathlib.Path(expected).resolve()
     assert a_obj.local_path == expected
 
     b_obj = mfest.metadata_file_attributes('b.txt')
@@ -139,7 +139,7 @@ def test_metadata_file_attributes():
     assert b_obj.version_id == '67890'
     assert b_obj.file_hash == 'fghijk'
     expected = safe_system_path('/my/cache/dir/fghijk/different/path/to/b.txt')
-    expected = pathlib.Path(expected)
+    expected = pathlib.Path(expected).resolve()
     assert b_obj.local_path == expected
 
     # test that the correct error is raised when you ask
@@ -182,14 +182,14 @@ def test_data_file_attributes():
     assert a_obj.version_id == '12345'
     assert a_obj.file_hash == 'abcde'
     expected = safe_system_path('/my/cache/dir/abcde/path/to/a.nwb')
-    assert a_obj.local_path == pathlib.Path(expected)
+    assert a_obj.local_path == pathlib.Path(expected).resolve()
 
     b_obj = mfest.data_file_attributes('b')
     assert b_obj.uri == 'http://my.other.url.com/different/path/b.nwb'
     assert b_obj.version_id == '67890'
     assert b_obj.file_hash == 'fghijk'
     expected = safe_system_path('/my/cache/dir/fghijk/different/path/b.nwb')
-    assert b_obj.local_path == pathlib.Path(expected)
+    assert b_obj.local_path == pathlib.Path(expected).resolve()
 
     with pytest.raises(ValueError) as context:
         _ = mfest.data_file_attributes('c')
@@ -269,28 +269,28 @@ def test_loading_two_manifests():
     assert m_obj.version_id == '12345'
     assert m_obj.file_hash == 'abcde'
     expected = safe_system_path('/my/cache/dir/abcde/path/to/a.csv')
-    assert m_obj.local_path == pathlib.Path(expected)
+    assert m_obj.local_path == pathlib.Path(expected).resolve()
 
     m_obj = mfest.metadata_file_attributes('metadata_b.csv')
     assert m_obj.uri == 'http://bbb.com/other/path/b.csv'
     assert m_obj.version_id == '67890'
     assert m_obj.file_hash == 'fghijk'
     expected = safe_system_path('/my/cache/dir/fghijk/other/path/b.csv')
-    assert m_obj.local_path == pathlib.Path(expected)
+    assert m_obj.local_path == pathlib.Path(expected).resolve()
 
     d_obj = mfest.data_file_attributes('c')
     assert d_obj.uri == 'http://ccc.com/third/path/c.csv'
     assert d_obj.version_id == '11121'
     assert d_obj.file_hash == 'lmnopq'
     expected = '/my/cache/dir/lmnopq/third/path/c.csv'
-    assert d_obj.local_path == pathlib.Path(expected)
+    assert d_obj.local_path == pathlib.Path(expected).resolve()
 
     d_obj = mfest.data_file_attributes('d')
     assert d_obj.uri == 'http://ddd.com/fourth/path/d.csv'
     assert d_obj.version_id == '31415'
     assert d_obj.file_hash == 'rstuvw'
     expected = safe_system_path('/my/cache/dir/rstuvw/fourth/path/d.csv')
-    assert d_obj.local_path == pathlib.Path(expected)
+    assert d_obj.local_path == pathlib.Path(expected).resolve()
 
     # now load the second manifest and make sure that everything
     # changes accordingly
@@ -304,14 +304,14 @@ def test_loading_two_manifests():
     assert m_obj.version_id == '161718'
     assert m_obj.file_hash == 'xyzab'
     expected = safe_system_path('/my/cache/dir/xyzab/path/to/a.csv')
-    assert m_obj.local_path == pathlib.Path(expected)
+    assert m_obj.local_path == pathlib.Path(expected).resolve()
 
     m_obj = mfest.metadata_file_attributes('metadata_f.csv')
     assert m_obj.uri == 'http://fff.com/fifth/path/f.csv'
     assert m_obj.version_id == '192021'
     assert m_obj.file_hash == 'cdefghi'
     expected = safe_system_path('/my/cache/dir/cdefghi/fifth/path/f.csv')
-    assert m_obj.local_path == pathlib.Path(expected)
+    assert m_obj.local_path == pathlib.Path(expected).resolve()
 
     with pytest.raises(ValueError):
         _ = mfest.metadata_file_attributes('metadata_b.csv')
@@ -321,14 +321,14 @@ def test_loading_two_manifests():
     assert d_obj.version_id == '222324'
     assert d_obj.file_hash == 'jklmnop'
     expected = safe_system_path('/my/cache/dir/jklmnop/third/path/c.csv')
-    assert d_obj.local_path == pathlib.Path(expected)
+    assert d_obj.local_path == pathlib.Path(expected).resolve()
 
     d_obj = mfest.data_file_attributes('g')
     assert d_obj.uri == 'http://ggg.com/sixth/path/g.csv'
     assert d_obj.version_id == '25262728'
     assert d_obj.file_hash == 'qrstuvwxy'
     expected = safe_system_path('/my/cache/dir/qrstuvwxy/sixth/path/g.csv')
-    assert d_obj.local_path == pathlib.Path(expected)
+    assert d_obj.local_path == pathlib.Path(expected).resolve()
 
     with pytest.raises(ValueError):
         _ = mfest.data_file_attributes('d')
