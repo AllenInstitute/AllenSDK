@@ -15,7 +15,7 @@ def test_prior_exposure_to_session_type():
         'date_of_acquisition': [0, 1, 2, 3, 0]
     }, index=pd.Series([0, 1, 2, 3, 4], name='behavior_session_id'))
     expected = pd.Series([0, 1, np.nan, 2, 0],
-                         index=pd.Series([0, 1, 2, 3, 4 ],
+                         index=pd.Series([0, 1, 2, 3, 4],
                                          name='behavior_session_id'))
     obtained = get_prior_exposures_to_session_type(df=df)
     pd.testing.assert_series_equal(expected, obtained)

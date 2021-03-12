@@ -54,7 +54,7 @@ class ProjectTable:
     @abstractmethod
     def postprocess_additional(self):
         """Additional postprocessing should be overridden by subclassess"""
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def __add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""

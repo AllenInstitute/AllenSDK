@@ -1,5 +1,3 @@
-import json
-
 import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable
 import logging
@@ -13,8 +11,8 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import (
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorOphysLimsApi)
 from allensdk.internal.api import db_connection_creator
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    HttpEngine)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
+    import (HttpEngine)
 from allensdk.core.typing import SupportsStr
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
@@ -142,7 +140,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     def _build_experiment_from_session_query() -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
         with a single ophys_session_id."""
-        query = f"""
+        query = """
             -- -- begin getting all ophys_experiment_ids -- --
             SELECT
                 (ARRAY_AGG(DISTINCT(oe.id))) AS experiment_ids, os.id
