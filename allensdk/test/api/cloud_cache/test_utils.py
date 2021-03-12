@@ -20,7 +20,7 @@ def test_bucket_name_from_uri():
 def test_relative_path_from_uri():
     uri = 'https://dummy_bucket.s3.amazonaws.com/my/dir/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
     relative_path = utils.relative_path_from_uri(uri)
-    assert relative_path == pathlib.Path('my/dir/txt_file.txt')
+    assert relative_path == 'my/dir/txt_file.txt'
 
 
 def test_file_hash_from_path(tmpdir):

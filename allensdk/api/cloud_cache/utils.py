@@ -28,7 +28,7 @@ def bucket_name_from_uri(uri: str) -> Optional[str]:
     return url_params.netloc.replace(s3_pattern, '')
 
 
-def relative_path_from_uri(uri: str) -> pathlib.Path:
+def relative_path_from_uri(uri: str) -> str:
     """
     Read in a URI and return the relative path of the object
 
@@ -39,11 +39,18 @@ def relative_path_from_uri(uri: str) -> pathlib.Path:
 
     Returns
     -------
-    pathlib.Path:
+    str:
         Relative path of the object
+
+    Notes
+    -----
+    This method returns a str rather than a pathlib.Path because
+    it is used to get the S3 object Key from a URL. If using
+    Pathlib.path on a Windows system, the '/' will get transformed
+    into '\', confusing S3.
     """
     url_params = url_parse.urlparse(uri)
-    return pathlib.Path(url_params.path[1:])
+    return url_params.path[1:]
 
 
 def file_hash_from_path(file_path: str) -> str:
