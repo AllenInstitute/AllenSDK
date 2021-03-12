@@ -1,3 +1,4 @@
+import json
 import pathlib
 
 
@@ -60,10 +61,9 @@ class CacheFileAttributes(object):
         return self._local_path
 
     def __str__(self):
-        output = "CacheFileAttributes{\n"
-        output += f"    uri: {self.uri}\n"
-        output += f"    version_id: {self.version_id}\n"
-        output += f"    file_hash: {self.file_hash}\n"
-        output += f"    local_path: {self.local_path}\n"
-        output += "}\n"
-        return output
+        output = {'uri': self.uri,
+                  'version_id': self.version_id,
+                  'file_hash': self.file_hash,
+                  'local_path': str(self.local_path)}
+        output = json.dumps(output, indent=2, sort_keys=True)
+        return f'CacheFileParameters{output}'

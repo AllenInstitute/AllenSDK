@@ -52,3 +52,20 @@ def test_cache_file_attributes():
 
     msg = "local_path must be pathlib.Path; got <class 'str'>"
     assert context.value.args[0] == msg
+
+
+def test_str():
+    """
+    Test the string representation of CacheFileParameters
+    """
+    attr = CacheFileAttributes(uri='http://my/uri',
+                               version_id='aaabbb',
+                               file_hash='12345',
+                               local_path=pathlib.Path('/my/local/path'))
+
+    s = f'{attr}'
+    assert "CacheFileParameters{" in s
+    assert '"file_hash": "12345"' in s
+    assert '"uri": "http://my/uri"' in s
+    assert '"version_id": "aaabbb"' in s
+    assert '"local_path": "/my/local/path"' in s
