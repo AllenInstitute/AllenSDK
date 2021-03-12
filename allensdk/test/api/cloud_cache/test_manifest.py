@@ -36,12 +36,14 @@ def test_load(tmpdir):
     metadata_files['y.txt'] = []
     good_manifest['metadata_files'] = metadata_files
 
-    stream = io.StringIO()
-    stream.write(json.dumps(good_manifest))
-    stream.seek(0)
-
     mfest = Manifest(pathlib.Path(tmpdir) / 'my/cache/dir')
-    mfest.load(stream)
+
+    with io.StringIO() as stream:
+        stream.write(json.dumps(good_manifest))
+        stream.seek(0)
+
+        mfest.load(stream)
+
     assert mfest.version == 'A'
     assert mfest.metadata_file_names == ['x.txt', 'y.txt', 'z.txt']
     assert mfest._cache_dir == pathlib.Path(str(tmpdir)+'/my/cache/dir')
@@ -58,11 +60,12 @@ def test_load(tmpdir):
     metadata_files['u.txt'] = []
     good_manifest['metadata_files'] = metadata_files
 
-    stream = io.StringIO()
-    stream.write(json.dumps(good_manifest))
-    stream.seek(0)
+    with io.StringIO() as stream:
+        stream.write(json.dumps(good_manifest))
+        stream.seek(0)
 
-    mfest.load(stream)
+        mfest.load(stream)
+
     assert mfest.version == 'B'
     assert mfest.metadata_file_names == ['k.txt', 'n.txt', 'u.txt']
 
@@ -70,11 +73,12 @@ def test_load(tmpdir):
 
     # test that an error is raised when manifest.json is not a dict
     bad_manifest = ['a', 'b', 'c']
-    stream = io.StringIO()
-    stream.write(json.dumps(bad_manifest))
-    stream.seek(0)
-    with pytest.raises(ValueError) as context:
-        mfest.load(stream)
+    with io.StringIO() as stream:
+        stream.write(json.dumps(bad_manifest))
+        stream.seek(0)
+        with pytest.raises(ValueError) as context:
+            mfest.load(stream)
+
     msg = "Expected to deserialize manifest into a dict; "
     msg += "instead got <class 'list'>"
     assert context.value.args[0] == msg
@@ -119,12 +123,11 @@ def test_metadata_file_attributes():
     manifest['dataset_version'] = '000'
     manifest['file_id_column'] = 'file_id'
 
-    stream = io.StringIO()
-    stream.write(json.dumps(manifest))
-    stream.seek(0)
-
     mfest = Manifest('/my/cache/dir/')
-    mfest.load(stream)
+    with io.StringIO() as stream:
+        stream.write(json.dumps(manifest))
+        stream.seek(0)
+        mfest.load(stream)
 
     a_obj = mfest.metadata_file_attributes('a.txt')
     assert a_obj.uri == 'http://my.url.com/path/to/a.txt'
@@ -170,12 +173,12 @@ def test_data_file_attributes():
                        'file_hash': 'fghijk'}
     manifest['data_files'] = data_files
 
-    stream = io.StringIO()
-    stream.write(json.dumps(manifest))
-    stream.seek(0)
-
     mfest = Manifest('/my/cache/dir')
-    mfest.load(stream)
+
+    with io.StringIO() as stream:
+        stream.write(json.dumps(manifest))
+        stream.seek(0)
+        mfest.load(stream)
 
     a_obj = mfest.data_file_attributes('a')
     assert a_obj.uri == 'http://my.url.com/path/to/a.nwb'
@@ -227,10 +230,6 @@ def test_loading_two_manifests():
     manifest_1['dataset_version'] = '1'
     manifest_1['file_id_column'] = 'file_id'
 
-    stream_1 = io.StringIO()
-    stream_1.write(json.dumps(manifest_1))
-    stream_1.seek(0)
-
     manifest_2 = {}
     metadata_2 = {}
     metadata_2['metadata_a.csv'] = {'uri': 'http://aaa.com/path/to/a.csv',
@@ -252,15 +251,16 @@ def test_loading_two_manifests():
     manifest_2['dataset_version'] = '2'
     manifest_2['file_id_column'] = 'file_id'
 
-    stream_2 = io.StringIO()
-    stream_2.write(json.dumps(manifest_2))
-    stream_2.seek(0)
-
     mfest = Manifest('/my/cache/dir')
 
     # load the first version of the manifest and check results
 
-    mfest.load(stream_1)
+    with io.StringIO() as stream_1:
+
+        stream_1.write(json.dumps(manifest_1))
+        stream_1.seek(0)
+        mfest.load(stream_1)
+
     assert mfest.version == '1'
     assert mfest.metadata_file_names == ['metadata_a.csv', 'metadata_b.csv']
 
@@ -295,7 +295,12 @@ def test_loading_two_manifests():
     # now load the second manifest and make sure that everything
     # changes accordingly
 
-    mfest.load(stream_2)
+    with io.StringIO() as stream_2:
+        stream_2.write(json.dumps(manifest_2))
+        stream_2.seek(0)
+
+        mfest.load(stream_2)
+
     assert mfest.version == '2'
     assert mfest.metadata_file_names == ['metadata_a.csv', 'metadata_f.csv']
 

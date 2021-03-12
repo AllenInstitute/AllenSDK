@@ -62,10 +62,11 @@ def test_full_cache_system(tmpdir):
     for df, key in zip((metadata1_v1, metadata2_v1),
                        ('metadata1.csv', 'metadata2.csv')):
 
-        stream = io.StringIO()
-        df.to_csv(stream, index=False)
-        stream.seek(0)
-        data = bytes(stream.read(), 'utf-8')
+        with io.StringIO() as stream:
+            df.to_csv(stream, index=False)
+            stream.seek(0)
+            data = bytes(stream.read(), 'utf-8')
+
         hasher = hashlib.blake2b()
         hasher.update(data)
         v1_hashes[key] = hasher.hexdigest()
@@ -96,10 +97,11 @@ def test_full_cache_system(tmpdir):
     s3_client.delete_object(Bucket=test_bucket_name,
                             Key='data/data3')
 
-    stream = io.StringIO()
-    metadata1_v2.to_csv(stream, index=False)
-    stream.seek(0)
-    data = bytes(stream.read(), 'utf-8')
+    with io.StringIO() as stream:
+        metadata1_v2.to_csv(stream, index=False)
+        stream.seek(0)
+        data = bytes(stream.read(), 'utf-8')
+
     hasher = hashlib.blake2b()
     hasher.update(data)
     v2_hashes['metadata1.csv'] = hasher.hexdigest()

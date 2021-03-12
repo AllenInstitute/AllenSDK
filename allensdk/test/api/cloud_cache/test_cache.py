@@ -546,10 +546,10 @@ def test_metadata(tmpdir):
     data['age'] = ['P50', 'P46', 'P23', 'P40']
     true_df = pd.DataFrame(data)
 
-    stream = io.StringIO()
-    true_df.to_csv(stream, index=False)
-    stream.seek(0)
-    data = bytes(stream.read(), 'utf-8')
+    with io.StringIO() as stream:
+        true_df.to_csv(stream, index=False)
+        stream.seek(0)
+        data = bytes(stream.read(), 'utf-8')
 
     hasher = hashlib.blake2b()
     hasher.update(data)

@@ -116,13 +116,13 @@ class CloudCache(object):
                              f"{self.manifest_file_names}")
 
         manifest_key = 'manifests/' + manifest_name
-        stream = io.BytesIO()
         response = self.s3_client.get_object(Bucket=self._bucket_name,
                                              Key=manifest_key)
-        for chunk in response['Body'].iter_chunks():
-            stream.write(chunk)
-        stream.seek(0)
-        self._manifest.load(stream)
+        with io.BytesIO() as stream:
+            for chunk in response['Body'].iter_chunks():
+                stream.write(chunk)
+            stream.seek(0)
+            self._manifest.load(stream)
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
