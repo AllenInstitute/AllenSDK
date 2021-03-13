@@ -196,6 +196,10 @@ class CloudCache(object):
         RuntimeError
             If the path to the directory where the file is to be saved
             points to something that is not a directory.
+
+        RuntimeError
+            If it is not able to successfully download the file after
+            10 iterations
         """
 
         local_path = file_attributes.local_path
@@ -229,8 +233,10 @@ class CloudCache(object):
 
             n_iter += 1
             if n_iter > max_iter:
-                return False
-        return True
+                raise RuntimeError("Could not download\n"
+                                   f"{file_attributes}\n"
+                                   "In {max_iter} iterations")
+        return None
 
     def data_path(self, file_id) -> LocalFileDescription:
         """
@@ -291,12 +297,7 @@ class CloudCache(object):
         """
         super_attributes = self.data_path(file_id)
         file_attributes = super_attributes['file_attributes']
-        is_valid = self._download_file(file_attributes)
-        if not is_valid:
-            raise RuntimeError("Unable to download file\n"
-                               f"file_id: {file_id}\n"
-                               f"{file_attributes}")
-
+        self._download_file(file_attributes)
         return file_attributes.local_path
 
     def metadata_path(self, fname: str) -> LocalFileDescription:
@@ -358,12 +359,7 @@ class CloudCache(object):
         """
         super_attributes = self.metadata_path(fname)
         file_attributes = super_attributes['file_attributes']
-        is_valid = self._download_file(file_attributes)
-        if not is_valid:
-            raise RuntimeError("Unable to download file\n"
-                               f"file_id: {fname}\n"
-                               f"{file_attributes}")
-
+        self._download_file(file_attributes)
         return file_attributes.local_path
 
     def metadata(self, fname: str) -> pd.DataFrame:

@@ -230,7 +230,7 @@ def test_download_file(tmpdir):
                                           expected_path)
 
     assert not expected_path.exists()
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
@@ -308,7 +308,7 @@ def test_download_file_multiple_versions(tmpdir):
                                           expected_path)
 
     assert not expected_path.exists()
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
@@ -324,7 +324,7 @@ def test_download_file_multiple_versions(tmpdir):
                                           expected_path)
 
     assert not expected_path.exists()
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
@@ -376,7 +376,7 @@ def test_re_download_file(tmpdir):
                                           expected_path)
 
     assert not expected_path.exists()
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
@@ -387,7 +387,7 @@ def test_re_download_file(tmpdir):
     expected_path.unlink()
     assert not expected_path.exists()
 
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
@@ -402,7 +402,7 @@ def test_re_download_file(tmpdir):
         hasher.update(in_file.read())
     assert hasher.hexdigest() != true_checksum
 
-    assert cache._download_file(good_attributes)
+    cache._download_file(good_attributes)
     assert expected_path.exists()
     hasher = hashlib.blake2b()
     with open(expected_path, 'rb') as in_file:
