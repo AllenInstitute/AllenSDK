@@ -143,7 +143,7 @@ def test_full_cache_system(tmpdir):
     data_files_1 = {}
     for k in ('data1', 'data2', 'data3'):
         obj = {}
-        obj['uri'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
         obj['file_hash'] = true_hashes['v1'][k]
         obj['version_id'] = version_id_lookup['v1'][k]
         data_files_1[k] = obj
@@ -151,7 +151,7 @@ def test_full_cache_system(tmpdir):
     metadata_files_1 = {}
     for k in ('metadata1.csv', 'metadata2.csv'):
         obj = {}
-        obj['uri'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
         obj['file_hash'] = true_hashes['v1'][k]
         obj['version_id'] = version_id_lookup['v1'][k]
         metadata_files_1[k] = obj
@@ -163,7 +163,7 @@ def test_full_cache_system(tmpdir):
     data_files_2 = {}
     for k in ('data1', 'data2'):
         obj = {}
-        obj['uri'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
         obj['file_hash'] = true_hashes['v2'][k]
         obj['version_id'] = version_id_lookup['v2'][k]
         data_files_2[k] = obj
@@ -171,7 +171,7 @@ def test_full_cache_system(tmpdir):
     metadata_files_2 = {}
     for k in ['metadata1.csv']:
         obj = {}
-        obj['uri'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
         obj['file_hash'] = true_hashes['v2'][k]
         obj['version_id'] = version_id_lookup['v2'][k]
         metadata_files_2[k] = obj

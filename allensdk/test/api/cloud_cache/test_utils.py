@@ -4,31 +4,31 @@ import numpy as np
 import allensdk.api.cloud_cache.utils as utils
 
 
-def test_bucket_name_from_uri():
+def test_bucket_name_from_url():
 
-    uri = 'https://dummy_bucket.s3.amazonaws.com/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
-    bucket_name = utils.bucket_name_from_uri(uri)
+    url = 'https://dummy_bucket.s3.amazonaws.com/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
+    bucket_name = utils.bucket_name_from_url(url)
     assert bucket_name == "dummy_bucket"
 
-    uri = 'https://dummy_bucket2.s3-us-west-3.amazonaws.com/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
-    bucket_name = utils.bucket_name_from_uri(uri)
+    url = 'https://dummy_bucket2.s3-us-west-3.amazonaws.com/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
+    bucket_name = utils.bucket_name_from_url(url)
     assert bucket_name == "dummy_bucket2"
 
-    uri = 'https://dummy_bucket/txt_file.txt?versionId="jklaafdaerew"'
+    url = 'https://dummy_bucket/txt_file.txt?versionId="jklaafdaerew"'
     with pytest.warns(UserWarning):
-        bucket_name = utils.bucket_name_from_uri(uri)
+        bucket_name = utils.bucket_name_from_url(url)
     assert bucket_name is None
 
     # make sure we are actualy detecting '.' in .amazonaws.com
-    uri = 'https://dummy_bucket2.s3-us-west-3XamazonawsYcom/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
+    url = 'https://dummy_bucket2.s3-us-west-3XamazonawsYcom/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
     with pytest.warns(UserWarning):
-        bucket_name = utils.bucket_name_from_uri(uri)
+        bucket_name = utils.bucket_name_from_url(url)
     assert bucket_name is None
 
 
-def test_relative_path_from_uri():
-    uri = 'https://dummy_bucket.s3.amazonaws.com/my/dir/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
-    relative_path = utils.relative_path_from_uri(uri)
+def test_relative_path_from_url():
+    url = 'https://dummy_bucket.s3.amazonaws.com/my/dir/txt_file.txt?versionId="jklaafdaerew"'  # noqa: E501
+    relative_path = utils.relative_path_from_url(url)
     assert relative_path == 'my/dir/txt_file.txt'
 
 

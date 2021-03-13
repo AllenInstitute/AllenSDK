@@ -10,8 +10,8 @@ class CacheFileAttributes(object):
 
     Parameters
     ----------
-    uri: str
-        The full URI of the remote file
+    url: str
+        The full URL of the remote file
     version_id: str
         A string specifying the version of the file (probably calculated
         by S3)
@@ -23,13 +23,13 @@ class CacheFileAttributes(object):
     """
 
     def __init__(self,
-                 uri: str,
+                 url: str,
                  version_id: str,
                  file_hash: str,
                  local_path: str):
 
-        if not isinstance(uri, str):
-            raise ValueError(f"uri must be str; got {type(uri)}")
+        if not isinstance(url, str):
+            raise ValueError(f"url must be str; got {type(url)}")
         if not isinstance(version_id, str):
             raise ValueError(f"version_id must be str; got {type(version_id)}")
         if not isinstance(file_hash, str):
@@ -39,14 +39,14 @@ class CacheFileAttributes(object):
             raise ValueError(f"local_path must be pathlib.Path; "
                              f"got {type(local_path)}")
 
-        self._uri = uri
+        self._url = url
         self._version_id = version_id
         self._file_hash = file_hash
         self._local_path = local_path
 
     @property
-    def uri(self) -> str:
-        return self._uri
+    def url(self) -> str:
+        return self._url
 
     @property
     def version_id(self) -> str:
@@ -61,7 +61,7 @@ class CacheFileAttributes(object):
         return self._local_path
 
     def __str__(self):
-        output = {'uri': self.uri,
+        output = {'url': self.url,
                   'version_id': self.version_id,
                   'file_hash': self.file_hash,
                   'local_path': str(self.local_path)}

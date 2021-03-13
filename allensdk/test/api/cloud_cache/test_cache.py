@@ -87,19 +87,19 @@ def test_loading_manifest():
 
     manifest_1 = {'dataset_version': '1',
                   'file_id_column': 'file_id',
-                  'metadata_files': {'a.csv': {'uri': 'http://www.junk.com',
+                  'metadata_files': {'a.csv': {'url': 'http://www.junk.com',
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
-                                     'b.csv': {'uri': 'http://silly.com',
+                                     'b.csv': {'url': 'http://silly.com',
                                                'version_id': '2222',
                                                'file_hash': 'fghijk'}}}
 
     manifest_2 = {'dataset_version': '2',
                   'file_id_column': 'file_id',
-                  'metadata_files': {'c.csv': {'uri': 'http://www.absurd.com',
+                  'metadata_files': {'c.csv': {'url': 'http://www.absurd.com',
                                                'version_id': '3333',
                                                'file_hash': 'lmnop'},
-                                     'd.csv': {'uri': 'http://nonsense.com',
+                                     'd.csv': {'url': 'http://nonsense.com',
                                                'version_id': '4444',
                                                'file_hash': 'qrstuv'}}}
 
@@ -223,8 +223,8 @@ def test_download_file(tmpdir):
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
-    good_attributes = CacheFileAttributes(uri,
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
+    good_attributes = CacheFileAttributes(url,
                                           version_id,
                                           true_checksum,
                                           expected_path)
@@ -297,12 +297,12 @@ def test_download_file_multiple_versions(tmpdir):
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
     cache = DownloadVersionTestCache(cache_dir)
 
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
 
     # download first version of file
     expected_path = cache_dir / true_checksum_1 / 'data/data_file.txt'
 
-    good_attributes = CacheFileAttributes(uri,
+    good_attributes = CacheFileAttributes(url,
                                           version_id_1,
                                           true_checksum_1,
                                           expected_path)
@@ -318,7 +318,7 @@ def test_download_file_multiple_versions(tmpdir):
     # download second version of file
     expected_path = cache_dir / true_checksum_2 / 'data/data_file.txt'
 
-    good_attributes = CacheFileAttributes(uri,
+    good_attributes = CacheFileAttributes(url,
                                           version_id_2,
                                           true_checksum_2,
                                           expected_path)
@@ -369,8 +369,8 @@ def test_re_download_file(tmpdir):
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
-    good_attributes = CacheFileAttributes(uri,
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
+    good_attributes = CacheFileAttributes(url,
                                           version_id,
                                           true_checksum,
                                           expected_path)
@@ -442,8 +442,8 @@ def test_download_data(tmpdir):
     manifest['dataset_version'] = '1'
     manifest['file_id_column'] = 'file_id'
     manifest['metadata_files'] = {}
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
-    data_file = {'uri': uri,
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
+    data_file = {'url': url,
                  'version_id': version_id,
                  'file_hash': true_checksum}
 
@@ -514,8 +514,8 @@ def test_download_metadata(tmpdir):
     manifest = {}
     manifest['dataset_version'] = '1'
     manifest['file_id_column'] = 'file_id'
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
-    metadata_file = {'uri': uri,
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
+    metadata_file = {'url': url,
                      'version_id': version_id,
                      'file_hash': true_checksum}
 
@@ -595,8 +595,8 @@ def test_metadata(tmpdir):
     manifest = {}
     manifest['dataset_version'] = '1'
     manifest['file_id_column'] = 'file_id'
-    uri = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
-    metadata_file = {'uri': uri,
+    url = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
+    metadata_file = {'url': url,
                      'version_id': version_id,
                      'file_hash': true_checksum}
 

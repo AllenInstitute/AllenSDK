@@ -4,12 +4,12 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 
 
 def test_cache_file_attributes():
-    attr = CacheFileAttributes(uri='http://my/uri',
+    attr = CacheFileAttributes(url='http://my/url',
                                version_id='aaabbb',
                                file_hash='12345',
                                local_path=pathlib.Path('/my/local/path'))
 
-    assert attr.uri == 'http://my/uri'
+    assert attr.url == 'http://my/url'
     assert attr.version_id == 'aaabbb'
     assert attr.file_hash == '12345'
     assert attr.local_path == pathlib.Path('/my/local/path')
@@ -18,16 +18,16 @@ def test_cache_file_attributes():
     # when you pass invalid arguments
 
     with pytest.raises(ValueError) as context:
-        attr = CacheFileAttributes(uri=5.0,
+        attr = CacheFileAttributes(url=5.0,
                                    version_id='aaabbb',
                                    file_hash='12345',
                                    local_path=pathlib.Path('/my/local/path'))
 
-    msg = "uri must be str; got <class 'float'>"
+    msg = "url must be str; got <class 'float'>"
     assert context.value.args[0] == msg
 
     with pytest.raises(ValueError) as context:
-        attr = CacheFileAttributes(uri='http://my/uri/',
+        attr = CacheFileAttributes(url='http://my/url/',
                                    version_id=5.0,
                                    file_hash='12345',
                                    local_path=pathlib.Path('/my/local/path'))
@@ -36,7 +36,7 @@ def test_cache_file_attributes():
     assert context.value.args[0] == msg
 
     with pytest.raises(ValueError) as context:
-        attr = CacheFileAttributes(uri='http://my/uri/',
+        attr = CacheFileAttributes(url='http://my/url/',
                                    version_id='aaabbb',
                                    file_hash=5.0,
                                    local_path=pathlib.Path('/my/local/path'))
@@ -45,7 +45,7 @@ def test_cache_file_attributes():
     assert context.value.args[0] == msg
 
     with pytest.raises(ValueError) as context:
-        attr = CacheFileAttributes(uri='http://my/uri/',
+        attr = CacheFileAttributes(url='http://my/url/',
                                    version_id='aaabbb',
                                    file_hash='12345',
                                    local_path='/my/local/path')
@@ -58,7 +58,7 @@ def test_str():
     """
     Test the string representation of CacheFileParameters
     """
-    attr = CacheFileAttributes(uri='http://my/uri',
+    attr = CacheFileAttributes(url='http://my/url',
                                version_id='aaabbb',
                                file_hash='12345',
                                local_path=pathlib.Path('/my/local/path'))
@@ -66,6 +66,6 @@ def test_str():
     s = f'{attr}'
     assert "CacheFileParameters{" in s
     assert '"file_hash": "12345"' in s
-    assert '"uri": "http://my/uri"' in s
+    assert '"url": "http://my/url"' in s
     assert '"version_id": "aaabbb"' in s
     assert '"local_path": "/my/local/path"' in s

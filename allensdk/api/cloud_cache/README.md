@@ -46,19 +46,19 @@ The `manifest.json` files are structured like so
  "dataset_version" : dataset_version_string,
  "file_id_column": name_of_column_uniquely_identifying_files,
  "metadata_files":{
-     metadata_file_name_1: {"uri": "full/uri/to/file",
+     metadata_file_name_1: {"url": "full/url/to/file",
                             "version_id": version_id_string,
                             "file_hash": file_hash_of_metadata_file},
-     metadata_file_name_2: {"uri": "full/uri/to/file",
+     metadata_file_name_2: {"url": "full/url/to/file",
                             "version_id": version_id_string,
                             "file_hash": file_hash_of_metadata_file},
   ...
  },
  "data_files": {
-     file_id_1: {"uri": "full/uri/to/imaging_plane.nwb",
+     file_id_1: {"url": "full/url/to/imaging_plane.nwb",
                  "version_id": version_id_string,
                  "file_hash": file_hash_of_file},
-     file_id_2: {"uri": "full/uri/to/behavior_only_session.nwb",
+     file_id_2: {"url": "full/url/to/behavior_only_session.nwb",
                  "version_id": version_id_string,
                  "file_hash": file_hash_of_file},
     ...

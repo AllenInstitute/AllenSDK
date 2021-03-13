@@ -3,7 +3,7 @@ import json
 import pathlib
 import copy
 from typing import Union
-from allensdk.api.cloud_cache.utils import relative_path_from_uri  # noqa: E501
+from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
@@ -101,7 +101,7 @@ class Manifest(object):
         """
 
         local_dir = self._cache_dir / file_hash
-        relative_path = relative_path_from_uri(remote_path)
+        relative_path = relative_path_from_url(remote_path)
         local_path = local_dir / relative_path
 
         obj = CacheFileAttributes(remote_path,
@@ -145,7 +145,7 @@ class Manifest(object):
                              f"{self._metadata_file_names}")
 
         file_data = self._data['metadata_files'][metadata_file_name]
-        return self._create_file_attributes(file_data['uri'],
+        return self._create_file_attributes(file_data['url'],
                                             file_data['version_id'],
                                             file_data['file_hash'])
 
@@ -184,6 +184,6 @@ class Manifest(object):
                              f"{valid_keys}")
 
         file_data = self._data['data_files'][file_id]
-        return self._create_file_attributes(file_data['uri'],
+        return self._create_file_attributes(file_data['url'],
                                             file_data['version_id'],
                                             file_data['file_hash'])

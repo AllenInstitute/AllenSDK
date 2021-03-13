@@ -11,8 +11,8 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.api.cloud_cache.manifest import Manifest
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 from allensdk.api.cloud_cache.utils import file_hash_from_path  # noqa: E501
-from allensdk.api.cloud_cache.utils import bucket_name_from_uri  # noqa: E501
-from allensdk.api.cloud_cache.utils import relative_path_from_uri  # noqa: E501
+from allensdk.api.cloud_cache.utils import bucket_name_from_url  # noqa: E501
+from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
 
 
 class LocalFileDescription(TypedDict):
@@ -213,8 +213,8 @@ class CloudCache(object):
             raise RuntimeError(f"{local_dir}\n"
                                "is not a directory")
 
-        bucket_name = bucket_name_from_uri(file_attributes.uri)
-        obj_key = relative_path_from_uri(file_attributes.uri)
+        bucket_name = bucket_name_from_url(file_attributes.url)
+        obj_key = relative_path_from_url(file_attributes.url)
 
         n_iter = 0
         max_iter = 10  # maximum number of times to try download
