@@ -199,9 +199,9 @@ def test_full_cache_system(tmpdir):
     assert cache.version == 'A'
 
     # check that metadata dataframes have expected contents
-    m1 = cache.metadata('metadata1.csv')
+    m1 = cache.get_metadata('metadata1.csv')
     assert metadata1_v1.equals(m1)
-    m2 = cache.metadata('metadata2.csv')
+    m2 = cache.get_metadata('metadata2.csv')
     assert metadata2_v1.equals(m2)
 
     # check that data files have expected hashes
@@ -227,11 +227,11 @@ def test_full_cache_system(tmpdir):
 
     # metadata2.csv should not exist in this version of the dataset
     with pytest.raises(ValueError) as context:
-        cache.metadata('metadata2.csv')
+        cache.get_metadata('metadata2.csv')
     assert 'is not in self.metadata_file_names' in context.value.args[0]
 
     # check that metadata1 has expected contents
-    m1 = cache.metadata('metadata1.csv')
+    m1 = cache.get_metadata('metadata1.csv')
     assert metadata1_v2.equals(m1)
 
     # data3 should not exist in this version of the dataset

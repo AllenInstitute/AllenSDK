@@ -362,7 +362,7 @@ class CloudCache(object):
         self._download_file(file_attributes)
         return file_attributes.local_path
 
-    def metadata(self, fname: str) -> pd.DataFrame:
+    def get_metadata(self, fname: str) -> pd.DataFrame:
         """
         Return a pandas DataFrame of metadata
 

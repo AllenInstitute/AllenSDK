@@ -35,7 +35,7 @@ the local system and return the path where the file has been stored. The list
 of valid values for `metadata_fname` can be found with
 `CloudCache.metadata_file_names`. If users wish to directly access a
 pandas DataFrame of a given metadata file, they can use
-`CloudCache.metadata(metadata_fname)`.
+`CloudCache.get_metadata(metadata_fname)`.
 
 ## Structure of `manifest.json`
 

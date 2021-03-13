@@ -613,5 +613,5 @@ def test_metadata(tmpdir):
     cache = MetadataCache(cache_dir)
     cache.load_manifest('manifest_1.json')
 
-    metadata_df = cache.metadata('metadata_file.csv')
+    metadata_df = cache.get_metadata('metadata_file.csv')
     assert true_df.equals(metadata_df)
