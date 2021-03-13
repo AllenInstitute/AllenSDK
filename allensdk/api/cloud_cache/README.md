@@ -5,8 +5,9 @@ Cloud Cache
 
 The classes defined in this directory are designed to provide programmatic
 access to version-controlled, cloud-hosted datasets. Users download these
-datasets using the `CloudCache` class defined in `cloud_cache.py`.
-The datasets accessed by `CloudCache` generally consist of three parts
+datasets using sub-classes of the `CloudCache` class defined in
+`cloud_cache.py`. The datasets accessed by `CloudCache` generally
+consist of three parts
 
 - Some arbitrary number of metadata files. These will be csv files suitable for
 reading with pandas.
@@ -22,15 +23,15 @@ be accessed through `cache.manifest_file_names`. Loading the manifest
 essentially configures `CloudCache` to access the corresponding version of the
 dataset.
 
-`CloudCache.data_path(file_id)` will download a data file to the local
+`CloudCache.download_data(file_id)` will download a data file to the local
 sytem and return the path to where that file has been downloaded. If the file
-has already been downloaded, `CloudCache.data_path(file_id)` will just return
-the path to the local copy of the file without downloading it again. In this
-call `file_id` is a unique identifier for each data file corresponding to a
-column in the metadata files. The name of that column can be found with
+has already been downloaded, `CloudCache.download_data(file_id)` will just
+return the path to the local copy of the file without downloading it again.
+In this call `file_id` is a unique identifier for each data file corresponding
+to a column in the metadata files. The name of that column can be found with
 `CloudCache.file_id_column`.
 
-`CloudCache.metadata_path(metadata_fname)` will download a metadata file to
+`CloudCache.download_metadata(metadata_fname)` will download a metadata file to
 the local system and return the path where the file has been stored. The list
 of valid values for `metadata_fname` can be found with
 `CloudCache.metadata_file_names`. If users wish to directly access a
@@ -99,3 +100,28 @@ version of the data file.
 The `version_id` entry in the `manifest.json` description of resources is
 necessary to disambiguate different versions of the same file when downloading
 the resources from the cloud service.
+
+## Implementation of `CloudCache`
+
+`CloudCache` is actually just a base class that is meant to be cloud-provider
+agnostic. In order to actually access a dataset, a sub-class of `CloudCache`
+must be implemented which knows how to access the specific cloud service
+hosting the data (see, for instance `S3CloudCache`, also defined in
+`cloud_cache.py`). Sub-classes of `CloudCache` must implement
+
+### `_list_all_manifests`
+
+Takes no arguments beyond `self`. Returns a list of all `manifest.json` files
+in the dataset (with the `manifest/` prefix removed from the path).
+
+### `_download_manifest`
+
+Takes the name of a `manifest.json` file an `io.BytesIO` stream. Downloads the
+contents of the `manifest.json`, loads it into the stream, and resets the
+stream to the beginning (i.e. `stream.seek(0)`). Returns nothing.
+
+### `_downlaod_file`
+
+Takes a `CacheFileAttributes` (defined in `file_attributes.py`) describing a
+file. Checks to see if the local file exists in a valid state. If not,
+downloads the file.

@@ -6,14 +6,14 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
-from allensdk.api.cloud_cache.cloud_cache import CloudCache  # noqa: E501
+from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 @mock_s3
 def test_list_all_manifests():
     """
-    Test that CloudCache.list_al_manifests() returns the correct result
+    Test that S3CloudCache.list_al_manifests() returns the correct result
     """
 
     test_bucket_name = 'list_manifest_bucket'
@@ -32,7 +32,7 @@ def test_list_all_manifests():
                       Key='junk.txt',
                       Body=b'123456')
 
-    class DummyCache(CloudCache):
+    class DummyCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache = DummyCache('/my/cache/dir')
@@ -62,7 +62,7 @@ def test_list_all_manifests_many():
                       Key='junk.txt',
                       Body=b'123456')
 
-    class DummyCache(CloudCache):
+    class DummyCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache = DummyCache('/my/cache/dir')
@@ -75,7 +75,7 @@ def test_list_all_manifests_many():
 @mock_s3
 def test_loading_manifest():
     """
-    Test loading manifests with CloudCache
+    Test loading manifests with S3CloudCache
     """
 
     test_bucket_name = 'list_manifest_bucket'
@@ -111,7 +111,7 @@ def test_loading_manifest():
                       Key='manifests/manifest_2.csv',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
-    class DummyCache(CloudCache):
+    class DummyCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache = DummyCache('/my/cache/dir')
@@ -144,12 +144,12 @@ def test_file_exists(tmpdir):
         out_file.write(data)
 
     # need to populate a bucket in order for
-    # CloudCache to be instantiated
+    # S3CloudCache to be instantiated
     test_bucket_name = 'silly_bucket'
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
-    class SillyCache(CloudCache):
+    class SillyCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache = SillyCache('my/cache/dir')
@@ -190,7 +190,7 @@ def test_file_exists(tmpdir):
 @mock_s3
 def test_download_file(tmpdir):
     """
-    Test that CloudCache._download_file behaves as expected
+    Test that S3CloudCache._download_file behaves as expected
     """
 
     hasher = hashlib.blake2b()
@@ -215,7 +215,7 @@ def test_download_file(tmpdir):
     response = client.list_object_versions(Bucket=test_bucket_name)
     version_id = response['Versions'][0]['VersionId']
 
-    class DownloadTestCache(CloudCache):
+    class DownloadTestCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
@@ -241,7 +241,7 @@ def test_download_file(tmpdir):
 @mock_s3
 def test_download_file_multiple_versions(tmpdir):
     """
-    Test that CloudCache._download_file behaves as expected
+    Test that S3CloudCache._download_file behaves as expected
     when there are multiple versions of the same file in the
     bucket
 
@@ -291,7 +291,7 @@ def test_download_file_multiple_versions(tmpdir):
     assert version_id_2 is not None
     assert version_id_2 != version_id_1
 
-    class DownloadVersionTestCache(CloudCache):
+    class DownloadVersionTestCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
@@ -335,7 +335,7 @@ def test_download_file_multiple_versions(tmpdir):
 @mock_s3
 def test_re_download_file(tmpdir):
     """
-    Test that CloudCache._download_file will re-download a file
+    Test that S3CloudCache._download_file will re-download a file
     when it has been altered locally
     """
 
@@ -361,7 +361,7 @@ def test_re_download_file(tmpdir):
     response = client.list_object_versions(Bucket=test_bucket_name)
     version_id = response['Versions'][0]['VersionId']
 
-    class ReDownloadTestCache(CloudCache):
+    class ReDownloadTestCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
@@ -413,7 +413,7 @@ def test_re_download_file(tmpdir):
 @mock_s3
 def test_download_data(tmpdir):
     """
-    Test that CloudCache.download_data() correctly downloads files from S3
+    Test that S3CloudCache.download_data() correctly downloads files from S3
     """
 
     hasher = hashlib.blake2b()
@@ -453,7 +453,7 @@ def test_download_data(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class DataPathCache(CloudCache):
+    class DataPathCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / "data/path/cache"
@@ -486,7 +486,8 @@ def test_download_data(tmpdir):
 @mock_s3
 def test_download_metadata(tmpdir):
     """
-    Test that CloudCache.download_metadata() correctly downloads files from S3
+    Test that S3CloudCache.download_metadata() correctly
+    downloads files from S3
     """
 
     hasher = hashlib.blake2b()
@@ -525,7 +526,7 @@ def test_download_metadata(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class MetadataPathCache(CloudCache):
+    class MetadataPathCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/path/cache"
@@ -558,7 +559,7 @@ def test_download_metadata(tmpdir):
 @mock_s3
 def test_metadata(tmpdir):
     """
-    Test that CloudCache.metadata() returns the expected pandas DataFrame
+    Test that S3CloudCache.metadata() returns the expected pandas DataFrame
     """
     data = {}
     data['mouse_id'] = [1, 4, 6, 8]
@@ -606,7 +607,7 @@ def test_metadata(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class MetadataCache(CloudCache):
+    class MetadataCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/cache"

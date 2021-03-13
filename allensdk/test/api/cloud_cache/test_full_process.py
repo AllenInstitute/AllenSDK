@@ -6,7 +6,7 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
-from allensdk.api.cloud_cache.cloud_cache import CloudCache
+from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
 
 @mock_s3
@@ -185,9 +185,9 @@ def test_full_cache_system(tmpdir):
                          Key='manifests/manifest_2.json',
                          Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
-    # Use CloudCache to interact with dataset
+    # Use S3CloudCache to interact with dataset
 
-    class FullTestCache(CloudCache):
+    class FullTestCache(S3CloudCache):
         _bucket_name = test_bucket_name
 
     cache_dir = pathlib.Path(tmpdir) / 'my/test/cache'

@@ -30,13 +30,60 @@ class CloudCache(object):
     ----------
     cache_dir: str or pathlib.Path
         Path to the directory where data will be stored on the local system
+
+    ***** THIS IS JUST A BASE CLASS AND CANNOT BE INSTANTIATED *****
+
+    Actual implementations of this class must implement
+    ===================================================
+
+    def _list_all_manifests(self) -> list:
+        Return a list of all of the file names of the manifests associated
+        with this dataset
+
+    def _download_manifest(self,
+                           manifest_name: str,
+                           output_stream: io.BytesIO):
+        Download a manifest from the dataset into output_stream.
+        Reset output_stream to the beginning
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+
+        output_stream: io.BytesIO
+            A byte stream into which to load the manifest
+
+    def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
+
+        Check if a file exists and is in the expected state.
+
+        If it is, return True.
+
+        If it is not, download the file, creating the directory
+        where the file is to be stored if necessary.
+
+        If the download is successful, return True.
+
+        If the download fails (file hash does not match expectation),
+        return False.
+
+        Parameters
+        ----------
+        file_attributes: CacheFileAttributes
+            Describes the file to download
+
+        Returns
+        -------
+        None
+
     """
 
     _bucket_name = None
 
     def __init__(self, cache_dir):
         self._manifest = Manifest(cache_dir)
-        self._s3_client = None
         self._manifest_file_names = self._list_all_manifests()
 
     @property
@@ -62,49 +109,12 @@ class CloudCache(object):
         return self._manifest.metadata_file_names
 
     @property
-    def s3_client(self):
-        if self._s3_client is None:
-            s3_config = Config(signature_version=UNSIGNED)
-            self._s3_client = boto3.client('s3',
-                                           config=s3_config)
-        return self._s3_client
-
-    @property
     def manifest_file_names(self) -> list:
         """
         Sorted list of manifest file names associated with this
         dataset
         """
         return copy.deepcopy(self._manifest_file_names)
-
-    def _list_all_manifests(self) -> list:
-        """
-        Return a list of all of the file names of the manifests associated
-        with this dataset
-        """
-        output = []
-        continuation_token = None
-        keep_going = True
-        while keep_going:
-            if continuation_token is not None:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix='manifests/',
-                                                        ContinuationToken=continuation_token)  # noqa: E501
-            else:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix='manifests/')
-
-            if 'Contents' in subset:
-                for obj in subset['Contents']:
-                    output.append(pathlib.Path(obj['Key']).name)
-
-            if 'NextContinuationToken' in subset:
-                continuation_token = subset['NextContinuationToken']
-            else:
-                keep_going = False
-
-        output.sort()
-        return output
 
     def load_manifest(self, manifest_name: str):
         """
@@ -123,13 +133,34 @@ class CloudCache(object):
                              f"{self.manifest_file_names}")
 
         manifest_key = 'manifests/' + manifest_name
-        response = self.s3_client.get_object(Bucket=self._bucket_name,
-                                             Key=manifest_key)
         with io.BytesIO() as stream:
-            for chunk in response['Body'].iter_chunks():
-                stream.write(chunk)
-            stream.seek(0)
+            self._download_manifest(manifest_name, stream)
             self._manifest.load(stream)
+
+    def _list_all_manifests(self) -> list:
+        """
+        Return a list of all of the file names of the manifests associated
+        with this dataset
+        """
+        raise NotImplementedError()
+
+    def _download_manifest(self,
+                           manifest_name: str,
+                           output_stream: io.BytesIO):
+        """
+        Download a manifest from the dataset into output_stream.
+        Reset output_stream to the beginning
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+
+        output_stream: io.BytesIO
+            A byte stream into which to load the manifest
+        """
+        raise NotImplementedError()
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
@@ -189,7 +220,7 @@ class CloudCache(object):
 
         Returns
         -------
-        boolean
+        None
 
         Raises
         ------
@@ -201,42 +232,7 @@ class CloudCache(object):
             If it is not able to successfully download the file after
             10 iterations
         """
-
-        local_path = file_attributes.local_path
-        local_dir = safe_system_path(local_path.parents[0])
-
-        # using os here rather than pathlib because safe_system_path
-        # returns a str
-        if not os.path.exists(local_dir):
-            os.makedirs(local_dir)
-        if not os.path.isdir(local_dir):
-            raise RuntimeError(f"{local_dir}\n"
-                               "is not a directory")
-
-        bucket_name = bucket_name_from_url(file_attributes.url)
-        obj_key = relative_path_from_url(file_attributes.url)
-
-        n_iter = 0
-        max_iter = 10  # maximum number of times to try download
-
-        version_id = file_attributes.version_id
-
-        while not self._file_exists(file_attributes):
-            response = self.s3_client.get_object(Bucket=bucket_name,
-                                                 Key=str(obj_key),
-                                                 VersionId=version_id)
-
-            if 'Body' in response:
-                with open(local_path, 'wb') as out_file:
-                    for chunk in response['Body'].iter_chunks():
-                        out_file.write(chunk)
-
-            n_iter += 1
-            if n_iter > max_iter:
-                raise RuntimeError("Could not download\n"
-                                   f"{file_attributes}\n"
-                                   "In {max_iter} iterations")
-        return None
+        raise NotImplementedError()
 
     def data_path(self, file_id) -> LocalFileDescription:
         """
@@ -383,3 +379,147 @@ class CloudCache(object):
         """
         local_path = self.download_metadata(fname)
         return pd.read_csv(local_path)
+
+
+class S3CloudCache(CloudCache):
+    """
+    A class to handle the downloading and accessing of data served from
+    an S3-based storage system
+
+    Parameters
+    ----------
+    cache_dir: str or pathlib.Path
+        Path to the directory where data will be stored on the local system
+    """
+
+    _s3_client = None
+
+    @property
+    def s3_client(self):
+        if self._s3_client is None:
+            s3_config = Config(signature_version=UNSIGNED)
+            self._s3_client = boto3.client('s3',
+                                           config=s3_config)
+        return self._s3_client
+
+    def _list_all_manifests(self) -> list:
+        """
+        Return a list of all of the file names of the manifests associated
+        with this dataset
+        """
+        output = []
+        continuation_token = None
+        keep_going = True
+        while keep_going:
+            if continuation_token is not None:
+                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
+                                                        Prefix='manifests/',
+                                                        ContinuationToken=continuation_token)  # noqa: E501
+            else:
+                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
+                                                        Prefix='manifests/')
+
+            if 'Contents' in subset:
+                for obj in subset['Contents']:
+                    output.append(pathlib.Path(obj['Key']).name)
+
+            if 'NextContinuationToken' in subset:
+                continuation_token = subset['NextContinuationToken']
+            else:
+                keep_going = False
+
+        output.sort()
+        return output
+
+    def _download_manifest(self,
+                           manifest_name: str,
+                           output_stream: io.BytesIO):
+        """
+        Download a manifest from the dataset
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+
+        output_stream: io.BytesIO
+            A byte stream into which to load the manifest
+        """
+
+        manifest_key = 'manifests/' + manifest_name
+        response = self.s3_client.get_object(Bucket=self._bucket_name,
+                                             Key=manifest_key)
+        for chunk in response['Body'].iter_chunks():
+            output_stream.write(chunk)
+        output_stream.seek(0)
+
+    def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
+        """
+        Check if a file exists and is in the expected state.
+
+        If it is, return True.
+
+        If it is not, download the file, creating the directory
+        where the file is to be stored if necessary.
+
+        If the download is successful, return True.
+
+        If the download fails (file hash does not match expectation),
+        return False.
+
+        Parameters
+        ----------
+        file_attributes: CacheFileAttributes
+            Describes the file to download
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        RuntimeError
+            If the path to the directory where the file is to be saved
+            points to something that is not a directory.
+
+        RuntimeError
+            If it is not able to successfully download the file after
+            10 iterations
+        """
+
+        local_path = file_attributes.local_path
+        local_dir = safe_system_path(local_path.parents[0])
+
+        # using os here rather than pathlib because safe_system_path
+        # returns a str
+        if not os.path.exists(local_dir):
+            os.makedirs(local_dir)
+        if not os.path.isdir(local_dir):
+            raise RuntimeError(f"{local_dir}\n"
+                               "is not a directory")
+
+        bucket_name = bucket_name_from_url(file_attributes.url)
+        obj_key = relative_path_from_url(file_attributes.url)
+
+        n_iter = 0
+        max_iter = 10  # maximum number of times to try download
+
+        version_id = file_attributes.version_id
+
+        while not self._file_exists(file_attributes):
+            response = self.s3_client.get_object(Bucket=bucket_name,
+                                                 Key=str(obj_key),
+                                                 VersionId=version_id)
+
+            if 'Body' in response:
+                with open(local_path, 'wb') as out_file:
+                    for chunk in response['Body'].iter_chunks():
+                        out_file.write(chunk)
+
+            n_iter += 1
+            if n_iter > max_iter:
+                raise RuntimeError("Could not download\n"
+                                   f"{file_attributes}\n"
+                                   "In {max_iter} iterations")
+        return None
