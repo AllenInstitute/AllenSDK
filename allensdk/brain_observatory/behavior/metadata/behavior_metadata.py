@@ -342,14 +342,16 @@ class BehaviorMetadata:
         """
         if not age.startswith('P'):
             if warn:
-                warnings.warn('Could not parse numeric age from age code')
+                warnings.warn('Could not parse numeric age from age code '
+                              '(age code does not start with "P")')
             return None
 
         match = re.search(r'\d+', age)
 
         if match is None:
             if warn:
-                warnings.warn('Could not parse numeric age from age code')
+                warnings.warn('Could not parse numeric age from age code '
+                              '(no numeric values found in age code)')
             return None
 
         start, end = match.span()
@@ -373,9 +375,15 @@ class BehaviorMetadata:
         ---------
         single reporter line, or None if not possible
         """
-        if not reporter_line:
+        if reporter_line is None:
             if warn:
-                warnings.warn('Error parsing reporter line. No reporter line')
+                warnings.warn('Error parsing reporter line. It is null.')
+            return None
+
+        if len(reporter_line) == 0:
+            if warn:
+                warnings.warn('Error parsing reporter line. '
+                              'The array is empty')
             return None
 
         if isinstance(reporter_line, str):
