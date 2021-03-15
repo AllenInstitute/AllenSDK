@@ -118,10 +118,14 @@ def test_loading_manifest():
     cache.load_manifest('manifest_1.csv')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
+    assert cache.file_id_column == 'file_id'
+    assert cache.metadata_file_names == ['a.csv', 'b.csv']
 
     cache.load_manifest('manifest_2.csv')
     assert cache._manifest._data == manifest_2
     assert cache.version == '2'
+    assert cache.file_id_column == 'file_id'
+    assert cache.metadata_file_names == ['c.csv', 'd.csv']
 
     with pytest.raises(ValueError) as context:
         cache.load_manifest('manifest_3.csv')
