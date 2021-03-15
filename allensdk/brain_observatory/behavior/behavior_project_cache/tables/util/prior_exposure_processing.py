@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 import pandas as pd
@@ -42,14 +43,11 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     """
 
     def __get_image_set_name(session_type: Optional[str]):
-        if 'images' not in session_type:
+        match = re.match(r'OPHYS_\d+_images_(?P<image_set>\w)',
+                         session_type)
+        if match is None:
             return None
-
-        try:
-            image_set = session_type.split('_')[3]
-        except IndexError:
-            image_set = None
-        return image_set
+        return match.group('image_set')
 
     session_type = df['session_type'][
         df['session_type'].notnull()]
