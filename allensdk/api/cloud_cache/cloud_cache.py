@@ -444,7 +444,12 @@ class S3CloudCache(CloudCacheBase):
         """
 
         local_path = file_attributes.local_path
-        local_dir = safe_system_path(local_path.parents[0])
+
+        local_dir = pathlib.Path(safe_system_path(str(local_path.parents[0])))
+
+        # make sure Windows references to Allen Institute
+        # local networked file system get handled correctly
+        local_path = pathlib.Path(safe_system_path(str(local_path)))
 
         # using os here rather than pathlib because safe_system_path
         # returns a str

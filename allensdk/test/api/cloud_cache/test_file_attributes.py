@@ -1,3 +1,4 @@
+import platform
 import pytest
 import pathlib
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
@@ -68,4 +69,5 @@ def test_str():
     assert '"file_hash": "12345"' in s
     assert '"url": "http://my/url"' in s
     assert '"version_id": "aaabbb"' in s
-    assert '"local_path": "/my/local/path"' in s
+    if platform.system().lower() != 'windows':
+        assert '"local_path": "/my/local/path"' in s
