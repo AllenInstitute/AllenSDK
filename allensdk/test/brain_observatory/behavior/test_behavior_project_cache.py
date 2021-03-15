@@ -214,6 +214,7 @@ def test_get_session_table_by_experiment(TempdirBehaviorCache):
     expected = (pd.DataFrame({"ophys_session_id": [1, 1],
                               "ophys_experiment_id": [5, 6]})
                 .set_index("ophys_experiment_id"))
-    actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
+    actual = TempdirBehaviorCache.get_session_table(
+        index_column="ophys_experiment_id")[
         ["ophys_session_id"]]
     pd.testing.assert_frame_equal(expected, actual)
