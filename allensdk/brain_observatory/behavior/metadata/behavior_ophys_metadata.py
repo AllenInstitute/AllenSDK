@@ -60,12 +60,6 @@ class BehaviorOphysMetadata(BehaviorMetadata):
         return self._extractor.get_plane_group_count()
 
     @property
-    def indicator(self) -> Optional[str]:
-        """Parses indicator from reporter"""
-        reporter_line = self.reporter_line
-        return self.parse_indicator(reporter_line=reporter_line)
-
-    @property
     def ophys_experiment_id(self) -> int:
         return self._extractor.get_ophys_experiment_id()
 
@@ -95,29 +89,3 @@ class BehaviorOphysMetadata(BehaviorMetadata):
         vars_ = vars(BehaviorOphysMetadata)
         d = self._get_properties(vars_=vars_)
         return {**super().to_dict(), **d}
-
-    @staticmethod
-    def parse_indicator(reporter_line: Optional[str], warn=False) -> Optional[
-            str]:
-        """Parses indicator from reporter"""
-        reporter_substring_indicator_map = {
-            'GCaMP6f': 'GCaMP6f',
-            'GC6f': 'GCaMP6f',
-            'GCaMP6s': 'GCaMP6s'
-        }
-        if reporter_line is None:
-            if warn:
-                warnings.warn(
-                    'Could not parse indicator from reporter because '
-                    'there is no reporter')
-            return None
-
-        for substr, indicator in reporter_substring_indicator_map.items():
-            if substr in reporter_line:
-                return indicator
-
-        if warn:
-            warnings.warn(
-                'Could not parse indicator from reporter because none'
-                'of the expected substrings were found in the reporter')
-        return None

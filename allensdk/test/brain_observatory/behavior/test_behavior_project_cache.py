@@ -15,7 +15,7 @@ def session_table():
                           "foraging_id": [1],
                           "ophys_experiment_id": [[5, 6]],
                           "date_of_acquisition": np.datetime64('2020-02-20'),
-                          "reporter_line": ["aa"],
+                          "reporter_line": ["Ai93(TITL-GCaMP6f)"],
                           "driver_line": [["aa"]],
                           'full_genotype': [
                               'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
@@ -23,7 +23,8 @@ def session_table():
                           'cre_line': ['Vip-IRES-Cre'],
                           'session_type': ['OPHYS_1_images_A'],
                           'mouse_id': [1],
-                          'session_number': [1]
+                          'session_number': [1],
+                          'indicator': ['GCaMP6f']
                           }, index=pd.Index([1], name='ophys_session_id'))
             )
 
@@ -37,7 +38,9 @@ def behavior_table():
                               np.datetime64('2020-02-21'),
                               np.datetime64('2020-02-22')
                           ],
-                          "reporter_line": ["aa", "bb", "cc"],
+                          "reporter_line": ["Ai93(TITL-GCaMP6f)",
+                                            "Ai93(TITL-GCaMP6f)",
+                                            "Ai93(TITL-GCaMP6f)"],
                           "driver_line": [["aa"], ["aa", "bb"], ["cc"]],
                           'full_genotype': [
                               'foo-SlcCre',
@@ -52,7 +55,8 @@ def behavior_table():
                           'prior_exposures_to_session_type': [0, 1, 0],
                           'prior_exposures_to_image_set': [
                               np.nan, np.nan, 0],
-                          'prior_exposures_to_omissions': [0, 0, 0]
+                          'prior_exposures_to_omissions': [0, 0, 0],
+                          'indicator': ['GCaMP6f', 'GCaMP6f', 'GCaMP6f']
                           })
             .set_index("behavior_session_id"))
 

@@ -581,3 +581,43 @@ def test_get_date_of_acquisition(monkeypatch, tmp_path, test_params,
             obt_date = metadata.date_of_acquisition
 
         assert obt_date == extractor_expt_date
+
+
+def test_indicator(monkeypatch):
+    """Test that indicator is parsed from full_genotype"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return 'Ai148(TIT2L-GC6f-ICL-tTA2)'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.indicator == 'GCaMP6f'
+
+
+def test_indicator_invalid_reporter_line(monkeypatch):
+    """Test that indicator is None if it can't be parsed from reporter line"""
+    class MockExtractor:
+        def get_reporter_line(self):
+            return 'foo'
+    extractor = MockExtractor()
+
+    with monkeypatch.context() as ctx:
+        def dummy_init(self):
+            self._extractor = extractor
+
+        ctx.setattr(BehaviorMetadata,
+                    '__init__',
+                    dummy_init)
+
+        metadata = BehaviorMetadata()
+
+        assert metadata.indicator is None

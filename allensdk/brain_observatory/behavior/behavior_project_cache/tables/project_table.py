@@ -39,6 +39,8 @@ class ProjectTable:
             BehaviorMetadata.parse_reporter_line)
         self._df['cre_line'] = self._df['full_genotype'].apply(
             BehaviorMetadata.parse_cre_line)
+        self._df['indicator'] = self._df['reporter_line'].apply(
+            BehaviorMetadata.parse_indicator)
 
         self.__add_session_number()
 

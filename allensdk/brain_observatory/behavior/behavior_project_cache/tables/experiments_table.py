@@ -36,8 +36,5 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         ProjectTable.__init__(self, df=df, suppress=suppress)
 
     def postprocess_additional(self):
-        self._df['indicator'] = self._df['reporter_line'].apply(
-            BehaviorOphysMetadata.parse_indicator)
-
         self._df = self._add_prior_exposures(
             sessions_table=self._sessions_table, df=self._df)

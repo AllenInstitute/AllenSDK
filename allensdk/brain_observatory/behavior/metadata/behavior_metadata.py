@@ -239,6 +239,12 @@ class BehaviorMetadata:
         return self.parse_reporter_line(reporter_line=reporter_line, warn=True)
 
     @property
+    def indicator(self) -> Optional[str]:
+        """Parses indicator from reporter"""
+        reporter_line = self.reporter_line
+        return self.parse_indicator(reporter_line=reporter_line)
+
+    @property
     def cre_line(self) -> Optional[str]:
         """Parses cre_line from full_genotype"""
         cre_line = self.parse_cre_line(full_genotype=self.full_genotype,
@@ -411,3 +417,29 @@ class BehaviorMetadata:
             except AssertionError:
                 return False
         return True
+
+    @staticmethod
+    def parse_indicator(reporter_line: Optional[str], warn=False) -> Optional[
+            str]:
+        """Parses indicator from reporter"""
+        reporter_substring_indicator_map = {
+            'GCaMP6f': 'GCaMP6f',
+            'GC6f': 'GCaMP6f',
+            'GCaMP6s': 'GCaMP6s'
+        }
+        if reporter_line is None:
+            if warn:
+                warnings.warn(
+                    'Could not parse indicator from reporter because '
+                    'there is no reporter')
+            return None
+
+        for substr, indicator in reporter_substring_indicator_map.items():
+            if substr in reporter_line:
+                return indicator
+
+        if warn:
+            warnings.warn(
+                'Could not parse indicator from reporter because none'
+                'of the expected substrings were found in the reporter')
+        return None
