@@ -167,17 +167,18 @@ class BehaviorProjectCache(Cache):
     def get_session_table(
             self,
             suppress: Optional[List[str]] = None,
-            by: str = "ophys_session_id") -> pd.DataFrame:
+            index_column: str = "ophys_session_id") -> pd.DataFrame:
         """
         Return summary table of all ophys_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :type suppress: list of str
-        :param by: (default="ophys_session_id"). Column to index on, either
+        :param index_column: (default="ophys_session_id"). Column to index
+        on, either
             "ophys_session_id" or "ophys_experiment_id".
-            If by="ophys_experiment_id", then each row will only have one
-            experiment id, of type int (vs. an array of 1>more).
-        :type by: str
+            If index_column="ophys_experiment_id", then each row will only have
+            one experiment id, of type int (vs. an array of 1>more).
+        :type index_column: str
         :rtype: pd.DataFrame
         """
         if self.cache:
@@ -193,7 +194,7 @@ class BehaviorProjectCache(Cache):
                                                          as_df=False)
         sessions = BehaviorOphysSessionsTable(df=sessions,
                                               suppress=suppress,
-                                              by=by,
+                                              index_column=index_column,
                                               sessions_table=sessions_table)
         return sessions.table
 

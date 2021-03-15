@@ -18,7 +18,7 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
     def __init__(self, df: pd.DataFrame,
                  sessions_table: SessionsTable,
                  suppress: Optional[List[str]] = None,
-                 by: str = 'ophys_session_id'):
+                 index_column: str = 'ophys_session_id'):
         """
         Parameters
         ----------
@@ -28,12 +28,12 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
             All session-level data (needed to calculate exposure counts)
         suppress
             columns to drop from table
-        by
+        index_column
             See description in BehaviorProjectCache.get_session_table
         """
 
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._by = by
+        self._index_column = index_column
         self._sessions_table = sessions_table
         super().__init__(df=df, suppress=suppress)
 
@@ -45,15 +45,15 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         self.__explode()
 
     def __explode(self):
-        if self._by == "ophys_session_id":
+        if self._index_column == "ophys_session_id":
             pass
-        elif self._by == "ophys_experiment_id":
+        elif self._index_column == "ophys_experiment_id":
             self._df = (self._df.reset_index()
                         .explode("ophys_experiment_id")
                         .set_index("ophys_experiment_id"))
         else:
             self._logger.warning(
-                f"Invalid value for `by`, '{self._by}', passed to "
+                f"Invalid value for `by`, '{self._index_column}', passed to "
                 f"BehaviorOphysSessionsCacheTable."
                 " Valid choices for `by` are 'ophys_experiment_id' and "
                 "'ophys_session_id'.")
