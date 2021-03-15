@@ -16,7 +16,7 @@ from allensdk.brain_observatory.behavior.project_apis.data_io import (
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .ophys_sessions_table import \
-    OphysSessionsTable
+    BehaviorOphysSessionsTable
 from allensdk.core.authentication import DbCredentials
 
 
@@ -191,10 +191,10 @@ class BehaviorProjectCache(Cache):
             sessions = self.fetch_api.get_session_table()
         sessions_table = self.get_behavior_session_table(suppress=suppress,
                                                          as_df=False)
-        sessions = OphysSessionsTable(df=sessions,
-                                      suppress=suppress,
-                                      by=by,
-                                      sessions_table=sessions_table)
+        sessions = BehaviorOphysSessionsTable(df=sessions,
+                                              suppress=suppress,
+                                              by=by,
+                                              sessions_table=sessions_table)
         return sessions.table
 
     def add_manifest_paths(self, manifest_builder):

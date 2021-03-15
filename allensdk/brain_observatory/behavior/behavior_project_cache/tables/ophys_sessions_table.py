@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .sessions_table import SessionsTable
 
 
-class OphysSessionsTable(ProjectTable, OphysMixin):
+class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
     """Class for storing and manipulating project-level data
     at the behavior-ophys session level"""
     def __init__(self, df: pd.DataFrame,
