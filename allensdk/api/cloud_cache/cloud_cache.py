@@ -148,7 +148,6 @@ class CloudCacheBase(ABC):
                              "for this dataset:\n"
                              f"{self.manifest_file_names}")
 
-        manifest_key = 'manifests/' + manifest_name
         with io.BytesIO() as stream:
             self._download_manifest(manifest_name, stream)
             self._manifest.load(stream)
