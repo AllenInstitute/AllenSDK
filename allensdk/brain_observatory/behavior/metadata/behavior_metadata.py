@@ -242,7 +242,7 @@ class BehaviorMetadata:
     def indicator(self) -> Optional[str]:
         """Parses indicator from reporter"""
         reporter_line = self.reporter_line
-        return self.parse_indicator(reporter_line=reporter_line)
+        return self.parse_indicator(reporter_line=reporter_line, warn=True)
 
     @property
     def cre_line(self) -> Optional[str]:
