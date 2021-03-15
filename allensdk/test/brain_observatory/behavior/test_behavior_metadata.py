@@ -126,8 +126,8 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
                                          },
                                          "stimuli": {
                                              "grating": {"draw_log": [1] * 10,
-                                                         "flash_interval_sec": [
-                                                             0.34, -1.0]}
+                                                         "flash_interval_sec":
+                                                             [0.34, -1.0]}
                                          },
                                      }
                                  }
@@ -170,8 +170,9 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
                                              "flash_omit_probability": 0.05
                                          },
                                          "stimuli": {
-                                             "grating": {"draw_log": [1] * 10,
-                                                         "flash_interval_sec": None}
+                                             "grating": {
+                                                 "draw_log": [1] * 10,
+                                                 "flash_interval_sec": None}
                                          },
                                      }
                                  }
@@ -510,9 +511,7 @@ def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
          "pkl_expt_date": datetime.strptime("2021-03-14 03:14:15",
                                             "%Y-%m-%d %H:%M:%S"),
          "behavior_session_id": 1
-     },
-     None
-    ),
+     }, None),
 
     # pkl expt date stored in unix format
     ({
@@ -520,9 +519,7 @@ def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
                                                   "%Y-%m-%d %H:%M:%S"),
          "pkl_expt_date": 1615716855.0,
          "behavior_session_id": 2
-     },
-     None
-    ),
+     }, None),
 
     # Extractor and pkl dates differ significantly
     ({
@@ -532,8 +529,7 @@ def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
                                             "%Y-%m-%d %H:%M:%S"),
          "behavior_session_id": 3
      },
-     "The `date_of_acquisition` field in LIMS *"
-    ),
+     "The `date_of_acquisition` field in LIMS *"),
 
     # pkl file contains an unparseable datetime
     ({
@@ -542,8 +538,7 @@ def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
          "pkl_expt_date": None,
          "behavior_session_id": 4
      },
-     "Could not parse the acquisition datetime *"
-    ),
+     "Could not parse the acquisition datetime *"),
 ])
 def test_get_date_of_acquisition(monkeypatch, tmp_path, test_params,
                                  expected_warn_msg):
