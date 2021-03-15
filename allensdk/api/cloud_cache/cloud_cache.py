@@ -4,7 +4,6 @@ import copy
 import io
 import pathlib
 import pandas as pd
-from typing import TypedDict
 import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
@@ -14,12 +13,6 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 from allensdk.api.cloud_cache.utils import file_hash_from_path  # noqa: E501
 from allensdk.api.cloud_cache.utils import bucket_name_from_url  # noqa: E501
 from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
-
-
-class LocalFileDescription(TypedDict):
-    local_path: pathlib.Path
-    exists: bool
-    file_attributes: CacheFileAttributes
 
 
 class CloudCacheBase(ABC):
@@ -189,7 +182,7 @@ class CloudCacheBase(ABC):
 
         return True
 
-    def data_path(self, file_id) -> LocalFileDescription:
+    def data_path(self, file_id) -> dict:
         """
         Return the local path to a data file, and test for the
         file's existence/validity
@@ -201,7 +194,7 @@ class CloudCacheBase(ABC):
 
         Returns
         -------
-        LocalFileDescription: a TypedDict
+        dict
 
             'path' will be a pathlib.Path pointing to the file's location
 
@@ -219,9 +212,9 @@ class CloudCacheBase(ABC):
         file_attributes = self._manifest.data_file_attributes(file_id)
         exists = self._file_exists(file_attributes)
         local_path = file_attributes.local_path
-        output: LocalFileDescription = {'local_path': local_path,
-                                        'exists': exists,
-                                        'file_attributes': file_attributes}
+        output = {'local_path': local_path,
+                  'exists': exists,
+                  'file_attributes': file_attributes}
 
         return output
 
@@ -251,7 +244,7 @@ class CloudCacheBase(ABC):
         self._download_file(file_attributes)
         return file_attributes.local_path
 
-    def metadata_path(self, fname: str) -> LocalFileDescription:
+    def metadata_path(self, fname: str) -> dict:
         """
         Return the local path to a metadata file, and test for the
         file's existence/validity
@@ -263,7 +256,7 @@ class CloudCacheBase(ABC):
 
         Returns
         -------
-        LocalFileDescription: a TypedDict
+        dict
 
             'path' will be a pathlib.Path pointing to the file's location
 
@@ -281,9 +274,9 @@ class CloudCacheBase(ABC):
         file_attributes = self._manifest.metadata_file_attributes(fname)
         exists = self._file_exists(file_attributes)
         local_path = file_attributes.local_path
-        output: LocalFileDescription = {'local_path': local_path,
-                                        'exists': exists,
-                                        'file_attributes': file_attributes}
+        output = {'local_path': local_path,
+                  'exists': exists,
+                  'file_attributes': file_attributes}
 
         return output
 
