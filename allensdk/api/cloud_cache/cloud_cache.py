@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import os
 import copy
 import io
@@ -21,7 +22,7 @@ class LocalFileDescription(TypedDict):
     file_attributes: CacheFileAttributes
 
 
-class CloudCache(object):
+class CloudCacheBase(ABC):
     """
     A class to handle the downloading and accessing of data served from a cloud
     storage system
@@ -30,19 +31,27 @@ class CloudCache(object):
     ----------
     cache_dir: str or pathlib.Path
         Path to the directory where data will be stored on the local system
+    """
 
-    ***** THIS IS JUST A BASE CLASS AND CANNOT BE INSTANTIATED *****
+    _bucket_name = None
 
-    Actual implementations of this class must implement
-    ===================================================
+    def __init__(self, cache_dir):
+        self._manifest = Manifest(cache_dir)
+        self._manifest_file_names = self._list_all_manifests()
 
+    @abstractmethod
     def _list_all_manifests(self) -> list:
+        """
         Return a list of all of the file names of the manifests associated
         with this dataset
+        """
+        raise NotImplementedError()
 
+    @abstractmethod
     def _download_manifest(self,
                            manifest_name: str,
                            output_stream: io.BytesIO):
+        """
         Download a manifest from the dataset into output_stream.
         Reset output_stream to the beginning
 
@@ -54,9 +63,12 @@ class CloudCache(object):
 
         output_stream: io.BytesIO
             A byte stream into which to load the manifest
+        """
+        raise NotImplementedError()
 
+    @abstractmethod
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
-
+        """
         Check if a file exists and is in the expected state.
 
         If it is, return True.
@@ -78,13 +90,17 @@ class CloudCache(object):
         -------
         None
 
-    """
+        Raises
+        ------
+        RuntimeError
+            If the path to the directory where the file is to be saved
+            points to something that is not a directory.
 
-    _bucket_name = None
-
-    def __init__(self, cache_dir):
-        self._manifest = Manifest(cache_dir)
-        self._manifest_file_names = self._list_all_manifests()
+        RuntimeError
+            If it is not able to successfully download the file after
+            10 iterations
+        """
+        raise NotImplementedError()
 
     @property
     def file_id_column(self) -> str:
@@ -137,31 +153,6 @@ class CloudCache(object):
             self._download_manifest(manifest_name, stream)
             self._manifest.load(stream)
 
-    def _list_all_manifests(self) -> list:
-        """
-        Return a list of all of the file names of the manifests associated
-        with this dataset
-        """
-        raise NotImplementedError()
-
-    def _download_manifest(self,
-                           manifest_name: str,
-                           output_stream: io.BytesIO):
-        """
-        Download a manifest from the dataset into output_stream.
-        Reset output_stream to the beginning
-
-        Parameters
-        ----------
-        manifest_name: str
-            The name of the manifest to load. Must be an element in
-            self.manifest_file_names
-
-        output_stream: io.BytesIO
-            A byte stream into which to load the manifest
-        """
-        raise NotImplementedError()
-
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
         Given a CacheFileAttributes describing a file, assess whether or
@@ -198,41 +189,6 @@ class CloudCache(object):
             return False
 
         return True
-
-    def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
-        """
-        Check if a file exists and is in the expected state.
-
-        If it is, return True.
-
-        If it is not, download the file, creating the directory
-        where the file is to be stored if necessary.
-
-        If the download is successful, return True.
-
-        If the download fails (file hash does not match expectation),
-        return False.
-
-        Parameters
-        ----------
-        file_attributes: CacheFileAttributes
-            Describes the file to download
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        RuntimeError
-            If the path to the directory where the file is to be saved
-            points to something that is not a directory.
-
-        RuntimeError
-            If it is not able to successfully download the file after
-            10 iterations
-        """
-        raise NotImplementedError()
 
     def data_path(self, file_id) -> LocalFileDescription:
         """
@@ -381,7 +337,7 @@ class CloudCache(object):
         return pd.read_csv(local_path)
 
 
-class S3CloudCache(CloudCache):
+class S3CloudCache(CloudCacheBase):
     """
     A class to handle the downloading and accessing of data served from
     an S3-based storage system
