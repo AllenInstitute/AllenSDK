@@ -1,5 +1,5 @@
 import re
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Optional, List
 
 import pandas as pd
@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 
 
-class ProjectTable:
+class ProjectTable(ABC):
     """Class for storing and manipulating project-level data"""
     def __init__(self, df: pd.DataFrame,
                  suppress: Optional[List[str]] = None):

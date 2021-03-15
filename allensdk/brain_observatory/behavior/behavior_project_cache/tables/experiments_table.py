@@ -10,8 +10,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .sessions_table import \
     SessionsTable
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
-    import BehaviorOphysMetadata
 
 
 class ExperimentsTable(ProjectTable, OphysMixin):
