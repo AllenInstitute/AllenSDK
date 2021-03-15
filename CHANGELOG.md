@@ -1,7 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.9.0] = TBD
+## [2.10.0] = TBD
+- Improvements to BehaviorProjectCache 
+
+## [2.9.0] = 20201-03-08
 - Updates to Session metadata; refactors implementation to use class rather than dict internally
 
 ## [2.8.0] = 2021-02-25
