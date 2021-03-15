@@ -7,8 +7,6 @@ import re
 import numpy as np
 import pytz
 
-from allensdk.brain_observatory.behavior.metadata.util import \
-    parse_cre_line, parse_age_in_days
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
@@ -177,7 +175,7 @@ class BehaviorMetadata:
         """Converts the age cod into a numeric days representation"""
 
         age = self._extractor.get_age()
-        return parse_age_in_days(age=age)
+        return self.parse_age_in_days(age=age, warn=True)
 
     @property
     def stimulus_frame_rate(self) -> float:
@@ -237,34 +235,20 @@ class BehaviorMetadata:
 
     @property
     def reporter_line(self) -> Optional[str]:
-        """There can be multiple reporter lines, so it is returned from LIMS
-        as a list. But there shouldn't be more than 1 for behavior. This
-        tries to convert to str
-
-        Returns
-        ---------
-        single reporter line, or None if not possible
-        """
         reporter_line = self._extractor.get_reporter_line()
+        return self.parse_reporter_line(reporter_line=reporter_line, warn=True)
 
-        if isinstance(reporter_line, str):
-            return reporter_line
-
-        if len(reporter_line) == 0:
-            warnings.warn('No reporter line')
-            return None
-
-        if len(reporter_line) > 1:
-            warnings.warn('More than 1 reporter line. Returning the first one')
-
-        return reporter_line[0]
+    @property
+    def indicator(self) -> Optional[str]:
+        """Parses indicator from reporter"""
+        reporter_line = self.reporter_line
+        return self.parse_indicator(reporter_line=reporter_line, warn=True)
 
     @property
     def cre_line(self) -> Optional[str]:
         """Parses cre_line from full_genotype"""
-        cre_line = parse_cre_line(full_genotype=self.full_genotype)
-        if cre_line is None:
-            warnings.warn('Unable to parse cre_line from full_genotype')
+        cre_line = self.parse_cre_line(full_genotype=self.full_genotype,
+                                       warn=True)
         return cre_line
 
     @property
@@ -322,6 +306,96 @@ class BehaviorMetadata:
     def _get_frame_rate(timestamps: np.ndarray):
         return np.round(1 / np.mean(np.diff(timestamps)), 0)
 
+    @staticmethod
+    def parse_cre_line(full_genotype: str, warn=False) -> Optional[str]:
+        """
+        Parameters
+        ----------
+        full_genotype
+            formatted from LIMS, e.g.
+            Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt
+        warn
+            Whether to output warning if parsing fails
+
+        Returns
+        ----------
+        cre_line
+            just the Cre line, e.g. Vip-IRES-Cre, or None if not possible to
+            parse
+        """
+        if ';' not in full_genotype:
+            if warn:
+                warnings.warn('Unable to parse cre_line from full_genotype')
+            return None
+        return full_genotype.split(';')[0].replace('/wt', '')
+
+    @staticmethod
+    def parse_age_in_days(age: str, warn=False) -> Optional[int]:
+        """Converts the age code into a numeric days representation
+
+        Parameters
+        ----------
+        age
+            age code, ie P123
+        warn
+            Whether to output warning if parsing fails
+        """
+        if not age.startswith('P'):
+            if warn:
+                warnings.warn('Could not parse numeric age from age code '
+                              '(age code does not start with "P")')
+            return None
+
+        match = re.search(r'\d+', age)
+
+        if match is None:
+            if warn:
+                warnings.warn('Could not parse numeric age from age code '
+                              '(no numeric values found in age code)')
+            return None
+
+        start, end = match.span()
+        return int(age[start:end])
+
+    @staticmethod
+    def parse_reporter_line(reporter_line: Optional[List[str]],
+                            warn=False) -> Optional[str]:
+        """There can be multiple reporter lines, so it is returned from LIMS
+        as a list. But there shouldn't be more than 1 for behavior. This
+        tries to convert to str
+
+        Parameters
+        ----------
+        reporter_line
+            List of reporter line
+        warn
+            Whether to output warnings if parsing fails
+
+        Returns
+        ---------
+        single reporter line, or None if not possible
+        """
+        if reporter_line is None:
+            if warn:
+                warnings.warn('Error parsing reporter line. It is null.')
+            return None
+
+        if len(reporter_line) == 0:
+            if warn:
+                warnings.warn('Error parsing reporter line. '
+                              'The array is empty')
+            return None
+
+        if isinstance(reporter_line, str):
+            return reporter_line
+
+        if len(reporter_line) > 1:
+            if warn:
+                warnings.warn('More than 1 reporter line. Returning the first '
+                              'one')
+
+        return reporter_line[0]
+
     def _get_properties(self, vars_: dict):
         """Returns all property names and values"""
         return {name: getattr(self, name) for name, value in vars_.items()
@@ -351,3 +425,29 @@ class BehaviorMetadata:
             except AssertionError:
                 return False
         return True
+
+    @staticmethod
+    def parse_indicator(reporter_line: Optional[str], warn=False) -> Optional[
+            str]:
+        """Parses indicator from reporter"""
+        reporter_substring_indicator_map = {
+            'GCaMP6f': 'GCaMP6f',
+            'GC6f': 'GCaMP6f',
+            'GCaMP6s': 'GCaMP6s'
+        }
+        if reporter_line is None:
+            if warn:
+                warnings.warn(
+                    'Could not parse indicator from reporter because '
+                    'there is no reporter')
+            return None
+
+        for substr, indicator in reporter_substring_indicator_map.items():
+            if substr in reporter_line:
+                return indicator
+
+        if warn:
+            warnings.warn(
+                'Could not parse indicator from reporter because none'
+                'of the expected substrings were found in the reporter')
+        return None

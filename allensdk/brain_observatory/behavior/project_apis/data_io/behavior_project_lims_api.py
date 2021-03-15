@@ -11,8 +11,8 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import (
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorOphysLimsApi)
 from allensdk.internal.api import db_connection_creator
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    HttpEngine)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
+    import (HttpEngine)
 from allensdk.core.typing import SupportsStr
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
@@ -140,7 +140,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     def _build_experiment_from_session_query() -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
         with a single ophys_session_id."""
-        query = f"""
+        query = """
             -- -- begin getting all ophys_experiment_ids -- --
             SELECT
                 (ARRAY_AGG(DISTINCT(oe.id))) AS experiment_ids, os.id
@@ -254,6 +254,35 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
         return self.mtrain_engine.select(query)
+
+    def get_behavior_stage_parameters(self,
+                                      foraging_ids: List[str]) -> pd.Series:
+        """Gets the stage parameters for each foraging id from mtrain
+
+        Parameters
+        ----------
+        foraging_ids
+            List of foraging ids
+
+
+        Returns
+        ---------
+        Series with index of foraging id and values stage parameters
+        """
+        foraging_ids_query = self._build_in_list_selector_query(
+            "bs.id", foraging_ids)
+
+        query = f"""
+            SELECT
+                bs.id AS foraging_id,
+                stages.parameters as stage_parameters
+            FROM behavior_sessions bs
+            JOIN stages ON stages.id = bs.state_id
+            {foraging_ids_query};
+        """
+        df = self.mtrain_engine.select(query)
+        df = df.set_index('foraging_id')
+        return df['stage_parameters']
 
     def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:
         """Returns a BehaviorOphysSession object that contains methods

@@ -1,19 +1,23 @@
 from functools import partial
-from typing import Type, Optional, List, Union
+from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
 import logging
 
 from allensdk.api.cache import Cache
-
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .experiments_table import \
+    ExperimentsTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .sessions_table import \
+    SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.brain_observatory.behavior.project_apis.abcs import (
-    BehaviorProjectBase)
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .ophys_sessions_table import \
+    BehaviorOphysSessionsTable
 from allensdk.core.authentication import DbCredentials
-
-BehaviorProjectApi = Type[BehaviorProjectBase]
 
 
 class BehaviorProjectCache(Cache):
@@ -43,7 +47,7 @@ class BehaviorProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: Optional[BehaviorProjectApi] = None,
+            fetch_api: Optional[BehaviorProjectLimsApi] = None,
             fetch_tries: int = 2,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
@@ -163,17 +167,18 @@ class BehaviorProjectCache(Cache):
     def get_session_table(
             self,
             suppress: Optional[List[str]] = None,
-            by: str = "ophys_session_id") -> pd.DataFrame:
+            index_column: str = "ophys_session_id") -> pd.DataFrame:
         """
         Return summary table of all ophys_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :type suppress: list of str
-        :param by: (default="ophys_session_id"). Column to index on, either
+        :param index_column: (default="ophys_session_id"). Column to index
+        on, either
             "ophys_session_id" or "ophys_experiment_id".
-            If by="ophys_experiment_id", then each row will only have one
-            experiment id, of type int (vs. an array of 1>more).
-        :type by: str
+            If index_column="ophys_experiment_id", then each row will only have
+            one experiment id, of type int (vs. an array of 1>more).
+        :type index_column: str
         :rtype: pd.DataFrame
         """
         if self.cache:
@@ -181,26 +186,17 @@ class BehaviorProjectCache(Cache):
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_session_table,
-                _write_json, _read_json)
-            sessions.set_index("ophys_session_id")
+                _write_json,
+                lambda path: _read_json(path, index_name='ophys_session_id'))
         else:
             sessions = self.fetch_api.get_session_table()
-        if suppress:
-            sessions.drop(columns=suppress, inplace=True, errors="ignore")
-
-        # Possibly explode and reindex
-        if by == "ophys_session_id":
-            pass
-        elif by == "ophys_experiment_id":
-            sessions = (sessions.reset_index()
-                        .explode("ophys_experiment_id")
-                        .set_index("ophys_experiment_id"))
-        else:
-            self.logger.warning(
-                f"Invalid value for `by`, '{by}', passed to get_session_table."
-                " Valid choices for `by` are 'ophys_experiment_id' and "
-                "'ophys_session_id'.")
-        return sessions
+        sessions_table = self.get_behavior_session_table(suppress=suppress,
+                                                         as_df=False)
+        sessions = BehaviorOphysSessionsTable(df=sessions,
+                                              suppress=suppress,
+                                              index_column=index_column,
+                                              sessions_table=sessions_table)
+        return sessions.table
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super().add_manifest_paths(manifest_builder)
@@ -223,21 +219,27 @@ class BehaviorProjectCache(Cache):
             experiments = one_file_call_caching(
                 path,
                 self.fetch_api.get_experiment_table,
-                _write_json, _read_json)
-            experiments.set_index("ophys_experiment_id")
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='ophys_experiment_id'))
         else:
             experiments = self.fetch_api.get_experiment_table()
-        if suppress:
-            experiments.drop(columns=suppress, inplace=True, errors="ignore")
-        return experiments
+        sessions_table = self.get_behavior_session_table(suppress=suppress,
+                                                         as_df=False)
+        experiments = ExperimentsTable(df=experiments,
+                                       suppress=suppress,
+                                       sessions_table=sessions_table)
+        return experiments.table
 
     def get_behavior_session_table(
             self,
-            suppress: Optional[List[str]] = None) -> pd.DataFrame:
+            suppress: Optional[List[str]] = None,
+            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
+        :param as_df: whether to return as df or as SessionsTable
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -247,14 +249,18 @@ class BehaviorProjectCache(Cache):
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_behavior_only_session_table,
-                _write_json, _read_json)
-            sessions.set_index("behavior_session_id")
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='behavior_session_id'))
         else:
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
-        if suppress:
-            sessions.drop(columns=suppress, inplace=True, errors="ignore")
-        return sessions
+        sessions = SessionsTable(df=sessions, suppress=suppress,
+                                 fetch_api=self.fetch_api)
+        if as_df:
+            return sessions.table
+        else:
+            return sessions
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
         """
@@ -311,12 +317,13 @@ def _write_json(path, df):
     them back to the expected format by adding them to `convert_dates`.
     In the future we could schematize this data using marshmallow
     or something similar."""
-    df.reset_index(inplace=True)
     df.to_json(path, orient="split", date_unit="s", date_format="epoch")
 
 
-def _read_json(path):
+def _read_json(path, index_name: Optional[str] = None):
     """Reads a dataframe file written to the cache by _write_json."""
     df = pd.read_json(path, date_unit="s", orient="split",
                       convert_dates=["date_of_acquisition"])
+    if index_name:
+        df = df.rename_axis(index=index_name)
     return df

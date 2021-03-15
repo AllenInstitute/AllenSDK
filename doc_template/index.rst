@@ -93,7 +93,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.10.0
 -----------------------------------------------------------------------
-
+- Improvements to BehaviorProjectCache
 
 What's New - 2.9.0
 -----------------------------------------------------------------------
