@@ -320,7 +320,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 oe.id as ophys_experiment_id,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
-                oec.visual_behavior_experiment_container_id as container_id,
+                oec.visual_behavior_experiment_container_id as 
+                    ophys_container_id,
                 pr.code as project_code,
                 vbc.workflow_state as container_workflow_state,
                 oe.workflow_state as experiment_workflow_state,
@@ -462,7 +463,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         level to examine the data.
         Return columns:
             ophys_experiment_id, ophys_session_id, behavior_session_id,
-            container_id, project_code, container_workflow_state,
+            ophys_container_id, project_code, container_workflow_state,
             experiment_workflow_state, session_name, session_type,
             equipment_name, date_of_acquisition, isi_experiment_id,
             specimen_id, sex, age_in_days, full_genotype, reporter_line,

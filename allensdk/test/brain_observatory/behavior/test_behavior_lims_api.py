@@ -307,7 +307,7 @@ class TestBehaviorRegression:
 
     def test_container_id_regression(self):
         assert (self.bd.extractor.ophys_container_id
-                == self.od.extractor.get_experiment_container_id())
+                == self.od.extractor.get_ophys_container_id())
 
     def test_stimulus_frame_rate_regression(self):
         assert (self.bd.get_stimulus_frame_rate()

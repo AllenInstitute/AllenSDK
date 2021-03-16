@@ -34,8 +34,8 @@ class BehaviorOphysMetadata(BehaviorMetadata):
         return 910.0
 
     @property
-    def experiment_container_id(self) -> int:
-        return self._extractor.get_experiment_container_id()
+    def ophys_container_id(self) -> int:
+        return self._extractor.get_ophys_container_id()
 
     @property
     def field_of_view_height(self) -> int:
