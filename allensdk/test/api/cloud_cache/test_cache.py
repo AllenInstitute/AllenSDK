@@ -32,10 +32,7 @@ def test_list_all_manifests():
                       Key='junk.txt',
                       Body=b'123456')
 
-    class DummyCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
-    cache = DummyCache('/my/cache/dir')
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
 
     assert cache.manifest_file_names == ['manifest_1.json', 'manifest_2.json']
 
@@ -62,10 +59,7 @@ def test_list_all_manifests_many():
                       Key='junk.txt',
                       Body=b'123456')
 
-    class DummyCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
-    cache = DummyCache('/my/cache/dir')
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
 
     expected = list([f'manifest_{ii}.json' for ii in range(2000)])
     expected.sort()
@@ -111,10 +105,7 @@ def test_loading_manifest():
                       Key='manifests/manifest_2.csv',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
-    class DummyCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
-    cache = DummyCache('/my/cache/dir')
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
     cache.load_manifest('manifest_1.csv')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
@@ -153,10 +144,7 @@ def test_file_exists(tmpdir):
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
-    class SillyCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
-    cache = SillyCache('my/cache/dir')
+    cache = S3CloudCache('my/cache/dir', test_bucket_name)
 
     # should be true
     good_attribute = CacheFileAttributes('http://silly.url.com',
@@ -219,11 +207,8 @@ def test_download_file(tmpdir):
     response = client.list_object_versions(Bucket=test_bucket_name)
     version_id = response['Versions'][0]['VersionId']
 
-    class DownloadTestCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = DownloadTestCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
@@ -295,11 +280,8 @@ def test_download_file_multiple_versions(tmpdir):
     assert version_id_2 is not None
     assert version_id_2 != version_id_1
 
-    class DownloadVersionTestCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = DownloadVersionTestCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
 
@@ -365,11 +347,8 @@ def test_re_download_file(tmpdir):
     response = client.list_object_versions(Bucket=test_bucket_name)
     version_id = response['Versions'][0]['VersionId']
 
-    class ReDownloadTestCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = ReDownloadTestCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
@@ -457,11 +436,8 @@ def test_download_data(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class DataPathCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / "data/path/cache"
-    cache = DataPathCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     cache.load_manifest('manifest_1.json')
 
@@ -530,11 +506,8 @@ def test_download_metadata(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class MetadataPathCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / "metadata/path/cache"
-    cache = MetadataPathCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     cache.load_manifest('manifest_1.json')
 
@@ -611,11 +584,8 @@ def test_metadata(tmpdir):
                       Key='manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
-    class MetadataCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / "metadata/cache"
-    cache = MetadataCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
     cache.load_manifest('manifest_1.json')
 
     metadata_df = cache.get_metadata('metadata_file.csv')
