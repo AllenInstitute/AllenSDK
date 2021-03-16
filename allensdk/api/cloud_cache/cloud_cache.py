@@ -338,6 +338,11 @@ class S3CloudCache(CloudCacheBase):
     ----------
     cache_dir: str or pathlib.Path
         Path to the directory where data will be stored on the local system
+
+    bucket_name: str
+        for example, if bucket URI is 's3://mybucket' this value should be
+        'mybucket'
+
     """
 
     def __init__(self, cache_dir, bucket_name):
