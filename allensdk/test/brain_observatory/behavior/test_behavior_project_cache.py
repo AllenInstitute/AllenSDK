@@ -6,7 +6,7 @@ import tempfile
 import logging
 
 from allensdk.brain_observatory.behavior.behavior_project_cache \
-    import BehaviorProjectCache
+    import VisualBehaviorOphysProjectCache
 
 
 @pytest.fixture
@@ -120,9 +120,9 @@ def mock_api(session_table, behavior_table, experiments_table):
 def TempdirBehaviorCache(mock_api, request):
     temp_dir = tempfile.TemporaryDirectory()
     manifest = os.path.join(temp_dir.name, "manifest.json")
-    yield BehaviorProjectCache(fetch_api=mock_api(),
-                               cache=request.param,
-                               manifest=manifest)
+    yield VisualBehaviorOphysProjectCache(fetch_api=mock_api(),
+                                          cache=request.param,
+                                          manifest=manifest)
     temp_dir.cleanup()
 
 

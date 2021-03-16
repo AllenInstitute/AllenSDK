@@ -13,14 +13,15 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.api.warehouse_cache.caching_utilities import one_file_call_caching, call_caching
+from allensdk.api.warehouse_cache.caching_utilities import (
+        one_file_call_caching, call_caching)
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable
 from allensdk.core.authentication import DbCredentials
 
 
-class BehaviorProjectCache(Cache):
+class VisualBehaviorOphysProjectCache(Cache):
 
     MANIFEST_VERSION = "0.0.1-alpha.3"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
@@ -115,7 +116,8 @@ class BehaviorProjectCache(Cache):
                   mtrain_credentials: Optional[DbCredentials] = None,
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
-                  asynchronous: bool = True) -> "BehaviorProjectCache":
+                  asynchronous: bool = True
+                  ) -> "VisualBehaviorOphysProjectCache":
         """
         Construct a BehaviorProjectCache with a lims api. Use this method
         to create a  BehaviorProjectCache instance rather than calling
