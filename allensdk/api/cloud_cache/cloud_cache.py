@@ -340,6 +340,11 @@ class S3CloudCache(CloudCacheBase):
         Path to the directory where data will be stored on the local system
     """
 
+    def __init__(self, cache_dir, bucket_name):
+        self._manifest = Manifest(cache_dir)
+        self._bucket_name = bucket_name
+        self._manifest_file_names = self._list_all_manifests()
+
     _s3_client = None
 
     @property
