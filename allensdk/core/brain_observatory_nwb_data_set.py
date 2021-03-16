@@ -52,7 +52,7 @@ import allensdk.brain_observatory.stimulus_info as si
 
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.core import h5_utilities 
 
 from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template

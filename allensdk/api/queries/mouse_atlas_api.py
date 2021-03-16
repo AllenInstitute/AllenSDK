@@ -35,7 +35,7 @@
 #
 
 from allensdk.core import sitk_utilities
-from allensdk.api.cache import Cache, cacheable
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
 
 from .reference_space_api import ReferenceSpaceApi
 from .grid_data_api import GridDataApi

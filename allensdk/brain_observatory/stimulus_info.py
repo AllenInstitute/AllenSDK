@@ -37,7 +37,7 @@ import six
 import numpy as np
 import scipy.ndimage.interpolation as spndi
 from PIL import Image
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 import itertools
 
 # some handles for stimulus types

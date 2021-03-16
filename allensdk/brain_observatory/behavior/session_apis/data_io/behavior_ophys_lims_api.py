@@ -2,7 +2,7 @@ import logging
 from typing import List, Optional
 
 import pandas as pd
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs. \
     data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase

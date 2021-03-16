@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_api import RmaApi
-from allensdk.api.cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from allensdk.core.obj_utilities import read_obj
 import allensdk.core.sitk_utilities as sitk_utilities
 import numpy as np
