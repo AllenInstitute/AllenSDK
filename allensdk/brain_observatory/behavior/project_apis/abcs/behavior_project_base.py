@@ -10,11 +10,12 @@ import pandas as pd
 
 class BehaviorProjectBase(ABC):
     @abstractmethod
-    def get_session_data(self, ophys_session_id: int) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int
+                                      ) -> BehaviorOphysExperiment:
         """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
-        :param ophys_session_id: id that corresponds to a behavior session
-        :type ophys_session_id: int
+        :param ophys_experiment_id: id that corresponds to an ophys experiment
+        :type ophys_experiment_id: int
         :rtype: BehaviorOphysExperiment
         """
         pass
