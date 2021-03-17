@@ -342,7 +342,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: pd.DataFrame
         """
         if not ophys_experiment_ids:
-            self.logger.warning("Getting all ophys sessions."
+            self.logger.warning("Getting all ophys experiments."
                                 " This might take a while.")
         experiment_query = self.build_in_list_selector_query(
             "oe.id", ophys_experiment_ids)

@@ -1,10 +1,12 @@
 import argparse
+import json
 import logging
 import os
 from typing import Union
 
 import pandas as pd
 
+import allensdk
 from allensdk.brain_observatory.behavior.behavior_project_cache import \
     BehaviorProjectCache
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
@@ -22,9 +24,10 @@ class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
     def __init__(self, behavior_project_cache: BehaviorProjectCache,
-                 out_dir: str):
+                 out_dir: str, project_name: str):
         self._behavior_project_cache = behavior_project_cache
         self._out_dir = out_dir
+        self._project_name = project_name
         self._logger = logging.getLogger(self.__class__.__name__)
 
         self._BEHAVIOR_SUPPRESS = [
@@ -42,6 +45,15 @@ class BehaviorProjectMetadataWriter:
             'experiment_workflow_state',
             'published_at',
         ]
+        self._OUTPUT_METADATA_FILENAMES = {
+            'behavior_session_table': 'behavior_session_table.csv',
+            'ophys_session_table': 'ophys_session_table.csv',
+            'ophys_experiment_table': 'ophys_experiment_table.csv'
+        }
+        self._release_behavior_only_nwb = self._get_release_files(
+            file_type='BehaviorNwb')
+        self._release_ophys_experiment_nwb = self._get_release_files(
+            file_type='BehaviorOphysNwb')
 
     def write_metadata(self):
         """Writes metadata to csv"""
@@ -51,23 +63,28 @@ class BehaviorProjectMetadataWriter:
         self._write_ophys_sessions()
         self._write_ophys_experiments()
 
+        self._write_manifest()
+
     def _write_behavior_sessions(self):
         behavior_sessions = self._get_behavior_sessions(
             suppress=self._BEHAVIOR_SUPPRESS)
-        self._write_file(df=behavior_sessions,
-                         filename='behavior_session_table.csv')
+        filename = self._OUTPUT_METADATA_FILENAMES['behavior_session_table']
+        self._write_metadata_table(df=behavior_sessions,
+                                   filename=filename)
 
     def _write_ophys_sessions(self):
         ophys_sessions = self._get_behavior_ophys_sessions(
             suppress=self._OPHYS_SUPPRESS)
-        self._write_file(df=ophys_sessions,
-                         filename='ophys_session_table.csv')
+        filename = self._OUTPUT_METADATA_FILENAMES['ophys_session_table']
+        self._write_metadata_table(df=ophys_sessions,
+                                   filename=filename)
 
     def _write_ophys_experiments(self):
         ophys_experiments = self._get_behavior_ophys_experiments(
             suppress=self._OPHYS_EXPERIMENTS_SUPPRESS)
-        self._write_file(df=ophys_experiments,
-                         filename='ophys_experiment_table.csv')
+        filename = self._OUTPUT_METADATA_FILENAMES['ophys_experiment_table']
+        self._write_metadata_table(df=ophys_experiments,
+                                   filename=filename)
 
     def _get_behavior_sessions(self, suppress=None) -> pd.DataFrame:
         behavior_sessions = self._behavior_project_cache. \
@@ -130,17 +147,13 @@ class BehaviorProjectMetadataWriter:
         table = table.table
 
         # 1) Filter to release "behavior-only" sessions, which get nwb files
-        behavior_release_files = self._get_release_files(
-            file_type='BehaviorNwb')
-        behavior_only_sessions = table.merge(behavior_release_files,
+        behavior_only_sessions = table.merge(self._release_behavior_only_nwb,
                                              left_index=True,
                                              right_index=True)
 
         # 2) Filter to release ophys sessions (but they get no nwb files)
-        ophys_release_files = self._get_release_files(
-            file_type='BehaviorOphysNwb')
         ophys_session_ids = self._get_ophys_sessions_from_ophys_experiments(
-            ophys_experiment_ids=ophys_release_files.index
+            ophys_experiment_ids=self._release_ophys_experiment_nwb.index
         )
         ophys_sessions = table[table['ophys_session_id']
             .isin(ophys_session_ids)]
@@ -164,11 +177,9 @@ class BehaviorProjectMetadataWriter:
         # ophys sessions are different because the nwb files for ophys
         # sessions are at the experiment level.
         # We don't want to associate these sessions with nwb files
-        release_files = self._get_release_files(
-            file_type='BehaviorOphysNwb')
         ophys_session_ids = \
             self._get_ophys_sessions_from_ophys_experiments(
-                ophys_experiment_ids=release_files.index)
+                ophys_experiment_ids=self._release_ophys_experiment_nwb.index)
         return table[table.index.isin(ophys_session_ids)]
 
     def _get_ophys_experiment_release_table(
@@ -184,9 +195,8 @@ class BehaviorProjectMetadataWriter:
         --------
         Dataframe including release ophys experiments with nwb file metadata
         """
-        release_files = self._get_release_files(
-            file_type='BehaviorOphysNwb')
-        return table.table.merge(release_files, left_index=True,
+        return table.table.merge(self._release_ophys_experiment_nwb,
+                                 left_index=True,
                                  right_index=True)
 
     def _get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
@@ -243,7 +253,7 @@ class BehaviorProjectMetadataWriter:
         res = self._behavior_project_cache.fetch_api.lims_engine.select(query)
         return res['ophys_session_id']
 
-    def _write_file(self, df: pd.DataFrame, filename: str):
+    def _write_metadata_table(self, df: pd.DataFrame, filename: str):
         """
         Writes file to csv
 
@@ -262,17 +272,47 @@ class BehaviorProjectMetadataWriter:
 
         self._logger.info('Writing successful')
 
+    def _write_manifest(self):
+        data_files = \
+            self._release_behavior_only_nwb['isilon_filepath'].to_list() + \
+            self._release_ophys_experiment_nwb['isilon_filepath'].to_list()
+        filenames = self._OUTPUT_METADATA_FILENAMES.values()
+
+        def get_abs_path(filename):
+            return os.path.abspath(os.path.join(self._out_dir, filename))
+
+        metadata_files = [get_abs_path(f) for f in filenames]
+        data_pipeline = [{
+            'name': 'AllenSDK',
+            'version': allensdk.__version__,
+            'comment': 'AllenSDK version used to produce data NWB and '
+                       'metadata CSV files for this release'
+        }]
+
+        manifest = {
+            'data_files': data_files,
+            'metadata_files': metadata_files,
+            'data_pipeline': data_pipeline,
+            'project_name': self._project_name
+        }
+
+        save_path = os.path.join(self._out_dir, 'manifest.json')
+        with open(save_path, 'w') as f:
+            f.write(json.dumps(manifest))
+
 
 def main():
     parser = argparse.ArgumentParser(description='Write project metadata to '
                                                  'csvs')
     parser.add_argument('-out_dir', help='directory to save csvs',
                         required=True)
+    parser.add_argument('-project_name', help='project name', required=True)
     args = parser.parse_args()
 
     bpc = BehaviorProjectCache.from_lims()
     bpmw = BehaviorProjectMetadataWriter(behavior_project_cache=bpc,
-                                         out_dir=args.out_dir)
+                                         out_dir=args.out_dir,
+                                         project_name=args.project_name)
     bpmw.write_metadata()
 
 

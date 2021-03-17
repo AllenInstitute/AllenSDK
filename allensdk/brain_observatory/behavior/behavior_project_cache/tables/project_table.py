@@ -33,7 +33,7 @@ class ProjectTable(ABC):
     def postprocess_base(self):
         """Postprocessing to apply to all project-level data"""
         # Make sure the index is not duplicated (it is rare)
-        self._df = self._df[~self._df.index.duplicated()]
+        self._df = self._df[~self._df.index.duplicated()].copy()
 
         self._df['reporter_line'] = self._df['reporter_line'].apply(
             BehaviorMetadata.parse_reporter_line)
