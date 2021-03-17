@@ -1,10 +1,12 @@
 import warnings
 
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-        BehaviorOphysExperiment
+        BehaviorOphysExperiment as BOE
 
+# alias as BOE prevents someone becoming comfortable with
+# import BehaviorOphysExperiment from this to-be-deprecated module
 
-class BehaviorOphysSession(BehaviorOphysExperiment):
+class BehaviorOphysSession(BOE):
     def __init__(self, **kwargs):
         warnings.warn(
             "allensdk.brain_observatory.behavior.behavior_ophys_session."
