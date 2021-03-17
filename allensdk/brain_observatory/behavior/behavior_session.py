@@ -66,7 +66,7 @@ class BehaviorSession(LazyPropertyMixin):
         try:
             self.api.cache_clear()
         except AttributeError:
-            logging.getLogger("BehaviorOphysSession").warning(
+            logging.getLogger("BehaviorSession").warning(
                 "Attempted to clear API cache, but method `cache_clear`"
                 f" does not exist on {self.api.__class__.__name__}")
 
@@ -220,7 +220,7 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysSessions.
+        Synchronized timestamps are only available for BehaviorOphysExperiments.
 
         Returns
         -------
@@ -239,7 +239,7 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysSessions.
+        Synchronized timestamps are only available for BehaviorOphysExperiments.
 
         Returns
         -------
@@ -260,7 +260,7 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysSessions.
+        Synchronized timestamps are only available for BehaviorOphysExperiments.
 
         Returns
         -------
@@ -280,7 +280,7 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysSessions.
+        Synchronized timestamps are only available for BehaviorOphysExperiments.
 
         Returns
         -------
@@ -336,7 +336,7 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysSessions.
+        Synchronized timestamps are only available for BehaviorOphysExperiments.
 
         Returns
         -------

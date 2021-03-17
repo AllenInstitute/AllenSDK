@@ -11,7 +11,7 @@ from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 
 
-class BehaviorOphysSession(BehaviorSession, ParamsMixin):
+class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
     """Represents data from a single Visual Behavior Ophys imaging session.
     Can be initialized with an api that fetches data, or by using class methods
     `from_lims` and `from_nwb_path`.
@@ -92,14 +92,14 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
     def from_lims(cls, ophys_experiment_id: int,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2
-                  ) -> "BehaviorOphysSession":
+                  ) -> "BehaviorOphysExperiment":
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id),
                    eye_tracking_z_threshold=eye_tracking_z_threshold,
                    eye_tracking_dilation_frames=eye_tracking_dilation_frames)
 
     @classmethod
     def from_nwb_path(
-            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysSession":
+            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysExperiment":
         api_kwargs["filter_invalid_rois"] = api_kwargs.get(
             "filter_invalid_rois", True)
         return cls(api=BehaviorOphysNwbApi.from_path(
@@ -353,10 +353,3 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
     @property
     def roi_masks(self) -> pd.DataFrame:
         return self.cell_specimen_table[['cell_roi_id', 'roi_mask']]
-
-
-if __name__ == "__main__":
-
-    ophys_experiment_id = 789359614
-    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
-    print(session.trials['reward_time'])

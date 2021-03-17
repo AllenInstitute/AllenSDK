@@ -8,8 +8,8 @@ from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.behavior_ophys_session import (
-    BehaviorOphysSession)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorOphysLimsApi)
 from allensdk.internal.api import db_connection_creator
@@ -322,14 +322,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = df.set_index('foraging_id')
         return df['stage_parameters']
 
-    def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:
-        """Returns a BehaviorOphysSession object that contains methods
+    def get_session_data(self, ophys_session_id: int) -> BehaviorOphysExperiment:
+        """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
         :param ophys_session_id: id that corresponds to a behavior session
         :type ophys_session_id: int
-        :rtype: BehaviorOphysSession
+        :rtype: BehaviorOphysExperiment
         """
-        return BehaviorOphysSession(BehaviorOphysLimsApi(ophys_session_id))
+        return BehaviorOphysExperiment(BehaviorOphysLimsApi(ophys_session_id))
 
     def _get_experiment_table(self) -> pd.DataFrame:
         """

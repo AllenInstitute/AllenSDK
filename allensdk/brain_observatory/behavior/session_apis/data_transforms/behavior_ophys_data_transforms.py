@@ -39,7 +39,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import (
 class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     """This class provides methods that transform data extracted from
     LIMS or JSON data sources into final data products necessary for
-    populating a BehaviorOphysSession.
+    populating a BehaviorOphysExperiment
     """
 
     def __init__(self,
@@ -438,7 +438,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         filter_n_time_steps: int
             See filter_events_array for description
 
-        See behavior_ophys_session.events for return type
+        See behavior_ophys_experiment.events for return type
         """
         events_file = self.extractor.get_event_detection_filepath()
         with h5py.File(events_file, 'r') as f:

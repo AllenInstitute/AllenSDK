@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import (
-    BehaviorOphysSession)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 import pandas as pd
@@ -10,12 +10,12 @@ import pandas as pd
 
 class BehaviorProjectBase(ABC):
     @abstractmethod
-    def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:
-        """Returns a BehaviorOphysSession object that contains methods
+    def get_session_data(self, ophys_session_id: int) -> BehaviorOphysExperiment:
+        """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
         :param ophys_session_id: id that corresponds to a behavior session
         :type ophys_session_id: int
-        :rtype: BehaviorOphysSession
+        :rtype: BehaviorOphysExperiment
         """
         pass
 

@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import itertools
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+        BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -13,7 +14,7 @@ from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as b
 from allensdk.brain_observatory.behavior.swdb.analysis_tools import get_nearest_frame, get_trace_around_timepoint, get_mean_in_window
 
 '''
-    This script computes the flash_response_df for a BehaviorOphysSession object
+    This script computes the flash_response_df for a BehaviorOphysExperiment object
 
 '''
 
@@ -22,7 +23,7 @@ def get_flash_response_df(session, response_analysis_params):
         Builds the flash response dataframe for <session>
 
         INPUTS:
-        <session> BehaviorOphysSession to build the flash response dataframe for
+        <session> BehaviorOphysExperiment to build the flash response dataframe for
         <response_analyis_params>   A dictionary with the following keys 
                 'window_around_timepoint_seconds' is the time window to save out the dff_trace around the flash onset.
                 'response_window_duration_seconds' is the length of time after the flash onset to compute the mean_response
@@ -83,7 +84,7 @@ def get_p_values_from_shuffled_spontaneous(session, flash_response_df, response_
         magnitude in the spontaneous window. The algorithm is copied from VBA
 
         INPUTS:
-            <session> a BehaviorOphysSession object
+            <session> a BehaviorOphysExperiment object
             <flash_response_df> the flash_response_df for this session
             <response_window_duration> is the duration of the response_window that was used to compute the mean_response in the flash_response_df. This is used here to extract an equivalent duration df/f trace from the spontaneous timepoint
             <number_of_shuffles> the number of shuffles of spontaneous activity used to compute the pvalue
@@ -144,7 +145,7 @@ def get_spontaneous_frames(session):
         Returns a list of the frames that occur during the before and after spontaneous windows. This is copied from VBA. Does not use the full spontaneous period because that is what VBA did. It only uses 4 minutes of the before and after spontaneous period. 
     
         INPUTS:
-        <session> a BehaviorOphysSession object to get all the spontaneous frames 
+        <session> a BehaviorOphysExperiment object to get all the spontaneous frames 
 
         OUTPUTS: a list of the frames during the spontaneous period
     '''
@@ -189,7 +190,7 @@ def add_image_name(session,fdf):
         Slow to run, could probably be improved with some more intelligent use of pandas
     
         INPUTS:
-        <session> a BehaviorOphysSession object
+        <session> a BehaviorOphysExperiment object
         <fdf> a flash_response_df for this session
 
         OUTPUTS:
@@ -289,7 +290,7 @@ if __name__=='__main__':
         cache = bpc.BehaviorProjectCache(cache_json)
         nwb_path = cache.get_nwb_filepath(experiment_id)
         api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois = True)
-        session = BehaviorOphysSession(api)
+        session = BehaviorOphysExperiment(api)
 
         # Where to save the results
         output_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/flash_response_500msec_response'
@@ -320,7 +321,7 @@ if __name__=='__main__':
         # This case is just for debugging. It computes the flash_response_df on a truncated portion of the data. 
         nwb_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files/behavior_ophys_session_880961028.nwb'
         api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois=True)
-        session = BehaviorOphysSession(api)
+        session = BehaviorOphysExperiment(api)
 
         #Small data for testing
         session.__dict__['dff_traces'].value = session.dff_traces.iloc[:5]

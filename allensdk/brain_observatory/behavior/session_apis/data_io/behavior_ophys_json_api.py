@@ -13,7 +13,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
 class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (extractor). Contains all methods
-    needed to fill a BehaviorOphysSession."""
+    needed to fill a BehaviorOphysExperiment."""
 
     def __init__(self, data: dict, skip_eye_tracking: bool = False):
         extractor = BehaviorOphysJsonExtractor(data=data)
@@ -24,11 +24,11 @@ class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
 class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
                                  BehaviorOphysDataExtractorBase):
     """A class which 'extracts' data from a json file. The extracted data
-    is necessary (but not sufficient) for populating a 'BehaviorOphysSession'.
+    is necessary (but not sufficient) for populating a 'BehaviorOphysExperiment'.
 
     Most data provided by this extractor needs to be processed by
     BehaviorOphysDataTransforms methods in order to usable by
-    'BehaviorOphysSession's.
+    'BehaviorOphysExperiment's.
 
     This class is used by the write_nwb module for behavior ophys sessions.
     """
