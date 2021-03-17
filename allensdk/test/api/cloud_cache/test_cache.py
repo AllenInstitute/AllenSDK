@@ -23,16 +23,16 @@ def test_list_all_manifests():
 
     client = boto3.client('s3', region_name='us-east-1')
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_1.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_2.json',
+                      Key='proj/manifests/manifest_2.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
                       Key='junk.txt',
                       Body=b'123456')
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
 
     assert cache.manifest_file_names == ['manifest_1.json', 'manifest_2.json']
 
@@ -52,14 +52,14 @@ def test_list_all_manifests_many():
     client = boto3.client('s3', region_name='us-east-1')
     for ii in range(2000):
         client.put_object(Bucket=test_bucket_name,
-                          Key=f'manifests/manifest_{ii}.json',
+                          Key=f'proj/manifests/manifest_{ii}.json',
                           Body=b'123456')
 
     client.put_object(Bucket=test_bucket_name,
                       Key='junk.txt',
                       Body=b'123456')
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
 
     expected = list([f'manifest_{ii}.json' for ii in range(2000)])
     expected.sort()
@@ -79,8 +79,8 @@ def test_loading_manifest():
 
     client = boto3.client('s3', region_name='us-east-1')
 
-    manifest_1 = {'dataset_version': '1',
-                  'file_id_column': 'file_id',
+    manifest_1 = {'manifest_version': '1',
+                  'metadata_file_id_column_name': 'file_id',
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com',
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -88,8 +88,8 @@ def test_loading_manifest():
                                                'version_id': '2222',
                                                'file_hash': 'fghijk'}}}
 
-    manifest_2 = {'dataset_version': '2',
-                  'file_id_column': 'file_id',
+    manifest_2 = {'manifest_version': '2',
+                  'metadata_file_id_column_name': 'file_id',
                   'metadata_files': {'c.csv': {'url': 'http://www.absurd.com',
                                                'version_id': '3333',
                                                'file_hash': 'lmnop'},
@@ -98,14 +98,14 @@ def test_loading_manifest():
                                                'file_hash': 'qrstuv'}}}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_1.csv',
+                      Key='proj/manifests/manifest_1.csv',
                       Body=bytes(json.dumps(manifest_1), 'utf-8'))
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_2.csv',
+                      Key='proj/manifests/manifest_2.csv',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name)
+    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
     cache.load_manifest('manifest_1.csv')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
@@ -144,7 +144,7 @@ def test_file_exists(tmpdir):
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
-    cache = S3CloudCache('my/cache/dir', test_bucket_name)
+    cache = S3CloudCache('my/cache/dir', test_bucket_name, 'proj')
 
     # should be true
     good_attribute = CacheFileAttributes('http://silly.url.com',
@@ -208,7 +208,7 @@ def test_download_file(tmpdir):
     version_id = response['Versions'][0]['VersionId']
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
@@ -281,7 +281,7 @@ def test_download_file_multiple_versions(tmpdir):
     assert version_id_2 != version_id_1
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
 
@@ -348,7 +348,7 @@ def test_re_download_file(tmpdir):
     version_id = response['Versions'][0]['VersionId']
 
     cache_dir = pathlib.Path(tmpdir) / 'download/test/cache'
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     expected_path = cache_dir / true_checksum / 'data/data_file.txt'
 
@@ -422,8 +422,8 @@ def test_download_data(tmpdir):
     version_id = response['Versions'][0]['VersionId']
 
     manifest = {}
-    manifest['dataset_version'] = '1'
-    manifest['file_id_column'] = 'file_id'
+    manifest['manifest_version'] = '1'
+    manifest['metadata_file_id_column_name'] = 'file_id'
     manifest['metadata_files'] = {}
     url = f'http://{test_bucket_name}.s3.amazonaws.com/data/data_file.txt'
     data_file = {'url': url,
@@ -433,11 +433,11 @@ def test_download_data(tmpdir):
     manifest['data_files'] = {'only_data_file': data_file}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "data/path/cache"
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     cache.load_manifest('manifest_1.json')
 
@@ -493,8 +493,8 @@ def test_download_metadata(tmpdir):
     version_id = response['Versions'][0]['VersionId']
 
     manifest = {}
-    manifest['dataset_version'] = '1'
-    manifest['file_id_column'] = 'file_id'
+    manifest['manifest_version'] = '1'
+    manifest['metadata_file_id_column_name'] = 'file_id'
     url = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'url': url,
                      'version_id': version_id,
@@ -503,11 +503,11 @@ def test_download_metadata(tmpdir):
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/path/cache"
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     cache.load_manifest('manifest_1.json')
 
@@ -571,8 +571,8 @@ def test_metadata(tmpdir):
     version_id = response['Versions'][0]['VersionId']
 
     manifest = {}
-    manifest['dataset_version'] = '1'
-    manifest['file_id_column'] = 'file_id'
+    manifest['manifest_version'] = '1'
+    manifest['metadata_file_id_column_name'] = 'file_id'
     url = f'http://{test_bucket_name}.s3.amazonaws.com/metadata_file.csv'
     metadata_file = {'url': url,
                      'version_id': version_id,
@@ -581,11 +581,11 @@ def test_metadata(tmpdir):
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_1.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/cache"
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
     cache.load_manifest('manifest_1.json')
 
     metadata_df = cache.get_metadata('metadata_file.csv')

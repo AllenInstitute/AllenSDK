@@ -28,8 +28,8 @@ def test_load(tmpdir):
     """
 
     good_manifest = {}
-    good_manifest['dataset_version'] = 'A'
-    good_manifest['file_id_column'] = 'file_id'
+    good_manifest['manifest_version'] = 'A'
+    good_manifest['metadata_file_id_column_name'] = 'file_id'
     metadata_files = {}
     metadata_files['z.txt'] = []
     metadata_files['x.txt'] = []
@@ -52,8 +52,8 @@ def test_load(tmpdir):
 
     # test that you can load a new manifest.json into the same Manifest
     good_manifest = {}
-    good_manifest['dataset_version'] = 'B'
-    good_manifest['file_id_column'] = 'file_id'
+    good_manifest['manifest_version'] = 'B'
+    good_manifest['metadata_file_id_column_name'] = 'file_id'
     metadata_files = {}
     metadata_files['n.txt'] = []
     metadata_files['k.txt'] = []
@@ -120,8 +120,8 @@ def test_metadata_file_attributes():
                                'file_hash': 'fghijk'}
 
     manifest['metadata_files'] = metadata_files
-    manifest['dataset_version'] = '000'
-    manifest['file_id_column'] = 'file_id'
+    manifest['manifest_version'] = '000'
+    manifest['metadata_file_id_column_name'] = 'file_id'
 
     mfest = Manifest('/my/cache/dir/')
     with io.StringIO() as stream:
@@ -162,8 +162,8 @@ def test_data_file_attributes():
     """
     manifest = {}
     manifest['metadata_files'] = {}
-    manifest['dataset_version'] = '0'
-    manifest['file_id_column'] = 'file_id'
+    manifest['manifest_version'] = '0'
+    manifest['metadata_file_id_column_name'] = 'file_id'
     data_files = {}
     data_files['a'] = {'url': 'http://my.url.com/path/to/a.nwb',
                        'version_id': '12345',
@@ -227,8 +227,8 @@ def test_loading_two_manifests():
                    'file_hash': 'rstuvw'}
 
     manifest_1['data_files'] = data_1
-    manifest_1['dataset_version'] = '1'
-    manifest_1['file_id_column'] = 'file_id'
+    manifest_1['manifest_version'] = '1'
+    manifest_1['metadata_file_id_column_name'] = 'file_id'
 
     manifest_2 = {}
     metadata_2 = {}
@@ -248,8 +248,8 @@ def test_loading_two_manifests():
                    'file_hash': 'qrstuvwxy'}
 
     manifest_2['data_files'] = data_2
-    manifest_2['dataset_version'] = '2'
-    manifest_2['file_id_column'] = 'file_id'
+    manifest_2['manifest_version'] = '2'
+    manifest_2['metadata_file_id_column_name'] = 'file_id'
 
     mfest = Manifest('/my/cache/dir')
 

@@ -24,12 +24,17 @@ class CloudCacheBase(ABC):
     ----------
     cache_dir: str or pathlib.Path
         Path to the directory where data will be stored on the local system
+
+    project_name: str
+        the name of the project this cache is supposed to access. This will
+        be the root directory for all files stored in the bucket.
     """
 
     _bucket_name = None
 
-    def __init__(self, cache_dir):
+    def __init__(self, cache_dir, project_name):
         self._manifest = Manifest(cache_dir)
+        self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
     @abstractmethod
@@ -94,6 +99,20 @@ class CloudCacheBase(ABC):
             10 iterations
         """
         raise NotImplementedError()
+
+    @property
+    def project_name(self) -> str:
+        """
+        The name of the project that this cache is accessing
+        """
+        return self._project_name
+
+    @property
+    def manifest_prefix(self) -> str:
+        """
+        On-line prefix for manifest files
+        """
+        return f'{self.project_name}/manifests/'
 
     @property
     def file_id_column(self) -> str:
@@ -343,11 +362,15 @@ class S3CloudCache(CloudCacheBase):
         for example, if bucket URI is 's3://mybucket' this value should be
         'mybucket'
 
+    project_name: str
+        the name of the project this cache is supposed to access. This will
+        be the root directory for all files stored in the bucket.
     """
 
-    def __init__(self, cache_dir, bucket_name):
+    def __init__(self, cache_dir, bucket_name, project_name):
         self._manifest = Manifest(cache_dir)
         self._bucket_name = bucket_name
+        self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
     _s3_client = None
@@ -371,11 +394,11 @@ class S3CloudCache(CloudCacheBase):
         while keep_going:
             if continuation_token is not None:
                 subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix='manifests/',
+                                                        Prefix=self.manifest_prefix,  # noqa: E501
                                                         ContinuationToken=continuation_token)  # noqa: E501
             else:
                 subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix='manifests/')
+                                                        Prefix=self.manifest_prefix)  # noqa: E501
 
             if 'Contents' in subset:
                 for obj in subset['Contents']:
@@ -405,7 +428,7 @@ class S3CloudCache(CloudCacheBase):
             A byte stream into which to load the manifest
         """
 
-        manifest_key = 'manifests/' + manifest_name
+        manifest_key = self.manifest_prefix + manifest_name
         response = self.s3_client.get_object(Bucket=self._bucket_name,
                                              Key=manifest_key)
         for chunk in response['Body'].iter_chunks():
