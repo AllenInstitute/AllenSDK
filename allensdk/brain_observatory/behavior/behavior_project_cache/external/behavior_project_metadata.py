@@ -27,37 +27,45 @@ class BehaviorProjectMetadataWriter:
         self._out_dir = out_dir
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def write_metadata(self):
-        """Writes metadata to csv"""
-        os.makedirs(self._out_dir, exist_ok=True)
-
-        behavior_suppress = [
+        self._BEHAVIOR_SUPPRESS = [
             'donor_id',
             'foraging_id'
         ]
-        ophys_suppress = [
+        self._OPHYS_SUPPRESS = [
             'session_name',
             'donor_id',
             'specimen_id'
         ]
-        ophys_experiments_suppress = ophys_suppress + [
+        self._OPHYS_EXPERIMENTS_SUPPRESS = self._OPHYS_SUPPRESS + [
             'container_workflow_state',
             'behavior_session_uuid',
             'experiment_workflow_state',
             'published_at',
         ]
 
-        behavior_sessions = self._get_behavior_sessions(
-            suppress=behavior_suppress)
-        ophys_sessions = self._get_behavior_ophys_sessions(
-            suppress=ophys_suppress)
-        ophys_experiments = self._get_behavior_ophys_experiments(
-            suppress=ophys_experiments_suppress)
+    def write_metadata(self):
+        """Writes metadata to csv"""
+        os.makedirs(self._out_dir, exist_ok=True)
 
+        self._write_behavior_sessions()
+        self._write_ophys_sessions()
+        self._write_ophys_experiments()
+
+    def _write_behavior_sessions(self):
+        behavior_sessions = self._get_behavior_sessions(
+            suppress=self._BEHAVIOR_SUPPRESS)
         self._write_file(df=behavior_sessions,
                          filename='behavior_session_table.csv')
+
+    def _write_ophys_sessions(self):
+        ophys_sessions = self._get_behavior_ophys_sessions(
+            suppress=self._OPHYS_SUPPRESS)
         self._write_file(df=ophys_sessions,
                          filename='ophys_session_table.csv')
+
+    def _write_ophys_experiments(self):
+        ophys_experiments = self._get_behavior_ophys_experiments(
+            suppress=self._OPHYS_EXPERIMENTS_SUPPRESS)
         self._write_file(df=ophys_experiments,
                          filename='ophys_experiment_table.csv')
 
@@ -151,6 +159,8 @@ class BehaviorProjectMetadataWriter:
         --------
         Dataframe including release ophys sessions
         """
+        table = table.table
+
         # ophys sessions are different because the nwb files for ophys
         # sessions are at the experiment level.
         # We don't want to associate these sessions with nwb files
@@ -159,7 +169,7 @@ class BehaviorProjectMetadataWriter:
         ophys_session_ids = \
             self._get_ophys_sessions_from_ophys_experiments(
                 ophys_experiment_ids=release_files.index)
-        return table.table[table.table.index.isin(ophys_session_ids)]
+        return table[table.index.isin(ophys_session_ids)]
 
     def _get_ophys_experiment_release_table(
             self, table: ExperimentsTable) -> pd.DataFrame:
@@ -190,6 +200,8 @@ class BehaviorProjectMetadataWriter:
         Returns
         ---------
         Dataframe of release files and file metadata
+            -index of behavior_session_id or ophys_experiment_id
+            -columns file_id and isilon filepath
         """
         if file_type not in ('BehaviorNwb', 'BehaviorOphysNwb'):
             raise ValueError(f'cannot retrieve file type {file_type}')
@@ -232,6 +244,16 @@ class BehaviorProjectMetadataWriter:
         return res['ophys_session_id']
 
     def _write_file(self, df: pd.DataFrame, filename: str):
+        """
+        Writes file to csv
+
+        Parameters
+        ----------
+        df
+            The dataframe to write
+        filename
+            Filename to save as
+        """
         filepath = os.path.join(self._out_dir, filename)
         self._logger.info(f'Writing {filepath}')
 
@@ -239,6 +261,7 @@ class BehaviorProjectMetadataWriter:
         df.to_csv(filepath, index=False)
 
         self._logger.info('Writing successful')
+
 
 def main():
     parser = argparse.ArgumentParser(description='Write project metadata to '
