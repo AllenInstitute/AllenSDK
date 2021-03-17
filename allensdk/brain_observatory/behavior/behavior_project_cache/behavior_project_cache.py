@@ -105,6 +105,7 @@ class BehaviorProjectCache(Cache):
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
+        self._sessions_table: Optional[SessionsTable] = None
 
     @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
@@ -247,7 +248,6 @@ class BehaviorProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
-
         if self.cache:
             path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
@@ -257,10 +257,16 @@ class BehaviorProjectCache(Cache):
                 lambda path: _read_json(path,
                                         index_name='behavior_session_id'))
         else:
+            if self._sessions_table is not None:
+                return self._sessions_table
+
             sessions = self.fetch_api.get_behavior_only_session_table()
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         sessions = SessionsTable(df=sessions, suppress=suppress,
                                  fetch_api=self.fetch_api)
+        # Storing so doesn't have to be recomputed
+        self._sessions_table = sessions
+
         return sessions.table if as_df else sessions
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
