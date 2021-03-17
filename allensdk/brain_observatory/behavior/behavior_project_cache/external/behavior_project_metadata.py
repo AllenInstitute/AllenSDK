@@ -91,23 +91,88 @@ class BehaviorProjectMetadataWriter:
         The filtered dataframe
         """
         if isinstance(table, SessionsTable):
-            release_files = self._get_release_files(
-                file_type='BehaviorNwb')
-        elif isinstance(table, BehaviorOphysSessionsTable) or \
-                isinstance(table, ExperimentsTable):
-            release_files = self._get_release_files(
-                file_type='BehaviorOphysNwb')
-            if isinstance(table, BehaviorOphysSessionsTable):
-                # ophys sessions are different because the nwb files for ophys
-                # sessions are at the experiment level.
-                # We don't want to associate these sessions with nwb files
-                ophys_session_ids = \
-                    self._get_ophys_sessions_from_ophys_experiments(
-                        ophys_experiment_ids=release_files.index)
-                return table.table[table.table.index.isin(ophys_session_ids)]
+            release_table = self._get_behavior_release_table(table=table)
+        elif isinstance(table, BehaviorOphysSessionsTable):
+            release_table = self._get_ophys_session_release_table(table=table)
+        elif isinstance(table, ExperimentsTable):
+            release_table = self._get_ophys_experiment_release_table(
+                table=table)
         else:
             raise ValueError(f'Bad table {type(table)}')
 
+        return release_table
+
+    def _get_behavior_release_table(self,
+                                    table: SessionsTable) -> pd.DataFrame:
+        """Returns behavior sessions release table
+
+        Parameters
+        ----------
+        table
+            SessionsTable
+
+        Returns
+        ---------
+        Dataframe including release behavior-only sessions and
+            behavior ophys sessions with nwb metadta for behavior-only
+            sessions"""
+        table = table.table
+
+        # 1) Filter to release "behavior-only" sessions, which get nwb files
+        behavior_release_files = self._get_release_files(
+            file_type='BehaviorNwb')
+        behavior_only_sessions = table.merge(behavior_release_files,
+                                             left_index=True,
+                                             right_index=True)
+
+        # 2) Filter to release ophys sessions (but they get no nwb files)
+        ophys_release_files = self._get_release_files(
+            file_type='BehaviorOphysNwb')
+        ophys_session_ids = self._get_ophys_sessions_from_ophys_experiments(
+            ophys_experiment_ids=ophys_release_files.index
+        )
+        ophys_sessions = table[table['ophys_session_id']
+            .isin(ophys_session_ids)]
+        return pd.concat([behavior_only_sessions, ophys_sessions], sort=False)
+
+    def _get_ophys_session_release_table(
+            self, table: BehaviorOphysSessionsTable) -> pd.DataFrame:
+        """Returns ophys sessions release table
+
+        Parameters
+        ----------
+        table
+            BehaviorOphysSessionsTable
+
+        Returns
+        --------
+        Dataframe including release ophys sessions
+        """
+        # ophys sessions are different because the nwb files for ophys
+        # sessions are at the experiment level.
+        # We don't want to associate these sessions with nwb files
+        release_files = self._get_release_files(
+            file_type='BehaviorOphysNwb')
+        ophys_session_ids = \
+            self._get_ophys_sessions_from_ophys_experiments(
+                ophys_experiment_ids=release_files.index)
+        return table.table[table.table.index.isin(ophys_session_ids)]
+
+    def _get_ophys_experiment_release_table(
+            self, table: ExperimentsTable) -> pd.DataFrame:
+        """Returns ophys experiment release table
+
+        Parameters
+        ----------
+        table
+            ExperimentsTable
+
+        Returns
+        --------
+        Dataframe including release ophys experiments with nwb file metadata
+        """
+        release_files = self._get_release_files(
+            file_type='BehaviorOphysNwb')
         return table.table.merge(release_files, left_index=True,
                                  right_index=True)
 
