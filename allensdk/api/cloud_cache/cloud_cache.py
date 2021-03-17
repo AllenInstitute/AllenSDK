@@ -5,6 +5,7 @@ import io
 import pathlib
 import pandas as pd
 import boto3
+import semver
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -124,6 +125,17 @@ class CloudCacheBase(ABC):
         dataset
         """
         return copy.deepcopy(self._manifest_file_names)
+
+    @property
+    def latest_manifest_file(self) -> str:
+        vstrs = [s.split(".json")[0].split("_v")[-1]
+                 for s in self.manifest_file_names]
+        versions = [semver.VersionInfo.parse(v) for v in vstrs]
+        imax = versions.index(max(versions))
+        return self.manifest_file_names[imax]
+
+    def load_latest_manifest(self):
+        self.load_manifest(self.latest_manifest_file)
 
     def load_manifest(self, manifest_name: str):
         """
