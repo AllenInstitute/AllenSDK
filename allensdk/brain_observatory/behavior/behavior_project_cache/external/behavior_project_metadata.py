@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 from typing import Union
 
@@ -20,18 +21,15 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
-    def __init__(self, behavior_project_cache: BehaviorProjectCache):
+    def __init__(self, behavior_project_cache: BehaviorProjectCache,
+                 out_dir: str):
         self._behavior_project_cache = behavior_project_cache
+        self._out_dir = out_dir
+        self._logger = logging.getLogger(self.__class__.__name__)
 
-    def write_metadata(self, out_dir: str):
-        """Writes metadata to csv
-
-        Parameters
-        ----------
-        out_dir
-            Output directory
-        """
-        os.makedirs(out_dir, exist_ok=True)
+    def write_metadata(self):
+        """Writes metadata to csv"""
+        os.makedirs(self._out_dir, exist_ok=True)
 
         behavior_suppress = [
             'donor_id',
@@ -48,15 +46,20 @@ class BehaviorProjectMetadataWriter:
             'experiment_workflow_state',
             'published_at',
         ]
-        self._get_behavior_sessions(
-            suppress=behavior_suppress).reset_index().to_csv(
-            os.path.join(out_dir, 'behavior_session_table.csv'))
-        self._get_behavior_ophys_sessions(
-            suppress=ophys_suppress).reset_index().to_csv(
-            os.path.join(out_dir, 'ophys_session_table.csv'))
-        self._get_behavior_ophys_experiments(
-            suppress=ophys_experiments_suppress).reset_index().to_csv(
-            os.path.join(out_dir, 'ophys_experiment_table.csv'))
+
+        behavior_sessions = self._get_behavior_sessions(
+            suppress=behavior_suppress)
+        ophys_sessions = self._get_behavior_ophys_sessions(
+            suppress=ophys_suppress)
+        ophys_experiments = self._get_behavior_ophys_experiments(
+            suppress=ophys_experiments_suppress)
+
+        self._write_file(df=behavior_sessions,
+                         filename='behavior_session_table.csv')
+        self._write_file(df=ophys_sessions,
+                         filename='ophys_session_table.csv')
+        self._write_file(df=ophys_experiments,
+                         filename='ophys_experiment_table.csv')
 
     def _get_behavior_sessions(self, suppress=None) -> pd.DataFrame:
         behavior_sessions = self._behavior_project_cache. \
@@ -228,6 +231,14 @@ class BehaviorProjectMetadataWriter:
         res = self._behavior_project_cache.fetch_api.lims_engine.select(query)
         return res['ophys_session_id']
 
+    def _write_file(self, df: pd.DataFrame, filename: str):
+        filepath = os.path.join(self._out_dir, filename)
+        self._logger.info(f'Writing {filepath}')
+
+        df = df.reset_index()
+        df.to_csv(filepath, index=False)
+
+        self._logger.info('Writing successful')
 
 def main():
     parser = argparse.ArgumentParser(description='Write project metadata to '
@@ -237,8 +248,9 @@ def main():
     args = parser.parse_args()
 
     bpc = BehaviorProjectCache.from_lims()
-    bpmw = BehaviorProjectMetadataWriter(behavior_project_cache=bpc)
-    bpmw.write_metadata(out_dir=args.out_dir)
+    bpmw = BehaviorProjectMetadataWriter(behavior_project_cache=bpc,
+                                         out_dir=args.out_dir)
+    bpmw.write_metadata()
 
 
 if __name__ == '__main__':
