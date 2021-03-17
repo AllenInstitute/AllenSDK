@@ -108,7 +108,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return cls(lims_engine, mtrain_engine, app_engine)
 
     @staticmethod
-    def _build_in_list_selector_query(
+    def build_in_list_selector_query(
             col,
             valid_list: Optional[SupportsStr] = None,
             operator: str = "WHERE") -> str:
@@ -212,9 +212,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     def _get_foraging_ids_from_behavior_session(
             self, behavior_session_ids: List[int]) -> List[str]:
-        behav_ids = self._build_in_list_selector_query("id",
-                                                       behavior_session_ids,
-                                                       operator="AND")
+        behav_ids = self.build_in_list_selector_query("id",
+                                                      behavior_session_ids,
+                                                      operator="AND")
         forag_ids_query = f"""
             SELECT foraging_id
             FROM behavior_sessions
@@ -241,7 +241,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         else:
             foraging_ids = None
 
-        foraging_ids_query = self._build_in_list_selector_query(
+        foraging_ids_query = self.build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -269,7 +269,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         ---------
         Series with index of foraging id and values stage parameters
         """
-        foraging_ids_query = self._build_in_list_selector_query(
+        foraging_ids_query = self.build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -313,7 +313,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if not ophys_experiment_ids:
             self.logger.warning("Getting all ophys sessions."
                                 " This might take a while.")
-        experiment_query = self._build_in_list_selector_query(
+        experiment_query = self.build_in_list_selector_query(
             "oe.id", ophys_experiment_ids)
         query = f"""
             SELECT
@@ -383,8 +383,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if not ophys_session_ids:
             self.logger.warning("Getting all ophys sessions."
                                 " This might take a while.")
-        session_query = self._build_in_list_selector_query("os.id",
-                                                           ophys_session_ids)
+        session_query = self.build_in_list_selector_query("os.id",
+                                                          ophys_session_ids)
         query = f"""
             SELECT
                 os.id as ophys_session_id,
@@ -486,7 +486,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         self.logger.warning("Getting behavior-only session data. "
                             "This might take a while...")
-        session_query = self._build_in_list_selector_query(
+        session_query = self.build_in_list_selector_query(
             "bs.id", behavior_session_ids)
         summary_tbl = self._get_behavior_summary_table(session_query)
         stimulus_names = self._get_behavior_stage_table(behavior_session_ids)

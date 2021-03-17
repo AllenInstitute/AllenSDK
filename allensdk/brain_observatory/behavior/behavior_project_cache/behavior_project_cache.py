@@ -167,7 +167,8 @@ class BehaviorProjectCache(Cache):
     def get_session_table(
             self,
             suppress: Optional[List[str]] = None,
-            index_column: str = "ophys_session_id") -> pd.DataFrame:
+            index_column: str = "ophys_session_id",
+            as_df=True) -> Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -179,6 +180,7 @@ class BehaviorProjectCache(Cache):
             If index_column="ophys_experiment_id", then each row will only have
             one experiment id, of type int (vs. an array of 1>more).
         :type index_column: str
+        :param as_df: whether to return as df or as BehaviorOphysSessionsTable
         :rtype: pd.DataFrame
         """
         if self.cache:
@@ -196,7 +198,7 @@ class BehaviorProjectCache(Cache):
                                               suppress=suppress,
                                               index_column=index_column,
                                               sessions_table=sessions_table)
-        return sessions.table
+        return sessions.table if as_df else sessions
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super().add_manifest_paths(manifest_builder)
@@ -206,12 +208,14 @@ class BehaviorProjectCache(Cache):
 
     def get_experiment_table(
             self,
-            suppress: Optional[List[str]] = None) -> pd.DataFrame:
+            suppress: Optional[List[str]] = None,
+            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all ophys_experiment_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :type suppress: list of str
+        :param as_df: whether to return as df or as SessionsTable
         :rtype: pd.DataFrame
         """
         if self.cache:
@@ -229,7 +233,7 @@ class BehaviorProjectCache(Cache):
         experiments = ExperimentsTable(df=experiments,
                                        suppress=suppress,
                                        sessions_table=sessions_table)
-        return experiments.table
+        return experiments.table if as_df else experiments
 
     def get_behavior_session_table(
             self,
@@ -257,10 +261,7 @@ class BehaviorProjectCache(Cache):
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         sessions = SessionsTable(df=sessions, suppress=suppress,
                                  fetch_api=self.fetch_api)
-        if as_df:
-            return sessions.table
-        else:
-            return sessions
+        return sessions.table if as_df else sessions
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
         """
