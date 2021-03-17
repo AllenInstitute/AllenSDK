@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 import numpy as np
 import inspect
+import warnings
 
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
@@ -23,7 +24,7 @@ from allensdk.brain_observatory.behavior.dprime import (
 BehaviorDataApi = Type[BehaviorBase]
 
 
-class BehaviorSession(LazyPropertyMixin):
+class BehaviorData(LazyPropertyMixin):
     def __init__(self, api: Optional[BehaviorDataApi] = None):
         self.api = api
 
@@ -397,3 +398,12 @@ class BehaviorSession(LazyPropertyMixin):
     @metadata.setter
     def metadata(self, value):
         self._metadata = value
+
+
+class BehaviorSession(BehaviorData):
+    def __init__(self, **kwargs):
+        warnings.warn("BehaviorSession is deprecated; use BehaviorData.",
+                      DeprecationWarning,
+                      stacklevel=3)
+        super().__init__(**kwargs)
+    pass

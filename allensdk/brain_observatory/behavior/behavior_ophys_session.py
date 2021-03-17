@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 from typing import Any
+import warnings
 
 from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+    BehaviorData)
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
@@ -11,7 +12,7 @@ from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 
 
-class BehaviorOphysSession(BehaviorSession, ParamsMixin):
+class OphysExperimentAndBehaviorData(BehaviorData, ParamsMixin):
     """Represents data from a single Visual Behavior Ophys imaging session.
     Can be initialized with an api that fetches data, or by using class methods
     `from_lims` and `from_nwb_path`.
@@ -44,7 +45,7 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
             Number of time steps to use for convolution of ophys events
         """
 
-        BehaviorSession.__init__(self, api=api)
+        BehaviorData.__init__(self, api=api)
         ParamsMixin.__init__(self, ignore={'api'})
 
         # eye_tracking processing params
@@ -355,8 +356,11 @@ class BehaviorOphysSession(BehaviorSession, ParamsMixin):
         return self.cell_specimen_table[['cell_roi_id', 'roi_mask']]
 
 
-if __name__ == "__main__":
-
-    ophys_experiment_id = 789359614
-    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
-    print(session.trials['reward_time'])
+class BehaviorOphysSession(OphysExperimentAndBehaviorData):
+    def __init__(self, **kwargs):
+        warnings.warn("BehaviorOphysSession is deprecated; use "
+                      "OphysExperimentAndBehaviorData.",
+                      DeprecationWarning,
+                      stacklevel=3)
+        super().__init__(**kwargs)
+    pass
