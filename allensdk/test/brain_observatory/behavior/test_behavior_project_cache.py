@@ -8,7 +8,7 @@ import logging
 from allensdk.brain_observatory.behavior.behavior_project_cache \
     import BehaviorProjectCache
 from allensdk.brain_observatory.behavior.behavior_project_cache.external\
-    .behavior_project_metadata import \
+    .behavior_project_metadata_writer import \
     BehaviorProjectMetadataWriter
 
 
