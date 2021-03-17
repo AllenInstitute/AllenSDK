@@ -298,7 +298,8 @@ class BehaviorProjectCache(Cache):
 
         return sessions.table if as_df else sessions
 
-    def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int,
+                                      fixed: bool = False):
         """
         Note -- This method mocks the behavior of a cache. Future
         development will include an NWB reader to read from
@@ -308,7 +309,7 @@ class BehaviorProjectCache(Cache):
         """
         if fixed:
             raise NotImplementedError
-        fetch_session = partial(self.fetch_api.get_session_data,
+        fetch_session = partial(self.fetch_api.get_behavior_ophys_experiment,
                                 ophys_experiment_id)
         return call_caching(
             fetch_session,
@@ -317,7 +318,7 @@ class BehaviorProjectCache(Cache):
             read=fetch_session
         )
 
-    def get_behavior_session_data(self, behavior_session_id: int,
+    def get_behavior_session(self, behavior_session_id: int,
                                   fixed: bool = False):
         """
         Note -- This method mocks the behavior of a cache. Future
@@ -329,7 +330,7 @@ class BehaviorProjectCache(Cache):
         if fixed:
             raise NotImplementedError
 
-        fetch_session = partial(self.fetch_api.get_behavior_only_session_data,
+        fetch_session = partial(self.fetch_api.get_behavior_session,
                                 behavior_session_id)
         return call_caching(
             fetch_session,

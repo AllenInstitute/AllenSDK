@@ -433,7 +433,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                  .set_index("ophys_session_id"))
         return table
 
-    def get_behavior_only_session_data(
+    def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
