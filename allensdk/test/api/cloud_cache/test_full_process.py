@@ -186,12 +186,8 @@ def test_full_cache_system(tmpdir):
                          Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     # Use S3CloudCache to interact with dataset
-
-    class FullTestCache(S3CloudCache):
-        _bucket_name = test_bucket_name
-
     cache_dir = pathlib.Path(tmpdir) / 'my/test/cache'
-    cache = FullTestCache(cache_dir)
+    cache = S3CloudCache(cache_dir, test_bucket_name)
 
     # load the first version of the dataset
 
