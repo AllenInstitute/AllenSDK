@@ -58,17 +58,17 @@ class BehaviorProjectMetadataWriter:
             suppress=ophys_experiments_suppress).reset_index().to_csv(
             os.path.join(out_dir, 'ophys_experiment_table.csv'))
 
-    def _get_behavior_sessions(self, suppress=None):
+    def _get_behavior_sessions(self, suppress=None) -> pd.DataFrame:
         behavior_sessions = self._behavior_project_cache. \
             get_behavior_session_table(suppress=suppress, as_df=False)
         return self._get_release_table(table=behavior_sessions)
 
-    def _get_behavior_ophys_sessions(self, suppress=None):
+    def _get_behavior_ophys_sessions(self, suppress=None) -> pd.DataFrame:
         ophys_sessions = self._behavior_project_cache. \
             get_session_table(suppress=suppress, as_df=False)
         return self._get_release_table(table=ophys_sessions)
 
-    def _get_behavior_ophys_experiments(self, suppress=None):
+    def _get_behavior_ophys_experiments(self, suppress=None) -> pd.DataFrame:
         ophys_experiments = self._behavior_project_cache.get_experiment_table(
             suppress=suppress, as_df=False)
         return self._get_release_table(table=ophys_experiments)

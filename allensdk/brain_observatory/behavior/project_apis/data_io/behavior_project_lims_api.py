@@ -152,6 +152,26 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return query
 
     @staticmethod
+    def _build_container_from_session_query() -> str:
+        """Aggregate sql sub-query to get all ophys_container_ids associated
+        with a single ophys_session_id."""
+        query = """
+            -- -- begin getting all ophys_container_ids -- --
+            SELECT
+                (ARRAY_AGG(
+                        DISTINCT(oec.visual_behavior_experiment_container_id))
+                    ) AS container_ids, os.id
+            FROM ophys_experiments_visual_behavior_experiment_containers oec
+            JOIN visual_behavior_experiment_containers vbc
+                ON oec.visual_behavior_experiment_container_id = vbc.id
+            JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            JOIN ophys_sessions os ON os.id = oe.ophys_session_id
+            GROUP BY os.id
+            -- -- end getting all ophys_container_ids -- --
+        """
+        return query
+
+    @staticmethod
     def _build_line_from_donor_query(line="driver") -> str:
         """Sub-query to get a line from a donor.
         :param line: 'driver' or 'reporter'
@@ -184,6 +204,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 bs.id AS behavior_session_id,
                 bs.ophys_session_id,
+                experiment_ids as ophys_experiment_id,
+                container_ids as ophys_container_id,
+                pr.code as project_code,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
                 d.id as donor_id,
@@ -196,6 +219,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                     AS age_in_days,
                 bs.foraging_id
             FROM behavior_sessions bs
+            LEFT JOIN (
+                {self._build_experiment_from_session_query()}
+            ) exp_ids ON bs.ophys_session_id = exp_ids.id
+            LEFT JOIN (
+                {self._build_container_from_session_query()}
+            ) cntr_ids ON bs.ophys_session_id = cntr_ids.id
+            LEFT JOIN ophys_sessions os ON os.id = bs.ophys_session_id
+            LEFT JOIN projects pr ON pr.id = os.project_id
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
             LEFT OUTER JOIN (
@@ -390,6 +421,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
                 experiment_ids as ophys_experiment_id,
+                container_ids as ophys_container_id,
                 pr.code as project_code,
                 os.name as session_name,
                 os.stimulus_name as session_type,
@@ -412,6 +444,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
+            JOIN (
+                {self._build_container_from_session_query()}
+            ) cntr_ids ON os.id = cntr_ids.id
             LEFT OUTER JOIN (
                 {self._build_line_from_donor_query(line="reporter")}
             ) reporter on reporter.donor_id = d.id
