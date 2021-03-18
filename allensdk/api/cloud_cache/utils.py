@@ -27,7 +27,7 @@ def bucket_name_from_url(url: str) -> Optional[str]:
     here
     https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
     """
-    s3_pattern = re.compile('\.s3[a-z,0-9,\-]*\.amazonaws.com')  # noqa: W605
+    s3_pattern = re.compile('\.s3[\.,a-z,0-9,\-]*\.amazonaws.com')  # noqa: W605, E501
     url_params = url_parse.urlparse(url)
     raw_location = url_params.netloc
     s3_match = s3_pattern.search(raw_location)

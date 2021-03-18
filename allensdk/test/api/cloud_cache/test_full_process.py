@@ -56,11 +56,11 @@ def test_full_cache_system(tmpdir):
         hasher.update(data)
         v1_hashes[key] = hasher.hexdigest()
         s3_client.put_object(Bucket=test_bucket_name,
-                             Key=f'data/{key}',
+                             Key=f'proj/data/{key}',
                              Body=data)
 
     for df, key in zip((metadata1_v1, metadata2_v1),
-                       ('metadata1.csv', 'metadata2.csv')):
+                       ('proj/metadata1.csv', 'proj/metadata2.csv')):
 
         with io.StringIO() as stream:
             df.to_csv(stream, index=False)
@@ -69,7 +69,7 @@ def test_full_cache_system(tmpdir):
 
         hasher = hashlib.blake2b()
         hasher.update(data)
-        v1_hashes[key] = hasher.hexdigest()
+        v1_hashes[key.replace('proj/', '')] = hasher.hexdigest()
         s3_client.put_object(Bucket=test_bucket_name,
                              Key=key,
                              Body=data)
@@ -78,7 +78,8 @@ def test_full_cache_system(tmpdir):
     v1_version_id = {}
     response = s3_client.list_object_versions(Bucket=test_bucket_name)
     for v in response['Versions']:
-        v1_version_id[v['Key'].replace('data/', '')] = v['VersionId']
+        vkey = v['Key'].replace('proj/', '').replace('data/', '')
+        v1_version_id[vkey] = v['VersionId']
 
     version_id_lookup['v1'] = v1_version_id
 
@@ -91,11 +92,11 @@ def test_full_cache_system(tmpdir):
         hasher.update(data)
         v2_hashes[key] = hasher.hexdigest()
         s3_client.put_object(Bucket=test_bucket_name,
-                             Key=f'data/{key}',
+                             Key=f'proj/data/{key}',
                              Body=data)
 
     s3_client.delete_object(Bucket=test_bucket_name,
-                            Key='data/data3')
+                            Key='proj/data/data3')
 
     with io.StringIO() as stream:
         metadata1_v2.to_csv(stream, index=False)
@@ -106,11 +107,11 @@ def test_full_cache_system(tmpdir):
     hasher.update(data)
     v2_hashes['metadata1.csv'] = hasher.hexdigest()
     s3_client.put_object(Bucket=test_bucket_name,
-                         Key='metadata1.csv',
+                         Key='proj/metadata1.csv',
                          Body=data)
 
     s3_client.delete_object(Bucket=test_bucket_name,
-                            Key='metadata2.csv')
+                            Key='proj/metadata2.csv')
 
     true_hashes['v2'] = v2_hashes
     v2_version_id = {}
@@ -118,7 +119,8 @@ def test_full_cache_system(tmpdir):
     for v in response['Versions']:
         if not v['IsLatest']:
             continue
-        v2_version_id[v['Key'].replace('data/', '')] = v['VersionId']
+        vkey = v['Key'].replace('proj/', '').replace('data/', '')
+        v2_version_id[vkey] = v['VersionId']
     version_id_lookup['v2'] = v2_version_id
 
     # check thata data3 and metadata2.csv do not occur in v2 of
@@ -138,12 +140,12 @@ def test_full_cache_system(tmpdir):
     # build manifests
 
     manifest_1 = {}
-    manifest_1['dataset_version'] = 'A'
-    manifest_1['file_id_column'] = 'file_id'
+    manifest_1['manifest_version'] = 'A'
+    manifest_1['metadata_file_id_column_name'] = 'file_id'
     data_files_1 = {}
     for k in ('data1', 'data2', 'data3'):
         obj = {}
-        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/proj/data/{k}'  # noqa: E501
         obj['file_hash'] = true_hashes['v1'][k]
         obj['version_id'] = version_id_lookup['v1'][k]
         data_files_1[k] = obj
@@ -151,19 +153,19 @@ def test_full_cache_system(tmpdir):
     metadata_files_1 = {}
     for k in ('metadata1.csv', 'metadata2.csv'):
         obj = {}
-        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/proj/{k}'
         obj['file_hash'] = true_hashes['v1'][k]
         obj['version_id'] = version_id_lookup['v1'][k]
         metadata_files_1[k] = obj
     manifest_1['metadata_files'] = metadata_files_1
 
     manifest_2 = {}
-    manifest_2['dataset_version'] = 'B'
-    manifest_2['file_id_column'] = 'file_id'
+    manifest_2['manifest_version'] = 'B'
+    manifest_2['metadata_file_id_column_name'] = 'file_id'
     data_files_2 = {}
     for k in ('data1', 'data2'):
         obj = {}
-        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/data/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/proj/data/{k}'  # noqa: E501
         obj['file_hash'] = true_hashes['v2'][k]
         obj['version_id'] = version_id_lookup['v2'][k]
         data_files_2[k] = obj
@@ -171,23 +173,23 @@ def test_full_cache_system(tmpdir):
     metadata_files_2 = {}
     for k in ['metadata1.csv']:
         obj = {}
-        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/{k}'
+        obj['url'] = f'http://{test_bucket_name}.s3.amazonaws.com/proj/{k}'
         obj['file_hash'] = true_hashes['v2'][k]
         obj['version_id'] = version_id_lookup['v2'][k]
         metadata_files_2[k] = obj
     manifest_2['metadata_files'] = metadata_files_2
 
     s3_client.put_object(Bucket=test_bucket_name,
-                         Key='manifests/manifest_1.json',
+                         Key='proj/manifests/manifest_1.json',
                          Body=bytes(json.dumps(manifest_1), 'utf-8'))
 
     s3_client.put_object(Bucket=test_bucket_name,
-                         Key='manifests/manifest_2.json',
+                         Key='proj/manifests/manifest_2.json',
                          Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     # Use S3CloudCache to interact with dataset
     cache_dir = pathlib.Path(tmpdir) / 'my/test/cache'
-    cache = S3CloudCache(cache_dir, test_bucket_name)
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
     # load the first version of the dataset
 
