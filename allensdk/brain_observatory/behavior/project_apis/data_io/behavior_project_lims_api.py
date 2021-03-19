@@ -1,5 +1,3 @@
-from enum import Enum
-
 import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable
 import logging

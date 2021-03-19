@@ -19,6 +19,9 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .sessions_table import \
     SessionsTable
 
+#########
+# These columns should be dropped from external-facing metadata
+#########
 SESSION_SUPPRESS = (
     'donor_id',
     'foraging_id',
@@ -32,6 +35,8 @@ OPHYS_EXPERIMENTS_SUPPRESS = SESSION_SUPPRESS + (
     'published_at',
     'isi_experiment_id'
 )
+#########
+
 OUTPUT_METADATA_FILENAMES = {
     'behavior_session_table': 'behavior_session_table.csv',
     'ophys_session_table': 'ophys_session_table.csv',
@@ -70,8 +75,14 @@ class BehaviorProjectMetadataWriter:
                                      'behavior_session_table']):
         behavior_sessions = self._behavior_project_cache. \
             get_behavior_session_table(suppress=suppress,
-                                       as_df=False)
-        behavior_sessions = self._get_release_table(table=behavior_sessions)
+                                       as_df=True)
+
+        # Add release files
+        behavior_sessions = behavior_sessions \
+            .merge(self._release_behavior_only_nwb,
+                   left_index=True,
+                   right_index=True,
+                   how='left')
         self._write_metadata_table(df=behavior_sessions,
                                    filename=output_filename)
 
@@ -80,8 +91,7 @@ class BehaviorProjectMetadataWriter:
                                   'ophys_session_table'
                               ]):
         ophys_sessions = self._behavior_project_cache. \
-            get_session_table(suppress=suppress, as_df=False)
-        ophys_sessions = self._get_release_table(table=ophys_sessions)
+            get_session_table(suppress=suppress, as_df=True)
         self._write_metadata_table(df=ophys_sessions,
                                    filename=output_filename)
 
@@ -90,46 +100,18 @@ class BehaviorProjectMetadataWriter:
                                      'ophys_experiment_table'
                                  ]):
         ophys_experiments = self._behavior_project_cache.get_experiment_table(
-            suppress=suppress, as_df=False)
-        ophys_experiments = self._get_release_table(table=ophys_experiments)
+            suppress=suppress, as_df=True)
+
+        # Add release files
+        ophys_experiments = ophys_experiments.merge(
+            self._release_behavior_with_ophys_nwb
+                .drop('behavior_session_id', axis=1),
+            left_index=True,
+            right_index=True,
+            how='left')
+
         self._write_metadata_table(df=ophys_experiments,
                                    filename=output_filename)
-
-    def _get_release_table(self,
-                           table: Union[
-                               SessionsTable,
-                               BehaviorOphysSessionsTable,
-                               ExperimentsTable]) -> pd.DataFrame:
-        """Takes as input an entire project-level table and filters it to
-        include records which we are releasing data for
-
-        Parameters
-        ----------
-        table
-            The project table to filter
-
-        Returns
-        --------
-        The filtered dataframe
-        """
-        if isinstance(table, SessionsTable):
-            release_table = table.table.merge(self._release_behavior_only_nwb,
-                                              left_index=True,
-                                              right_index=True,
-                                              how='left')
-        elif isinstance(table, BehaviorOphysSessionsTable):
-            release_table = table.table
-        elif isinstance(table, ExperimentsTable):
-            release_table = table.table.merge(
-                self._release_behavior_with_ophys_nwb
-                    .drop('behavior_session_id', axis=1),
-                left_index=True,
-                right_index=True,
-                how='left')
-        else:
-            raise ValueError(f'Bad table {type(table)}')
-
-        return release_table
 
     def _write_metadata_table(self, df: pd.DataFrame, filename: str):
         """
