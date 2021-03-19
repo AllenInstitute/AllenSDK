@@ -55,16 +55,6 @@ class BehaviorProjectMetadataWriter:
         self._release_behavior_with_ophys_nwb = self._behavior_project_cache \
             .fetch_api.get_release_files(file_type='BehaviorOphysNwb')
 
-    @property
-    def release_behavior_only_nwb(self):
-        """Returns all release behavior only nwb"""
-        return self._release_behavior_only_nwb
-
-    @property
-    def release_behavior_with_ophys_nwb(self):
-        """Returns all release behavior only nwb"""
-        return self._release_behavior_with_ophys_nwb
-
     def write_metadata(self):
         """Writes metadata to csv"""
         os.makedirs(self._out_dir, exist_ok=True)
