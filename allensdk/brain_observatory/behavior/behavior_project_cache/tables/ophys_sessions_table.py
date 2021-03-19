@@ -8,15 +8,12 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     OphysMixin
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .project_table import ProjectTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .sessions_table import SessionsTable
 
 
 class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
     """Class for storing and manipulating project-level data
     at the behavior-ophys session level"""
     def __init__(self, df: pd.DataFrame,
-                 sessions_table: SessionsTable,
                  suppress: Optional[List[str]] = None,
                  index_column: str = 'ophys_session_id'):
         """
@@ -24,8 +21,6 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         ----------
         df
             The behavior-ophys session-level data
-        sessions_table
-            All session-level data (needed to calculate exposure counts)
         suppress
             columns to drop from table
         index_column
@@ -34,13 +29,10 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
 
         self._logger = logging.getLogger(self.__class__.__name__)
         self._index_column = index_column
-        self._sessions_table = sessions_table
-        super().__init__(df=df, suppress=suppress)
+        ProjectTable.__init__(self, df=df, suppress=suppress)
+        OphysMixin.__init__(self)
 
     def postprocess_additional(self):
-        self._df = self._add_prior_exposures(
-            sessions_table=self._sessions_table, df=self._df)
-
         # Possibly explode and reindex
         self.__explode()
 

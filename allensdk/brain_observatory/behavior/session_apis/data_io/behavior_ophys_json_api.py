@@ -64,7 +64,7 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         return {'height': self.data['movie_height'],
                 'width': self.data['movie_width']}
 
-    def get_experiment_container_id(self) -> int:
+    def get_ophys_container_id(self) -> int:
         """Get the experiment container id associated with an ophys
         experiment"""
         return self.data['container_id']

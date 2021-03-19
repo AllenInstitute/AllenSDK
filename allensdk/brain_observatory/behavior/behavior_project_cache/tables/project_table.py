@@ -1,17 +1,13 @@
-import re
 from abc import abstractmethod, ABC
-from typing import Optional, List
+from typing import Optional, Iterable
 
 import pandas as pd
-
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
-    BehaviorMetadata
 
 
 class ProjectTable(ABC):
     """Class for storing and manipulating project-level data"""
     def __init__(self, df: pd.DataFrame,
-                 suppress: Optional[List[str]] = None):
+                 suppress: Optional[Iterable[str]] = None):
         """
         Parameters
         ----------
@@ -22,6 +18,9 @@ class ProjectTable(ABC):
 
         """
         self._df = df
+
+        if suppress is not None:
+            suppress = list(suppress)
         self._suppress = suppress
 
         self.postprocess()
@@ -33,16 +32,7 @@ class ProjectTable(ABC):
     def postprocess_base(self):
         """Postprocessing to apply to all project-level data"""
         # Make sure the index is not duplicated (it is rare)
-        self._df = self._df[~self._df.index.duplicated()]
-
-        self._df['reporter_line'] = self._df['reporter_line'].apply(
-            BehaviorMetadata.parse_reporter_line)
-        self._df['cre_line'] = self._df['full_genotype'].apply(
-            BehaviorMetadata.parse_cre_line)
-        self._df['indicator'] = self._df['reporter_line'].apply(
-            BehaviorMetadata.parse_indicator)
-
-        self.__add_session_number()
+        self._df = self._df[~self._df.index.duplicated()].copy()
 
     def postprocess(self):
         """Postprocess loop"""
@@ -57,19 +47,3 @@ class ProjectTable(ABC):
     def postprocess_additional(self):
         """Additional postprocessing should be overridden by subclassess"""
         raise NotImplementedError()
-
-    def __add_session_number(self):
-        """Parses session number from session type and and adds to dataframe"""
-        def parse_session_number(session_type: str):
-            """Parse the session number from session type"""
-            match = re.match(r'OPHYS_(?P<session_number>\d+)',
-                             session_type)
-            if match is None:
-                return None
-            return int(match.group('session_number'))
-
-        session_type = self._df['session_type']
-        session_type = session_type[session_type.notnull()]
-
-        self._df.loc[session_type.index, 'session_number'] = \
-            session_type.apply(parse_session_number)

@@ -1,27 +1,13 @@
-import pandas as pd
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .sessions_table import \
-    SessionsTable
-
-
 class OphysMixin:
-    """A mixin for ophys data"""
-    @staticmethod
-    def _add_prior_exposures(sessions_table: SessionsTable,
-                             df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Adds prior exposures by merging from sessions_table
+    """A mixin class for ophys project data"""
+    def __init__(self):
+        # If we're in the state of combining behavior and ophys data
+        if 'date_of_acquisition_behavior' in self._df and \
+                'date_of_acquisition_ophys' in self._df:
 
-        Parameters
-        ----------
-        df
-            The behavior-ophys session-level data
-        sessions_table
-            sessions table to merge from
-        """
-        prior_exposures = sessions_table.prior_exposures
-        df = df.merge(prior_exposures,
-                      left_on='behavior_session_id',
-                      right_index=True)
-        return df
+            # Prioritize ophys_date_of_acquisition
+            self._df['date_of_acquisition'] = \
+                self._df['date_of_acquisition_ophys']
+            self._df = self._df.drop(
+                ['date_of_acquisition_behavior',
+                 'date_of_acquisition_ophys'], axis=1)

@@ -20,7 +20,8 @@ from allensdk.core.auth_config import (
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
-    def __init__(self, lims_engine, mtrain_engine, app_engine):
+    def __init__(self, lims_engine, mtrain_engine, app_engine,
+                 data_release_date: Optional[str] = None):
         """ Downloads visual behavior data from the Allen Institute's
         internal Laboratory Information Management System (LIMS). Only
         functional if connected to the Allen Institute Network. Used to load
@@ -59,18 +60,23 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             implement:
                 stream : takes a url as a string. Returns an iterable yielding
                 the response body as bytes.
+        data_release_date
+            Use to filter tables to only include data released on date
+            ie 2021-03-25
         """
         self.lims_engine = lims_engine
         self.mtrain_engine = mtrain_engine
         self.app_engine = app_engine
+        self.data_release_date = data_release_date
         self.logger = logging.getLogger("BehaviorProjectLimsApi")
 
     @classmethod
     def default(
-        cls,
-        lims_credentials: Optional[DbCredentials] = None,
-        mtrain_credentials: Optional[DbCredentials] = None,
-        app_kwargs: Optional[Dict[str, Any]] = None) -> \
+            cls,
+            lims_credentials: Optional[DbCredentials] = None,
+            mtrain_credentials: Optional[DbCredentials] = None,
+            app_kwargs: Optional[Dict[str, Any]] = None,
+            data_release_date: Optional[str] = None) -> \
             "BehaviorProjectLimsApi":
         """Construct a BehaviorProjectLimsApi instance with default
         postgres and app engines.
@@ -85,6 +91,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             Credentials to pass to the postgres connector to the mtrain
             database. If left unspecified, will check environment variables
             for the appropriate values.
+        data_release_date: Optional[str]
+            Filters tables to include only data released on date
+            ie 2021-03-25
         app_kwargs: Dict
             Dict of arguments to pass to the app engine. Currently unused.
 
@@ -105,7 +114,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
 
         app_engine = HttpEngine(**_app_kwargs)
-        return cls(lims_engine, mtrain_engine, app_engine)
+        return cls(lims_engine, mtrain_engine, app_engine,
+                   data_release_date=data_release_date)
 
     @staticmethod
     def _build_in_list_selector_query(
@@ -136,18 +146,46 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 sorted(set(map(str, valid_list))))})""")
         return session_query
 
-    @staticmethod
-    def _build_experiment_from_session_query() -> str:
+    def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
         with a single ophys_session_id."""
-        query = """
+        if self.data_release_date:
+            release_filter = self._get_ophys_experiment_release_filter()
+        else:
+            release_filter = ''
+        query = f"""
             -- -- begin getting all ophys_experiment_ids -- --
             SELECT
                 (ARRAY_AGG(DISTINCT(oe.id))) AS experiment_ids, os.id
             FROM ophys_sessions os
             RIGHT JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
+            {release_filter}
             GROUP BY os.id
             -- -- end getting all ophys_experiment_ids -- --
+        """
+        return query
+
+    def _build_container_from_session_query(self) -> str:
+        """Aggregate sql sub-query to get all ophys_container_ids associated
+        with a single ophys_session_id."""
+        if self.data_release_date:
+            release_filter = self._get_ophys_experiment_release_filter()
+        else:
+            release_filter = ''
+        query = f"""
+            -- -- begin getting all ophys_container_ids -- --
+            SELECT
+                (ARRAY_AGG(
+                        DISTINCT(oec.visual_behavior_experiment_container_id))
+                    ) AS container_ids, os.id
+            FROM ophys_experiments_visual_behavior_experiment_containers oec
+            JOIN visual_behavior_experiment_containers vbc
+                ON oec.visual_behavior_experiment_container_id = vbc.id
+            JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            JOIN ophys_sessions os ON os.id = oe.ophys_session_id
+            {release_filter}
+            GROUP BY os.id
+            -- -- end getting all ophys_container_ids -- --
         """
         return query
 
@@ -169,21 +207,16 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return query
 
-    def _get_behavior_summary_table(self,
-                                    session_sub_query: str) -> pd.DataFrame:
+    def _get_behavior_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,
         or a subset of session_ids (via the session_sub_query).
         Should pass an empty string to `session_sub_query` if want to get
         all data in the database.
-        :param session_sub_query: additional filtering logic to get a
-        subset of sessions.
-        :type session_sub_query: str
         :rtype: pd.DataFrame
         """
         query = f"""
             SELECT
                 bs.id AS behavior_session_id,
-                bs.ophys_session_id,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
                 d.id as donor_id,
@@ -205,8 +238,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 {self._build_line_from_donor_query("driver")}
             ) driver on driver.donor_id = d.id
             LEFT OUTER JOIN equipment ON equipment.id = bs.equipment_id
-            {session_sub_query}
         """
+
+        if self.data_release_date is not None:
+            query += self._get_behavior_session_release_filter()
+
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
@@ -293,9 +329,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorOphysSession(BehaviorOphysLimsApi(ophys_session_id))
 
-    def _get_experiment_table(
-            self,
-            ophys_experiment_ids: Optional[List[int]] = None) -> pd.DataFrame:
+    def _get_experiment_table(self) -> pd.DataFrame:
         """
         Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_experiment_ids and relevant
@@ -306,38 +340,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line, mouse_id
 
-        :param ophys_experiment_ids: optional list of ophys_experiment_ids
-            to include
         :rtype: pd.DataFrame
         """
-        if not ophys_experiment_ids:
-            self.logger.warning("Getting all ophys sessions."
-                                " This might take a while.")
-        experiment_query = self._build_in_list_selector_query(
-            "oe.id", ophys_experiment_ids)
         query = f"""
             SELECT
                 oe.id as ophys_experiment_id,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
-                oec.visual_behavior_experiment_container_id as container_id,
+                oec.visual_behavior_experiment_container_id as 
+                    ophys_container_id,
                 pr.code as project_code,
                 vbc.workflow_state as container_workflow_state,
                 oe.workflow_state as experiment_workflow_state,
                 os.name as session_name,
-                os.stimulus_name as session_type,
-                equipment.name as equipment_name,
                 os.date_of_acquisition,
                 os.isi_experiment_id,
-                os.specimen_id,
-                d.id as donor_id,
-                g.name as sex,
-                DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
-                    AS age_in_days,
-                d.full_genotype,
-                d.external_donor_name AS mouse_id,
-                reporter.reporter_line,
-                driver.driver_line,
                 id.depth as imaging_depth,
                 st.acronym as targeted_structure,
                 vbc.published_at
@@ -346,27 +363,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 ON oec.visual_behavior_experiment_container_id = vbc.id
             JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
             LEFT OUTER JOIN projects pr ON pr.id = os.project_id
-            JOIN donors d ON d.id = bs.donor_id
-            JOIN genders g ON g.id = d.gender_id
-            LEFT OUTER JOIN (
-                {self._build_line_from_donor_query(line="reporter")}
-            ) reporter on reporter.donor_id = d.id
-            LEFT OUTER JOIN (
-                {self._build_line_from_donor_query(line="driver")}
-            ) driver on driver.donor_id = d.id
             LEFT JOIN imaging_depths id ON id.id = oe.imaging_depth_id
             JOIN structures st ON st.id = oe.targeted_structure_id
-            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
-            {experiment_query};
         """
+
+        if self.data_release_date is not None:
+            query += self._get_ophys_experiment_release_filter()
+
         self.logger.debug(f"get_experiment_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def _get_session_table(
-            self,
-            ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
+    def _get_session_table(self) -> pd.DataFrame:
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
@@ -376,56 +385,35 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line, mouse_id
 
-        :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
         """
-        if not ophys_session_ids:
-            self.logger.warning("Getting all ophys sessions."
-                                " This might take a while.")
-        session_query = self._build_in_list_selector_query("os.id",
-                                                           ophys_session_ids)
         query = f"""
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
-                experiment_ids as ophys_experiment_id,
+                exp_ids.experiment_ids as ophys_experiment_id,
+                cntr_ids.container_ids as ophys_container_id,
                 pr.code as project_code,
                 os.name as session_name,
-                os.stimulus_name as session_type,
-                equipment.name as equipment_name,
                 os.date_of_acquisition,
-                os.specimen_id,
-                d.id as donor_id,
-                g.name as sex,
-                DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
-                    AS age_in_days,
-                d.full_genotype,
-                d.external_donor_name AS mouse_id,
-                reporter.reporter_line,
-                driver.driver_line
+                os.specimen_id
             FROM ophys_sessions os
-            LEFT OUTER JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
             LEFT OUTER JOIN projects pr ON pr.id = os.project_id
-            JOIN donors d ON d.id = bs.donor_id
-            JOIN genders g ON g.id = d.gender_id
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
-            LEFT OUTER JOIN (
-                {self._build_line_from_donor_query(line="reporter")}
-            ) reporter on reporter.donor_id = d.id
-            LEFT OUTER JOIN (
-                {self._build_line_from_donor_query(line="driver")}
-            ) driver on driver.donor_id = d.id
-            LEFT OUTER JOIN equipment ON equipment.id = os.equipment_id
-            {session_query};
+            JOIN (
+                {self._build_container_from_session_query()}
+            ) cntr_ids ON os.id = cntr_ids.id
         """
+
+        if self.data_release_date is not None:
+            query += self._get_ophys_session_release_filter()
         self.logger.debug(f"get_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_session_table(
-            self,
-            ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
+    def get_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
         Return columns: ophys_session_id, behavior_session_id,
@@ -433,13 +421,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line
-
-        :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
         """
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
-        table = (self._get_session_table(ophys_session_ids)
+        table = (self._get_session_table()
                  .drop_duplicates(subset=["ophys_session_id"], keep=False)
                  .set_index("ophys_session_id"))
         return table
@@ -462,7 +448,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         level to examine the data.
         Return columns:
             ophys_experiment_id, ophys_session_id, behavior_session_id,
-            container_id, project_code, container_workflow_state,
+            ophys_container_id, project_code, container_workflow_state,
             experiment_workflow_state, session_name, session_type,
             equipment_name, date_of_acquisition, isi_experiment_id,
             specimen_id, sex, age_in_days, full_genotype, reporter_line,
@@ -473,9 +459,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return self._get_experiment_table().set_index("ophys_experiment_id")
 
-    def get_behavior_only_session_table(
-            self,
-            behavior_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
+    def get_behavior_only_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
@@ -483,15 +467,103 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         :rtype: pd.DataFrame
         """
-        self.logger.warning("Getting behavior-only session data. "
-                            "This might take a while...")
-        session_query = self._build_in_list_selector_query(
-            "bs.id", behavior_session_ids)
-        summary_tbl = self._get_behavior_summary_table(session_query)
-        stimulus_names = self._get_behavior_stage_table(behavior_session_ids)
+        summary_tbl = self._get_behavior_summary_table()
+        stimulus_names = self._get_behavior_stage_table(
+            behavior_session_ids=summary_tbl.index.tolist())
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
                 .set_index("behavior_session_id"))
+
+    def get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
+        """Gets the release nwb files.
+
+        Parameters
+        ----------
+        file_type
+            NWB files to return ('BehaviorNwb', 'BehaviorOphysNwb')
+
+        Returns
+        ---------
+        Dataframe of release files and file metadata
+            -index of behavior_session_id or ophys_experiment_id
+            -columns file_id and isilon filepath
+        """
+        if self.data_release_date is None:
+            raise RuntimeError(f'data_release_date must be set in constructor')
+
+        if file_type not in ('BehaviorNwb', 'BehaviorOphysNwb'):
+            raise ValueError(f'cannot retrieve file type {file_type}')
+
+        if file_type == 'BehaviorNwb':
+            attachable_id_alias = 'behavior_session_id'
+            select_clause = f'''
+                SELECT attachable_id as {attachable_id_alias}, id as file_id, 
+                    filename, storage_directory
+            '''
+            join_clause = ''
+        else:
+            attachable_id_alias = 'ophys_experiment_id'
+            select_clause = f'''
+                SELECT attachable_id as {attachable_id_alias}, 
+                    bs.id as behavior_session_id, wkf.id as file_id, 
+                    filename, wkf.storage_directory
+            '''
+            join_clause = f'''
+                JOIN ophys_experiments oe ON oe.id = attachable_id
+                JOIN ophys_sessions os ON os.id = oe.ophys_session_id
+                JOIN behavior_sessions bs on bs.ophys_session_id = os.id
+            '''
+
+        query = f'''
+            {select_clause}
+            FROM well_known_files wkf
+            {join_clause}
+            WHERE published_at = '{self.data_release_date}' AND 
+                well_known_file_type_id IN (
+                    SELECT id 
+                    FROM well_known_file_types 
+                    WHERE name = '{file_type}'
+                );
+        '''
+
+        res = self.lims_engine.select(query)
+        res['isilon_filepath'] = res['storage_directory'] \
+            .str.cat(res['filename'])
+        res = res.drop(['filename', 'storage_directory'], axis=1)
+        return res.set_index(attachable_id_alias)
+
+    def _get_behavior_session_release_filter(self):
+        # 1) Get release behavior only session ids
+        behavior_only_release_files = self.get_release_files(
+            file_type='BehaviorNwb')
+        release_behavior_only_session_ids = \
+            behavior_only_release_files.index.tolist()
+
+        # 2) Get release behavior with ophys session ids
+        ophys_release_files = self.get_release_files(
+            file_type='BehaviorOphysNwb')
+        release_behavior_with_ophys_session_ids = \
+            ophys_release_files['behavior_session_id'].tolist()
+
+        # 3) release behavior session ids is combination
+        release_behavior_session_ids = \
+            release_behavior_only_session_ids + \
+            release_behavior_with_ophys_session_ids
+
+        return self._build_in_list_selector_query(
+            "bs.id", release_behavior_session_ids)
+
+    def _get_ophys_session_release_filter(self):
+        release_files = self.get_release_files(
+            file_type='BehaviorOphysNwb')
+        return self._build_in_list_selector_query(
+            "bs.id", release_files['behavior_session_id'].tolist())
+
+    def _get_ophys_experiment_release_filter(self):
+        release_files = self.get_release_files(
+            file_type='BehaviorOphysNwb')
+        return self._build_in_list_selector_query(
+            "oe.id", release_files.index.tolist())
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
         """Download a template for the natural scene stimulus. This is the

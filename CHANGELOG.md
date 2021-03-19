@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.10.0] = TBD
 - Improvements to BehaviorProjectCache
+- Adds project metadata writer
 
 ## [2.9.0] = 2021-03-08
 - Improvements to BehaviorProjectCache 
