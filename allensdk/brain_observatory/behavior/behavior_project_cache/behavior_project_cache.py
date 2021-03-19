@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .sessions_table import \
     SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
-    BehaviorProjectLimsApi)
+    BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
     one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
@@ -105,6 +105,13 @@ class VisualBehaviorOphysProjectCache(Cache):
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    @classmethod
+    def from_s3_cache(cls, cache_dir: Union[str, Path],
+                      bucket_name: str) -> "VisualBehaviorOphysProjectCache":
+        fetch_api = BehaviorProjectCloudApi.from_s3_cache(
+                cache_dir, bucket_name)
+        return cls(fetch_api=fetch_api)
 
     @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
