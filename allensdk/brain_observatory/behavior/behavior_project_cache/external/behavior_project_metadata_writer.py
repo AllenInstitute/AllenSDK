@@ -48,11 +48,13 @@ class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
     def __init__(self, behavior_project_cache: BehaviorProjectCache,
-                 out_dir: str, project_name: str, data_release_date: str):
+                 out_dir: str, project_name: str, data_release_date: str,
+                 overwrite_ok=False):
         self._behavior_project_cache = behavior_project_cache
         self._out_dir = out_dir
         self._project_name = project_name
         self._data_release_date = data_release_date
+        self._overwrite_ok = overwrite_ok
         self._logger = logging.getLogger(self.__class__.__name__)
 
         self._release_behavior_only_nwb = self._behavior_project_cache \
@@ -125,6 +127,8 @@ class BehaviorProjectMetadataWriter:
             Filename to save as
         """
         filepath = os.path.join(self._out_dir, filename)
+        self._pre_file_write(filepath=filepath)
+
         self._logger.info(f'Writing {filepath}')
 
         df = df.reset_index()
@@ -158,8 +162,21 @@ class BehaviorProjectMetadataWriter:
         }
 
         save_path = os.path.join(self._out_dir, 'manifest.json')
+        self._pre_file_write(filepath=save_path)
+
         with open(save_path, 'w') as f:
             f.write(json.dumps(manifest, indent=4))
+
+    def _pre_file_write(self, filepath: str):
+        """Checks if file exists at filepath. If so, and overwrite_ok is False,
+        raises an exception"""
+        if os.path.exists(filepath):
+            if self._overwrite_ok:
+                pass
+            else:
+                raise RuntimeError(f'{filepath} already exists. In order '
+                                   f'to overwrite this file, pass the '
+                                   f'--overwrite_ok flag')
 
 
 def main():
@@ -171,6 +188,9 @@ def main():
     parser.add_argument('-data_release_date', help='Project release date. '
                                                    'Ie 2021-03-25',
                         required=True)
+    parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
+                                               'existing output files',
+                        dest='overwrite_ok', action='store_true')
     args = parser.parse_args()
 
     bpc = BehaviorProjectCache.from_lims(
@@ -179,7 +199,8 @@ def main():
         behavior_project_cache=bpc,
         out_dir=args.out_dir,
         project_name=args.project_name,
-        data_release_date=args.data_release_date)
+        data_release_date=args.data_release_date,
+        overwrite_ok=args.overwrite_ok)
     bpmw.write_metadata()
 
 
