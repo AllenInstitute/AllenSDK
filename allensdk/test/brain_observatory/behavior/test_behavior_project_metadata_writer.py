@@ -1,10 +1,7 @@
-import json
-import logging
 import os
 import tempfile
 from ast import literal_eval
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -14,9 +11,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.external \
     .behavior_project_metadata_writer import \
     BehaviorProjectMetadataWriter
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
-from allensdk.test.brain_observatory.behavior.test_behavior_project_cache \
-    import TempdirBehaviorCache, mock_api, session_table, behavior_table, \
-    experiments_table  # noqa F401
 
 
 def convert_strings_to_lists(df, is_session=True):
@@ -33,7 +27,7 @@ def convert_strings_to_lists(df, is_session=True):
                 .apply(lambda x: literal_eval(x))
 
 
-@pytest.mark.bamboo
+@pytest.mark.requires_bamboo
 def test_metadata():
     release_date = '2021-03-25'
     with tempfile.TemporaryDirectory() as tmp_dir:
