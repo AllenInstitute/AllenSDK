@@ -5,23 +5,23 @@ import pandas as pd
 import logging
 
 from allensdk.api.warehouse_cache.cache import Cache
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .experiments_table import \
     ExperimentsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .sessions_table import \
     SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
     BehaviorProjectLimsApi)
-from allensdk.api.warehouse_cache.caching_utilities import one_file_call_caching, call_caching
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+from allensdk.api.warehouse_cache.caching_utilities import \
+    one_file_call_caching, call_caching
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable
 from allensdk.core.authentication import DbCredentials
 
 
 class BehaviorProjectCache(Cache):
-
     MANIFEST_VERSION = "0.0.1-alpha.3"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
@@ -32,12 +32,12 @@ class BehaviorProjectCache(Cache):
             "spec": f"{OPHYS_SESSIONS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
-            },
+        },
         BEHAVIOR_SESSIONS_KEY: {
             "spec": f"{BEHAVIOR_SESSIONS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
-            },
+        },
         OPHYS_EXPERIMENTS_KEY: {
             "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
             "parent_key": "BASEDIR",
@@ -105,7 +105,6 @@ class BehaviorProjectCache(Cache):
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
-        self._sessions_table: Optional[SessionsTable] = None
 
     @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
@@ -116,7 +115,9 @@ class BehaviorProjectCache(Cache):
                   mtrain_credentials: Optional[DbCredentials] = None,
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
-                  asynchronous: bool = True) -> "BehaviorProjectCache":
+                  asynchronous: bool = True,
+                  data_release_date: Optional[str] = None
+                  ) -> "BehaviorProjectCache":
         """
         Construct a BehaviorProjectCache with a lims api. Use this method
         to create a  BehaviorProjectCache instance rather than calling
@@ -148,6 +149,9 @@ class BehaviorProjectCache(Cache):
             included for consistency with EcephysProjectCache.from_lims.
         asynchronous : bool
             Whether to fetch from web asynchronously. Currently unused.
+        data_release_date: str
+            Use to filter tables to only include data released on date
+            ie 2021-03-25
         Returns
         =======
         BehaviorProjectCache
@@ -159,9 +163,10 @@ class BehaviorProjectCache(Cache):
         else:
             app_kwargs = None
         fetch_api = BehaviorProjectLimsApi.default(
-                        lims_credentials=lims_credentials,
-                        mtrain_credentials=mtrain_credentials,
-                        app_kwargs=app_kwargs)
+            lims_credentials=lims_credentials,
+            mtrain_credentials=mtrain_credentials,
+            data_release_date=data_release_date,
+            app_kwargs=app_kwargs)
         return cls(fetch_api=fetch_api, manifest=manifest, version=version,
                    cache=cache, fetch_tries=fetch_tries)
 
@@ -169,7 +174,9 @@ class BehaviorProjectCache(Cache):
             self,
             suppress: Optional[List[str]] = None,
             index_column: str = "ophys_session_id",
-            as_df=True) -> Union[pd.DataFrame, BehaviorOphysSessionsTable]:
+            as_df=True,
+            include_behavior_data=True) -> \
+            Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -182,23 +189,34 @@ class BehaviorProjectCache(Cache):
             one experiment id, of type int (vs. an array of 1>more).
         :type index_column: str
         :param as_df: whether to return as df or as BehaviorOphysSessionsTable
+        :param include_behavior_data
+            Whether to include behavior data
         :rtype: pd.DataFrame
         """
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
-            sessions = one_file_call_caching(
+            ophys_sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_session_table,
                 _write_json,
                 lambda path: _read_json(path, index_name='ophys_session_id'))
         else:
-            sessions = self.fetch_api.get_session_table()
-        sessions_table = self.get_behavior_session_table(suppress=suppress,
-                                                         as_df=False)
-        sessions = BehaviorOphysSessionsTable(df=sessions,
+            ophys_sessions = self.fetch_api.get_session_table()
+
+        if include_behavior_data:
+            # Merge behavior data in
+            behavior_sessions_table = self.get_behavior_session_table(
+                suppress=suppress, as_df=True, include_ophys_data=False)
+            ophys_sessions = behavior_sessions_table.merge(
+                ophys_sessions,
+                left_index=True,
+                right_on='behavior_session_id',
+                suffixes=('_behavior', '_ophys'))
+
+        sessions = BehaviorOphysSessionsTable(df=ophys_sessions,
                                               suppress=suppress,
-                                              index_column=index_column,
-                                              sessions_table=sessions_table)
+                                              index_column=index_column)
+
         return sessions.table if as_df else sessions
 
     def add_manifest_paths(self, manifest_builder):
@@ -229,22 +247,29 @@ class BehaviorProjectCache(Cache):
                                         index_name='ophys_experiment_id'))
         else:
             experiments = self.fetch_api.get_experiment_table()
-        sessions_table = self.get_behavior_session_table(suppress=suppress,
-                                                         as_df=False)
+
+        # Merge behavior data in
+        behavior_sessions_table = self.get_behavior_session_table(
+            suppress=suppress, as_df=True, include_ophys_data=False)
+        experiments = behavior_sessions_table.merge(
+            experiments, left_index=True, right_on='behavior_session_id',
+            suffixes=('_behavior', '_ophys'))
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress,
-                                       sessions_table=sessions_table)
+                                       suppress=suppress)
         return experiments.table if as_df else experiments
 
     def get_behavior_session_table(
             self,
             suppress: Optional[List[str]] = None,
-            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
+            as_df=True,
+            include_ophys_data=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :param as_df: whether to return as df or as SessionsTable
+        :param include_ophys_data
+            Whether to include ophys data
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -257,15 +282,19 @@ class BehaviorProjectCache(Cache):
                 lambda path: _read_json(path,
                                         index_name='behavior_session_id'))
         else:
-            if self._sessions_table is not None:
-                return self._sessions_table
+            sessions = self.fetch_api. \
+                get_behavior_only_session_table()
 
-            sessions = self.fetch_api.get_behavior_only_session_table()
-        sessions = sessions.rename(columns={"genotype": "full_genotype"})
+        if include_ophys_data:
+            ophys_session_table = self.get_session_table(
+                suppress=suppress,
+                as_df=False,
+                include_behavior_data=False)
+        else:
+            ophys_session_table = None
         sessions = SessionsTable(df=sessions, suppress=suppress,
-                                 fetch_api=self.fetch_api)
-        # Storing so doesn't have to be recomputed
-        self._sessions_table = sessions
+                                 fetch_api=self.fetch_api,
+                                 ophys_session_table=ophys_session_table)
 
         return sessions.table if as_df else sessions
 
@@ -283,8 +312,8 @@ class BehaviorProjectCache(Cache):
                                 ophys_experiment_id)
         return call_caching(
             fetch_session,
-            lambda x: x,        # not writing anything
-            lazy=False,         # can't actually read from file cache
+            lambda x: x,  # not writing anything
+            lazy=False,  # can't actually read from file cache
             read=fetch_session
         )
 
@@ -304,8 +333,8 @@ class BehaviorProjectCache(Cache):
                                 behavior_session_id)
         return call_caching(
             fetch_session,
-            lambda x: x,       # not writing anything
-            lazy=False,        # can't actually read from file cache
+            lambda x: x,  # not writing anything
+            lazy=False,  # can't actually read from file cache
             read=fetch_session
         )
 
