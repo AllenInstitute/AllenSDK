@@ -118,7 +118,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                    data_release_date=data_release_date)
 
     @staticmethod
-    def build_in_list_selector_query(
+    def _build_in_list_selector_query(
             col,
             valid_list: Optional[SupportsStr] = None,
             operator: str = "WHERE") -> str:
@@ -248,9 +248,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     def _get_foraging_ids_from_behavior_session(
             self, behavior_session_ids: List[int]) -> List[str]:
-        behav_ids = self.build_in_list_selector_query("id",
-                                                      behavior_session_ids,
-                                                      operator="AND")
+        behav_ids = self._build_in_list_selector_query("id",
+                                                       behavior_session_ids,
+                                                       operator="AND")
         forag_ids_query = f"""
             SELECT foraging_id
             FROM behavior_sessions
@@ -277,7 +277,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         else:
             foraging_ids = None
 
-        foraging_ids_query = self.build_in_list_selector_query(
+        foraging_ids_query = self._build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -305,7 +305,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         ---------
         Series with index of foraging id and values stage parameters
         """
-        foraging_ids_query = self.build_in_list_selector_query(
+        foraging_ids_query = self._build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -550,19 +550,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             release_behavior_only_session_ids + \
             release_behavior_with_ophys_session_ids
 
-        return self.build_in_list_selector_query(
+        return self._build_in_list_selector_query(
             "bs.id", release_behavior_session_ids)
 
     def _get_ophys_session_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self.build_in_list_selector_query(
+        return self._build_in_list_selector_query(
             "bs.id", release_files['behavior_session_id'].tolist())
 
     def _get_ophys_experiment_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self.build_in_list_selector_query(
+        return self._build_in_list_selector_query(
             "oe.id", release_files.index.tolist())
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:

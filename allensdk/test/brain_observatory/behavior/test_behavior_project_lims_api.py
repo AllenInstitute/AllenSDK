@@ -36,7 +36,7 @@ def MockBehaviorProjectLimsApi():
 def test_build_in_list_selector_query(
         col, valid_list, operator, expected, MockBehaviorProjectLimsApi):
     assert (expected
-            == MockBehaviorProjectLimsApi.build_in_list_selector_query(
+            == MockBehaviorProjectLimsApi._build_in_list_selector_query(
                 col, valid_list, operator))
 
 
