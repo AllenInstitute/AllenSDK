@@ -391,8 +391,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
-                experiment_ids as ophys_experiment_id,
-                container_ids as ophys_container_id,
+                exp_ids.experiment_ids as ophys_experiment_id,
+                cntr_ids.container_ids as ophys_container_id,
                 pr.code as project_code,
                 os.name as session_name,
                 os.date_of_acquisition,
