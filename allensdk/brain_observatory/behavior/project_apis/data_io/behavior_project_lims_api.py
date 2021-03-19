@@ -469,8 +469,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         :rtype: pd.DataFrame
         """
-        self.logger.warning("Getting behavior-only session data. "
-                            "This might take a while...")
         summary_tbl = self._get_behavior_summary_table()
         stimulus_names = self._get_behavior_stage_table(
             behavior_session_ids=summary_tbl.index.tolist())
