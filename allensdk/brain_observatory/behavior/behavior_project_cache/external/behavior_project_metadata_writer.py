@@ -137,15 +137,11 @@ class BehaviorProjectMetadataWriter:
         self._logger.info('Writing successful')
 
     def _write_manifest(self):
-        data_files = \
-            self._release_behavior_only_nwb['isilon_filepath'].to_list() + \
-            self._release_behavior_with_ophys_nwb['isilon_filepath'].to_list()
-        filenames = OUTPUT_METADATA_FILENAMES.values()
-
         def get_abs_path(filename):
             return os.path.abspath(os.path.join(self._out_dir, filename))
 
-        metadata_files = [get_abs_path(f) for f in filenames]
+        metadata_filenames = OUTPUT_METADATA_FILENAMES.values()
+        metadata_files = [get_abs_path(f) for f in metadata_filenames]
         data_pipeline = [{
             'name': 'AllenSDK',
             'version': allensdk.__version__,
@@ -154,7 +150,6 @@ class BehaviorProjectMetadataWriter:
         }]
 
         manifest = {
-            'data_files': data_files,
             'metadata_files': metadata_files,
             'data_pipeline': data_pipeline,
             'project_name': self._project_name,

@@ -29,7 +29,7 @@ def convert_strings_to_lists(df, is_session=True):
                 .apply(lambda x: literal_eval(x))
 
 
-# @pytest.mark.requires_bamboo
+@pytest.mark.requires_bamboo
 def test_metadata():
     release_date = '2021-03-25'
     with tempfile.TemporaryDirectory() as tmp_dir:
