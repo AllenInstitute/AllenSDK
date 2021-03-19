@@ -33,8 +33,9 @@ class BehaviorOphysMetadata(BehaviorMetadata):
     def excitation_lambda(self) -> float:
         return 910.0
 
+    # TODO rename to ophys_container_id
     @property
-    def ophys_container_id(self) -> int:
+    def experiment_container_id(self) -> int:
         return self._extractor.get_ophys_container_id()
 
     @property
