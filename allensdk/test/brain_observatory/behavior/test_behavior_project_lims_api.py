@@ -36,7 +36,7 @@ def MockBehaviorProjectLimsApi():
 def test_build_in_list_selector_query(
         col, valid_list, operator, expected, MockBehaviorProjectLimsApi):
     assert (expected
-            == MockBehaviorProjectLimsApi.build_in_list_selector_query(
+            == MockBehaviorProjectLimsApi._build_in_list_selector_query(
                 col, valid_list, operator))
 
 
@@ -63,6 +63,20 @@ def test_get_foraging_ids_from_behavior_session(
     mock_api = MockBehaviorProjectLimsApi
     assert expected == mock_api._get_foraging_ids_from_behavior_session(
         behavior_session_ids)
+
+
+def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
+    expected = WhitespaceStrippedString("""
+            SELECT
+                stages.name as session_type,
+                bs.id AS foraging_id
+            FROM behavior_sessions bs
+            JOIN stages ON stages.id = bs.state_id
+            ;
+        """)
+    mock_api = MockBehaviorProjectLimsApi
+    actual = mock_api._get_behavior_stage_table()
+    assert expected == actual
 
 
 @pytest.mark.parametrize(

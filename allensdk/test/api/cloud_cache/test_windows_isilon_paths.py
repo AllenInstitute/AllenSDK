@@ -14,8 +14,8 @@ def test_windows_path_to_isilon(monkeypatch):
 
     cache_dir = '/allen/silly/cache/path'
 
-    manifest_1 = {'dataset_version': '1',
-                  'file_id_column': 'file_id',
+    manifest_1 = {'manifest_version': '1',
+                  'metadata_file_id_column_name': 'file_id',
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com/path/to/a.csv',  # noqa: E501
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -64,7 +64,7 @@ def test_windows_path_to_isilon(monkeypatch):
                     '_file_exists',
                     dummy_file_exists)
 
-        cache = TestCloudCache(cache_dir)
+        cache = TestCloudCache(cache_dir, 'proj')
         cache.load_manifest()
 
         m_path = cache.metadata_path('a.csv')

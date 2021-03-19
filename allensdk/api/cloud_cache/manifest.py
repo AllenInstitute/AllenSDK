@@ -71,8 +71,8 @@ class Manifest(object):
             raise ValueError("Expected to deserialize manifest into a dict; "
                              f"instead got {type(self._data)}")
 
-        self._version = copy.deepcopy(self._data['dataset_version'])
-        self._file_id_column = copy.deepcopy(self._data['file_id_column'])
+        self._version = copy.deepcopy(self._data['manifest_version'])
+        self._file_id_column = copy.deepcopy(self._data['metadata_file_id_column_name'])  # noqa: E501
 
         self._metadata_file_names = [file_name for file_name
                                      in self._data['metadata_files']]

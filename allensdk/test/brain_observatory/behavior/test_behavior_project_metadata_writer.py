@@ -14,6 +14,8 @@ from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
 
 def convert_strings_to_lists(df, is_session=True):
+    """Lists when inside dataframe and written using .to_csv
+    get written as string literals. Need to parse out lists"""
     df.loc[df['driver_line'].notnull(), 'driver_line'] = \
         df['driver_line'][df['driver_line'].notnull()] \
         .apply(lambda x: literal_eval(x))
