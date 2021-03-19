@@ -16,11 +16,11 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS for filling optical physiology data. This data is
     is necessary (but not sufficient) to fill the 'Ophys' portion of a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
 
     This class needs to be inherited by the BehaviorOphysLimsApi and also
     have methods from BehaviorOphysDataTransforms in order to be usable by a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
     """
 
     def __init__(self, ophys_experiment_id: int,

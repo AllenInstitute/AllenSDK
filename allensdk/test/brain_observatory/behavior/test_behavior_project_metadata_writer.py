@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from allensdk.brain_observatory.behavior.behavior_project_cache import \
-    BehaviorProjectCache
+    VisualBehaviorOphysProjectCache
 from allensdk.brain_observatory.behavior.behavior_project_cache.external \
     .behavior_project_metadata_writer import \
     BehaviorProjectMetadataWriter
@@ -18,22 +18,22 @@ def convert_strings_to_lists(df, is_session=True):
     get written as string literals. Need to parse out lists"""
     df.loc[df['driver_line'].notnull(), 'driver_line'] = \
         df['driver_line'][df['driver_line'].notnull()] \
-            .apply(lambda x: literal_eval(x))
+        .apply(lambda x: literal_eval(x))
 
     if is_session:
         df.loc[df['ophys_experiment_id'].notnull(), 'ophys_experiment_id'] = \
             df['ophys_experiment_id'][df['ophys_experiment_id'].notnull()] \
-                .apply(lambda x: literal_eval(x))
+            .apply(lambda x: literal_eval(x))
         df.loc[df['ophys_container_id'].notnull(), 'ophys_container_id'] = \
             df['ophys_container_id'][df['ophys_container_id'].notnull()] \
-                .apply(lambda x: literal_eval(x))
+            .apply(lambda x: literal_eval(x))
 
 
 @pytest.mark.requires_bamboo
 def test_metadata():
     release_date = '2021-03-25'
     with tempfile.TemporaryDirectory() as tmp_dir:
-        bpc = BehaviorProjectCache.from_lims(
+        bpc = VisualBehaviorOphysProjectCache.from_lims(
             data_release_date=release_date)
         bpmw = BehaviorProjectMetadataWriter(
             behavior_project_cache=bpc,

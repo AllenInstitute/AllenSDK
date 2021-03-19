@@ -5,7 +5,8 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
     import OphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+        BehaviorOphysExperiment
 
 class ValidationError(AssertionError):
     pass
@@ -52,7 +53,7 @@ def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, ve
         #   the second carrot represents the time at which another flash should have started, after accounting for the possibility of the session ending on an omitted flash
         
         api = BehaviorOphysLimsApi() if api is None else api
-        session = BehaviorOphysSession(api)
+        session = BehaviorOphysExperiment(api)
 
         # get the flash/blank parameters
         max_flash_duration = session.stimulus_presentations['duration'].max()

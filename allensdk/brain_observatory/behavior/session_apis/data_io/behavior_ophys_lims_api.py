@@ -22,7 +22,7 @@ class BehaviorOphysLimsApi(BehaviorOphysDataTransforms,
                            CachedInstanceMethodMixin):
     """A data fetching and processing class that serves processed data from
     a specified data source (extractor). Contains all methods
-    needed to populate a BehaviorOphysSession."""
+    needed to populate a BehaviorOphysExperiment."""
 
     def __init__(self,
                  ophys_experiment_id: Optional[int] = None,
@@ -50,11 +50,11 @@ class BehaviorOphysLimsExtractor(OphysLimsExtractor, BehaviorLimsExtractor,
                                  BehaviorOphysDataExtractorBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS necessary (but not sufficient) for filling
-    a 'BehaviorOphysSession'.
+    a 'BehaviorOphysExperiment'.
 
     Most 'raw' data provided by this API needs to be processed by
     BehaviorOphysDataTransforms methods in order to usable by
-    'BehaviorOphysSession's.
+    'BehaviorOphysExperiment's.
     """
 
     def __init__(self, ophys_experiment_id: int,

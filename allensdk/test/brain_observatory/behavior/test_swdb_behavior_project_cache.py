@@ -106,7 +106,7 @@ def test_get_container_sessions(cache):
     container_id = cache.experiment_table['container_id'].unique()[0]
     container_sessions = cache.get_container_sessions(container_id)
     session = container_sessions['OPHYS_1_images_A']
-    assert isinstance(session, bpc.ExtendedBehaviorSession)
+    assert isinstance(session, bpc.ExtendedBehaviorOphysExperiment)
     np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)
 
 

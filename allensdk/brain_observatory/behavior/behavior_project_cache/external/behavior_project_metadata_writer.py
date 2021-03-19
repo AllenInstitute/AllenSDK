@@ -8,7 +8,7 @@ import pandas as pd
 
 import allensdk
 from allensdk.brain_observatory.behavior.behavior_project_cache import \
-    BehaviorProjectCache
+    VisualBehaviorOphysProjectCache
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .experiments_table import \
     ExperimentsTable
@@ -47,9 +47,10 @@ OUTPUT_METADATA_FILENAMES = {
 class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
-    def __init__(self, behavior_project_cache: BehaviorProjectCache,
+    def __init__(self, behavior_project_cache: VisualBehaviorOphysProjectCache,
                  out_dir: str, project_name: str, data_release_date: str,
                  overwrite_ok=False):
+
         self._behavior_project_cache = behavior_project_cache
         self._out_dir = out_dir
         self._project_name = project_name
@@ -188,7 +189,7 @@ def main():
                         dest='overwrite_ok', action='store_true')
     args = parser.parse_args()
 
-    bpc = BehaviorProjectCache.from_lims(
+    bpc = VisualBehaviorOphysProjectCache.from_lims(
         data_release_date=args.data_release_date)
     bpmw = BehaviorProjectMetadataWriter(
         behavior_project_cache=bpc,

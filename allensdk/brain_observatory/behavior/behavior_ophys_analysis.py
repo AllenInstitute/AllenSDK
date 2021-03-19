@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+        BehaviorOphysExperiment
 
 def plot_trace(timestamps, trace, ax=None, xlabel='time (seconds)', ylabel='fluorescence', title='roi'):
     if ax is None:
@@ -108,7 +109,7 @@ class BehaviorOphysAnalysis(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
-    session = BehaviorOphysSession(789359614)
+    session = BehaviorOphysExperiment(789359614)
     analysis = BehaviorOphysAnalysis(session)
     analysis.plot_example_traces_and_behavior()
     

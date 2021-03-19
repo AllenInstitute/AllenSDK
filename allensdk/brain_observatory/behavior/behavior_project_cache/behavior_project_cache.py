@@ -21,7 +21,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.core.authentication import DbCredentials
 
 
-class BehaviorProjectCache(Cache):
+class VisualBehaviorOphysProjectCache(Cache):
     MANIFEST_VERSION = "0.0.1-alpha.3"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
@@ -57,8 +57,8 @@ class BehaviorProjectCache(Cache):
         downloading detailed session data (such as dff traces).
 
         Likely you will want to use a class constructor, such as `from_lims`,
-        to initialize a BehaviorProjectCache, rather than calling this
-        directly.
+        to initialize a VisualBehaviorOphysProjectCache, rather than calling
+        this directly.
 
         --- NOTE ---
         Because NWB files are not currently supported for this project (as of
@@ -117,11 +117,11 @@ class BehaviorProjectCache(Cache):
                   scheme: Optional[str] = None,
                   asynchronous: bool = True,
                   data_release_date: Optional[str] = None
-                  ) -> "BehaviorProjectCache":
+                  ) -> "VisualBehaviorOphysProjectCache":
         """
-        Construct a BehaviorProjectCache with a lims api. Use this method
-        to create a  BehaviorProjectCache instance rather than calling
-        BehaviorProjectCache directly.
+        Construct a VisualBehaviorOphysProjectCache with a lims api. Use this
+        method to create a  VisualBehaviorOphysProjectCache instance rather
+        than calling VisualBehaviorOphysProjectCache directly.
 
         Parameters
         ==========
@@ -154,8 +154,8 @@ class BehaviorProjectCache(Cache):
             ie 2021-03-25
         Returns
         =======
-        BehaviorProjectCache
-            BehaviorProjectCache instance with a LIMS fetch API
+        VisualBehaviorOphysProjectCache
+            VisualBehaviorOphysProjectCache instance with a LIMS fetch API
         """
         if host and scheme:
             app_kwargs = {"host": host, "scheme": scheme,
@@ -298,7 +298,8 @@ class BehaviorProjectCache(Cache):
 
         return sessions.table if as_df else sessions
 
-    def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int,
+                                      fixed: bool = False):
         """
         Note -- This method mocks the behavior of a cache. Future
         development will include an NWB reader to read from
@@ -308,7 +309,7 @@ class BehaviorProjectCache(Cache):
         """
         if fixed:
             raise NotImplementedError
-        fetch_session = partial(self.fetch_api.get_session_data,
+        fetch_session = partial(self.fetch_api.get_behavior_ophys_experiment,
                                 ophys_experiment_id)
         return call_caching(
             fetch_session,
@@ -317,8 +318,8 @@ class BehaviorProjectCache(Cache):
             read=fetch_session
         )
 
-    def get_behavior_session_data(self, behavior_session_id: int,
-                                  fixed: bool = False):
+    def get_behavior_session(self, behavior_session_id: int,
+                             fixed: bool = False):
         """
         Note -- This method mocks the behavior of a cache. Future
         development will include an NWB reader to read from
@@ -329,7 +330,7 @@ class BehaviorProjectCache(Cache):
         if fixed:
             raise NotImplementedError
 
-        fetch_session = partial(self.fetch_api.get_behavior_only_session_data,
+        fetch_session = partial(self.fetch_api.get_behavior_session,
                                 behavior_session_id)
         return call_caching(
             fetch_session,
