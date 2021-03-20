@@ -152,9 +152,8 @@ class BehaviorProjectMetadataWriter:
 
         manifest = {
             'metadata_files': metadata_files,
-            'data_pipeline': data_pipeline,
+            'data_pipeline_metadata': data_pipeline,
             'project_name': self._project_name,
-            'data_release_date': self._data_release_date
         }
 
         save_path = os.path.join(self._out_dir, 'manifest.json')
