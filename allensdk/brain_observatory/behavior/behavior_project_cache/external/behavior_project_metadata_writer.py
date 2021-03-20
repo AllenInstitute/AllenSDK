@@ -177,10 +177,10 @@ class BehaviorProjectMetadataWriter:
 def main():
     parser = argparse.ArgumentParser(description='Write project metadata to '
                                                  'csvs')
-    parser.add_argument('-out_dir', help='directory to save csvs',
+    parser.add_argument('--out_dir', help='directory to save csvs',
                         required=True)
-    parser.add_argument('-project_name', help='project name', required=True)
-    parser.add_argument('-data_release_date', help='Project release date. '
+    parser.add_argument('--project_name', help='project name', required=True)
+    parser.add_argument('--data_release_date', help='Project release date. '
                                                    'Ie 2021-03-25',
                         required=True)
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
