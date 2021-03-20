@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from typing import Union
+import warnings
 
 import pandas as pd
 
@@ -86,6 +87,11 @@ class BehaviorProjectMetadataWriter:
                    left_index=True,
                    right_index=True,
                    how='left')
+        if "file_id" in behavior_sessions.columns:
+            if behavior_sessions["file_id"].isnull().values.any():
+                msg = (f"{output_filename} field `file_id` contains missing "
+                       "values and pandas.to_csv() converts it to float")
+                warnings.warn(msg)
         self._write_metadata_table(df=behavior_sessions,
                                    filename=output_filename)
 
