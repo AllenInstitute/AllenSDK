@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from typing import Union
+import warnings
 
 import pandas as pd
 
@@ -86,6 +87,11 @@ class BehaviorProjectMetadataWriter:
                    left_index=True,
                    right_index=True,
                    how='left')
+        if "file_id" in behavior_sessions.columns:
+            if behavior_sessions["file_id"].isnull().values.any():
+                msg = (f"{output_filename} field `file_id` contains missing "
+                       "values and pandas.to_csv() converts it to float")
+                warnings.warn(msg)
         self._write_metadata_table(df=behavior_sessions,
                                    filename=output_filename)
 
@@ -152,9 +158,8 @@ class BehaviorProjectMetadataWriter:
 
         manifest = {
             'metadata_files': metadata_files,
-            'data_pipeline': data_pipeline,
+            'data_pipeline_metadata': data_pipeline,
             'project_name': self._project_name,
-            'data_release_date': self._data_release_date
         }
 
         save_path = os.path.join(self._out_dir, 'manifest.json')
@@ -178,10 +183,10 @@ class BehaviorProjectMetadataWriter:
 def main():
     parser = argparse.ArgumentParser(description='Write project metadata to '
                                                  'csvs')
-    parser.add_argument('-out_dir', help='directory to save csvs',
+    parser.add_argument('--out_dir', help='directory to save csvs',
                         required=True)
-    parser.add_argument('-project_name', help='project name', required=True)
-    parser.add_argument('-data_release_date', help='Project release date. '
+    parser.add_argument('--project_name', help='project name', required=True)
+    parser.add_argument('--data_release_date', help='Project release date. '
                                                    'Ie 2021-03-25',
                         required=True)
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
