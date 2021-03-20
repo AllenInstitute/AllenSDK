@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Iterable, Union
 from pathlib import Path
 import logging
+import ast
 
 from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)
@@ -62,17 +63,22 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         -------
         BehaviorSession
         """
-        #row = self._behavior_only_session_table.query(
-        #        f"behavior_session_id=={behavior_session_id}")
-        #if row.shape[0] != 1:
-        #    raise RuntimeError("The behavior_only_session_table should have "
-        #                       "1 and only 1 entry for a given "
-        #                       "behavior_session_id. For "
-        #                       f"{behavior_session_id} "
-        #                       f" there are {row.shape[0]} entries.")
-        #data_path = self.cache.download_data(row.data_file_id.values[0])
-        #return BehaviorSession.from_nwb_path(str(data_path))
-        pass
+        row = self._behavior_only_session_table.query(
+                f"behavior_session_id=={behavior_session_id}")
+        if row.shape[0] != 1:
+            raise RuntimeError("The behavior_only_session_table should have "
+                               "1 and only 1 entry for a given "
+                               "behavior_session_id. For "
+                               f"{behavior_session_id} "
+                               f" there are {row.shape[0]} entries.")
+        row = row.squeeze()
+        has_file_id = not pd.isna(row.file_id)
+        if not has_file_id:
+            oeid = ast.literal_eval(row.ophys_experiment_id)[0]
+            row = self._experiment_table.query(
+                f"ophys_experiment_id=={oeid}").squeeze()
+        data_path = self.cache.download_data(str(int(row.file_id)))
+        return BehaviorSession.from_nwb_path(str(data_path))
 
     def get_behavior_ophys_experiment(self, ophys_experiment_id: int
                                       ) -> BehaviorOphysExperiment:
