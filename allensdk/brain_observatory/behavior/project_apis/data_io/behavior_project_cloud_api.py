@@ -7,7 +7,7 @@ from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.behavior_ophys_session import (
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
@@ -45,12 +45,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
     @staticmethod
     def from_s3_cache(cache_dir: Union[str, Path],
-                      bucket_name: str) -> "BehaviorProjectCloudApi":
-        cache = S3CloudCache(cache_dir, bucket_name)
+                      bucket_name: str,
+                      project_name: str) -> "BehaviorProjectCloudApi":
+        cache = S3CloudCache(cache_dir, bucket_name, project_name)
         cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache)
 
-    def get_behavior_only_session_data(
+    def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
         """get a BehaviorSession by specifying behavior_session_id
         Parameters
@@ -61,37 +62,39 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         -------
         BehaviorSession
         """
-        row = self._behavior_only_session_table.query(
-                f"behavior_session_id=={behavior_session_id}")
-        if row.shape[0] != 1:
-            raise RuntimeError("The behavior_only_session_table should have "
-                               "1 and only 1 entry for a given "
-                               "behavior_session_id. For "
-                               f"{behavior_session_id} "
-                               f" there are {row.shape[0]} entries.")
-        data_path = self.cache.download_data(row.data_file_id.values[0])
-        return BehaviorSession.from_nwb_path(str(data_path))
+        #row = self._behavior_only_session_table.query(
+        #        f"behavior_session_id=={behavior_session_id}")
+        #if row.shape[0] != 1:
+        #    raise RuntimeError("The behavior_only_session_table should have "
+        #                       "1 and only 1 entry for a given "
+        #                       "behavior_session_id. For "
+        #                       f"{behavior_session_id} "
+        #                       f" there are {row.shape[0]} entries.")
+        #data_path = self.cache.download_data(row.data_file_id.values[0])
+        #return BehaviorSession.from_nwb_path(str(data_path))
+        pass
 
-    def get_session_data(self, ophys_session_id: int
-                         ) -> BehaviorOphysExperiment:
-        """get a BehaviorOphysExperiment by specifying session_id
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int
+                                      ) -> BehaviorOphysExperiment:
+        """get a BehaviorOphysExperiment by specifying ophys_experiment_id
         Parameters
         ----------
-        ophys_session_id: int
-            the id of the ophys_session
+        ophys_experiment_id: int
+            the id of the ophys_experiment
         Returns
         -------
         BehaviorOphysExperiment
         """
-        row = self._session_table.query(
-                f"ophys_session_id=={ophys_session_id}")
-        if row.shape[0] != 1:
-            raise RuntimeError("The behavior_session_table should have "
-                               "1 and only 1 entry for a given "
-                               f"ophys_session_id. For {ophys_session_id} "
-                               f" there are {row.shape[0]} entries.")
-        data_path = self.cache.download_data(row.data_file_id.values[0])
-        return BehaviorOphysExperiment.from_nwb_path(str(data_path))
+        #row = self._session_table.query(
+        #        f"ophys_session_id=={ophys_session_id}")
+        #if row.shape[0] != 1:
+        #    raise RuntimeError("The behavior_session_table should have "
+        #                       "1 and only 1 entry for a given "
+        #                       f"ophys_session_id. For {ophys_session_id} "
+        #                       f" there are {row.shape[0]} entries.")
+        #data_path = self.cache.download_data(row.data_file_id.values[0])
+        #return BehaviorOphysExperiment.from_nwb_path(str(data_path))
+        pass
 
     def _get_session_table(self):
         session_table_path = self.cache.download_metadata(

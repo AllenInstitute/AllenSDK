@@ -108,9 +108,10 @@ class VisualBehaviorOphysProjectCache(Cache):
 
     @classmethod
     def from_s3_cache(cls, cache_dir: Union[str, Path],
-                      bucket_name: str) -> "VisualBehaviorOphysProjectCache":
+                      bucket_name: str,
+                      project_name: str) -> "VisualBehaviorOphysProjectCache":
         fetch_api = BehaviorProjectCloudApi.from_s3_cache(
-                cache_dir, bucket_name)
+                cache_dir, bucket_name, project_name)
         return cls(fetch_api=fetch_api)
 
     @classmethod
@@ -200,6 +201,8 @@ class VisualBehaviorOphysProjectCache(Cache):
             Whether to include behavior data
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
             ophys_sessions = one_file_call_caching(
@@ -244,6 +247,8 @@ class VisualBehaviorOphysProjectCache(Cache):
         :param as_df: whether to return as df or as SessionsTable
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_experiment_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
@@ -280,6 +285,8 @@ class VisualBehaviorOphysProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_behavior_only_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
