@@ -91,16 +91,17 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         -------
         BehaviorOphysExperiment
         """
-        #row = self._session_table.query(
-        #        f"ophys_session_id=={ophys_session_id}")
-        #if row.shape[0] != 1:
-        #    raise RuntimeError("The behavior_session_table should have "
-        #                       "1 and only 1 entry for a given "
-        #                       f"ophys_session_id. For {ophys_session_id} "
-        #                       f" there are {row.shape[0]} entries.")
-        #data_path = self.cache.download_data(row.data_file_id.values[0])
-        #return BehaviorOphysExperiment.from_nwb_path(str(data_path))
-        pass
+        row = self._experiment_table.query(
+                f"ophys_experiment_id=={ophys_experiment_id}")
+        if row.shape[0] != 1:
+            raise RuntimeError("The behavior_ophys_experiment_table should "
+                               "have 1 and only 1 entry for a given "
+                               f"ophys_experiment_id. For "
+                               f"{ophys_experiment_id} "
+                               f" there are {row.shape[0]} entries.")
+        row = row.squeeze()
+        data_path = self.cache.download_data(str(int(row.file_id)))
+        return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
     def _get_session_table(self):
         session_table_path = self.cache.download_metadata(
