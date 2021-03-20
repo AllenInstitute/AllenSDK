@@ -37,6 +37,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._behavior_session_id = None
 
     def save(self, session_object):
 
@@ -120,7 +121,9 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         return nwbfile
 
     def get_behavior_session_id(self) -> int:
-        return int(self.nwbfile.identifier)
+        if self._behavior_session_id is None:
+            self.get_metadata()
+        return self._behavior_session_id
 
     def get_running_acquisition_df(self) -> pd.DataFrame:
         """Get running speed acquisition data.
@@ -251,6 +254,7 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
         data = OphysBehaviorMetadataSchema(
             exclude=['date_of_acquisition']).dump(metadata_nwb_obj)
+        self._behavior_session_id = data["behavior_session_id"]
 
         # Add pyNWB Subject metadata to behavior session metadata
         nwb_subject = self.nwbfile.subject
