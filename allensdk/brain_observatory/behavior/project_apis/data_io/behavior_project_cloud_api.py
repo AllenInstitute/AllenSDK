@@ -24,9 +24,9 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
           - file_id_column
         are populated
         """
-        expected_metadata = set(["behavior_session_table.csv",
-                                 "ophys_session_table.csv",
-                                 "ophys_experiment_table.csv"])
+        expected_metadata = set(["behavior_session_table",
+                                 "ophys_session_table",
+                                 "ophys_experiment_table"])
         self.cache = cache
         if cache._manifest.metadata_file_names is None:
             raise RuntimeError("S3CloudCache object has no metadata "
@@ -98,7 +98,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
     def _get_session_table(self):
         session_table_path = self.cache.download_metadata(
-                "ophys_session_table.csv")
+                "ophys_session_table")
         self._session_table = pd.read_csv(session_table_path)
 
     def get_session_table(self) -> pd.DataFrame:
@@ -108,7 +108,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
     def _get_behavior_only_session_table(self):
         session_table_path = self.cache.download_metadata(
-                "behavior_session_table.csv")
+                "behavior_session_table")
         self._behavior_only_session_table = pd.read_csv(session_table_path)
 
     def get_behavior_only_session_table(self) -> pd.DataFrame:
@@ -118,7 +118,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
     def _get_experiment_table(self):
         experiment_table_path = self.cache.download_metadata(
-                "ophys_experiment_table.csv")
+                "ophys_experiment_table")
         self._experiment_table = pd.read_csv(experiment_table_path)
 
     def get_experiment_table(self):
