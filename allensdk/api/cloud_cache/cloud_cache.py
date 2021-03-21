@@ -48,6 +48,16 @@ class CloudCacheBase(ABC):
 
     @property
     def latest_manifest_file(self) -> str:
+        """parses available manifest files for semver string
+        and returns the latest one
+        self.manifest_file_names are assumed to be of the form
+        '<anything>_v<semver_str>.json'
+
+        Returns
+        -------
+        str
+            the filename whose semver string is the latest one
+        """
         vstrs = [s.split(".json")[0].split("_v")[-1]
                  for s in self.manifest_file_names]
         versions = [semver.VersionInfo.parse(v) for v in vstrs]

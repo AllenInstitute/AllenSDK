@@ -48,6 +48,28 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def from_s3_cache(cache_dir: Union[str, Path],
                       bucket_name: str,
                       project_name: str) -> "BehaviorProjectCloudApi":
+        """instantiates this object with a connection to an s3 bucket and/or
+        a local cache related to that bucket.
+
+        Parameters
+        ----------
+        cache_dir: str or pathlib.Path
+            Path to the directory where data will be stored on the local system
+
+        bucket_name: str
+            for example, if bucket URI is 's3://mybucket' this value should be
+            'mybucket'
+
+        project_name: str
+            the name of the project this cache is supposed to access. This
+            project name is the first part of the prefix of the release data
+            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
+
+        Returns
+        -------
+        BehaviorProjectCloudApi instance
+
+        """
         cache = S3CloudCache(cache_dir, bucket_name, project_name)
         cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache)
@@ -55,13 +77,16 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
         """get a BehaviorSession by specifying behavior_session_id
+
         Parameters
         ----------
         behavior_session_id: int
             the id of the behavior_session
+
         Returns
         -------
         BehaviorSession
+
         """
         row = self._behavior_only_session_table.query(
                 f"behavior_session_id=={behavior_session_id}")
@@ -74,6 +99,14 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         row = row.squeeze()
         has_file_id = not pd.isna(row.file_id)
         if not has_file_id:
+            # some entries in this table represent ophys sessions
+            # which have a many-to-one mapping between nwb files
+            # (1 per experiment) and behavior session.
+            # in that case, the `file_id` column is nan.
+            # this method returns an object which is just behavior data
+            # which is shared by all experiments in 1 session
+            # and so we just take the first ophys_experiment entry
+            # to determine an appropriate nwb file to supply that information
             oeid = ast.literal_eval(row.ophys_experiment_id)[0]
             row = self._experiment_table.query(
                 f"ophys_experiment_id=={oeid}").squeeze()
@@ -83,13 +116,16 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def get_behavior_ophys_experiment(self, ophys_experiment_id: int
                                       ) -> BehaviorOphysExperiment:
         """get a BehaviorOphysExperiment by specifying ophys_experiment_id
+
         Parameters
         ----------
         ophys_experiment_id: int
             the id of the ophys_experiment
+
         Returns
         -------
         BehaviorOphysExperiment
+
         """
         row = self._experiment_table.query(
                 f"ophys_experiment_id=={ophys_experiment_id}")
@@ -103,14 +139,22 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         data_path = self.cache.download_data(str(int(row.file_id)))
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
-    def _get_session_table(self):
+    def _get_session_table(self) -> pd.DataFrame:
         session_table_path = self.cache.download_metadata(
                 "ophys_session_table")
         self._session_table = pd.read_csv(session_table_path)
 
     def get_session_table(self) -> pd.DataFrame:
-        """Return a pd.Dataframe table with all ophys_session_ids and relevant
-        metadata."""
+        """Return a pd.Dataframe table summarizing ophys_sessions
+        and associated metadata.
+
+        Notes
+        -----
+        - Each entry in this table represents the metadata of an ophys_session.
+        Link to nwb-hosted files in the cache is had via the
+        'ophys_experiment_id' column (can be a list)
+        and experiment_table
+        """
         return self._session_table
 
     def _get_behavior_only_session_table(self):
@@ -119,8 +163,24 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         self._behavior_only_session_table = pd.read_csv(session_table_path)
 
     def get_behavior_only_session_table(self) -> pd.DataFrame:
-        """Return a pd.Dataframe table with all ophys_session_ids and relevant
-        metadata."""
+        """Return a pd.Dataframe table with both behavior-only
+        (BehaviorSession) and with-ophys (BehaviorOphysExperiment)
+        sessions as entries.
+
+        Notes
+        -----
+        - In the first case, provides a critical mapping of
+        behavior_session_id to file_id, which the cache uses to find the
+        nwb path in cache.
+        - In the second case, provides a critical mapping of
+        behavior_session_id to a list of ophys_experiment_id(s)
+        which can be used to find file_id mappings in experiment_table
+        see method get_behavior_session()
+        - the BehaviorProjectCache calls this method through a method called
+        get_behavior_session_table. The name of this method is a legacy shared
+        with the behavior_project_lims_api and should be made consistent with
+        the BehaviorProjectCache calling method.
+        """
         return self._behavior_only_session_table
 
     def _get_experiment_table(self):
@@ -129,6 +189,16 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         self._experiment_table = pd.read_csv(experiment_table_path)
 
     def get_experiment_table(self):
+        """returns a pd.DataFrame where each entry has a 1-to-1
+        relation with an ophys experiment (i.e. imaging plane)
+
+        Notes
+        -----
+        - the file_id column allows the underlying cache to link
+        this table to a cache-hosted NWB file. There is a 1-to-1
+        relation between nwb files and ophy experiments. See method
+        get_behavior_ophys_experiment()
+        """
         return self._experiment_table
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:

@@ -110,6 +110,28 @@ class VisualBehaviorOphysProjectCache(Cache):
     def from_s3_cache(cls, cache_dir: Union[str, Path],
                       bucket_name: str,
                       project_name: str) -> "VisualBehaviorOphysProjectCache":
+        """instantiates this object with a connection to an s3 bucket and/or
+        a local cache related to that bucket.
+
+        Parameters
+        ----------
+        cache_dir: str or pathlib.Path
+            Path to the directory where data will be stored on the local system
+
+        bucket_name: str
+            for example, if bucket URI is 's3://mybucket' this value should be
+            'mybucket'
+
+        project_name: str
+            the name of the project this cache is supposed to access. This
+            project name is the first part of the prefix of the release data
+            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
+
+        Returns
+        -------
+        VisualBehaviorOphysProjectCache instance
+
+        """
         fetch_api = BehaviorProjectCloudApi.from_s3_cache(
                 cache_dir, bucket_name, project_name)
         return cls(fetch_api=fetch_api)
