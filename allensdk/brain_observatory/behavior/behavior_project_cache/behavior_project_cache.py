@@ -108,8 +108,9 @@ class VisualBehaviorOphysProjectCache(Cache):
 
     @classmethod
     def from_s3_cache(cls, cache_dir: Union[str, Path],
-                      bucket_name: str,
-                      project_name: str) -> "VisualBehaviorOphysProjectCache":
+                      bucket_name: str = "visual-behavior-ophys-data",
+                      project_name: str = "visual-behavior-ophys"
+                      ) -> "VisualBehaviorOphysProjectCache":
         """instantiates this object with a connection to an s3 bucket and/or
         a local cache related to that bucket.
 
