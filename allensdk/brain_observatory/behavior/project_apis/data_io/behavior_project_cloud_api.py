@@ -1,8 +1,9 @@
 import pandas as pd
-from typing import Iterable, Union
+from typing import Iterable, Union, Dict, List
 from pathlib import Path
 import logging
 import ast
+import semver
 
 from allensdk.brain_observatory.behavior.project_apis.abcs import (
     BehaviorProjectBase)
@@ -11,20 +12,80 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
+from allensdk import __version__ as sdk_version
+
+
+# [min inclusive, max exclusive)
+COMPATIBILITY = {
+        "pipeline_versions": {
+            "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}}
+
+
+class BehaviorCloudCacheVersionException(Exception):
+    pass
+
+
+def version_check(pipeline_versions: List[Dict[str, str]],
+                  sdk_version: str = sdk_version,
+                  compatibility: Dict[str, Dict] = COMPATIBILITY):
+    """given a pipeline_versions list (from manifest) determine
+    the pipeline version of AllenSDK used to write the data. Lookup
+    the compatibility limits, and check the the running version of
+    AllenSDK meets those limits.
+
+    Parameters
+    ----------
+    pipeline_versions: List[Dict[str, str]]:
+        each element has keys name, version, (and comment - not used here)
+    sdk_version: str
+        typically the current return value for allensdk.__version__
+    compatibility_dict: Dict
+        keys (under 'pipeline_versions' key) are specific version numbers to
+        match a pipeline version for AllenSDK from the manifest. values
+        specify the min (inclusive) and max (exclusive) limits for
+        interoperability
+
+    Raises
+    ------
+    BehaviorCloudCacheVersionException
+
+    """
+    pipeline_version = [i for i in pipeline_versions
+                        if "AllenSDK" == i["name"]]
+    if len(pipeline_version) != 1:
+        raise BehaviorCloudCacheVersionException(
+                "expected to find 1 and only 1 entry for `AllenSDK` "
+                "in the manifest.data_pipeline metadata. "
+                f"found {len(pipeline_version)}")
+    pipeline_version = pipeline_version[0]["version"]
+    if pipeline_version not in compatibility["pipeline_versions"]:
+        raise BehaviorCloudCacheVersionException(
+                f"no version compatibility listed for {pipeline_version}")
+    version_limits = compatibility["pipeline_versions"][pipeline_version]
+    pver = sdk_version
+    smin = semver.VersionInfo.parse(version_limits["AllenSDK"][0])
+    smax = semver.VersionInfo.parse(version_limits["AllenSDK"][1])
+    if (pver < smin) | (pver >= smax):
+        raise BehaviorCloudCacheVersionException(
+                f"expected {smin} <= {pipeline_version} < {smax}")
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase):
-    """API for downloading data released on S3
-     and returning tables.
-    """
-    def __init__(self, cache: S3CloudCache):
-        """
-        the passed cache should already have had `cache.load_manifest()`
-        executed. With this satisfied, the attributes
+    """API for downloading data released on S3 and returning tables.
+
+    Parameters
+    ----------
+    cache: S3CloudCache
+        an instantiated S3CloudCache object, which has already run
+        `self.load_manifest()` which populates the columns:
           - metadata_file_names
           - file_id_column
-        are populated
-        """
+    skip_version_check: bool
+        whether to skip the version checking of pipeline SDK version
+        vs. running SDK version, which may raise Exceptions. (default=False)
+
+    """
+    def __init__(self, cache: S3CloudCache, skip_version_check: bool = False):
         expected_metadata = set(["behavior_session_table",
                                  "ophys_session_table",
                                  "ophys_experiment_table"])
@@ -39,6 +100,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             raise RuntimeError("expected S3CloudCache object to have "
                                f"metadata file names: {expected_metadata} "
                                f"but it has {cache_metadata}")
+        if not skip_version_check:
+            version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
         self._get_session_table()
         self._get_behavior_only_session_table()
@@ -87,6 +150,18 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         -------
         BehaviorSession
 
+        Notes
+        -----
+        entries in the _behavior_only_session_table represent
+        (1) ophys_sessions which have a many-to-one mapping between nwb files
+        and behavior sessions. (file_id is NaN)
+        AND
+        (2) behavior only sessions, which have a one-to-one mapping with
+        nwb files. (file_id is not Nan)
+        In the case of (1) this method returns an object which is just behavior
+        data which is shared by all experiments in 1 session. This is extracted
+        from the nwb file for the first-listed ophys_experiment.
+
         """
         row = self._behavior_only_session_table.query(
                 f"behavior_session_id=={behavior_session_id}")
@@ -99,14 +174,6 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         row = row.squeeze()
         has_file_id = not pd.isna(row[self.cache.file_id_column])
         if not has_file_id:
-            # some entries in this table represent ophys sessions
-            # which have a many-to-one mapping between nwb files
-            # (1 per experiment) and behavior session.
-            # in that case, the `file_id` column is nan.
-            # this method returns an object which is just behavior data
-            # which is shared by all experiments in 1 session
-            # and so we just take the first ophys_experiment entry
-            # to determine an appropriate nwb file to supply that information
             oeid = ast.literal_eval(row.ophys_experiment_id)[0]
             row = self._experiment_table.query(
                 f"ophys_experiment_id=={oeid}").squeeze()

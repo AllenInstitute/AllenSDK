@@ -1,6 +1,7 @@
 import pytest
 import ast
 import pandas as pd
+import contextlib
 from unittest.mock import MagicMock
 
 from allensdk.brain_observatory.behavior.project_apis.data_io import \
@@ -68,7 +69,8 @@ def mock_cache(request, tmpdir):
         indirect=["mock_cache"])
 def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
     mocked_cache, expected = mock_cache
-    api = cloudapi.BehaviorProjectCloudApi(mocked_cache)
+    api = cloudapi.BehaviorProjectCloudApi(mocked_cache,
+                                           skip_version_check=True)
 
     # behavior session table as expected
     bost = api.get_behavior_only_session_table()
@@ -104,3 +106,59 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
     monkeypatch.setattr(cloudapi.BehaviorOphysExperiment,
                         "from_nwb_path", mock_nwb)
     assert api.get_behavior_ophys_experiment(8) == "8"
+
+
+@pytest.mark.parametrize(
+        "pipeline_versions, sdk_version, lookup, context",
+        [
+            (
+                [{
+                    "name": "AllenSDK",
+                    "version": "2.9.0"}],
+                "2.9.0",
+                {"pipeline_versions": {
+                    "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}},
+                contextlib.nullcontext()),
+            (
+                [{
+                    "name": "AllenSDK",
+                    "version": "2.9.0"}],
+                "2.9.0",
+                {"pipeline_versions": {
+                    "2.9.0": {"AllenSDK": ["2.9.1", "3.0.0"]}}},
+                pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+                              match=r"expected 2.9.1 <= 2.9.0 < 3.0.0")),
+            (
+                [{
+                    "name": "AllenSDK",
+                    "version": "2.9.0"}],
+                "2.9.0",
+                {"pipeline_versions": {
+                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+                              match=r"expected 2.8.0 <= 2.9.0 < 2.9.0")),
+            (
+                [{
+                    "name": "AllenSDK",
+                    "version": "2.10.0"}],
+                "2.9.0",
+                {"pipeline_versions": {
+                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+                              match=r"no version compatibility .*")),
+            (
+                [{
+                    "name": "AllenSDK",
+                    "version": "2.10.0"},
+                 {
+                     "name": "AllenSDK",
+                     "version": "2.10.1"}],
+                "2.9.0",
+                {"pipeline_versions": {
+                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+                              match=r"expected to find 1 and only 1 .*")),
+            ])
+def test_compatibility(pipeline_versions, sdk_version, lookup, context):
+    with context:
+        cloudapi.version_check(pipeline_versions, sdk_version, lookup)

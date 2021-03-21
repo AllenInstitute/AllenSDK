@@ -70,10 +70,10 @@ class Manifest(object):
         if not isinstance(self._data, dict):
             raise ValueError("Expected to deserialize manifest into a dict; "
                              f"instead got {type(self._data)}")
-
-        self._version = copy.deepcopy(self._data['manifest_version'])
-        self._file_id_column = copy.deepcopy(self._data['metadata_file_id_column_name'])  # noqa: E501
-
+        self._data = copy.deepcopy(self._data)
+        self._version = self._data['manifest_version']
+        self._file_id_column = self._data['metadata_file_id_column_name']
+        self._data_pipeline = self._data["data_pipeline"]
         self._metadata_file_names = [file_name for file_name
                                      in self._data['metadata_files']]
         self._metadata_file_names.sort()
