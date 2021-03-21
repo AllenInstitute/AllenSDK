@@ -97,7 +97,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                f"{behavior_session_id} "
                                f" there are {row.shape[0]} entries.")
         row = row.squeeze()
-        has_file_id = not pd.isna(row.file_id)
+        has_file_id = not pd.isna(row[self.cache.file_id_column])
         if not has_file_id:
             # some entries in this table represent ophys sessions
             # which have a many-to-one mapping between nwb files
@@ -110,7 +110,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             oeid = ast.literal_eval(row.ophys_experiment_id)[0]
             row = self._experiment_table.query(
                 f"ophys_experiment_id=={oeid}").squeeze()
-        data_path = self.cache.download_data(str(int(row.file_id)))
+        data_path = self.cache.download_data(
+                str(int(row[self.cache.file_id_column])))
         return BehaviorSession.from_nwb_path(str(data_path))
 
     def get_behavior_ophys_experiment(self, ophys_experiment_id: int
@@ -136,7 +137,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                f"{ophys_experiment_id} "
                                f" there are {row.shape[0]} entries.")
         row = row.squeeze()
-        data_path = self.cache.download_data(str(int(row.file_id)))
+        data_path = self.cache.download_data(
+                str(int(row[self.cache.file_id_column])))
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
     def _get_session_table(self) -> pd.DataFrame:
