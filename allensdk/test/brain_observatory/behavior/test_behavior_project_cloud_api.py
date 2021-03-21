@@ -127,7 +127,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
                 {"pipeline_versions": {
                     "2.9.0": {"AllenSDK": ["2.9.1", "3.0.0"]}}},
                 cloudapi.BehaviorCloudCacheVersionException,
-                r"expected 2.9.1 <= 2.9.0 < 3.0.0"),
+                r".*version be >=2.9.1 and <3.0.0.*"),
             (
                 [{
                     "name": "AllenSDK",
@@ -136,7 +136,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
                 {"pipeline_versions": {
                     "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
                 cloudapi.BehaviorCloudCacheVersionException,
-                r"expected 2.8.0 <= 2.9.0 < 2.9.0"),
+                r".*version be >=2.8.0 and <2.9.0.*"),
             (
                 [{
                     "name": "AllenSDK",

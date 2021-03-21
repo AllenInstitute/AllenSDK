@@ -62,12 +62,20 @@ def version_check(pipeline_versions: List[Dict[str, str]],
         raise BehaviorCloudCacheVersionException(
                 f"no version compatibility listed for {pipeline_version}")
     version_limits = compatibility["pipeline_versions"][pipeline_version]
-    pver = sdk_version
     smin = semver.VersionInfo.parse(version_limits["AllenSDK"][0])
     smax = semver.VersionInfo.parse(version_limits["AllenSDK"][1])
-    if (pver < smin) | (pver >= smax):
+    if (sdk_version < smin) | (sdk_version >= smax):
         raise BehaviorCloudCacheVersionException(
-                f"expected {smin} <= {pipeline_version} < {smax}")
+            f"""
+            The version of the visual-behavior-ophys data files (specified
+            in path_to_users_current_release_manifest) requires that your
+            AllenSDK version be >={smin} and <{smax}.
+            Your version of AllenSDK is: {sdk_version}.
+            If you want to use the specified manifest to retrieve data, please
+            upgrade or downgrade AllenSDK to the range specified.
+            If you just want to get the latest version of visual-behavior-ophys
+            data please upgrade to the latest AllenSDK version and try this
+            process again.""")
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase):
