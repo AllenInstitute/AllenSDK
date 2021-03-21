@@ -6,6 +6,7 @@ import pathlib
 import pandas as pd
 import boto3
 import semver
+import tqdm
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -515,6 +516,18 @@ class S3CloudCache(CloudCacheBase):
 
         version_id = file_attributes.version_id
 
+        pbar = None
+        if not self._file_exists(file_attributes):
+            response = self.s3_client.list_object_versions(Bucket=bucket_name,
+                                                           Prefix=str(obj_key))
+            object_info = [i for i in response["Versions"]
+                           if i["VersionId"] == version_id][0]
+            pbar = tqdm.tqdm(desc=object_info["Key"].split("/")[-1],
+                             total=object_info["Size"],
+                             unit_scale=True,
+                             unit_divisor=1000.,
+                             unit="MB")
+
         while not self._file_exists(file_attributes):
             response = self.s3_client.get_object(Bucket=bucket_name,
                                                  Key=str(obj_key),
@@ -524,10 +537,14 @@ class S3CloudCache(CloudCacheBase):
                 with open(local_path, 'wb') as out_file:
                     for chunk in response['Body'].iter_chunks():
                         out_file.write(chunk)
+                pbar.update(response["ContentLength"])
 
             n_iter += 1
             if n_iter > max_iter:
+                pbar.close()
                 raise RuntimeError("Could not download\n"
                                    f"{file_attributes}\n"
                                    "In {max_iter} iterations")
+        if pbar is not None:
+            pbar.close()
         return None
