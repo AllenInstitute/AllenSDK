@@ -35,6 +35,7 @@ def test_load(tmpdir):
     metadata_files['x.txt'] = []
     metadata_files['y.txt'] = []
     good_manifest['metadata_files'] = metadata_files
+    good_manifest['data_pipeline'] = 'placeholder'
 
     mfest = Manifest(pathlib.Path(tmpdir) / 'my/cache/dir')
 
@@ -59,6 +60,7 @@ def test_load(tmpdir):
     metadata_files['k.txt'] = []
     metadata_files['u.txt'] = []
     good_manifest['metadata_files'] = metadata_files
+    good_manifest['data_pipeline'] = 'placeholder'
 
     with io.StringIO() as stream:
         stream.write(json.dumps(good_manifest))
@@ -122,6 +124,7 @@ def test_metadata_file_attributes():
     manifest['metadata_files'] = metadata_files
     manifest['manifest_version'] = '000'
     manifest['metadata_file_id_column_name'] = 'file_id'
+    manifest['data_pipeline'] = 'placeholder'
 
     mfest = Manifest('/my/cache/dir/')
     with io.StringIO() as stream:
@@ -164,6 +167,7 @@ def test_data_file_attributes():
     manifest['metadata_files'] = {}
     manifest['manifest_version'] = '0'
     manifest['metadata_file_id_column_name'] = 'file_id'
+    manifest['data_pipeline'] = 'placeholder'
     data_files = {}
     data_files['a'] = {'url': 'http://my.url.com/path/to/a.nwb',
                        'version_id': '12345',
@@ -218,6 +222,7 @@ def test_loading_two_manifests():
                                     'version_id': '67890',
                                     'file_hash': 'fghijk'}
     manifest_1['metadata_files'] = metadata_1
+    manifest_1['data_pipeline'] = 'placeholder'
     data_1 = {}
     data_1['c'] = {'url': 'http://ccc.com/third/path/c.csv',
                    'version_id': '11121',
@@ -239,6 +244,7 @@ def test_loading_two_manifests():
                                     'version_id': '192021',
                                     'file_hash': 'cdefghi'}
     manifest_2['metadata_files'] = metadata_2
+    manifest_2['data_pipeline'] = 'placeholder'
     data_2 = {}
     data_2['c'] = {'url': 'http://ccc.com/third/path/c.csv',
                    'version_id': '222324',

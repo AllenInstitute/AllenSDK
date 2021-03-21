@@ -16,6 +16,7 @@ def test_windows_path_to_isilon(monkeypatch):
 
     manifest_1 = {'manifest_version': '1',
                   'metadata_file_id_column_name': 'file_id',
+                  'data_pipeline': 'placeholder',
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com/path/to/a.csv',  # noqa: E501
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
