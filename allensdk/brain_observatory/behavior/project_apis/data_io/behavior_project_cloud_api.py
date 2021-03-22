@@ -379,4 +379,4 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             raise FileNotFoundError(f'You started a cache without a '
                                     f'connection to s3 and {local_path} is '
                                     'not already on your system')
-        return
+        return local_path
