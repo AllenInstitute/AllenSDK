@@ -27,17 +27,26 @@ class MockCache():
         self._manifest.metadata_file_names = ["behavior_session_table",
                                               "ophys_session_table",
                                               "ophys_experiment_table"]
-
-    def download_metadata(self, mname):
-        mymap = {
+        self._metadata_name_path_map = {
                 "behavior_session_table": self.behavior_session_table_path,
                 "ophys_session_table": self.session_table_path,
                 "ophys_experiment_table": self.ophys_experiment_table_path}
-        return mymap[mname]
 
-    def download_data(self, idstr):
-        return idstr
+    def download_metadata(self, fname):
+        return self._metadata_name_path_map[fname]
 
+    def download_data(self, file_id):
+        return file_id
+
+    def metadata_path(self, fname):
+        return {
+            'local_path': self._metadata_name_path_map[fname]
+        }
+
+    def data_path(self, file_id):
+        return {
+            'local_path': file_id
+        }
 
 @pytest.fixture
 def mock_cache(request, tmpdir):
@@ -73,10 +82,16 @@ def mock_cache(request, tmpdir):
                     "file_id": [4, 5, 6, 7, 8, 9]})},
                 ],
         indirect=["mock_cache"])
-def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
+@pytest.mark.parametrize("local", [True, False])
+def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     mocked_cache, expected = mock_cache
     api = cloudapi.BehaviorProjectCloudApi(mocked_cache,
-                                           skip_version_check=True)
+                                           skip_version_check=True,
+                                           local=False)
+    if local:
+        api = cloudapi.BehaviorProjectCloudApi(mocked_cache,
+                                               skip_version_check=True,
+                                               local=True)
 
     # behavior session table as expected
     bost = api.get_behavior_only_session_table()

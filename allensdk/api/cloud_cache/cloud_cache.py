@@ -35,6 +35,9 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name):
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+
         self._manifest = None
         self._cache_dir = cache_dir
         self._project_name = project_name
@@ -71,8 +74,7 @@ class CloudCacheBase(ABC):
 
     @abstractmethod
     def _download_manifest(self,
-                           manifest_name: str,
-                           output_stream: io.BytesIO):
+                           manifest_name: str):
         """
         Download a manifest from the dataset into output_stream.
         Reset output_stream to the beginning
@@ -82,9 +84,6 @@ class CloudCacheBase(ABC):
         manifest_name: str
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
-
-        output_stream: io.BytesIO
-            A byte stream into which to load the manifest
         """
         raise NotImplementedError()
 
@@ -184,11 +183,14 @@ class CloudCacheBase(ABC):
                              "for this dataset:\n"
                              f"{self.manifest_file_names}")
 
-        with io.BytesIO() as stream:
-            self._download_manifest(manifest_name, stream)
+        filepath = os.path.join(self._cache_dir, manifest_name)
+        if not os.path.exists(filepath):
+            self._download_manifest(manifest_name)
+
+        with open(filepath) as f:
             self._manifest = Manifest(
                 cache_dir=self._cache_dir,
-                json_input=stream
+                json_input=f
             )
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
@@ -396,10 +398,9 @@ class S3CloudCache(CloudCacheBase):
 
     def __init__(self, cache_dir, bucket_name, project_name):
         self._manifest = None
-        self._cache_dir = cache_dir
         self._bucket_name = bucket_name
-        self._project_name = project_name
-        self._manifest_file_names = self._list_all_manifests()
+
+        super().__init__(cache_dir=cache_dir, project_name=project_name)
 
     _s3_client = None
 
@@ -432,8 +433,7 @@ class S3CloudCache(CloudCacheBase):
         return output
 
     def _download_manifest(self,
-                           manifest_name: str,
-                           output_stream: io.BytesIO):
+                           manifest_name: str):
         """
         Download a manifest from the dataset
 
@@ -442,17 +442,17 @@ class S3CloudCache(CloudCacheBase):
         manifest_name: str
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
-
-        output_stream: io.BytesIO
-            A byte stream into which to load the manifest
         """
 
         manifest_key = self.manifest_prefix + manifest_name
         response = self.s3_client.get_object(Bucket=self._bucket_name,
                                              Key=manifest_key)
-        for chunk in response['Body'].iter_chunks():
-            output_stream.write(chunk)
-        output_stream.seek(0)
+
+        filepath = os.path.join(self._cache_dir, manifest_name)
+
+        with open(filepath, 'wb') as f:
+            for chunk in response['Body'].iter_chunks():
+                f.write(chunk)
 
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
         """
@@ -544,3 +544,29 @@ class S3CloudCache(CloudCacheBase):
         if pbar is not None:
             pbar.close()
         return None
+
+
+class LocalCache(CloudCacheBase):
+    """A class to handle accessing of data that has already been downloaded
+    locally
+
+    Parameters
+    ----------
+    cache_dir: str or pathlib.Path
+        Path to the directory where data will be stored on the local system
+
+    project_name: str
+        the name of the project this cache is supposed to access. This will
+        be the root directory for all files stored in the bucket.
+    """
+    def __init__(self, cache_dir, project_name):
+        super().__init__(cache_dir=cache_dir, project_name=project_name)
+
+    def _list_all_manifests(self) -> list:
+        return [x for x in os.listdir(self._cache_dir) if 'manifest' in x]
+
+    def _download_manifest(self, manifest_name: str):
+        raise NotImplementedError()
+
+    def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
+        raise NotImplementedError()

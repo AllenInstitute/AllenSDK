@@ -139,6 +139,31 @@ class VisualBehaviorOphysProjectCache(Cache):
         return cls(fetch_api=fetch_api)
 
     @classmethod
+    def from_local_cache(cls, cache_dir: Union[str, Path],
+                         project_name: str = "visual-behavior-ophys"
+                         ) -> "VisualBehaviorOphysProjectCache":
+        """instantiates this object with a local cache.
+
+        Parameters
+        ----------
+        cache_dir: str or pathlib.Path
+            Path to the directory where data will be stored on the local system
+
+        project_name: str
+            the name of the project this cache is supposed to access. This
+            project name is the first part of the prefix of the release data
+            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
+
+        Returns
+        -------
+        VisualBehaviorOphysProjectCache instance
+
+        """
+        fetch_api = BehaviorProjectCloudApi.from_local_cache(
+                cache_dir, project_name)
+        return cls(fetch_api=fetch_api)
+
+    @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
                   version: Optional[str] = None,
                   cache: bool = False,
