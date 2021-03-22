@@ -415,26 +415,17 @@ class S3CloudCache(CloudCacheBase):
         Return a list of all of the file names of the manifests associated
         with this dataset
         """
-        output = []
-        continuation_token = None
-        keep_going = True
-        while keep_going:
-            if continuation_token is not None:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix,  # noqa: E501
-                                                        ContinuationToken=continuation_token)  # noqa: E501
-            else:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix)  # noqa: E501
+        paginator = self.s3_client.get_paginator('list_objects_v2')
+        subset_iterator = paginator.paginate(
+            Bucket=self._bucket_name,
+            Prefix=self.manifest_prefix
+        )
 
+        output = []
+        for subset in subset_iterator:
             if 'Contents' in subset:
                 for obj in subset['Contents']:
                     output.append(pathlib.Path(obj['Key']).name)
-
-            if 'NextContinuationToken' in subset:
-                continuation_token = subset['NextContinuationToken']
-            else:
-                keep_going = False
 
         output.sort()
         return output
