@@ -35,7 +35,8 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
+        self._cache_dir = cache_dir
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
@@ -185,7 +186,10 @@ class CloudCacheBase(ABC):
 
         with io.BytesIO() as stream:
             self._download_manifest(manifest_name, stream)
-            self._manifest.load(stream)
+            self._manifest = Manifest(
+                cache_dir=self._cache_dir,
+                json_input=stream
+            )
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
@@ -391,7 +395,8 @@ class S3CloudCache(CloudCacheBase):
     """
 
     def __init__(self, cache_dir, bucket_name, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
+        self._cache_dir = cache_dir
         self._bucket_name = bucket_name
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
@@ -411,26 +416,17 @@ class S3CloudCache(CloudCacheBase):
         Return a list of all of the file names of the manifests associated
         with this dataset
         """
-        output = []
-        continuation_token = None
-        keep_going = True
-        while keep_going:
-            if continuation_token is not None:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix,  # noqa: E501
-                                                        ContinuationToken=continuation_token)  # noqa: E501
-            else:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix)  # noqa: E501
+        paginator = self.s3_client.get_paginator('list_objects_v2')
+        subset_iterator = paginator.paginate(
+            Bucket=self._bucket_name,
+            Prefix=self.manifest_prefix
+        )
 
+        output = []
+        for subset in subset_iterator:
             if 'Contents' in subset:
                 for obj in subset['Contents']:
                     output.append(pathlib.Path(obj['Key']).name)
-
-            if 'NextContinuationToken' in subset:
-                continuation_token = subset['NextContinuationToken']
-            else:
-                keep_going = False
 
         output.sort()
         return output
@@ -537,7 +533,7 @@ class S3CloudCache(CloudCacheBase):
                 with open(local_path, 'wb') as out_file:
                     for chunk in response['Body'].iter_chunks():
                         out_file.write(chunk)
-                pbar.update(response["ContentLength"])
+                        pbar.update(len(chunk))
 
             n_iter += 1
             if n_iter > max_iter:
