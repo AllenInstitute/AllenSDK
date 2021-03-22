@@ -1,5 +1,4 @@
 import pytest
-import ast
 import pandas as pd
 from unittest.mock import MagicMock
 
@@ -42,12 +41,20 @@ class MockCache():
 
 @pytest.fixture
 def mock_cache(request, tmpdir):
-    yield (MockCache(
-             request.param.get("behavior_session_table"),
-             request.param.get("ophys_session_table"),
-             request.param.get("ophys_experiment_table"),
-             tmpdir),
-           request.param)
+    bst = request.param.get("behavior_session_table")
+    ost = request.param.get("ophys_session_table")
+    oet = request.param.get("ophys_experiment_table")
+
+    # round-trip the tables through csv to pick up
+    # pandas mods to lists
+    fname = tmpdir / "my.csv"
+    bst.to_csv(fname, index=False)
+    bst = pd.read_csv(fname)
+    ost.to_csv(fname, index=False)
+    ost = pd.read_csv(fname)
+    oet.to_csv(fname, index=False)
+    oet = pd.read_csv(fname)
+    yield (MockCache(bst, ost, oet, tmpdir), request.param)
 
 
 @pytest.mark.parametrize(
@@ -77,7 +84,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
     for k in ["behavior_session_id", "file_id"]:
         pd.testing.assert_series_equal(bost[k], ebost[k])
     for k in ["ophys_experiment_id"]:
-        assert all([ast.literal_eval(i) == j
+        assert all([i == j
                     for i, j in zip(bost[k].values, ebost[k].values)])
 
     # ophys session table as expected
@@ -86,7 +93,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch):
     for k in ["ophys_session_id"]:
         pd.testing.assert_series_equal(ost[k], eost[k])
     for k in ["ophys_experiment_id"]:
-        assert all([ast.literal_eval(i) == j
+        assert all([i == j
                     for i, j in zip(ost[k].values, eost[k].values)])
 
     # experiment table as expected

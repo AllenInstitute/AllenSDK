@@ -18,7 +18,8 @@ from allensdk import __version__ as sdk_version
 # [min inclusive, max exclusive)
 COMPATIBILITY = {
         "pipeline_versions": {
-            "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}}
+            "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]},
+            "2.10.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}}
 
 
 class BehaviorCloudCacheVersionException(Exception):
@@ -76,6 +77,22 @@ def version_check(pipeline_versions: List[Dict[str, str]],
             If you just want to get the latest version of visual-behavior-ophys
             data please upgrade to the latest AllenSDK version and try this
             process again.""")
+
+
+def literal_col_eval(df: pd.DataFrame,
+                     columns: List[str] = ["ophys_experiment_id",
+                                           "ophys_container_id",
+                                           "driver_line"]) -> pd.DataFrame:
+    def converter(x):
+        if isinstance(x, str):
+            x = ast.literal_eval(x)
+        return x
+
+    for column in columns:
+        if column in df.columns:
+            df.loc[df[column].notnull(), column] = \
+                df[column][df[column].notnull()].apply(converter)
+    return df
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase):
@@ -182,7 +199,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         row = row.squeeze()
         has_file_id = not pd.isna(row[self.cache.file_id_column])
         if not has_file_id:
-            oeid = ast.literal_eval(row.ophys_experiment_id)[0]
+            oeid = row.ophys_experiment_id[0]
             row = self._experiment_table.query(
                 f"ophys_experiment_id=={oeid}").squeeze()
         data_path = self.cache.download_data(
@@ -219,7 +236,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def _get_session_table(self) -> pd.DataFrame:
         session_table_path = self.cache.download_metadata(
                 "ophys_session_table")
-        self._session_table = pd.read_csv(session_table_path)
+        self._session_table = literal_col_eval(pd.read_csv(session_table_path))
 
     def get_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table summarizing ophys_sessions
@@ -237,7 +254,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def _get_behavior_only_session_table(self):
         session_table_path = self.cache.download_metadata(
                 "behavior_session_table")
-        self._behavior_only_session_table = pd.read_csv(session_table_path)
+        self._behavior_only_session_table = literal_col_eval(
+                pd.read_csv(session_table_path))
 
     def get_behavior_only_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with both behavior-only
@@ -263,7 +281,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def _get_experiment_table(self):
         experiment_table_path = self.cache.download_metadata(
                 "ophys_experiment_table")
-        self._experiment_table = pd.read_csv(experiment_table_path)
+        self._experiment_table = literal_col_eval(
+                pd.read_csv(experiment_table_path))
 
     def get_experiment_table(self):
         """returns a pd.DataFrame where each entry has a 1-to-1
