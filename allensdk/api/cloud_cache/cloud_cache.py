@@ -533,7 +533,7 @@ class S3CloudCache(CloudCacheBase):
                 with open(local_path, 'wb') as out_file:
                     for chunk in response['Body'].iter_chunks():
                         out_file.write(chunk)
-                pbar.update(response["ContentLength"])
+                        pbar.update(len(chunk))
 
             n_iter += 1
             if n_iter > max_iter:
