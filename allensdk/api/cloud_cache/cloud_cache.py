@@ -188,7 +188,7 @@ class CloudCacheBase(ABC):
             self._download_manifest(manifest_name, stream)
             self._manifest = Manifest(
                 cache_dir=self.cache_dir,
-                input_json=stream
+                json_input=stream
             )
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
@@ -395,7 +395,7 @@ class S3CloudCache(CloudCacheBase):
     """
 
     def __init__(self, cache_dir, bucket_name, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
         self._bucket_name = bucket_name
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
