@@ -17,8 +17,11 @@ from allensdk import __version__ as sdk_version
 
 # [min inclusive, max exclusive)
 COMPATIBILITY = {
-        "pipeline_versions": {
-            "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}}
+    "pipeline_versions": {
+        "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]},
+        "2.10.0": {"AllenSDK": ["2.10.0", "3.0.0"]}
+    }
+}
 
 
 class BehaviorCloudCacheVersionException(Exception):
