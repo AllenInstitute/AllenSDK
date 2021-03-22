@@ -1,5 +1,7 @@
 import re
 import json
+from pathlib import Path
+
 from allensdk.api.cloud_cache.cloud_cache import CloudCacheBase
 from allensdk.api.cloud_cache.manifest import Manifest
 
@@ -12,7 +14,7 @@ def test_windows_path_to_isilon(monkeypatch, tmpdir):
     spurious C:/ prepended as in AllenSDK issue #1964
     """
 
-    cache_dir = '/allen/silly/cache/path'
+    cache_dir = Path(tmpdir)
 
     manifest_1 = {'manifest_version': '1',
                   'metadata_file_id_column_name': 'file_id',
