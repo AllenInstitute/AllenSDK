@@ -5,6 +5,8 @@ import io
 import pathlib
 import pandas as pd
 import boto3
+import semver
+import tqdm
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -33,7 +35,8 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
+        self._cache_dir = cache_dir
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
@@ -44,6 +47,27 @@ class CloudCacheBase(ABC):
         with this dataset
         """
         raise NotImplementedError()
+
+    @property
+    def latest_manifest_file(self) -> str:
+        """parses available manifest files for semver string
+        and returns the latest one
+        self.manifest_file_names are assumed to be of the form
+        '<anything>_v<semver_str>.json'
+
+        Returns
+        -------
+        str
+            the filename whose semver string is the latest one
+        """
+        vstrs = [s.split(".json")[0].split("_v")[-1]
+                 for s in self.manifest_file_names]
+        versions = [semver.VersionInfo.parse(v) for v in vstrs]
+        imax = versions.index(max(versions))
+        return self.manifest_file_names[imax]
+
+    def load_latest_manifest(self):
+        self.load_manifest(self.latest_manifest_file)
 
     @abstractmethod
     def _download_manifest(self,
@@ -162,7 +186,10 @@ class CloudCacheBase(ABC):
 
         with io.BytesIO() as stream:
             self._download_manifest(manifest_name, stream)
-            self._manifest.load(stream)
+            self._manifest = Manifest(
+                cache_dir=self._cache_dir,
+                json_input=stream
+            )
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
@@ -368,7 +395,8 @@ class S3CloudCache(CloudCacheBase):
     """
 
     def __init__(self, cache_dir, bucket_name, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
+        self._cache_dir = cache_dir
         self._bucket_name = bucket_name
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
@@ -388,26 +416,17 @@ class S3CloudCache(CloudCacheBase):
         Return a list of all of the file names of the manifests associated
         with this dataset
         """
-        output = []
-        continuation_token = None
-        keep_going = True
-        while keep_going:
-            if continuation_token is not None:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix,  # noqa: E501
-                                                        ContinuationToken=continuation_token)  # noqa: E501
-            else:
-                subset = self.s3_client.list_objects_v2(Bucket=self._bucket_name,  # noqa: E501
-                                                        Prefix=self.manifest_prefix)  # noqa: E501
+        paginator = self.s3_client.get_paginator('list_objects_v2')
+        subset_iterator = paginator.paginate(
+            Bucket=self._bucket_name,
+            Prefix=self.manifest_prefix
+        )
 
+        output = []
+        for subset in subset_iterator:
             if 'Contents' in subset:
                 for obj in subset['Contents']:
                     output.append(pathlib.Path(obj['Key']).name)
-
-            if 'NextContinuationToken' in subset:
-                continuation_token = subset['NextContinuationToken']
-            else:
-                keep_going = False
 
         output.sort()
         return output
@@ -493,6 +512,18 @@ class S3CloudCache(CloudCacheBase):
 
         version_id = file_attributes.version_id
 
+        pbar = None
+        if not self._file_exists(file_attributes):
+            response = self.s3_client.list_object_versions(Bucket=bucket_name,
+                                                           Prefix=str(obj_key))
+            object_info = [i for i in response["Versions"]
+                           if i["VersionId"] == version_id][0]
+            pbar = tqdm.tqdm(desc=object_info["Key"].split("/")[-1],
+                             total=object_info["Size"],
+                             unit_scale=True,
+                             unit_divisor=1000.,
+                             unit="MB")
+
         while not self._file_exists(file_attributes):
             response = self.s3_client.get_object(Bucket=bucket_name,
                                                  Key=str(obj_key),
@@ -502,10 +533,14 @@ class S3CloudCache(CloudCacheBase):
                 with open(local_path, 'wb') as out_file:
                     for chunk in response['Body'].iter_chunks():
                         out_file.write(chunk)
+                        pbar.update(len(chunk))
 
             n_iter += 1
             if n_iter > max_iter:
+                pbar.close()
                 raise RuntimeError("Could not download\n"
                                    f"{file_attributes}\n"
                                    "In {max_iter} iterations")
+        if pbar is not None:
+            pbar.close()
         return None

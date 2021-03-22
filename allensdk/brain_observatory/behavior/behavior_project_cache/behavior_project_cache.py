@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .sessions_table import \
     SessionsTable
 from allensdk.brain_observatory.behavior.project_apis.data_io import (
-    BehaviorProjectLimsApi)
+    BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
     one_file_call_caching, call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
@@ -47,7 +47,8 @@ class VisualBehaviorOphysProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: Optional[BehaviorProjectLimsApi] = None,
+            fetch_api: Optional[Union[BehaviorProjectLimsApi,
+                                      BehaviorProjectCloudApi]] = None,
             fetch_tries: int = 2,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
@@ -105,6 +106,37 @@ class VisualBehaviorOphysProjectCache(Cache):
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    @classmethod
+    def from_s3_cache(cls, cache_dir: Union[str, Path],
+                      bucket_name: str = "visual-behavior-ophys-data",
+                      project_name: str = "visual-behavior-ophys"
+                      ) -> "VisualBehaviorOphysProjectCache":
+        """instantiates this object with a connection to an s3 bucket and/or
+        a local cache related to that bucket.
+
+        Parameters
+        ----------
+        cache_dir: str or pathlib.Path
+            Path to the directory where data will be stored on the local system
+
+        bucket_name: str
+            for example, if bucket URI is 's3://mybucket' this value should be
+            'mybucket'
+
+        project_name: str
+            the name of the project this cache is supposed to access. This
+            project name is the first part of the prefix of the release data
+            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
+
+        Returns
+        -------
+        VisualBehaviorOphysProjectCache instance
+
+        """
+        fetch_api = BehaviorProjectCloudApi.from_s3_cache(
+                cache_dir, bucket_name, project_name)
+        return cls(fetch_api=fetch_api)
 
     @classmethod
     def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
@@ -193,6 +225,8 @@ class VisualBehaviorOphysProjectCache(Cache):
             Whether to include behavior data
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
             ophys_sessions = one_file_call_caching(
@@ -237,6 +271,8 @@ class VisualBehaviorOphysProjectCache(Cache):
         :param as_df: whether to return as df or as SessionsTable
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_experiment_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
@@ -273,6 +309,8 @@ class VisualBehaviorOphysProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_behavior_only_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(

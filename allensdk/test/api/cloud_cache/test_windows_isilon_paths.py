@@ -1,10 +1,10 @@
 import re
-import io
 import json
 from allensdk.api.cloud_cache.cloud_cache import CloudCacheBase
+from allensdk.api.cloud_cache.manifest import Manifest
 
 
-def test_windows_path_to_isilon(monkeypatch):
+def test_windows_path_to_isilon(monkeypatch, tmpdir):
     """
     This test is just meant to verify on Windows CI instances
     that, if a path to the `/allen/` shared file store is used as
@@ -16,6 +16,8 @@ def test_windows_path_to_isilon(monkeypatch):
 
     manifest_1 = {'manifest_version': '1',
                   'metadata_file_id_column_name': 'file_id',
+                  'data_pipeline': 'placeholder',
+                  'project_name': 'my-project',
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com/path/to/a.csv',  # noqa: E501
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -26,12 +28,9 @@ def test_windows_path_to_isilon(monkeypatch):
                                             'version_id': '1111',
                                             'file_hash': 'lmnopqrst'}}
                   }
-
-    def dummy_load_manifest(self):
-        with io.StringIO() as stream:
-            stream.write(json.dumps(manifest_1))
-            stream.seek(0)
-            self._manifest.load(stream)
+    manifest_path = tmpdir / "manifest.json"
+    with open(manifest_path, "w") as f:
+        json.dump(manifest_1, f)
 
     def dummy_file_exists(self, m):
         return True
@@ -57,15 +56,11 @@ def test_windows_path_to_isilon(monkeypatch):
                 pass
 
         ctx.setattr(TestCloudCache,
-                    'load_manifest',
-                    dummy_load_manifest)
-
-        ctx.setattr(TestCloudCache,
                     '_file_exists',
                     dummy_file_exists)
 
         cache = TestCloudCache(cache_dir, 'proj')
-        cache.load_manifest()
+        cache._manifest = Manifest(cache_dir, json_input=manifest_path)
 
         m_path = cache.metadata_path('a.csv')
         assert bad_windows_pattern.match(str(m_path)) is None
