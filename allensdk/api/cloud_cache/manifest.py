@@ -114,7 +114,7 @@ class Manifest(object):
         # relative_paths from remote start with the project name which
         # we want to remove since we already specified a project directory
         relative_path = relative_path_from_url(remote_path)
-        shaved_rel_path = relative_path.lstrip(f"{self._project_name}/")
+        shaved_rel_path = "/".join(relative_path.split("/")[1:])
 
         local_path = project_dir / shaved_rel_path
 
