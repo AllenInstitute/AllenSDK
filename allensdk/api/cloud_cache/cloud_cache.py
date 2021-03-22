@@ -76,8 +76,7 @@ class CloudCacheBase(ABC):
     def _download_manifest(self,
                            manifest_name: str):
         """
-        Download a manifest from the dataset into output_stream.
-        Reset output_stream to the beginning
+        Download a manifest from the dataset
 
         Parameters
         ----------
