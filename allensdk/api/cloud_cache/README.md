@@ -44,6 +44,7 @@ The `manifest.json` files are structured like so
 ```
 
 {
+ "project_name" : my-project-name-string,
  "dataset_version" : dataset_version_string,
  "file_id_column": name_of_column_uniquely_identifying_files,
  "metadata_files":{
