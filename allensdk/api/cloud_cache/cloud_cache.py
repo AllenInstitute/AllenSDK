@@ -35,7 +35,8 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name):
-        self._manifest = Manifest(cache_dir)
+        self._manifest = None
+        self._cache_dir = cache_dir
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
@@ -185,7 +186,10 @@ class CloudCacheBase(ABC):
 
         with io.BytesIO() as stream:
             self._download_manifest(manifest_name, stream)
-            self._manifest.load(stream)
+            self._manifest = Manifest(
+                cache_dir=self.cache_dir,
+                input_json=stream
+            )
 
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """

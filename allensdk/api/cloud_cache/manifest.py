@@ -12,13 +12,22 @@ class Manifest(object):
     A class for loading and manipulating the online manifest.json associated
     with a dataset release
 
+    Each Manifest instance should represent the data for 1 and only 1
+    manifest.json file.
+
     Parameters
     ----------
     cache_dir: str or pathlib.Path
         The path to the directory where local copies of files will be stored
+    json_input:
+        A ''.read()''-supporting file-like object containing
+        a JSON document to be deserialized (i.e. same as the
+        first argument to json.load)
     """
 
-    def __init__(self, cache_dir: Union[str, pathlib.Path]):
+    def __init__(self,
+                 cache_dir: Union[str, pathlib.Path],
+                 json_input):
         if isinstance(cache_dir, str):
             self._cache_dir = pathlib.Path(cache_dir).resolve()
         elif isinstance(cache_dir, pathlib.Path):
@@ -28,10 +37,27 @@ class Manifest(object):
                              "or a pathlib.Path; "
                              f"got {type(cache_dir)}")
 
-        self._data: Dict[str, Any] = None
-        self._version: str = None
-        self._file_id_column: str = None
-        self._metadata_file_names: List[str] = None
+        self._data: Dict[str, Any] = json.load(json_input)
+        if not isinstance(self._data, dict):
+            raise ValueError("Expected to deserialize manifest into a dict; "
+                             f"instead got {type(self._data)}")
+        self._project_name: str = self._data["project_name"]
+        self._version: str = self._data['manifest_version']
+        self._file_id_column: str = self._data['metadata_file_id_column_name']
+        self._data_pipeline: str = self._data["data_pipeline"]
+
+        self._metadata_file_names: List[str] = [
+            file_name for file_name in self._data['metadata_files']
+        ]
+        self._metadata_file_names.sort()
+
+    @property
+    def project_name(self):
+        """
+        The name of the project whose data and metadata files this
+        manifest tracks.
+        """
+        return self._project_name
 
     @property
     def version(self):
@@ -53,30 +79,7 @@ class Manifest(object):
         """
         List of metadata file names associated with this dataset
         """
-        return copy.deepcopy(self._metadata_file_names)
-
-    def load(self, json_input):
-        """
-        Load a manifest.json
-
-        Parameters
-        ----------
-        json_input:
-            A ''.read()''-supporting file-like object containing
-            a JSON document to be deserialized (i.e. same as the
-            first argument to json.load)
-        """
-        self._data = json.load(json_input)
-        if not isinstance(self._data, dict):
-            raise ValueError("Expected to deserialize manifest into a dict; "
-                             f"instead got {type(self._data)}")
-        self._data = copy.deepcopy(self._data)
-        self._version = self._data['manifest_version']
-        self._file_id_column = self._data['metadata_file_id_column_name']
-        self._data_pipeline = self._data["data_pipeline"]
-        self._metadata_file_names = [file_name for file_name
-                                     in self._data['metadata_files']]
-        self._metadata_file_names.sort()
+        return self._metadata_file_names
 
     def _create_file_attributes(self,
                                 remote_path: str,
@@ -100,9 +103,20 @@ class Manifest(object):
         CacheFileAttributes
         """
 
-        local_dir = self._cache_dir / file_hash
+        # Paths should be built like:
+        # {cache_dir} / {project_name}-{manifest_version} / relative_path
+        # Ex: my_cache_dir/visual-behavior-ophys-1.0.0/behavior_sessions/etc...
+
+        project_dir_name = f"{self._project_name}-{self._version}"
+        project_dir = self._cache_dir / project_dir_name
+
+        # The convention of the data release tool is to have all
+        # relative_paths from remote start with the project name which
+        # we want to remove since we already specified a project directory
         relative_path = relative_path_from_url(remote_path)
-        local_path = local_dir / relative_path
+        shaved_rel_path = relative_path.lstrip(f"{self._project_name}/")
+
+        local_path = project_dir / shaved_rel_path
 
         obj = CacheFileAttributes(remote_path,
                                   version_id,
