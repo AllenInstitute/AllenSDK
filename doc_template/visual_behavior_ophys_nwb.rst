@@ -52,7 +52,7 @@ Within an NWB file, stimulus data is organized into 'templates', which are stimu
 
    **Figure 2. Stimuli presented during the experiment**
 
-In this experiment shown in Figure 2, there were four stimuli – one locally sparse noise, two movies and one neutral stimulus for observing spontaneous activity. 
+In this experiment shown in Figure 2, there was only one stimulus presented - a set of natural images. 
 When browsing the file, note the panel to the right. 
 Clicking on a folder or dataset will cause information about that object to be displayed there. 
 This will display a table of information related to that dataset, including comments, descriptions, and other relevant metadata. 
