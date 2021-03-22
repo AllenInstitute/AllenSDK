@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Iterable, Union, Dict, List
+from typing import Iterable, Union, Dict, List, Optional
 from pathlib import Path
 import logging
 import ast
@@ -348,14 +348,35 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
     def _get_metadata_path(self, fname: str):
         if self._local:
-            path = self.cache.metadata_path(fname=fname)['local_path']
+            path = self._get_local_path(fname=fname)
         else:
             path = self.cache.download_metadata(fname=fname)
         return path
 
     def _get_data_path(self, file_id: str):
         if self._local:
-            data_path = self.cache.data_path(file_id=file_id)['local_path']
+            data_path = self._get_local_path(file_id=file_id)
         else:
             data_path = self.cache.download_data(file_id=file_id)
         return data_path
+
+    def _get_local_path(self, fname: Optional[str] = None, file_id:
+                                 Optional[str] = None):
+        if fname is None and file_id is None:
+            raise ValueError('Must pass either fname or file_id')
+
+        if fname is not None and file_id is not None:
+            raise ValueError('Must pass only one of fname or file_id')
+
+        if fname is not None:
+            path = self.cache.metadata_path(fname=fname)
+        else:
+            path = self.cache.data_path(file_id=file_id)
+
+        exists = path['exists']
+        local_path = path['local_path']
+        if not exists:
+            raise FileNotFoundError(f'You started a cache without a '
+                                    f'connection to s3 and {local_path} is '
+                                    'not already on your system')
+        return
