@@ -47,7 +47,8 @@ class VisualBehaviorOphysProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: Optional[BehaviorProjectLimsApi] = None,
+            fetch_api: Optional[Union[BehaviorProjectLimsApi,
+                                      BehaviorProjectCloudApi]] = None,
             fetch_tries: int = 2,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
