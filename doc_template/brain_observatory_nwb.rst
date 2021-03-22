@@ -2,6 +2,7 @@ Organization of a Brain Observatory NWB file
 ============================================
 
 The Allen Institute's Brain Observatory data sets include data from 2-photon microscope recordings including image segmentation, motion correction and fluorescence traces. 
+These data are separated into two different types of files - files with just data about specimen behavior and files which include this _and_ optical physiology data.
 It also includes information about the visual stimuli presented during the recording. This information is packaged in the `NWB format <http://www.nwb.org>`_. 
 Here is a brief description how the data is stored in the NWB file.
 
@@ -24,7 +25,7 @@ It is *highly* recommended that anyone using an NWB file download and install th
 NWB file organization
 ---------------------
 
-Each NWB file is organized into six sections. These sections store acquired data ('acquisition'), stimulus data ('stimulus'), general metadata about the experiment ('general'), experiment organization ('epochs'), processed data ('processing') and a free-form area for storing analysis data ('analysis'). 
+Each NWB file is organized into seven sections. These sections store acquired data ('acquisition'), stimulus data ('stimulus'), general metadata about the experiment ('general'), experiment organization ('intervals'), processed data ('processing'), metadata about data types found in the NWB ('specifications'), and a free-form area for storing analysis data ('analysis'). 
 
 .. figure:: /_static/fig-1.png
 
@@ -35,10 +36,10 @@ It is most useful to imagine an HDF5 file as a container that stores many files 
 Because of this structure, you can browse an HDF5 file, and an NWB file, in the same way that you browse the files and folders on your computer.
 Folders can be opened by double-clicking on the folder icon.
 The contents of a 'file' within HDF5, which called a dataset, can be seen by double-clicking it. 
-An NWB file has six top-level folders and five top-level datasets. 
+An NWB file has seven top-level folders and five top-level datasets. 
 In Figure 1, the contents of the 'session_description' dataset is displayed.
-An NWB file is designed to store data from a single experimental session in a single animal. 
-The session_description dataset provides a quick summary of the information available in the file.
+An NWB file is designed to store data from a single experimental session on a single animal. 
+The `session_description` dataset provides a quick summary of the information available in the file.
 The NWB specification, describing the format and how data is stored, can be downloaded `here <http://github.com/NeurodataWithoutBorders/specification/blob/master/version_1.0.3/nwb_file_format_specification_v1.0.3.pdf>`_.
 
 
@@ -52,19 +53,25 @@ Within an NWB file, stimulus data is organized into 'templates', which are stimu
    **Figure 2. Stimuli presented during the experiment**
 
 In this experiment shown in Figure 2, there were four stimuli – one locally sparse noise, two movies and one neutral stimulus for observing spontaneous activity. 
-When browsing the file, note the panel at the bottom. 
+When browsing the file, note the panel to the right. 
 Clicking on a folder or dataset will cause information about that object to be displayed there. 
-This information can include the type of data stored, the unit that stored in, as well as comments and/or other metadata. 
+This will display a table of information related to that dataset, including comments, descriptions, and other relevant metadata. 
+Double clicking one of these will further reveal the value stored inside.
 
 Processing
 ----------
 
-In the NWB file, the processing folder is designed to store the contents the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis. 
-In the Allen Institute's NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli. 
+In the NWB file, the processing folder is designed to store the contents of the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis, as well as information about the behavior of the specimen during data collection. 
+In the Allen Institute's NWB file, these levels of processing include motion correction of the acquired 2-photon movie frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli. 
+
+This is also where you will find the main difference between the two types on NWB files produced for the Allen Institute Brain Observatory dataset. 
+In the processing directory, you will notice behavior data information like licking, running, rewards, etc. 
+If this is an NWB strictly containing behavior data, then that will be all. If the NWB file is one that includes optical physiology data as well then there wil also be a directory in processing called `ophys`, where you will find the intermediate processing data. 
 
 .. figure:: /_static/fig-3.png
 
    **Figure 3. Location of dF/F data**
+
 
 HDFView provides a very efficient way to browse the contents of an NWB file.
 
