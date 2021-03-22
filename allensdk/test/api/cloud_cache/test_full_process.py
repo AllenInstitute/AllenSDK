@@ -141,6 +141,7 @@ def test_full_cache_system(tmpdir):
 
     manifest_1 = {}
     manifest_1['manifest_version'] = 'A'
+    manifest_1['project_name'] = "project-A1"
     manifest_1['metadata_file_id_column_name'] = 'file_id'
     manifest_1['data_pipeline'] = 'placeholder'
     data_files_1 = {}
@@ -162,6 +163,7 @@ def test_full_cache_system(tmpdir):
 
     manifest_2 = {}
     manifest_2['manifest_version'] = 'B'
+    manifest_2['project_name'] = "project-B2"
     manifest_2['metadata_file_id_column_name'] = 'file_id'
     manifest_2['data_pipeline'] = 'placeholder'
     data_files_2 = {}
