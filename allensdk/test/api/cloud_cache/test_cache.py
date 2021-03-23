@@ -11,7 +11,7 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 
 
 @mock_s3
-def test_list_all_manifests():
+def test_list_all_manifests(tmpdir):
     """
     Test that S3CloudCache.list_al_manifests() returns the correct result
     """
@@ -32,13 +32,13 @@ def test_list_all_manifests():
                       Key='junk.txt',
                       Body=b'123456')
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
+    cache = S3CloudCache(tmpdir, test_bucket_name, 'proj')
 
     assert cache.manifest_file_names == ['manifest_1.json', 'manifest_2.json']
 
 
 @mock_s3
-def test_list_all_manifests_many():
+def test_list_all_manifests_many(tmpdir):
     """
     Test the extreme case when there are more manifests than list_objects_v2
     can return at a time
@@ -59,7 +59,7 @@ def test_list_all_manifests_many():
                       Key='junk.txt',
                       Body=b'123456')
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
+    cache = S3CloudCache(tmpdir, test_bucket_name, 'proj')
 
     expected = list([f'manifest_{ii}.json' for ii in range(2000)])
     expected.sort()
@@ -67,7 +67,7 @@ def test_list_all_manifests_many():
 
 
 @mock_s3
-def test_loading_manifest():
+def test_loading_manifest(tmpdir):
     """
     Test loading manifests with S3CloudCache
     """
@@ -109,7 +109,7 @@ def test_loading_manifest():
                       Key='proj/manifests/manifest_2.csv',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
-    cache = S3CloudCache('/my/cache/dir', test_bucket_name, 'proj')
+    cache = S3CloudCache(pathlib.Path(tmpdir), test_bucket_name, 'proj')
     cache.load_manifest('manifest_1.csv')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
@@ -148,7 +148,7 @@ def test_file_exists(tmpdir):
     conn = boto3.resource('s3', region_name='us-east-1')
     conn.create_bucket(Bucket=test_bucket_name, ACL='public-read')
 
-    cache = S3CloudCache('my/cache/dir', test_bucket_name, 'proj')
+    cache = S3CloudCache(tmpdir, test_bucket_name, 'proj')
 
     # should be true
     good_attribute = CacheFileAttributes('http://silly.url.com',

@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Iterable, Union, Dict, List
+from typing import Iterable, Union, Dict, List, Optional
 from pathlib import Path
 import logging
 import ast
@@ -11,7 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
-from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
+from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
 from allensdk import __version__ as sdk_version
 
 
@@ -110,9 +110,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     skip_version_check: bool
         whether to skip the version checking of pipeline SDK version
         vs. running SDK version, which may raise Exceptions. (default=False)
-
+    local: bool
+        Whether to operate in local mode, where no data will be downloaded
+        and instead will be loaded from local
     """
-    def __init__(self, cache: S3CloudCache, skip_version_check: bool = False):
+    def __init__(self, cache: Union[S3CloudCache, LocalCache],
+                 skip_version_check: bool = False,
+                 local: bool = False):
         expected_metadata = set(["behavior_session_table",
                                  "ophys_session_table",
                                  "ophys_experiment_table"])
@@ -130,6 +134,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         if not skip_version_check:
             version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
+        self._local = local
         self._get_session_table()
         self._get_behavior_only_session_table()
         self._get_experiment_table()
@@ -163,6 +168,30 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         cache = S3CloudCache(cache_dir, bucket_name, project_name)
         cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache)
+
+    @staticmethod
+    def from_local_cache(cache_dir: Union[str, Path],
+                         project_name: str) -> "BehaviorProjectCloudApi":
+        """instantiates this object with a local cache.
+
+        Parameters
+        ----------
+        cache_dir: str or pathlib.Path
+            Path to the directory where data will be stored on the local system
+
+        project_name: str
+            the name of the project this cache is supposed to access. This
+            project name is the first part of the prefix of the release data
+            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
+
+        Returns
+        -------
+        BehaviorProjectCloudApi instance
+
+        """
+        cache = LocalCache(cache_dir, project_name)
+        cache.load_latest_manifest()
+        return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
@@ -203,8 +232,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
             row = self._experiment_table.query(f"index=={oeid}")
-        data_path = self.cache.download_data(
-                str(int(row[self.cache.file_id_column])))
+        file_id = str(int(row[self.cache.file_id_column]))
+        data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(str(data_path))
 
     def get_behavior_ophys_experiment(self, ophys_experiment_id: int
@@ -229,13 +258,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                f"ophys_experiment_id. For "
                                f"{ophys_experiment_id} "
                                f" there are {row.shape[0]} entries.")
-        data_path = self.cache.download_data(
-                str(int(row[self.cache.file_id_column])))
+        file_id = str(int(row[self.cache.file_id_column]))
+        data_path = self._get_data_path(file_id=file_id)
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
-    def _get_session_table(self) -> pd.DataFrame:
-        session_table_path = self.cache.download_metadata(
-                "ophys_session_table")
+    def _get_session_table(self):
+        session_table_path = self._get_metadata_path(
+            fname="ophys_session_table")
         df = literal_col_eval(pd.read_csv(session_table_path))
         self._session_table = df.set_index("ophys_session_id")
 
@@ -253,8 +282,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         return self._session_table
 
     def _get_behavior_only_session_table(self):
-        session_table_path = self.cache.download_metadata(
-                "behavior_session_table")
+        session_table_path = self._get_metadata_path(
+            fname='behavior_session_table')
         df = literal_col_eval(pd.read_csv(session_table_path))
         self._behavior_only_session_table = df.set_index("behavior_session_id")
 
@@ -280,8 +309,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         return self._behavior_only_session_table
 
     def _get_experiment_table(self):
-        experiment_table_path = self.cache.download_metadata(
-                "ophys_experiment_table")
+        experiment_table_path = self._get_metadata_path(
+            fname="ophys_experiment_table")
         df = literal_col_eval(pd.read_csv(experiment_table_path))
         self._experiment_table = df.set_index("ophys_experiment_id")
 
@@ -316,3 +345,38 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         :returns: iterable yielding a tiff file as bytes
         """
         raise NotImplementedError()
+
+    def _get_metadata_path(self, fname: str):
+        if self._local:
+            path = self._get_local_path(fname=fname)
+        else:
+            path = self.cache.download_metadata(fname=fname)
+        return path
+
+    def _get_data_path(self, file_id: str):
+        if self._local:
+            data_path = self._get_local_path(file_id=file_id)
+        else:
+            data_path = self.cache.download_data(file_id=file_id)
+        return data_path
+
+    def _get_local_path(self, fname: Optional[str] = None, file_id:
+                                 Optional[str] = None):
+        if fname is None and file_id is None:
+            raise ValueError('Must pass either fname or file_id')
+
+        if fname is not None and file_id is not None:
+            raise ValueError('Must pass only one of fname or file_id')
+
+        if fname is not None:
+            path = self.cache.metadata_path(fname=fname)
+        else:
+            path = self.cache.data_path(file_id=file_id)
+
+        exists = path['exists']
+        local_path = path['local_path']
+        if not exists:
+            raise FileNotFoundError(f'You started a cache without a '
+                                    f'connection to s3 and {local_path} is '
+                                    'not already on your system')
+        return local_path
