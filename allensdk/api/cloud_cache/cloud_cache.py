@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 import os
 import copy
-import io
 import pathlib
 import pandas as pd
 import boto3
 import semver
 import tqdm
+import re
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -560,7 +560,8 @@ class LocalCache(CloudCacheBase):
         super().__init__(cache_dir=cache_dir, project_name=project_name)
 
     def _list_all_manifests(self) -> list:
-        return [x for x in os.listdir(self._cache_dir) if 'manifest' in x]
+        return [x for x in os.listdir(self._cache_dir)
+                if re.fullmatch(".*_manifest_v.*.json", x)]
 
     def _download_manifest(self, manifest_name: str):
         raise NotImplementedError()
