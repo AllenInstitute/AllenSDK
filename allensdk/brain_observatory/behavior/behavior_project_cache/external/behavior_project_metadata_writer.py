@@ -2,7 +2,6 @@ import argparse
 import json
 import logging
 import os
-from typing import Union
 import warnings
 
 import pandas as pd
@@ -10,15 +9,6 @@ import pandas as pd
 import allensdk
 from allensdk.brain_observatory.behavior.behavior_project_cache import \
     VisualBehaviorOphysProjectCache
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .experiments_table import \
-    ExperimentsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .ophys_sessions_table import \
-    BehaviorOphysSessionsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .sessions_table import \
-    SessionsTable
 
 #########
 # These columns should be dropped from external-facing metadata
@@ -100,7 +90,7 @@ class BehaviorProjectMetadataWriter:
                                   'ophys_session_table'
                               ]):
         ophys_sessions = self._behavior_project_cache. \
-            get_session_table(suppress=suppress, as_df=True)
+            get_ophys_session_table(suppress=suppress, as_df=True)
         self._write_metadata_table(df=ophys_sessions,
                                    filename=output_filename)
 
@@ -108,8 +98,9 @@ class BehaviorProjectMetadataWriter:
                                  output_filename=OUTPUT_METADATA_FILENAMES[
                                      'ophys_experiment_table'
                                  ]):
-        ophys_experiments = self._behavior_project_cache.get_experiment_table(
-            suppress=suppress, as_df=True)
+        ophys_experiments = \
+                self._behavior_project_cache.get_ophys_experiment_table(
+                        suppress=suppress, as_df=True)
 
         # Add release files
         ophys_experiments = ophys_experiments.merge(
@@ -187,7 +178,7 @@ def main():
                         required=True)
     parser.add_argument('--project_name', help='project name', required=True)
     parser.add_argument('--data_release_date', help='Project release date. '
-                                                   'Ie 2021-03-25',
+                        'Ie 2021-03-25',
                         required=True)
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
                                                'existing output files',
