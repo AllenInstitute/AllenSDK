@@ -67,17 +67,14 @@ def mock_api(session_table, behavior_table, experiments_table):
         def get_ophys_session_table(self):
             return session_table
 
-        def get_behavior_only_session_table(self):
+        def get_behavior_session_table(self):
             return behavior_table
 
-        def get_experiment_table(self):
+        def get_ophys_experiment_table(self):
             return experiments_table
 
         def get_session_data(self, ophys_session_id):
             return ophys_session_id
-
-        def get_behavior_only_session_data(self, behavior_session_id):
-            return behavior_session_id
 
         def get_behavior_stage_parameters(self, foraging_ids):
             return {x: {} for x in foraging_ids}
@@ -130,7 +127,7 @@ def test_get_behavior_table(TempdirBehaviorCache, behavior_table):
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_experiment_table()
+    obtained = cache.get_ophys_experiment_table()
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_experiments").get("spec")
         assert os.path.exists(path)

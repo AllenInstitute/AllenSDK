@@ -284,7 +284,7 @@ class VisualBehaviorOphysProjectCache(Cache):
             manifest_builder.add_path(key, **config)
         return manifest_builder
 
-    def get_experiment_table(
+    def get_ophys_experiment_table(
             self,
             suppress: Optional[List[str]] = None,
             as_df=True) -> Union[pd.DataFrame, SessionsTable]:
@@ -297,17 +297,17 @@ class VisualBehaviorOphysProjectCache(Cache):
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
-            return self.fetch_api.get_experiment_table()
+            return self.fetch_api.get_ophys_experiment_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
                 path,
-                self.fetch_api.get_experiment_table,
+                self.fetch_api.get_ophys_experiment_table,
                 _write_json,
                 lambda path: _read_json(path,
                                         index_name='ophys_experiment_id'))
         else:
-            experiments = self.fetch_api.get_experiment_table()
+            experiments = self.fetch_api.get_ophys_experiment_table()
 
         # Merge behavior data in
         behavior_sessions_table = self.get_behavior_session_table(
@@ -335,18 +335,17 @@ class VisualBehaviorOphysProjectCache(Cache):
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
-            return self.fetch_api.get_behavior_only_session_table()
+            return self.fetch_api.get_behavior_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
                 path,
-                self.fetch_api.get_behavior_only_session_table,
+                self.fetch_api.get_behavior_session_table,
                 _write_json,
                 lambda path: _read_json(path,
                                         index_name='behavior_session_id'))
         else:
-            sessions = self.fetch_api. \
-                get_behavior_only_session_table()
+            sessions = self.fetch_api.get_behavior_session_table()
 
         if include_ophys_data:
             ophys_session_table = self.get_ophys_session_table(

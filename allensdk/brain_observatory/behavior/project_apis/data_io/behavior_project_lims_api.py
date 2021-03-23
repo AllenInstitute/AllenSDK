@@ -330,7 +330,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorOphysExperiment(BehaviorOphysLimsApi(ophys_experiment_id))
 
-    def _get_experiment_table(self) -> pd.DataFrame:
+    def _get_ophys_experiment_table(self) -> pd.DataFrame:
         """
         Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_experiment_ids and relevant
@@ -373,7 +373,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if self.data_release_date is not None:
             query += self._get_ophys_experiment_release_filter()
 
-        self.logger.debug(f"get_experiment_table query: \n{query}")
+        self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
         return self.lims_engine.select(query)
 
     def _get_ophys_session_table(self) -> pd.DataFrame:
@@ -441,7 +441,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorSession(BehaviorLimsApi(behavior_session_id))
 
-    def get_experiment_table(
+    def get_ophys_experiment_table(
             self,
             ophys_experiment_ids: Optional[List[int]] = None) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_experiment_ids and
@@ -458,9 +458,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             to include
         :rtype: pd.DataFrame
         """
-        return self._get_experiment_table().set_index("ophys_experiment_id")
+        return self._get_ophys_experiment_table().set_index("ophys_experiment_id")
 
-    def get_behavior_only_session_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
