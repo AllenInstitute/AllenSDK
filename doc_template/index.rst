@@ -91,9 +91,15 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
-What's New - 2.10.0
+What's New - 2.10.1
 -----------------------------------------------------------------------
+- changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
+- changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()
+- changes VisualBehaviorOphysProjectCache method get_experiment_table() to get_ophys_experiment_table()
+- VisualBehaviorOphysProjectCache is enabled to instantiate from_s3_cache() and from_local_cache()
 - Improvements to BehaviorProjectCache
+- Adds project metadata writer
+
 
 What's New - 2.9.0
 -----------------------------------------------------------------------

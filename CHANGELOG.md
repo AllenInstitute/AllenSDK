@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.10.0] = TBD
+## [2.10.1] = 2021-03-23
+- changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
+- changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()
+- changes VisualBehaviorOphysProjectCache method get_experiment_table() to get_ophys_experiment_table()
+- VisualBehaviorOphysProjectCache is enabled to instantiate from_s3_cache() and from_local_cache()
 - Improvements to BehaviorProjectCache
 - Adds project metadata writer
 
