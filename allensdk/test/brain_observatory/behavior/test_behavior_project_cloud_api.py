@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+from pathlib import Path
 from unittest.mock import MagicMock
 
 from allensdk.brain_observatory.behavior.project_apis.data_io import \
@@ -39,14 +40,18 @@ class MockCache():
         return file_id
 
     def metadata_path(self, fname):
+        local_path = self._metadata_name_path_map[fname]
         return {
-            'local_path': self._metadata_name_path_map[fname]
+            'local_path': local_path,
+            'exists': Path(local_path).exists()
         }
 
     def data_path(self, file_id):
         return {
-            'local_path': file_id
+            'local_path': file_id,
+            'exists': True
         }
+
 
 @pytest.fixture
 def mock_cache(request, tmpdir):
