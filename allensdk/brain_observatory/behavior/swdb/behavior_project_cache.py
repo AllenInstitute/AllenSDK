@@ -5,12 +5,12 @@ import json
 import re
 
 from allensdk import one
-from allensdk.brain_observatory.behavior.metadata.util import \
-    parse_cre_line
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
-from allensdk.brain_observatory.behavior.behavior_ophys_session import \
-    BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import \
     calculate_reward_rate
@@ -49,7 +49,7 @@ class BehaviorProjectCache(object):
 
         Methods:
             get_session(ophys_experiment_id):
-                Returns an extended BehaviorOphysSession object, including
+                Returns an extended BehaviorOphysExperiment object, including
                 trial_response_df and flash_response_df
 
             get_container_sessions(container_id):
@@ -72,7 +72,7 @@ class BehaviorProjectCache(object):
             self.cache_paths['manifest_path'])
 
         self.experiment_table['cre_line'] = self.experiment_table[
-            'full_genotype'].apply(parse_cre_line)
+            'full_genotype'].apply(BehaviorMetadata.parse_cre_line)
         self.experiment_table['passive_session'] = self.experiment_table[
             'stage_name'].apply(parse_passive)
         self.experiment_table['image_set'] = self.experiment_table[
@@ -132,7 +132,7 @@ class BehaviorProjectCache(object):
 
     def get_session(self, experiment_id):
         '''
-        Return a BehaviorOphysSession object given an ophys_experiment_id.
+        Return a BehaviorOphysExperiment object given an ophys_experiment_id.
         '''
         nwb_path = self.get_nwb_filepath(experiment_id)
         trial_response_df_path = self.get_trial_response_df_path(experiment_id)
@@ -145,7 +145,7 @@ class BehaviorProjectCache(object):
             flash_response_df_path,
             extended_stim_df_path
         )
-        session = ExtendedBehaviorSession(api)
+        session = ExtendedBehaviorOphysExperiment(api)
         return session
 
     def get_container_sessions(self, container_id):
@@ -457,7 +457,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         return image_index_names
 
 
-class ExtendedBehaviorSession(BehaviorOphysSession):
+class ExtendedBehaviorOphysExperiment(BehaviorOphysExperiment):
     """Represents data from a single Visual Behavior Ophys imaging session.
     LazyProperty attributes access the data only on the first demand,
     and then memoize the result for reuse.
@@ -521,7 +521,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
     """
 
     def __init__(self, api):
-        super(ExtendedBehaviorSession, self).__init__(api)
+        super(ExtendedBehaviorOphysExperiment, self).__init__(api)
         self.api = api
 
         self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
@@ -530,7 +530,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         self.roi_masks = LazyProperty(self.get_roi_masks)
 
     def get_roi_masks(self):
-        masks = super(ExtendedBehaviorSession, self).get_roi_masks()
+        masks = super(ExtendedBehaviorOphysExperiment, self).get_roi_masks()
         return {
             cell_specimen_id: masks.loc[
                 {"cell_specimen_id": cell_specimen_id}].data

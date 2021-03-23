@@ -5,7 +5,7 @@ import os
 import pytest
 import pandas as pd
 
-from allensdk.api import caching_utilities as cu
+from allensdk.api.warehouse_cache import caching_utilities as cu
 
 
 def get_data():

@@ -42,7 +42,7 @@ class BehaviorOphysDataExtractorBase(BehaviorDataExtractorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_experiment_container_id(self) -> int:
+    def get_ophys_container_id(self) -> int:
         """Get the experiment container id associated with an ophys
         experiment"""
         raise NotImplementedError()

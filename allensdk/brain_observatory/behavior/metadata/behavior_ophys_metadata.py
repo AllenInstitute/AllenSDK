@@ -1,5 +1,3 @@
-import warnings
-
 import numpy as np
 from typing import Optional
 
@@ -35,9 +33,10 @@ class BehaviorOphysMetadata(BehaviorMetadata):
     def excitation_lambda(self) -> float:
         return 910.0
 
+    # TODO rename to ophys_container_id
     @property
     def experiment_container_id(self) -> int:
-        return self._extractor.get_experiment_container_id()
+        return self._extractor.get_ophys_container_id()
 
     @property
     def field_of_view_height(self) -> int:
@@ -58,27 +57,6 @@ class BehaviorOphysMetadata(BehaviorMetadata):
     @property
     def imaging_plane_group_count(self) -> int:
         return self._extractor.get_plane_group_count()
-
-    @property
-    def indicator(self) -> Optional[str]:
-        """Parses indicator from reporter"""
-        reporter_substring_indicator_map = {
-            'GCaMP6f': 'GCaMP6f',
-            'GC6f': 'GCaMP6f',
-            'GCaMP6s': 'GCaMP6s'
-        }
-        if self.reporter_line is None:
-            warnings.warn('Could not parse indicator from reporter because '
-                          'there is no reporter')
-            return None
-
-        for substr, indicator in reporter_substring_indicator_map.items():
-            if substr in self.reporter_line:
-                return indicator
-
-        warnings.warn('Could not parse indicator from reporter because none'
-                      'of the expected substrings were found in the reporter')
-        return None
 
     @property
     def ophys_experiment_id(self) -> int:

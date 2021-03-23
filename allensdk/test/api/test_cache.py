@@ -43,7 +43,7 @@ import time
 import pytest
 from mock import MagicMock, mock_open, patch
 
-from allensdk.api.cache import Cache, memoize, get_default_manifest_file
+from allensdk.api.warehouse_cache.cache import Cache, memoize, get_default_manifest_file
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError

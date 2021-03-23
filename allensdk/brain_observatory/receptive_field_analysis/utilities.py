@@ -37,7 +37,7 @@ from scipy.ndimage.filters import gaussian_filter
 import numpy as np
 import scipy.interpolate as spinterp
 from .tools import dict_generator
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 import os
 import warnings
 from skimage.measure import block_reduce

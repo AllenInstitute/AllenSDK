@@ -2,7 +2,7 @@ import os
 import six
 
 from allensdk.config.manifest import Manifest
-from allensdk.api.cache import Cache, cacheable
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.grid_data_api import GridDataApi
 from allensdk.core import json_utilities
 

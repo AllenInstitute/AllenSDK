@@ -46,7 +46,7 @@ load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from an NWB file that is both necessary and sufficient for filling
-    a 'BehaviorOphysSession'.
+    a 'BehaviorOphysExperiment'.
     """
 
     def __init__(self, *args, **kwargs):
@@ -270,9 +270,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             dilation_frames=dilation_frames)
 
         eye_tracking_data["likely_blink"] = likely_blinks
-        eye_tracking_data["eye_area"][likely_blinks] = np.nan
-        eye_tracking_data["pupil_area"][likely_blinks] = np.nan
-        eye_tracking_data["cr_area"][likely_blinks] = np.nan
+        eye_tracking_data.at[likely_blinks, "eye_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "pupil_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "cr_area"] = np.nan
 
         return eye_tracking_data
 

@@ -5,7 +5,8 @@ import pandas as pd
 from scipy import stats
 import itertools
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
@@ -215,7 +216,7 @@ if __name__=='__main__':
         # experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
         # nwb_path = cache.get_nwb_filepath(experiment_id)
         # api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois=True)
-        # session = BehaviorOphysSession(api)
+        # session = BehaviorOphysExperiment(api)
 
         # Get the session using the cache so that the change time fix is applied
         session = cache.get_session(experiment_id)
@@ -246,10 +247,10 @@ if __name__=='__main__':
         experiment_id  = 846487947
 
         # api = BehaviorOphysLimsApi(experiment_id)
-        # session = BehaviorOphysSession(api)
+        # session = BehaviorOphysExperiment(api)
         # nwb_path = cache.get_nwb_filepath(experiment_id)
         # api = BehaviorOphysNwbApi(nwb_path)
-        # session = BehaviorOphysSession(api)
+        # session = BehaviorOphysExperiment(api)
 
         session = cache.get_session(experiment_id)
 

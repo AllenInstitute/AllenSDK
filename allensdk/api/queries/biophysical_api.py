@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from allensdk.api.queries.rma_template import RmaTemplate
-from allensdk.api.cache import cacheable
+from allensdk.api.warehouse_cache.cache import cacheable
 import os
 import simplejson as json
 from collections import OrderedDict

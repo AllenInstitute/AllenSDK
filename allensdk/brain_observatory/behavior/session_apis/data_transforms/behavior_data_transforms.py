@@ -7,7 +7,7 @@ import pandas as pd
 import os
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     get_task_parameters, BehaviorMetadata
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.running_processing import \

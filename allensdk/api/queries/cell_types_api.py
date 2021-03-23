@@ -34,9 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_api import RmaApi
-from ..cache import cacheable
+from allensdk.api.warehouse_cache.cache import cacheable
 from allensdk.config.manifest import Manifest
-from allensdk.api.cache import Cache
+from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.deprecated import deprecated
 
 

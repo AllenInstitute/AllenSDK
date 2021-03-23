@@ -5,7 +5,7 @@ from typing import Optional
 
 from allensdk.internal.api import (
     OneOrMoreResultExpectedError, db_connection_creator)
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 from allensdk.core.authentication import DbCredentials
@@ -16,11 +16,11 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS for filling optical physiology data. This data is
     is necessary (but not sufficient) to fill the 'Ophys' portion of a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
 
     This class needs to be inherited by the BehaviorOphysLimsApi and also
     have methods from BehaviorOphysDataTransforms in order to be usable by a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
     """
 
     def __init__(self, ophys_experiment_id: int,
