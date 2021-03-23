@@ -50,7 +50,7 @@ image change detection task.
      - Modality
      - Resource
      - Initial Release
-   * - Pasive
+   * - Passive
      - Optical physiology
      - `Visual Coding - Optical Physiology <https://allensdk.readthedocs.io/en/latest/brain_observatory.html>`_
      - June 2016
