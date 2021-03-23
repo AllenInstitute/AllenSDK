@@ -135,9 +135,9 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
         self._local = local
-        self._get_session_table()
-        self._get_behavior_only_session_table()
-        self._get_experiment_table()
+        self._get_ophys_session_table()
+        self._get_behavior_session_table()
+        self._get_ophys_experiment_table()
 
     @staticmethod
     def from_s3_cache(cache_dir: Union[str, Path],
@@ -208,7 +208,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
         Notes
         -----
-        entries in the _behavior_only_session_table represent
+        entries in the _behavior_session_table represent
         (1) ophys_sessions which have a many-to-one mapping between nwb files
         and behavior sessions. (file_id is NaN)
         AND
@@ -219,10 +219,10 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         from the nwb file for the first-listed ophys_experiment.
 
         """
-        row = self._behavior_only_session_table.query(
+        row = self._behavior_session_table.query(
                 f"behavior_session_id=={behavior_session_id}")
         if row.shape[0] != 1:
-            raise RuntimeError("The behavior_only_session_table should have "
+            raise RuntimeError("The behavior_session_table should have "
                                "1 and only 1 entry for a given "
                                "behavior_session_id. For "
                                f"{behavior_session_id} "
@@ -231,7 +231,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         has_file_id = not pd.isna(row[self.cache.file_id_column])
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
-            row = self._experiment_table.query(f"index=={oeid}")
+            row = self._ophys_experiment_table.query(f"index=={oeid}")
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(str(data_path))
@@ -250,7 +250,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         BehaviorOphysExperiment
 
         """
-        row = self._experiment_table.query(
+        row = self._ophys_experiment_table.query(
                 f"index=={ophys_experiment_id}")
         if row.shape[0] != 1:
             raise RuntimeError("The behavior_ophys_experiment_table should "
@@ -262,13 +262,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
-    def _get_session_table(self):
+    def _get_ophys_session_table(self):
         session_table_path = self._get_metadata_path(
             fname="ophys_session_table")
         df = literal_col_eval(pd.read_csv(session_table_path))
-        self._session_table = df.set_index("ophys_session_id")
+        self._ophys_session_table = df.set_index("ophys_session_id")
 
-    def get_session_table(self) -> pd.DataFrame:
+    def get_ophys_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table summarizing ophys_sessions
         and associated metadata.
 
@@ -279,15 +279,15 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         'ophys_experiment_id' column (can be a list)
         and experiment_table
         """
-        return self._session_table
+        return self._ophys_session_table
 
-    def _get_behavior_only_session_table(self):
+    def _get_behavior_session_table(self):
         session_table_path = self._get_metadata_path(
             fname='behavior_session_table')
         df = literal_col_eval(pd.read_csv(session_table_path))
-        self._behavior_only_session_table = df.set_index("behavior_session_id")
+        self._behavior_session_table = df.set_index("behavior_session_id")
 
-    def get_behavior_only_session_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with both behavior-only
         (BehaviorSession) and with-ophys (BehaviorOphysExperiment)
         sessions as entries.
@@ -299,22 +299,18 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         nwb path in cache.
         - In the second case, provides a critical mapping of
         behavior_session_id to a list of ophys_experiment_id(s)
-        which can be used to find file_id mappings in experiment_table
+        which can be used to find file_id mappings in ophys_experiment_table
         see method get_behavior_session()
-        - the BehaviorProjectCache calls this method through a method called
-        get_behavior_session_table. The name of this method is a legacy shared
-        with the behavior_project_lims_api and should be made consistent with
-        the BehaviorProjectCache calling method.
         """
-        return self._behavior_only_session_table
+        return self._behavior_session_table
 
-    def _get_experiment_table(self):
+    def _get_ophys_experiment_table(self):
         experiment_table_path = self._get_metadata_path(
             fname="ophys_experiment_table")
         df = literal_col_eval(pd.read_csv(experiment_table_path))
-        self._experiment_table = df.set_index("ophys_experiment_id")
+        self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
-    def get_experiment_table(self):
+    def get_ophys_experiment_table(self):
         """returns a pd.DataFrame where each entry has a 1-to-1
         relation with an ophys experiment (i.e. imaging plane)
 
@@ -325,7 +321,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         relation between nwb files and ophy experiments. See method
         get_behavior_ophys_experiment()
         """
-        return self._experiment_table
+        return self._ophys_experiment_table
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
         """ Download a template for the natural movie stimulus. This is the
@@ -361,7 +357,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         return data_path
 
     def _get_local_path(self, fname: Optional[str] = None, file_id:
-                                 Optional[str] = None):
+                        Optional[str] = None):
         if fname is None and file_id is None:
             raise ValueError('Must pass either fname or file_id')
 

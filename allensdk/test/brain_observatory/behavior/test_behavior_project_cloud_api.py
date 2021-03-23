@@ -99,7 +99,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                                                local=True)
 
     # behavior session table as expected
-    bost = api.get_behavior_only_session_table()
+    bost = api.get_behavior_session_table()
     assert bost.index.name == "behavior_session_id"
     bost = bost.reset_index()
     ebost = expected["behavior_session_table"]
@@ -110,7 +110,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     for i, j in zip(bost[k].values, ebost[k].values)])
 
     # ophys session table as expected
-    ost = api.get_session_table()
+    ost = api.get_ophys_session_table()
     assert ost.index.name == "ophys_session_id"
     ost = ost.reset_index()
     eost = expected["ophys_session_table"]
@@ -121,7 +121,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     for i, j in zip(ost[k].values, eost[k].values)])
 
     # experiment table as expected
-    et = api.get_experiment_table()
+    et = api.get_ophys_experiment_table()
     assert et.index.name == "ophys_experiment_id"
     et = et.reset_index()
     pd.testing.assert_frame_equal(et, expected["ophys_experiment_table"])

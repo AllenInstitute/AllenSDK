@@ -330,7 +330,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorOphysExperiment(BehaviorOphysLimsApi(ophys_experiment_id))
 
-    def _get_experiment_table(self) -> pd.DataFrame:
+    def _get_ophys_experiment_table(self) -> pd.DataFrame:
         """
         Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_experiment_ids and relevant
@@ -373,10 +373,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if self.data_release_date is not None:
             query += self._get_ophys_experiment_release_filter()
 
-        self.logger.debug(f"get_experiment_table query: \n{query}")
+        self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def _get_session_table(self) -> pd.DataFrame:
+    def _get_ophys_session_table(self) -> pd.DataFrame:
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
@@ -411,10 +411,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         if self.data_release_date is not None:
             query += self._get_ophys_session_release_filter()
-        self.logger.debug(f"get_session_table query: \n{query}")
+        self.logger.debug(f"get_ophys_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_session_table(self) -> pd.DataFrame:
+    def get_ophys_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
         Return columns: ophys_session_id, behavior_session_id,
@@ -426,7 +426,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
-        table = (self._get_session_table()
+        table = (self._get_ophys_session_table()
                  .drop_duplicates(subset=["ophys_session_id"], keep=False)
                  .set_index("ophys_session_id"))
         return table
@@ -441,7 +441,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorSession(BehaviorLimsApi(behavior_session_id))
 
-    def get_experiment_table(
+    def get_ophys_experiment_table(
             self,
             ophys_experiment_ids: Optional[List[int]] = None) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_experiment_ids and
@@ -458,9 +458,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             to include
         :rtype: pd.DataFrame
         """
-        return self._get_experiment_table().set_index("ophys_experiment_id")
+        return self._get_ophys_experiment_table().set_index("ophys_experiment_id")
 
-    def get_behavior_only_session_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
