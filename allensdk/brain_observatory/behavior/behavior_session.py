@@ -170,8 +170,12 @@ class BehaviorSession(LazyPropertyMixin):
             self.trials.correct_reject.sum()
         performance_metrics['auto_rewarded_trial_count'] = \
             self.trials.auto_rewarded.sum()
-        performance_metrics['rewarded_trial_count'] = \
-            self.trials.reward_time.apply(lambda x: not np.isnan(x)).sum()
+        # Although 'rewarded_trial_count' will currently have the same value as
+        # 'hit_trial_count', in the future there may be variants of the
+        # task where rewards are withheld. In that case the
+        # 'rewarded_trial_count' will be smaller than (and different from)
+        # the 'hit_trial_count'.
+        performance_metrics['rewarded_trial_count'] = self.trials.hit.sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
