@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.10.2] = TBD
+- update documentation to support visual behavior data release
+
 ## [2.10.1] = 2021-03-23
 - changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
 - changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()
