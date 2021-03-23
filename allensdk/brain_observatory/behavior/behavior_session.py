@@ -7,6 +7,7 @@ import inspect
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
+from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
@@ -82,6 +83,36 @@ class BehaviorSession(LazyPropertyMixin):
         docs = [inspect.getdoc(m[1]) or "" for m in methods]
         method_names = [m[0] for m in methods]
         return list(zip(method_names, docs))
+
+    def list_data_attributes_and_methods(self) -> List[str]:
+        """Convenience method for end-users to list attributes and methods
+        that can be called to access data for a BehaviorSession.
+
+        NOTE: Because BehaviorExperiment inherits from BehaviorSession
+        this method was also be available there.
+
+        Returns
+        -------
+        List[str]
+            A list of attributes and methods that end-users can access or call
+            to get data.
+        """
+        attrs_and_methods_to_ignore: set = {
+            "api",
+            "from_lims",
+            "from_nwb_path",
+            "LazyProperty",
+            "list_api_methods",
+            "list_data_attributes_and_methods"
+        }
+        attrs_and_methods_to_ignore.update(dir(ParamsMixin))
+        attrs_and_methods_to_ignore.update(dir(LazyPropertyMixin))
+        class_dir = dir(self)
+        attrs_and_methods = [
+            r for r in class_dir
+            if (r not in attrs_and_methods_to_ignore and not r.startswith("_"))
+        ]
+        return attrs_and_methods
 
     # ========================= 'get' methods ==========================
 
