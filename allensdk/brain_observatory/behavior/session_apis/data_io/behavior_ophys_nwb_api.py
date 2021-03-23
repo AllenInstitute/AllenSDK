@@ -270,9 +270,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             dilation_frames=dilation_frames)
 
         eye_tracking_data["likely_blink"] = likely_blinks
-        eye_tracking_data["eye_area"][likely_blinks] = np.nan
-        eye_tracking_data["pupil_area"][likely_blinks] = np.nan
-        eye_tracking_data["cr_area"][likely_blinks] = np.nan
+        eye_tracking_data.at[likely_blinks, "eye_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "pupil_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "cr_area"] = np.nan
 
         return eye_tracking_data
 
