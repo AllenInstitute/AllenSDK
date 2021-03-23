@@ -93,14 +93,16 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.10.2
 -----------------------------------------------------------------------
-- update documentation to support visual behavior data release
+- Update documentation to support visual behavior data release
+- Fixes a bug with the dictionary returned by BehaviorSession get get_performance_metrics() method
+- Adds docstrings to the BehaviorSession get_performance_metrics(), get_rolling_performance_df(), and get_reward_rate() methods
 
 
 What's New - 2.10.1
 -----------------------------------------------------------------------
-- changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
-- changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()
-- changes VisualBehaviorOphysProjectCache method get_experiment_table() to get_ophys_experiment_table()
+- Changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
+- Changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()
+- Changes VisualBehaviorOphysProjectCache method get_experiment_table() to get_ophys_experiment_table()
 - VisualBehaviorOphysProjectCache is enabled to instantiate from_s3_cache() and from_local_cache()
 - Improvements to BehaviorProjectCache
 - Adds project metadata writer
