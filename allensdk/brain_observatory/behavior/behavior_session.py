@@ -85,7 +85,17 @@ class BehaviorSession(LazyPropertyMixin):
 
     # ========================= 'get' methods ==========================
 
-    def get_reward_rate(self):
+    def get_reward_rate(self) -> np.ndarray:
+        """ Get the reward rate of the subject for the task calculated over a
+        25 trial rolling window and provides a measure of the rewards
+        earned per unit time (in units of rewards/minute).
+
+        Returns
+        -------
+        np.ndarray
+            The reward rate (rewards/minute) of the subject for the
+            task calculated over a 25 trial rolling window.
+        """
         response_latency_list = []
         for _, t in self.trials.iterrows():
             valid_response_licks = \
@@ -103,7 +113,42 @@ class BehaviorSession(LazyPropertyMixin):
         reward_rate[np.isinf(reward_rate)] = float('nan')
         return reward_rate
 
-    def get_rolling_performance_df(self):
+    def get_rolling_performance_df(self) -> pd.DataFrame:
+        """Return a DataFrame containing trial by trial behavior response
+        performance metrics.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing:
+                trials_id [index]:
+                    Index of the trial. All trials, including aborted trials,
+                    are assigned an index starting at 0 for the first trial.
+                reward_rate:
+                    Rewards earned in the previous 25 trials, normalized by
+                    the elapsed time of the same 25 trials. Units are
+                    rewards/minute.
+                hit_rate_raw:
+                    Fraction of go trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                hit_rate:
+                    Fraction of go trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. With trial count correction applied.
+                false_alarm_rate_raw:
+                    Fraction of catch trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                false_alarm_rate:
+                    Fraction of catch trials where the mouse licked in
+                    the response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                rolling_dprime:
+                    d prime calculated using the rolling hit_rate and
+                    rolling false_alarm _rate.
+
+        """
         # Indices to build trial metrics dataframe:
         trials_index = self.trials.index
         not_aborted_index = \
@@ -157,7 +202,88 @@ class BehaviorSession(LazyPropertyMixin):
 
         return performance_metrics_df
 
-    def get_performance_metrics(self, engaged_trial_reward_rate_threshold=2):
+    def get_performance_metrics(
+            self,
+            engaged_trial_reward_rate_threshold: float = 2.0
+        ) -> dict:
+        """Get a dictionary containing a subject's behavior response
+        summary data.
+
+        Parameters
+        ----------
+        engaged_trial_reward_rate_threshold : float, optional
+            The number of rewards per minute that needs to be attained
+            before a subject is considered 'engaged', by default 2.0
+
+        Returns
+        -------
+        dict
+            Returns a dict of performance metrics with the following fields:
+                trial_count:
+                    The length of the trial dataframe
+                    (including all 'go', 'catch', and 'aborted' trials)
+                go_trial_count:
+                    Number of 'go' trials in a behavior session
+                catch_trial_count:
+                    Number of 'catch' trial types during a behavior session
+                hit_trial_count:
+                    Number of trials with a hit behavior response
+                    type in a behavior session
+                miss_trial_count:
+                    Number of trials with a miss behavior response
+                    type in a behavior session
+                false_alarm_trial_count:
+                    Number of trials where the mouse had a false alarm
+                    behavior response
+                correct_reject_trial_count:
+                    Number of trials with a correct reject behavior
+                    response during a behavior session
+                auto_rewarded_trial_count:
+                    Number of trials where the mouse received an auto
+                    reward of water.
+                rewarded_trial_count:
+                    Number of trials on which the animal was rewarded for
+                    licking in the response window.
+                total_reward_count:
+                    Number of trials where the mouse received a
+                    water reward (earned or auto rewarded)
+                total_reward_volume:
+                    Volume of all water rewards received during a
+                    behavior session (earned and auto rewarded)
+                maximum_reward_rate:
+                    The peak of the rolling reward rate (rewards/minute)
+                engaged_trial_count:
+                    Number of trials where the mouse is engaged
+                    (reward rate > 2 rewards/minute)
+                mean_hit_rate:
+                    The mean of the rolling hit_rate
+                mean_hit_rate_uncorrected:
+                    The mean of the rolling hit_rate_raw
+                mean_hit_rate_engaged:
+                    The mean of the rolling hit_rate, excluding epochs
+                    when the rolling reward rate was below 2 rewards/minute
+                mean_false_alarm_rate:
+                    The mean of the rolling false_alarm_rate, excluding
+                    epochs when the rolling reward rate was below 2
+                    rewards/minute
+                mean_false_alarm_rate_uncorrected:
+                    The mean of the rolling false_alarm_rate_raw
+                mean_false_alarm_rate_engaged:
+                    The mean of the rolling false_alarm_rate,
+                    excluding epochs when the rolling reward rate
+                    was below 2 rewards/minute
+                mean_dprime:
+                    The mean of the rolling d_prime
+                mean_dprime_engaged:
+                    The mean of the rolling d_prime, excluding
+                    epochs when the rolling reward rate was
+                    below 2 rewards/minute
+                max_dprime:
+                    The peak of the rolling d_prime
+                max_dprime_engaged:
+                    The peak of the rolling d_prime, excluding epochs
+                    when the rolling reward rate was below 2 rewards/minute
+        """
         performance_metrics = {}
         performance_metrics['trial_count'] = len(self.trials)
         performance_metrics['go_trial_count'] = self.trials.go.sum()
