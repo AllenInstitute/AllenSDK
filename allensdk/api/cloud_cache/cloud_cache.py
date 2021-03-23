@@ -35,8 +35,7 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name):
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
+        os.makedirs(cache_dir, exist_ok=True)
 
         self._manifest = None
         self._cache_dir = cache_dir
@@ -497,8 +496,7 @@ class S3CloudCache(CloudCacheBase):
 
         # using os here rather than pathlib because safe_system_path
         # returns a str
-        if not os.path.exists(local_dir):
-            os.makedirs(local_dir)
+        os.makedirs(local_dir, exist_ok=True)
         if not os.path.isdir(local_dir):
             raise RuntimeError(f"{local_dir}\n"
                                "is not a directory")
