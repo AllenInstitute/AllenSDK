@@ -135,7 +135,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
         self._local = local
-        self._get_session_table()
+        self._get_ophys_session_table()
         self._get_behavior_only_session_table()
         self._get_experiment_table()
 
@@ -262,13 +262,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
-    def _get_session_table(self):
+    def _get_ophys_session_table(self):
         session_table_path = self._get_metadata_path(
             fname="ophys_session_table")
         df = literal_col_eval(pd.read_csv(session_table_path))
-        self._session_table = df.set_index("ophys_session_id")
+        self._ophys_session_table = df.set_index("ophys_session_id")
 
-    def get_session_table(self) -> pd.DataFrame:
+    def get_ophys_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table summarizing ophys_sessions
         and associated metadata.
 
@@ -279,7 +279,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         'ophys_experiment_id' column (can be a list)
         and experiment_table
         """
-        return self._session_table
+        return self._ophys_session_table
 
     def _get_behavior_only_session_table(self):
         session_table_path = self._get_metadata_path(

@@ -21,7 +21,7 @@ class BehaviorProjectBase(ABC):
         pass
 
     @abstractmethod
-    def get_session_table(self) -> pd.DataFrame:
+    def get_ophys_session_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata."""
         pass

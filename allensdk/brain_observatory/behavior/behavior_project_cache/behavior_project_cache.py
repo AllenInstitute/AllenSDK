@@ -227,7 +227,7 @@ class VisualBehaviorOphysProjectCache(Cache):
         return cls(fetch_api=fetch_api, manifest=manifest, version=version,
                    cache=cache, fetch_tries=fetch_tries)
 
-    def get_session_table(
+    def get_ophys_session_table(
             self,
             suppress: Optional[List[str]] = None,
             index_column: str = "ophys_session_id",
@@ -251,16 +251,16 @@ class VisualBehaviorOphysProjectCache(Cache):
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
-            return self.fetch_api.get_session_table()
+            return self.fetch_api.get_ophys_session_table()
         if self.cache:
             path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
             ophys_sessions = one_file_call_caching(
                 path,
-                self.fetch_api.get_session_table,
+                self.fetch_api.get_ophys_session_table,
                 _write_json,
                 lambda path: _read_json(path, index_name='ophys_session_id'))
         else:
-            ophys_sessions = self.fetch_api.get_session_table()
+            ophys_sessions = self.fetch_api.get_ophys_session_table()
 
         if include_behavior_data:
             # Merge behavior data in
@@ -349,7 +349,7 @@ class VisualBehaviorOphysProjectCache(Cache):
                 get_behavior_only_session_table()
 
         if include_ophys_data:
-            ophys_session_table = self.get_session_table(
+            ophys_session_table = self.get_ophys_session_table(
                 suppress=suppress,
                 as_df=False,
                 include_behavior_data=False)

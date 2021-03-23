@@ -110,7 +110,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     for i, j in zip(bost[k].values, ebost[k].values)])
 
     # ophys session table as expected
-    ost = api.get_session_table()
+    ost = api.get_ophys_session_table()
     assert ost.index.name == "ophys_session_id"
     ost = ost.reset_index()
     eost = expected["ophys_session_table"]

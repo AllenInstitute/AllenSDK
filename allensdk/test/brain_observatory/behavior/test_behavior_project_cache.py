@@ -64,7 +64,7 @@ def experiments_table():
 @pytest.fixture
 def mock_api(session_table, behavior_table, experiments_table):
     class MockApi:
-        def get_session_table(self):
+        def get_ophys_session_table(self):
             return session_table
 
         def get_behavior_only_session_table(self):
@@ -96,9 +96,9 @@ def TempdirBehaviorCache(mock_api, request):
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-def test_get_session_table(TempdirBehaviorCache, session_table):
+def test_get_ophys_session_table(TempdirBehaviorCache, session_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_session_table()
+    obtained = cache.get_ophys_session_table()
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_sessions").get("spec")
         assert os.path.exists(path)
@@ -148,7 +148,7 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
                                         caplog):
     caplog.set_level(logging.INFO, logger="call_caching")
     cache = TempdirBehaviorCache
-    cache.get_session_table()
+    cache.get_ophys_session_table()
     expected_first = [
         ('call_caching', logging.INFO, 'Reading data from cache'),
         ('call_caching', logging.INFO, 'No cache file found.'),
@@ -162,7 +162,7 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
         ('call_caching', logging.INFO, 'Reading data from cache')]
     assert expected_first == caplog.record_tuples
     caplog.clear()
-    cache.get_session_table()
+    cache.get_ophys_session_table()
     assert [expected_first[0], expected_first[-1]] == caplog.record_tuples
 
 
@@ -190,11 +190,11 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-def test_get_session_table_by_experiment(TempdirBehaviorCache):
+def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache):
     expected = (pd.DataFrame({"ophys_session_id": [1, 1],
                               "ophys_experiment_id": [5, 6]})
                 .set_index("ophys_experiment_id"))
-    actual = TempdirBehaviorCache.get_session_table(
+    actual = TempdirBehaviorCache.get_ophys_session_table(
         index_column="ophys_experiment_id")[
         ["ophys_session_id"]]
     pd.testing.assert_frame_equal(expected, actual)
