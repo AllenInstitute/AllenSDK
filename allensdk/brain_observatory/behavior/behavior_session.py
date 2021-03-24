@@ -99,6 +99,7 @@ class BehaviorSession(LazyPropertyMixin):
         """
         attrs_and_methods_to_ignore: set = {
             "api",
+            "cache_clear",
             "from_lims",
             "from_nwb_path",
             "LazyProperty",

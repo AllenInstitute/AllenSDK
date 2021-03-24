@@ -78,7 +78,6 @@ def test_behavior_session_list_data_attributes_and_methods():
     # 2. Inheritance of class has changed
     expected = {
         'behavior_session_id',
-        'cache_clear',
         'get_performance_metrics',
         'get_reward_rate',
         'get_rolling_performance_df',

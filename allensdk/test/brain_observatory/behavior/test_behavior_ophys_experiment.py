@@ -262,7 +262,6 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods():
     expected = {
         'average_projection',
         'behavior_session_id',
-        'cache_clear',
         'cell_specimen_table',
         'corrected_fluorescence_traces',
         'dff_traces',
