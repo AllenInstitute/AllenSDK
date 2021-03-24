@@ -17,7 +17,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs.\
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    StimulusTemplate, StimulusTemplateFactory
+    StimulusTemplate, StimulusTemplateFactory, is_change_event
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
@@ -211,6 +211,11 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             image_set_name=image_set_name, image_attributes=image_attributes,
             warped=image_data.data[:], unwarped=image_data.unwarped[:]
         )
+
+    def get_stimulus_presentations(self) -> pd.DataFrame:
+        df = super().get_stimulus_presentations()
+        df['is_change'] = is_change_event(stimulus_presentations=df)
+        return df
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         stim_module = self.nwbfile.processing['stimulus']

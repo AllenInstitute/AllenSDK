@@ -7,7 +7,7 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates)
+    get_stimulus_templates, is_change_event)
 from allensdk.brain_observatory.behavior.stimulus_processing\
     .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
@@ -394,3 +394,51 @@ def test_get_visual_stimuli_df(behavior_stimuli_time_fixture,
 
     expected_df = pd.DataFrame.from_dict(expected_data)
     assert stimuli_df.equals(expected_df)
+
+
+def test_is_change_event_no_change():
+    """Test case for no change"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'A', 'A'],
+        'omitted': [False, False, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, False], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_event_all_change():
+    """Test case for all change"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C'],
+        'omitted': [False, False, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, True, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_omission():
+    """Test case for single omission"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C'],
+        'omitted': [False, True, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_mult_omission():
+    """Test case for multiple omission"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C', 'D'],
+        'omitted': [False, True, True, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, False, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)

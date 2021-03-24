@@ -19,7 +19,7 @@ from allensdk.brain_observatory.behavior.session_apis.abcs.\
     BehaviorDataExtractorBase
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
-    StimulusTemplate)
+    StimulusTemplate, is_change_event)
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials_from_data_transform)
 from allensdk.core.exceptions import DataFrameIndexError
@@ -212,6 +212,9 @@ class BehaviorDataTransforms(BehaviorBase):
             raise ValueError("Length of `stim_pres_df` should not change after"
                              f" merge; was {len(raw_stim_pres_df)}, now "
                              f" {len(stim_pres_df)}.")
+
+        stim_pres_df['is_change'] = is_change_event(
+            stimulus_presentations=stim_pres_df)
 
         # Sort columns then drop columns which contain only all NaN values
         return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')

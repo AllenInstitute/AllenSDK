@@ -488,3 +488,40 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     df = pd.concat((visual_stimuli_df, omitted_df),
                    sort=False).sort_values('frame').reset_index()
     return df
+
+
+def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
+    """
+    Returns whether a stimulus is a change stimulus
+    A change stimulus is defined as the first presentation of a new image_name
+    Omitted stimuli are ignored
+    The first stimulus in the session is ignored
+
+    :param stimulus_presentations
+        The stimulus presentations table
+
+    :return: is_change: pd.Series indicating whether a given stimulus is a
+        change stimulus
+    """
+    stimuli = stimulus_presentations['image_name']
+
+    # exclude omitted stimuli
+    stimuli = stimuli[~stimulus_presentations['omitted']]
+
+    prev_stimuli = stimuli.shift()
+
+    # exclude first stimulus
+    stimuli = stimuli.iloc[1:]
+    prev_stimuli = prev_stimuli.iloc[1:]
+
+    is_change = stimuli != prev_stimuli
+
+    # reset back to original index
+    is_change = is_change\
+        .reindex(stimulus_presentations.index)\
+        .rename('is_change')
+
+    # Excluded stimuli are not change events
+    is_change = is_change.fillna(False)
+
+    return is_change
