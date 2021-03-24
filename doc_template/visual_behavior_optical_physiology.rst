@@ -1,28 +1,22 @@
 Visual Behavior - Optical Physiology
 ====================================
 
-VISUAL BEHAVIOR 2P
-==================
-
 The Visual Behavior 2P project used in vivo 2-photon calcium imaging (also 
 called optical physiology, or “ophys”) to measure the activity of populations 
 of genetically identified neurons in the visual cortex of mice performing a 
-visually guided behavioral task (described below). Each population of neurons 
-was imaged repeatedly over multiple days under different sensory and 
-behavioral contexts, including familiar and novel stimuli, as well as active 
-behavior and passive viewing conditions. This dataset can be used to evaluate 
-the influence of experience, expectation, and task engagement on neural 
-coding, interactions, and dynamics.
+visually guided behavioral task (described below). We used single- and 
+multi-plane imaging approaches to record the activity of populations of 
+excitatory neurons and two inhibitory classes, Somatostatin (Sst) and 
+Vasoactive Intestinal Peptide (Vip) expressing interneurons, across 
+multiple cortical depths and visual areas. Each population of neurons was 
+imaged repeatedly over multiple days under different sensory and behavioral 
+contexts, including familiar and novel stimuli, as well as active behavior 
+and passive viewing conditions. This dataset can be used to evaluate the 
+influence of experience, expectation, and task engagement on neural coding 
+and dynamics.  
 
 .. image:: /_static/visual_behavior_2p/datasets.png
    :align: center
-
-We used single- and multi-plane imaging approaches to record the activity 
-of populations of excitatory neurons and two inhibitory classes, Somatostatin 
-(Sst) and Vasoactive Intestinal Peptide (Vip) expressing interneurons, across 
-multiple cortical depths and visual areas.  
-
-[FIND AND ADD GOOD VERSION OF CRE LINE FOVS IMAGE]
 
 While 2-photon imaging data was acquired in well-trained mice, the full 
 behavioral training history of all imaged mice is also provided, allowing 
@@ -56,20 +50,20 @@ data access and subsequent analysis.
 
 To get started, check out these jupyter notebooks to learn how to:
 
-1) Download data using the AllenSDK or directly from our Amazon S3 bucket
-2) Identify experiments of interest using the dataset manifest
+1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
+2) `Identify experiments of interest using the dataset manifest <_static/examples/nb/visual_behavior_ophys_dataset_manifest.html>`_
 3) Load and visualize data from a 2-photon imaging experiment
-4) Load and visualize data from a behavior training session
-5) Examine the full training history of one mouse
-6) Align neural data timeseries with stimulus and behavior events (Doug’s notebook)
-7) Get data from all imaging planes in one multi-plane imaging session and look at correlations across areas
-8) Get all data acquired for one 2-photon field of view and examine how cell activity changes between sessions
+4) Examine the full training history of one mouse 
+5) Compare behavior and neural activity across different trial types in the task 
 
 For a quick summary of experimental design and data access, see the 
 `cheat sheet <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/0f/5d/0f5d22c9-f8f6-428c-9f7a-2983631e72b4/neuropixels_cheat_sheet_nov_2019.pdf>`_.
 
 For detailed information about the experimental design, data acquisition, 
-and informatics methods, please refer to our technical whitepaper.
+and informatics methods, please refer to our technical whitepaper. If you 
+have questions about the dataset that aren’t addressed by the whitepaper 
+or any of our tutorials, please reach out by posting at 
+https://community.brain-map.org/  
 
 CHANGE DETECTION TASK
 ---------------------
@@ -151,7 +145,8 @@ of GCaMP6 expressing cells in populations of excitatory
 (Vip-IRES-Cre;Ai148(TIT2L-GC6f-ICL-tTA2) & Sst-IRES-Cre;Ai148(TIT2L-GC6f-ICL-tTA2)) 
 neurons. Imaging took place between 75-400um below the cortical surface. 
 
-[FIND THE OTHER GOOD MULTISCOPE IMAGE]
+.. image:: /_static/visual_behavior_2/cre_lines.png
+   :align: center
 
 The data collected in a single continuous recording is defined as a 
 **session**. For single-plane imaging experiments, there is only one 
@@ -159,7 +154,7 @@ imaging plane (referred to as an **experiment**) per session. For
 multi-plane imaging experiments, there can be up to 8 imaging planes 
 (aka 8 experiments) per session. Due to our strict QC process, described 
 below, not all multi-plane imaging sessions have exactly 8 experiments, 
-as some imaging planes did not meet our r data quality criteria. 
+as some imaging planes did not meet our data quality criteria. 
 
 We aimed to track the activity of single neurons across the session 
 types described above by targeting the same population of neurons over 

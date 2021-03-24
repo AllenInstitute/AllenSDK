@@ -75,72 +75,36 @@ If this is an NWB strictly containing behavior data, then that will be all. If t
 
 HDFView provides a very efficient way to browse the contents of an NWB file.
 
-Organization of data
---------------------
-
-This data release was based on three different sets of stimuli, name 'A', 'B' and 'C'. 
-
-Stimulus A included:
-
-   1) Drifting grating (30 minutes over 3 intervals)
-   2) Natural movie (20 minutes over 2 intervals)
-   3) Natural movie (5 minutes in 1 interval)
-   4) Spontaneous activity (5 minutes in 1 interval)
-
-This was presented as: (1) (2) (3) (1) (2) (4) (1) (2)
-
-Stimulus B included:
-
-   1) Static gratings (25 minutes over 3 intervals)
-   2) Natural images (25 minutes over 3 intervals)
-   3) Natural movie (5 minutes in 1 interval)
-   4) Spontaneous activity (5 minutes in 1 interval)
-
-This was presented as: (1) (2) (4) (2) (1) (3) (1) (2)
-
-Stimulus C included:
-
-   1) Locally sparse noise (37 minutes over 3 intervals)
-   2) Natural movie (5 minutes over 1 interval)
-   3) Natural movie (5 minutes over 1 interval)
-   4) Spontaneous activity (10 minutes over 2 intervals)
-
-This was presented as: (1) (4) (2) (1) (3) (4) (1)
-
 Below is a brief description and location for several types of data in the NWB file.
 
-+-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
-| Category  | Data                 | Location                                                | SDK function(s)                              |
-+===========+======================+=========================================================+==============================================+
-| Metadata  | Cre line             | /general/subject/genotype                               | * get_metadata                               |
-+           +----------------------+---------------------------------------------------------+                                              |
-|           | Imaging depth        | /general/optophysiology/imaging_plane_1/imaging_depth   |                                              |
-+           +----------------------+---------------------------------------------------------+                                              |
-|           | Target structure     | /general/targeted_structure                             |                                              |
-+           +----------------------+---------------------------------------------------------+                                              |
-|           | Stimulus session     | /general/session_type                                   |                                              |
-+-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
-| Stimulus  | Locally sparse noise | /stimulus/presentation/locally_sparse_noise_stimulus    | * get_stimulus_table                         |
-|           |                      |                                                         | * get_locally_sparse_noise_stimulus_template |
-+           +----------------------+---------------------------------------------------------+----------------------------------------------+
-|           | Natural movie (1)    | /stimulus/presentation/natural_movie_one_stimulus       | * get_stimulus_table                         |
-+           +----------------------+---------------------------------------------------------+                                              |
-|           | Natural movie (2)    | /stimulus/presentation/natural_movie_two_stimulus       |                                              |
-+           +----------------------+---------------------------------------------------------+----------------------------------------------+
-|           | Gray-screen          | /stimulus/presentation/spontaneous_stimulus             | * get_stimulus_table                         |
-+-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
-| Processed | Motion correction    | /processing/visual_coding_pipeline/MotionCorrection     | * get_motion_correction                      |
-| data      |                      |                                                         |                                              |
-+           +----------------------+---------------------------------------------------------+----------------------------------------------+
-|           | Image segmentation   | /processing/visual_coding_pipeline/ImageSegmentation    | * get_roi_ids                                |
-|           |                      |                                                         | * get_cell_specimen_ids                      |
-|           |                      |                                                         | * get_roi_mask                               |
-+           +----------------------+---------------------------------------------------------+----------------------------------------------+
-|           | Fluorescence         | /processing/visual_coding_pipeline/Fluorescence         | * get_fluorescence_traces                    |
-|           |                      |                                                         | * get_neuropil_traces                        |
-|           |                      |                                                         | * get_corrected_fluorescence_traces          |
-+           +----------------------+---------------------------------------------------------+----------------------------------------------+
-|           | dF/F                 | /processing/visual_coding_pipeline/DfOverF              | * get_dff_traces                             |
-+-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
++-----------+-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+| Category  | Data                  | Location                                                                     | SDK function(s)                              |
++===========+=======================+==============================================================================+==============================================+
+| Metadata  | Cre line              | /general/subject/genotype                                                    |                                              |
++           +-----------------------+------------------------------------------------------------------------------+                                              |
+|           | Imaging depth         | /general/metadata                                                            |                                              |
++           +-----------------------+------------------------------------------------------------------------------+                                              |
+|           | Target structure      |                                                                              |                                              |
++           +-----------------------+------------------------------------------------------------------------------+                                              |
+|           | Session type          | /general/task_parameters                                                     |                                              |
++-----------+-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+| Stimulus  | Natural Images        | /stimulus/presentation/Natural_Images_Lum_Matched_set_training_2017.07.14    |                                              |
+|           |                       |                                                                              |                                              |
++           +-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+|           | Stimulus Distribution | /general/task_parameters                                                     |                                              |
+|           |                       |                                                                              |                                              |
++-----------+-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+| Processed | Motion correction     | /processing/ophys/ophys_motion_correction_x                                  |                                              |
+| data      |                       | /processing/ophys/ophys_motion_correction_y                                  |                                              |
+|           |                       |                                                                              |                                              |
++           +-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+|           | Image segmentation    | /processing/ophys/image_segmentation                                         |                                              |
+|           |                       |                                                                              |                                              |
++           +-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+|           | Fluorescence          | /processing/ophys/corrected_fluorescence                                     |                                              |
+|           |                       |                                                                              |                                              |
++           +-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
+|           | dF/F                  | /processing/ophys/dff                                                        |                                              |
++-----------+-----------------------+------------------------------------------------------------------------------+----------------------------------------------+
 
 

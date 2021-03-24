@@ -13,5 +13,6 @@ come in future updates.
    reference_space
    data_api_client 
    visual_coding_neuropixels
+   visual_behavior_optical_physiology
 
 

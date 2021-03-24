@@ -60,7 +60,7 @@ image change detection task.
      - October 2019
    * - Active
      - Optical physiology
-     - Visual Behavior - Optical Physiology
+     - `Visual Behavior - Optical Physiology <https://allensdk.readthedocs.io/en/latest/visual_behavior_optical_physiology.html>`_
      - March 2021
    * - Active
      - Extracellular electrophysiology
