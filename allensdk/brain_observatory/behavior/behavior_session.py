@@ -228,7 +228,12 @@ class BehaviorSession(LazyPropertyMixin):
             pd.Series(false_alarm_rate, index=not_aborted_index)
 
         # Rolling-dprime:
-        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
+        if self.task_parameters['session_type'].endswith('passive'):
+            # It does not make sense to calculate d' for a passive session
+            # So just set it to zeros
+            rolling_dprime = np.zeros(len(hit_rate))
+        else:
+            rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
         performance_metrics_df['rolling_dprime'] = \
             pd.Series(rolling_dprime, index=not_aborted_index)
 
