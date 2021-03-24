@@ -13,12 +13,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
-    calculate_reward_rate)
-from allensdk.brain_observatory.behavior.dprime import (
-    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
-    get_trial_count_corrected_hit_rate)
-from allensdk.brain_observatory.behavior.dprime import (
-    get_hit_rate, get_false_alarm_rate)
+    construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 
 
 BehaviorDataApi = Type[BehaviorBase]
@@ -128,22 +123,9 @@ class BehaviorSession(LazyPropertyMixin):
             The reward rate (rewards/minute) of the subject for the
             task calculated over a 25 trial rolling window.
         """
-        response_latency_list = []
-        for _, t in self.trials.iterrows():
-            valid_response_licks = \
-                    [x for x in t.lick_times
-                     if x - t.change_time >
-                        self.task_parameters['response_window_sec'][0]]
-            response_latency = (
-                    float('inf')
-                    if len(valid_response_licks) == 0
-                    else valid_response_licks[0] - t.change_time)
-            response_latency_list.append(response_latency)
-        reward_rate = calculate_reward_rate(
-                response_latency=response_latency_list,
-                starttime=self.trials.start_time.values)
-        reward_rate[np.isinf(reward_rate)] = float('nan')
-        return reward_rate
+        return calculate_reward_rate_fix_nans(
+                self.trials,
+                self.task_parameters['response_window_sec'][0])
 
     def get_rolling_performance_df(self) -> pd.DataFrame:
         """Return a DataFrame containing trial by trial behavior response
@@ -181,58 +163,10 @@ class BehaviorSession(LazyPropertyMixin):
                     rolling false_alarm _rate.
 
         """
-        # Indices to build trial metrics dataframe:
-        trials_index = self.trials.index
-        not_aborted_index = \
-            self.trials[np.logical_not(self.trials.aborted)].index
-
-        # Initialize dataframe:
-        performance_metrics_df = pd.DataFrame(index=trials_index)
-
-        # Reward rate:
-        performance_metrics_df['reward_rate'] = \
-            pd.Series(self.get_reward_rate(), index=self.trials.index)
-
-        # Hit rate raw:
-        hit_rate_raw = get_hit_rate(
-            hit=self.trials.hit,
-            miss=self.trials.miss,
-            aborted=self.trials.aborted)
-        performance_metrics_df['hit_rate_raw'] = \
-            pd.Series(hit_rate_raw, index=not_aborted_index)
-
-        # Hit rate with trial count correction:
-        hit_rate = get_trial_count_corrected_hit_rate(
-                hit=self.trials.hit,
-                miss=self.trials.miss,
-                aborted=self.trials.aborted)
-        performance_metrics_df['hit_rate'] = \
-            pd.Series(hit_rate, index=not_aborted_index)
-
-        # False-alarm rate raw:
-        false_alarm_rate_raw = \
-            get_false_alarm_rate(
-                    false_alarm=self.trials.false_alarm,
-                    correct_reject=self.trials.correct_reject,
-                    aborted=self.trials.aborted)
-        performance_metrics_df['false_alarm_rate_raw'] = \
-            pd.Series(false_alarm_rate_raw, index=not_aborted_index)
-
-        # False-alarm rate with trial count correction:
-        false_alarm_rate = \
-            get_trial_count_corrected_false_alarm_rate(
-                    false_alarm=self.trials.false_alarm,
-                    correct_reject=self.trials.correct_reject,
-                    aborted=self.trials.aborted)
-        performance_metrics_df['false_alarm_rate'] = \
-            pd.Series(false_alarm_rate, index=not_aborted_index)
-
-        # Rolling-dprime:
-        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
-        performance_metrics_df['rolling_dprime'] = \
-            pd.Series(rolling_dprime, index=not_aborted_index)
-
-        return performance_metrics_df
+        return construct_rolling_performance_df(
+                self.trials,
+                self.task_parameters['response_window_sec'][0],
+                self.task_parameters["session_type"])
 
     def get_performance_metrics(
             self,
