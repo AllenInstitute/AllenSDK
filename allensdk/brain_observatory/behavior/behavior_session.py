@@ -526,33 +526,39 @@ class BehaviorSession(LazyPropertyMixin):
             A dictionary containing parameters used to define the task runtime
             behavior.
                 auto_reward_volume: (float)
-                    Volume of auto rewards in ml 
+                    Volume of auto rewards in ml.
                 blank_duration_sec : (list of floats)
-                    Duration in seconds of inter stimulus interval
-                    Inter-stimulus interval chosen as a uniform random value between the range defined by the two values
-                    Values are ignored if `stimulus_duration_sec` is null
+                    Duration in seconds of inter stimulus interval.
+                    Inter-stimulus interval chosen as a uniform random value.
+                    between the range defined by the two values.
+                    Values are ignored if `stimulus_duration_sec` is null.
                 response_window_sec: (list of floats)
-                    Range of period following an image change, in seconds, where mouse response influences trial outcome
-                    First value represents response window start
-                    Second value represents response window end
-                    Values represent time before display lag is accounted for and applied
+                    Range of period following an image change, in seconds,
+                    where mouse response influences trial outcome.
+                    First value represents response window start.
+                    Second value represents response window end.
+                    Values represent time before display lag is
+                    accounted for and applied.
                 n_stimulus_frames: (int)
-                    Total number of visual stimulus frames presented during a behavior session 
+                    Total number of visual stimulus frames presented during
+                    a behavior session.
                 task: (string)
-                    Type of visual stimulus task
+                    Type of visual stimulus task.
                 session_type: (string)
-                    Visual stimulus type run during behavior session 
+                    Visual stimulus type run during behavior session.
                 omitted_flash_fraction: (float)
-                    Probability that a stimulus image presentations is omitted. 
-                    Change stimuli, and the stimulus immediately preceding the change, are never omitted.
+                    Probability that a stimulus image presentations is omitted.
+                    Change stimuli, and the stimulus immediately preceding the
+                    change, are never omitted.
                 stimulus_distribution: (string)
-                    Distribution for drawing change times. Either 'exponential' or 'geometric'
+                    Distribution for drawing change times.
+                    Either 'exponential' or 'geometric'.
                 stimulus_duration_sec: (float)
-                    Duration in seconds of each stimulus image presentation 
+                    Duration in seconds of each stimulus image presentation
                 reward_volume: (float)
-                    Volume of earned water reward in ml
+                    Volume of earned water reward in ml.
                 stimulus: (string)
-                    Stimulus type ('gratings' or 'images')
+                    Stimulus type ('gratings' or 'images').
 
         """
         return self._task_parameters
