@@ -1,13 +1,15 @@
-import numpy as np
-import pandas as pd
 import pickle
 import warnings
 from typing import Dict, List, Tuple, Union, Optional
 
+import numpy as np
+import pandas as pd
+
+from allensdk.brain_observatory.behavior.stimulus_processing \
+    .stimulus_templates import \
+    StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.stimulus_processing.util import \
     convert_filepath_caseinsensitive, get_image_set_name
-from allensdk.brain_observatory.behavior.stimulus_processing.stimulus_templates import \
-    StimulusTemplate, StimulusTemplateFactory
 
 
 def load_pickle(pstream):
@@ -149,7 +151,7 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
             'image_set': ['grating'] * len(unique_oris),
             'phase': [phase] * len(unique_oris),
             'spatial_frequency': [correct_freq] * len(unique_oris),
-            'image_index': range(start_idx, start_idx+len(unique_oris), 1)
+            'image_index': range(start_idx, start_idx + len(unique_oris), 1)
         }
         grating_df = pd.DataFrame.from_dict(grating_dict)
     else:
@@ -230,12 +232,12 @@ def get_stimulus_templates(pkl: dict,
         )
     else:
         warnings.warn(
-                "Could not determine stimulus template images from pkl file. "
-                f"The pkl stimuli nested dict "
-                "(pkl['items']['behavior']['stimuli']) contained neither "
-                "'images' nor 'grating' but instead: "
-                f"'{pkl_stimuli.keys()}'"
-            )
+            "Could not determine stimulus template images from pkl file. "
+            f"The pkl stimuli nested dict "
+            "(pkl['items']['behavior']['stimuli']) contained neither "
+            "'images' nor 'grating' but instead: "
+            f"'{pkl_stimuli.keys()}'"
+        )
         return None
 
 
@@ -517,8 +519,8 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     is_change = stimuli != prev_stimuli
 
     # reset back to original index
-    is_change = is_change\
-        .reindex(stimulus_presentations.index)\
+    is_change = is_change \
+        .reindex(stimulus_presentations.index) \
         .rename('is_change')
 
     # Excluded stimuli are not change events
