@@ -237,7 +237,7 @@ class BehaviorSession(LazyPropertyMixin):
     def get_performance_metrics(
             self,
             engaged_trial_reward_rate_threshold: float = 2.0
-        ) -> dict:
+            ) -> dict:
         """Get a dictionary containing a subject's behavior response
         summary data.
 
@@ -382,7 +382,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -401,7 +402,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -422,7 +424,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -442,7 +445,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -498,7 +502,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
