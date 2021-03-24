@@ -250,3 +250,52 @@ def test_BehaviorOphysExperiment_property_data():
 
     assert dataset.ophys_session_id == 959458018
     assert dataset.ophys_experiment_id == 960410026
+
+
+def test_behavior_ophys_experiment_list_data_attributes_and_methods():
+    # Test that data related methods/attributes/properties for
+    # BehaviorOphysExperiment are returned properly.
+
+    # This test will need to be updated if:
+    # 1. Data being returned by class has changed
+    # 2. Inheritance of class has changed
+    expected = {
+        'average_projection',
+        'behavior_session_id',
+        'cache_clear',
+        'cell_specimen_table',
+        'corrected_fluorescence_traces',
+        'dff_traces',
+        'events',
+        'eye_tracking',
+        'eye_tracking_rig_geometry',
+        'get_cell_specimen_ids',
+        'get_cell_specimen_indices',
+        'get_dff_traces',
+        'get_performance_metrics',
+        'get_reward_rate',
+        'get_rolling_performance_df',
+        'get_segmentation_mask_image',
+        'licks',
+        'max_projection',
+        'metadata',
+        'motion_correction',
+        'ophys_experiment_id',
+        'ophys_session_id',
+        'ophys_timestamps',
+        'raw_running_speed',
+        'rewards',
+        'roi_masks',
+        'running_speed',
+        'segmentation_mask_image',
+        'stimulus_presentations',
+        'stimulus_templates',
+        'stimulus_timestamps',
+        'task_parameters',
+        'trials'
+    }
+
+    behavior_ophys_experiment = BehaviorOphysExperiment(api=MagicMock())
+    obt = behavior_ophys_experiment.list_data_attributes_and_methods()
+
+    assert any(expected ^ set(obt)) is False

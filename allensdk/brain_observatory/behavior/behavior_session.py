@@ -88,8 +88,8 @@ class BehaviorSession(LazyPropertyMixin):
         """Convenience method for end-users to list attributes and methods
         that can be called to access data for a BehaviorSession.
 
-        NOTE: Because BehaviorExperiment inherits from BehaviorSession
-        this method was also be available there.
+        NOTE: Because BehaviorOphysExperiment inherits from BehaviorSession,
+        this method will also be available there.
 
         Returns
         -------
