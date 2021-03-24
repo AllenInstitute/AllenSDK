@@ -1,7 +1,6 @@
 import pytest
 
-from allensdk.brain_observatory.behavior.project_apis.data_io import (
-    BehaviorProjectLimsApi)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
 from allensdk.test_utilities.custom_comparators import (
     WhitespaceStrippedString)
 
@@ -22,7 +21,7 @@ class MockQueryEngine:
 
 @pytest.fixture
 def MockBehaviorProjectLimsApi():
-    return BehaviorProjectLimsApi(MockQueryEngine(), MockQueryEngine(), 
+    return BehaviorProjectLimsApi(MockQueryEngine(), MockQueryEngine(),
                                   MockQueryEngine())
 
 
@@ -103,7 +102,7 @@ def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
             -- -- end getting driver line from donors -- --"""))
     ]
 )
-def test_build_line_from_donor_query(line, expected, 
+def test_build_line_from_donor_query(line, expected,
                                      MockBehaviorProjectLimsApi):
     mbp_api = MockBehaviorProjectLimsApi
     assert expected == mbp_api._build_line_from_donor_query(line=line)

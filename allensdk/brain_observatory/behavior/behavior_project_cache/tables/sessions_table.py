@@ -15,8 +15,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     ProjectTable
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
-from allensdk.brain_observatory.behavior.project_apis.data_io import \
-    BehaviorProjectLimsApi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
 
 
 class SessionsTable(ProjectTable):

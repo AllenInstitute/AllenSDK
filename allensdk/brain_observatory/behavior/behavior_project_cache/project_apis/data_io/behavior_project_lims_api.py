@@ -2,8 +2,7 @@ import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable
 import logging
 
-from allensdk.brain_observatory.behavior.project_apis.abcs import (
-    BehaviorProjectBase)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
@@ -328,7 +327,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :type ophys_experiment_id: int
         :rtype: BehaviorOphysExperiment
         """
-        return BehaviorOphysExperiment(BehaviorOphysLimsApi(ophys_experiment_id))
+        return BehaviorOphysExperiment(
+                BehaviorOphysLimsApi(ophys_experiment_id))
 
     def _get_ophys_experiment_table(self) -> pd.DataFrame:
         """
@@ -343,12 +343,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         :rtype: pd.DataFrame
         """
-        query = f"""
+        query = """
             SELECT
                 oe.id as ophys_experiment_id,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
-                oec.visual_behavior_experiment_container_id as 
+                oec.visual_behavior_experiment_container_id as
                     ophys_container_id,
                 pr.code as project_code,
                 vbc.workflow_state as container_workflow_state,
@@ -458,7 +458,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             to include
         :rtype: pd.DataFrame
         """
-        return self._get_ophys_experiment_table().set_index("ophys_experiment_id")
+        df = self._get_ophys_experiment_table()
+        return df.set_index("ophys_experiment_id")
 
     def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
@@ -490,7 +491,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             -columns file_id and isilon filepath
         """
         if self.data_release_date is None:
-            raise RuntimeError(f'data_release_date must be set in constructor')
+            raise RuntimeError('data_release_date must be set in constructor')
 
         if file_type not in ('BehaviorNwb', 'BehaviorOphysNwb'):
             raise ValueError(f'cannot retrieve file type {file_type}')
@@ -498,31 +499,31 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if file_type == 'BehaviorNwb':
             attachable_id_alias = 'behavior_session_id'
             select_clause = f'''
-                SELECT attachable_id as {attachable_id_alias}, id as file_id, 
+                SELECT attachable_id as {attachable_id_alias}, id as file_id,
                     filename, storage_directory
             '''
             join_clause = ''
         else:
             attachable_id_alias = 'ophys_experiment_id'
             select_clause = f'''
-                SELECT attachable_id as {attachable_id_alias}, 
-                    bs.id as behavior_session_id, wkf.id as file_id, 
+                SELECT attachable_id as {attachable_id_alias},
+                    bs.id as behavior_session_id, wkf.id as file_id,
                     filename, wkf.storage_directory
             '''
-            join_clause = f'''
+            join_clause = """
                 JOIN ophys_experiments oe ON oe.id = attachable_id
                 JOIN ophys_sessions os ON os.id = oe.ophys_session_id
                 JOIN behavior_sessions bs on bs.ophys_session_id = os.id
-            '''
+            """
 
         query = f'''
             {select_clause}
             FROM well_known_files wkf
             {join_clause}
-            WHERE published_at = '{self.data_release_date}' AND 
+            WHERE published_at = '{self.data_release_date}' AND
                 well_known_file_type_id IN (
-                    SELECT id 
-                    FROM well_known_file_types 
+                    SELECT id
+                    FROM well_known_file_types
                     WHERE name = '{file_type}'
                 );
         '''

@@ -3,8 +3,7 @@ import pandas as pd
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from allensdk.brain_observatory.behavior.project_apis.data_io import \
-        behavior_project_cloud_api as cloudapi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import behavior_project_cloud_api as cloudapi  # noqa: E501
 
 
 class MockCache():
