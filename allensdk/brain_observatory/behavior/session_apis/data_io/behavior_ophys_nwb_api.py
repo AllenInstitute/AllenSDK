@@ -1,5 +1,4 @@
 import datetime
-import uuid
 import warnings
 from typing import Optional
 
@@ -12,25 +11,25 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
+from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+    import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.metadata_processing import (
+from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
     get_expt_description
 )
-from allensdk.brain_observatory.behavior.session_apis.abcs import (
-    BehaviorOphysBase
-)
+from allensdk.brain_observatory.behavior.session_apis.abcs.session_base. \
+    behavior_ophys_base import BehaviorOphysBase
 from allensdk.brain_observatory.behavior.schemas import (
-    BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema,
-    OphysEyeTrackingRigMetadataSchema)
+    BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
 from allensdk.brain_observatory.behavior.trials_processing import (
     TRIAL_COLUMN_DESCRIPTION_DICT
 )
 from allensdk.brain_observatory.nwb import TimeSeries
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
-        EllipseEyeTracking, EllipseSeries)
-from allensdk.brain_observatory.behavior.write_nwb.extensions\
+    EllipseEyeTracking, EllipseSeries)
+from allensdk.brain_observatory.behavior.write_nwb.extensions \
     .event_detection.ndx_ophys_events import OphysEventDetection
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -41,15 +40,13 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     determine_outliers, determine_likely_blinks
 )
 
-
-load_pynwb_extension(OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
 
 class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
     """A data fetching class that serves as an API for fetching 'raw'
     data from an NWB file that is both necessary and sufficient for filling
-    a 'BehaviorOphysSession'.
+    a 'BehaviorOphysExperiment'.
     """
 
     def __init__(self, *args, **kwargs):
@@ -57,13 +54,18 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         super().__init__(*args, **kwargs)
 
     def save(self, session_object):
+        # Cannot type session_object due to a circular dependency
+        # TODO fix circular dependency and add type
 
-        session_type = str(session_object.metadata['session_type'])
+        session_metadata: BehaviorOphysMetadata = \
+            session_object.api.get_metadata()
+
+        session_type = session_metadata.session_type
 
         nwbfile = NWBFile(
             session_description=session_type,
             identifier=str(session_object.ophys_experiment_id),
-            session_start_time=session_object.metadata['experiment_datetime'],
+            session_start_time=session_metadata.date_of_acquisition,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=["2-photon", "calcium imaging", "visual cortex",
@@ -173,17 +175,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         return nwbfile
 
-    def get_nwb_metadata(self) -> dict:
-        metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-        data = OphysBehaviorMetadataSchema(
-            exclude=['experiment_datetime']).dump(metadata_nwb_obj)
-        return data
-
     def get_behavior_session_id(self) -> int:
-        return self.get_nwb_metadata()['behavior_session_id']
+        return self.get_metadata()['behavior_session_id']
 
     def get_ophys_session_id(self) -> int:
-        return self.get_nwb_metadata()['ophys_session_id']
+        return self.get_metadata()['ophys_session_id']
 
     def get_ophys_experiment_id(self) -> int:
         return int(self.nwbfile.identifier)
@@ -274,9 +270,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             dilation_frames=dilation_frames)
 
         eye_tracking_data["likely_blink"] = likely_blinks
-        eye_tracking_data["eye_area"][likely_blinks] = np.nan
-        eye_tracking_data["pupil_area"][likely_blinks] = np.nan
-        eye_tracking_data["cr_area"][likely_blinks] = np.nan
+        eye_tracking_data.at[likely_blinks, "eye_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "pupil_area"] = np.nan
+        eye_tracking_data.at[likely_blinks, "cr_area"] = np.nan
 
         return eye_tracking_data
 
@@ -319,14 +315,14 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
 
         rig_geometry = {
             f"monitor_position_{meta.monitor_position__unit_of_measurement}":
-            monitor_position,
+                monitor_position,
             f"camera_position_{meta.camera_position__unit_of_measurement}":
-            camera_position,
+                camera_position,
             "led_position": led_position,
             f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
-            monitor_rotation,
+                monitor_rotation,
             f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
-            camera_rotation,
+                camera_rotation,
             "equipment": meta.equipment
         }
 
@@ -348,16 +344,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                               'ophys', image_api=image_api)
 
     def get_metadata(self) -> dict:
-        data = self.get_nwb_metadata()
-
-        # Add pyNWB Subject metadata to behavior ophys session metadata
-        nwb_subject = self.nwbfile.subject
-        data['LabTracks_ID'] = int(nwb_subject.subject_id)
-        data['sex'] = nwb_subject.sex
-        data['age'] = nwb_subject.age
-        data['full_genotype'] = nwb_subject.genotype
-        data['reporter_line'] = sorted(list(nwb_subject.reporter_line))
-        data['driver_line'] = sorted(list(nwb_subject.driver_line))
+        data = super().get_metadata()
 
         # Add pyNWB OpticalChannel and ImagingPlane metadata to behavior ophys
         # session metadata
@@ -388,10 +375,6 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         else:
             data["imaging_plane_group"] = nwb_imaging_plane_group
 
-        # Add other metadata stored in nwb file to behavior ophys session meta
-        data['experiment_datetime'] = self.nwbfile.session_start_time
-        data['behavior_session_uuid'] = uuid.UUID(
-            data['behavior_session_uuid'])
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
@@ -467,8 +450,8 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # 1. Add rig geometry
         if eye_tracking_rig_geometry:
             self.add_eye_tracking_rig_geometry_data_to_nwbfile(
-                    nwbfile=nwbfile,
-                    eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+                nwbfile=nwbfile,
+                eye_tracking_rig_geometry=eye_tracking_rig_geometry)
 
         # 2. Add eye tracking
         eye_tracking = EllipseSeries(
@@ -536,11 +519,11 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         equipment: A string describing rig
         """
         eye_tracking_rig_mod = pynwb.ProcessingModule(
-                name='eye_tracking_rig_metadata',
-                description='Eye tracking rig metadata module')
+            name='eye_tracking_rig_metadata',
+            description='Eye tracking rig metadata module')
 
         ophys_eye_tracking_rig_metadata = load_pynwb_extension(
-                OphysEyeTrackingRigMetadataSchema, 'ndx-aibs-behavior-ophys')
+            OphysEyeTrackingRigMetadataSchema, 'ndx-aibs-behavior-ophys')
 
         rig_metadata = ophys_eye_tracking_rig_metadata(
             name="eye_tracking_rig_metadata",

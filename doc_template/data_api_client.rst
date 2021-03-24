@@ -113,7 +113,7 @@ The .itertuples method is one way to do it.
 Caching Queries on Disk
 -----------------------
 
-:py:meth:`~allensdk.api.cache.Cache.wrap` has several parameters for querying the API,
+:py:meth:`~allensdk.api.warehouse_cache.cache.Cache.wrap` has several parameters for querying the API,
 saving the results as CSV or JSON and reading the results as a pandas dataframe.
 
 .. literalinclude:: examples_root/examples/data_api_client_ex.py

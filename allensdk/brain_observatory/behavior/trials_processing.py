@@ -269,7 +269,7 @@ def get_trial_timing(
         Dictionary of trial events in the well-known `pkl` file
     licks: List[float]
         list of lick timestamps, from the `get_licks` response for
-        the BehaviorOphysSession.api.
+        the BehaviorOphysExperiment.api.
     go: bool
         True if "go" trial, False otherwise. Mutually exclusive with
         `catch`.

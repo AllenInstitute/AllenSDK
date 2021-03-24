@@ -43,7 +43,7 @@ from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 
 from .rma_template import RmaTemplate
-from ..cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from .rma_pager import pageable
 
 from dateutil.parser import parse as parse_date

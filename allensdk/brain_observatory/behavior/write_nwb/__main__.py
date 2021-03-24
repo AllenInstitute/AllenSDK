@@ -4,8 +4,8 @@ import sys
 import argschema
 import marshmallow
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import (
-    BehaviorOphysSession)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysJsonApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.write_nwb._schemas import (
@@ -32,22 +32,22 @@ def write_behavior_ophys_nwb(session_data: dict,
     try:
         json_api = BehaviorOphysJsonApi(data=session_data,
                                         skip_eye_tracking=skip_eye_tracking)
-        json_session = BehaviorOphysSession(api=json_api)
+        json_session = BehaviorOphysExperiment(api=json_api)
         lims_api = BehaviorOphysLimsApi(
             ophys_experiment_id=session_data['ophys_experiment_id'],
             skip_eye_tracking=skip_eye_tracking)
-        lims_session = BehaviorOphysSession(api=lims_api)
+        lims_session = BehaviorOphysExperiment(api=lims_api)
 
-        logging.info("Comparing a BehaviorOphysSession created from JSON "
-                     "with a BehaviorOphysSession created from LIMS")
+        logging.info("Comparing a BehaviorOphysExperiment created from JSON "
+                     "with a BehaviorOphysExperiment created from LIMS")
         assert sessions_are_equal(json_session, lims_session, reraise=True)
 
         BehaviorOphysNwbApi(nwb_filepath_inprogress).save(json_session)
 
-        logging.info("Comparing a BehaviorOphysSession created from JSON "
-                     "with a BehaviorOphysSession created from NWB")
+        logging.info("Comparing a BehaviorOphysExperiment created from JSON "
+                     "with a BehaviorOphysExperiment created from NWB")
         nwb_api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
-        nwb_session = BehaviorOphysSession(api=nwb_api)
+        nwb_session = BehaviorOphysExperiment(api=nwb_api)
         assert sessions_are_equal(json_session, nwb_session, reraise=True)
 
         os.rename(nwb_filepath_inprogress, nwb_filepath)

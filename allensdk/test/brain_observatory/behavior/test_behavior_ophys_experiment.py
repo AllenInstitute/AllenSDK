@@ -8,8 +8,8 @@ import numpy as np
 from imageio import imread
 from unittest.mock import MagicMock
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import \
-    BehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import \
     BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
@@ -32,7 +32,7 @@ from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 ])
 def test_session_from_json(tmpdir_factory, session_data, get_expected,
                            get_from_session):
-    session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
+    session = BehaviorOphysExperiment(api=BehaviorOphysJsonApi(session_data))
 
     expected = get_expected(session_data)
     obtained = get_from_session(session)
@@ -51,10 +51,10 @@ def test_nwb_end_to_end(tmpdir_factory):
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp(tmpdir)),
                                 'nwbfile.nwb')
 
-    d1 = BehaviorOphysSession.from_lims(oeid)
+    d1 = BehaviorOphysExperiment.from_lims(oeid)
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
-    d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
+    d2 = BehaviorOphysExperiment(api=BehaviorOphysNwbApi(nwb_filepath))
 
     assert sessions_are_equal(d1, d2, reraise=True)
 
@@ -62,7 +62,7 @@ def test_nwb_end_to_end(tmpdir_factory):
 @pytest.mark.nightly
 def test_visbeh_ophys_data_set():
     ophys_experiment_id = 789359614
-    data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    data_set = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
 
     # TODO: need to improve testing here:
     # for _, row in data_set.roi_metrics.iterrows():
@@ -73,7 +73,7 @@ def test_visbeh_ophys_data_set():
 
     # All sorts of assert relationships:
     assert data_set.api.extractor.get_foraging_id() == \
-        str(data_set.api.get_behavior_session_uuid())
+        str(data_set.api.get_metadata().behavior_session_uuid)
 
     stimulus_templates = data_set._stimulus_templates
     assert len(stimulus_templates) == 8
@@ -105,25 +105,28 @@ def test_visbeh_ophys_data_set():
         'ophys_session_id': 789220000,
         'session_type': 'OPHYS_6_images_B',
         'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
+        'cre_line': 'Slc17a7-IRES2-Cre',
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
-        'experiment_datetime': pytz.utc.localize(
+        'date_of_acquisition': pytz.utc.localize(
             datetime.datetime(2018, 11, 30, 23, 28, 37)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
-        'LabTracks_ID': 416369,
+        'mouse_id': 416369,
         'experiment_container_id': 814796558,
         'targeted_structure': 'VISp',
-        'reporter_line': ['Ai93(TITL-GCaMP6f)'],
+        'reporter_line': 'Ai93(TITL-GCaMP6f)',
         'emission_lambda': 520.0,
         'excitation_lambda': 910.0,
         'field_of_view_height': 512,
         'field_of_view_width': 447,
-        'indicator': 'GCAMP6f',
-        'rig_name': 'CAM2P.5',
-        'age': 'P139',
+        'indicator': 'GCaMP6f',
+        'equipment_name': 'CAM2P.5',
+        'age_in_days': 139,
         'sex': 'F',
-        'imaging_plane_group': None}
+        'imaging_plane_group': None,
+        'project_code': 'VisualBehavior'
+    }
     assert data_set.metadata == expected_metadata
     assert data_set.task_parameters == {'reward_volume': 0.007,
                                         'stimulus_distribution': u'geometric',
@@ -142,7 +145,7 @@ def test_visbeh_ophys_data_set():
 def test_legacy_dff_api():
     ophys_experiment_id = 792813858
     api = BehaviorOphysLimsApi(ophys_experiment_id)
-    session = BehaviorOphysSession(api)
+    session = BehaviorOphysExperiment(api)
 
     _, dff_array = session.get_dff_traces()
     for csid in session.dff_traces.index.values:
@@ -159,7 +162,7 @@ def test_legacy_dff_api():
     pytest.param(792813858, 129)
 ])
 def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
-    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    session = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
     df = session.stimulus_presentations
     assert df['omitted'].sum() == number_omitted
 
@@ -172,7 +175,7 @@ def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
 ])
 def test_trial_response_window_bounds_reward(ophys_experiment_id):
     api = BehaviorOphysLimsApi(ophys_experiment_id)
-    session = BehaviorOphysSession(api)
+    session = BehaviorOphysExperiment(api)
     response_window = session.task_parameters['response_window_sec']
     for _, row in session.trials.iterrows():
 
@@ -199,7 +202,7 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
 def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
     mock = MagicMock()
     mock.get_eye_tracking.return_value = pd.DataFrame([1, 2, 3])
-    session = BehaviorOphysSession(
+    session = BehaviorOphysExperiment(
         api=mock,
         eye_tracking_z_threshold=z_threshold,
         eye_tracking_dilation_frames=dilation_frames)
@@ -220,7 +223,7 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
 @pytest.mark.requires_bamboo
 def test_event_detection():
     ophys_experiment_id = 789359614
-    session = BehaviorOphysSession.from_lims(
+    session = BehaviorOphysExperiment.from_lims(
         ophys_experiment_id=ophys_experiment_id)
     events = session.events
 
@@ -238,3 +241,12 @@ def test_event_detection():
     # All events are the same length
     event_length = len(set([len(x) for x in events['events']]))
     assert event_length == 1
+
+
+@pytest.mark.requires_bamboo
+def test_BehaviorOphysExperiment_property_data():
+    ophys_experiment_id = 960410026
+    dataset = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
+
+    assert dataset.ophys_session_id == 959458018
+    assert dataset.ophys_experiment_id == 960410026

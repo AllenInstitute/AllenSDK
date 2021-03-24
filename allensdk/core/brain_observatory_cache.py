@@ -40,7 +40,7 @@ import pandas as pd
 
 from pathlib import Path
 
-from allensdk.api.cache import Cache, get_default_manifest_file
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet

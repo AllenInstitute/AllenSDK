@@ -59,7 +59,7 @@ class TestBehaviorSession:
                         " `cache_clear` does not exist on DummyApi")
         self.behavior_session.cache_clear()
         assert caplog.record_tuples == [
-            ("BehaviorOphysSession", logging.WARNING, expected_msg)]
+            ("BehaviorSession", logging.WARNING, expected_msg)]
 
     def test_cache_clear_no_warning(self, caplog):
         caplog.clear()

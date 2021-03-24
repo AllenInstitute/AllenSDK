@@ -8,7 +8,7 @@ import SimpleITK as sitk
 import numpy as np
 import pynwb
 
-from allensdk.api.cache import Cache
+from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.core.authentication import DbCredentials
 from allensdk.brain_observatory.ecephys.ecephys_project_api import (
     EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi,
@@ -22,7 +22,7 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import (
 )
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
-from allensdk.api.caching_utilities import one_file_call_caching
+from allensdk.api.warehouse_cache.caching_utilities import one_file_call_caching
 
 
 class EcephysProjectCache(Cache):

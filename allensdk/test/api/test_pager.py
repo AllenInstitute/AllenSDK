@@ -44,7 +44,7 @@ from six.moves import builtins
 import os
 import simplejson as json
 from allensdk.api.queries.rma_template import RmaTemplate
-from allensdk.api.cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import cacheable, Cache
 try:
     import StringIO
 except:

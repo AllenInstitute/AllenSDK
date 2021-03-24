@@ -5,7 +5,7 @@ from typing import Optional
 
 from allensdk.internal.api import (
     OneOrMoreResultExpectedError, db_connection_creator)
-from allensdk.api.cache import memoize
+from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 from allensdk.core.authentication import DbCredentials
@@ -16,11 +16,11 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
     """A data fetching class that serves as an API for fetching 'raw'
     data from LIMS for filling optical physiology data. This data is
     is necessary (but not sufficient) to fill the 'Ophys' portion of a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
 
     This class needs to be inherited by the BehaviorOphysLimsApi and also
     have methods from BehaviorOphysDataTransforms in order to be usable by a
-    BehaviorOphysSession.
+    BehaviorOphysExperiment.
     """
 
     def __init__(self, ophys_experiment_id: int,
@@ -201,7 +201,7 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
         return stimulus_name
 
     @memoize
-    def get_experiment_date(self) -> datetime:
+    def get_date_of_acquisition(self) -> datetime:
         """Get the acquisition date of an ophys experiment"""
         query = """
                 SELECT os.date_of_acquisition
@@ -398,18 +398,6 @@ class OphysLimsExtractor(CachedInstanceMethodMixin):
                 FROM ophys_experiments oe
                 LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
-                """.format(self.get_ophys_experiment_id())
-        return self.lims_db.fetchone(query, strict=True)
-
-    @memoize
-    def get_rig_name(self) -> str:
-        """Get the name of the experiment rig (ex: CAM2P.3)"""
-        query = """
-                SELECT e.name AS device_name
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-                JOIN equipment e ON e.id = os.equipment_id
-                WHERE oe.id = {};
                 """.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=True)
 

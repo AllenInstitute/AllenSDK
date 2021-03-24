@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from allensdk.brain_observatory.behavior.session_apis.abcs import \
+from allensdk.brain_observatory.behavior.session_apis.abcs.\
+    data_extractor_base.behavior_ophys_data_extractor_base import \
     BehaviorOphysDataExtractorBase
 from allensdk.brain_observatory.behavior.session_apis.data_io import \
     BehaviorJsonExtractor
@@ -12,7 +13,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
 class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
     """A data fetching and processing class that serves processed data from
     a specified raw data source (extractor). Contains all methods
-    needed to fill a BehaviorOphysSession."""
+    needed to fill a BehaviorOphysExperiment."""
 
     def __init__(self, data: dict, skip_eye_tracking: bool = False):
         extractor = BehaviorOphysJsonExtractor(data=data)
@@ -23,11 +24,11 @@ class BehaviorOphysJsonApi(BehaviorOphysDataTransforms):
 class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
                                  BehaviorOphysDataExtractorBase):
     """A class which 'extracts' data from a json file. The extracted data
-    is necessary (but not sufficient) for populating a 'BehaviorOphysSession'.
+    is necessary (but not sufficient) for populating a 'BehaviorOphysExperiment'.
 
     Most data provided by this extractor needs to be processed by
     BehaviorOphysDataTransforms methods in order to usable by
-    'BehaviorOphysSession's.
+    'BehaviorOphysExperiment's.
 
     This class is used by the write_nwb module for behavior ophys sessions.
     """
@@ -63,7 +64,7 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         return {'height': self.data['movie_height'],
                 'width': self.data['movie_width']}
 
-    def get_experiment_container_id(self) -> int:
+    def get_ophys_container_id(self) -> int:
         """Get the experiment container id associated with an ophys
         experiment"""
         return self.data['container_id']
@@ -137,3 +138,6 @@ class BehaviorOphysJsonExtractor(BehaviorJsonExtractor,
         """Get the filepath of the .h5 events file associated with an ophys
         experiment"""
         return self.data['events_file']
+
+    def get_project_code(self) -> str:
+        raise NotImplementedError('Not exposed externally')

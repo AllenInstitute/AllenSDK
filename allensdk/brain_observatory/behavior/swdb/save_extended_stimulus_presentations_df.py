@@ -3,9 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_ophys_session import (
-    BehaviorOphysSession,
-)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 
@@ -207,7 +206,7 @@ if __name__ == "__main__":
         # experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
         nwb_path = cache.get_nwb_filepath(experiment_id)
         api = BehaviorOphysNwbApi(nwb_path)
-        session = BehaviorOphysSession(api)
+        session = BehaviorOphysExperiment(api)
 
         #  output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final"
         output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/corrected_extended_stim"
@@ -228,7 +227,7 @@ if __name__ == "__main__":
         #  nwb_path = cache.get_nwb_filepath(success_oeid)
         nwb_path = cache.get_nwb_filepath(failed_oeid)
         api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois = True)
-        session = BehaviorOphysSession(api)
+        session = BehaviorOphysExperiment(api)
 
         extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
 

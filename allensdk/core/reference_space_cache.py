@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache
+from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.deprecated import deprecated
