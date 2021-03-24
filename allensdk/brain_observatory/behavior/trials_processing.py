@@ -8,6 +8,10 @@ import pandas as pd
 import numpy as np
 
 from allensdk import one
+from allensdk.brain_observatory.behavior.dprime import (
+    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate,
+    get_hit_rate, get_false_alarm_rate)
 
 # TODO: add trial column descriptions
 TRIAL_COLUMN_DESCRIPTION_DICT = {}
@@ -1170,3 +1174,131 @@ def get_extended_trials(data, time=None):
                                   metadata=data_to_metadata(data, time),
                                   time=time,
                                   licks=data_to_licks(data, time))
+
+
+def calculate_response_latency_list(trials,
+                                    response_window_start):
+    response_latency_list = []
+    for _, t in trials.iterrows():
+        valid_response_licks = \
+                [x for x in t.lick_times
+                 if x - t.change_time > response_window_start]
+        response_latency = (
+                float('inf')
+                if len(valid_response_licks) == 0
+                else valid_response_licks[0] - t.change_time)
+        response_latency_list.append(response_latency)
+    return response_latency_list
+
+
+def calculate_reward_rate_fix_nans(trials,
+                                   response_window_start):
+    response_latency_list = calculate_response_latency_list(
+            trials,
+            response_window_start)
+    reward_rate = calculate_reward_rate(
+            response_latency=response_latency_list,
+            starttime=trials.start_time.values)
+    reward_rate[np.isinf(reward_rate)] = float('nan')
+    return reward_rate
+
+
+def construct_rolling_performance_df(trials: pd.DataFrame,
+                                     response_window_start,
+                                     session_type) -> pd.DataFrame:
+    """Return a DataFrame containing trial by trial behavior response
+    performance metrics.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing:
+            trials_id [index]:
+                Index of the trial. All trials, including aborted trials,
+                are assigned an index starting at 0 for the first trial.
+            reward_rate:
+                Rewards earned in the previous 25 trials, normalized by
+                the elapsed time of the same 25 trials. Units are
+                rewards/minute.
+            hit_rate_raw:
+                Fraction of go trials where the mouse licked in the
+                response window, calculated over the previous 100
+                non-aborted trials. Without trial count correction applied.
+            hit_rate:
+                Fraction of go trials where the mouse licked in the
+                response window, calculated over the previous 100
+                non-aborted trials. With trial count correction applied.
+            false_alarm_rate_raw:
+                Fraction of catch trials where the mouse licked in the
+                response window, calculated over the previous 100
+                non-aborted trials. Without trial count correction applied.
+            false_alarm_rate:
+                Fraction of catch trials where the mouse licked in
+                the response window, calculated over the previous 100
+                non-aborted trials. Without trial count correction applied.
+            rolling_dprime:
+                d prime calculated using the rolling hit_rate and
+                rolling false_alarm _rate.
+
+    """
+    reward_rate = calculate_reward_rate_fix_nans(
+            trials,
+            response_window_start)
+
+    # Indices to build trial metrics dataframe:
+    trials_index = trials.index
+    not_aborted_index = \
+        trials[np.logical_not(trials.aborted)].index
+
+    # Initialize dataframe:
+    performance_metrics_df = pd.DataFrame(index=trials_index)
+
+    # Reward rate:
+    performance_metrics_df['reward_rate'] = \
+        pd.Series(reward_rate, index=trials.index)
+
+    # Hit rate raw:
+    hit_rate_raw = get_hit_rate(
+        hit=trials.hit,
+        miss=trials.miss,
+        aborted=trials.aborted)
+    performance_metrics_df['hit_rate_raw'] = \
+        pd.Series(hit_rate_raw, index=not_aborted_index)
+
+    # Hit rate with trial count correction:
+    hit_rate = get_trial_count_corrected_hit_rate(
+            hit=trials.hit,
+            miss=trials.miss,
+            aborted=trials.aborted)
+    performance_metrics_df['hit_rate'] = \
+        pd.Series(hit_rate, index=not_aborted_index)
+
+    # False-alarm rate raw:
+    false_alarm_rate_raw = \
+        get_false_alarm_rate(
+                false_alarm=trials.false_alarm,
+                correct_reject=trials.correct_reject,
+                aborted=trials.aborted)
+    performance_metrics_df['false_alarm_rate_raw'] = \
+        pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+
+    # False-alarm rate with trial count correction:
+    false_alarm_rate = \
+        get_trial_count_corrected_false_alarm_rate(
+                false_alarm=trials.false_alarm,
+                correct_reject=trials.correct_reject,
+                aborted=trials.aborted)
+    performance_metrics_df['false_alarm_rate'] = \
+        pd.Series(false_alarm_rate, index=not_aborted_index)
+
+    # Rolling-dprime:
+    if session_type.endswith('passive'):
+        # It does not make sense to calculate d' for a passive session
+        # So just set it to zeros
+        rolling_dprime = np.zeros(len(hit_rate))
+    else:
+        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
+    performance_metrics_df['rolling_dprime'] = \
+        pd.Series(rolling_dprime, index=not_aborted_index)
+
+    return performance_metrics_df
