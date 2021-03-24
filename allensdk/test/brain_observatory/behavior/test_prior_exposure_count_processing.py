@@ -25,7 +25,7 @@ def test_prior_exposure_to_image_set():
     """Tests normal behavior as well as case where session type is not an
     image set type"""
     df = pd.DataFrame({
-        'session_type': ['OPHYS_1_images_A', 'OPHYS_2_images_A_passive',
+        'session_type': ['TRAINING_1_images_A', 'OPHYS_2_images_A_passive',
                          'foo', 'OPHYS_3_images_A', 'B'],
         'mouse_id': [0, 0, 0, 0, 1],
         'date_of_acquisition': [0, 1, 2, 3, 0]
