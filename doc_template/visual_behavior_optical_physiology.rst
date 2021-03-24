@@ -51,13 +51,13 @@ data access and subsequent analysis.
 To get started, check out these jupyter notebooks to learn how to:
 
 1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
-2) `Identify experiments of interest using the dataset manifest <_static/examples/nb/visual_behavior_ophys_dataset_manifest.html>`_
-3) Load and visualize data from a 2-photon imaging experiment
-4) Examine the full training history of one mouse 
-5) Compare behavior and neural activity across different trial types in the task 
+2) `Identify experiments of interest using the dataset manifest <_static/examples/nb/visual_behavior_ophys_dataset_manifest.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_dataset_manifest.ipynb>`_
+3) `Load and visualize data from a 2-photon imaging experiment <_static/examples/nb/visual_behavior_load_ophys_data.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_load_ophys_data.ipynb>`_
+4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_
+5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
 
 For a quick summary of experimental design and data access, see the 
-`cheat sheet <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/0f/5d/0f5d22c9-f8f6-428c-9f7a-2983631e72b4/neuropixels_cheat_sheet_nov_2019.pdf>`_.
+`further documentation <https://alleninstitute.sharepoint.com/:w:/s/VisualBehaviorAIBS/EUkWXB9X8wZKleIGtsviscMBTgesWXsrHESs84Ye9FvqzQ?e=Jm7GmA>`_.
 
 For detailed information about the experimental design, data acquisition, 
 and informatics methods, please refer to our technical whitepaper. If you 
