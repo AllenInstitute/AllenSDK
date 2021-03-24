@@ -42,8 +42,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     """
 
     def __get_image_set_name(session_type: Optional[str]):
-        match = re.match(r'OPHYS_\d+_images_(?P<image_set>\w)',
-                         session_type)
+        match = re.match(r'.*images_(?P<image_set>\w)', session_type)
         if match is None:
             return None
         return match.group('image_set')
