@@ -5,8 +5,7 @@ import logging
 import ast
 import semver
 
-from allensdk.brain_observatory.behavior.project_apis.abcs import (
-    BehaviorProjectBase)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
