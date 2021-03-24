@@ -1176,8 +1176,25 @@ def get_extended_trials(data, time=None):
                                   licks=data_to_licks(data, time))
 
 
-def calculate_response_latency_list(trials,
-                                    response_window_start):
+def calculate_response_latency_list(
+        trials: pd.DataFrame, response_window_start: float) -> List:
+    """per trial, detemines a response latency
+
+    Parameters
+    ----------
+    trials: pd.DataFrame
+        contains columns "lick_times" and "change_times"
+    response_window_start: float
+        [seconds] relative to the non-display-lag-compensated presentation
+        of the change-image
+
+    Returns
+    -------
+    response_latency_list: list
+        len() = trials.shape[0]
+        value is 'inf' if there are no valid licks in the trial
+
+    """
     response_latency_list = []
     for _, t in trials.iterrows():
         valid_response_licks = \
@@ -1191,8 +1208,25 @@ def calculate_response_latency_list(trials,
     return response_latency_list
 
 
-def calculate_reward_rate_fix_nans(trials,
-                                   response_window_start):
+def calculate_reward_rate_fix_nans(
+        trials: pd.DataFrame, response_window_start: float) -> np.ndarray:
+    """per trial, detemines the reward rate, replacing infs with nans
+
+    Parameters
+    ----------
+    trials: pd.DataFrame
+        contains columns "lick_times", "change_times", and "start_time"
+    response_window_start: float
+        [seconds] relative to the non-display-lag-compensated presentation
+        of the change-image
+
+    Returns
+    -------
+    reward_rate: np.ndarray
+        size = trials.shape[0]
+        value is nan if calculate_reward_rate evaluates to 'inf'
+
+    """
     response_latency_list = calculate_response_latency_list(
             trials,
             response_window_start)
@@ -1208,6 +1242,16 @@ def construct_rolling_performance_df(trials: pd.DataFrame,
                                      session_type) -> pd.DataFrame:
     """Return a DataFrame containing trial by trial behavior response
     performance metrics.
+
+    Parameters
+    ----------
+    trials: pd.DataFrame
+        contains columns "lick_times", "change_times", and "start_time"
+    response_window_start: float
+        [seconds] relative to the non-display-lag-compensated presentation
+        of the change-image
+    session_type: str
+        used to check if this was a passive session
 
     Returns
     -------
