@@ -35,19 +35,47 @@ The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and M
 Allen Brain Observatory
 -----------------------
 
-The `Allen Brain Observatory <http://observatory.brain-map.org/visualcoding>`_ is a data resource for
-understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
-responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons 
-targeted using Cre driver lines.  Response characterizations include orientation tuning, spatial and temporal
-frequency tuning, temporal dynamics, and spatial receptive field structure.
+The Allen Brain Observatory is a collection of data resources for understanding sensory 
+processing in the mouse visual cortex.  These resources systematically measure visual 
+responses in multiple cortical areas and layers using two-photon calcium imaging or 
+high-density extracellular electrophysiology (Neuropixels) probes.  Recordings are 
+performed on mice passively viewing visual stimuli or trained to actively perform an 
+image change detection task.
+
+.. list-table:: 
+   :widths: 25 50 50 25
+   :header-rows: 1
+
+   * - Behavior
+     - Modality
+     - Resource
+     - Initial Release
+   * - Passive
+     - Optical physiology
+     - `Visual Coding - Optical Physiology <https://allensdk.readthedocs.io/en/latest/brain_observatory.html>`_
+     - June 2016
+   * - Passive
+     - Extracellular electrophysiology
+     - `Visual Coding - Neuropixels <https://allensdk.readthedocs.io/en/latest/visual_coding_neuropixels.html>`_
+     - October 2019
+   * - Active
+     - Optical physiology
+     - `Visual Behavior - Optical Physiology <https://allensdk.readthedocs.io/en/latest/visual_behavior_optical_physiology.html>`_
+     - March 2021
+   * - Active
+     - Extracellular electrophysiology
+     - Visual Behavior - Neuropixels
+     - Coming soon...
  
-The mean fluorescence traces for all segmented cells are available in the Neurodata Without Borders file format 
-(`NWB files <brain_observatory_nwb.html>`_).  These files contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  The Allen SDK provides code to:
+Experiment and stimulus data are provided in `Neurodata Without Borders <https://www.nwb.org/>`_ (NWB) files. 
+The AllenSDK provides code to:
 
    * download and organize experiment data according to cortical area, imaging depth, and Cre line
-   * remove the contribution of neuropil signal from fluorescence traces
-   * access (or compute) dF/F traces based on the neuropil-corrected traces
-   * perform stimulus-specific tuning analysis (e.g. drifting grating direction tuning)
+   * access experiment metadata and data streams
+   * transform and analyze data
+
+More information about each study is provided in the linked pages. A web-based entry point to 
+the Visual Coding – Optical physiology data is available at http://observatory.brain-map.org/visualcoding .
 
 ....
 

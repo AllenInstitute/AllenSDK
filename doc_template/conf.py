@@ -216,10 +216,9 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_domain_indices = True
+# latex_domain_indices = True
 
-
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output -------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
@@ -229,10 +228,9 @@ man_pages = [
 ]
 
 # If true, show URL addresses after external links.
-#man_show_urls = False
+# man_show_urls = False
 
-
-# -- Options for Texinfo output ------------------------------------------------
+# -- Options for Texinfo output -----------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
@@ -305,11 +303,12 @@ autodoc_mock_imports = ["tables"]
 
 
 def skip_autodoc(app, what, name, obj, skip, options):
-    #TODO: also check obj/module name, documentation isn't great though,
+    # TODO: also check obj/module name, documentation isn't great though,
     # see: http://sphinx-doc.org/ext/autodoc.html
     skip_explicit = name in skip_autodoc_names
-    
+
     return skip or skip_explicit
+
 
 def render_notebooks(_):
     nb_root = os.path.abspath('examples_root/examples/nb')
@@ -318,16 +317,16 @@ def render_notebooks(_):
             nb = os.path.join(nb_root, filename)
             nb_html = nb.replace("ipynb","html")
             os.system('jupyter-nbconvert --to html %s --output %s' % (nb, nb_html))
-            
+
+
 def run_apidoc(_):
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     module = os.path.join(cur_dir,"..","allensdk")
     os.system('sphinx-apidoc -e -o %s %s --force' % (cur_dir, module))
 
+
 def setup(app):
     app.connect('autodoc-skip-member', skip_autodoc)
     app.connect('builder-inited', render_notebooks)
     app.connect('builder-inited', run_apidoc)
-
-    
