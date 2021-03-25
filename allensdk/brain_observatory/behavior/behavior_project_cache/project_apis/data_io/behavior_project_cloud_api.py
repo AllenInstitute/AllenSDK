@@ -15,12 +15,13 @@ from allensdk import __version__ as sdk_version
 
 
 # [min inclusive, max exclusive)
-COMPATIBILITY = {
-    "pipeline_versions": {
-        "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]},
-        "2.10.0": {"AllenSDK": ["2.10.0", "3.0.0"]}
-    }
-}
+COMPATIBILITY = [
+        {
+            "data_pipeline_min": "2.9.0",
+            "data_pipeline_max": "3.0.0",
+            "AllenSDK_min": "2.9.0",
+            "AllenSDK_max": "3.0.0"},
+        ]
 
 
 class BehaviorCloudCacheVersionException(Exception):
@@ -52,6 +53,7 @@ def version_check(pipeline_versions: List[Dict[str, str]],
     BehaviorCloudCacheVersionException
 
     """
+    # read version from data
     pipeline_version = [i for i in pipeline_versions
                         if "AllenSDK" == i["name"]]
     if len(pipeline_version) != 1:
@@ -59,14 +61,29 @@ def version_check(pipeline_versions: List[Dict[str, str]],
                 "expected to find 1 and only 1 entry for `AllenSDK` "
                 "in the manifest.data_pipeline metadata. "
                 f"found {len(pipeline_version)}")
-    pipeline_version = pipeline_version[0]["version"]
-    if pipeline_version not in compatibility["pipeline_versions"]:
+    v_data = semver.VersionInfo.parse(pipeline_version[0]["version"])
+
+    # compare to compatibility list
+    nmatch = 0
+    index = None
+    for ic, c_entry in enumerate(compatibility):
+        dmin = semver.VersionInfo.parse(c_entry["data_pipeline_min"])
+        dmax = semver.VersionInfo.parse(c_entry["data_pipeline_max"])
+        if (v_data >= dmin) & (v_data < dmax):
+            index = ic
+            nmatch += 1
+
+    if nmatch != 1:
         raise BehaviorCloudCacheVersionException(
-                f"no version compatibility listed for {pipeline_version}")
-    version_limits = compatibility["pipeline_versions"][pipeline_version]
-    smin = semver.VersionInfo.parse(version_limits["AllenSDK"][0])
-    smax = semver.VersionInfo.parse(version_limits["AllenSDK"][1])
-    if (sdk_version < smin) | (sdk_version >= smax):
+                "expected 1 version compatibility to match "
+                f"{pipeline_version} but found {nmatch} matches.")
+
+    # check that current SDK matches
+    v_sdk = semver.VersionInfo.parse(sdk_version)
+    c_entry = compatibility[index]
+    smin = semver.VersionInfo.parse(c_entry["AllenSDK_min"])
+    smax = semver.VersionInfo.parse(c_entry["AllenSDK_max"])
+    if (v_sdk < smin) | (v_sdk >= smax):
         raise BehaviorCloudCacheVersionException(
             f"""
             The version of the visual-behavior-ophys data files (specified

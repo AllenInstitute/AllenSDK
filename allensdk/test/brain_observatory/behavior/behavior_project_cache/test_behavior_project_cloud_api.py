@@ -147,8 +147,11 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     "name": "AllenSDK",
                     "version": "2.9.0"}],
                 "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}},
+                [{
+                    "data_pipeline_min": "2.9.0",
+                    "data_pipeline_max": "3.0.0",
+                    "AllenSDK_min": "2.9.0",
+                    "AllenSDK_max": "3.0.0"}],
                 None,
                 ""),
             (
@@ -156,8 +159,11 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     "name": "AllenSDK",
                     "version": "2.9.0"}],
                 "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.9.1", "3.0.0"]}}},
+                [{
+                    "data_pipeline_min": "2.9.0",
+                    "data_pipeline_max": "3.0.0",
+                    "AllenSDK_min": "2.9.1",
+                    "AllenSDK_max": "3.0.0"}],
                 cloudapi.BehaviorCloudCacheVersionException,
                 r".*version be >=2.9.1 and <3.0.0.*"),
             (
@@ -165,19 +171,25 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                     "name": "AllenSDK",
                     "version": "2.9.0"}],
                 "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                [{
+                    "data_pipeline_min": "2.9.0",
+                    "data_pipeline_max": "3.0.0",
+                    "AllenSDK_min": "2.8.0",
+                    "AllenSDK_max": "2.9.0"}],
                 cloudapi.BehaviorCloudCacheVersionException,
                 r".*version be >=2.8.0 and <2.9.0.*"),
             (
                 [{
                     "name": "AllenSDK",
-                    "version": "2.10.0"}],
+                    "version": "3.1.0"}],
                 "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                [{
+                    "data_pipeline_min": "2.9.0",
+                    "data_pipeline_max": "3.0.0",
+                    "AllenSDK_min": "2.8.0",
+                    "AllenSDK_max": "2.9.0"}],
                 cloudapi.BehaviorCloudCacheVersionException,
-                r"no version compatibility .*"),
+                r".*found 0 matches.*"),
             (
                 [{
                     "name": "AllenSDK",
@@ -186,8 +198,11 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
                      "name": "AllenSDK",
                      "version": "2.10.1"}],
                 "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
+                [{
+                    "data_pipeline_min": "2.9.0",
+                    "data_pipeline_max": "3.0.0",
+                    "AllenSDK_min": "2.8.0",
+                    "AllenSDK_max": "2.9.0"}],
                 cloudapi.BehaviorCloudCacheVersionException,
                 r"expected to find 1 and only 1 .*"),
             ])
