@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Iterable, Union, Dict, List, Optional
+from typing import Iterable, Union, List, Optional
 from pathlib import Path
 import logging
 import ast
@@ -11,90 +11,30 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
-from allensdk import __version__ as sdk_version
 
 
 # [min inclusive, max exclusive)
-COMPATIBILITY = [
-        {
-            "data_pipeline_min": "2.9.0",
-            "data_pipeline_max": "3.0.0",
-            "AllenSDK_min": "2.9.0",
-            "AllenSDK_max": "3.0.0"},
-        ]
+MANIFEST_COMPATIBILITY = ["0.0.0", "1.0.0"]
 
 
 class BehaviorCloudCacheVersionException(Exception):
     pass
 
 
-def version_check(pipeline_versions: List[Dict[str, str]],
-                  sdk_version: str = sdk_version,
-                  compatibility: Dict[str, Dict] = COMPATIBILITY):
-    """given a pipeline_versions list (from manifest) determine
-    the pipeline version of AllenSDK used to write the data. Lookup
-    the compatibility limits, and check the the running version of
-    AllenSDK meets those limits.
-
-    Parameters
-    ----------
-    pipeline_versions: List[Dict[str, str]]:
-        each element has keys name, version, (and comment - not used here)
-    sdk_version: str
-        typically the current return value for allensdk.__version__
-    compatibility_dict: Dict
-        keys (under 'pipeline_versions' key) are specific version numbers to
-        match a pipeline version for AllenSDK from the manifest. values
-        specify the min (inclusive) and max (exclusive) limits for
-        interoperability
-
-    Raises
-    ------
-    BehaviorCloudCacheVersionException
-
-    """
-    # read version from data
-    pipeline_version = [i for i in pipeline_versions
-                        if "AllenSDK" == i["name"]]
-    if len(pipeline_version) != 1:
-        raise BehaviorCloudCacheVersionException(
-                "expected to find 1 and only 1 entry for `AllenSDK` "
-                "in the manifest.data_pipeline metadata. "
-                f"found {len(pipeline_version)}")
-    v_data = semver.VersionInfo.parse(pipeline_version[0]["version"])
-
-    # compare to compatibility list
-    nmatch = 0
-    index = None
-    for ic, c_entry in enumerate(compatibility):
-        dmin = semver.VersionInfo.parse(c_entry["data_pipeline_min"])
-        dmax = semver.VersionInfo.parse(c_entry["data_pipeline_max"])
-        if (v_data >= dmin) & (v_data < dmax):
-            index = ic
-            nmatch += 1
-
-    if nmatch != 1:
-        raise BehaviorCloudCacheVersionException(
-                "expected 1 version compatibility to match "
-                f"{pipeline_version} but found {nmatch} matches.")
-
-    # check that current SDK matches
-    v_sdk = semver.VersionInfo.parse(sdk_version)
-    c_entry = compatibility[index]
-    smin = semver.VersionInfo.parse(c_entry["AllenSDK_min"])
-    smax = semver.VersionInfo.parse(c_entry["AllenSDK_max"])
-    if (v_sdk < smin) | (v_sdk >= smax):
-        raise BehaviorCloudCacheVersionException(
-            f"""
-            The version of the visual-behavior-ophys data files (specified
-            in path_to_users_current_release_manifest) requires that your
-            AllenSDK version be >={smin} and <{smax}.
-            Your version of AllenSDK is: {sdk_version}.
-            If you want to use the specified manifest to retrieve data, please
-            upgrade or downgrade AllenSDK to the range specified.
-            If you just want to get the latest version of visual-behavior-ophys
-            data please upgrade to the latest AllenSDK version and try this
-            process again.""")
+def version_check(manifest_version: str,
+                  data_pipeline_version: str,
+                  cmin: str = MANIFEST_COMPATIBILITY[0],
+                  cmax: str = MANIFEST_COMPATIBILITY[1]):
+    mver_parsed = semver.VersionInfo.parse(manifest_version)
+    cmin_parsed = semver.VersionInfo.parse(cmin)
+    cmax_parsed = semver.VersionInfo.parse(cmax)
+    if (mver_parsed < cmin_parsed) | (mver_parsed >= cmax_parsed):
+        estr = (f"the manifest has manifest_version {manifest_version} but "
+                "this version of AllenSDK is compatible only with manifest "
+                f"versions {cmin} <= X < {cmax}. \n"
+                "Consider using a version of AllenSDK closer to the version "
+                f"used to release the data: {data_pipeline_version}")
+        raise BehaviorCloudCacheVersionException(estr)
 
 
 def literal_col_eval(df: pd.DataFrame,
@@ -137,18 +77,25 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                  "ophys_session_table",
                                  "ophys_experiment_table"])
         self.cache = cache
+
         if cache._manifest.metadata_file_names is None:
             raise RuntimeError("S3CloudCache object has no metadata "
                                "file names. BehaviorProjectCloudApi "
                                "expects a S3CloudCache passed which "
                                "has already run load_manifest()")
         cache_metadata = set(cache._manifest.metadata_file_names)
+
         if cache_metadata != expected_metadata:
             raise RuntimeError("expected S3CloudCache object to have "
                                f"metadata file names: {expected_metadata} "
                                f"but it has {cache_metadata}")
+
         if not skip_version_check:
-            version_check(self.cache._manifest._data_pipeline)
+            data_sdk_version = [i for i in cache._manifest._data_pipeline
+                                if i['name'] == "AllenSDK"][0]["version"]
+            version_check(cache._manifest.version, data_sdk_version)
+
+        #    version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
         self._local = local
         self._get_ophys_session_table()
