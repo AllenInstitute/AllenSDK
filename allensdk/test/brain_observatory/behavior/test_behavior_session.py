@@ -1,5 +1,6 @@
 import logging
 
+from unittest.mock import MagicMock
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 
@@ -66,3 +67,33 @@ class TestBehaviorSession:
         bs = SimpleBehaviorSession(api=DummyApiCache())
         bs.cache_clear()
         assert len(caplog.record_tuples) == 0
+
+
+def test_behavior_session_list_data_attributes_and_methods():
+    # Test that data related methods/attributes/properties for
+    # BehaviorSession are returned properly.
+
+    # This test will need to be updated if:
+    # 1. Data being returned by class has changed
+    # 2. Inheritance of class has changed
+    expected = {
+        'behavior_session_id',
+        'get_performance_metrics',
+        'get_reward_rate',
+        'get_rolling_performance_df',
+        'licks',
+        'metadata',
+        'raw_running_speed',
+        'rewards',
+        'running_speed',
+        'stimulus_presentations',
+        'stimulus_templates',
+        'stimulus_timestamps',
+        'task_parameters',
+        'trials'
+    }
+
+    behavior_session = BehaviorSession(api=MagicMock())
+    obt = behavior_session.list_data_attributes_and_methods()
+
+    assert any(expected ^ set(obt)) is False

@@ -11,7 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .sessions_table import \
     SessionsTable
-from allensdk.brain_observatory.behavior.project_apis.data_io import (
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
     BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
     one_file_call_caching, call_caching

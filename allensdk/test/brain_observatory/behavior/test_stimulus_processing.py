@@ -1,14 +1,14 @@
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
 
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates)
-from allensdk.brain_observatory.behavior.stimulus_processing\
+    get_stimulus_templates, is_change_event)
+from allensdk.brain_observatory.behavior.stimulus_processing \
     .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
@@ -33,21 +33,23 @@ def behavior_stimuli_time_fixture(request):
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
-            ('Image', 'im062', 348.5941232265203, 12)],
+            ('Image', 'im062', 348.5941232265203, 12)
+        ],
              'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 0, 18, (0, 6)),
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
-            ('Image', 'im062', 348.5941232265203, 12)],
+            ('Image', 'im062', 348.5941232265203, 12)
+        ],
              'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          2, 11, 18, (11, 18))
     ], indirect=["behavior_stimuli_data_fixture"]
 )
 def test_get_stimulus_epoch(behavior_stimuli_data_fixture,
                             current_set_ix, start_frame, n_frames, expected):
-    log = (behavior_stimuli_data_fixture["items"]["behavior"]["stimuli"]
-    ["images"]["set_log"])
+    items = behavior_stimuli_data_fixture["items"]
+    log = items["behavior"]["stimuli"]["images"]["set_log"]
     actual = _get_stimulus_epoch(log, current_set_ix, start_frame, n_frames)
     assert actual == expected
 
@@ -58,32 +60,37 @@ def test_get_stimulus_epoch(behavior_stimuli_data_fixture,
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
-            ('Image', 'im062', 348.5941232265203, 12)],
-            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            ('Image', 'im062', 348.5941232265203, 12)
+        ],
+             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 6, [(1, 4)], 'images'),
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
-            ('Image', 'im062', 348.5941232265203, 12)],
-            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            ('Image', 'im062', 348.5941232265203, 12)
+        ],
+             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 11, [(1, 4), (8, 11)], 'images'),
         ({'images_set_log': [
             ('Image', 'im065', 5.809955710916157, 0),
             ('Image', 'im061', 314.06612555068784, 6),
-            ('Image', 'im062', 348.5941232265203, 12)],
-            'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            ('Image', 'im062', 348.5941232265203, 12)
+        ],
+             'images_draw_log': ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 22, [(1, 4), (8, 11), (15, 18)], 'images'),
         ({"grating_set_log": [
             ("Ori", 90, 3.585, 0),
             ("Ori", 180, 40.847, 6),
-            ("Ori", 270, 62.633, 12)],
-            "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            ("Ori", 270, 62.633, 12)
+        ],
+             "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          0, 6, [(1, 4)], 'grating'),
         ({"grating_set_log": [
             ("Ori", 90.0, 3.585, 0),
             ("Ori", 180.0, 40.847, 6),
-            ("Ori", 270.0, 62.633, 12)],
-            "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
+            ("Ori", 270.0, 62.633, 12)
+        ],
+             "grating_draw_log": ([0] + [1] * 3 + [0] * 3) * 3 + [0]},
          6, 11, [(8, 11)], 'grating')
     ], indirect=['behavior_stimuli_data_fixture']
 )
@@ -136,11 +143,12 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
 
 @pytest.mark.parametrize(("behavior_stimuli_data_fixture, "
                           "grating_images_dict, expected"), [
-    ({"has_images": False},
-     {"gratings_90.0": {"warped": np.ones((2, 2)),
-                        "unwarped": np.ones((2, 2)) * 2}},
-     {}),
-], indirect=["behavior_stimuli_data_fixture"])
+                             ({"has_images": False},
+                              {"gratings_90.0": {"warped": np.ones((2, 2)),
+                                                 "unwarped": np.ones(
+                                                     (2, 2)) * 2}},
+                              {}),
+                         ], indirect=["behavior_stimuli_data_fixture"])
 def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture,
                                              grating_images_dict, expected):
     templates = get_stimulus_templates(behavior_stimuli_data_fixture,
@@ -198,7 +206,8 @@ def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture,
                               }),
                              ({"grating_set_log": [
                                  ("Ori", 90.0, 3.5, 0),
-                                 ("Ori", 270.0, 15, 6)],
+                                 ("Ori", 270.0, 15, 6)
+                             ],
                                   "grating_phase": 0.5,
                                   "grating_spatial_frequency": 12},
                               [], 12,
@@ -226,9 +235,10 @@ def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture,
                               }),
                              ({"grating_set_log":
                                  [
-                                     ("Ori", 90, 3, 0)],
-                                  "grating_phase": 0.5,
-                                  "grating_spatial_frequency": 0.25},
+                                     ("Ori", 90, 3, 0)
+                                 ],
+                                 "grating_phase": 0.5,
+                                 "grating_spatial_frequency": 0.25},
                               [], 0,
                               {
                                   'image_category': {0: 'grating'},
@@ -272,7 +282,7 @@ def test_get_gratings_metadata(behavior_stimuli_data_fixture, remove_stimuli,
                                              'grating', 'omitted'],
                                'phase': [10, 10, 10, None],
                                'spatial_frequency': [90, 90,
-                                             90, None],
+                                                     90, None],
                                'orientation': [90, 180, 270, None]}),
                              ({}, ['images', 'grating'],
                               {'image_index': [0],
@@ -312,8 +322,9 @@ def test_get_stimulus_metadata(behavior_stimuli_data_fixture,
                                       ("Ori", 90, 3.5, 0),
                                       ("Ori", 270, 15, 6)
                                   ],
-                                  "grating_draw_log": (([0] + [1] * 3 + [0] * 3)
-                                                       * 2 + [0])},
+                                  "grating_draw_log": (
+                                          ([0] + [1] * 3 + [0] * 3)
+                                          * 2 + [0])},
                               {"duration": [3.0, 2.0, 3.0, 2.0],
                                "end_frame": [5.0, 5.0, 12.0, 12.0],
                                "image_name": [np.NaN, 'im065', np.NaN,
@@ -352,8 +363,9 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
                                       ("Ori", 90, 3.5, 0),
                                       ("Ori", 270, 15, 6)
                                   ],
-                                  "grating_draw_log": (([0] + [1] * 3 + [0] * 3)
-                                                       * 2 + [0])},
+                                  "grating_draw_log": (
+                                          ([0] + [1] * 3 + [0] * 3)
+                                          * 2 + [0])},
                               {"orientation": [90, None, 270, None],
                                "image_name": [None, 'im065', None, 'im064'],
                                "frame": [2.0, 3.0, 9.0, 10.0],
@@ -362,19 +374,22 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
                                "duration": [3.0, 2.0, 3.0, 2.0],
                                "omitted": [False, False, False, False]}),
 
-                              # test case with images and a static grating
-                              ({"timestamp_count": 30, "time_step": 1},
+                             # test case with images and a static grating
+                             ({"timestamp_count": 30, "time_step": 1},
                               {"images_set_log": [
                                   ('Image', 'im065', 5, 0),
                                   ('Image', 'im064', 25, 6)
                               ],
                                   "images_draw_log": (([0] * 2 + [1] * 2 +
-                                                       [0] * 3) * 2 + [0]*16),
+                                                       [0] * 3) * 2 + [
+                                                          0] * 16),
                                   "grating_set_log": [
-                                      ("Ori", 90, -1, 12),  # -1 because that element is not used
+                                      ("Ori", 90, -1, 12),
+                                      # -1 because that element is not used
                                       ("Ori", 270, -1, 24)
                                   ],
-                                  "grating_draw_log": ([0]*17 + [1]*11 + [0, 0])},
+                                  "grating_draw_log": (
+                                          [0] * 17 + [1] * 11 + [0, 0])},
                               {"orientation": [None, None, 90, 270],
                                "image_name": ['im065', 'im064', None, None],
                                "frame": [3.0, 10.0, 18.0, 25.0],
@@ -394,3 +409,51 @@ def test_get_visual_stimuli_df(behavior_stimuli_time_fixture,
 
     expected_df = pd.DataFrame.from_dict(expected_data)
     assert stimuli_df.equals(expected_df)
+
+
+def test_is_change_event_no_change():
+    """Test case for no change"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'A', 'A'],
+        'omitted': [False, False, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, False], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_event_all_change():
+    """Test case for all change"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C'],
+        'omitted': [False, False, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, True, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_omission():
+    """Test case for single omission"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C'],
+        'omitted': [False, True, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_is_change_mult_omission():
+    """Test case for multiple omission"""
+    stimulus_presentations = pd.DataFrame({
+        'image_name': ['A', 'B', 'C', 'D'],
+        'omitted': [False, True, True, False]
+    })
+
+    obtained = is_change_event(stimulus_presentations=stimulus_presentations)
+    expected = pd.Series([False, False, False, True], name='is_change')
+    pd.testing.assert_series_equal(obtained, expected)

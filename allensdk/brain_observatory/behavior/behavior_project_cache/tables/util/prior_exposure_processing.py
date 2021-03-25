@@ -3,8 +3,7 @@ from typing import Optional
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.project_apis.data_io import \
-    BehaviorProjectLimsApi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
 
 
 def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
@@ -43,8 +42,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     """
 
     def __get_image_set_name(session_type: Optional[str]):
-        match = re.match(r'OPHYS_\d+_images_(?P<image_set>\w)',
-                         session_type)
+        match = re.match(r'.*images_(?P<image_set>\w)', session_type)
         if match is None:
             return None
         return match.group('image_set')

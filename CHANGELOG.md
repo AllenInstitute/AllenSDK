@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.10.2] = TBD
+- update documentation to support visual behavior data release
+- Fixes a bug with the dictionary returned by BehaviorSession get get_performance_metrics() method
+- Adds docstrings to the BehaviorSession get_performance_metrics(), get_rolling_performance_df(), and get_reward_rate() methods
+
 ## [2.10.1] = 2021-03-23
 - changes name of BehaviorProjectCache to VisualBehaviorOphysProjectCache
 - changes VisualBehaviorOphysProjectCache method get_session_table() to get_ophys_session_table()

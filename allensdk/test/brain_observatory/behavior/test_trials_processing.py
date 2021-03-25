@@ -670,3 +670,69 @@ def test_input_validation(monkeypatch):
                         assert method_name in error.value.args[0]
                     else:
                         assert method_name not in error.value.args[0]
+
+
+@pytest.mark.parametrize(
+        "trials, response_window_start, expected",
+        [
+            (
+                pd.DataFrame({
+                    "change_time": [1, 2, 3, 4],
+                    "lick_times": [[1.1], [2.1, 2.2], [3.3, 3.4], [4.4]]}),
+                0.0,
+                [0.1, 0.1, 0.3, 0.4]),
+            (
+                pd.DataFrame({
+                    "change_time": [1, 2, 3, 4],
+                    "lick_times": [[1.1], [], [3.3, 3.4], [4.4]]}),
+                0.0,
+                [0.1, float("inf"), 0.3, 0.4]),
+            (
+                pd.DataFrame({
+                    "change_time": [1, 2, 3, 4],
+                    "lick_times": [[1.1], [], [3.3, 3.4], [4.4]]}),
+                0.15,
+                [float("inf"), float("inf"), 0.3, 0.4]),
+            ])
+def test_calculate_response_latency_list(
+        trials, response_window_start, expected):
+    latencies = trials_processing.calculate_response_latency_list(
+            trials, response_window_start)
+    np.testing.assert_allclose(latencies, expected)
+
+
+@pytest.fixture
+def trials_example():
+    """minimal example for test_construct_rolling_performance_df
+    """
+    trials_dict = {
+            'start_time': {
+                8: 368.305066913832,
+                9: 378.0631642451044,
+                10: 386.31999971927144,
+                11: 394.57686825376004},
+            'lick_times': {
+                8: np.array([]),
+                9: np.array([]),
+                10: np.array([]),
+                11: np.array([])},
+            'hit': {8: False, 9: False, 10: False, 11: False},
+            'false_alarm': {8: False, 9: False, 10: False, 11: False},
+            'miss': {8: True, 9: False, 10: True, 11: True},
+            'aborted': {8: False, 9: False, 10: False, 11: False},
+            'correct_reject': {8: False, 9: True, 10: False, 11: False}}
+    return pd.DataFrame(trials_dict)
+
+
+@pytest.mark.parametrize("session_type", ["OPHYS_5_images_B_passive",
+                                          "OPHYS_5_images_B"])
+def test_construct_rolling_performance_df(trials_example, session_type):
+    """tests that ending a session_type with "passive" replaces
+    rolling_dprime values with all zeros
+    """
+    df = trials_processing.construct_rolling_performance_df(
+            trials_example, 0.15, session_type)
+    if session_type.endswith("passive"):
+        assert np.all(df["rolling_dprime"].values == 0.0)
+    else:
+        assert not np.all(df["rolling_dprime"].values == 0.0)
