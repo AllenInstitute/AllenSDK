@@ -4,13 +4,13 @@ Visual Behavior - Optical Physiology
 The Visual Behavior 2P project used in vivo 2-photon calcium imaging (also 
 called optical physiology, or “ophys”) to measure the activity of populations 
 of genetically identified neurons in the visual cortex of mice performing a 
-visually guided behavioral task (described below). We used single- and 
+visually guided behavioral task (image change detection, described below). We used single- and 
 multi-plane imaging approaches to record the activity of populations of 
 excitatory neurons and two inhibitory classes, Somatostatin (Sst) and 
 Vasoactive Intestinal Peptide (Vip) expressing interneurons, across 
-multiple cortical depths and visual areas. Each population of neurons was 
+multiple cortical depths and two visual areas (VSIp and VISl). Each population of neurons was 
 imaged repeatedly over multiple days under different sensory and behavioral 
-contexts, including familiar and novel stimuli, as well as active behavior 
+contexts, including with familiar and novel stimuli, as well as active behavior 
 and passive viewing conditions. This dataset can be used to evaluate the 
 influence of experience, expectation, and task engagement on neural coding 
 and dynamics.  
@@ -43,13 +43,13 @@ First, `install or update the AllenSDK <https://allensdk.readthedocs.io/en/lates
 our Python based toolkit for accessing and working with Allen Institute datasets.
 
 Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloaded using the AllenSDK, 
-or accessed directly via this S3 bucket. Regardless of which method of file 
+or accessed directly via an S3 bucket (instructions provided in notebook #1 below). Regardless of which method of file 
 download you choose, we recommend that you load and interact with the data 
 using the tools provided in the AllenSDK, which have been designed to simplify 
 data access and subsequent analysis. No knowledge of the NWB file format is required.
 
 Specific information about how Visual Behavior Optical Physiology data is stored 
-in NWB files and how AllenSDK accesses NWB files can be found: `here <visual_behavior_ophys_nwb.html>`_.
+in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
 
 To get started, check out these jupyter notebooks to learn how to:
 
@@ -59,12 +59,13 @@ To get started, check out these jupyter notebooks to learn how to:
 4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_
 5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
 
-For a quick summary of experimental design and data access, see the 
+For a description of available AllenSDK methods and attributes for data access, see this 
 `further documentation <https://alleninstitute.sharepoint.com/:w:/s/VisualBehaviorAIBS/EUkWXB9X8wZKleIGtsviscMBTgesWXsrHESs84Ye9FvqzQ?e=Jm7GmA>`_.
 
 For detailed information about the experimental design, data acquisition, 
-and informatics methods, please refer to our technical whitepaper. If you 
-have questions about the dataset that aren’t addressed by the whitepaper 
+and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/4e/be/4ebe2911-bd38-4230-86c8-01a86cfd758e/visual_behavior_2p_technical_whitepaper.pdf>`_.
+
+If you have questions about the dataset that aren’t addressed by the whitepaper 
 or any of our tutorials, please reach out by posting at 
 https://community.brain-map.org/  
 
