@@ -140,61 +140,18 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
 
 
 @pytest.mark.parametrize(
-        "pipeline_versions, sdk_version, lookup, exception, match",
+        "manifest_version, data_pipeline_version, cmin, cmax, exception",
         [
-            (
-                [{
-                    "name": "AllenSDK",
-                    "version": "2.9.0"}],
-                "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.9.0", "3.0.0"]}}},
-                None,
-                ""),
-            (
-                [{
-                    "name": "AllenSDK",
-                    "version": "2.9.0"}],
-                "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.9.1", "3.0.0"]}}},
-                cloudapi.BehaviorCloudCacheVersionException,
-                r".*version be >=2.9.1 and <3.0.0.*"),
-            (
-                [{
-                    "name": "AllenSDK",
-                    "version": "2.9.0"}],
-                "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
-                cloudapi.BehaviorCloudCacheVersionException,
-                r".*version be >=2.8.0 and <2.9.0.*"),
-            (
-                [{
-                    "name": "AllenSDK",
-                    "version": "2.10.0"}],
-                "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
-                cloudapi.BehaviorCloudCacheVersionException,
-                r"no version compatibility .*"),
-            (
-                [{
-                    "name": "AllenSDK",
-                    "version": "2.10.0"},
-                 {
-                     "name": "AllenSDK",
-                     "version": "2.10.1"}],
-                "2.9.0",
-                {"pipeline_versions": {
-                    "2.9.0": {"AllenSDK": ["2.8.0", "2.9.0"]}}},
-                cloudapi.BehaviorCloudCacheVersionException,
-                r"expected to find 1 and only 1 .*"),
+            ("0.0.1", "2.9.0", "0.0.0", "1.0.0", False),
+            ("1.0.1", "2.9.0", "0.0.0", "1.0.0", True)
             ])
-def test_compatibility(pipeline_versions, sdk_version, lookup,
-                       exception, match):
-    if exception is None:
-        cloudapi.version_check(pipeline_versions, sdk_version, lookup)
-        return
-    with pytest.raises(exception, match=match):
-        cloudapi.version_check(pipeline_versions, sdk_version, lookup)
+def test_version_check(manifest_version, data_pipeline_version,
+                       cmin, cmax, exception):
+    if exception:
+        with pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+                           match=f".*{data_pipeline_version}"):
+            cloudapi.version_check(manifest_version, data_pipeline_version,
+                                   cmin, cmax)
+    else:
+        cloudapi.version_check(manifest_version, data_pipeline_version,
+                               cmin, cmax)
