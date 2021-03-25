@@ -98,8 +98,13 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior,
     else:
         obt = BehaviorNwbApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(stimulus_presentations_behavior,
-                                  obt.get_stimulus_presentations(),
+    expected = stimulus_presentations_behavior.copy()
+    expected['is_change'] = [False, True, True, True, True]
+
+    obtained = obt.get_stimulus_presentations()
+
+    pd.testing.assert_frame_equal(expected[sorted(expected.columns)],
+                                  obtained[sorted(obtained.columns)],
                                   check_dtype=False)
 
 

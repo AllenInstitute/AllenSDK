@@ -7,17 +7,13 @@ import inspect
 from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
+from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
-    calculate_reward_rate)
-from allensdk.brain_observatory.behavior.dprime import (
-    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
-    get_trial_count_corrected_hit_rate)
-from allensdk.brain_observatory.behavior.dprime import (
-    get_hit_rate, get_false_alarm_rate)
+    construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 
 
 BehaviorDataApi = Type[BehaviorBase]
@@ -83,81 +79,177 @@ class BehaviorSession(LazyPropertyMixin):
         method_names = [m[0] for m in methods]
         return list(zip(method_names, docs))
 
+    def list_data_attributes_and_methods(self) -> List[str]:
+        """Convenience method for end-users to list attributes and methods
+        that can be called to access data for a BehaviorSession.
+
+        NOTE: Because BehaviorOphysExperiment inherits from BehaviorSession,
+        this method will also be available there.
+
+        Returns
+        -------
+        List[str]
+            A list of attributes and methods that end-users can access or call
+            to get data.
+        """
+        attrs_and_methods_to_ignore: set = {
+            "api",
+            "cache_clear",
+            "from_lims",
+            "from_nwb_path",
+            "LazyProperty",
+            "list_api_methods",
+            "list_data_attributes_and_methods"
+        }
+        attrs_and_methods_to_ignore.update(dir(ParamsMixin))
+        attrs_and_methods_to_ignore.update(dir(LazyPropertyMixin))
+        class_dir = dir(self)
+        attrs_and_methods = [
+            r for r in class_dir
+            if (r not in attrs_and_methods_to_ignore and not r.startswith("_"))
+        ]
+        return attrs_and_methods
+
     # ========================= 'get' methods ==========================
 
-    def get_reward_rate(self):
-        response_latency_list = []
-        for _, t in self.trials.iterrows():
-            valid_response_licks = \
-                    [x for x in t.lick_times
-                     if x - t.change_time >
-                        self.task_parameters['response_window_sec'][0]]
-            response_latency = (
-                    float('inf')
-                    if len(valid_response_licks) == 0
-                    else valid_response_licks[0] - t.change_time)
-            response_latency_list.append(response_latency)
-        reward_rate = calculate_reward_rate(
-                response_latency=response_latency_list,
-                starttime=self.trials.start_time.values)
-        reward_rate[np.isinf(reward_rate)] = float('nan')
-        return reward_rate
+    def get_reward_rate(self) -> np.ndarray:
+        """ Get the reward rate of the subject for the task calculated over a
+        25 trial rolling window and provides a measure of the rewards
+        earned per unit time (in units of rewards/minute).
 
-    def get_rolling_performance_df(self):
-        # Indices to build trial metrics dataframe:
-        trials_index = self.trials.index
-        not_aborted_index = \
-            self.trials[np.logical_not(self.trials.aborted)].index
+        Returns
+        -------
+        np.ndarray
+            The reward rate (rewards/minute) of the subject for the
+            task calculated over a 25 trial rolling window.
+        """
+        return calculate_reward_rate_fix_nans(
+                self.trials,
+                self.task_parameters['response_window_sec'][0])
 
-        # Initialize dataframe:
-        performance_metrics_df = pd.DataFrame(index=trials_index)
+    def get_rolling_performance_df(self) -> pd.DataFrame:
+        """Return a DataFrame containing trial by trial behavior response
+        performance metrics.
 
-        # Reward rate:
-        performance_metrics_df['reward_rate'] = \
-            pd.Series(self.get_reward_rate(), index=self.trials.index)
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing:
+                trials_id [index]:
+                    Index of the trial. All trials, including aborted trials,
+                    are assigned an index starting at 0 for the first trial.
+                reward_rate:
+                    Rewards earned in the previous 25 trials, normalized by
+                    the elapsed time of the same 25 trials. Units are
+                    rewards/minute.
+                hit_rate_raw:
+                    Fraction of go trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                hit_rate:
+                    Fraction of go trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. With trial count correction applied.
+                false_alarm_rate_raw:
+                    Fraction of catch trials where the mouse licked in the
+                    response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                false_alarm_rate:
+                    Fraction of catch trials where the mouse licked in
+                    the response window, calculated over the previous 100
+                    non-aborted trials. Without trial count correction applied.
+                rolling_dprime:
+                    d prime calculated using the rolling hit_rate and
+                    rolling false_alarm _rate.
 
-        # Hit rate raw:
-        hit_rate_raw = get_hit_rate(
-            hit=self.trials.hit,
-            miss=self.trials.miss,
-            aborted=self.trials.aborted)
-        performance_metrics_df['hit_rate_raw'] = \
-            pd.Series(hit_rate_raw, index=not_aborted_index)
+        """
+        return construct_rolling_performance_df(
+                self.trials,
+                self.task_parameters['response_window_sec'][0],
+                self.task_parameters["session_type"])
 
-        # Hit rate with trial count correction:
-        hit_rate = get_trial_count_corrected_hit_rate(
-                hit=self.trials.hit,
-                miss=self.trials.miss,
-                aborted=self.trials.aborted)
-        performance_metrics_df['hit_rate'] = \
-            pd.Series(hit_rate, index=not_aborted_index)
+    def get_performance_metrics(
+            self,
+            engaged_trial_reward_rate_threshold: float = 2.0
+            ) -> dict:
+        """Get a dictionary containing a subject's behavior response
+        summary data.
 
-        # False-alarm rate raw:
-        false_alarm_rate_raw = \
-            get_false_alarm_rate(
-                    false_alarm=self.trials.false_alarm,
-                    correct_reject=self.trials.correct_reject,
-                    aborted=self.trials.aborted)
-        performance_metrics_df['false_alarm_rate_raw'] = \
-            pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+        Parameters
+        ----------
+        engaged_trial_reward_rate_threshold : float, optional
+            The number of rewards per minute that needs to be attained
+            before a subject is considered 'engaged', by default 2.0
 
-        # False-alarm rate with trial count correction:
-        false_alarm_rate = \
-            get_trial_count_corrected_false_alarm_rate(
-                    false_alarm=self.trials.false_alarm,
-                    correct_reject=self.trials.correct_reject,
-                    aborted=self.trials.aborted)
-        performance_metrics_df['false_alarm_rate'] = \
-            pd.Series(false_alarm_rate, index=not_aborted_index)
-
-        # Rolling-dprime:
-        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
-        performance_metrics_df['rolling_dprime'] = \
-            pd.Series(rolling_dprime, index=not_aborted_index)
-
-        return performance_metrics_df
-
-    def get_performance_metrics(self, engaged_trial_reward_rate_threshold=2):
+        Returns
+        -------
+        dict
+            Returns a dict of performance metrics with the following fields:
+                trial_count:
+                    The length of the trial dataframe
+                    (including all 'go', 'catch', and 'aborted' trials)
+                go_trial_count:
+                    Number of 'go' trials in a behavior session
+                catch_trial_count:
+                    Number of 'catch' trial types during a behavior session
+                hit_trial_count:
+                    Number of trials with a hit behavior response
+                    type in a behavior session
+                miss_trial_count:
+                    Number of trials with a miss behavior response
+                    type in a behavior session
+                false_alarm_trial_count:
+                    Number of trials where the mouse had a false alarm
+                    behavior response
+                correct_reject_trial_count:
+                    Number of trials with a correct reject behavior
+                    response during a behavior session
+                auto_rewarded_trial_count:
+                    Number of trials where the mouse received an auto
+                    reward of water.
+                rewarded_trial_count:
+                    Number of trials on which the animal was rewarded for
+                    licking in the response window.
+                total_reward_count:
+                    Number of trials where the mouse received a
+                    water reward (earned or auto rewarded)
+                total_reward_volume:
+                    Volume of all water rewards received during a
+                    behavior session (earned and auto rewarded)
+                maximum_reward_rate:
+                    The peak of the rolling reward rate (rewards/minute)
+                engaged_trial_count:
+                    Number of trials where the mouse is engaged
+                    (reward rate > 2 rewards/minute)
+                mean_hit_rate:
+                    The mean of the rolling hit_rate
+                mean_hit_rate_uncorrected:
+                    The mean of the rolling hit_rate_raw
+                mean_hit_rate_engaged:
+                    The mean of the rolling hit_rate, excluding epochs
+                    when the rolling reward rate was below 2 rewards/minute
+                mean_false_alarm_rate:
+                    The mean of the rolling false_alarm_rate, excluding
+                    epochs when the rolling reward rate was below 2
+                    rewards/minute
+                mean_false_alarm_rate_uncorrected:
+                    The mean of the rolling false_alarm_rate_raw
+                mean_false_alarm_rate_engaged:
+                    The mean of the rolling false_alarm_rate,
+                    excluding epochs when the rolling reward rate
+                    was below 2 rewards/minute
+                mean_dprime:
+                    The mean of the rolling d_prime
+                mean_dprime_engaged:
+                    The mean of the rolling d_prime, excluding
+                    epochs when the rolling reward rate was
+                    below 2 rewards/minute
+                max_dprime:
+                    The peak of the rolling d_prime
+                max_dprime_engaged:
+                    The peak of the rolling d_prime, excluding epochs
+                    when the rolling reward rate was below 2 rewards/minute
+        """
         performance_metrics = {}
         performance_metrics['trial_count'] = len(self.trials)
         performance_metrics['go_trial_count'] = self.trials.go.sum()
@@ -170,8 +262,12 @@ class BehaviorSession(LazyPropertyMixin):
             self.trials.correct_reject.sum()
         performance_metrics['auto_rewarded_trial_count'] = \
             self.trials.auto_rewarded.sum()
-        performance_metrics['rewarded_trial_count'] = \
-            self.trials.reward_time.apply(lambda x: not np.isnan(x)).sum()
+        # Although 'rewarded_trial_count' will currently have the same value as
+        # 'hit_trial_count', in the future there may be variants of the
+        # task where rewards are withheld. In that case the
+        # 'rewarded_trial_count' will be smaller than (and different from)
+        # the 'hit_trial_count'.
+        performance_metrics['rewarded_trial_count'] = self.trials.hit.sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
@@ -220,7 +316,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -239,7 +336,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -260,7 +358,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -280,7 +379,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -336,7 +436,8 @@ class BehaviorSession(LazyPropertyMixin):
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for BehaviorOphysExperiments.
+        Synchronized timestamps are only available for
+        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -358,6 +459,41 @@ class BehaviorSession(LazyPropertyMixin):
         dict
             A dictionary containing parameters used to define the task runtime
             behavior.
+                auto_reward_volume: (float)
+                    Volume of auto rewards in ml.
+                blank_duration_sec : (list of floats)
+                    Duration in seconds of inter stimulus interval.
+                    Inter-stimulus interval chosen as a uniform random value.
+                    between the range defined by the two values.
+                    Values are ignored if `stimulus_duration_sec` is null.
+                response_window_sec: (list of floats)
+                    Range of period following an image change, in seconds,
+                    where mouse response influences trial outcome.
+                    First value represents response window start.
+                    Second value represents response window end.
+                    Values represent time before display lag is
+                    accounted for and applied.
+                n_stimulus_frames: (int)
+                    Total number of visual stimulus frames presented during
+                    a behavior session.
+                task: (string)
+                    Type of visual stimulus task.
+                session_type: (string)
+                    Visual stimulus type run during behavior session.
+                omitted_flash_fraction: (float)
+                    Probability that a stimulus image presentations is omitted.
+                    Change stimuli, and the stimulus immediately preceding the
+                    change, are never omitted.
+                stimulus_distribution: (string)
+                    Distribution for drawing change times.
+                    Either 'exponential' or 'geometric'.
+                stimulus_duration_sec: (float)
+                    Duration in seconds of each stimulus image presentation
+                reward_volume: (float)
+                    Volume of earned water reward in ml.
+                stimulus: (string)
+                    Stimulus type ('gratings' or 'images').
+
         """
         return self._task_parameters
 
