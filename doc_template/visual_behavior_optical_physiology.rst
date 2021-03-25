@@ -218,7 +218,8 @@ stimulus and behavioral information, as well as other metadata.
    :width: 850
 
 Detailed descriptions of data processing steps can be found 
-in the technical white paper. 
+in the technical white paper, as well as our 
+`data processing repository <https://github.com/AllenInstitute/ophys_etl_pipelines>`_.
 
 
 QUALITY CONTROL
