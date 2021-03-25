@@ -23,8 +23,6 @@ behavioral training history of all imaged mice is also provided, allowing
 investigation into task learning, behavioral strategy, and inter-animal 
 variability.
 
-[BEHAVIOR FIGURE OF SOME KIND]
-
 Overall, the dataset includes neural and behavioral measurements from 82 
 mice, including 3021 behavior training sessions and 551 in vivo 2-photon 
 imaging sessions, resulting in longitudinal recordings from 34,619 
@@ -46,7 +44,11 @@ Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloade
 or accessed directly via this S3 bucket. Regardless of which method of file 
 download you choose, we recommend that you load and interact with the data 
 using the tools provided in the AllenSDK, which have been designed to simplify 
-data access and subsequent analysis.
+data access and subsequent analysis. No knowledge of the NWB file format is required.
+
+Information about the datasets including the specific parameters found within,
+the specific AllenSDK methods used to access those parameters, and how to 
+browse an NWB file can be found `here <visual_behavior_ophys_nwb.html>`_.
 
 To get started, check out these jupyter notebooks to learn how to:
 
