@@ -17,7 +17,7 @@ and dynamics.
 
 .. image:: /_static/visual_behavior_2p/datasets.png
    :align: center
-   :width: 700
+   :width: 850
 
 While 2-photon imaging data was acquired in well-trained mice, the full 
 behavioral training history of all imaged mice is also provided, allowing 
@@ -34,7 +34,7 @@ neurons for each transgenic line and imaging platform in the dataset:
 
 .. image:: /_static/visual_behavior_2p/variants_table.png
    :align: center
-   :width: 700
+   :width: 850
 
 GETTING STARTED
 ---------------
@@ -48,9 +48,8 @@ download you choose, we recommend that you load and interact with the data
 using the tools provided in the AllenSDK, which have been designed to simplify 
 data access and subsequent analysis. No knowledge of the NWB file format is required.
 
-Information about the datasets including the specific parameters found within,
-the specific AllenSDK methods used to access those parameters, and how to 
-browse an NWB file can be found `here <visual_behavior_ophys_nwb.html>`_.
+Specific information about how Visual Behavior Optical Physiology data is stored 
+in NWB files and how AllenSDK accesses NWB files can be found: `here <visual_behavior_ophys_nwb.html>`_.
 
 To get started, check out these jupyter notebooks to learn how to:
 
@@ -74,7 +73,7 @@ CHANGE DETECTION TASK
 
 .. image:: /_static/visual_behavior_2p/task.png
    :align: center
-   :width: 700
+   :width: 850
 
 We trained mice to perform a go/no-go visual change detection task in 
 which they learned to lick a spout in response to changes in stimulus 
@@ -99,7 +98,7 @@ neural activity and behavior.
 
 .. image:: /_static/visual_behavior_2p/automated_training.png
    :align: center
-   :width: 700
+   :width: 850
 
 Behavioral training data for mice progressing through these 
 stages of task learning is accessible via the **BehaviorSession** 
@@ -116,7 +115,7 @@ contains the following data streams, event times, and metadata:
 
 .. image:: /_static/visual_behavior_2p/behavior_timeseries.png
    :align: center
-   :width: 700
+   :width: 850
 
 2-PHOTON IMAGING DATASET
 ------------------------
@@ -129,7 +128,7 @@ different sensory and behavioral contexts.
 
 .. image:: /_static/visual_behavior_2p/experiment_design.png
    :align: center
-   :width: 700
+   :width: 850
 
 Mice initially perform the task under the microscope with the same set of 
 images they observed during training, which have become highly familiar 
@@ -153,9 +152,9 @@ of GCaMP6 expressing cells in populations of excitatory
 (Vip-IRES-Cre;Ai148(TIT2L-GC6f-ICL-tTA2) & Sst-IRES-Cre;Ai148(TIT2L-GC6f-ICL-tTA2)) 
 neurons. Imaging took place between 75-400um below the cortical surface. 
 
-.. image:: /_static/visual_behavior_2/cre_lines.png
+.. image:: /_static/visual_behavior_2p/cre_lines.png
    :align: center
-   :width: 700
+   :width: 850
 
 The data collected in a single continuous recording is defined as a 
 **session**. For single-plane imaging experiments, there is only one 
@@ -184,7 +183,7 @@ sensory conditions (**session types**).
 
 .. image:: /_static/visual_behavior_2p/data_structure.png
    :align: center
-   :width: 700
+   :width: 850
 
 The **BehaviorOphysExperiment** class in the AllenSDK (or the 
 :py:meth:`.get_behavior_ophys_experiment()` method of the 
@@ -204,7 +203,7 @@ described above:
 
 .. image:: /_static/visual_behavior_2p/behavior_and_ophys_timeseries.png
    :align: center
-   :width: 700
+   :width: 850
 
 DATA PROCESSING
 ---------------
@@ -216,7 +215,7 @@ stimulus and behavioral information, as well as other metadata.
 
 .. image:: /_static/visual_behavior_2p/data_processing.png
    :align: center
-   :width: 700
+   :width: 850
 
 Detailed descriptions of data processing steps can be found 
 in the technical white paper. 
