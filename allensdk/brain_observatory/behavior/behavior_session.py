@@ -312,7 +312,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def licks(self) -> pd.DataFrame:
-        """Get lick data from pkl file.
+        """A dataframe containing lick timestmaps and frames, sampled
+        at 60 Hz.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -338,7 +339,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def rewards(self) -> pd.DataFrame:
-        """Get reward data from pkl file.
+        """Retrieves rewards from data file saved at the end of the
+        behavior session.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -495,7 +497,8 @@ class BehaviorSession(LazyPropertyMixin):
     @property
     def stimulus_timestamps(self) -> np.ndarray:
         """Timestamps associated with the stimulus presetntation on
-        the monitor retrieved from pkl file. Sampled at 60Hz.
+        the monitor retrieveddata file saved at the end of the
+        behavior session. Sampled at 60Hz.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -515,7 +518,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def task_parameters(self) -> dict:
-        """Get task parameters from pkl file.
+        """Get task parameters from data file saved at the end of
+        the behavior session file.
 
         Returns
         -------
@@ -566,7 +570,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def trials(self) -> pd.DataFrame:
-        """Get trials from pkl file
+        """Get trials from data file saved at the end of the
+        behavior session.
 
         Returns
         -------
