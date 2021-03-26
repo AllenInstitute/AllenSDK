@@ -99,7 +99,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @classmethod
     def from_nwb_path(
-            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysExperiment":
+            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysExperiment":  # noqa: E501
         api_kwargs["filter_invalid_rois"] = api_kwargs.get(
             "filter_invalid_rois", True)
         return cls(api=BehaviorOphysNwbApi.from_path(
