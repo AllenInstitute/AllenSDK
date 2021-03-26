@@ -108,13 +108,13 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
     # ========================= 'get' methods ==========================
 
     def get_segmentation_mask_image(self):
-        """ Returns an image with value 1 if the pixel was included
-        in an ROI, and 0 otherwise
+        """a 2D binary image of all valid cell masks
 
         Returns
         ----------
         allensdk.brain_observatory.behavior.image_api.Image:
-            array-like interface to segmentation_mask image data and metadata
+            array-like interface to segmentation_mask image data and
+            metadata
         """
         mask_data = np.sum(self.roi_masks['roi_mask'].values).astype(int)
 
@@ -203,8 +203,25 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def dff_traces(self) -> pd.DataFrame:
-        """Traces of dff organized into a dataframe; index is the cell roi ids.
-        :rtype: pandas.DataFrame
+        """traces of change in fluoescence / fluorescence
+
+        Returns
+        -------
+        pd.DataFrame
+            dataframe of traces of dff
+            (change in fluorescence / fluorescence)
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    assigned after cell matching
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi,
+                    assigned before cell matching
+                dff: (list of float)
+                    fluorescence fractional values relative to baseline
+                    (arbitrary units)
+
         """
         return self._dff_traces
 
@@ -214,19 +231,35 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def events(self) -> pd.DataFrame:
-        """Get event detection data
+        """A dataframe containing spiking events in traces derived
+        from the two photon movies, organized by cell specimen id.
+        For more information on event detection processing
+        please see the event detection portion of the white paper.
 
         Returns
         -------
         pd.DataFrame
-            index:
-                cell_specimen_id: int
-            cell_roi_id: int
-            events: np.array
-            filtered_events: np.array
-                Events, convolved with filter to smooth it for visualization
-            lambdas: float64
-            noise_stds: float64
+            cell_specimen_id [index]: (int)
+                unified id of segmented cell across experiments
+                (assigned after cell matching)
+            cell_roi_id: (int)
+                experiment specific id of segmented roi (assigned
+                before cell matching)
+            events: (np.array of float)
+                event trace where events correspond to the rise time
+                of a calcium transient in the dF/F trace, with a
+                magnitude roughly proportional the magnitude of the
+                increase in dF/F.
+            filtered_events: (np.array of float)
+                Events array with a 1d causal half-gaussian filter to
+                smooth it for visualization. Uses a halfnorm
+                distribution as weights to the filter
+            lambdas: (float64)
+                regularization value selected to make the minimum
+                event size be close to N * noise_std
+            noise_stds: (float64)
+                estimated noise standard deviation for the events trace
+
         """
         params = {'events_filter_scale', 'events_filter_n_time_steps'}
 
@@ -245,9 +278,47 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
-        """Cell roi information organized into a dataframe; index is the cell
-        roi ids.
-        :rtype: pandas.DataFrame
+        """Cell information organized into a dataframe. Table only
+        contains roi_valid = True entries, as invalid ROIs/ non cell
+        segmented objects have been filtered out
+
+        Returns
+        -------
+        pd.DataFrame
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                height: (int)
+                    height of ROI/cell in pixels
+                mask_image_plane: (int)
+                    which image plane an ROI resides on. Overlapping
+                    ROIs are stored on different mask image planes
+                max_corretion_down: (float)
+                    max motion correction in down direction in pixels
+                max_correction_left: (float)
+                    max motion correction in left direction in pixels
+                max_correction_right: (float)
+                    max motion correction in right direction in pixels
+                max_correction_up: (float)
+                    max motion correction in up direction in pixels
+                roi_mask: (array of bool)
+                    an image array that displays the location of the
+                    roi mask in the field of view
+                valid_roi: (bool)
+                    indicates if cell classification found the segmented
+                    ROI to be a cell or not (True = cell, False = not cell).
+                width: (int)
+                    width of ROI in pixels
+                x: (float)
+                    x position of ROI in field of view in pixels (top
+                    left corner)
+                y: (float)
+                    y position of ROI in field of view in pixels (top
+                    left corner)
         """
         return self._cell_specimen_table
 
@@ -257,9 +328,26 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
-        """The motion-corrected fluorescence traces organized into a dataframe;
-        index is the cell roi ids.
-        :rtype: pandas.DataFrame
+        """Corrected fluorescence traces which are neuropil corrected
+        and demixed. Sampling rate can be found in metadata
+        ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                corrected_fluorescence: (list of float)
+                    fluorescence values (arbitrary units)
+
         """
         return self._corrected_fluorescence_traces
 
@@ -269,9 +357,17 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def motion_correction(self) -> pd.DataFrame:
-        """A dataframe containing trace data used during motion correction
-        computation
-        :rtype: pandas.DataFrame
+        """a dataframe containing the x and y offsets applied during
+        motion correction
+
+        Returns
+        -------
+        pd.DataFrame
+            dataframe columns:
+                x: (int)
+                    frame shift along x axis
+                y: (int)
+                    frame shift along y axis
         """
         return self._motion_correction
 
@@ -281,8 +377,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def segmentation_mask_image(self) -> Image:
-        """An image with pixel value 1 if that pixel was included in an ROI,
-        and 0 otherwise
+        """A 2d binary image of all valid cell masks
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
         if self._segmentation_mask_image is None:
@@ -346,8 +441,20 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
     @property
     def eye_tracking_rig_geometry(self) -> dict:
-        """Get the eye tracking rig geometry
-        associated with an ophys experiment"""
+        """the eye tracking equipment geometry associate with a
+        given ophys experiment session.
+
+        Returns
+        -------
+        dict
+            dictionary with the following keys:
+                camera_eye_position_mm (array of float)
+                camera_rotation_deg (array of float)
+                equipment (string)
+                led_position (array of float)
+                monitor_position_mm (array of float)
+                monitor_rotation_deg (array of float)
+        """
         return self.api.get_eye_tracking_rig_geometry()
 
     @property

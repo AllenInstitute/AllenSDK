@@ -655,7 +655,7 @@ class BehaviorSession(LazyPropertyMixin):
                 cre_line: (string)
                     cre driver line for a transgenic mouse
                 date_of_acquisition: (date time object)
-                    date and time of experiment acquisition, 
+                    date and time of experiment acquisition,
                     yyyy-mm-dd hh:mm:ss
                 driver_line: (list of string)
                     all driver lines for a transgenic mouse
