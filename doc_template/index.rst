@@ -119,6 +119,11 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.11.0
+-----------------------------------------------------------------------
+- list updates here
+
+
 What's New - 2.10.2
 -----------------------------------------------------------------------
 - This version marks the release of Visual Behavior Optical Physiology data! For more details please visit the: `Visual Behavior - Optical Physiology Project Page <https://allensdk.readthedocs.io/en/latest/visual_behavior_optical_physiology.html>`_

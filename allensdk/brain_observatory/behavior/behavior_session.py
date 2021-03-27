@@ -204,13 +204,14 @@ class BehaviorSession(LazyPropertyMixin):
                 correct_reject_trial_count: (int)
                     Number of trials with a correct reject behavior
                     response during a behavior session
-                auto_rewarded_trial_count: (int)
+                auto_reward_count:
                     Number of trials where the mouse received an auto
                     reward of water.
-                rewarded_trial_count: (int)
-                    Number of trials on which the animal was rewarded for
-                    licking in the response window.
-                total_reward_count: (int)
+                earned_reward_count:
+                    Number of trials where the mouse was eligible to receive a
+                    water reward ('go' trials) and did receive an earned
+                    water reward
+                total_reward_count:
                     Number of trials where the mouse received a
                     water reward (earned or auto rewarded)
                 total_reward_volume: (float)
@@ -260,14 +261,14 @@ class BehaviorSession(LazyPropertyMixin):
             self.trials.false_alarm.sum()
         performance_metrics['correct_reject_trial_count'] = \
             self.trials.correct_reject.sum()
-        performance_metrics['auto_rewarded_trial_count'] = \
+        performance_metrics['auto_reward_count'] = \
             self.trials.auto_rewarded.sum()
-        # Although 'rewarded_trial_count' will currently have the same value as
+        # Although 'earned_reward_count' will currently have the same value as
         # 'hit_trial_count', in the future there may be variants of the
         # task where rewards are withheld. In that case the
-        # 'rewarded_trial_count' will be smaller than (and different from)
+        # 'earned_reward_count' will be smaller than (and different from)
         # the 'hit_trial_count'.
-        performance_metrics['rewarded_trial_count'] = self.trials.hit.sum()
+        performance_metrics['earned_reward_count'] = self.trials.hit.sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
