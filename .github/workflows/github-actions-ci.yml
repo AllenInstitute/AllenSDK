@@ -44,7 +44,8 @@ jobs:
     strategy:
       matrix:
         os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.6", "3.7"]
+        python-version: ["3.6", "3.7", "3.8"]
+      fail-fast: false
     defaults:
       run:
         shell: bash -l {0}
