@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import pynwb
 import pytest
 
@@ -242,7 +243,7 @@ def test_add_task_parameters_stim_nan(nwbfile, roundtrip,
             assert val == task_parameters_obt[key]
 
 
-def test_write_behavior_nwb():
+def test_write_behavior_nwb_no_file():
     """
         This function is intended to test the code in the except block
         of the write_behavior_nwb method. To get there, we simply pass
@@ -259,4 +260,14 @@ def test_write_behavior_nwb():
             nwb_filepath=''
         )
     
+    assert 'TypeError' in str(err.type)
+
+def test_write_behavior_nwb_with_file(tmpdir):
+    fake_nwb = Path(tmpdir) / ''
+    
+    write_behavior_nwb(
+        session_data=None,
+        nwb_filepath=''
+    )
+
     assert 'TypeError' in str(err.type)
