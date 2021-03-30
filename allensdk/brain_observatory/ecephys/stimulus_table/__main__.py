@@ -8,7 +8,8 @@ import numpy as np
 from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (
     EcephysSyncDataset,
 )
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, \
+    write_or_print_outputs
 from allensdk.brain_observatory.ecephys.file_io.stim_file import (
     CamStimOnePickleStimFile,
 )
@@ -95,11 +96,7 @@ def main():
     )
     output = build_stimulus_table(**mod.args)
 
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        print(mod.get_output_json(output))
+    write_or_print_outputs(data=output, parser=mod)
 
 
 if __name__ == "__main__":
