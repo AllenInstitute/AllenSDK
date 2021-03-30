@@ -12,6 +12,8 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import \
     create_refined_eye_tracking_df  # noqa: E501
 
+from allensdk.brain_observatory.behavior.write_nwb.__main__ import write_behavior_ophys_nwb  # noqa: E501
+
 
 @pytest.fixture
 def rig_geometry():
@@ -388,3 +390,24 @@ def test_add_events(tmp_path, nwbfile, roundtripper, roundtrip,
     obtained = obt.get_events()
 
     pd.testing.assert_frame_equal(obtained, events, check_like=True)
+
+
+def test_write_behavior_ophys_nwb():
+    """
+        This function is intended to test the code in the except block
+        of the write_behavior_ophys_nwb method. To get there, we simply pass
+        None for the session_data parameter which will cause a TypeError
+        when the try block attempts to subscript it.
+
+        If this function is ever meaningfully changed in implementation,
+        this method of getting to the except block may no longer work and
+        this test will need updating.
+    """
+    with pytest.raises(TypeError) as err:
+        write_behavior_ophys_nwb(
+            session_data=None,
+            nwb_filepath='',
+            skip_eye_tracking=True
+        )
+    
+    assert 'TypeError' in str(err.type)
