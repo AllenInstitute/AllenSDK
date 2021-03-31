@@ -19,15 +19,13 @@ LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
 
-def get_keys(sync_dset: Dataset, invalid_sync_line_warning=False) -> dict:
+def get_keys(sync_dset: Dataset) -> dict:
     """
     Gets the correct keys for the sync file by searching the sync file
     line labels. Removes key from the dictionary if it is not in the
     sync dataset line labels.
     Args:
         sync_dset: The sync dataset to search for keys within
-        invalid_sync_line_warning: (bool) if True,
-                prints warnings about keys in sync file
 
     Returns:
         key_dict: dictionary of key value pairs for finding data in the
@@ -45,19 +43,26 @@ def get_keys(sync_dset: Dataset, invalid_sync_line_warning=False) -> dict:
                            "eye_frame_received"],
             "behavior_camera": ["cam1_exposure", "behavior_monitoring",
                                 "beh_frame_received"],
-            "acquiring": ["2p_acquiring"],
+            "acquiring": ["2p_acquiring", "acq_trigger"],
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
     label_set = set(sync_dset.line_labels)
     remove_keys = []
     for key, value in key_dict.items():
+        # for each key in the above `key_dict`, this loop
+        # checks to see if there is a corresponing value in
+        # the set of line labels present in the sync file (`label_set`)
+        # If not, the key is added to the `remove_keys` list
         value_set = set(value)
         diff = value_set.intersection(label_set)
         if len(diff) == 1:
             key_dict[key] = diff.pop()
         else:
             remove_keys.append(key)
-    if len(remove_keys) > 0 and invalid_sync_line_warning:
+
+    # the contents of the `remove_keys` list is printed to the console
+    # as a user warning
+    if len(remove_keys) > 0:
         logging.warning("Could not find valid lines for the following data "
                         "sources")
         for key in remove_keys:
