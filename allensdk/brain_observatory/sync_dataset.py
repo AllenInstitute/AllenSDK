@@ -110,26 +110,8 @@ class Dataset(object):
                        "cam1_exposure",
                        "behavior_monitoring"}
 
-    def __init__(self, path, sync_line_label_deprecation_warning=False):
-        '''
-        sync_line_label_deprecation_warning: (bool) if True,
-        warns about deprecated lines in sync file
-        '''
+    def __init__(self, path):
         self.dfile = self.load(path)
-        self._check_line_labels(
-            sync_line_label_deprecation_warning=sync_line_label_deprecation_warning)  # NOQA E501
-
-    def _check_line_labels(self, sync_line_label_deprecation_warning):
-        if hasattr(self, "line_labels"):
-            deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
-            if deprecated_keys and sync_line_label_deprecation_warning:
-                warnings.warn((f"The loaded sync file contains the "
-                               f"following deprecated line label keys: "
-                               f"{deprecated_keys}. Consider updating the sync "  # NOQA E501
-                               f"file line labels."), stacklevel=2)
-        else:
-            warnings.warn((f"The loaded sync file has no line labels and may "  # NOQA F541
-                           f"not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
