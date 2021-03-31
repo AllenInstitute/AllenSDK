@@ -411,9 +411,9 @@ def test_write_behavior_ophys_nwb_no_file():
 
         To ensure that we enter the except block, a value of None is passed
         for the session_data argument. This will cause a TypeError when
-        write_behavior_ophys_nwb tries to subscript this variable. We are checking
-        that, even though no partial output exists, we still get this
-        TypeError raised.
+        write_behavior_ophys_nwb tries to subscript this variable. We are
+        checking that, even though no partial output exists, we still get
+        this TypeError raised.
     """
     with pytest.raises(TypeError) as err:
         write_behavior_ophys_nwb(
