@@ -270,8 +270,6 @@ def test_write_behavior_nwb_no_file():
             nwb_filepath=''
         )
 
-    assert 'TypeError' in str(err.type)
-
 
 def test_write_behavior_nwb_with_file(tmpdir):
     """
@@ -315,4 +313,3 @@ def test_write_behavior_nwb_with_file(tmpdir):
             # Check that the new .error file exists, and that we
             # still get the expected exception
             assert Path(str(fake_nwb_fp) + '.error').exists()
-            assert 'TypeError' in str(err.type)
