@@ -48,7 +48,8 @@ def write_behavior_nwb(session_data, nwb_filepath):
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
-        os.rename(nwb_filepath_inprogress, nwb_filepath_error)
+        if os.path.isfile(nwb_filepath_inprogress):
+            os.rename(nwb_filepath_inprogress, nwb_filepath_error)
         raise e
 
 
