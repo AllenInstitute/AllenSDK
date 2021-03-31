@@ -19,13 +19,14 @@ LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
 
-def get_keys(sync_dset: Dataset) -> dict:
+def get_keys(sync_dset: Dataset, invalid_sync_line_warning=False) -> dict:
     """
     Gets the correct keys for the sync file by searching the sync file
     line labels. Removes key from the dictionary if it is not in the
     sync dataset line labels.
     Args:
         sync_dset: The sync dataset to search for keys within
+        invalid_sync_line_warning: (bool) if True, prints warnings about keys in sync file
 
     Returns:
         key_dict: dictionary of key value pairs for finding data in the
@@ -55,7 +56,7 @@ def get_keys(sync_dset: Dataset) -> dict:
             key_dict[key] = diff.pop()
         else:
             remove_keys.append(key)
-    if len(remove_keys) > 0:
+    if len(remove_keys) > 0 and invalid_sync_line_warning:
         logging.warning("Could not find valid lines for the following data "
                         "sources")
         for key in remove_keys:

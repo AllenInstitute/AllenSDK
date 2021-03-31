@@ -104,14 +104,17 @@ class Dataset(object):
                        "cam1_exposure",
                        "behavior_monitoring"}
 
-    def __init__(self, path):
+    def __init__(self, path, sync_line_label_deprecation_warning=False):
+        '''
+        sync_line_label_deprecation_warning: (bool) if True, warns about deprecated lines in sync file
+        '''
         self.dfile = self.load(path)
-        self._check_line_labels()
+        self._check_line_labels(sync_line_label_deprecation_warning=sync_line_label_deprecation_warning)
 
-    def _check_line_labels(self):
+    def _check_line_labels(self, sync_line_label_deprecation_warning):
         if hasattr(self, "line_labels"):
             deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
-            if deprecated_keys:
+            if deprecated_keys and sync_line_label_deprecation_warning:
                 warnings.warn((f"The loaded sync file contains the "
                                f"following deprecated line label keys: "
                                f"{deprecated_keys}. Consider updating the sync "
