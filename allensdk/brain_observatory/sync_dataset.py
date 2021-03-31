@@ -20,7 +20,6 @@ from typing import Union, Sequence, Optional
 import h5py as h5
 import numpy as np
 
-import warnings
 import logging
 logger = logging.getLogger(__name__)
 
