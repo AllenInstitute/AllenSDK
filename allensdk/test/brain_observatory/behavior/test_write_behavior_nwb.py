@@ -264,7 +264,7 @@ def test_write_behavior_nwb_no_file():
         that, even though no partial output exists, we still get this
         TypeError raised.
     """
-    with pytest.raises(TypeError) as err:
+    with pytest.raises(TypeError):
         write_behavior_nwb(
             session_data=None,
             nwb_filepath=''
@@ -304,7 +304,7 @@ def test_write_behavior_nwb_with_file(tmpdir):
 
     # Patch the os.remove method to do nothing
     with mock.patch('os.remove', side_effects=mock_os_remove):
-        with pytest.raises(TypeError) as err:
+        with pytest.raises(TypeError):
             write_behavior_nwb(
                 session_data=None,
                 nwb_filepath=str(fake_nwb_fp)
