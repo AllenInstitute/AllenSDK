@@ -26,7 +26,8 @@ def get_keys(sync_dset: Dataset, invalid_sync_line_warning=False) -> dict:
     sync dataset line labels.
     Args:
         sync_dset: The sync dataset to search for keys within
-        invalid_sync_line_warning: (bool) if True, prints warnings about keys in sync file
+        invalid_sync_line_warning: (bool) if True,
+                prints warnings about keys in sync file
 
     Returns:
         key_dict: dictionary of key value pairs for finding data in the
