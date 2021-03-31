@@ -1,4 +1,6 @@
 import math
+import mock
+from pathlib import Path
 import warnings
 
 import numpy as np
@@ -12,7 +14,8 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import \
     create_refined_eye_tracking_df  # noqa: E501
 
-from allensdk.brain_observatory.behavior.write_nwb.__main__ import write_behavior_ophys_nwb  # noqa: E501
+from allensdk.brain_observatory.behavior.write_nwb.__main__ import \
+    write_behavior_ophys_nwb  # noqa: E501
 
 
 @pytest.fixture
@@ -392,16 +395,25 @@ def test_add_events(tmp_path, nwbfile, roundtripper, roundtrip,
     pd.testing.assert_frame_equal(obtained, events, check_like=True)
 
 
-def test_write_behavior_ophys_nwb():
+def test_write_behavior_ophys_nwb_no_file():
     """
-        This function is intended to test the code in the except block
-        of the write_behavior_ophys_nwb method. To get there, we simply pass
-        None for the session_data parameter which will cause a TypeError
-        when the try block attempts to subscript it.
+        This function is testing the fail condition of the
+        write_behavior_ophys_nwb method. The main functionality of the 
+        write_behavior_ophys_nwb method occurs in a try block, and in the
+        case that an exception is raised there is functionality in the except
+        block to check if any partial output exists, and if so rename that
+        file to have a .error suffix before raising the previously
+        mentioned exception.
 
-        If this function is ever meaningfully changed in implementation,
-        this method of getting to the except block may no longer work and
-        this test will need updating.
+        This test is checking the case where that partial output does not
+        exist. In this case we still want to have the original exception
+        returned and avoid a FileNotFound error.
+
+        To ensure that we enter the except block, a value of None is passed
+        for the session_data argument. This will cause a TypeError when
+        write_behavior_ophys_nwb tries to subscript this variable. We are checking
+        that, even though no partial output exists, we still get this
+        TypeError raised.
     """
     with pytest.raises(TypeError) as err:
         write_behavior_ophys_nwb(
@@ -411,3 +423,50 @@ def test_write_behavior_ophys_nwb():
         )
     
     assert 'TypeError' in str(err.type)
+
+def test_write_behavior_ophys_nwb_with_file(tmpdir):
+    """
+        This function is testing the fail condition of the
+        write_behavior_ophys_nwb method. The main functionality of the 
+        write_behavior_ophys_nwb method occurs in a try block, and in the
+        case that an exception is raised there is functionality in the except
+        block to check if any partial output exists, and if so rename that
+        file to have a .error suffix before raising the previously
+        mentioned exception.
+
+        This test is checking the case where a partial output file does
+        exist. In this case we still want to have the original exception
+        returned and avoid a FileNotFound error, but also check that a new 
+        file with the .error suffix exists.
+
+        To ensure that we enter the except block, a value of None is passed
+        for the session_data argument. This will cause a TypeError when
+        write_behavior_ophys_nwb tries to subscript this variable. To get the 
+        partial output file to exist, we simply create a Path object and
+        call the .touch method.
+
+        This test also patched the os.remove method to do nothing. This is
+        necessary because the write_behavior_nwb method checks for any
+        existing output and removes it before running.
+    """
+    # Create the dummy .nwb file
+    fake_nwb_fp = Path(tmpdir) / 'fake_nwb.nwb'
+    Path(str(fake_nwb_fp) + '.inprogress').touch()
+    
+    def mock_os_remove(fp):
+        pass
+    
+    # Patch the os.remove method to do nothing
+    with mock.patch('os.remove', side_effects=mock_os_remove):
+        with pytest.raises(TypeError) as err:
+            write_behavior_ophys_nwb(
+                session_data=None,
+                nwb_filepath=str(fake_nwb_fp),
+                skip_eye_tracking=True
+            )
+
+            # Check that the new .error file exists, and that we
+            # still get the expected exception
+            assert Path(str(fake_nwb_fp) + '.error').exists()
+            assert 'TypeError' in str(err.type)
+
