@@ -140,4 +140,5 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
+    input_parameters = Nested(InputSchema)
     output_path = String(required=True, description='write outputs to here')
