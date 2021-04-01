@@ -80,4 +80,4 @@ class OutputSchema(RaisingSchema):
 
 
 class OutputParameters(OutputSchema): 
-    output_file_paths = Dict(required=True)
+    output_file_paths = List(String, required=True)

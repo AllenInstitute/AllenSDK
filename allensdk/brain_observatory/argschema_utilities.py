@@ -42,8 +42,7 @@ class OutputFile(marshmallow.fields.String):
 def write_or_print_outputs(data, parser):
     data.update({'input_parameters': parser.args})
     if 'output_json' in parser.args:
-        with open(parser.args['output_json'], 'w') as f:
-            f.write(json.dumps(data, indent=2))
+        parser.output(data, indent=2)
     else:
         print(parser.get_output_json(data))
 

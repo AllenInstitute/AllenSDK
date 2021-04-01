@@ -1,5 +1,5 @@
 from argschema import ArgSchema
-from argschema.fields import Float, LogLevel, String, Boolean
+from argschema.fields import Float, LogLevel, String, Boolean, Nested
 
 from allensdk.brain_observatory.argschema_utilities import (
     InputFile,
@@ -102,6 +102,7 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
+    input_parameters = Nested(InputSchema)
     screen_mapping_file = OutputFile(required=True,
                                      description=('Full save path of output h5 '
                                                   'file that will be created '

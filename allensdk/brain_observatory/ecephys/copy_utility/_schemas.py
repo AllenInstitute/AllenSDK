@@ -45,5 +45,5 @@ class InputSchema(ArgSchema):
     
 
 class OutputSchema(RaisingSchema):
+    input_parameters = Nested(InputSchema)
     files = Nested(CopiedFile, many=True, required=True, description='copied files')
-    

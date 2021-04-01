@@ -42,7 +42,6 @@ class InputParameters(ArgSchema):
 class ProbeOutputParameters(DefaultSchema):
     name = String(required=True, help='Identifier for this probe.')
     csd_path = String(required=True, help='Path to current source density file.')
-    csd_channels = List(Int, required=True, help='LFP channels from which CSD was calculated.')
 
 
 class OutputSchema(DefaultSchema):
@@ -53,6 +52,4 @@ class OutputSchema(DefaultSchema):
 
 
 class OutputParameters(OutputSchema):
-    stimulus_name = String(required=True, help="name of stimulus from which CSD was calculated")
-    stimulus_index = Int(required=True, help="index of stimulus from which CSD was calculated")
     probe_outputs = Nested(ProbeOutputParameters, many=True, required=True, help='probewise outputs')

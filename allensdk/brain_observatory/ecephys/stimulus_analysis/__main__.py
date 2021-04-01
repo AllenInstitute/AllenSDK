@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 import logging
 
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
 from ..ecephys_session import EcephysSession
 from .drifting_gratings import DriftingGratings
 from .static_gratings import StaticGratings
@@ -181,11 +183,7 @@ def main():
     # output = calculate_stimulus_metrics_ondisk(mod.args)
     output = calculate_stimulus_metrics_gather(mod.args)
     if MPI_rank == 0:
-        output.update({"input_parameters": mod.args})
-        if "output_json" in mod.args:
-            mod.output(output, indent=2)
-        else:
-            log_info(mod.get_output_json(output))
+        write_or_print_outputs(data=output, parser=mod)
     barrier()
 
 

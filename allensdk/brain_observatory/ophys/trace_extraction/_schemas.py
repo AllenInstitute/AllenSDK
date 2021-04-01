@@ -42,6 +42,7 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
+    input_parameters = Nested(InputSchema)
     neuropil_trace_file = String(required=True, description='path to output h5 file containing neuropil traces') # TODO rename these to _path
     roi_trace_file = String(required=True, description='path to output h5 file containing roi traces')
     exclusion_labels = Nested(ExclusionLabel, many=True, description='a report of roi-wise problems detected during extraction')

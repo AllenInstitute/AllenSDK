@@ -5,7 +5,8 @@ import pandas as pd
 
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, \
+    write_or_print_outputs
 
 from ._schemas import InputParameters, OutputParameters
 
@@ -146,9 +147,4 @@ if __name__ == "__main__":
     )
 
     output = main(**mod.args)
-    output.update({"input_parameters": mod.args})
-
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        print(mod.get_output_json(output))
+    write_or_print_outputs(data=output, parser=mod)

@@ -38,7 +38,8 @@ import logging
 
 from ._schemas import InputParameters, OutputParameters
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, \
+    write_or_print_outputs
 from .subsampling import select_channels, subsample_timestamps, subsample_lfp, remove_lfp_offset, remove_lfp_noise
 
 
@@ -120,11 +121,7 @@ def subsample(args):
 def main():
     mod = ArgSchemaParserPlus(schema_type=InputParameters, output_schema_type=OutputParameters)
     output = subsample(mod.args)
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        logger.info(mod.get_output_json(output))
+    write_or_print_outputs(data=output, parser=mod)
 
 
 if __name__ == "__main__":

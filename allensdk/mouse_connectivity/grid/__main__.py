@@ -7,6 +7,8 @@ import os
 import argschema
 import requests
 
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
 from ._schemas import InputParameters, OutputParameters
 from . import cases
 from .image_series_gridder import ImageSeriesGridder
@@ -32,14 +34,6 @@ def get_inputs_from_lims(host, image_series_id, output_root, job_queue, strategy
     data['accumulator_prefix'] = os.path.join(output_root, os.path.split(data['accumulator_prefix'])[-1])
 
     return data
-
-
-def write_or_print_outputs(data, parser):
-    data.update({'input_parameters': parser.args})
-    if 'output_json' in parser.args:
-        parser.output(data, indent=2)
-    else:
-        print(parser.get_output_json(data))    
 
 
 def run_grid(args):

@@ -3,7 +3,8 @@ import sys
 import copy
 
 import numpy as np
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, \
+    write_or_print_outputs
 import argparse
 
 from ._schemas import InputParameters, OutputParameters
@@ -104,11 +105,7 @@ def main():
     )
     output = align_timestamps(mod.args)
 
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        print(mod.get_output_json(output))
+    write_or_print_outputs(data=output, parser=mod)
 
 
 if __name__ == "__main__":

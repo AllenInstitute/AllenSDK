@@ -75,6 +75,7 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
+    input_parameters = Nested(InputSchema)
     output_path = String(required=True,
                          validate=check_write_access_overwrite,
                          description='Path of output.json to be written')
