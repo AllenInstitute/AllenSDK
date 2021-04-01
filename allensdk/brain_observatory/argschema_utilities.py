@@ -1,12 +1,11 @@
-import json
+import argparse
 import os
 import pathlib
 
-import argparse
 import marshmallow
-from marshmallow import RAISE, ValidationError
 from argschema import ArgSchemaParser
 from argschema.schemas import DefaultSchema
+from marshmallow import RAISE, ValidationError
 
 
 class InputFile(marshmallow.fields.String):
@@ -14,6 +13,7 @@ class InputFile(marshmallow.fields.String):
        that represent a desired input path to pathlib.Path.
        Also performs read access checking.
     """
+
     def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
         return pathlib.Path(value)
 
@@ -29,6 +29,7 @@ class OutputFile(marshmallow.fields.String):
        that represent a desired output file path to a pathlib.Path.
        Also performs write access checking.
     """
+
     def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
         return pathlib.Path(value)
 
@@ -48,7 +49,6 @@ def write_or_print_outputs(data, parser):
 
 
 def check_write_access_dir(dirpath):
-
     if os.path.exists(dirpath):
         test_filepath = pathlib.Path(dirpath, 'test_file.txt')
         try:
@@ -57,14 +57,16 @@ def check_write_access_dir(dirpath):
             os.remove(test_filepath)
             return True
         except PermissionError:
-            raise ValidationError(f'don\'t have permissions to write in directory {dirpath}')
+            raise ValidationError(
+                f'don\'t have permissions to write in directory {dirpath}')
     else:
         try:
             pathlib.Path(dirpath).mkdir(parents=True)
             pathlib.Path(dirpath).rmdir()
             return True
         except PermissionError:
-            raise ValidationError(f'Can\'t build path to requested location {dirpath}')
+            raise ValidationError(
+                f'Can\'t build path to requested location {dirpath}')
 
     raise RuntimeError('Unhandled case; this should not happen')
 
@@ -101,7 +103,8 @@ def check_read_access(path):
         f.close()
         return True
     except Exception as err:
-        raise ValidationError(f'file at #{path} not readable (#{type(err)}: {err}')
+        raise ValidationError(
+            f'file at #{path} not readable (#{type(err)}: {err}')
 
 
 class RaisingSchema(DefaultSchema):
@@ -120,7 +123,6 @@ class ArgSchemaParserPlus(ArgSchemaParser):  # pragma: no cover
 
 
 def optional_lims_inputs(argv, input_schema, output_schema, lims_input_getter):
-
     remaining_args = argv[1:]
     input_data = {}
 
@@ -129,10 +131,12 @@ def optional_lims_inputs(argv, input_schema, output_schema, lims_input_getter):
         lims_parser.add_argument("--host", type=str, default="http://lims2")
         lims_parser.add_argument("--job_queue", type=str, default=None)
         lims_parser.add_argument("--strategy", type=str, default=None)
-        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
+        lims_parser.add_argument("--ecephys_session_id", type=int,
+                                 default=None)
         lims_parser.add_argument("--output_root", type=str, default=None)
 
-        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
+        lims_args, remaining_args = lims_parser.parse_known_args(
+            remaining_args)
         remaining_args = [
             item for item in remaining_args if item != "--get_inputs_from_lims"
         ]

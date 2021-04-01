@@ -9,7 +9,6 @@ from allensdk.brain_observatory.argschema_utilities import (
 
 
 class InputSchema(ArgSchema):
-
     # ============== Required fields ==============
     input_file = InputFile(
         required=True,
@@ -104,6 +103,7 @@ class InputSchema(ArgSchema):
 class OutputSchema(RaisingSchema):
     input_parameters = Nested(InputSchema)
     screen_mapping_file = OutputFile(required=True,
-                                     description=('Full save path of output h5 '
-                                                  'file that will be created '
-                                                  'by this module.'))
+                                     description=(
+                                         'Full save path of output h5 '
+                                         'file that will be created '
+                                         'by this module.'))

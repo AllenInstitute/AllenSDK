@@ -1,19 +1,16 @@
 import functools
-import warnings
-import re
 
-import pandas as pd
 import numpy as np
 
+from allensdk.brain_observatory.argschema_utilities import \
+    ArgSchemaParserPlus, \
+    write_or_print_outputs
 from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (
     EcephysSyncDataset,
 )
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, \
-    write_or_print_outputs
 from allensdk.brain_observatory.ecephys.file_io.stim_file import (
     CamStimOnePickleStimFile,
 )
-
 from . import ephys_pre_spikes
 from . import naming_utilities
 from . import output_validation
@@ -21,32 +18,33 @@ from ._schemas import InputParameters, OutputSchema
 
 
 def build_stimulus_table(
-    stimulus_pkl_path,
-    sync_h5_path,
-    frame_time_strategy,
-    minimum_spontaneous_activity_duration,
-    extract_const_params_from_repr,
-    drop_const_params,
-    maximum_expected_spontanous_activity_duration,
-    stimulus_name_map,
-    column_name_map,
-    output_stimulus_table_path,
-    output_frame_times_path,
-    fail_on_negative_duration,
-    **kwargs
+        stimulus_pkl_path,
+        sync_h5_path,
+        frame_time_strategy,
+        minimum_spontaneous_activity_duration,
+        extract_const_params_from_repr,
+        drop_const_params,
+        maximum_expected_spontanous_activity_duration,
+        stimulus_name_map,
+        column_name_map,
+        output_stimulus_table_path,
+        output_frame_times_path,
+        fail_on_negative_duration,
+        **kwargs
 ):
-
     stim_file = CamStimOnePickleStimFile.factory(stimulus_pkl_path)
 
     sync_dataset = EcephysSyncDataset.factory(sync_h5_path)
-    frame_times = sync_dataset.extract_frame_times(strategy=frame_time_strategy)
+    frame_times = sync_dataset.extract_frame_times(
+        strategy=frame_time_strategy)
 
-    seconds_to_frames = (
-        lambda seconds: (np.array(seconds) + stim_file.pre_blank_sec)
-        * stim_file.frames_per_second
-    )
+    def seconds_to_frames(seconds):
+        return  \
+            (np.array(seconds) + stim_file.pre_blank_sec) * \
+            stim_file.frames_per_second
+
     minimum_spontaneous_activity_duration = (
-        minimum_spontaneous_activity_duration / stim_file.frames_per_second
+            minimum_spontaneous_activity_duration / stim_file.frames_per_second
     )
 
     stimulus_tabler = functools.partial(
@@ -67,19 +65,23 @@ def build_stimulus_table(
         stim_table_full, frame_times, stim_file.frames_per_second, True
     )
 
-    output_validation.validate_epoch_durations(stim_table_full, fail_on_negative_durations=fail_on_negative_duration)
+    output_validation.validate_epoch_durations(
+        stim_table_full, fail_on_negative_durations=fail_on_negative_duration)
     output_validation.validate_max_spontaneous_epoch_duration(
         stim_table_full, maximum_expected_spontanous_activity_duration
     )
 
     stim_table_full = naming_utilities.collapse_columns(stim_table_full)
     stim_table_full = naming_utilities.drop_empty_columns(stim_table_full)
-    stim_table_full = naming_utilities.standardize_movie_numbers(stim_table_full)
-    stim_table_full = naming_utilities.add_number_to_shuffled_movie(stim_table_full)
+    stim_table_full = naming_utilities.standardize_movie_numbers(
+        stim_table_full)
+    stim_table_full = naming_utilities.add_number_to_shuffled_movie(
+        stim_table_full)
     stim_table_full = naming_utilities.map_stimulus_names(
         stim_table_full, stimulus_name_map
     )
-    stim_table_full = naming_utilities.map_column_names(stim_table_full, column_name_map)
+    stim_table_full = naming_utilities.map_column_names(stim_table_full,
+                                                        column_name_map)
 
     stim_table_full.to_csv(output_stimulus_table_path, index=False)
     np.save(output_frame_times_path, frame_times, allow_pickle=False)
@@ -90,7 +92,6 @@ def build_stimulus_table(
 
 
 def main():
-
     mod = ArgSchemaParserPlus(
         schema_type=InputParameters, output_schema_type=OutputSchema
     )
