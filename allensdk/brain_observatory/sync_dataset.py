@@ -86,6 +86,12 @@ class Dataset(object):
     ...     logger.info(dset.meta_data)
     ...     dset.stats()
 
+    The sync file documentation from MPE can be found at
+    sharepoint > Instrumentation > Shared Documents > Sync_line_labels_discussion_2020-01-27-.xlsx  # NOQA E501
+    Direct link:
+    https://alleninstitute.sharepoint.com/:x:/s/Instrumentation/ES2bi1xJ3E9NupX-zQeXTlYBS2mVVySycfbCQhsD_jPMUw?e=Z9jCwH
+
+
     """
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
