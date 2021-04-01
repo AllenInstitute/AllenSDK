@@ -103,14 +103,23 @@ class Dataset(object):
                               "cam1_exposure",
                               "behavior_monitoring")
 
-    DEPRECATED_KEYS = {"cam2_exposure",
-                       "eyetracking",
-                       "eye_tracking",
-                       "cam1_exposure",
-                       "behavior_monitoring"}
+    DEPRECATED_KEYS = {}
 
     def __init__(self, path):
         self.dfile = self.load(path)
+        self._check_line_labels()
+
+    def _check_line_labels(self):
+        if hasattr(self, "line_labels"):
+            deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
+            if deprecated_keys:
+                warnings.warn((f"The loaded sync file contains the "
+                               f"following deprecated line label keys: "
+                               f"{deprecated_keys}. Consider updating the sync "
+                               f"file line labels."), stacklevel=2)
+        else:
+            warnings.warn((f"The loaded sync file has no line labels and may "
+                           f"not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
