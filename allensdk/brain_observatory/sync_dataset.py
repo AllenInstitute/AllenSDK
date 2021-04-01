@@ -110,7 +110,7 @@ class Dataset(object):
                               "cam1_exposure",
                               "behavior_monitoring")
 
-    DEPRECATED_KEYS = {}
+    DEPRECATED_KEYS = set()
 
     def __init__(self, path):
         self.dfile = self.load(path)
