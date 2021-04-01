@@ -135,30 +135,30 @@ class BehaviorSession(LazyPropertyMixin):
         -------
         pd.DataFrame
             A pandas DataFrame containing:
-                trials_id [index]:
+                trials_id [index]: (int)
                     Index of the trial. All trials, including aborted trials,
                     are assigned an index starting at 0 for the first trial.
-                reward_rate:
+                reward_rate: (float)
                     Rewards earned in the previous 25 trials, normalized by
                     the elapsed time of the same 25 trials. Units are
                     rewards/minute.
-                hit_rate_raw:
+                hit_rate_raw: (float)
                     Fraction of go trials where the mouse licked in the
                     response window, calculated over the previous 100
                     non-aborted trials. Without trial count correction applied.
-                hit_rate:
+                hit_rate: (float)
                     Fraction of go trials where the mouse licked in the
                     response window, calculated over the previous 100
                     non-aborted trials. With trial count correction applied.
-                false_alarm_rate_raw:
+                false_alarm_rate_raw: (float)
                     Fraction of catch trials where the mouse licked in the
                     response window, calculated over the previous 100
                     non-aborted trials. Without trial count correction applied.
-                false_alarm_rate:
+                false_alarm_rate: (float)
                     Fraction of catch trials where the mouse licked in
                     the response window, calculated over the previous 100
                     non-aborted trials. Without trial count correction applied.
-                rolling_dprime:
+                rolling_dprime: (float)
                     d prime calculated using the rolling hit_rate and
                     rolling false_alarm _rate.
 
@@ -185,23 +185,23 @@ class BehaviorSession(LazyPropertyMixin):
         -------
         dict
             Returns a dict of performance metrics with the following fields:
-                trial_count:
+                trial_count: (int)
                     The length of the trial dataframe
                     (including all 'go', 'catch', and 'aborted' trials)
-                go_trial_count:
+                go_trial_count: (int)
                     Number of 'go' trials in a behavior session
-                catch_trial_count:
+                catch_trial_count: (int)
                     Number of 'catch' trial types during a behavior session
-                hit_trial_count:
+                hit_trial_count: (int)
                     Number of trials with a hit behavior response
                     type in a behavior session
-                miss_trial_count:
+                miss_trial_count: (int)
                     Number of trials with a miss behavior response
                     type in a behavior session
-                false_alarm_trial_count:
+                false_alarm_trial_count: (int)
                     Number of trials where the mouse had a false alarm
                     behavior response
-                correct_reject_trial_count:
+                correct_reject_trial_count: (int)
                     Number of trials with a correct reject behavior
                     response during a behavior session
                 auto_reward_count:
@@ -214,40 +214,40 @@ class BehaviorSession(LazyPropertyMixin):
                 total_reward_count:
                     Number of trials where the mouse received a
                     water reward (earned or auto rewarded)
-                total_reward_volume:
+                total_reward_volume: (float)
                     Volume of all water rewards received during a
                     behavior session (earned and auto rewarded)
-                maximum_reward_rate:
+                maximum_reward_rate: (float)
                     The peak of the rolling reward rate (rewards/minute)
-                engaged_trial_count:
+                engaged_trial_count: (int)
                     Number of trials where the mouse is engaged
                     (reward rate > 2 rewards/minute)
-                mean_hit_rate:
+                mean_hit_rate: (float)
                     The mean of the rolling hit_rate
                 mean_hit_rate_uncorrected:
                     The mean of the rolling hit_rate_raw
-                mean_hit_rate_engaged:
+                mean_hit_rate_engaged: (float)
                     The mean of the rolling hit_rate, excluding epochs
                     when the rolling reward rate was below 2 rewards/minute
-                mean_false_alarm_rate:
+                mean_false_alarm_rate: (float)
                     The mean of the rolling false_alarm_rate, excluding
                     epochs when the rolling reward rate was below 2
                     rewards/minute
-                mean_false_alarm_rate_uncorrected:
+                mean_false_alarm_rate_uncorrected: (float)
                     The mean of the rolling false_alarm_rate_raw
-                mean_false_alarm_rate_engaged:
+                mean_false_alarm_rate_engaged: (float)
                     The mean of the rolling false_alarm_rate,
                     excluding epochs when the rolling reward rate
                     was below 2 rewards/minute
-                mean_dprime:
+                mean_dprime: (float)
                     The mean of the rolling d_prime
-                mean_dprime_engaged:
+                mean_dprime_engaged: (float)
                     The mean of the rolling d_prime, excluding
                     epochs when the rolling reward rate was
                     below 2 rewards/minute
-                max_dprime:
+                max_dprime: (float)
                     The peak of the rolling d_prime
-                max_dprime_engaged:
+                max_dprime_engaged: (float)
                     The peak of the rolling d_prime, excluding epochs
                     when the rolling reward rate was below 2 rewards/minute
         """
@@ -306,14 +306,15 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def behavior_session_id(self) -> int:
-        """Unique identifier for this experimental session.
+        """Unique identifier for a behavioral session.
         :rtype: int
         """
         return self._behavior_session_id
 
     @property
     def licks(self) -> pd.DataFrame:
-        """Get lick data from pkl file.
+        """A dataframe containing lick timestmaps and frames, sampled
+        at 60 Hz.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -324,6 +325,12 @@ class BehaviorSession(LazyPropertyMixin):
         -------
         np.ndarray
             A dataframe containing lick timestamps.
+            dataframe columns:
+                timestamps: (float)
+                    time of lick, in seconds
+                frame: (int)
+                    frame of lick
+
         """
         return self._licks
 
@@ -333,7 +340,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def rewards(self) -> pd.DataFrame:
-        """Get reward data from pkl file.
+        """Retrieves rewards from data file saved at the end of the
+        behavior session.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -344,6 +352,19 @@ class BehaviorSession(LazyPropertyMixin):
         -------
         pd.DataFrame
             A dataframe containing timestamps of delivered rewards.
+            Timestamps are sampled at 60Hz.
+
+            dataframe columns:
+                volume: (float)
+                    volume of individual water reward in ml.
+                    0.007 if earned reward, 0.005 if auto reward.
+                timestamps: (float)
+                    time in seconds
+                autorewarded: (bool)
+                    True if free reward was delivered for that trial.
+                    Occurs during the first 5 trials of a session and
+                    throughout as needed
+
         """
         return self._rewards
 
@@ -353,9 +374,9 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def running_speed(self) -> pd.DataFrame:
-        """Get running speed data. By default applies a 10Hz low pass
-        filter to the data. To get the running speed without the filter,
-        use `raw_running_speed`.
+        """Running speed and timestamps, sampled at 60Hz. By default
+        applies a 10Hz low pass filter to the data. To get the
+        running speed without the filter, use `raw_running_speed`.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -365,8 +386,12 @@ class BehaviorSession(LazyPropertyMixin):
         Returns
         -------
         pd.DataFrame
-            Dataframe containing various signals used to compute running
-            speed, and the filtered speed.
+            Dataframe containing running speed and timestamps
+            dataframe columns:
+                timestamps: (float)
+                    time in seconds
+                speed: (float)
+                    speed in cm/sec
         """
         return self._running_speed
 
@@ -376,7 +401,7 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def raw_running_speed(self) -> pd.DataFrame:
-        """Get unfiltered running speed data.
+        """Get unfiltered running speed data. Sampled at 60Hz.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -386,8 +411,12 @@ class BehaviorSession(LazyPropertyMixin):
         Returns
         -------
         pd.DataFrame
-            Dataframe containing various signals used to compute running
-            speed, and the unfiltered speed.
+            Dataframe containing unfiltered running speed and timestamps
+            dataframe columns:
+                timestamps: (float)
+                    time in seconds
+                speed: (float)
+                    speed in cm/sec
         """
         return self._raw_running_speed
 
@@ -407,6 +436,32 @@ class BehaviorSession(LazyPropertyMixin):
             Table whose rows are stimulus presentations
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
+
+            dataframe columns:
+                stimulus_presentations_id [index]: (int)
+                    identifier for a stimulus presentation
+                    (presentation of an image)
+                duration: (float)
+                    duration of an image presentation (flash)
+                    in seconds (stop_time - start_time). NaN if omitted
+                end_frame: (float)
+                    image presentation end frame
+                image_index: (int)
+                    image index (0-7) for a given session,
+                    corresponding to each image name
+                image_set: (string)
+                    image set for this behavior session
+                index: (int)
+                    an index assigned to each stimulus presentation
+                omitted: (bool)
+                    True if no image was shown for this stimulus
+                    presentation
+                start_frame: (int)
+                    image presentation start frame
+                start_time: (float)
+                    image presentation start time in seconds
+                stop_time: (float)
+                    image presentation end time in seconds
         """
         return self._stimulus_presentations
 
@@ -422,8 +477,17 @@ class BehaviorSession(LazyPropertyMixin):
         -------
         pd.DataFrame
             A pandas DataFrame object containing the stimulus images for the
-            experiment. Indices are image names, 'warped' and 'unwarped'
-            columns contains image arrays, and the df.name is the image set.
+            experiment.
+
+            dataframe columns:
+                image_name [index]: (string)
+                    name of image presented, if 'omitted'
+                    then no image was presented
+                unwarped: (array of int)
+                    image array of unwarped stimulus image
+                warped: (array of int)
+                    image array of warped stimulus image
+
         """
         return self._stimulus_templates.to_dataframe()
 
@@ -433,7 +497,9 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
-        """Get stimulus timestamps from pkl file.
+        """Timestamps associated with the stimulus presetntation on
+        the monitor retrieveddata file saved at the end of the
+        behavior session. Sampled at 60Hz.
 
         NOTE: For BehaviorSessions, returned timestamps are not
         aligned to external 'synchronization' reference timestamps.
@@ -453,7 +519,8 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def task_parameters(self) -> dict:
-        """Get task parameters from pkl file.
+        """Get task parameters from data file saved at the end of
+        the behavior session file.
 
         Returns
         -------
@@ -504,13 +571,71 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def trials(self) -> pd.DataFrame:
-        """Get trials from pkl file
+        """Get trials from data file saved at the end of the
+        behavior session.
 
         Returns
         -------
         pd.DataFrame
-            A dataframe containing behavioral trial start/stop times,
-            and trial data
+            A dataframe containing trial and behavioral response data,
+            by cell specimen id
+
+            dataframe columns:
+                trials_id: (int)
+                    trial identifier
+                lick_times: (array of float)
+                    array of lick times in seconds during that trial.
+                    Empty array if no licks occured during the trial.
+                reward_time: (NaN or float)
+                    Time the reward is delivered following a correct
+                    response or on auto rewarded trials.
+                reward_volume: (float)
+                    volume of reward in ml. 0.005 for auto reward
+                    0.007 for earned reward
+                hit: (bool)
+                    Behavior response type. On catch trial mouse licks
+                    within reward window.
+                false_alarm: (bool)
+                    Behavior response type. On catch trial mouse licks
+                    within reward window.
+                miss: (bool)
+                    Behavior response type. On a go trial, mouse either
+                    does not lick at all, or licks after reward window
+                stimulus_change: (bool)
+                    True if an image change occurs during the trial
+                    (if the trial was both a 'go' trial and the trial
+                    was not aborted)
+                aborted: (bool)
+                    Behavior response type. True if the mouse licks
+                    before the scheduled change time.
+                go: (bool)
+                    Trial type. True if there was a change in stimulus
+                    image identity on this trial
+                catch: (bool)
+                    Trial type. True if there was not a change in stimulus
+                    identity on this trial
+                auto_rewarded: (bool)
+                    True if free reward was delivered for that trial.
+                    Occurs during the first 5 trials of a session and
+                    throughout as needed.
+                correct_reject: (bool)
+                    Behavior response type. On a catch trial, mouse
+                    either does not lick at all or licks after reward
+                    window
+                start_time: (float)
+                    start time of the trial in seconds
+                stop_time: (float)
+                    end time of the trial in seconds
+                trial_length: (float)
+                    duration of trial in seconds (stop_time -start_time)
+                response_time: (float)
+                    time of first lick in trial in seconds and NaN if
+                    trial aborted
+                initial_image_name: (string)
+                    name of image presented at start of trial
+                change_image_name: (string)
+                    name of image that is changed to at the change time,
+                    on go trials
         """
         return self._trials
 
@@ -520,8 +645,42 @@ class BehaviorSession(LazyPropertyMixin):
 
     @property
     def metadata(self) -> Dict[str, Any]:
-        """Return metadata about the session.
-        :rtype: dict
+        """metadata for a give session
+
+        Returns
+        -------
+        Dict
+            A dictionary containing behavior session specific metadata
+            dictionary keys:
+                age_in_days: (int)
+                    age of mouse in days
+                behavior_session_uuid: (int)
+                    unique identifier for a behavior session
+                behavior_session_id: (int)
+                    unique identifier for a behavior session
+                cre_line: (string)
+                    cre driver line for a transgenic mouse
+                date_of_acquisition: (date time object)
+                    date and time of experiment acquisition,
+                    yyyy-mm-dd hh:mm:ss
+                driver_line: (list of string)
+                    all driver lines for a transgenic mouse
+                equipment_name: (string)
+                    identifier for equipment data was collected on
+                full_genotype: (string)
+                    full genotype of transgenic mouse
+                mouse_id: (int)
+                    unique identifier for a mouse
+                reporter_line: (string)
+                    reporter line for a transgenic mouse
+                session_type: (string)
+                    visual stimulus type displayed during behavior
+                    session
+                sex: (string)
+                    sex of the mouse
+                stimulus_frame_rate: (float)
+                    frame rate (Hz) at which the visual stimulus is
+                    displayed
         """
         if isinstance(self._metadata, BehaviorMetadata):
             metadata = self._metadata.to_dict()
