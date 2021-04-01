@@ -29,6 +29,13 @@ def convert_strings_to_lists(df, is_session=True):
             .apply(lambda x: literal_eval(x))
 
 
+def sort_df(df: pd.DataFrame, sort_col: str):
+    """Sorts df for comparison"""
+    return df.sort_values(sort_col)\
+        .reset_index()\
+        .drop('index', axis=1)
+
+
 @pytest.mark.requires_bamboo
 def test_metadata():
     release_date = '2021-03-25'
@@ -48,10 +55,12 @@ def test_metadata():
         # test behavior
         expected = pd.read_pickle(os.path.join(expected_path,
                                                'behavior_session_table.pkl'))
+        expected = sort_df(df=expected, sort_col='behavior_session_id')
         obtained = pd.read_csv(os.path.join(tmp_dir,
                                             'behavior_session_table.csv'),
                                dtype={'mouse_id': str},
                                parse_dates=['date_of_acquisition'])
+        obtained = sort_df(df=obtained, sort_col='behavior_session_id')
         convert_strings_to_lists(df=obtained)
         pd.testing.assert_frame_equal(expected,
                                       obtained)
@@ -59,10 +68,12 @@ def test_metadata():
         # test ophys session
         expected = pd.read_pickle(os.path.join(expected_path,
                                                'ophys_session_table.pkl'))
+        expected = sort_df(df=expected, sort_col='ophys_session_id')
         obtained = pd.read_csv(os.path.join(tmp_dir,
                                             'ophys_session_table.csv'),
                                dtype={'mouse_id': str},
                                parse_dates=['date_of_acquisition'])
+        obtained = sort_df(df=obtained, sort_col='ophys_session_id')
         convert_strings_to_lists(df=obtained)
         pd.testing.assert_frame_equal(expected,
                                       obtained)
@@ -70,10 +81,12 @@ def test_metadata():
         # test ophys experiment
         expected = pd.read_pickle(os.path.join(expected_path,
                                                'ophys_experiment_table.pkl'))
+        expected = sort_df(df=expected, sort_col='ophys_experiment_id')
         obtained = pd.read_csv(os.path.join(tmp_dir,
                                             'ophys_experiment_table.csv'),
                                dtype={'mouse_id': str},
                                parse_dates=['date_of_acquisition'])
+        obtained = sort_df(df=obtained, sort_col='ophys_experiment_id')
         convert_strings_to_lists(df=obtained, is_session=False)
         pd.testing.assert_frame_equal(expected,
                                       obtained)
