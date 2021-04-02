@@ -20,13 +20,12 @@ data_skip = False
 if not os.path.exists(test_data["nikon"]["sync_file"]):
     data_skip = True
 
-### Functions from lims2_modules ophys_time_sync.py for regression testing
+# Functions from lims2_modules ophys_time_sync.py for regression testing
 
 MIN_BOUND = .03
 MAX_BOUND = .04
 
 
-### Mock keys
 mock_keys = {
     "photodiode": "photodiode",
     "2p": "2p_vsync",
@@ -37,6 +36,7 @@ mock_keys = {
     "lick_sensor": "lick_1"
 }
 
+
 class MockSyncDataset(Dataset):
     """
     Mock the Dataset class so it doesn't load an h5 file upon
@@ -44,7 +44,7 @@ class MockSyncDataset(Dataset):
     """
     def __init__(self, data, line_labels=None):
         self.dfile = data
-        self.line_labels=line_labels
+        self.line_labels = line_labels
 
 
 def mock_get_real_photodiode_events(data, key):
@@ -59,31 +59,35 @@ def calculate_stimulus_alignment(stim_time, valid_twop_vsync_fall):
     stimulus_alignment = np.empty(len(stim_time))
 
     for index in range(len(stim_time)):
-        crossings = np.nonzero(np.ediff1d(np.sign(valid_twop_vsync_fall - stim_time[index])) > 0)
+        crossings = np.nonzero(
+                np.ediff1d(
+                    np.sign(valid_twop_vsync_fall - stim_time[index])) > 0)
         try:
             stimulus_alignment[index] = int(crossings[0][0])
-        except:
+        except:  # noqa: E722
             stimulus_alignment[index] = np.NaN
 
     return stimulus_alignment
 
 
 def calculate_valid_twop_vsync_fall(sync_data, sample_frequency):
-    twop_vsync_fall = sync_data.get_falling_edges('2p_vsync') / sample_frequency
+    twop_vsync_fall = sync_data.get_falling_edges('2p_vsync') /\
+            sample_frequency
 
     if len(twop_vsync_fall) == 0:
-        raise ValueError('Error: twop_vsync_fall length is 0, possible invalid, missing, and/or bad data')
+        raise ValueError('Error: twop_vsync_fall length is 0, possible '
+                         'invalid, missing, and/or bad data')
 
     ophys_start = twop_vsync_fall[0]
-
-    valid_twop_vsync_fall = twop_vsync_fall[np.where(twop_vsync_fall > ophys_start)[0]]
+    valid_twop_vsync_fall = twop_vsync_fall[np.where(
+        twop_vsync_fall > ophys_start)[0]]
 
     return valid_twop_vsync_fall
 
 
 def calculate_stim_vsync_fall(sync_data, sample_frequency):
-    stim_vsync_fall = sync_data.get_falling_edges('stim_vsync')[0:] / sample_frequency 
-
+    stim_vsync_fall = sync_data.get_falling_edges('stim_vsync')[0:] /\
+            sample_frequency
     return stim_vsync_fall
 
 
@@ -97,61 +101,63 @@ def find_start(twop_vsync_fall):
     index = 0
     for value in twop_vsync_fall:
         if not found_start:
-            if prev_value != None:
+            if prev_value is not None:
                 diff = value - prev_value
-
                 if diff < MIN_BOUND or diff > MAX_BOUND:
                     if in_start_frames:
                         in_start_frames = False
-
                 elif not in_start_frames:
-
                     found_start = True
-                    start_index = index			
+                    start_index = index
 
             prev_value = value
-        index+= 1
+        index += 1
 
     return start_index
 
 
-def sync_camera_stimulus(sync_data, sample_frequency, camera, ophys_experiment_id):
-        twop_vsync_fall = sync_data.get_falling_edges('2p_vsync') / sample_frequency
+def sync_camera_stimulus(sync_data, sample_frequency, camera,
+                         ophys_experiment_id):
+    twop_vsync_fall = sync_data.get_falling_edges('2p_vsync') /\
+            sample_frequency
 
-        if len(twop_vsync_fall) == 0:
-            raise ValueError('Error: twop_vsync_fall length is 0, possible invalid, missing, and/or bad data')
+    if len(twop_vsync_fall) == 0:
+        raise ValueError('Error: twop_vsync_fall length is 0, '
+                         'possible invalid, missing, and/or bad data')
 
+    try:
+        twop_acquiring = sync_data.get_rising_edges('2p_acquiring')
+        ophys_start = twop_acquiring / sample_frequency
+    except:  # noqa: E722
+        ophys_start = [find_start(twop_vsync_fall)]
+
+    twop_vsync_fall = twop_vsync_fall[np.where(
+        twop_vsync_fall > ophys_start)[0]]
+
+    cam_fall = None
+
+    if camera == 1:
+        cam_fall = sync_data.get_falling_edges('cam1_exposure') /\
+                sample_frequency
+    elif camera == 2:
+        cam_fall = sync_data.get_falling_edges('cam2_exposure') /\
+                sample_frequency
+    else:
+        raise ValueError(f'Error: camera value {camera} is invalid')
+
+    frames = np.zeros((len(twop_vsync_fall), 1))
+
+    for i in range(len(frames)):
+        crossings = np.nonzero(
+            np.ediff1d(np.sign(cam_fall - twop_vsync_fall[i])) > 0)
         try:
-            twop_acquiring = sync_data.get_rising_edges('2p_acquiring')
-            ophys_start = twop_acquiring / sample_frequency
-        except:
-            ophys_start = [find_start(twop_vsync_fall)]
+            frames[i] = crossings[0][0]
+        except:  # noqa: E722
+            frames[i] = np.NaN
 
-        twop_vsync_fall = twop_vsync_fall[np.where(twop_vsync_fall > ophys_start)[0]]
+    return frames
 
-        cam_fall = None
-
-        if camera == 1:
-            cam_fall = sync_data.get_falling_edges('cam1_exposure') / sample_frequency
-        elif camera == 2:
-            cam_fall = sync_data.get_falling_edges('cam2_exposure') / sample_frequency
-        else:
-            raise ValueError('Error: camera value ' + str(camera) + ' is invalid')
-
-        frames = np.zeros((len(twop_vsync_fall), 1))
-
-
-        for i in range(len(frames)):
-                crossings = np.nonzero(np.ediff1d(np.sign(cam_fall - twop_vsync_fall[i])) > 0)
-
-                try:
-                        frames[i] = crossings[0][0]
-                except:
-                        frames[i] = np.NaN
-                        
-        return frames
-
-### End of regression functions
+# End of regression functions
 
 
 @pytest.fixture
@@ -187,7 +193,7 @@ def test_get_alignment_array():
     alignment = ts.get_alignment_array(bigger, smaller)
     assert np.all(~np.isnan(alignment))
     assert np.all(bigger[alignment.astype(int)] < smaller)
-    
+
     alignment = ts.get_alignment_array(smaller, bigger)
     assert np.all(np.isnan(alignment[bigger <= 0.2]))
     assert np.all(np.isnan(alignment[bigger >= 50]))
@@ -236,7 +242,7 @@ def test_regression_calculate_stimulus_alignment(nikon_input,
                                                  aligner.ophys_timestamps)
         new_align = ts.get_alignment_array(aligner.ophys_timestamps,
                                            aligner.stim_timestamps)
-        
+
         # Old alignment assigned simultaneous stim frames to the previous ophys
         # frame. Methods should only differ when ophys and stim are identical.
         mismatch = old_align != new_align
@@ -259,12 +265,13 @@ def test_regression_calculate_camera_alignment(nikon_input,
         new_eye_align = ts.get_alignment_array(aligner.eye_video_timestamps,
                                                aligner.ophys_timestamps[1:],
                                                int_method=np.ceil)
-        mismatch = np.where(old_eye_align[:,0] != new_eye_align)
-        mis_e = aligner.eye_video_timestamps[new_eye_align[mismatch].astype(int)]
+        mismatch = np.where(old_eye_align[:, 0] != new_eye_align)
+        mis_e = \
+            aligner.eye_video_timestamps[new_eye_align[mismatch].astype(int)]
         mis_o = aligner.ophys_timestamps[1:][mismatch]
         mis_o_plus = aligner.ophys_timestamps[1:][(mismatch[0]+1,)]
         # New method should only disagree when old method was wrong (old method
-        # set an eye tracking frame to an earlier ophys frame). 
+        # set an eye tracking frame to an earlier ophys frame).
         assert np.all(mis_o < mis_e)
         assert np.all(mis_o_plus >= mis_e)
         # Occurence of mismatch should be rare
@@ -350,11 +357,12 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
     with patch.object(ts, "calculate_monitor_delay",
                       return_value=ASSUMED_DELAY):
         with patch.object(ts.Dataset, "get_falling_edges",
-                          return_value=true_falling) as mock_falling:
+                          return_value=true_falling):
             with patch.object(ts.Dataset, "get_rising_edges",
-                          return_value=true_rising) as mock_rising:
+                              return_value=true_rising) as mock_rising:
                 with patch("logging.info") as mock_log:
-                    times, delta, stim_delay = aligner.corrected_stim_timestamps
+                    times, delta, stim_delay = \
+                            aligner.corrected_stim_timestamps
 
     if stim_data_length is None:
         mock_log.assert_called_once()
@@ -388,9 +396,9 @@ def test_get_corrected_ophys_times_nikon(ophys_data_length):
 
     aligner.ophys_data_length = ophys_data_length
     with patch.object(ts.Dataset, "get_falling_edges",
-                      return_value=true_times) as mock_times:
+                      return_value=true_times):
         with patch.object(ts.Dataset, "get_rising_edges",
-                          return_value=[0]) as mock_acquiring:
+                          return_value=[0]):
             with patch("logging.info") as mock_log:
                 if ophys_data_length is not None and \
                    ophys_data_length > len(true_times):
@@ -417,7 +425,7 @@ def test_get_corrected_ophys_times_nikon(ophys_data_length):
 @pytest.mark.skipif(data_skip, reason="No sync or data")
 def test_module(input_json):
     with patch("sys.argv", ["test_run", input_json]):
-        with patch("logging.info") as mock_logging:
+        with patch("logging.info"):
             run_ophys_time_sync.main()
 
     with open(input_json, "r") as f:
@@ -522,8 +530,10 @@ def test_find_last_n(arr, cond, n, expected):
     [
         ([0.25, 0.5, 0.75, 1., 2., 3., 5., 5.75], [1., 2., 3.]),
         ([1., 2., 3., 4.], [1., 2., 3., 4.]),
-        ([0.25, 1., 2., 2.1, 2.2, 3., 4., 5.], [3., 4., 5.]),   # false alarm start
-        ([0.25, 1., 2., 3., 4., 4.5, 5.1, 6.1], [1., 2., 3., 4.]),  # false alarm end
+        # false alarm start
+        ([0.25, 1., 2., 2.1, 2.2, 3., 4., 5.], [3., 4., 5.]),
+        # false alarm end
+        ([0.25, 1., 2., 3., 4., 4.5, 5.1, 6.1], [1., 2., 3., 4.]),
     ],
 )
 def test_get_photodiode_events(sync_dset, expected, monkeypatch):
@@ -563,104 +573,108 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
     assert obtained == expected
 
 
-@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels,"
-                         "expected_log",
-                         [(None, ['2p_vsync', 'stim_vsync', 'stim_photodiode',
-                                  'acq_trigger', '', 'cam1_exposure',
-                                  'cam2_exposure', 'lick_sensor'],
-                          {
-                            "photodiode": "stim_photodiode",
-                            "2p": "2p_vsync",
-                            "stimulus": "stim_vsync",
-                            "eye_camera": "cam2_exposure",
-                            "behavior_camera": "cam1_exposure",
-                            "lick_sensor": "lick_sensor",
-                            "acquiring": "acq_trigger"},
-                          []),
-                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
-                                  'acq_trigger', 'behavior_monitoring',
-                                  'eye_tracking', 'lick_1'],
-                          {
-                            "photodiode": "photodiode",
-                            "2p": "2p_vsync",
-                            "stimulus": "stim_vsync",
-                            "eye_camera": "eye_tracking",
-                            "behavior_camera": "behavior_monitoring",
-                            "lick_sensor": "lick_1",
-                            "acquiring": "acq_trigger"},
-                          []),
-                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
-                                  'acq_trigger', '', 'behavior_monitoring',
-                                  'lick_1'],
-                          {
-                            "photodiode": "photodiode",
-                            "2p": "2p_vsync",
-                            "stimulus": "stim_vsync",
-                            "behavior_camera": "behavior_monitoring",
-                            "lick_sensor": "lick_1",
-                            "acquiring": "acq_trigger"},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "eye_camera (valid line label(s) = "
-                                         "['cam2_exposure', 'eye_tracking', "
-                                         "'eye_frame_received']")]),
-                          (None, [],
-                          {},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "photodiode (valid line label(s) = "
-                                          "['stim_photodiode', 'photodiode']"),
-                            ('root', 30, "2p (valid line label(s) = "
-                                          "['2p_vsync']"),
-                            ('root', 30, "stimulus (valid line label(s) = "
-                                          "['stim_vsync', 'vsync_stim']"),
-                            ('root', 30, "eye_camera (valid line label(s) = "
-                                          "['cam2_exposure', 'eye_tracking', "
-                                          "'eye_frame_received']"),
-                            ('root', 30, "behavior_camera (valid line label(s) "
-                                         "= ['cam1_exposure', "
-                                         "'behavior_monitoring', "
-                                         "'beh_frame_received']"),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring', 'acq_trigger']"),
-                            ('root', 30, "lick_sensor (valid line label(s) = "
-                                         "['lick_1', 'lick_sensor']")]),
-                          (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
-                                  'eye_tracking', 'lick_1', 'acq_trigger',
-                                  'cam1_exposure'],
-                          {
-                            "photodiode": "photodiode",
-                            "stimulus": "stim_vsync",
-                            "eye_camera": "eye_tracking",
-                            "behavior_camera": "cam1_exposure",
-                            "lick_sensor": "lick_1",
-                            "acquiring": "acq_trigger"},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "2p (valid line label(s) = "
-                                         "['2p_vsync']")]),
-                          (None, ['barcode_ephys', 'vsync_stim',
-                                  'stim_photodiode', 'stim_running',
-                                  'beh_frame_received', 'eye_frame_received',
-                                  'face_frame_received', 'stim_running_opto',
-                                  'stim_trial_opto', 'face_came_frame_readout',
-                                  'eye_cam_frame_readout',
-                                  'beh_cam_frame_readout', 'face_cam_exposing',
-                                  'eye_cam_exposing', 'beh_cam_exposing',
-                                  'lick_sensor'],
-                          {
-                            "photodiode": "stim_photodiode",
-                            "stimulus": "vsync_stim",
-                            "eye_camera": "eye_frame_received",
-                            "behavior_camera": "beh_frame_received",
-                            "lick_sensor": "lick_sensor"},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "2p (valid line label(s) = "
-                                         "['2p_vsync']"),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring', 'acq_trigger']")])
-])
+@pytest.mark.parametrize(
+        "sync_dset, line_labels, expected_line_labels, expected_log",
+        [
+            (None, ['2p_vsync', 'stim_vsync', 'stim_photodiode',
+                    'acq_trigger', '', 'cam1_exposure',
+                    'cam2_exposure', 'lick_sensor'],
+             {
+              "photodiode": "stim_photodiode",
+              "2p": "2p_vsync",
+              "stimulus": "stim_vsync",
+              "eye_camera": "cam2_exposure",
+              "behavior_camera": "cam1_exposure",
+              "lick_sensor": "lick_sensor",
+              "acquiring": "acq_trigger"},
+             []),
+            (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                    'acq_trigger', 'behavior_monitoring',
+                    'eye_tracking', 'lick_1'],
+             {
+              "photodiode": "photodiode",
+              "2p": "2p_vsync",
+              "stimulus": "stim_vsync",
+              "eye_camera": "eye_tracking",
+              "behavior_camera": "behavior_monitoring",
+              "lick_sensor": "lick_1",
+              "acquiring": "acq_trigger"},
+             []),
+            (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                    'acq_trigger', '', 'behavior_monitoring',
+                    'lick_1'],
+             {
+              "photodiode": "photodiode",
+              "2p": "2p_vsync",
+              "stimulus": "stim_vsync",
+              "behavior_camera": "behavior_monitoring",
+              "lick_sensor": "lick_1",
+              "acquiring": "acq_trigger"},
+             [('root', 30, 'Could not find valid lines for the '
+                           'following data sources'),
+              ('root', 30, "eye_camera (valid line label(s) = "
+                           "['cam2_exposure', 'eye_tracking', "
+                           "'eye_frame_received']")]),
+            (None, [],
+             {},
+             [('root', 30,
+               'Could not find valid lines for the '
+               'following data sources'),
+              ('root', 30,
+               "photodiode (valid line label(s) = "
+               "['stim_photodiode', 'photodiode']"),
+              ('root', 30,
+               "2p (valid line label(s) = ['2p_vsync']"),
+              ('root', 30,
+               "stimulus (valid line label(s) = "
+               "['stim_vsync', 'vsync_stim']"),
+              ('root', 30,
+               "eye_camera (valid line label(s) = "
+               "['cam2_exposure', 'eye_tracking', 'eye_frame_received']"),
+              ('root', 30, "behavior_camera (valid line label(s) "
+                           "= ['cam1_exposure', "
+                           "'behavior_monitoring', "
+                           "'beh_frame_received']"),
+              ('root', 30, "acquiring (valid line label(s) = "
+                           "['2p_acquiring', 'acq_trigger']"),
+              ('root', 30, "lick_sensor (valid line label(s) = "
+                           "['lick_1', 'lick_sensor']")]),
+            (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
+                    'eye_tracking', 'lick_1', 'acq_trigger',
+                    'cam1_exposure'],
+             {
+              "photodiode": "photodiode",
+              "stimulus": "stim_vsync",
+              "eye_camera": "eye_tracking",
+              "behavior_camera": "cam1_exposure",
+              "lick_sensor": "lick_1",
+              "acquiring": "acq_trigger"},
+             [('root', 30, 'Could not find valid lines for the '
+                           'following data sources'),
+              ('root', 30, "2p (valid line label(s) = "
+                           "['2p_vsync']")]),
+            (None, ['barcode_ephys', 'vsync_stim',
+                    'stim_photodiode', 'stim_running',
+                    'beh_frame_received', 'eye_frame_received',
+                    'face_frame_received', 'stim_running_opto',
+                    'stim_trial_opto', 'face_came_frame_readout',
+                    'eye_cam_frame_readout',
+                    'beh_cam_frame_readout', 'face_cam_exposing',
+                    'eye_cam_exposing', 'beh_cam_exposing',
+                    'lick_sensor'],
+             {
+              "photodiode": "stim_photodiode",
+              "stimulus": "vsync_stim",
+              "eye_camera": "eye_frame_received",
+              "behavior_camera": "beh_frame_received",
+              "lick_sensor": "lick_sensor"},
+             [('root', 30, 'Could not find valid lines for the '
+                           'following data sources'),
+              ('root', 30, "2p (valid line label(s) = "
+                           "['2p_vsync']"),
+              ('root', 30, "acquiring (valid line label(s) = "
+                           "['2p_acquiring', 'acq_trigger']")])
+               ])
 def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
                   caplog):
     """
@@ -677,5 +691,3 @@ def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
     keys = ts.get_keys(ds)
     assert keys == expected_line_labels
     assert caplog.record_tuples == expected_log
-
-
