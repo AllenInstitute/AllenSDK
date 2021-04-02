@@ -574,11 +574,9 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "cam2_exposure",
                             "behavior_camera": "cam1_exposure",
-                            "lick_sensor": "lick_sensor"},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']")]),
+                            "lick_sensor": "lick_sensor",
+                            "acquiring": "acq_trigger"},
+                          []),
                           (None, ['2p_vsync', 'stim_vsync', 'photodiode',
                                   'acq_trigger', 'behavior_monitoring',
                                   'eye_tracking', 'lick_1'],
@@ -588,11 +586,9 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "eye_tracking",
                             "behavior_camera": "behavior_monitoring",
-                            "lick_sensor": "lick_1"},
-                           [('root', 30, 'Could not find valid lines for the '
-                                         'following data sources'),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']")]),
+                            "lick_sensor": "lick_1",
+                            "acquiring": "acq_trigger"},
+                          []),
                           (None, ['2p_vsync', 'stim_vsync', 'photodiode',
                                   'acq_trigger', '', 'behavior_monitoring',
                                   'lick_1'],
@@ -601,14 +597,13 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "2p": "2p_vsync",
                             "stimulus": "stim_vsync",
                             "behavior_camera": "behavior_monitoring",
-                            "lick_sensor": "lick_1"},
+                            "lick_sensor": "lick_1",
+                            "acquiring": "acq_trigger"},
                            [('root', 30, 'Could not find valid lines for the '
                                          'following data sources'),
                             ('root', 30, "eye_camera (valid line label(s) = "
                                          "['cam2_exposure', 'eye_tracking', "
-                                         "'eye_frame_received']"),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']")]),
+                                         "'eye_frame_received']")]),
                           (None, [],
                           {},
                            [('root', 30, 'Could not find valid lines for the '
@@ -627,7 +622,7 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                                          "'behavior_monitoring', "
                                          "'beh_frame_received']"),
                             ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']"),
+                                         "['2p_acquiring', 'acq_trigger']"),
                             ('root', 30, "lick_sensor (valid line label(s) = "
                                          "['lick_1', 'lick_sensor']")]),
                           (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
@@ -638,13 +633,12 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "eye_tracking",
                             "behavior_camera": "cam1_exposure",
-                            "lick_sensor": "lick_1"},
+                            "lick_sensor": "lick_1",
+                            "acquiring": "acq_trigger"},
                            [('root', 30, 'Could not find valid lines for the '
                                          'following data sources'),
                             ('root', 30, "2p (valid line label(s) = "
-                                         "['2p_vsync']"),
-                            ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']")]),
+                                         "['2p_vsync']")]),
                           (None, ['barcode_ephys', 'vsync_stim',
                                   'stim_photodiode', 'stim_running',
                                   'beh_frame_received', 'eye_frame_received',
@@ -665,7 +659,7 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             ('root', 30, "2p (valid line label(s) = "
                                          "['2p_vsync']"),
                             ('root', 30, "acquiring (valid line label(s) = "
-                                         "['2p_acquiring']")])
+                                         "['2p_acquiring', 'acq_trigger']")])
 ])
 def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
                   caplog):
