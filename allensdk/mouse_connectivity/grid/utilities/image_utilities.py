@@ -200,7 +200,7 @@ def build_composite_transform(dfmfield=None, aff_params=None):
         dfmxfm = sitk.DisplacementFieldTransform(dfmfield)
         affxfm = build_affine_transform(aff_params)
 
-        sitk.CompositeTransform([affxfm, dfmxfm])
+        transform = sitk.CompositeTransform([affxfm, dfmxfm])
 
     return transform
     
