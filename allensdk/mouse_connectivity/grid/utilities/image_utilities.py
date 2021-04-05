@@ -269,8 +269,8 @@ def __read_segmentation_image_with_glymur(path):
     return glymur.Jp2k(path)[:]
 
 
-def __read_intensity_image_with_glymur():
-    image = glymur.Jp2k(path)[:]
+def __read_intensity_image_with_glymur(path):
+    return glymur.Jp2k(path)[:]
 
 
 try:
