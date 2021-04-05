@@ -127,9 +127,9 @@ def grid_image_blocks(in_shape, in_spacing, out_spacing):
                                  (in_shape[dim]-0.5)*in_spacing[dim],
                                  out_spacing[dim])
 
-        dig = np.digitize(in_px_centers, out_px_edges)        
+        dig = np.digitize(in_px_centers, out_px_edges)
 
-        inds = np.where(np.diff(dig)>0)[0] + 1
+        inds = np.where(np.diff(dig) > 0)[0] + 1
         inds = [0] + inds.tolist() + [in_shape[dim]]
 
         dim_blocks = [
@@ -150,8 +150,12 @@ def rasterize_polygons(shape, scale, polys):
     canvas = np.zeros(shape, dtype=np.uint8)
     for points in polys:
 
-        rpts = np.array([int(np.around(item[1] * scale[1])) for item in points])
-        cpts = np.array([int(np.around(item[0] * scale[0])) for item in points])
+        rpts = np.array([
+            int(np.around(item[1] * scale[1])) for item in points
+        ])
+        cpts = np.array([
+            int(np.around(item[0] * scale[0])) for item in points
+        ])
 
         poly = polygon(rpts, cpts)
         canvas[poly] = 1
@@ -188,7 +192,8 @@ def build_composite_transform(dfmfield=None, aff_params=None):
     '''
     '''
 
-    if dfmfield is not None and dfmfield.GetPixelIDValue() != sitk.sitkVectorFloat64:
+    if dfmfield is not None and \
+       dfmfield.GetPixelIDValue() != sitk.sitkVectorFloat64:
         dfmfield = sitk.Cast(dfmfield, sitk.sitkVectorFloat64)
 
     if dfmfield is None and aff_params is None:
@@ -232,9 +237,9 @@ def write_volume(volume,
         path = os.path.join(prefix, name)
 
     if specify_resolution is not None:
-        if isinstance(specify_resolution, (float, np.floating)): 
-            if specify_resolution % 1.0 == 0:
-                specify_resolution = int(specify_resolution)
+        if isinstance(specify_resolution, (float, np.floating)) and \
+           specify_resolution % 1.0 == 0:
+            specify_resolution = int(specify_resolution)
         path = path + '_{0}'.format(specify_resolution)
 
     path = path + extension
