@@ -29,7 +29,7 @@ class DataObject(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def from_nwb() -> Type["DataObject"]:
+    def from_nwb(nwbfile: NWBFile) -> Type["DataObject"]:
         raise NotImplementedError()
 
     @abc.abstractmethod

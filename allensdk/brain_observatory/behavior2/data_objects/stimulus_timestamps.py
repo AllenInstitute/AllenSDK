@@ -24,8 +24,12 @@ class StimulusTimestamps(DataObject):
         stimulus_timestamps = np.array(dict_repr['stimulus_timestamps'])
         return StimulusTimestamps(timestamps=stimulus_timestamps)
 
-    def from_nwb(self):
-        pass
+    @staticmethod
+    def from_nwb(nwbfile: NWBFile) -> "StimulusTimestamps":
+        stim_module = nwbfile.processing['stimulus']
+        stimulus_timestamps = \
+            stim_module.get_data_interface('timestamps').timestamps[:]
+        return StimulusTimestamps(timestamps=stimulus_timestamps)
 
     def to_json(self):
         return {self._name: self._value.tolist()[:5]}

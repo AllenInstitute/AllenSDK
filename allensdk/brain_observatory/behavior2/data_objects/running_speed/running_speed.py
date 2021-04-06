@@ -35,8 +35,18 @@ class RunningSpeed(DataObject):
         running_speed = pd.DataFrame(running_speed)
         return RunningSpeed(running_speed=running_speed)
 
-    def from_nwb(self):
-        pass
+    @staticmethod
+    def from_nwb(nwbfile: NWBFile, lowpass=True) -> "RunningSpeed":
+        interface_name = 'speed' if lowpass else 'speed_unfiltered'
+        values = nwbfile.modules['running'].get_data_interface(
+            interface_name).data[:]
+        timestamps = nwbfile.modules['running'].get_data_interface(
+            interface_name).timestamps[:]
+
+        running_speed = pd.DataFrame({
+            "timestamps": timestamps,
+            "values": values})
+        return RunningSpeed(running_speed=running_speed)
 
     def to_json(self):
         value: pd.DataFrame = self._value
@@ -52,7 +62,7 @@ class RunningSpeed(DataObject):
         timestamps = running_speed['timestamps'].values
 
         running_speed_series = pynwb.base.TimeSeries(
-            name=self._name,
+            name='speed',
             data=data,
             timestamps=timestamps,
             unit='m/s')
