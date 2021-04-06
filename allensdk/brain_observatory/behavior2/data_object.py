@@ -1,4 +1,7 @@
 import abc
+from typing import Type
+
+from pynwb import NWBFile
 
 
 class DataObject(abc.ABC):
@@ -14,16 +17,19 @@ class DataObject(abc.ABC):
     def value(self):
         return self._value
 
+    @staticmethod
     @abc.abstractmethod
-    def from_lims(self):
+    def from_lims() -> Type["DataObject"]:
         raise NotImplementedError()
 
+    @staticmethod
     @abc.abstractmethod
-    def from_json(self):
+    def from_json() -> Type["DataObject"]:
         raise NotImplementedError()
 
+    @staticmethod
     @abc.abstractmethod
-    def from_nwb(self):
+    def from_nwb() -> Type["DataObject"]:
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -31,5 +37,5 @@ class DataObject(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def to_nwb(self):
+    def to_nwb(self, nwbfile: NWBFile):
         raise NotImplementedError()

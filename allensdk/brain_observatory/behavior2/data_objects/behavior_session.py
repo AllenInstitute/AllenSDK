@@ -1,3 +1,5 @@
+from pynwb import NWBFile
+
 from allensdk.brain_observatory.behavior2.data_object import \
     DataObject
 from allensdk.brain_observatory.behavior2.data_objects.ids import \
@@ -22,12 +24,31 @@ class BehaviorSession(DataObject):
         self._ophys_experiment_ids = ophys_experiment_ids
         self._stimulus_timestamps = stimulus_timestamps
         self._running_speed = running_speed
-        self.set_properties()
 
         super().__init__(name='BehaviorSession', value=None)
 
+    @property
+    def behavior_session_id(self):
+        return self._behavior_session_id
+
+    @property
+    def ophys_session_id(self):
+        return self._ophys_session_id
+
+    @property
+    def ophys_experiment_ids(self):
+        return self._ophys_experiment_ids
+
+    @property
+    def stimulus_timestamps(self):
+        return self._stimulus_timestamps
+
+    @property
+    def running_speed(self):
+        return self._running_speed
+
     @staticmethod
-    def from_lims(dbconn, ophys_experiment_id):
+    def from_lims(dbconn, ophys_experiment_id) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_lims(
                 dbconn, ophys_experiment_id)
         ophys_session_id = OphysSessionId.from_lims(
@@ -48,7 +69,7 @@ class BehaviorSession(DataObject):
             running_speed=running_speed)
 
     @staticmethod
-    def from_json(dict_repr):
+    def from_json(dict_repr) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
         ophys_session_id = OphysSessionId.from_json(dict_rep=dict_repr)
         ophys_experiment_ids = \
@@ -65,13 +86,6 @@ class BehaviorSession(DataObject):
     def from_nwb(self):
         pass
 
-    def set_properties(self):
-        freeze_vars = list(vars(self).items())
-        for prop, value in freeze_vars:
-            if (prop.startswith('_') &
-                    isinstance(value, DataObject)):
-                setattr(self, prop[1:], value.value)
-
     def to_json(self):
         dict_repr = dict()
         for prop, value in vars(self).items():
@@ -80,5 +94,6 @@ class BehaviorSession(DataObject):
                 dict_repr.update(value.to_json())
         return dict_repr
 
-    def to_nwb(self):
-        pass
+    def to_nwb(self, nwbfile: NWBFile):
+        self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
+        self._running_speed.to_nwb(nwbfile=nwbfile)

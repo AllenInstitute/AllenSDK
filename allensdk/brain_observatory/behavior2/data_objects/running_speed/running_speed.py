@@ -1,6 +1,8 @@
 import json
 
 import pandas as pd
+import pynwb
+from pynwb import NWBFile, ProcessingModule
 
 from allensdk.brain_observatory.behavior2.data_object import \
     DataObject
@@ -28,7 +30,7 @@ class RunningSpeed(DataObject):
         raise NotImplementedError()
 
     @staticmethod
-    def from_json(dict_repr: dict):
+    def from_json(dict_repr: dict) -> "RunningSpeed":
         running_speed = json.loads(dict_repr['running_speed'])
         running_speed = pd.DataFrame(running_speed)
         return RunningSpeed(running_speed=running_speed)
@@ -44,8 +46,25 @@ class RunningSpeed(DataObject):
 
         return {self._name: value.to_json(orient='records')}
 
-    def to_nwb(self):
-        pass
+    def to_nwb(self, nwbfile: NWBFile):
+        running_speed: pd.DataFrame = self._value
+        data = running_speed['values'].values
+        timestamps = running_speed['timestamps'].values
+
+        running_speed_series = pynwb.base.TimeSeries(
+            name=self._name,
+            data=data,
+            timestamps=timestamps,
+            unit='m/s')
+
+        if 'running' in nwbfile.processing:
+            running_mod = nwbfile.processing['running']
+        else:
+            running_mod = ProcessingModule('running',
+                                           'Running speed processing module')
+            nwbfile.add_processing_module(running_mod)
+
+        running_mod.add_data_interface(running_speed_series)
 
     @staticmethod
     def _get_running_data_df(stimulus_file: StimulusFile,

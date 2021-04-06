@@ -1,5 +1,5 @@
 import numpy as np
-
+from pynwb import TimeSeries, ProcessingModule, NWBFile
 
 from allensdk.brain_observatory.behavior2.data_object import \
     DataObject
@@ -30,5 +30,15 @@ class StimulusTimestamps(DataObject):
     def to_json(self):
         return {self._name: self._value.tolist()[:5]}
 
-    def to_nwb(self):
-        pass
+    def to_nwb(self, nwbfile: NWBFile):
+        stimulus_ts = TimeSeries(
+            data=self._value,
+            name='timestamps',
+            timestamps=self._value,
+            unit='s'
+        )
+
+        stim_mod = ProcessingModule('stimulus', 'Stimulus Times processing')
+
+        nwbfile.add_processing_module(stim_mod)
+        stim_mod.add_data_interface(stimulus_ts)
