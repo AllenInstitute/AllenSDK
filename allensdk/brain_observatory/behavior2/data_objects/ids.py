@@ -1,15 +1,12 @@
 from typing import List, Dict
-from allensdk.brain_observatory.behavior2.data_objects.abc import \
-    AbstractDataObject
+from allensdk.brain_observatory.behavior2.data_object import \
+    DataObject
 
 
-class OphysExperimentIds(AbstractDataObject):
+class OphysExperimentIds(DataObject):
     def __init__(self, ophys_experiment_ids: List[int]):
-        self._name = "ophys_experiment_ids"
-        self._value = ophys_experiment_ids
-
-    def to_dict(self) -> Dict[str, int]:
-        return {self._name: self._value}
+        super().__init__(name="ophys_experiment_ids",
+                         value=ophys_experiment_ids)
 
     @staticmethod
     def from_lims(dbconn, ophys_session_id: int) -> "OphysExperimentIds":
@@ -25,14 +22,24 @@ class OphysExperimentIds(AbstractDataObject):
             value = [int(i) for i in dbresponse]
         return OphysExperimentIds(ophys_experiment_ids=value)
 
+    @staticmethod
+    def from_json(dict_repr: dict) -> "OphysExperimentIds":
+        ophys_experiment_ids = dict_repr['ophys_experiment_ids']
+        return OphysExperimentIds(ophys_experiment_ids=ophys_experiment_ids)
 
-class OphysSessionId(AbstractDataObject):
-    def __init__(self, ophys_session_id: int):
-        self._name = "ophys_session_id"
-        self._value = ophys_session_id
+    def from_nwb(self):
+        pass
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_nwb(self):
+        pass
+
+    def to_json(self) -> Dict[str, int]:
         return {self._name: self._value}
+
+
+class OphysSessionId(DataObject):
+    def __init__(self, ophys_session_id: int):
+        super().__init__(name="ophys_session_id", value=ophys_session_id)
 
     @staticmethod
     def from_lims(dbconn, behavior_session_id) -> "OphysSessionId":
@@ -50,14 +57,24 @@ class OphysSessionId(AbstractDataObject):
             value = int(dbresponse[0])
         return OphysSessionId(ophys_session_id=value)
 
+    @staticmethod
+    def from_json(dict_rep: dict) -> "OphysSessionId":
+        ophys_session_id = dict_rep['ophys_session_id']
+        return OphysSessionId(ophys_session_id=ophys_session_id)
 
-class BehaviorSessionId(AbstractDataObject):
-    def __init__(self, behavior_session_id: int):
-        self._name = "behavior_session_id"
-        self._value = behavior_session_id
+    def from_nwb(self):
+        pass
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_nwb(self):
+        pass
+
+    def to_json(self) -> Dict[str, int]:
         return {self._name: self._value}
+
+
+class BehaviorSessionId(DataObject):
+    def __init__(self, behavior_session_id: int):
+        super().__init__(name="behavior_session_id", value=behavior_session_id)
 
     @staticmethod
     def from_lims(dbconn, ophys_experiment_id) -> "BehaviorSessionId":
@@ -76,3 +93,17 @@ class BehaviorSessionId(AbstractDataObject):
         else:
             value = int(dbresponse[0])
         return BehaviorSessionId(behavior_session_id=value)
+
+    @staticmethod
+    def from_json(dict_repr: dict) -> "BehaviorSessionId":
+        behavior_session_id = dict_repr['behavior_session_id']
+        return BehaviorSessionId(behavior_session_id=behavior_session_id)
+
+    def from_nwb(self):
+        pass
+
+    def to_json(self) -> Dict[str, int]:
+        return {self._name: self._value}
+
+    def to_nwb(self):
+        pass
