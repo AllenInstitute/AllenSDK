@@ -31,7 +31,7 @@ def main():
         keywords=["visual", "behavior", "task"],
         experiment_description='test'
     )
-    bsession2.to_nwb(nwbfile=nwbfile)
+    bsession2.write_nwb(path='/tmp/test_nwb.nwb', nwbfile=nwbfile)
 
 
 if __name__ == '__main__':

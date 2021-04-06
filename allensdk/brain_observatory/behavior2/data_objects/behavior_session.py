@@ -1,4 +1,4 @@
-from pynwb import NWBFile
+from pynwb import NWBFile, NWBHDF5IO
 
 from allensdk.brain_observatory.behavior2.data_object import \
     DataObject
@@ -93,6 +93,11 @@ class BehaviorSession(DataObject):
                     isinstance(value, DataObject)):
                 dict_repr.update(value.to_json())
         return dict_repr
+
+    def write_nwb(self, path: str, nwbfile: NWBFile):
+        self.to_nwb(nwbfile=nwbfile)
+        with NWBHDF5IO(path, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
 
     def to_nwb(self, nwbfile: NWBFile):
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
