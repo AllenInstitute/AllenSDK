@@ -76,6 +76,13 @@ class SessionsTable(ProjectTable):
             self._df = self._df.drop(['date_of_acquisition_behavior',
                                       'date_of_acquisition_ophys'], axis=1)
 
+            # Prioritize behavior session_type
+            self._df['session_type'] = \
+                self._df['session_type_behavior']
+            self._df = self._df.drop(
+                ['session_type_behavior',
+                 'session_type_ophys'], axis=1)
+
     def __add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""
 
