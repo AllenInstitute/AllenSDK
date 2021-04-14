@@ -78,7 +78,7 @@ class SessionsTable(ProjectTable):
 
             # Prioritize behavior session_type
             self._df['session_type'] = \
-                self._df['session_type_behavior']
+                self.__get_session_type()
             self._df = self._df.drop(
                 ['session_type_behavior',
                  'session_type_ophys'], axis=1)
@@ -99,3 +99,18 @@ class SessionsTable(ProjectTable):
 
         self._df.loc[session_type.index, 'session_number'] = \
             session_type.apply(parse_session_number)
+
+    def __get_session_type(self) -> pd.Series:
+        """Session type is returned by both mtrain for behavior sessions
+        as well as in LIMS table ophys_sessions.
+
+        This method applies logic to use the mtrain value for behavior-only
+        sessions and LIMS value otherwise
+        """
+        behavior_only = self._df['ophys_session_id'].isnull()
+        behavior_only_session = self._df[behavior_only]\
+            ['session_type_behavior']
+        behavior_ophys_session = self._df[~behavior_only]['session_type_ophys']
+        return pd.concat([behavior_only_session, behavior_ophys_session])
+
+
