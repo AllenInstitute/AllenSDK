@@ -108,9 +108,7 @@ class SessionsTable(ProjectTable):
         sessions and LIMS value otherwise
         """
         behavior_only = self._df['ophys_session_id'].isnull()
-        behavior_only_session = self._df[behavior_only]\
-            ['session_type_behavior']
+        behavior_only_session = \
+            self._df[behavior_only]['session_type_behavior']
         behavior_ophys_session = self._df[~behavior_only]['session_type_ophys']
         return pd.concat([behavior_only_session, behavior_ophys_session])
-
-
