@@ -14,7 +14,8 @@ from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 def session_table():
     return (pd.DataFrame({"behavior_session_id": [3],
                           "ophys_experiment_id": [[5, 6]],
-                          "date_of_acquisition": np.datetime64('2020-02-20')
+                          "date_of_acquisition": np.datetime64('2020-02-20'),
+                          'session_type': ['OPHYS_1_images_A'],
                           }, index=pd.Index([1], name='ophys_session_id'))
             )
 
@@ -55,6 +56,9 @@ def experiments_table():
                               np.datetime64('2020-02-21'),
                               np.datetime64('2020-02-22')
                           ],
+                          'session_type': ['TRAINING_1_gratings',
+                                           'TRAINING_1_gratings',
+                                           'OPHYS_1_images_A'],
                           'imaging_depth': [75, 75, 75],
                           'targeted_structure': ['VISp', 'VISp', 'VISp']
                           })
