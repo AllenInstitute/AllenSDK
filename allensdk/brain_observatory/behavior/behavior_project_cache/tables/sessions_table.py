@@ -76,7 +76,6 @@ class SessionsTable(ProjectTable):
             self._df = self._df.drop(['date_of_acquisition_behavior',
                                       'date_of_acquisition_ophys'], axis=1)
 
-            # Prioritize behavior session_type
             self._df['session_type'] = \
                 self.__get_session_type()
             self._df = self._df.drop(
