@@ -2,10 +2,21 @@ import json
 from typing import Dict, Union
 from pathlib import Path
 
+from cachetools import cached, LRUCache
+from cachetools.keys import hashkey
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.behavior.data_files import DataFile
+
+
+def from_json_cache_key(cls, dict_repr: dict):
+    return hashkey(json.dumps(dict_repr))
+
+
+def from_lims_cache_key(cls, db, ophys_experiment_id: int):
+    return hashkey(ophys_experiment_id)
 
 
 class SyncFile(DataFile):
@@ -14,6 +25,7 @@ class SyncFile(DataFile):
         super().__init__(filepath=filepath)
 
     @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(cls, dict_repr: dict) -> "SyncFile":
         filepath = dict_repr["sync_file"]
         return cls(filepath=filepath)
@@ -22,6 +34,7 @@ class SyncFile(DataFile):
         return {"sync_file": str(self.filepath)}
 
     @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin,
         ophys_experiment_id: Union[int, str]
