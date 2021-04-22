@@ -7,6 +7,7 @@ import boto3
 import semver
 import tqdm
 import re
+import json
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -39,6 +40,14 @@ class CloudCacheBase(ABC):
 
         self._manifest = None
         self._cache_dir = cache_dir
+
+        # self._downloaded_data_path is where we will keep a JSONized
+        # dict mapping paths to downloaded files to their file_hashes;
+        # this will be used when determining if a downloaded file
+        # can instead be a symlink
+        c_path = pathlib.Path(self._cache_dir)
+        self._downloaded_data_path = c_path / '_downloaded_data.json'
+
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
@@ -191,6 +200,88 @@ class CloudCacheBase(ABC):
                 json_input=f
             )
 
+    def _update_list_of_downloads(self,
+                                  file_attributes: CacheFileAttributes
+                                  ) -> None:
+        """
+        Update the local file that keeps track of files that have actually
+        been downloaded to reflect a newly downloaded file.
+
+        Parameters
+        ----------
+        file_attributes: CacheFileAttributes
+
+        Returns
+        -------
+        None
+        """
+        if not file_attributes.local_path.exists():
+            # This file does not exist; there is nothing to do
+            return None
+
+        if self._downloaded_data_path.exists():
+            with open(self._downloaded_data_path, 'rb') as in_file:
+                downloaded_data = json.load(in_file)
+        else:
+            downloaded_data = {}
+
+        abs_path = str(file_attributes.local_path.resolve())
+        downloaded_data[abs_path] = file_attributes.file_hash
+        with open(self._downloaded_data_path, 'w') as out_file:
+            out_file.write(json.dumps(downloaded_data,
+                                      indent=2,
+                                      sort_keys=True))
+        return None
+
+    def _check_for_identical_copy(self,
+                                  file_attributes: CacheFileAttributes
+                                  ) -> bool:
+        """
+        Check the manifest of files that have been locally downloaded to
+        see if a file with an identical hash to the requested file has already
+        been downloaded. If it has, create a symlink to the downloaded file
+        at the requested file's localpath, update the manifest of downloaded
+        files, and return True.
+
+        Else return False
+
+        Parameters
+        ----------
+        file_attributes: CacheFileAttributes
+            The file we are considering downloading
+
+        Returns
+        -------
+        bool
+        """
+        if not self._downloaded_data_path.exists():
+            return False
+
+        with open(self._downloaded_data_path, 'rb') as in_file:
+            available_files = json.load(in_file)
+
+        matched_path = None
+        for abs_path in available_files:
+            if available_files[abs_path] == file_attributes.file_hash:
+                matched_path = pathlib.Path(abs_path)
+                break
+
+        if matched_path is None:
+            return False
+
+        # double check that locally downloaded file still has
+        # the expected hash
+        candidate_hash = file_hash_from_path(matched_path)
+        if candidate_hash != file_attributes.file_hash:
+            return False
+
+        local_parent = file_attributes.local_path.parent.resolve()
+        if not local_parent.exists():
+            os.makedirs(local_parent)
+
+        file_attributes.local_path.symlink_to(matched_path.resolve())
+        return True
+
     def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
         """
         Given a CacheFileAttributes describing a file, assess whether or
@@ -213,20 +304,23 @@ class CloudCacheBase(ABC):
             If file_attributes.local_path exists but is not a file.
             It would be unclear how the cache should proceed in this case.
         """
+        file_exists = False
 
-        if not file_attributes.local_path.exists():
-            return False
-        if not file_attributes.local_path.is_file():
-            raise RuntimeError(f"{file_attributes.local_path}\n"
-                               "exists, but is not a file;\n"
-                               "unsure how to proceed")
+        if file_attributes.local_path.exists():
+            if not file_attributes.local_path.is_file():
+                raise RuntimeError(f"{file_attributes.local_path}\n"
+                                   "exists, but is not a file;\n"
+                                   "unsure how to proceed")
 
-        full_path = file_attributes.local_path.resolve()
-        test_checksum = file_hash_from_path(full_path)
-        if test_checksum != file_attributes.file_hash:
-            return False
+            full_path = file_attributes.local_path.resolve()
+            test_checksum = file_hash_from_path(full_path)
+            if test_checksum == file_attributes.file_hash:
+                file_exists = True
 
-        return True
+        if not file_exists:
+            file_exists = self._check_for_identical_copy(file_attributes)
+
+        return file_exists
 
     def data_path(self, file_id) -> dict:
         """
@@ -288,6 +382,7 @@ class CloudCacheBase(ABC):
         super_attributes = self.data_path(file_id)
         file_attributes = super_attributes['file_attributes']
         self._download_file(file_attributes)
+        self._update_list_of_downloads(file_attributes)
         return file_attributes.local_path
 
     def metadata_path(self, fname: str) -> dict:
