@@ -31,9 +31,11 @@ def convert_strings_to_lists(df, is_session=True):
 
 def sort_df(df: pd.DataFrame, sort_col: str):
     """Sorts df for comparison"""
-    return df.sort_values(sort_col)\
+    df = df.sort_values(sort_col)\
         .reset_index()\
         .drop('index', axis=1)
+    df = df[df.columns.sort_values()]
+    return df
 
 
 @pytest.mark.requires_bamboo
