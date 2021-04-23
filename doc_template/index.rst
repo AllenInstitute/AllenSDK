@@ -121,7 +121,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.10.2
 -----------------------------------------------------------------------
-- - Adds an upper limit to the hdmf version, latest hdmf version currently breaks pynwb
+- Adds restriction to disallow hdmf version which breaks pynwb
 
 
 What's New - 2.10.2
