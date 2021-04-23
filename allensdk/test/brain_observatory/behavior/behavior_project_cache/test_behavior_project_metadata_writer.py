@@ -29,8 +29,8 @@ def convert_strings_to_lists(df, is_session=True):
             .apply(lambda x: literal_eval(x))
 
 
-@pytest.mark.xfail("Disabling to push out a bugfix. "
-                   "Please re-enable in rc/2.11.0.")
+@pytest.mark.xfail(reason="Disabling to push out a bugfix. "
+                          "Please re-enable in rc/2.11.0.")
 @pytest.mark.requires_bamboo
 def test_metadata():
     release_date = '2021-03-25'
