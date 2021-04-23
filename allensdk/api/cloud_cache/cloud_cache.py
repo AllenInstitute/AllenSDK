@@ -182,15 +182,19 @@ class CloudCacheBase(ABC):
         """
         return copy.deepcopy(self._manifest_file_names)
 
-    def load_manifest(self, manifest_name: str):
+    def _load_manifest(self, manifest_name: str) -> Manifest:
         """
-        Load a manifest from this dataset.
+        Load and return a manifest from this dataset.
 
         Parameters
         ----------
         manifest_name: str
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
+
+        Returns
+        -------
+        Manifest
         """
         if manifest_name not in self.manifest_file_names:
             raise ValueError(f"manifest: {manifest_name}\n"
@@ -203,10 +207,23 @@ class CloudCacheBase(ABC):
             self._download_manifest(manifest_name)
 
         with open(filepath) as f:
-            self._manifest = Manifest(
+            local_manifest = Manifest(
                 cache_dir=self._cache_dir,
                 json_input=f
             )
+        return local_manifest
+
+    def load_manifest(self, manifest_name: str):
+        """
+        Load a manifest from this dataset.
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+        """
+        self._manifest = self._load_manifest(manifest_name)
 
     def _update_list_of_downloads(self,
                                   file_attributes: CacheFileAttributes
