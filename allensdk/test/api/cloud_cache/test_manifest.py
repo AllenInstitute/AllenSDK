@@ -64,6 +64,7 @@ def manifest_for_metadata(tmpdir):
                                'file_hash': 'fghijk'}
 
     manifest['metadata_files'] = metadata_files
+    manifest['data_files'] = {}
     manifest['project_name'] = "some-project"
     manifest['manifest_version'] = '000'
     manifest['metadata_file_id_column_name'] = 'file_id'

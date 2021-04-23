@@ -83,6 +83,7 @@ def test_loading_manifest(tmpdir):
                   'metadata_file_id_column_name': 'file_id',
                   'data_pipeline': 'placeholder',
                   'project_name': 'sam-beckett',
+                  'data_files': {},
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com',
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -94,6 +95,7 @@ def test_loading_manifest(tmpdir):
                   'metadata_file_id_column_name': 'file_id',
                   'data_pipeline': 'placeholder',
                   'project_name': 'al',
+                  'data_files': {},
                   'metadata_files': {'c.csv': {'url': 'http://www.absurd.com',
                                                'version_id': '3333',
                                                'file_hash': 'lmnop'},
@@ -511,6 +513,7 @@ def test_download_metadata(tmpdir):
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
+    manifest['data_files'] = {}
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
@@ -602,6 +605,7 @@ def test_metadata(tmpdir):
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
+    manifest['data_files'] = {}
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
