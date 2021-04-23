@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [2.10.3] = 2021-04-23
-- Adds restriction to disallow hdmf version which breaks pynwb
+- Adds restriction to disallow hdmf version 2.5.0 which accidentally introduced a major version breaking change
 
 ## [2.10.2] = 2021-03-25
 - This version marks the release of Visual Behavior Optical Physiology data! For more details please visit the: [Visual Behavior - Optical Physiology Project Page](https://allensdk.readthedocs.io/en/latest/visual_behavior_optical_physiology.html)
