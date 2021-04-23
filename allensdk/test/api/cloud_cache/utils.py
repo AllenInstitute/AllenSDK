@@ -50,7 +50,6 @@ def load_dataset(data_blobs: dict,
                               Key=f'project-x/project_metadata/{fname}',
                               Body=metadata_blobs[fname])
 
-
     response = client.list_object_versions(Bucket=bucket_name)
     fname_to_version = {}
     for obj in response['Versions']:
@@ -107,7 +106,7 @@ def load_dataset(data_blobs: dict,
 
 def create_bucket(test_bucket_name: str,
                   datasets: dict,
-                  metadatasets: Optional[dict]=None) -> None:
+                  metadatasets: Optional[dict] = None) -> None:
     """
     Create a bucket and populate it with example datasets
 
