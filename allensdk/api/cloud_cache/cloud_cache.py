@@ -68,9 +68,23 @@ class CloudCacheBase(ABC):
         """
         raise NotImplementedError()
 
+    def _find_latest_file(self, file_name_list: List[str]):
+        """
+        Take a list of files named like
+
+        {blob}_v{version}.json
+
+        and return the one with the latest version
+        """
+        vstrs = [s.split(".json")[0].split("_v")[-1]
+                 for s in file_name_list]
+        versions = [semver.VersionInfo.parse(v) for v in vstrs]
+        imax = versions.index(max(versions))
+        return file_name_list[imax]
+
     @property
     def latest_manifest_file(self) -> str:
-        """parses available manifest files for semver string
+        """parses on-line available manifest files for semver string
         and returns the latest one
         self.manifest_file_names are assumed to be of the form
         '<anything>_v<semver_str>.json'
@@ -80,11 +94,21 @@ class CloudCacheBase(ABC):
         str
             the filename whose semver string is the latest one
         """
-        vstrs = [s.split(".json")[0].split("_v")[-1]
-                 for s in self.manifest_file_names]
-        versions = [semver.VersionInfo.parse(v) for v in vstrs]
-        imax = versions.index(max(versions))
-        return self.manifest_file_names[imax]
+        return self._find_latest_file(self.manifest_file_names)
+
+    @property
+    def latest_downloaded_manifest_file(self) -> str:
+        """parses downloaded available manifest files for semver string
+        and returns the latest one
+        self.manifest_file_names are assumed to be of the form
+        '<anything>_v<semver_str>.json'
+
+        Returns
+        -------
+        str
+            the filename whose semver string is the latest one
+        """
+        return self._find_latest_file(self._list_all_downloaded_manifests())
 
     def load_latest_manifest(self):
         self.load_manifest(self.latest_manifest_file)

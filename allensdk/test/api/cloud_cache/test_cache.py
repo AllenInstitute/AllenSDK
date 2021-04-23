@@ -6,6 +6,7 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
+from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
@@ -619,3 +620,27 @@ def test_metadata(tmpdir):
 
     metadata_df = cache.get_metadata('metadata_file.csv')
     assert true_df.equals(metadata_df)
+
+
+@mock_s3
+def test_latest_manifest(tmpdir, example_datasets_with_metadata):
+    """
+    Test that the methods which return the latest and latest downloaded
+    manifest file names work correctly
+    """
+    bucket_name = 'latest_manifest_bucket'
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=example_datasets_with_metadata['metadata'])
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    cache.load_manifest('project-x_manifest_v7.0.0.json')
+    cache.load_manifest('project-x_manifest_v3.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+
+    assert cache.latest_manifest_file == 'project-x_manifest_v15.0.0.json'
+
+    expected = 'project-x_manifest_v7.0.0.json'
+    assert cache.latest_downloaded_manifest_file == expected
