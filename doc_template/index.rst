@@ -121,7 +121,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.10.2
 -----------------------------------------------------------------------
-- Adds restriction to disallow hdmf version 2.5.0 which accidentally introduced a major version breaking change
+- Adds restriction to require hdmf version to be strictly less than 2.5.0 which accidentally introduced a major version breaking change
 
 
 What's New - 2.10.2
