@@ -51,6 +51,14 @@ class CloudCacheBase(ABC):
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
+    def _list_all_downloaded_manifests(self) -> list:
+        """
+        Return a list of all of the manifest files that have been
+        downloaded for this dataset
+        """
+        return [x for x in os.listdir(self._cache_dir)
+                if re.fullmatch(".*_manifest_v.*.json", x)]
+
     @abstractmethod
     def _list_all_manifests(self) -> list:
         """
@@ -655,8 +663,7 @@ class LocalCache(CloudCacheBase):
         super().__init__(cache_dir=cache_dir, project_name=project_name)
 
     def _list_all_manifests(self) -> list:
-        return [x for x in os.listdir(self._cache_dir)
-                if re.fullmatch(".*_manifest_v.*.json", x)]
+        return self._list_all_downloaded_manifests()
 
     def _download_manifest(self, manifest_name: str):
         raise NotImplementedError()
