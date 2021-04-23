@@ -1,9 +1,11 @@
+from typing import Union, Optional
 import boto3
 import json
 import hashlib
 
 
 def load_dataset(data_blobs: dict,
+                 metadata_blobs: Union[dict, None],
                  manifest_version: str,
                  bucket_name: str,
                  client: boto3.client) -> None:
@@ -16,6 +18,9 @@ def load_dataset(data_blobs: dict,
         Maps filename to a dict
         'data': the bytes in the data file
         'file_id': the file_id of the data file
+
+    metadata_blobs: Union[dict, None]
+        A dict mapping metadata filename to bytes in the file
 
     manifest_version: str
         The version of the manifest (manifest will be
@@ -38,6 +43,13 @@ def load_dataset(data_blobs: dict,
         client.put_object(Bucket=bucket_name,
                           Key=f'project-x/data/{fname}',
                           Body=data_blobs[fname]['data'])
+
+    if metadata_blobs is not None:
+        for fname in metadata_blobs:
+            client.put_object(Bucket=bucket_name,
+                              Key=f'project-x/project_metadata/{fname}',
+                              Body=metadata_blobs[fname])
+
 
     response = client.list_object_versions(Bucket=bucket_name)
     fname_to_version = {}
@@ -69,6 +81,21 @@ def load_dataset(data_blobs: dict,
 
     manifest['data_files'] = data_file_dict
 
+    if metadata_blobs is not None:
+        url_root = f'http://{bucket_name}.s3.amazonaws.com/{project_name}/'
+        url_root += 'project_metadata'
+
+        metadata_dict = {}
+        for fname in metadata_blobs:
+            url = f'{url_root}/{fname}'
+            hasher = hashlib.blake2b()
+            hasher.update(metadata_blobs[fname])
+            metadata_dict[fname] = {'url': url,
+                                    'file_hash': hasher.hexdigest(),
+                                    'version_id': fname_to_version[fname]}
+
+            manifest['metadata_files'] = metadata_dict
+
     manifest_k = f'{project_name}/manifests/'
     manifest_k += f'{project_name}_manifest_v{manifest_version}.json'
     client.put_object(Bucket=bucket_name,
@@ -78,7 +105,9 @@ def load_dataset(data_blobs: dict,
     return None
 
 
-def create_bucket(test_bucket_name: str, datasets: dict) -> None:
+def create_bucket(test_bucket_name: str,
+                  datasets: dict,
+                  metadatasets: Optional[dict]=None) -> None:
     """
     Create a bucket and populate it with example datasets
 
@@ -90,6 +119,10 @@ def create_bucket(test_bucket_name: str, datasets: dict) -> None:
     datasets: dict
         Keyed on version names; values are dicts of individual
         data files to be loaded to the bucket
+
+    metadatasets: Optional[dict]
+        Keyed on version names; values are dicts of individual
+        metadata files to be loaded to the bucket (default: None)
     """
 
     conn = boto3.resource('s3', region_name='us-east-1')
@@ -103,7 +136,12 @@ def create_bucket(test_bucket_name: str, datasets: dict) -> None:
 
     # upload first dataset
     for v in datasets.keys():
+        if metadatasets is not None:
+            m = metadatasets[v]
+        else:
+            m = None
         load_dataset(datasets[v],
+                     m,
                      v,
                      test_bucket_name,
                      client)

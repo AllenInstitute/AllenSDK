@@ -1,3 +1,4 @@
+from typing import List, Tuple, Dict
 from abc import ABC, abstractmethod
 import os
 import copy
@@ -493,6 +494,137 @@ class CloudCacheBase(ABC):
         """
         local_path = self.download_metadata(fname)
         return pd.read_csv(local_path)
+
+    def _detect_changes(self,
+                        filename_to_hash: dict) -> List[Tuple[str, str]]:
+        """
+        Assemble list of changes between two manifests
+
+        Parameters
+        ----------
+        filename_to_hash: dict
+            filename_to_hash[0] is a dict mapping file names to file hashes
+            for manifest 0
+
+            filename_to_hash[1] is a dict mapping file names to file hashes
+            for manifest 1
+
+        Returns
+        -------
+        List[Tuple[str, str]]
+            List of changes between manifest 0 and manifest 1.
+
+        Notes
+        -----
+        Changes are tuples of the form
+        (fname, string describing how fname changed)
+
+        e.g.
+
+        ('data/f1.txt', 'data/f1.txt renamed data/f5.txt')
+        ('data/f2.txt', 'data/f2.txt deleted')
+        ('data/f3.txt', 'data/f3.txt created')
+        ('data/f4.txt', 'data/f4.txt changed')
+        """
+        output = []
+        n0 = set(filename_to_hash[0].keys())
+        n1 = set(filename_to_hash[1].keys())
+        all_file_names = n0.union(n1)
+
+        hash_to_filename = {}
+        for v in (0, 1):
+            hash_to_filename[v] = {}
+            for fname in filename_to_hash[v]:
+                hash_to_filename[v][filename_to_hash[v][fname]] = fname
+
+        for fname in all_file_names:
+            delta = None
+            if fname in filename_to_hash[0] and fname in filename_to_hash[1]:
+                h0 = filename_to_hash[0][fname]
+                h1 = filename_to_hash[1][fname]
+                if h0 != h1:
+                    delta = f'{fname} changed'
+            elif fname in filename_to_hash[0]:
+                h0 = filename_to_hash[0][fname]
+                if h0 in hash_to_filename[1]:
+                    f1 = hash_to_filename[1][h0]
+                    delta = f'{fname} renamed {f1}'
+                else:
+                    delta = f'{fname} deleted'
+            elif fname in filename_to_hash[1]:
+                h1 = filename_to_hash[1][fname]
+                if h1 not in hash_to_filename[0]:
+                    delta = f'{fname} created'
+            else:
+                raise RuntimeError("should never reach this line")
+
+            if delta is not None:
+                output.append((fname, delta))
+
+        return output
+
+    def summarize_comparison(self,
+                             manifest_0_name: str,
+                             manifest_1_name: str
+                             ) -> Dict[str, List[Tuple[str, str]]]:
+        """
+        Compare two manifests from this dataset. Return a dict
+        containing the list of metadata and data files that changed
+        between them
+
+        Note: this assumes that manifest_0 predates manifest_1
+
+        Parameters
+        ----------
+        manifest_0_name: str
+
+        manifest_1_name: str
+
+        Returns
+        -------
+        result: Dict[List[Tuple[str, str]]]
+            result['data_changes'] lists changes to data files
+            result['metadata_changes'] lists changes to metadata files
+
+        Notes
+        -----
+        Changes are tuples of the form
+        (fname, string describing how fname changed)
+
+        e.g.
+
+        ('data/f1.txt', 'data/f1.txt renamed data/f5.txt')
+        ('data/f2.txt', 'data/f2.txt deleted')
+        ('data/f3.txt', 'data/f3.txt created')
+        ('data/f4.txt', 'data/f4.txt changed')
+        """
+        man0 = self._load_manifest(manifest_0_name)
+        man1 = self._load_manifest(manifest_1_name)
+
+        result = {}
+        for (result_key,
+             fname_list,
+             fname_lookup) in zip(('metadata_changes', 'data_changes'),
+                                  ((man0.metadata_file_names,
+                                    man1.metadata_file_names),
+                                   (man0.file_id_values,
+                                    man1.file_id_values)),
+                                  ((man0.metadata_file_attributes,
+                                    man1.metadata_file_attributes),
+                                   (man0.data_file_attributes,
+                                    man1.data_file_attributes))):
+
+            filename_to_hash = {}
+            for version in (0, 1):
+                filename_to_hash[version] = {}
+                for file_id in fname_list[version]:
+                    obj = fname_lookup[version](file_id)
+                    file_name = relative_path_from_url(obj.url)
+                    file_name = '/'.join(file_name.split('/')[1:])
+                    filename_to_hash[version][file_name] = obj.file_hash
+            changes = self._detect_changes(filename_to_hash)
+            result[result_key] = changes
+        return result
 
 
 class S3CloudCache(CloudCacheBase):
