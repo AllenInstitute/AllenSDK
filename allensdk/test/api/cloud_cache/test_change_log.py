@@ -18,45 +18,45 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v2.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v2.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 1
     assert ('data/f2.txt', 'data/f2.txt deleted') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v3.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v3.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 1
     assert ('data/f2.txt',
             'data/f2.txt renamed data/f4.txt') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v4.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v4.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 1
     assert ('data/f3.txt', 'data/f3.txt changed') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v5.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v5.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 1
     assert ('data/f4.txt', 'data/f4.txt created') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v6.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v6.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 2
     assert ('data/f2.txt', 'data/f2.txt deleted') in log['data_changes']
     assert ('data/f1.txt', 'data/f1.txt changed') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v7.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v7.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 2
@@ -64,16 +64,16 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
     assert ('data/f3.txt', 'data/f3.txt '
             'renamed data/f5.txt') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v8.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v8.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 2
     assert ('data/f2.txt', 'data/f2.txt deleted') in log['data_changes']
     assert ('data/f5.txt', 'data/f5.txt created') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v9.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v9.0.0.json')
 
     assert len(log['metadata_changes']) == 0
     assert len(log['data_changes']) == 2
@@ -81,8 +81,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'data/f4.txt') in log['data_changes']
     assert ('data/f5.txt', 'data/f5.txt created') in log['data_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v10.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v10.0.0.json')
 
     assert len(log['data_changes']) == 0
     assert len(log['metadata_changes']) == 1
@@ -90,8 +90,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_2.csv '
             'deleted') in log['metadata_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v11.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v11.0.0.json')
 
     assert len(log['data_changes']) == 0
     assert len(log['metadata_changes']) == 1
@@ -99,8 +99,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_2.csv renamed '
             'project_metadata/metadata_4.csv') in log['metadata_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v12.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v12.0.0.json')
 
     assert len(log['data_changes']) == 0
     assert len(log['metadata_changes']) == 1
@@ -108,8 +108,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_3.csv '
             'changed') in log['metadata_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v13.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v13.0.0.json')
 
     assert len(log['data_changes']) == 0
     assert len(log['metadata_changes']) == 1
@@ -117,8 +117,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_4.csv '
             'created') in log['metadata_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v14.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v14.0.0.json')
     assert len(log['data_changes']) == 1
     assert len(log['metadata_changes']) == 1
     assert ('data/f2.txt', 'data/f2.txt deleted') in log['data_changes']
@@ -126,8 +126,8 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_3.csv renamed '
             'project_metadata/metadata_4.csv') in log['metadata_changes']
 
-    log = cache.summarize_comparison('project-x_manifest_v1.0.json',
-                                     'project-x_manifest_v15.0.json')
+    log = cache.summarize_comparison('project-x_manifest_v1.0.0.json',
+                                     'project-x_manifest_v15.0.0.json')
     assert len(log['data_changes']) == 3
     assert len(log['metadata_changes']) == 3
 

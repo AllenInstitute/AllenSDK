@@ -23,10 +23,10 @@ def test_list_all_manifests(tmpdir):
 
     client = boto3.client('s3', region_name='us-east-1')
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_2.json',
+                      Key='proj/manifests/manifest_v2.0.0.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
                       Key='junk.txt',
@@ -34,7 +34,8 @@ def test_list_all_manifests(tmpdir):
 
     cache = S3CloudCache(tmpdir, test_bucket_name, 'proj')
 
-    assert cache.manifest_file_names == ['manifest_1.json', 'manifest_2.json']
+    assert cache.manifest_file_names == ['manifest_v1.0.0.json',
+                                         'manifest_v2.0.0.json']
 
 
 @mock_s3
@@ -104,28 +105,28 @@ def test_loading_manifest(tmpdir):
                                                'file_hash': 'qrstuv'}}}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.csv',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest_1), 'utf-8'))
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_2.csv',
+                      Key='proj/manifests/manifest_v2.0.0.json',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     cache = S3CloudCache(pathlib.Path(tmpdir), test_bucket_name, 'proj')
-    cache.load_manifest('manifest_1.csv')
+    cache.load_manifest('manifest_v1.0.0.json')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
     assert cache.file_id_column == 'file_id'
     assert cache.metadata_file_names == ['a.csv', 'b.csv']
 
-    cache.load_manifest('manifest_2.csv')
+    cache.load_manifest('manifest_v2.0.0.json')
     assert cache._manifest._data == manifest_2
     assert cache.version == '2'
     assert cache.file_id_column == 'file_id'
     assert cache.metadata_file_names == ['c.csv', 'd.csv']
 
     with pytest.raises(ValueError) as context:
-        cache.load_manifest('manifest_3.csv')
+        cache.load_manifest('manifest_v3.0.0.json')
     msg = 'is not one of the valid manifest names'
     assert msg in context.value.args[0]
 
@@ -441,13 +442,13 @@ def test_download_data(tmpdir):
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "data/path/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     expected_path = cache_dir / 'project-z-1' / 'data/data_file.txt'
     assert not expected_path.exists()
@@ -517,13 +518,13 @@ def test_download_metadata(tmpdir):
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/path/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     expected_path = cache_dir / "project4-1" / 'metadata_file.csv'
     assert not expected_path.exists()
@@ -609,12 +610,12 @@ def test_metadata(tmpdir):
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     metadata_df = cache.get_metadata('metadata_file.csv')
     assert true_df.equals(metadata_df)

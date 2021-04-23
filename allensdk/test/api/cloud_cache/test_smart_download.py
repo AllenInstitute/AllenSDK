@@ -22,68 +22,68 @@ def test_smart_file_downloading(tmpdir, example_datasets):
     # download all data files from all versions, keeping track
     # of the paths to the downloaded data files
     downloaded = {}
-    for version in ('1.0', '2.0', '3.0'):
+    for version in ('1.0.0', '2.0.0', '3.0.0'):
         downloaded[version] = {}
         cache.load_manifest(f'project-x_manifest_v{version}.json')
         for file_id in ('1', '2', '3'):
             downloaded[version][file_id] = cache.download_data(file_id)
 
-    # check that the version 1.0 of all files are actual files
+    # check that the version 1.0.0 of all files are actual files
     for file_id in ('1', '2', '3'):
-        assert downloaded['1.0'][file_id].is_file()
-        assert not downloaded['1.0'][file_id].is_symlink()
+        assert downloaded['1.0.0'][file_id].is_file()
+        assert not downloaded['1.0.0'][file_id].is_symlink()
 
-    # check that v2.0 f1.txt is a new file
-    assert downloaded['2.0']['1'].is_file()
-    assert not downloaded['2.0']['1'].is_symlink()
+    # check that v2.0.0 f1.txt is a new file
+    assert downloaded['2.0.0']['1'].is_file()
+    assert not downloaded['2.0.0']['1'].is_symlink()
 
-    # check that v2.0 f2.txt and f3.txt are symlinks to
-    # the correct v1.0 files
+    # check that v2.0.0 f2.txt and f3.txt are symlinks to
+    # the correct v1.0.0 files
     for file_id in ('2', '3'):
-        assert downloaded['2.0'][file_id].is_file()
-        assert downloaded['2.0'][file_id].is_symlink()
+        assert downloaded['2.0.0'][file_id].is_file()
+        assert downloaded['2.0.0'][file_id].is_symlink()
 
         # check that symlink points to the correct file
-        test = downloaded['2.0'][file_id].resolve()
-        control = downloaded['1.0'][file_id].resolve()
+        test = downloaded['2.0.0'][file_id].resolve()
+        control = downloaded['1.0.0'][file_id].resolve()
         if test != control:
-            test = downloaded['2.0'][file_id].resolve()
-            control = downloaded['1.0'][file_id].resolve()
+            test = downloaded['2.0.0'][file_id].resolve()
+            control = downloaded['1.0.0'][file_id].resolve()
             raise RuntimeError(f'{test} != {control}\n'
                                'even though the first is a symlink')
 
         # check that the absolute paths of the files are different,
         # even though one is a symlink
-        test = downloaded['2.0'][file_id].absolute()
-        control = downloaded['1.0'][file_id].absolute()
+        test = downloaded['2.0.0'][file_id].absolute()
+        control = downloaded['1.0.0'][file_id].absolute()
         if test == control:
-            test = downloaded['2.0'][file_id].absolute()
-            control = downloaded['1.0'][file_id].absolute()
+            test = downloaded['2.0.0'][file_id].absolute()
+            control = downloaded['1.0.0'][file_id].absolute()
             raise RuntimeError(f'{test} == {control}\n'
                                'even though they should be '
                                'different absolute paths')
 
-    # repeat the above tests for v3.0, f1.txt
-    assert downloaded['3.0']['1'].is_file()
-    assert downloaded['3.0']['1'].is_symlink()
-    if downloaded['3.0']['1'].resolve() != downloaded['1.0']['1'].resolve():
-        test = downloaded['3.0']['1'].resolve()
-        control = downloaded['1.0']['1'].resolve()
+    # repeat the above tests for v3.0.0, f1.txt
+    assert downloaded['3.0.0']['1'].is_file()
+    assert downloaded['3.0.0']['1'].is_symlink()
+    if downloaded['3.0.0']['1'].resolve() != downloaded['1.0.0']['1'].resolve():
+        test = downloaded['3.0.0']['1'].resolve()
+        control = downloaded['1.0.0']['1'].resolve()
         raise RuntimeError(f'{test} != {control}\n'
                            'even though the first is a symlink')
 
-    if downloaded['3.0']['1'].absolute() == downloaded['1.0']['1'].absolute():
-        test = downloaded['3.0']['1'].absolute()
-        control = downloaded['1.0']['1'].absolute()
+    if downloaded['3.0.0']['1'].absolute() == downloaded['1.0.0']['1'].absolute():
+        test = downloaded['3.0.0']['1'].absolute()
+        control = downloaded['1.0.0']['1'].absolute()
         raise RuntimeError(f'{test} == {control}\n'
                            'even though they should be '
                            'different absolute paths')
 
     # check that v3 v2.txt and f3.txt are not symlinks
-    assert downloaded['3.0']['2'].is_file()
-    assert not downloaded['3.0']['2'].is_symlink()
-    assert downloaded['3.0']['3'].is_file()
-    assert not downloaded['3.0']['3'].is_symlink()
+    assert downloaded['3.0.0']['2'].is_file()
+    assert not downloaded['3.0.0']['2'].is_symlink()
+    assert downloaded['3.0.0']['3'].is_file()
+    assert not downloaded['3.0.0']['3'].is_symlink()
 
 
 @mock_s3
@@ -99,7 +99,7 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
 
-    version_list = ('1.0', '2.0', '3.0')
+    version_list = ('1.0.0', '2.0.0', '3.0.0')
     file_id_list = ('1', '2', '3')
 
     for version in version_list:
@@ -122,14 +122,14 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
 
-    cache.load_manifest('project-x_manifest_v1.0.json')
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
     with open(attr['local_path'], 'wb') as out_file:
         out_file.write(b'xxxxxx')
 
     attr = cache.data_path('2')
     assert not attr['exists']
-    cache.load_manifest('project-x_manifest_v2.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
     attr = cache.data_path('2')
     assert not attr['exists']
 
@@ -139,7 +139,7 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     attr = cache.data_path('2')
     assert attr['exists']
     redownloaded_path = attr['local_path']
-    cache.load_manifest('project-x_manifest_v1.0.json')
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
     assert attr['exists']
     other_path = attr['local_path']
@@ -170,7 +170,7 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
 
-    version_list = ('1.0', '2.0', '3.0')
+    version_list = ('1.0.0', '2.0.0', '3.0.0')
     file_id_list = ('1', '2', '3')
 
     for version in version_list:
@@ -192,7 +192,7 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
 
-    cache.load_manifest('project-x_manifest_v1.0.json')
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
 
     # assert below will pass; because file exists and is not yet corrupted,
@@ -202,7 +202,7 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     with open(attr['local_path'], 'wb') as out_file:
         out_file.write(b'xxxxx')
 
-    cache.load_manifest('project-x_manifest_v2.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
     attr = cache.data_path('2')
     assert not attr['exists']
     cache.download_data('2')
@@ -216,7 +216,7 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     test_hash = hasher.hexdigest()
     assert test_hash == true_hash
 
-    cache.load_manifest('project-x_manifest_v1.0.json')
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
     assert attr['exists']
     assert attr['local_path'].resolve() == downloaded_path.resolve()
