@@ -1,7 +1,6 @@
 from typing import Dict, List, Any
 import json
 import pathlib
-import copy
 from typing import Union
 from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
