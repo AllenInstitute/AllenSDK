@@ -6,7 +6,8 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
-from .utils import create_bucket
+from .utils import create_bucket, load_dataset
+from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
@@ -646,3 +647,38 @@ def test_latest_manifest(tmpdir, example_datasets_with_metadata):
 
     expected = 'project-x_manifest_v7.0.0.json'
     assert cache.latest_downloaded_manifest_file == expected
+
+
+@mock_s3
+def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
+    """
+    Test that a warning is raised the first time you try to load an outdated
+    manifest
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    client = create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=example_datasets_with_metadata['metadata'])
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    m_warn_type = 'OutdatedManifestWarning'
+
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_manifest('project-x_manifest_v7.0.0.json')
+    ct = 0
+    for w in warnings.list:
+        if w._category_name == m_warn_type:
+            ct += 1
+    assert ct > 0
+
+    # assert no warning is raised the second time by catching
+    # any warnings that are emitted and making sure they are
+    # not OutdatedManifestWarnings
+    with pytest.warns(None) as warnings:
+        cache.load_manifest('project-x_manifest_v11.0.0.json')
+    if len(warnings) > 0:
+        for w in warnings.list:
+            assert w._category_name != 'OutdatedManifestWarning'

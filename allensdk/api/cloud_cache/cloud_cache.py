@@ -9,6 +9,7 @@ import semver
 import tqdm
 import re
 import json
+import warnings
 from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -17,6 +18,10 @@ from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa
 from allensdk.api.cloud_cache.utils import file_hash_from_path  # noqa: E501
 from allensdk.api.cloud_cache.utils import bucket_name_from_url  # noqa: E501
 from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
+
+
+class OutdatedManifestWarning(UserWarning):
+    pass
 
 
 class CloudCacheBase(ABC):
@@ -51,6 +56,36 @@ class CloudCacheBase(ABC):
 
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
+
+        # what latest_manifest was the last time an OutdatedManifestWarning
+        # was emitted
+        self._manifest_last_warned_on = None
+
+    def _warn_of_outdated_manifest(self, manifest_name: str) -> None:
+        """
+        Warn that manifest_name is not the latest manifest available
+        """
+        if self._manifest_last_warned_on is not None:
+            if self.latest_manifest_file == self._manifest_last_warned_on:
+                return None
+
+        self._manifest_last_warned_on = self.latest_manifest_file
+
+        msg = '\n'
+        msg += 'The manifest file you are loading is not the '
+        msg += 'most up to date manifest file available for '
+        msg += 'this dataset. The most up to data manifest file '
+        msg += 'available for this dataset is \n'
+        msg += f'{self.latest_manifest_file}\n'
+        msg += 'To see the differences between these manifests'
+        msg += 'run\n'
+        msg += f"self.compare_manifests('{manifest_name}', "
+        msg += f"'{self.latest_manifest_file}')\n"
+        msg += "To see all of the manifest files currently downloaded "
+        msg += "onto your local system, run\n"
+        msg += "self.list_all_downloaded_manifests()\n"
+        warnings.warn(msg, OutdatedManifestWarning)
+        return None
 
     def list_all_downloaded_manifests(self) -> list:
         """
@@ -251,6 +286,9 @@ class CloudCacheBase(ABC):
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
         """
+        if manifest_name != self.latest_manifest_file:
+            self._warn_of_outdated_manifest(manifest_name)
+
         self._manifest = self._load_manifest(manifest_name)
 
     def _update_list_of_downloads(self,
