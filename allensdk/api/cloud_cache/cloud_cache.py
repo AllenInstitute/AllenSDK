@@ -52,7 +52,7 @@ class CloudCacheBase(ABC):
         self._project_name = project_name
         self._manifest_file_names = self._list_all_manifests()
 
-    def _list_all_downloaded_manifests(self) -> list:
+    def list_all_downloaded_manifests(self) -> list:
         """
         Return a list of all of the manifest files that have been
         downloaded for this dataset
@@ -108,7 +108,10 @@ class CloudCacheBase(ABC):
         str
             the filename whose semver string is the latest one
         """
-        return self._find_latest_file(self._list_all_downloaded_manifests())
+        file_list = self.list_all_downloaded_manifests()
+        if len(file_list) == 0:
+            return ''
+        return self._find_latest_file(self.list_all_downloaded_manifests())
 
     def load_latest_manifest(self):
         self.load_manifest(self.latest_manifest_file)
@@ -836,7 +839,7 @@ class LocalCache(CloudCacheBase):
         super().__init__(cache_dir=cache_dir, project_name=project_name)
 
     def _list_all_manifests(self) -> list:
-        return self._list_all_downloaded_manifests()
+        return self.list_all_downloaded_manifests()
 
     def _download_manifest(self, manifest_name: str):
         raise NotImplementedError()

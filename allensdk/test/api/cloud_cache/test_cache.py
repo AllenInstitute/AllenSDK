@@ -636,6 +636,8 @@ def test_latest_manifest(tmpdir, example_datasets_with_metadata):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
 
+    assert cache.latest_downloaded_manifest_file == ''
+
     cache.load_manifest('project-x_manifest_v7.0.0.json')
     cache.load_manifest('project-x_manifest_v3.0.0.json')
     cache.load_manifest('project-x_manifest_v2.0.0.json')
