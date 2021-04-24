@@ -71,19 +71,19 @@ class CloudCacheBase(ABC):
 
         self._manifest_last_warned_on = self.latest_manifest_file
 
-        msg = '\n'
+        msg = '\n\n'
         msg += 'The manifest file you are loading is not the '
         msg += 'most up to date manifest file available for '
         msg += 'this dataset. The most up to data manifest file '
-        msg += 'available for this dataset is \n'
-        msg += f'{self.latest_manifest_file}\n'
-        msg += 'To see the differences between these manifests'
-        msg += 'run\n'
+        msg += 'available for this dataset is \n\n'
+        msg += f'{self.latest_manifest_file}\n\n'
+        msg += 'To see the differences between these manifests,'
+        msg += 'run\n\n'
         msg += f"self.compare_manifests('{manifest_name}', "
-        msg += f"'{self.latest_manifest_file}')\n"
+        msg += f"'{self.latest_manifest_file}')\n\n"
         msg += "To see all of the manifest files currently downloaded "
-        msg += "onto your local system, run\n"
-        msg += "self.list_all_downloaded_manifests()\n"
+        msg += "onto your local system, run\n\n"
+        msg += "self.list_all_downloaded_manifests()\n\n"
         warnings.warn(msg, OutdatedManifestWarning)
         return None
 
