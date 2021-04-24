@@ -691,6 +691,58 @@ class CloudCacheBase(ABC):
             result[result_key] = changes
         return result
 
+    def compare_manifests(self,
+                          manifest_0_name: str,
+                          manifest_1_name: str
+                          ) -> str:
+        """
+        Compare two manifests from this dataset. Return a dict
+        containing the list of metadata and data files that changed
+        between them
+
+        Note: this assumes that manifest_0 predates manifest_1
+
+        Parameters
+        ----------
+        manifest_0_name: str
+
+        manifest_1_name: str
+
+        Returns
+        -------
+        str
+            A string summarizing all of the changes going from
+            manifest_0 to manifest_1
+        """
+
+        changes = self.summarize_comparison(manifest_0_name,
+                                            manifest_1_name)
+        if len(changes['data_changes']) == 0:
+            if len(changes['metadata_changes']) == 0:
+                return "The two manifests are equivalent"
+
+        data_change_dict = {}
+        for delta in changes['data_changes']:
+            data_change_dict[delta[0]] = delta[1]
+        metadata_change_dict = {}
+        for delta in changes['metadata_changes']:
+            metadata_change_dict[delta[0]] = delta[1]
+
+        msg = 'Changes going from\n'
+        msg += f'{manifest_0_name}\n'
+        msg += 'to\n'
+        msg += f'{manifest_1_name}\n\n'
+
+        m_keys = list(metadata_change_dict.keys())
+        m_keys.sort()
+        for m in m_keys:
+            msg += f'{metadata_change_dict[m]}\n'
+        d_keys = list(data_change_dict.keys())
+        d_keys.sort()
+        for d in d_keys:
+            msg += f'{data_change_dict[d]}\n'
+        return msg
+
 
 class S3CloudCache(CloudCacheBase):
     """

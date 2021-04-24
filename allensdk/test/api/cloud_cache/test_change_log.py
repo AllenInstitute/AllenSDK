@@ -146,3 +146,37 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
             'project_metadata/metadata_3.csv deleted')
 
     assert set(log['metadata_changes']) == {ans1, ans2, ans3}
+
+
+@mock_s3
+@mock_s3
+def test_compare_manifesst_string(tmpdir, example_datasets_with_metadata):
+    """
+    Test that CloudCacheBase.compare_manifests reports the correct
+    changes when comparing two manifests
+    """
+    bucket_name = 'compare_manifest_bucket'
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=example_datasets_with_metadata['metadata'])
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    msg = cache.compare_manifests('project-x_manifest_v1.0.0.json',
+                                  'project-x_manifest_v15.0.0.json')
+
+
+    expected = 'Changes going from\n'
+    expected += 'project-x_manifest_v1.0.0.json\n'
+    expected += 'to\n'
+    expected += 'project-x_manifest_v15.0.0.json\n\n'
+    expected += 'project_metadata/metadata_1.csv deleted\n'
+    expected += 'project_metadata/metadata_2.csv renamed '
+    expected += 'project_metadata/metadata_4.csv\n'
+    expected += 'project_metadata/metadata_3.csv deleted\n'
+    expected += 'data/f1.txt renamed data/f4.txt\n'
+    expected += 'data/f5.txt created\n'
+    expected += 'data/f6.txt created\n'
+
+    assert msg == expected
