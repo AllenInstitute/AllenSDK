@@ -119,13 +119,13 @@ def test_on_corrupted_files(tmpdir, example_datasets):
             attr = cache.data_path(file_id)
             assert attr['exists']
 
-    # Check that, when a file on disk gets corrupted,
-    # all of the symlinks that point back to that file
-    # get marked as `not exists`
-
     hasher = hashlib.blake2b()
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
+
+    # Check that, when a file on disk gets corrupted,
+    # all of the symlinks that point back to that file
+    # get marked as `not exists`
 
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
@@ -134,6 +134,9 @@ def test_on_corrupted_files(tmpdir, example_datasets):
 
     attr = cache.data_path('2')
     assert not attr['exists']
+
+    # note that v0.2.0/f2.txt is identical to v0.1.0/f2.txt
+    # in the example data set
     cache.load_manifest('project-x_manifest_v2.0.0.json')
     attr = cache.data_path('2')
     assert not attr['exists']
@@ -144,6 +147,7 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     attr = cache.data_path('2')
     assert attr['exists']
     redownloaded_path = attr['local_path']
+
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
     assert attr['exists']
@@ -192,7 +196,6 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     with open(cache._downloaded_data_path, 'w') as out_file:
         out_file.write(json.dumps(src_data, indent=2))
 
-    # now corrupt one of the data files
     hasher = hashlib.blake2b()
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
@@ -204,12 +207,20 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     # CloudCache won't consult _downloaded_data_path
     assert attr['exists']
 
+    # now corrupt one of the data files
     with open(attr['local_path'], 'wb') as out_file:
         out_file.write(b'xxxxx')
 
+    # now that the file is corrupted, 'exists' is False
+    attr = cache.data_path('2')
+    assert not attr['exists']
+
+    # note that v0.2.0/f2.txt is identical to v0.1.0/f2.txt
     cache.load_manifest('project-x_manifest_v2.0.0.json')
     attr = cache.data_path('2')
     assert not attr['exists']
+
+    # re download the file
     cache.download_data('2')
     attr = cache.data_path('2')
     downloaded_path = attr['local_path']
@@ -221,6 +232,9 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     test_hash = hasher.hexdigest()
     assert test_hash == true_hash
 
+    # check that the v0.1.0 version of the file, which should be
+    # identical to the v0.2.0 version of the file, is also
+    # fixed
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
     assert attr['exists']
