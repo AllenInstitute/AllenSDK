@@ -658,9 +658,9 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
 
     bucket_name = 'outdated_manifest_bucket'
     metadatasets = example_datasets_with_metadata['metadata']
-    _ = create_bucket(bucket_name,
-                      example_datasets_with_metadata['data'],
-                      metadatasets=metadatasets)
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
 
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
