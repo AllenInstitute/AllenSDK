@@ -66,13 +66,18 @@ def test_smart_file_downloading(tmpdir, example_datasets):
     # repeat the above tests for v3.0.0, f1.txt
     assert downloaded['3.0.0']['1'].is_file()
     assert downloaded['3.0.0']['1'].is_symlink()
-    if downloaded['3.0.0']['1'].resolve() != downloaded['1.0.0']['1'].resolve():
+
+    res3 = downloaded['3.0.0']['1'].resolve()
+    res1 = downloaded['1.0.0']['1'].resolve()
+    if res3 != res1:
         test = downloaded['3.0.0']['1'].resolve()
         control = downloaded['1.0.0']['1'].resolve()
         raise RuntimeError(f'{test} != {control}\n'
                            'even though the first is a symlink')
 
-    if downloaded['3.0.0']['1'].absolute() == downloaded['1.0.0']['1'].absolute():
+    abs3 = downloaded['3.0.0']['1'].absolute()
+    abs1 = downloaded['1.0.0']['1'].absolute()
+    if abs3 == abs1:
         test = downloaded['3.0.0']['1'].absolute()
         control = downloaded['1.0.0']['1'].absolute()
         raise RuntimeError(f'{test} == {control}\n'

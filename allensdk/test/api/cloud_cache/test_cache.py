@@ -6,7 +6,7 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
-from .utils import create_bucket, load_dataset
+from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
@@ -657,9 +657,10 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
     """
 
     bucket_name = 'outdated_manifest_bucket'
-    client = create_bucket(bucket_name,
-                  example_datasets_with_metadata['data'],
-                  metadatasets=example_datasets_with_metadata['metadata'])
+    metadatasets = example_datasets_with_metadata['metadata']
+    _ = create_bucket(bucket_name,
+                      example_datasets_with_metadata['data'],
+                      metadatasets=metadatasets)
 
     cache_dir = pathlib.Path(tmpdir) / 'cache'
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')

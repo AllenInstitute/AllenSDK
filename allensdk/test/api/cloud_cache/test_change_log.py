@@ -166,7 +166,6 @@ def test_compare_manifesst_string(tmpdir, example_datasets_with_metadata):
     msg = cache.compare_manifests('project-x_manifest_v1.0.0.json',
                                   'project-x_manifest_v15.0.0.json')
 
-
     expected = 'Changes going from\n'
     expected += 'project-x_manifest_v1.0.0.json\n'
     expected += 'to\n'
