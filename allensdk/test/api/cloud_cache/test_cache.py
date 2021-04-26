@@ -683,3 +683,31 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
     if len(warnings) > 0:
         for w in warnings.list:
             assert w._category_name != 'OutdatedManifestWarning'
+
+
+@mock_s3
+def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
+    """
+    Test that list_all_downloaded_manifests works
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    assert cache.list_all_downloaded_manifests() == []
+
+    cache.load_manifest('project-x_manifest_v5.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+
+    expected = {'project-x_manifest_v5.0.0.json',
+                'project-x_manifest_v2.0.0.json',
+                'project-x_manifest_v2.0.0.json'}
+    downloaded = set(cache.list_all_downloaded_manifests())
+    assert downloaded == expected
