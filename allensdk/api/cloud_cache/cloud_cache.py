@@ -637,7 +637,8 @@ class CloudCacheBase(ABC):
         containing the list of metadata and data files that changed
         between them
 
-        Note: this assumes that manifest_0 predates manifest_1
+        Note: this assumes that manifest_0 predates manifest_1 (i.e.
+        changes are listed relative to manifest_0)
 
         Parameters
         ----------
@@ -668,22 +669,22 @@ class CloudCacheBase(ABC):
 
         result = {}
         for (result_key,
-             fname_list,
-             fname_lookup) in zip(('metadata_changes', 'data_changes'),
-                                  ((man0.metadata_file_names,
-                                    man1.metadata_file_names),
-                                   (man0.file_id_values,
-                                    man1.file_id_values)),
-                                  ((man0.metadata_file_attributes,
-                                    man1.metadata_file_attributes),
-                                   (man0.data_file_attributes,
-                                    man1.data_file_attributes))):
+             file_id_list,
+             attr_lookup) in zip(('metadata_changes', 'data_changes'),
+                                 ((man0.metadata_file_names,
+                                   man1.metadata_file_names),
+                                  (man0.file_id_values,
+                                   man1.file_id_values)),
+                                 ((man0.metadata_file_attributes,
+                                   man1.metadata_file_attributes),
+                                  (man0.data_file_attributes,
+                                   man1.data_file_attributes))):
 
             filename_to_hash = {}
             for version in (0, 1):
                 filename_to_hash[version] = {}
-                for file_id in fname_list[version]:
-                    obj = fname_lookup[version](file_id)
+                for file_id in file_id_list[version]:
+                    obj = attr_lookup[version](file_id)
                     file_name = relative_path_from_url(obj.url)
                     file_name = '/'.join(file_name.split('/')[1:])
                     filename_to_hash[version][file_name] = obj.file_hash
