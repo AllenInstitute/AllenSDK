@@ -47,6 +47,13 @@ class CloudCacheBase(ABC):
         self._manifest = None
         self._cache_dir = cache_dir
 
+        self._project_name = project_name
+        self._manifest_file_names = self._list_all_manifests()
+
+        # what latest_manifest was the last time an OutdatedManifestWarning
+        # was emitted
+        self._manifest_last_warned_on = None
+
         # self._downloaded_data_path is where we will keep a JSONized
         # dict mapping paths to downloaded files to their file_hashes;
         # this will be used when determining if a downloaded file
@@ -54,12 +61,40 @@ class CloudCacheBase(ABC):
         c_path = pathlib.Path(self._cache_dir)
         self._downloaded_data_path = c_path / '_downloaded_data.json'
 
-        self._project_name = project_name
-        self._manifest_file_names = self._list_all_manifests()
+        if not self._downloaded_data_path.exists():
+            self._construct_file_version_lookup()
 
-        # what latest_manifest was the last time an OutdatedManifestWarning
-        # was emitted
-        self._manifest_last_warned_on = None
+    def _construct_file_version_lookup(self) -> None:
+        """
+        Construct the dict that maps between file_hash and
+        absolute local path. Save it to self._downloaded_data_path
+        """
+        lookup = {}
+        for mfest_name in self.list_all_downloaded_manifests():
+
+            # Call the private method so that we don't accidentally
+            # raise the "a more up to date version of the manifest
+            # exists" warning. That is not the point here.
+            self._manifest = self._load_manifest(mfest_name)
+
+            for file_id in self._manifest.file_id_values:
+                attr = self.data_path(file_id)
+                if attr['exists']:
+                    local_path = str(attr['local_path'].resolve())
+                    hsh = attr['file_attributes'].file_hash
+                    lookup[local_path] = hsh
+
+            for metadata_name in self._manifest.metadata_file_names:
+                attr = self.metadata_path(metadata_name)
+                if attr['exists']:
+                    local_path = str(attr['local_path'].resolve())
+                    hsh = attr['file_attributes'].file_hash
+                    lookup[local_path] = hsh
+
+        with open(self._downloaded_data_path, 'w') as out_file:
+            out_file.write(json.dumps(lookup, indent=2, sort_keys=True))
+
+        self._manifest = None
 
     def _warn_of_outdated_manifest(self, manifest_name: str) -> None:
         """
@@ -427,7 +462,7 @@ class CloudCacheBase(ABC):
         -------
         dict
 
-            'path' will be a pathlib.Path pointing to the file's location
+            'local_path' will be a pathlib.Path pointing to the file's location
 
             'exists' will be a boolean indicating if the file
             exists in a valid state

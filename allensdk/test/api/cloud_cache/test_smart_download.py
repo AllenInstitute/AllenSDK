@@ -1,9 +1,11 @@
+import pytest
 import json
 import hashlib
 import pathlib
 from moto import mock_s3
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 @mock_s3
@@ -240,3 +242,81 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     assert attr['exists']
     assert attr['local_path'].resolve() == downloaded_path.resolve()
     assert attr['local_path'].absolute() != downloaded_path.absolute()
+
+
+@mock_s3
+def test_reconstruction_of_local_manifest(tmpdir):
+    """
+    Test that, if _downloaded_data.json gets lost, it can be reconstructed
+    so that the CloudCache does not automatically download new copies of files
+    """
+
+    # define a cache class that cannot download from S3
+    class DummyCache(S3CloudCache):
+        def _download_file(self, file_attributes: CacheFileAttributes):
+            if not self._file_exists(file_attributes):
+                raise RuntimeError("Cannot download files")
+            return True
+
+    # first two versions of dataset are identical;
+    # third differs
+    example_data = {}
+    example_data['1.0.0'] = {}
+    example_data['1.0.0']['f1.txt'] = {'file_id': '1', 'data': b'abc'}
+    example_data['1.0.0']['f2.txt'] = {'file_id': '2', 'data': b'def'}
+
+    example_data['2.0.0'] = {}
+    example_data['2.0.0']['f1.txt'] = {'file_id': '1', 'data': b'abc'}
+    example_data['2.0.0']['f2.txt'] = {'file_id': '2', 'data': b'def'}
+
+    example_data['3.0.0'] = {}
+    example_data['3.0.0']['f1.txt'] = {'file_id': '1', 'data': b'tuv'}
+    example_data['3.0.0']['f2.txt'] = {'file_id': '2', 'data': b'wxy'}
+
+    test_bucket_name = 'cache_from_scratch_bucket'
+    create_bucket(test_bucket_name,
+                  example_data)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+
+    # read in v1.0.0 data files using normal S3 cache class
+    cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
+    expected_hash = {}
+    cache.load_manifest(f'project-x_manifest_v1.0.0.json')
+    for file_id in ('1', '2'):
+        local_path = cache.download_data(file_id)
+        hasher = hashlib.blake2b()
+        with open(local_path, 'rb') as in_file:
+            hasher.update(in_file.read())
+        expected_hash[file_id] = hasher.hexdigest()
+
+    # load the other manifests, so DummyCache can get it
+    cache.load_manifest(f'project-x_manifest_v2.0.0.json')
+    cache.load_manifest(f'project-x_manifest_v3.0.0.json')
+
+    # delete the JSON file that maps local path to file hash
+    lookup_path = cache._downloaded_data_path
+    assert lookup_path.exists()
+    lookup_path.unlink()
+    assert not lookup_path.exists()
+
+    del cache
+
+    # Reload the data using the cache class that cannot download
+    # files. Verify that paths to files with the correct hashes
+    # are returned. This will mean that the local manifest mapping
+    # filename to file hash was correctly reconstructed.
+    dummy = DummyCache(cache_dir, test_bucket_name, 'project-x')
+    dummy.load_manifest(f'project-x_manifest_v2.0.0.json')
+    for file_id in ('1', '2'):
+       local_path = dummy.download_data(file_id)
+       hasher = hashlib.blake2b()
+       with open(local_path, 'rb') as in_file:
+           hasher.update(in_file.read())
+       assert hasher.hexdigest() == expected_hash[file_id]
+
+    # make sure that dummy really is unable to download by trying
+    # (and failing) to get data from v3.0.0
+    dummy.load_manifest(f'project-x_manifest_v3.0.0.json')
+    with pytest.raises(RuntimeError) as error:
+        dummy.download_data('1')
