@@ -4,6 +4,15 @@ import copy
 
 @pytest.fixture
 def example_datasets():
+    """
+    A dict representing an example dataset that can
+    be used for testing the CloudCache api.
+
+    The key of the dict is the name of each file.
+    The values of the dict are dicts in which
+        'file_id' -> maps to the file_id used to describe the file
+        'data' -> a bytestring representing the contents of the file
+    """
     datasets = {}
     data = {}
     data['f1.txt'] = {'data': b'1234567',
@@ -38,6 +47,10 @@ def example_datasets():
 
 @pytest.fixture
 def baseline_data_with_metadata():
+    """
+    Example dataset with example metadata for use in testing
+    CloudCache API
+    """
     data = {}
     data['f1.txt'] = {'file_id': '1', 'data': b'1234'}
     data['f2.txt'] = {'file_id': '2', 'data': b'2345'}
@@ -52,6 +65,11 @@ def baseline_data_with_metadata():
 
 @pytest.fixture
 def example_datasets_with_metadata(baseline_data_with_metadata):
+    """
+    Multiple versions of an example dataset that goes through
+    all possible mutations (adding/deleting files; renaming files;
+    changing existing files) for use in testing the CloudCache API
+    """
 
     example = {}
     example['data'] = {}

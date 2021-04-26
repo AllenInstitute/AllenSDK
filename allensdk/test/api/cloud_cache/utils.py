@@ -24,7 +24,7 @@ def load_dataset(data_blobs: dict,
 
     manifest_version: str
         The version of the manifest (manifest will be
-        uploaded to moto3 as manifest_{manifest_version}.json
+        uploaded to moto3 as manifest_{manifest_version}.json)
 
     bucket_name: str
 
