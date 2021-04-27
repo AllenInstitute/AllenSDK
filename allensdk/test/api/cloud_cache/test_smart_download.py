@@ -282,7 +282,7 @@ def test_reconstruction_of_local_manifest(tmpdir):
     # read in v1.0.0 data files using normal S3 cache class
     cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
     expected_hash = {}
-    cache.load_manifest(f'project-x_manifest_v1.0.0.json')
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
     for file_id in ('1', '2'):
         local_path = cache.download_data(file_id)
         hasher = hashlib.blake2b()
@@ -291,8 +291,8 @@ def test_reconstruction_of_local_manifest(tmpdir):
         expected_hash[file_id] = hasher.hexdigest()
 
     # load the other manifests, so DummyCache can get it
-    cache.load_manifest(f'project-x_manifest_v2.0.0.json')
-    cache.load_manifest(f'project-x_manifest_v3.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    cache.load_manifest('project-x_manifest_v3.0.0.json')
 
     # delete the JSON file that maps local path to file hash
     lookup_path = cache._downloaded_data_path
@@ -307,16 +307,16 @@ def test_reconstruction_of_local_manifest(tmpdir):
     # are returned. This will mean that the local manifest mapping
     # filename to file hash was correctly reconstructed.
     dummy = DummyCache(cache_dir, test_bucket_name, 'project-x')
-    dummy.load_manifest(f'project-x_manifest_v2.0.0.json')
+    dummy.load_manifest('project-x_manifest_v2.0.0.json')
     for file_id in ('1', '2'):
-       local_path = dummy.download_data(file_id)
-       hasher = hashlib.blake2b()
-       with open(local_path, 'rb') as in_file:
-           hasher.update(in_file.read())
-       assert hasher.hexdigest() == expected_hash[file_id]
+        local_path = dummy.download_data(file_id)
+        hasher = hashlib.blake2b()
+        with open(local_path, 'rb') as in_file:
+            hasher.update(in_file.read())
+        assert hasher.hexdigest() == expected_hash[file_id]
 
     # make sure that dummy really is unable to download by trying
     # (and failing) to get data from v3.0.0
-    dummy.load_manifest(f'project-x_manifest_v3.0.0.json')
-    with pytest.raises(RuntimeError) as error:
+    dummy.load_manifest('project-x_manifest_v3.0.0.json')
+    with pytest.raises(RuntimeError):
         dummy.download_data('1')
