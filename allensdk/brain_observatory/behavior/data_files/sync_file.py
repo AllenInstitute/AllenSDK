@@ -20,6 +20,12 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
 
 
 class SyncFile(DataFile):
+    """A DataFile which contains methods for accessing and loading visual
+    behavior stimulus *.pkl files.
+
+    This file type contains global timing information for different data
+    streams collected during a behavior + ophys session.
+    """
 
     def __init__(self, filepath: Union[str, Path]):
         super().__init__(filepath=filepath)

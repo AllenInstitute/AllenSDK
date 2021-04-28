@@ -21,6 +21,13 @@ def from_lims_cache_key(cls, db, behavior_session_id: int):
 
 
 class StimulusFile(DataFile):
+    """A DataFile which contains methods for accessing and loading visual
+    behavior stimulus *.pkl files.
+
+    This file type contains a number of parameters collected during a behavior
+    session including information about stimulus presentations, rewards,
+    trials, and timing for all of the above.
+    """
 
     def __init__(self, filepath: Union[str, Path]):
         super().__init__(filepath=filepath)

@@ -42,6 +42,16 @@ def from_lims_cache_key(
 
 
 class RunningSpeed(DataObject):
+    """A DataObject which contains properties and methods to load, process,
+    and represent running speed data.
+
+    Running speed data is represented as:
+
+    Pandas Dataframe with the following columns:
+        "timestamps": Timestamps (in s) for calculated speed values
+        "speed": Computed running speed in cm/s
+    """
+
     def __init__(
         self,
         running_speed: pd.DataFrame,

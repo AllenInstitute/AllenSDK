@@ -29,6 +29,14 @@ class DataFile(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def from_json(cls) -> "DataFile":  # pragma: no cover
+        """Populates a DataFile from an input *.json likely parsed by
+        argschema
+
+        Returns
+        -------
+        DataFile:
+            An instantiated DataFile which has `data` and `filepath` properties
+        """
         # Example:
         # filepath = dict_repr["my_data_file_path"]
         # return cls.instantiate(filepath=filepath)
@@ -36,11 +44,27 @@ class DataFile(abc.ABC):
 
     @abc.abstractmethod
     def to_json(self) -> dict:  # pragma: no cover
+        """Given an already populated DataFile, return the dict that
+        when used with the `from_json()` classmethod would produce the same
+        DataFile
+
+        Returns
+        -------
+        dict:
+            The JSON (in dict form) that would produce the DataFile.
+        """
         raise NotImplementedError()
 
     @classmethod
     @abc.abstractmethod
     def from_lims(cls) -> "DataFile":  # pragma: no cover
+        """Populate a DataFile from an internal database (likely LIMS)
+
+        Returns
+        -------
+        DataFile:
+            An instantiated DataFile which has `data` and `filepath` properties
+        """
         # Example:
         # query = """SELECT my_file FROM some_lims_table"""
         # filepath = dbconn.fetchone(query, strict=True)
@@ -50,4 +74,19 @@ class DataFile(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def load_data(filepath: Union[str, Path]) -> Any:  # pragma: no cover
+        """Given a filepath (that is meant to by read by the DataFile type),
+        load the contents of the file into a Python type.
+        (dict, DataFrame, list, etc...)
+
+        Parameters
+        ----------
+        filepath : Union[str, Path]
+            The filepath that the DataFile class should load.
+
+        Returns
+        -------
+        Any
+            A Python data type that has been parsed/loaded from the provided
+            filepath.
+        """
         raise NotImplementedError()

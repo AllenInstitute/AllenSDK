@@ -38,13 +38,29 @@ def from_lims_cache_key(
 
 
 class RunningAcquisition(DataObject):
+    """A DataObject which contains properties and methods to load, process,
+    and represent running acquisition data.
+
+    Running aquisition data is represented as:
+
+    Pandas Dataframe with an index of timestamps and the following columns:
+        "dx": Angular change, computed during data collection
+        "v_sig": Voltage signal from the encoder
+        "v_in": The theoretical maximum voltage that the encoder
+            will reach prior to "wrapping". This should
+            theoretically be 5V (after crossing 5V goes to 0V, or
+            vice versa). In practice the encoder does not always
+            reach this value before wrapping, which can cause
+            transient spikes in speed at the voltage "wraps".
+    """
+
     def __init__(
         self,
         running_acquisition: pd.DataFrame,
         stimulus_file: Optional[StimulusFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
     ):
-        super().__init__(name='running_acquisition', value=running_acquisition)
+        super().__init__(name="running_acquisition", value=running_acquisition)
         self._stimulus_file = stimulus_file
         self._stimulus_timestamps = stimulus_timestamps
 
@@ -68,6 +84,18 @@ class RunningAcquisition(DataObject):
         )
 
     def to_json(self) -> dict:
+        """[summary]
+
+        Returns
+        -------
+        dict
+            [description]
+
+        Raises
+        ------
+        RuntimeError
+            [description]
+        """
         if self._stimulus_file is None or self._stimulus_timestamps is None:
             raise RuntimeError(
                 "RunningAcquisition DataObject lacks information about the "
@@ -87,6 +115,7 @@ class RunningAcquisition(DataObject):
         behavior_session_id: int,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
+
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
         stimulus_timestamps = StimulusTimestamps.from_lims(
             db, behavior_session_id, ophys_experiment_id

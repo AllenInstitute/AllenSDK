@@ -31,6 +31,14 @@ def from_lims_cache_key(
 
 
 class StimulusTimestamps(DataObject):
+    """A DataObject which contains properties and methods to load, process,
+    and represent visual behavior stimulus timestamp data.
+
+    Stimulus timestamp data is represented as:
+
+    Numpy array whose length is equal to the number of timestamps collected
+    and whose values are timestamps (in seconds)
+    """
 
     def __init__(
         self,
