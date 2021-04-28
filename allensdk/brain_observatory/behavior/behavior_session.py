@@ -1,5 +1,6 @@
 from typing import Any, Optional, List, Dict, Type, Tuple
 import logging
+import pynwb
 import pandas as pd
 import numpy as np
 import inspect
@@ -9,38 +10,49 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi, BehaviorNwbApi)
+    BehaviorNwbApi, BehaviorJsonApi, BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.brain_observatory.behavior.data_objects import (
+    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
+)
+
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import db_connection_creator
 
 
 BehaviorDataApi = Type[BehaviorBase]
 
 
 class BehaviorSession(LazyPropertyMixin):
-    def __init__(self, api: Optional[BehaviorDataApi] = None):
+    def __init__(
+        self, api: Optional[BehaviorDataApi] = None,
+        behavior_session_id: BehaviorSessionId = None,
+        stimulus_timestamps: StimulusTimestamps = None,
+        running_acquisition: RunningAcquisition = None,
+        raw_running_speed: RunningSpeed = None,
+        running_speed: RunningSpeed = None,
+    ):
         self.api = api
 
         # LazyProperty constructor provided by LazyPropertyMixin
         LazyProperty = self.LazyProperty
 
         # Initialize attributes to be lazily evaluated
-        self._behavior_session_id = LazyProperty(
-            self.api.get_behavior_session_id)
+        self._behavior_session_id = behavior_session_id
         self._licks = LazyProperty(self.api.get_licks, settable=True)
         self._rewards = LazyProperty(self.api.get_rewards, settable=True)
-        self._running_speed = LazyProperty(self.api.get_running_speed,
-                                           settable=True, lowpass=True)
-        self._raw_running_speed = LazyProperty(self.api.get_running_speed,
-                                               settable=True, lowpass=False)
+        self._running_acquisition = running_acquisition
+        self._running_speed = running_speed
+        self._raw_running_speed = raw_running_speed
         self._stimulus_presentations = LazyProperty(
             self.api.get_stimulus_presentations, settable=True)
         self._stimulus_templates = LazyProperty(
-            self.api.get_stimulus_templates, settable=True)
-        self._stimulus_timestamps = LazyProperty(
-            self.api.get_stimulus_timestamps, settable=True)
+            self.api.get_stimulus_templates, settable=True
+        )
+        self._stimulus_timestamps = stimulus_timestamps
         self._task_parameters = LazyProperty(self.api.get_task_parameters,
                                              settable=True)
         self._trials = LazyProperty(self.api.get_trials, settable=True)
@@ -49,13 +61,70 @@ class BehaviorSession(LazyPropertyMixin):
     # ==================== class and utility methods ======================
 
     @classmethod
+    def from_json(cls, session_data: dict) -> "BehaviorSession":
+        behavior_session_id = BehaviorSessionId.from_json(session_data)
+        stimulus_timestamps = StimulusTimestamps.from_json(session_data)
+        running_acquisition = RunningAcquisition.from_json(session_data)
+        raw_running_speed = RunningSpeed.from_json(
+            session_data, filtered=False
+        )
+        running_speed = RunningSpeed.from_json(session_data)
+        return cls(
+            api=BehaviorJsonApi(session_data),
+            behavior_session_id=behavior_session_id,
+            stimulus_timestamps=stimulus_timestamps,
+            running_acquisition=running_acquisition,
+            raw_running_speed=raw_running_speed,
+            running_speed=running_speed
+        )
+
+    @classmethod
     def from_lims(cls, behavior_session_id: int) -> "BehaviorSession":
-        return cls(api=BehaviorLimsApi(behavior_session_id))
+        lims_db = db_connection_creator(
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+        )
+
+        behavior_session_id = BehaviorSessionId(behavior_session_id)
+        stimulus_timestamps = StimulusTimestamps.from_lims(
+            lims_db, behavior_session_id.value
+        )
+        running_acquisition = RunningAcquisition.from_lims(
+            lims_db, behavior_session_id.value
+        )
+        raw_running_speed = RunningSpeed.from_lims(
+            lims_db, behavior_session_id.value, filtered=False
+        )
+        running_speed = RunningSpeed.from_lims(
+            lims_db, behavior_session_id.value
+        )
+        return cls(
+            api=BehaviorLimsApi(behavior_session_id.value),
+            behavior_session_id=behavior_session_id,
+            stimulus_timestamps=stimulus_timestamps,
+            running_acquisition=running_acquisition,
+            raw_running_speed=raw_running_speed,
+            running_speed=running_speed
+        )
 
     @classmethod
     def from_nwb_path(
-            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorSession":
-        return cls(api=BehaviorNwbApi.from_path(path=nwb_path, **api_kwargs))
+        cls, nwb_path: str, **api_kwargs: Any
+    ) -> "BehaviorSession":
+        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
+            nwbfile = read_io.read()
+            behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
+            stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
+            running_acquisition = RunningAcquisition.from_nwb(nwbfile)
+            raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
+            running_speed = RunningSpeed.from_nwb(nwbfile)
+        return cls(
+            api=BehaviorNwbApi.from_path(path=nwb_path, **api_kwargs),
+            behavior_session_id=behavior_session_id,
+            stimulus_timestamps=stimulus_timestamps,
+            running_acquisition=running_acquisition,
+            raw_running_speed=raw_running_speed,
+            running_speed=running_speed
+        )
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
@@ -95,6 +164,7 @@ class BehaviorSession(LazyPropertyMixin):
         attrs_and_methods_to_ignore: set = {
             "api",
             "cache_clear",
+            "from_json",
             "from_lims",
             "from_nwb_path",
             "LazyProperty",
@@ -309,7 +379,7 @@ class BehaviorSession(LazyPropertyMixin):
         """Unique identifier for a behavioral session.
         :rtype: int
         """
-        return self._behavior_session_id
+        return self._behavior_session_id.value
 
     @property
     def licks(self) -> pd.DataFrame:
@@ -393,11 +463,11 @@ class BehaviorSession(LazyPropertyMixin):
                 speed: (float)
                     speed in cm/sec
         """
-        return self._running_speed
+        return self._running_speed.value
 
     @running_speed.setter
     def running_speed(self, value):
-        self._running_speed = value
+        self._running_speed.value = value
 
     @property
     def raw_running_speed(self) -> pd.DataFrame:
@@ -418,11 +488,11 @@ class BehaviorSession(LazyPropertyMixin):
                 speed: (float)
                     speed in cm/sec
         """
-        return self._raw_running_speed
+        return self._raw_running_speed.value
 
     @raw_running_speed.setter
     def raw_running_speed(self, value):
-        self._raw_running_speed = value
+        self._raw_running_speed.value = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
@@ -511,11 +581,11 @@ class BehaviorSession(LazyPropertyMixin):
         np.ndarray
             Timestamps associated with stimulus presentations on the monitor
         """
-        return self._stimulus_timestamps
+        return self._stimulus_timestamps.value
 
     @stimulus_timestamps.setter
     def stimulus_timestamps(self, value):
-        self._stimulus_timestamps = value
+        self._stimulus_timestamps.value = value
 
     @property
     def task_parameters(self) -> dict:
