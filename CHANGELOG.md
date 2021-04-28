@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.11.0] = TBD
+- python 3.8 compatibility
+
 ## [2.10.3] = 2021-04-23
 - Adds restriction to require hdmf version to be strictly less than 2.5.0 which accidentally introduced a major version breaking change
 
