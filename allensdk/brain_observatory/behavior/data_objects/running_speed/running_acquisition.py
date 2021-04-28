@@ -29,7 +29,8 @@ def from_json_cache_key(
 
 
 def from_lims_cache_key(
-    cls, db, behavior_session_id: int, ophys_experiment_id: Optional[int]
+    cls, db,
+    behavior_session_id: int, ophys_experiment_id: Optional[int] = None
 ):
     return hashkey(
         behavior_session_id, ophys_experiment_id

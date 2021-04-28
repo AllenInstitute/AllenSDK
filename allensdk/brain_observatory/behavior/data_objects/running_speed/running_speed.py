@@ -24,14 +24,17 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 
 
 def from_json_cache_key(
-    cls, dict_repr: dict, filtered: bool, zscore_threshold: float
+    cls, dict_repr: dict,
+    filtered: bool = True,
+    zscore_threshold: float = 10.0
 ):
     return hashkey(json.dumps(dict_repr), filtered, zscore_threshold)
 
 
 def from_lims_cache_key(
-    cls, db, behavior_session_id: int, ophys_experiment_id: Optional[int],
-    filtered: bool, zscore_threshold: float
+    cls, db,
+    behavior_session_id: int, ophys_experiment_id: Optional[int] = None,
+    filtered: bool = True, zscore_threshold: float = 10.0
 ):
     return hashkey(
         behavior_session_id, ophys_experiment_id, filtered, zscore_threshold
