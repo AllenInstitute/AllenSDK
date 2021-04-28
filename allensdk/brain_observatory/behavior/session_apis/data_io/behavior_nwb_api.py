@@ -198,6 +198,9 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
         data['cre_line'] = BehaviorMetadata.parse_cre_line(
             full_genotype=nwb_subject.genotype)
+        data['indicator'] = BehaviorMetadata.parse_indicator(
+            reporter_line=nwb_subject.reporter_line, warn=True
+        )
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time
