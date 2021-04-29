@@ -28,9 +28,9 @@ class DataFile(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls) -> "DataFile":  # pragma: no cover
-        """Populates a DataFile from an input *.json likely parsed by
-        argschema
+    def from_json(cls, dict_repr: dict) -> "DataFile":  # pragma: no cover
+        """Populates a DataFile from a JSON compatible dict (likely parsed by
+        argschema)
 
         Returns
         -------

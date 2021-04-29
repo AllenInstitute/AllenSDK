@@ -26,9 +26,9 @@ class DataObject(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls) -> "DataObject":  # pragma: no cover
-        """Populates a DataObject from an input *.json likely parsed by
-        argschema
+    def from_json(cls, dict_repr: dict) -> "DataObject":  # pragma: no cover
+        """Populates a DataFile from a JSON compatible dict (likely parsed by
+        argschema)
 
         Returns
         -------
