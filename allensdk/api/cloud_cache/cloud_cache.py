@@ -24,6 +24,10 @@ class OutdatedManifestWarning(UserWarning):
     pass
 
 
+class MissingLocalManifestWarning(UserWarning):
+    pass
+
+
 class CloudCacheBase(ABC):
     """
     A class to handle the downloading and accessing of data served from a cloud
@@ -61,10 +65,38 @@ class CloudCacheBase(ABC):
         c_path = pathlib.Path(self._cache_dir)
         self._downloaded_data_path = c_path / '_downloaded_data.json'
 
+        # if the local manifest is missing but there are
+        # data files in cache_dir, emit a warning
+        # suggesting that the user run
+        # self.construct_local_manifest
         if not self._downloaded_data_path.exists():
-            self._construct_file_version_lookup()
+            file_list = c_path.glob('**/*')
+            has_files = False
+            for fname in file_list:
+                if fname.is_file():
+                    if 'json' not in fname.name:
+                        has_files = True
+                        break
+            if has_files:
+                msg = 'This cache directory appears to '
+                msg += 'contain data files, but it has no '
+                msg += 'record of what those files are. '
+                msg += 'You might want to consider running\n\n'
+                msg += 'self.construct_local_manifest()\n\n'
+                msg += 'to avoid needlessly downloading duplicates '
+                msg += 'of data files that did not change between '
+                msg += 'data releases. NOTE: running this method '
+                msg += 'will require hashing every data file you '
+                msg += 'have currently downloaded and could be '
+                msg += 'very time consuming.\n\n'
+                msg += 'To avoid this warning in the future, make '
+                msg += 'sure that\n\n'
+                msg += f'{str(self._downloaded_data_path.resolve())}\n\n'
+                msg += 'is not deleted between instantiations of this '
+                msg += 'cache'
+                warnings.warn(msg, MissingLocalManifestWarning)
 
-    def _construct_file_version_lookup(self) -> None:
+    def construct_local_manifest(self) -> None:
         """
         Construct the dict that maps between file_hash and
         absolute local path. Save it to self._downloaded_data_path

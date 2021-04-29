@@ -4,6 +4,7 @@ import hashlib
 import pathlib
 from moto import mock_s3
 from .utils import create_bucket
+from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
@@ -280,7 +281,17 @@ def test_reconstruction_of_local_manifest(tmpdir):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
 
     # read in v1.0.0 data files using normal S3 cache class
-    cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
+    with pytest.warns(None) as warnings:
+        cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
+
+    # make sure no MissingLocalManifestWarnings were raised
+    w_type = 'MissingLocalManifestWarning'
+    for w in warnings.list:
+        if w._category_name == w_type:
+            msg = 'Raised MissingLocalManifestWarning on empty '
+            msg += 'cache dir'
+            assert False, msg
+
     expected_hash = {}
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     for file_id in ('1', '2'):
@@ -306,7 +317,11 @@ def test_reconstruction_of_local_manifest(tmpdir):
     # files. Verify that paths to files with the correct hashes
     # are returned. This will mean that the local manifest mapping
     # filename to file hash was correctly reconstructed.
-    dummy = DummyCache(cache_dir, test_bucket_name, 'project-x')
+    with pytest.warns(MissingLocalManifestWarning) as warnings:
+        dummy = DummyCache(cache_dir, test_bucket_name, 'project-x')
+
+    dummy.construct_local_manifest()
+
     dummy.load_manifest('project-x_manifest_v2.0.0.json')
     for file_id in ('1', '2'):
         local_path = dummy.download_data(file_id)
