@@ -672,6 +672,10 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
     ct = 0
     for w in warnings.list:
         if w._category_name == m_warn_type:
+            msg = str(w.message)
+            assert 'is not the most up to date' in msg
+            assert 'self.compare_manifests' in msg
+            assert 'load_latest_manifest' in msg
             ct += 1
     assert ct > 0
 

@@ -144,6 +144,8 @@ class CloudCacheBase(ABC):
         msg += "To see all of the manifest files currently downloaded "
         msg += "onto your local system, run\n\n"
         msg += "self.list_all_downloaded_manifests()\n\n"
+        msg += "If you just want to load the latest manifest, run\n\n"
+        msg += "self.load_latest_manifest()\n\n"
         warnings.warn(msg, OutdatedManifestWarning)
         return None
 
