@@ -110,7 +110,11 @@ class CloudCacheBase(ABC):
                 if 'json' not in file_name.name:
                     files_to_hash.add(file_name.resolve())
 
-        for local_path in files_to_hash:
+        pbar = tqdm.tqdm(files_to_hash,
+                         total=len(files_to_hash),
+                         unit='(files hashed)')
+
+        for local_path in pbar:
             hsh = file_hash_from_path(local_path)
             lookup[str(local_path.absolute())] = hsh
 
