@@ -211,6 +211,21 @@ class CloudCacheBase(ABC):
         return self._find_latest_file(self.list_all_downloaded_manifests())
 
     def load_latest_manifest(self):
+        latest_downloaded = self.latest_downloaded_manifest_file
+        latest = self.latest_manifest_file
+        if latest != latest_downloaded:
+            if latest_downloaded != '':
+                msg = f'You are loading\n{self.latest_manifest_file}\n'
+                msg += 'which is newer than the most recent manifest '
+                msg += 'file you have previously been working with\n'
+                msg += f'{latest_downloaded}\n'
+                msg += 'It is possible that some data files have changed '
+                msg += 'between these two data releases, which will '
+                msg += 'force you to re-download those data files '
+                msg += '(currently downloaded files will not be overwritten).'
+                msg += f' To continue using {latest_downloaded}, run\n'
+                msg += f"self.load_manifest('{latest_downloaded}')"
+                warnings.warn(msg, OutdatedManifestWarning)
         self.load_manifest(self.latest_manifest_file)
 
     @abstractmethod

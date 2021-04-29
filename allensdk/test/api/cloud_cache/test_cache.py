@@ -715,3 +715,31 @@ def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
                 'project-x_manifest_v2.0.0.json'}
     downloaded = set(cache.list_all_downloaded_manifests())
     assert downloaded == expected
+
+
+@mock_s3
+def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
+    """
+    Test that the correct warning is emitted when the user tries
+    to load_latest_manifest but that has not been downloaded yet
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    cache.load_manifest('project-x_manifest_v4.0.0.json')
+
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_latest_manifest()
+    assert len(warnings) == 1
+    msg = str(warnings[0].message)
+    assert 'project-x_manifest_v4.0.0.json' in msg
+    assert 'project-x_manifest_v15.0.0.json' in msg
+    assert 'It is possible that some data files' in msg
+    assert "self.load_manifest('project-x_manifest_v4.0.0.json')" in msg
