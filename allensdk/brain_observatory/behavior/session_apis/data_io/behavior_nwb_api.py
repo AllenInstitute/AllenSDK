@@ -57,25 +57,16 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         )
 
         # Add stimulus_timestamps to NWB in-memory object:
-        nwb.add_stimulus_timestamps(nwbfile,
-                                    session_object.stimulus_timestamps)
+        session_object._stimulus_timestamps.to_nwb(nwbfile)
 
         # Add running acquisition ('dx', 'v_sig', 'v_in') data to NWB
         # This data should be saved to NWB but not accessible directly from
         # Sessions
-        nwb.add_running_acquisition_to_nwbfile(
-            nwbfile,
-            session_object.api.get_running_acquisition_df())
+        session_object._running_acquisition.to_nwb(nwbfile)
 
         # Add running data to NWB in-memory object:
-        nwb.add_running_speed_to_nwbfile(nwbfile,
-                                         session_object.running_speed,
-                                         name="speed",
-                                         from_dataframe=True)
-        nwb.add_running_speed_to_nwbfile(nwbfile,
-                                         session_object.raw_running_speed,
-                                         name="speed_unfiltered",
-                                         from_dataframe=True)
+        session_object._raw_running_speed.to_nwb(nwbfile)
+        session_object._running_speed.to_nwb(nwbfile)
 
         # Add stimulus template data to NWB in-memory object:
         # Use the semi-private _stimulus_templates attribute because it is
@@ -125,75 +116,11 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
             self.get_metadata()
         return self._behavior_session_id
 
-    def get_running_acquisition_df(self) -> pd.DataFrame:
-        """Get running speed acquisition data.
+    def get_running_acquisition_df(self):
+        raise NotImplementedError()
 
-        Returns
-        -------
-        pd.DataFrame
-            Dataframe with an index of timestamps and the following columns:
-                "dx": angular change, computed during data collection
-                "v_sig": voltage signal from the encoder
-                "v_in": the theoretical maximum voltage that the encoder
-                    will reach prior to "wrapping". This should
-                    theoretically be 5V (after crossing 5V goes to 0V, or
-                    vice versa). In practice the encoder does not always
-                    reach this value before wrapping, which can cause
-                    transient spikes in speed at the voltage "wraps".
-        """
-        running_module = self.nwbfile.modules['running']
-        dx_interface = running_module.get_data_interface('dx')
-
-        timestamps = dx_interface.timestamps[:]
-        dx = dx_interface.data
-        v_in = self.nwbfile.get_acquisition('v_in').data
-        v_sig = self.nwbfile.get_acquisition('v_sig').data
-
-        running_acq_df = pd.DataFrame(
-            {
-                'dx': dx,
-                'v_in': v_in,
-                'v_sig': v_sig
-            },
-            index=pd.Index(timestamps, name='timestamps'))
-
-        return running_acq_df
-
-    def get_running_speed(self, lowpass: bool = True) -> pd.DataFrame:
-        """
-        Gets running speed data
-
-        NOTE: Overrides the inherited method from:
-        allensdk.brain_observatory.nwb.nwb_api
-
-        Parameters
-        ----------
-        lowpass: bool
-            Whether to return running speed with or without low pass filter
-            applied
-        zscore_threshold: float
-            The threshold to use for removing outlier running speeds which
-            might be noise and not true signal
-
-        Returns
-        -------
-            pd.DataFrame:
-                Dataframe containing various signals used to compute running
-                speed, and the filtered or unfiltered speed.
-        """
-        running_module = self.nwbfile.modules['running']
-        interface_name = 'speed' if lowpass else 'speed_unfiltered'
-        running_interface = running_module.get_data_interface(interface_name)
-        values = running_interface.data[:]
-        timestamps = running_interface.timestamps[:]
-
-        running_speed_df = pd.DataFrame(
-            {
-                'timestamps': timestamps,
-                'speed': values
-            },
-        )
-        return running_speed_df
+    def get_running_speed(self):
+        raise NotImplementedError()
 
     def get_stimulus_templates(self, **kwargs) -> Optional[StimulusTemplate]:
 
@@ -217,9 +144,8 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         df['is_change'] = is_change_event(stimulus_presentations=df)
         return df
 
-    def get_stimulus_timestamps(self) -> np.ndarray:
-        stim_module = self.nwbfile.processing['stimulus']
-        return stim_module.get_data_interface('timestamps').timestamps[:]
+    def get_stimulus_timestamps(self):
+        raise NotImplementedError
 
     def get_trials(self) -> pd.DataFrame:
         trials = self.nwbfile.trials.to_dataframe()
@@ -272,6 +198,9 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
         data['driver_line'] = sorted(list(nwb_subject.driver_line))
         data['cre_line'] = BehaviorMetadata.parse_cre_line(
             full_genotype=nwb_subject.genotype)
+        data['indicator'] = BehaviorMetadata.parse_indicator(
+            reporter_line=nwb_subject.reporter_line, warn=True
+        )
 
         # Add other metadata stored in nwb file to behavior session meta
         data['date_of_acquisition'] = self.nwbfile.session_start_time

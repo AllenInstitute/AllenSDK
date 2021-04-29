@@ -10,8 +10,9 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
 from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.running_processing import \
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
+)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.session_apis.abcs.\

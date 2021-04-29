@@ -3,7 +3,7 @@ from scipy.stats import zscore
 import numpy as np
 import pandas as pd
 import warnings
-from typing import Iterable, Union, Any, Optional
+from typing import Iterable, Union, Optional
 
 
 def calc_deriv(x, time):
@@ -299,7 +299,9 @@ def _zscore_threshold_1d(data: np.ndarray,
     return corrected_data
 
 
-def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0):
+def get_running_df(
+    data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0
+):
     """
     Given the data from the behavior 'pkl' file object and a 1d
     array of timestamps, compute the running speed. Returns a
@@ -318,7 +320,8 @@ def get_running_df(data, time: np.ndarray, lowpass: bool = True, zscore_threshol
         Whether to apply a 10Hz low-pass filter to the running speed
         data.
     zscore_threshold: float
-        The threshold to use for removing outlier running speeds which might be noise and not true signal
+        The threshold to use for removing outlier running speeds which might
+        be noise and not true signal.
 
     Returns
     -------

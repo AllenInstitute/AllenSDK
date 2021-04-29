@@ -15,6 +15,8 @@ import SimpleITK as sitk
 from pandas.util.testing import assert_frame_equal
 
 from allensdk.core.lazy_property import LazyProperty
+from allensdk.brain_observatory.behavior.data_objects import DataObject
+
 
 logger = logging.getLogger(__name__)
 
@@ -174,10 +176,10 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
 
     field_set = set()
     for key, val in A.__dict__.items():
-        if isinstance(val, LazyProperty):
+        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
             field_set.add(key)
     for key, val in B.__dict__.items():
-        if isinstance(val, LazyProperty):
+        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
             field_set.add(key)
 
     logger.info(f"Comparing the following fields: {field_set}")
@@ -188,6 +190,10 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
             x1, x2 = getattr(A, field), getattr(B, field)
             err_msg = (f"{field} on {A} did not equal {field} "
                        f"on {B} (\n{x1} vs\n{x2}\n)")
+            if isinstance(x1, DataObject):
+                x1 = x1.value
+            if isinstance(x2, DataObject):
+                x2 = x2.value
             compare_session_fields(x1, x2, err_msg)
 
         except NotImplementedError:

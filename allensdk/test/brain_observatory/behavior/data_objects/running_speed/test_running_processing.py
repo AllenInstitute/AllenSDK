@@ -1,13 +1,12 @@
 import numpy as np
-import pandas as pd
 import pytest
 
-from allensdk.brain_observatory.behavior.running_processing import (
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df, calc_deriv, deg_to_dist, _shift, _identify_wraps,
     _unwrap_voltage_signal, _angular_change, _zscore_threshold_1d,
     _clip_speed_wraps)
 
-import allensdk.brain_observatory.behavior.running_processing as rp
+import allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing as rp  # noqa: E501
 
 
 @pytest.fixture
@@ -110,8 +109,14 @@ def test_get_running_df_one_fewer_timestamp_check_truncation(running_data,
 
     # Check that the output is actually trimmed, and the values are the same
     assert len(output) == len(timestamps) - 1
-    np.testing.assert_equal(output["v_sig"], running_data["items"]["behavior"]["encoders"][0]["vsig"][:-1])
-    np.testing.assert_equal(output["v_in"], running_data["items"]["behavior"]["encoders"][0]["vin"][:-1])
+    np.testing.assert_equal(
+        output["v_sig"],
+        running_data["items"]["behavior"]["encoders"][0]["vsig"][:-1]
+    )
+    np.testing.assert_equal(
+        output["v_in"],
+        running_data["items"]["behavior"]["encoders"][0]["vin"][:-1]
+    )
 
 
 @pytest.mark.parametrize(

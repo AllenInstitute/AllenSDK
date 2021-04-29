@@ -29,3 +29,4 @@ tqdm>=4.27
 ndx-events<=0.2.0
 boto3==1.17.21
 semver
+cachetools>=4.2.1,<5.0.0
