@@ -102,31 +102,20 @@ class CloudCacheBase(ABC):
         absolute local path. Save it to self._downloaded_data_path
         """
         lookup = {}
-        for mfest_name in self.list_all_downloaded_manifests():
+        files_to_hash = set()
+        c_dir = pathlib.Path(self._cache_dir)
+        file_iterator = c_dir.glob('**/*')
+        for file_name in file_iterator:
+            if file_name.is_file():
+                if 'json' not in file_name.name:
+                    files_to_hash.add(file_name.resolve())
 
-            # Call the private method so that we don't accidentally
-            # raise the "a more up to date version of the manifest
-            # exists" warning. That is not the point here.
-            self._manifest = self._load_manifest(mfest_name)
-
-            for file_id in self._manifest.file_id_values:
-                attr = self.data_path(file_id)
-                if attr['exists']:
-                    local_path = str(attr['local_path'].resolve())
-                    hsh = attr['file_attributes'].file_hash
-                    lookup[local_path] = hsh
-
-            for metadata_name in self._manifest.metadata_file_names:
-                attr = self.metadata_path(metadata_name)
-                if attr['exists']:
-                    local_path = str(attr['local_path'].resolve())
-                    hsh = attr['file_attributes'].file_hash
-                    lookup[local_path] = hsh
+        for local_path in files_to_hash:
+            hsh = file_hash_from_path(local_path)
+            lookup[str(local_path.absolute())] = hsh
 
         with open(self._downloaded_data_path, 'w') as out_file:
             out_file.write(json.dumps(lookup, indent=2, sort_keys=True))
-
-        self._manifest = None
 
     def _warn_of_outdated_manifest(self, manifest_name: str) -> None:
         """
