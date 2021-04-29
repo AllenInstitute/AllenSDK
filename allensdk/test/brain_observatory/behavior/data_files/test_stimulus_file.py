@@ -7,6 +7,9 @@ import pytest
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    STIMULUS_FILE_QUERY_TEMPLATE
+)
 
 
 @pytest.fixture
@@ -60,21 +63,9 @@ def test_stimulus_file_from_lims(stimulus_file_fixture, behavior_session_id):
     stimfile_cached = StimulusFile.from_lims(mock_db_conn, behavior_session_id)
     assert stimfile_cached.data == stim_pkl_data
 
-    # This query string has strict formatting requirements
-    # in order to pass Mock assert_called_once_with() so don't change it!
-    query = f"""
-            SELECT
-                wkf.storage_directory || wkf.filename AS stim_file
-            FROM
-                well_known_files wkf
-            WHERE
-                wkf.attachable_id = {behavior_session_id}
-                AND wkf.attachable_type = 'BehaviorSession'
-                AND wkf.well_known_file_type_id IN (
-                    SELECT id
-                    FROM well_known_file_types
-                    WHERE name = 'StimulusPickle');
-        """
+    query = STIMULUS_FILE_QUERY_TEMPLATE.format(
+        behavior_session_id=behavior_session_id
+    )
 
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
 

@@ -8,6 +8,9 @@ import pytest
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_files.sync_file import (
+    SYNC_FILE_QUERY_TEMPLATE
+)
 
 
 @pytest.fixture
@@ -84,19 +87,9 @@ def test_sync_file_from_lims(
         stimfile_cached = SyncFile.from_lims(mock_db_conn, ophys_experiment_id)
         np.allclose(stimfile_cached.data, sync_data)
 
-    # This query string has strict formatting requirements
-    # in order to pass Mock assert_called_once_with() so don't change it!
-    query = f"""
-                SELECT wkf.storage_directory || wkf.filename AS sync_file
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-                JOIN well_known_files wkf ON wkf.attachable_id = os.id
-                JOIN well_known_file_types wkft
-                ON wkft.id = wkf.well_known_file_type_id
-                WHERE wkf.attachable_type = 'OphysSession'
-                AND wkft.name = 'OphysRigSync'
-                AND oe.id = {ophys_experiment_id};
-                """
+    query = SYNC_FILE_QUERY_TEMPLATE.format(
+        ophys_experiment_id=ophys_experiment_id
+    )
 
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
 

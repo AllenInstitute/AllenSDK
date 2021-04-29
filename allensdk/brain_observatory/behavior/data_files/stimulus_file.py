@@ -12,6 +12,22 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.data_files import DataFile
 
 
+# Query returns path to StimulusPickle file for given behavior session
+STIMULUS_FILE_QUERY_TEMPLATE = """
+    SELECT
+        wkf.storage_directory || wkf.filename AS stim_file
+    FROM
+        well_known_files wkf
+    WHERE
+        wkf.attachable_id = {behavior_session_id}
+        AND wkf.attachable_type = 'BehaviorSession'
+        AND wkf.well_known_file_type_id IN (
+            SELECT id
+            FROM well_known_file_types
+            WHERE name = 'StimulusPickle');
+"""
+
+
 def from_json_cache_key(cls, dict_repr: dict):
     return hashkey(json.dumps(dict_repr))
 
@@ -47,21 +63,9 @@ class StimulusFile(DataFile):
         cls, db: PostgresQueryMixin,
         behavior_session_id: Union[int, str]
     ) -> "StimulusFile":
-        # Query returns the path to the StimulusPickle file for the given
-        # behavior session
-        query = f"""
-            SELECT
-                wkf.storage_directory || wkf.filename AS stim_file
-            FROM
-                well_known_files wkf
-            WHERE
-                wkf.attachable_id = {behavior_session_id}
-                AND wkf.attachable_type = 'BehaviorSession'
-                AND wkf.well_known_file_type_id IN (
-                    SELECT id
-                    FROM well_known_file_types
-                    WHERE name = 'StimulusPickle');
-        """
+        query = STIMULUS_FILE_QUERY_TEMPLATE.format(
+            behavior_session_id=behavior_session_id
+        )
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)
 
