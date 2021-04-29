@@ -121,7 +121,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.11.0
 -----------------------------------------------------------------------
-- list updates here
+- python 3.8 compatibility
 
 
 What's New - 2.10.3

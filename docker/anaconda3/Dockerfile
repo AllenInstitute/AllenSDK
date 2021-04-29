@@ -22,7 +22,7 @@ RUN conda create -y --name py36 python=3.6 ipykernel \
 RUN conda create -y --name py37 python=3.7 ipykernel \
     && conda clean --index-cache --tarballs
 
-RUN conda create -y --name py38 python=3.8 ipykernel numpy h5py \
+RUN conda create -y --name py38 python=3.8 ipykernel numpy\
     && conda clean --index-cache --tarballs
 
 RUN conda create -y --name py39 python=3.9 ipykernel \
