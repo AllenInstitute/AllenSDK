@@ -1,22 +1,21 @@
 import logging
-from six.moves import cPickle
 import allensdk.internal.core.lims_utilities as lu
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
+from allensdk.internal.core.lims_pipeline_module import (
+        PipelineModule, run_module)
 from allensdk.internal.brain_observatory import roi_filter, roi_filter_utils
 from allensdk.brain_observatory.roi_masks import (RIGHT_SHIFT, LEFT_SHIFT,
                                                   DOWN_SHIFT, UP_SHIFT)
 import pandas as pd
 import os
-import numpy
 import h5py
 
 DEPRECATED_MOTION_HEADER = ["index", "x", "y", "a", "b", "c", "d", "e", "f"]
 MAX_SHIFT = 30
 OVERLAP_THRESHOLD = 0.9
-DEBUG_SDK_PATH="/data/informatics/CAM/roi_filter/allensdk/"
-DEBUG_SCRIPT=os.path.join(DEBUG_SDK_PATH, "allensdk", "internal",
-                          "pipeline_modules", "run_roi_filter.py")
-DEBUG_OUTPUT_DIRECTORY="/data/informatics/CAM/roi_filter/"
+DEBUG_SDK_PATH = "/data/informatics/CAM/roi_filter/allensdk/"
+DEBUG_SCRIPT = os.path.join(DEBUG_SDK_PATH, "allensdk", "internal",
+                            "pipeline_modules", "run_roi_filter.py")
+DEBUG_OUTPUT_DIRECTORY = "/data/informatics/CAM/roi_filter/"
 
 
 def get_motion_filepath(experiment_id):
@@ -143,10 +142,12 @@ def load_all_input(data):
         raise
 
     try:
-        rigid_motion_transform_file = data["log_0"]  # TODO: update name in LIMS and here
+        # TODO: update name in LIMS and here
+        rigid_motion_transform_file = data["log_0"]
         motion_data = load_rigid_motion_transform(rigid_motion_transform_file)
     except KeyError:
-        logging.error("Input json missing log_0")  # TODO: update name in LIMS and here
+        # TODO: update name in LIMS and here
+        logging.error("Input json missing log_0")
         raise
     except IOError:
         logging.error("Could not read rigid motion transform file %s",
@@ -209,6 +210,8 @@ def load_all_input(data):
 
     border = roi_filter_utils.calculate_max_border(motion_data, MAX_SHIFT)
     rois = roi_filter_utils.get_rois(segmentation_stack, border)
+    if len(rois) == 0:
+        raise ValueError(f"no ROIs were found from {maxint_file}")
     rois = roi_filter_utils.order_rois_by_object_list(object_data, rois)
 
     result = {"model_id": model_id,
@@ -283,4 +286,6 @@ def main():
 
     mod.write_output_data(output_data)
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()

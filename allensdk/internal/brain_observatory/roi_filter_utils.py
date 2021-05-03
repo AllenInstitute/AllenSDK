@@ -12,6 +12,7 @@ CRITERIA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              "roi_filter_training_criteria.json")
 _CRITERIA = None
 
+
 def CRITERIA():
     global _CRITERIA
     if _CRITERIA is None:
@@ -181,10 +182,10 @@ def calculate_max_border(motion_df, max_shift):
         [right_shift, left_shift, down_shift, up_shift]
     '''
     # strip outliers
-    x_no_outliers = motion_df["x"][(motion_df["x"] >= -max_shift) & \
-                                   (motion_df["x"] <= max_shift)]
-    y_no_outliers = motion_df["y"][(motion_df["y"] >= -max_shift) & \
-                                   (motion_df["y"] <= max_shift)]
+    x_no_outliers = motion_df["x"][(motion_df["x"] >= -max_shift)
+                                   & (motion_df["x"] <= max_shift)]
+    y_no_outliers = motion_df["y"][(motion_df["y"] >= -max_shift)
+                                   & (motion_df["y"] <= max_shift)]
 
     right_shift = np.max(-1*x_no_outliers.min(), 0)
     left_shift = np.max(x_no_outliers.max(), 0)
@@ -214,7 +215,11 @@ def order_rois_by_object_list(object_data, rois):
     list
         The list of rois reordered to index the same as object_data.
     '''
-    object_points = object_data[["minx", "miny", "maxx", "maxy", "area"]].copy()
+    object_points = object_data[["minx",
+                                 "miny",
+                                 "maxx",
+                                 "maxy",
+                                 "area"]].copy()
     object_points["maxx"] += 1
     object_points["maxy"] += 1
     roi_points = []
@@ -286,6 +291,9 @@ def get_indices_by_distance(object_list_points, mask_points):
     Require a distance of 0 (perfect match) and a unique match between
     masks and object_list entries.
     '''
+    if np.array(mask_points).ndim != 2:
+        raise ValueError("number of dimensions is incorrect. Expected 2 "
+                         f"got {np.array(mask_points).ndim}")
     tree = cKDTree(mask_points)
     distance, indices = tree.query(object_list_points)
     if distance.max() > 0:
