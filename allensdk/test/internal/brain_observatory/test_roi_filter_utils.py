@@ -29,7 +29,8 @@ from allensdk.internal.brain_observatory.roi_filter_utils import (
                                      "perhaps there are no ROIs."))
             )
             ])
-def test_get_indices_by_distance(tree_points, query_points, expected, exception):
+def test_get_indices_by_distance(tree_points, query_points,
+                                 expected, exception):
     """tests exceptions with simple 2D vectors. Actual code has 5D vectors
     for a basic cell-matching to [minx, miny, maxx, maxy, area]
     """
