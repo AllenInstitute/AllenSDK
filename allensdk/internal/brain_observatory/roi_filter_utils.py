@@ -182,10 +182,10 @@ def calculate_max_border(motion_df, max_shift):
         [right_shift, left_shift, down_shift, up_shift]
     '''
     # strip outliers
-    x_no_outliers = motion_df["x"][(motion_df["x"] >= -max_shift) &
-                                   (motion_df["x"] <= max_shift)]
-    y_no_outliers = motion_df["y"][(motion_df["y"] >= -max_shift) &
-                                   (motion_df["y"] <= max_shift)]
+    x_no_outliers = motion_df["x"][(motion_df["x"] >= -max_shift)
+                                   & (motion_df["x"] <= max_shift)]
+    y_no_outliers = motion_df["y"][(motion_df["y"] >= -max_shift)
+                                   & (motion_df["y"] <= max_shift)]
 
     right_shift = np.max(-1*x_no_outliers.min(), 0)
     left_shift = np.max(x_no_outliers.max(), 0)
