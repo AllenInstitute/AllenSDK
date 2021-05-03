@@ -209,6 +209,8 @@ def load_all_input(data):
 
     border = roi_filter_utils.calculate_max_border(motion_data, MAX_SHIFT)
     rois = roi_filter_utils.get_rois(segmentation_stack, border)
+    if len(rois) == 0:
+        raise ValueError(f"no ROIs were found from {maxint_file}")
     rois = roi_filter_utils.order_rois_by_object_list(object_data, rois)
 
     result = {"model_id": model_id,
