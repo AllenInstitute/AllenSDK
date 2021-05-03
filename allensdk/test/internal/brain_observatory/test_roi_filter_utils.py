@@ -25,7 +25,8 @@ from allensdk.internal.brain_observatory.roi_filter_utils import (
                 [],
                 [],
                 pytest.raises(ValueError,
-                              match=("number of dimensions is incorrect."))
+                              match=("number of dimensions is incorrect. "
+                                     "Expected 2 got 1"))
             )
             ])
 def test_get_indices_by_distance(tree_points, query_points,

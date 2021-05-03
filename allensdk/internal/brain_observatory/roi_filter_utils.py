@@ -292,7 +292,8 @@ def get_indices_by_distance(object_list_points, mask_points):
     masks and object_list entries.
     '''
     if np.array(mask_points).ndim != 2:
-        raise ValueError("number of dimensions is incorrect.")
+        raise ValueError("number of dimensions is incorrect. Expected 2 "
+                         f"got {np.array(mask_points).ndim}")
     tree = cKDTree(mask_points)
     distance, indices = tree.query(object_list_points)
     if distance.max() > 0:
