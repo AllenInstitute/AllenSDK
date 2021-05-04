@@ -115,11 +115,13 @@ def test_loading_manifest(tmpdir):
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     cache = S3CloudCache(pathlib.Path(tmpdir), test_bucket_name, 'proj')
+    assert cache.current_manifest is None
     cache.load_manifest('manifest_v1.0.0.json')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
     assert cache.file_id_column == 'file_id'
     assert cache.metadata_file_names == ['a.csv', 'b.csv']
+    assert cache.current_manifest == 'manifest_v1.0.0.json'
 
     cache.load_manifest('manifest_v2.0.0.json')
     assert cache._manifest._data == manifest_2
@@ -674,7 +676,7 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
         if w._category_name == m_warn_type:
             msg = str(w.message)
             assert 'is not the most up to date' in msg
-            assert 'self.compare_manifests' in msg
+            assert 'S3CloudCache.compare_manifests' in msg
             assert 'load_latest_manifest' in msg
             ct += 1
     assert ct > 0
@@ -742,4 +744,5 @@ def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
     assert 'project-x_manifest_v4.0.0.json' in msg
     assert 'project-x_manifest_v15.0.0.json' in msg
     assert 'It is possible that some data files' in msg
-    assert "self.load_manifest('project-x_manifest_v4.0.0.json')" in msg
+    cmd = "S3CloudCache.load_manifest('project-x_manifest_v4.0.0.json')"
+    assert cmd in msg

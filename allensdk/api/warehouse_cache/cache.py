@@ -97,6 +97,8 @@ class Cache(object):
                  version=None,
                  **kwargs):
         self.cache = cache
+        if version is None and hasattr(self, 'MANIFEST_VERSION'):
+            version = self.MANIFEST_VERSION
         self.load_manifest(manifest, version)
 
     def get_cache_path(self, file_name, manifest_key, *args):
@@ -193,6 +195,9 @@ class Cache(object):
         should call super.
         '''
         manifest_builder.add_path('BASEDIR', '.')
+        if hasattr(self, 'MANIFEST_CONFIG'):
+            for key, config in self.MANIFEST_CONFIG.items():
+                manifest_builder.add_path(key, **config)
         return manifest_builder
 
 

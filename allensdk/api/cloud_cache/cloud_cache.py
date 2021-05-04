@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 from abc import ABC, abstractmethod
 import os
 import copy
@@ -41,14 +41,26 @@ class CloudCacheBase(ABC):
     project_name: str
         the name of the project this cache is supposed to access. This will
         be the root directory for all files stored in the bucket.
+
+    ui_class_name: Optional[str]
+        Name of the class users are actually using to maniuplate this
+        functionality (used to populate helpful error messages)
     """
 
     _bucket_name = None
 
-    def __init__(self, cache_dir, project_name):
+    def __init__(self, cache_dir, project_name, ui_class_name=None):
         os.makedirs(cache_dir, exist_ok=True)
 
+        # the class users are actually interacting with
+        # (for warning message purposes)
+        if ui_class_name is None:
+            self._user_interface_class = type(self).__name__
+        else:
+            self._user_interface_class = ui_class_name
+
         self._manifest = None
+        self._manifest_name = None
         self._cache_dir = cache_dir
 
         self._project_name = project_name
@@ -82,7 +94,7 @@ class CloudCacheBase(ABC):
                 msg += 'contain data files, but it has no '
                 msg += 'record of what those files are. '
                 msg += 'You might want to consider running\n\n'
-                msg += 'self.construct_local_manifest()\n\n'
+                msg += f'{self.ui}.construct_local_manifest()\n\n'
                 msg += 'to avoid needlessly downloading duplicates '
                 msg += 'of data files that did not change between '
                 msg += 'data releases. NOTE: running this method '
@@ -95,6 +107,10 @@ class CloudCacheBase(ABC):
                 msg += 'is not deleted between instantiations of this '
                 msg += 'cache'
                 warnings.warn(msg, MissingLocalManifestWarning)
+
+    @property
+    def ui(self):
+        return self._user_interface_class
 
     def construct_local_manifest(self) -> None:
         """
@@ -139,7 +155,7 @@ class CloudCacheBase(ABC):
         msg += f'{self.latest_manifest_file}\n\n'
         msg += 'To see the differences between these manifests,'
         msg += 'run\n\n'
-        msg += f"self.compare_manifests('{manifest_name}', "
+        msg += f"{self.ui}.compare_manifests('{manifest_name}', "
         msg += f"'{self.latest_manifest_file}')\n\n"
         msg += "To see all of the manifest files currently downloaded "
         msg += "onto your local system, run\n\n"
@@ -224,7 +240,7 @@ class CloudCacheBase(ABC):
                 msg += 'force you to re-download those data files '
                 msg += '(currently downloaded files will not be overwritten).'
                 msg += f' To continue using {latest_downloaded}, run\n'
-                msg += f"self.load_manifest('{latest_downloaded}')"
+                msg += f"{self.ui}.load_manifest('{latest_downloaded}')"
                 warnings.warn(msg, OutdatedManifestWarning)
         self.load_manifest(self.latest_manifest_file)
 
@@ -277,6 +293,13 @@ class CloudCacheBase(ABC):
             10 iterations
         """
         raise NotImplementedError()
+
+    @property
+    def current_manifest(self) -> Union[None, str]:
+        """
+        The name of the currently loaded manifest
+        """
+        return self._manifest_name
 
     @property
     def project_name(self) -> str:
@@ -367,6 +390,7 @@ class CloudCacheBase(ABC):
             self._warn_of_outdated_manifest(manifest_name)
 
         self._manifest = self._load_manifest(manifest_name)
+        self._manifest_name = manifest_name
 
     def _update_list_of_downloads(self,
                                   file_attributes: CacheFileAttributes
@@ -613,6 +637,7 @@ class CloudCacheBase(ABC):
         super_attributes = self.metadata_path(fname)
         file_attributes = super_attributes['file_attributes']
         self._download_file(file_attributes)
+        self._update_list_of_downloads(file_attributes)
         return file_attributes.local_path
 
     def get_metadata(self, fname: str) -> pd.DataFrame:
@@ -839,13 +864,19 @@ class S3CloudCache(CloudCacheBase):
     project_name: str
         the name of the project this cache is supposed to access. This will
         be the root directory for all files stored in the bucket.
+
+    ui_class_name: Optional[str]
+        Name of the class users are actually using to maniuplate this
+        functionality (used to populate helpful error messages)
     """
 
-    def __init__(self, cache_dir, bucket_name, project_name):
+    def __init__(self, cache_dir, bucket_name, project_name,
+                 ui_class_name=None):
         self._manifest = None
         self._bucket_name = bucket_name
 
-        super().__init__(cache_dir=cache_dir, project_name=project_name)
+        super().__init__(cache_dir=cache_dir, project_name=project_name,
+                         ui_class_name=ui_class_name)
 
     _s3_client = None
 
@@ -1002,9 +1033,14 @@ class LocalCache(CloudCacheBase):
     project_name: str
         the name of the project this cache is supposed to access. This will
         be the root directory for all files stored in the bucket.
+
+    ui_class_name: Optional[str]
+        Name of the class users are actually using to maniuplate this
+        functionality (used to populate helpful error messages)
     """
-    def __init__(self, cache_dir, project_name):
-        super().__init__(cache_dir=cache_dir, project_name=project_name)
+    def __init__(self, cache_dir, project_name, ui_class_name=None):
+        super().__init__(cache_dir=cache_dir, project_name=project_name,
+                         ui_class_name=ui_class_name)
 
     def _list_all_manifests(self) -> list:
         return self.list_all_downloaded_manifests()
