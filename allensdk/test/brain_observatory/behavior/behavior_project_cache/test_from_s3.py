@@ -3,12 +3,13 @@ from .utils import create_bucket, load_dataset
 import boto3
 from moto import mock_s3
 import pathlib
-import re
 import json
 
 from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
-from allensdk.brain_observatory.behavior.behavior_project_cache.behavior_project_cache import VisualBehaviorOphysProjectCache
+from allensdk.brain_observatory.\
+    behavior.behavior_project_cache.behavior_project_cache \
+    import VisualBehaviorOphysProjectCache
 
 
 @mock_s3
@@ -141,7 +142,7 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data):
     # Check that all expected file were downloaded
     dir_glob = v1_dir.glob('*')
     file_names = set()
-    file_contents ={}
+    file_contents = {}
     for p in dir_glob:
         file_names.add(p.name)
         with open(p, 'rb') as in_file:
@@ -275,9 +276,9 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
     name2 = f'{project_name}_manifest_v0.2.0'
     cmd = 'VisualBehaviorOphysProjectCache.load_manifest'
     with pytest.warns(OutdatedManifestWarning, match=name3) as warnings:
-        cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                              bucket_name,
-                                                              project_name)
+        _ = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
+                                                          bucket_name,
+                                                          project_name)
 
     checked_msg = False
     for w in warnings.list:

@@ -23,13 +23,13 @@ def s3_cloud_cache_data():
     data['behavior_file_3.nwb'] = {'file_id': 3,
                                    'data': b'12345'}
 
-    data['behavior_file_4.nwb']  = {'file_id': 4,
-                                    'data': b'67890'}
+    data['behavior_file_4.nwb'] = {'file_id': 4,
+                                   'data': b'67890'}
 
     o_session = [{'ophys_session_id': 111,
                   'file_id': 1},
-                  {'ophys_session_id': 222,
-                   'file_id': 2}]
+                 {'ophys_session_id': 222,
+                  'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()
@@ -53,8 +53,8 @@ def s3_cloud_cache_data():
 
     o_session = [{'ophys_experiment_id': 5111,
                   'file_id': 1},
-                  {'ophys_experiment_id': 5222,
-                   'file_id': 2}]
+                 {'ophys_experiment_id': 5222,
+                  'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()
@@ -79,17 +79,16 @@ def s3_cloud_cache_data():
     data['behavior_file_3.nwb'] = {'file_id': 3,
                                    'data': b'12345'}
 
-    data['behavior_file_4.nwb']  = {'file_id': 4,
-                                    'data': b'67890'}
+    data['behavior_file_4.nwb'] = {'file_id': 4,
+                                   'data': b'67890'}
 
-    data['ophys_file_5.nwb']  = {'file_id': 5,
-                                 'data': b'98765'}
-
+    data['ophys_file_5.nwb'] = {'file_id': 5,
+                                'data': b'98765'}
 
     o_session = [{'ophys_session_id': 222,
                   'file_id': 1},
-                  {'ophys_session_id': 333,
-                   'file_id': 2}]
+                 {'ophys_session_id': 333,
+                  'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()
@@ -113,10 +112,10 @@ def s3_cloud_cache_data():
 
     o_session = [{'ophys_experiment_id': 5444,
                   'file_id': 1},
-                  {'ophys_experiment_id': 5666,
-                   'file_id': 2},
-                  {'ophys_experiment_id': 5777,
-                   'file_id': 5}]
+                 {'ophys_experiment_id': 5666,
+                  'file_id': 2},
+                 {'ophys_experiment_id': 5777,
+                  'file_id': 5}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()
@@ -145,16 +144,16 @@ def data_update():
     data['behavior_file_3.nwb'] = {'file_id': 3,
                                    'data': b'04916'}
 
-    data['behavior_file_4.nwb']  = {'file_id': 4,
-                                    'data': b'253649'}
+    data['behavior_file_4.nwb'] = {'file_id': 4,
+                                   'data': b'253649'}
 
-    data['ophys_file_5.nwb']  = {'file_id': 5,
-                                 'data': b'98765'}
+    data['ophys_file_5.nwb'] = {'file_id': 5,
+                                'data': b'98765'}
 
     o_session = [{'ophys_session_id': 1110,
                   'file_id': 1},
-                  {'ophys_session_id': 2220,
-                   'file_id': 2}]
+                 {'ophys_session_id': 2220,
+                  'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()
@@ -178,10 +177,10 @@ def data_update():
 
     o_session = [{'ophys_experiment_id': 6111,
                   'file_id': 1},
-                  {'ophys_experiment_id': 6222,
-                   'file_id': 2},
-                  {'ophys_experiment_id': 63456,
-                   'file_id': 5}]
+                 {'ophys_experiment_id': 6222,
+                  'file_id': 2},
+                 {'ophys_experiment_id': 63456,
+                  'file_id': 5}]
 
     o_session = pd.DataFrame(o_session)
     buff = io.StringIO()

@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union
 import boto3
 import json
 import hashlib
