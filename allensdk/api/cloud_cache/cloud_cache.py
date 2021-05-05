@@ -456,7 +456,14 @@ class CloudCacheBase(ABC):
         for abs_path in available_files:
             if available_files[abs_path] == file_attributes.file_hash:
                 matched_path = pathlib.Path(abs_path)
-                break
+
+                # check that the file still exists,
+                # in case someone accidentally deleted
+                # the file at the root of a symlink
+                if matched_path.is_file():
+                    break
+                else:
+                    matched_path = None
 
         if matched_path is None:
             return False

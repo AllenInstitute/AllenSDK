@@ -170,6 +170,149 @@ def test_on_corrupted_files(tmpdir, example_datasets):
 
 
 @mock_s3
+def test_on_removed_files(tmpdir, example_datasets):
+    """
+    Test that the CloudCache re-downloads files when the
+    the files at the root of the symlinks have been removed
+    """
+    bucket_name = 'corruption_bucket'
+    create_bucket(bucket_name,
+                  example_datasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    version_list = ('1.0.0', '2.0.0', '3.0.0')
+    file_id_list = ('1', '2', '3')
+
+    for version in version_list:
+        cache.load_manifest(f'project-x_manifest_v{version}.json')
+        for file_id in file_id_list:
+            cache.download_data(file_id)
+
+    # make sure that all files exist
+    for version in version_list:
+        cache.load_manifest(f'project-x_manifest_v{version}.json')
+        for file_id in file_id_list:
+            attr = cache.data_path(file_id)
+            assert attr['exists']
+
+    hasher = hashlib.blake2b()
+    hasher.update(b'4567890')
+    true_hash = hasher.hexdigest()
+
+    p1 = cache_dir / 'project-x-1.0.0' / 'data' / 'f2.txt'
+    p2 = cache_dir / 'project-x-2.0.0' / 'data' / 'f2.txt'
+
+    # note that f2.txt is identical between v 1.0.0 and 2.0.0
+    assert p1.is_file()
+    assert not p1.is_symlink()
+    assert p2.is_symlink()
+    assert p1.resolve() == p2.resolve()
+
+    # remove p1
+    p1.unlink()
+    assert not p1.exists()
+    assert not p1.is_file()
+    assert not p2.is_file()
+    assert p2.is_symlink()
+
+    # make sure that the file which has been moved is now
+    # marked as not existing
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
+    test_path = cache.data_path('2')
+    assert not test_path['exists']
+
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    test_path = cache.data_path('2')
+    assert not test_path['exists']
+
+    # now, re-download the data by way of manifest 2
+    # and verify that the symlink relationship is
+    # re-established
+    p2 = cache.download_data('2')
+    assert p2.is_file()
+    assert p2.is_symlink()  # because the symlink was not removed
+
+    cache.load_manifest('project-x_manifest_v1.0.0.json')
+    p1 = cache.download_data('2')
+
+    assert p1.is_file()
+    assert not p1.is_symlink()
+    assert p1.resolve() == p2.resolve()
+    assert p1.absolute() != p2.absolute()
+
+    hasher = hashlib.blake2b()
+    with open(p2, 'rb') as in_file:
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_hash
+
+
+@mock_s3
+def test_on_removed_symlinks(tmpdir, example_datasets):
+    """
+    Test that the CloudCache re-downloads files when the
+    the symlinks have been removed
+    """
+    bucket_name = 'corruption_bucket'
+    create_bucket(bucket_name,
+                  example_datasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    version_list = ('1.0.0', '2.0.0', '3.0.0')
+    file_id_list = ('1', '2', '3')
+
+    for version in version_list:
+        cache.load_manifest(f'project-x_manifest_v{version}.json')
+        for file_id in file_id_list:
+            cache.download_data(file_id)
+
+    # make sure that all files exist
+    for version in version_list:
+        cache.load_manifest(f'project-x_manifest_v{version}.json')
+        for file_id in file_id_list:
+            attr = cache.data_path(file_id)
+            assert attr['exists']
+
+    hasher = hashlib.blake2b()
+    hasher.update(b'4567890')
+    true_hash = hasher.hexdigest()
+
+    p1 = cache_dir / 'project-x-1.0.0' / 'data' / 'f2.txt'
+    p2 = cache_dir / 'project-x-2.0.0' / 'data' / 'f2.txt'
+
+    # note that f2.txt is identical between v 1.0.0 and 2.0.0
+    assert p1.is_file()
+    assert not p1.is_symlink()
+    assert p2.is_symlink()
+    assert p1.resolve() == p2.resolve()
+
+    # remove symlink at p2 and show that the file
+    # still exists (and that the symlink gets restored
+    # once you ask for the file path)
+    p2.unlink()
+    assert not p2.exists()
+    assert not p2.is_symlink()
+    assert p1.is_file()
+
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    test_path = cache.data_path('2')
+    assert test_path['exists']
+    p2 = pathlib.Path(test_path['local_path'])
+    assert p2.is_symlink()
+    assert p2.exists()
+    assert p1.absolute() != p2.absolute()
+    assert p1.resolve() == p2.resolve()
+
+    hasher = hashlib.blake2b()
+    with open(p2, 'rb') as in_file:
+        hasher.update(in_file.read())
+    assert hasher.hexdigest() == true_hash
+
+
+@mock_s3
 def test_corrupted_download_manifest(tmpdir, example_datasets):
     """
     Test that CloudCache can handle the case where the
