@@ -709,12 +709,15 @@ def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
     assert cache.list_all_downloaded_manifests() == []
 
     cache.load_manifest('project-x_manifest_v5.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v5.0.0.json'
     cache.load_manifest('project-x_manifest_v2.0.0.json')
-    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v2.0.0.json'
+    cache.load_manifest('project-x_manifest_v3.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v3.0.0.json'
 
     expected = {'project-x_manifest_v5.0.0.json',
                 'project-x_manifest_v2.0.0.json',
-                'project-x_manifest_v2.0.0.json'}
+                'project-x_manifest_v3.0.0.json'}
     downloaded = set(cache.list_all_downloaded_manifests())
     assert downloaded == expected
 
@@ -746,3 +749,92 @@ def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
     assert 'It is possible that some data files' in msg
     cmd = "S3CloudCache.load_manifest('project-x_manifest_v4.0.0.json')"
     assert cmd in msg
+
+
+@mock_s3
+def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
+    """
+    Test that load_last_manifest works
+    """
+    bucket_name = 'load_lst_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'load_last_cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    # check that load_last_manifest in a new cache loads the
+    # latest manifest without emitting a warning
+    with pytest.warns(None) as warnings:
+        cache.load_last_manifest()
+    ct = 0
+    for w in warnings.list:
+        if w._category_name == 'OutdatedManifestWarning':
+            ct += 1
+    assert ct == 0
+    assert cache.current_manifest == 'project-x_manifest_v15.0.0.json'
+
+    cache.load_manifest('project-x_manifest_v7.0.0.json')
+
+    del cache
+
+    # check that load_last_manifest on an old cache emits the
+    # expected warning and loads the correct manifest
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_last_manifest()
+    for w in warnings.list:
+        if w._category_name == 'OutdatedManifestWarning':
+            msg = str(w.message)
+            expected = 'A more up to date version of the '
+            expected += 'dataset -- project-x_manifest_v15.0.0.json '
+            expected += '-- exists online'
+            assert expected in msg
+
+    assert cache.current_manifest == 'project-x_manifest_v7.0.0.json'
+    cache.load_manifest('project-x_manifest_v4.0.0.json')
+    del cache
+
+    # repeat the above test, making sure the correct manifest is
+    # loaded again
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_last_manifest()
+    for w in warnings.list:
+        if w._category_name == 'OutdatedManifestWarning':
+            msg = str(w.message)
+            expected = 'A more up to date version of the '
+            expected += 'dataset -- project-x_manifest_v15.0.0.json '
+            expected += '-- exists online'
+            assert expected in msg
+
+    assert cache.current_manifest == 'project-x_manifest_v4.0.0.json'
+
+
+@mock_s3
+def test_corrupted_load_last_manifest(tmpdir,
+                                      example_datasets_with_metadata):
+    """
+    Test that load_last_manifest works when the record of the last
+    manifest has been corrupted
+    """
+    bucket_name = 'load_lst_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'load_last_cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    cache.load_manifest('project-x_manifest_v9.0.0.json')
+    fname = cache._manifest_last_used.resolve()
+    del cache
+    with open(fname, 'w') as out_file:
+        out_file.write('babababa')
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    expected = 'Loading latest version -- project-x_manifest_v15.0.0.json'
+    with pytest.warns(UserWarning, match=expected):
+        cache.load_last_manifest()
+    assert cache.current_manifest == 'project-x_manifest_v15.0.0.json'
