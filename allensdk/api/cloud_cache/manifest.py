@@ -1,7 +1,6 @@
 from typing import Dict, List, Any
 import json
 import pathlib
-import copy
 from typing import Union
 from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
@@ -51,6 +50,10 @@ class Manifest(object):
         ]
         self._metadata_file_names.sort()
 
+        self._file_id_values: List[Any] = [ii for ii in
+                                           self._data['data_files'].keys()]
+        self._file_id_values.sort()
+
     @property
     def project_name(self):
         """
@@ -80,6 +83,13 @@ class Manifest(object):
         List of metadata file names associated with this dataset
         """
         return self._metadata_file_names
+
+    @property
+    def file_id_values(self):
+        """
+        List of valid file_id values
+        """
+        return self._file_id_values
 
     def _create_file_attributes(self,
                                 remote_path: str,

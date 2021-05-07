@@ -199,3 +199,46 @@ def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache):
         index_column="ophys_experiment_id")[
         ["ophys_session_id"]]
     pd.testing.assert_frame_equal(expected, actual)
+
+
+@pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
+def test_cloud_manifest_errors(TempdirBehaviorCache):
+    """
+    Test that methods which should not exist for BehaviorProjectCaches
+    that are not backed by CloudCaches raise NotImplementedError
+    """
+    msg = 'Method {mname} does not exist for this '
+    msg += 'VisualBehaviorOphysProjectCache, which is based on MockApi'
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='construct_local_manifest')):
+        TempdirBehaviorCache.construct_local_manifest()
+
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='compare_manifests')):
+        TempdirBehaviorCache.compare_manifests('a', 'b')
+
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='load_latest_manifest')):
+        TempdirBehaviorCache.load_latest_manifest()
+
+    this_msg = msg.format(mname='latest_downloaded_manifest_file')
+    with pytest.raises(NotImplementedError,
+                       match=this_msg):
+        TempdirBehaviorCache.latest_downloaded_manifest_file()
+
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='latest_manifest_file')):
+        TempdirBehaviorCache.latest_manifest_file()
+
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='load_manifest')):
+        TempdirBehaviorCache.load_manifest('a')
+
+    with pytest.raises(NotImplementedError,
+                       match=msg.format(mname='current_manifest')):
+        TempdirBehaviorCache.current_manifest()
+
+    this_msg = msg.format(mname='list_manifest_file_names')
+    with pytest.raises(NotImplementedError,
+                       match=this_msg):
+        TempdirBehaviorCache.list_manifest_file_names()

@@ -6,6 +6,8 @@ import pandas as pd
 import io
 import boto3
 from moto import mock_s3
+from .utils import create_bucket
+from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
@@ -23,10 +25,10 @@ def test_list_all_manifests(tmpdir):
 
     client = boto3.client('s3', region_name='us-east-1')
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_2.json',
+                      Key='proj/manifests/manifest_v2.0.0.json',
                       Body=b'123456')
     client.put_object(Bucket=test_bucket_name,
                       Key='junk.txt',
@@ -34,7 +36,8 @@ def test_list_all_manifests(tmpdir):
 
     cache = S3CloudCache(tmpdir, test_bucket_name, 'proj')
 
-    assert cache.manifest_file_names == ['manifest_1.json', 'manifest_2.json']
+    assert cache.manifest_file_names == ['manifest_v1.0.0.json',
+                                         'manifest_v2.0.0.json']
 
 
 @mock_s3
@@ -83,6 +86,7 @@ def test_loading_manifest(tmpdir):
                   'metadata_file_id_column_name': 'file_id',
                   'data_pipeline': 'placeholder',
                   'project_name': 'sam-beckett',
+                  'data_files': {},
                   'metadata_files': {'a.csv': {'url': 'http://www.junk.com',
                                                'version_id': '1111',
                                                'file_hash': 'abcde'},
@@ -94,6 +98,7 @@ def test_loading_manifest(tmpdir):
                   'metadata_file_id_column_name': 'file_id',
                   'data_pipeline': 'placeholder',
                   'project_name': 'al',
+                  'data_files': {},
                   'metadata_files': {'c.csv': {'url': 'http://www.absurd.com',
                                                'version_id': '3333',
                                                'file_hash': 'lmnop'},
@@ -102,28 +107,30 @@ def test_loading_manifest(tmpdir):
                                                'file_hash': 'qrstuv'}}}
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.csv',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest_1), 'utf-8'))
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_2.csv',
+                      Key='proj/manifests/manifest_v2.0.0.json',
                       Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     cache = S3CloudCache(pathlib.Path(tmpdir), test_bucket_name, 'proj')
-    cache.load_manifest('manifest_1.csv')
+    assert cache.current_manifest is None
+    cache.load_manifest('manifest_v1.0.0.json')
     assert cache._manifest._data == manifest_1
     assert cache.version == '1'
     assert cache.file_id_column == 'file_id'
     assert cache.metadata_file_names == ['a.csv', 'b.csv']
+    assert cache.current_manifest == 'manifest_v1.0.0.json'
 
-    cache.load_manifest('manifest_2.csv')
+    cache.load_manifest('manifest_v2.0.0.json')
     assert cache._manifest._data == manifest_2
     assert cache.version == '2'
     assert cache.file_id_column == 'file_id'
     assert cache.metadata_file_names == ['c.csv', 'd.csv']
 
     with pytest.raises(ValueError) as context:
-        cache.load_manifest('manifest_3.csv')
+        cache.load_manifest('manifest_v3.0.0.json')
     msg = 'is not one of the valid manifest names'
     assert msg in context.value.args[0]
 
@@ -439,13 +446,13 @@ def test_download_data(tmpdir):
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "data/path/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     expected_path = cache_dir / 'project-z-1' / 'data/data_file.txt'
     assert not expected_path.exists()
@@ -511,16 +518,17 @@ def test_download_metadata(tmpdir):
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
+    manifest['data_files'] = {}
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/path/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
 
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     expected_path = cache_dir / "project4-1" / 'metadata_file.csv'
     assert not expected_path.exists()
@@ -602,15 +610,139 @@ def test_metadata(tmpdir):
                      'file_hash': true_checksum}
 
     manifest['metadata_files'] = {'metadata_file.csv': metadata_file}
+    manifest['data_files'] = {}
     manifest['data_pipeline'] = 'placeholder'
 
     client.put_object(Bucket=test_bucket_name,
-                      Key='proj/manifests/manifest_1.json',
+                      Key='proj/manifests/manifest_v1.0.0.json',
                       Body=bytes(json.dumps(manifest), 'utf-8'))
 
     cache_dir = pathlib.Path(tmpdir) / "metadata/cache"
     cache = S3CloudCache(cache_dir, test_bucket_name, 'proj')
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
 
     metadata_df = cache.get_metadata('metadata_file.csv')
     assert true_df.equals(metadata_df)
+
+
+@mock_s3
+def test_latest_manifest(tmpdir, example_datasets_with_metadata):
+    """
+    Test that the methods which return the latest and latest downloaded
+    manifest file names work correctly
+    """
+    bucket_name = 'latest_manifest_bucket'
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=example_datasets_with_metadata['metadata'])
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    assert cache.latest_downloaded_manifest_file == ''
+
+    cache.load_manifest('project-x_manifest_v7.0.0.json')
+    cache.load_manifest('project-x_manifest_v3.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+
+    assert cache.latest_manifest_file == 'project-x_manifest_v15.0.0.json'
+
+    expected = 'project-x_manifest_v7.0.0.json'
+    assert cache.latest_downloaded_manifest_file == expected
+
+
+@mock_s3
+def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
+    """
+    Test that a warning is raised the first time you try to load an outdated
+    manifest
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    m_warn_type = 'OutdatedManifestWarning'
+
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_manifest('project-x_manifest_v7.0.0.json')
+    ct = 0
+    for w in warnings.list:
+        if w._category_name == m_warn_type:
+            msg = str(w.message)
+            assert 'is not the most up to date' in msg
+            assert 'S3CloudCache.compare_manifests' in msg
+            assert 'load_latest_manifest' in msg
+            ct += 1
+    assert ct > 0
+
+    # assert no warning is raised the second time by catching
+    # any warnings that are emitted and making sure they are
+    # not OutdatedManifestWarnings
+    with pytest.warns(None) as warnings:
+        cache.load_manifest('project-x_manifest_v11.0.0.json')
+    if len(warnings) > 0:
+        for w in warnings.list:
+            assert w._category_name != 'OutdatedManifestWarning'
+
+
+@mock_s3
+def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
+    """
+    Test that list_all_downloaded_manifests works
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    assert cache.list_all_downloaded_manifests() == []
+
+    cache.load_manifest('project-x_manifest_v5.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    cache.load_manifest('project-x_manifest_v2.0.0.json')
+
+    expected = {'project-x_manifest_v5.0.0.json',
+                'project-x_manifest_v2.0.0.json',
+                'project-x_manifest_v2.0.0.json'}
+    downloaded = set(cache.list_all_downloaded_manifests())
+    assert downloaded == expected
+
+
+@mock_s3
+def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
+    """
+    Test that the correct warning is emitted when the user tries
+    to load_latest_manifest but that has not been downloaded yet
+    """
+
+    bucket_name = 'outdated_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    cache.load_manifest('project-x_manifest_v4.0.0.json')
+
+    with pytest.warns(OutdatedManifestWarning) as warnings:
+        cache.load_latest_manifest()
+    assert len(warnings) == 1
+    msg = str(warnings[0].message)
+    assert 'project-x_manifest_v4.0.0.json' in msg
+    assert 'project-x_manifest_v15.0.0.json' in msg
+    assert 'It is possible that some data files' in msg
+    cmd = "S3CloudCache.load_manifest('project-x_manifest_v4.0.0.json')"
+    assert cmd in msg
