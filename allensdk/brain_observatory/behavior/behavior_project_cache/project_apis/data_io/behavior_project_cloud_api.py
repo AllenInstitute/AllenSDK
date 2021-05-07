@@ -155,7 +155,6 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                              bucket_name,
                              project_name,
                              ui_class_name=ui_class_name)
-        cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache)
 
     @staticmethod
@@ -185,7 +184,6 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         cache = LocalCache(cache_dir,
                            project_name,
                            ui_class_name=ui_class_name)
-        cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(
