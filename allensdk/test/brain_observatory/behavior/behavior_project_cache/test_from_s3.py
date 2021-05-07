@@ -289,3 +289,35 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
             assert cmd in msg
             checked_msg = True
     assert checked_msg
+
+
+@mock_s3
+def test_load_last(tmpdir, s3_cloud_cache_data, data_update):
+    """
+    Test that, when a cache is instantiated over an old
+    cache_dir, it loads the most recently loaded manifest,
+    not the most up to date manifest
+    """
+    cache_dir = pathlib.Path(tmpdir) / "test_update"
+    bucket_name = "vis-behav-test-bucket"
+    project_name = "vis-behav-test-proj"
+    create_bucket(bucket_name,
+                  project_name,
+                  s3_cloud_cache_data['data'],
+                  s3_cloud_cache_data['metadata'])
+    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
+                                                          bucket_name,
+                                                          project_name)
+
+    assert cache.current_manifest() == f'{project_name}_manifest_v0.2.0.json'
+    cache.load_manifest(f'{project_name}_manifest_v0.1.0.json')
+    assert cache.current_manifest() == f'{project_name}_manifest_v0.1.0.json'
+    del cache
+
+    msg = 'VisualBehaviorOphysProjectCache.compare_manifests'
+    with pytest.warns(OutdatedManifestWarning, match=msg):
+        cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
+                                                              bucket_name,
+                                                              project_name)
+
+    assert cache.current_manifest() == f'{project_name}_manifest_v0.1.0.json'

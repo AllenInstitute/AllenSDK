@@ -51,7 +51,7 @@ class MockCache():
             'exists': True
         }
 
-    def load_latest_manifest(self):
+    def load_last_manifest(self):
         return None
 
 

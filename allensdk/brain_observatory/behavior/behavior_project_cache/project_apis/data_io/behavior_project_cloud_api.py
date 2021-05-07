@@ -90,7 +90,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             (default: None)
         """
         if manifest_name is None:
-            self.cache.load_latest_manifest()
+            self.cache.load_last_manifest()
         else:
             self.cache.load_manifest(manifest_name)
 
