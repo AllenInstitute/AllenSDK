@@ -517,12 +517,6 @@ class CloudCacheBase(ABC):
         if matched_path is None:
             return False
 
-        # double check that locally downloaded file still has
-        # the expected hash
-        candidate_hash = file_hash_from_path(matched_path)
-        if candidate_hash != file_attributes.file_hash:
-            return False
-
         local_parent = file_attributes.local_path.parent.resolve()
         if not local_parent.exists():
             os.makedirs(local_parent)
