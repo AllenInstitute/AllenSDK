@@ -126,14 +126,13 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
 
-    # Check that, when a file on disk gets corrupted,
+    # Check that, when a file on disk gets removed,
     # all of the symlinks that point back to that file
     # get marked as `not exists`
 
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
-    with open(attr['local_path'], 'wb') as out_file:
-        out_file.write(b'xxxxxx')
+    attr['local_path'].unlink()
 
     attr = cache.data_path('2')
     assert not attr['exists']
@@ -353,9 +352,8 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     # CloudCache won't consult _downloaded_data_path
     assert attr['exists']
 
-    # now corrupt one of the data files
-    with open(attr['local_path'], 'wb') as out_file:
-        out_file.write(b'xxxxx')
+    # now remove one of the data files
+    attr['local_path'].unlink()
 
     # now that the file is corrupted, 'exists' is False
     attr = cache.data_path('2')

@@ -560,10 +560,7 @@ class CloudCacheBase(ABC):
                                    "exists, but is not a file;\n"
                                    "unsure how to proceed")
 
-            full_path = file_attributes.local_path.resolve()
-            test_checksum = file_hash_from_path(full_path)
-            if test_checksum == file_attributes.file_hash:
-                file_exists = True
+            file_exists = True
 
         if not file_exists:
             file_exists = self._check_for_identical_copy(file_attributes)
@@ -1066,6 +1063,13 @@ class S3CloudCache(CloudCacheBase):
                         out_file.write(chunk)
                         pbar.update(len(chunk))
 
+            # Verify the hash of the downloaded file
+            full_path = file_attributes.local_path.resolve()
+            test_checksum = file_hash_from_path(full_path)
+            if test_checksum != file_attributes.file_hash:
+                file_attributes.local_path.exists()
+                file_attributes.local_path.unlink()
+
             n_iter += 1
             if n_iter > max_iter:
                 pbar.close()
@@ -1074,6 +1078,7 @@ class S3CloudCache(CloudCacheBase):
                                    "In {max_iter} iterations")
         if pbar is not None:
             pbar.close()
+
         return None
 
 

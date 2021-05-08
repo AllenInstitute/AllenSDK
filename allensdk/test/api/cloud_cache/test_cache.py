@@ -164,13 +164,6 @@ def test_file_exists(tmpdir):
                                          test_file_path)
     assert cache._file_exists(good_attribute)
 
-    # test when checksum is wrong
-    bad_attribute = CacheFileAttributes('http://silly.url.com',
-                                        '12345',
-                                        'probably_not_the_checksum',
-                                        test_file_path)
-    assert not cache._file_exists(bad_attribute)
-
     # test when file path is wrong
     bad_path = pathlib.Path('definitely/not/a/file.txt')
     bad_attribute = CacheFileAttributes('http://silly.url.com',
@@ -333,7 +326,7 @@ def test_download_file_multiple_versions(tmpdir):
 def test_re_download_file(tmpdir):
     """
     Test that S3CloudCache._download_file will re-download a file
-    when it has been altered locally
+    when it has been removed from the local system
     """
 
     hasher = hashlib.blake2b()
@@ -380,21 +373,6 @@ def test_re_download_file(tmpdir):
     # now, remove the file, and see if it gets re-downloaded
     expected_path.unlink()
     assert not expected_path.exists()
-
-    cache._download_file(good_attributes)
-    assert expected_path.exists()
-    hasher = hashlib.blake2b()
-    with open(expected_path, 'rb') as in_file:
-        hasher.update(in_file.read())
-    assert hasher.hexdigest() == true_checksum
-
-    # now, alter the file, and see if it gets re-downloaded
-    with open(expected_path, 'wb') as out_file:
-        out_file.write(b'778899')
-    hasher = hashlib.blake2b()
-    with open(expected_path, 'rb') as in_file:
-        hasher.update(in_file.read())
-    assert hasher.hexdigest() != true_checksum
 
     cache._download_file(good_attributes)
     assert expected_path.exists()
