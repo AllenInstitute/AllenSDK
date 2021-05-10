@@ -90,7 +90,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             (default: None)
         """
         if manifest_name is None:
-            self.cache.load_latest_manifest()
+            self.cache.load_last_manifest()
         else:
             self.cache.load_manifest(manifest_name)
 
@@ -155,7 +155,6 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                              bucket_name,
                              project_name,
                              ui_class_name=ui_class_name)
-        cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache)
 
     @staticmethod
@@ -185,7 +184,6 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         cache = LocalCache(cache_dir,
                            project_name,
                            ui_class_name=ui_class_name)
-        cache.load_latest_manifest()
         return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(

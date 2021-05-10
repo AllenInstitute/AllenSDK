@@ -164,13 +164,6 @@ def test_file_exists(tmpdir):
                                          test_file_path)
     assert cache._file_exists(good_attribute)
 
-    # test when checksum is wrong
-    bad_attribute = CacheFileAttributes('http://silly.url.com',
-                                        '12345',
-                                        'probably_not_the_checksum',
-                                        test_file_path)
-    assert not cache._file_exists(bad_attribute)
-
     # test when file path is wrong
     bad_path = pathlib.Path('definitely/not/a/file.txt')
     bad_attribute = CacheFileAttributes('http://silly.url.com',
@@ -333,7 +326,7 @@ def test_download_file_multiple_versions(tmpdir):
 def test_re_download_file(tmpdir):
     """
     Test that S3CloudCache._download_file will re-download a file
-    when it has been altered locally
+    when it has been removed from the local system
     """
 
     hasher = hashlib.blake2b()
@@ -380,21 +373,6 @@ def test_re_download_file(tmpdir):
     # now, remove the file, and see if it gets re-downloaded
     expected_path.unlink()
     assert not expected_path.exists()
-
-    cache._download_file(good_attributes)
-    assert expected_path.exists()
-    hasher = hashlib.blake2b()
-    with open(expected_path, 'rb') as in_file:
-        hasher.update(in_file.read())
-    assert hasher.hexdigest() == true_checksum
-
-    # now, alter the file, and see if it gets re-downloaded
-    with open(expected_path, 'wb') as out_file:
-        out_file.write(b'778899')
-    hasher = hashlib.blake2b()
-    with open(expected_path, 'rb') as in_file:
-        hasher.update(in_file.read())
-    assert hasher.hexdigest() != true_checksum
 
     cache._download_file(good_attributes)
     assert expected_path.exists()
@@ -709,12 +687,15 @@ def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
     assert cache.list_all_downloaded_manifests() == []
 
     cache.load_manifest('project-x_manifest_v5.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v5.0.0.json'
     cache.load_manifest('project-x_manifest_v2.0.0.json')
-    cache.load_manifest('project-x_manifest_v2.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v2.0.0.json'
+    cache.load_manifest('project-x_manifest_v3.0.0.json')
+    assert cache.current_manifest == 'project-x_manifest_v3.0.0.json'
 
     expected = {'project-x_manifest_v5.0.0.json',
                 'project-x_manifest_v2.0.0.json',
-                'project-x_manifest_v2.0.0.json'}
+                'project-x_manifest_v3.0.0.json'}
     downloaded = set(cache.list_all_downloaded_manifests())
     assert downloaded == expected
 
@@ -746,3 +727,86 @@ def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
     assert 'It is possible that some data files' in msg
     cmd = "S3CloudCache.load_manifest('project-x_manifest_v4.0.0.json')"
     assert cmd in msg
+
+
+@mock_s3
+def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
+    """
+    Test that load_last_manifest works
+    """
+    bucket_name = 'load_lst_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'load_last_cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+
+    # check that load_last_manifest in a new cache loads the
+    # latest manifest without emitting a warning
+    with pytest.warns(None) as warnings:
+        cache.load_last_manifest()
+    ct = 0
+    for w in warnings.list:
+        if w._category_name == 'OutdatedManifestWarning':
+            ct += 1
+    assert ct == 0
+    assert cache.current_manifest == 'project-x_manifest_v15.0.0.json'
+
+    cache.load_manifest('project-x_manifest_v7.0.0.json')
+
+    del cache
+
+    # check that load_last_manifest on an old cache emits the
+    # expected warning and loads the correct manifest
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    expected = 'A more up to date version of the '
+    expected += 'dataset -- project-x_manifest_v15.0.0.json '
+    expected += '-- exists online'
+    with pytest.warns(OutdatedManifestWarning,
+                      match=expected) as warnings:
+        cache.load_last_manifest()
+
+    assert cache.current_manifest == 'project-x_manifest_v7.0.0.json'
+    cache.load_manifest('project-x_manifest_v4.0.0.json')
+    del cache
+
+    # repeat the above test, making sure the correct manifest is
+    # loaded again
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    expected = 'A more up to date version of the '
+    expected += 'dataset -- project-x_manifest_v15.0.0.json '
+    expected += '-- exists online'
+    with pytest.warns(OutdatedManifestWarning,
+                      match=expected) as warnings:
+        cache.load_last_manifest()
+
+    assert cache.current_manifest == 'project-x_manifest_v4.0.0.json'
+
+
+@mock_s3
+def test_corrupted_load_last_manifest(tmpdir,
+                                      example_datasets_with_metadata):
+    """
+    Test that load_last_manifest works when the record of the last
+    manifest has been corrupted
+    """
+    bucket_name = 'load_lst_manifest_bucket'
+    metadatasets = example_datasets_with_metadata['metadata']
+    create_bucket(bucket_name,
+                  example_datasets_with_metadata['data'],
+                  metadatasets=metadatasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'load_last_cache'
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    cache.load_manifest('project-x_manifest_v9.0.0.json')
+    fname = cache._manifest_last_used.resolve()
+    del cache
+    with open(fname, 'w') as out_file:
+        out_file.write('babababa')
+    cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
+    expected = 'Loading latest version -- project-x_manifest_v15.0.0.json'
+    with pytest.warns(UserWarning, match=expected):
+        cache.load_last_manifest()
+    assert cache.current_manifest == 'project-x_manifest_v15.0.0.json'

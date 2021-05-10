@@ -5,7 +5,7 @@ import pathlib
 from moto import mock_s3
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
-from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
+from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
@@ -126,14 +126,13 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     hasher.update(b'4567890')
     true_hash = hasher.hexdigest()
 
-    # Check that, when a file on disk gets corrupted,
+    # Check that, when a file on disk gets removed,
     # all of the symlinks that point back to that file
     # get marked as `not exists`
 
     cache.load_manifest('project-x_manifest_v1.0.0.json')
     attr = cache.data_path('2')
-    with open(attr['local_path'], 'wb') as out_file:
-        out_file.write(b'xxxxxx')
+    attr['local_path'].unlink()
 
     attr = cache.data_path('2')
     assert not attr['exists']
@@ -353,9 +352,8 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     # CloudCache won't consult _downloaded_data_path
     assert attr['exists']
 
-    # now corrupt one of the data files
-    with open(attr['local_path'], 'wb') as out_file:
-        out_file.write(b'xxxxx')
+    # now remove one of the data files
+    attr['local_path'].unlink()
 
     # now that the file is corrupted, 'exists' is False
     attr = cache.data_path('2')
@@ -478,3 +476,48 @@ def test_reconstruction_of_local_manifest(tmpdir):
     dummy.load_manifest('project-x_manifest_v3.0.0.json')
     with pytest.raises(RuntimeError):
         dummy.download_data('1')
+
+
+@mock_s3
+def test_local_cache_symlink(tmpdir, example_datasets):
+    """
+    Test that a LocalCache is smart enough to construct
+    a symlink where appropriate
+    """
+    test_bucket_name = 'local_cache_test_bucket'
+    create_bucket(test_bucket_name,
+                  example_datasets)
+
+    cache_dir = pathlib.Path(tmpdir) / 'cache'
+
+    # create an online cache and download some data
+    online_cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
+    online_cache.load_manifest('project-x_manifest_v1.0.0.json')
+    p0 = online_cache.download_data('1')
+    online_cache.load_manifest('project-x_manifest_v3.0.0.json')
+
+    # path to file we intend to download
+    # (just making sure it wasn't accidentally created early
+    # by the online cache)
+    shld_be = cache_dir / 'project-x-3.0.0/data/f1.txt'
+    assert not shld_be.exists()
+
+    del online_cache
+
+    # create a local cache pointing to the same cache directory
+    # an try to access a data file that, while not downloaded,
+    # is identical to a file that has been downloaded
+    local_cache = LocalCache(cache_dir, test_bucket_name, 'project-x')
+    local_cache.load_manifest('project-x_manifest_v3.0.0.json')
+    attr = local_cache.data_path('1')
+    assert attr['exists']
+    assert attr['local_path'].absolute() == shld_be.absolute()
+    assert attr['local_path'].is_symlink()
+    assert attr['local_path'].resolve() == p0.resolve()
+
+    # test that LocalCache does not have access to data that
+    # has not been downloaded
+    attr = local_cache.data_path('2')
+    assert not attr['exists']
+    with pytest.raises(NotImplementedError):
+        local_cache.download_data('2')

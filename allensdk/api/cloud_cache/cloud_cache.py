@@ -70,11 +70,16 @@ class CloudCacheBase(ABC):
         # was emitted
         self._manifest_last_warned_on = None
 
+        c_path = pathlib.Path(self._cache_dir)
+
+        # self._manifest_last_used contains the name of the manifest
+        # last loaded from this cache dir (if applicable)
+        self._manifest_last_used = c_path / '_manifest_last_used.txt'
+
         # self._downloaded_data_path is where we will keep a JSONized
         # dict mapping paths to downloaded files to their file_hashes;
         # this will be used when determining if a downloaded file
         # can instead be a symlink
-        c_path = pathlib.Path(self._cache_dir)
         self._downloaded_data_path = c_path / '_downloaded_data.json'
 
         # if the local manifest is missing but there are
@@ -124,7 +129,8 @@ class CloudCacheBase(ABC):
         for file_name in file_iterator:
             if file_name.is_file():
                 if 'json' not in file_name.name:
-                    files_to_hash.add(file_name.resolve())
+                    if file_name != self._manifest_last_used:
+                        files_to_hash.add(file_name.resolve())
 
         with tqdm.tqdm(files_to_hash,
                        total=len(files_to_hash),
@@ -225,6 +231,45 @@ class CloudCacheBase(ABC):
         if len(file_list) == 0:
             return ''
         return self._find_latest_file(self.list_all_downloaded_manifests())
+
+    def load_last_manifest(self):
+        """
+        If this Cache was used previously, load the last manifest
+        used in this cache. If this cache has never been used, load
+        the latest manifest.
+        """
+        if not self._manifest_last_used.exists():
+            self.load_latest_manifest()
+            return None
+
+        with open(self._manifest_last_used, 'r') as in_file:
+            to_load = in_file.read()
+
+        latest = self.latest_manifest_file
+
+        if to_load not in self.manifest_file_names:
+            msg = 'The manifest version recorded as last used '
+            msg += f'for this cache -- {to_load}-- '
+            msg += 'is not a valid manifest for this dataset. '
+            msg += f'Loading latest version -- {latest} -- '
+            msg += 'instead.'
+            warnings.warn(msg, UserWarning)
+            self.load_latest_manifest()
+            return None
+
+        if latest != to_load:
+            self._manifest_last_warned_on = self.latest_manifest_file
+            msg = f"You are loading {to_load}. A more up to date "
+            msg += f"version of the dataset -- {latest} -- exists "
+            msg += "online. To see the changes between the two "
+            msg += "versions of the dataset, run\n"
+            msg += f"{self.ui}.compare_manifests('{to_load}',"
+            msg += f" '{latest}')\n"
+            msg += "To load another version of the dataset, run\n"
+            msg += f"{self.ui}.load_manifest('{latest}')"
+            warnings.warn(msg, OutdatedManifestWarning)
+        self.load_manifest(to_load)
+        return None
 
     def load_latest_manifest(self):
         latest_downloaded = self.latest_downloaded_manifest_file
@@ -374,6 +419,10 @@ class CloudCacheBase(ABC):
                 cache_dir=self._cache_dir,
                 json_input=f
             )
+
+        with open(self._manifest_last_used, 'w') as out_file:
+            out_file.write(manifest_name)
+
         return local_manifest
 
     def load_manifest(self, manifest_name: str):
@@ -468,12 +517,6 @@ class CloudCacheBase(ABC):
         if matched_path is None:
             return False
 
-        # double check that locally downloaded file still has
-        # the expected hash
-        candidate_hash = file_hash_from_path(matched_path)
-        if candidate_hash != file_attributes.file_hash:
-            return False
-
         local_parent = file_attributes.local_path.parent.resolve()
         if not local_parent.exists():
             os.makedirs(local_parent)
@@ -511,10 +554,7 @@ class CloudCacheBase(ABC):
                                    "exists, but is not a file;\n"
                                    "unsure how to proceed")
 
-            full_path = file_attributes.local_path.resolve()
-            test_checksum = file_hash_from_path(full_path)
-            if test_checksum == file_attributes.file_hash:
-                file_exists = True
+            file_exists = True
 
         if not file_exists:
             file_exists = self._check_for_identical_copy(file_attributes)
@@ -1017,6 +1057,13 @@ class S3CloudCache(CloudCacheBase):
                         out_file.write(chunk)
                         pbar.update(len(chunk))
 
+            # Verify the hash of the downloaded file
+            full_path = file_attributes.local_path.resolve()
+            test_checksum = file_hash_from_path(full_path)
+            if test_checksum != file_attributes.file_hash:
+                file_attributes.local_path.exists()
+                file_attributes.local_path.unlink()
+
             n_iter += 1
             if n_iter > max_iter:
                 pbar.close()
@@ -1025,6 +1072,7 @@ class S3CloudCache(CloudCacheBase):
                                    "In {max_iter} iterations")
         if pbar is not None:
             pbar.close()
+
         return None
 
 
