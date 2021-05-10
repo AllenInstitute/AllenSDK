@@ -761,15 +761,12 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     # check that load_last_manifest on an old cache emits the
     # expected warning and loads the correct manifest
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
-    with pytest.warns(OutdatedManifestWarning) as warnings:
+    expected = 'A more up to date version of the '
+    expected += 'dataset -- project-x_manifest_v15.0.0.json '
+    expected += '-- exists online'
+    with pytest.warns(OutdatedManifestWarning,
+                      match=expected) as warnings:
         cache.load_last_manifest()
-    for w in warnings.list:
-        if w._category_name == 'OutdatedManifestWarning':
-            msg = str(w.message)
-            expected = 'A more up to date version of the '
-            expected += 'dataset -- project-x_manifest_v15.0.0.json '
-            expected += '-- exists online'
-            assert expected in msg
 
     assert cache.current_manifest == 'project-x_manifest_v7.0.0.json'
     cache.load_manifest('project-x_manifest_v4.0.0.json')
@@ -778,15 +775,12 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     # repeat the above test, making sure the correct manifest is
     # loaded again
     cache = S3CloudCache(cache_dir, bucket_name, 'project-x')
-    with pytest.warns(OutdatedManifestWarning) as warnings:
+    expected = 'A more up to date version of the '
+    expected += 'dataset -- project-x_manifest_v15.0.0.json '
+    expected += '-- exists online'
+    with pytest.warns(OutdatedManifestWarning,
+                      match=expected) as warnings:
         cache.load_last_manifest()
-    for w in warnings.list:
-        if w._category_name == 'OutdatedManifestWarning':
-            msg = str(w.message)
-            expected = 'A more up to date version of the '
-            expected += 'dataset -- project-x_manifest_v15.0.0.json '
-            expected += '-- exists online'
-            assert expected in msg
 
     assert cache.current_manifest == 'project-x_manifest_v4.0.0.json'
 
