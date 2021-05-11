@@ -176,8 +176,10 @@ class CloudCacheBase(ABC):
         Return a list of all of the manifest files that have been
         downloaded for this dataset
         """
-        return [x for x in os.listdir(self._cache_dir)
-                if re.fullmatch(".*_manifest_v.*.json", x)]
+        output = [x for x in os.listdir(self._cache_dir)
+                  if re.fullmatch(".*_manifest_v.*.json", x)]
+        output.sort()
+        return output
 
     @abstractmethod
     def _list_all_manifests(self) -> list:

@@ -191,9 +191,13 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
     v2_dir = cache_dir / f'{project_name}-0.2.0/data'
 
     assert cache.current_manifest() == v2_name
+    assert cache.list_all_downloaded_manifests() == [v2_name]
 
     cache.load_manifest(v1_name)
     assert cache.current_manifest() == v1_name
+    assert cache.list_all_downloaded_manifests() == [v1_name,
+                                                     v2_name]
+
     for sess_id in (333, 444):
         cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):

@@ -238,6 +238,11 @@ def test_cloud_manifest_errors(TempdirBehaviorCache):
                        match=msg.format(mname='current_manifest')):
         TempdirBehaviorCache.current_manifest()
 
+    this_msg = msg.format(mname='list_all_downloaded_manifests')
+    with pytest.raises(NotImplementedError,
+                       match=this_msg):
+        TempdirBehaviorCache.list_all_downloaded_manifests()
+
     this_msg = msg.format(mname='list_manifest_file_names')
     with pytest.raises(NotImplementedError,
                        match=this_msg):
