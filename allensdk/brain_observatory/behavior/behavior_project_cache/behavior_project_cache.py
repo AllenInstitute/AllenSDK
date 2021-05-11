@@ -344,6 +344,15 @@ class VisualBehaviorOphysProjectCache(object):
             self._cache_not_implemented('load_manifest')
         self.fetch_api.load_manifest(manifest_name)
 
+    def list_all_downloaded_manifests(self) -> list:
+        """
+        Return a sorted list of the names of the manifest files
+        that have been downloaded to this cache.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('list_all_downloaded_manifests')
+        return self.fetch_api.cache.list_all_downloaded_manifests()
+
     def list_manifest_file_names(self) -> list:
         """
         Return a sorted list of the names of the manifest files
