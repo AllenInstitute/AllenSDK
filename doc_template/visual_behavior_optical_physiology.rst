@@ -280,3 +280,72 @@ SUMMARY OF AVAILABLE DATA
    * - 
      - Ophys timestamps
      - 
+
+DATA FILE CHANGELOG
+-------------------
+
+**v0.3.0**
+
+13 sessions were labeled with the wrong session_type in v0.2.0. We have
+corrected that error. The offending sessions were
+
+.. list-table:: 
+   :widths: 30 30 50 50
+   :header-rows: 1
+
+   * - behavior_session_id
+     - ophys_session_id
+     - session_type_v0.2.0
+     - session_type_v0.3.0
+   * - 875020233
+     -
+     - OPHYS_3_images_A
+     - OPHYS_2_images_A_passive
+   * - 902810506
+     -
+     - TRAINING_4_images_B_training
+     - TRAINING_3_images_B_10uL_reward
+   * - 914219174
+     -
+     - OPHYS_0_images_B_habituation
+     - TRAINING_5_images_B_handoff_ready
+   * - 863571063
+     -
+     -  TRAINING_5_images_A_handoff_ready
+     - TRAINING_1_gratings
+   * - 974330793
+     -
+     - OPHYS_0_images_B_habituation
+     - TRAINING_5_images_B_handoff_ready
+   * - 863571072
+     -
+     - OPHYS_5_images_B_passive
+     - TRAINING_4_images_A_training
+   * - 1010972317
+     -
+     - OPHYS_4_images_A
+     - OPHYS_3_images_B
+   * - 1011659817
+     -
+     - OPHYS_5_images_A_passive
+     - OPHYS_4_images_A
+   * - 1003302686
+     - 1003277121
+     - OPHYS_6_images_A
+     - OPHYS_5_images_A_passive
+   * - 863571054
+     -
+     - OPHYS_7_receptive_field_mapping
+     - TRAINING_5_images_A_epilogue
+   * - 974282914
+     - 974167263
+     - OPHYS_6_images_B
+     - OPHYS_5_images_B_passive
+   * - 885418521
+     -
+     - OPHYS_1_images_A
+     - TRAINING_5_images_A_handoff_lapsed
+   * - 915739774
+     -
+     - OPHYS_1_images_A
+     - OPHYS_0_images_A_habituation
