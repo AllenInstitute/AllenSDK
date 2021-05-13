@@ -122,6 +122,8 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - 2.11.0
 -----------------------------------------------------------------------
 - python 3.8 compatibility
+- CloudCache (the class supporting cloud-based data releases) is now smart enough to construct symlinks between files that are identical across dataset versions (rather than downloading duplicate copies of files).
+- VisualBehavioOphysProjectCache supports user-controlled switching between dataset versions.
 
 
 What's New - 2.10.3
