@@ -86,23 +86,31 @@ class Dataset(object):
     ...     logger.info(dset.meta_data)
     ...     dset.stats()
 
+    The sync file documentation from MPE can be found at
+    sharepoint > Instrumentation > Shared Documents > Sync_line_labels_discussion_2020-01-27-.xlsx  # NOQA E501
+    Direct link:
+    https://alleninstitute.sharepoint.com/:x:/s/Instrumentation/ES2bi1xJ3E9NupX-zQeXTlYBS2mVVySycfbCQhsD_jPMUw?e=Z9jCwH
+
+
     """
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
-    EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking line label after 3/27/2020
-                         "cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
-                         "eyetracking",  # previous line label for eye tracking (prior to ~ Oct. 2018)
-                         "eye_tracking")  # An undocumented, but possible eye tracking line label
-    BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020
-                              "cam1_exposure",  # clocks behavior tracking frame pulses (port 0, line 8)
+    EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking
+                                                # line label after 3/27/2020
+                         # clocks eye tracking frame pulses (port 0, line 9)
+                         "cam2_exposure",
+                         # previous line label for eye tracking
+                         # (prior to ~ Oct. 2018)
+                         "eyetracking",
+                         "eye_tracking")  # An undocumented, but possible eye tracking line label  # NOQA E114
+    BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020  # NOQA E127
+                                                    # clocks behavior tracking frame # NOQA E127
+                                                    # pulses (port 0, line 8)
+                              "cam1_exposure",
                               "behavior_monitoring")
 
-    DEPRECATED_KEYS = {"cam2_exposure",
-                       "eyetracking",
-                       "eye_tracking",
-                       "cam1_exposure",
-                       "behavior_monitoring"}
+    DEPRECATED_KEYS = set()
 
     def __init__(self, path):
         self.dfile = self.load(path)
@@ -114,11 +122,11 @@ class Dataset(object):
             if deprecated_keys:
                 warnings.warn((f"The loaded sync file contains the "
                                f"following deprecated line label keys: "
-                               f"{deprecated_keys}. Consider updating the sync "
-                               f"file line labels."), stacklevel=2)
+                               f"{deprecated_keys}. Consider updating the "
+                               f"sync file line labels."), stacklevel=2)
         else:
-            warnings.warn((f"The loaded sync file has no line labels and may "
-                           f"not be valid."), stacklevel=2)
+            warnings.warn(("The loaded sync file has no line labels and may "
+                           "not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
@@ -146,7 +154,8 @@ class Dataset(object):
             Path to hdf5 file.
 
         """
-        self.dfile = h5.File(path, 'r')  # MG edit 3/15 removed 'r' because some sync files were unable to load
+        self.dfile = h5.File(
+            path, 'r')  # MG edit 3/15 removed 'r' because some sync files were unable to load  # NOQA E501
         self.meta_data = eval(self.dfile['meta'][()])
         self.line_labels = self.meta_data['line_labels']
         self.times = self._process_times()
@@ -320,34 +329,34 @@ class Dataset(object):
         return self.get_all_times(units)[np.where(changes == 1)]
 
     def get_edges(
-        self, 
-        kind: str, 
-        keys: Union[str, Sequence[str]], 
-        units: str = "seconds", 
+        self,
+        kind: str,
+        keys: Union[str, Sequence[str]],
+        units: str = "seconds",
         permissive: bool = False
     ) -> Optional[np.ndarray]:
         """ Utility function for extracting edge times from a line
 
         Parameters
         ----------
-        kind : One of "rising", "falling", or "all". Should this method return 
-            timestamps for rising, falling or both edges on the appropriate 
+        kind : One of "rising", "falling", or "all". Should this method return
+            timestamps for rising, falling or both edges on the appropriate
             line
-        keys : These will be checked in sequence. Timestamps will be returned 
+        keys : These will be checked in sequence. Timestamps will be returned
             for the first which is present in the line labels
-        units : one of "seconds", "samples", or "indices". The returned 
+        units : one of "seconds", "samples", or "indices". The returned
             "time"stamps will be given in these units.
         raise_missing : If True and no matching line is found, a KeyError will
             be raised
 
         Returns
         -------
-        An array of edge times. If raise_missing is False and none of the keys 
+        An array of edge times. If raise_missing is False and none of the keys
             were found, returns None.
 
         Raises
         ------
-        KeyError : none of the provided keys were found among this dataset's 
+        KeyError : none of the provided keys were found among this dataset's
             line labels
 
         """
@@ -414,9 +423,9 @@ class Dataset(object):
 
         """
         source_edges = getattr(self,
-                               "get_{}_edges".format(source_edge.lower()))(source.lower(), units="samples")
+                               "get_{}_edges".format(source_edge.lower()))(source.lower(), units="samples")  # NOQA E501
         target_edges = getattr(self,
-                               "get_{}_edges".format(target_edge.lower()))(target.lower(), units="samples")
+                               "get_{}_edges".format(target_edge.lower()))(target.lower(), units="samples")  # NOQA E501
         indices = np.searchsorted(target_edges, source_edges, side="right")
         if direction.lower() == "previous":
             indices[np.where(indices != 0)] -= 1
@@ -429,7 +438,8 @@ class Dataset(object):
         elif units in ['sec', 'seconds', 'second']:
             return target_edges[indices] / self.sample_freq
         else:
-            raise KeyError("Invalid units.  Try 'seconds', 'samples' or 'indices'")
+            raise KeyError(
+                "Invalid units.  Try 'seconds', 'samples' or 'indices'")
 
     def get_analog_channel(self,
                            channel,
@@ -454,8 +464,10 @@ class Dataset(object):
 
         """
         if isinstance(channel, str):
-            channel_index = self.analog_meta_data['analog_labels'].index(channel)
-            channel = self.analog_meta_data['analog_channels'].index(channel_index)
+            channel_index = self.analog_meta_data['analog_labels'].index(
+                channel)
+            channel = self.analog_meta_data['analog_channels'].index(
+                channel_index)
 
         if "analog_data" in self.dfile.keys():
             dset = self.dfile['analog_data']

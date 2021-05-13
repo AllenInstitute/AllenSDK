@@ -347,6 +347,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 oe.id as ophys_experiment_id,
                 os.id as ophys_session_id,
+                os.stimulus_name as session_type,
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
                     ophys_container_id,
@@ -397,7 +398,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 pr.code as project_code,
                 os.name as session_name,
                 os.date_of_acquisition,
-                os.specimen_id
+                os.specimen_id,
+                os.stimulus_name as session_type
             FROM ophys_sessions os
             JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
             LEFT OUTER JOIN projects pr ON pr.id = os.project_id

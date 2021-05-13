@@ -44,7 +44,8 @@ jobs:
     strategy:
       matrix:
         os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.6", "3.7"]
+        python-version: ["3.6", "3.7", "3.8"]
+      fail-fast: false
     defaults:
       run:
         shell: bash -l {0}
@@ -64,3 +65,31 @@ jobs:
       - name: Test
         run: |
           py.test --cov=allensdk -n 4
+
+  onprem:
+    name: python ${{ matrix.image }} on-prem test
+    runs-on: ["self-hosted"]
+    strategy:
+      matrix:
+        image: ["allensdk_local_py37:latest"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: run test in docker
+        run: |
+          docker run \
+              --env-file /home/github_worker/env.list \
+              --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
+              --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
+              --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
+              ${{ matrix.image }} \
+                  /bin/bash -c "pip install -r requirements.txt; \
+                                pip install -r test_requirements.txt; \
+                                python -m pytest \
+                                    --capture=no \
+                                    --cov=allensdk \
+                                    --cov-config coveragerc \
+                                    --cov-report html \
+                                    --junitxml=test-reports/test.xml \
+                                    --boxed \
+                                    --numprocesses 4 \
+                                    --durations=0"

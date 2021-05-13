@@ -33,14 +33,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
 import logging
 
-from ._schemas import InputParameters, OutputParameters
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
-from .subsampling import select_channels, subsample_timestamps, subsample_lfp, remove_lfp_offset, remove_lfp_noise
+import numpy as np
 
+from allensdk.brain_observatory.argschema_utilities import \
+    ArgSchemaParserPlus, \
+    write_or_print_outputs
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
+    ContinuousFile
+from ._schemas import InputParameters, OutputParameters
+from .subsampling import select_channels, subsample_timestamps, \
+    subsample_lfp, \
+    remove_lfp_offset, remove_lfp_noise
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +61,8 @@ def subsample(args):
     probe_outputs = []
     for probe in args['probes']:
         logging.info("Sub-sampling LFP for " + probe['name'])
-        lfp_data_file = ContinuousFile(probe['lfp_input_file_path'], probe['lfp_timestamps_input_path'],
+        lfp_data_file = ContinuousFile(probe['lfp_input_file_path'],
+                                       probe['lfp_timestamps_input_path'],
                                        probe['total_channels'])
 
         logging.info("loading lfp data...")
@@ -67,27 +73,31 @@ def subsample(args):
             lfp_channel_order = np.arange(0, probe['total_channels'])
 
         logging.info("selecting channels...")
-        channels_to_save, actual_channels = select_channels(probe['total_channels'],
-                                                            probe['surface_channel'],
-                                                            params['surface_padding'],
-                                                            params['start_channel_offset'],
-                                                            params['channel_stride'],
-                                                            lfp_channel_order,
-                                                            probe.get('noisy_channels', []),
-                                                            params['remove_noisy_channels'],
-                                                            probe['reference_channels'],
-                                                            params['remove_reference_channels'])
+        channels_to_save, actual_channels = select_channels(
+            probe['total_channels'],
+            probe['surface_channel'],
+            params['surface_padding'],
+            params['start_channel_offset'],
+            params['channel_stride'],
+            lfp_channel_order,
+            probe.get('noisy_channels', []),
+            params['remove_noisy_channels'],
+            probe['reference_channels'],
+            params['remove_reference_channels'])
 
-        ts_subsampled = subsample_timestamps(timestamps, params['temporal_subsampling_factor'])
+        ts_subsampled = subsample_timestamps(timestamps, params[
+            'temporal_subsampling_factor'])
 
         logging.info("subsampling data...")
-        lfp_subsampled = subsample_lfp(lfp_raw, channels_to_save, params['temporal_subsampling_factor'])
+        lfp_subsampled = subsample_lfp(lfp_raw, channels_to_save,
+                                       params['temporal_subsampling_factor'])
 
         del lfp_raw
 
         logging.info("removing offset...")
         lfp_filtered = remove_lfp_offset(lfp_subsampled,
-                                         probe['lfp_sampling_rate'] / params['temporal_subsampling_factor'],
+                                         probe['lfp_sampling_rate'] / params[
+                                             'temporal_subsampling_factor'],
                                          params['cutoff_frequency'],
                                          params['filter_order'])
 
@@ -96,11 +106,13 @@ def subsample(args):
         logging.info("Surface channel: " + str(probe['surface_channel']))
 
         logging.info("removing noise...")
-        lfp = remove_lfp_noise(lfp_filtered, probe['surface_channel'], actual_channels)
+        lfp = remove_lfp_noise(lfp_filtered, probe['surface_channel'],
+                               actual_channels)
         del lfp_filtered
 
         if params['remove_channels_out_of_brain']:
-            channels_to_keep = actual_channels < (probe['surface_channel'] + 10)
+            channels_to_keep = actual_channels < (
+                        probe['surface_channel'] + 10)
             actual_channels = actual_channels[channels_to_keep]
             lfp = lfp[:, channels_to_keep]
 
@@ -111,20 +123,19 @@ def subsample(args):
 
         probe_outputs.append({'name': probe['name'],
                               'lfp_data_path': probe['lfp_data_path'],
-                              'lfp_timestamps_path': probe['lfp_timestamps_path'],
-                              'lfp_channel_info_path': probe['lfp_channel_info_path']})
+                              'lfp_timestamps_path': probe[
+                                  'lfp_timestamps_path'],
+                              'lfp_channel_info_path': probe[
+                                  'lfp_channel_info_path']})
 
     return {'probe_outputs': probe_outputs}
 
 
 def main():
-    mod = ArgSchemaParserPlus(schema_type=InputParameters, output_schema_type=OutputParameters)
+    mod = ArgSchemaParserPlus(schema_type=InputParameters,
+                              output_schema_type=OutputParameters)
     output = subsample(mod.args)
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        logger.info(mod.get_output_json(output))
+    write_or_print_outputs(data=output, parser=mod)
 
 
 if __name__ == "__main__":

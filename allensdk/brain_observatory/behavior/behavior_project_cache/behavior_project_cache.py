@@ -21,7 +21,12 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.core.authentication import DbCredentials
 
 
-class VisualBehaviorOphysProjectCache(Cache):
+class VBOLimsCache(Cache):
+    """
+    A class that ineherits from the warehouse Cache and provides
+    that functionality to VisualBehaviorOphysProjectCache
+    """
+
     MANIFEST_VERSION = "0.0.1-alpha.3"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
@@ -44,6 +49,9 @@ class VisualBehaviorOphysProjectCache(Cache):
             "typename": "file"
         }
     }
+
+
+class VisualBehaviorOphysProjectCache(object):
 
     def __init__(
             self,
@@ -100,12 +108,27 @@ class VisualBehaviorOphysProjectCache(Cache):
             manifest_ = manifest or "behavior_project_manifest.json"
         else:
             manifest_ = None
-        version_ = version or self.MANIFEST_VERSION
 
-        super().__init__(manifest=manifest_, version=version_, cache=cache)
         self.fetch_api = fetch_api
+        self.cache = None
+
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            if cache:
+                self.cache = VBOLimsCache(manifest=manifest_,
+                                          version=version,
+                                          cache=cache)
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    @property
+    def manifest(self):
+        if self.cache is None:
+            api_name = type(self.fetch_api).__name__
+            raise NotImplementedError(f"A {type(self).__name__} "
+                                      f"based on {api_name} "
+                                      "does not have an accessible manifest "
+                                      "property")
+        return self.cache.manifest
 
     @classmethod
     def from_s3_cache(cls, cache_dir: Union[str, Path],
@@ -135,7 +158,8 @@ class VisualBehaviorOphysProjectCache(Cache):
 
         """
         fetch_api = BehaviorProjectCloudApi.from_s3_cache(
-                cache_dir, bucket_name, project_name)
+                cache_dir, bucket_name, project_name,
+                ui_class_name=cls.__name__)
         return cls(fetch_api=fetch_api)
 
     @classmethod
@@ -160,7 +184,8 @@ class VisualBehaviorOphysProjectCache(Cache):
 
         """
         fetch_api = BehaviorProjectCloudApi.from_local_cache(
-                cache_dir, project_name)
+                cache_dir, project_name,
+                ui_class_name=cls.__name__)
         return cls(fetch_api=fetch_api)
 
     @classmethod
@@ -227,6 +252,125 @@ class VisualBehaviorOphysProjectCache(Cache):
         return cls(fetch_api=fetch_api, manifest=manifest, version=version,
                    cache=cache, fetch_tries=fetch_tries)
 
+    def _cache_not_implemented(self, method_name: str) -> None:
+        """
+        Raise a NotImplementedError explaining that method_name
+        does not exist for VisualBehaviorOphysProjectCache
+        that does not have a fetch_api based on LIMS
+        """
+        msg = f"Method {method_name} does not exist for this "
+        msg += f"{type(self).__name__}, which is based on "
+        msg += f"{type(self.fetch_api).__name__}"
+        raise NotImplementedError(msg)
+
+    def construct_local_manifest(self) -> None:
+        """
+        Construct the local file used to determine if two files are
+        duplicates of each other or not. Save it into the expected
+        place in the cache. (You will see a warning if the cache
+        thinks that you need to run this method).
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('construct_local_manifest')
+        self.fetch_api.cache.construct_local_manifest()
+
+    def compare_manifests(self,
+                          manifest_0_name: str,
+                          manifest_1_name: str
+                          ) -> str:
+        """
+        Compare two manifests from this dataset. Return a dict
+        containing the list of metadata and data files that changed
+        between them
+
+        Note: this assumes that manifest_0 predates manifest_1
+
+        Parameters
+        ----------
+        manifest_0_name: str
+
+        manifest_1_name: str
+
+        Returns
+        -------
+        str
+            A string summarizing all of the changes going from
+            manifest_0 to manifest_1
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('compare_manifests')
+        return self.fetch_api.cache.compare_manifests(manifest_0_name,
+                                                      manifest_1_name)
+
+    def load_latest_manifest(self) -> None:
+        """
+        Load the manifest corresponding to the most up to date
+        version of the dataset.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('load_latest_manifest')
+        self.fetch_api.cache.load_latest_manifest()
+
+    def latest_downloaded_manifest_file(self) -> str:
+        """
+        Return the name of the most up to date data manifest
+        available on your local system.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('latest_downloaded_manifest_file')
+        return self.fetch_api.cache.latest_downloaded_manifest_file
+
+    def latest_manifest_file(self) -> str:
+        """
+        Return the name of the most up to date data manifest
+        corresponding to this dataset, checking in the cloud
+        if this is a cloud-backed cache.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('latest_manifest_file')
+        return self.fetch_api.cache.latest_manifest_file
+
+    def load_manifest(self, manifest_name: str):
+        """
+        Load a specific versioned manifest for this dataset.
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('load_manifest')
+        self.fetch_api.load_manifest(manifest_name)
+
+    def list_all_downloaded_manifests(self) -> list:
+        """
+        Return a sorted list of the names of the manifest files
+        that have been downloaded to this cache.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('list_all_downloaded_manifests')
+        return self.fetch_api.cache.list_all_downloaded_manifests()
+
+    def list_manifest_file_names(self) -> list:
+        """
+        Return a sorted list of the names of the manifest files
+        associated with this dataset.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('list_manifest_file_names')
+        return self.fetch_api.cache.manifest_file_names
+
+    def current_manifest(self) -> Union[None, str]:
+        """
+        Return the name of the dataset manifest currently being
+        used by this cache.
+        """
+        if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            self._cache_not_implemented('current_manifest')
+        return self.fetch_api.cache.current_manifest
+
     def get_ophys_session_table(
             self,
             suppress: Optional[List[str]] = None,
@@ -252,8 +396,9 @@ class VisualBehaviorOphysProjectCache(Cache):
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_ophys_session_table()
-        if self.cache:
-            path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.OPHYS_SESSIONS_KEY)
             ophys_sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_ophys_session_table,
@@ -278,12 +423,6 @@ class VisualBehaviorOphysProjectCache(Cache):
 
         return sessions.table if as_df else sessions
 
-    def add_manifest_paths(self, manifest_builder):
-        manifest_builder = super().add_manifest_paths(manifest_builder)
-        for key, config in self.MANIFEST_CONFIG.items():
-            manifest_builder.add_path(key, **config)
-        return manifest_builder
-
     def get_ophys_experiment_table(
             self,
             suppress: Optional[List[str]] = None,
@@ -298,8 +437,9 @@ class VisualBehaviorOphysProjectCache(Cache):
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_ophys_experiment_table()
-        if self.cache:
-            path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
                 path,
                 self.fetch_api.get_ophys_experiment_table,
@@ -336,8 +476,9 @@ class VisualBehaviorOphysProjectCache(Cache):
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_behavior_session_table()
-        if self.cache:
-            path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_behavior_session_table,

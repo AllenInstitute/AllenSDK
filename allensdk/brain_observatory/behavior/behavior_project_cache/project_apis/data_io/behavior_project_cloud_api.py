@@ -73,31 +73,50 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     def __init__(self, cache: Union[S3CloudCache, LocalCache],
                  skip_version_check: bool = False,
                  local: bool = False):
+
+        self.cache = cache
+        self.skip_version_check = skip_version_check
+        self._local = local
+        self.load_manifest()
+
+    def load_manifest(self, manifest_name: Optional[str] = None):
+        """
+        Load the specified manifest file into the CloudCache
+
+        Parameters
+        ----------
+        manifest_name: Optional[str]
+            Name of manifest file to load. If None, load latest
+            (default: None)
+        """
+        if manifest_name is None:
+            self.cache.load_last_manifest()
+        else:
+            self.cache.load_manifest(manifest_name)
+
         expected_metadata = set(["behavior_session_table",
                                  "ophys_session_table",
                                  "ophys_experiment_table"])
-        self.cache = cache
 
-        if cache._manifest.metadata_file_names is None:
+        if self.cache._manifest.metadata_file_names is None:
             raise RuntimeError("S3CloudCache object has no metadata "
                                "file names. BehaviorProjectCloudApi "
                                "expects a S3CloudCache passed which "
                                "has already run load_manifest()")
-        cache_metadata = set(cache._manifest.metadata_file_names)
+        cache_metadata = set(self.cache._manifest.metadata_file_names)
 
         if cache_metadata != expected_metadata:
             raise RuntimeError("expected S3CloudCache object to have "
                                f"metadata file names: {expected_metadata} "
                                f"but it has {cache_metadata}")
 
-        if not skip_version_check:
-            data_sdk_version = [i for i in cache._manifest._data_pipeline
+        if not self.skip_version_check:
+            data_sdk_version = [i for i in self.cache._manifest._data_pipeline
                                 if i['name'] == "AllenSDK"][0]["version"]
-            version_check(cache._manifest.version, data_sdk_version)
+            version_check(self.cache._manifest.version, data_sdk_version)
 
         #    version_check(self.cache._manifest._data_pipeline)
         self.logger = logging.getLogger("BehaviorProjectCloudApi")
-        self._local = local
         self._get_ophys_session_table()
         self._get_behavior_session_table()
         self._get_ophys_experiment_table()
@@ -105,7 +124,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
     @staticmethod
     def from_s3_cache(cache_dir: Union[str, Path],
                       bucket_name: str,
-                      project_name: str) -> "BehaviorProjectCloudApi":
+                      project_name: str,
+                      ui_class_name: str) -> "BehaviorProjectCloudApi":
         """instantiates this object with a connection to an s3 bucket and/or
         a local cache related to that bucket.
 
@@ -123,18 +143,24 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             project name is the first part of the prefix of the release data
             objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
 
+        ui_class_name: str
+            Name of user interface class (used to populate error messages)
+
         Returns
         -------
         BehaviorProjectCloudApi instance
 
         """
-        cache = S3CloudCache(cache_dir, bucket_name, project_name)
-        cache.load_latest_manifest()
+        cache = S3CloudCache(cache_dir,
+                             bucket_name,
+                             project_name,
+                             ui_class_name=ui_class_name)
         return BehaviorProjectCloudApi(cache)
 
     @staticmethod
     def from_local_cache(cache_dir: Union[str, Path],
-                         project_name: str) -> "BehaviorProjectCloudApi":
+                         project_name: str,
+                         ui_class_name: str) -> "BehaviorProjectCloudApi":
         """instantiates this object with a local cache.
 
         Parameters
@@ -147,13 +173,17 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             project name is the first part of the prefix of the release data
             objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
 
+        ui_class_name: str
+            Name of user interface class (used to populate error messages)
+
         Returns
         -------
         BehaviorProjectCloudApi instance
 
         """
-        cache = LocalCache(cache_dir, project_name)
-        cache.load_latest_manifest()
+        cache = LocalCache(cache_dir,
+                           project_name,
+                           ui_class_name=ui_class_name)
         return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(
