@@ -55,15 +55,17 @@ def copy_file_entry(source, dest, use_rsync, make_parent_dirs, chmod=None):
 
     if chmod is not None:
         chmod_target = leftmost if leftmost is not None else dest
+
         def apply_permissions(path):
             return path.chmod(int(f"0o{chmod}", 0))
+
         walk_fs_tree(chmod_target, apply_permissions)
 
     logging.info(f"copied from {source} to {dest}")
 
 
 def raise_or_warn(message, do_raise, typ=None):
-    if do_raise == False:
+    if do_raise is False:
         typ = UserWarning if typ is None else typ
         warnings.warn(message, typ)
 
@@ -161,11 +163,11 @@ def main(
 if __name__ == '__main__':
     logging.basicConfig(
         format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
-    
+
     parser = argschema.ArgSchemaParser(
         schema_type=SessionUploadInputSchema,
         output_schema_type=SessionUploadOutputSchema,
     )
-    
+
     output = main(**parser.args)
     write_or_print_outputs(output, parser)

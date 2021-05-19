@@ -169,8 +169,6 @@ def test_SessionUploadSchema_destination_exists(tmpdir):
         }]
     }
 
-    res = SessionUploadOutputSchema
-
     _ = argschema.ArgSchemaParser(
         test_data,
         schema_type=SessionUploadInputSchema,
