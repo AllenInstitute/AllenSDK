@@ -187,4 +187,3 @@ def test_SessionUploadSchema_destination_exists(tmpdir):
 
     parser.output({'files': test_data['files']})
     pass
-
