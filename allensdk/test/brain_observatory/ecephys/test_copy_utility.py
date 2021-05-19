@@ -1,11 +1,16 @@
 import os
 import hashlib
 import io
+from pathlib import Path
 import sys
 
 import pytest
 
+import argschema
+
 import allensdk.brain_observatory.ecephys.copy_utility.__main__ as cu
+from allensdk.brain_observatory.ecephys.copy_utility._schemas import (
+    SessionUploadInputSchema, SessionUploadOutputSchema)
 
 
 def test_hash_file(tmpdir_factory):
@@ -110,3 +115,40 @@ def test_compare_files(tmpdir_factory, different, raise_if_comparison_fails):
             f.write('baz')
 
         cu.compare_files(spath, dpath, hasher_cls, raise_if_comparison_fails)
+
+
+def test_SessionUploadInputSchema(tmpdir):
+    in_file = Path(tmpdir) / 'in.json'
+    in_file.touch()
+
+    test_data = {
+        'files': [{
+            'source': str(in_file),
+            'destination': '',
+            'key': ''
+        }]
+    }
+
+    parser = argschema.ArgSchemaParser(
+        test_data,
+        schema_type=SessionUploadInputSchema,
+        args=[]
+    )
+
+
+def test_SessionUploadOutputSchema(tmpdir):
+    out_file = Path(tmpdir) / 'out.json'
+    out_file.touch()
+
+    test_data = {
+        'files': [{
+            'source': '',
+            'destination': str(out_file)
+        }]
+    }
+
+    parser = argschema.ArgSchemaParser(
+        test_data,
+        output_schema_type=SessionUploadOutputSchema,
+        args=[]
+    )
