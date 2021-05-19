@@ -133,45 +133,56 @@ def test_compare_files(tmpdir_factory, different, raise_if_comparison_fails):
 
 
 def test_SessionUploadSchema(tmpdir):
-    in_file = Path(tmpdir) / 'in.json'
-    in_file.touch()
+    src_file = Path(tmpdir) / 'src.csv'
+    src_file.touch()
 
-    out_file = Path(tmpdir) / 'out.json'
+    dst_file = Path(tmpdir) / 'dst.csv'
+
+    output_json = Path(tmpdir) / 'output.json'
 
     test_data = {
         'files': [{
-            'source': str(in_file),
-            'destination': str(out_file),
+            'source': str(src_file),
+            'destination': str(dst_file),
             'key': ''
-        }]
+        }],
+        'output_json': str(output_json)
     }
 
-    _ = argschema.ArgSchemaParser(
+    parser = argschema.ArgSchemaParser(
         test_data,
         schema_type=SessionUploadInputSchema,
         output_schema_type=SessionUploadOutputSchema,
         args=[]
     )
+
+    parser.output({'data': 0})
 
 
 def test_SessionUploadSchema_destination_exists(tmpdir):
-    in_file = Path(tmpdir) / 'in.json'
-    in_file.touch()
+    src_file = Path(tmpdir) / 'src.csv'
+    src_file.touch()
 
-    out_file = Path(tmpdir) / 'out.json'
-    out_file.touch()
+    dst_file = Path(tmpdir) / 'dst.csv'
+    dst_file.touch()
+
+    output_json = Path(tmpdir) / 'output.json'
+    output_json.touch()
 
     test_data = {
         'files': [{
-            'source': str(in_file),
-            'destination': str(out_file),
+            'source': str(src_file),
+            'destination': str(dst_file),
             'key': ''
-        }]
+        }],
+        'output_json': str(output_json)
     }
 
-    _ = argschema.ArgSchemaParser(
+    parser = argschema.ArgSchemaParser(
         test_data,
         schema_type=SessionUploadInputSchema,
         output_schema_type=SessionUploadOutputSchema,
         args=[]
     )
+
+    parser.output({'data': 0})

@@ -13,8 +13,6 @@ from ._schemas import (
     SessionUploadOutputSchema,
     available_hashers
 )
-from allensdk.brain_observatory.argschema_utilities \
-    import write_or_print_outputs
 
 
 def hash_file(path, hasher_cls, blocks_per_chunk=128):
@@ -170,4 +168,4 @@ if __name__ == '__main__':
     )
 
     output = main(**parser.args)
-    write_or_print_outputs(output, parser)
+    parser.output(output)
