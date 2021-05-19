@@ -156,7 +156,8 @@ def test_SessionUploadSchema(tmpdir):
         args=[]
     )
 
-    parser.output({'files': test_data['files']})
+    output = cu.main(**parser.args)
+    parser.output(output)
 
 
 def test_SessionUploadSchema_destination_exists(tmpdir):
@@ -185,5 +186,5 @@ def test_SessionUploadSchema_destination_exists(tmpdir):
         args=[]
     )
 
-    parser.output({'files': test_data['files']})
-    pass
+    output = cu.main(**parser.args)
+    parser.output(output)
