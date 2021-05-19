@@ -168,4 +168,4 @@ if __name__ == '__main__':
     )
 
     output = main(**parser.args)
-    parser.output(output)
+    parser.output(output, indent=2)
