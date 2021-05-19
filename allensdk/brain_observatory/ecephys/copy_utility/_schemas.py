@@ -4,7 +4,6 @@ from argschema import ArgSchema
 from argschema.fields import (
     LogLevel, String, Int, Nested, Boolean, List, InputFile, OutputFile)
 from argschema.schemas import DefaultSchema
-from marshmallow import RAISE
 
 
 available_hashers = {
@@ -21,8 +20,8 @@ class FileExists(InputFile):
 class FileToCopy(DefaultSchema):
     source = InputFile(required=True, description='copy from here')
     destination = OutputFile(required=True,
-                         description='copy to here (full path, not just '
-                                     'directory!)')
+                             description='copy to here (full path, not just '
+                                         'directory!)')
     key = String(required=True,
                  description='will be passed through to outputs, allowing a '
                              'name or kind to be associated with this file')
