@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.11.0] = TBD
+
+## [2.11.1] = 2021-05-20
+- Refactored the schema for the ecephys copy utility to avoid raising an error when a previous output file already exists.
+
+## [2.11.0] = 2021-05-13
 - python 3.8 compatibility
 - CloudCache (the class supporting cloud-based data releases) is now smart enough to construct symlinks between files that are identical across dataset versions (rather than downloading duplicate copies of files).
 - VisualBehavioOphysProjectCache supports user-controlled switching between dataset versions.

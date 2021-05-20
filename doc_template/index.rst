@@ -121,6 +121,11 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's New - 2.11.0
 -----------------------------------------------------------------------
+- Refactored the schema for the Ecephys copy utility to avoid raising an error when a previous output file already exists.
+
+
+What's New - 2.11.0
+-----------------------------------------------------------------------
 - python 3.8 compatibility
 - CloudCache (the class supporting cloud-based data releases) is now smart enough to construct symlinks between files that are identical across dataset versions (rather than downloading duplicate copies of files).
 - VisualBehavioOphysProjectCache supports user-controlled switching between dataset versions.
