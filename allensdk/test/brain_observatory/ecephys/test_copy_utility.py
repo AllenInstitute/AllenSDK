@@ -157,6 +157,6 @@ def test_SessionUploadSchema(tmpdir):
         args=[]
     )
 
-    ## Mocking the functionality of the main method
+    # Mocking the functionality of the main method
     shutil.copy(src_file, dst_file)
     parser.output({'files': test_data['files']})
