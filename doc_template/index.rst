@@ -119,7 +119,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
-What's New - 2.11.0
+What's New - 2.11.2
+-----------------------------------------------------------------------
+- Fixed mkdir error for non-existing ecephys upload directory
+
+ 
+What's New - 2.11.1
 -----------------------------------------------------------------------
 - Refactored the schema for the Ecephys copy utility to avoid raising an error when a previous output file already exists.
 
