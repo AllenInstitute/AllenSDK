@@ -10,7 +10,46 @@ import argschema
 
 import allensdk.brain_observatory.ecephys.copy_utility.__main__ as cu
 from allensdk.brain_observatory.ecephys.copy_utility._schemas import (
-    SessionUploadInputSchema, SessionUploadOutputSchema)
+        SessionUploadInputSchema, SessionUploadOutputSchema)
+
+
+@pytest.mark.parametrize("already_exists", [True, False])
+def test_dst_dir_exists(already_exists, tmp_path, monkeypatch):
+    dst_dir = tmp_path / "new_directory"
+    src_file = tmp_path / "source.txt"
+    src_file.touch()
+
+    if already_exists:
+        dst_dir.mkdir()
+    dst_file = dst_dir / "destination.txt"
+    outj_path = tmp_path / "output.json"
+
+    args = {
+            "files": [
+                {
+                    "source": str(src_file),
+                    "destination": str(dst_file),
+                    "key": "something"}],
+            "output_json": str(outj_path)}
+
+    parser = argschema.ArgSchemaParser(
+        args,
+        schema_type=SessionUploadInputSchema,
+        output_schema_type=SessionUploadOutputSchema,
+        args=[]
+    )
+
+    def mock_copy_file(source, dest, use_rsync, make_parent_dirs, chmod=None):
+        parent = Path(dest).parent
+        if make_parent_dirs & (not parent.exists()):
+            parent.mkdir()
+        shutil.copy(source, dest)
+
+    monkeypatch.setattr(cu, "copy_file_entry", mock_copy_file)
+    output = cu.main(**parser.args)
+    parser.output(output, indent=2)
+    assert outj_path.exists()
+    assert Path(args["files"][0]["destination"]).exists()
 
 
 def test_hash_file(tmpdir_factory):
