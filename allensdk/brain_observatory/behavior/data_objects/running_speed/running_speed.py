@@ -129,8 +129,8 @@ class RunningSpeed(DataObject):
         zscore_threshold: float = 10.0
     ) -> "RunningSpeed":
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_lims(
-            db, behavior_session_id, ophys_experiment_id
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
         )
 
         running_speed = cls._get_running_speed_df(

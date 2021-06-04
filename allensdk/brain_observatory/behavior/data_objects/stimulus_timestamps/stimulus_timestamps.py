@@ -2,14 +2,19 @@
 import json
 from typing import Optional
 
-from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
+    .stimulus_file_readable_mixin \
+    import \
+    StimulusFileReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
+    .sync_file_readable_mixin import \
+    SyncFileReadableMixin
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
@@ -30,7 +35,8 @@ def from_lims_cache_key(
     return hashkey(behavior_session_id, ophys_experiment_id)
 
 
-class StimulusTimestamps(DataObject):
+class StimulusTimestamps(DataObject, StimulusFileReadableMixin,
+                         SyncFileReadableMixin):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 
@@ -51,24 +57,25 @@ class StimulusTimestamps(DataObject):
         self._sync_file = sync_file
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls, dict_repr: dict) -> "StimulusTimestamps":
-        stimulus_file = StimulusFile.from_json(dict_repr)
-
-        if "sync_file" in dict_repr:
-            sync_file = SyncFile.from_json(dict_repr)
-            stimulus_timestamps = get_ophys_stimulus_timestamps(
-                sync_path=sync_file.filepath
-            )
-        else:
-            sync_file = None
-            stimulus_timestamps = get_behavior_stimulus_timestamps(
-                stimulus_pkl=stimulus_file.data
-            )
+    def from_stimulus_file(
+            cls,
+            stimulus_file: StimulusFile) -> "StimulusTimestamps":
+        stimulus_timestamps = get_behavior_stimulus_timestamps(
+            stimulus_pkl=stimulus_file.data
+        )
 
         return cls(
             timestamps=stimulus_timestamps,
-            stimulus_file=stimulus_file,
+            stimulus_file=stimulus_file
+        )
+
+    @classmethod
+    def from_sync_file(cls, sync_file: SyncFile) -> "StimulusTimestamps":
+        stimulus_timestamps = get_ophys_stimulus_timestamps(
+            sync_path=sync_file.filepath
+        )
+        return cls(
+            timestamps=stimulus_timestamps,
             sync_file=sync_file
         )
 
@@ -85,33 +92,6 @@ class StimulusTimestamps(DataObject):
         if self._sync_file is not None:
             output_dict.update(self._sync_file.to_json())
         return output_dict
-
-    @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls,
-        db: PostgresQueryMixin,
-        behavior_session_id: int,
-        ophys_experiment_id: Optional[int] = None
-    ) -> "StimulusTimestamps":
-        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-
-        if ophys_experiment_id:
-            sync_file = SyncFile.from_lims(db, ophys_experiment_id)
-            stimulus_timestamps = get_ophys_stimulus_timestamps(
-                sync_path=sync_file.filepath
-            )
-        else:
-            sync_file = None
-            stimulus_timestamps = get_behavior_stimulus_timestamps(
-                stimulus_pkl=stimulus_file.data
-            )
-
-        return cls(
-            timestamps=stimulus_timestamps,
-            stimulus_file=stimulus_file,
-            sync_file=sync_file
-        )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "StimulusTimestamps":
@@ -133,3 +113,6 @@ class StimulusTimestamps(DataObject):
         nwbfile.add_processing_module(stim_mod)
 
         return nwbfile
+
+    def calc_frame_rate(self):
+        return np.round(1 / np.mean(np.diff(self.value)), 0)

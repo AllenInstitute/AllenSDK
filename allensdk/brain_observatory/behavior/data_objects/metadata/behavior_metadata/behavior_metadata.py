@@ -1,16 +1,56 @@
 import abc
 import uuid
-import warnings
 from datetime import datetime
 from typing import Dict, List, Optional
 import re
 import numpy as np
-import pytz
+from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.session_apis.abcs.\
-    data_extractor_base.behavior_data_extractor_base import \
-    BehaviorDataExtractorBase
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_objects import DataObject, \
+    StimulusTimestamps, BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
+    .internal_mixed_readable_mixin \
+    import \
+    InternalMixedReadableMixin
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.age import \
+    Age
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_session_uuid import \
+    BehaviorSessionUUID
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.driver_line import \
+    DriverLine
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment_name import \
+    EquipmentName
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.foraging_id import \
+    ForagingId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.full_genotype import \
+    FullGenotype
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.mouse_id import \
+    MouseId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.reporter_line import \
+    ReporterLine
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.sex import \
+    Sex
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.stimulus_frame_rate import \
+    StimulusFrameRate
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
+from allensdk.internal.api import PostgresQueryMixin
 
 description_dict = {
     # key is a regex and value is returned on match
@@ -151,250 +191,166 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata:
+class BehaviorMetadata(DataObject, InternalMixedReadableMixin):
     """Container class for behavior metadata"""
-    def __init__(self, extractor: BehaviorDataExtractorBase,
-                 stimulus_timestamps: np.ndarray,
-                 behavior_stimulus_file: dict):
+    def __init__(self,
+                 behavior_session_id: BehaviorSessionId,
+                 equipment_name: EquipmentName,
+                 sex: Sex,
+                 age: Age,
+                 stimulus_frame_rate: StimulusFrameRate,
+                 session_type: SessionType,
+                 date_of_acquisition: DateOfAcquisition,
+                 reporter_line: ReporterLine,
+                 full_genotype: FullGenotype,
+                 behavior_session_uuid: BehaviorSessionUUID,
+                 driver_line: DriverLine,
+                 mouse_id: MouseId):
+        super().__init__(name='behavior_metadata', value=self)
+        self._behavior_session_id = behavior_session_id
+        self._equipment_name = equipment_name
+        self._sex = sex
+        self._age = age
+        self._stimulus_frame_rate = stimulus_frame_rate
+        self._session_type = session_type
+        self._date_of_acquisition = date_of_acquisition
+        self._reporter_line = reporter_line
+        self._full_genotype = full_genotype
+        self._behavior_session_uuid = behavior_session_uuid
+        self._driver_line = driver_line
+        self._mouse_id = mouse_id
 
-        self._extractor = extractor
-        self._stimulus_timestamps = stimulus_timestamps
-        self._behavior_stimulus_file = behavior_stimulus_file
         self._exclude_from_equals = set()
+
+    @classmethod
+    def from_internal_mixed(
+            cls,
+            behavior_session_id: BehaviorSessionId,
+            stimulus_file: StimulusFile,
+            stimulus_timestamps: StimulusTimestamps,
+            lims_db: PostgresQueryMixin
+        ) -> "BehaviorMetadata":
+        equipment_name = EquipmentName.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        sex = Sex.from_lims(behavior_session_id=behavior_session_id.value,
+                            lims_db=lims_db)
+        age = Age.from_lims(behavior_session_id=behavior_session_id.value,
+                            lims_db=lims_db)
+        stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
+            stimulus_timestamps=stimulus_timestamps)
+        session_type = SessionType.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        date_of_acquisition = DateOfAcquisition.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)\
+            .validate(stimulus_file=stimulus_file,
+                      behavior_session_id=behavior_session_id.value)
+        reporter_line = ReporterLine.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        full_genotype = FullGenotype.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+
+        foraging_id = ForagingId.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        behavior_session_uuid = BehaviorSessionUUID.from_stimulus_file(
+            stimulus_file=stimulus_file)\
+            .validate(behavior_session_id=behavior_session_id.value,
+                                       foraging_id=foraging_id.value,
+                                       stimulus_file=stimulus_file)
+        driver_line = DriverLine.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        mouse_id = MouseId.from_lims(
+            behavior_session_id=behavior_session_id.value,
+                                     lims_db=lims_db)
+
+        return cls(
+            behavior_session_id=behavior_session_id,
+            equipment_name=equipment_name,
+            sex=sex,
+            age=age,
+            stimulus_frame_rate=stimulus_frame_rate,
+            session_type=session_type,
+            date_of_acquisition=date_of_acquisition,
+            reporter_line=reporter_line,
+            full_genotype=full_genotype,
+            behavior_session_uuid=behavior_session_uuid,
+            driver_line=driver_line,
+            mouse_id=mouse_id
+        )
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "BehaviorMetadata":
+        pass
+
+    @classmethod
+    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
+        pass
 
     @property
     def equipment_name(self) -> str:
-        return self._extractor.get_equipment_name()
+        return self._equipment_name.value
 
     @property
     def sex(self) -> str:
-        return self._extractor.get_sex()
+        return self._sex.value
 
     @property
     def age_in_days(self) -> Optional[int]:
-        """Converts the age cod into a numeric days representation"""
-
-        age = self._extractor.get_age()
-        return self.parse_age_in_days(age=age, warn=True)
+        return self._age.value
 
     @property
     def stimulus_frame_rate(self) -> float:
-        return self._get_frame_rate(timestamps=self._stimulus_timestamps)
+        return self._stimulus_frame_rate.value
 
     @property
     def session_type(self) -> str:
-        return self._extractor.get_stimulus_name()
+        return self._session_type.value
 
     @property
     def date_of_acquisition(self) -> datetime:
-        """Return the timestamp for when experiment was started in UTC
-
-        NOTE: This method will only get acquisition datetime from
-        extractor (data from LIMS) methods. As a sanity check,
-        it will also read the acquisition datetime from the behavior stimulus
-        (*.pkl) file and raise a warning if the date differs too much from the
-        datetime obtained from the behavior stimulus (*.pkl) file.
-
-        :rtype: datetime
-        """
-        extractor_acq_date = self._extractor.get_date_of_acquisition()
-
-        pkl_data = self._behavior_stimulus_file
-        pkl_raw_acq_date = pkl_data["start_time"]
-        if isinstance(pkl_raw_acq_date, datetime):
-            pkl_acq_date = pytz.utc.localize(pkl_raw_acq_date)
-
-        elif isinstance(pkl_raw_acq_date, (int, float)):
-            # We are dealing with an older pkl file where the acq time is
-            # stored as a Unix style timestamp string
-            parsed_pkl_acq_date = datetime.fromtimestamp(pkl_raw_acq_date)
-            pkl_acq_date = pytz.utc.localize(parsed_pkl_acq_date)
-        else:
-            pkl_acq_date = None
-            warnings.warn(
-                "Could not parse the acquisition datetime "
-                f"({pkl_raw_acq_date}) found in the following stimulus *.pkl: "
-                f"{self._extractor.get_behavior_stimulus_file()}"
-            )
-
-        if pkl_acq_date:
-            acq_start_diff = (
-                    extractor_acq_date - pkl_acq_date).total_seconds()
-            # If acquisition dates differ by more than an hour
-            if abs(acq_start_diff) > 3600:
-                session_id = self._extractor.get_behavior_session_id()
-                warnings.warn(
-                    "The `date_of_acquisition` field in LIMS "
-                    f"({extractor_acq_date}) for behavior session "
-                    f"({session_id}) deviates by more "
-                    f"than an hour from the `start_time` ({pkl_acq_date}) "
-                    "specified in the associated stimulus *.pkl file: "
-                    f"{self._extractor.get_behavior_stimulus_file()}"
-                )
-        return extractor_acq_date
+        return self._date_of_acquisition.value
 
     @property
     def reporter_line(self) -> Optional[str]:
-        reporter_line = self._extractor.get_reporter_line()
-        return self.parse_reporter_line(reporter_line=reporter_line, warn=True)
+        return self._reporter_line.value
 
     @property
     def indicator(self) -> Optional[str]:
-        """Parses indicator from reporter"""
-        reporter_line = self.reporter_line
-        return self.parse_indicator(reporter_line=reporter_line, warn=True)
-
-    @property
-    def cre_line(self) -> Optional[str]:
-        """Parses cre_line from full_genotype"""
-        cre_line = self.parse_cre_line(full_genotype=self.full_genotype,
-                                       warn=True)
-        return cre_line
-
-    @property
-    def behavior_session_uuid(self) -> Optional[uuid.UUID]:
-        """Get the universally unique identifier (UUID)
-        """
-        data = self._behavior_stimulus_file
-        behavior_pkl_uuid = data.get("session_uuid")
-
-        behavior_session_id = self._extractor.get_behavior_session_id()
-        foraging_id = self._extractor.get_foraging_id()
-
-        # Sanity check to ensure that pkl file data matches up with
-        # the behavior session that the pkl file has been associated with.
-        assert_err_msg = (
-            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
-            f"behavior stimulus *.pkl file "
-            f"({self._extractor.get_behavior_stimulus_file()}) does "
-            f"does not match the foraging UUID ({foraging_id}) for "
-            f"behavior session: {behavior_session_id}")
-        assert behavior_pkl_uuid == foraging_id, assert_err_msg
-
-        if behavior_pkl_uuid is None:
-            bs_uuid = None
-        else:
-            bs_uuid = uuid.UUID(behavior_pkl_uuid)
-        return bs_uuid
-
-    @property
-    def driver_line(self) -> List[str]:
-        return sorted(self._extractor.get_driver_line())
-
-    @property
-    def mouse_id(self) -> int:
-        return self._extractor.get_mouse_id()
+        return self._reporter_line.indicator
 
     @property
     def full_genotype(self) -> str:
-        return self._extractor.get_full_genotype()
+        return self._full_genotype.value
+
+    @property
+    def cre_line(self) -> Optional[str]:
+        return self._full_genotype.parse_cre_line(warn=True)
+
+    @property
+    def behavior_session_uuid(self) -> Optional[uuid.UUID]:
+        return self._behavior_session_uuid.value
+
+    @property
+    def driver_line(self) -> List[str]:
+        return self._driver_line.value
+
+    @property
+    def mouse_id(self) -> int:
+        return self._mouse_id.value
 
     @property
     def behavior_session_id(self) -> int:
-        return self._extractor.get_behavior_session_id()
+        return self._behavior_session_id.value
 
-    def get_extractor(self):
-        return self._extractor
-
-    @abc.abstractmethod
     def to_dict(self) -> dict:
         """Returns dict representation of all properties in class"""
         vars_ = vars(BehaviorMetadata)
         return self._get_properties(vars_=vars_)
 
-    @staticmethod
-    def _get_frame_rate(timestamps: np.ndarray):
-        return np.round(1 / np.mean(np.diff(timestamps)), 0)
+    def to_json(self) -> dict:
+        pass
 
-    @staticmethod
-    def parse_cre_line(full_genotype: str, warn=False) -> Optional[str]:
-        """
-        Parameters
-        ----------
-        full_genotype
-            formatted from LIMS, e.g.
-            Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt
-        warn
-            Whether to output warning if parsing fails
-
-        Returns
-        ----------
-        cre_line
-            just the Cre line, e.g. Vip-IRES-Cre, or None if not possible to
-            parse
-        """
-        if ';' not in full_genotype:
-            if warn:
-                warnings.warn('Unable to parse cre_line from full_genotype')
-            return None
-        return full_genotype.split(';')[0].replace('/wt', '')
-
-    @staticmethod
-    def parse_age_in_days(age: str, warn=False) -> Optional[int]:
-        """Converts the age code into a numeric days representation
-
-        Parameters
-        ----------
-        age
-            age code, ie P123
-        warn
-            Whether to output warning if parsing fails
-        """
-        if not age.startswith('P'):
-            if warn:
-                warnings.warn('Could not parse numeric age from age code '
-                              '(age code does not start with "P")')
-            return None
-
-        match = re.search(r'\d+', age)
-
-        if match is None:
-            if warn:
-                warnings.warn('Could not parse numeric age from age code '
-                              '(no numeric values found in age code)')
-            return None
-
-        start, end = match.span()
-        return int(age[start:end])
-
-    @staticmethod
-    def parse_reporter_line(reporter_line: Optional[List[str]],
-                            warn=False) -> Optional[str]:
-        """There can be multiple reporter lines, so it is returned from LIMS
-        as a list. But there shouldn't be more than 1 for behavior. This
-        tries to convert to str
-
-        Parameters
-        ----------
-        reporter_line
-            List of reporter line
-        warn
-            Whether to output warnings if parsing fails
-
-        Returns
-        ---------
-        single reporter line, or None if not possible
-        """
-        if reporter_line is None:
-            if warn:
-                warnings.warn('Error parsing reporter line. It is null.')
-            return None
-
-        if len(reporter_line) == 0:
-            if warn:
-                warnings.warn('Error parsing reporter line. '
-                              'The array is empty')
-            return None
-
-        if isinstance(reporter_line, str):
-            return reporter_line
-
-        if len(reporter_line) > 1:
-            if warn:
-                warnings.warn('More than 1 reporter line. Returning the first '
-                              'one')
-
-        return reporter_line[0]
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        pass
 
     def _get_properties(self, vars_: dict):
         """Returns all property names and values"""
@@ -425,29 +381,3 @@ class BehaviorMetadata:
             except AssertionError:
                 return False
         return True
-
-    @staticmethod
-    def parse_indicator(reporter_line: Optional[str], warn=False) -> Optional[
-            str]:
-        """Parses indicator from reporter"""
-        reporter_substring_indicator_map = {
-            'GCaMP6f': 'GCaMP6f',
-            'GC6f': 'GCaMP6f',
-            'GCaMP6s': 'GCaMP6s'
-        }
-        if reporter_line is None:
-            if warn:
-                warnings.warn(
-                    'Could not parse indicator from reporter because '
-                    'there is no reporter')
-            return None
-
-        for substr, indicator in reporter_substring_indicator_map.items():
-            if substr in reporter_line:
-                return indicator
-
-        if warn:
-            warnings.warn(
-                'Could not parse indicator from reporter because none'
-                'of the expected substrings were found in the reporter')
-        return None

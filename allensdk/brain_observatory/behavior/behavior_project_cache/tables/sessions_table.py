@@ -13,7 +13,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .project_table import \
     ProjectTable
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
 

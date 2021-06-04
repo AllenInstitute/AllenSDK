@@ -24,19 +24,6 @@ class DataObject(abc.ABC):
     def value(self) -> Any:
         return self._value
 
-    @classmethod
-    @abc.abstractmethod
-    def from_json(cls, dict_repr: dict) -> "DataObject":  # pragma: no cover
-        """Populates a DataFile from a JSON compatible dict (likely parsed by
-        argschema)
-
-        Returns
-        -------
-        DataObject:
-            An instantiated DataObject which has `name` and `value` properties
-        """
-        raise NotImplementedError()
-
     @abc.abstractmethod
     def to_json(self) -> dict:  # pragma: no cover
         """Given an already populated DataObject, return the dict that
@@ -48,20 +35,6 @@ class DataObject(abc.ABC):
         dict:
             The JSON (in dict form) that would produce the DataObject.
         """
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def from_lims(cls) -> "DataObject":  # pragma: no cover
-        """Populate a DataObject from an internal database (likely LIMS)
-
-        Returns
-        -------
-        DataObject:
-            An instantiated DataObject which has `name` and `value` properties
-        """
-        # Example:
-        # return cls(name="my_data_object", value=42)
         raise NotImplementedError()
 
     @classmethod

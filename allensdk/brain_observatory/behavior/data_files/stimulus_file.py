@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 from pathlib import Path
 
 from cachetools import cached, LRUCache
@@ -10,7 +10,6 @@ import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.data_files import DataFile
-
 
 # Query returns path to StimulusPickle file for given behavior session
 STIMULUS_FILE_QUERY_TEMPLATE = """

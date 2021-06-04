@@ -117,8 +117,8 @@ class RunningAcquisition(DataObject):
     ) -> "RunningAcquisition":
 
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_lims(
-            db, behavior_session_id, ophys_experiment_id
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
         )
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,

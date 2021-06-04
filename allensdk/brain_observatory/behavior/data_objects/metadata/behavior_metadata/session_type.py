@@ -1,0 +1,49 @@
+from pynwb import NWBFile
+
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
+    .stimulus_file_readable_mixin \
+    import \
+    StimulusFileReadableMixin
+
+
+class SessionType(DataObject, StimulusFileReadableMixin):
+    """the stimulus set used"""
+    def __init__(self, session_type: str):
+        super().__init__(name="session_type", value=session_type)
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> None:
+        raise NotImplementedError()
+
+    def to_json(self) -> dict:
+        return {"sex": self.value}
+
+    @classmethod
+    def from_lims(cls) -> None:
+        raise NotImplementedError()
+
+    @classmethod
+    def from_stimulus_file(
+            cls,
+            stimulus_file: StimulusFile) -> "SessionType":
+        try:
+            stimulus_name = \
+                stimulus_file.data["items"]["behavior"]["cl_params"]["stage"]
+        except KeyError:
+            raise RuntimeError(
+                f"Could not obtain stimulus_name/stage information from "
+                f"the *.pkl file ({stimulus_file.filepath}) "
+                f"for the behavior session to save as NWB! The "
+                f"following series of nested keys did not work: "
+                f"['items']['behavior']['cl_params']['stage']"
+            )
+        return cls(session_type=stimulus_name)
+
+    @classmethod
+    def from_nwb(cls, nwbfile: NWBFile) -> "SessionType":
+        pass
+
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        pass

@@ -8,7 +8,8 @@ import pytest
 import pytz
 
 from allensdk import OneResultExpectedError
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (

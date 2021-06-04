@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import pytz
 
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import (
     description_dict, get_task_parameters, get_expt_description,
     BehaviorMetadata)
 

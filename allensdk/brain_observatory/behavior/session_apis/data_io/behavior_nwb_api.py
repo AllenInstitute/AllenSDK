@@ -9,7 +9,8 @@ import pytz
 from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import (
     get_expt_description, BehaviorMetadata
 )
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
