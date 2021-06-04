@@ -1,4 +1,6 @@
 import math
+import pickle
+import tempfile
 from datetime import datetime
 from uuid import UUID
 
@@ -8,9 +10,16 @@ import pytest
 import pytz
 
 from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_session_uuid import \
+    BehaviorSessionUUID
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
@@ -152,7 +161,12 @@ def MockBehaviorLimsApi():
                 "session_uuid": '138531ab-fe59-4523-9154-07c8d97bbe03',
                 "start_time": datetime(2019, 9, 26, 9),
             }
-            return data
+            with tempfile.NamedTemporaryFile('wb') as f:
+                pickle.dump(data, f)
+                f.seek(0)
+                file = StimulusFile.from_json(
+                    dict_repr={'behavior_stimulus_file': f.name})
+            return file
 
         def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
@@ -224,24 +238,16 @@ def test_get_behavior_session_uuid(MockBehaviorLimsApi, monkeypatch):
                     '__init__',
                     dummy_init)
         stimulus_file = MockBehaviorLimsApi._behavior_stimulus_file()
-        metadata = BehaviorMetadata(
-            extractor=MockBehaviorLimsApi.extractor,
-            behavior_stimulus_file=stimulus_file)
+        uuid = BehaviorSessionUUID.from_stimulus_file(
+            stimulus_file=stimulus_file)
 
     expected = UUID('138531ab-fe59-4523-9154-07c8d97bbe03')
-    assert expected == metadata.behavior_session_uuid
+    assert expected == uuid.value
 
 
 def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
     api = MockBehaviorLimsApi
     assert 62.0 == api.get_stimulus_frame_rate()
-
-
-def test_get_date_of_acquisition(MockBehaviorLimsApi):
-    api = MockBehaviorLimsApi
-    expected = datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    actual = api.get_metadata().date_of_acquisition
-    assert expected == actual
 
 
 def test_get_running_speed(MockBehaviorLimsApi):
