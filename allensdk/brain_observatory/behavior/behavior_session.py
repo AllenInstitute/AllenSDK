@@ -9,8 +9,8 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
-    .internal_mixed_readable_interface import \
-    InternalMixedReadableInterface
+    .internal_readable_interface import \
+    InternalReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.nwb_writable_interface import \
     NwbWritableInterface
@@ -37,7 +37,7 @@ from allensdk.internal.api import db_connection_creator
 BehaviorDataApi = Type[BehaviorBase]
 
 
-class BehaviorSession(DataObject, InternalMixedReadableInterface,
+class BehaviorSession(DataObject, InternalReadableInterface,
                       NwbWritableInterface, LazyPropertyMixin):
     def __init__(
         self, api: Optional[BehaviorDataApi] = None,
