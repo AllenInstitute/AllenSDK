@@ -3,13 +3,13 @@ import uuid
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ForagingId(DataObject, LimsReadableMixin):
+class ForagingId(DataObject, LimsReadableInterface):
     """Foraging id"""
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)
@@ -38,7 +38,4 @@ class ForagingId(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ForagingId":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         pass

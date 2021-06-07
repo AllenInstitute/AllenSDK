@@ -3,14 +3,14 @@ from typing import List
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class DriverLine(DataObject, LimsReadableMixin):
+class DriverLine(DataObject, LimsReadableInterface):
     """the genotype name(s) of the driver line(s)"""
     def __init__(self, driver_line: List[str]):
         super().__init__(name="driver_line", value=driver_line)

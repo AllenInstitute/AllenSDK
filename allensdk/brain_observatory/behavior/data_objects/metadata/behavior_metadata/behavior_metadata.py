@@ -8,13 +8,13 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     StimulusTimestamps, BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .internal_mixed_readable_mixin \
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .internal_mixed_readable_interface \
     import \
-    InternalMixedReadableMixin
-from allensdk.brain_observatory.behavior.data_objects._base.writable_mixins\
-    .nwb_writable_mixin import \
-    NwbWritableMixin
+    InternalMixedReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base.writable_interfaces\
+    .nwb_writable_interface import \
+    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
@@ -178,8 +178,8 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
-                       NwbWritableMixin):
+class BehaviorMetadata(DataObject, InternalMixedReadableInterface,
+                       NwbWritableInterface):
     """Container class for behavior metadata"""
     def __init__(self,
                  behavior_session_id: BehaviorSessionId,

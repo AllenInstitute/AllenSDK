@@ -3,9 +3,9 @@ from pynwb import NWBFile
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
@@ -14,7 +14,7 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
 
-class BehaviorSessionId(DataObject, LimsReadableMixin):
+class BehaviorSessionId(DataObject, LimsReadableInterface):
     def __init__(self, behavior_session_id: int):
         super().__init__(name="behavior_session_id", value=behavior_session_id)
 

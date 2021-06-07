@@ -5,7 +5,7 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
-class NwbWritableMixin:
+class NwbWritableInterface(abc.ABC):
     """Marks a data object as writable to NWB"""
     @classmethod
     @abc.abstractmethod

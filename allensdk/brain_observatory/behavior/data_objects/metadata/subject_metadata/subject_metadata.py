@@ -4,12 +4,12 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
-from allensdk.brain_observatory.behavior.data_objects._base.writable_mixins\
-    .nwb_writable_mixin import \
-    NwbWritableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base.writable_interfaces\
+    .nwb_writable_interface import \
+    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.age import \
     Age
@@ -33,8 +33,8 @@ from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class SubjectMetadata(DataObject, LimsReadableMixin,
-                       NwbWritableMixin):
+class SubjectMetadata(DataObject, LimsReadableInterface,
+                      NwbWritableInterface):
     """Subject metadata"""
     def __init__(self,
                  sex: Sex,

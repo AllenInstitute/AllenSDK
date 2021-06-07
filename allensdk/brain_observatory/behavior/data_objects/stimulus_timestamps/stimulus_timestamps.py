@@ -8,17 +8,20 @@ import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .stimulus_file_readable_mixin \
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .stimulus_file_readable_interface \
     import \
-    StimulusFileReadableMixin
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .sync_file_readable_mixin import \
-    SyncFileReadableMixin
+    StimulusFileReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .sync_file_readable_interface import \
+    SyncFileReadableInterface
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
 )
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.nwb_writable_interface import \
+    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.stimulus_timestamps.timestamps_processing import (  # noqa: E501
     get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps
 )
@@ -35,8 +38,8 @@ def from_lims_cache_key(
     return hashkey(behavior_session_id, ophys_experiment_id)
 
 
-class StimulusTimestamps(DataObject, StimulusFileReadableMixin,
-                         SyncFileReadableMixin):
+class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
+                         SyncFileReadableInterface, NwbWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 

@@ -3,12 +3,13 @@ import abc
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
-class LimsReadableMixin:
-    """Marks a data object as readable from LIMS"""
+class InternalMixedReadableInterface(abc.ABC):
+    """Marks a data object as readable from a variety of internal data sources
+    """
     @classmethod
     @abc.abstractmethod
-    def from_lims(cls, *args) -> "DataObject":  # pragma: no cover
-        """Populate a DataObject from an internal database (likely LIMS)
+    def from_onprem(cls, *args) -> "DataObject":  # pragma: no cover
+        """Populate a DataObject from various on-prem data sources
 
         Returns
         -------

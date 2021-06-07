@@ -1,13 +1,13 @@
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class Sex(DataObject, LimsReadableMixin):
+class Sex(DataObject, LimsReadableInterface):
     """sex of the animal (M/F)"""
     def __init__(self, sex: str):
         super().__init__(name="sex", value=sex)

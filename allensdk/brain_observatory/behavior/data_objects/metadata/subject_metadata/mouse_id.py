@@ -1,13 +1,13 @@
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class MouseId(DataObject, LimsReadableMixin):
+class MouseId(DataObject, LimsReadableInterface):
     """the LabTracks ID"""
     def __init__(self, mouse_id: int):
         super().__init__(name="mouse_id", value=mouse_id)

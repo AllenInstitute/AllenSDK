@@ -10,6 +10,9 @@ import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.nwb_writable_interface import \
+    NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import (
     DataObject, StimulusTimestamps
@@ -37,7 +40,7 @@ def from_lims_cache_key(
     )
 
 
-class RunningAcquisition(DataObject):
+class RunningAcquisition(DataObject, NwbWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running acquisition data.
 

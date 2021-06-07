@@ -2,13 +2,13 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .stimulus_file_readable_mixin \
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .stimulus_file_readable_interface \
     import \
-    StimulusFileReadableMixin
+    StimulusFileReadableInterface
 
 
-class SessionType(DataObject, StimulusFileReadableMixin):
+class SessionType(DataObject, StimulusFileReadableInterface):
     """the stimulus set used"""
     def __init__(self, session_type: str):
         super().__init__(name="session_type", value=session_type)

@@ -6,13 +6,13 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class DateOfAcquisition(DataObject, LimsReadableMixin):
+class DateOfAcquisition(DataObject, LimsReadableInterface):
     """timestamp for when experiment was started in UTC"""
     def __init__(self, date_of_acquisition: float):
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)

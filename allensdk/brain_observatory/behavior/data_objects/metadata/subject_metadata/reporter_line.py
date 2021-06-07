@@ -4,14 +4,14 @@ from typing import Optional, List
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
-    .lims_readable_mixin import \
-    LimsReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
+    .lims_readable_interface import \
+    LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class ReporterLine(DataObject, LimsReadableMixin):
+class ReporterLine(DataObject, LimsReadableInterface):
     """the genotype name(s) of the reporter line(s)"""
     def __init__(self, reporter_line: Optional[str]):
         super().__init__(name="reporter_line", value=reporter_line)
@@ -47,9 +47,6 @@ class ReporterLine(DataObject, LimsReadableMixin):
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ReporterLine":
         return cls(reporter_line=nwbfile.subject.reporter_line)
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
 
     @staticmethod
     def _parse(reporter_line: Optional[List[str]],
