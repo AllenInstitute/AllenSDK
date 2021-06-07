@@ -1,7 +1,6 @@
-import abc
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 import re
 import numpy as np
 from pynwb import NWBFile
@@ -17,17 +16,11 @@ from allensdk.brain_observatory.behavior.data_objects._base.writable_mixins\
     .nwb_writable_mixin import \
     NwbWritableMixin
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.age import \
-    Age
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.driver_line import \
-    DriverLine
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment_name import \
     EquipmentName
@@ -35,26 +28,13 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.foraging_id import \
     ForagingId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.full_genotype import \
-    FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.mouse_id import \
-    MouseId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.reporter_line import \
-    ReporterLine
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.session_type import \
     SessionType
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.sex import \
-    Sex
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
 from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema, \
-    CompleteOphysBehaviorMetadataSchema, BehaviorMetadataSchema, \
-    OphysBehaviorMetadataSchema
+    BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 from allensdk.internal.api import PostgresQueryMixin
@@ -204,29 +184,17 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
     def __init__(self,
                  behavior_session_id: BehaviorSessionId,
                  equipment_name: EquipmentName,
-                 sex: Sex,
-                 age: Age,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
                  date_of_acquisition: DateOfAcquisition,
-                 reporter_line: ReporterLine,
-                 full_genotype: FullGenotype,
-                 behavior_session_uuid: BehaviorSessionUUID,
-                 driver_line: DriverLine,
-                 mouse_id: MouseId):
+                 behavior_session_uuid: BehaviorSessionUUID):
         super().__init__(name='behavior_metadata', value=self)
         self._behavior_session_id = behavior_session_id
         self._equipment_name = equipment_name
-        self._sex = sex
-        self._age = age
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
         self._date_of_acquisition = date_of_acquisition
-        self._reporter_line = reporter_line
-        self._full_genotype = full_genotype
         self._behavior_session_uuid = behavior_session_uuid
-        self._driver_line = driver_line
-        self._mouse_id = mouse_id
 
         self._exclude_from_equals = set()
 
@@ -240,10 +208,6 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
         ) -> "BehaviorMetadata":
         equipment_name = EquipmentName.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
-        sex = Sex.from_lims(behavior_session_id=behavior_session_id.value,
-                            lims_db=lims_db)
-        age = Age.from_lims(behavior_session_id=behavior_session_id.value,
-                            lims_db=lims_db)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_timestamps=stimulus_timestamps)
         session_type = SessionType.from_stimulus_file(
@@ -252,10 +216,6 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)\
             .validate(stimulus_file=stimulus_file,
                       behavior_session_id=behavior_session_id.value)
-        reporter_line = ReporterLine.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
-        full_genotype = FullGenotype.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
         foraging_id = ForagingId.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
@@ -264,25 +224,14 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
             .validate(behavior_session_id=behavior_session_id.value,
                                        foraging_id=foraging_id.value,
                                        stimulus_file=stimulus_file)
-        driver_line = DriverLine.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
-        mouse_id = MouseId.from_lims(
-            behavior_session_id=behavior_session_id.value,
-                                     lims_db=lims_db)
 
         return cls(
             behavior_session_id=behavior_session_id,
             equipment_name=equipment_name,
-            sex=sex,
-            age=age,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             date_of_acquisition=date_of_acquisition,
-            reporter_line=reporter_line,
-            full_genotype=full_genotype,
             behavior_session_uuid=behavior_session_uuid,
-            driver_line=driver_line,
-            mouse_id=mouse_id
         )
 
     @classmethod
@@ -293,43 +242,23 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile=nwbfile)
         equipment_name = EquipmentName.from_nwb(nwbfile=nwbfile)
-        mouse_id = MouseId.from_nwb(nwbfile=nwbfile)
-        sex = Sex.from_nwb(nwbfile=nwbfile)
-        age = Age.from_nwb(nwbfile=nwbfile)
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
-        reporter_line = ReporterLine.from_nwb(nwbfile=nwbfile)
-        driver_line = DriverLine.from_nwb(nwbfile=nwbfile)
-        genotype = FullGenotype.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
         return cls(
             behavior_session_id=behavior_session_id,
             equipment_name=equipment_name,
-            sex=sex,
-            age=age,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             date_of_acquisition=date_of_acquisition,
-            reporter_line=reporter_line,
-            full_genotype=genotype,
-            behavior_session_uuid=session_uuid,
-            driver_line=driver_line,
-            mouse_id=mouse_id
+            behavior_session_uuid=session_uuid
         )
 
     @property
     def equipment_name(self) -> str:
         return self._equipment_name.value
-
-    @property
-    def sex(self) -> str:
-        return self._sex.value
-
-    @property
-    def age_in_days(self) -> Optional[int]:
-        return self._age.value
 
     @property
     def stimulus_frame_rate(self) -> float:
@@ -344,32 +273,8 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
         return self._date_of_acquisition.value
 
     @property
-    def reporter_line(self) -> Optional[str]:
-        return self._reporter_line.value
-
-    @property
-    def indicator(self) -> Optional[str]:
-        return self._reporter_line.indicator
-
-    @property
-    def full_genotype(self) -> str:
-        return self._full_genotype.value
-
-    @property
-    def cre_line(self) -> Optional[str]:
-        return self._full_genotype.parse_cre_line(warn=True)
-
-    @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:
         return self._behavior_session_uuid.value
-
-    @property
-    def driver_line(self) -> List[str]:
-        return self._driver_line.value
-
-    @property
-    def mouse_id(self) -> int:
-        return self._mouse_id.value
 
     @property
     def behavior_session_id(self) -> int:
@@ -384,30 +289,9 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
         pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
-                                               'ndx-aibs-behavior-ophys')
-        nwb_subject = BehaviorSubject(
-            description="A visual behavior subject with a LabTracks ID",
-            age=Age.to_iso8601(age=self.age_in_days),
-            driver_line=self.driver_line,
-            genotype=self.full_genotype,
-            subject_id=str(self.mouse_id),
-            reporter_line=self.reporter_line,
-            sex=self.sex,
-            species='Mus musculus')
-        nwbfile.subject = nwb_subject
-
-        nwb_metadata = self._to_nwb()
-        extension = self._get_nwb_extension()
-        nwb_metadata = extension(**nwb_metadata)
-        nwbfile.add_lab_meta_data(nwb_metadata)
-
-        return nwbfile
-
-    @abc.abstractmethod
-    def _to_nwb(self) -> dict:
-        """Constructs data structure for non-subject metadata"""
-        return dict(
+        extension = load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
+        nwb_metadata = extension(
             name='metadata',
             behavior_session_id=self.behavior_session_id,
             behavior_session_uuid=str(self.behavior_session_uuid),
@@ -415,11 +299,9 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
             session_type=self.session_type,
             equipment_name=self.equipment_name
         )
+        nwbfile.add_lab_meta_data(nwb_metadata)
 
-    @staticmethod
-    def _get_nwb_extension():
-        return load_pynwb_extension(BehaviorMetadataSchema,
-                                                'ndx-aibs-behavior-ophys')
+        return nwbfile
 
     def _get_properties(self, vars_: dict):
         """Returns all property names and values"""
