@@ -32,10 +32,9 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSessionUUID":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        metadata = nwbfile.lab_meta_data['metadata']
+        id = uuid.UUID(metadata.behavior_session_uuid)
+        return cls(behavior_session_uuid=id)
 
     def validate(self, behavior_session_id: int,
                  foraging_id: int,

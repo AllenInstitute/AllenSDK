@@ -46,7 +46,7 @@ class ReporterLine(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ReporterLine":
-        pass
+        return cls(reporter_line=nwbfile.subject.reporter_line)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         pass

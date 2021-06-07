@@ -30,7 +30,5 @@ class EquipmentName(DataObject):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "EquipmentName":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        metadata = nwbfile.lab_meta_data['metadata']
+        return cls(equipment_name=metadata.equipment_name)

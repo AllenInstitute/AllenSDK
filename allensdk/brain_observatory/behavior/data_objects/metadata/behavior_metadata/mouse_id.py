@@ -38,8 +38,5 @@ class MouseId(DataObject, LimsReadableMixin):
         return cls(mouse_id=mouse_id)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "EquipmentName":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+    def from_nwb(cls, nwbfile: NWBFile) -> "MouseId":
+        return cls(mouse_id=int(nwbfile.subject.subject_id))

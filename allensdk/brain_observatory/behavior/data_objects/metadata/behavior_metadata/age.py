@@ -38,7 +38,8 @@ class Age(DataObject):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Age":
-        pass
+        age = cls._age_code_to_days(age=nwbfile.subject.age)
+        return cls(age=age)
 
     @staticmethod
     def to_iso8601(age: int):

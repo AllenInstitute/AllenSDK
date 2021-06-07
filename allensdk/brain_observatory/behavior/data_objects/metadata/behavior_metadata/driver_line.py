@@ -45,7 +45,5 @@ class DriverLine(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DriverLine":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        driver_line = sorted(list(nwbfile.subject.driver_line))
+        return cls(driver_line=driver_line)

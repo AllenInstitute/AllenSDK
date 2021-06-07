@@ -36,10 +36,7 @@ class DateOfAcquisition(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        return cls(date_of_acquisition=nwbfile.session_start_time)
 
     def validate(self, stimulus_file: StimulusFile,
                  behavior_session_id: int) -> "DateOfAcquisition":

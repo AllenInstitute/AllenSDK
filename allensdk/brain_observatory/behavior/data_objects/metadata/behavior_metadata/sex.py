@@ -33,8 +33,5 @@ class Sex(DataObject, LimsReadableMixin):
         return cls(sex=sex)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "EquipmentName":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+    def from_nwb(cls, nwbfile: NWBFile) -> "Sex":
+        return cls(sex=nwbfile.subject.sex)

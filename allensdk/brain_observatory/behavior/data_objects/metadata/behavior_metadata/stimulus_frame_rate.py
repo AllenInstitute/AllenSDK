@@ -25,7 +25,5 @@ class StimulusFrameRate(DataObject, StimulusFileReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "StimulusFrameRate":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        metadata = nwbfile.lab_meta_data['metadata']
+        return cls(stimulus_frame_rate=metadata.stimulus_frame_rate)

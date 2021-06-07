@@ -53,7 +53,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
 from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema, \
-    CompleteOphysBehaviorMetadataSchema, BehaviorMetadataSchema
+    CompleteOphysBehaviorMetadataSchema, BehaviorMetadataSchema, \
+    OphysBehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 from allensdk.internal.api import PostgresQueryMixin
@@ -290,7 +291,33 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
-        pass
+        behavior_session_id = BehaviorSessionId.from_nwb(nwbfile=nwbfile)
+        equipment_name = EquipmentName.from_nwb(nwbfile=nwbfile)
+        mouse_id = MouseId.from_nwb(nwbfile=nwbfile)
+        sex = Sex.from_nwb(nwbfile=nwbfile)
+        age = Age.from_nwb(nwbfile=nwbfile)
+        stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
+        session_type = SessionType.from_nwb(nwbfile=nwbfile)
+        reporter_line = ReporterLine.from_nwb(nwbfile=nwbfile)
+        driver_line = DriverLine.from_nwb(nwbfile=nwbfile)
+        genotype = FullGenotype.from_nwb(nwbfile=nwbfile)
+        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
+        session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
+
+        return cls(
+            behavior_session_id=behavior_session_id,
+            equipment_name=equipment_name,
+            sex=sex,
+            age=age,
+            stimulus_frame_rate=stimulus_frame_rate,
+            session_type=session_type,
+            date_of_acquisition=date_of_acquisition,
+            reporter_line=reporter_line,
+            full_genotype=genotype,
+            behavior_session_uuid=session_uuid,
+            driver_line=driver_line,
+            mouse_id=mouse_id
+        )
 
     @property
     def equipment_name(self) -> str:

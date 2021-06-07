@@ -44,14 +44,5 @@ class BehaviorSessionId(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSessionId":
-        # TODO:
-        # This implementation will be wrong when trying to get
-        # behavior session id for an ophys experiment.
-        # Will need to revisit.
-        return cls(behavior_session_id=int(nwbfile.identifier))
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        # TODO:
-        # Likely need to have some yet to be determined interaction with
-        # the out-of-scope `metadata` DataObject
-        raise NotImplementedError
+        metadata = nwbfile.lab_meta_data['metadata']
+        return cls(behavior_session_id=metadata.behavior_session_id)

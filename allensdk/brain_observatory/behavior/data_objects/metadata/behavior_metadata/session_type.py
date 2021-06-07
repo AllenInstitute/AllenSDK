@@ -43,7 +43,5 @@ class SessionType(DataObject, StimulusFileReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "SessionType":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        metadata = nwbfile.lab_meta_data['metadata']
+        return cls(session_type=metadata.session_type)

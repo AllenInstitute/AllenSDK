@@ -23,10 +23,6 @@ class FullGenotype(DataObject, LimsReadableMixin):
         return {"sex": self.value}
 
     @classmethod
-    def from_string(cls, full_genotype: str):
-        return cls(full_genotype=full_genotype)
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "FullGenotype":
         query = f"""
@@ -40,10 +36,7 @@ class FullGenotype(DataObject, LimsReadableMixin):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "FullGenotype":
-        pass
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        return cls(full_genotype=nwbfile.subject.genotype)
 
     def parse_cre_line(self, warn=False) -> Optional[str]:
         """
