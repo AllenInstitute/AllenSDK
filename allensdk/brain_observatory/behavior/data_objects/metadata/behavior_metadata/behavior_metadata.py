@@ -13,6 +13,9 @@ from allensdk.brain_observatory.behavior.data_objects._base.readable_mixins\
     .internal_mixed_readable_mixin \
     import \
     InternalMixedReadableMixin
+from allensdk.brain_observatory.behavior.data_objects._base.writable_mixins\
+    .nwb_writable_mixin import \
+    NwbWritableMixin
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.age import \
     Age
@@ -49,6 +52,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
+from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema, \
+    CompleteOphysBehaviorMetadataSchema, BehaviorMetadataSchema
+from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -191,7 +197,8 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata(DataObject, InternalMixedReadableMixin):
+class BehaviorMetadata(DataObject, InternalMixedReadableMixin,
+                       NwbWritableMixin):
     """Container class for behavior metadata"""
     def __init__(self,
                  behavior_session_id: BehaviorSessionId,
@@ -350,7 +357,42 @@ class BehaviorMetadata(DataObject, InternalMixedReadableMixin):
         pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
+                                               'ndx-aibs-behavior-ophys')
+        nwb_subject = BehaviorSubject(
+            description="A visual behavior subject with a LabTracks ID",
+            age=Age.to_iso8601(age=self.age_in_days),
+            driver_line=self.driver_line,
+            genotype=self.full_genotype,
+            subject_id=str(self.mouse_id),
+            reporter_line=self.reporter_line,
+            sex=self.sex,
+            species='Mus musculus')
+        nwbfile.subject = nwb_subject
+
+        nwb_metadata = self._to_nwb()
+        extension = self._get_nwb_extension()
+        nwb_metadata = extension(**nwb_metadata)
+        nwbfile.add_lab_meta_data(nwb_metadata)
+
+        return nwbfile
+
+    @abc.abstractmethod
+    def _to_nwb(self) -> dict:
+        """Constructs data structure for non-subject metadata"""
+        return dict(
+            name='metadata',
+            behavior_session_id=self.behavior_session_id,
+            behavior_session_uuid=str(self.behavior_session_uuid),
+            stimulus_frame_rate=self.stimulus_frame_rate,
+            session_type=self.session_type,
+            equipment_name=self.equipment_name
+        )
+
+    @staticmethod
+    def _get_nwb_extension():
+        return load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
 
     def _get_properties(self, vars_: dict):
         """Returns all property names and values"""

@@ -53,21 +53,3 @@ class DataObject(abc.ABC):
             An instantiated DataObject which has `name` and `value` properties
         """
         raise NotImplementedError()
-
-    @abc.abstractmethod
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:  # pragma: no cover
-        """Given an already populated DataObject, return an pyNWB file object
-        that had had DataObject data added.
-
-        Parameters
-        ----------
-        nwbfile : NWBFile
-            An NWB file object
-
-        Returns
-        -------
-        NWBFile
-            An NWB file object that has had data from the DataObject added
-            to it.
-        """
-        raise NotImplementedError()

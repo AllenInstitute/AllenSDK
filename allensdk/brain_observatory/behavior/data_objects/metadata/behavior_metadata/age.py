@@ -37,11 +37,14 @@ class Age(DataObject):
         return cls(age=age)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "EquipmentName":
+    def from_nwb(cls, nwbfile: NWBFile) -> "Age":
         pass
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+    @staticmethod
+    def to_iso8601(age: int):
+        if age is None:
+            return 'null'
+        return f'P{age}D'
 
     @staticmethod
     def _age_code_to_days(age: str, warn=False) -> Optional[int]:
