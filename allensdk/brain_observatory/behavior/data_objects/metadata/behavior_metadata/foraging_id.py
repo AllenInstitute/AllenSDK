@@ -9,10 +9,14 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
+class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface,
+                 JsonWritableInterface):
     """Foraging id"""
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)
@@ -41,4 +45,4 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ForagingId":
-        pass
+        raise NotImplementedError('Foraging id is not stored in NWB')

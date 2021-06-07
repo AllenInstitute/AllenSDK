@@ -10,11 +10,15 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface):
+class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
+                   JsonWritableInterface):
     """the genotype name(s) of the reporter line(s)"""
     def __init__(self, reporter_line: Optional[str]):
         super().__init__(name="reporter_line", value=reporter_line)

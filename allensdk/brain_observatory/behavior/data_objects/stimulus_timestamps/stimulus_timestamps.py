@@ -20,6 +20,9 @@ from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
 )
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.nwb_writable_interface import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.stimulus_timestamps.timestamps_processing import (  # noqa: E501
@@ -39,7 +42,8 @@ def from_lims_cache_key(
 
 
 class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
-                         SyncFileReadableInterface, NwbWritableInterface):
+                         SyncFileReadableInterface, NwbWritableInterface,
+                         JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 

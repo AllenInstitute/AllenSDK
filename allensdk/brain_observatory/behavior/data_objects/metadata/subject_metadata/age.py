@@ -11,10 +11,14 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base\
     .readable_interfaces.lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class Age(DataObject, JsonReadableInterface, LimsReadableInterface):
+class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
+          JsonWritableInterface):
     """Age of animal (in days)"""
     def __init__(self, age: int):
         super().__init__(name="age_in_days", value=age)

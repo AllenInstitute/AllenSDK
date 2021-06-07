@@ -9,6 +9,9 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
@@ -18,7 +21,8 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
 
 
 class BehaviorSessionId(DataObject, LimsReadableInterface,
-                        JsonReadableInterface):
+                        JsonReadableInterface,
+                        JsonWritableInterface):
     def __init__(self, behavior_session_id: int):
         super().__init__(name="behavior_session_id", value=behavior_session_id)
 

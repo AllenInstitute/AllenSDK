@@ -12,6 +12,12 @@ from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .internal_readable_interface import \
     InternalReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.nwb_writable_interface import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -38,7 +44,9 @@ BehaviorDataApi = Type[BehaviorBase]
 
 
 class BehaviorSession(DataObject, InternalReadableInterface,
-                      NwbWritableInterface, LazyPropertyMixin):
+                      JsonReadableInterface, NwbWritableInterface,
+                      JsonWritableInterface,
+                      LazyPropertyMixin):
     def __init__(
         self, api: Optional[BehaviorDataApi] = None,
         behavior_session_id: BehaviorSessionId = None,
@@ -93,8 +101,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
 
     @classmethod
-    def from_internal_mixed(cls,
-                            behavior_session_id: int) -> "BehaviorSession":
+    def from_internal(cls, behavior_session_id: int) -> "BehaviorSession":
         lims_db = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         )
@@ -114,7 +121,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         running_speed = RunningSpeed.from_lims(
             lims_db, behavior_session_id.value
         )
-        behavior_metadata = BehaviorMetadata.from_internal_mixed(
+        behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps

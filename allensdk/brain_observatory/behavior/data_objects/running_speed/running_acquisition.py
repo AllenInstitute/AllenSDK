@@ -11,6 +11,12 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.lims_readable_interface import \
+    LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.nwb_writable_interface import \
     NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
@@ -40,7 +46,8 @@ def from_lims_cache_key(
     )
 
 
-class RunningAcquisition(DataObject, NwbWritableInterface):
+class RunningAcquisition(DataObject, LimsReadableInterface,
+                         NwbWritableInterface, JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running acquisition data.
 

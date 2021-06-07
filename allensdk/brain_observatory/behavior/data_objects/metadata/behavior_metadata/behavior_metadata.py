@@ -12,6 +12,12 @@ from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .internal_readable_interface \
     import \
     InternalReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.writable_interfaces\
     .nwb_writable_interface import \
     NwbWritableInterface
@@ -179,6 +185,8 @@ def get_task_parameters(data: Dict) -> Dict:
 
 
 class BehaviorMetadata(DataObject, InternalReadableInterface,
+                       JsonReadableInterface,
+                       JsonWritableInterface,
                        NwbWritableInterface):
     """Container class for behavior metadata"""
     def __init__(self,
@@ -199,7 +207,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         self._exclude_from_equals = set()
 
     @classmethod
-    def from_internal_mixed(
+    def from_internal(
             cls,
             behavior_session_id: BehaviorSessionId,
             stimulus_file: StimulusFile,

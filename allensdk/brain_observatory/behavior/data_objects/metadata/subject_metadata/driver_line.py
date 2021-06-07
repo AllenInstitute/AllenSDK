@@ -9,11 +9,15 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface):
+class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
+                 JsonWritableInterface):
     """the genotype name(s) of the driver line(s)"""
     def __init__(self, driver_line: List[str]):
         super().__init__(name="driver_line", value=driver_line)

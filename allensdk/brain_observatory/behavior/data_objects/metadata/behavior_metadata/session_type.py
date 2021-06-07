@@ -13,9 +13,6 @@ class SessionType(DataObject, StimulusFileReadableInterface):
     def __init__(self, session_type: str):
         super().__init__(name="session_type", value=session_type)
 
-    def to_json(self) -> dict:
-        return {"sex": self.value}
-
     @classmethod
     def from_stimulus_file(
             cls,

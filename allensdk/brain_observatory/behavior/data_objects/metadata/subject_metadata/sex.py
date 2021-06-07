@@ -7,10 +7,14 @@ from allensdk.brain_observatory.behavior.data_objects._base\
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .writable_interfaces.json_writable_interface import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class Sex(DataObject, LimsReadableInterface, JsonReadableInterface):
+class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
+          JsonWritableInterface):
     """sex of the animal (M/F)"""
     def __init__(self, sex: str):
         super().__init__(name="sex", value=sex)

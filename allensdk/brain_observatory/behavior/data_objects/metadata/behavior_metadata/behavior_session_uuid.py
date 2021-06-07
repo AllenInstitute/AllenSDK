@@ -5,26 +5,15 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects._base\
-    .readable_interfaces.json_readable_interface import \
-    JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .stimulus_file_readable_interface import \
     StimulusFileReadableInterface
 
 
-class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
-                          JsonReadableInterface):
+class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface):
     """the universally unique identifier (UUID)"""
     def __init__(self, behavior_session_uuid: Optional[uuid.UUID]):
         super().__init__(name="behavior_session_uuid", value=behavior_session_uuid)
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "BehaviorSessionUUID":
-        pass
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_stimulus_file(

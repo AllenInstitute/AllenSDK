@@ -13,9 +13,6 @@ class StimulusFrameRate(DataObject, StimulusFileReadableInterface):
     def __init__(self, stimulus_frame_rate: float):
         super().__init__(name="stimulus_frame_rate", value=stimulus_frame_rate)
 
-    def to_json(self) -> dict:
-        return {"stimulus_frame_rate": self.value}
-
     @classmethod
     def from_stimulus_file(
             cls,

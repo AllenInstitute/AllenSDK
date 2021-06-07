@@ -24,19 +24,6 @@ class DataObject(abc.ABC):
     def value(self) -> Any:
         return self._value
 
-    @abc.abstractmethod
-    def to_json(self) -> dict:  # pragma: no cover
-        """Given an already populated DataObject, return the dict that
-        when used with the `from_json()` classmethod would produce the same
-        DataObject
-
-        Returns
-        -------
-        dict:
-            The JSON (in dict form) that would produce the DataObject.
-        """
-        raise NotImplementedError()
-
     @classmethod
     @abc.abstractmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DataObject":  # pragma: no cover
