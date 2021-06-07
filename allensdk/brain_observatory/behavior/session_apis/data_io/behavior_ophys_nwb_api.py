@@ -11,7 +11,8 @@ from hdmf.backends.hdf5 import H5DataIO
 
 from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.behavior_ophys_metadata \
     import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array

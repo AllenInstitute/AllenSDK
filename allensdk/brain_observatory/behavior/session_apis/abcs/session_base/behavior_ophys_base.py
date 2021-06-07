@@ -4,7 +4,8 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.behavior_ophys_metadata \
     import BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
