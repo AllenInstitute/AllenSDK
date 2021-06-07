@@ -3,13 +3,16 @@ import uuid
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ForagingId(DataObject, LimsReadableInterface):
+class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
     """Foraging id"""
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)

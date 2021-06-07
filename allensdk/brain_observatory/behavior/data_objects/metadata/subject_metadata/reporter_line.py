@@ -4,6 +4,9 @@ from typing import Optional, List
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
@@ -11,7 +14,7 @@ from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class ReporterLine(DataObject, LimsReadableInterface):
+class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface):
     """the genotype name(s) of the reporter line(s)"""
     def __init__(self, reporter_line: Optional[str]):
         super().__init__(name="reporter_line", value=reporter_line)

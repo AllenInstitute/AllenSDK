@@ -3,6 +3,9 @@ from typing import List
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
@@ -10,7 +13,7 @@ from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class DriverLine(DataObject, LimsReadableInterface):
+class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface):
     """the genotype name(s) of the driver line(s)"""
     def __init__(self, driver_line: List[str]):
         super().__init__(name="driver_line", value=driver_line)
