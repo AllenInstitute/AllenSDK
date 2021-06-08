@@ -137,24 +137,26 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
 
     @classmethod
-    def from_nwb(
-        cls, nwb_path: str, **api_kwargs: Any
-    ) -> "BehaviorSession":
-        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
-            nwbfile = read_io.read()
-            behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
-            stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
-            running_acquisition = RunningAcquisition.from_nwb(nwbfile)
-            raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
-            running_speed = RunningSpeed.from_nwb(nwbfile)
+    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSession":
+        behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
+        stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
+        running_acquisition = RunningAcquisition.from_nwb(nwbfile)
+        raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
+        running_speed = RunningSpeed.from_nwb(nwbfile)
+
         return cls(
-            api=BehaviorNwbApi.from_path(path=nwb_path, **api_kwargs),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
             running_speed=running_speed
         )
+
+    @classmethod
+    def from_nwb_path(cls, nwb_path: str):
+        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
+            nwbfile = read_io.read()
+            return cls.from_nwb(nwbfile=nwbfile)
 
     def to_json(self) -> dict:
         pass
