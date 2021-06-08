@@ -95,13 +95,16 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             session_data, filtered=False
         )
         running_speed = RunningSpeed.from_json(session_data)
+        metadata = BehaviorMetadata.from_json(session_data)
+
         return cls(
             api=BehaviorJsonApi(session_data),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
-            running_speed=running_speed
+            running_speed=running_speed,
+            metadata=metadata
         )
 
     @classmethod
@@ -147,13 +150,15 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
         raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
         running_speed = RunningSpeed.from_nwb(nwbfile)
+        metadata = BehaviorMetadata.from_nwb(nwbfile)
 
         return cls(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
-            running_speed=running_speed
+            running_speed=running_speed,
+            metadata=metadata
         )
 
     @classmethod
@@ -166,7 +171,12 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
+        self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
+        self._running_acquisition.to_nwb(nwbfile=nwbfile)
+        self._running_speed.to_nwb(nwbfile=nwbfile)
+        self._metadata.to_nwb(nwbfile=nwbfile)
+
+        return nwbfile
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
