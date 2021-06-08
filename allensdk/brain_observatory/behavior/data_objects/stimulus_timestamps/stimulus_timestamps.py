@@ -8,6 +8,9 @@ import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.nwb_readable_interface import \
+    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .stimulus_file_readable_interface \
     import \
@@ -42,8 +45,8 @@ def from_lims_cache_key(
 
 
 class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
-                         SyncFileReadableInterface, NwbWritableInterface,
-                         JsonWritableInterface):
+                         SyncFileReadableInterface, NwbReadableInterface,
+                         NwbWritableInterface, JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 

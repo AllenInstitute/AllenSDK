@@ -14,6 +14,9 @@ from allensdk.brain_observatory.behavior.data_objects._base\
     .readable_interfaces.lims_readable_interface import \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.nwb_readable_interface import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.json_writable_interface import \
     JsonWritableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
@@ -47,7 +50,8 @@ def from_lims_cache_key(
 
 
 class RunningAcquisition(DataObject, LimsReadableInterface,
-                         NwbWritableInterface, JsonWritableInterface):
+                         NwbReadableInterface, NwbWritableInterface,
+                         JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running acquisition data.
 

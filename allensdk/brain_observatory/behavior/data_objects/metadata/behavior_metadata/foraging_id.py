@@ -42,7 +42,3 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface,
         foraging_id = lims_db.fetchone(query, strict=True)
         foraging_id = uuid.UUID(foraging_id)
         return cls(foraging_id=foraging_id)
-
-    @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "ForagingId":
-        raise NotImplementedError('Foraging id is not stored in NWB')

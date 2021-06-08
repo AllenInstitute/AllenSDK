@@ -2,13 +2,17 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.nwb_readable_interface import \
+    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .stimulus_file_readable_interface \
     import \
     StimulusFileReadableInterface
 
 
-class StimulusFrameRate(DataObject, StimulusFileReadableInterface):
+class StimulusFrameRate(DataObject, StimulusFileReadableInterface,
+                        NwbReadableInterface):
     """Stimulus frame rate"""
     def __init__(self, stimulus_frame_rate: float):
         super().__init__(name="stimulus_frame_rate", value=stimulus_frame_rate)

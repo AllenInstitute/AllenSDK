@@ -15,6 +15,9 @@ from allensdk.brain_observatory.behavior.data_objects._base\
     .readable_interfaces.json_readable_interface import \
     JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.nwb_readable_interface import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.json_writable_interface import \
     JsonWritableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
@@ -44,6 +47,7 @@ BehaviorDataApi = Type[BehaviorBase]
 
 
 class BehaviorSession(DataObject, InternalReadableInterface,
+                      NwbReadableInterface,
                       JsonReadableInterface, NwbWritableInterface,
                       JsonWritableInterface,
                       LazyPropertyMixin):

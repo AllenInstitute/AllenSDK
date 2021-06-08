@@ -13,13 +13,17 @@ from allensdk.brain_observatory.behavior.data_objects._base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects._base\
+    .readable_interfaces.nwb_readable_interface import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects._base\
     .writable_interfaces.json_writable_interface import \
     JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class DateOfAcquisition(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, JsonWritableInterface):
+                        JsonReadableInterface, NwbReadableInterface,
+                        JsonWritableInterface):
     """timestamp for when experiment was started in UTC"""
     def __init__(self, date_of_acquisition: float):
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
