@@ -42,8 +42,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
-from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema, \
-    BehaviorMetadataSchema
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.subject_metadata import \
+    SubjectMetadata
+from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.brain_observatory.session_api_utils import compare_session_fields
 from allensdk.internal.api import PostgresQueryMixin
@@ -194,6 +196,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
                        NwbWritableInterface):
     """Container class for behavior metadata"""
     def __init__(self,
+                 subject_metadata: SubjectMetadata,
                  behavior_session_id: BehaviorSessionId,
                  equipment_name: EquipmentName,
                  stimulus_frame_rate: StimulusFrameRate,
@@ -201,6 +204,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
                  date_of_acquisition: DateOfAcquisition,
                  behavior_session_uuid: BehaviorSessionUUID):
         super().__init__(name='behavior_metadata', value=self)
+        self._subject_metadata = subject_metadata
         self._behavior_session_id = behavior_session_id
         self._equipment_name = equipment_name
         self._stimulus_frame_rate = stimulus_frame_rate
@@ -218,6 +222,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             stimulus_timestamps: StimulusTimestamps,
             lims_db: PostgresQueryMixin
         ) -> "BehaviorMetadata":
+        subject_metadata = SubjectMetadata.from_lims(
+            behavior_session_id=behavior_session_id, lims_db=lims_db)
         equipment_name = EquipmentName.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
@@ -238,6 +244,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
                                        stimulus_file=stimulus_file)
 
         return cls(
+            subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment_name=equipment_name,
             stimulus_frame_rate=stimulus_frame_rate,
@@ -252,6 +259,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
+        subject_metadata = SubjectMetadata.from_nwb(nwbfile=nwbfile)
+
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile=nwbfile)
         equipment_name = EquipmentName.from_nwb(nwbfile=nwbfile)
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
@@ -260,6 +269,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
         return cls(
+            subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment_name=equipment_name,
             stimulus_frame_rate=stimulus_frame_rate,
@@ -301,6 +311,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        self._subject_metadata.to_nwb(nwbfile=nwbfile)
+        
         extension = load_pynwb_extension(BehaviorMetadataSchema,
                                                 'ndx-aibs-behavior-ophys')
         nwb_metadata = extension(
