@@ -126,18 +126,17 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             full_genotype=genotype
         )
 
-    @classmethod
-    def to_nwb(cls, nwbfile: NWBFile) -> NWBFile:
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         BehaviorSubject = load_pynwb_extension(SubjectMetadataSchema,
                                                'ndx-aibs-behavior-ophys')
         nwb_subject = BehaviorSubject(
             description="A visual behavior subject with a LabTracks ID",
-            age=Age.to_iso8601(age=cls.age_in_days),
-            driver_line=cls.driver_line,
-            genotype=cls.full_genotype,
-            subject_id=str(cls.mouse_id),
-            reporter_line=cls.reporter_line,
-            sex=cls.sex,
+            age=Age.to_iso8601(age=self.age_in_days),
+            driver_line=self.driver_line,
+            genotype=self.full_genotype,
+            subject_id=str(self.mouse_id),
+            reporter_line=self.reporter_line,
+            sex=self.sex,
             species='Mus musculus')
         nwbfile.subject = nwb_subject
         return nwbfile
