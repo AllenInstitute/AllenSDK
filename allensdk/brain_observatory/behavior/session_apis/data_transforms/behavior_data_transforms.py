@@ -66,10 +66,10 @@ class BehaviorDataTransforms(BehaviorBase):
             the frame numbers of licks that occurred in this session
         """
         # Get licks from pickle file instead of sync
-        data = self._behavior_stimulus_file()
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
-                       ["lick_events"])
+        #data = self._behavior_stimulus_file()
+        #stimulus_timestamps = self.get_stimulus_timestamps()
+        #lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
+        #               ["lick_events"])
 
         # there's an occasional bug where the number of logged
         # frames is one greater than the number of vsync intervals.
@@ -81,15 +81,16 @@ class BehaviorDataTransforms(BehaviorBase):
         # This bugfix copied from
         # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master/visual_behavior/translator/foraging2/extract.py#L640-L647
 
-        if len(lick_frames) > 0:
-            if lick_frames[-1] == len(stimulus_timestamps):
-                lick_frames = lick_frames[:-1]
-                self.logger.error('removed last lick - '
-                                  'it fell outside of stimulus_timestamps '
-                                  'range')
+        #if len(lick_frames) > 0:
+        #    if lick_frames[-1] == len(stimulus_timestamps):
+        #        lick_frames = lick_frames[:-1]
+        #        self.logger.error('removed last lick - '
+        #                          'it fell outside of stimulus_timestamps '
+        #                          'range')
 
-        lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
-        return pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
+        #lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
+        #return pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
+        return pd.DataFrame()
 
     @memoize
     def get_rewards(self) -> pd.DataFrame:
@@ -136,8 +137,11 @@ class BehaviorDataTransforms(BehaviorBase):
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        return get_running_df(data, stimulus_timestamps, lowpass=lowpass,
-                              zscore_threshold=zscore_threshold)
+        try:
+            return get_running_df(data, stimulus_timestamps, lowpass=lowpass,
+                                  zscore_threshold=zscore_threshold)
+        except:
+            return None
 
     def get_running_speed(self, lowpass=True) -> pd.DataFrame:
         """Get running speed using timestamps from
@@ -149,14 +153,17 @@ class BehaviorDataTransforms(BehaviorBase):
             index: timestamps
             speed : subject's running speeds (in cm/s)
         """
-        running_data_df = self.get_running_acquisition_df(lowpass=lowpass)
-        if running_data_df.index.name != "timestamps":
-            raise DataFrameIndexError(
-                f"Expected index to be named 'timestamps' but got "
-                f"'{running_data_df.index.name}'.")
-        return pd.DataFrame({
-            "timestamps": running_data_df.index.values,
-            "speed": running_data_df.speed.values})
+        try:
+            running_data_df = self.get_running_acquisition_df(lowpass=lowpass)
+            if running_data_df.index.name != "timestamps":
+                raise DataFrameIndexError(
+                    f"Expected index to be named 'timestamps' but got "
+                    f"'{running_data_df.index.name}'.")
+            return pd.DataFrame({
+                "timestamps": running_data_df.index.values,
+                "speed": running_data_df.speed.values})
+        except:
+            return pd.DataFrame()
 
     def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()
@@ -174,50 +181,54 @@ class BehaviorDataTransforms(BehaviorBase):
         """
         stimulus_timestamps = self.get_stimulus_timestamps()
         data = self._behavior_stimulus_file()
-        raw_stim_pres_df = get_stimulus_presentations(
-            data, stimulus_timestamps)
+        try:
+            raw_stim_pres_df = get_stimulus_presentations(
+                data, stimulus_timestamps)
 
-        # Fill in nulls for image_name
-        # This makes two assumptions:
-        #   1. Nulls in `image_name` should be "gratings_<orientation>"
-        #   2. Gratings are only present (or need to be fixed) when all
-        #      values for `image_name` are null.
-        if pd.isnull(raw_stim_pres_df["image_name"]).all():
-            if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
-                raw_stim_pres_df["image_name"] = (
-                    raw_stim_pres_df["orientation"]
-                    .apply(lambda x: f"gratings_{x}"))
-            else:
-                raise ValueError("All values for 'orentation' and 'image_name'"
-                                 " are null.")
+            # Fill in nulls for image_name
+            # This makes two assumptions:
+            #   1. Nulls in `image_name` should be "gratings_<orientation>"
+            #   2. Gratings are only present (or need to be fixed) when all
+            #      values for `image_name` are null.
+            if pd.isnull(raw_stim_pres_df["image_name"]).all():
+                if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
+                    raw_stim_pres_df["image_name"] = (
+                        raw_stim_pres_df["orientation"]
+                        .apply(lambda x: f"gratings_{x}"))
+                else:
+                    raise ValueError("All values for 'orentation' and 'image_name'"
+                                     " are null.")
 
-        stimulus_metadata_df = get_stimulus_metadata(data)
+            stimulus_metadata_df = get_stimulus_metadata(data)
 
-        idx_name = raw_stim_pres_df.index.name
-        stimulus_index_df = (
-            raw_stim_pres_df
-            .reset_index()
-            .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
-            .set_index(idx_name))
-        stimulus_index_df = (
-            stimulus_index_df[["image_set", "image_index", "start_time",
-                               "phase", "spatial_frequency"]]
-            .rename(columns={"start_time": "timestamps"})
-            .sort_index()
-            .set_index("timestamps", drop=True))
-        stim_pres_df = raw_stim_pres_df.merge(
-            stimulus_index_df, left_on="start_time", right_index=True,
-            how="left")
-        if len(raw_stim_pres_df) != len(stim_pres_df):
-            raise ValueError("Length of `stim_pres_df` should not change after"
-                             f" merge; was {len(raw_stim_pres_df)}, now "
-                             f" {len(stim_pres_df)}.")
+            idx_name = raw_stim_pres_df.index.name
+            stimulus_index_df = (
+                raw_stim_pres_df
+                .reset_index()
+                .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
+                .set_index(idx_name))
+            stimulus_index_df = (
+                stimulus_index_df[["image_set", "image_index", "start_time",
+                                   "phase", "spatial_frequency"]]
+                .rename(columns={"start_time": "timestamps"})
+                .sort_index()
+                .set_index("timestamps", drop=True))
+            stim_pres_df = raw_stim_pres_df.merge(
+                stimulus_index_df, left_on="start_time", right_index=True,
+                how="left")
+            if len(raw_stim_pres_df) != len(stim_pres_df):
+                raise ValueError("Length of `stim_pres_df` should not change after"
+                                 f" merge; was {len(raw_stim_pres_df)}, now "
+                                 f" {len(stim_pres_df)}.")
 
-        stim_pres_df['is_change'] = is_change_event(
-            stimulus_presentations=stim_pres_df)
+            stim_pres_df['is_change'] = is_change_event(
+                stimulus_presentations=stim_pres_df)
 
-        # Sort columns then drop columns which contain only all NaN values
-        return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
+            # Sort columns then drop columns which contain only all NaN values
+        except:
+            pass
+        #return stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
+        return pd.DataFrame()
 
     def get_stimulus_templates(self) -> Optional[StimulusTemplate]:
         """Get stimulus templates (movies, scenes) for behavior session.
@@ -270,8 +281,9 @@ class BehaviorDataTransforms(BehaviorBase):
         }
 
         pkl = self._behavior_stimulus_file()
-        return get_stimulus_templates(pkl=pkl,
-                                      grating_images_dict=grating_images_dict)
+        return None
+        #return get_stimulus_templates(pkl=pkl,
+        #                              grating_images_dict=grating_images_dict)
 
     def get_monitor_delay(self) -> float:
         """
@@ -324,9 +336,9 @@ class BehaviorDataTransforms(BehaviorBase):
             and trial data
         """
 
-        trial_df = get_trials_from_data_transform(self)
+        #trial_df = get_trials_from_data_transform(self)
 
-        return trial_df
+        return pd.DataFrame()  # trial_df
 
     def get_extended_trials(self) -> pd.DataFrame:
         """Get extended trials from pkl file

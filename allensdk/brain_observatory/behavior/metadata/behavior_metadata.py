@@ -83,6 +83,7 @@ def get_task_parameters(data: Dict) -> Dict:
     dict
         A dict containing the task_parameters associated with this session.
     """
+    return {}
     behavior = data["items"]["behavior"]
     stimuli = behavior['stimuli']
     config = behavior["config"]
@@ -222,7 +223,7 @@ class BehaviorMetadata:
                     extractor_acq_date - pkl_acq_date).total_seconds()
             # If acquisition dates differ by more than an hour
             if abs(acq_start_diff) > 3600:
-                session_id = self._extractor.get_behavior_session_id()
+                session_id = None  # self._extractor.get_behavior_session_id()
                 warnings.warn(
                     "The `date_of_acquisition` field in LIMS "
                     f"({extractor_acq_date}) for behavior session "
@@ -257,25 +258,28 @@ class BehaviorMetadata:
         """
         data = self._behavior_stimulus_file
         behavior_pkl_uuid = data.get("session_uuid")
+        try:
+            behavior_session_id = self._extractor.get_behavior_session_id()
+            foraging_id = self._extractor.get_foraging_id()
 
-        behavior_session_id = self._extractor.get_behavior_session_id()
-        foraging_id = self._extractor.get_foraging_id()
+            # Sanity check to ensure that pkl file data matches up with
+            # the behavior session that the pkl file has been associated with.
+            assert_err_msg = (
+                f"The behavior session UUID ({behavior_pkl_uuid}) in the "
+                f"behavior stimulus *.pkl file "
+                f"({self._extractor.get_behavior_stimulus_file()}) does "
+                f"does not match the foraging UUID ({foraging_id}) for "
+                f"behavior session: {behavior_session_id}")
+            assert behavior_pkl_uuid == foraging_id, assert_err_msg
 
-        # Sanity check to ensure that pkl file data matches up with
-        # the behavior session that the pkl file has been associated with.
-        assert_err_msg = (
-            f"The behavior session UUID ({behavior_pkl_uuid}) in the "
-            f"behavior stimulus *.pkl file "
-            f"({self._extractor.get_behavior_stimulus_file()}) does "
-            f"does not match the foraging UUID ({foraging_id}) for "
-            f"behavior session: {behavior_session_id}")
-        assert behavior_pkl_uuid == foraging_id, assert_err_msg
-
-        if behavior_pkl_uuid is None:
-            bs_uuid = None
-        else:
-            bs_uuid = uuid.UUID(behavior_pkl_uuid)
-        return bs_uuid
+            if behavior_pkl_uuid is None:
+                bs_uuid = None
+            else:
+                bs_uuid = uuid.UUID(behavior_pkl_uuid)
+        except:
+            pass
+        #return bs_uuid
+        return uuid.UUID(int=0)
 
     @property
     def driver_line(self) -> List[str]:
@@ -291,7 +295,8 @@ class BehaviorMetadata:
 
     @property
     def behavior_session_id(self) -> int:
-        return self._extractor.get_behavior_session_id()
+        #return self._extractor.get_behavior_session_id()
+        return 0
 
     def get_extractor(self):
         return self._extractor

@@ -52,11 +52,13 @@ class BehaviorOphysMetadata(BehaviorMetadata):
 
     @property
     def imaging_plane_group(self) -> Optional[int]:
-        return self._extractor.get_imaging_plane_group()
+        #return self._extractor.get_imaging_plane_group()
+        return None
 
     @property
     def imaging_plane_group_count(self) -> int:
-        return self._extractor.get_plane_group_count()
+        #return self._extractor.get_plane_group_count()
+        return 0
 
     @property
     def ophys_experiment_id(self) -> int:
@@ -68,7 +70,8 @@ class BehaviorOphysMetadata(BehaviorMetadata):
 
     @property
     def ophys_session_id(self) -> int:
-        return self._extractor.get_ophys_session_id()
+        #return self._extractor.get_ophys_session_id()
+        return 0
 
     @property
     def project_code(self) -> Optional[str]:

@@ -80,9 +80,9 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Add running acquisition ('dx', 'v_sig', 'v_in') data to NWB
         # This data should be saved to NWB but not accessible directly from
         # Sessions
-        nwb.add_running_acquisition_to_nwbfile(
-            nwbfile,
-            session_object.api.get_running_acquisition_df())
+        #nwb.add_running_acquisition_to_nwbfile(
+        #    nwbfile,
+        #    session_object.api.get_running_acquisition_df())
 
         # Add running data to NWB in-memory object:
         nwb.add_running_speed_to_nwbfile(nwbfile,
@@ -105,16 +105,16 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
             stimulus_presentations=session_object.stimulus_presentations)
 
         # search for omitted rows and add stop_time before writing to NWB file
-        set_omitted_stop_time(
-            stimulus_table=session_object.stimulus_presentations)
+        #set_omitted_stop_time(
+        #    stimulus_table=session_object.stimulus_presentations)
 
         # Add stimulus presentations data to NWB in-memory object:
-        nwb.add_stimulus_presentations(nwbfile,
-                                       session_object.stimulus_presentations)
+        #nwb.add_stimulus_presentations(nwbfile,
+        #                               session_object.stimulus_presentations)
 
         # Add trials data to NWB in-memory object:
-        nwb.add_trials(nwbfile, session_object.trials,
-                       TRIAL_COLUMN_DESCRIPTION_DICT)
+        #nwb.add_trials(nwbfile, session_object.trials,
+        #               TRIAL_COLUMN_DESCRIPTION_DICT)
 
         # Add licks data to NWB in-memory object:
         if len(session_object.licks) > 0:
@@ -139,7 +139,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                          behavior_only=False)
 
         # Add task parameters to NWB in-memory object:
-        nwb.add_task_parameters(nwbfile, session_object.task_parameters)
+        #nwb.add_task_parameters(nwbfile, session_object.task_parameters)
 
         # Add roi metrics to NWB in-memory object:
         nwb.add_cell_specimen_table(nwbfile,
@@ -167,7 +167,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
                 session_object.eye_tracking_rig_geometry)
 
         # Add events
-        self.add_events(nwbfile=nwbfile, events=session_object.events)
+        #self.add_events(nwbfile=nwbfile, events=session_object.events)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:

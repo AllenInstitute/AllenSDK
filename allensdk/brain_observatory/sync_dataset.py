@@ -379,9 +379,9 @@ class Dataset(object):
             except ValueError:
                 continue
 
-        if not permissive:
-            raise KeyError(
-                f"none of {keys} were found in this dataset's line labels")
+        #if not permissive:
+        #    raise KeyError(
+        #        f"none of {keys} were found in this dataset's line labels")
 
     def get_falling_edges(self, line, units='samples'):
         """
