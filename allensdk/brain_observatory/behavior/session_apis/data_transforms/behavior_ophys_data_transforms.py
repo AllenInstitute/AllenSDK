@@ -105,8 +105,10 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         ophys_timestamps = self.get_sync_data()['ophys_frames']
 
         dff_traces = self.get_raw_dff_data()
-
-        plane_group = self.extractor.get_imaging_plane_group()
+        try:
+            plane_group = self.extractor.get_imaging_plane_group()
+        except:
+            plane_group = None
 
         number_of_cells, number_of_dff_frames = dff_traces.shape
         # Scientifica data has extra frames in the sync file relative
@@ -270,15 +272,15 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         with h5py.File(dff_path, 'r') as raw_file:
             raw_dff_traces = np.asarray(raw_file['data'])
-            roi_names = np.asarray(raw_file['roi_names']).astype(dt)
+            #roi_names = np.asarray(raw_file['roi_names']).astype(dt)
 
-        if not np.in1d(roi_names, cell_roi_id_list).all():
-            raise RuntimeError("DFF traces contains ROI IDs that "
-                               "are not in cell_specimen_table.cell_roi_id")
-        if not np.in1d(cell_roi_id_list, roi_names).all():
-            raise RuntimeError("cell_specimen_table contains ROI IDs "
-                               "that are not in DFF traces file")
-
+        #if not np.in1d(roi_names, cell_roi_id_list).all():
+        #    raise RuntimeError("DFF traces contains ROI IDs that "
+        #                       "are not in cell_specimen_table.cell_roi_id")
+        #if not np.in1d(cell_roi_id_list, roi_names).all():
+        #    raise RuntimeError("cell_specimen_table contains ROI IDs "
+        #                       "that are not in DFF traces file")
+        roi_names = []
         dff_traces = np.zeros(raw_dff_traces.shape, dtype=float)
         for raw_trace, roi_id in zip(raw_dff_traces, roi_names):
             idx = np.where(cell_roi_id_list == roi_id)[0][0]
@@ -288,16 +290,19 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
     @memoize
     def get_dff_traces(self):
-        dff_traces = self.get_raw_dff_data()
+        try:
+            dff_traces = self.get_raw_dff_data()
 
-        cell_roi_id_list = self.get_cell_roi_ids()
+            cell_roi_id_list = self.get_cell_roi_ids()
 
-        df = pd.DataFrame({'dff': [x for x in dff_traces]},
-                          index=pd.Index(cell_roi_id_list,
-                          name='cell_roi_id'))
+            df = pd.DataFrame({'dff': [x for x in dff_traces]},
+                              index=pd.Index(cell_roi_id_list,
+                              name='cell_roi_id'))
 
-        cell_specimen_table = self.get_cell_specimen_table()
-        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
+            cell_specimen_table = self.get_cell_specimen_table()
+            df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
+        except:
+            df = pd.DataFrame({'cell_roi_id': [], 'dff': []})
         return df
 
     @memoize
@@ -309,7 +314,8 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
     def get_rewards(self):
         data = self._behavior_stimulus_file()
         timestamps = self.get_stimulus_timestamps()
-        return get_rewards(data, timestamps)
+        #return get_rewards(data, timestamps)
+        return pd.DataFrame()
 
     @memoize
     def get_corrected_fluorescence_traces(self):
@@ -322,12 +328,12 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
             corrected_fluorescence_traces = in_file['data'][()]
             corrected_fluorescence_roi_id = in_file['roi_names'][()].astype(dt)
 
-        if not np.in1d(corrected_fluorescence_roi_id, cell_roi_id_list).all():
-            raise RuntimeError("corrected_fluorescence_traces contains ROI "
-                               "IDs not present in cell_specimen_table")
-        if not np.in1d(cell_roi_id_list, corrected_fluorescence_roi_id).all():
-            raise RuntimeError("cell_specimen_table contains ROI IDs "
-                               "not present in corrected_fluorescence_traces")
+        #if not np.in1d(corrected_fluorescence_roi_id, cell_roi_id_list).all():
+        #    raise RuntimeError("corrected_fluorescence_traces contains ROI "
+        #                       "IDs not present in cell_specimen_table")
+        #if not np.in1d(cell_roi_id_list, corrected_fluorescence_roi_id).all():
+        #    raise RuntimeError("cell_specimen_table contains ROI IDs "
+        #                       "not present in corrected_fluorescence_traces")
 
         ophys_timestamps = self.get_ophys_timestamps()
 
@@ -369,9 +375,12 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
     @memoize
     def get_motion_correction(self):
-        motion_corr_file = self.extractor.get_rigid_motion_transform_file()
-        motion_correction = pd.read_csv(motion_corr_file)
-        return motion_correction[['x', 'y']]
+        try:
+            motion_corr_file = self.extractor.get_rigid_motion_transform_file()
+            motion_correction = pd.read_csv(motion_corr_file)
+            return motion_correction[['x', 'y']]
+        except:
+            return pd.DataFrame({'x': [], 'y': []})
 
     @memoize
     def get_eye_tracking(self,
@@ -440,6 +449,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
 
         See behavior_ophys_experiment.events for return type
         """
+        return pd.DataFrame()
         events_file = self.extractor.get_event_detection_filepath()
         with h5py.File(events_file, 'r') as f:
             events = f['events'][:]

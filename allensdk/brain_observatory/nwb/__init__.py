@@ -405,28 +405,30 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     nwbfile : pynwb.NWBFile
 
     '''
+    try:
+        if from_dataframe:
+            data = running_speed['speed'].values
+            timestamps = running_speed['timestamps'].values
+        else:
+            data = running_speed.values
+            timestamps = running_speed.timestamps
 
-    if from_dataframe:
-        data = running_speed['speed'].values
-        timestamps = running_speed['timestamps'].values
-    else:
-        data = running_speed.values
-        timestamps = running_speed.timestamps
+        running_speed_series = pynwb.base.TimeSeries(
+            name=name,
+            data=data,
+            timestamps=timestamps,
+            unit=unit)
 
-    running_speed_series = pynwb.base.TimeSeries(
-        name=name,
-        data=data,
-        timestamps=timestamps,
-        unit=unit)
+        if 'running' in nwbfile.processing:
+            running_mod = nwbfile.processing['running']
+        else:
+            running_mod = ProcessingModule('running',
+                                           'Running speed processing module')
+            nwbfile.add_processing_module(running_mod)
 
-    if 'running' in nwbfile.processing:
-        running_mod = nwbfile.processing['running']
-    else:
-        running_mod = ProcessingModule('running',
-                                       'Running speed processing module')
-        nwbfile.add_processing_module(running_mod)
-
-    running_mod.add_data_interface(running_speed_series)
+        running_mod.add_data_interface(running_speed_series)
+    except:
+        pass
 
     return nwbfile
 

@@ -289,15 +289,15 @@ class BehaviorNwbApi(NwbApi, BehaviorBase):
     def _add_stimulus_templates(nwbfile: NWBFile,
                                 stimulus_templates: StimulusTemplate,
                                 stimulus_presentations: pd.DataFrame):
-        nwb.add_stimulus_template(
-            nwbfile=nwbfile, stimulus_template=stimulus_templates)
+        #nwb.add_stimulus_template(
+        #    nwbfile=nwbfile, stimulus_template=stimulus_templates)
 
         # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[
-            stimulus_templates.image_set_name]
-        stimulus_index = stimulus_presentations[
-            stimulus_presentations[
-                'image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
+        #nwb_template = nwbfile.stimulus_template[
+        #    stimulus_templates.image_set_name]
+        #stimulus_index = stimulus_presentations[
+        #    stimulus_presentations[
+        #        'image_set'] == nwb_template.name]
+        #nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         return nwbfile
