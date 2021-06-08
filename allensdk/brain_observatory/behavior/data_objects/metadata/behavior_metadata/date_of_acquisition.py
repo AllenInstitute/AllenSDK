@@ -28,8 +28,13 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     def __init__(self, date_of_acquisition: float):
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
 
+    @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
-        pass
+        tz = pytz.timezone("America/Los_Angeles")
+        doa = dict_repr['date_of_acquisition']
+        doa = tz.localize(datetime.strptime(doa, "%Y-%m-%d %H:%M:%S"))
+        doa = doa.astimezone(pytz.utc)
+        return cls(date_of_acquisition=doa)
 
     def to_json(self) -> dict:
         return {"stimulus_frame_rate": self.value}

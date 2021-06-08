@@ -25,6 +25,7 @@ class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "MouseId":
         mouse_id = dict_repr['external_specimen_name']
+        mouse_id = int(mouse_id)
         return cls(mouse_id=mouse_id)
 
     def to_json(self) -> dict:

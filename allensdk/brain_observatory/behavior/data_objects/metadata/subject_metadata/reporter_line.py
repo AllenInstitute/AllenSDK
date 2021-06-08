@@ -28,7 +28,9 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ReporterLine":
-        pass
+        reporter_line = dict_repr['reporter_line']
+        reporter_line = cls._parse(reporter_line=reporter_line, warn=True)
+        return cls(reporter_line=reporter_line)
 
     def to_json(self) -> dict:
         return {"sex": self.value}

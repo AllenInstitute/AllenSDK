@@ -27,7 +27,7 @@ class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "FullGenotype":
-        pass
+        return cls(full_genotype=dict_repr['full_genotype'])
 
     def to_json(self) -> dict:
         return {"sex": self.value}

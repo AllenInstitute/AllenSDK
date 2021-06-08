@@ -255,7 +255,30 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "BehaviorMetadata":
-        pass
+        subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
+        behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
+        equipment_name = EquipmentName.from_json(dict_repr=dict_repr)
+        date_of_acquisition = DateOfAcquisition.from_json(dict_repr=dict_repr)
+
+        stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
+            stimulus_timestamps=stimulus_timestamps)
+        session_type = SessionType.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        session_uuid = BehaviorSessionUUID.from_stimulus_file(
+            stimulus_file=stimulus_file)
+
+        return cls(
+            subject_metadata=subject_metadata,
+            behavior_session_id=behavior_session_id,
+            equipment_name=equipment_name,
+            stimulus_frame_rate=stimulus_frame_rate,
+            session_type=session_type,
+            date_of_acquisition=date_of_acquisition,
+            behavior_session_uuid=session_uuid,
+        )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
@@ -312,7 +335,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._subject_metadata.to_nwb(nwbfile=nwbfile)
-        
+
         extension = load_pynwb_extension(BehaviorMetadataSchema,
                                                 'ndx-aibs-behavior-ophys')
         nwb_metadata = extension(

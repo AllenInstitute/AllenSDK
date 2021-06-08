@@ -27,7 +27,7 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DriverLine":
-        pass
+        return cls(driver_line=dict_repr['driver_line'])
 
     def to_json(self) -> dict:
         return {"sex": self.value}

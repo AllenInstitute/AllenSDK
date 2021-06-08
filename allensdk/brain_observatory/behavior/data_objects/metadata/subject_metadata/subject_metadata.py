@@ -4,6 +4,9 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base.readable_interfaces\
     .lims_readable_interface import \
     LimsReadableInterface
@@ -40,7 +43,8 @@ from allensdk.internal.api import PostgresQueryMixin
 
 
 class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
-                      NwbWritableInterface, JsonWritableInterface):
+                      NwbWritableInterface, JsonReadableInterface,
+                      JsonWritableInterface):
     """Subject metadata"""
     def __init__(self,
                  sex: Sex,
@@ -74,6 +78,24 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         mouse_id = MouseId.from_lims(
             behavior_session_id=behavior_session_id.value,
                                      lims_db=lims_db)
+        return cls(
+            sex=sex,
+            age=age,
+            full_genotype=full_genotype,
+            driver_line=driver_line,
+            mouse_id=mouse_id,
+            reporter_line=reporter_line
+        )
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "SubjectMetadata":
+        sex = Sex.from_json(dict_repr=dict_repr)
+        age = Age.from_json(dict_repr=dict_repr)
+        reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
+        full_genotype = FullGenotype.from_json(dict_repr=dict_repr)
+        driver_line = DriverLine.from_json(dict_repr=dict_repr)
+        mouse_id = MouseId.from_json(dict_repr=dict_repr)
+
         return cls(
             sex=sex,
             age=age,
