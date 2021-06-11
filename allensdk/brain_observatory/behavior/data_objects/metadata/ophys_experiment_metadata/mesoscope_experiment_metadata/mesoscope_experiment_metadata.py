@@ -10,14 +10,14 @@ from allensdk.brain_observatory.behavior.data_objects.base\
     .readable_interfaces.nwb_readable_interface import \
     NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.imaging_plane import \
+    ImagingPlane
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_experiment_metadata import \
     OphysExperimentMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.emission_lambda import \
     EmissionLambda
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.excitation_lambda import \
-    ExcitationLambda
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
@@ -32,14 +32,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_frame_rate import \
-    OphysFrameRate
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.project_code import \
     ProjectCode
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.targeted_structure import \
-    TargetedStructure
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -47,22 +41,18 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
     def __init__(self,
                  experiment_container_id: ExperimentContainerId,
                  emission_lambda: EmissionLambda,
-                 excitation_lambda: ExcitationLambda,
+                 imaging_plane: ImagingPlane,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  imaging_plane_group: ImagingPlaneGroup,
-                 ophys_frame_rate: OphysFrameRate,
-                 project_code: ProjectCode,
-                 targeted_structure: TargetedStructure):
+                 project_code: ProjectCode):
         super().__init__(
             experiment_container_id=experiment_container_id,
             emission_lambda=emission_lambda,
-            excitation_lambda=excitation_lambda,
+            imaging_plane=imaging_plane,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
-            ophys_frame_rate=ophys_frame_rate,
-            project_code=project_code,
-            targeted_structure=targeted_structure
+            project_code=project_code
         )
         self._imaging_plane_group = imaging_plane_group
 
@@ -78,12 +68,10 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,
-            excitation_lambda=ophys_experiment_metadata._excitation_lambda,
+            imaging_plane=ophys_experiment_metadata._imaging_plane,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
-            ophys_frame_rate=ophys_experiment_metadata._ophys_frame_rate,
             project_code=ophys_experiment_metadata._project_code,
-            targeted_structure=ophys_experiment_metadata._targeted_structure,
             imaging_plane_group=imaging_plane_group
         )
 
@@ -95,9 +83,10 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,
-            excitation_lambda=ophys_experiment_metadata._excitation_lambda,
+            imaging_plane=ophys_experiment_metadata._imaging_plane,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
+            project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
 
@@ -109,9 +98,10 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,
-            excitation_lambda=ophys_experiment_metadata._excitation_lambda,
+            imaging_plane=ophys_experiment_metadata._imaging_plane,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
+            project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
 
