@@ -12,8 +12,8 @@ from hdmf.backends.hdf5 import H5DataIO
 from pynwb import NWBHDF5IO, NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.behavior_ophys_metadata \
-    import BehaviorOphysMetadata
+    .ophys_experiment_metadata.ophys_experiment_metadata \
+    import OphysExperimentMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 import allensdk.brain_observatory.nwb as nwb
@@ -59,7 +59,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Cannot type session_object due to a circular dependency
         # TODO fix circular dependency and add type
 
-        session_metadata: BehaviorOphysMetadata = \
+        session_metadata: OphysExperimentMetadata = \
             session_object.api.get_metadata()
 
         session_type = session_metadata.session_type

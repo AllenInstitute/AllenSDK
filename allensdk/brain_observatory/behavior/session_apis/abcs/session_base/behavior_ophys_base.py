@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.behavior_ophys_metadata \
-    import BehaviorOphysMetadata
+    .ophys_experiment_metadata.ophys_experiment_metadata \
+    import OphysExperimentMetadata
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.image_api import Image
@@ -95,7 +95,7 @@ class BehaviorOphysBase(BehaviorBase):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_metadata(self) -> Union[BehaviorOphysMetadata, dict]:
+    def get_metadata(self) -> Union[OphysExperimentMetadata, dict]:
         """Get behavior+ophys session metadata.
 
         Returns
