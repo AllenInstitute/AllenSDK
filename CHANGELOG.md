@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 
+## [2.12.0] = TBD
+- updated hdmf and pynwb required versions
+
 ## [2.11.2] = 2021-05-21
 - Fixed mkdir error for non-existing ecephys upload directory
 
