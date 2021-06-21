@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from pynwb import NWBFile
 
@@ -61,7 +61,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(reporter_line=nwbfile.subject.reporter_line)
 
     @staticmethod
-    def _parse(reporter_line: Optional[List[str]],
+    def _parse(reporter_line: Union[Optional[List[str]], str],
                             warn=False) -> Optional[str]:
         """There can be multiple reporter lines, so it is returned from LIMS
         as a list. But there shouldn't be more than 1 for behavior. This
@@ -99,8 +99,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
         return reporter_line[0]
 
-    @property
-    def indicator(self, warn=False) -> Optional[str]:
+    def parse_indicator(self, warn=False) -> Optional[str]:
         """Parses indicator from reporter"""
         reporter_line = self.value
         reporter_substring_indicator_map = {

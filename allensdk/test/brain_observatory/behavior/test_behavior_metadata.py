@@ -6,10 +6,23 @@ import numpy as np
 import pandas as pd
 import pytz
 
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import (
     description_dict, get_task_parameters, get_expt_description,
     BehaviorMetadata)
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.age import \
+    Age
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.full_genotype import \
+    FullGenotype
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
 
 
 @pytest.mark.parametrize("data, expected",
@@ -325,94 +338,34 @@ def test_get_expt_description_raises_with_invalid_session_type(session_type):
         get_expt_description(session_type)
 
 
-def test_cre_line(monkeypatch):
+def test_cre_line():
     """Tests that cre_line properly parsed from driver_line"""
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            pass
-
-        def full_genotype(self):
-            return 'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        ctx.setattr(BehaviorMetadata,
-                    'full_genotype',
-                    property(full_genotype))
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.cre_line == 'Sst-IRES-Cre'
+    fg = FullGenotype(
+        full_genotype='Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt')
+    assert fg.parse_cre_line() == 'Sst-IRES-Cre'
 
 
-def test_cre_line_bad_full_genotype(monkeypatch):
+def test_cre_line_bad_full_genotype():
     """Test that cre_line is None and no error raised"""
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            pass
+    fg = FullGenotype(full_genotype='foo')
 
-        def full_genotype(self):
-            return 'foo'
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        ctx.setattr(BehaviorMetadata,
-                    'full_genotype',
-                    property(full_genotype))
-
-        metadata = BehaviorMetadata()
-
-        with pytest.warns(UserWarning) as record:
-            cre_line = metadata.cre_line
-        assert cre_line is None
-        assert str(record[0].message) == 'Unable to parse cre_line from ' \
-                                         'full_genotype'
+    with pytest.warns(UserWarning) as record:
+        cre_line = fg.parse_cre_line(warn=True)
+    assert cre_line is None
+    assert str(record[0].message) == 'Unable to parse cre_line from ' \
+                                     'full_genotype'
 
 
-def test_reporter_line(monkeypatch):
+def test_reporter_line():
     """Test that reporter line properly parsed from list"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return ['foo']
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.reporter_line == 'foo'
+    reporter_line = ReporterLine._parse(reporter_line=['foo'])
+    assert reporter_line == 'foo'
 
 
-def test_reporter_line_str(monkeypatch):
+def test_reporter_line_str():
     """Test that reporter line returns itself if str"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return 'foo'
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.reporter_line == 'foo'
+    reporter_line = ReporterLine._parse(reporter_line='foo')
+    assert reporter_line == 'foo'
 
 
 @pytest.mark.parametrize("input_reporter_line, warning_msg, expected", (
@@ -422,52 +375,20 @@ def test_reporter_line_str(monkeypatch):
         ([], 'Error parsing reporter line. The array is empty', None)
 )
                          )
-def test_reporter_edge_cases(monkeypatch, input_reporter_line, warning_msg,
+def test_reporter_edge_cases(input_reporter_line, warning_msg,
                              expected):
     """Test reporter line edge cases"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return input_reporter_line
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        metadata = BehaviorMetadata()
-
-        with pytest.warns(UserWarning) as record:
-            reporter_line = metadata.reporter_line
-
-        assert reporter_line == expected
-        assert str(record[0].message) == warning_msg
+    with pytest.warns(UserWarning) as record:
+        reporter_line = ReporterLine._parse(reporter_line=input_reporter_line,
+                                            warn=True)
+    assert reporter_line == expected
+    assert str(record[0].message) == warning_msg
 
 
-def test_age_in_days(monkeypatch):
+def test_age_in_days():
     """Test that age_in_days properly parsed from age"""
-
-    class MockExtractor:
-        def get_age(self):
-            return 'P123'
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.age_in_days == 123
+    age = Age._age_code_to_days(age='P123')
+    assert age == 123
 
 
 @pytest.mark.parametrize("input_age, warning_msg, expected", (
@@ -480,28 +401,11 @@ def test_age_in_days(monkeypatch):
 def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
                                 expected):
     """Test age in days edge cases"""
+    with pytest.warns(UserWarning) as record:
+        age_in_days = Age._age_code_to_days(age=input_age, warn=True)
 
-    class MockExtractor:
-        def get_age(self):
-            return input_age
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        with pytest.warns(UserWarning) as record:
-            age_in_days = metadata.age_in_days
-
-        assert age_in_days is None
-        assert str(record[0].message) == warning_msg
+    assert age_in_days is None
+    assert str(record[0].message) == warning_msg
 
 
 @pytest.mark.parametrize("test_params, expected_warn_msg", [
@@ -541,102 +445,49 @@ def test_age_in_days_edge_cases(monkeypatch, input_age, warning_msg,
      },
      "Could not parse the acquisition datetime *"),
 ])
-def test_get_date_of_acquisition(monkeypatch, tmp_path, test_params,
+def test_get_date_of_acquisition(tmp_path, test_params,
                                  expected_warn_msg):
     mock_session_id = test_params["behavior_session_id"]
 
     pkl_save_path = tmp_path / f"mock_pkl_{mock_session_id}.pkl"
     with open(pkl_save_path, 'wb') as handle:
         pickle.dump({"start_time": test_params['pkl_expt_date']}, handle)
-    behavior_stimulus_file = pd.read_pickle(pkl_save_path)
 
     tz = pytz.timezone("America/Los_Angeles")
     extractor_expt_date = tz.localize(
         test_params['extractor_expt_date']).astimezone(pytz.utc)
 
-    class MockExtractor():
-        def get_date_of_acquisition(self):
-            return extractor_expt_date
+    stimulus_file = StimulusFile(filepath=pkl_save_path)
+    obt_date = DateOfAcquisition(
+        date_of_acquisition=extractor_expt_date)
 
-        def get_behavior_session_id(self):
-            return test_params['behavior_session_id']
+    if expected_warn_msg:
+        with pytest.warns(Warning, match=expected_warn_msg):
+            obt_date.validate(
+                stimulus_file=stimulus_file,
+                behavior_session_id=test_params['behavior_session_id'])
 
-        def get_behavior_stimulus_file(self):
-            return pkl_save_path
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self, extractor, behavior_stimulus_file):
-            self._extractor = extractor
-            self._behavior_stimulus_file = behavior_stimulus_file
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata(
-            extractor=extractor,
-            behavior_stimulus_file=behavior_stimulus_file)
-
-        if expected_warn_msg:
-            with pytest.warns(Warning, match=expected_warn_msg):
-                obt_date = metadata.date_of_acquisition
-        else:
-            obt_date = metadata.date_of_acquisition
-
-        assert obt_date == extractor_expt_date
+    assert obt_date.value == extractor_expt_date
 
 
-def test_indicator(monkeypatch):
+def test_indicator():
     """Test that indicator is parsed from full_genotype"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return 'Ai148(TIT2L-GC6f-ICL-tTA2)'
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.indicator == 'GCaMP6f'
+    reporter_line = ReporterLine(reporter_line='Ai148(TIT2L-GC6f-ICL-tTA2)')
+    assert reporter_line.parse_indicator() == 'GCaMP6f'
 
 
 @pytest.mark.parametrize("input_reporter_line, warning_msg, expected", (
-        (None, 'Error parsing reporter line. It is null.', None),
+        (None, 'Could not parse indicator from reporter because there is no '
+               'reporter', None),
         ('foo', 'Could not parse indicator from reporter because none'
                 'of the expected substrings were found in the reporter', None)
 )
                          )
-def test_indicator_edge_cases(monkeypatch, input_reporter_line, warning_msg,
+def test_indicator_edge_cases(input_reporter_line, warning_msg,
                               expected):
     """Test indicator parsing edge cases"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return input_reporter_line
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        with pytest.warns(UserWarning) as record:
-            indicator = metadata.indicator
-        assert indicator is expected
-        assert str(record[0].message) == warning_msg
+    with pytest.warns(UserWarning) as record:
+        reporter_line = ReporterLine(reporter_line=input_reporter_line)
+        indicator = reporter_line.parse_indicator(warn=True)
+    assert indicator is expected
+    assert str(record[0].message) == warning_msg
