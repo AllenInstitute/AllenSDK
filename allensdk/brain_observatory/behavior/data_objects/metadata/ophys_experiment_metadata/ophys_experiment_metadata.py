@@ -28,6 +28,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.ophys_session_id import \
+    OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.project_code import \
     ProjectCode
 from allensdk.internal.api import PostgresQueryMixin
@@ -38,6 +41,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
     """Container class for ophys experiment metadata"""
     def __init__(self,
                  ophys_experiment_id: int,
+                 ophys_session_id: OphysSessionId,
                  experiment_container_id: ExperimentContainerId,
                  imaging_plane: ImagingPlane,
                  emission_lambda: EmissionLambda,
@@ -46,6 +50,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
                  project_code: Optional[ProjectCode] = None):
         super().__init__(name='ophys_experiment_metadata', value=self)
         self._ophys_experiment_id = ophys_experiment_id
+        self._ophys_session_id = ophys_session_id
         self._experiment_container_id = experiment_container_id
         self._imaging_plane = imaging_plane
         self._emission_lambda = emission_lambda
@@ -61,6 +66,8 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
     def from_internal(
             cls, ophys_experiment_id: int,
             lims_db: PostgresQueryMixin) -> "OphysExperimentMetadata":
+        ophys_session_id = OphysSessionId.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         experiment_container_id = ExperimentContainerId.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         imaging_plane = ImagingPlane.from_internal(
@@ -75,6 +82,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
         return cls(
             ophys_experiment_id=ophys_experiment_id,
+            ophys_session_id=ophys_session_id,
             emission_lambda=emission_lambda,
             imaging_plane=imaging_plane,
             experiment_container_id=experiment_container_id,
@@ -85,6 +93,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "OphysExperimentMetadata":
+        ophys_session_id = OphysSessionId.from_json(dict_repr=dict_repr)
         experiment_container_id = ExperimentContainerId.from_json(
             dict_repr=dict_repr)
         ophys_experiment_id = dict_repr['ophys_experiment_id']
@@ -94,6 +103,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
         return cls(
             ophys_experiment_id=ophys_experiment_id,
+            ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
             imaging_plane=imaging_plane,
             emission_lambda=emission_lambda,
@@ -104,6 +114,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysExperimentMetadata":
         ophys_experiment_id = nwbfile.identifier
+        ophys_session_id = OphysSessionId.from_nwb(nwbfile=nwbfile)
         experiment_container_id = ExperimentContainerId.from_nwb(
             nwbfile=nwbfile)
         imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
@@ -112,6 +123,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
         return cls(
             ophys_experiment_id=ophys_experiment_id,
+            ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
             imaging_plane=imaging_plane,
             emission_lambda=emission_lambda,
@@ -142,15 +154,14 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
     @property
     def ophys_experiment_id(self) -> int:
-        # TODO remove this. Should be at Ophys experiment class level
-        return 0
+        return self._ophys_experiment_id
 
     @property
     def ophys_session_id(self) -> int:
         # TODO this is at the wrong layer of abstraction.
         #  Should be at ophys session level
         #  (need to create ophys session class)
-        return 0
+        return self._ophys_session_id.value
 
     @property
     def project_code(self) -> Optional[str]:
