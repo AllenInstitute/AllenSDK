@@ -223,6 +223,11 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         }
         attrs_and_methods_to_ignore.update(dir(ParamsMixin))
         attrs_and_methods_to_ignore.update(dir(LazyPropertyMixin))
+        attrs_and_methods_to_ignore.update(dir(InternalReadableInterface))
+        attrs_and_methods_to_ignore.update(dir(NwbReadableInterface))
+        attrs_and_methods_to_ignore.update(dir(NwbWritableInterface))
+        attrs_and_methods_to_ignore.update(dir(JsonWritableInterface))
+        attrs_and_methods_to_ignore.update(dir(DataObject))
         class_dir = dir(self)
         attrs_and_methods = [
             r for r in class_dir
