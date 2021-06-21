@@ -38,3 +38,6 @@ class SessionType(DataObject, StimulusFileReadableInterface,
     def from_nwb(cls, nwbfile: NWBFile) -> "SessionType":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(session_type=metadata.session_type)
+
+    def is_mesoscope(self):
+        return self.value.startswith('MESO')

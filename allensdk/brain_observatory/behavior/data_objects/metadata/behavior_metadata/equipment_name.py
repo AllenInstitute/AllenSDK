@@ -24,7 +24,7 @@ class EquipmentName(DataObject, JsonReadableInterface, LimsReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "EquipmentName":
-        return cls(equipment_name=dict_repr["equipment_name"])
+        return cls(equipment_name=dict_repr["rig_name"])
 
     def to_json(self) -> dict:
         return {"eqipment_name": self.value}

@@ -2,9 +2,7 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base\
     .readable_interfaces.internal_readable_interface import \
     InternalReadableInterface
@@ -38,17 +36,13 @@ from allensdk.internal.api import PostgresQueryMixin
 class OphysExperimentMetadata(DataObject, InternalReadableInterface,
                               JsonReadableInterface, NwbReadableInterface):
     """Container class for behavior ophys metadata"""
-    # def __init__(self, extractor: BehaviorOphysDataExtractorBase,
-    #              stimulus_timestamps: np.ndarray,
-    #              ophys_timestamps: np.ndarray,
-    #              behavior_stimulus_file: dict):
     def __init__(self,
                  experiment_container_id: ExperimentContainerId,
                  imaging_plane: ImagingPlane,
                  emission_lambda: EmissionLambda,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
-                 project_code: ProjectCode):
+                 project_code: Optional[ProjectCode] = None):
         super().__init__(name='ophys_experiment_metadata', value=self)
         self._experiment_container_id = experiment_container_id
         self._imaging_plane = imaging_plane
@@ -88,11 +82,35 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "OphysExperimentMetadata":
-        pass
+        experiment_container_id = ExperimentContainerId.from_json(
+            dict_repr=dict_repr)
+        imaging_plane = ImagingPlane.from_json(dict_repr=dict_repr)
+        emission_lambda = EmissionLambda()
+        field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
+        imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
+        return cls(
+            experiment_container_id=experiment_container_id,
+            imaging_plane=imaging_plane,
+            emission_lambda=emission_lambda,
+            field_of_view_shape=field_of_view_shape,
+            imaging_depth=imaging_depth
+        )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysExperimentMetadata":
-        pass
+        experiment_container_id = ExperimentContainerId.from_nwb(
+            nwbfile=nwbfile)
+        imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
+        emission_lambda = EmissionLambda()
+        field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
+        imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
+        return cls(
+            experiment_container_id=experiment_container_id,
+            imaging_plane=imaging_plane,
+            emission_lambda=emission_lambda,
+            field_of_view_shape=field_of_view_shape,
+            imaging_depth=imaging_depth
+        )
 
     @property
     def emission_lambda(self) -> float:

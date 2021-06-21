@@ -218,14 +218,17 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     def from_internal(
             cls,
             behavior_session_id: BehaviorSessionId,
-            stimulus_file: StimulusFile,
-            stimulus_timestamps: StimulusTimestamps,
             lims_db: PostgresQueryMixin
         ) -> "BehaviorMetadata":
         subject_metadata = SubjectMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
         equipment_name = EquipmentName.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+
+        stimulus_file = StimulusFile.from_lims(
+            db=lims_db, behavior_session_id=behavior_session_id.value)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_timestamps=stimulus_timestamps)
         session_type = SessionType.from_stimulus_file(
@@ -310,8 +313,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         return self._stimulus_frame_rate.value
 
     @property
-    def session_type(self) -> str:
-        return self._session_type.value
+    def session_type(self) -> SessionType:
+        return self._session_type
 
     @property
     def date_of_acquisition(self) -> datetime:
@@ -324,6 +327,10 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     @property
     def behavior_session_id(self) -> int:
         return self._behavior_session_id.value
+
+    @property
+    def subject_metadata(self):
+        return self._subject_metadata
 
     def to_dict(self) -> dict:
         """Returns dict representation of all properties in class"""
@@ -343,7 +350,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             behavior_session_id=self.behavior_session_id,
             behavior_session_uuid=str(self.behavior_session_uuid),
             stimulus_frame_rate=self.stimulus_frame_rate,
-            session_type=self.session_type,
+            session_type=self.session_type.value,
             equipment_name=self.equipment_name
         )
         nwbfile.add_lab_meta_data(nwb_metadata)

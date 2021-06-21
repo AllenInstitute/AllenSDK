@@ -129,9 +129,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             lims_db, behavior_session_id.value
         )
         behavior_metadata = BehaviorMetadata.from_internal(
-            behavior_session_id=behavior_session_id, lims_db=lims_db,
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps
+            behavior_session_id=behavior_session_id, lims_db=lims_db
         )
         return cls(
             api=BehaviorLimsApi(behavior_session_id.value),
