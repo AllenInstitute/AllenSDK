@@ -30,10 +30,9 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
-        tz = pytz.timezone("America/Los_Angeles")
         doa = dict_repr['date_of_acquisition']
-        doa = tz.localize(datetime.strptime(doa, "%Y-%m-%d %H:%M:%S"))
-        doa = doa.astimezone(pytz.utc)
+        doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
+        doa = cls.to_utc(date_of_acquisition=doa)
         return cls(date_of_acquisition=doa)
 
     def to_json(self) -> dict:
@@ -50,7 +49,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                 """.format(behavior_session_id)
 
         experiment_date = lims_db.fetchone(query, strict=True)
-        experiment_date = pytz.utc.localize(experiment_date)
+        experiment_date = cls.to_utc(date_of_acquisition=experiment_date)
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
@@ -94,3 +93,8 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                     f"{stimulus_file.filepath}"
                 )
         return self
+
+    @staticmethod
+    def to_utc(date_of_acquisition: datetime):
+        return pytz.utc.localize(dt=date_of_acquisition)
+
