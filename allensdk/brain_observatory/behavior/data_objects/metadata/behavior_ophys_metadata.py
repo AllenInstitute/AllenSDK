@@ -2,9 +2,8 @@ from typing import Union
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId, StimulusTimestamps
+    BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base\
     .readable_interfaces.internal_readable_interface import \
     InternalReadableInterface
