@@ -28,7 +28,9 @@ class DataObject(abc.ABC):
         """
         self._name = name
         self._value = value
-        self._exclude_from_equals = exclude_from_equals
+
+        efe = exclude_from_equals if exclude_from_equals else set()
+        self._exclude_from_equals = efe
 
     @property
     def name(self) -> str:
@@ -53,11 +55,11 @@ class DataObject(abc.ABC):
                 for p in path:
                     cur = cur[p]
                 cur[name] = {}
-                path.append(name)
-                values = [(name, value, path) for name, value in
+                newpath = path + [name]
+                values = [(name, value, newpath) for name, value in
                           value._get_properties().items()]
                 if not values:
-                    q.append((name, value._value, path))
+                    q.append((name, value._value, newpath))
                 else:
                     for v in values:
                         q.append(v)

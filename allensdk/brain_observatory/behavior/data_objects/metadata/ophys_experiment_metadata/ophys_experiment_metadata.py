@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from pynwb import NWBFile
@@ -113,15 +114,21 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysExperimentMetadata":
-        ophys_experiment_id = nwbfile.identifier
+        if 'ophys' not in nwbfile.processing:
+            raise RuntimeError('Key "ophys" not found in nwb file '
+                               '(needed to read imaging plane metadata). '
+                               'Did you forget to write cell specimen table '
+                               'to nwb?')
+
+        ophys_experiment_id = int(nwbfile.identifier)
         ophys_session_id = OphysSessionId.from_nwb(nwbfile=nwbfile)
         experiment_container_id = ExperimentContainerId.from_nwb(
             nwbfile=nwbfile)
         imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
-        emission_lambda = EmissionLambda()
+        emission_lambda = EmissionLambda.from_nwb(nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
-        return cls(
+        return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
@@ -165,10 +172,8 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
 
     @property
     def project_code(self) -> Optional[str]:
-        return self._project_code.value
-
-    def to_dict(self) -> dict:
-        """Returns dict representation of all properties in class"""
-        vars_ = vars(OphysExperimentMetadata)
-        d = self._get_properties(vars_=vars_)
-        return {**super().to_dict(), **d}
+        if self._project_code is None:
+            pc = self._project_code
+        else:
+            pc = self._project_code.value
+        return pc
