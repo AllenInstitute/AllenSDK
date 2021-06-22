@@ -23,6 +23,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.ophys_session_id import \
+    OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.project_code import \
     ProjectCode
 from allensdk.internal.api import PostgresQueryMixin
@@ -30,6 +33,8 @@ from allensdk.internal.api import PostgresQueryMixin
 
 class MesoscopeExperimentMetadata(OphysExperimentMetadata):
     def __init__(self,
+                 ophys_experiment_id: int,
+                 ophys_session_id: OphysSessionId,
                  experiment_container_id: ExperimentContainerId,
                  emission_lambda: EmissionLambda,
                  imaging_plane: ImagingPlane,
@@ -38,6 +43,8 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
                  imaging_plane_group: ImagingPlaneGroup,
                  project_code: ProjectCode):
         super().__init__(
+            ophys_experiment_id=ophys_experiment_id,
+            ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
             emission_lambda=emission_lambda,
             imaging_plane=imaging_plane,
@@ -56,6 +63,8 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
         imaging_plane_group = ImagingPlaneGroup.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         return cls(
+            ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
+            ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,
@@ -71,6 +80,8 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
         ophys_experiment_metadata = super().from_json(dict_repr=dict_repr)
         imaging_plane_group = ImagingPlaneGroup.from_json(dict_repr=dict_repr)
         return cls(
+            ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
+            ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,
@@ -86,6 +97,8 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
         ophys_experiment_metadata = super().from_nwb(nwbfile=nwbfile)
         imaging_plane_group = ImagingPlaneGroup.from_nwb(nwbfile=nwbfile)
         return cls(
+            ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
+            ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=
             ophys_experiment_metadata._experiment_container_id,
             emission_lambda=ophys_experiment_metadata._emission_lambda,

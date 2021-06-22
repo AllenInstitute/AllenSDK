@@ -47,7 +47,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     SubjectMetadata
 from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
-from allensdk.brain_observatory.session_api_utils import compare_session_fields
+from allensdk.brain_observatory.comparison_utils import compare_fields
 from allensdk.internal.api import PostgresQueryMixin
 
 description_dict = {
@@ -332,11 +332,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     def subject_metadata(self):
         return self._subject_metadata
 
-    def to_dict(self) -> dict:
-        """Returns dict representation of all properties in class"""
-        vars_ = vars(BehaviorMetadata)
-        return self._get_properties(vars_=vars_)
-
     def to_json(self) -> dict:
         pass
 
@@ -357,32 +352,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
         return nwbfile
 
-    def _get_properties(self, vars_: dict):
-        """Returns all property names and values"""
-        return {name: getattr(self, name) for name, value in vars_.items()
-                if isinstance(value, property)}
+    def __dict__(self):
+        props = self._get_properties()
 
-    def __eq__(self, other):
-        if not isinstance(other, (BehaviorMetadata, dict)):
-            msg = f'Do not know how to compare with type {type(other)}'
-            raise NotImplementedError(msg)
-
-        properties_self = self.to_dict()
-
-        if isinstance(other, dict):
-            properties_other = other
-        else:
-            properties_other = other.to_dict()
-
-        for p in properties_self:
-            if p in self._exclude_from_equals:
-                continue
-
-            x1 = properties_self[p]
-            x2 = properties_other[p]
-
-            try:
-                compare_session_fields(x1=x1, x2=x2)
-            except AssertionError:
-                return False
-        return True

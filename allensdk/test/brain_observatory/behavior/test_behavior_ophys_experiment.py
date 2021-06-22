@@ -15,7 +15,8 @@ from allensdk.brain_observatory.behavior.write_nwb.__main__ import \
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.session_api_utils import (
-    sessions_are_equal, compare_session_fields)
+    sessions_are_equal)
+from allensdk.brain_observatory.comparison_utils import compare_fields
 from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 
 
@@ -37,7 +38,7 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected,
     expected = get_expected(session_data)
     obtained = get_from_session(session)
 
-    compare_session_fields(expected, obtained)
+    compare_fields(expected, obtained)
 
 
 @pytest.mark.requires_bamboo
