@@ -303,12 +303,11 @@ def test_running_speed_from_lims(
     )
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps.from_lims.assert_called_once_with(
-        mock_db_conn, behavior_session_id, ophys_experiment_id
+    mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
+        mock_stimulus_file_instance
     )
-    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.from_lims(
-        mock_db_conn, behavior_session_id, ophys_experiment_id
-    )
+    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.\
+        from_stimulus_file(stimulus_file=mock_stimulus_file)
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_speed_df.assert_called_once_with(

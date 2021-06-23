@@ -138,45 +138,6 @@ def test_segmentation_mask_image(nwbfile, roundtrip, roundtripper,
            image_api.deserialize(obt.get_segmentation_mask_image())
 
 
-@pytest.mark.parametrize('test_partial_metadata', [True, False])
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
-                              cell_specimen_table,
-                              metadata_fixture, partial_metadata_fixture):
-    if test_partial_metadata:
-        meta = partial_metadata_fixture
-    else:
-        meta = metadata_fixture
-
-    nwbfile = pynwb.NWBFile(
-        session_description='asession',
-        identifier='afile',
-        session_start_time=meta['date_of_acquisition']
-    )
-    nwb.add_metadata(nwbfile, meta, behavior_only=False)
-    if not test_partial_metadata:
-        nwb.add_cell_specimen_table(nwbfile, cell_specimen_table, meta)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    if not test_partial_metadata:
-        metadata_obt = obt.get_metadata()
-    else:
-        with warnings.catch_warnings(record=True) as record:
-            metadata_obt = obt.get_metadata()
-        exp_warn_msg = "Could not locate 'ophys' module in NWB"
-        print(record)
-
-        assert record[0].message.args[0].startswith(exp_warn_msg)
-
-    assert len(metadata_obt) == len(meta)
-    for key, val in meta.items():
-        assert val == metadata_obt[key]
-
-
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_task_parameters(nwbfile, roundtrip,
                              roundtripper, task_parameters):

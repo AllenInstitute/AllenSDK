@@ -74,20 +74,22 @@ def test_stimulus_timestamps_from_json(
             ".get_ophys_stimulus_timestamps",
             mock_get_ophys_stimulus_timestamps
         )
-        obt = StimulusTimestamps.from_json(dict_repr)
+        mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
+        ts_from_stim = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=mock_stimulus_file_instance)
 
-    mock_stimulus_file.from_json.assert_called_with(dict_repr)
-    mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
-    assert obt._stimulus_file == mock_stimulus_file_instance
+        if has_pkl and has_sync:
+            mock_sync_file_instance = mock_sync_file.from_json(dict_repr)
+            ts_from_sync = StimulusTimestamps.from_sync_file(
+                sync_file=mock_sync_file_instance)
 
     if has_pkl and has_sync:
-        mock_sync_file.from_json.assert_called_with(dict_repr)
-        mock_sync_file_instance = mock_sync_file.from_json(dict_repr)
         mock_get_ophys_stimulus_timestamps.assert_called_once_with(
             sync_path=mock_sync_file_instance.filepath
         )
-        assert obt._sync_file == mock_sync_file_instance
+        assert ts_from_sync._sync_file == mock_sync_file_instance
     else:
+        assert ts_from_stim._stimulus_file == mock_stimulus_file_instance
         mock_get_behavior_stimulus_timestamps.assert_called_once_with(
             stimulus_pkl=mock_stimulus_file_instance.data
         )
@@ -215,30 +217,29 @@ def test_stimulus_timestamps_from_lims(
             ".get_ophys_stimulus_timestamps",
             mock_get_ophys_stimulus_timestamps
         )
-        obt = StimulusTimestamps.from_lims(
-            mock_db_conn, behavior_session_id, ophys_experiment_id
+        mock_stimulus_file_instance = mock_stimulus_file.from_lims(
+            mock_db_conn, behavior_session_id
         )
+        ts_from_stim = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=mock_stimulus_file_instance)
+        assert ts_from_stim._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_file.from_lims.assert_called_with(
-        mock_db_conn, behavior_session_id
-    )
-    mock_stimulus_file_instance = mock_stimulus_file.from_lims(
-        mock_db_conn, behavior_session_id
-    )
-    assert obt._stimulus_file == mock_stimulus_file_instance
+        if behavior_session_id is not None and ophys_experiment_id is not None:
+            mock_sync_file_instance = mock_sync_file.from_lims(
+                mock_db_conn, ophys_experiment_id
+            )
+            ts_from_sync = StimulusTimestamps.from_sync_file(
+                sync_file=mock_sync_file_instance)
 
     if behavior_session_id is not None and ophys_experiment_id is not None:
-        mock_sync_file.from_lims.assert_called_with(
-            mock_db_conn, ophys_experiment_id
-        )
-        mock_sync_file_instance = mock_sync_file.from_lims(
-            mock_db_conn, ophys_experiment_id
-        )
         mock_get_ophys_stimulus_timestamps.assert_called_once_with(
             sync_path=mock_sync_file_instance.filepath
         )
-        assert obt._sync_file == mock_sync_file_instance
+        assert ts_from_sync._sync_file == mock_sync_file_instance
     else:
+        mock_stimulus_file.from_lims.assert_called_with(
+            mock_db_conn, behavior_session_id
+        )
         mock_get_behavior_stimulus_timestamps.assert_called_once_with(
             stimulus_pkl=mock_stimulus_file_instance.data
         )
