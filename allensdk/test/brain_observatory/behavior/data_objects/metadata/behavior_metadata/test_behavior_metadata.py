@@ -99,12 +99,12 @@ class TestBehaviorMetadata:
 
     def test_reporter_line(self):
         """Test that reporter line properly parsed from list"""
-        reporter_line = ReporterLine._parse(reporter_line=['foo'])
+        reporter_line = ReporterLine.parse(reporter_line=['foo'])
         assert reporter_line == 'foo'
 
     def test_reporter_line_str(self):
         """Test that reporter line returns itself if str"""
-        reporter_line = ReporterLine._parse(reporter_line='foo')
+        reporter_line = ReporterLine.parse(reporter_line='foo')
         assert reporter_line == 'foo'
 
     @pytest.mark.parametrize("input_reporter_line, warning_msg, expected", (
@@ -118,7 +118,7 @@ class TestBehaviorMetadata:
                                  expected):
         """Test reporter line edge cases"""
         with pytest.warns(UserWarning) as record:
-            reporter_line = ReporterLine._parse(
+            reporter_line = ReporterLine.parse(
                 reporter_line=input_reporter_line,
                 warn=True)
         assert reporter_line == expected
