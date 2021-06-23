@@ -9,6 +9,12 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
 from allensdk.brain_observatory.behavior.data_objects.base\
+    .readable_interfaces.json_readable_interface import \
+    JsonReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base\
+    .readable_interfaces.lims_readable_interface import \
+    LimsReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base\
     .readable_interfaces.nwb_readable_interface import \
     NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base.readable_interfaces\
@@ -31,6 +37,7 @@ from allensdk.brain_observatory.behavior.data_objects.base\
 from allensdk.brain_observatory.behavior.data_objects.stimulus_timestamps.timestamps_processing import (  # noqa: E501
     get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps
 )
+from allensdk.internal.api import PostgresQueryMixin
 
 
 def from_json_cache_key(cls, dict_repr: dict):
@@ -45,7 +52,8 @@ def from_lims_cache_key(
 
 
 class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
-                         SyncFileReadableInterface, NwbReadableInterface,
+                         SyncFileReadableInterface, JsonReadableInterface,
+                         NwbReadableInterface, LimsReadableInterface,
                          NwbWritableInterface, JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
@@ -88,6 +96,30 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
             timestamps=stimulus_timestamps,
             sync_file=sync_file
         )
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "StimulusTimestamps":
+        if 'sync_file' in dict_repr:
+            sync_file = SyncFile.from_json(dict_repr=dict_repr)
+            return cls.from_sync_file(sync_file=sync_file)
+        else:
+            stim_file = StimulusFile.from_json(dict_repr=dict_repr)
+            return cls.from_stimulus_file(stimulus_file=stim_file)
+
+    def from_lims(
+        cls,
+        db: PostgresQueryMixin,
+        behavior_session_id: int,
+        ophys_experiment_id: Optional[int] = None
+    ) -> "StimulusTimestamps":
+        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
+
+        if ophys_experiment_id:
+            sync_file = SyncFile.from_lims(
+                db=db, ophys_experiment_id=ophys_experiment_id)
+            return cls.from_sync_file(sync_file=sync_file)
+        else:
+            return cls.from_stimulus_file(stimulus_file=stimulus_file)
 
     def to_json(self) -> dict:
         if self._stimulus_file is None:
