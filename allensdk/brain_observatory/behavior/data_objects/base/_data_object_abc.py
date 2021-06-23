@@ -44,25 +44,78 @@ class DataObject(abc.ABC):
     def _get_vars(cls):
         return vars(cls)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Serialize DataObject to dict
+        :return
+            A nested dict serializing the DataObject
+
+        notes
+            If a DataObject contains properties, these properties will either:
+                1) be serialized to nested dict with "name" attribute of
+                    DataObject if the property is itself a DataObject
+                2) Value for property will be added with name of property
+        :examples
+            >>> class Simple(DataObject):
+            ...     def __init__(self):
+            ...         super().__init__(name='simple', value=1)
+            >>> s = Simple()
+            >>> s.to_dict() == {'simple': 1}
+
+            >>> class B(DataObject):
+            ...     def __init__(self):
+            ...         super().__init__(name='b', value='!')
+
+            >>> class A(DataObject):
+            ...     def __init__(self, b: B):
+            ...         super().__init__(name='simple', value=self)
+            ...         self._b = b
+            ...     @property
+            ...     def prop1(self):
+            ...         return self._b
+            ...     @property
+            ...     def prop2(self):
+            ...         return '@'
+            >>> a = A()
+            >>> a.to_dict() == {'a': {'b': '!'}, 'prop2': '@'}
+        """
         res = {}
-        q = deque([(name, value, []) for name, value in
-                   self._get_properties().items()])
+        q = deque([(self._name, self, [])])
+
         while q:
             name, value, path = q.popleft()
             if isinstance(value, DataObject):
+                # The path stores the nested key structure
+                # Here, build onto the nested key structure
+                newpath = path + [name]
+
+                def _get_keys_and_values(value: DataObject):
+                    properties = []
+                    for name, value in value._get_properties().items():
+                        if isinstance(value, DataObject):
+                            # The key will be the DataObject "name" field
+                            name = value._name
+                        else:
+                            # The key will be the property name
+                            pass
+                        properties.append((name, value, newpath))
+                    return properties
+                properties = _get_keys_and_values(value=value)
+
+                # Find the nested dict
                 cur = res
                 for p in path:
                     cur = cur[p]
-                cur[name] = {}
-                newpath = path + [name]
-                values = [(name, value, newpath) for name, value in
-                          value._get_properties().items()]
-                if not values:
-                    q.append((name, value._value, newpath))
+
+                if properties:
+                    # it's nested
+                    cur[value._name] = {}
+                    for p in properties:
+                        q.append(p)
                 else:
-                    for v in values:
-                        q.append(v)
+                    # it's flat
+                    cur[name] = value._value
+
             else:
                 cur = res
                 for p in path:
@@ -84,13 +137,6 @@ class DataObject(abc.ABC):
 
         d_self = self.to_dict()
         d_other = other.to_dict()
-
-        # if not isinstance(self._value, DataObject):
-        #     properties_self['value'] = self._value
-        #     properties_other['value'] = other._value
-        #
-        # properties_self['name'] = self._name
-        # properties_other['name'] = other._name
 
         for p in d_self:
             if p in self._exclude_from_equals:
