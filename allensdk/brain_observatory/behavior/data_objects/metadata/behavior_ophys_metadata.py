@@ -94,7 +94,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._behavior_metadata.subject_metadata.to_nwb(nwbfile=nwbfile)
-        OphysBehaviorMetadata = load_pynwb_extension(
+        nwb_extension = load_pynwb_extension(
             OphysBehaviorMetadataSchema, 'ndx-aibs-behavior-ophys')
 
         behavior_meta = self._behavior_metadata
@@ -107,7 +107,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
             imaging_plane_group_count = 0
             imaging_plane_group = -1
 
-        nwb_metadata = OphysBehaviorMetadata(
+        nwb_metadata = nwb_extension(
             name='metadata',
             ophys_session_id=ophys_meta.ophys_session_id,
             field_of_view_width=ophys_meta.field_of_view_shape.width,
