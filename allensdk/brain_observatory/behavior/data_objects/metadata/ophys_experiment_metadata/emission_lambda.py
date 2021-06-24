@@ -2,7 +2,7 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base\
-    .readable_interfaces.nwb_readable_interface import \
+    .readable_interfaces import \
     NwbReadableInterface
 
 

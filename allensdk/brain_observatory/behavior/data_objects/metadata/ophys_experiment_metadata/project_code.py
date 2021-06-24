@@ -1,6 +1,6 @@
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base\
-    .readable_interfaces.lims_readable_interface import \
+    .readable_interfaces import \
     LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 

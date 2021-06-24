@@ -8,21 +8,12 @@ import inspect
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects.base.readable_interfaces\
-    .internal_readable_interface import \
-    InternalReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .readable_interfaces.json_readable_interface import \
-    JsonReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .readable_interfaces.nwb_readable_interface import \
-    NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces.json_writable_interface import \
-    JsonWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces.nwb_writable_interface import \
-    NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .writable_interfaces import \
+    JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata

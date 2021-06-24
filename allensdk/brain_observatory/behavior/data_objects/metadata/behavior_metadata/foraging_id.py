@@ -3,14 +3,11 @@ import uuid
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    JsonReadableInterface, LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base\
-    .readable_interfaces.json_readable_interface import \
-    JsonReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base.readable_interfaces\
-    .lims_readable_interface import \
-    LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces.json_writable_interface import \
+    .writable_interfaces import \
     JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
