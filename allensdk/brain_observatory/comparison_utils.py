@@ -1,6 +1,6 @@
 import datetime
 import math
-from typing import Any
+from typing import Any, Optional, Set
 
 import SimpleITK as sitk
 import numpy as np
@@ -9,7 +9,8 @@ import xarray as xr
 from pandas.util.testing import assert_frame_equal
 
 
-def compare_fields(x1: Any, x2: Any, err_msg=""):
+def compare_fields(x1: Any, x2: Any, err_msg="",
+                   ignore_keys: Optional[Set[str]] = None):
     """Helper function to compare if two fields (attributes)
     are equal to one another.
 
@@ -22,7 +23,12 @@ def compare_fields(x1: Any, x2: Any, err_msg=""):
     err_msg : str, optional
         The error message to display if two compared fields do not equal
         one another, by default "" (an empty string)
+    ignore_keys
+        For dictionary comparison, ignore these keys
     """
+    if ignore_keys is None:
+        ignore_keys = set()
+
     if isinstance(x1, pd.DataFrame):
         try:
             assert_frame_equal(x1, x2, check_like=True)
@@ -54,6 +60,8 @@ def compare_fields(x1: Any, x2: Any, err_msg=""):
             assert x1 == x2, err_msg
     elif isinstance(x1, (dict,)):
         for key in set(x1.keys()).union(set(x2.keys())):
+            if key in ignore_keys:
+                continue
             key_err_msg = f"Mismatch when checking key {key}. {err_msg}"
             compare_fields(x1[key], x2[key], err_msg=key_err_msg)
     else:

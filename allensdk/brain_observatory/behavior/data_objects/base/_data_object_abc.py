@@ -66,7 +66,7 @@ class DataObject(abc.ABC):
 
             >>> class A(DataObject):
             ...     def __init__(self, b: B):
-            ...         super().__init__(name='simple', value=self)
+            ...         super().__init__(name='a', value=self)
             ...         self._b = b
             ...     @property
             ...     def prop1(self):
@@ -74,7 +74,7 @@ class DataObject(abc.ABC):
             ...     @property
             ...     def prop2(self):
             ...         return '@'
-            >>> a = A()
+            >>> a = A(b=B())
             >>> a.to_dict() == {'a': {'b': '!'}, 'prop2': '@'}
         """
         res = dict()
@@ -137,14 +137,12 @@ class DataObject(abc.ABC):
         d_other = other.to_dict()
 
         for p in d_self:
-            if p in self._exclude_from_equals:
-                continue
-
             x1 = d_self[p]
             x2 = d_other[p]
 
             try:
-                compare_fields(x1=x1, x2=x2)
+                compare_fields(x1=x1, x2=x2,
+                               ignore_keys=self._exclude_from_equals)
             except AssertionError:
                 return False
         return True
