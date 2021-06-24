@@ -2,8 +2,6 @@ import abc
 from collections import deque
 from typing import Any, Optional, Set
 
-from pynwb import NWBFile
-
 from allensdk.brain_observatory.comparison_utils import compare_fields
 
 
@@ -16,7 +14,7 @@ class DataObject(abc.ABC):
     """
 
     def __init__(self, name: str, value: Any,
-                 exclude_from_equals: Optional[Set] = None):
+                 exclude_from_equals: Optional[Set[str]] = None):
         """
         :param name
             Name
