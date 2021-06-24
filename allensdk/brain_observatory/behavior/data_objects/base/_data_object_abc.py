@@ -77,7 +77,7 @@ class DataObject(abc.ABC):
             >>> a = A()
             >>> a.to_dict() == {'a': {'b': '!'}, 'prop2': '@'}
         """
-        res = {}
+        res = dict()
         q = deque([(self._name, self, [])])
 
         while q:
@@ -107,7 +107,7 @@ class DataObject(abc.ABC):
 
                 if properties:
                     # it's nested
-                    cur[value._name] = {}
+                    cur[value._name] = dict()
                     for p in properties:
                         q.append(p)
                 else:
