@@ -2,6 +2,7 @@ import datetime
 import pickle
 import uuid
 
+import pynwb
 import pytest
 import pytz
 
@@ -48,7 +49,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     SubjectMetadata
 
 
-class TestBehaviorMetadata:
+class BehaviorMetaTestCase:
     @classmethod
     def setup_class(cls):
         cls.meta = cls._get_meta()
@@ -81,6 +82,8 @@ class TestBehaviorMetadata:
         )
         return behavior_meta
 
+
+class TestBehaviorMetadata(BehaviorMetaTestCase):
     def test_cre_line(self):
         """Tests that cre_line properly parsed from driver_line"""
         fg = FullGenotype(
@@ -233,3 +236,26 @@ class TestBehaviorMetadata:
             indicator = reporter_line.parse_indicator(warn=True)
         assert indicator is expected
         assert str(record[0].message) == warning_msg
+
+
+class TestNWB(BehaviorMetaTestCase):
+    def setup_method(self, method):
+        self.nwbfile = pynwb.NWBFile(
+            session_description='asession',
+            identifier='afile',
+            session_start_time=self.meta.date_of_acquisition
+        )
+
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_add_behavior_only_metadata(self, roundtrip,
+                                        data_object_roundtrip_fixture):
+        self.meta.to_nwb(nwbfile=self.nwbfile)
+
+        if roundtrip:
+            meta_obt = data_object_roundtrip_fixture(
+                self.nwbfile, BehaviorMetadata
+            )
+        else:
+            meta_obt = BehaviorMetadata.from_nwb(nwbfile=self.nwbfile)
+
+        assert self.meta == meta_obt

@@ -452,12 +452,10 @@ def test_monitor_delay(monkeypatch):
                         xform_init)
 
             def dummy_get_metadata(self):
-                test_beh_meta = TestBehaviorMetadata()
-                test_beh_meta.setup_class()
-                metadata = test_beh_meta.meta
-                metadata._equipment_name = EquipmentName(
+                test_beh_meta = TestBehaviorMetadata().meta
+                test_beh_meta._equipment_name = EquipmentName(
                     equipment_name=equipment_name)
-                return metadata
+                return test_beh_meta
 
             ctx.setattr(BehaviorOphysDataTransforms,
                         'get_metadata',
