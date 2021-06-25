@@ -1,18 +1,13 @@
 import json
 from pathlib import Path
-from unittest.mock import create_autospec
 
 import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.cell_specimen_table \
     import \
     CellSpecimenTable
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -48,7 +43,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.test_behavior_metadata import \
     TestBehaviorMetadata
@@ -113,43 +109,35 @@ class TestBO:
 
 
 class TestInternal(TestBO):
+    @classmethod
+    def setup_method(self, method):
+        marks = getattr(method, 'pytestmark', None)
+        if marks:
+            marks = [m.name for m in marks]
+
+            # Will only create a dbconn if the test requires_bamboo
+            if 'requires_bamboo' in marks:
+                self.dbconn = db_connection_creator(
+                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+
+    @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
-    def test_from_internal(self, monkeypatch, meso):
-        mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
-
-        behavior_session_id = self.meta.behavior_metadata.behavior_session_id
-        experiment_id = self.meta.ophys_metadata.ophys_experiment_id
-
-        meta = self._get_mesoscope_meta() if meso else self.meta
-
-        with monkeypatch.context() as m:
-            m.setattr(BehaviorSessionId,
-                      'from_lims',
-                      lambda ophys_experiment_id, db: BehaviorSessionId(
-                          behavior_session_id=behavior_session_id))
-            m.setattr(BehaviorMetadata,
-                      'from_internal',
-                      lambda behavior_session_id, lims_db:
-                      meta.behavior_metadata)
-            if meso:
-                m.setattr(MesoscopeExperimentMetadata,
-                          'from_internal',
-                          lambda ophys_experiment_id, lims_db:
-                          meta.ophys_metadata)
-            else:
-                m.setattr(OphysExperimentMetadata,
-                          'from_internal',
-                          lambda ophys_experiment_id, lims_db:
-                          meta.ophys_metadata)
-            obt = BehaviorOphysMetadata.from_internal(
-                ophys_experiment_id=experiment_id, lims_db=mock_db_conn)
+    def test_from_internal(self, meso):
+        if meso:
+            ophys_experiment_id = 951980471
+        else:
+            ophys_experiment_id = 994278291
+        bom = BehaviorOphysMetadata.from_internal(
+            ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn)
 
         if meso:
-            assert isinstance(obt.ophys_metadata, MesoscopeExperimentMetadata)
+            assert isinstance(bom.ophys_metadata,
+                              MesoscopeExperimentMetadata)
         else:
-            assert isinstance(obt.ophys_metadata, OphysExperimentMetadata)
+            assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
-        assert obt == meta
+    def test_foo(self):
+        pass
 
 
 class TestJson(TestBO):
@@ -166,7 +154,7 @@ class TestJson(TestBO):
         self.dict_repr = dict_repr
 
     @pytest.mark.parametrize('meso', [True, False])
-    def test_from_json(self, monkeypatch, meso):
+    def test_from_json(self, meso):
         if meso:
             self.dict_repr['rig_name'] = 'MESO.1'
         bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
