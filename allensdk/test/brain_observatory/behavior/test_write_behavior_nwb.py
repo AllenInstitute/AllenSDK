@@ -4,13 +4,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pynwb
 import pytest
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.stimulus_processing import \

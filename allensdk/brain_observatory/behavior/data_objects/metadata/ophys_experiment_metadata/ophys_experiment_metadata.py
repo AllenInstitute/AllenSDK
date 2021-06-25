@@ -1,4 +1,3 @@
-import warnings
 from typing import Optional
 
 from pynwb import NWBFile

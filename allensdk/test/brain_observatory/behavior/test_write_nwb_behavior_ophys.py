@@ -1,11 +1,9 @@
 import math
 import mock
 from pathlib import Path
-import warnings
 
 import numpy as np
 import pandas as pd
-import pynwb
 import pytest
 
 import allensdk.brain_observatory.nwb as nwb

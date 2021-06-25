@@ -91,4 +91,3 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     @staticmethod
     def to_utc(date_of_acquisition: datetime):
         return pytz.utc.localize(dt=date_of_acquisition)
-

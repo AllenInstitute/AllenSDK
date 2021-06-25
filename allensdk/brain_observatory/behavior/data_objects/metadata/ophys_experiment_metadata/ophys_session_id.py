@@ -8,7 +8,7 @@ from allensdk.internal.api import PostgresQueryMixin
 
 
 class OphysSessionId(DataObject, LimsReadableInterface,
-                            JsonReadableInterface, NwbReadableInterface):
+                     JsonReadableInterface, NwbReadableInterface):
     """"Ophys session id"""
     def __init__(self, session_id: int):
         super().__init__(name='session_id',

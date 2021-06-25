@@ -8,13 +8,13 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.equipment import \
     EquipmentType
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -130,9 +130,9 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         fov_height = metadata.field_of_view_height
         imaging_plane_description = "{} field of view in {} at depth {} " \
                                     "um".format(
-            (fov_width, fov_height),
-            imaging_plane_meta.targeted_structure,
-            metadata.imaging_depth)
+                                        (fov_width, fov_height),
+                                        imaging_plane_meta.targeted_structure,
+                                        metadata.imaging_depth)
 
         # Optical Channel:
         optical_channel = OpticalChannel(

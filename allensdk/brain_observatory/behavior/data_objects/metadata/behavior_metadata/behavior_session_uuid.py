@@ -14,7 +14,8 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
                           NwbReadableInterface):
     """the universally unique identifier (UUID)"""
     def __init__(self, behavior_session_uuid: Optional[uuid.UUID]):
-        super().__init__(name="behavior_session_uuid", value=behavior_session_uuid)
+        super().__init__(name="behavior_session_uuid",
+                         value=behavior_session_uuid)
 
     @classmethod
     def from_stimulus_file(

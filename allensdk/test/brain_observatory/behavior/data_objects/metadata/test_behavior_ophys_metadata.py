@@ -44,7 +44,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
+from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.test_behavior_metadata import \
     TestBehaviorMetadata
@@ -93,8 +93,7 @@ class TestBO:
         meso_meta = MesoscopeExperimentMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            experiment_container_id=
-            ophys_experiment_metadata._experiment_container_id,
+            experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
             emission_lambda=ophys_experiment_metadata._emission_lambda,
             imaging_plane=ophys_experiment_metadata._imaging_plane,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,

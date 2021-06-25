@@ -10,22 +10,22 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     JsonWritableInterface, NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.age import \
     Age
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.driver_line import \
     DriverLine
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.full_genotype import \
     FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.mouse_id import \
     MouseId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.reporter_line import \
     ReporterLine
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.sex import \
     Sex
 from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema
@@ -37,6 +37,7 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
                       NwbWritableInterface, JsonReadableInterface,
                       JsonWritableInterface):
     """Subject metadata"""
+
     def __init__(self,
                  sex: Sex,
                  age: Age,
@@ -68,7 +69,7 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         mouse_id = MouseId.from_lims(
             behavior_session_id=behavior_session_id.value,
-                                     lims_db=lims_db)
+            lims_db=lims_db)
         return cls(
             sex=sex,
             age=age,

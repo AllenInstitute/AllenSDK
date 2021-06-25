@@ -1,9 +1,7 @@
-import json
 import math
 import pickle
 import tempfile
 from datetime import datetime
-from pathlib import Path
 from uuid import UUID
 
 import numpy as np
@@ -14,9 +12,6 @@ import pytz
 from allensdk import OneResultExpectedError
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID

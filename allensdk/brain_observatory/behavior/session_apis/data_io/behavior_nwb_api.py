@@ -5,18 +5,16 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import pytz
-
 from pynwb import NWBHDF5IO, NWBFile
 
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import (
-    get_expt_description, BehaviorMetadata
-)
-from allensdk.brain_observatory.behavior.session_apis.abcs.\
-    session_base.behavior_base import BehaviorBase
+from allensdk.brain_observatory.behavior.data_objects.metadata \
+    .behavior_metadata.behavior_metadata import get_expt_description, \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.schemas import (
     BehaviorTaskParametersSchema, OphysBehaviorMetadataSchema)
+from allensdk.brain_observatory.behavior.session_apis.abcs. \
+    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplate, StimulusTemplateFactory, is_change_event
 from allensdk.brain_observatory.behavior.trials_processing import (

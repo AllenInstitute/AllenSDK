@@ -20,7 +20,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorNwbApi, BehaviorJsonApi, BehaviorLimsApi)
+    BehaviorJsonApi, BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (

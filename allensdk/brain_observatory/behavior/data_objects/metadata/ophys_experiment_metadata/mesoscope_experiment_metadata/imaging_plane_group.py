@@ -32,7 +32,7 @@ class ImagingPlaneGroup(DataObject, LimsReadableInterface,
             JOIN  ophys_imaging_plane_groups pg
                 ON pg.id = oe.ophys_imaging_plane_group_id
             WHERE os.id = (
-                SELECT oe.ophys_session_id 
+                SELECT oe.ophys_session_id
                 FROM ophys_experiments oe
                 WHERE oe.id = {ophys_experiment_id}
             )
