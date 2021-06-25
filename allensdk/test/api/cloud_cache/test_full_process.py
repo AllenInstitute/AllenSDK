@@ -184,11 +184,11 @@ def test_full_cache_system(tmpdir):
     manifest_2['metadata_files'] = metadata_files_2
 
     s3_client.put_object(Bucket=test_bucket_name,
-                         Key='proj/manifests/manifest_1.json',
+                         Key='proj/manifests/manifest_v1.0.0.json',
                          Body=bytes(json.dumps(manifest_1), 'utf-8'))
 
     s3_client.put_object(Bucket=test_bucket_name,
-                         Key='proj/manifests/manifest_2.json',
+                         Key='proj/manifests/manifest_v2.0.0.json',
                          Body=bytes(json.dumps(manifest_2), 'utf-8'))
 
     # Use S3CloudCache to interact with dataset
@@ -197,7 +197,7 @@ def test_full_cache_system(tmpdir):
 
     # load the first version of the dataset
 
-    cache.load_manifest('manifest_1.json')
+    cache.load_manifest('manifest_v1.0.0.json')
     assert cache.version == 'A'
 
     # check that metadata dataframes have expected contents
@@ -224,7 +224,7 @@ def test_full_cache_system(tmpdir):
 
     # now load the second version of the dataset
 
-    cache.load_manifest('manifest_2.json')
+    cache.load_manifest('manifest_v2.0.0.json')
     assert cache.version == 'B'
 
     # metadata2.csv should not exist in this version of the dataset

@@ -51,6 +51,9 @@ class MockCache():
             'exists': True
         }
 
+    def load_last_manifest(self):
+        return None
+
 
 @pytest.fixture
 def mock_cache(request, tmpdir):

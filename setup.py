@@ -44,7 +44,7 @@ setup(
     description = 'core libraries for the allensdk.',
     install_requires = required,
     tests_require=test_required,
-    setup_requires=['setuptools', 'sphinx', 'numpydoc', 'pytest-runner'],
+    setup_requires=['setuptools', 'jinja2>=2.7.3,<2.12.0', 'sphinx', 'numpydoc', 'pytest-runner'],
     url='https://github.com/AllenInstitute/AllenSDK/tree/v%s' % (allensdk.__version__),
     download_url = 'https://github.com/AllenInstitute/AllenSDK/tarball/v%s' % (allensdk.__version__),
     keywords = ['neuroscience', 'bioinformatics', 'scientific'  ],
