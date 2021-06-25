@@ -1,11 +1,9 @@
 import hashlib
-
 from argschema import ArgSchema
-from argschema.fields import LogLevel, String, Int, Nested, Boolean, List
-from marshmallow import RAISE
+from argschema.fields import (
+    LogLevel, String, Int, Nested, Boolean, List, InputFile)
+from argschema.schemas import DefaultSchema
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, \
-    check_write_access, RaisingSchema
 
 available_hashers = {
     'sha3_256': hashlib.sha3_256,
@@ -14,34 +12,32 @@ available_hashers = {
 }
 
 
-class FileToCopy(RaisingSchema):
-    source = String(required=True, validate=check_read_access,
-                    description='copy from here')
-    destination = String(required=True, validate=check_write_access,
-                         description='copy to here (full path, not just '
-                                     'directory!)')
+class FileExists(InputFile):
+    pass
+
+
+class FileToCopy(DefaultSchema):
+    source = InputFile(
+            required=True,
+            description='copy from here')
+    destination = String(
+            required=True,
+            description='copy to here (full path, not just directory!)')
     key = String(required=True,
                  description='will be passed through to outputs, allowing a '
                              'name or kind to be associated with this file')
 
 
-class CopiedFile(RaisingSchema):
-    source = String(required=True, description='copied from here')
-    destination = String(required=True, description='copied to here')
+class CopiedFile(DefaultSchema):
+    source = InputFile(required=True, description='copied from here')
+    destination = FileExists(required=True, description='copied to here')
     key = String(required=False, description='passed from inputs')
     source_hash = List(Int,
                        required=False)  # int array vs bytes for JSONability
     destination_hash = List(Int, required=False)
 
 
-class InputSchema(ArgSchema):
-    class Meta:
-        unknown = RAISE
-
-    log_level = LogLevel(default='INFO',
-                         description='set the logging level of the module')
-    files = Nested(FileToCopy, many=True, required=True,
-                   description='files to be copied')
+class NonFileParameters(DefaultSchema):
     use_rsync = Boolean(default=True,
                         description='copy files using rsync rather than '
                                     'shutil (this is not likely to work if '
@@ -65,7 +61,14 @@ class InputSchema(ArgSchema):
                             "have these permissions")
 
 
-class OutputSchema(RaisingSchema):
-    input_parameters = Nested(InputSchema)
+class SessionUploadInputSchema(ArgSchema, NonFileParameters):
+    log_level = LogLevel(default='INFO',
+                         description='set the logging level of the module')
+    files = Nested(FileToCopy, many=True, required=True,
+                   description='files to be copied')
+
+
+class SessionUploadOutputSchema(DefaultSchema):
+    input_parameters = Nested(NonFileParameters)
     files = Nested(CopiedFile, many=True, required=True,
                    description='copied files')

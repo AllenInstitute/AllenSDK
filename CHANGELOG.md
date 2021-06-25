@@ -1,8 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.11.0] = TBD
+
+## [2.11.2] = 2021-05-21
+- Fixed mkdir error for non-existing ecephys upload directory
+
+## [2.11.1] = 2021-05-20
+- Refactored the schema for the ecephys copy utility to avoid raising an error when a previous output file already exists.
+
+## [2.11.0] = 2021-05-13
 - python 3.8 compatibility
+- CloudCache (the class supporting cloud-based data releases) is now smart enough to construct symlinks between files that are identical across dataset versions (rather than downloading duplicate copies of files).
+- VisualBehavioOphysProjectCache supports user-controlled switching between dataset versions.
 
 ## [2.10.3] = 2021-04-23
 - Adds restriction to require hdmf version to be strictly less than 2.5.0 which accidentally introduced a major version breaking change
