@@ -14,6 +14,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment import \
+    EquipmentType
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.mesoscope_experiment_metadata\
     .mesoscope_experiment_metadata import \
     MesoscopeExperimentMetadata
@@ -54,7 +57,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
 
-        if behavior_metadata.session_type.is_mesoscope():
+        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
             ophys_metadata = MesoscopeExperimentMetadata.from_internal(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         else:
@@ -68,7 +71,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
     def from_json(cls, dict_repr: dict) -> "BehaviorOphysMetadata":
         behavior_metadata = BehaviorMetadata.from_json(dict_repr=dict_repr)
 
-        if behavior_metadata.session_type.is_mesoscope():
+        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
             ophys_metadata = MesoscopeExperimentMetadata.from_json(
                 dict_repr=dict_repr)
         else:
@@ -82,7 +85,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorOphysMetadata":
         behavior_metadata = BehaviorMetadata.from_nwb(nwbfile=nwbfile)
 
-        if behavior_metadata.session_type.is_mesoscope():
+        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
             ophys_metadata = MesoscopeExperimentMetadata.from_nwb(
                 nwbfile=nwbfile)
         else:
@@ -117,8 +120,8 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
             stimulus_frame_rate=behavior_meta.stimulus_frame_rate,
             experiment_container_id=ophys_meta.experiment_container_id,
             ophys_experiment_id=ophys_meta.ophys_experiment_id,
-            session_type=behavior_meta.session_type.value,
-            equipment_name=behavior_meta.equipment_name,
+            session_type=behavior_meta.session_type,
+            equipment_name=behavior_meta.equipment.value,
             imaging_depth=ophys_meta.imaging_depth,
             behavior_session_uuid=str(behavior_meta.behavior_session_uuid),
             behavior_session_id=behavior_meta.behavior_session_id

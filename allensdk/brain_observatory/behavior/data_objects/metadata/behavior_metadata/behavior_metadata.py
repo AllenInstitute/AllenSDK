@@ -21,8 +21,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment_name import \
-    EquipmentName
+    .behavior_metadata.equipment import \
+    Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.foraging_id import \
     ForagingId
@@ -188,7 +188,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     def __init__(self,
                  subject_metadata: SubjectMetadata,
                  behavior_session_id: BehaviorSessionId,
-                 equipment_name: EquipmentName,
+                 equipment: Equipment,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
                  date_of_acquisition: DateOfAcquisition,
@@ -196,7 +196,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         super().__init__(name='behavior_metadata', value=self)
         self._subject_metadata = subject_metadata
         self._behavior_session_id = behavior_session_id
-        self._equipment_name = equipment_name
+        self._equipment = equipment
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
         self._date_of_acquisition = date_of_acquisition
@@ -212,7 +212,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         ) -> "BehaviorMetadata":
         subject_metadata = SubjectMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
-        equipment_name = EquipmentName.from_lims(
+        equipment = Equipment.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
         stimulus_file = StimulusFile.from_lims(
@@ -239,7 +239,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         return cls(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
-            equipment_name=equipment_name,
+            equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             date_of_acquisition=date_of_acquisition,
@@ -250,7 +250,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     def from_json(cls, dict_repr: dict) -> "BehaviorMetadata":
         subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
-        equipment_name = EquipmentName.from_json(dict_repr=dict_repr)
+        equipment = Equipment.from_json(dict_repr=dict_repr)
         date_of_acquisition = DateOfAcquisition.from_json(dict_repr=dict_repr)
 
         stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
@@ -266,7 +266,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         return cls(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
-            equipment_name=equipment_name,
+            equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             date_of_acquisition=date_of_acquisition,
@@ -278,7 +278,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         subject_metadata = SubjectMetadata.from_nwb(nwbfile=nwbfile)
 
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile=nwbfile)
-        equipment_name = EquipmentName.from_nwb(nwbfile=nwbfile)
+        equipment = Equipment.from_nwb(nwbfile=nwbfile)
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
@@ -287,7 +287,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         return cls(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
-            equipment_name=equipment_name,
+            equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             date_of_acquisition=date_of_acquisition,
@@ -295,16 +295,16 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         )
 
     @property
-    def equipment_name(self) -> str:
-        return self._equipment_name.value
+    def equipment(self) -> Equipment:
+        return self._equipment
 
     @property
     def stimulus_frame_rate(self) -> float:
         return self._stimulus_frame_rate.value
 
     @property
-    def session_type(self) -> SessionType:
-        return self._session_type
+    def session_type(self) -> str:
+        return self._session_type.value
 
     @property
     def date_of_acquisition(self) -> datetime:
@@ -335,13 +335,9 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             behavior_session_id=self.behavior_session_id,
             behavior_session_uuid=str(self.behavior_session_uuid),
             stimulus_frame_rate=self.stimulus_frame_rate,
-            session_type=self.session_type.value,
-            equipment_name=self.equipment_name
+            session_type=self.session_type,
+            equipment_name=self.equipment.value
         )
         nwbfile.add_lab_meta_data(nwb_metadata)
 
         return nwbfile
-
-    def __dict__(self):
-        props = self._get_properties()
-

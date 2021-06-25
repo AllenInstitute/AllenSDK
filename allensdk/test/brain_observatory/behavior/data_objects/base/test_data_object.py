@@ -72,7 +72,7 @@ class TestDataObject:
         assert s1 != s2
 
     def test_exclude_equals(self):
-        s1 = DataObject(name='s1', value=1, exclude_from_equals={'value'})
+        s1 = DataObject(name='s1', value=1, exclude_from_equals={'s1'})
         s2 = DataObject(name='s1', value='1')
         assert s1 == s2
 

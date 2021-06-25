@@ -96,7 +96,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         emission_lambda = EmissionLambda()
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
-        return cls(
+        return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,

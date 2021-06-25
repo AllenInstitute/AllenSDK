@@ -105,7 +105,7 @@ class DataObject(abc.ABC):
                 for p in path:
                     cur = cur[p]
 
-                if properties:
+                if isinstance(value._value, DataObject):
                     # it's nested
                     cur[value._name] = dict()
                     for p in properties:
@@ -137,6 +137,8 @@ class DataObject(abc.ABC):
         d_other = other.to_dict()
 
         for p in d_self:
+            if p in self._exclude_from_equals:
+                continue
             x1 = d_self[p]
             x2 = d_other[p]
 

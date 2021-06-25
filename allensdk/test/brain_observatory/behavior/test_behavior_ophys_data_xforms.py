@@ -7,8 +7,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment_name import \
-    EquipmentName
+    .behavior_metadata.equipment import \
+    Equipment
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.metadata\
@@ -452,8 +452,10 @@ def test_monitor_delay(monkeypatch):
                         xform_init)
 
             def dummy_get_metadata(self):
-                test_beh_meta = TestBehaviorMetadata().meta
-                test_beh_meta._equipment_name = EquipmentName(
+                test_beh_meta = TestBehaviorMetadata()
+                test_beh_meta.setup_class()
+                test_beh_meta = test_beh_meta.meta
+                test_beh_meta._equipment = Equipment(
                     equipment_name=equipment_name)
                 return test_beh_meta
 

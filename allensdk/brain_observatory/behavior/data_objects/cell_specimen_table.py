@@ -12,6 +12,9 @@ from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment import \
+    EquipmentType
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -107,20 +110,20 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         imaging_plane_meta = meta.ophys_metadata.imaging_plane
 
         # Device:
-        device_name: str = metadata.equipment_name
-        if device_name.startswith("MESO"):
+        equipment = meta.behavior_metadata.equipment
+        if equipment.type == EquipmentType.MESOSCOPE:
             device_config = {
-                "name": device_name,
+                "name": equipment.value,
                 "description": "Allen Brain Observatory - Mesoscope 2P Rig"
             }
         else:
             device_config = {
-                "name": device_name,
+                "name": equipment.value,
                 "description": "Allen Brain Observatory - Scientifica 2P Rig",
                 "manufacturer": "Scientifica"
             }
         nwbfile.create_device(**device_config)
-        device = nwbfile.get_device(device_name)
+        device = nwbfile.get_device(equipment.value)
 
         # FOV:
         fov_width = metadata.field_of_view_width

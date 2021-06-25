@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from unittest.mock import create_autospec
 
 import pandas as pd
@@ -12,8 +14,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.session_type import \
-    SessionType
+    .behavior_metadata.equipment import \
+    Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
@@ -49,7 +51,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.test.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.test_behavior_metadata import \
-    TestBehaviorMetadata, BehaviorMetaTestCase
+    TestBehaviorMetadata
 
 
 class TestBO:
@@ -86,8 +88,8 @@ class TestBO:
 
     def _get_mesoscope_meta(self):
         bo_meta = self.meta
-        bo_meta.behavior_metadata._session_type = \
-            SessionType(session_type='MESO.1')
+        bo_meta.behavior_metadata._equipment = \
+            Equipment(equipment_name='MESO.1')
         ophys_experiment_metadata = bo_meta.ophys_metadata
 
         imaging_plane_group = ImagingPlaneGroup(plane_group_count=5,
@@ -151,35 +153,28 @@ class TestInternal(TestBO):
 
 
 class TestJson(TestBO):
+    @classmethod
+    def setup_method(self, method):
+        dir = Path(__file__).parent.resolve()
+        test_data_dir = dir.parent / 'test_data'
+        with open(test_data_dir / 'test_input.json') as f:
+            dict_repr = json.load(f)
+        dict_repr = dict_repr['session_data']
+        dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
+        dict_repr['behavior_stimulus_file'] = str(test_data_dir /
+                                                  'behavior_stimulus_file.pkl')
+        self.dict_repr = dict_repr
+
     @pytest.mark.parametrize('meso', [True, False])
     def test_from_json(self, monkeypatch, meso):
-        dict_repr = create_autospec(dict)
-
-        meta = self._get_mesoscope_meta() if meso else self.meta
-
-        with monkeypatch.context() as m:
-            m.setattr(BehaviorMetadata,
-                      'from_json',
-                      lambda dict_repr:
-                      meta.behavior_metadata)
-            if meso:
-                m.setattr(MesoscopeExperimentMetadata,
-                          'from_json',
-                          lambda dict_repr:
-                          meta.ophys_metadata)
-            else:
-                m.setattr(OphysExperimentMetadata,
-                          'from_json',
-                          lambda dict_repr:
-                          meta.ophys_metadata)
-            obt = BehaviorOphysMetadata.from_json(dict_repr=dict_repr)
+        if meso:
+            self.dict_repr['rig_name'] = 'MESO.1'
+        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
 
         if meso:
-            assert isinstance(obt.ophys_metadata, MesoscopeExperimentMetadata)
+            assert isinstance(bom.ophys_metadata, MesoscopeExperimentMetadata)
         else:
-            assert isinstance(obt.ophys_metadata, OphysExperimentMetadata)
-
-        assert obt == meta
+            assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
 
 class TestNWB(TestBO):

@@ -18,8 +18,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.equipment_name import \
-    EquipmentName
+    .behavior_metadata.equipment import \
+    Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.session_type import \
     SessionType
@@ -71,7 +71,7 @@ class BehaviorMetaTestCase:
         behavior_meta = BehaviorMetadata(
             subject_metadata=subject_meta,
             behavior_session_id=BehaviorSessionId(behavior_session_id=4242),
-            equipment_name=EquipmentName(equipment_name='my_device'),
+            equipment=Equipment(equipment_name='my_device'),
             stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
             session_type=SessionType(session_type='Unknown'),
             date_of_acquisition=DateOfAcquisition(
