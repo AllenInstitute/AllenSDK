@@ -7,9 +7,6 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.emission_lambda import \
-    EmissionLambda
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -18,9 +15,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_plane import \
-    ImagingPlane
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
@@ -37,8 +31,6 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
                  ophys_experiment_id: int,
                  ophys_session_id: OphysSessionId,
                  experiment_container_id: ExperimentContainerId,
-                 imaging_plane: ImagingPlane,
-                 emission_lambda: EmissionLambda,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  project_code: Optional[ProjectCode] = None):
@@ -46,8 +38,6 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         self._ophys_experiment_id = ophys_experiment_id
         self._ophys_session_id = ophys_session_id
         self._experiment_container_id = experiment_container_id
-        self._imaging_plane = imaging_plane
-        self._emission_lambda = emission_lambda
         self._field_of_view_shape = field_of_view_shape
         self._imaging_depth = imaging_depth
         self._project_code = project_code
@@ -64,9 +54,6 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         experiment_container_id = ExperimentContainerId.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        imaging_plane = ImagingPlane.from_internal(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        emission_lambda = EmissionLambda(emission_lambda=520.0)
         field_of_view_shape = FieldOfViewShape.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         imaging_depth = ImagingDepth.from_lims(
@@ -77,8 +64,6 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         return cls(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            emission_lambda=emission_lambda,
-            imaging_plane=imaging_plane,
             experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
@@ -91,53 +76,31 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         experiment_container_id = ExperimentContainerId.from_json(
             dict_repr=dict_repr)
         ophys_experiment_id = dict_repr['ophys_experiment_id']
-        imaging_plane = ImagingPlane.from_json(dict_repr=dict_repr)
-        emission_lambda = EmissionLambda()
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
-            imaging_plane=imaging_plane,
-            emission_lambda=emission_lambda,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth
         )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysExperimentMetadata":
-        if 'ophys' not in nwbfile.processing:
-            raise RuntimeError('Key "ophys" not found in nwb file '
-                               '(needed to read imaging plane metadata). '
-                               'Did you forget to write cell specimen table '
-                               'to nwb?')
-
         ophys_experiment_id = int(nwbfile.identifier)
         ophys_session_id = OphysSessionId.from_nwb(nwbfile=nwbfile)
         experiment_container_id = ExperimentContainerId.from_nwb(
             nwbfile=nwbfile)
-        imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
-        emission_lambda = EmissionLambda.from_nwb(nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
-            imaging_plane=imaging_plane,
-            emission_lambda=emission_lambda,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth
         )
-
-    @property
-    def emission_lambda(self) -> float:
-        return self._emission_lambda.value
-
-    @property
-    def imaging_plane(self) -> ImagingPlane:
-        return self._imaging_plane
 
     # TODO rename to ophys_container_id
     @property

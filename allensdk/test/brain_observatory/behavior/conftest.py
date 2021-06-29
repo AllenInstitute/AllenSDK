@@ -31,9 +31,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.emission_lambda import \
-    EmissionLambda
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -281,7 +278,6 @@ def behavior_ophys_metadata_fixture(
             targeted_structure='VISp',
             excitation_lambda=1.0
         ),
-        emission_lambda=EmissionLambda(emission_lambda=1.0),
         field_of_view_shape=FieldOfViewShape(width=4, height=4),
         imaging_depth=ImagingDepth(imaging_depth=375)
     )

@@ -20,15 +20,35 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.imaging_plane import \
+    ImagingPlane
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
 from allensdk.internal.api import PostgresQueryMixin
+
+
+class CellSpecimenTableMeta:
+    def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
+        self._emission_lambda = emission_lambda
+        self._imaging_plane = imaging_plane
+
+    @property
+    def emission_lambda(self):
+        return self._emission_lambda
+
+    @property
+    def imaging_plane(self):
+        return self._imaging_plane
 
 
 class CellSpecimenTable(DataObject, LimsReadableInterface,
                         JsonReadableInterface, NwbReadableInterface,
                         NwbWritableInterface):
-    def __init__(self, cell_specimen_table: pd.DataFrame):
+    def __init__(self, cell_specimen_table: pd.DataFrame,
+                 meta: CellSpecimenTableMeta):
         super().__init__(name='cell_specimen_table', value=cell_specimen_table)
+        self._meta = meta
+
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
@@ -63,7 +83,11 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         cell_specimen_table = cls._postprocess(
             cell_specimen_table=cell_specimen_table, fov_shape=fov_shape)
-        return cls(cell_specimen_table=cell_specimen_table)
+
+        imaging_plane_meta = ImagingPlane.from_internal(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        meta = CellSpecimenTableMeta(imaging_plane=imaging_plane_meta)
+        return cls(cell_specimen_table=cell_specimen_table, meta=meta)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "CellSpecimenTable":
@@ -71,30 +95,51 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         cell_specimen_table = cls._postprocess(
             cell_specimen_table=cell_specimen_table, fov_shape=fov_shape)
-        return cls(cell_specimen_table=cell_specimen_table)
+
+        imaging_plane_meta = ImagingPlane.from_json(dict_repr=dict_repr)
+        meta = CellSpecimenTableMeta(imaging_plane=imaging_plane_meta)
+        return cls(cell_specimen_table=cell_specimen_table, meta=meta)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  filter_invalid_rois=False) -> "CellSpecimenTable":
         # NOTE: ROI masks are stored in full frame width and height arrays
-        df = nwbfile.processing[
-            'ophys'].data_interfaces[
-            'image_segmentation'].plane_segmentations[
-            'cell_specimen_table'].to_dataframe()
+        ophys_module = nwbfile.processing['ophys']
+        image_seg = ophys_module.data_interfaces['image_segmentation']
+        plane_segmentations = image_seg.plane_segmentations
+        cell_specimen_table = plane_segmentations['cell_specimen_table']
 
-        # Because pynwb stores this field as "image_mask", it is renamed here
-        df = df.rename(columns={'image_mask': 'roi_mask'})
+        def _read_table(cell_specimen_table):
+            df = cell_specimen_table.to_dataframe()
 
-        df.index.rename('cell_roi_id', inplace=True)
-        df['cell_specimen_id'] = [None if csid == -1 else csid
-                                  for csid in df['cell_specimen_id'].values]
+            # Because pynwb stores this field as "image_mask", it is renamed
+            # here
+            df = df.rename(columns={'image_mask': 'roi_mask'})
 
-        df.reset_index(inplace=True)
-        df.set_index('cell_specimen_id', inplace=True)
+            df.index.rename('cell_roi_id', inplace=True)
+            df['cell_specimen_id'] = [None if csid == -1 else csid
+                                      for csid in df['cell_specimen_id'].values]
 
-        if filter_invalid_rois:
-            df = df[df["valid_roi"]]
-        return cls(cell_specimen_table=df)
+            df.reset_index(inplace=True)
+            df.set_index('cell_specimen_id', inplace=True)
+
+            if filter_invalid_rois:
+                df = df[df["valid_roi"]]
+            return df
+
+        def _read_meta(cell_specimen_table) -> CellSpecimenTableMeta:
+            imaging_plane = cell_specimen_table.imaging_plane
+            optical_channel = imaging_plane.optical_channel[0]
+            emission_lambda = optical_channel.emission_lambda
+
+            imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
+            return CellSpecimenTableMeta(emission_lambda=emission_lambda,
+                                         imaging_plane=imaging_plane)
+
+        df = _read_table(cell_specimen_table=cell_specimen_table)
+        meta = _read_meta(cell_specimen_table=cell_specimen_table)
+
+        return cls(cell_specimen_table=df, meta=meta)
 
     def to_nwb(self, nwbfile: NWBFile, meta: BehaviorOphysMetadata) -> NWBFile:
         """
@@ -107,7 +152,6 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         cell_roi_table = self.value.reset_index().set_index(
             'cell_roi_id')
         metadata = nwbfile.lab_meta_data['metadata']
-        imaging_plane_meta = meta.ophys_metadata.imaging_plane
 
         # Device:
         equipment = meta.behavior_metadata.equipment
@@ -131,14 +175,14 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         imaging_plane_description = "{} field of view in {} at depth {} " \
                                     "um".format(
                                         (fov_width, fov_height),
-                                        imaging_plane_meta.targeted_structure,
+                                        self._meta.imaging_plane.targeted_structure, # noqa E501
                                         metadata.imaging_depth)
 
         # Optical Channel:
         optical_channel = OpticalChannel(
             name='channel_1',
             description='2P Optical Channel',
-            emission_lambda=meta.ophys_metadata.emission_lambda)
+            emission_lambda=self._meta.emission_lambda)
 
         # Imaging Plane:
         imaging_plane = nwbfile.create_imaging_plane(
@@ -146,10 +190,10 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             optical_channel=optical_channel,
             description=imaging_plane_description,
             device=device,
-            excitation_lambda=imaging_plane_meta.excitation_lambda,
-            imaging_rate=imaging_plane_meta.ophys_frame_rate,
+            excitation_lambda=self._meta.imaging_plane.excitation_lambda,
+            imaging_rate=self._meta.imaging_plane.ophys_frame_rate,
             indicator=meta.behavior_metadata.subject_metadata.indicator,
-            location=imaging_plane_meta.targeted_structure)
+            location=self._meta.imaging_plane.targeted_structure)
 
         # Image Segmentation:
         image_segmentation = ImageSegmentation(name="image_segmentation")

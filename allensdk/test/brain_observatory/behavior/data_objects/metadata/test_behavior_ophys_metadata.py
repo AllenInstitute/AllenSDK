@@ -15,9 +15,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.emission_lambda import \
-    EmissionLambda
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -65,12 +62,6 @@ class TestBO:
             ophys_session_id=OphysSessionId(session_id=999),
             experiment_container_id=ExperimentContainerId(
                 experiment_container_id=5678),
-            imaging_plane=ImagingPlane(
-                ophys_frame_rate=31.0,
-                targeted_structure='VISp',
-                excitation_lambda=1.0
-            ),
-            emission_lambda=EmissionLambda(emission_lambda=1.0),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
             imaging_depth=ImagingDepth(imaging_depth=375)
         )
@@ -94,8 +85,6 @@ class TestBO:
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
-            emission_lambda=ophys_experiment_metadata._emission_lambda,
-            imaging_plane=ophys_experiment_metadata._imaging_plane,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
@@ -173,19 +162,6 @@ class TestNWB(TestBO):
             session_start_time=self.meta.behavior_metadata.date_of_acquisition
         )
 
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_write_nwb_read_no_cell_specimen_table(
-            self, roundtrip, data_object_roundtrip_fixture):
-        self.meta.to_nwb(nwbfile=self.nwbfile)
-
-        with pytest.raises(RuntimeError):
-            if roundtrip:
-                data_object_roundtrip_fixture(
-                    nwbfile=self.nwbfile,
-                    data_object_cls=BehaviorOphysMetadata)
-            else:
-                self.meta.from_nwb(nwbfile=self.nwbfile)
-
     @pytest.mark.parametrize('meso', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip, cell_specimen_table,
@@ -194,11 +170,6 @@ class TestNWB(TestBO):
             self.meta = self._get_mesoscope_meta()
 
         self.meta.to_nwb(nwbfile=self.nwbfile)
-
-        cell_specimen_table = pd.DataFrame(cell_specimen_table)
-        cell_specimen_table = CellSpecimenTable(
-            cell_specimen_table=cell_specimen_table)
-        cell_specimen_table.to_nwb(nwbfile=self.nwbfile, meta=self.meta)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(
