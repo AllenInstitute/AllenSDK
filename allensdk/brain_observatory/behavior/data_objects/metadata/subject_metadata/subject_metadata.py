@@ -146,10 +146,6 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         return self._reporter_line.value
 
     @property
-    def indicator(self) -> Optional[str]:
-        return self._reporter_line.parse_indicator(warn=True)
-
-    @property
     def full_genotype(self) -> str:
         return self._full_genotype.value
 
