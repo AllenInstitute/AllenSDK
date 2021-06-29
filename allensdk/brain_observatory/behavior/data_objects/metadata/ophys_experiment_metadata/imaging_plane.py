@@ -1,11 +1,16 @@
+from typing import Optional
+
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
+    StimulusTimestamps, BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -13,11 +18,13 @@ class ImagingPlane(DataObject, InternalReadableInterface,
                    JsonReadableInterface, NwbReadableInterface):
     def __init__(self, ophys_frame_rate: float,
                  targeted_structure: str,
-                 excitation_lambda: float):
+                 excitation_lambda: float,
+                 indicator: Optional[str]):
         super().__init__(name='imaging_plane', value=self)
         self._ophys_frame_rate = ophys_frame_rate
         self._targeted_structure = targeted_structure
         self._excitation_lambda = excitation_lambda
+        self._indicator = indicator
 
     @classmethod
     def from_internal(cls, ophys_experiment_id: int,
@@ -29,9 +36,15 @@ class ImagingPlane(DataObject, InternalReadableInterface,
             sync_file=sync_file)
         targeted_structure = cls._get_targeted_structure_from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        behavior_session_id = BehaviorSessionId.from_lims(
+            db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        reporter_line = ReporterLine.from_lims(
+            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        indicator = reporter_line.parse_indicator(warn=True)
         return cls(ophys_frame_rate=ophys_frame_rate,
                    targeted_structure=targeted_structure,
-                   excitation_lambda=excitation_lambda)
+                   excitation_lambda=excitation_lambda,
+                   indicator=indicator)
 
     @classmethod
     def from_json(cls, dict_repr: dict,
@@ -40,9 +53,12 @@ class ImagingPlane(DataObject, InternalReadableInterface,
         sync_file = SyncFile.from_json(dict_repr=dict_repr)
         ophys_fame_rate = cls._get_frame_rate_from_sync_file(
             sync_file=sync_file)
+        reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
+        indicator = reporter_line.parse_indicator(warn=True)
         return cls(targeted_structure=targeted_structure,
                    ophys_frame_rate=ophys_fame_rate,
-                   excitation_lambda=excitation_lambda)
+                   excitation_lambda=excitation_lambda,
+                   indicator=indicator)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ImagingPlane":
@@ -53,9 +69,13 @@ class ImagingPlane(DataObject, InternalReadableInterface,
         ophys_frame_rate = imaging_plane.imaging_rate
         targeted_structure = imaging_plane.location
         excitation_lambda = imaging_plane.excitation_lambda
+
+        reporter_line = ReporterLine.from_nwb(nwbfile=nwbfile)
+        indicator = reporter_line.parse_indicator(warn=True)
         return cls(ophys_frame_rate=ophys_frame_rate,
                    targeted_structure=targeted_structure,
-                   excitation_lambda=excitation_lambda)
+                   excitation_lambda=excitation_lambda,
+                   indicator=indicator)
 
     @property
     def ophys_frame_rate(self) -> float:
@@ -68,6 +88,10 @@ class ImagingPlane(DataObject, InternalReadableInterface,
     @property
     def excitation_lambda(self) -> float:
         return self._excitation_lambda
+
+    @property
+    def indicator(self) -> Optional[str]:
+        return self._indicator
 
     @staticmethod
     def _get_frame_rate_from_sync_file(

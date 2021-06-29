@@ -6,9 +6,9 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
-    JsonWritableInterface
+    JsonWritableInterface, NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -18,7 +18,8 @@ class EquipmentType(Enum):
 
 
 class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
-                NwbReadableInterface, JsonWritableInterface):
+                NwbReadableInterface, JsonWritableInterface,
+                NwbWritableInterface):
     """the name of the experimental rig."""
     def __init__(self, equipment_name: str):
         super().__init__(name="equipment_name", value=equipment_name)
@@ -46,6 +47,22 @@ class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
     def from_nwb(cls, nwbfile: NWBFile) -> "Equipment":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(equipment_name=metadata.equipment_name)
+
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        if self.type == EquipmentType.MESOSCOPE:
+            device_config = {
+                "name": self.value,
+                "description": "Allen Brain Observatory - Mesoscope 2P Rig"
+            }
+        else:
+            device_config = {
+                "name": self.value,
+                "description": "Allen Brain Observatory - Scientifica 2P "
+                               "Rig",
+                "manufacturer": "Scientifica"
+            }
+        nwbfile.create_device(**device_config)
+        return nwbfile
 
     @property
     def type(self):

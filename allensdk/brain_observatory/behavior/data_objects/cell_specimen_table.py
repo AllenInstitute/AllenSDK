@@ -141,7 +141,7 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
 
         return cls(cell_specimen_table=df, meta=meta)
 
-    def to_nwb(self, nwbfile: NWBFile, meta: BehaviorOphysMetadata) -> NWBFile:
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         """
         :param nwbfile
             In-memory nwb file object
@@ -153,21 +153,7 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             'cell_roi_id')
         metadata = nwbfile.lab_meta_data['metadata']
 
-        # Device:
-        equipment = meta.behavior_metadata.equipment
-        if equipment.type == EquipmentType.MESOSCOPE:
-            device_config = {
-                "name": equipment.value,
-                "description": "Allen Brain Observatory - Mesoscope 2P Rig"
-            }
-        else:
-            device_config = {
-                "name": equipment.value,
-                "description": "Allen Brain Observatory - Scientifica 2P Rig",
-                "manufacturer": "Scientifica"
-            }
-        nwbfile.create_device(**device_config)
-        device = nwbfile.get_device(equipment.value)
+        device = nwbfile.get_device()
 
         # FOV:
         fov_width = metadata.field_of_view_width
@@ -192,7 +178,7 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             device=device,
             excitation_lambda=self._meta.imaging_plane.excitation_lambda,
             imaging_rate=self._meta.imaging_plane.ophys_frame_rate,
-            indicator=meta.behavior_metadata.subject_metadata.indicator,
+            indicator=self._meta.imaging_plane.indicator,
             location=self._meta.imaging_plane.targeted_structure)
 
         # Image Segmentation:

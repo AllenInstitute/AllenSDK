@@ -327,7 +327,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._subject_metadata.to_nwb(nwbfile=nwbfile)
-
+        self._equipment.to_nwb(nwbfile=nwbfile)
         extension = load_pynwb_extension(BehaviorMetadataSchema,
                                                 'ndx-aibs-behavior-ophys')
         nwb_metadata = extension(
