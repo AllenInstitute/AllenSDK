@@ -38,10 +38,6 @@ class DataObject(abc.ABC):
     def value(self) -> Any:
         return self._value
 
-    @classmethod
-    def _get_vars(cls):
-        return vars(cls)
-
     def to_dict(self) -> dict:
         """
         Serialize DataObject to dict
@@ -87,9 +83,17 @@ class DataObject(abc.ABC):
                 # Here, build onto the nested key structure
                 newpath = path + [name]
 
-                def _get_keys_and_values(value: DataObject):
+                def _get_keys_and_values(base_value: DataObject):
                     properties = []
-                    for name, value in value._get_properties().items():
+                    for name, value in base_value._get_properties().items():
+                        if value is base_value:
+                            # skip properties that return self
+                            # (leads to infinite recursion)
+                            continue
+                        if name == 'name':
+                            # The name is the key
+                            continue
+                            
                         if isinstance(value, DataObject):
                             # The key will be the DataObject "name" field
                             name = value._name
@@ -98,7 +102,7 @@ class DataObject(abc.ABC):
                             pass
                         properties.append((name, value, newpath))
                     return properties
-                properties = _get_keys_and_values(value=value)
+                properties = _get_keys_and_values(base_value=value)
 
                 # Find the nested dict
                 cur = res
@@ -124,9 +128,10 @@ class DataObject(abc.ABC):
 
     def _get_properties(self):
         """Returns all property names and values"""
-        vars_ = self._get_vars()
-        return {name: getattr(self, name) for name, value in vars_.items()
-                if isinstance(value, property)}
+        def is_prop(attr):
+            return isinstance(getattr(type(self), attr, None), property)
+        props = [attr for attr in dir(self) if is_prop(attr)]
+        return {name: getattr(self, name) for name in props}
 
     def __eq__(self, other: "DataObject"):
         if type(self) != type(other):
