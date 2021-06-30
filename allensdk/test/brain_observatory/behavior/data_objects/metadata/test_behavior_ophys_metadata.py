@@ -1,13 +1,9 @@
 import json
 from pathlib import Path
 
-import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.cell_specimen_table \
-    import \
-    CellSpecimenTable
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -23,9 +19,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_plane import \
-    ImagingPlane
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.mesoscope_experiment_metadata\
     .imaging_plane_group import \

@@ -13,12 +13,6 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.equipment import \
-    EquipmentType
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_ophys_metadata import \
-    BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -153,8 +147,8 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             df = df.rename(columns={'image_mask': 'roi_mask'})
 
             df.index.rename('cell_roi_id', inplace=True)
-            df['cell_specimen_id'] = [None if csid == -1 else csid
-                                      for csid in df['cell_specimen_id'].values]
+            df['cell_specimen_id'] = [None if id_ == -1 else id_
+                                      for id_ in df['cell_specimen_id'].values]
 
             df.reset_index(inplace=True)
             df.set_index('cell_specimen_id', inplace=True)

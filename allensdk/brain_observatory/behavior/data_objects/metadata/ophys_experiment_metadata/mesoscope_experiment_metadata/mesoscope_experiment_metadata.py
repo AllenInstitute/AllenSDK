@@ -10,9 +10,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .ophys_experiment_metadata.imaging_plane import \
-    ImagingPlane
-from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.mesoscope_experiment_metadata \
     .imaging_plane_group import \
     ImagingPlaneGroup
