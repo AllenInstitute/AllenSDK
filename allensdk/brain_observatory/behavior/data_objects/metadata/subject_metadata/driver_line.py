@@ -6,15 +6,12 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
 class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
-                 NwbReadableInterface, JsonWritableInterface):
+                 NwbReadableInterface):
     """the genotype name(s) of the driver line(s)"""
     def __init__(self, driver_line: List[str]):
         super().__init__(name="driver_line", value=driver_line)
@@ -22,9 +19,6 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DriverLine":
         return cls(driver_line=dict_repr['driver_line'])
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

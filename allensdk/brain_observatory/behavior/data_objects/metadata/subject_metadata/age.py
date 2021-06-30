@@ -8,14 +8,11 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
-          NwbReadableInterface, JsonWritableInterface):
+          NwbReadableInterface):
     """Age of animal (in days)"""
     def __init__(self, age: int):
         super().__init__(name="age_in_days", value=age)
@@ -25,9 +22,6 @@ class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
         age = dict_repr["age"]
         age = cls._age_code_to_days(age=age)
         return cls(age=age)
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

@@ -7,15 +7,12 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
 class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
-                   NwbReadableInterface, JsonWritableInterface):
+                   NwbReadableInterface):
     """the genotype name(s) of the reporter line(s)"""
     def __init__(self, reporter_line: Optional[str]):
         super().__init__(name="reporter_line", value=reporter_line)
@@ -25,9 +22,6 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         reporter_line = dict_repr['reporter_line']
         reporter_line = cls.parse(reporter_line=reporter_line, warn=True)
         return cls(reporter_line=reporter_line)
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

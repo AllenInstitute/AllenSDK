@@ -4,14 +4,10 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface,
-                 JsonWritableInterface):
+class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
     """Foraging id"""
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)
@@ -19,9 +15,6 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ForagingId":
         pass
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

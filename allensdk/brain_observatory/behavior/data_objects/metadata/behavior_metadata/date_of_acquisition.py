@@ -9,15 +9,11 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class DateOfAcquisition(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, NwbReadableInterface,
-                        JsonWritableInterface):
+                        JsonReadableInterface, NwbReadableInterface):
     """timestamp for when experiment was started in UTC"""
     def __init__(self, date_of_acquisition: float):
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
@@ -28,9 +24,6 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
         doa = cls.to_utc(date_of_acquisition=doa)
         return cls(date_of_acquisition=doa)
-
-    def to_json(self) -> dict:
-        return {"stimulus_frame_rate": self.value}
 
     @classmethod
     def from_lims(

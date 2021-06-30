@@ -7,14 +7,11 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
-                   NwbReadableInterface, JsonWritableInterface):
+                   NwbReadableInterface):
     """the name of the subject's genotype"""
     def __init__(self, full_genotype: str):
         super().__init__(name="full_genotype", value=full_genotype)
@@ -22,9 +19,6 @@ class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "FullGenotype":
         return cls(full_genotype=dict_repr['full_genotype'])
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

@@ -4,14 +4,11 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
-              NwbReadableInterface, JsonWritableInterface):
+              NwbReadableInterface):
     """the LabTracks ID"""
     def __init__(self, mouse_id: int):
         super().__init__(name="mouse_id", value=mouse_id)
@@ -21,9 +18,6 @@ class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
         mouse_id = dict_repr['external_specimen_name']
         mouse_id = int(mouse_id)
         return cls(mouse_id=mouse_id)
-
-    def to_json(self) -> dict:
-        return {"sex": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,
