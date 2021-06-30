@@ -93,7 +93,7 @@ class DataObject(abc.ABC):
                         if name == 'name':
                             # The name is the key
                             continue
-                            
+
                         if isinstance(value, DataObject):
                             # The key will be the DataObject "name" field
                             name = value._name

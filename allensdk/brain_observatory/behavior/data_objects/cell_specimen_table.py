@@ -176,7 +176,7 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             Additional metadata not written to nwb yet, required to write
             cell specimen table
         """
-        cell_roi_table = self.value.reset_index().set_index(
+        cell_roi_table = self.table.reset_index().set_index(
             'cell_roi_id')
         metadata = nwbfile.lab_meta_data['metadata']
 

@@ -47,7 +47,7 @@ from allensdk.test.brain_observatory.behavior.data_objects.metadata \
     TestBehaviorMetadata
 
 
-class TestBO:
+class TestBOM:
     @classmethod
     def setup_class(cls):
         cls.meta = cls._get_meta()
@@ -96,7 +96,7 @@ class TestBO:
         )
 
 
-class TestInternal(TestBO):
+class TestInternal(TestBOM):
     @classmethod
     def setup_method(self, method):
         marks = getattr(method, 'pytestmark', None)
@@ -124,11 +124,8 @@ class TestInternal(TestBO):
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
-    def test_foo(self):
-        pass
 
-
-class TestJson(TestBO):
+class TestJson(TestBOM):
     @classmethod
     def setup_method(self, method):
         dir = Path(__file__).parent.resolve()
@@ -153,7 +150,7 @@ class TestJson(TestBO):
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
 
-class TestNWB(TestBO):
+class TestNWB(TestBOM):
     def setup_method(self, method):
         self.meta = self._get_meta()
         self.nwbfile = pynwb.NWBFile(
@@ -164,7 +161,7 @@ class TestNWB(TestBO):
 
     @pytest.mark.parametrize('meso', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip, cell_specimen_table,
+    def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture, meso):
         if meso:
             self.meta = self._get_mesoscope_meta()
