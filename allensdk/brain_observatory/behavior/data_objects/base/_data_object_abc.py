@@ -54,7 +54,7 @@ class DataObject(abc.ABC):
             ...     def __init__(self):
             ...         super().__init__(name='simple', value=1)
             >>> s = Simple()
-            >>> s.to_dict() == {'simple': 1}
+            >>> assert s.to_dict() == {'simple': 1}
 
             >>> class B(DataObject):
             ...     def __init__(self):
@@ -71,7 +71,7 @@ class DataObject(abc.ABC):
             ...     def prop2(self):
             ...         return '@'
             >>> a = A(b=B())
-            >>> a.to_dict() == {'a': {'b': '!'}, 'prop2': '@'}
+            >>> assert a.to_dict() == {'a': {'b': '!', 'prop2': '@'}}
         """
         res = dict()
         q = deque([(self._name, self, [])])
