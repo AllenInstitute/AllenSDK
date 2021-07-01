@@ -11,8 +11,9 @@ import pandas as pd
 import warnings
 
 from allensdk.api.warehouse_cache.cache import memoize
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
-    import BehaviorOphysMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.ophys_experiment_metadata \
+    import OphysExperimentMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
@@ -162,7 +163,7 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         try:
             delay = aligner.monitor_delay
         except ValueError as ee:
-            equipment_name = self.get_metadata().equipment_name
+            equipment_name = self.get_metadata()
 
             warning_msg = 'Monitory delay calculation failed '
             warning_msg += 'with ValueError\n'
@@ -241,11 +242,11 @@ class BehaviorOphysDataTransforms(BehaviorDataTransforms, BehaviorOphysBase):
         return resampled
 
     @memoize
-    def get_metadata(self) -> BehaviorOphysMetadata:
+    def get_metadata(self) -> OphysExperimentMetadata:
         """Return metadata about the session.
-        :rtype: BehaviorOphysMetadata
+        :rtype: OphysExperimentMetadata
         """
-        metadata = BehaviorOphysMetadata(
+        metadata = OphysExperimentMetadata(
             extractor=self.extractor,
             stimulus_timestamps=self.get_stimulus_timestamps(),
             ophys_timestamps=self.get_ophys_timestamps(),

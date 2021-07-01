@@ -5,18 +5,29 @@ import pandas as pd
 import numpy as np
 import inspect
 
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
+from pynwb import NWBFile
+
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .writable_interfaces import \
+    JsonWritableInterface, NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorNwbApi, BehaviorJsonApi, BehaviorLimsApi)
+    BehaviorJsonApi, BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
+    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
+    DataObject
 )
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
@@ -26,7 +37,11 @@ from allensdk.internal.api import db_connection_creator
 BehaviorDataApi = Type[BehaviorBase]
 
 
-class BehaviorSession(LazyPropertyMixin):
+class BehaviorSession(DataObject, InternalReadableInterface,
+                      NwbReadableInterface,
+                      JsonReadableInterface, NwbWritableInterface,
+                      JsonWritableInterface,
+                      LazyPropertyMixin):
     def __init__(
         self, api: Optional[BehaviorDataApi] = None,
         behavior_session_id: BehaviorSessionId = None,
@@ -34,7 +49,9 @@ class BehaviorSession(LazyPropertyMixin):
         running_acquisition: RunningAcquisition = None,
         raw_running_speed: RunningSpeed = None,
         running_speed: RunningSpeed = None,
+        metadata: BehaviorMetadata = None
     ):
+        super().__init__(name='behavior_session', value=self)
         self.api = api
 
         # LazyProperty constructor provided by LazyPropertyMixin
@@ -56,7 +73,7 @@ class BehaviorSession(LazyPropertyMixin):
         self._task_parameters = LazyProperty(self.api.get_task_parameters,
                                              settable=True)
         self._trials = LazyProperty(self.api.get_trials, settable=True)
-        self._metadata = LazyProperty(self.api.get_metadata, settable=True)
+        self._metadata = metadata
 
     # ==================== class and utility methods ======================
 
@@ -69,24 +86,29 @@ class BehaviorSession(LazyPropertyMixin):
             session_data, filtered=False
         )
         running_speed = RunningSpeed.from_json(session_data)
+        metadata = BehaviorMetadata.from_json(session_data)
+
         return cls(
             api=BehaviorJsonApi(session_data),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
-            running_speed=running_speed
+            running_speed=running_speed,
+            metadata=metadata
         )
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int) -> "BehaviorSession":
+    def from_internal(cls, behavior_session_id: int) -> "BehaviorSession":
         lims_db = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         )
 
         behavior_session_id = BehaviorSessionId(behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_lims(
-            lims_db, behavior_session_id.value
+        stimulus_file = StimulusFile.from_lims(
+            db=lims_db, behavior_session_id=behavior_session_id.value)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
         )
         running_acquisition = RunningAcquisition.from_lims(
             lims_db, behavior_session_id.value
@@ -97,34 +119,53 @@ class BehaviorSession(LazyPropertyMixin):
         running_speed = RunningSpeed.from_lims(
             lims_db, behavior_session_id.value
         )
+        behavior_metadata = BehaviorMetadata.from_internal(
+            behavior_session_id=behavior_session_id, lims_db=lims_db
+        )
         return cls(
             api=BehaviorLimsApi(behavior_session_id.value),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
-            running_speed=running_speed
+            running_speed=running_speed,
+            metadata=behavior_metadata
         )
 
     @classmethod
-    def from_nwb_path(
-        cls, nwb_path: str, **api_kwargs: Any
-    ) -> "BehaviorSession":
-        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
-            nwbfile = read_io.read()
-            behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
-            stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
-            running_acquisition = RunningAcquisition.from_nwb(nwbfile)
-            raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
-            running_speed = RunningSpeed.from_nwb(nwbfile)
+    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSession":
+        behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
+        stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
+        running_acquisition = RunningAcquisition.from_nwb(nwbfile)
+        raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
+        running_speed = RunningSpeed.from_nwb(nwbfile)
+        metadata = BehaviorMetadata.from_nwb(nwbfile)
+
         return cls(
-            api=BehaviorNwbApi.from_path(path=nwb_path, **api_kwargs),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
-            running_speed=running_speed
+            running_speed=running_speed,
+            metadata=metadata
         )
+
+    @classmethod
+    def from_nwb_path(cls, nwb_path: str):
+        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
+            nwbfile = read_io.read()
+            return cls.from_nwb(nwbfile=nwbfile)
+
+    def to_json(self) -> dict:
+        pass
+
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
+        self._running_acquisition.to_nwb(nwbfile=nwbfile)
+        self._running_speed.to_nwb(nwbfile=nwbfile)
+        self._metadata.to_nwb(nwbfile=nwbfile)
+
+        return nwbfile
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
@@ -173,6 +214,11 @@ class BehaviorSession(LazyPropertyMixin):
         }
         attrs_and_methods_to_ignore.update(dir(ParamsMixin))
         attrs_and_methods_to_ignore.update(dir(LazyPropertyMixin))
+        attrs_and_methods_to_ignore.update(dir(InternalReadableInterface))
+        attrs_and_methods_to_ignore.update(dir(NwbReadableInterface))
+        attrs_and_methods_to_ignore.update(dir(NwbWritableInterface))
+        attrs_and_methods_to_ignore.update(dir(JsonWritableInterface))
+        attrs_and_methods_to_ignore.update(dir(DataObject))
         class_dir = dir(self)
         attrs_and_methods = [
             r for r in class_dir

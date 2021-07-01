@@ -8,6 +8,67 @@ import pandas as pd
 import pytest
 import pytz
 
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_session_uuid import \
+    BehaviorSessionUUID
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment import \
+    Equipment
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.stimulus_frame_rate import \
+    StimulusFrameRate
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_ophys_metadata import \
+    BehaviorOphysMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.experiment_container_id import \
+    ExperimentContainerId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.field_of_view_shape import \
+    FieldOfViewShape
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.imaging_depth import \
+    ImagingDepth
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.imaging_plane import \
+    ImagingPlane
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.ophys_experiment_metadata import \
+    OphysExperimentMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.ophys_session_id import \
+    OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.age import \
+    Age
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.driver_line import \
+    DriverLine
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.full_genotype import \
+    FullGenotype
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.mouse_id import \
+    MouseId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.sex import \
+    Sex
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.subject_metadata import \
+    SubjectMetadata
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
     BehaviorOphysDataTransforms
@@ -143,22 +204,31 @@ def stimulus_presentations_behavior(stimulus_templates,
 @pytest.fixture
 def behavior_only_metadata_fixture():
     """Fixture that provides mock behavior only session metadata"""
-    return {
-        "behavior_session_id": 4242,
-        "session_type": 'Unknown',
-        "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
-        "reporter_line": "Ai93(TITL-GCaMP6f)",
-        "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-        "cre_line": "Slc17a7-IRES2-Cre",
-        "mouse_id": 416369,
-        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
-                         "Ai93(TITL-GCaMP6f)/wt",
-        "behavior_session_uuid": uuid.uuid4(),
-        "stimulus_frame_rate": 60.0,
-        "equipment_name": 'my_device',
-        "sex": 'M',
-        "age_in_days": 139
-    }
+    subject_meta = SubjectMetadata(
+        sex=Sex(sex='M'),
+        age=Age(age=139),
+        reporter_line=ReporterLine(reporter_line="Ai93(TITL-GCaMP6f)"),
+        full_genotype=FullGenotype(
+            full_genotype="Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
+                          "Ai93(TITL-GCaMP6f)/wt"),
+        driver_line=DriverLine(
+            driver_line=["Camk2a-tTA", "Slc17a7-IRES2-Cre"]),
+        mouse_id=MouseId(mouse_id=416369)
+
+    )
+    behavior_meta = BehaviorMetadata(
+        subject_metadata=subject_meta,
+        behavior_session_id=BehaviorSessionId(behavior_session_id=4242),
+        equipment=Equipment(equipment_name='my_device'),
+        stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
+        session_type=SessionType(session_type='Unknown'),
+        date_of_acquisition=DateOfAcquisition(
+            date_of_acquisition=pytz.utc.localize(datetime.datetime.now())
+        ),
+        behavior_session_uuid=BehaviorSessionUUID(
+            behavior_session_uuid=uuid.uuid4())
+    )
+    return behavior_meta
 
 
 @pytest.fixture
@@ -196,33 +266,25 @@ def metadata_fixture():
 
 
 @pytest.fixture
-def partial_metadata_fixture():
-    """Fixture that passes only metadata that will be saved in
-    custom pyNWB extension fields"""
-    return {
-        "behavior_session_id": 777,
-        "ophys_session_id": 999,
-        "ophys_experiment_id": 1234,
-        "experiment_container_id": 5678,
-        "stimulus_frame_rate": 60.0,
-        "imaging_depth": 375,
-        "session_type": 'Unknown',
-        "date_of_acquisition": pytz.utc.localize(datetime.datetime.now()),
-        "reporter_line": "Ai93(TITL-GCaMP6f)",
-        "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
-        "cre_line": "Slc17a7-IRES2-Cre",
-        "mouse_id": 416369,
-        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
-                         "Ai93(TITL-GCaMP6f)/wt",
-        "behavior_session_uuid": uuid.uuid4(),
-        "field_of_view_width": 4,
-        "field_of_view_height": 4,
-        "equipment_name": 'my_device',
-        "sex": 'M',
-        "age_in_days": 139,
-        "imaging_plane_group": None,
-        "imaging_plane_group_count": 0
-    }
+def behavior_ophys_metadata_fixture(
+        behavior_only_metadata_fixture) -> BehaviorOphysMetadata:
+    ophys_meta = OphysExperimentMetadata(
+        ophys_experiment_id=1234,
+        ophys_session_id=OphysSessionId(session_id=999),
+        experiment_container_id=ExperimentContainerId(
+            experiment_container_id=5678),
+        imaging_plane=ImagingPlane(
+            ophys_frame_rate=31.0,
+            targeted_structure='VISp',
+            excitation_lambda=1.0
+        ),
+        field_of_view_shape=FieldOfViewShape(width=4, height=4),
+        imaging_depth=ImagingDepth(imaging_depth=375)
+    )
+    return BehaviorOphysMetadata(
+        behavior_metadata=behavior_only_metadata_fixture,
+        ophys_metadata=ophys_meta
+    )
 
 
 @pytest.fixture

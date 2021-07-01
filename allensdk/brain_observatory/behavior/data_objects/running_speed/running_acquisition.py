@@ -10,6 +10,12 @@ import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    LimsReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .writable_interfaces import \
+    JsonWritableInterface, NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import (
     DataObject, StimulusTimestamps
@@ -37,7 +43,9 @@ def from_lims_cache_key(
     )
 
 
-class RunningAcquisition(DataObject):
+class RunningAcquisition(DataObject, LimsReadableInterface,
+                         NwbReadableInterface, NwbWritableInterface,
+                         JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running acquisition data.
 
@@ -117,8 +125,8 @@ class RunningAcquisition(DataObject):
     ) -> "RunningAcquisition":
 
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_lims(
-            db, behavior_session_id, ophys_experiment_id
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
         )
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,

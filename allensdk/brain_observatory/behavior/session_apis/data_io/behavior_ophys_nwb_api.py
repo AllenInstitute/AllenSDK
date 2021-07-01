@@ -2,43 +2,42 @@ import datetime
 import warnings
 from typing import Optional
 
+import SimpleITK as sitk
 import numpy as np
 import pandas as pd
 import pynwb
 import pytz
-import SimpleITK as sitk
 from hdmf.backends.hdf5 import H5DataIO
-
 from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.behavior.metadata.behavior_ophys_metadata \
-    import BehaviorOphysMetadata
+import allensdk.brain_observatory.nwb as nwb
+from allensdk.brain_observatory.behavior.data_objects.metadata \
+    .behavior_metadata.behavior_metadata import get_expt_description
+from allensdk.brain_observatory.behavior.data_objects.metadata \
+    .ophys_experiment_metadata.ophys_experiment_metadata \
+    import OphysExperimentMetadata
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
-import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import (
-    get_expt_description
-)
-from allensdk.brain_observatory.behavior.session_apis.abcs.session_base. \
-    behavior_ophys_base import BehaviorOphysBase
-from allensdk.brain_observatory.behavior.schemas import (
-    BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
-from allensdk.brain_observatory.behavior.trials_processing import (
-    TRIAL_COLUMN_DESCRIPTION_DICT
-)
-from allensdk.brain_observatory.nwb import TimeSeries
-from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (  # noqa: E501
-    EllipseEyeTracking, EllipseSeries)
-from allensdk.brain_observatory.behavior.write_nwb.extensions \
-    .event_detection.ndx_ophys_events import OphysEventDetection
-from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorNwbApi
-)
-from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     determine_outliers, determine_likely_blinks
 )
+from allensdk.brain_observatory.behavior.schemas import (
+    BehaviorTaskParametersSchema, OphysEyeTrackingRigMetadataSchema)
+from allensdk.brain_observatory.behavior.session_apis.abcs.session_base. \
+    behavior_ophys_base import BehaviorOphysBase
+from allensdk.brain_observatory.behavior.session_apis.data_io import (
+    BehaviorNwbApi
+)
+from allensdk.brain_observatory.behavior.trials_processing import (
+    TRIAL_COLUMN_DESCRIPTION_DICT
+)
+from allensdk.brain_observatory.behavior.write_nwb.extensions \
+    .event_detection.ndx_ophys_events import OphysEventDetection
+from allensdk.brain_observatory.nwb import TimeSeries
+from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
+    import EllipseEyeTracking, EllipseSeries
+from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
+from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 
 load_pynwb_extension(BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys')
 
@@ -57,7 +56,7 @@ class BehaviorOphysNwbApi(BehaviorNwbApi, BehaviorOphysBase):
         # Cannot type session_object due to a circular dependency
         # TODO fix circular dependency and add type
 
-        session_metadata: BehaviorOphysMetadata = \
+        session_metadata: OphysExperimentMetadata = \
             session_object.api.get_metadata()
 
         session_type = session_metadata.session_type

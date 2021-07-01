@@ -3,10 +3,14 @@ import logging
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
-    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment import \
+    Equipment
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
+from allensdk.test.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.test_behavior_metadata import \
+    TestBehaviorMetadata
 
 
 @pytest.mark.parametrize("roi_ids,expected", [
@@ -436,25 +440,6 @@ def test_monitor_delay(monkeypatch):
                     'CAM2P.5': 0.021192,
                     'MESO.1': 0.03613}
 
-    def dummy_get_metadata(self):
-        def dummy_metadata_init(self, extractor):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_metadata_init)
-
-        class DummyExtractor:
-            def get_sync_file(self):
-                return ''
-
-            def get_equipment_name(self):
-                return equipment_name
-
-        metadata = BehaviorMetadata(
-            extractor=DummyExtractor())
-        return metadata
-
     for equipment_name in delay_lookup.keys():
         expected_delay = delay_lookup[equipment_name]
 
@@ -462,6 +447,14 @@ def test_monitor_delay(monkeypatch):
             ctx.setattr(BehaviorOphysDataTransforms,
                         '__init__',
                         xform_init)
+
+            def dummy_get_metadata(self):
+                test_beh_meta = TestBehaviorMetadata()
+                test_beh_meta.setup_class()
+                test_beh_meta = test_beh_meta.meta
+                test_beh_meta._equipment = Equipment(
+                    equipment_name=equipment_name)
+                return test_beh_meta
 
             ctx.setattr(BehaviorOphysDataTransforms,
                         'get_metadata',

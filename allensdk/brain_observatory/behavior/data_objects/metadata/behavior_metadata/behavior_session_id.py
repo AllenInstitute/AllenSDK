@@ -3,6 +3,12 @@ from pynwb import NWBFile
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base\
+    .writable_interfaces import \
+    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
@@ -11,7 +17,10 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
 
-class BehaviorSessionId(DataObject):
+class BehaviorSessionId(DataObject, LimsReadableInterface,
+                        JsonReadableInterface,
+                        NwbReadableInterface,
+                        JsonWritableInterface):
     def __init__(self, behavior_session_id: int):
         super().__init__(name="behavior_session_id", value=behavior_session_id)
 
@@ -41,14 +50,5 @@ class BehaviorSessionId(DataObject):
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSessionId":
-        # TODO:
-        # This implementation will be wrong when trying to get
-        # behavior session id for an ophys experiment.
-        # Will need to revisit.
-        return cls(behavior_session_id=int(nwbfile.identifier))
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        # TODO:
-        # Likely need to have some yet to be determined interaction with
-        # the out-of-scope `metadata` DataObject
-        raise NotImplementedError
+        metadata = nwbfile.lab_meta_data['metadata']
+        return cls(behavior_session_id=metadata.behavior_session_id)

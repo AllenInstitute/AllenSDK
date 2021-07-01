@@ -10,6 +10,12 @@ import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .writable_interfaces import \
+    JsonWritableInterface, NwbWritableInterface
 from allensdk.core.exceptions import DataFrameIndexError
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_objects import (
@@ -41,7 +47,9 @@ def from_lims_cache_key(
     )
 
 
-class RunningSpeed(DataObject):
+class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
+                   NwbWritableInterface, JsonReadableInterface,
+                   JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running speed data.
 
@@ -129,8 +137,8 @@ class RunningSpeed(DataObject):
         zscore_threshold: float = 10.0
     ) -> "RunningSpeed":
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_lims(
-            db, behavior_session_id, ophys_experiment_id
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
         )
 
         running_speed = cls._get_running_speed_df(

@@ -1,4 +1,6 @@
 import math
+import pickle
+import tempfile
 from datetime import datetime
 from uuid import UUID
 
@@ -8,8 +10,14 @@ import pytest
 import pytz
 
 from allensdk import OneResultExpectedError
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
-    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_session_uuid import \
+    BehaviorSessionUUID
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
@@ -122,7 +130,7 @@ def MockBehaviorLimsApi():
 
     class MockBehaviorLimsApi(BehaviorLimsApi):
 
-        def _behavior_stimulus_file(self):
+        def _behavior_stimulus_file(self) -> StimulusFile:
             data = {
                 "items": {
                     "behavior": {
@@ -151,7 +159,12 @@ def MockBehaviorLimsApi():
                 "session_uuid": '138531ab-fe59-4523-9154-07c8d97bbe03',
                 "start_time": datetime(2019, 9, 26, 9),
             }
-            return data
+            with tempfile.NamedTemporaryFile('wb') as f:
+                pickle.dump(data, f)
+                f.seek(0)
+                file = StimulusFile.from_json(
+                    dict_repr={'behavior_stimulus_file': f.name})
+                return file
 
         def get_running_acquisition_df(self, lowpass=True):
             return pd.DataFrame(
@@ -201,9 +214,11 @@ def MockApiRunSpeedExpectedError():
 # Does not include test for get_metadata since it just collects data from
 # methods covered in other unit tests, or data derived from sql queries.
 def test_get_stimulus_timestamps(MockBehaviorLimsApi):
-    api = MockBehaviorLimsApi
+    stim_file = MockBehaviorLimsApi._behavior_stimulus_file()
+    stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+        stimulus_file=stim_file)
     expected = np.array([0.016 * i for i in range(11)])
-    assert np.allclose(expected, api.get_stimulus_timestamps())
+    assert np.allclose(expected, stimulus_timestamps.value)
 
 
 def test_get_licks(MockBehaviorLimsApi):
@@ -213,33 +228,25 @@ def test_get_licks(MockBehaviorLimsApi):
     pd.testing.assert_frame_equal(expected, api.get_licks())
 
 
-def test_get_behavior_session_uuid(MockBehaviorLimsApi, monkeypatch):
-    with monkeypatch.context() as ctx:
-        def dummy_init(self, extractor, behavior_stimulus_file):
-            self._extractor = extractor
-            self._behavior_stimulus_file = behavior_stimulus_file
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-        stimulus_file = MockBehaviorLimsApi._behavior_stimulus_file()
-        metadata = BehaviorMetadata(
-            extractor=MockBehaviorLimsApi.extractor,
-            behavior_stimulus_file=stimulus_file)
-
+def test_get_behavior_session_uuid(MockBehaviorLimsApi):
+    stimulus_file = MockBehaviorLimsApi._behavior_stimulus_file()
+    uuid = BehaviorSessionUUID.from_stimulus_file(
+        stimulus_file=stimulus_file)
     expected = UUID('138531ab-fe59-4523-9154-07c8d97bbe03')
-    assert expected == metadata.behavior_session_uuid
+    assert expected == uuid.value
 
 
 def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
-    api = MockBehaviorLimsApi
-    assert 62.0 == api.get_stimulus_frame_rate()
+    stim_file = MockBehaviorLimsApi._behavior_stimulus_file()
+    stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+        stimulus_file=stim_file)
+    assert 62.0 == stimulus_timestamps.calc_frame_rate()
 
 
-def test_get_date_of_acquisition(MockBehaviorLimsApi):
-    api = MockBehaviorLimsApi
+def test_get_date_of_acquisition():
     expected = datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    actual = api.get_metadata().date_of_acquisition
+    doa = datetime(2019, 9, 26, 16)
+    actual = DateOfAcquisition.to_utc(date_of_acquisition=doa)
     assert expected == actual
 
 

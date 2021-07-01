@@ -4,7 +4,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pynwb
 import pytest
 
 import allensdk.brain_observatory.nwb as nwb
@@ -166,30 +165,6 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
 
     pd.testing.assert_frame_equal(rewards, obt.get_rewards(),
                                   check_dtype=False)
-
-
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_behavior_only_metadata(roundtrip, roundtripper,
-                                    behavior_only_metadata_fixture):
-
-    metadata = behavior_only_metadata_fixture
-    nwbfile = pynwb.NWBFile(
-        session_description='asession',
-        identifier='afile',
-        session_start_time=metadata['date_of_acquisition']
-    )
-    nwb.add_metadata(nwbfile, metadata, behavior_only=True)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorNwbApi)
-    else:
-        obt = BehaviorNwbApi.from_nwbfile(nwbfile)
-
-    metadata_obt = obt.get_metadata()
-
-    assert len(metadata_obt) == len(metadata)
-    for key, val in metadata.items():
-        assert val == metadata_obt[key]
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
