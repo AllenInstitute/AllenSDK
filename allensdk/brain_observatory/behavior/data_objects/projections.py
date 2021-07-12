@@ -1,0 +1,154 @@
+from SimpleITK import Image
+from matplotlib import image as mpimg
+from pynwb import NWBFile, ProcessingModule
+from pynwb.base import Images
+from pynwb.image import GrayscaleImage
+
+from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.brain_observatory.behavior.data_objects.base \
+    .readable_interfaces import \
+    JsonReadableInterface, NwbReadableInterface, \
+    InternalReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.base\
+    .writable_interfaces import \
+    NwbWritableInterface
+from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.nwb.nwb_utils import get_image
+from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.core.lims_utilities import safe_system_path
+
+
+class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
+                  NwbReadableInterface, NwbWritableInterface):
+    def __init__(self, max_projection: Image, avg_projection: Image):
+        super().__init__(name='projections', value=self)
+        self._max_projection = max_projection
+        self._avg_projection = avg_projection
+
+    @property
+    def max_projection(self) -> Image:
+        return self._max_projection
+
+    @property
+    def avg_projection(self) -> Image:
+        return self._avg_projection
+
+    @classmethod
+    def from_internal(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin) -> "Projections":
+        query = """
+                SELECT 
+                    wkf.storage_directory || wkf.filename AS filepath,
+                    wkft.name as wkfn
+                FROM ophys_experiments oe
+                JOIN ophys_cell_segmentation_runs ocsr
+                ON ocsr.ophys_experiment_id = oe.id
+                JOIN well_known_files wkf ON wkf.attachable_id = ocsr.id
+                JOIN well_known_file_types wkft
+                ON wkft.id = wkf.well_known_file_type_id
+                WHERE ocsr.current = 't'
+                AND wkf.attachable_type = 'OphysCellSegmentationRun'
+                AND wkft.name IN ('OphysMaxIntImage', 
+                    'OphysAverageIntensityProjectionImage')
+                AND oe.id = {};
+                """.format(ophys_experiment_id)
+        res = lims_db.select(query=query)
+        res['filepath'] = res['filepath'].apply(safe_system_path)
+
+        def _get_pixel_size():
+            query = """
+                    SELECT sc.resolution
+                    FROM ophys_experiments oe
+                    JOIN scans sc ON sc.image_id=oe.ophys_primary_image_id
+                    WHERE oe.id = {};
+                    """.format(ophys_experiment_id)
+            return lims_db.fetchone(query, strict=True)
+
+        pixel_size = _get_pixel_size()
+
+        max_projection_filepath = \
+            res[res['wkfn'] == 'OphysMaxIntImage'].iloc[0]['filepath']
+        max_projection = cls._from_filepath(filepath=max_projection_filepath,
+                                            pixel_size=pixel_size)
+
+        avg_projection_filepath = \
+            (res[res['wkfn'] == 'OphysAverageIntensityProjectionImage'].iloc[0]
+                ['filepath'])
+        avg_projection = cls._from_filepath(filepath=avg_projection_filepath,
+                                            pixel_size=pixel_size)
+        return Projections(max_projection=max_projection,
+                           avg_projection=avg_projection)
+
+    @classmethod
+    def from_nwb(cls, nwbfile: NWBFile) -> "Projections":
+        max_projection = get_image(nwbfile=nwbfile, name='max_projection',
+                                   module='ophys')
+        avg_projection = get_image(nwbfile=nwbfile, name='average_image',
+                                   module='ophys')
+        return Projections(max_projection=max_projection,
+                           avg_projection=avg_projection)
+
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        def _add_image(image_data: Image, image_name: str):
+            MODULE_NAME = 'ophys'
+            description = '{} image at pixels/cm resolution'.format(image_name)
+
+            if isinstance(image_data, Image):
+                data, spacing, unit = ImageApi.deserialize(image_data)
+            else:
+                raise ValueError("Not a supported image_data type: "
+                                 f"{type(image_data)}")
+
+            assert spacing[0] == spacing[1] and len(
+                spacing) == 2 and unit == 'mm'
+
+            if MODULE_NAME not in nwbfile.processing:
+                ophys_mod = ProcessingModule(MODULE_NAME,
+                                             'Ophys processing module')
+                nwbfile.add_processing_module(ophys_mod)
+            else:
+                ophys_mod = nwbfile.processing[MODULE_NAME]
+
+            image = GrayscaleImage(image_name,
+                                   data,
+                                   resolution=spacing[0] / 10,
+                                   description=description)
+
+            if 'images' not in ophys_mod.containers:
+                images = Images(name='images')
+                ophys_mod.add_data_interface(images)
+            else:
+                images = ophys_mod['images']
+            images.add_image(image)
+
+        _add_image(image_data=self._max_projection,
+                   image_name='max_projection')
+        _add_image(image_data=self._avg_projection, image_name='average_image')
+
+        return nwbfile
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "Projections":
+        max_projection_filepath = dict_repr['max_projection_file']
+        avg_projection_filepath = \
+            dict_repr['average_intensity_projection_image_file']
+        pixel_size = dict_repr['surface_2p_pixel_size_um']
+
+        max_projection = cls._from_filepath(filepath=max_projection_filepath,
+                                            pixel_size=pixel_size)
+        avg_projection = cls._from_filepath(filepath=avg_projection_filepath,
+                                            pixel_size=pixel_size)
+        return Projections(max_projection=max_projection,
+                           avg_projection=avg_projection)
+
+    @staticmethod
+    def _from_filepath(filepath: str, pixel_size: float) -> Image:
+        """
+        :param filepath
+            path to image
+        :param pixel_size
+            pixel size in um
+        """
+        max_projection = mpimg.imread(filepath)
+        return ImageApi.serialize(max_projection, [pixel_size / 1000.,
+                                                   pixel_size / 1000.], 'mm')

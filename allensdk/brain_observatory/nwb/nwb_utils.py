@@ -2,6 +2,10 @@ import pandas as pd
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.
+from SimpleITK import Image
+from pynwb import NWBFile
+
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 def get_column_name(table_cols: list,
@@ -50,3 +54,12 @@ def set_omitted_stop_time(stimulus_table: pd.DataFrame,
         row['stop_time'] = end_time
         row['duration'] = omitted_time_duration
         stimulus_table.iloc[omitted_row_idx] = row
+
+
+def get_image(nwbfile: NWBFile, name: str, module: str) -> Image:
+    nwb_img = nwbfile.modules[module].get_data_interface('images')[name]
+    data = nwb_img.data
+    resolution = nwb_img.resolution  # px/cm
+    spacing = [resolution * 10, resolution * 10]
+
+    return ImageApi.serialize(data, spacing, 'mm')
