@@ -35,24 +35,26 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
     @classmethod
     def from_internal(cls, ophys_experiment_id: int,
                       lims_db: PostgresQueryMixin) -> "Projections":
-        query = """
-                SELECT
-                    wkf.storage_directory || wkf.filename AS filepath,
-                    wkft.name as wkfn
-                FROM ophys_experiments oe
-                JOIN ophys_cell_segmentation_runs ocsr
-                ON ocsr.ophys_experiment_id = oe.id
-                JOIN well_known_files wkf ON wkf.attachable_id = ocsr.id
-                JOIN well_known_file_types wkft
-                ON wkft.id = wkf.well_known_file_type_id
-                WHERE ocsr.current = 't'
-                AND wkf.attachable_type = 'OphysCellSegmentationRun'
-                AND wkft.name IN ('OphysMaxIntImage',
-                    'OphysAverageIntensityProjectionImage')
-                AND oe.id = {};
-                """.format(ophys_experiment_id)
-        res = lims_db.select(query=query)
-        res['filepath'] = res['filepath'].apply(safe_system_path)
+        def _get_filepaths():
+            query = """
+                    SELECT
+                        wkf.storage_directory || wkf.filename AS filepath,
+                        wkft.name as wkfn
+                    FROM ophys_experiments oe
+                    JOIN ophys_cell_segmentation_runs ocsr
+                    ON ocsr.ophys_experiment_id = oe.id
+                    JOIN well_known_files wkf ON wkf.attachable_id = ocsr.id
+                    JOIN well_known_file_types wkft
+                    ON wkft.id = wkf.well_known_file_type_id
+                    WHERE ocsr.current = 't'
+                    AND wkf.attachable_type = 'OphysCellSegmentationRun'
+                    AND wkft.name IN ('OphysMaxIntImage',
+                        'OphysAverageIntensityProjectionImage')
+                    AND oe.id = {};
+                    """.format(ophys_experiment_id)
+            res = lims_db.select(query=query)
+            res['filepath'] = res['filepath'].apply(safe_system_path)
+            return res
 
         def _get_pixel_size():
             query = """
@@ -63,6 +65,7 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
                     """.format(ophys_experiment_id)
             return lims_db.fetchone(query, strict=True)
 
+        res = _get_filepaths()
         pixel_size = _get_pixel_size()
 
         max_projection_filepath = \
