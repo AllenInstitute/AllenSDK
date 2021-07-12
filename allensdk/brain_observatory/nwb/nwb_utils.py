@@ -29,7 +29,7 @@ def get_column_name(table_cols: list,
 
 
 def set_omitted_stop_time(stimulus_table: pd.DataFrame,
-                          omitted_time_duration: float=0.25) -> None:
+                          omitted_time_duration: float = 0.25) -> None:
     """
     This function sets the stop time for a row that of a stimuli table that
     is a omitted stimuli. A omitted stimuli is a stimuli where a mouse is
@@ -39,13 +39,15 @@ def set_omitted_stop_time(stimulus_table: pd.DataFrame,
     stop_time calculated and put into the row as data before writing to NWB.
     :param stimulus_table: pd.DataFrame that contains the stimuli presented to
                            an experiment subject
-    :param omitted_time_duration: The duration in seconds of the expected length
+    :param omitted_time_duration: The duration in seconds of the expected
+    length
                                   of the omitted stimuli
     :return:
           stimulus_table_row: returns the same dictionary as inputted but with
                               an additional entry for stop_time.
     """
-    omitted_row_indexs = stimulus_table.index[stimulus_table['omitted']].tolist()
+    omitted_row_indexs = stimulus_table.index[
+        stimulus_table['omitted']].tolist()
     for omitted_row_idx in omitted_row_indexs:
         row = stimulus_table.iloc[omitted_row_idx]
         start_time = row['start_time']

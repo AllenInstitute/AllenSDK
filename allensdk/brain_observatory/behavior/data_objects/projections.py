@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, NwbReadableInterface, \
     InternalReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
@@ -34,9 +34,9 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_internal(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "Projections":
+                      lims_db: PostgresQueryMixin) -> "Projections":
         query = """
-                SELECT 
+                SELECT
                     wkf.storage_directory || wkf.filename AS filepath,
                     wkft.name as wkfn
                 FROM ophys_experiments oe
@@ -47,7 +47,7 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
                 ON wkft.id = wkf.well_known_file_type_id
                 WHERE ocsr.current = 't'
                 AND wkf.attachable_type = 'OphysCellSegmentationRun'
-                AND wkft.name IN ('OphysMaxIntImage', 
+                AND wkft.name IN ('OphysMaxIntImage',
                     'OphysAverageIntensityProjectionImage')
                 AND oe.id = {};
                 """.format(ophys_experiment_id)
@@ -146,6 +146,6 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
         """
         max_projection = mpimg.imread(filepath)
         img = ImageApi.serialize(max_projection, [pixel_size / 1000.,
-                                                   pixel_size / 1000.], 'mm')
+                                                  pixel_size / 1000.], 'mm')
         img = ImageApi.deserialize(img=img)
         return img

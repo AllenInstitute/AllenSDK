@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
 from pathlib import Path
-import pynwb
 
+import pynwb
 import pytest
 
 from allensdk.brain_observatory.behavior.data_objects.projections import \
@@ -55,9 +55,9 @@ class TestJson:
             dict_repr = json.load(f)
         dict_repr = dict_repr['session_data']
         dict_repr['max_projection_file'] = test_data_dir / \
-                                           dict_repr['max_projection_file']
+            dict_repr['max_projection_file']
         dict_repr['average_intensity_projection_image_file'] = \
-            test_data_dir /\
+            test_data_dir / \
             dict_repr['average_intensity_projection_image_file']
 
         cls.expected_max = Projections._from_filepath(

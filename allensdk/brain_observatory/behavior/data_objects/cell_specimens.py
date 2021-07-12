@@ -79,7 +79,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         return self._cell_specimen_table
 
     @property
-    def roi_masks(self):
+    def roi_masks(self) -> pd.DataFrame:
         return self._cell_specimen_table[['cell_roi_id', 'roi_mask']]
 
     @property
