@@ -147,8 +147,8 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
         :param pixel_size
             pixel size in um
         """
-        max_projection = mpimg.imread(filepath)
-        img = ImageApi.serialize(max_projection, [pixel_size / 1000.,
-                                                  pixel_size / 1000.], 'mm')
+        img = mpimg.imread(filepath)
+        img = ImageApi.serialize(img, [pixel_size / 1000.,
+                                       pixel_size / 1000.], 'mm')
         img = ImageApi.deserialize(img=img)
         return img
