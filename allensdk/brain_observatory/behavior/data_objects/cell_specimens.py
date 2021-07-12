@@ -22,8 +22,8 @@ from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class CellSpecimenTableMeta(DataObject, InternalReadableInterface,
-                            JsonReadableInterface, NwbReadableInterface):
+class CellSpecimenMeta(DataObject, InternalReadableInterface,
+                       JsonReadableInterface, NwbReadableInterface):
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
         super().__init__(name='cell_spcimen_meta', value=self)
         self._emission_lambda = emission_lambda
@@ -39,18 +39,18 @@ class CellSpecimenTableMeta(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin) -> "CellSpecimenTableMeta":
+                      lims_db: PostgresQueryMixin) -> "CellSpecimenMeta":
         imaging_plane_meta = ImagingPlane.from_internal(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         return cls(imaging_plane=imaging_plane_meta)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "CellSpecimenTableMeta":
+    def from_json(cls, dict_repr: dict) -> "CellSpecimenMeta":
         imaging_plane_meta = ImagingPlane.from_json(dict_repr=dict_repr)
         return cls(imaging_plane=imaging_plane_meta)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "CellSpecimenTableMeta":
+    def from_nwb(cls, nwbfile: NWBFile) -> "CellSpecimenMeta":
         ophys_module = nwbfile.processing['ophys']
         image_seg = ophys_module.data_interfaces['image_segmentation']
         plane_segmentations = image_seg.plane_segmentations
@@ -61,15 +61,15 @@ class CellSpecimenTableMeta(DataObject, InternalReadableInterface,
         emission_lambda = optical_channel.emission_lambda
 
         imaging_plane = ImagingPlane.from_nwb(nwbfile=nwbfile)
-        return CellSpecimenTableMeta(emission_lambda=emission_lambda,
-                                     imaging_plane=imaging_plane)
+        return CellSpecimenMeta(emission_lambda=emission_lambda,
+                                imaging_plane=imaging_plane)
 
 
-class CellSpecimenTable(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, NwbReadableInterface,
-                        NwbWritableInterface):
+class CellSpecimens(DataObject, LimsReadableInterface,
+                    JsonReadableInterface, NwbReadableInterface,
+                    NwbWritableInterface):
     def __init__(self, cell_specimen_table: pd.DataFrame,
-                 meta: CellSpecimenTableMeta):
+                 meta: CellSpecimenMeta):
         super().__init__(name='cell_specimen_table', value=self)
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
@@ -79,12 +79,16 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         return self._cell_specimen_table
 
     @property
-    def meta(self) -> CellSpecimenTableMeta:
+    def roi_masks(self):
+        return self._cell_specimen_table[['cell_roi_id', 'roi_mask']]
+
+    @property
+    def meta(self) -> CellSpecimenMeta:
         return self._meta
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "CellSpecimenTable":
+                  lims_db: PostgresQueryMixin) -> "CellSpecimens":
         def get_ophys_cell_segmentation_run_id() -> int:
             """Get the ophys cell segmentation run id associated with an
             ophys experiment id"""
@@ -116,23 +120,23 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
         cell_specimen_table = cls._postprocess(
             cell_specimen_table=cell_specimen_table, fov_shape=fov_shape)
 
-        meta = CellSpecimenTableMeta.from_internal(
+        meta = CellSpecimenMeta.from_internal(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         return cls(cell_specimen_table=cell_specimen_table, meta=meta)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "CellSpecimenTable":
+    def from_json(cls, dict_repr: dict) -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
         fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         cell_specimen_table = cls._postprocess(
             cell_specimen_table=cell_specimen_table, fov_shape=fov_shape)
 
-        meta = CellSpecimenTableMeta.from_json(dict_repr=dict_repr)
+        meta = CellSpecimenMeta.from_json(dict_repr=dict_repr)
         return cls(cell_specimen_table=cell_specimen_table, meta=meta)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
-                 filter_invalid_rois=False) -> "CellSpecimenTable":
+                 filter_invalid_rois=False) -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
         ophys_module = nwbfile.processing['ophys']
         image_seg = ophys_module.data_interfaces['image_segmentation']
@@ -158,7 +162,7 @@ class CellSpecimenTable(DataObject, LimsReadableInterface,
             return df
 
         df = _read_table(cell_specimen_table=cell_specimen_table)
-        meta = CellSpecimenTableMeta.from_nwb(nwbfile=nwbfile)
+        meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
 
         return cls(cell_specimen_table=df, meta=meta)
 

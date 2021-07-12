@@ -6,9 +6,9 @@ import pynwb
 
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.cell_specimen_table \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
     import \
-    CellSpecimenTable, CellSpecimenTableMeta
+    CellSpecimens, CellSpecimenMeta
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
@@ -23,7 +23,7 @@ class TestLims:
     @classmethod
     def setup_class(cls):
         cls.ophys_experiment_id = 994278291
-        cls.expected_meta = CellSpecimenTableMeta(
+        cls.expected_meta = CellSpecimenMeta(
             emission_lambda=520.0,
             imaging_plane=ImagingPlane(
                 excitation_lambda=910.0,
@@ -45,7 +45,7 @@ class TestLims:
 
     @pytest.mark.requires_bamboo
     def test_from_internal(self):
-        csp = CellSpecimenTable.from_lims(
+        csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
         assert not csp.table.empty
         assert csp.meta == self.expected_meta
@@ -64,7 +64,7 @@ class TestJson:
                                                   'behavior_stimulus_file.pkl')
 
         cls.dict_repr = dict_repr
-        cls.expected_meta = CellSpecimenTableMeta(
+        cls.expected_meta = CellSpecimenMeta(
             emission_lambda=520.0,
             imaging_plane=ImagingPlane(
                 excitation_lambda=910.0,
@@ -75,7 +75,7 @@ class TestJson:
         )
 
     def test_from_json(self):
-        csp = CellSpecimenTable.from_json(dict_repr=self.dict_repr)
+        csp = CellSpecimens.from_json(dict_repr=self.dict_repr)
         assert not csp.table.empty
         assert csp.meta == self.expected_meta
 
@@ -85,7 +85,7 @@ class TestNWB:
     def setup_class(cls):
         tj = TestJson()
         tj.setup_class()
-        cls.cell_specimen_table = CellSpecimenTable.from_json(
+        cls.cell_specimen_table = CellSpecimens.from_json(
             dict_repr=tj.dict_repr)
 
     def setup_method(self, method):
@@ -109,7 +109,7 @@ class TestNWB:
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=CellSpecimenTable)
+                data_object_cls=CellSpecimens)
         else:
             obt = self.cell_specimen_table.from_nwb(nwbfile=self.nwbfile)
 
