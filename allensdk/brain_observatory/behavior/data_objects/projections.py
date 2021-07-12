@@ -1,4 +1,3 @@
-from SimpleITK import Image
 from matplotlib import image as mpimg
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import Images
@@ -12,7 +11,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
-from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 from allensdk.brain_observatory.nwb.nwb_utils import get_image
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -93,11 +92,7 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
             MODULE_NAME = 'ophys'
             description = '{} image at pixels/cm resolution'.format(image_name)
 
-            if isinstance(image_data, Image):
-                data, spacing, unit = ImageApi.deserialize(image_data)
-            else:
-                raise ValueError("Not a supported image_data type: "
-                                 f"{type(image_data)}")
+            data, spacing, unit = image_data
 
             assert spacing[0] == spacing[1] and len(
                 spacing) == 2 and unit == 'mm'
@@ -150,5 +145,7 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
             pixel size in um
         """
         max_projection = mpimg.imread(filepath)
-        return ImageApi.serialize(max_projection, [pixel_size / 1000.,
+        img = ImageApi.serialize(max_projection, [pixel_size / 1000.,
                                                    pixel_size / 1000.], 'mm')
+        img = ImageApi.deserialize(img=img)
+        return img

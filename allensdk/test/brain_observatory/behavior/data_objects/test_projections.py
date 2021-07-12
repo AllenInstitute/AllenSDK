@@ -1,26 +1,14 @@
 import json
 from datetime import datetime
 from pathlib import Path
-import numpy as np
 import pynwb
 
 import pytest
-from skimage import io
 
-from allensdk.brain_observatory.behavior.data_objects.cell_specimen_table \
-    import \
-    CellSpecimenTable, CellSpecimenTableMeta
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_plane import \
-    ImagingPlane
 from allensdk.brain_observatory.behavior.data_objects.projections import \
     Projections
-from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata\
-    .test_behavior_ophys_metadata import \
-    TestBOM
 
 
 class TestLims:
@@ -34,12 +22,10 @@ class TestLims:
         cls.expected_max = Projections._from_filepath(
             filepath=str(test_data_dir / 'max_projection.png'),
             pixel_size=.78125)
-        cls.expected_max = ImageApi.deserialize(img=cls.expected_max)
 
         cls.expected_avg = Projections._from_filepath(
             filepath=str(test_data_dir / 'avg_projection.png'),
             pixel_size=.78125)
-        cls.expected_avg = ImageApi.deserialize(img=cls.expected_avg)
 
     def setup_method(self, method):
         marks = getattr(method, 'pytestmark', None)
@@ -55,11 +41,9 @@ class TestLims:
     def test_from_internal(self):
         projections = Projections.from_internal(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
-        max = ImageApi.deserialize(img=projections.max_projection)
-        avg = ImageApi.deserialize(img=projections.avg_projection)
 
-        assert max == self.expected_max
-        assert avg == self.expected_avg
+        assert projections.max_projection == self.expected_max
+        assert projections.avg_projection == self.expected_avg
 
 
 class TestJson:
@@ -79,22 +63,18 @@ class TestJson:
         cls.expected_max = Projections._from_filepath(
             filepath=str(test_data_dir / 'max_projection.png'),
             pixel_size=.78125)
-        cls.expected_max = ImageApi.deserialize(img=cls.expected_max)
 
         cls.expected_avg = Projections._from_filepath(
             filepath=str(test_data_dir / 'avg_projection.png'),
             pixel_size=.78125)
-        cls.expected_avg = ImageApi.deserialize(img=cls.expected_avg)
 
         cls.dict_repr = dict_repr
 
     def test_from_json(self):
         projections = Projections.from_json(dict_repr=self.dict_repr)
-        max = ImageApi.deserialize(img=projections.max_projection)
-        avg = ImageApi.deserialize(img=projections.avg_projection)
 
-        assert max == self.expected_max
-        assert avg == self.expected_avg
+        assert projections.max_projection == self.expected_max
+        assert projections.avg_projection == self.expected_avg
 
 
 class TestNWB:
