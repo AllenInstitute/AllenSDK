@@ -608,12 +608,20 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         assert np.allclose(lfp_data["data"], obt_ser.data[:])
         assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
 
+        # NOTE removing "impedence" from this column list as it is not in the
+        # DataFrame and this behavior is no longer supported
+        # https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike  # noqa: E501
+
         obt_electrodes = obt_f.electrodes.to_dataframe().loc[
             :, ["local_index", "probe_horizontal_position",
                 "probe_id", "probe_vertical_position",
-                "valid_data", "x", "y", "z", "location", "impedence",
+                "valid_data", "x", "y", "z", "location",
                 "filtering"]
         ]
+        # adding the impedence column as it would have been created in older
+        # pandas versions
+        obt_electrodes["impedence"] = np.nan
+
 
         assert obt_f.session_id == "4242"
         assert obt_f.subject.subject_id == "42"
