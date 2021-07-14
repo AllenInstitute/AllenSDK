@@ -259,9 +259,9 @@ class DriftingGratings(StimulusAnalysis):
         cmax = max(cmin, data.mean() + data.std()*3)
 
         fp = cplots.FanPlotter.for_drifting_gratings()
-        fp.plot(r_data=st.temporal_frequency.ix[mask].values,
-                angle_data=st.orientation.ix[mask].values,
-                data=df.ix[mask].values,
+        fp.plot(r_data=st.temporal_frequency.loc[mask].values,
+                angle_data=st.orientation.loc[mask].values,
+                data=df.loc[mask].values,
                 clim=[cmin, cmax])
         fp.show_axes(closed=True)
     
@@ -281,7 +281,7 @@ class DriftingGratings(StimulusAnalysis):
         # orientation selective cells
         osi_cells = vis_cells & (self.peak.osi_dg > si_range[0]) & (self.peak.osi_dg < si_range[1])
 
-        peak_osi = self.peak.ix[osi_cells]
+        peak_osi = self.peak.loc[osi_cells]
         osis = peak_osi.osi_dg.values
 
         oplots.plot_selectivity_cumulative_histogram(osis, 
@@ -303,7 +303,7 @@ class DriftingGratings(StimulusAnalysis):
         # direction selective cells
         dsi_cells = vis_cells & (self.peak.dsi_dg > si_range[0]) & (self.peak.dsi_dg < si_range[1])
 
-        peak_dsi = self.peak.ix[dsi_cells]
+        peak_dsi = self.peak.loc[dsi_cells]
         dsis = peak_dsi.dsi_dg.values
 
         oplots.plot_selectivity_cumulative_histogram(dsis, 
@@ -319,7 +319,7 @@ class DriftingGratings(StimulusAnalysis):
                                  p_value_max=oplots.P_VALUE_MAX,
                                  peak_dff_min=oplots.PEAK_DFF_MIN):
         vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)    
-        pref_dirs = self.peak.ix[vis_cells].ori_dg.values
+        pref_dirs = self.peak.loc[vis_cells].ori_dg.values
         pref_dirs = [ self.orivals[pref_dir] for pref_dir in pref_dirs ]
 
         angles, counts = np.unique(pref_dirs, return_counts=True)
@@ -339,7 +339,7 @@ class DriftingGratings(StimulusAnalysis):
                                           peak_dff_min=oplots.PEAK_DFF_MIN):
 
         vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)    
-        pref_tfs = self.peak.ix[vis_cells].tf_dg.values
+        pref_tfs = self.peak.loc[vis_cells].tf_dg.values
 
         oplots.plot_condition_histogram(pref_tfs, 
                                         self.tfvals[1:],
