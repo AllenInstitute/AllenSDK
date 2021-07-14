@@ -456,7 +456,7 @@ class StimulusAnalysis(object):
             # value.
             try:
                 df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-            except (IndexError, NotImplementedError) as err:
+            except (IndexError, NotImplementedError, KeyError) as err:
                 df = self.conditionwise_statistics
 
             # TODO: Calculated preferred condition_id once for all units and store in a table.
@@ -488,7 +488,15 @@ class StimulusAnalysis(object):
 
     def _get_lifetime_sparseness(self, unit_id):
         """Computes lifetime sparseness of responses for one unit"""
-        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        try:
+            df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        except KeyError:
+            # as of pandas 1.0 the above throws a KeyError when the
+            # label is not found in the level. Prior versions, this
+            # raised no exception and returned the unaltered
+            # DataFrame, implemented here:
+            df = self.conditionwise_statistics
+
         responses = df.loc[unit_id]['spike_count'].values
 
         return lifetime_sparseness(responses)
