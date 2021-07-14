@@ -188,10 +188,12 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
         ('call_caching', logging.INFO, 'Fetching data from remote'),
         ('call_caching', logging.INFO, 'Writing data to cache'),
         ('call_caching', logging.INFO, 'Reading data from cache')]
-    assert expected_first == caplog.record_tuples
+    records = [i for i in caplog.record_tuples if i[0] == 'call_caching']
+    assert expected_first == records
     caplog.clear()
     cache.get_behavior_session_table()
-    assert [expected_first[0], expected_first[-1]] == caplog.record_tuples
+    records = [i for i in caplog.record_tuples if i[0] == 'call_caching']
+    assert [expected_first[0], expected_first[-1]] == records
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
