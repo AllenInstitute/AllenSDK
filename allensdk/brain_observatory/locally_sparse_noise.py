@@ -359,7 +359,11 @@ class LocallySparseNoise(StimulusAnalysis):
                                                                             mask_off_screen=False)
 
         baseline_trials = np.unique(np.where(lsn_movie[:,-5:,-1] != LocallySparseNoise.LSN_GREY)[0])
-        baseline_df = self.mean_sweep_response.loc[baseline_trials]
+        # NOTE in newer versions of pandas, one can't pass in to DataFrame.loc
+        # non-existent indices. Adding valid_indices to fix this.
+        valid_indices = pd.Index(set(baseline_trials) &
+                                 set(self.mean_sweep_response.index.tolist()))
+        baseline_df = self.mean_sweep_response.loc[valid_indices]
         cell_baselines = np.nanmean(baseline_df.values, axis=0)
 
         lsn_movie[:,~lsn_mask] = LocallySparseNoise.LSN_OFF_SCREEN
