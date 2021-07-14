@@ -161,10 +161,14 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
         ('call_caching', logging.INFO, 'Fetching data from remote'),
         ('call_caching', logging.INFO, 'Writing data to cache'),
         ('call_caching', logging.INFO, 'Reading data from cache')]
-    assert expected_first == caplog.record_tuples
+    # NOTE the filter below prevents this test from failing when other
+    # packages emit a log entry. Notably numexpr in windows.
+    records = [i for i in caplog.record_tuples if i[0] == 'call_caching']
+    assert expected_first == records
     caplog.clear()
     cache.get_ophys_session_table()
-    assert [expected_first[0], expected_first[-1]] == caplog.record_tuples
+    records = [i for i in caplog.record_tuples if i[0] == 'call_caching']
+    assert [expected_first[0], expected_first[-1]] == records
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
