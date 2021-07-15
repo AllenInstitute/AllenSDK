@@ -436,12 +436,64 @@ class StimulusAnalysis(object):
         raise NotImplementedError()
 
     def empty_metrics_table(self):
-        # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
-        # correct data type for each column
-        empty_array = np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS))
-        empty_array[:] = np.nan
+        """create an empty array filled with np.nan or pd.NA
+        with number of rows self.unit_count and columns/data types specified
+        by self.METRICS_COLUMNS
 
-        return pd.DataFrame(empty_array, index=self.unit_ids).rename_axis('unit_id')
+        Returns
+        -------
+        df: pd.DataFrame
+            columns:
+              - size: len(self.METRICS_COLUMNS)
+              - names: self.METRICS_COLUMNS[i][0]
+              - dtype: self.METRICS_COLUMNS[i][1]
+            index:
+              - size: self.unit_count
+              - values: self.unit_ids
+              - name 'unit_id'
+            values:
+              - np.nan (np.float64)
+              - pd.NA (np.uint64)
+              - pd.NA (bool)
+
+        Raises
+        ------
+        NotImplementedError for any data type not listed above.
+
+        """
+        empty_array = np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS))
+        series_list = []
+        for metric in self.METRICS_COLUMNS:
+            if metric[1] == np.uint64:
+                # NOTE the old behavior of setting int columns to np.nan
+                # failed silently and left the columns as the uninitialized
+                # memory values. this sets them to pd.NA
+                # nullable pd.Uint64Dtype is present since pandas 1.0.0 though
+                # it is marked as experimental.
+                values = pd.array([None] * self.unit_count,
+                                  dtype=pd.UInt64Dtype())
+            elif metric[1] == np.float64:
+                # NOTE above pandas 1.2.0 an equivalent pd.Float64Dtype exists
+                # that supports pd.NA entries, as pd.UInt64Dtype above
+                # As of now, AllenSDK supports down to pandas 1.0.5 
+                # (following pyNWB) and we must still populate with np.nan
+                values = np.full(shape=(self.unit_count,), fill_value=np.nan)
+            elif metric[1] == bool:
+                # NOTE the previous process of creating an empty array
+                # and setting to np.nan filled the empty DataFrame bool
+                # columns with True. This is changed to fill with pd.NA
+                # nullable pd.BooleanDtype is present since pandas 1.0.0
+                values = pd.array([None] * self.unit_count,
+                                  dtype=pd.BooleanDtype())
+            else:
+                raise NotImplementedError(
+                        "empty_metrics_table does not currently support data "
+                        f"type {metric[1]} for column {metric[0]}")
+            series_list.append(pd.Series(data=values, name=metric[0]))
+        df = pd.concat(series_list, axis=1)
+        df.index = self.unit_ids
+        df = df.rename_axis("unit_id")
+        return df
 
 
     def _find_stimuli(self):
