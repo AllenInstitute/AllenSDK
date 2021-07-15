@@ -22,7 +22,8 @@ def behavior_stimuli_time_fixture(request):
     timestamp_count = request.param["timestamp_count"]
     time_step = request.param["time_step"]
 
-    timestamps = np.array([time_step * i for i in range(timestamp_count)])
+    timestamps = np.array([time_step * i
+                           for i in range(timestamp_count)]).astype('int64')
 
     return timestamps
 
@@ -349,6 +350,7 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
     pd.testing.assert_frame_equal(presentations_df,
                                   expected_df,
                                   check_names=False)
+
 
 @pytest.mark.parametrize("behavior_stimuli_time_fixture,"
                          "behavior_stimuli_data_fixture,"
