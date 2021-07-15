@@ -346,8 +346,9 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
 
     expected_df = pd.DataFrame.from_dict(expected)
 
-    assert presentations_df.equals(expected_df)
-
+    pd.testing.assert_frame_equal(presentations_df,
+                                  expected_df,
+                                  check_names=False)
 
 @pytest.mark.parametrize("behavior_stimuli_time_fixture,"
                          "behavior_stimuli_data_fixture,"
