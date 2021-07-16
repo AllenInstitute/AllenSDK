@@ -106,7 +106,7 @@ class MtrainApi:
             'index', drop=False)
         trials_df['behavior_session_uuid'] = trials_df[
             'behavior_session_uuid'].map(uuid.UUID)
-        del trials_df.index.name
+        trials_df.index.name = None
         session_dict['trials'] = trials_df[EDF_COLUMNS]
 
         return session_dict
