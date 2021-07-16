@@ -187,7 +187,7 @@ def cell_specimen_table(tmpdir_factory):
     zipped = os.path.join("cell_specimens.zip")
     api.retrieve_file_over_http(CELL_SPECIMEN_ZIP_URL, zipped)
     df = pd.read_csv(ZipFile(zipped).open("cell_metrics.csv"),
-                     true_values="t", false_values="f")
+                     true_values=["t"], false_values=["f"])
     js = json.loads(df.to_json(orient="records"))
     table_file = os.path.join(data_dir, "cell_specimens.json")
     with open(table_file, "w") as f:

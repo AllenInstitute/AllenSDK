@@ -631,6 +631,16 @@ def c50(contrasts, responses):
     Returns
     -------
     c50 : float
+
+    Notes
+    -----
+    - this function very occasionally is non-deterministic at the single
+    index level. i.e. it returns X_sorted[99] when most often it returns
+    X_sorted[100]. test_metric_with_contrast() in test_drifting_gratings.py
+    was modified to accommodate this uncertainty. This behavior started
+    when upgrading pyNWB requirements, perhaps due to a dependency change
+    allowing scipy 1.7.0 to be used.
+
     """
     if contrasts.size == 0 or contrasts.size != responses.size:
         warnings.warn('the contrasts and responses arrays must be of the same length')

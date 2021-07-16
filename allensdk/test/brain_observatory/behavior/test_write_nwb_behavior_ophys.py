@@ -168,8 +168,12 @@ def test_add_partial_metadata(test_partial_metadata, roundtrip, roundtripper,
         with warnings.catch_warnings(record=True) as record:
             metadata_obt = obt.get_metadata()
         exp_warn_msg = "Could not locate 'ophys' module in NWB"
-        print(record)
 
+        # NOTE skipping new warnings that are coming from newest
+        # pynwb versions (warnings coming up in roundtripper)
+        skip_message = ("Passing None into shape arguments as an "
+                        "alias for () is deprecated.")
+        record = [i for i in record if i.message.args[0] != skip_message]
         assert record[0].message.args[0].startswith(exp_warn_msg)
 
     assert len(metadata_obt) == len(meta)

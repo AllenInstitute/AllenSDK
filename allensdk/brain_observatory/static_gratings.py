@@ -347,7 +347,7 @@ class StaticGratings(StimulusAnalysis):
         # orientation selective cells
         osi_cells = vis_cells & (self.peak.osi_sg > si_range[0]) & (self.peak.osi_sg < si_range[1])
 
-        peak_osi = self.peak.ix[osi_cells]
+        peak_osi = self.peak.loc[osi_cells]
         osis = peak_osi.osi_sg.values
 
         oplots.plot_selectivity_cumulative_histogram(osis, 
@@ -364,7 +364,7 @@ class StaticGratings(StimulusAnalysis):
                                    peak_dff_min=oplots.PEAK_DFF_MIN):
 
         vis_cells = (self.peak.ptest_sg < p_value_max) & (self.peak.peak_dff_sg > peak_dff_min)    
-        pref_oris = self.peak.ix[vis_cells].ori_sg.values
+        pref_oris = self.peak.loc[vis_cells].ori_sg.values
         pref_oris = [ self.orivals[pref_ori] for pref_ori in pref_oris ]
 
         angles, counts = np.unique(pref_oris, return_counts=True)
@@ -400,7 +400,7 @@ class StaticGratings(StimulusAnalysis):
                                          peak_dff_min=oplots.PEAK_DFF_MIN):
 
         vis_cells = (self.peak.ptest_sg < p_value_max) & (self.peak.peak_dff_sg > peak_dff_min)    
-        pref_sfs = self.peak.ix[vis_cells].sf_sg.values
+        pref_sfs = self.peak.loc[vis_cells].sf_sg.values
 
         oplots.plot_condition_histogram(pref_sfs, 
                                         self.sfvals[1:],
@@ -422,10 +422,10 @@ class StaticGratings(StimulusAnalysis):
         cmax = max(cmin, data.mean() + data.std()*3)
 
         fp = cplots.FanPlotter.for_static_gratings()
-        fp.plot(r_data=st.spatial_frequency.ix[mask].values,
-                angle_data=st.orientation.ix[mask].values,
-                group_data=st.phase.ix[mask].values,
-                data=df.ix[mask].values,
+        fp.plot(r_data=st.spatial_frequency.loc[mask].values,
+                angle_data=st.orientation.loc[mask].values,
+                group_data=st.phase.loc[mask].values,
+                data=df.loc[mask].values,
                 clim=[cmin, cmax])
         fp.show_axes(closed=False)
 

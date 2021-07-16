@@ -64,7 +64,7 @@ jobs:
           pip install .
       - name: Test
         run: |
-          py.test --cov=allensdk -n 4
+          py.test -n 4
 
   onprem:
     name: python ${{ matrix.image }} on-prem test
@@ -92,4 +92,4 @@ jobs:
                                     --junitxml=test-reports/test.xml \
                                     --boxed \
                                     --numprocesses 4 \
-                                    --durations=0"
+                                    --durations=25"

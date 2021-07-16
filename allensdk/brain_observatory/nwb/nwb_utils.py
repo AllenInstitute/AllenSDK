@@ -48,5 +48,10 @@ def set_omitted_stop_time(stimulus_table: pd.DataFrame,
         start_time = row['start_time']
         end_time = start_time + omitted_time_duration
         row['stop_time'] = end_time
-        row['duration'] = omitted_time_duration
+        # NOTE in pandas 0.25.3 and < 1.2.0 adding a new column to row
+        # like "duration" and assigning to df.iloc where "duration" was not
+        # a column would silently ignore "duration". >= pandas 1.2.0, that
+        # is not the case and this generates a key error
+        if "duration" in stimulus_table.columns:
+            row['duration'] = omitted_time_duration
         stimulus_table.iloc[omitted_row_idx] = row
