@@ -483,8 +483,13 @@ class StimulusAnalysis(object):
             else:
                 test_values = celltraces_sorted_sp[
                     nc, start_min * binsize:(start_min + 1) * binsize]
+                # NOTE as of numpy v1.19.0, np.delete no longer silently
+                # ignores out-of-bound indices - this was happening at 
+                # least in brain_observatory/test_session_analysis.py
+                ind_max = min(celltraces_sorted_sp[nc, :].size,
+                              (start_min + 1) * binsize)
                 other_values = np.delete(celltraces_sorted_sp[nc, :], range(
-                    start_min * binsize, (start_min + 1) * binsize))
+                    start_min * binsize, ind_max))
                 (_, peak_run.ptest_sp[nc]) = nonraising_ks_2samp(
                     test_values, other_values)
             temp = binned_cells_vis[nc, :, 0]
