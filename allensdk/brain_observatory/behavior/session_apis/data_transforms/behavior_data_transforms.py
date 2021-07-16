@@ -19,9 +19,10 @@ from allensdk.brain_observatory.behavior.session_apis.abcs.\
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     data_extractor_base.behavior_data_extractor_base import \
     BehaviorDataExtractorBase
-from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
-    StimulusTemplate, is_change_event)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.\
+    stimulus_processing import (
+        get_stimulus_metadata, get_stimulus_presentations,
+        get_stimulus_templates, StimulusTemplate, is_change_event)
 from allensdk.brain_observatory.behavior.trials_processing import (
     get_extended_trials, get_trials_from_data_transform)
 from allensdk.core.exceptions import DataFrameIndexError

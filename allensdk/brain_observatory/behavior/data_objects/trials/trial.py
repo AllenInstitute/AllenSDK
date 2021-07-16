@@ -47,7 +47,7 @@ class Trial:
 
         # this block of code is trying to mimic
         # https://github.com/AllenInstitute/visual_behavior_analysis
-        # /blob/master/visual_behavior/translator/foraging2/__init__.py
+        # /blob/master/visual_behavior/translator/foraging2/stimulus_processing.py
         # #L377-L381
         # https://github.com/AllenInstitute/visual_behavior_analysis
         # /blob/master/visual_behavior/translator/foraging2
