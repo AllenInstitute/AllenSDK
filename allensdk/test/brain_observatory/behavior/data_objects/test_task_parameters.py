@@ -2,20 +2,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-import pandas as pd
 import pynwb
 import pytest
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
-    Presentations
-from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
-    Stimuli
-from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
-    import \
-    Templates
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \

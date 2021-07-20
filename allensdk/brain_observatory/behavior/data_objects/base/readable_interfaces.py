@@ -2,7 +2,8 @@ import abc
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
+    DataFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
@@ -68,6 +69,22 @@ class NwbReadableInterface(abc.ABC):
         ----------
         nwbfile:
             The file object (NWBFile) of a pynwb dataset file.
+
+        Returns
+        -------
+        DataObject:
+            An instantiated DataObject which has `name` and `value` properties
+        """
+        raise NotImplementedError()
+
+
+class DataFileReadableInterface(abc.ABC):
+    """Maraks a data object as readable from various data files, not covered by
+    existing interfaces"""
+    @classmethod
+    @abc.abstractmethod
+    def from_data_file(cls, *args) -> "DataObject":
+        """Populate a DataObject from the data file
 
         Returns
         -------
