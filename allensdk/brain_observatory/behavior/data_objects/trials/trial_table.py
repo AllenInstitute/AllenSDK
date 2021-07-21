@@ -110,7 +110,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
     @staticmethod
     def _calculate_monitor_delay(sync_file: SyncFile,
-                                 equipment: Equipment):
+                                 equipment: Equipment) -> float:
         aligner = OphysTimeAligner(sync_file=sync_file.filepath)
 
         try:
