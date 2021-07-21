@@ -81,32 +81,32 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
                                  'calculate monitor delay')
             monitor_delay = cls._calculate_monitor_delay(sync_file=sync_file,
                                                          equipment=equipment)
-            bsf = stimulus_file.data
+        bsf = stimulus_file.data
 
-            stimuli = bsf["items"]["behavior"]["stimuli"]
-            trial_log = bsf["items"]["behavior"]["trial_log"]
+        stimuli = bsf["items"]["behavior"]["stimuli"]
+        trial_log = bsf["items"]["behavior"]["trial_log"]
 
-            trial_bounds = cls._get_trial_bounds(trial_log=trial_log)
+        trial_bounds = cls._get_trial_bounds(trial_log=trial_log)
 
-            all_trial_data = [None] * len(trial_log)
+        all_trial_data = [None] * len(trial_log)
 
-            for idx, trial in enumerate(trial_log):
-                trial_start, trial_end = trial_bounds[idx]
-                t = Trial(trial=trial, start=trial_start, end=trial_end,
-                          behavior_stimulus_file=stimulus_file,
-                          index=idx,
-                          monitor_delay=monitor_delay,
-                          stimulus_timestamps=stimulus_timestamps,
-                          licks=licks, rewards=rewards,
-                          stimuli=stimuli
-                          )
-                all_trial_data[idx] = t.data
+        for idx, trial in enumerate(trial_log):
+            trial_start, trial_end = trial_bounds[idx]
+            t = Trial(trial=trial, start=trial_start, end=trial_end,
+                      behavior_stimulus_file=stimulus_file,
+                      index=idx,
+                      monitor_delay=monitor_delay,
+                      stimulus_timestamps=stimulus_timestamps,
+                      licks=licks, rewards=rewards,
+                      stimuli=stimuli
+                      )
+            all_trial_data[idx] = t.data
 
-            trials = pd.DataFrame(all_trial_data).set_index('trial')
-            trials.index = trials.index.rename('trials_id')
-            del trials["sham_change"]
+        trials = pd.DataFrame(all_trial_data).set_index('trial')
+        trials.index = trials.index.rename('trials_id')
+        del trials["sham_change"]
 
-            return TrialTable(trials=trials)
+        return TrialTable(trials=trials)
 
     @staticmethod
     def _calculate_monitor_delay(sync_file: SyncFile,

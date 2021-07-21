@@ -34,12 +34,8 @@ class TestFromStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file = StimulusFile.from_lims(
-            behavior_session_id=self.behavior_session_id, db=self.dbconn)
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        licks = Licks.from_stimulus_file(stimulus_file=stimulus_file)
-        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file)
+        stimulus_file, stimulus_timestamps, licks, rewards = \
+            self._get_trial_table_data()
         sync_file = SyncFile.from_lims(
             db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
         equipment = Equipment.from_lims(
@@ -53,6 +49,30 @@ class TestFromStimulusFile(LimsTest):
             equipment=equipment
         )
         assert trials == self.expected
+
+    @pytest.mark.requires_bamboo
+    def test_monitor_delay_passed_in(self):
+        monitor_delay = 0.021578635252278967
+        stimulus_file, stimulus_timestamps, licks, rewards = \
+            self._get_trial_table_data()
+        trials = TrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            monitor_delay=monitor_delay,
+            licks=licks,
+            rewards=rewards
+        )
+        assert trials == self.expected
+
+    def _get_trial_table_data(self):
+        """returns data required to instantiate a TrialTable"""
+        stimulus_file = StimulusFile.from_lims(
+            behavior_session_id=self.behavior_session_id, db=self.dbconn)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        licks = Licks.from_stimulus_file(stimulus_file=stimulus_file)
+        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file)
+        return stimulus_file, stimulus_timestamps, licks, rewards
 
 
 class TestMonitorDelay:
