@@ -3,14 +3,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    Equipment
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
-from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
-from allensdk.test.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.test_behavior_metadata import \
-    TestBehaviorMetadata
 
 
 @pytest.mark.parametrize("roi_ids,expected", [

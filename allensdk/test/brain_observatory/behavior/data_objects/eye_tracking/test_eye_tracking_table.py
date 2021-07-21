@@ -1,8 +1,8 @@
-import numpy as np
-import pandas as pd
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 import pynwb
 import pytest
 
@@ -10,7 +10,7 @@ from allensdk.brain_observatory.behavior.data_files import \
     SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import \
     EyeTrackingTable
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
@@ -38,7 +38,7 @@ class TestFromDataFile(LimsTest):
         sync_file = SyncFile.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, db=self.dbconn)
         ett = EyeTrackingTable.from_data_file(data_file=etf,
-                                             sync_file=sync_file)
+                                              sync_file=sync_file)
 
         # filter to first 100 values for testing
         ett = EyeTrackingTable(eye_tracking=ett.value.iloc[:100])

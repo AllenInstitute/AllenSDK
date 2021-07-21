@@ -9,7 +9,7 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject, \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.stimulus_processing import \
@@ -81,7 +81,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls,stimulus_file: StimulusFile,
+            cls, stimulus_file: StimulusFile,
             limit_to_images: Optional[List] = None) -> "Presentations":
         """Get stimulus presentation data.
 
@@ -111,7 +111,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
                 raw_stim_pres_df["image_name"] = (
                     raw_stim_pres_df["orientation"]
-                        .apply(lambda x: f"gratings_{x}"))
+                    .apply(lambda x: f"gratings_{x}"))
             else:
                 raise ValueError("All values for 'orentation' and 'image_name'"
                                  " are null.")
@@ -121,15 +121,15 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         idx_name = raw_stim_pres_df.index.name
         stimulus_index_df = (
             raw_stim_pres_df
-                .reset_index()
-                .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
-                .set_index(idx_name))
+            .reset_index()
+            .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
+            .set_index(idx_name))
         stimulus_index_df = (
             stimulus_index_df[["image_set", "image_index", "start_time",
                                "phase", "spatial_frequency"]]
-                .rename(columns={"start_time": "timestamps"})
-                .sort_index()
-                .set_index("timestamps", drop=True))
+            .rename(columns={"start_time": "timestamps"})
+            .sort_index()
+            .set_index("timestamps", drop=True))
         stim_pres_df = raw_stim_pres_df.merge(
             stimulus_index_df, left_on="start_time", right_index=True,
             how="left")
@@ -142,7 +142,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             stimulus_presentations=stim_pres_df)
 
         # Sort columns then drop columns which contain only all NaN values
-        stim_pres_df =\
+        stim_pres_df = \
             stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
         if limit_to_images is not None:
             stim_pres_df = \

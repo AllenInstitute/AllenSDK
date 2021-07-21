@@ -1,19 +1,20 @@
 import logging
 import warnings
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.behavior.data_files import DataFile, SyncFile
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     NwbReadableInterface, DataFileReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
@@ -142,9 +143,6 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             "pupil_height": pupil_tracking.height[:],
             "pupil_phi": pupil_tracking.angle[:],
 
-
-
-
         }
 
         eye_tracking_data = pd.DataFrame(eye_tracking_dict)
@@ -168,9 +166,9 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
 
     @classmethod
     def from_data_file(cls, data_file: EyeTrackingFile,
-                          sync_file: SyncFile,
-                          z_threshold: float = 3.0, dilation_frames: int = 2
-                          ) -> "EyeTrackingTable":
+                       sync_file: SyncFile,
+                       z_threshold: float = 3.0, dilation_frames: int = 2
+                       ) -> "EyeTrackingTable":
         """
         Parameters
         ----------

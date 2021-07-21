@@ -47,7 +47,8 @@ class Trial:
 
         # this block of code is trying to mimic
         # https://github.com/AllenInstitute/visual_behavior_analysis
-        # /blob/master/visual_behavior/translator/foraging2/stimulus_processing.py
+        # /blob/master/visual_behavior/translator/foraging2
+        # /stimulus_processing.py
         # #L377-L381
         # https://github.com/AllenInstitute/visual_behavior_analysis
         # /blob/master/visual_behavior/translator/foraging2
@@ -335,7 +336,7 @@ class Trial:
         trial_start_frame = self._trial["events"][0][3]
         initial_image_category_name, _, initial_image_name = \
             self._resolve_initial_image(
-            stimuli, trial_start_frame)
+                stimuli, trial_start_frame)
         if len(self._trial["stimulus_changes"]) == 0:
             change_image_name = initial_image_name
         else:

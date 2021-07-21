@@ -49,7 +49,7 @@ class TestFromJson(LimsTest):
     @pytest.mark.requires_bamboo
     def test_from_json(self):
         dict_repr = {'eye_tracking_rig_geometry':
-                         self.expected.to_dict()['rig_geometry']}
+                     self.expected.to_dict()['rig_geometry']}
         rg = RigGeometry.from_json(dict_repr=dict_repr)
         assert rg == self.expected
 
