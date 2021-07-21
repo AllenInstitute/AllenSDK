@@ -44,7 +44,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
                  stimulus: str,
                  stimulus_distribution: StimulusDistribution,
                  task_type: TaskType,
-                 _stimulus_frames: int):
+                 n_stimulus_frames: int):
         super().__init__(name='task_parameters', value=self)
         self._blank_duration_sec = blank_duration_sec
         self._stimulus_duration_sec = stimulus_duration_sec
@@ -170,7 +170,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         )
 
     @staticmethod
-    def _calculate_stimulus_duration(stimulus_file: StimulusFile):
+    def _calculate_stimulus_duration(stimulus_file: StimulusFile) -> float:
         data = stimulus_file.data
 
         behavior = data["items"]["behavior"]
@@ -211,7 +211,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         return stim_duration
 
     @staticmethod
-    def _parse_task(stimulus_file: StimulusFile):
+    def _parse_task(stimulus_file: StimulusFile) -> TaskType:
         data = stimulus_file.data
         config = data["items"]["behavior"]["config"]
 
@@ -225,7 +225,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         return task
 
     @staticmethod
-    def _calculuate_n_stimulus_frames(stimulus_file: StimulusFile):
+    def _calculuate_n_stimulus_frames(stimulus_file: StimulusFile) -> int:
         data = stimulus_file.data
         behavior = data["items"]["behavior"]
 
