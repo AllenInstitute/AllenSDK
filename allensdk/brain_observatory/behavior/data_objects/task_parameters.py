@@ -33,14 +33,18 @@ class TaskType(Enum):
 
 class TaskParameters(DataObject, StimulusFileReadableInterface,
                      NwbReadableInterface, NwbWritableInterface):
-    def __init__(self, blank_duration_sec: List[float],
+    def __init__(self,
+                 blank_duration_sec: List[float],
                  stimulus_duration_sec: float,
                  omitted_flash_fraction: float,
-                 response_window_sec: List[float], reward_volume: float,
-                 auto_reward_volume: float, session_type: str,
+                 response_window_sec: List[float],
+                 reward_volume: float,
+                 auto_reward_volume: float,
+                 session_type: str,
                  stimulus: str,
                  stimulus_distribution: StimulusDistribution,
-                 task_type: TaskType, n_stimulus_frames: int):
+                 task_type: TaskType,
+                 _stimulus_frames: int):
         super().__init__(name='task_parameters', value=self)
         self._blank_duration_sec = blank_duration_sec
         self._stimulus_duration_sec = stimulus_duration_sec
