@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 import pandas as pd
 from pynwb import NWBFile
@@ -145,7 +145,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         return delay
 
     @staticmethod
-    def _get_trial_bounds(trial_log: List) -> List:
+    def _get_trial_bounds(trial_log: List) -> List[Tuple[int, int]]:
         """
         Adjust trial boundaries from a trial_log so that there is no dead time
         between trials.
