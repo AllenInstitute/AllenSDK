@@ -18,7 +18,7 @@ from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
 
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_templates import StimulusTemplate  # noqa: E501
+    .stimulus_templates import StimulusTemplate
 from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import StimulusTemplateExtension  # noqa: E501
 from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory import dict_to_indexed_array
