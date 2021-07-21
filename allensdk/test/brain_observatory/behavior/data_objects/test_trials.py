@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+import numpy as np
 import pynwb
 import pytest
 
@@ -15,6 +16,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.trials.trials import \
     Trials
+from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
@@ -52,6 +54,71 @@ class TestFromStimulusFile(LimsTest):
             equipment=equipment
         )
         assert trials == self.expected
+
+
+class TestMonitorDelay:
+    @classmethod
+    def setup_class(cls):
+        cls.lookup_table_expected_values = {
+            'CAM2P.1': 0.020842,
+            'CAM2P.2': 0.037566,
+            'CAM2P.3': 0.021390,
+            'CAM2P.4': 0.021102,
+            'CAM2P.5': 0.021192,
+            'MESO.1': 0.03613
+        }
+
+    def setup_method(self, method):
+        dir = Path(__file__).parent.resolve()
+        test_data_dir = dir / 'test_data'
+
+        trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
+        self.sync_file = SyncFile(filepath=str(test_data_dir / 'sync.h5'))
+        self.trials = Trials(trials=trials)
+
+    def test_monitor_delay(self, monkeypatch):
+        equipment = Equipment(equipment_name='CAM2P.1')
+
+        def dummy_delay(self):
+            return 1.12
+
+        with monkeypatch.context() as ctx:
+            ctx.setattr(OphysTimeAligner,
+                        '_get_monitor_delay',
+                        dummy_delay)
+            md = Trials._calculate_monitor_delay(sync_file=self.sync_file,
+                                                 equipment=equipment)
+            assert abs(md - 1.12) < 1.0e-6
+
+    def test_monitor_delay_lookup(self, monkeypatch):
+        def dummy_delay(self):
+            """force monitor delay calculation to fail"""
+            raise ValueError("that did not work")
+
+        with monkeypatch.context() as ctx:
+            ctx.setattr(OphysTimeAligner,
+                        '_get_monitor_delay',
+                        dummy_delay)
+            for equipment, expected in \
+                    self.lookup_table_expected_values.items():
+                equipment = Equipment(equipment_name=equipment)
+                md = Trials._calculate_monitor_delay(sync_file=self.sync_file,
+                                                     equipment=equipment)
+                assert abs(md - expected) < 1e-6
+
+    def test_unkown_rig_name(self, monkeypatch):
+        def dummy_delay(self):
+            """force monitor delay calculation to fail"""
+            raise ValueError("that did not work")
+
+        with monkeypatch.context() as ctx:
+            ctx.setattr(OphysTimeAligner,
+                        '_get_monitor_delay',
+                        dummy_delay)
+            equipment = Equipment(equipment_name='spam')
+            with pytest.raises(RuntimeError):
+                Trials._calculate_monitor_delay(sync_file=self.sync_file,
+                                                equipment=equipment)
 
 
 class TestNWB:
