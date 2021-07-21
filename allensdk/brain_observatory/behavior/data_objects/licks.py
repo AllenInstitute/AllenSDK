@@ -25,8 +25,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
     def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "Licks":
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
-        lick_sensors is the desired lick sensor. If this changes we need
-        to update to get the proper line.
+        lick_sensors is the desired lick sensor. 
 
         Since licks can occur outside of a trial context, the lick times
         are extracted from the vsyncs and the frame number in `lick_events`.
