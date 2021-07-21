@@ -78,7 +78,7 @@ class NwbReadableInterface(abc.ABC):
 
 
 class DataFileReadableInterface(abc.ABC):
-    """Maraks a data object as readable from various data files, not covered by
+    """Marks a data object as readable from various data files, not covered by
     existing interfaces"""
     @classmethod
     @abc.abstractmethod
