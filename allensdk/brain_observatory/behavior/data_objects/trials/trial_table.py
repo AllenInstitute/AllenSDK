@@ -24,8 +24,8 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
 
-class Trials(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
-             NwbWritableInterface):
+class TrialTable(DataObject, StimulusFileReadableInterface,
+                 NwbReadableInterface, NwbWritableInterface):
     def __init__(self, trials: pd.DataFrame):
         super().__init__(name='trials', value=trials)
 
@@ -59,12 +59,12 @@ class Trials(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         return nwbfile
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Trials":
+    def from_nwb(cls, nwbfile: NWBFile) -> "TrialTable":
         trials = nwbfile.trials.to_dataframe()
         if 'lick_events' in trials.columns:
             trials.drop('lick_events', inplace=True, axis=1)
         trials.index = trials.index.rename('trials_id')
-        return Trials(trials=trials)
+        return TrialTable(trials=trials)
 
     @classmethod
     def from_stimulus_file(cls, stimulus_file: StimulusFile,
@@ -74,7 +74,7 @@ class Trials(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                            monitor_delay: Optional[float] = None,
                            sync_file: Optional[SyncFile] = None,
                            equipment: Optional[Equipment] = None
-                           ) -> "Trials":
+                           ) -> "TrialTable":
         if monitor_delay is None:
             if sync_file is None or equipment is None:
                 raise ValueError('Need sync file and equipment in order to '
@@ -106,7 +106,7 @@ class Trials(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
             trials.index = trials.index.rename('trials_id')
             del trials["sham_change"]
 
-            return Trials(trials=trials)
+            return TrialTable(trials=trials)
 
     @staticmethod
     def _calculate_monitor_delay(sync_file: SyncFile,

@@ -13,8 +13,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.data_objects.trials.trials import \
-    Trials
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
+    TrialTable
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -30,7 +30,7 @@ class TestFromStimulusFile(LimsTest):
         test_data_dir = dir / 'test_data'
 
         expected = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.expected = Trials(trials=expected)
+        cls.expected = TrialTable(trials=expected)
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
@@ -44,7 +44,7 @@ class TestFromStimulusFile(LimsTest):
             db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
         equipment = Equipment.from_lims(
             behavior_session_id=self.behavior_session_id, lims_db=self.dbconn)
-        trials = Trials.from_stimulus_file(
+        trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -73,7 +73,7 @@ class TestMonitorDelay:
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
         self.sync_file = SyncFile(filepath=str(test_data_dir / 'sync.h5'))
-        self.trials = Trials(trials=trials)
+        self.trials = TrialTable(trials=trials)
 
     def test_monitor_delay(self, monkeypatch):
         equipment = Equipment(equipment_name='CAM2P.1')
@@ -85,8 +85,8 @@ class TestMonitorDelay:
             ctx.setattr(OphysTimeAligner,
                         '_get_monitor_delay',
                         dummy_delay)
-            md = Trials._calculate_monitor_delay(sync_file=self.sync_file,
-                                                 equipment=equipment)
+            md = TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
+                                                     equipment=equipment)
             assert abs(md - 1.12) < 1.0e-6
 
     def test_monitor_delay_lookup(self, monkeypatch):
@@ -101,8 +101,8 @@ class TestMonitorDelay:
             for equipment, expected in \
                     self.lookup_table_expected_values.items():
                 equipment = Equipment(equipment_name=equipment)
-                md = Trials._calculate_monitor_delay(sync_file=self.sync_file,
-                                                     equipment=equipment)
+                md = TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
+                                                         equipment=equipment)
                 assert abs(md - expected) < 1e-6
 
     def test_unkown_rig_name(self, monkeypatch):
@@ -116,8 +116,8 @@ class TestMonitorDelay:
                         dummy_delay)
             equipment = Equipment(equipment_name='spam')
             with pytest.raises(RuntimeError):
-                Trials._calculate_monitor_delay(sync_file=self.sync_file,
-                                                equipment=equipment)
+                TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
+                                                    equipment=equipment)
 
 
 class TestNWB:
@@ -127,7 +127,7 @@ class TestNWB:
         test_data_dir = dir / 'test_data'
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.trials = Trials(trials=trials)
+        cls.trials = TrialTable(trials=trials)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -144,7 +144,7 @@ class TestNWB:
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=Trials)
+                data_object_cls=TrialTable)
         else:
             obt = self.trials.from_nwb(nwbfile=self.nwbfile)
 
