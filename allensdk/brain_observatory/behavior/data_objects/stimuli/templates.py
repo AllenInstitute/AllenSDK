@@ -17,8 +17,7 @@ from allensdk.brain_observatory.behavior.data_objects.base\
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
     Presentations
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_processing import \
+from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_templates
 from allensdk.brain_observatory.behavior.data_objects.stimuli \
     .stimulus_templates import \

@@ -7,8 +7,7 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
-from allensdk.brain_observatory.behavior.data_objects.stimuli.\
-    stimulus_processing import StimulusTemplate
+from allensdk.brain_observatory.behavior.stimulus_processing import StimulusTemplate
 
 
 class BehaviorBase(abc.ABC):

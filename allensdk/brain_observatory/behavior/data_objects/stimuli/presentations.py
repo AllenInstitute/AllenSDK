@@ -12,8 +12,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.stimuli \
-    .stimulus_processing import \
+from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval, get_column_name
