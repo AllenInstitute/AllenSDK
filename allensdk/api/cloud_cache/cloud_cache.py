@@ -28,7 +28,319 @@ class MissingLocalManifestWarning(UserWarning):
     pass
 
 
-class CloudCacheBase(ABC):
+class BasicLocalCache(ABC):
+    """
+    A class to handle the loading and accessing a project's data and
+    metadata from a local cache directory. Does NOT include any 'smart'
+    features like:
+    1. Keeping track of last loaded manifest
+    2. Constructing symlinks for valid data from previous dataset versions
+    3. Warning of outdated manifests
+
+    For those features (and more) see the CloudCacheBase class
+
+    Parameters
+    ----------
+    cache_dir: str or pathlib.Path
+        Path to the directory where data and meatadata arestored on the
+        local system
+
+    project_name: str
+        the name of the project this cache is supposed to access. This will
+        be the root directory for all files stored in the bucket.
+
+    ui_class_name: Optional[str]
+        Name of the class users are actually using to maniuplate this
+        functionality (used to populate helpful error messages)
+    """
+
+    def __init__(
+        self,
+        cache_dir: Union[str, Path],
+        project_name: str,
+        ui_class_name: Optional[str] = None
+    ):
+        os.makedirs(cache_dir, exist_ok=True)
+
+        # the class users are actually interacting with
+        # (for warning message purposes)
+        if ui_class_name is None:
+            self._user_interface_class = type(self).__name__
+        else:
+            self._user_interface_class = ui_class_name
+
+        self._manifest = None
+        self._manifest_name = None
+
+        self._cache_dir = cache_dir
+        self._project_name = project_name
+
+        self._manifest_file_names = self._list_all_manifests()
+
+    # ====================== BasicLocalCache properties =======================
+
+    @property
+    def ui(self):
+        return self._user_interface_class
+
+    @property
+    def current_manifest(self) -> Union[None, str]:
+        """The name of the currently loaded manifest"""
+        return self._manifest_name
+
+    @property
+    def project_name(self) -> str:
+        """The name of the project that this cache is accessing"""
+        return self._project_name
+
+    @property
+    def manifest_prefix(self) -> str:
+        """On-line prefix for manifest files"""
+        return f'{self.project_name}/manifests/'
+
+    @property
+    def file_id_column(self) -> str:
+        """The col name in metadata files used to uniquely identify data files
+        """
+        return self._manifest.file_id_column
+
+    @property
+    def version(self) -> str:
+        """The version of the dataset currently loaded"""
+        return self._manifest.version
+
+    @property
+    def metadata_file_names(self) -> list:
+        """List of metadata file names associated with this dataset"""
+        return self._manifest.metadata_file_names
+
+    @property
+    def manifest_file_names(self) -> list:
+        """Sorted list of manifest file names associated with this dataset
+        """
+        return self._manifest_file_names
+
+    @property
+    def latest_manifest_file(self) -> str:
+        """parses on-line available manifest files for semver string
+        and returns the latest one
+        self.manifest_file_names are assumed to be of the form
+        '<anything>_v<semver_str>.json'
+
+        Returns
+        -------
+        str
+            the filename whose semver string is the latest one
+        """
+        return self._find_latest_file(self.manifest_file_names)
+
+    # ====================== BasicLocalCache methods ==========================
+
+    @abstractmethod
+    def _list_all_manifests(self) -> list:
+        """
+        Return a list of all of the file names of the manifests associated
+        with this dataset
+        """
+        raise NotImplementedError()
+
+    def list_all_downloaded_manifests(self) -> list:
+        """
+        Return a list of all of the manifest files that have been
+        downloaded for this dataset
+        """
+        output = [x for x in os.listdir(self._cache_dir)
+                  if re.fullmatch(".*_manifest_v.*.json", x)]
+        output.sort()
+        return output
+
+    def _find_latest_file(self, file_name_list: List[str]) -> str:
+        """
+        Take a list of files named like
+
+        {blob}_v{version}.json
+
+        and return the one with the latest version
+        """
+        vstrs = [s.split(".json")[0].split("_v")[-1]
+                 for s in file_name_list]
+        versions = [semver.VersionInfo.parse(v) for v in vstrs]
+        imax = versions.index(max(versions))
+        return file_name_list[imax]
+
+    def _load_manifest(
+        self,
+        manifest_name: str,
+        use_static_project_dir: bool = False
+    ) -> Manifest:
+        """
+        Load and return a manifest from this dataset.
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+        use_static_project_dir: bool
+            When determining what the local path of a remote resource
+            (data or metadata file) should be, the Manifest class will
+            typically create a versioned project subdirectory under the user
+            provided `cache_dir`
+            (e.g. f"{cache_dir}/{project_name}-{manifest_version}")
+            to allow the possibility of multiple manifest (and data) versions
+            to be used. In certain cases, like when using a project's s3 bucket
+            directly as the cache_dir, the project directory name needs to be
+            static (e.g. f"{cache_dir}/{project_name}"). When set to True,
+            the Manifest class will use a static project directory to determine
+            local paths for remote resources. Defaults to False.
+
+        Returns
+        -------
+        Manifest
+        """
+        if manifest_name not in self.manifest_file_names:
+            raise ValueError(
+                f"Manifest to load ({manifest_name}) is not one of the "
+                "valid manifest names for this dataset. Valid names include:\n"
+                f"{self.manifest_file_names}"
+            )
+
+        if use_static_project_dir:
+            manifest_path = os.path.join(
+                self._cache_dir, self.project_name, "manifests", manifest_name
+            )
+        else:
+            manifest_path = os.path.join(self._cache_dir, manifest_name)
+
+        with open(manifest_path, "r") as f:
+            local_manifest = Manifest(
+                cache_dir=self._cache_dir,
+                json_input=f,
+                use_static_project_dir=use_static_project_dir
+            )
+
+        return local_manifest
+
+    def load_manifest(self, manifest_name: str):
+        """
+        Load a manifest from this dataset.
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+        """
+        self._manifest = self._load_manifest(manifest_name)
+        self._manifest_name = manifest_name
+
+    def _file_exists(self, file_attributes: CacheFileAttributes) -> bool:
+        """
+        Given a CacheFileAttributes describing a file, assess whether or
+        not that file exists locally.
+
+        Parameters
+        ----------
+        file_attributes: CacheFileAttributes
+            Description of the file to look for
+
+        Returns
+        -------
+        bool
+            True if the file exists and is valid; False otherwise
+
+        Raises
+        -----
+        RuntimeError
+            If file_attributes.local_path exists but is not a file.
+            It would be unclear how the cache should proceed in this case.
+        """
+        file_exists = False
+
+        if file_attributes.local_path.exists():
+            if not file_attributes.local_path.is_file():
+                raise RuntimeError(f"{file_attributes.local_path}\n"
+                                   "exists, but is not a file;\n"
+                                   "unsure how to proceed")
+
+            file_exists = True
+
+        return file_exists
+
+    def metadata_path(self, fname: str) -> dict:
+        """
+        Return the local path to a metadata file, and test for the
+        file's existence
+
+        Parameters
+        ----------
+        fname: str
+            The name of the metadata file to be accessed
+
+        Returns
+        -------
+        dict
+
+            'path' will be a pathlib.Path pointing to the file's location
+
+            'exists' will be a boolean indicating if the file
+            exists in a valid state
+
+            'file_attributes' is a CacheFileAttributes describing the file
+            in more detail
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be downloaded
+        """
+        file_attributes = self._manifest.metadata_file_attributes(fname)
+        exists = self._file_exists(file_attributes)
+        local_path = file_attributes.local_path
+        output = {'local_path': local_path,
+                  'exists': exists,
+                  'file_attributes': file_attributes}
+
+        return output
+
+    def data_path(self, file_id) -> dict:
+        """
+        Return the local path to a data file, and test for the
+        file's existence
+
+        Parameters
+        ----------
+        file_id:
+            The unique identifier of the file to be accessed
+
+        Returns
+        -------
+        dict
+
+            'local_path' will be a pathlib.Path pointing to the file's location
+
+            'exists' will be a boolean indicating if the file
+            exists in a valid state
+
+            'file_attributes' is a CacheFileAttributes describing the file
+            in more detail
+
+        Raises
+        ------
+        RuntimeError
+            If the file cannot be downloaded
+        """
+        file_attributes = self._manifest.data_file_attributes(file_id)
+        exists = self._file_exists(file_attributes)
+        local_path = file_attributes.local_path
+        output = {'local_path': local_path,
+                  'exists': exists,
+                  'file_attributes': file_attributes}
+
+        return output
+
+
+class CloudCacheBase(BasicLocalCache):
     """
     A class to handle the downloading and accessing of data served from a cloud
     storage system
@@ -50,21 +362,8 @@ class CloudCacheBase(ABC):
     _bucket_name = None
 
     def __init__(self, cache_dir, project_name, ui_class_name=None):
-        os.makedirs(cache_dir, exist_ok=True)
-
-        # the class users are actually interacting with
-        # (for warning message purposes)
-        if ui_class_name is None:
-            self._user_interface_class = type(self).__name__
-        else:
-            self._user_interface_class = ui_class_name
-
-        self._manifest = None
-        self._manifest_name = None
-        self._cache_dir = cache_dir
-
-        self._project_name = project_name
-        self._manifest_file_names = self._list_all_manifests()
+        super().__init__(cache_dir=cache_dir, project_name=project_name,
+                         ui_class_name=ui_class_name)
 
         # what latest_manifest was the last time an OutdatedManifestWarning
         # was emitted
@@ -112,10 +411,6 @@ class CloudCacheBase(ABC):
                 msg += 'is not deleted between instantiations of this '
                 msg += 'cache'
                 warnings.warn(msg, MissingLocalManifestWarning)
-
-    @property
-    def ui(self):
-        return self._user_interface_class
 
     def construct_local_manifest(self) -> None:
         """
@@ -170,52 +465,6 @@ class CloudCacheBase(ABC):
         msg += "self.load_latest_manifest()\n\n"
         warnings.warn(msg, OutdatedManifestWarning)
         return None
-
-    def list_all_downloaded_manifests(self) -> list:
-        """
-        Return a list of all of the manifest files that have been
-        downloaded for this dataset
-        """
-        output = [x for x in os.listdir(self._cache_dir)
-                  if re.fullmatch(".*_manifest_v.*.json", x)]
-        output.sort()
-        return output
-
-    @abstractmethod
-    def _list_all_manifests(self) -> list:
-        """
-        Return a list of all of the file names of the manifests associated
-        with this dataset
-        """
-        raise NotImplementedError()
-
-    def _find_latest_file(self, file_name_list: List[str]):
-        """
-        Take a list of files named like
-
-        {blob}_v{version}.json
-
-        and return the one with the latest version
-        """
-        vstrs = [s.split(".json")[0].split("_v")[-1]
-                 for s in file_name_list]
-        versions = [semver.VersionInfo.parse(v) for v in vstrs]
-        imax = versions.index(max(versions))
-        return file_name_list[imax]
-
-    @property
-    def latest_manifest_file(self) -> str:
-        """parses on-line available manifest files for semver string
-        and returns the latest one
-        self.manifest_file_names are assumed to be of the form
-        '<anything>_v<semver_str>.json'
-
-        Returns
-        -------
-        str
-            the filename whose semver string is the latest one
-        """
-        return self._find_latest_file(self.manifest_file_names)
 
     @property
     def latest_downloaded_manifest_file(self) -> str:
@@ -341,92 +590,6 @@ class CloudCacheBase(ABC):
         """
         raise NotImplementedError()
 
-    @property
-    def current_manifest(self) -> Union[None, str]:
-        """
-        The name of the currently loaded manifest
-        """
-        return self._manifest_name
-
-    @property
-    def project_name(self) -> str:
-        """
-        The name of the project that this cache is accessing
-        """
-        return self._project_name
-
-    @property
-    def manifest_prefix(self) -> str:
-        """
-        On-line prefix for manifest files
-        """
-        return f'{self.project_name}/manifests/'
-
-    @property
-    def file_id_column(self) -> str:
-        """
-        The column in the metadata files used to uniquely
-        identify data files
-        """
-        return self._manifest.file_id_column
-
-    @property
-    def version(self) -> str:
-        """
-        The version of the dataset currently loaded
-        """
-        return self._manifest.version
-
-    @property
-    def metadata_file_names(self) -> list:
-        """
-        List of metadata file names associated with this dataset
-        """
-        return self._manifest.metadata_file_names
-
-    @property
-    def manifest_file_names(self) -> list:
-        """
-        Sorted list of manifest file names associated with this
-        dataset
-        """
-        return copy.deepcopy(self._manifest_file_names)
-
-    def _load_manifest(self, manifest_name: str) -> Manifest:
-        """
-        Load and return a manifest from this dataset.
-
-        Parameters
-        ----------
-        manifest_name: str
-            The name of the manifest to load. Must be an element in
-            self.manifest_file_names
-
-        Returns
-        -------
-        Manifest
-        """
-        if manifest_name not in self.manifest_file_names:
-            raise ValueError(f"manifest: {manifest_name}\n"
-                             "is not one of the valid manifest names "
-                             "for this dataset:\n"
-                             f"{self.manifest_file_names}")
-
-        filepath = os.path.join(self._cache_dir, manifest_name)
-        if not os.path.exists(filepath):
-            self._download_manifest(manifest_name)
-
-        with open(filepath) as f:
-            local_manifest = Manifest(
-                cache_dir=self._cache_dir,
-                json_input=f
-            )
-
-        with open(self._manifest_last_used, 'w') as out_file:
-            out_file.write(manifest_name)
-
-        return local_manifest
-
     def load_manifest(self, manifest_name: str):
         """
         Load a manifest from this dataset.
@@ -437,10 +600,27 @@ class CloudCacheBase(ABC):
             The name of the manifest to load. Must be an element in
             self.manifest_file_names
         """
+        if manifest_name not in self.manifest_file_names:
+            raise ValueError(
+                f"Manifest to load ({manifest_name}) is not one of the "
+                "valid manifest names for this dataset. Valid names include:\n"
+                f"{self.manifest_file_names}"
+            )
+
         if manifest_name != self.latest_manifest_file:
             self._warn_of_outdated_manifest(manifest_name)
 
+        # If desired manifest does not exist, try to download it
+        manifest_path = os.path.join(self._cache_dir, manifest_name)
+        if not os.path.exists(manifest_path):
+            self._download_manifest(manifest_name)
+
         self._manifest = self._load_manifest(manifest_name)
+
+        # Keep track of the newly loaded manifest
+        with open(self._manifest_last_used, 'w') as out_file:
+            out_file.write(manifest_name)
+
         self._manifest_name = manifest_name
 
     def _update_list_of_downloads(self,
@@ -563,42 +743,6 @@ class CloudCacheBase(ABC):
 
         return file_exists
 
-    def data_path(self, file_id) -> dict:
-        """
-        Return the local path to a data file, and test for the
-        file's existence/validity
-
-        Parameters
-        ----------
-        file_id:
-            The unique identifier of the file to be accessed
-
-        Returns
-        -------
-        dict
-
-            'local_path' will be a pathlib.Path pointing to the file's location
-
-            'exists' will be a boolean indicating if the file
-            exists in a valid state
-
-            'file_attributes' is a CacheFileAttributes describing the file
-            in more detail
-
-        Raises
-        ------
-        RuntimeError
-            If the file cannot be downloaded
-        """
-        file_attributes = self._manifest.data_file_attributes(file_id)
-        exists = self._file_exists(file_attributes)
-        local_path = file_attributes.local_path
-        output = {'local_path': local_path,
-                  'exists': exists,
-                  'file_attributes': file_attributes}
-
-        return output
-
     def download_data(self, file_id) -> pathlib.Path:
         """
         Return the local path to a data file, downloading the file
@@ -625,42 +769,6 @@ class CloudCacheBase(ABC):
         self._download_file(file_attributes)
         self._update_list_of_downloads(file_attributes)
         return file_attributes.local_path
-
-    def metadata_path(self, fname: str) -> dict:
-        """
-        Return the local path to a metadata file, and test for the
-        file's existence/validity
-
-        Parameters
-        ----------
-        fname: str
-            The name of the metadata file to be accessed
-
-        Returns
-        -------
-        dict
-
-            'path' will be a pathlib.Path pointing to the file's location
-
-            'exists' will be a boolean indicating if the file
-            exists in a valid state
-
-            'file_attributes' is a CacheFileAttributes describing the file
-            in more detail
-
-        Raises
-        ------
-        RuntimeError
-            If the file cannot be downloaded
-        """
-        file_attributes = self._manifest.metadata_file_attributes(fname)
-        exists = self._file_exists(file_attributes)
-        local_path = file_attributes.local_path
-        output = {'local_path': local_path,
-                  'exists': exists,
-                  'file_attributes': file_attributes}
-
-        return output
 
     def download_metadata(self, fname: str) -> pathlib.Path:
         """
