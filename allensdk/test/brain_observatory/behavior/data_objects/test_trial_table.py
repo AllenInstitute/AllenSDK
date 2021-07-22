@@ -13,8 +13,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
-    TrialTable
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
+    import TrialTable
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -125,8 +125,8 @@ class TestMonitorDelay:
             for equipment, expected in \
                     self.lookup_table_expected_values.items():
                 equipment = Equipment(equipment_name=equipment)
-                md = TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
-                                                         equipment=equipment)
+                md = TrialTable._calculate_monitor_delay(
+                    sync_file=self.sync_file, equipment=equipment)
                 assert abs(md - expected) < 1e-6
 
     def test_unkown_rig_name(self, monkeypatch):
