@@ -1,7 +1,7 @@
-from typing import List, Tuple, Dict, Union
+from typing import List, Tuple, Dict, Optional, Union
 from abc import ABC, abstractmethod
+from pathlib import Path
 import os
-import copy
 import pathlib
 import pandas as pd
 import boto3
@@ -14,10 +14,10 @@ from botocore import UNSIGNED
 from botocore.client import Config
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.api.cloud_cache.manifest import Manifest
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
-from allensdk.api.cloud_cache.utils import file_hash_from_path  # noqa: E501
-from allensdk.api.cloud_cache.utils import bucket_name_from_url  # noqa: E501
-from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
+from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes
+from allensdk.api.cloud_cache.utils import file_hash_from_path
+from allensdk.api.cloud_cache.utils import bucket_name_from_url
+from allensdk.api.cloud_cache.utils import relative_path_from_url
 
 
 class OutdatedManifestWarning(UserWarning):
@@ -855,7 +855,7 @@ class CloudCacheBase(BasicLocalCache):
         n1 = set(filename_to_hash[1].keys())
         all_file_names = n0.union(n1)
 
-        hash_to_filename = {}
+        hash_to_filename: dict = dict()
         for v in (0, 1):
             hash_to_filename[v] = {}
             for fname in filename_to_hash[v]:
@@ -923,10 +923,15 @@ class CloudCacheBase(BasicLocalCache):
         ('data/f3.txt', 'data/f3.txt created')
         ('data/f4.txt', 'data/f4.txt changed')
         """
+        for manifest_name in [manifest_0_name, manifest_1_name]:
+            manifest_path = os.path.join(self._cache_dir, manifest_name)
+            if not os.path.exists(manifest_path):
+                self._download_manifest(manifest_name)
+
         man0 = self._load_manifest(manifest_0_name)
         man1 = self._load_manifest(manifest_1_name)
 
-        result = {}
+        result: dict = dict()
         for (result_key,
              file_id_list,
              attr_lookup) in zip(('metadata_changes', 'data_changes'),
@@ -939,7 +944,7 @@ class CloudCacheBase(BasicLocalCache):
                                   (man0.data_file_attributes,
                                    man1.data_file_attributes))):
 
-            filename_to_hash = {}
+            filename_to_hash: dict = dict()
             for version in (0, 1):
                 filename_to_hash[version] = {}
                 for file_id in file_id_list[version]:
@@ -1188,7 +1193,7 @@ class S3CloudCache(CloudCacheBase):
 
 class LocalCache(CloudCacheBase):
     """A class to handle accessing of data that has already been downloaded
-    locally
+    locally. Supports multiple manifest versions from a given dataset.
 
     Parameters
     ----------
