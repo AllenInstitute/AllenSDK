@@ -1,3 +1,6 @@
+import warnings
+from typing import Optional
+
 import pandas as pd
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
@@ -42,7 +45,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         return cls(rewards=df)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Rewards":
+    def from_nwb(cls, nwbfile: NWBFile) -> Optional["Rewards"]:
         if 'rewards' in nwbfile.processing:
             rewards = nwbfile.processing['rewards']
             time = rewards.get_data_interface('autorewarded').timestamps[:]
@@ -52,9 +55,9 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 'volume': volume, 'timestamps': time,
                 'autorewarded': autorewarded})
         else:
-            df = pd.DataFrame({
-                'volume': [], 'timestamps': [],
-                'autorewarded': []})
+            warnings.warn("This session "
+                          f"'{int(nwbfile.identifier)}' has no rewards data.")
+            return None
         return cls(rewards=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:

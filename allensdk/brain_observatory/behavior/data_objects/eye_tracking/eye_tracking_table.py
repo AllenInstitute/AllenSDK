@@ -1,6 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -91,7 +92,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  z_threshold: float = 3.0,
-                 dilation_frames: int = 2) -> "EyeTrackingTable":
+                 dilation_frames: int = 2) -> Optional["EyeTrackingTable"]:
         """
         Parameters
         -----------
@@ -107,7 +108,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             warnings.warn("This ophys session "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking data. (NWB error: {e})")
-            return EyeTrackingTable(eye_tracking=pd.DataFrame())
+            return None
 
         eye_tracking = eye_tracking_acquisition.eye_tracking
         pupil_tracking = eye_tracking_acquisition.pupil_tracking

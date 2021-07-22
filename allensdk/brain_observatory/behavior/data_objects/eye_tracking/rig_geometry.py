@@ -119,7 +119,7 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
         return nwbfile
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "RigGeometry":
+    def from_nwb(cls, nwbfile: NWBFile) -> Optional["RigGeometry"]:
         try:
             et_mod = \
                 nwbfile.get_processing_module("eye_tracking_rig_metadata")
@@ -127,7 +127,7 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
             warnings.warn("This ophys session "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking rig metadata. (NWB error: {e})")
-            raise
+            return None
 
         meta = et_mod.get_data_interface("eye_tracking_rig_metadata")
 
