@@ -5,7 +5,9 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
+    SyncFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -24,9 +26,12 @@ class TestFromStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        self.stimulus_file = StimulusFile.from_lims(
+        stimulus_file = StimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
-        rewards = Rewards.from_stimulus_file(stimulus_file=self.stimulus_file)
+        timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
+                                             timestamps=timestamps)
         assert rewards == self.expected
 
 

@@ -18,13 +18,12 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         super().__init__(name='rewards', value=rewards)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "Rewards":
-        """Get reward data from pkl file, based on pkl file timestamps
+    def from_stimulus_file(cls, stimulus_file: StimulusFile,
+                           timestamps: StimulusTimestamps) -> "Rewards":
+        """Get reward data from pkl file, based on timestamps
         (not sync file).
         """
         data = stimulus_file.data
-        timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
 
         trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])
         rewards_dict = {"volume": [], "timestamps": [], "autorewarded": []}
