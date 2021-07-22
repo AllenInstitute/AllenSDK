@@ -81,22 +81,22 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
-            limit_to_images: Optional[List] = None) -> "Presentations":
+        cls, stimulus_file: StimulusFile,
+        stimulus_timestamps: StimulusTimestamps,
+        limit_to_images: Optional[List] = None) -> "Presentations":
         """Get stimulus presentation data.
 
-        NOTE: Uses timestamps that do not account for monitor delay.
-
+        :param stimulus_file
         :param limit_to_images
             Only return images given by these image names
+        :param stimulus_timestamps
+
 
         :returns: pd.DataFrame --
             Table whose rows are stimulus presentations
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
         """
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
         stimulus_timestamps = stimulus_timestamps.value
         data = stimulus_file.data
         raw_stim_pres_df = get_stimulus_presentations(
@@ -111,7 +111,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
                 raw_stim_pres_df["image_name"] = (
                     raw_stim_pres_df["orientation"]
-                    .apply(lambda x: f"gratings_{x}"))
+                        .apply(lambda x: f"gratings_{x}"))
             else:
                 raise ValueError("All values for 'orentation' and 'image_name'"
                                  " are null.")
@@ -121,15 +121,15 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         idx_name = raw_stim_pres_df.index.name
         stimulus_index_df = (
             raw_stim_pres_df
-            .reset_index()
-            .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
-            .set_index(idx_name))
+                .reset_index()
+                .merge(stimulus_metadata_df.reset_index(), on=["image_name"])
+                .set_index(idx_name))
         stimulus_index_df = (
             stimulus_index_df[["image_set", "image_index", "start_time",
                                "phase", "spatial_frequency"]]
-            .rename(columns={"start_time": "timestamps"})
-            .sort_index()
-            .set_index("timestamps", drop=True))
+                .rename(columns={"start_time": "timestamps"})
+                .sort_index()
+                .set_index("timestamps", drop=True))
         stim_pres_df = raw_stim_pres_df.merge(
             stimulus_index_df, left_on="start_time", right_index=True,
             how="left")

@@ -38,8 +38,12 @@ class TestFromStimulusFile(LimsTest):
     def test_from_stimulus_file(self):
         stimulus_file = StimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
-        stimuli = Stimuli.from_stimulus_file(stimulus_file=stimulus_file,
-                                             limit_to_images=['im065'])
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        stimuli = Stimuli.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            limit_to_images=['im065'])
         assert stimuli.presentations == self.expected_presentations
         assert stimuli.templates == self.expected_templates
 
