@@ -156,19 +156,14 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
                         if isinstance(led_position, np.ndarray)
                         else led_position)
 
-        rig_geometry = {
-            f"monitor_position_{meta.monitor_position__unit_of_measurement}":
-                Coordinates(*monitor_position),
-            f"camera_position_{meta.camera_position__unit_of_measurement}":
-                Coordinates(*camera_position),
-            "led_position": Coordinates(*led_position),
-            f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
-                Coordinates(*monitor_rotation),
-            f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
-                Coordinates(*camera_rotation),
-            "equipment": meta.equipment
-        }
-        return RigGeometry(**rig_geometry)
+        return RigGeometry(
+            equipment=meta.equipment,
+            monitor_position_mm=Coordinates(*monitor_position),
+            camera_position_mm=Coordinates(*camera_position),
+            led_position=Coordinates(*led_position),
+            monitor_rotation_deg=Coordinates(*monitor_rotation),
+            camera_rotation_deg=Coordinates(*camera_rotation)
+        )
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "RigGeometry":
