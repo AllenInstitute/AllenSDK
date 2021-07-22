@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any, Tuple
 
 import numpy as np
 
@@ -33,7 +33,7 @@ class Trial:
             self, monitor_delay: float,
             stimulus_timestamps: StimulusTimestamps,
             licks: Licks, rewards: Rewards,
-            stimuli: dict):
+            stimuli: dict) -> Dict[str, Any]:
         event_dict = {
             (e[0], e[1]): {
                 'timestamp': stimulus_timestamps.value[e[3]],
@@ -105,7 +105,7 @@ class Trial:
     @staticmethod
     def _get_reward_time(rebased_reward_times,
                          start_time,
-                         stop_time):
+                         stop_time) -> float:
         """extract reward times in time range"""
         reward_times = rebased_reward_times[np.where(np.logical_and(
             rebased_reward_times >= start_time,
@@ -116,14 +116,14 @@ class Trial:
 
     @staticmethod
     def _calculate_trial_end(trial_end,
-                             behavior_stimulus_file: StimulusFile):
+                             behavior_stimulus_file: StimulusFile) -> int:
         if trial_end < 0:
             bhv = behavior_stimulus_file.data['items']['behavior']['items']
             if 'fingerprint' in bhv.keys():
                 trial_end = bhv['fingerprint']['starting_frame']
         return trial_end
 
-    def _get_trial_data(self):
+    def _get_trial_data(self) -> Dict[str, Any]:
         """
         Infer trial logic from trial log. Returns a dictionary.
 
@@ -194,7 +194,7 @@ class Trial:
             licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
             hit: bool, false_alarm: bool, aborted: bool,
             timestamps: np.ndarray,
-            monitor_delay: float):
+            monitor_delay: float) -> Dict[str, Any]:
         """
         Extract a dictionary of trial timing data.
         See trial_data_from_log for a description of the trial types.
@@ -358,7 +358,7 @@ class Trial:
         }
 
     @staticmethod
-    def _resolve_initial_image(stimuli, start_frame):
+    def _resolve_initial_image(stimuli, start_frame) -> Tuple[str, str, str]:
         """Attempts to resolve the initial image for a given start_frame for
         a trial
 
@@ -398,7 +398,7 @@ class Trial:
         return initial_image_category_name, initial_image_group, \
             initial_image_name
 
-    def _validate_trial_condition_exclusivity(self, tr_data: dict):
+    def _validate_trial_condition_exclusivity(self, tr_data: dict) -> None:
         """ensure that only one of N possible mutually
         exclusive trial conditions is True"""
         trial_conditions = {}
