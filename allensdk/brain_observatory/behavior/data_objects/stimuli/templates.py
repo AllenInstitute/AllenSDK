@@ -30,7 +30,7 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 
 class Templates(DataObject, StimulusFileReadableInterface,
                 NwbReadableInterface, NwbWritableInterface):
-    def __init__(self, templates: Optional[StimulusTemplate] = None):
+    def __init__(self, templates: StimulusTemplate):
         super().__init__(name='stimulus_templates', value=templates)
 
     @classmethod
@@ -89,11 +89,6 @@ class Templates(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Templates":
-        # If we have a session where only gratings were presented
-        # there will be no stimulus_template dict in the nwbfile
-        if len(nwbfile.stimulus_template) == 0:
-            return Templates(templates=None)
-
         image_set_name = list(nwbfile.stimulus_template.keys())[0]
         image_data = list(nwbfile.stimulus_template.values())[0]
 
