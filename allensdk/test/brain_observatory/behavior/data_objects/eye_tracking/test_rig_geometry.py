@@ -24,7 +24,8 @@ class TestFromLims(LimsTest):
         with open(test_data_dir / 'eye_tracking_rig_geometry.json') as f:
             x = json.load(f)
             x = x['rig_geometry']
-            cls.expected = RigGeometry(**x)
+            x = {'eye_tracking_rig_geometry': x}
+            cls.expected = RigGeometry.from_json(dict_repr=x)
 
     @pytest.mark.requires_bamboo
     def test_from_lims(self):
@@ -44,7 +45,8 @@ class TestFromJson(LimsTest):
         with open(test_data_dir / 'eye_tracking_rig_geometry.json') as f:
             x = json.load(f)
             x = x['rig_geometry']
-            cls.expected = RigGeometry(**x)
+            x = {'eye_tracking_rig_geometry': x}
+            cls.expected = RigGeometry.from_json(dict_repr=x)
 
     @pytest.mark.requires_bamboo
     def test_from_json(self):
@@ -63,7 +65,8 @@ class TestNWB:
         with open(cls.test_data_dir / 'eye_tracking_rig_geometry.json') as f:
             x = json.load(f)
             x = x['rig_geometry']
-            cls.rig_geometry = RigGeometry(**x)
+            x = {'eye_tracking_rig_geometry': x}
+            cls.rig_geometry = RigGeometry.from_json(dict_repr=x)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(

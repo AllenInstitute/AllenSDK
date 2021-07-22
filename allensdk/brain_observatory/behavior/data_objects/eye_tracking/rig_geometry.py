@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from typing import List, Optional
+from typing import Optional
 
 import pynwb
 from pynwb import NWBFile
@@ -20,14 +20,45 @@ from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.internal.api import PostgresQueryMixin
 
 
+class Coordinates:
+    """Represents coordinates in 3d space"""
+    def __init__(self, x: float, y: float, z: float):
+        self._x = x
+        self._y = y
+        self._z = z
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
+    @property
+    def z(self):
+        return self._z
+
+    def __iter__(self):
+        yield self._x
+        yield self._y
+        yield self._z
+
+    def __eq__(self, other):
+        if type(other) != type(self):
+            raise ValueError(f'Do not know how to compare with type '
+                             f'{type(other)}')
+        return self._x == other.x and self._y == other.y and self._z == other.z
+
+
 class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, equipment: str,
-                 monitor_position_mm: List,
-                 monitor_rotation_deg: List,
-                 camera_position_mm: List,
-                 camera_rotation_deg: List,
-                 led_position: List):
+                 monitor_position_mm: Coordinates,
+                 monitor_rotation_deg: Coordinates,
+                 camera_position_mm: Coordinates,
+                 camera_rotation_deg: Coordinates,
+                 led_position: Coordinates):
         super().__init__(name='rig_geometry', value=self)
         self._monitor_position_mm = monitor_position_mm
         self._monitor_rotation_deg = monitor_rotation_deg
@@ -71,15 +102,15 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
         rig_metadata = nwb_extension(
             name="eye_tracking_rig_metadata",
             equipment=self._equipment,
-            monitor_position=self._monitor_position_mm,
+            monitor_position=list(self._monitor_position_mm),
             monitor_position__unit_of_measurement="mm",
-            camera_position=self._camera_position_mm,
+            camera_position=list(self._camera_position_mm),
             camera_position__unit_of_measurement="mm",
-            led_position=self._led_position,
+            led_position=list(self._led_position),
             led_position__unit_of_measurement="mm",
-            monitor_rotation=self._monitor_rotation_deg,
+            monitor_rotation=list(self._monitor_rotation_deg),
             monitor_rotation__unit_of_measurement="deg",
-            camera_rotation=self._camera_rotation_deg,
+            camera_rotation=list(self._camera_rotation_deg),
             camera_rotation__unit_of_measurement="deg"
         )
 
@@ -127,21 +158,29 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
 
         rig_geometry = {
             f"monitor_position_{meta.monitor_position__unit_of_measurement}":
-                monitor_position,
+                Coordinates(*monitor_position),
             f"camera_position_{meta.camera_position__unit_of_measurement}":
-                camera_position,
-            "led_position": led_position,
+                Coordinates(*camera_position),
+            "led_position": Coordinates(*led_position),
             f"monitor_rotation_{meta.monitor_rotation__unit_of_measurement}":
-                monitor_rotation,
+                Coordinates(*monitor_rotation),
             f"camera_rotation_{meta.camera_rotation__unit_of_measurement}":
-                camera_rotation,
+                Coordinates(*camera_rotation),
             "equipment": meta.equipment
         }
         return RigGeometry(**rig_geometry)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "RigGeometry":
-        return RigGeometry(**dict_repr['eye_tracking_rig_geometry'])
+        rg = dict_repr['eye_tracking_rig_geometry']
+        return RigGeometry(
+            equipment=rg['equipment'],
+            monitor_position_mm=Coordinates(*rg['monitor_position_mm']),
+            monitor_rotation_deg=Coordinates(*rg['monitor_rotation_deg']),
+            camera_position_mm=Coordinates(*rg['camera_position_mm']),
+            camera_rotation_deg=Coordinates(*rg['camera_rotation_deg']),
+            led_position=Coordinates(*rg['led_position'])
+        )
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
@@ -189,11 +228,11 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
             else f'{v}_position' for v in position.index]
         position = position.to_dict(orient='index')
         position = {
-            config_type: [
-                values['center_x_mm'],
-                values['center_y_mm'],
-                values['center_z_mm']
-            ]
+            config_type:
+                Coordinates(
+                    values['center_x_mm'],
+                    values['center_y_mm'],
+                    values['center_z_mm'])
             for config_type, values in position.items()
         }
 
@@ -204,11 +243,13 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
         rotation.index = [f'{v}_rotation_deg' for v in rotation.index]
         rotation = rotation.to_dict(orient='index')
         rotation = {
-            config_type: [
-                values['rotation_x_deg'],
-                values['rotation_y_deg'],
-                values['rotation_z_deg']
-            ] for config_type, values in rotation.items()
+            config_type:
+                Coordinates(
+                    values['rotation_x_deg'],
+                    values['rotation_y_deg'],
+                    values['rotation_z_deg']
+                )
+                for config_type, values in rotation.items()
         }
 
         # Combine the dictionaries
