@@ -18,8 +18,9 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         super().__init__(name='rewards', value=rewards)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile,
-                           timestamps: StimulusTimestamps) -> "Rewards":
+    def from_stimulus_file(
+            cls, stimulus_file: StimulusFile,
+            stimulus_timestamps: StimulusTimestamps) -> "Rewards":
         """Get reward data from pkl file, based on timestamps
         (not sync file).
         """
@@ -33,7 +34,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
             if rewards:
                 rewards_dict["volume"].append(rewards[0][0])
                 rewards_dict["timestamps"].append(
-                    timestamps.value[rewards[0][2]])
+                    stimulus_timestamps.value[rewards[0][2]])
                 auto_rwrd = trial["trial_params"]["auto_reward"]
                 rewards_dict["autorewarded"].append(auto_rwrd)
 

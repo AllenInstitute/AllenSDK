@@ -70,8 +70,12 @@ class TestFromStimulusFile(LimsTest):
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file)
-        licks = Licks.from_stimulus_file(stimulus_file=stimulus_file)
-        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file)
+        licks = Licks.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        rewards = Rewards.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
         return stimulus_file, stimulus_timestamps, licks, rewards
 
 

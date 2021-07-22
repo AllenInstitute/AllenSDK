@@ -22,7 +22,8 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         super().__init__(name='licks', value=licks)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "Licks":
+    def from_stimulus_file(cls, stimulus_file: StimulusFile,
+                           stimulus_timestamps: StimulusTimestamps) -> "Licks":
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of
         lick_sensors is the desired lick sensor.
@@ -42,9 +43,6 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         """
         data = stimulus_file.data
 
-        # Get licks from pickle file instead of sync
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
 

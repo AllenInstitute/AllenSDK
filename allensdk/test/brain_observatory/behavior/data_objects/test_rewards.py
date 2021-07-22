@@ -31,7 +31,7 @@ class TestFromStimulusFile(LimsTest):
         timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file)
         rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
-                                             timestamps=timestamps)
+                                             stimulus_timestamps=timestamps)
         assert rewards == self.expected
 
 

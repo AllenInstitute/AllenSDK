@@ -6,6 +6,7 @@ import pynwb
 import pytest
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 
 
@@ -21,17 +22,25 @@ class TestFromStimulusFile:
         cls.expected = Licks(licks=expected)
 
     def test_from_stimulus_file(self):
-        licks = Licks.from_stimulus_file(stimulus_file=self.stimulus_file)
+        st = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=self.stimulus_file)
+        licks = Licks.from_stimulus_file(stimulus_file=self.stimulus_file,
+                                         stimulus_timestamps=st)
         assert licks == self.expected
 
 
 class TestNWB:
     @classmethod
     def setup_class(cls):
-        tsf = TestFromStimulusFile()
-        tsf.setup_class()
-        cls.licks = Licks.from_stimulus_file(
-            stimulus_file=tsf.stimulus_file)
+        dir = Path(__file__).parent.resolve()
+        test_data_dir = dir / 'test_data'
+
+        stimulus_file = StimulusFile(
+            filepath=test_data_dir / 'behavior_stimulus_file.pkl')
+        ts = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        cls.licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
+                                             stimulus_timestamps=ts)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
