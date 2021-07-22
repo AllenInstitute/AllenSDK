@@ -1,4 +1,6 @@
 import logging
+import warnings
+from typing import Optional
 
 import pandas as pd
 from pynwb import NWBFile, TimeSeries, ProcessingModule
@@ -19,6 +21,14 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
     _logger = logging.getLogger(__name__)
 
     def __init__(self, licks: pd.DataFrame):
+        """
+        :param licks
+            dataframe containing the following columns:
+                - timestamps: float
+                    stimulus timestamps in which there was a lick
+                - frame: int
+                    frame number in which there was a lick
+        """
         super().__init__(name='licks', value=licks)
 
     @classmethod
@@ -72,7 +82,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         return cls(licks=df)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Licks":
+    def from_nwb(cls, nwbfile: NWBFile) -> Optional["Licks"]:
         if 'licking' in nwbfile.processing:
             lick_module = nwbfile.processing['licking']
             licks = lick_module.get_data_interface('licks')
@@ -82,7 +92,9 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 'frame': licks.data[:]
             })
         else:
-            df = pd.DataFrame({'time': [], 'frame': []})
+            warnings.warn("This session "
+                          f"'{int(nwbfile.identifier)}' has no rewards data.")
+            return None
         return cls(licks=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
