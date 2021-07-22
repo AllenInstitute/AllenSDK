@@ -1,5 +1,6 @@
 import abc
 from collections import deque
+from enum import Enum
 from typing import Any, Optional, Set
 
 from allensdk.brain_observatory.comparison_utils import compare_fields
@@ -122,6 +123,10 @@ class DataObject(abc.ABC):
                 cur = res
                 for p in path:
                     cur = cur[p]
+
+                if isinstance(value, Enum):
+                    # convert to string
+                    value = value.value
                 cur[name] = value
 
         return res

@@ -217,10 +217,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
 
         stimulus_file = StimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
-            stimulus_timestamps=stimulus_timestamps)
+            stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
         date_of_acquisition = DateOfAcquisition.from_lims(
@@ -254,10 +252,8 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         date_of_acquisition = DateOfAcquisition.from_json(dict_repr=dict_repr)
 
         stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
-            stimulus_timestamps=stimulus_timestamps)
+            stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
         session_uuid = BehaviorSessionUUID.from_stimulus_file(
