@@ -163,9 +163,12 @@ class VisualBehaviorOphysProjectCache(object):
         return cls(fetch_api=fetch_api)
 
     @classmethod
-    def from_local_cache(cls, cache_dir: Union[str, Path],
-                         project_name: str = "visual-behavior-ophys"
-                         ) -> "VisualBehaviorOphysProjectCache":
+    def from_local_cache(
+        cls,
+        cache_dir: Union[str, Path],
+        project_name: str = "visual-behavior-ophys",
+        use_static_cache: bool = False
+    ) -> "VisualBehaviorOphysProjectCache":
         """instantiates this object with a local cache.
 
         Parameters
@@ -184,8 +187,11 @@ class VisualBehaviorOphysProjectCache(object):
 
         """
         fetch_api = BehaviorProjectCloudApi.from_local_cache(
-                cache_dir, project_name,
-                ui_class_name=cls.__name__)
+            cache_dir,
+            project_name,
+            ui_class_name=cls.__name__,
+            use_static_cache=use_static_cache
+        )
         return cls(fetch_api=fetch_api)
 
     @classmethod
