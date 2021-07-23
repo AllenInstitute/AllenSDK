@@ -1220,3 +1220,82 @@ class LocalCache(CloudCacheBase):
 
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
         raise NotImplementedError()
+
+
+class StaticLocalCache(BasicLocalCache):
+    """A class to handle accessing data that has already been downloaded
+    locally and whose directory structure and/or contained files are not
+    expected to be changed in any way. Does NOT support multiple manifest
+    versions for a given dataset.
+
+    Example intended use case:
+        Calling
+        VisualBehaviorOphysProjectCache.from_local_cache(use_static_cache=True)
+        where the cache directory is a mounted S3 public bucket.
+
+    Parameters
+    ----------
+    cache_dir: str or pathlib.Path
+        Path to the directory where data will be stored on the local system
+
+    project_name: str
+        the name of the project this cache is supposed to access. This will
+        be the root directory for all files stored in the bucket.
+
+    ui_class_name: Optional[str]
+        Name of the class users are actually using to maniuplate this
+        functionality (used to populate helpful error messages)
+    """
+
+    def __init__(self, cache_dir, project_name, ui_class_name=None):
+        super().__init__(cache_dir=cache_dir, project_name=project_name,
+                         ui_class_name=ui_class_name)
+
+    def _list_all_manifests(self) -> list:
+        """
+        Return a list of all of the file names of the manifests associated
+        with this dataset. For the StaticLocalCache only return only the
+        latest manifest.
+        """
+        manifest_dir = os.path.join(
+            self._cache_dir, self.project_name, "manifests"
+        )
+
+        output = [x for x in os.listdir(manifest_dir)
+                  if re.fullmatch(".*_manifest_v.*.json", x)]
+
+        return [self._find_latest_file(output)]
+
+    def list_all_downloaded_manifests(self) -> list:
+        """
+        Return a list of all of the manifest files for this dataset.
+        For the StaticLocalCache, this will only be the latest manifest.
+        """
+        return self._list_all_manifests()
+
+    def load_last_manifest(self):
+        """For the StaticLocalCache always load the latest manifest."""
+        self.load_manifest(self.latest_manifest_file)
+
+    def load_manifest(self, manifest_name: str):
+        """
+        Load a manifest from this dataset.
+
+        Parameters
+        ----------
+        manifest_name: str
+            The name of the manifest to load. Must be an element in
+            self.manifest_file_names
+        """
+        self._manifest = self._load_manifest(
+            manifest_name,
+            use_static_project_dir=True
+        )
+        self._manifest_name = manifest_name
+
+    def compare_manifests(self, manifest_0_name: str, manifest_1_name: str):
+        raise RuntimeError(
+            "The ability to load many manifest versions and use the "
+            "`compare_manifests()` method is not available for the "
+            "StaticLocalCache class!"
+        )
