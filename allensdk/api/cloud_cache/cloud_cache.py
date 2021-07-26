@@ -1260,6 +1260,12 @@ class StaticLocalCache(BasicLocalCache):
         manifest_dir = os.path.join(
             self._cache_dir, self.project_name, "manifests"
         )
+        if not os.path.exists(manifest_dir):
+            raise RuntimeError(
+                f"Expected the provided cache_dir ({self._cache_dir})"
+                "to have the following subfolders but it did not: "
+                f"{self.project_name}/manifests"
+            )
 
         output = [x for x in os.listdir(manifest_dir)
                   if re.fullmatch(".*_manifest_v.*.json", x)]

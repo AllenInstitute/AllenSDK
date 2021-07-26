@@ -147,3 +147,57 @@ def test_static_local_cache_access(mounted_s3_dataset_fixture):
         with open(obt_data_path["local_path"], "r") as f:
             obt_data = f.read()
         assert exp_data_contents == obt_data
+
+
+@pytest.mark.parametrize(
+    "num_manifests, project_name, create_project_folders, expected",
+    [
+        (
+            2,
+            "test_project",
+            True,
+            ['test_project_manifest_v0.1.0.json']
+        ),
+        (
+            4,
+            "test_project_2",
+            True,
+            ['test_project_2_manifest_v0.3.0.json']
+        ),
+        # This test case is expected to raise a RuntimeError
+        (
+            None,  # Not applicable
+            "test_project_2",
+            False,
+            None  # Not applicable
+        )
+    ]
+)
+def test_static_local_cache_list_all_manifests(
+    tmp_path, num_manifests, project_name, create_project_folders, expected
+):
+    cache_dir = tmp_path / "cache_dir"
+    cache_dir.mkdir()
+
+    if create_project_folders:
+        project_dir = cache_dir / project_name
+        project_dir.mkdir()
+
+        manifests_dir = project_dir / "manifests"
+        manifests_dir.mkdir()
+
+        for n in range(num_manifests):
+            manifest_path = (
+                manifests_dir / f"{project_name}_manifest_v0.{n}.0.json"
+            )
+            manifest_path.touch()
+
+        cache = StaticLocalCache(cache_dir, project_name)
+
+        assert cache._manifest_file_names == expected
+
+    else:
+        with pytest.raises(
+            RuntimeError, match="Expected the provided cache_dir"
+        ):
+            _ = StaticLocalCache(cache_dir, project_name)
