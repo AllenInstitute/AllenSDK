@@ -1,8 +1,9 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, create_autospec
 
+from allensdk.api.cloud_cache.manifest import Manifest
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import behavior_project_cloud_api as cloudapi  # noqa: E501
 
 
@@ -158,3 +159,64 @@ def test_version_check(manifest_version, data_pipeline_version,
     else:
         cloudapi.version_check(manifest_version, data_pipeline_version,
                                cmin, cmax)
+
+
+def test_from_local_cache(monkeypatch):
+    mock_manifest = create_autospec(Manifest)
+    mock_manifest.metadata_file_names = {
+        'ophys_experiment_table',
+        'ophys_session_table',
+        'behavior_session_table'
+    }
+    mock_manifest._data_pipeline = [
+        {
+            "name": "AllenSDK",
+            "version": "2.11.0",
+            "comment": "This is a test entry. NOT REAL."
+        }
+    ]
+    mock_manifest.version = "0.3.0"
+
+    mock_local_cache = create_autospec(cloudapi.LocalCache)
+    type(mock_local_cache.return_value)._manifest = mock_manifest
+
+    mock_static_local_cache = create_autospec(cloudapi.StaticLocalCache)
+    type(mock_static_local_cache.return_value)._manifest = mock_manifest
+
+    with monkeypatch.context() as m:
+        m.setattr(cloudapi, "LocalCache", mock_local_cache)
+        m.setattr(cloudapi, "StaticLocalCache", mock_static_local_cache)
+
+        # Test from_local_cache with use_static_cache=False
+        try:
+            _ = cloudapi.BehaviorProjectCloudApi.from_local_cache(
+                "first_cache_dir", "project_1", "ui_1", use_static_cache=False
+            )
+        # Because cache is a mock, the following calls in the load_manifest
+        # method of BehaviorProjectCloudApi will fail with TypeError:
+        # self._get_ophys_session_table()
+        # self._get_behavior_session_table()
+        # self._get_ophys_experiment_table()
+        except (TypeError, FileNotFoundError):
+            pass
+
+        mock_local_cache.assert_called_once_with(
+            "first_cache_dir", "project_1", "ui_1"
+        )
+
+        # Test from_local_cache with use_static_cache=True
+        try:
+            _ = cloudapi.BehaviorProjectCloudApi.from_local_cache(
+                "second_cache_dir", "project_2", "ui_2", use_static_cache=True
+            )
+        # Because cache is a mock, the following calls in the load_manifest
+        # method of BehaviorProjectCloudApi will fail with TypeError:
+        # self._get_ophys_session_table()
+        # self._get_behavior_session_table()
+        # self._get_ophys_experiment_table()
+        except (TypeError, FileNotFoundError):
+            pass
+
+        mock_static_local_cache.assert_called_once_with(
+            "second_cache_dir", "project_2", "ui_2"
+        )
