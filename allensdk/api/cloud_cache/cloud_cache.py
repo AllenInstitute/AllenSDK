@@ -42,7 +42,7 @@ class BasicLocalCache(ABC):
     Parameters
     ----------
     cache_dir: str or pathlib.Path
-        Path to the directory where data and meatadata arestored on the
+        Path to the directory where data and metadata are stored on the
         local system
 
     project_name: str
@@ -50,7 +50,7 @@ class BasicLocalCache(ABC):
         be the root directory for all files stored in the bucket.
 
     ui_class_name: Optional[str]
-        Name of the class users are actually using to maniuplate this
+        Name of the class users are actually using to manipulate this
         functionality (used to populate helpful error messages)
     """
 
@@ -355,7 +355,7 @@ class CloudCacheBase(BasicLocalCache):
         be the root directory for all files stored in the bucket.
 
     ui_class_name: Optional[str]
-        Name of the class users are actually using to maniuplate this
+        Name of the class users are actually using to manipulate this
         functionality (used to populate helpful error messages)
     """
 
