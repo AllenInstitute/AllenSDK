@@ -118,6 +118,9 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.12.0
+-----------------------------------------------------------------------
+- Added ability to specify a static cache directory (use_static_cache=True) to instantiate VisualBehaviorOphysProjectCache.from_local_cache()
 
 What's New - 2.11.2
 -----------------------------------------------------------------------
