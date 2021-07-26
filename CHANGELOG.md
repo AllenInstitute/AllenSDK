@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.0] = TBA
+- Added ability to specify a static cache directory (use_static_cache=True) to instantiate VisualBehaviorOphysProjectCache.from_local_cache()
+
 ## [2.11.3] = 2021-08-04
 - Bugfixes related to NWB creation for BehaviorSessions
 
