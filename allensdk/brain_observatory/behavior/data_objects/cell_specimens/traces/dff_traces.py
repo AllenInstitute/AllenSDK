@@ -65,10 +65,6 @@ class DFF_traces(DataObject, DataFileReadableInterface, NwbReadableInterface,
         return DFF_traces(traces=df)
 
     @classmethod
-    def from_data_file(cls, dff_file: DFFFile,
-                       cell_roi_id_list: np.ndarray) -> "DFF_traces":
+    def from_data_file(cls, dff_file: DFFFile) -> "DFF_traces":
         dff_traces = dff_file.data
-        df = pd.DataFrame({'dff': [x for x in dff_traces.values]},
-                          index=pd.Index(cell_roi_id_list,
-                          name='cell_roi_id'))
-        return DFF_traces(traces=df)
+        return DFF_traces(traces=dff_traces)

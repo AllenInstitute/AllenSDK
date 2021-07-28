@@ -6,8 +6,8 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens import \
-    CellSpecimens
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
+    cell_specimens import  CellSpecimens
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
@@ -17,10 +17,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .imaging_plane_group import \
-    ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId

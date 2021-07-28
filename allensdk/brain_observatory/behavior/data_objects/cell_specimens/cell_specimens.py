@@ -81,11 +81,14 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                     NwbWritableInterface):
     def __init__(self, cell_specimen_table: pd.DataFrame,
                  meta: CellSpecimenMeta,
-                 dff_traces: DFF_traces):
+                 dff_traces: DFF_traces,
+                 ophys_timestamps: OphysTimestamps):
         super().__init__(name='cell_specimen_table', value=self)
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
+
+        self._validate_traces(ophys_timestamps=ophys_timestamps)
 
     @property
     def table(self) -> pd.DataFrame:
@@ -101,7 +104,6 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
     @property
     def dff_traces(self) -> pd.DataFrame:
-        self._validate_traces(traces=self._dff_traces.value, name='dff_traces')
         df = self.table[['cell_roi_id']].join(self._dff_traces.value,
                                               on='cell_roi_id')
         return df
@@ -148,8 +150,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 ophys_experiment_id=ophys_experiment_id,
                 db=lims_db)
             return DFF_traces.from_data_file(
-                dff_file=dff_file,
-                cell_roi_id_list=cell_specimen_table['cell_roi_id'].values)
+                dff_file=dff_file)
 
         cell_specimen_table = _get_cell_specimen_table()
         meta = CellSpecimenMeta.from_internal(
@@ -158,7 +159,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         dff_traces = _get_dff_traces()
 
         return cls(cell_specimen_table=cell_specimen_table, meta=meta,
-                   dff_traces=dff_traces)
+                   dff_traces=dff_traces, ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_json(cls, dict_repr: dict,
@@ -171,14 +172,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         def _get_dff_traces():
             dff_file = DFFFile.from_json(dict_repr=dict_repr)
             return DFF_traces.from_data_file(
-                dff_file=dff_file,
-                cell_roi_id_list=cell_specimen_table['cell_roi_id'].values)
+                dff_file=dff_file)
 
         meta = CellSpecimenMeta.from_json(dict_repr=dict_repr,
                                           ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
         return cls(cell_specimen_table=cell_specimen_table, meta=meta,
-                   dff_traces=dff_traces)
+                   dff_traces=dff_traces, ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
@@ -210,8 +210,10 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         df = _read_table(cell_specimen_table=cell_specimen_table)
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
         dff_traces = DFF_traces.from_nwb(nwbfile=nwbfile)
+        ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
 
-        return cls(cell_specimen_table=df, meta=meta, dff_traces=dff_traces)
+        return cls(cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
+                   ophys_timestamps=ophys_timestamps)
 
     def to_nwb(self, nwbfile: NWBFile,
                ophys_timestamps: OphysTimestamps) -> NWBFile:
@@ -339,10 +341,30 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         cell_specimen_table.set_index('cell_specimen_id', inplace=True)
         return cell_specimen_table
 
-    def _validate_traces(self, traces: pd.DataFrame,  name: str):
-        if not np.in1d(traces.index, self.table[['cell_roi_id']]).all():
-            raise RuntimeError(f"{name} contains ROI IDs that "
-                               f"are not in cell_specimen_table.cell_roi_id")
-        if not np.in1d(self.table[['cell_roi_id']], traces.index).all():
-            raise RuntimeError(f"cell_specimen_table contains ROI IDs "
-                               f"that are not in {name}")
+    def _validate_traces(self, ophys_timestamps: OphysTimestamps):
+        """validates traces"""
+        trace_col_map = {
+            'dff_traces': 'dff',
+            'corrected_fluorescence_traces': 'corrected_fluorescence'
+        }
+        for traces in (self._dff_traces,):
+            # validate traces contain expected roi ids
+            if not np.in1d(traces.value.index,
+                           self.table[['cell_roi_id']]).all():
+                raise RuntimeError(f"{traces.name} contains ROI IDs that "
+                                   f"are not in "
+                                   f"cell_specimen_table.cell_roi_id")
+            if not np.in1d(self.table[['cell_roi_id']],
+                           traces.value.index).all():
+                raise RuntimeError(f"cell_specimen_table contains ROI IDs "
+                                   f"that are not in {traces.name}")
+
+            # validate traces contain expected timepoints
+            num_trace_timepoints = len(traces.value.iloc[0]
+                                       [trace_col_map[traces.name]])
+            num_ophys_timestamps = ophys_timestamps.value.shape[0]
+            if num_trace_timepoints != num_ophys_timestamps:
+                raise RuntimeError(f'{traces.name} contains '
+                                   f'{num_trace_timepoints}'
+                                   f'but there are {num_ophys_timestamps} '
+                                   f'ophys timestamps')

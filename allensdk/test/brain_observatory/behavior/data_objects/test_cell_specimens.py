@@ -4,10 +4,14 @@ from pathlib import Path
 import numpy as np
 import pynwb
 
+import pandas as pd
 import pytest
 
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
     cell_specimens import CellSpecimens, CellSpecimenMeta
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .dff_traces import \
+    DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
@@ -47,8 +51,11 @@ class TestLims:
 
     @pytest.mark.requires_bamboo
     def test_from_internal(self):
-        ots = OphysTimestamps(timestamps=np.array([.1, .2]),
-                              number_of_frames=2)
+        number_of_frames = 140296
+        ots = OphysTimestamps(timestamps=np.linspace(start=.1,
+                                                     stop=.1*number_of_frames,
+                                                     num=number_of_frames),
+                              number_of_frames=number_of_frames)
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
             ophys_timestamps=ots)
@@ -67,7 +74,7 @@ class TestJson:
         dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
         dict_repr['behavior_stimulus_file'] = str(test_data_dir /
                                                   'behavior_stimulus_file.pkl')
-        dict_repr['demix_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
 
         cls.dict_repr = dict_repr
         cls.expected_meta = CellSpecimenMeta(
@@ -79,8 +86,8 @@ class TestJson:
                 targeted_structure='VISp'
             )
         )
-        cls.ophys_timestamps = OphysTimestamps(timestamps=np.array([.1, .2]),
-                                               number_of_frames=2)
+        cls.ophys_timestamps = OphysTimestamps(
+            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
 
     def test_from_json(self):
         csp = CellSpecimens.from_json(dict_repr=self.dict_repr,
@@ -94,8 +101,8 @@ class TestNWB:
     def setup_class(cls):
         tj = TestJson()
         tj.setup_class()
-        cls.ophys_timestamps = OphysTimestamps(timestamps=np.array([.1, .2]),
-                              number_of_frames=2)
+        cls.ophys_timestamps = OphysTimestamps(
+            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
         cls.cell_specimen_table = CellSpecimens.from_json(
             dict_repr=tj.dict_repr, ophys_timestamps=cls.ophys_timestamps)
 

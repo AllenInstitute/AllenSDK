@@ -32,11 +32,11 @@ class DFFFile(DataFile):
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(cls, dict_repr: dict) -> "DFFFile":
-        filepath = dict_repr["demix_file"]
+        filepath = dict_repr["dff_file"]
         return cls(filepath=filepath)
 
     def to_json(self) -> Dict[str, str]:
-        return {"demix_file": str(self.filepath)}
+        return {"dff_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
@@ -59,6 +59,7 @@ class DFFFile(DataFile):
     @staticmethod
     def load_data(filepath: Union[str, Path]) -> pd.DataFrame:
         with h5py.File(filepath, 'r') as raw_file:
-            raw_dff_traces = np.asarray(raw_file['data'])
+            traces = np.asarray(raw_file['data'])
             roi_names = np.asarray(raw_file['roi_names'])
-            return pd.DataFrame(raw_dff_traces, index=roi_names)
+            idx = pd.Index(roi_names, name='cell_roi_id', dtype=int)
+            return pd.DataFrame({'dff': [x for x in traces]}, index=idx)
