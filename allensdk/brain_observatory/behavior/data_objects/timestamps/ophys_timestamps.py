@@ -36,10 +36,18 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
 
     @classmethod
     def from_sync_file(cls, sync_file: SyncFile,
-                        number_of_frames: int) -> "OphysTimestamps":
+                        number_of_frames: int,
+                       group_count: Optional[int] = None,
+                       plane_group: Optional[int] = None) -> "OphysTimestamps":
         ophys_timestamps = sync_file.data['ophys_frames']
-        return cls(timestamps=ophys_timestamps,
-                   number_of_frames=number_of_frames)
+        is_multiplane = group_count is not None and group_count > 0
+        if is_multiplane:
+            return _OphysTimestampsMultiplane.from_sync_file(
+                sync_file=sync_file, number_of_frames=number_of_frames,
+                group_count=group_count, plane_group=plane_group)
+        else:
+            return cls(timestamps=ophys_timestamps,
+                       number_of_frames=number_of_frames)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysTimestamps":
@@ -78,7 +86,7 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
         return ophys_timestamps
 
 
-class OphysTimestampsMultiplane(OphysTimestamps):
+class _OphysTimestampsMultiplane(OphysTimestamps):
     def __init__(self, timestamps: np.ndarray, number_of_frames: int):
         super().__init__(timestamps=timestamps,
                          number_of_frames=number_of_frames)
@@ -87,7 +95,7 @@ class OphysTimestampsMultiplane(OphysTimestamps):
     def from_sync_file(cls, sync_file: SyncFile,
                        number_of_frames: int,
                        group_count: int,
-                       plane_group: int) -> "OphysTimestampsMultiplane":
+                       plane_group: int) -> "_OphysTimestampsMultiplane":
         ophys_timestamps = sync_file.data['ophys_frames']
         cls._logger.info(
             "Mesoscope data detected. Splitting timestamps "

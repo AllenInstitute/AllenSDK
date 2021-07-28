@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
+    .ophys_experiment_metadata.multi_plane_metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -67,8 +67,6 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         imaging_depth = ImagingDepth.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         project_code = ProjectCode.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        imaging_plane_group = ImagingPlaneGroup.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         def _get_number_of_frames():

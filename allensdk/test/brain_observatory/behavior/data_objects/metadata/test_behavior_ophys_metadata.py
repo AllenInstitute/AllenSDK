@@ -20,13 +20,13 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
+    .ophys_experiment_metadata.multi_plane_metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
-    .mesoscope_experiment_metadata import \
-    MesoscopeExperimentMetadata
+    .ophys_experiment_metadata.multi_plane_metadata\
+    .multi_plane_metadata import \
+    MultiplaneMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_experiment_metadata import \
     OphysExperimentMetadata
@@ -75,7 +75,7 @@ class TestBOM:
 
         imaging_plane_group = ImagingPlaneGroup(plane_group_count=5,
                                                 plane_group=0)
-        meso_meta = MesoscopeExperimentMetadata(
+        meso_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
@@ -115,7 +115,7 @@ class TestInternal(TestBOM):
 
         if meso:
             assert isinstance(bom.ophys_metadata,
-                              MesoscopeExperimentMetadata)
+                              MultiplaneMetadata)
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
@@ -140,7 +140,7 @@ class TestJson(TestBOM):
         bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
 
         if meso:
-            assert isinstance(bom.ophys_metadata, MesoscopeExperimentMetadata)
+            assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 

@@ -53,8 +53,7 @@ class ImagingPlane(DataObject, InternalReadableInterface,
                   ophys_timestamps: OphysTimestamps,
                   excitation_lambda=910.0) -> "ImagingPlane":
         targeted_structure = dict_repr['targeted_structure']
-        sync_file = SyncFile.from_json(dict_repr=dict_repr)
-        ophys_fame_rate = calc_frame_rate(timestamps=ophys_timestamps)
+        ophys_fame_rate = calc_frame_rate(timestamps=ophys_timestamps.value)
         reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
         indicator = reporter_line.parse_indicator(warn=True)
         return cls(targeted_structure=targeted_structure,

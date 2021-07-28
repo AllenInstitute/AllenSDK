@@ -19,6 +19,7 @@
     "container_id": 5678,
     "surface_2p_pixel_size_um": 0.78125,
     "max_projection_file": "max_projection.png",
+    "demix_file": "demix_file.h5",
     "average_intensity_projection_image_file": "avg_projection.png",
     "date_of_acquisition": "2020-12-17 10:01:12",
     "external_specimen_name": 544261,

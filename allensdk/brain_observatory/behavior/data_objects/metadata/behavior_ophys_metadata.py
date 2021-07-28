@@ -17,9 +17,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     EquipmentType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
-    .mesoscope_experiment_metadata import \
-    MesoscopeExperimentMetadata
+    .ophys_experiment_metadata.multi_plane_metadata\
+    .multi_plane_metadata import \
+    MultiplaneMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_experiment_metadata import \
     OphysExperimentMetadata
@@ -34,7 +34,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
                             NwbWritableInterface):
     def __init__(self, behavior_metadata: BehaviorMetadata,
                  ophys_metadata: Union[OphysExperimentMetadata,
-                                       MesoscopeExperimentMetadata]):
+                                       MultiplaneMetadata]):
         super().__init__(name='behavior_ophys_metadata', value=self)
 
         self._behavior_metadata = behavior_metadata
@@ -58,7 +58,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
             behavior_session_id=behavior_session_id, lims_db=lims_db)
 
         if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
-            ophys_metadata = MesoscopeExperimentMetadata.from_internal(
+            ophys_metadata = MultiplaneMetadata.from_internal(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         else:
             ophys_metadata = OphysExperimentMetadata.from_internal(
@@ -72,7 +72,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         behavior_metadata = BehaviorMetadata.from_json(dict_repr=dict_repr)
 
         if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
-            ophys_metadata = MesoscopeExperimentMetadata.from_json(
+            ophys_metadata = MultiplaneMetadata.from_json(
                 dict_repr=dict_repr)
         else:
             ophys_metadata = OphysExperimentMetadata.from_json(
@@ -86,7 +86,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         behavior_metadata = BehaviorMetadata.from_nwb(nwbfile=nwbfile)
 
         if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
-            ophys_metadata = MesoscopeExperimentMetadata.from_nwb(
+            ophys_metadata = MultiplaneMetadata.from_nwb(
                 nwbfile=nwbfile)
         else:
             ophys_metadata = OphysExperimentMetadata.from_nwb(
@@ -105,7 +105,7 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         behavior_meta = self._behavior_metadata
         ophys_meta = self._ophys_metadata
 
-        if isinstance(ophys_meta, MesoscopeExperimentMetadata):
+        if isinstance(ophys_meta, MultiplaneMetadata):
             imaging_plane_group = ophys_meta.imaging_plane_group
             imaging_plane_group_count = ophys_meta.imaging_plane_group_count
         else:
