@@ -18,6 +18,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
+    calc_frame_rate
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorLimsApi, BehaviorLimsExtractor, BehaviorOphysLimsApi)
@@ -233,7 +235,7 @@ def test_get_stimulus_frame_rate(MockBehaviorLimsApi):
     stim_file = MockBehaviorLimsApi._behavior_stimulus_file()
     stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
         stimulus_file=stim_file)
-    assert 62.0 == stimulus_timestamps.calc_frame_rate()
+    assert 62.0 == calc_frame_rate(timestamps=stimulus_timestamps.value)
 
 
 def test_get_date_of_acquisition():
