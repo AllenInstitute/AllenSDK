@@ -9,9 +9,6 @@ import pytest
 
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
     cell_specimens import CellSpecimens, CellSpecimenMeta
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .dff_traces import \
-    DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
@@ -75,6 +72,7 @@ class TestJson:
         dict_repr['behavior_stimulus_file'] = str(test_data_dir /
                                                   'behavior_stimulus_file.pkl')
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['demix_file'] = str(test_data_dir / 'demix_file.h5')
 
         cls.dict_repr = dict_repr
         cls.expected_meta = CellSpecimenMeta(

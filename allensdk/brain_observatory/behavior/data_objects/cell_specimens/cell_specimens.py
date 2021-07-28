@@ -4,6 +4,7 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.ophys import OpticalChannel, ImageSegmentation
 
 import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
@@ -13,6 +14,9 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .corrected_flourescence_traces import \
+    CorrectedFluorescenceTraces
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
     .dff_traces import \
     DFF_traces
@@ -82,11 +86,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     def __init__(self, cell_specimen_table: pd.DataFrame,
                  meta: CellSpecimenMeta,
                  dff_traces: DFF_traces,
+                 corrected_fluourescence_traces: CorrectedFluorescenceTraces,
                  ophys_timestamps: OphysTimestamps):
         super().__init__(name='cell_specimen_table', value=self)
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
+        self._corrected_fluourescence_traces = corrected_fluourescence_traces
 
         self._validate_traces(ophys_timestamps=ophys_timestamps)
 
@@ -106,6 +112,12 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     def dff_traces(self) -> pd.DataFrame:
         df = self.table[['cell_roi_id']].join(self._dff_traces.value,
                                               on='cell_roi_id')
+        return df
+
+    @property
+    def corrected_fluorescence_traces(self) -> pd.DataFrame:
+        df = self.table[['cell_roi_id']].join(
+            self._corrected_fluourescence_traces.value, on='cell_roi_id')
         return df
 
     @classmethod
@@ -152,14 +164,25 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return DFF_traces.from_data_file(
                 dff_file=dff_file)
 
+        def _get_corrected_fluorescence_traces():
+            demix_file = DemixFile.from_lims(
+                ophys_experiment_id=ophys_experiment_id,
+                db=lims_db)
+            return CorrectedFluorescenceTraces.from_data_file(
+                demix_file=demix_file)
+
         cell_specimen_table = _get_cell_specimen_table()
         meta = CellSpecimenMeta.from_internal(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
+        corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
 
-        return cls(cell_specimen_table=cell_specimen_table, meta=meta,
-                   dff_traces=dff_traces, ophys_timestamps=ophys_timestamps)
+        return cls(
+            cell_specimen_table=cell_specimen_table, meta=meta,
+            dff_traces=dff_traces,
+            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_json(cls, dict_repr: dict,
@@ -174,11 +197,20 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return DFF_traces.from_data_file(
                 dff_file=dff_file)
 
+        def _get_corrected_fluorescence_traces():
+            demix_file = DemixFile.from_json(dict_repr=dict_repr)
+            return CorrectedFluorescenceTraces.from_data_file(
+                demix_file=demix_file)
+
         meta = CellSpecimenMeta.from_json(dict_repr=dict_repr,
                                           ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
-        return cls(cell_specimen_table=cell_specimen_table, meta=meta,
-                   dff_traces=dff_traces, ophys_timestamps=ophys_timestamps)
+        corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+        return cls(
+            cell_specimen_table=cell_specimen_table, meta=meta,
+            dff_traces=dff_traces,
+            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
@@ -210,10 +242,14 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         df = _read_table(cell_specimen_table=cell_specimen_table)
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
         dff_traces = DFF_traces.from_nwb(nwbfile=nwbfile)
+        corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
+            nwbfile=nwbfile)
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
 
-        return cls(cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
-                   ophys_timestamps=ophys_timestamps)
+        return cls(
+            cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
+            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            ophys_timestamps=ophys_timestamps)
 
     def to_nwb(self, nwbfile: NWBFile,
                ophys_timestamps: OphysTimestamps) -> NWBFile:
@@ -307,6 +343,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         self._dff_traces.to_nwb(nwbfile=nwbfile,
                                 ophys_timestamps=ophys_timestamps)
 
+        # 3. Add Corrected fluorescence traces
+        self._corrected_fluourescence_traces.to_nwb(nwbfile=nwbfile)
+
         return nwbfile
 
     @staticmethod
@@ -347,7 +386,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             'dff_traces': 'dff',
             'corrected_fluorescence_traces': 'corrected_fluorescence'
         }
-        for traces in (self._dff_traces,):
+        for traces in (self._dff_traces, self._corrected_fluourescence_traces):
             # validate traces contain expected roi ids
             if not np.in1d(traces.value.index,
                            self.table[['cell_roi_id']]).all():
