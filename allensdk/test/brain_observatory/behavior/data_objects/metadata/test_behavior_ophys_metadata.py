@@ -56,7 +56,8 @@ class TestBOM:
             experiment_container_id=ExperimentContainerId(
                 experiment_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
-            imaging_depth=ImagingDepth(imaging_depth=375)
+            imaging_depth=ImagingDepth(imaging_depth=375),
+            number_of_frames=10
         )
 
         behavior_metadata = TestBehaviorMetadata()
@@ -66,7 +67,7 @@ class TestBOM:
             ophys_metadata=ophys_meta
         )
 
-    def _get_mesoscope_meta(self):
+    def get_mesoscope_meta(self):
         bo_meta = self.meta
         bo_meta.behavior_metadata._equipment = \
             Equipment(equipment_name='MESO.1')
@@ -81,6 +82,7 @@ class TestBOM:
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
+            number_of_frames=ophys_experiment_metadata._number_of_frames,
             imaging_plane_group=imaging_plane_group
         )
         return BehaviorOphysMetadata(
@@ -157,7 +159,7 @@ class TestNWB(TestBOM):
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture, meso):
         if meso:
-            self.meta = self._get_mesoscope_meta()
+            self.meta = self.get_mesoscope_meta()
 
         self.meta.to_nwb(nwbfile=self.nwbfile)
 

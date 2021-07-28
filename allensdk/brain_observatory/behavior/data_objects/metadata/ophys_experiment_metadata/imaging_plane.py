@@ -4,13 +4,17 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps, BehaviorSessionId
+    BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.reporter_line import \
     ReporterLine
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .ophys_timestamps import OphysTimestamps
+from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
+    calc_frame_rate
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -29,15 +33,13 @@ class ImagingPlane(DataObject, InternalReadableInterface,
     @classmethod
     def from_internal(cls, ophys_experiment_id: int,
                       lims_db: PostgresQueryMixin,
+                      ophys_timestamps: OphysTimestamps,
                       excitation_lambda=910.0) -> "ImagingPlane":
-        sync_file = SyncFile.from_lims(ophys_experiment_id=ophys_experiment_id,
-                                       db=lims_db)
-        ophys_frame_rate = cls._get_frame_rate_from_sync_file(
-            sync_file=sync_file)
-        targeted_structure = cls._get_targeted_structure_from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         behavior_session_id = BehaviorSessionId.from_lims(
             db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        ophys_frame_rate = calc_frame_rate(timestamps=ophys_timestamps.value)
+        targeted_structure = cls._get_targeted_structure_from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         reporter_line = ReporterLine.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         indicator = reporter_line.parse_indicator(warn=True)
@@ -48,11 +50,11 @@ class ImagingPlane(DataObject, InternalReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict,
+                  ophys_timestamps: OphysTimestamps,
                   excitation_lambda=910.0) -> "ImagingPlane":
         targeted_structure = dict_repr['targeted_structure']
         sync_file = SyncFile.from_json(dict_repr=dict_repr)
-        ophys_fame_rate = cls._get_frame_rate_from_sync_file(
-            sync_file=sync_file)
+        ophys_fame_rate = calc_frame_rate(timestamps=ophys_timestamps)
         reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
         indicator = reporter_line.parse_indicator(warn=True)
         return cls(targeted_structure=targeted_structure,
@@ -92,13 +94,6 @@ class ImagingPlane(DataObject, InternalReadableInterface,
     @property
     def indicator(self) -> Optional[str]:
         return self._indicator
-
-    @staticmethod
-    def _get_frame_rate_from_sync_file(
-            sync_file: SyncFile) -> float:
-        timestamps = StimulusTimestamps.from_sync_file(sync_file=sync_file)
-        ophys_frame_rate = timestamps.calc_frame_rate()
-        return ophys_frame_rate
 
     @staticmethod
     def _get_targeted_structure_from_lims(ophys_experiment_id: int,

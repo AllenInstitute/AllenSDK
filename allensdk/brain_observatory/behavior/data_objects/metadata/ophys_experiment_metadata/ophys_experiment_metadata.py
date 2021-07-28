@@ -6,6 +6,8 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens import \
+    CellSpecimens
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
@@ -15,6 +17,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.mesoscope_experiment_metadata\
+    .imaging_plane_group import \
+    ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
@@ -33,6 +39,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
                  experiment_container_id: ExperimentContainerId,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
+                 number_of_frames: int,
                  project_code: Optional[ProjectCode] = None):
         super().__init__(name='ophys_experiment_metadata', value=self)
         self._ophys_experiment_id = ophys_experiment_id
@@ -40,6 +47,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         self._experiment_container_id = experiment_container_id
         self._field_of_view_shape = field_of_view_shape
         self._imaging_depth = imaging_depth
+        self._number_of_frames = number_of_frames
         self._project_code = project_code
 
         # project_code needs to be excluded from comparison
@@ -60,6 +68,14 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         project_code = ProjectCode.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        imaging_plane_group = ImagingPlaneGroup.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+
+        def _get_number_of_frames():
+            csp = CellSpecimens.from_lims(
+                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+            return cls._get_number_of_frames(cell_specimens=csp)
+        number_of_frames = _get_number_of_frames()
 
         return cls(
             ophys_experiment_id=ophys_experiment_id,
@@ -68,6 +84,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
             project_code=project_code,
+            number_of_frames=number_of_frames
         )
 
     @classmethod
@@ -78,12 +95,19 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         ophys_experiment_id = dict_repr['ophys_experiment_id']
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
+
+        def _get_number_of_frames():
+            csp = CellSpecimens.from_json(dict_repr=dict_repr)
+            return cls._get_number_of_frames(cell_specimens=csp)
+        number_of_frames = _get_number_of_frames()
+
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
-            imaging_depth=imaging_depth
+            imaging_depth=imaging_depth,
+            number_of_frames=number_of_frames
         )
 
     @classmethod
@@ -94,13 +118,24 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
+
+        def _get_number_of_frames():
+            csp = CellSpecimens.from_nwb(nwbfile=nwbfile)
+            return cls._get_number_of_frames(cell_specimens=csp)
+        number_of_frames = _get_number_of_frames()
+
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
-            imaging_depth=imaging_depth
+            imaging_depth=imaging_depth,
+            number_of_frames=number_of_frames
         )
+
+    @staticmethod
+    def _get_number_of_frames(cell_specimens: CellSpecimens):
+        return cell_specimens.dff_traces.shape[1]
 
     # TODO rename to ophys_container_id
     @property
@@ -133,3 +168,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         else:
             pc = self._project_code.value
         return pc
+
+    @property
+    def number_of_frames(self) -> int:
+        return self._number_of_frames

@@ -33,6 +33,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  imaging_plane_group: ImagingPlaneGroup,
+                 number_of_frames: int,
                  project_code: ProjectCode):
         super().__init__(
             ophys_experiment_id=ophys_experiment_id,
@@ -40,6 +41,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
+            number_of_frames=number_of_frames,
             project_code=project_code
         )
         self._imaging_plane_group = imaging_plane_group
@@ -59,6 +61,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
+            number_of_frames=ophys_experiment_metadata.number_of_frames,
             imaging_plane_group=imaging_plane_group
         )
 
@@ -73,6 +76,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
+            number_of_frames=ophys_experiment_metadata.number_of_frames,
             imaging_plane_group=imaging_plane_group
         )
 
@@ -87,6 +91,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
+            number_of_frames=ophys_experiment_metadata.number_of_frames,
             imaging_plane_group=imaging_plane_group
         )
 
