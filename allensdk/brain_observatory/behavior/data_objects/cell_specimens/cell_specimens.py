@@ -101,6 +101,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
     @property
     def dff_traces(self) -> pd.DataFrame:
+        self._validate_traces(traces=self._dff_traces.value, name='dff_traces')
         df = self.table[['cell_roi_id']].join(self._dff_traces.value,
                                               on='cell_roi_id')
         return df
@@ -337,3 +338,11 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         cell_specimen_table.reset_index(inplace=True)
         cell_specimen_table.set_index('cell_specimen_id', inplace=True)
         return cell_specimen_table
+
+    def _validate_traces(self, traces: pd.DataFrame,  name: str):
+        if not np.in1d(traces.index, self.table[['cell_roi_id']]).all():
+            raise RuntimeError(f"{name} contains ROI IDs that "
+                               f"are not in cell_specimen_table.cell_roi_id")
+        if not np.in1d(self.table[['cell_roi_id']], traces.index).all():
+            raise RuntimeError(f"cell_specimen_table contains ROI IDs "
+                               f"that are not in {name}")
