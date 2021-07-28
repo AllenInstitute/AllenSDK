@@ -13,7 +13,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.dff_traces import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .dff_traces import \
     DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.field_of_view_shape import \

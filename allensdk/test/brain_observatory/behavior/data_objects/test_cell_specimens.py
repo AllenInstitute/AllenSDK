@@ -6,17 +6,11 @@ import pynwb
 
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
-    import \
-    CellSpecimens, CellSpecimenMeta
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
+    cell_specimens import CellSpecimens, CellSpecimenMeta
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata \
-    import \
-    MultiplaneMetadata
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .ophys_timestamps import \
     OphysTimestamps
