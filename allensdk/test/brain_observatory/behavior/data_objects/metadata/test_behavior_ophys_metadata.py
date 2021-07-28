@@ -1,9 +1,13 @@
 import json
 from pathlib import Path
-
+import numpy as np
 import pynwb
 import pytest
 
+from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .dff_traces import \
+    DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -33,6 +37,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .ophys_timestamps import \
+    OphysTimestamps
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata \
@@ -56,8 +63,7 @@ class TestBOM:
             experiment_container_id=ExperimentContainerId(
                 experiment_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
-            imaging_depth=ImagingDepth(imaging_depth=375),
-            number_of_frames=10
+            imaging_depth=ImagingDepth(imaging_depth=375)
         )
 
         behavior_metadata = TestBehaviorMetadata()
@@ -82,7 +88,6 @@ class TestBOM:
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
-            number_of_frames=ophys_experiment_metadata._number_of_frames,
             imaging_plane_group=imaging_plane_group
         )
         return BehaviorOphysMetadata(
@@ -131,6 +136,7 @@ class TestJson(TestBOM):
         dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
         dict_repr['behavior_stimulus_file'] = str(test_data_dir /
                                                   'behavior_stimulus_file.pkl')
+        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         self.dict_repr = dict_repr
 
     @pytest.mark.parametrize('meso', [True, False])

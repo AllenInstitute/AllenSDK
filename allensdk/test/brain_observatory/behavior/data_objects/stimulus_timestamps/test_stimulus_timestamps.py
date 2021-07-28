@@ -55,23 +55,23 @@ def test_stimulus_timestamps_from_json(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps.StimulusFile",
+            ".timestamps.stimulus_timestamps.stimulus_timestamps.StimulusFile",
             mock_stimulus_file
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps.SyncFile",
+            ".timestamps.stimulus_timestamps.stimulus_timestamps.SyncFile",
             mock_sync_file
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps"
+            ".timestamps.stimulus_timestamps.stimulus_timestamps"
             ".get_behavior_stimulus_timestamps",
             mock_get_behavior_stimulus_timestamps
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps"
+            ".timestamps.stimulus_timestamps.stimulus_timestamps"
             ".get_ophys_stimulus_timestamps",
             mock_get_ophys_stimulus_timestamps
         )
@@ -198,23 +198,23 @@ def test_stimulus_timestamps_from_lims(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps.StimulusFile",
+            ".timestamps.stimulus_timestamps.stimulus_timestamps.StimulusFile",
             mock_stimulus_file
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps.SyncFile",
+            ".timestamps.stimulus_timestamps.stimulus_timestamps.SyncFile",
             mock_sync_file
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps"
+            ".timestamps.stimulus_timestamps.stimulus_timestamps"
             ".get_behavior_stimulus_timestamps",
             mock_get_behavior_stimulus_timestamps
         )
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.stimulus_timestamps"
+            ".timestamps.stimulus_timestamps.stimulus_timestamps"
             ".get_ophys_stimulus_timestamps",
             mock_get_ophys_stimulus_timestamps
         )

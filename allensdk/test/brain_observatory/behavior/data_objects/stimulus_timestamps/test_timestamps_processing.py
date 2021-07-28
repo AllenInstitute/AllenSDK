@@ -70,7 +70,8 @@ def test_get_ophys_stimulus_timestamps(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.timestamps_processing.OphysTimeAligner",
+            ".timestamps.stimulus_timestamps.timestamps_processing"
+            ".OphysTimeAligner",
             mock_ophys_time_aligner
         )
         obt = get_ophys_stimulus_timestamps(sync_path)
