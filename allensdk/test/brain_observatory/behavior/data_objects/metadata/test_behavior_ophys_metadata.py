@@ -65,7 +65,7 @@ class TestBOM:
             ophys_metadata=ophys_meta
         )
 
-    def get_mesoscope_meta(self):
+    def _get_multiplane_meta(self):
         bo_meta = self.meta
         bo_meta.behavior_metadata._equipment = \
             Equipment(equipment_name='MESO.1')
@@ -73,7 +73,7 @@ class TestBOM:
 
         imaging_plane_group = ImagingPlaneGroup(plane_group_count=5,
                                                 plane_group=0)
-        meso_meta = MultiplaneMetadata(
+        multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
@@ -84,7 +84,7 @@ class TestBOM:
         )
         return BehaviorOphysMetadata(
             behavior_metadata=bo_meta.behavior_metadata,
-            ophys_metadata=meso_meta
+            ophys_metadata=multiplane_meta
         )
 
 
@@ -157,7 +157,7 @@ class TestNWB(TestBOM):
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture, meso):
         if meso:
-            self.meta = self.get_mesoscope_meta()
+            self.meta = self._get_multiplane_meta()
 
         self.meta.to_nwb(nwbfile=self.nwbfile)
 
