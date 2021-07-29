@@ -57,6 +57,9 @@ class TestLims:
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
             ophys_timestamps=ots)
         assert not csp.table.empty
+        assert not csp.events.empty
+        assert not csp.dff_traces.empty
+        assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
 
@@ -73,6 +76,7 @@ class TestJson:
                                                   'behavior_stimulus_file.pkl')
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         dict_repr['demix_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['events_file'] = str(test_data_dir / 'events.h5')
 
         cls.dict_repr = dict_repr
         cls.expected_meta = CellSpecimenMeta(
@@ -91,6 +95,9 @@ class TestJson:
         csp = CellSpecimens.from_json(dict_repr=self.dict_repr,
                                       ophys_timestamps=self.ophys_timestamps)
         assert not csp.table.empty
+        assert not csp.events.empty
+        assert not csp.dff_traces.empty
+        assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
 

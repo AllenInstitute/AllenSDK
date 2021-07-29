@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, ProcessingModule
@@ -6,6 +8,9 @@ from pynwb.ophys import OpticalChannel, ImageSegmentation
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
+from allensdk.brain_observatory.behavior.data_files.event_detection_file \
+    import \
+    EventDetectionFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
@@ -14,6 +19,9 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
+    import \
+    Events
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
     .corrected_flourescence_traces import \
     CorrectedFluorescenceTraces
@@ -31,6 +39,29 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps \
     OphysTimestamps
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
 from allensdk.internal.api import PostgresQueryMixin
+
+
+class EventsParams:
+    """Container for arguments to event detection"""
+    def __init__(self,
+                 filter_scale: float = 2,
+                 filter_n_time_steps: int = 20):
+        """
+        :param filter_scale
+            See Events.filter_scale
+        :param filter_n_time_steps
+            See Events.filter_n_time_steps
+        """
+        self._filter_scale = filter_scale
+        self._filter_n_time_steps = filter_n_time_steps
+
+    @property
+    def filter_scale(self):
+        return self._filter_scale
+
+    @property
+    def filter_n_time_steps(self):
+        return self._filter_n_time_steps
 
 
 class CellSpecimenMeta(DataObject, InternalReadableInterface,
@@ -87,12 +118,14 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                  meta: CellSpecimenMeta,
                  dff_traces: DFF_traces,
                  corrected_fluourescence_traces: CorrectedFluorescenceTraces,
+                 events: Events,
                  ophys_timestamps: OphysTimestamps):
         super().__init__(name='cell_specimen_table', value=self)
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
         self._corrected_fluourescence_traces = corrected_fluourescence_traces
+        self._events = events
 
         self._validate_traces(ophys_timestamps=ophys_timestamps)
 
@@ -120,10 +153,20 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             self._corrected_fluourescence_traces.value, on='cell_roi_id')
         return df
 
+    @property
+    def events(self) -> pd.DataFrame:
+        df = self.table.reset_index()
+        df = df[['cell_roi_id', 'cell_specimen_id']] \
+            .merge(self._events.value, on='cell_roi_id')
+        df = df.set_index('cell_specimen_id')
+        return df
+
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
                   lims_db: PostgresQueryMixin,
-                  ophys_timestamps: OphysTimestamps) -> "CellSpecimens":
+                  ophys_timestamps: OphysTimestamps,
+                  events_params: Optional[EventsParams] = None) \
+            -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
             """Get the ophys cell segmentation run id associated with an
             ophys experiment id"""
@@ -171,22 +214,33 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return CorrectedFluorescenceTraces.from_data_file(
                 demix_file=demix_file)
 
+        def _get_events():
+            events_file = EventDetectionFile.from_lims(
+                ophys_experiment_id=ophys_experiment_id,
+                db=lims_db)
+            return cls._get_events(events_file=events_file,
+                                   events_params=events_params)
+
         cell_specimen_table = _get_cell_specimen_table()
         meta = CellSpecimenMeta.from_internal(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+        events = _get_events()
 
         return cls(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
+            events=events,
             ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_json(cls, dict_repr: dict,
-                  ophys_timestamps: OphysTimestamps) -> "CellSpecimens":
+                  ophys_timestamps: OphysTimestamps,
+                  events_params: Optional[EventsParams] = None) \
+            -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
         fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         cell_specimen_table = cls._postprocess(
@@ -202,19 +256,28 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return CorrectedFluorescenceTraces.from_data_file(
                 demix_file=demix_file)
 
+        def _get_events():
+            events_file = EventDetectionFile.from_json(dict_repr=dict_repr)
+            return cls._get_events(events_file=events_file,
+                                   events_params=events_params)
+
         meta = CellSpecimenMeta.from_json(dict_repr=dict_repr,
                                           ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+        events = _get_events()
         return cls(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
+            events=events,
             ophys_timestamps=ophys_timestamps)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
-                 filter_invalid_rois=False) -> "CellSpecimens":
+                 filter_invalid_rois=False,
+                 events_params: Optional[EventsParams] = None) \
+            -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
         ophys_module = nwbfile.processing['ophys']
         image_seg = ophys_module.data_interfaces['image_segmentation']
@@ -244,11 +307,19 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         dff_traces = DFF_traces.from_nwb(nwbfile=nwbfile)
         corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
             nwbfile=nwbfile)
+
+        def _get_events():
+            ep = EventsParams() if events_params is None else events_params
+            return Events.from_nwb(
+                nwbfile=nwbfile, filter_scale=ep.filter_scale,
+                filter_n_time_steps=ep.filter_n_time_steps)
+        events = _get_events()
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
 
         return cls(
             cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
+            events=events,
             ophys_timestamps=ophys_timestamps)
 
     def to_nwb(self, nwbfile: NWBFile,
@@ -346,6 +417,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         # 3. Add Corrected fluorescence traces
         self._corrected_fluourescence_traces.to_nwb(nwbfile=nwbfile)
 
+        # 4. Add events
+        self._events.to_nwb(nwbfile=nwbfile)
+
         return nwbfile
 
     @staticmethod
@@ -407,3 +481,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                                    f'{num_trace_timepoints}'
                                    f'but there are {num_ophys_timestamps} '
                                    f'ophys timestamps')
+
+    @staticmethod
+    def _get_events(events_file: EventDetectionFile,
+                    events_params: Optional[EventsParams] = None):
+        if events_params is None:
+            events_params = EventsParams()
+        return Events.from_data_file(
+            events_file=events_file,
+            filter_scale=events_params.filter_scale,
+            filter_n_time_steps=events_params.filter_n_time_steps)
