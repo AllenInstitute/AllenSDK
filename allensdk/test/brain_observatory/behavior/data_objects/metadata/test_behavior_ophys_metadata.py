@@ -1,13 +1,8 @@
 import json
 from pathlib import Path
-import numpy as np
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .dff_traces import \
-    DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -37,9 +32,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import \
-    OphysTimestamps
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata \

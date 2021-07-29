@@ -2,7 +2,6 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \

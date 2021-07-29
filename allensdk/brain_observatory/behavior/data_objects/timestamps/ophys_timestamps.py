@@ -36,7 +36,7 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
 
     @classmethod
     def from_sync_file(cls, sync_file: SyncFile,
-                        number_of_frames: int,
+                       number_of_frames: int,
                        group_count: Optional[int] = None,
                        plane_group: Optional[int] = None) -> "OphysTimestamps":
         ophys_timestamps = sync_file.data['ophys_frames']
@@ -52,12 +52,12 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysTimestamps":
         ts = nwbfile.processing[
-                   'ophys'].get_data_interface('dff').roi_response_series[
-                   'traces'].timestamps[:]
+                 'ophys'].get_data_interface('dff').roi_response_series[
+                 'traces'].timestamps[:]
         return cls(timestamps=ts, validate=False)
 
     def _validate(self, number_of_frames: int,
-                 ophys_timestamps: np.ndarray) -> np.ndarray:
+                  ophys_timestamps: np.ndarray) -> np.ndarray:
         """Validates that number of ophys timestamps do not exceed number of
         dff traces. If so, truncates number of ophys timestamps to the same
         length as dff traces
@@ -110,7 +110,7 @@ class _OphysTimestampsMultiplane(OphysTimestamps):
                    number_of_frames=number_of_frames)
 
     def _validate(self, number_of_frames: int,
-                 ophys_timestamps: np.ndarray) -> np.ndarray:
+                  ophys_timestamps: np.ndarray) -> np.ndarray:
         """
         Raises error if length of timestamps and number of frames are not equal
         :param number_of_frames

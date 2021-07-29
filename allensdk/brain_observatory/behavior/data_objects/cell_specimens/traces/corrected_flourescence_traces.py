@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     DataFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
+from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 
@@ -52,8 +52,9 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
              for cell_roi_id in corrected_fluorescence_traces.index.values])
 
         roi_table_region = \
-        nwbfile.processing['ophys'].data_interfaces['dff'].roi_response_series[
-            'traces'].rois  # noqa: E501
+            nwbfile.processing['ophys'].data_interfaces[
+                'dff'].roi_response_series[
+                'traces'].rois  # noqa: E501
         ophys_timestamps = ophys_module.get_data_interface(
             'dff').roi_response_series['traces'].timestamps
         f_interface = Fluorescence(name='corrected_fluorescence')

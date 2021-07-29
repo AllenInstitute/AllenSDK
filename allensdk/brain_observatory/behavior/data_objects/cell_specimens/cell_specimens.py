@@ -22,10 +22,10 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
     import \
     Events
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
     .corrected_flourescence_traces import \
     CorrectedFluorescenceTraces
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
     .dff_traces import \
     DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -43,6 +43,7 @@ from allensdk.internal.api import PostgresQueryMixin
 
 class EventsParams:
     """Container for arguments to event detection"""
+
     def __init__(self,
                  filter_scale: float = 2,
                  filter_n_time_steps: int = 20):
@@ -313,6 +314,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return Events.from_nwb(
                 nwbfile=nwbfile, filter_scale=ep.filter_scale,
                 filter_n_time_steps=ep.filter_n_time_steps)
+
         events = _get_events()
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
 
@@ -340,11 +342,12 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         # FOV:
         fov_width = metadata.field_of_view_width
         fov_height = metadata.field_of_view_height
-        imaging_plane_description = "{} field of view in {} at depth {} " \
-                                    "um".format(
-            (fov_width, fov_height),
-            self._meta.imaging_plane.targeted_structure,  # noqa E501
-            metadata.imaging_depth)
+        imaging_plane_description = \
+            "{} field of view in {} at depth {} " \
+            "um".format(
+                (fov_width, fov_height),
+                self._meta.imaging_plane.targeted_structure,
+                metadata.imaging_depth)
 
         # Optical Channel:
         optical_channel = OpticalChannel(

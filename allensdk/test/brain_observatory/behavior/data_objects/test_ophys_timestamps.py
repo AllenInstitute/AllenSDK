@@ -39,14 +39,14 @@ class TestFromSyncFile(LimsTest):
         self.sync_file._data = {'ophys_frames': np.array([.1, .2, .3])}
         with pytest.raises(RuntimeError):
             OphysTimestamps.from_sync_file(sync_file=self.sync_file,
-                                                number_of_frames=4)
+                                           number_of_frames=4)
 
     def test_multiplane(self):
         """test timestamps properly extracted when multiplane"""
         self.sync_file._data = {'ophys_frames': np.array([.1, .2, .3, .4])}
         ts = OphysTimestamps.from_sync_file(sync_file=self.sync_file,
-                                                       group_count=2,
-                                                       plane_group=0,
-                                                       number_of_frames=2)
+                                            group_count=2,
+                                            plane_group=0,
+                                            number_of_frames=2)
         expected = np.array([.1, .3])
         np.testing.assert_equal(ts.value, expected)

@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pynwb
 
-import pandas as pd
 import pytest
 
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\

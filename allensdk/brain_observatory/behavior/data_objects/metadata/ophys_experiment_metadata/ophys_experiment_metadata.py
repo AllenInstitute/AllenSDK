@@ -2,16 +2,10 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
-    cell_specimens import  CellSpecimens
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
-    .dff_traces import \
-    DFF_traces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
@@ -27,9 +21,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.project_code import \
     ProjectCode
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import \
-    OphysTimestamps
 from allensdk.internal.api import PostgresQueryMixin
 
 

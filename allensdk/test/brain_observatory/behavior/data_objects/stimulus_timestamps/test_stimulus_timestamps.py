@@ -8,9 +8,8 @@ from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
 )
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .stimulus_timestamps.timestamps_processing import (  # noqa: E501
-    get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps
-)
+    .stimulus_timestamps.timestamps_processing import (
+        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 
 
