@@ -16,8 +16,8 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps\
     OphysTimestamps
 
 
-class DFF_traces(DataObject, DataFileReadableInterface, NwbReadableInterface,
-                 NwbWritableInterface):
+class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
+                NwbWritableInterface):
     def __init__(self, traces: pd.DataFrame):
         super().__init__(name='dff_traces', value=traces)
 
@@ -52,7 +52,7 @@ class DFF_traces(DataObject, DataFileReadableInterface, NwbReadableInterface,
         return nwbfile
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "DFF_traces":
+    def from_nwb(cls, nwbfile: NWBFile) -> "DFFTraces":
         dff_nwb = nwbfile.processing[
             'ophys'].data_interfaces['dff'].roi_response_series['traces']
         # dff traces stored as timepoints x rois in NWB
@@ -62,9 +62,9 @@ class DFF_traces(DataObject, DataFileReadableInterface, NwbReadableInterface,
         df = pd.DataFrame({'dff': dff_traces.tolist()},
                           index=pd.Index(data=dff_nwb.rois.table.id[:],
                                          name='cell_roi_id'))
-        return DFF_traces(traces=df)
+        return DFFTraces(traces=df)
 
     @classmethod
-    def from_data_file(cls, dff_file: DFFFile) -> "DFF_traces":
+    def from_data_file(cls, dff_file: DFFFile) -> "DFFTraces":
         dff_traces = dff_file.data
-        return DFF_traces(traces=dff_traces)
+        return DFFTraces(traces=dff_traces)

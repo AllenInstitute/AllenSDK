@@ -27,7 +27,7 @@ from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
     CorrectedFluorescenceTraces
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
     .dff_traces import \
-    DFF_traces
+    DFFTraces
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
@@ -117,7 +117,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                     NwbWritableInterface):
     def __init__(self, cell_specimen_table: pd.DataFrame,
                  meta: CellSpecimenMeta,
-                 dff_traces: DFF_traces,
+                 dff_traces: DFFTraces,
                  corrected_fluourescence_traces: CorrectedFluorescenceTraces,
                  events: Events,
                  ophys_timestamps: OphysTimestamps):
@@ -205,7 +205,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             dff_file = DFFFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id,
                 db=lims_db)
-            return DFF_traces.from_data_file(
+            return DFFTraces.from_data_file(
                 dff_file=dff_file)
 
         def _get_corrected_fluorescence_traces():
@@ -249,7 +249,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
         def _get_dff_traces():
             dff_file = DFFFile.from_json(dict_repr=dict_repr)
-            return DFF_traces.from_data_file(
+            return DFFTraces.from_data_file(
                 dff_file=dff_file)
 
         def _get_corrected_fluorescence_traces():
@@ -305,7 +305,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
         df = _read_table(cell_specimen_table=cell_specimen_table)
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
-        dff_traces = DFF_traces.from_nwb(nwbfile=nwbfile)
+        dff_traces = DFFTraces.from_nwb(nwbfile=nwbfile)
         corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
             nwbfile=nwbfile)
 
