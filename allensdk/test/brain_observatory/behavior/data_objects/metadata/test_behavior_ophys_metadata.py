@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-
 import pynwb
 import pytest
 
@@ -20,13 +19,13 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
+    .ophys_experiment_metadata.multi_plane_metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.mesoscope_experiment_metadata\
-    .mesoscope_experiment_metadata import \
-    MesoscopeExperimentMetadata
+    .ophys_experiment_metadata.multi_plane_metadata\
+    .multi_plane_metadata import \
+    MultiplaneMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_experiment_metadata import \
     OphysExperimentMetadata
@@ -66,7 +65,7 @@ class TestBOM:
             ophys_metadata=ophys_meta
         )
 
-    def _get_mesoscope_meta(self):
+    def _get_multiplane_meta(self):
         bo_meta = self.meta
         bo_meta.behavior_metadata._equipment = \
             Equipment(equipment_name='MESO.1')
@@ -74,7 +73,7 @@ class TestBOM:
 
         imaging_plane_group = ImagingPlaneGroup(plane_group_count=5,
                                                 plane_group=0)
-        meso_meta = MesoscopeExperimentMetadata(
+        multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
@@ -85,7 +84,7 @@ class TestBOM:
         )
         return BehaviorOphysMetadata(
             behavior_metadata=bo_meta.behavior_metadata,
-            ophys_metadata=meso_meta
+            ophys_metadata=multiplane_meta
         )
 
 
@@ -113,7 +112,7 @@ class TestInternal(TestBOM):
 
         if meso:
             assert isinstance(bom.ophys_metadata,
-                              MesoscopeExperimentMetadata)
+                              MultiplaneMetadata)
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
@@ -129,6 +128,7 @@ class TestJson(TestBOM):
         dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
         dict_repr['behavior_stimulus_file'] = str(test_data_dir /
                                                   'behavior_stimulus_file.pkl')
+        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         self.dict_repr = dict_repr
 
     @pytest.mark.parametrize('meso', [True, False])
@@ -138,7 +138,7 @@ class TestJson(TestBOM):
         bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
 
         if meso:
-            assert isinstance(bom.ophys_metadata, MesoscopeExperimentMetadata)
+            assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
 
@@ -157,7 +157,7 @@ class TestNWB(TestBOM):
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture, meso):
         if meso:
-            self.meta = self._get_mesoscope_meta()
+            self.meta = self._get_multiplane_meta()
 
         self.meta.to_nwb(nwbfile=self.nwbfile)
 

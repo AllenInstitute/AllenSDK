@@ -1,11 +1,15 @@
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     NwbReadableInterface, StimulusFileReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .stimulus_timestamps.stimulus_timestamps import \
+    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
+    calc_frame_rate
 
 
 class StimulusFrameRate(DataObject, StimulusFileReadableInterface,
@@ -20,7 +24,7 @@ class StimulusFrameRate(DataObject, StimulusFileReadableInterface,
             stimulus_file: StimulusFile) -> "StimulusFrameRate":
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file)
-        frame_rate = stimulus_timestamps.calc_frame_rate()
+        frame_rate = calc_frame_rate(timestamps=stimulus_timestamps.value)
         return cls(stimulus_frame_rate=frame_rate)
 
     @classmethod

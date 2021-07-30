@@ -67,7 +67,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
-            project_code=project_code,
+            project_code=project_code
         )
 
     @classmethod
@@ -78,6 +78,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         ophys_experiment_id = dict_repr['ophys_experiment_id']
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
+
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
@@ -94,6 +95,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
             nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
+
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,

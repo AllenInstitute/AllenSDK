@@ -6,12 +6,14 @@ import pynwb
 
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
-    import \
-    CellSpecimens, CellSpecimenMeta
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
+    cell_specimens import CellSpecimens, CellSpecimenMeta
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .ophys_timestamps import \
+    OphysTimestamps
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata\
@@ -28,7 +30,7 @@ class TestLims:
             imaging_plane=ImagingPlane(
                 excitation_lambda=910.0,
                 indicator='GCaMP6f',
-                ophys_frame_rate=60.0,
+                ophys_frame_rate=10.0,
                 targeted_structure='VISp'
             )
         )
@@ -45,9 +47,18 @@ class TestLims:
 
     @pytest.mark.requires_bamboo
     def test_from_internal(self):
+        number_of_frames = 140296
+        ots = OphysTimestamps(timestamps=np.linspace(start=.1,
+                                                     stop=.1*number_of_frames,
+                                                     num=number_of_frames),
+                              number_of_frames=number_of_frames)
         csp = CellSpecimens.from_lims(
-            ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
+            ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
+            ophys_timestamps=ots)
         assert not csp.table.empty
+        assert not csp.events.empty
+        assert not csp.dff_traces.empty
+        assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
 
@@ -62,6 +73,9 @@ class TestJson:
         dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
         dict_repr['behavior_stimulus_file'] = str(test_data_dir /
                                                   'behavior_stimulus_file.pkl')
+        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['demix_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['events_file'] = str(test_data_dir / 'events.h5')
 
         cls.dict_repr = dict_repr
         cls.expected_meta = CellSpecimenMeta(
@@ -69,14 +83,20 @@ class TestJson:
             imaging_plane=ImagingPlane(
                 excitation_lambda=910.0,
                 indicator='GCaMP6f',
-                ophys_frame_rate=np.nan,
+                ophys_frame_rate=10.0,
                 targeted_structure='VISp'
             )
         )
+        cls.ophys_timestamps = OphysTimestamps(
+            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
 
     def test_from_json(self):
-        csp = CellSpecimens.from_json(dict_repr=self.dict_repr)
+        csp = CellSpecimens.from_json(dict_repr=self.dict_repr,
+                                      ophys_timestamps=self.ophys_timestamps)
         assert not csp.table.empty
+        assert not csp.events.empty
+        assert not csp.dff_traces.empty
+        assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
 
@@ -85,8 +105,10 @@ class TestNWB:
     def setup_class(cls):
         tj = TestJson()
         tj.setup_class()
+        cls.ophys_timestamps = OphysTimestamps(
+            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
         cls.cell_specimen_table = CellSpecimens.from_json(
-            dict_repr=tj.dict_repr)
+            dict_repr=tj.dict_repr, ophys_timestamps=cls.ophys_timestamps)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -104,7 +126,8 @@ class TestNWB:
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture):
-        self.cell_specimen_table.to_nwb(nwbfile=self.nwbfile)
+        self.cell_specimen_table.to_nwb(nwbfile=self.nwbfile,
+                                        ophys_timestamps=self.ophys_timestamps)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(

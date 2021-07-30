@@ -1,11 +1,11 @@
 from unittest.mock import create_autospec, PropertyMock
 
-import pytest
 import numpy as np
+import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.stimulus_timestamps.timestamps_processing import (  # noqa: E501
-    get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps
-)
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .stimulus_timestamps.timestamps_processing import (
+        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
 
@@ -34,7 +34,8 @@ from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
             "items": {
                 "behavior": {
                     "intervalsms": np.array([
-                        16.5429, 16.6685, 16.66580001, 16.70569999, 16.6668,
+                        16.5429, 16.6685, 16.66580001, 16.70569999,
+                        16.6668,
                         16.69619999, 16.655, 16.6805, 16.75940001, 16.6831
                     ])
                 }
@@ -56,9 +57,8 @@ def test_get_behavior_stimulus_timestamps(pkl_data, expected):
     ("/tmp/mock_sync_file.h5", [1, 2, 3]),
 ])
 def test_get_ophys_stimulus_timestamps(
-    monkeypatch, sync_path, expected_timestamps
+        monkeypatch, sync_path, expected_timestamps
 ):
-
     mock_ophys_time_aligner = create_autospec(OphysTimeAligner)
     mock_aligner_instance = mock_ophys_time_aligner.return_value
     property_mock = PropertyMock(
@@ -69,7 +69,8 @@ def test_get_ophys_stimulus_timestamps(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".stimulus_timestamps.timestamps_processing.OphysTimeAligner",
+            ".timestamps.stimulus_timestamps.timestamps_processing"
+            ".OphysTimeAligner",
             mock_ophys_time_aligner
         )
         obt = get_ophys_stimulus_timestamps(sync_path)

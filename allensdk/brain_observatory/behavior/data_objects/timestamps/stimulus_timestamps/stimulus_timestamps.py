@@ -19,9 +19,9 @@ from allensdk.brain_observatory.behavior.data_files import (
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     JsonWritableInterface, NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.stimulus_timestamps.timestamps_processing import (  # noqa: E501
-    get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps
-)
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .stimulus_timestamps.timestamps_processing import (
+        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -140,6 +140,3 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         nwbfile.add_processing_module(stim_mod)
 
         return nwbfile
-
-    def calc_frame_rate(self):
-        return np.round(1 / np.mean(np.diff(self.value)), 0)

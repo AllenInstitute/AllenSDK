@@ -10,7 +10,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .ophys_experiment_metadata.mesoscope_experiment_metadata \
+    .ophys_experiment_metadata.multi_plane_metadata \
     .imaging_plane_group import \
     ImagingPlaneGroup
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -25,7 +25,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class MesoscopeExperimentMetadata(OphysExperimentMetadata):
+class MultiplaneMetadata(OphysExperimentMetadata):
     def __init__(self,
                  ophys_experiment_id: int,
                  ophys_session_id: OphysSessionId,
@@ -47,7 +47,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
     @classmethod
     def from_internal(
             cls, ophys_experiment_id: int,
-            lims_db: PostgresQueryMixin) -> "MesoscopeExperimentMetadata":
+            lims_db: PostgresQueryMixin) -> "MultiplaneMetadata":
         ophys_experiment_metadata = OphysExperimentMetadata.from_internal(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         imaging_plane_group = ImagingPlaneGroup.from_lims(
@@ -63,7 +63,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
         )
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "MesoscopeExperimentMetadata":
+    def from_json(cls, dict_repr: dict) -> "MultiplaneMetadata":
         ophys_experiment_metadata = super().from_json(dict_repr=dict_repr)
         imaging_plane_group = ImagingPlaneGroup.from_json(dict_repr=dict_repr)
         return cls(
@@ -77,7 +77,7 @@ class MesoscopeExperimentMetadata(OphysExperimentMetadata):
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "MesoscopeExperimentMetadata":
+    def from_nwb(cls, nwbfile: NWBFile) -> "MultiplaneMetadata":
         ophys_experiment_metadata = super().from_nwb(nwbfile=nwbfile)
         imaging_plane_group = ImagingPlaneGroup.from_nwb(nwbfile=nwbfile)
         return cls(
