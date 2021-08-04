@@ -119,6 +119,11 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - 2.11.3
+-----------------------------------------------------------------------
+- Bugfixes related to NWB creation for BehaviorSessions
+
+
 What's New - 2.11.2
 -----------------------------------------------------------------------
 - Fixed mkdir error for non-existing ecephys upload directory
