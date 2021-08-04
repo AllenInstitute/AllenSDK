@@ -26,6 +26,12 @@ class BehaviorOphysMetadata(BehaviorMetadata):
         self._exclude_from_equals = {'project_code'}
 
     @property
+    def indicator(self) -> Optional[str]:
+        """Parses indicator from reporter"""
+        reporter_line = self.reporter_line
+        return self.parse_indicator(reporter_line=reporter_line, warn=True)
+
+    @property
     def emission_lambda(self) -> float:
         return 520.0
 

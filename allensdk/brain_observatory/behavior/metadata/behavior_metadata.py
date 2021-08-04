@@ -239,12 +239,6 @@ class BehaviorMetadata:
         return self.parse_reporter_line(reporter_line=reporter_line, warn=True)
 
     @property
-    def indicator(self) -> Optional[str]:
-        """Parses indicator from reporter"""
-        reporter_line = self.reporter_line
-        return self.parse_indicator(reporter_line=reporter_line, warn=True)
-
-    @property
     def cre_line(self) -> Optional[str]:
         """Parses cre_line from full_genotype"""
         cre_line = self.parse_cre_line(full_genotype=self.full_genotype,
