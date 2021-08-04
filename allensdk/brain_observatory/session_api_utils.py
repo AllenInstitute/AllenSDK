@@ -17,6 +17,7 @@ from pandas.util.testing import assert_frame_equal
 from allensdk.core.lazy_property import LazyProperty
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def is_equal(a: Any, b: Any) -> bool:
