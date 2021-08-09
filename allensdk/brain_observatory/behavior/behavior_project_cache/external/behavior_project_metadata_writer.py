@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import warnings
+from typing import List, Union
 
 import pandas as pd
 
@@ -39,7 +40,8 @@ class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
     def __init__(self, behavior_project_cache: VisualBehaviorOphysProjectCache,
-                 out_dir: str, project_name: str, data_release_date: str,
+                 out_dir: str, project_name: str,
+                 data_release_date: Union[str, List[str]],
                  overwrite_ok=False):
 
         self._behavior_project_cache = behavior_project_cache
@@ -179,7 +181,8 @@ def main():
     parser.add_argument('--project_name', help='project name', required=True)
     parser.add_argument('--data_release_date', help='Project release date. '
                         'Ie 2021-03-25',
-                        required=True)
+                        required=True,
+                        nargs="+")
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
                                                'existing output files',
                         dest='overwrite_ok', action='store_true')

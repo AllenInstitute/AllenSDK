@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Optional, List, Dict, Any, Iterable
+from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
@@ -20,7 +20,7 @@ from allensdk.core.auth_config import (
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(self, lims_engine, mtrain_engine, app_engine,
-                 data_release_date: Optional[str] = None):
+                 data_release_date: Optional[Union[str, List[str]]] = None):
         """ Downloads visual behavior data from the Allen Institute's
         internal Laboratory Information Management System (LIMS). Only
         functional if connected to the Allen Institute Network. Used to load
@@ -59,9 +59,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             implement:
                 stream : takes a url as a string. Returns an iterable yielding
                 the response body as bytes.
-        data_release_date
+        data_release_date: str or list of str
             Use to filter tables to only include data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         """
         self.lims_engine = lims_engine
         self.mtrain_engine = mtrain_engine
@@ -75,7 +75,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             lims_credentials: Optional[DbCredentials] = None,
             mtrain_credentials: Optional[DbCredentials] = None,
             app_kwargs: Optional[Dict[str, Any]] = None,
-            data_release_date: Optional[str] = None) -> \
+            data_release_date: Optional[Union[str, List[str]]] = None) -> \
             "BehaviorProjectLimsApi":
         """Construct a BehaviorProjectLimsApi instance with default
         postgres and app engines.
@@ -90,9 +90,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             Credentials to pass to the postgres connector to the mtrain
             database. If left unspecified, will check environment variables
             for the appropriate values.
-        data_release_date: Optional[str]
+        data_release_date: Optional[Union[str, List[str]]
             Filters tables to include only data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         app_kwargs: Dict
             Dict of arguments to pass to the app engine. Currently unused.
 
@@ -518,11 +518,17 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 JOIN behavior_sessions bs on bs.ophys_session_id = os.id
             """
 
+        if isinstance(self.data_release_date, str):
+            release_date_list = [self.data_release_date]
+        else:
+            release_date_list = self.data_release_date
+        release_date_str = ",".join([f"'{i}'" for i in release_date_list])
+
         query = f'''
             {select_clause}
             FROM well_known_files wkf
             {join_clause}
-            WHERE published_at = '{self.data_release_date}' AND
+            WHERE published_at IN ({release_date_str}) AND
                 well_known_file_type_id IN (
                     SELECT id
                     FROM well_known_file_types

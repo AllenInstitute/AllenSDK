@@ -204,7 +204,7 @@ class VisualBehaviorOphysProjectCache(object):
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
                   asynchronous: bool = True,
-                  data_release_date: Optional[str] = None
+                  data_release_date: Optional[Union[str, List[str]]] = None
                   ) -> "VisualBehaviorOphysProjectCache":
         """
         Construct a VisualBehaviorOphysProjectCache with a lims api. Use this
@@ -237,9 +237,9 @@ class VisualBehaviorOphysProjectCache(object):
             included for consistency with EcephysProjectCache.from_lims.
         asynchronous : bool
             Whether to fetch from web asynchronously. Currently unused.
-        data_release_date: str
+        data_release_date: str or list of str
             Use to filter tables to only include data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         Returns
         =======
         VisualBehaviorOphysProjectCache
