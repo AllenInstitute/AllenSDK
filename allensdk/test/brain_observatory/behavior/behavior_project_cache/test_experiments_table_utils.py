@@ -86,6 +86,7 @@ def test_add_experience_level():
     expected_df = pd.DataFrame(expected_data)
     output_df = add_experience_level_to_experiment_table(input_df)
     assert not input_df.equals(output_df)
+    assert len(input_df.columns) != len(output_df.columns)
     assert output_df.equals(expected_df)
 
 
@@ -129,4 +130,6 @@ def test_add_passive_flag():
     assert not input_df.equals(expected_df)
     output_df = add_passive_flag_to_ophys_experiment_table(
                     input_df)
+    assert not input_df.equals(output_df)
+    assert len(input_df.columns) != len(output_df.columns)
     assert output_df.equals(expected_df)
