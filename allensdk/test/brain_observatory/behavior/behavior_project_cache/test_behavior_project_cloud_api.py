@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, create_autospec
 
 from allensdk.api.cloud_cache.manifest import Manifest
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import behavior_project_cloud_api as cloudapi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
+        data_io.behavior_project_cloud_api import MANIFEST_COMPATIBILITY
 
 
 class MockCache():
@@ -175,7 +177,7 @@ def test_from_local_cache(monkeypatch):
             "comment": "This is a test entry. NOT REAL."
         }
     ]
-    mock_manifest.version = "0.3.0"
+    mock_manifest.version = MANIFEST_COMPATIBILITY[0]
 
     mock_local_cache = create_autospec(cloudapi.LocalCache)
     type(mock_local_cache.return_value)._manifest = mock_manifest
@@ -189,7 +191,7 @@ def test_from_local_cache(monkeypatch):
 
         # Test from_local_cache with use_static_cache=False
         try:
-            _ = cloudapi.BehaviorProjectCloudApi.from_local_cache(
+            cloudapi.BehaviorProjectCloudApi.from_local_cache(
                 "first_cache_dir", "project_1", "ui_1", use_static_cache=False
             )
         # Because cache is a mock, the following calls in the load_manifest
@@ -206,7 +208,7 @@ def test_from_local_cache(monkeypatch):
 
         # Test from_local_cache with use_static_cache=True
         try:
-            _ = cloudapi.BehaviorProjectCloudApi.from_local_cache(
+            cloudapi.BehaviorProjectCloudApi.from_local_cache(
                 "second_cache_dir", "project_2", "ui_2", use_static_cache=True
             )
         # Because cache is a mock, the following calls in the load_manifest

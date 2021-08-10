@@ -1,6 +1,10 @@
 import pytest
 import pandas as pd
 import io
+import semver
+
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
+        data_io.behavior_project_cloud_api import MANIFEST_COMPATIBILITY
 
 
 @pytest.fixture
@@ -10,7 +14,11 @@ def s3_cloud_cache_data():
     all_versions['data'] = {}
     all_versions['metadata'] = {}
 
-    version = '0.1.0'
+    min_compat = semver.parse_version_info(MANIFEST_COMPATIBILITY[0])
+    versions = []
+
+    version = str(min_compat)
+    versions.append(version)
     data = {}
     metadata = {}
 
@@ -66,7 +74,8 @@ def s3_cloud_cache_data():
     all_versions['data'][version] = data
     all_versions['metadata'][version] = metadata
 
-    version = '0.2.0'
+    version = str(min_compat.bump_minor())
+    versions.append(version)
     data = {}
     metadata = {}
 
@@ -127,7 +136,7 @@ def s3_cloud_cache_data():
     all_versions['data'][version] = data
     all_versions['metadata'][version] = metadata
 
-    return all_versions
+    return all_versions, versions
 
 
 @pytest.fixture
