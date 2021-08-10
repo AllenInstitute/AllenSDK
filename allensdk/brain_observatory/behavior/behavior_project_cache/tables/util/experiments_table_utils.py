@@ -56,3 +56,38 @@ def add_experience_level_to_experiment_table(
                          'experience_level'] = 'Novel >1'
 
     return experiments_table
+
+
+def add_passive_flag_to_ophys_experiment_table(
+        experiments_table: pd.DataFrame) -> pd.DataFrame:
+    """
+    adds a column to ophys_experiment_table that contains a Boolean
+    indicating whether a session was passive or not based on session
+    number
+
+    Parameters
+    ----------
+    experiments_table: pd.DataFrame
+
+    Returns
+    -------
+    experiments_table: pd.DataFrame
+
+    Note
+    ----
+    Does not change the input DataFrame in-place
+    """
+
+    # Ported from
+    # https://github.com/AllenInstitute/visual_behavior_analysis/blob/master
+    # /visual_behavior/data_access/utilities.py#L1344
+
+    experiments_table = experiments_table.copy(deep=True)
+
+    experiments_table['passive'] = False
+
+    session_25 = experiments_table.session_number.isin([2, 5])
+    passive_indices = experiments_table[session_25].index.values
+    experiments_table.at[passive_indices, 'passive'] = True
+
+    return experiments_table
