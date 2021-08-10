@@ -16,7 +16,7 @@ from allensdk.api.cloud_cache.cloud_cache import (
 
 
 # [min inclusive, max exclusive)
-MANIFEST_COMPATIBILITY = ["0.0.0", "1.0.0"]
+MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
 
 class BehaviorCloudCacheVersionException(Exception):
