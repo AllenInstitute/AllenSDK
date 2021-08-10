@@ -11,8 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 from allensdk.api.cloud_cache.cloud_cache import (
-    S3CloudCache, LocalCache, StaticLocalCache
-)
+    S3CloudCache, LocalCache, StaticLocalCache)
 
 
 # [min inclusive, max exclusive)
