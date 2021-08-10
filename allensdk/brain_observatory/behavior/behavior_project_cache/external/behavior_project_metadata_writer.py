@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import warnings
+from typing import List, Union
 
 import pandas as pd
 
@@ -31,7 +32,8 @@ OPHYS_EXPERIMENTS_SUPPRESS = SESSION_SUPPRESS + (
 OUTPUT_METADATA_FILENAMES = {
     'behavior_session_table': 'behavior_session_table.csv',
     'ophys_session_table': 'ophys_session_table.csv',
-    'ophys_experiment_table': 'ophys_experiment_table.csv'
+    'ophys_experiment_table': 'ophys_experiment_table.csv',
+    'ophys_cells_table': 'ophys_cells_table.csv'
 }
 
 
@@ -39,7 +41,8 @@ class BehaviorProjectMetadataWriter:
     """Class to write project-level metadata to csv"""
 
     def __init__(self, behavior_project_cache: VisualBehaviorOphysProjectCache,
-                 out_dir: str, project_name: str, data_release_date: str,
+                 out_dir: str, project_name: str,
+                 data_release_date: Union[str, List[str]],
                  overwrite_ok=False):
 
         self._behavior_project_cache = behavior_project_cache
@@ -61,6 +64,7 @@ class BehaviorProjectMetadataWriter:
         self._write_behavior_sessions()
         self._write_ophys_sessions()
         self._write_ophys_experiments()
+        self._write_ophys_cells()
 
         self._write_manifest()
 
@@ -83,6 +87,14 @@ class BehaviorProjectMetadataWriter:
                        "values and pandas.to_csv() converts it to float")
                 warnings.warn(msg)
         self._write_metadata_table(df=behavior_sessions,
+                                   filename=output_filename)
+
+    def _write_ophys_cells(self,
+                           output_filename=OUTPUT_METADATA_FILENAMES[
+                                'ophys_cells_table']):
+        ophys_cells = self._behavior_project_cache. \
+            get_ophys_cells_table()
+        self._write_metadata_table(df=ophys_cells,
                                    filename=output_filename)
 
     def _write_ophys_sessions(self, suppress=SESSION_SUPPRESS,
@@ -179,7 +191,8 @@ def main():
     parser.add_argument('--project_name', help='project name', required=True)
     parser.add_argument('--data_release_date', help='Project release date. '
                         'Ie 2021-03-25',
-                        required=True)
+                        required=True,
+                        nargs="+")
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
                                                'existing output files',
                         dest='overwrite_ok', action='store_true')

@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Optional, List, Dict, Any, Iterable
+from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
@@ -20,7 +20,7 @@ from allensdk.core.auth_config import (
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(self, lims_engine, mtrain_engine, app_engine,
-                 data_release_date: Optional[str] = None):
+                 data_release_date: Optional[Union[str, List[str]]] = None):
         """ Downloads visual behavior data from the Allen Institute's
         internal Laboratory Information Management System (LIMS). Only
         functional if connected to the Allen Institute Network. Used to load
@@ -59,9 +59,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             implement:
                 stream : takes a url as a string. Returns an iterable yielding
                 the response body as bytes.
-        data_release_date
+        data_release_date: str or list of str
             Use to filter tables to only include data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         """
         self.lims_engine = lims_engine
         self.mtrain_engine = mtrain_engine
@@ -75,7 +75,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             lims_credentials: Optional[DbCredentials] = None,
             mtrain_credentials: Optional[DbCredentials] = None,
             app_kwargs: Optional[Dict[str, Any]] = None,
-            data_release_date: Optional[str] = None) -> \
+            data_release_date: Optional[Union[str, List[str]]] = None) -> \
             "BehaviorProjectLimsApi":
         """Construct a BehaviorProjectLimsApi instance with default
         postgres and app engines.
@@ -90,9 +90,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             Credentials to pass to the postgres connector to the mtrain
             database. If left unspecified, will check environment variables
             for the appropriate values.
-        data_release_date: Optional[str]
+        data_release_date: Optional[Union[str, List[str]]
             Filters tables to include only data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         app_kwargs: Dict
             Dict of arguments to pass to the app engine. Currently unused.
 
@@ -377,6 +377,49 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
         return self.lims_engine.select(query)
 
+    def _get_ophys_cells_table(self):
+        """
+        Helper function for easier testing.
+        Return a pd.Dataframe table with all cell_roi_id and associated
+        cell_specimen_id and ophys_experiment_id
+        metadata.
+        Return columns: ophys_experiment_id,
+                        cell_roi_id,
+                        cell_specimen_id
+
+        :rtype: pd.DataFrame
+        """
+        query = """
+            SELECT
+            cr.id as cell_roi_id,
+            cr.cell_specimen_id,
+            cr.ophys_experiment_id
+            FROM cell_rois AS cr
+            JOIN ophys_cell_segmentation_runs AS ocsr
+            ON ocsr.id=cr.ophys_cell_segmentation_run_id
+            JOIN ophys_experiments AS oe
+            ON oe.id=cr.ophys_experiment_id
+        """
+        if self.data_release_date is not None:
+            query += self._get_ophys_experiment_release_filter()
+            query += "\nAND cr.valid_roi = True"
+        else:
+            query += "\nWHERE cr.valid_roi = True"
+        query += "\nAND ocsr.current=True"
+
+        self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
+        df = self.lims_engine.select(query)
+
+        # NaN's for invalid cells force this to float, push to int
+        df['cell_specimen_id'] = pd.array(df['cell_specimen_id'],
+                                          dtype="Int64")
+        return df
+
+    def get_ophys_cells_table(self):
+        df = self._get_ophys_cells_table()
+        df = df.set_index("cell_roi_id")
+        return df
+
     def _get_ophys_session_table(self) -> pd.DataFrame:
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
@@ -518,11 +561,17 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 JOIN behavior_sessions bs on bs.ophys_session_id = os.id
             """
 
+        if isinstance(self.data_release_date, str):
+            release_date_list = [self.data_release_date]
+        else:
+            release_date_list = self.data_release_date
+        release_date_str = ",".join([f"'{i}'" for i in release_date_list])
+
         query = f'''
             {select_clause}
             FROM well_known_files wkf
             {join_clause}
-            WHERE published_at = '{self.data_release_date}' AND
+            WHERE published_at IN ({release_date_str}) AND
                 well_known_file_type_id IN (
                     SELECT id
                     FROM well_known_file_types
