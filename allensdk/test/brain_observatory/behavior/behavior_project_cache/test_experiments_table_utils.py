@@ -4,7 +4,8 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_project_cache.\
     tables.util.experiments_table_utils import (
         add_experience_level_to_experiment_table,
-        add_passive_flag_to_ophys_experiment_table)
+        add_passive_flag_to_ophys_experiment_table,
+        add_image_set_to_experiment_table)
 
 
 def test_add_experience_level():
@@ -130,6 +131,30 @@ def test_add_passive_flag():
     assert not input_df.equals(expected_df)
     output_df = add_passive_flag_to_ophys_experiment_table(
                     input_df)
+    assert not input_df.equals(output_df)
+    assert len(input_df.columns) != len(output_df.columns)
+    assert output_df.equals(expected_df)
+
+
+def test_add_image_set_to_experiment_table():
+
+    input_data = []
+    expected_data = []
+
+    datum = {'id': 0, 'session_type': 'ophys_5_images_x_passive'}
+    input_data.append(copy.deepcopy(datum))
+    datum['image_set'] = 'x'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 1, 'session_type': 'ophys_5'}
+    input_data.append(copy.deepcopy(datum))
+    datum['image_set'] = 'N/A'
+    expected_data.append(copy.deepcopy(datum))
+
+    input_df = pd.DataFrame(input_data)
+    expected_df = pd.DataFrame(expected_data)
+    assert not expected_df.equals(input_df)
+    output_df = add_image_set_to_experiment_table(input_df)
     assert not input_df.equals(output_df)
     assert len(input_df.columns) != len(output_df.columns)
     assert output_df.equals(expected_df)
