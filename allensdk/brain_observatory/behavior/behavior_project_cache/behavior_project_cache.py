@@ -31,6 +31,7 @@ class VBOLimsCache(Cache):
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
     OPHYS_EXPERIMENTS_KEY = "ophys_experiments"
+    OPHYS_CELLS_KEY = "ophys_cells"
 
     MANIFEST_CONFIG = {
         OPHYS_SESSIONS_KEY: {
@@ -45,6 +46,11 @@ class VBOLimsCache(Cache):
         },
         OPHYS_EXPERIMENTS_KEY: {
             "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
+            "parent_key": "BASEDIR",
+            "typename": "file"
+        },
+        OPHYS_CELLS_KEY: {
+            "spec": f"{OPHYS_CELLS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
         }
@@ -464,6 +470,27 @@ class VisualBehaviorOphysProjectCache(object):
         experiments = ExperimentsTable(df=experiments,
                                        suppress=suppress)
         return experiments.table if as_df else experiments
+
+    def get_ophys_cells_table(self) -> pd.DataFrame:
+        """
+        Return summary table of all cells in this project cache
+        :rtype: pd.DataFrame
+        """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_ophys_cells_table()
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.OPHyS_CELLS_KEY)
+            ophys_cells_table = one_file_call_caching(
+                path,
+                self.fetch_api.get_ophys_cells_table,
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='cell_roi_id'))
+        else:
+            ophys_cells_table = self.fetch_api.get_ophys_cells_table()
+
+        return ophys_cells_table
 
     def get_behavior_session_table(
             self,

@@ -377,6 +377,49 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
         return self.lims_engine.select(query)
 
+    def _get_ophys_cells_table(self):
+        """
+        Helper function for easier testing.
+        Return a pd.Dataframe table with all cell_roi_id and associated
+        cell_specimen_id and ophys_experiment_id
+        metadata.
+        Return columns: ophys_experiment_id,
+                        cell_roi_id,
+                        cell_specimen_id
+
+        :rtype: pd.DataFrame
+        """
+        query = """
+            SELECT
+            cr.id as cell_roi_id,
+            cr.cell_specimen_id,
+            cr.ophys_experiment_id
+            FROM cell_rois AS cr
+            JOIN ophys_cell_segmentation_runs AS ocsr
+            ON ocsr.id=cr.ophys_cell_segmentation_run_id
+            JOIN ophys_experiments AS oe
+            ON oe.id=cr.ophys_experiment_id
+        """
+        if self.data_release_date is not None:
+            query += self._get_ophys_experiment_release_filter()
+            query += "\nAND cr.valid_roi = True"
+        else:
+            query += "\nWHERE cr.valid_roi = True"
+        query += "\nAND ocsr.current=True"
+
+        self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
+        df = self.lims_engine.select(query)
+
+        # NaN's for invalid cells force this to float, push to int
+        df['cell_specimen_id'] = pd.array(df['cell_specimen_id'],
+                                          dtype="Int64")
+        return df
+
+    def get_ophys_cells_table(self):
+        df = self._get_ophys_cells_table()
+        df = df.set_index("cell_roi_id")
+        return df
+
     def _get_ophys_session_table(self) -> pd.DataFrame:
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
