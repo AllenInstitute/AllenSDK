@@ -31,6 +31,7 @@ class VBOLimsCache(Cache):
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
     OPHYS_EXPERIMENTS_KEY = "ophys_experiments"
+    OPHYS_CELLS_KEY = "ophys_cells"
 
     MANIFEST_CONFIG = {
         OPHYS_SESSIONS_KEY: {
@@ -45,6 +46,11 @@ class VBOLimsCache(Cache):
         },
         OPHYS_EXPERIMENTS_KEY: {
             "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
+            "parent_key": "BASEDIR",
+            "typename": "file"
+        },
+        OPHYS_CELLS_KEY: {
+            "spec": f"{OPHYS_CELLS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
         }
@@ -163,9 +169,12 @@ class VisualBehaviorOphysProjectCache(object):
         return cls(fetch_api=fetch_api)
 
     @classmethod
-    def from_local_cache(cls, cache_dir: Union[str, Path],
-                         project_name: str = "visual-behavior-ophys"
-                         ) -> "VisualBehaviorOphysProjectCache":
+    def from_local_cache(
+        cls,
+        cache_dir: Union[str, Path],
+        project_name: str = "visual-behavior-ophys",
+        use_static_cache: bool = False
+    ) -> "VisualBehaviorOphysProjectCache":
         """instantiates this object with a local cache.
 
         Parameters
@@ -184,8 +193,11 @@ class VisualBehaviorOphysProjectCache(object):
 
         """
         fetch_api = BehaviorProjectCloudApi.from_local_cache(
-                cache_dir, project_name,
-                ui_class_name=cls.__name__)
+            cache_dir,
+            project_name,
+            ui_class_name=cls.__name__,
+            use_static_cache=use_static_cache
+        )
         return cls(fetch_api=fetch_api)
 
     @classmethod
@@ -198,7 +210,7 @@ class VisualBehaviorOphysProjectCache(object):
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
                   asynchronous: bool = True,
-                  data_release_date: Optional[str] = None
+                  data_release_date: Optional[Union[str, List[str]]] = None
                   ) -> "VisualBehaviorOphysProjectCache":
         """
         Construct a VisualBehaviorOphysProjectCache with a lims api. Use this
@@ -231,9 +243,9 @@ class VisualBehaviorOphysProjectCache(object):
             included for consistency with EcephysProjectCache.from_lims.
         asynchronous : bool
             Whether to fetch from web asynchronously. Currently unused.
-        data_release_date: str
+        data_release_date: str or list of str
             Use to filter tables to only include data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         Returns
         =======
         VisualBehaviorOphysProjectCache
@@ -458,6 +470,27 @@ class VisualBehaviorOphysProjectCache(object):
         experiments = ExperimentsTable(df=experiments,
                                        suppress=suppress)
         return experiments.table if as_df else experiments
+
+    def get_ophys_cells_table(self) -> pd.DataFrame:
+        """
+        Return summary table of all cells in this project cache
+        :rtype: pd.DataFrame
+        """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_ophys_cells_table()
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.OPHyS_CELLS_KEY)
+            ophys_cells_table = one_file_call_caching(
+                path,
+                self.fetch_api.get_ophys_cells_table,
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='cell_roi_id'))
+        else:
+            ophys_cells_table = self.fetch_api.get_ophys_cells_table()
+
+        return ophys_cells_table
 
     def get_behavior_session_table(
             self,

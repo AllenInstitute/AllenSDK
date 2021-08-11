@@ -4,6 +4,7 @@ import boto3
 from moto import mock_s3
 import pathlib
 import json
+import semver
 
 from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
@@ -15,36 +16,34 @@ from allensdk.brain_observatory.\
 @mock_s3
 def test_manifest_methods(tmpdir, s3_cloud_cache_data):
 
+    data, versions = s3_cloud_cache_data
+
     cache_dir = pathlib.Path(tmpdir) / "test_manifest_list"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
 
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
 
+    v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     m_list = cache.list_manifest_file_names()
 
-    v1_name = f'{project_name}_manifest_v0.1.0.json'
-    v2_name = f'{project_name}_manifest_v0.2.0.json'
-
     assert len(m_list) == 2
-    assert v1_name in m_list
-    assert v2_name in m_list
-
-    cache.load_manifest(v1_name)
+    assert all([i in m_list for i in v_names])
+    cache.load_manifest(v_names[0])
 
     # because the BehaviorProjectCloudApi automatically
     # loads the latest manifest, so the latest manifest
     # will always be the latest_downloaded_manifest
-    assert cache.latest_downloaded_manifest_file() == v2_name
-    assert cache.latest_manifest_file() == v2_name
+    assert cache.latest_downloaded_manifest_file() == v_names[-1]
+    assert cache.latest_manifest_file() == v_names[-1]
 
-    change_msg = cache.compare_manifests(v1_name, v2_name)
+    change_msg = cache.compare_manifests(v_names[0], v_names[-1])
 
     for mname in ('behavior_session_table',
                   'ophys_session_table',
@@ -61,20 +60,21 @@ def test_manifest_methods(tmpdir, s3_cloud_cache_data):
 @mock_s3
 def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
 
+    data, versions = s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_construction"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
 
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
 
-    v1_name = f'{project_name}_manifest_v0.1.0.json'
-    cache.load_manifest(v1_name)
+    v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
+    cache.load_manifest(v_names[0])
     cache.get_behavior_ophys_experiment(ophys_experiment_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
     cache.fetch_api.cache._downloaded_data_path.unlink()
@@ -118,26 +118,28 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data):
     manifest other than the latest and download files
     from that manifest.
     """
+    data, versions = s3_cloud_cache_data
+
     cache_dir = pathlib.Path(tmpdir) / "test_linkage"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
 
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
 
-    v1_name = f'{project_name}_manifest_v0.1.0.json'
-    cache.load_manifest(v1_name)
+    v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
+    cache.load_manifest(v_names[0])
     for sess_id in (333, 444):
         cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
         cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
-    v1_dir = cache_dir / f'{project_name}-0.1.0/data'
+    v1_dir = cache_dir / f'{project_name}-{versions[0]}/data'
 
     # Check that all expected file were downloaded
     dir_glob = v1_dir.glob('*')
@@ -173,37 +175,35 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
     construct_local_cache() to make sure that the symlinks
     are still properly constructed
     """
+    data, versions = s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_linkage"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
 
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
 
-    v1_name = f'{project_name}_manifest_v0.1.0.json'
-    v2_name = f'{project_name}_manifest_v0.2.0.json'
-    v1_dir = cache_dir / f'{project_name}-0.1.0/data'
-    v2_dir = cache_dir / f'{project_name}-0.2.0/data'
+    v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
+    v_dirs = [cache_dir / f'{project_name}-{i}/data' for i in versions]
 
-    assert cache.current_manifest() == v2_name
-    assert cache.list_all_downloaded_manifests() == [v2_name]
+    assert cache.current_manifest() == v_names[-1]
+    assert cache.list_all_downloaded_manifests() == [v_names[-1]]
 
-    cache.load_manifest(v1_name)
-    assert cache.current_manifest() == v1_name
-    assert cache.list_all_downloaded_manifests() == [v1_name,
-                                                     v2_name]
+    cache.load_manifest(v_names[0])
+    assert cache.current_manifest() == v_names[0]
+    assert cache.list_all_downloaded_manifests() == v_names
 
     for sess_id in (333, 444):
         cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
         cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
-    v1_glob = v1_dir.glob('*')
+    v1_glob = v_dirs[0].glob('*')
     v1_paths = {}
     for p in v1_glob:
         v1_paths[p.name] = p
@@ -220,14 +220,14 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
                                                               project_name)
         cache.construct_local_manifest()
 
-    cache.load_manifest(v2_name)
-    assert cache.current_manifest() == v2_name
+    cache.load_manifest(v_names[-1])
+    assert cache.current_manifest() == v_names[-1]
     for sess_id in (777, 888):
         cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5444, 5666, 5777):
         cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
-    v2_glob = v2_dir.glob('*')
+    v2_glob = v_dirs[-1].glob('*')
     v2_paths = {}
     for p in v2_glob:
         v2_paths[p.name] = p
@@ -254,13 +254,14 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
     Test that when a cache is instantiated after an update has
     been loaded to the dataset, the correct warning is emitted
     """
+    data, versions = s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_update"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
@@ -269,20 +270,22 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
 
     client = boto3.client('s3', region_name='us-east-1')
 
+    later_version = str(semver.parse_version_info(versions[-1]).bump_minor())
     load_dataset(data_update['data'],
                  data_update['metadata'],
-                 '0.3.0',
+                 later_version,
                  bucket_name,
                  project_name,
                  client)
 
-    name3 = f'{project_name}_manifest_v0.3.0'
-    name2 = f'{project_name}_manifest_v0.2.0'
+    name3 = f'{project_name}_manifest_v{later_version}'
+    name2 = f'{project_name}_manifest_v{versions[-1]}'
+
     cmd = 'VisualBehaviorOphysProjectCache.load_manifest'
     with pytest.warns(OutdatedManifestWarning, match=name3) as warnings:
-        _ = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+        VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
+                                                      bucket_name,
+                                                      project_name)
 
     checked_msg = False
     for w in warnings.list:
@@ -302,20 +305,23 @@ def test_load_last(tmpdir, s3_cloud_cache_data, data_update):
     cache_dir, it loads the most recently loaded manifest,
     not the most up to date manifest
     """
+    data, versions = s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_update"
     bucket_name = "vis-behav-test-bucket"
     project_name = "vis-behav-test-proj"
     create_bucket(bucket_name,
                   project_name,
-                  s3_cloud_cache_data['data'],
-                  s3_cloud_cache_data['metadata'])
+                  data['data'],
+                  data['metadata'])
     cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
                                                           bucket_name,
                                                           project_name)
 
-    assert cache.current_manifest() == f'{project_name}_manifest_v0.2.0.json'
-    cache.load_manifest(f'{project_name}_manifest_v0.1.0.json')
-    assert cache.current_manifest() == f'{project_name}_manifest_v0.1.0.json'
+    v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
+
+    assert cache.current_manifest() == v_names[-1]
+    cache.load_manifest(v_names[0])
+    assert cache.current_manifest() == v_names[0]
     del cache
 
     msg = 'VisualBehaviorOphysProjectCache.compare_manifests'
@@ -324,4 +330,4 @@ def test_load_last(tmpdir, s3_cloud_cache_data, data_update):
                                                               bucket_name,
                                                               project_name)
 
-    assert cache.current_manifest() == f'{project_name}_manifest_v0.1.0.json'
+    assert cache.current_manifest() == v_names[0]

@@ -26,7 +26,7 @@ class CacheFileAttributes(object):
                  url: str,
                  version_id: str,
                  file_hash: str,
-                 local_path: str):
+                 local_path: pathlib.Path):
 
         if not isinstance(url, str):
             raise ValueError(f"url must be str; got {type(url)}")

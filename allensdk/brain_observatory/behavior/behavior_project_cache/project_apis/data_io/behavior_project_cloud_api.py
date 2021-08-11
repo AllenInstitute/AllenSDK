@@ -10,11 +10,12 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
-from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
+from allensdk.api.cloud_cache.cloud_cache import (
+    S3CloudCache, LocalCache, StaticLocalCache)
 
 
 # [min inclusive, max exclusive)
-MANIFEST_COMPATIBILITY = ["0.0.0", "1.0.0"]
+MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
 
 class BehaviorCloudCacheVersionException(Exception):
@@ -70,9 +71,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         Whether to operate in local mode, where no data will be downloaded
         and instead will be loaded from local
     """
-    def __init__(self, cache: Union[S3CloudCache, LocalCache],
-                 skip_version_check: bool = False,
-                 local: bool = False):
+    def __init__(
+        self,
+        cache: Union[S3CloudCache, LocalCache, StaticLocalCache],
+        skip_version_check: bool = False,
+        local: bool = False
+    ):
 
         self.cache = cache
         self.skip_version_check = skip_version_check
@@ -158,9 +162,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         return BehaviorProjectCloudApi(cache)
 
     @staticmethod
-    def from_local_cache(cache_dir: Union[str, Path],
-                         project_name: str,
-                         ui_class_name: str) -> "BehaviorProjectCloudApi":
+    def from_local_cache(
+        cache_dir: Union[str, Path],
+        project_name: str,
+        ui_class_name: str,
+        use_static_cache: bool = False
+    ) -> "BehaviorProjectCloudApi":
         """instantiates this object with a local cache.
 
         Parameters
@@ -181,9 +188,18 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         BehaviorProjectCloudApi instance
 
         """
-        cache = LocalCache(cache_dir,
-                           project_name,
-                           ui_class_name=ui_class_name)
+        if use_static_cache:
+            cache = StaticLocalCache(
+                cache_dir,
+                project_name,
+                ui_class_name=ui_class_name
+            )
+        else:
+            cache = LocalCache(
+                cache_dir,
+                project_name,
+                ui_class_name=ui_class_name
+            )
         return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(
@@ -302,6 +318,18 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
             fname="ophys_experiment_table")
         df = literal_col_eval(pd.read_csv(experiment_table_path))
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
+
+    def _get_ophys_cells_table(self):
+        ophys_cells_table_path = self._get_metadata_path(
+            fname="ophys_cells_table")
+        df = literal_col_eval(pd.read_csv(ophys_cells_table_path))
+        # NaN's for invalid cells force this to float, push to int
+        df['cell_specimen_id'] = pd.array(df['cell_specimen_id'],
+                                          dtype="Int64")
+        self._ophys_cells_table = df.set_index("cell_roi_id")
+
+    def get_ophys_cells_table(self):
+        return self._ophys_cells_table
 
     def get_ophys_experiment_table(self):
         """returns a pd.DataFrame where each entry has a 1-to-1

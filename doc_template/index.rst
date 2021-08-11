@@ -118,6 +118,11 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.12.0
+-----------------------------------------------------------------------
+- Added ability to specify a static cache directory (use_static_cache=True) to instantiate VisualBehaviorOphysProjectCache.from_local_cache()
+- Added 'experience_level', 'passive' and 'image_set' columns to ophys_experiments_table
+- Added 'ophys_cells_table' metadata table to track the relationship between ophys_experiment_id and cell_specimen_id
 
 What's New - 2.11.3
 -----------------------------------------------------------------------

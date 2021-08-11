@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.0] = 2021-08-11
+- Added ability to specify a static cache directory (use_static_cache=True) to instantiate VisualBehaviorOphysProjectCache.from_local_cache()
+- Added 'experience_level', 'passive' and 'image_set' columns to ophys_experiments_table
+- Added 'ophys_cells_table' metadata table to track the relationship between ophys_experiment_id and cell_specimen_id
+
 ## [2.11.3] = 2021-08-04
 - Bugfixes related to NWB creation for BehaviorSessions
 
