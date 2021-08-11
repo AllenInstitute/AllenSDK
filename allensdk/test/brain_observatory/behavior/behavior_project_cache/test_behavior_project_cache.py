@@ -9,6 +9,12 @@ from allensdk.brain_observatory.behavior.behavior_project_cache \
     import VisualBehaviorOphysProjectCache
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
+from allensdk.brain_observatory.behavior.behavior_project_cache.\
+    tables.util.experiments_table_utils import (
+        add_experience_level_to_experiment_table,
+        add_passive_flag_to_ophys_experiment_table,
+        add_image_set_to_experiment_table)
+
 
 @pytest.fixture
 def session_table():
@@ -141,7 +147,16 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     expected = pd.read_pickle(os.path.join(expected_path,
                                            'ophys_experiment_table.pkl'))
 
-    pd.testing.assert_frame_equal(expected, obtained)
+    expected = add_experience_level_to_experiment_table(expected)
+    expected = add_passive_flag_to_ophys_experiment_table(expected)
+    expected = add_image_set_to_experiment_table(expected)
+
+    # pd.testing.assert_frame_equal and pd.DataFrame.equals
+    # return false if the columns are not in the same order
+    # in the two dataframes
+    assert len(expected.columns) == len(obtained.columns)
+    for column in expected.columns:
+        assert expected[column].equals(obtained[column])
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
