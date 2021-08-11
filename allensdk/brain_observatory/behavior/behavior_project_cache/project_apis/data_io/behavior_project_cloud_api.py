@@ -125,6 +125,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         self._get_ophys_session_table()
         self._get_behavior_session_table()
         self._get_ophys_experiment_table()
+        self._get_ophys_cells_table()
 
     @staticmethod
     def from_s3_cache(cache_dir: Union[str, Path],
