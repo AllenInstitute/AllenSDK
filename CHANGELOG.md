@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.1] = 2021-08-11
+- minor fix to cloud cache
+
 ## [2.12.0] = 2021-08-11
 - Added ability to specify a static cache directory (use_static_cache=True) to instantiate VisualBehaviorOphysProjectCache.from_local_cache()
 - Added 'experience_level', 'passive' and 'image_set' columns to ophys_experiments_table

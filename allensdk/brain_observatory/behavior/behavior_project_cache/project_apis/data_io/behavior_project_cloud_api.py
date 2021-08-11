@@ -100,7 +100,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
 
         expected_metadata = set(["behavior_session_table",
                                  "ophys_session_table",
-                                 "ophys_experiment_table"])
+                                 "ophys_experiment_table",
+                                 "ophys_cells_table"])
 
         if self.cache._manifest.metadata_file_names is None:
             raise RuntimeError("S3CloudCache object has no metadata "
