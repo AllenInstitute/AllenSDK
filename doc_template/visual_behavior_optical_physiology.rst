@@ -286,6 +286,25 @@ SUMMARY OF AVAILABLE DATA
 DATA FILE CHANGELOG
 -------------------
 
+**v1.0.0**
+
+New Data
+
+- 107 mice, up from 82
+- 4082 behavior training sessions, up from 3021.
+- 705 in vivo 2-photon imaging sessions, up from 551.
+- 50,489 logitudinal recordings from cortical cells, up from 34,619
+
+Metadata changes
+
+- A new metadata table is present: ophys_cells_table. This table has a project-wide aggregate of cell_specimen_id, cell_roi_id, and ophys_experiment_id.
+- Added 'experience_level', 'passive' and 'image_set' columns to ophys_experiments_table
+
+Data Corrections
+
+- 196 BehaviorOphysExperiments had excess invalid ROIs in the dataframe returned by
+  the events field. These have been corrected to remove these invalid ROIs.
+
 **v0.3.0**
 
 13 sessions were labeled with the wrong session_type in v0.2.0. We have
