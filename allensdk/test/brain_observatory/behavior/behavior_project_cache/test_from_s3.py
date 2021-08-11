@@ -99,7 +99,8 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
         local_manifest = json.load(in_file)
     fnames = set([pathlib.Path(k).name for k in local_manifest])
     assert 'ophys_file_1.nwb' not in fnames
-    assert len(local_manifest) == 3
+    print(local_manifest)
+    assert len(local_manifest) == 4
 
     cache.construct_local_manifest()
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -108,7 +109,7 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
         local_manifest = json.load(in_file)
     fnames = set([pathlib.Path(k).name for k in local_manifest])
     assert 'ophys_file_1.nwb' in fnames
-    assert len(local_manifest) == 7  # 6 metadata files and 1 data file
+    assert len(local_manifest) == 9  # 8 metadata files and 1 data file
 
 
 @mock_s3
