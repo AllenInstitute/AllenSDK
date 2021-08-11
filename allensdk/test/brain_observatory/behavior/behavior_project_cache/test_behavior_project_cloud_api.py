@@ -14,13 +14,16 @@ class MockCache():
                  behavior_session_table,
                  ophys_session_table,
                  ophys_experiment_table,
+                 ophys_cells_table,
                  cachedir):
         self.file_id_column = "file_id"
         self.session_table_path = cachedir / "session.csv"
         self.behavior_session_table_path = cachedir / "behavior_session.csv"
         self.ophys_experiment_table_path = cachedir / "ophys_experiment.csv"
+        self.ophys_cells_table_path = cachedir / "ophys_cells.csv"
 
         ophys_session_table.to_csv(self.session_table_path, index=False)
+        ophys_cells_table.to_csv(self.ophys_cells_table_path, index=False)
         behavior_session_table.to_csv(self.behavior_session_table_path,
                                       index=False)
         ophys_experiment_table.to_csv(self.ophys_experiment_table_path,
@@ -29,11 +32,13 @@ class MockCache():
         self._manifest = MagicMock()
         self._manifest.metadata_file_names = ["behavior_session_table",
                                               "ophys_session_table",
-                                              "ophys_experiment_table"]
+                                              "ophys_experiment_table",
+                                              "ophys_cells_table"]
         self._metadata_name_path_map = {
                 "behavior_session_table": self.behavior_session_table_path,
                 "ophys_session_table": self.session_table_path,
-                "ophys_experiment_table": self.ophys_experiment_table_path}
+                "ophys_experiment_table": self.ophys_experiment_table_path,
+                "ophys_cells_table": self.ophys_cells_table_path}
 
     def download_metadata(self, fname):
         return self._metadata_name_path_map[fname]
@@ -63,6 +68,7 @@ def mock_cache(request, tmpdir):
     bst = request.param.get("behavior_session_table")
     ost = request.param.get("ophys_session_table")
     oet = request.param.get("ophys_experiment_table")
+    clt = request.param.get("ophys_cells_table")
 
     # round-trip the tables through csv to pick up
     # pandas mods to lists
@@ -73,7 +79,9 @@ def mock_cache(request, tmpdir):
     ost = pd.read_csv(fname)
     oet.to_csv(fname, index=False)
     oet = pd.read_csv(fname)
-    yield (MockCache(bst, ost, oet, tmpdir), request.param)
+    clt.to_csv(fname, index=False)
+    clt = pd.read_csv(fname)
+    yield (MockCache(bst, ost, oet, clt, tmpdir), request.param)
 
 
 @pytest.mark.parametrize(
@@ -89,7 +97,11 @@ def mock_cache(request, tmpdir):
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]]}),
                 "ophys_experiment_table": pd.DataFrame({
                     "ophys_experiment_id": [4, 5, 6, 7, 8, 9],
-                    "file_id": [4, 5, 6, 7, 8, 9]})},
+                    "file_id": [4, 5, 6, 7, 8, 9]}),
+                "ophys_cells_table": pd.DataFrame({
+                    "cell_roi_id": [4, 5, 6],
+                    "cell_specimen_id": [104, 105, 106],
+                    "ophys_experiment_id": [4, 5, 6]})}
                 ],
         indirect=["mock_cache"])
 @pytest.mark.parametrize("local", [True, False])
@@ -168,7 +180,8 @@ def test_from_local_cache(monkeypatch):
     mock_manifest.metadata_file_names = {
         'ophys_experiment_table',
         'ophys_session_table',
-        'behavior_session_table'
+        'behavior_session_table',
+        'ophys_cells_table'
     }
     mock_manifest._data_pipeline = [
         {

@@ -71,6 +71,17 @@ def s3_cloud_cache_data():
 
     metadata['ophys_experiment_table'] = bytes(buff.read(), 'utf-8')
 
+    o_cells = {
+            'cell_roi_id': {0: 9080884343, 1: 1080884173, 2: 1080883843},
+            'cell_specimen_id': {0: 1086496928, 1: 1086496914, 2: 1086496838},
+            'ophys_experiment_id': {0: 775614751, 1: 775614751, 2: 775614751}}
+    o_cells = pd.DataFrame(o_cells)
+    buff = io.StringIO()
+    o_cells.to_csv(buff, index=False)
+    buff.seek(0)
+
+    metadata['ophys_cells_table'] = bytes(buff.read(), 'utf-8')
+
     all_versions['data'][version] = data
     all_versions['metadata'][version] = metadata
 
@@ -132,6 +143,17 @@ def s3_cloud_cache_data():
     buff.seek(0)
 
     metadata['ophys_experiment_table'] = bytes(buff.read(), 'utf-8')
+
+    o_cells = {
+            'cell_roi_id': {0: 1080884343, 1: 1080884173, 2: 1080883843},
+            'cell_specimen_id': {0: 1086496928, 1: 1086496914, 2: 1086496838},
+            'ophys_experiment_id': {0: 775614751, 1: 775614751, 2: 775614751}}
+    o_cells = pd.DataFrame(o_cells)
+    buff = io.StringIO()
+    o_cells.to_csv(buff, index=False)
+    buff.seek(0)
+
+    metadata['ophys_cells_table'] = bytes(buff.read(), 'utf-8')
 
     all_versions['data'][version] = data
     all_versions['metadata'][version] = metadata
@@ -197,5 +219,16 @@ def data_update():
     buff.seek(0)
 
     metadata['ophys_experiment_table'] = bytes(buff.read(), 'utf-8')
+
+    o_cells = {
+            'cell_roi_id': {0: 9080884343, 1: 1080884173, 2: 1080883843},
+            'cell_specimen_id': {0: 1086496928, 1: 1086496914, 2: 1086496838},
+            'ophys_experiment_id': {0: 775614751, 1: 775614751, 2: 775614751}}
+    o_cells = pd.DataFrame(o_cells)
+    buff = io.StringIO()
+    o_cells.to_csv(buff, index=False)
+    buff.seek(0)
+
+    metadata['ophys_cells_table'] = bytes(buff.read(), 'utf-8')
 
     return {'data': data, 'metadata': metadata}
