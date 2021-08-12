@@ -66,8 +66,13 @@ def experiments_table():
                                            'TRAINING_1_gratings',
                                            'OPHYS_1_images_A'],
                           'imaging_depth': [75, 75, 75],
-                          'targeted_structure': ['VISp', 'VISp', 'VISp']
-                          })
+                          'targeted_structure': ['VISp', 'VISp', 'VISp'],
+                          'experiment_workflow_state': ['passed',
+                                                        'passed',
+                                                        'passed'],
+                          'container_workflow_state': ['published',
+                                                       'published',
+                                                       'published']})
             .set_index("ophys_experiment_id"))
 
 
@@ -150,6 +155,8 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     expected = add_experience_level_to_experiment_table(expected)
     expected = add_passive_flag_to_ophys_experiment_table(expected)
     expected = add_image_set_to_experiment_table(expected)
+    expected['experiment_workflow_state'] = 'passed'
+    expected['container_workflow_state'] = 'published'
 
     # pd.testing.assert_frame_equal and pd.DataFrame.equals
     # return false if the columns are not in the same order
