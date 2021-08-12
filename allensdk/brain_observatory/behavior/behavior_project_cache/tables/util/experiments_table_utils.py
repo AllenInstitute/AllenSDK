@@ -118,8 +118,9 @@ def add_image_set_to_experiment_table(
 
     experiments_table = experiments_table.copy(deep=True)
 
-    experiments_table['image_set'] = [session_type[15]
-                                      if len(session_type) > 15 else 'N/A'
-                                      for session_type
-                                      in experiments_table.session_type.values]
+    experiments_table['image_set'] = [
+            session_type[15]
+            if len(session_type) > 15 else 'N/A'
+            for session_type
+            in experiments_table.session_type.values.astype(str)]
     return experiments_table
