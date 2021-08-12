@@ -118,6 +118,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.13.0
+-----------------------------------------------------------------------
+- TBD
+ 
 What's New - 2.12.1
 -----------------------------------------------------------------------
 - minor fix to cloud cache consistency check
