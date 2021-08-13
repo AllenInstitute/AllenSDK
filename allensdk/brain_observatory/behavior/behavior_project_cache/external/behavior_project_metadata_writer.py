@@ -21,12 +21,13 @@ SESSION_SUPPRESS = (
     'specimen_id'
 )
 OPHYS_EXPERIMENTS_SUPPRESS = SESSION_SUPPRESS + (
-    'container_workflow_state',
     'behavior_session_uuid',
-    'experiment_workflow_state',
     'published_at',
     'isi_experiment_id'
 )
+OPHYS_EXPERIMENTS_SUPPRESS_FINAL = [
+    'container_workflow_state',
+    'experiment_workflow_state']
 #########
 
 OUTPUT_METADATA_FILENAMES = {
@@ -121,6 +122,12 @@ class BehaviorProjectMetadataWriter:
             left_index=True,
             right_index=True,
             how='left')
+
+        # users don't need to see these
+        ophys_experiments.drop(
+                labels=OPHYS_EXPERIMENTS_SUPPRESS_FINAL,
+                inplace=True,
+                axis=1)
 
         self._write_metadata_table(df=ophys_experiments,
                                    filename=output_filename)
