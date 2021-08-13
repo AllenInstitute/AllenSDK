@@ -438,13 +438,17 @@ class VisualBehaviorOphysProjectCache(object):
     def get_ophys_experiment_table(
             self,
             suppress: Optional[List[str]] = None,
-            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
+            as_df=True,
+            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all ophys_experiment_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :type suppress: list of str
         :param as_df: whether to return as df or as SessionsTable
+        :param passed_only: if True, return only experiments flagged as
+                            'passed' and containers flagged as 'published'
+                            (default=True)
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -468,7 +472,8 @@ class VisualBehaviorOphysProjectCache(object):
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress)
+                                       suppress=suppress,
+                                       passed_only=passed_only)
         return experiments.table if as_df else experiments
 
     def get_ophys_cells_table(self) -> pd.DataFrame:

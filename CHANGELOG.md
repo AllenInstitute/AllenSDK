@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.1] = 2021-08-13
+- fix to how from_lims API gets OPhys experiment metadata. Preserves relationship between OPhys experiments and failed containers
+
 ## [2.12.1] = 2021-08-11
 - minor fix to cloud cache
 
