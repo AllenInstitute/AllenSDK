@@ -68,11 +68,11 @@ def experiments_table():
                           'imaging_depth': [75, 75, 75],
                           'targeted_structure': ['VISp', 'VISp', 'VISp'],
                           'experiment_workflow_state': ['passed',
-                                                        'passed',
+                                                        'failed',
                                                         'passed'],
                           'container_workflow_state': ['published',
                                                        'published',
-                                                       'published']})
+                                                       'nonsense']})
             .set_index("ophys_experiment_id"))
 
 
@@ -142,7 +142,7 @@ def test_get_behavior_table(TempdirBehaviorCache, behavior_table):
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_experiment_table()
+    obtained = cache.get_ophys_experiment_table(passed_only=False)
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_experiments").get("spec")
         assert os.path.exists(path)
@@ -155,15 +155,28 @@ def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
     expected = add_experience_level_to_experiment_table(expected)
     expected = add_passive_flag_to_ophys_experiment_table(expected)
     expected = add_image_set_to_experiment_table(expected)
-    expected['experiment_workflow_state'] = 'passed'
-    expected['container_workflow_state'] = 'published'
+
+    expected['experiment_workflow_state'] = ['passed',
+                                             'failed',
+                                             'passed']
+    expected['container_workflow_state'] = ['published',
+                                            'published',
+                                            'nonsense']
 
     # pd.testing.assert_frame_equal and pd.DataFrame.equals
     # return false if the columns are not in the same order
     # in the two dataframes
     assert len(expected.columns) == len(obtained.columns)
     for column in expected.columns:
-        assert expected[column].equals(obtained[column])
+        np.testing.assert_array_equal(expected[column].values,
+                                      obtained[column].values)
+
+    obtained = cache.get_ophys_experiment_table()
+    expected = expected.head(1)
+    assert len(expected.columns) == len(obtained.columns)
+    for column in expected.columns:
+        np.testing.assert_array_equal(expected[column].values,
+                                      obtained[column].values)
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)

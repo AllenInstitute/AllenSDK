@@ -472,7 +472,8 @@ class VisualBehaviorOphysProjectCache(object):
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress)
+                                       suppress=suppress,
+                                       passed_only=passed_only)
         return experiments.table if as_df else experiments
 
     def get_ophys_cells_table(self) -> pd.DataFrame:
