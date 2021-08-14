@@ -433,14 +433,12 @@ class VisualBehaviorOphysProjectCache(object):
         sessions = BehaviorOphysSessionsTable(df=ophys_sessions,
                                               suppress=suppress,
                                               index_column=index_column)
-
         if passed_only:
             oet = self.get_ophys_experiment_table(passed_only=True)
             for i in sessions.table.index:
                 sub_df = oet.query(f"ophys_session_id=={i}")
                 sessions.table.at[i, "ophys_container_id"] = \
-                        sub_df["ophys_container_id"].values
-
+                        list(sub_df["ophys_container_id"].values)
 
         return sessions.table if as_df else sessions
 
