@@ -388,7 +388,8 @@ class VisualBehaviorOphysProjectCache(object):
             suppress: Optional[List[str]] = None,
             index_column: str = "ophys_session_id",
             as_df=True,
-            include_behavior_data=True) -> \
+            include_behavior_data=True,
+            passed_only=True) -> \
             Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
@@ -432,6 +433,12 @@ class VisualBehaviorOphysProjectCache(object):
         sessions = BehaviorOphysSessionsTable(df=ophys_sessions,
                                               suppress=suppress,
                                               index_column=index_column)
+        if passed_only:
+            oet = self.get_ophys_experiment_table(passed_only=True)
+            for i in sessions.table.index:
+                sub_df = oet.query(f"ophys_session_id=={i}")
+                sessions.table.at[i, "ophys_container_id"] = \
+                        list(sub_df["ophys_container_id"].values)
 
         return sessions.table if as_df else sessions
 
@@ -501,7 +508,8 @@ class VisualBehaviorOphysProjectCache(object):
             self,
             suppress: Optional[List[str]] = None,
             as_df=True,
-            include_ophys_data=True) -> Union[pd.DataFrame, SessionsTable]:
+            include_ophys_data=True,
+            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -530,7 +538,8 @@ class VisualBehaviorOphysProjectCache(object):
             ophys_session_table = self.get_ophys_session_table(
                 suppress=suppress,
                 as_df=False,
-                include_behavior_data=False)
+                include_behavior_data=False,
+                passed_only=passed_only)
         else:
             ophys_session_table = None
         sessions = SessionsTable(df=sessions, suppress=suppress,
