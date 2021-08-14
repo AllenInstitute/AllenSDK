@@ -19,18 +19,31 @@ class ExperimentsTable(ProjectTable, OphysMixin):
     """Class for storing and manipulating project-level data
     at the behavior-ophys experiment level"""
     def __init__(self, df: pd.DataFrame,
-                 suppress: Optional[List[str]] = None):
+                 suppress: Optional[List[str]] = None,
+                 passed_only: bool = True):
         """
         Parameters
         ----------
-        df
+        df: pd.DataFrame
             The behavior-ophys experiment-level data
-        suppress
-            columns to drop from table
+        suppress: Optional[List[str]]
+            columns to drop from table (default=None)
+        passed_only: bool
+             If True, only return experiments whose
+             exeriment_workflow_state is True
         """
+        self._passed_only = passed_only
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
         self.final_processing()
+
+    def postprocess_base(self):
+        """
+        It actually is possible for the same ophys_experiment_id
+        to map to more than one container, so we don't want to
+        eliminate duplicate instances of the index
+        """
+        pass
 
     def postprocess_additional(self):
         pass
@@ -51,3 +64,7 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         self._df = add_experience_level_to_experiment_table(self._df)
         self._df = add_passive_flag_to_ophys_experiment_table(self._df)
         self._df = add_image_set_to_experiment_table(self._df)
+
+        if self._passed_only:
+            self._df = self._df.query("experiment_workflow_state=='passed'")
+            self._df = self._df.query("container_workflow_state=='published'")
