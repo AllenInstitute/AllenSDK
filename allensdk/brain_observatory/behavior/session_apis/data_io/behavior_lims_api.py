@@ -4,8 +4,6 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 import pytz
 
-import pandas as pd
-
 from allensdk.api.warehouse_cache.cache import memoize
 from allensdk.brain_observatory.behavior.session_apis.abcs.\
     data_extractor_base.behavior_data_extractor_base import \
@@ -253,26 +251,6 @@ class BehaviorLimsExtractor(BehaviorDataExtractorBase):
             WHERE bs.id = {self.behavior_session_id};
         """
         return self.lims_db.fetchone(query, strict=True)
-
-    @memoize
-    def get_stimulus_name(self) -> str:
-        """Get the stimulus set used from the behavior session pkl file
-        :rtype: str
-        """
-        behavior_stimulus_path = self.get_behavior_stimulus_file()
-        pkl = pd.read_pickle(behavior_stimulus_path)
-
-        try:
-            stimulus_name = pkl["items"]["behavior"]["cl_params"]["stage"]
-        except KeyError:
-            raise RuntimeError(
-                f"Could not obtain stimulus_name/stage information from "
-                f"the *.pkl file ({behavior_stimulus_path}) "
-                f"for the behavior session to save as NWB! The "
-                f"following series of nested keys did not work: "
-                f"['items']['behavior']['cl_params']['stage']"
-            )
-        return stimulus_name
 
     @memoize
     def get_reporter_line(self) -> List[str]:
