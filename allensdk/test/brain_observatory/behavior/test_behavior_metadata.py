@@ -246,7 +246,7 @@ def test_get_task_parameters_task_id_exception():
     }
 
     with pytest.raises(RuntimeError) as error:
-        _ = get_task_parameters(input_data)
+        get_task_parameters(input_data)
     assert "does not know how to parse 'task_id'" in error.value.args[0]
 
 
@@ -285,7 +285,7 @@ def test_get_task_parameters_flash_duration_exception():
     }
 
     with pytest.raises(RuntimeError) as error:
-        _ = get_task_parameters(input_data)
+        get_task_parameters(input_data)
     shld_be = "'images' and/or 'grating' not a valid key"
     assert shld_be in error.value.args[0]
 
@@ -585,57 +585,3 @@ def test_get_date_of_acquisition(monkeypatch, tmp_path, test_params,
             obt_date = metadata.date_of_acquisition
 
         assert obt_date == extractor_expt_date
-
-
-def test_indicator(monkeypatch):
-    """Test that indicator is parsed from full_genotype"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return 'Ai148(TIT2L-GC6f-ICL-tTA2)'
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        assert metadata.indicator == 'GCaMP6f'
-
-
-@pytest.mark.parametrize("input_reporter_line, warning_msg, expected", (
-        (None, 'Error parsing reporter line. It is null.', None),
-        ('foo', 'Could not parse indicator from reporter because none'
-                'of the expected substrings were found in the reporter', None)
-)
-                         )
-def test_indicator_edge_cases(monkeypatch, input_reporter_line, warning_msg,
-                              expected):
-    """Test indicator parsing edge cases"""
-
-    class MockExtractor:
-        def get_reporter_line(self):
-            return input_reporter_line
-
-    extractor = MockExtractor()
-
-    with monkeypatch.context() as ctx:
-        def dummy_init(self):
-            self._extractor = extractor
-
-        ctx.setattr(BehaviorMetadata,
-                    '__init__',
-                    dummy_init)
-
-        metadata = BehaviorMetadata()
-
-        with pytest.warns(UserWarning) as record:
-            indicator = metadata.indicator
-        assert indicator is expected
-        assert str(record[0].message) == warning_msg

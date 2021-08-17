@@ -51,10 +51,6 @@ class BehaviorJsonExtractor(BehaviorDataExtractorBase):
         """Get the age code of the subject (ie P123)"""
         return self.data['age']
 
-    def get_stimulus_name(self) -> str:
-        """Get the name of the stimulus presented for the experiment"""
-        return self.data['stimulus_name']
-
     def get_reporter_line(self) -> str:
         """Get the (gene) reporter line for the subject associated with an
         experiment"""

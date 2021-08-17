@@ -22,11 +22,25 @@ class Manifest(object):
         A ''.read()''-supporting file-like object containing
         a JSON document to be deserialized (i.e. same as the
         first argument to json.load)
+    use_static_project_dir: bool
+        When determining what the local path of a remote resource
+        (data or metadata file) should be, the Manifest class will typically
+        create a versioned project subdirectory under the user provided
+        `cache_dir` (e.g. f"{cache_dir}/{project_name}-{manifest_version}")
+        to allow the possibility of multiple manifest (and data) versions to be
+        used. In certain cases, like when using a project's s3 bucket
+        directly as the cache_dir, the project directory name needs to be
+        static (e.g. f"{cache_dir}/{project_name}"). When set to True,
+        the Manifest class will use a static project directory to determine
+        local paths for remote resources. Defaults to False.
     """
 
-    def __init__(self,
-                 cache_dir: Union[str, pathlib.Path],
-                 json_input):
+    def __init__(
+        self,
+        cache_dir: Union[str, pathlib.Path],
+        json_input,
+        use_static_project_dir: bool = False
+    ):
         if isinstance(cache_dir, str):
             self._cache_dir = pathlib.Path(cache_dir).resolve()
         elif isinstance(cache_dir, pathlib.Path):
@@ -35,6 +49,8 @@ class Manifest(object):
             raise ValueError("cache_dir must be either a str "
                              "or a pathlib.Path; "
                              f"got {type(cache_dir)}")
+
+        self._use_static_project_dir = use_static_project_dir
 
         self._data: Dict[str, Any] = json.load(json_input)
         if not isinstance(self._data, dict):
@@ -97,7 +113,7 @@ class Manifest(object):
                                 file_hash: str) -> CacheFileAttributes:
         """
         Create the cache_file_attributes describing a file.
-        This method does the work of assigning a local_path to a remote file.
+        This method does the work of assigning a local_path for a remote file.
 
         Parameters
         ----------
@@ -113,30 +129,41 @@ class Manifest(object):
         CacheFileAttributes
         """
 
-        # Paths should be built like:
-        # {cache_dir} / {project_name}-{manifest_version} / relative_path
-        # Ex: my_cache_dir/visual-behavior-ophys-1.0.0/behavior_sessions/etc...
+        if self._use_static_project_dir:
+            # If we only want to support 1 version of the project on disk
+            # like when mounting the project S3 bucket as a file system
+            project_dir_name = f"{self._project_name}"
+        else:
+            # If we want to support multiple versions of the project on disk
+            # paths should be built like:
+            # {cache_dir} / {project_name}-{manifest_version} / relative_path
+            # Example:
+            # my_cache_dir/visual-behavior-ophys-1.0.0/behavior_sessions/etc...
+            project_dir_name = f"{self._project_name}-{self._version}"
 
-        project_dir_name = f"{self._project_name}-{self._version}"
         project_dir = self._cache_dir / project_dir_name
 
         # The convention of the data release tool is to have all
         # relative_paths from remote start with the project name which
-        # we want to remove since we already specified a project directory
+        # we want to remove since we already specified a project_dir_name
         relative_path = relative_path_from_url(remote_path)
         shaved_rel_path = "/".join(relative_path.split("/")[1:])
 
         local_path = project_dir / shaved_rel_path
 
-        obj = CacheFileAttributes(remote_path,
-                                  version_id,
-                                  file_hash,
-                                  local_path)
+        obj = CacheFileAttributes(
+            remote_path,
+            version_id,
+            file_hash,
+            local_path
+        )
 
         return obj
 
-    def metadata_file_attributes(self,
-                                 metadata_file_name: str) -> CacheFileAttributes:  # noqa: E501
+    def metadata_file_attributes(
+        self,
+        metadata_file_name: str
+    ) -> CacheFileAttributes:
         """
         Return the CacheFileAttributes associated with a metadata file
 
