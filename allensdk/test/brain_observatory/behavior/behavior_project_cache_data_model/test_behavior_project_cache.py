@@ -60,16 +60,21 @@ def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame):
         raise RuntimeError(msg)
 
 
-@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
+@pytest.mark.parametrize("TempdirBehaviorCache, expected_ophys_session_table",
+                         [(True, True),
+                          (True, False),
+                          (False, True),
+                          (False, False)], indirect=True)
 def test_get_ophys_session_table(TempdirBehaviorCache,
                                  expected_ophys_session_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_session_table()
+    obtained = cache.get_ophys_session_table(
+                   passed_only=expected_ophys_session_table['passed_only'])
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_sessions").get("spec")
         assert os.path.exists(path)
 
-    safe_df_comparison(expected_ophys_session_table,
+    safe_df_comparison(expected_ophys_session_table['df'],
                        obtained)
 
 
@@ -163,7 +168,7 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache,
 def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache,
                                                expected_ophys_session_table):
 
-    raw = expected_ophys_session_table[['ophys_experiment_id']]
+    raw = expected_ophys_session_table['df'][['ophys_experiment_id']]
     data = []
     for session_id, exp_id_list in zip(raw.index.values,
                                        raw.ophys_experiment_id.values):

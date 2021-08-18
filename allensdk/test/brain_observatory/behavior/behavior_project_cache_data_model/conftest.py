@@ -472,28 +472,34 @@ def expected_ophys_session_table(ophys_session_table,
                                  intermediate_behavior_table,
                                  container_state_lookup,
                                  experiment_state_lookup,
-                                 ophys_experiment_to_container_map):
+                                 ophys_experiment_to_container_map,
+                                 request):
 
+    if hasattr(request, 'param'):
+        passed_only = request.param
+    else:
+        passed_only = True
     expected = ophys_session_table.copy(deep=True)
 
-    valid_containers = set()
-    valid_experiments = set()
-    for exp_id in ophys_experiment_to_container_map:
-        if experiment_state_lookup[exp_id] != 'passed':
-            continue
-        for container_id in ophys_experiment_to_container_map[exp_id]:
-            if container_state_lookup[container_id] == 'published':
-                valid_containers.add(container_id)
-                valid_experiments.add(exp_id)
+    if passed_only:
+        valid_containers = set()
+        valid_experiments = set()
+        for exp_id in ophys_experiment_to_container_map:
+            if experiment_state_lookup[exp_id] != 'passed':
+                continue
+            for container_id in ophys_experiment_to_container_map[exp_id]:
+                if container_state_lookup[container_id] == 'published':
+                    valid_containers.add(container_id)
+                    valid_experiments.add(exp_id)
 
-    # ophys_sessions_table does not appear to filter on
-    # whether or not an experiment is 'passed';
-    # that is probably supposed to happen at the level
-    # of the LIMS query (?)
-    for index_val in expected.index.values:
-        raw_containers = expected.loc[index_val]['ophys_container_id']
-        container_id = [c for c in raw_containers if c in valid_containers]
-        expected.at[index_val, 'ophys_container_id'] = container_id
+        # ophys_sessions_table does not appear to filter on
+        # whether or not an experiment is 'passed';
+        # that is probably supposed to happen at the level
+        # of the LIMS query (?)
+        for index_val in expected.index.values:
+            raw_containers = expected.loc[index_val]['ophys_container_id']
+            container_id = [c for c in raw_containers if c in valid_containers]
+            expected.at[index_val, 'ophys_container_id'] = container_id
 
     behavior_table = intermediate_behavior_table.copy(deep=True)
 
@@ -528,7 +534,7 @@ def expected_ophys_session_table(ophys_session_table,
             session_number.append(None)
     expected['session_number'] = session_number
 
-    return expected
+    return {'df': expected, 'passed_only': passed_only}
 
 
 @pytest.fixture
