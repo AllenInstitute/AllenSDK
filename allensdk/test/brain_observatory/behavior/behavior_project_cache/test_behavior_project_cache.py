@@ -379,27 +379,8 @@ def expected_behavior_session_table(behavior_session_table,
 def expected_experiments_table(ophys_experiments_table,
                                container_state_lookup,
                                experiment_state_lookup,
-                               behavior_session_data_fixture,
                                mock_api,
                                behavior_session_table):
-
-    """
-        datum = {'behavior_session_id': s_id,
-                 'session_name': s_name,
-                 'date_of_acquisition': date,
-                 'specimen_id': specimen_id,
-                 'session_type': s_type,
-                 'equipment_name': 'MESO2.0',
-                 'donor_id': 20+s_id,
-                 'full_genotype': genotype,
-                 'sex': ['m', 'f'][s_id % 2],
-                 'age_in_days': s_id*7,
-                 'foraging_id': s_id+30,
-                 'mouse_id': s_id+40,
-                 'reporter_line': reporter,
-                 'driver_line': driver}
-    """
-
 
     behavior_table = behavior_session_table.copy(deep=True)
     expected = ophys_experiments_table.copy(deep=True)
@@ -422,10 +403,6 @@ def expected_experiments_table(ophys_experiments_table,
         get_prior_exposures_to_omissions(
             df=behavior_table,
             fetch_api=mock_api)
-
-    behavior_id_to_session = dict()
-    for datum in behavior_session_data_fixture:
-        behavior_id_to_session[datum['behavior_session_id']] = datum
 
     expected = expected.query("experiment_workflow_state=='passed'")
     expected = expected.query("container_workflow_state=='published'")
@@ -452,13 +429,6 @@ def expected_experiments_table(ophys_experiments_table,
                                  ['session_name']],
                               on='behavior_session_id',
                               rsuffix='_behavior')
-
-
-    #beh_session_name = []
-    #for ii in expected['behavior_session_id'].values:
-    #    session = behavior_id_to_session[ii]
-    #    beh_session_name.append(session['session_name'])
-    #expected['session_name_behavior'] = beh_session_name
 
     session_number = []
     for v in expected['session_type'].values:
