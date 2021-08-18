@@ -725,7 +725,6 @@ def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache,
     pd.testing.assert_frame_equal(expected, actual)
 
 
-@pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
 def test_cloud_manifest_errors(TempdirBehaviorCache):
     """
