@@ -21,75 +21,104 @@ from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import \
-    get_prior_exposures_to_session_type, get_prior_exposures_to_image_set, \
+    get_prior_exposures_to_session_type, \
+    get_prior_exposures_to_image_set, \
     get_prior_exposures_to_omissions
 
 
 @pytest.fixture(scope='session')
 def behavior_session_id_list():
-    return [1, 2, 3 ,4]
+    return list(range(1,9))
 
 @pytest.fixture(scope='session')
-def session_name_list():
-    return ['session_1', 'session_2', 'session_3', 'session_4']
+def session_name_lookup(behavior_session_id_list):
+    return {ii: f'session_{ii}'
+            for ii in behavior_session_id_list}
 
 @pytest.fixture(scope='session')
-def date_of_acquisition_list():
-    return [np.datetime64(f'2020-02-{ii:02d}')
-            for ii in range(1, 5)]
-
-
-@pytest.fixture(scope='session')
-def session_type_list():
-    return ['TRAINING_1_gratings',
-            'OPHYS_1_images_A',
-            'OPHYS_1_images_B',
-            'TRAINING_1_gratings']
+def date_of_acquisition_lookup(behavior_session_id_list):
+    return {ii: np.datetime64(f'2020-02-{ii:02d}')
+            for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
-def project_code_list():
-    return ['a123', 'b456', 'c789', 'd012']
+def session_type_lookup(behavior_session_id_list):
+    rng = np.random.default_rng(871231)
+    possible = ('TRAINING_1_gratings',
+                'OPHYS_1_images_A',
+                'OPHYS_1_images_B')
+
+    vals = rng.choice(possible,
+                      size=len(behavior_session_id_list),
+                      replace=True)
+
+    return {ii: vv
+            for ii, vv in zip(behavior_session_id_list,
+                              vals)}
 
 @pytest.fixture(scope='session')
-def specimen_id_list():
-     return [111, 222, 333, 444]
+def project_code_lookup(behavior_session_id_list):
+    return {ii: 'code{ii}'
+            for ii in behavior_session_id_list}
+
+@pytest.fixture(scope='session')
+def specimen_id_lookup(behavior_session_id_list):
+     return {ii: 1111*ii
+             for ii in behavior_session_id_list}
+
+@pytest.fixture(scope='session')
+def genotype_lookup(behavior_session_id_list):
+    rng = np.random.default_rng(981232)
+    possible = ('foo-SlcCre',
+                'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+                'bar',
+                'foobar')
+    chosen = rng.choice(possible,
+                        size=len(behavior_session_id_list),
+                        replace=True)
+    return {ii: val
+            for ii, val in zip(behavior_session_id_list, chosen)}
+
+
+@pytest.fixture(scope='session')
+def reporter_lookup(behavior_session_id_list):
+    return {ii: f"Ai{90+ii}(TITL-GCaMP6f)"
+            for ii in behavior_session_id_list}
+
+@pytest.fixture(scope='session')
+def driver_lookup(behavior_session_id_list):
+    rng = np.random.default_rng(1723213)
+    possible = (["aa"],
+                ["aa", "bb"],
+                ["cc"],
+                ["cc", "dd"])
+    chosen = rng.choice(possible,
+                        size=len(behavior_session_id_list),
+                        replace=True)
+    return {ii: val
+            for ii, val in zip(behavior_session_id_list,
+                               chosen)}
 
 @pytest.fixture(scope='session')
 def behavior_session_data_fixture(behavior_session_id_list,
-                                  session_name_list,
-                                  date_of_acquisition_list,
-                                  session_type_list,
-                                  specimen_id_list):
+                                  session_name_lookup,
+                                  date_of_acquisition_lookup,
+                                  session_type_lookup,
+                                  specimen_id_lookup,
+                                  genotype_lookup,
+                                  reporter_lookup,
+                                  driver_lookup):
 
     behavior_session_list = []
-    for (s_id,
-         s_name,
-         s_type,
-         date,
-         genotype,
-         reporter,
-         driver,
-         specimen_id) in zip(
-                        behavior_session_id_list,
-                        session_name_list,
-                        session_type_list,
-                        date_of_acquisition_list,
-                          ('foo-SlcCre',
-                           'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
-                           'bar',
-                           'foobar'),
-                           ("Ai93(TITL-GCaMP6f)",
-                            "Ai94(TITL-GCaMP6f)",
-                            "Ai95(TITL-GCaMP6f)",
-                            "Ai96(TITL-GCaMP6f)"),
-                           (["aa"],
-                            ["aa", "bb"],
-                            ["cc"],
-                            ["cc", "dd"]),
-                           specimen_id_list):
+    for s_id in behavior_session_id_list:
 
-        date = np.datetime64(f'2020-02-{s_id:02d}')
+        genotype = genotype_lookup[s_id]
+        driver = driver_lookup[s_id]
+        reporter = reporter_lookup[s_id]
+        date = date_of_acquisition_lookup[s_id]
+        specimen_id = specimen_id_lookup[s_id]
+        s_name = session_name_lookup[s_id]
+        s_type = session_type_lookup[s_id]
         datum = {'behavior_session_id': s_id,
                  'session_name': s_name,
                  'date_of_acquisition': date,
@@ -110,11 +139,27 @@ def behavior_session_data_fixture(behavior_session_id_list,
     return behavior_session_list
 
 @pytest.fixture(scope='session')
-def ophys_session_to_experiment_map():
+def behavior_session_to_ophys_session_map(behavior_session_id_list):
     lookup = dict()
-    lookup[88] = list(range(1000, 1005))
-    lookup[89] = list(range(1005, 1010))
-    lookup[90] = list(range(1010, 1015))
+    ophys_id = 88
+    for ii in range(0, len(behavior_session_id_list)):
+        if ii%3 == 0:
+            continue
+        lookup[behavior_session_id_list[ii]] = ophys_id
+        ophys_id += 1
+    return lookup
+
+@pytest.fixture(scope='session')
+def ophys_session_to_experiment_map(behavior_session_to_ophys_session_map):
+    lookup = dict()
+    i0 = 1000
+    dd = 5
+    ophys_vals = list(behavior_session_to_ophys_session_map.values())
+    ophys_vals.sort()
+    for ii in ophys_vals:
+        lookup[ii] = list(range(i0, i0+dd))
+        i0 += dd
+
     return lookup
 
 
@@ -136,30 +181,33 @@ def ophys_experiment_to_container_map(ophys_session_to_experiment_map):
 
 
 @pytest.fixture(scope='session')
-def ophys_session_data_fixture(behavior_session_id_list,
-                               project_code_list,
-                               session_name_list,
-                               date_of_acquisition_list,
-                               specimen_id_list,
-                               session_type_list,
+def ophys_session_data_fixture(project_code_lookup,
+                               session_name_lookup,
+                               date_of_acquisition_lookup,
+                               specimen_id_lookup,
+                               session_type_lookup,
                                ophys_session_to_experiment_map,
-                               ophys_experiment_to_container_map):
+                               ophys_experiment_to_container_map,
+                               behavior_session_to_ophys_session_map):
     ophys_session_list = []
     ophys_session_id_list = list(ophys_session_to_experiment_map.keys())
     ophys_session_id_list.sort()
-    for ii, o_session in zip((0, 1, 3), ophys_session_id_list):
+    for beh in behavior_session_to_ophys_session_map:
+        o_session = behavior_session_to_ophys_session_map[beh]
         container_list = []
         for exp_id in ophys_session_to_experiment_map[o_session]:
             container_list += ophys_experiment_to_container_map[exp_id]
-        datum = {'behavior_session_id': behavior_session_id_list[ii],
-                 'project_code': project_code_list[ii],
-                 'date_of_acquisition': date_of_acquisition_list[ii],
-                 'session_name': session_name_list[ii],
-                 'session_type': session_type_list[ii],
+
+        datum = {'behavior_session_id': beh,
+                 'project_code': project_code_lookup[beh],
+                 'date_of_acquisition': date_of_acquisition_lookup[beh],
+                 'session_name': session_name_lookup[beh],
+                 'session_type': session_type_lookup[beh],
                  'ophys_experiment_id': ophys_session_to_experiment_map[o_session],
                  'ophys_container_id': container_list,
-                 'specimen_id': 9*behavior_session_id_list[ii],
+                 'specimen_id': 9*beh,
                  'ophys_session_id': o_session}
+
         ophys_session_list.append(datum)
     return ophys_session_list
 
@@ -195,16 +243,18 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
 
 
 @pytest.fixture(scope='session')
-def container_state_lookup(ophys_session_data_fixture):
+def container_state_lookup(ophys_experiment_to_container_map):
     rng = np.random.default_rng(66232)
-    container_id_list = []
-    for datum in ophys_session_data_fixture:
-        for container_id in datum['ophys_container_id']:
-            if container_id not in container_id_list:
-                container_id_list.append(container_id)
+    exp_id_list = list(ophys_experiment_to_container_map.keys())
+    exp_id_list.sort()
     lookup = dict()
-    for container_id in container_id_list:
-        lookup[container_id] = ['published', 'junk'][rng.integers(0, 2)]
+    for exp_id in exp_id_list:
+        local_container_list = ophys_experiment_to_container_map[exp_id]
+        for container_id in local_container_list:
+            assert container_id not in lookup
+            lookup[container_id] = 'junk'
+        good_container = rng.choice(local_container_list)
+        lookup[good_container] = 'published'
     return lookup
 
 
@@ -326,6 +376,69 @@ def expected_behavior_session_table(behavior_session_table,
     return df
 
 @pytest.fixture()
+def expected_experiments_table(ophys_experiments_table,
+                               container_state_lookup,
+                               experiment_state_lookup,
+                               behavior_session_data_fixture):
+
+    """
+        datum = {'behavior_session_id': s_id,
+                 'session_name': s_name,
+                 'date_of_acquisition': date,
+                 'specimen_id': specimen_id,
+                 'session_type': s_type,
+                 'equipment_name': 'MESO2.0',
+                 'donor_id': 20+s_id,
+                 'full_genotype': genotype,
+                 'sex': ['m', 'f'][s_id % 2],
+                 'age_in_days': s_id*7,
+                 'foraging_id': s_id+30,
+                 'mouse_id': s_id+40,
+                 'reporter_line': reporter,
+                 'driver_line': driver}
+    """
+
+    behavior_id_to_session = dict()
+    for datum in behavior_session_data_fixture:
+        behavior_id_to_session[datum['behavior_session_id']] = datum
+
+    expected = ophys_experiments_table.copy(deep=True)
+
+    expected = expected.query("experiment_workflow_state=='passed'")
+    expected = expected.query("container_workflow_state=='published'")
+
+    for col_name in ('equipment_name',
+                     'donor_id',
+                     'full_genotype',
+                     'mouse_id',
+                     'driver_line',
+                     'sex',
+                     'age_in_days',
+                     'foraging_id'):
+        values = []
+        for ii in expected['behavior_session_id'].values:
+            session = behavior_id_to_session[ii]
+            values.append(session[col_name])
+        expected[col_name] = values
+
+    session_number = []
+    for v in expected['session_type'].values:
+        if 'OPHYS' in v:
+            session_number.append(1)
+        else:
+            session_number.append(None)
+    expected['session_number'] = session_number
+
+    expected['prior_exposures_to_image_set'] = \
+            get_prior_exposures_to_image_set(expected)
+    expected = add_experience_level_to_experiment_table(expected)
+    expected = add_passive_flag_to_ophys_experiment_table(expected)
+    expected = add_image_set_to_experiment_table(expected)
+
+    return expected
+
+
+@pytest.fixture()
 def ophys_experiments_table(ophys_experiment_fixture):
     data = []
     index = []
@@ -375,6 +488,51 @@ def TempdirBehaviorCache(mock_api, request):
     temp_dir.cleanup()
 
 
+def safe_df_comparison(expected: pd.DataFrame, obtained:pd.DataFrame):
+    """
+    Compare two dataframes in a way that is agnostic to column order
+    and datatype of NULL values
+    """
+    msg = ''
+    if len(obtained.columns) != len(expected.columns):
+        msg += 'column mis-match\n'
+        msg += 'obtained columns\n'
+        msg += f'{obtained.columns}\n'
+        msg += 'expected columns\n'
+        msg += f'{expected.columns}\n'
+        raise RuntimeError(msg)
+
+    if not expected.index.equals(obtained.index):
+        msg += 'index mis-match\n'
+        msg += 'expected index\n'
+        msg += f'{expected.index}\n'
+        msg += 'obtained index\n'
+        msg += f'{obtained.index}\n'
+        raise RuntimeError(msg)
+
+    for col in expected.columns:
+        expected_null = expected[col].isnull()
+        obtained_null = obtained[col].isnull()
+        if not expected_null.equals(obtained_null):
+            msg += f'\n{col} not null at same point in '
+            msg += 'obtained and expected\n'
+            continue
+        expected_valid = expected[~expected_null]
+        obtained_valid = obtained[~obtained_null]
+        if not expected_valid.index.equals(obtained_valid.index):
+            msg += f'\nindex mismatch in non-null when checking '
+            msg += f'{col}\n'
+        for index_val in expected_valid.index.values:
+            e = expected_valid.at[index_val, col]
+            o = obtained_valid.at[index_val, col]
+            if not e==o:
+                msg += f'\n{col}\n'
+                msg += f'expected: {e}\n'
+                msg += f'obtained: {o}\n'
+    if msg != '':
+        raise RuntimeError(msg)
+
+
 @pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
 def test_get_ophys_session_table(TempdirBehaviorCache, session_table):
@@ -405,71 +563,19 @@ def test_get_behavior_table(TempdirBehaviorCache,
         path = cache.manifest.path_info.get("behavior_sessions").get("spec")
         assert os.path.exists(path)
 
-    assert len(obtained.columns) == len(expected.columns)
-    assert expected.index.equals(obtained.index)
-    msg = ''
-    for col in expected.columns:
-        expected_null = expected[col].isnull()
-        obtained_null = obtained[col].isnull()
-        if not expected_null.equals(obtained_null):
-            msg += f'\n{col} not null at same point in '
-            msg += 'obtained and expected\n'
-            continue
-        expected_valid = expected[~expected_null]
-        obtained_valid = obtained[~obtained_null]
-        if not expected_valid.index.equals(obtained_valid.index):
-            msg += f'\nindex mismatch in non-null when checking '
-            msg += f'{col}\n'
-        for index_val in expected_valid.index.values:
-            e = expected_valid.at[index_val, col]
-            o = obtained_valid.at[index_val, col]
-            if not e==o:
-                msg += f'\n{col}\n'
-                msg += f'expected: {e}\n'
-                msg += f'obtained: {o}\n'
-    if msg != '':
-        raise RuntimeError(msg)
+    safe_df_comparison(expected, obtained)
 
 
-@pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-def test_get_experiments_table(TempdirBehaviorCache, experiments_table):
+def test_get_experiments_table(TempdirBehaviorCache,
+                               expected_experiments_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_experiment_table(passed_only=False)
+    obtained = cache.get_ophys_experiment_table(passed_only=True)
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_experiments").get("spec")
         assert os.path.exists(path)
 
-    expected_path = os.path.join(get_resources_dir(), 'project_metadata',
-                                 'expected')
-    expected = pd.read_pickle(os.path.join(expected_path,
-                                           'ophys_experiment_table.pkl'))
-
-    expected = add_experience_level_to_experiment_table(expected)
-    expected = add_passive_flag_to_ophys_experiment_table(expected)
-    expected = add_image_set_to_experiment_table(expected)
-
-    expected['experiment_workflow_state'] = ['passed',
-                                             'failed',
-                                             'passed']
-    expected['container_workflow_state'] = ['published',
-                                            'published',
-                                            'nonsense']
-
-    # pd.testing.assert_frame_equal and pd.DataFrame.equals
-    # return false if the columns are not in the same order
-    # in the two dataframes
-    assert len(expected.columns) == len(obtained.columns)
-    for column in expected.columns:
-        np.testing.assert_array_equal(expected[column].values,
-                                      obtained[column].values)
-
-    obtained = cache.get_ophys_experiment_table()
-    expected = expected.head(1)
-    assert len(expected.columns) == len(obtained.columns)
-    for column in expected.columns:
-        np.testing.assert_array_equal(expected[column].values,
-                                      obtained[column].values)
+    safe_df_comparison(expected_experiments_table, obtained)
 
 
 @pytest.mark.skip('SFD')
