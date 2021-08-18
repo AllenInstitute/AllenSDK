@@ -78,15 +78,21 @@ def test_get_ophys_session_table(TempdirBehaviorCache,
                        obtained)
 
 
-@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
+@pytest.mark.parametrize("TempdirBehaviorCache, "
+                         "expected_behavior_session_table",
+                         [(True, True),
+                          (True, False),
+                          (False, True),
+                          (False, False)], indirect=True)
 def test_get_behavior_table(TempdirBehaviorCache,
                             expected_behavior_session_table,
                             container_state_lookup,
                             experiment_state_lookup,
                             ophys_experiment_to_container_map):
     cache = TempdirBehaviorCache
-    obtained = cache.get_behavior_session_table()
-    expected = expected_behavior_session_table
+    obtained = cache.get_behavior_session_table(
+                    passed_only=expected_behavior_session_table['passed_only'])
+    expected = expected_behavior_session_table['df']
     if cache.cache:
         path = cache.manifest.path_info.get("behavior_sessions").get("spec")
         assert os.path.exists(path)

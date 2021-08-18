@@ -345,7 +345,13 @@ def expected_behavior_session_table(intermediate_behavior_table,
                                     mock_api,
                                     container_state_lookup,
                                     experiment_state_lookup,
-                                    ophys_experiment_to_container_map):
+                                    ophys_experiment_to_container_map,
+                                    request):
+
+    if hasattr(request, 'param'):
+        passed_only = request.param
+    else:
+        passed_only = True
 
     df = intermediate_behavior_table.copy(deep=True)
 
@@ -380,11 +386,14 @@ def expected_behavior_session_table(intermediate_behavior_table,
         for exp_id in ophys_session['ophys_experiment_id']:
             # because SessionsTable does not filter on experiment state
             exp_id_list.add(exp_id)
-            if experiment_state_lookup[exp_id] != 'passed':
+            if experiment_state_lookup[exp_id] != 'passed' and passed_only:
                 continue
             for container_id in ophys_experiment_to_container_map[exp_id]:
-                if container_state_lookup[container_id] == 'published':
+                is_published = (container_state_lookup[container_id]
+                                == 'published')
+                if is_published or not passed_only:
                     container_id_list.add(container_id)
+
         exp_id_list = list(exp_id_list)
         exp_id_list.sort()
         container_id_list = list(container_id_list)
@@ -396,7 +405,7 @@ def expected_behavior_session_table(intermediate_behavior_table,
 
     df['ophys_session_id'] = df['ophys_session_id'].astype(float)
 
-    return df
+    return {'df': df, 'passed_only': passed_only}
 
 
 @pytest.fixture()
