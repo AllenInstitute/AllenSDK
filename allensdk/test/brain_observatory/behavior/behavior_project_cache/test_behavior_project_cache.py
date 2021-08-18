@@ -704,15 +704,24 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache,
     assert [expected_first[0]]*4 == caplog.record_tuples
 
 
-@pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache):
-    expected = (pd.DataFrame({"ophys_session_id": [1, 1],
-                              "ophys_experiment_id": [5, 6]})
-                .set_index("ophys_experiment_id"))
+def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache,
+                                               expected_ophys_session_table):
+
+    raw = expected_ophys_session_table[['ophys_experiment_id']]
+    data = []
+    for session_id, exp_id_list in zip(raw.index.values,
+                                       raw.ophys_experiment_id.values):
+        for exp_id in exp_id_list:
+            data.append({'ophys_session_id': session_id,
+                         'ophys_experiment_id': exp_id})
+
+    expected = pd.DataFrame(data).set_index('ophys_experiment_id')
+
     actual = TempdirBehaviorCache.get_ophys_session_table(
         index_column="ophys_experiment_id")[
         ["ophys_session_id"]]
+
     pd.testing.assert_frame_equal(expected, actual)
 
 
