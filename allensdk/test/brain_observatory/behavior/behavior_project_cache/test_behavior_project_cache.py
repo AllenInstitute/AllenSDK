@@ -646,9 +646,8 @@ def test_get_experiments_table(TempdirBehaviorCache,
     safe_df_comparison(expected_experiments_table, obtained)
 
 
-@pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
-def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
+def test_session_table_reads_from_cache(TempdirBehaviorCache,
                                         caplog):
     caplog.set_level(logging.INFO, logger="call_caching")
     cache = TempdirBehaviorCache
@@ -663,11 +662,17 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
         ('call_caching', logging.INFO, 'No cache file found.'),
         ('call_caching', logging.INFO, 'Fetching data from remote'),
         ('call_caching', logging.INFO, 'Writing data to cache'),
+        ('call_caching', logging.INFO, 'Reading data from cache'),
+        ('call_caching', logging.INFO, 'Reading data from cache'),
+        ('call_caching', logging.INFO, 'No cache file found.'),
+        ('call_caching', logging.INFO, 'Fetching data from remote'),
+        ('call_caching', logging.INFO, 'Writing data to cache'),
+        ('call_caching', logging.INFO, 'Reading data from cache'),
         ('call_caching', logging.INFO, 'Reading data from cache')]
     assert expected_first == caplog.record_tuples
     caplog.clear()
     cache.get_ophys_session_table()
-    assert [expected_first[0], expected_first[-1]] == caplog.record_tuples
+    assert [expected_first[0]]*4 == caplog.record_tuples
 
 
 @pytest.mark.skip('SFD')
