@@ -379,7 +379,9 @@ def expected_behavior_session_table(behavior_session_table,
 def expected_experiments_table(ophys_experiments_table,
                                container_state_lookup,
                                experiment_state_lookup,
-                               behavior_session_data_fixture):
+                               behavior_session_data_fixture,
+                               mock_api,
+                               behavior_session_table):
 
     """
         datum = {'behavior_session_id': s_id,
@@ -398,28 +400,65 @@ def expected_experiments_table(ophys_experiments_table,
                  'driver_line': driver}
     """
 
+
+    behavior_table = behavior_session_table.copy(deep=True)
+    expected = ophys_experiments_table.copy(deep=True)
+
+    behavior_table['reporter_line'] = \
+        behavior_table['reporter_line'].apply(
+            BehaviorMetadata.parse_reporter_line)
+    behavior_table['cre_line'] = \
+        behavior_table['full_genotype'].apply(
+            BehaviorMetadata.parse_cre_line)
+    behavior_table['indicator'] = \
+        behavior_table['reporter_line'].apply(
+            BehaviorMetadata.parse_indicator)
+
+    behavior_table['prior_exposures_to_session_type'] = \
+        get_prior_exposures_to_session_type(df=behavior_table)
+    behavior_table['prior_exposures_to_image_set'] = \
+        get_prior_exposures_to_image_set(df=behavior_table)
+    behavior_table['prior_exposures_to_omissions'] = \
+        get_prior_exposures_to_omissions(
+            df=behavior_table,
+            fetch_api=mock_api)
+
     behavior_id_to_session = dict()
     for datum in behavior_session_data_fixture:
         behavior_id_to_session[datum['behavior_session_id']] = datum
 
-    expected = ophys_experiments_table.copy(deep=True)
-
     expected = expected.query("experiment_workflow_state=='passed'")
     expected = expected.query("container_workflow_state=='published'")
 
-    for col_name in ('equipment_name',
-                     'donor_id',
-                     'full_genotype',
-                     'mouse_id',
-                     'driver_line',
-                     'sex',
-                     'age_in_days',
-                     'foraging_id'):
-        values = []
-        for ii in expected['behavior_session_id'].values:
-            session = behavior_id_to_session[ii]
-            values.append(session[col_name])
-        expected[col_name] = values
+    expected = expected.join(behavior_table[
+                                 ['equipment_name',
+                                  'donor_id',
+                                  'full_genotype',
+                                  'mouse_id',
+                                  'driver_line',
+                                  'sex',
+                                  'age_in_days',
+                                  'foraging_id',
+                                  'reporter_line',
+                                  'specimen_id',
+                                  'prior_exposures_to_session_type',
+                                  'prior_exposures_to_image_set',
+                                  'prior_exposures_to_omissions',
+                                  'indicator',
+                                  'cre_line']],
+                              on='behavior_session_id')
+
+    expected = expected.join(behavior_table[
+                                 ['session_name']],
+                              on='behavior_session_id',
+                              rsuffix='_behavior')
+
+
+    #beh_session_name = []
+    #for ii in expected['behavior_session_id'].values:
+    #    session = behavior_id_to_session[ii]
+    #    beh_session_name.append(session['session_name'])
+    #expected['session_name_behavior'] = beh_session_name
 
     session_number = []
     for v in expected['session_type'].values:
@@ -429,11 +468,12 @@ def expected_experiments_table(ophys_experiments_table,
             session_number.append(None)
     expected['session_number'] = session_number
 
-    expected['prior_exposures_to_image_set'] = \
-            get_prior_exposures_to_image_set(expected)
     expected = add_experience_level_to_experiment_table(expected)
     expected = add_passive_flag_to_ophys_experiment_table(expected)
     expected = add_image_set_to_experiment_table(expected)
+
+    expected['session_name_ophys'] = expected['session_name']
+    expected = expected.drop(['session_name'], axis=1)
 
     return expected
 
@@ -500,6 +540,17 @@ def safe_df_comparison(expected: pd.DataFrame, obtained:pd.DataFrame):
         msg += f'{obtained.columns}\n'
         msg += 'expected columns\n'
         msg += f'{expected.columns}\n'
+
+        missing_from_obtained = []
+        for c in expected.columns:
+            if c not in obtained.columns:
+                missing_from_obtained.append(c)
+        missing_from_expected = []
+        for c in obtained.columns:
+            if c not in expected.columns:
+                missing_from_expected.append(c)
+        msg += f'missing from obtained\n{missing_from_obtained}\n'
+        msg += f'missing from expected\n{missing_from_expected}\n'
         raise RuntimeError(msg)
 
     if not expected.index.equals(obtained.index):
