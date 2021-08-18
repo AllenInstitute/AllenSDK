@@ -26,23 +26,35 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 
 @pytest.fixture(scope='session')
 def behavior_session_id_list():
+    """
+    List of behavior_session_id; the most fundamental fixture
+    """
     return list(range(1, 9))
 
 
 @pytest.fixture(scope='session')
 def session_name_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to session_name
+    """
     return {ii: f'session_{ii}'
             for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
 def date_of_acquisition_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to date of acquisition
+    """
     return {ii: np.datetime64(f'2020-02-{ii:02d}')
             for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
 def session_type_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to session_type
+    """
     rng = np.random.default_rng(871231)
     possible = ('TRAINING_1_gratings',
                 'OPHYS_1_images_A',
@@ -59,18 +71,27 @@ def session_type_lookup(behavior_session_id_list):
 
 @pytest.fixture(scope='session')
 def project_code_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to project_code
+    """
     return {ii: 'code{ii}'
             for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
 def specimen_id_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to specimen_id
+    """
     return {ii: 1111*ii
             for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
 def genotype_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to full_genotype
+    """
     rng = np.random.default_rng(981232)
     possible = ('foo-SlcCre',
                 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
@@ -85,12 +106,19 @@ def genotype_lookup(behavior_session_id_list):
 
 @pytest.fixture(scope='session')
 def reporter_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to reporter_line
+    """
     return {ii: f"Ai{90+ii}(TITL-GCaMP6f)"
             for ii in behavior_session_id_list}
 
 
 @pytest.fixture(scope='session')
 def driver_lookup(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to driver_line.
+    Note: driver_line is a list of strings
+    """
     rng = np.random.default_rng(1723213)
     possible = (["aa"],
                 ["aa", "bb"],
@@ -113,6 +141,11 @@ def behavior_session_data_fixture(behavior_session_id_list,
                                   genotype_lookup,
                                   reporter_lookup,
                                   driver_lookup):
+    """
+    List of dicts. Each dict is an entry in the raw
+    behavior_session_table as would be returned by the
+    fetch_api
+    """
 
     behavior_session_list = []
     for s_id in behavior_session_id_list:
@@ -146,6 +179,11 @@ def behavior_session_data_fixture(behavior_session_id_list,
 
 @pytest.fixture(scope='session')
 def behavior_session_to_ophys_session_map(behavior_session_id_list):
+    """
+    Dict mapping behavior_session_id to ophys_session_id.
+    This is a one-to-one mapping, though not all behavior_sessions
+    have corresponding ophys_sessions
+    """
     lookup = dict()
     ophys_id = 88
     for ii in range(0, len(behavior_session_id_list)):
@@ -158,6 +196,10 @@ def behavior_session_to_ophys_session_map(behavior_session_id_list):
 
 @pytest.fixture(scope='session')
 def ophys_session_to_experiment_map(behavior_session_to_ophys_session_map):
+    """
+    Dict mapping ophys_session_id to a list of ophys_experiment_ids
+    (this is a one-to-many relationship)
+    """
     lookup = dict()
     i0 = 1000
     dd = 5
@@ -172,6 +214,10 @@ def ophys_session_to_experiment_map(behavior_session_to_ophys_session_map):
 
 @pytest.fixture(scope='session')
 def ophys_experiment_to_container_map(ophys_session_to_experiment_map):
+    """
+    Dict mapping ophys_experiment_id to a list of ophys_container_ids
+    (this is a one-to-many relationship)
+    """
     lookup = dict()
     container_id = 4000
     key_list = list(ophys_session_to_experiment_map.keys())
@@ -196,6 +242,12 @@ def ophys_session_data_fixture(project_code_lookup,
                                ophys_session_to_experiment_map,
                                ophys_experiment_to_container_map,
                                behavior_session_to_ophys_session_map):
+    """
+    List of dicts.
+    Each dict is one entry in the ophys_session_table as returned
+    by the fetch_api.
+    """
+
     ophys_session_list = []
     ophys_session_id_list = list(ophys_session_to_experiment_map.keys())
     ophys_session_id_list.sort()
@@ -225,7 +277,11 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
                              experiment_state_lookup,
                              container_state_lookup,
                              ophys_experiment_to_container_map):
-
+    """
+    List of dicts.
+    Each dict is an entry in the ophys_experiment_table as returned
+    by the fetch_api.
+    """
     rng = np.random.default_rng(182312)
 
     isi_id = 4000
@@ -258,6 +314,11 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
 
 @pytest.fixture(scope='session')
 def container_state_lookup(ophys_experiment_to_container_map):
+    """
+    Dict mapping ophys_container_id to container_workflow_state
+    Note: each ophys_experiment_id can only be associated with
+    one 'published' ophys_container.
+    """
     rng = np.random.default_rng(66232)
     exp_id_list = list(ophys_experiment_to_container_map.keys())
     exp_id_list.sort()
@@ -274,6 +335,9 @@ def container_state_lookup(ophys_experiment_to_container_map):
 
 @pytest.fixture(scope='session')
 def experiment_state_lookup(ophys_session_data_fixture):
+    """
+    Dict mapping ophys_experiment_id to the experiment_workflow_state
+    """
     rng = np.random.default_rng(772312)
     exp_id_list = []
     for datum in ophys_session_data_fixture:
@@ -288,6 +352,9 @@ def experiment_state_lookup(ophys_session_data_fixture):
 
 @pytest.fixture()
 def ophys_session_table(ophys_session_data_fixture):
+    """
+    The ophys_session_table dataframe as returned by the fetch_api
+    """
     data = []
     index = []
     for datum in ophys_session_data_fixture:
@@ -303,6 +370,10 @@ def ophys_session_table(ophys_session_data_fixture):
 
 @pytest.fixture()
 def behavior_session_table(behavior_session_data_fixture):
+    """
+    The behavior_session_table dataframe as returned by the
+    fetch_api
+    """
     data = []
     index = []
     for datum in behavior_session_data_fixture:
@@ -319,6 +390,11 @@ def behavior_session_table(behavior_session_data_fixture):
 @pytest.fixture()
 def intermediate_behavior_table(behavior_session_table,
                                 mock_api):
+    """
+    A dataframe created by adding/transfrming columns in
+    behavior_session_table. This table is used to produce the
+    expected experiments_table and ophys_session_table.
+    """
     df = behavior_session_table.copy(deep=True)
 
     df['reporter_line'] = df['reporter_line'].apply(
@@ -347,7 +423,16 @@ def expected_behavior_session_table(intermediate_behavior_table,
                                     experiment_state_lookup,
                                     ophys_experiment_to_container_map,
                                     request):
+    """
+    The behavior_session_table as returned by the user-facing methods
+    in behavior_project_cache.
 
+    Note: request specifies whether the table was produced with
+    passed_only = True or False. The actual object returned by
+    this fixture is a dict. 'df' points to the dataframe.
+    'passed_only' points to the value of passed_only used to
+    generate the dataframe.
+    """
     if hasattr(request, 'param'):
         passed_only = request.param
     else:
@@ -414,6 +499,16 @@ def expected_experiments_table(ophys_experiments_table,
                                experiment_state_lookup,
                                intermediate_behavior_table,
                                request):
+    """
+    The experiments_table as returned by the user-facing methods
+    in the behavior_project_cache
+
+    Note: request specifies whether the table was produced with
+    passed_only = True or False. The actual object returned by
+    this fixture is a dict. 'df' points to the dataframe.
+    'passed_only' points to the value of passed_only used to
+    generate the dataframe.
+    """
 
     if hasattr(request, 'param'):
         passed_only = request.param
@@ -470,6 +565,10 @@ def expected_experiments_table(ophys_experiments_table,
 
 @pytest.fixture()
 def ophys_experiments_table(ophys_experiment_fixture):
+    """
+    The ophys_experiments_table as returned by the fetch_api
+    (a dataframe)
+    """
     data = []
     index = []
     for datum in ophys_experiment_fixture:
@@ -490,7 +589,16 @@ def expected_ophys_session_table(ophys_session_table,
                                  experiment_state_lookup,
                                  ophys_experiment_to_container_map,
                                  request):
+    """
+    The ophys_session_table as returned by the user-facing methods
+    in the behavior_project_cache.
 
+    Note: request specifies whether the table was produced with
+    passed_only = True or False. The actual object returned by
+    this fixture is a dict. 'df' points to the dataframe.
+    'passed_only' points to the value of passed_only used to
+    generate the dataframe.
+    """
     if hasattr(request, 'param'):
         passed_only = request.param
     else:
