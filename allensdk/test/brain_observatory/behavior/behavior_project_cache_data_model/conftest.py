@@ -412,13 +412,20 @@ def expected_behavior_session_table(intermediate_behavior_table,
 def expected_experiments_table(ophys_experiments_table,
                                container_state_lookup,
                                experiment_state_lookup,
-                               intermediate_behavior_table):
+                               intermediate_behavior_table,
+                               request):
+
+    if hasattr(request, 'param'):
+        passed_only = request.param
+    else:
+        passed_only = True
 
     behavior_table = intermediate_behavior_table.copy(deep=True)
     expected = ophys_experiments_table.copy(deep=True)
 
-    expected = expected.query("experiment_workflow_state=='passed'")
-    expected = expected.query("container_workflow_state=='published'")
+    if passed_only:
+        expected = expected.query("experiment_workflow_state=='passed'")
+        expected = expected.query("container_workflow_state=='published'")
 
     expected = expected.join(behavior_table[
                                  ['equipment_name',
@@ -458,7 +465,7 @@ def expected_experiments_table(ophys_experiments_table,
     expected['session_name_ophys'] = expected['session_name']
     expected = expected.drop(['session_name'], axis=1)
 
-    return expected
+    return {'df': expected, 'passed_only': passed_only}
 
 
 @pytest.fixture()

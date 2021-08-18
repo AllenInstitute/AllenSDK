@@ -1,6 +1,7 @@
 import pytest
 import pandas as pd
 import logging
+import numpy as np
 import os
 
 
@@ -52,6 +53,10 @@ def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame):
         for index_val in expected_valid.index.values:
             e = expected_valid.at[index_val, col]
             o = obtained_valid.at[index_val, col]
+            if isinstance(e, np.ndarray):
+                e = list(e)
+            if isinstance(o, np.ndarray):
+                o = list(o)
             if not e == o:
                 msg += f'\n{col}\n'
                 msg += f'expected: {e}\n'
@@ -100,16 +105,22 @@ def test_get_behavior_table(TempdirBehaviorCache,
     safe_df_comparison(expected, obtained)
 
 
-@pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
+@pytest.mark.parametrize("TempdirBehaviorCache, "
+                         "expected_experiments_table",
+                         [(True, True),
+                          (True, False),
+                          (False, True),
+                          (False, False)], indirect=True)
 def test_get_experiments_table(TempdirBehaviorCache,
                                expected_experiments_table):
     cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_experiment_table(passed_only=True)
+    obtained = cache.get_ophys_experiment_table(
+                     passed_only=expected_experiments_table['passed_only'])
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_experiments").get("spec")
         assert os.path.exists(path)
 
-    safe_df_comparison(expected_experiments_table, obtained)
+    safe_df_comparison(expected_experiments_table['df'], obtained)
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
