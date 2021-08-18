@@ -303,12 +303,8 @@ def behavior_session_table(behavior_session_data_fixture):
 
 
 @pytest.fixture()
-def expected_behavior_session_table(behavior_session_table,
-                                    ophys_session_data_fixture,
-                                    mock_api,
-                                    container_state_lookup,
-                                    experiment_state_lookup,
-                                    ophys_experiment_to_container_map):
+def intermediate_behavior_table(behavior_session_table,
+                                mock_api):
     df = behavior_session_table.copy(deep=True)
 
     df['reporter_line'] = df['reporter_line'].apply(
@@ -326,6 +322,17 @@ def expected_behavior_session_table(behavior_session_table,
         get_prior_exposures_to_omissions(
             df=df,
             fetch_api=mock_api)
+    return df
+
+@pytest.fixture()
+def expected_behavior_session_table(intermediate_behavior_table,
+                                    ophys_session_data_fixture,
+                                    mock_api,
+                                    container_state_lookup,
+                                    experiment_state_lookup,
+                                    ophys_experiment_to_container_map):
+
+    df = intermediate_behavior_table.copy(deep=True)
 
     df['session_name_behavior'] = df['session_name']
     df = df.drop(['session_name'], axis=1)
@@ -379,30 +386,10 @@ def expected_behavior_session_table(behavior_session_table,
 def expected_experiments_table(ophys_experiments_table,
                                container_state_lookup,
                                experiment_state_lookup,
-                               mock_api,
-                               behavior_session_table):
+                               intermediate_behavior_table):
 
-    behavior_table = behavior_session_table.copy(deep=True)
+    behavior_table = intermediate_behavior_table.copy(deep=True)
     expected = ophys_experiments_table.copy(deep=True)
-
-    behavior_table['reporter_line'] = \
-        behavior_table['reporter_line'].apply(
-            BehaviorMetadata.parse_reporter_line)
-    behavior_table['cre_line'] = \
-        behavior_table['full_genotype'].apply(
-            BehaviorMetadata.parse_cre_line)
-    behavior_table['indicator'] = \
-        behavior_table['reporter_line'].apply(
-            BehaviorMetadata.parse_indicator)
-
-    behavior_table['prior_exposures_to_session_type'] = \
-        get_prior_exposures_to_session_type(df=behavior_table)
-    behavior_table['prior_exposures_to_image_set'] = \
-        get_prior_exposures_to_image_set(df=behavior_table)
-    behavior_table['prior_exposures_to_omissions'] = \
-        get_prior_exposures_to_omissions(
-            df=behavior_table,
-            fetch_api=mock_api)
 
     expected = expected.query("experiment_workflow_state=='passed'")
     expected = expected.query("container_workflow_state=='published'")
@@ -465,7 +452,7 @@ def ophys_experiments_table(ophys_experiment_fixture):
 
 @pytest.fixture()
 def expected_ophys_session_table(ophys_session_table,
-                                 behavior_session_table,
+                                 intermediate_behavior_table,
                                  container_state_lookup,
                                  experiment_state_lookup,
                                  ophys_experiment_to_container_map):
@@ -491,26 +478,7 @@ def expected_ophys_session_table(ophys_session_table,
         container_id = [c for c in raw_containers if c in valid_containers]
         expected.at[index_val, 'ophys_container_id'] = container_id
 
-    behavior_table = behavior_session_table.copy(deep=True)
-
-    behavior_table['reporter_line'] = \
-        behavior_table['reporter_line'].apply(
-            BehaviorMetadata.parse_reporter_line)
-    behavior_table['cre_line'] = \
-        behavior_table['full_genotype'].apply(
-            BehaviorMetadata.parse_cre_line)
-    behavior_table['indicator'] = \
-        behavior_table['reporter_line'].apply(
-            BehaviorMetadata.parse_indicator)
-
-    behavior_table['prior_exposures_to_session_type'] = \
-        get_prior_exposures_to_session_type(df=behavior_table)
-    behavior_table['prior_exposures_to_image_set'] = \
-        get_prior_exposures_to_image_set(df=behavior_table)
-    behavior_table['prior_exposures_to_omissions'] = \
-        get_prior_exposures_to_omissions(
-            df=behavior_table,
-            fetch_api=mock_api)
+    behavior_table = intermediate_behavior_table.copy(deep=True)
 
     expected = expected.join(behavior_table[
                                  ['equipment_name',
