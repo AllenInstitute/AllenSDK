@@ -103,12 +103,8 @@ class TestJson:
 class TestNWB:
     @classmethod
     def setup_class(cls):
-        tj = TestJson()
-        tj.setup_class()
         cls.ophys_timestamps = OphysTimestamps(
             timestamps=np.array([.1, .2, .3]), number_of_frames=3)
-        cls.cell_specimen_table = CellSpecimens.from_json(
-            dict_repr=tj.dict_repr, ophys_timestamps=cls.ophys_timestamps)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -117,23 +113,46 @@ class TestNWB:
             session_start_time=datetime.now()
         )
 
+        tj = TestJson()
+        tj.setup_class()
+        self.cell_specimens = CellSpecimens.from_json(
+            dict_repr=tj.dict_repr, ophys_timestamps=self.ophys_timestamps)
+
         # Write metadata, since csp requires other metdata
         tbom = TestBOM()
         tbom.setup_class()
         bom = tbom.meta
         bom.to_nwb(nwbfile=self.nwbfile)
 
+    @pytest.mark.parametrize('filter_invalid_rois', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
-        self.cell_specimen_table.to_nwb(nwbfile=self.nwbfile,
-                                        ophys_timestamps=self.ophys_timestamps)
+                            data_object_roundtrip_fixture,
+                            filter_invalid_rois):
+        csp = self.cell_specimens._cell_specimen_table
+
+        if filter_invalid_rois:
+            # changing one of the rois to be valid
+            csp.loc[1086633332, 'valid_roi'] = True
+
+        valid_roi_id = csp[csp['valid_roi']]['cell_roi_id']
+
+        self.cell_specimens.to_nwb(nwbfile=self.nwbfile,
+                                   ophys_timestamps=self.ophys_timestamps)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=CellSpecimens)
+                data_object_cls=CellSpecimens,
+                filter_invalid_rois=filter_invalid_rois)
         else:
-            obt = self.cell_specimen_table.from_nwb(nwbfile=self.nwbfile)
+            obt = self.cell_specimens.from_nwb(
+                nwbfile=self.nwbfile, filter_invalid_rois=filter_invalid_rois)
 
-        assert obt == self.cell_specimen_table
+        if filter_invalid_rois:
+            self.cell_specimens._cell_specimen_table = \
+                self.cell_specimens._cell_specimen_table[
+                    self.cell_specimens._cell_specimen_table['cell_roi_id']
+                        .isin(valid_roi_id)]
+
+        assert obt == self.cell_specimens

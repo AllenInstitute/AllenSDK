@@ -305,9 +305,10 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
         df = _read_table(cell_specimen_table=cell_specimen_table)
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
-        dff_traces = DFFTraces.from_nwb(nwbfile=nwbfile)
+        dff_traces = DFFTraces.from_nwb(
+            nwbfile=nwbfile, filter_to_roi_ids=df['cell_roi_id'].values)
         corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
-            nwbfile=nwbfile)
+            nwbfile=nwbfile, filter_to_roi_ids=df['cell_roi_id'].values)
 
         def _get_events():
             ep = EventsParams() if events_params is None else events_params
