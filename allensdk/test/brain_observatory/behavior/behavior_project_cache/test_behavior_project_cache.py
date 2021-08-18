@@ -463,6 +463,89 @@ def ophys_experiments_table(ophys_experiment_fixture):
     return df
 
 
+@pytest.fixture()
+def expected_ophys_session_table(ophys_session_table,
+                                 behavior_session_table,
+                                 container_state_lookup,
+                                 experiment_state_lookup,
+                                 ophys_experiment_to_container_map):
+
+    expected = ophys_session_table.copy(deep=True)
+
+    valid_containers = set()
+    valid_experiments = set()
+    for exp_id in ophys_experiment_to_container_map:
+        if experiment_state_lookup[exp_id] != 'passed':
+            continue
+        for container_id in ophys_experiment_to_container_map[exp_id]:
+            if container_state_lookup[container_id] == 'published':
+                valid_containers.add(container_id)
+                valid_experiments.add(exp_id)
+
+    # ophys_sessions_table does not appear to filter on
+    # whether or not an experiment is 'passed';
+    # that is probably supposed to happen at the level
+    # of the LIMS query (?)
+    for index_val in expected.index.values:
+        raw_containers = expected.loc[index_val]['ophys_container_id']
+        container_id = [c for c in raw_containers if c in valid_containers]
+        expected.at[index_val, 'ophys_container_id'] = container_id
+
+    behavior_table = behavior_session_table.copy(deep=True)
+
+    behavior_table['reporter_line'] = \
+        behavior_table['reporter_line'].apply(
+            BehaviorMetadata.parse_reporter_line)
+    behavior_table['cre_line'] = \
+        behavior_table['full_genotype'].apply(
+            BehaviorMetadata.parse_cre_line)
+    behavior_table['indicator'] = \
+        behavior_table['reporter_line'].apply(
+            BehaviorMetadata.parse_indicator)
+
+    behavior_table['prior_exposures_to_session_type'] = \
+        get_prior_exposures_to_session_type(df=behavior_table)
+    behavior_table['prior_exposures_to_image_set'] = \
+        get_prior_exposures_to_image_set(df=behavior_table)
+    behavior_table['prior_exposures_to_omissions'] = \
+        get_prior_exposures_to_omissions(
+            df=behavior_table,
+            fetch_api=mock_api)
+
+    expected = expected.join(behavior_table[
+                                 ['equipment_name',
+                                  'donor_id',
+                                  'full_genotype',
+                                  'mouse_id',
+                                  'driver_line',
+                                  'sex',
+                                  'age_in_days',
+                                  'foraging_id',
+                                  'reporter_line',
+                                  'prior_exposures_to_session_type',
+                                  'prior_exposures_to_image_set',
+                                  'prior_exposures_to_omissions',
+                                  'indicator',
+                                  'cre_line']],
+                              on='behavior_session_id')
+
+    expected = expected.join(
+                  behavior_table[['specimen_id', 'session_name']],
+                  on='behavior_session_id',
+                  rsuffix='_behavior',
+                  lsuffix='_ophys')
+
+    session_number = []
+    for v in expected['session_type'].values:
+        if 'OPHYS' in v:
+            session_number.append(1)
+        else:
+            session_number.append(None)
+    expected['session_number'] = session_number
+
+    return expected
+
+
 @pytest.fixture
 def mock_api(ophys_session_table,
              behavior_session_table,
@@ -554,21 +637,17 @@ def safe_df_comparison(expected: pd.DataFrame, obtained:pd.DataFrame):
         raise RuntimeError(msg)
 
 
-@pytest.mark.skip('SFD')
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
-def test_get_ophys_session_table(TempdirBehaviorCache, session_table):
+def test_get_ophys_session_table(TempdirBehaviorCache,
+                                 expected_ophys_session_table):
     cache = TempdirBehaviorCache
     obtained = cache.get_ophys_session_table()
     if cache.cache:
         path = cache.manifest.path_info.get("ophys_sessions").get("spec")
         assert os.path.exists(path)
 
-    expected_path = os.path.join(get_resources_dir(), 'project_metadata',
-                                 'expected')
-    expected = pd.read_pickle(os.path.join(expected_path,
-                                           'ophys_session_table.pkl'))
-
-    pd.testing.assert_frame_equal(expected, obtained)
+    safe_df_comparison(expected_ophys_session_table,
+                       obtained)
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
