@@ -4,7 +4,7 @@ import logging
 import os
 
 
-def safe_df_comparison(expected: pd.DataFrame, obtained:pd.DataFrame):
+def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame):
     """
     Compare two dataframes in a way that is agnostic to column order
     and datatype of NULL values
@@ -47,12 +47,12 @@ def safe_df_comparison(expected: pd.DataFrame, obtained:pd.DataFrame):
         expected_valid = expected[~expected_null]
         obtained_valid = obtained[~obtained_null]
         if not expected_valid.index.equals(obtained_valid.index):
-            msg += f'\nindex mismatch in non-null when checking '
+            msg += '\nindex mismatch in non-null when checking '
             msg += f'{col}\n'
         for index_val in expected_valid.index.values:
             e = expected_valid.at[index_val, col]
             o = obtained_valid.at[index_val, col]
-            if not e==o:
+            if not e == o:
                 msg += f'\n{col}\n'
                 msg += f'expected: {e}\n'
                 msg += f'obtained: {o}\n'

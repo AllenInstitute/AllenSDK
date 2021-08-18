@@ -4,11 +4,9 @@ import numpy as np
 import pytest
 import pandas as pd
 import tempfile
-import logging
 
 from allensdk.brain_observatory.behavior.behavior_project_cache \
     import VisualBehaviorOphysProjectCache
-from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.\
     tables.util.experiments_table_utils import (
@@ -28,12 +26,14 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 
 @pytest.fixture(scope='session')
 def behavior_session_id_list():
-    return list(range(1,9))
+    return list(range(1, 9))
+
 
 @pytest.fixture(scope='session')
 def session_name_lookup(behavior_session_id_list):
     return {ii: f'session_{ii}'
             for ii in behavior_session_id_list}
+
 
 @pytest.fixture(scope='session')
 def date_of_acquisition_lookup(behavior_session_id_list):
@@ -56,15 +56,18 @@ def session_type_lookup(behavior_session_id_list):
             for ii, vv in zip(behavior_session_id_list,
                               vals)}
 
+
 @pytest.fixture(scope='session')
 def project_code_lookup(behavior_session_id_list):
     return {ii: 'code{ii}'
             for ii in behavior_session_id_list}
 
+
 @pytest.fixture(scope='session')
 def specimen_id_lookup(behavior_session_id_list):
-     return {ii: 1111*ii
-             for ii in behavior_session_id_list}
+    return {ii: 1111*ii
+            for ii in behavior_session_id_list}
+
 
 @pytest.fixture(scope='session')
 def genotype_lookup(behavior_session_id_list):
@@ -85,6 +88,7 @@ def reporter_lookup(behavior_session_id_list):
     return {ii: f"Ai{90+ii}(TITL-GCaMP6f)"
             for ii in behavior_session_id_list}
 
+
 @pytest.fixture(scope='session')
 def driver_lookup(behavior_session_id_list):
     rng = np.random.default_rng(1723213)
@@ -98,6 +102,7 @@ def driver_lookup(behavior_session_id_list):
     return {ii: val
             for ii, val in zip(behavior_session_id_list,
                                chosen)}
+
 
 @pytest.fixture(scope='session')
 def behavior_session_data_fixture(behavior_session_id_list,
@@ -138,16 +143,18 @@ def behavior_session_data_fixture(behavior_session_id_list,
 
     return behavior_session_list
 
+
 @pytest.fixture(scope='session')
 def behavior_session_to_ophys_session_map(behavior_session_id_list):
     lookup = dict()
     ophys_id = 88
     for ii in range(0, len(behavior_session_id_list)):
-        if ii%3 == 0:
+        if ii % 3 == 0:
             continue
         lookup[behavior_session_id_list[ii]] = ophys_id
         ophys_id += 1
     return lookup
+
 
 @pytest.fixture(scope='session')
 def ophys_session_to_experiment_map(behavior_session_to_ophys_session_map):
@@ -203,7 +210,8 @@ def ophys_session_data_fixture(project_code_lookup,
                  'date_of_acquisition': date_of_acquisition_lookup[beh],
                  'session_name': session_name_lookup[beh],
                  'session_type': session_type_lookup[beh],
-                 'ophys_experiment_id': ophys_session_to_experiment_map[o_session],
+                 'ophys_experiment_id':
+                 ophys_session_to_experiment_map[o_session],
                  'ophys_container_id': container_list,
                  'specimen_id': 9*beh,
                  'ophys_session_id': o_session}
@@ -224,20 +232,26 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
     ophys_experiment_list = []
     for ophys_session in ophys_session_data_fixture:
         for i_experiment in ophys_session['ophys_experiment_id']:
-            for container_id in ophys_experiment_to_container_map[i_experiment]:
-                datum = {'ophys_session_id': ophys_session['ophys_session_id'],
-                         'session_type': ophys_session['session_type'],
-                         'behavior_session_id': ophys_session['behavior_session_id'],
-                         'ophys_container_id': container_id,
-                         'container_workflow_state': container_state_lookup[container_id],
-                         'experiment_workflow_state': experiment_state_lookup[i_experiment],
-                         'session_name': ophys_session['session_name'],
-                         'date_of_acquisition': ophys_session['date_of_acquisition'],
-                         'isi_experiment_id': isi_id,
-                         'imaging_depth': rng.integers(50, 200),
-                         'targeted_tructure': 'VISp',
-                         'published_at': ophys_session['date_of_acquisition'],
-                         'ophys_experiment_id': i_experiment}
+            cntr_id_list = ophys_experiment_to_container_map[i_experiment]
+            for container_id in cntr_id_list:
+                datum = {
+                    'ophys_session_id': ophys_session['ophys_session_id'],
+                    'session_type': ophys_session['session_type'],
+                    'behavior_session_id':
+                    ophys_session['behavior_session_id'],
+                    'ophys_container_id': container_id,
+                    'container_workflow_state':
+                    container_state_lookup[container_id],
+                    'experiment_workflow_state':
+                    experiment_state_lookup[i_experiment],
+                    'session_name': ophys_session['session_name'],
+                    'date_of_acquisition':
+                    ophys_session['date_of_acquisition'],
+                    'isi_experiment_id': isi_id,
+                    'imaging_depth': rng.integers(50, 200),
+                    'targeted_tructure': 'VISp',
+                    'published_at': ophys_session['date_of_acquisition'],
+                    'ophys_experiment_id': i_experiment}
                 ophys_experiment_list.append(datum)
     return ophys_experiment_list
 
@@ -264,8 +278,8 @@ def experiment_state_lookup(ophys_session_data_fixture):
     exp_id_list = []
     for datum in ophys_session_data_fixture:
         for exp_id in datum['ophys_experiment_id']:
-           if exp_id not in exp_id_list:
-               exp_id_list.append(exp_id)
+            if exp_id not in exp_id_list:
+                exp_id_list.append(exp_id)
     lookup = dict()
     for exp_id in exp_id_list:
         lookup[exp_id] = ['passed', 'failed'][rng.integers(0, 2)]
@@ -324,6 +338,7 @@ def intermediate_behavior_table(behavior_session_table,
             fetch_api=mock_api)
     return df
 
+
 @pytest.fixture()
 def expected_behavior_session_table(intermediate_behavior_table,
                                     ophys_session_data_fixture,
@@ -363,7 +378,8 @@ def expected_behavior_session_table(intermediate_behavior_table,
         container_id_list = set()
         exp_id_list = set()
         for exp_id in ophys_session['ophys_experiment_id']:
-            exp_id_list.add(exp_id)  # because SessionsTable does not filter on experiment state
+            # because SessionsTable does not filter on experiment state
+            exp_id_list.add(exp_id)
             if experiment_state_lookup[exp_id] != 'passed':
                 continue
             for container_id in ophys_experiment_to_container_map[exp_id]:
@@ -381,6 +397,7 @@ def expected_behavior_session_table(intermediate_behavior_table,
     df['ophys_session_id'] = df['ophys_session_id'].astype(float)
 
     return df
+
 
 @pytest.fixture()
 def expected_experiments_table(ophys_experiments_table,
@@ -410,12 +427,12 @@ def expected_experiments_table(ophys_experiments_table,
                                   'prior_exposures_to_omissions',
                                   'indicator',
                                   'cre_line']],
-                              on='behavior_session_id')
+                             on='behavior_session_id')
 
     expected = expected.join(behavior_table[
                                  ['session_name']],
-                              on='behavior_session_id',
-                              rsuffix='_behavior')
+                             on='behavior_session_id',
+                             rsuffix='_behavior')
 
     session_number = []
     for v in expected['session_type'].values:
@@ -495,7 +512,7 @@ def expected_ophys_session_table(ophys_session_table,
                                   'prior_exposures_to_omissions',
                                   'indicator',
                                   'cre_line']],
-                              on='behavior_session_id')
+                             on='behavior_session_id')
 
     expected = expected.join(
                   behavior_table[['specimen_id', 'session_name']],
