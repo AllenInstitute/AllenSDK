@@ -11,7 +11,10 @@ def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame):
     and datatype of NULL values
     """
     msg = ''
-    if len(obtained.columns) != len(expected.columns):
+    obtained_column_set = set(obtained.columns)
+    expected_column_set = set(expected.columns)
+
+    if obtained_column_set != expected_column_set:
         msg += 'column mis-match\n'
         msg += 'obtained columns\n'
         msg += f'{obtained.columns}\n'
