@@ -348,10 +348,10 @@ def ophys_session_table(ophys_session_data_fixture):
 
 
 @pytest.fixture(scope='session')
-def ophys_experiment_fixture(ophys_session_data_fixture,
-                             experiment_state_lookup,
-                             container_state_lookup,
-                             ophys_experiment_to_container_map):
+def ophys_experiment_data_fixture(ophys_session_data_fixture,
+                                  experiment_state_lookup,
+                                  container_state_lookup,
+                                  ophys_experiment_to_container_map):
     """
     List of dicts.
     Each dict is an entry in the ophys_experiment_table as returned
@@ -388,14 +388,14 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
 
 
 @pytest.fixture()
-def ophys_experiments_table(ophys_experiment_fixture):
+def ophys_experiments_table(ophys_experiment_data_fixture):
     """
     The ophys_experiments_table as returned by the fetch_api
     (a dataframe)
     """
     data = []
     index = []
-    for datum in ophys_experiment_fixture:
+    for datum in ophys_experiment_data_fixture:
         datum = copy.deepcopy(datum)
         index.append(datum.pop('ophys_experiment_id'))
         data.append(datum)
