@@ -21,7 +21,8 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                  eye_tracking_z_threshold: float = 3.0,
                  eye_tracking_dilation_frames: int = 2,
                  events_filter_scale: float = 2.0,
-                 events_filter_n_time_steps: int = 20):
+                 events_filter_n_time_steps: int = 20,
+                 include_invalid_rois = False):
         """
         Parameters
         ----------
@@ -42,6 +43,9 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
             by default 2.0
         events_filter_n_time_steps : int, optional
             Number of time steps to use for convolution of ophys events
+        include_invalid_rois: bool
+            Whether or not to include invalid ROIs in data tables
+            (default: False)
         """
 
         BehaviorSession.__init__(self, api=api)
@@ -69,10 +73,50 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
             self.api.get_average_projection, wrappers=[ImageApi.deserialize])
         self._ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps,
                                               settable=True)
-        self._dff_traces = LazyProperty(self.api.get_dff_traces, settable=True)
-        self._events = LazyProperty(self.api.get_events, settable=True)
+
+        if include_invalid_rois:
+            cell_getter = self.api.get_cell_specimen_table
+        else:
+            def cell_getter():
+                _df = self.api.get_cell_specimen_table()
+                return _df.query('valid_roi')
+
         self._cell_specimen_table = LazyProperty(
-            self.api.get_cell_specimen_table, settable=True)
+            cell_getter, settable=True)
+
+        if include_invalid_rois:
+            dff_getter = self.api.get_dff_traces
+        else:
+            def dff_getter():
+                _df = self.api.get_dff_traces()
+                return _df.query('valid_roi')
+
+        self._dff_traces = LazyProperty(dff_getter, settable=True)
+
+        if include_invalid_rois:
+            def events_getter():
+                _cell_table = self.cell_specimen_table
+                _invalid_rois = _cell_table.query('not valid_roi')
+                _events_df = self.api.get_events()
+                _events_df.reset_index()
+                _events_columns = _events_df.columns
+                for _cell_id in _invalid_rois.index.values:
+                    _roi_id = _invalid_rois.loc[_cell_id].cell_roi_id
+                    datum = {'cell_specimen_id': _cell_id}
+                    datum['events'] = np.array([])
+                    datum['filtered_events'] = np.array([])
+                    datum['lambda'] = np.NaN
+                    datum['noise_std'] = np.NaN
+                    datum['cell_roi_id'] = _roi_id
+                    _events_df.append(datum)
+                _events_df = _events_df.set_index('cell_specimen_id')
+                return _events_df
+        else:
+            events_getter = self.api.get_events
+
+        self._events = LazyProperty(events_getter, settable=True)
+
+
         self._corrected_fluorescence_traces = LazyProperty(
             self.api.get_corrected_fluorescence_traces, settable=True)
         self._motion_correction = LazyProperty(self.api.get_motion_correction,
