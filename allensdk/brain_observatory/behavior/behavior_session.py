@@ -476,6 +476,8 @@ class BehaviorSession(LazyPropertyMixin):
                     image index (0-7) for a given session,
                     corresponding to each image name
                 is_change: (bool)
+                    True if the presentation represents a change
+                    in image
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
@@ -604,9 +606,29 @@ class BehaviorSession(LazyPropertyMixin):
             dataframe columns:
                 trials_id: (int)
                     trial identifier
+                initial_image_name: (string)
+                    name of image presented at start of trial
+                change_image_name: (string)
+                    name of image that is changed to at the change time,
+                    on go trials
+                stimulus_change: (bool)
+                    True if an image change occurs during the trial
+                    (if the trial was both a 'go' trial and the trial
+                    was not aborted)
+                change_time: (float)
+                go: (bool)
+                    Trial type. True if there was a change in stimulus
+                    image identity on this trial
+                catch: (bool)
+                    Trial type. True if there was not a change in stimulus
+                    identity on this trial
                 lick_times: (array of float)
                     array of lick times in seconds during that trial.
                     Empty array if no licks occured during the trial.
+                response_time: (float)
+                    time of first lick in trial in seconds and NaN if
+                    trial aborted
+                response_latency: (float)
                 reward_time: (NaN or float)
                     Time the reward is delivered following a correct
                     response or on auto rewarded trials.
@@ -622,41 +644,24 @@ class BehaviorSession(LazyPropertyMixin):
                 miss: (bool)
                     Behavior response type. On a go trial, mouse either
                     does not lick at all, or licks after reward window
-                stimulus_change: (bool)
-                    True if an image change occurs during the trial
-                    (if the trial was both a 'go' trial and the trial
-                    was not aborted)
-                aborted: (bool)
-                    Behavior response type. True if the mouse licks
-                    before the scheduled change time.
-                go: (bool)
-                    Trial type. True if there was a change in stimulus
-                    image identity on this trial
-                catch: (bool)
-                    Trial type. True if there was not a change in stimulus
-                    identity on this trial
-                auto_rewarded: (bool)
-                    True if free reward was delivered for that trial.
-                    Occurs during the first 5 trials of a session and
-                    throughout as needed.
                 correct_reject: (bool)
                     Behavior response type. On a catch trial, mouse
                     either does not lick at all or licks after reward
                     window
+                aborted: (bool)
+                    Behavior response type. True if the mouse licks
+                    before the scheduled change time.
+                auto_rewarded: (bool)
+                    True if free reward was delivered for that trial.
+                    Occurs during the first 5 trials of a session and
+                    throughout as needed.
+                change_frame: (float)
                 start_time: (float)
                     start time of the trial in seconds
                 stop_time: (float)
                     end time of the trial in seconds
                 trial_length: (float)
                     duration of trial in seconds (stop_time -start_time)
-                response_time: (float)
-                    time of first lick in trial in seconds and NaN if
-                    trial aborted
-                initial_image_name: (string)
-                    name of image presented at start of trial
-                change_image_name: (string)
-                    name of image that is changed to at the change time,
-                    on go trials
         """
         return self._trials
 
