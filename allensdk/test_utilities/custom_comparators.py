@@ -40,7 +40,7 @@ def safe_df_comparison(expected: pd.DataFrame,
 
     obtained: pd.DataFrame
 
-t    expect_identical_column_order: bool
+    expect_identical_column_order: bool
        If True, raise an error if columns are not
        in the same order (default=False)
 
@@ -60,10 +60,17 @@ t    expect_identical_column_order: bool
               compares with ==
     """
     msg = ''
-    obtained_column_set = set(obtained.columns)
-    expected_column_set = set(expected.columns)
+    columns_match = True
+    if not expect_identical_column_order:
+        obtained_column_set = set(obtained.columns)
+        expected_column_set = set(expected.columns)
+        if obtained_column_set != expected_column_set:
+            columns_match = False
+    else:
+        if not obtained.columns.equals(expected.columns):
+            columns_match = False
 
-    if obtained_column_set != expected_column_set:
+    if not columns_match:
         msg += 'column mis-match\n'
         msg += 'obtained columns\n'
         msg += f'{obtained.columns}\n'
