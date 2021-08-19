@@ -177,6 +177,25 @@ def behavior_session_data_fixture(behavior_session_id_list,
     return behavior_session_list
 
 
+@pytest.fixture()
+def behavior_session_table(behavior_session_data_fixture):
+    """
+    The behavior_session_table dataframe as returned by the
+    fetch_api
+    """
+    data = []
+    index = []
+    for datum in behavior_session_data_fixture:
+        datum = copy.deepcopy(datum)
+        index.append(datum.pop('behavior_session_id'))
+        data.append(datum)
+
+    df = pd.DataFrame(
+              data,
+              index=pd.Index(index, name='behavior_session_id'))
+    return df
+
+
 @pytest.fixture(scope='session')
 def behavior_session_to_ophys_session_map(behavior_session_id_list):
     """
@@ -234,6 +253,44 @@ def ophys_experiment_to_container_map(ophys_session_to_experiment_map):
 
 
 @pytest.fixture(scope='session')
+def container_state_lookup(ophys_experiment_to_container_map):
+    """
+    Dict mapping ophys_container_id to container_workflow_state
+    Note: each ophys_experiment_id can only be associated with
+    one 'published' ophys_container.
+    """
+    rng = np.random.default_rng(66232)
+    exp_id_list = list(ophys_experiment_to_container_map.keys())
+    exp_id_list.sort()
+    lookup = dict()
+    for exp_id in exp_id_list:
+        local_container_list = ophys_experiment_to_container_map[exp_id]
+        for container_id in local_container_list:
+            assert container_id not in lookup
+            lookup[container_id] = 'junk'
+        good_container = rng.choice(local_container_list)
+        lookup[good_container] = 'published'
+    return lookup
+
+
+@pytest.fixture(scope='session')
+def experiment_state_lookup(ophys_session_data_fixture):
+    """
+    Dict mapping ophys_experiment_id to the experiment_workflow_state
+    """
+    rng = np.random.default_rng(772312)
+    exp_id_list = []
+    for datum in ophys_session_data_fixture:
+        for exp_id in datum['ophys_experiment_id']:
+            if exp_id not in exp_id_list:
+                exp_id_list.append(exp_id)
+    lookup = dict()
+    for exp_id in exp_id_list:
+        lookup[exp_id] = ['passed', 'failed'][rng.integers(0, 2)]
+    return lookup
+
+
+@pytest.fixture(scope='session')
 def ophys_session_data_fixture(project_code_lookup,
                                session_name_lookup,
                                date_of_acquisition_lookup,
@@ -270,6 +327,24 @@ def ophys_session_data_fixture(project_code_lookup,
 
         ophys_session_list.append(datum)
     return ophys_session_list
+
+
+@pytest.fixture()
+def ophys_session_table(ophys_session_data_fixture):
+    """
+    The ophys_session_table dataframe as returned by the fetch_api
+    """
+    data = []
+    index = []
+    for datum in ophys_session_data_fixture:
+        datum = copy.deepcopy(datum)
+        index.append(datum.pop('ophys_session_id'))
+        data.append(datum)
+
+    df = pd.DataFrame(
+             data,
+             index=pd.Index(index, name='ophys_session_id'))
+    return df
 
 
 @pytest.fixture(scope='session')
@@ -312,78 +387,22 @@ def ophys_experiment_fixture(ophys_session_data_fixture,
     return ophys_experiment_list
 
 
-@pytest.fixture(scope='session')
-def container_state_lookup(ophys_experiment_to_container_map):
-    """
-    Dict mapping ophys_container_id to container_workflow_state
-    Note: each ophys_experiment_id can only be associated with
-    one 'published' ophys_container.
-    """
-    rng = np.random.default_rng(66232)
-    exp_id_list = list(ophys_experiment_to_container_map.keys())
-    exp_id_list.sort()
-    lookup = dict()
-    for exp_id in exp_id_list:
-        local_container_list = ophys_experiment_to_container_map[exp_id]
-        for container_id in local_container_list:
-            assert container_id not in lookup
-            lookup[container_id] = 'junk'
-        good_container = rng.choice(local_container_list)
-        lookup[good_container] = 'published'
-    return lookup
-
-
-@pytest.fixture(scope='session')
-def experiment_state_lookup(ophys_session_data_fixture):
-    """
-    Dict mapping ophys_experiment_id to the experiment_workflow_state
-    """
-    rng = np.random.default_rng(772312)
-    exp_id_list = []
-    for datum in ophys_session_data_fixture:
-        for exp_id in datum['ophys_experiment_id']:
-            if exp_id not in exp_id_list:
-                exp_id_list.append(exp_id)
-    lookup = dict()
-    for exp_id in exp_id_list:
-        lookup[exp_id] = ['passed', 'failed'][rng.integers(0, 2)]
-    return lookup
-
-
 @pytest.fixture()
-def ophys_session_table(ophys_session_data_fixture):
+def ophys_experiments_table(ophys_experiment_fixture):
     """
-    The ophys_session_table dataframe as returned by the fetch_api
+    The ophys_experiments_table as returned by the fetch_api
+    (a dataframe)
     """
     data = []
     index = []
-    for datum in ophys_session_data_fixture:
+    for datum in ophys_experiment_fixture:
         datum = copy.deepcopy(datum)
-        index.append(datum.pop('ophys_session_id'))
-        data.append(datum)
-
-    df = pd.DataFrame(
-             data,
-             index=pd.Index(index, name='ophys_session_id'))
-    return df
-
-
-@pytest.fixture()
-def behavior_session_table(behavior_session_data_fixture):
-    """
-    The behavior_session_table dataframe as returned by the
-    fetch_api
-    """
-    data = []
-    index = []
-    for datum in behavior_session_data_fixture:
-        datum = copy.deepcopy(datum)
-        index.append(datum.pop('behavior_session_id'))
+        index.append(datum.pop('ophys_experiment_id'))
         data.append(datum)
 
     df = pd.DataFrame(
               data,
-              index=pd.Index(index, name='behavior_session_id'))
+              index=pd.Index(index, name='ophys_experiment_id'))
     return df
 
 
@@ -561,25 +580,6 @@ def expected_experiments_table(ophys_experiments_table,
     expected = expected.drop(['session_name'], axis=1)
 
     return {'df': expected, 'passed_only': passed_only}
-
-
-@pytest.fixture()
-def ophys_experiments_table(ophys_experiment_fixture):
-    """
-    The ophys_experiments_table as returned by the fetch_api
-    (a dataframe)
-    """
-    data = []
-    index = []
-    for datum in ophys_experiment_fixture:
-        datum = copy.deepcopy(datum)
-        index.append(datum.pop('ophys_experiment_id'))
-        data.append(datum)
-
-    df = pd.DataFrame(
-              data,
-              index=pd.Index(index, name='ophys_experiment_id'))
-    return df
 
 
 @pytest.fixture()
