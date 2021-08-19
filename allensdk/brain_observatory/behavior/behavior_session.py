@@ -35,8 +35,19 @@ class BehaviorSession(LazyPropertyMixin):
                                            settable=True, lowpass=True)
         self._raw_running_speed = LazyProperty(self.api.get_running_speed,
                                                settable=True, lowpass=False)
+
+        def stimulus_getter():
+            _df = self.api.get_stimulus_presentations()
+            _df.drop(['image_set', 'index'], axis=1, errors='ignore')
+            _df = _df[['start_time', 'stop_time',
+                       'duration',
+                       'image_name', 'image_index',
+                       'is_change', 'omitted',
+                       'start_frame', 'end_frame']]
+            return _df
         self._stimulus_presentations = LazyProperty(
-            self.api.get_stimulus_presentations, settable=True)
+            stimulus_getter, settable=True)
+
         self._stimulus_templates = LazyProperty(
             self.api.get_stimulus_templates, settable=True)
         self._stimulus_timestamps = LazyProperty(
@@ -441,27 +452,25 @@ class BehaviorSession(LazyPropertyMixin):
                 stimulus_presentations_id [index]: (int)
                     identifier for a stimulus presentation
                     (presentation of an image)
+                start_time: (float)
+                    image presentation start time in seconds
+                stop_time: (float)
+                    image presentation end time in seconds
                 duration: (float)
                     duration of an image presentation (flash)
                     in seconds (stop_time - start_time). NaN if omitted
-                end_frame: (float)
-                    image presentation end frame
+                image_name: (str)
                 image_index: (int)
                     image index (0-7) for a given session,
                     corresponding to each image name
-                image_set: (string)
-                    image set for this behavior session
-                index: (int)
-                    an index assigned to each stimulus presentation
+                is_change: (bool)
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
                 start_frame: (int)
                     image presentation start frame
-                start_time: (float)
-                    image presentation start time in seconds
-                stop_time: (float)
-                    image presentation end time in seconds
+                end_frame: (float)
+                    image presentation end frame
         """
         return self._stimulus_presentations
 
