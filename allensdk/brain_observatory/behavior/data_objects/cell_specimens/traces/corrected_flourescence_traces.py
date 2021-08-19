@@ -83,7 +83,7 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
 
     def filter_to_roi_ids(self, roi_ids: np.ndarray):
         """Limit traces to roi_ids' traces.
-        Use for, ie excluding traces invalid rois"""
+        Use for, ie excluding traces of invalid rois"""
         if not np.in1d(roi_ids, self._value.index).all():
             raise RuntimeError('Not all roi ids to be filtered are in '
                                'corrected fluorescence traces')
