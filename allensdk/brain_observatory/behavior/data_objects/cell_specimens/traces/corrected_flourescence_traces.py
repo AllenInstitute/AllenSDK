@@ -17,8 +17,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 
 class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
                                   NwbReadableInterface, NwbWritableInterface):
-    def __init__(self, traces: pd.DataFrame,
-                 filter_to_roi_ids: Optional[np.array] = None):
+    def __init__(self, traces: pd.DataFrame):
         """
 
         Parameters
@@ -28,21 +27,11 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
             columns:
             - corrected_fluorescence
                 list of float
-        filter_to_roi_ids
-            Filter traces to only these roi ids, for example to filter invalid
-            rois
         """
-        if filter_to_roi_ids is not None:
-            if not np.in1d(filter_to_roi_ids, traces.index).all():
-                raise RuntimeError('Not all roi ids to be filtered are in '
-                                   'corrected fluorescence traces')
-            traces = traces.loc[filter_to_roi_ids]
-
         super().__init__(name='corrected_fluorescence_traces', value=traces)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile,
-                 filter_to_roi_ids: Optional[np.array] = None) \
+    def from_nwb(cls, nwbfile: NWBFile) \
             -> "CorrectedFluorescenceTraces":
         corr_fluorescence_nwb = nwbfile.processing[
             'ophys'].data_interfaces[
@@ -54,7 +43,7 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
                           index=pd.Index(
                               data=corr_fluorescence_nwb.rois.table.id[:],
                               name='cell_roi_id'))
-        return cls(traces=df, filter_to_roi_ids=filter_to_roi_ids)
+        return cls(traces=df)
 
     @classmethod
     def from_data_file(cls,
@@ -91,3 +80,11 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
             rois=roi_table_region,
             timestamps=ophys_timestamps)
         return nwbfile
+
+    def filter_to_roi_ids(self, roi_ids: np.ndarray):
+        """Limit traces to roi_ids' traces.
+        Use for, ie excluding traces invalid rois"""
+        if not np.in1d(roi_ids, self._value.index).all():
+            raise RuntimeError('Not all roi ids to be filtered are in '
+                               'corrected fluorescence traces')
+        self._value = self._value.loc[roi_ids]

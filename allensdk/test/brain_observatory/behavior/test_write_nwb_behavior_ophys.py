@@ -1,60 +1,11 @@
-import math
 import mock
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import pytest
 
-import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi)
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import (  # noqa: E501
-    create_refined_eye_tracking_df)
 
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import \
     write_behavior_ophys_nwb  # noqa: E501
-
-
-@pytest.fixture
-def rig_geometry():
-    """Returns mock rig geometry data"""
-    return {
-        "monitor_position_mm": [1., 2., 3.],
-        "monitor_rotation_deg": [4., 5., 6.],
-        "camera_position_mm": [7., 8., 9.],
-        "camera_rotation_deg": [10., 11., 12.],
-        "led_position": [13., 14., 15.],
-        "equipment": "test_rig"}
-
-
-@pytest.fixture
-def eye_tracking_data():
-    return create_refined_eye_tracking_df(
-        np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
-                   196 * np.pi, 12 * np.pi, 72 * np.pi,
-                   1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.,
-                   13., 14., 15.],
-                  [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
-                   225 * np.pi, 20 * np.pi, 90 * np.pi,
-                   2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13.,
-                   14., 15., 16.]])
-    )
-
-
-# TODO need to add segmentation_mask_image
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_segmentation_mask_image(nwbfile, roundtrip, roundtripper,
-                                 segmentation_mask_image, image_api):
-    nwb.add_segmentation_mask_image(nwbfile, segmentation_mask_image)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    assert image_api.deserialize(segmentation_mask_image) == \
-           image_api.deserialize(obt.get_segmentation_mask_image())
 
 
 def test_write_behavior_ophys_nwb_no_file():

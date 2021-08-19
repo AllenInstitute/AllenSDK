@@ -132,3 +132,8 @@ class Events(DataObject, DataFileReadableInterface, NwbReadableInterface,
         ophys_module.add_data_interface(events)
 
         return nwbfile
+
+    def filter_to_roi_ids(self, roi_ids: np.ndarray):
+        """Limit events to roi_ids' traces.
+        Use for, ie excluding events of invalid rois"""
+        self._value = self._value[self._value['cell_roi_id'].isin(roi_ids)]

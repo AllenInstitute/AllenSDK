@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
-from allensdk.brain_observatory.nwb.nwb_utils import get_image
+from allensdk.brain_observatory.nwb.nwb_utils import get_image, add_image
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
@@ -91,37 +91,12 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
                            avg_projection=avg_projection)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        def _add_image(image_data: Image, image_name: str):
-            MODULE_NAME = 'ophys'
-            description = '{} image at pixels/cm resolution'.format(image_name)
-
-            data, spacing, unit = image_data
-
-            assert spacing[0] == spacing[1] and len(
-                spacing) == 2 and unit == 'mm'
-
-            if MODULE_NAME not in nwbfile.processing:
-                ophys_mod = ProcessingModule(MODULE_NAME,
-                                             'Ophys processing module')
-                nwbfile.add_processing_module(ophys_mod)
-            else:
-                ophys_mod = nwbfile.processing[MODULE_NAME]
-
-            image = GrayscaleImage(image_name,
-                                   data,
-                                   resolution=spacing[0] / 10,
-                                   description=description)
-
-            if 'images' not in ophys_mod.containers:
-                images = Images(name='images')
-                ophys_mod.add_data_interface(images)
-            else:
-                images = ophys_mod['images']
-            images.add_image(image)
-
-        _add_image(image_data=self._max_projection,
-                   image_name='max_projection')
-        _add_image(image_data=self._avg_projection, image_name='average_image')
+        add_image(nwbfile=nwbfile,
+                  image_data=self._max_projection,
+                  image_name='max_projection')
+        add_image(nwbfile=nwbfile,
+                  image_data=self._avg_projection,
+                  image_name='average_image')
 
         return nwbfile
 

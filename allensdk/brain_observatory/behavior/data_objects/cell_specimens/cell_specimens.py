@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -37,7 +37,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.brain_observatory.behavior.data_objects.timestamps \
     .ophys_timestamps import \
     OphysTimestamps
+from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
+from allensdk.brain_observatory.nwb.nwb_utils import add_image
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -115,18 +117,64 @@ class CellSpecimenMeta(DataObject, InternalReadableInterface,
 class CellSpecimens(DataObject, LimsReadableInterface,
                     JsonReadableInterface, NwbReadableInterface,
                     NwbWritableInterface):
-    def __init__(self, cell_specimen_table: pd.DataFrame,
+    def __init__(self,
+                 cell_specimen_table: pd.DataFrame,
                  meta: CellSpecimenMeta,
                  dff_traces: DFFTraces,
                  corrected_fluourescence_traces: CorrectedFluorescenceTraces,
                  events: Events,
-                 ophys_timestamps: OphysTimestamps):
+                 ophys_timestamps: OphysTimestamps,
+                 segmentation_mask_image_spacing: Tuple,
+                 filter_invalid_rois=False):
+        """
+
+        Parameters
+        ----------
+        cell_specimen_table
+            index cell_specimen_id
+            columns:
+                - cell_roi_id
+                - height
+                - mask_image_plane
+                - max_correction_down
+                - max_correction_left
+                - max_correction_right
+                - max_correction_up
+                - roi_mask
+                - valid_roi
+                - width
+                - x
+                - y
+        meta
+        dff_traces
+        corrected_fluourescence_traces
+        events
+        ophys_timestamps
+        segmentation_mask_image_spacing
+            Spacing to pass to sitk when constructing segmentation mask image
+        filter_invalid_rois
+            Whether to exclude invalid rois
+
+        """
         super().__init__(name='cell_specimen_table', value=self)
+
+        if filter_invalid_rois:
+            cell_specimen_table = cell_specimen_table[
+                cell_specimen_table['valid_roi']]
+            dff_traces.filter_to_roi_ids(
+                roi_ids=cell_specimen_table['cell_roi_id'].values)
+            corrected_fluourescence_traces.filter_to_roi_ids(
+                roi_ids=cell_specimen_table['cell_roi_id'].values)
+            events.filter_to_roi_ids(
+                roi_ids=cell_specimen_table['cell_roi_id'].values)
+
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
         self._corrected_fluourescence_traces = corrected_fluourescence_traces
         self._events = events
+        self._segmentation_mask_image = self._get_segmentation_mask_image(
+            spacing=segmentation_mask_image_spacing)
 
         self._validate_traces(ophys_timestamps=ophys_timestamps)
 
@@ -162,10 +210,16 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         df = df.set_index('cell_specimen_id')
         return df
 
+    @property
+    def segmentation_mask_image(self) -> Image:
+        return self._segmentation_mask_image
+
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
                   lims_db: PostgresQueryMixin,
                   ophys_timestamps: OphysTimestamps,
+                  segmentation_mask_image_spacing: Tuple,
+                  filter_invalid_rois=False,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
@@ -235,11 +289,16 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
             events=events,
-            ophys_timestamps=ophys_timestamps)
+            ophys_timestamps=ophys_timestamps,
+            segmentation_mask_image_spacing=segmentation_mask_image_spacing,
+            filter_invalid_rois=filter_invalid_rois
+        )
 
     @classmethod
     def from_json(cls, dict_repr: dict,
                   ophys_timestamps: OphysTimestamps,
+                  segmentation_mask_image_spacing: Tuple,
+                  filter_invalid_rois=False,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
@@ -272,10 +331,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
             events=events,
-            ophys_timestamps=ophys_timestamps)
+            ophys_timestamps=ophys_timestamps,
+            segmentation_mask_image_spacing=segmentation_mask_image_spacing,
+            filter_invalid_rois=filter_invalid_rois)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
+                 segmentation_mask_image_spacing: Tuple,
                  filter_invalid_rois=False,
                  events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
@@ -298,17 +360,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
             df.reset_index(inplace=True)
             df.set_index('cell_specimen_id', inplace=True)
-
-            if filter_invalid_rois:
-                df = df[df["valid_roi"]]
             return df
 
         df = _read_table(cell_specimen_table=cell_specimen_table)
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
-        dff_traces = DFFTraces.from_nwb(
-            nwbfile=nwbfile, filter_to_roi_ids=df['cell_roi_id'].values)
+        dff_traces = DFFTraces.from_nwb(nwbfile=nwbfile)
         corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
-            nwbfile=nwbfile, filter_to_roi_ids=df['cell_roi_id'].values)
+            nwbfile=nwbfile)
 
         def _get_events():
             ep = EventsParams() if events_params is None else events_params
@@ -323,7 +381,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
             corrected_fluourescence_traces=corrected_fluorescence_traces,
             events=events,
-            ophys_timestamps=ophys_timestamps)
+            ophys_timestamps=ophys_timestamps,
+            segmentation_mask_image_spacing=segmentation_mask_image_spacing,
+            filter_invalid_rois=filter_invalid_rois)
 
     def to_nwb(self, nwbfile: NWBFile,
                ophys_timestamps: OphysTimestamps) -> NWBFile:
@@ -424,7 +484,35 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         # 4. Add events
         self._events.to_nwb(nwbfile=nwbfile)
 
+        # 5. Add segmentation mask image
+        add_image(nwbfile=nwbfile,
+                  image_data=self._segmentation_mask_image,
+                  image_name='segmentation_mask_image')
+
         return nwbfile
+
+    def _get_segmentation_mask_image(self, spacing: tuple) -> Image:
+        """a 2D binary image of all cell masks
+
+        Parameters
+        ----------
+        spacing
+            See image_api.Image for details
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to segmentation_mask image data and
+            metadata
+        """
+        mask_data = np.sum(self.roi_masks['roi_mask'].values).astype(int)
+
+        mask_image = Image(
+            data=mask_data,
+            spacing=spacing,
+            unit='mm'
+        )
+        return mask_image
 
     @staticmethod
     def _postprocess(cell_specimen_table: dict,

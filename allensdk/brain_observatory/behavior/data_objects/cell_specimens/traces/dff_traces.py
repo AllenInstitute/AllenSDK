@@ -20,8 +20,7 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps\
 
 class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
                 NwbWritableInterface):
-    def __init__(self, traces: pd.DataFrame,
-                 filter_to_roi_ids: Optional[np.array] = None):
+    def __init__(self, traces: pd.DataFrame):
         """
         Parameters
         ----------
@@ -29,16 +28,7 @@ class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
             index cell_roi_id
             columns:
                 dff: List of float
-        filter_to_roi_ids
-            Filter traces to only these roi ids, for example to filter invalid
-            rois
         """
-        if filter_to_roi_ids is not None:
-            if not np.in1d(filter_to_roi_ids, traces.index).all():
-                raise RuntimeError('Not all roi ids to be filtered are in dff '
-                                   'traces')
-            traces = traces.loc[filter_to_roi_ids]
-
         super().__init__(name='dff_traces', value=traces)
 
     def to_nwb(self, nwbfile: NWBFile,
@@ -72,8 +62,7 @@ class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
         return nwbfile
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile,
-                 filter_to_roi_ids: Optional[np.array] = None) -> "DFFTraces":
+    def from_nwb(cls, nwbfile: NWBFile) -> "DFFTraces":
         dff_nwb = nwbfile.processing[
             'ophys'].data_interfaces['dff'].roi_response_series['traces']
         # dff traces stored as timepoints x rois in NWB
@@ -83,9 +72,17 @@ class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
         df = pd.DataFrame({'dff': dff_traces.tolist()},
                           index=pd.Index(data=dff_nwb.rois.table.id[:],
                                          name='cell_roi_id'))
-        return DFFTraces(traces=df, filter_to_roi_ids=filter_to_roi_ids)
+        return DFFTraces(traces=df)
 
     @classmethod
     def from_data_file(cls, dff_file: DFFFile) -> "DFFTraces":
         dff_traces = dff_file.data
         return DFFTraces(traces=dff_traces)
+
+    def filter_to_roi_ids(self, roi_ids: np.ndarray):
+        """Limit traces to roi_ids' traces.
+        Use for, ie excluding traces invalid rois"""
+        if not np.in1d(roi_ids, self._value.index).all():
+            raise RuntimeError('Not all roi ids to be filtered are in dff '
+                               'traces')
+        self._value = self._value.loc[roi_ids]

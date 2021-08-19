@@ -2,7 +2,9 @@ import pandas as pd
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.
-from pynwb import NWBFile
+from pynwb import NWBFile, ProcessingModule
+from pynwb.base import Images
+from pynwb.image import GrayscaleImage
 
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 
@@ -66,3 +68,48 @@ def get_image(nwbfile: NWBFile, name: str, module: str) -> Image:
     img = ImageApi.serialize(data, spacing, 'mm')
     img = ImageApi.deserialize(img=img)
     return img
+
+
+def add_image(nwbfile: NWBFile, image_data: Image, image_name: str):
+    """
+    Adds image given by image_data with name image_name to nwbfile
+
+    Parameters
+    ----------
+    nwbfile
+        nwbfile to add image to
+    image_data
+        The image data
+    image_name
+        Image name
+
+    Returns
+    -------
+    None
+    """
+    module_name = 'ophys'
+    description = '{} image at pixels/cm resolution'.format(image_name)
+
+    data, spacing, unit = image_data
+
+    assert spacing[0] == spacing[1] and len(
+        spacing) == 2 and unit == 'mm'
+
+    if module_name not in nwbfile.processing:
+        ophys_mod = ProcessingModule(module_name,
+                                     'Ophys processing module')
+        nwbfile.add_processing_module(ophys_mod)
+    else:
+        ophys_mod = nwbfile.processing[module_name]
+
+    image = GrayscaleImage(image_name,
+                           data,
+                           resolution=spacing[0] / 10,
+                           description=description)
+
+    if 'images' not in ophys_mod.containers:
+        images = Images(name='images')
+        ophys_mod.add_data_interface(images)
+    else:
+        images = ophys_mod['images']
+    images.add_image(image)

@@ -54,7 +54,8 @@ class TestLims:
                               number_of_frames=number_of_frames)
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
-            ophys_timestamps=ots)
+            ophys_timestamps=ots,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
@@ -91,8 +92,10 @@ class TestJson:
             timestamps=np.array([.1, .2, .3]), number_of_frames=3)
 
     def test_from_json(self):
-        csp = CellSpecimens.from_json(dict_repr=self.dict_repr,
-                                      ophys_timestamps=self.ophys_timestamps)
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
@@ -115,8 +118,7 @@ class TestNWB:
 
         tj = TestJson()
         tj.setup_class()
-        self.cell_specimens = CellSpecimens.from_json(
-            dict_repr=tj.dict_repr, ophys_timestamps=self.ophys_timestamps)
+        self.dict_repr = tj.dict_repr
 
         # Write metadata, since csp requires other metdata
         tbom = TestBOM()
@@ -129,30 +131,37 @@ class TestNWB:
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture,
                             filter_invalid_rois):
-        csp = self.cell_specimens._cell_specimen_table
-
         if filter_invalid_rois:
             # changing one of the rois to be valid
-            csp.loc[1086633332, 'valid_roi'] = True
+            self.dict_repr['cell_specimen_table_dict']['valid_roi']['0'] = True
+
+        cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            filter_invalid_rois=filter_invalid_rois)
+
+        csp = cell_specimens._cell_specimen_table
 
         valid_roi_id = csp[csp['valid_roi']]['cell_roi_id']
 
-        self.cell_specimens.to_nwb(nwbfile=self.nwbfile,
-                                   ophys_timestamps=self.ophys_timestamps)
+        cell_specimens.to_nwb(nwbfile=self.nwbfile,
+                              ophys_timestamps=self.ophys_timestamps)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
                 data_object_cls=CellSpecimens,
-                filter_invalid_rois=filter_invalid_rois)
+                filter_invalid_rois=filter_invalid_rois,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         else:
-            obt = self.cell_specimens.from_nwb(
-                nwbfile=self.nwbfile, filter_invalid_rois=filter_invalid_rois)
+            obt = cell_specimens.from_nwb(
+                nwbfile=self.nwbfile, filter_invalid_rois=filter_invalid_rois,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
 
         if filter_invalid_rois:
-            self.cell_specimens._cell_specimen_table = \
-                self.cell_specimens._cell_specimen_table[
-                    self.cell_specimens._cell_specimen_table['cell_roi_id']
-                        .isin(valid_roi_id)]
+            cell_specimens._cell_specimen_table = \
+                cell_specimens._cell_specimen_table[
+                    cell_specimens._cell_specimen_table['cell_roi_id']
+                    .isin(valid_roi_id)]
 
-        assert obt == self.cell_specimens
+        assert obt == cell_specimens

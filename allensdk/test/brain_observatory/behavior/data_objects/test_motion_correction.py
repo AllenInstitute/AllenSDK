@@ -93,8 +93,9 @@ class TestNWB:
             ij = NwbInputJson()
             ophys_timestamps = OphysTimestamps(
                 timestamps=np.array([.1, .2, .3]), number_of_frames=3)
-            csp = CellSpecimens.from_json(dict_repr=ij.dict_repr,
-                                          ophys_timestamps=ophys_timestamps)
+            csp = CellSpecimens.from_json(
+                dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
             csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
 
         # need to write cell specimen, since it is a dependency
