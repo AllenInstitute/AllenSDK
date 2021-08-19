@@ -5,10 +5,37 @@ import numpy as np
 import os
 
 
-def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame):
+def safe_df_comparison(expected: pd.DataFrame,
+                       obtained: pd.DataFrame,
+                       expect_identical_column_order: bool = False):
     """
     Compare two dataframes in a way that is agnostic to column order
     and datatype of NULL values
+
+    Parameters
+    ----------
+    expected: pd.DataFrame
+
+    obtained: pd.DataFrame
+
+t    expect_identical_column_order: bool
+       If True, raise an error if columns are not
+       in the same order (default=False)
+
+    Raises
+    ------
+    RuntimeError
+       If:
+           - dataframes do not have the same columns
+           - dataframes do not have identical indexes
+           - dataframe columns do not have identical contents
+
+        When comparing the contents of dataframe columns,
+        the function:
+            - verifies that NULL values (whether None or NaN) are in
+              the same location
+            - loops over non-null values, casts arrays into lists, and
+              compares with ==
     """
     msg = ''
     obtained_column_set = set(obtained.columns)
