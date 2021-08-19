@@ -54,7 +54,19 @@ class BehaviorSession(LazyPropertyMixin):
             self.api.get_stimulus_timestamps, settable=True)
         self._task_parameters = LazyProperty(self.api.get_task_parameters,
                                              settable=True)
-        self._trials = LazyProperty(self.api.get_trials, settable=True)
+
+        def trials_getter():
+            _df = self.api.get_trials()
+            _df = _df[['initial_image_name', 'change_image_name',
+                       'stimulus_change', 'change_time',
+                       'go', 'catch', 'lick_times', 'response_time',
+                       'response_latency','reward_time', 'reward_volume',
+                       'hit', 'false_alarm', 'miss', 'correct_reject',
+                       'aborted', 'auto_rewarded', 'change_frame',
+                       'start_time', 'stop_time', 'trial_length']]
+            return _df
+        self._trials = LazyProperty(trials_getter, settable=True)
+
         self._metadata = LazyProperty(self.api.get_metadata, settable=True)
 
     # ==================== class and utility methods ======================
