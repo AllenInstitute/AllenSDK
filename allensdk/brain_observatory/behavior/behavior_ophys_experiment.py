@@ -88,8 +88,9 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
             dff_getter = self.api.get_dff_traces
         else:
             def dff_getter():
+                _cell_table = self.cell_specimen_table
                 _df = self.api.get_dff_traces()
-                return _df.query('valid_roi')
+                return _df[_df.index.isin(_cell_table.index)]
 
         self._dff_traces = LazyProperty(dff_getter, settable=True)
 
