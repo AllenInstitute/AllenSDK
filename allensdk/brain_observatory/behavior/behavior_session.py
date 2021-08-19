@@ -38,12 +38,13 @@ class BehaviorSession(LazyPropertyMixin):
 
         def stimulus_getter():
             _df = self.api.get_stimulus_presentations()
-            _df.drop(['image_set', 'index'], axis=1, errors='ignore')
+            _df.drop(['index'], axis=1, errors='ignore')
             _df = _df[['start_time', 'stop_time',
                        'duration',
                        'image_name', 'image_index',
                        'is_change', 'omitted',
-                       'start_frame', 'end_frame']]
+                       'start_frame', 'end_frame',
+                       'image_set']]
             return _df
         self._stimulus_presentations = LazyProperty(
             stimulus_getter, settable=True)
@@ -485,6 +486,8 @@ class BehaviorSession(LazyPropertyMixin):
                     image presentation start frame
                 end_frame: (float)
                     image presentation end frame
+                image_set: (string)
+                    image set for this behavior session
         """
         return self._stimulus_presentations
 
