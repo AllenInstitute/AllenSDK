@@ -129,27 +129,18 @@ def test_session_table_reads_from_cache(TempdirBehaviorCache,
     caplog.set_level(logging.INFO, logger="call_caching")
     cache = TempdirBehaviorCache
     cache.get_ophys_session_table()
-    expected_first = [
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache')]
-    assert expected_first == caplog.record_tuples
+    reading_tuple = ('call_caching', logging.INFO, 'Reading data from cache')
+    no_file_tuple = ('call_caching', logging.INFO, 'No cache file found.')
+    writing_tuple = ('call_caching', logging.INFO, 'Writing data to cache')
+    assert reading_tuple in caplog.record_tuples
+    assert no_file_tuple in caplog.record_tuples
+    assert writing_tuple in caplog.record_tuples
+
     caplog.clear()
     cache.get_ophys_session_table()
-    assert [expected_first[0]]*4 == caplog.record_tuples
+    assert reading_tuple in caplog.record_tuples
+    assert no_file_tuple not in caplog.record_tuples
+    assert writing_tuple not in caplog.record_tuples
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
@@ -158,27 +149,18 @@ def test_behavior_table_reads_from_cache(TempdirBehaviorCache,
     caplog.set_level(logging.INFO, logger="call_caching")
     cache = TempdirBehaviorCache
     cache.get_behavior_session_table()
-    expected_first = [
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'No cache file found.'),
-        ('call_caching', logging.INFO, 'Fetching data from remote'),
-        ('call_caching', logging.INFO, 'Writing data to cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache'),
-        ('call_caching', logging.INFO, 'Reading data from cache')]
-    assert expected_first == caplog.record_tuples
+    reading_tuple = ('call_caching', logging.INFO, 'Reading data from cache')
+    no_file_tuple = ('call_caching', logging.INFO, 'No cache file found.')
+    writing_tuple = ('call_caching', logging.INFO, 'Writing data to cache')
+    assert reading_tuple in caplog.record_tuples
+    assert no_file_tuple in caplog.record_tuples
+    assert writing_tuple in caplog.record_tuples
+
     caplog.clear()
     cache.get_behavior_session_table()
-    assert [expected_first[0]]*4 == caplog.record_tuples
+    assert reading_tuple in caplog.record_tuples
+    assert no_file_tuple not in caplog.record_tuples
+    assert writing_tuple not in caplog.record_tuples
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True, False], indirect=True)
