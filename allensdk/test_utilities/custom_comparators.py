@@ -8,8 +8,8 @@ import numpy as np
 class WhitespaceStrippedString(object):
     """Comparator class to compare strings that have been stripped of
     whitespace. By default removes any unicode whitespace character that
-    matches the regex \s, (which includes [ \t\n\r\f\v], and other unicode
-    whitespace characters).
+    matches the regex \\s, (which includes [ \\t\\n\\r\\f\\v],
+    and other unicode whitespace characters).
     """
     def __init__(self, string: str, whitespace_chars: str = r"\s",
                  ASCII: bool = False):
