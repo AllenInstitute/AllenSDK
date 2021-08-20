@@ -102,6 +102,78 @@ class TestJson:
         assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_traces_same_order_as_cell_specimen_table(self, trace_type):
+        """tests that traces are in same order as cell specimen table"""
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+        private_trace_attr = getattr(csp, f'_{trace_type}')
+        public_trace_attr = getattr(csp, trace_type)
+
+        current_order = np.where(
+            private_trace_attr.value.index ==
+            csp._cell_specimen_table['cell_roi_id'])[0]
+
+        # make sure same order
+        private_trace_attr._value = private_trace_attr.value.iloc[current_order]
+
+        # rearrange
+        private_trace_attr._value = private_trace_attr._value.iloc[[2, 0, 1]]
+
+        # make sure same order
+        np.testing.assert_array_equal(public_trace_attr.index, csp.table.index)
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+        private_trace_attr = getattr(csp, f'_{trace_type}')
+
+        if extra_in_trace:
+            # Drop an roi from cell specimen table that is in trace
+            trace_rois = private_trace_attr.value.index
+            csp._cell_specimen_table = csp._cell_specimen_table[
+                csp._cell_specimen_table['cell_roi_id'] != trace_rois[0]]
+        else:
+            # Drop an roi from trace that is in cell specimen table
+            csp_rois = csp._cell_specimen_table['cell_roi_id']
+            private_trace_attr._value = private_trace_attr._value[
+                private_trace_attr._value.index != csp_rois.iloc[0]]
+
+        if trace_type == 'dff_traces':
+            trace_args = {
+                'dff_traces': private_trace_attr,
+                'corrected_fluorescence_traces':
+                    csp._corrected_fluorescence_traces
+            }
+        else:
+            trace_args = {
+                'dff_traces': csp._dff_traces,
+                'corrected_fluorescence_traces': private_trace_attr
+            }
+        with pytest.raises(RuntimeError):
+            # construct it again using trace/table combo with different rois
+            CellSpecimens(
+                cell_specimen_table=csp._cell_specimen_table,
+                meta=csp._meta,
+                events=csp._events,
+                ophys_timestamps=self.ophys_timestamps,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                **trace_args
+            )
+
 
 class TestNWB:
     @classmethod

@@ -121,12 +121,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                  cell_specimen_table: pd.DataFrame,
                  meta: CellSpecimenMeta,
                  dff_traces: DFFTraces,
-                 corrected_fluourescence_traces: CorrectedFluorescenceTraces,
+                 corrected_fluorescence_traces: CorrectedFluorescenceTraces,
                  events: Events,
                  ophys_timestamps: OphysTimestamps,
                  segmentation_mask_image_spacing: Tuple,
                  filter_invalid_rois=False):
         """
+        A container for cell specimens including traces, events, metadata, etc.
 
         Parameters
         ----------
@@ -147,7 +148,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 - y
         meta
         dff_traces
-        corrected_fluourescence_traces
+        corrected_fluorescence_traces
         events
         ophys_timestamps
         segmentation_mask_image_spacing
@@ -163,7 +164,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 cell_specimen_table['valid_roi']]
             dff_traces.filter_to_roi_ids(
                 roi_ids=cell_specimen_table['cell_roi_id'].values)
-            corrected_fluourescence_traces.filter_to_roi_ids(
+            corrected_fluorescence_traces.filter_to_roi_ids(
                 roi_ids=cell_specimen_table['cell_roi_id'].values)
             events.filter_to_roi_ids(
                 roi_ids=cell_specimen_table['cell_roi_id'].values)
@@ -171,7 +172,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
-        self._corrected_fluourescence_traces = corrected_fluourescence_traces
+        self._corrected_fluorescence_traces = corrected_fluorescence_traces
         self._events = events
         self._segmentation_mask_image = self._get_segmentation_mask_image(
             spacing=segmentation_mask_image_spacing)
@@ -199,7 +200,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
         df = self.table[['cell_roi_id']].join(
-            self._corrected_fluourescence_traces.value, on='cell_roi_id')
+            self._corrected_fluorescence_traces.value, on='cell_roi_id')
         return df
 
     @property
@@ -287,7 +288,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         return cls(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
-            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
@@ -329,7 +330,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         return cls(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
-            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
@@ -379,7 +380,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
         return cls(
             cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
-            corrected_fluourescence_traces=corrected_fluorescence_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
@@ -479,7 +480,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                                 ophys_timestamps=ophys_timestamps)
 
         # 3. Add Corrected fluorescence traces
-        self._corrected_fluourescence_traces.to_nwb(nwbfile=nwbfile)
+        self._corrected_fluorescence_traces.to_nwb(nwbfile=nwbfile)
 
         # 4. Add events
         self._events.to_nwb(nwbfile=nwbfile)
@@ -552,7 +553,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             'dff_traces': 'dff',
             'corrected_fluorescence_traces': 'corrected_fluorescence'
         }
-        for traces in (self._dff_traces, self._corrected_fluourescence_traces):
+        for traces in (self._dff_traces, self._corrected_fluorescence_traces):
             # validate traces contain expected roi ids
             if not np.in1d(traces.value.index,
                            self.table[['cell_roi_id']]).all():

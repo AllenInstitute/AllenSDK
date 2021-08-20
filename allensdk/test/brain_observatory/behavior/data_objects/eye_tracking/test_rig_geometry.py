@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 
 from datetime import datetime
 from pathlib import Path
@@ -6,9 +7,9 @@ from pathlib import Path
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .rig_geometry import \
-    RigGeometry
+    RigGeometry, Coordinates
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
@@ -32,6 +33,42 @@ class TestFromLims(LimsTest):
         rg = RigGeometry.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
         assert rg == self.expected
+
+    @pytest.mark.requires_bamboo
+    def test_rig_geometry_newer_than_experiment(self):
+        """
+        This test ensures that if the experiment date_of_acquisition
+        is before a rig activate_date that it is not returned as the rig
+        used for the experiment
+        """
+        # This experiment has rig config more recent than the
+        # experiment date_of_acquisition
+        ophys_experiment_id = 521405260
+
+        rg = RigGeometry.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn)
+        expected = RigGeometry(
+            camera_position_mm=Coordinates(x=130.0, y=0.0, z=0.0),
+            led_position=Coordinates(x=265.1, y=-39.3, z=1.0),
+            monitor_position_mm=Coordinates(x=170.0, y=0.0, z=0.0),
+            camera_rotation_deg=Coordinates(x=0.0, y=0.0, z=13.1),
+            monitor_rotation_deg=Coordinates(x=0.0, y=0.0, z=0.0),
+            equipment='CAM2P.1'
+        )
+        assert rg == expected
+
+    def test_only_single_geometry_returned(self):
+        """Tests that when a rig contains multiple geometries, that only 1 is
+        returned"""
+        dir = Path(__file__).parent.parent.resolve()
+        test_data_dir = dir / 'test_data'
+
+        # This example contains multiple geometries per config
+        df = pd.read_pickle(
+            str(test_data_dir / 'raw_eye_tracking_rig_geometry.pkl'))
+
+        obtained = RigGeometry._select_most_recent_geometry(rig_geometry=df)
+        assert obtained.shape[0] == 3
 
 
 class TestFromJson(LimsTest):

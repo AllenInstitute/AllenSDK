@@ -210,11 +210,8 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
         rig_geometry['config_type'] = rig_geometry['config_type'] \
             .map(rig_geometry_config_type_map)
 
-        # Select the most recent config
-        # that precedes the date_of_acquisition for this experiment
-        rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
-        rig_geometry = rig_geometry.groupby('config_type') \
-            .apply(lambda x: x.iloc[0])
+        rig_geometry = cls._select_most_recent_geometry(
+            rig_geometry=rig_geometry)
 
         # Construct dictionary for positions
         position = rig_geometry[['center_x_mm', 'center_y_mm', 'center_z_mm']]
@@ -254,3 +251,20 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
             'equipment': rig_geometry['equipment_name'].iloc[0]
         }
         return RigGeometry(**rig_geometry)
+
+    @staticmethod
+    def _select_most_recent_geometry(rig_geometry: pd.DataFrame):
+        """There can be multiple geometry entries in LIMS for a rig.
+        Select most recent one that precedes the date of acquisition
+        (only relevant for retrieving from LIMS)
+
+        Parameters
+        ----------
+        rig_geometry
+            Table of geometries for rig as returned by LIMS
+
+        """
+        rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
+        rig_geometry = rig_geometry.groupby('config_type') \
+            .apply(lambda x: x.iloc[0])
+        return rig_geometry
