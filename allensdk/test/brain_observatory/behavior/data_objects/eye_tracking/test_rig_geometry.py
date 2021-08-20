@@ -68,7 +68,7 @@ class TestFromLims(LimsTest):
             str(test_data_dir / 'raw_eye_tracking_rig_geometry.pkl'))
 
         obtained = RigGeometry._select_most_recent_geometry(rig_geometry=df)
-        assert obtained.shape[0] == 3
+        assert (obtained.groupby(obtained.index).size() == 1).all()
 
 
 class TestFromJson(LimsTest):
