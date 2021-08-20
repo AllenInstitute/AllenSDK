@@ -118,10 +118,13 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.12.4
+-----------------------------------------------------------------------
+- Documentation changes ahead of SWDB 2021
+
 What's New - 2.12.3
 -----------------------------------------------------------------------
 - Reordered columns in Visual Behavior metadata tables to be more helpful
-
 
 What's New - 2.12.2
 -----------------------------------------------------------------------
