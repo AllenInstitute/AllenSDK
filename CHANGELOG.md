@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.3] = 2021-08-20
+- Reordered columns in Visual Behavior metadata tables to be more helpful
+
 ## [2.12.2] = 2021-08-13
 - fix to how from_lims API gets OPhys experiment metadata. Preserves relationship between OPhys experiments and failed containers
 

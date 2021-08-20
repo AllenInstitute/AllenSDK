@@ -118,7 +118,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - 12.2.2
+What's New - 2.12.3
+-----------------------------------------------------------------------
+- Reordered columns in Visual Behavior metadata tables to be more helpful
+
+
+What's New - 2.12.2
 -----------------------------------------------------------------------
 - fix to how from_lims API gets OPhys experiment metadata. Preserves relationship between OPhys experiments and failed containers
 
