@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from unittest.mock import create_autospec
 
@@ -93,6 +95,19 @@ def test_stimulus_timestamps_from_json(
         mock_get_behavior_stimulus_timestamps.assert_called_once_with(
             stimulus_pkl=mock_stimulus_file_instance.data
         )
+
+
+def test_stimulus_timestamps_from_json2():
+    dir = Path(__file__).parent.parent.resolve()
+    test_data_dir = dir / 'test_data'
+    sf_path = test_data_dir / 'stimulus_file.pkl'
+
+    sf = StimulusFile.from_json(
+        dict_repr={'behavior_stimulus_file': str(sf_path)})
+    stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+        stimulus_file=sf)
+    expected = np.array([0.016 * i for i in range(11)])
+    assert np.allclose(expected, stimulus_timestamps.value)
 
 
 @pytest.mark.parametrize(

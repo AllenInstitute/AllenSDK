@@ -1,6 +1,7 @@
 {
   "log_level": "DEBUG",
   "session_data": {
+    "behavior_stimulus_file": "stimulus_file.pkl",
     "ophys_experiment_id": 1234,
     "ophys_session_id": 999,
     "behavior_session_id": 1071270468,
