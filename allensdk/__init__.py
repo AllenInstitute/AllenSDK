@@ -37,7 +37,6 @@ import logging
 
 __version__ = '2.13.0'
 
-
 try:
     from logging import NullHandler
 except ImportError:

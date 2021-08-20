@@ -286,6 +286,11 @@ SUMMARY OF AVAILABLE DATA
 DATA FILE CHANGELOG
 -------------------
 
+**v1.0.1**
+
+Metadata corrections
+- ophys_container_id columns contained extra IDs of incorrect containers.
+
 **v1.0.0**
 
 New Data

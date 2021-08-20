@@ -1,7 +1,7 @@
 psycopg2-binary>=2.7,<3.0.0
 hdmf<2.5.0
 h5py>=2.8,<3.0.0
-matplotlib>=1.4.3,<4.0.0
+matplotlib>=1.4.3,<3.4.3
 numpy>=1.15.4,<1.19.0
 pandas>=0.25.1,<=0.25.3
 jinja2>=2.7.3,<2.12.0

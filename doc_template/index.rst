@@ -122,6 +122,14 @@ What's New - 2.13.0
 -----------------------------------------------------------------------
 - TBD
  
+What's New - 2.12.3
+-----------------------------------------------------------------------
+- Reordered columns in Visual Behavior metadata tables to be more helpful
+
+What's New - 2.12.2
+-----------------------------------------------------------------------
+- fix to how from_lims API gets OPhys experiment metadata. Preserves relationship between OPhys experiments and failed containers
+
 What's New - 2.12.1
 -----------------------------------------------------------------------
 - minor fix to cloud cache consistency check
