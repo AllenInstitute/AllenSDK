@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.12.4] = 2021-08-21
+- Documentation changes ahead of SWDB 2021
+
 ## [2.12.3] = 2021-08-20
 - Reordered columns in Visual Behavior metadata tables to be more helpful
 
