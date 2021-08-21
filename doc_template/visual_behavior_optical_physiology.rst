@@ -1,3 +1,8 @@
+.. image:: /_static/visual_behavior_2p/experimental_design_conditions.png
+   :align: center
+   :width: 850
+
+
 GETTING STARTED
 ---------------
 
@@ -49,7 +54,7 @@ and passive viewing conditions. This dataset can be used to evaluate the
 influence of experience, expectation, and task engagement on neural coding 
 and dynamics.  
 
-.. image:: /_static/visual_behavior_2p/datasets.png
+.. image:: /_static/visual_behavior_2p/datasets_project_codes.png
    :align: center
    :width: 850
 
@@ -66,7 +71,7 @@ cortical cells.
 The table below describes the numbers of mice, sessions, and unique recorded 
 neurons for each transgenic line and imaging platform in the dataset:
 
-.. image:: /_static/visual_behavior_2p/variants_table.png
+.. image:: /_static/visual_behavior_2p/final_dataset_numbers.png
    :align: center
    :width: 850
 
