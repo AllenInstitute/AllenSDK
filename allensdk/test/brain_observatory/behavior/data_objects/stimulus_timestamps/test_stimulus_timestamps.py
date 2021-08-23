@@ -110,6 +110,30 @@ def test_stimulus_timestamps_from_json2():
     assert np.allclose(expected, stimulus_timestamps.value)
 
 
+def test_stimulus_timestamps_from_json3():
+    """
+    Test that BehaviorDataTransforms.get_stimulus_timestamps()
+    just returns the sum of the intervalsms field in the
+    behavior stimulus pickle file, padded with a zero at the
+    first timestamp.
+    """
+    dir = Path(__file__).parent.parent.resolve()
+    test_data_dir = dir / 'test_data'
+    sf_path = test_data_dir / 'stimulus_file.pkl'
+
+    sf = StimulusFile.from_json(
+        dict_repr={'behavior_stimulus_file': str(sf_path)})
+
+    sf._data['items']['behavior']['intervalsms'] = [0.1, 0.2, 0.3, 0.4]
+
+    stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+        stimulus_file=sf)
+
+    expected = np.array([0., 0.0001, 0.0003, 0.0006, 0.001])
+    np.testing.assert_array_almost_equal(stimulus_timestamps.value,
+                                         expected,
+                                         decimal=10)
+
 @pytest.mark.parametrize(
     "stimulus_file, stimulus_file_to_json_ret, "
     "sync_file, sync_file_to_json_ret, raises, expected",

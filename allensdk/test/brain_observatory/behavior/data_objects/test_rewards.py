@@ -1,6 +1,7 @@
+import pickle
 from datetime import datetime
 from pathlib import Path
-
+import numpy as np
 import pandas as pd
 import pynwb
 import pytest
@@ -32,6 +33,50 @@ class TestFromStimulusFile(LimsTest):
         rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
                                              stimulus_timestamps=timestamps)
         assert rewards == self.expected
+
+    def test_from_stimulus_file2(self, tmpdir):
+        """
+        Test that Rewards.from_stimulus_file returns
+        expected results (main nuance is that timestamps should be
+        determined by applying the reward frame as an index to
+        stimulus_timestamps)
+        """
+
+        def _create_dummy_stimulus_file():
+            trial_log = [
+                {'rewards': [(0.001, -1.0, 4)],
+                 'trial_params': {'auto_reward': True}},
+                {'rewards': []},
+                {'rewards': [(0.002, -1.0, 10)],
+                 'trial_params': {'auto_reward': False}}
+            ]
+            data = {
+                'items': {
+                    'behavior': {
+                        'trial_log': trial_log
+                    }
+                },
+            }
+            tmp_path = tmpdir / 'stimulus_file.pkl'
+            with open(tmp_path, 'wb') as f:
+                pickle.dump(data, f)
+                f.seek(0)
+
+            return tmp_path
+
+        stimulus_filepath = _create_dummy_stimulus_file()
+        stimulus_file = StimulusFile.from_json(
+            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
+                                             stimulus_timestamps=timestamps)
+
+        expected_dict = {'volume': [0.001, 0.002],
+                         'timestamps': [0.04, 0.1],
+                         'autorewarded': [True, False]}
+        expected_df = pd.DataFrame(expected_dict)
+        expected_df = expected_df
+        assert expected_df.equals(rewards.value)
 
 
 class TestNWB:
