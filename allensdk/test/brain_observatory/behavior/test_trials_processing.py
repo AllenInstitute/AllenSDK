@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 from itertools import combinations
 
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior import trials_processing
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import db_connection_creator
 
 
 @pytest.mark.requires_bamboo
@@ -26,10 +27,13 @@ def test_get_ori_info_from_trial(behavior_experiment_id,
     -----
     - i may be rewriting code here but its more a sanity check really...
     """
-    lims_api = BehaviorLimsApi(behavior_session_id=behavior_experiment_id)
-    stim_output = pd.read_pickle(
-        lims_api.extractor.get_behavior_stimulus_file()
-    )
+    def _get_stimulus_data():
+        lims_db = db_connection_creator(
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        stimulus_file = StimulusFile.from_lims(
+            db=lims_db, behavior_session_id=behavior_experiment_id)
+        return stimulus_file.data
+    stim_output = _get_stimulus_data()
     trial_log = stim_output['items']['behavior']['trial_log']
 
     if exception:
