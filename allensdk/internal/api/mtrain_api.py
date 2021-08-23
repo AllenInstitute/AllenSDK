@@ -6,12 +6,15 @@ import itertools
 import json
 import uuid
 
-from . import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi)
+from . import PostgresQueryMixin, db_connection_creator
 from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
-from allensdk.core.auth_config import MTRAIN_DB_CREDENTIAL_MAP
+from allensdk.core.auth_config import MTRAIN_DB_CREDENTIAL_MAP, \
+    LIMS_DB_CREDENTIAL_MAP
 from allensdk.core.authentication import credential_injector
+from ...brain_observatory.behavior.data_objects import BehaviorSessionId
+from ...brain_observatory.behavior.data_objects.metadata.behavior_metadata\
+    .behavior_metadata import \
+    BehaviorMetadata
 
 
 class MtrainApi:
@@ -59,22 +62,29 @@ class MtrainApi:
             behavior_session_id]), 'must enter either a ' \
                                    'behavior_session_uuid or a ' \
                                    'behavior_session_id'
+        if behavior_session_id is not None:
+            def _get_behavior_metadata():
+                lims_db = db_connection_creator(
+                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+                )
+                behavior_session_id_ = BehaviorSessionId(
+                    behavior_session_id=behavior_session_id)
+                bm = BehaviorMetadata.from_internal(
+                    behavior_session_id=behavior_session_id_, lims_db=lims_db)
+                return bm
+            bm = _get_behavior_metadata()
 
-        if behavior_session_uuid is not None and behavior_session_id is not \
-                None:
-            # if both a behavior session uuid and a lims id are entered,
-            # ensure that they match
-            behavior_api = BehaviorLimsApi(behavior_session_id)
-            assert behavior_session_uuid == \
-                   str(behavior_api.get_metadata().behavior_session_uuid), \
-                   'behavior_session {} does not match ' \
-                   'behavior_session_id {}'.format(behavior_session_uuid,
-                                                   behavior_session_id)
-        if behavior_session_uuid is None and behavior_session_id is not None:
-            # get a behavior session uuid if a lims ID was entered
-            behavior_api = BehaviorLimsApi(behavior_session_id)
-            behavior_session_uuid = str(behavior_api.get_metadata().
-                                        behavior_session_uuid)
+            if behavior_session_uuid is not None:
+                # if both a behavior session uuid and a lims id are entered,
+                # ensure that they match
+                assert behavior_session_uuid == \
+                       str(bm.behavior_session_uuid), \
+                       'behavior_session {} does not match ' \
+                       'behavior_session_id {}'.format(
+                            behavior_session_uuid, bm.behavior_session_uuid)
+            else:
+                # get a behavior session uuid if a lims ID was entered
+                behavior_session_uuid = str(bm.behavior_session_uuid)
 
         filters = [{"name": "id", "op": "eq", "val": behavior_session_uuid}]
         behavior_df = self.get_df('behavior_sessions', filters=filters).rename(
