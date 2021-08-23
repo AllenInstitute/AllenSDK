@@ -115,20 +115,3 @@ def test_get_session(behavior_session_uuid, behavior_session_id):
                                                u'VisualBehavior_Task1A_v1.0.1'
                                            }],
                             u'default_y': False}
-
-# def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
-
-#     api = LimsOphysAPI()
-
-#     if compare_val is None:
-#         expected_fail = False
-#         try:
-#             api.get_ophys_experiment_dir(ophys_experiment_id)
-#         except OneResultExpectedError:
-#             expected_fail = True
-#         assert expected_fail == True
-
-#     else:
-#         api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id)
-#         assert api.get_ophys_experiment_dir(
-#         ophys_experiment_id=ophys_experiment_id) == compare_val

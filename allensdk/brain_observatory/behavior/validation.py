@@ -1,45 +1,61 @@
 import h5py
 import os
 
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi)
-from allensdk.brain_observatory.behavior.session_apis.data_io.ophys_lims_api \
-    import OphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
         BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .ophys_timestamps import \
+    OphysTimestamps
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import db_connection_creator
+from allensdk.internal.core.lims_utilities import safe_system_path
+
+db_conn = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+
 
 class ValidationError(AssertionError):
     pass
+
 
 def get_raw_ophys_file_shape(raw_filepath):
         with h5py.File(raw_filepath, 'r') as raw_file:
             raw_data_shape = raw_file['data'].shape
         return raw_data_shape
 
-def validate_ophys_dff_length(ophys_experiment_id, api=None):
-    api = OphysLimsApi() if api is None else api
 
-    ophys_experiment_dir = api.get_ophys_experiment_dir(ophys_experiment_id)
+def validate_ophys_dff_length(ophys_experiment_id, dff_file: DFFFile):
+    ophys_experiment_dir = _get_ophys_experiment_dir(
+        ophys_experiment_id=ophys_experiment_id)
     raw_filepath = os.path.join(ophys_experiment_dir, str(ophys_experiment_id)+'.h5')
     raw_data_shape = get_raw_ophys_file_shape(raw_filepath)
 
-    dff_filepath = api.get_dff_file(ophys_experiment_id=ophys_experiment_id)
-    dff_shape = get_raw_ophys_file_shape(dff_filepath)
+    dff_shape = get_raw_ophys_file_shape(dff_file.filepath)
 
     if raw_data_shape[0] != dff_shape[1]:
         raise ValidationError('dff length does not match raw data length')
 
-def validate_ophys_timestamps(ophys_experiment_id, api=None):
-    api = BehaviorOphysLimsApi() if api is None else api
 
-    ophys_experiment_dir = api.get_ophys_experiment_dir(ophys_experiment_id)
+def validate_ophys_timestamps(ophys_experiment_id, number_of_frames):
+    def _get_ophys_timestamps():
+        sync_file = SyncFile.from_lims(db=db_conn,
+                                       ophys_experiment_id=ophys_experiment_id)
+        ophys_timestamps = OphysTimestamps.from_sync_file(
+            sync_file=sync_file, number_of_frames=number_of_frames)
+        return ophys_timestamps
+
+    ophys_experiment_dir = _get_ophys_experiment_dir(
+        ophys_experiment_id=ophys_experiment_id)
     raw_filepath = os.path.join(ophys_experiment_dir, str(ophys_experiment_id)+'.h5')
     raw_data_shape = get_raw_ophys_file_shape(raw_filepath)
 
-    ophys_timestamps_shape = api.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id).shape
+    ophys_timestamps = _get_ophys_timestamps()
+    ophys_timestamps_shape = ophys_timestamps.value.shape
 
     if raw_data_shape[0] != ophys_timestamps_shape[0]:
         raise ValidationError('ophys_timestamp length does not match raw data length')
+
 
 def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, verbose=False):
         # ensure that the last trial ends sometime on the last flash/blank cycle
@@ -52,7 +68,6 @@ def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, ve
         #   the first carrot represents the time of the last recorded stimulus flash
         #   the second carrot represents the time at which another flash should have started, after accounting for the possibility of the session ending on an omitted flash
         
-        api = BehaviorOphysLimsApi() if api is None else api
         session = BehaviorOphysExperiment(api)
 
         # get the flash/blank parameters
@@ -80,9 +95,8 @@ def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, ve
         if not last_flash_start <= last_trial_end <= next_flash_would_have_started:
             raise ValidationError('The last trial does not end between the start of the last flash and the expected start time of the next flash')
 
-if __name__ == "__main__":
 
-    api = BehaviorOphysLimsApi()
+def main():
     ophys_experiment_id_list = [775614751, 778644591, 787461073, 782675436, 783928214, 783927872,
                                 787501821, 787498309, 788490510, 788488596, 788489531, 789359614,
                                 790149413, 790709081, 791119849, 791453282, 791980891, 792813858,
@@ -97,14 +111,32 @@ if __name__ == "__main__":
                                 808619526, 808619543, 808621034, 808621015]
 
     for ophys_experiment_id in ophys_experiment_id_list:
+        dff_file = DFFFile.from_lims(db=db_conn,
+                                     ophys_experiment_id=ophys_experiment_id)
+
         validation_functions_to_run = [
-            validate_ophys_timestamps, 
-            validate_ophys_dff_length,
+            validate_ophys_timestamps,
+            lambda ophys_experiment_id: validate_ophys_dff_length(
+                ophys_experiment_id=ophys_experiment_id, dff_file=dff_file),
             validate_last_trial_ends_adjacent_to_flash,
         ]
         for validation_function in validation_functions_to_run:
 
             try:
-                validation_function(ophys_experiment_id, api=api)
+                validation_function(ophys_experiment_id)
             except ValidationError as e:
                 print(ophys_experiment_id, e)
+
+
+def _get_ophys_experiment_dir(ophys_experiment_id) -> str:
+    """Get the storage directory associated with the ophys experiment"""
+    query = """
+            SELECT oe.storage_directory
+            FROM ophys_experiments oe
+            WHERE oe.id = {};
+            """.format(ophys_experiment_id)
+    return safe_system_path(db_conn.fetchone(query, strict=True))
+
+
+if __name__ == "__main__":
+    main()

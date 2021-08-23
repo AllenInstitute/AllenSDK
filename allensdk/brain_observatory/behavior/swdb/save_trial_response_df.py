@@ -5,10 +5,6 @@ import pandas as pd
 from scipy import stats
 import itertools
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-    BehaviorOphysExperiment
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from importlib import reload; reload(bpc)
 from allensdk.brain_observatory.behavior.swdb.analysis_tools import get_nearest_frame, get_trace_around_timepoint, get_mean_in_window
@@ -245,12 +241,6 @@ if __name__=='__main__':
     elif case == 1:
         # This is a debugging case 
         experiment_id  = 846487947
-
-        # api = BehaviorOphysLimsApi(experiment_id)
-        # session = BehaviorOphysExperiment(api)
-        # nwb_path = cache.get_nwb_filepath(experiment_id)
-        # api = BehaviorOphysNwbApi(nwb_path)
-        # session = BehaviorOphysExperiment(api)
 
         session = cache.get_session(experiment_id)
 

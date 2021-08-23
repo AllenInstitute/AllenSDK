@@ -8,8 +8,6 @@ from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
         BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
     BehaviorOphysNwbApi)
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from allensdk.brain_observatory.behavior.swdb.analysis_tools import get_nearest_frame, get_trace_around_timepoint, get_mean_in_window
 
