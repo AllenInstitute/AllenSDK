@@ -112,7 +112,7 @@ def test_stimulus_timestamps_from_json2():
 
 def test_stimulus_timestamps_from_json3():
     """
-    Test that BehaviorDataTransforms.get_stimulus_timestamps()
+    Test that StimulusTimestamps.from_stimulus_file
     just returns the sum of the intervalsms field in the
     behavior stimulus pickle file, padded with a zero at the
     first timestamp.

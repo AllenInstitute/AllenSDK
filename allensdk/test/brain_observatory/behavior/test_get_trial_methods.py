@@ -20,30 +20,7 @@ focus of a future ticket.
 import os
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorDataTransforms  # noqa: E501
 from allensdk.brain_observatory.behavior.session_apis.data_transforms import BehaviorOphysDataTransforms  # noqa: E501
-
-
-def test_behavior_get_trials(monkeypatch):
-
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    resource_dir = os.path.join(this_dir, 'resources')
-    pkl_name = os.path.join(resource_dir, 'example_stimulus.pkl.gz')
-    pkl_data = pd.read_pickle(pkl_name)
-
-    def dummy_init(self):
-        pass
-
-    with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorDataTransforms,
-                    '__init__',
-                    dummy_init)
-        ctx.setattr(BehaviorDataTransforms,
-                    '_behavior_stimulus_file',
-                    lambda x: pkl_data)
-
-        xforms = BehaviorDataTransforms()
-        _ = xforms.get_trials()
 
 
 def test_behavior_ophys_get_trials(monkeypatch):
