@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorLimsApi, BehaviorOphysLimsApi)
+    BehaviorOphysLimsApi)
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
@@ -441,7 +441,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
-        return BehaviorSession(BehaviorLimsApi(behavior_session_id))
+        return BehaviorSession.from_internal(
+            behavior_session_id=behavior_session_id)
 
     def get_ophys_experiment_table(
             self,
