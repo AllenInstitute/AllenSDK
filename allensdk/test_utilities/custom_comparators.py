@@ -8,7 +8,7 @@ class WhitespaceStrippedString(object):
     whitespace. By default removes any unicode whitespace character that
     matches the regex \s, (which includes [ \t\n\r\f\v], and other unicode
     whitespace characters).
-    """
+    """ # noqa W605
     def __init__(self, string: str, whitespace_chars: str = r"\s",
                  ASCII: bool = False):
         self.orig = string

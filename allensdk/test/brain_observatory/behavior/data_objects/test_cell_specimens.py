@@ -119,7 +119,8 @@ class TestJson:
             csp._cell_specimen_table['cell_roi_id'])[0]
 
         # make sure same order
-        private_trace_attr._value = private_trace_attr.value.iloc[current_order]
+        private_trace_attr._value = private_trace_attr.value\
+            .iloc[current_order]
 
         # rearrange
         private_trace_attr._value = private_trace_attr._value.iloc[[2, 0, 1]]

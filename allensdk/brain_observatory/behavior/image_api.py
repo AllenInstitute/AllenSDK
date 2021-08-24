@@ -27,6 +27,7 @@ class Image(NamedTuple):
     def __array__(self):
         return np.array(self.data)
 
+
 class ImageApi:
 
     @staticmethod

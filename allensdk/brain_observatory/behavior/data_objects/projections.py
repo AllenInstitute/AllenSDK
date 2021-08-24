@@ -1,7 +1,5 @@
 from matplotlib import image as mpimg
-from pynwb import NWBFile, ProcessingModule
-from pynwb.base import Images
-from pynwb.image import GrayscaleImage
+from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \

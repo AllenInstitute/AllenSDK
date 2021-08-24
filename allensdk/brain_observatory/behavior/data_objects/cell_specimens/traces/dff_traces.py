@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pandas as pd
 import numpy as np
 from pynwb import NWBFile

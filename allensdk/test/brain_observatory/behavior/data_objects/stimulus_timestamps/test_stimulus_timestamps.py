@@ -134,6 +134,7 @@ def test_stimulus_timestamps_from_json3():
                                          expected,
                                          decimal=10)
 
+
 @pytest.mark.parametrize(
     "stimulus_file, stimulus_file_to_json_ret, "
     "sync_file, sync_file_to_json_ret, raises, expected",

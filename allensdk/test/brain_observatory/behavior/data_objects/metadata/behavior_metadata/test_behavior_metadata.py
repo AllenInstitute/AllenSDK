@@ -9,8 +9,7 @@ import pytz
 from uuid import UUID
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId, \
-    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
