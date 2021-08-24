@@ -125,7 +125,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                  events: Events,
                  ophys_timestamps: OphysTimestamps,
                  segmentation_mask_image_spacing: Tuple,
-                 filter_invalid_rois=False):
+                 exclude_invalid_rois=False):
         """
         A container for cell specimens including traces, events, metadata, etc.
 
@@ -153,13 +153,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         ophys_timestamps
         segmentation_mask_image_spacing
             Spacing to pass to sitk when constructing segmentation mask image
-        filter_invalid_rois
+        exclude_invalid_rois
             Whether to exclude invalid rois
 
         """
         super().__init__(name='cell_specimen_table', value=self)
 
-        if filter_invalid_rois:
+        if exclude_invalid_rois:
             cell_specimen_table = cell_specimen_table[
                 cell_specimen_table['valid_roi']]
             dff_traces.filter_to_roi_ids(
@@ -220,7 +220,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                   lims_db: PostgresQueryMixin,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  filter_invalid_rois=False,
+                  exclude_invalid_rois=False,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
@@ -285,21 +285,21 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
 
-        return cls(
+        return CellSpecimens(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
-            filter_invalid_rois=filter_invalid_rois
+            exclude_invalid_rois=exclude_invalid_rois
         )
 
     @classmethod
     def from_json(cls, dict_repr: dict,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  filter_invalid_rois=False,
+                  exclude_invalid_rois=False,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
@@ -327,19 +327,19 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
-        return cls(
+        return CellSpecimens(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
-            filter_invalid_rois=filter_invalid_rois)
+            exclude_invalid_rois=exclude_invalid_rois)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  segmentation_mask_image_spacing: Tuple,
-                 filter_invalid_rois=False,
+                 exclude_invalid_rois=False,
                  events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
@@ -378,13 +378,13 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         events = _get_events()
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
 
-        return cls(
+        return CellSpecimens(
             cell_specimen_table=df, meta=meta, dff_traces=dff_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=segmentation_mask_image_spacing,
-            filter_invalid_rois=filter_invalid_rois)
+            exclude_invalid_rois=exclude_invalid_rois)
 
     def to_nwb(self, nwbfile: NWBFile,
                ophys_timestamps: OphysTimestamps) -> NWBFile:

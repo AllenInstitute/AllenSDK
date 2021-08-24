@@ -198,19 +198,19 @@ class TestNWB:
         bom = tbom.meta
         bom.to_nwb(nwbfile=self.nwbfile)
 
-    @pytest.mark.parametrize('filter_invalid_rois', [True, False])
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture,
-                            filter_invalid_rois):
-        if filter_invalid_rois:
+                            exclude_invalid_rois):
+        if exclude_invalid_rois:
             # changing one of the rois to be valid
             self.dict_repr['cell_specimen_table_dict']['valid_roi']['0'] = True
 
         cell_specimens = CellSpecimens.from_json(
             dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
-            filter_invalid_rois=filter_invalid_rois)
+            exclude_invalid_rois=exclude_invalid_rois)
 
         csp = cell_specimens._cell_specimen_table
 
@@ -223,14 +223,15 @@ class TestNWB:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
                 data_object_cls=CellSpecimens,
-                filter_invalid_rois=filter_invalid_rois,
+                exclude_invalid_rois=exclude_invalid_rois,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         else:
             obt = cell_specimens.from_nwb(
-                nwbfile=self.nwbfile, filter_invalid_rois=filter_invalid_rois,
+                nwbfile=self.nwbfile,
+                exclude_invalid_rois=exclude_invalid_rois,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
 
-        if filter_invalid_rois:
+        if exclude_invalid_rois:
             cell_specimens._cell_specimen_table = \
                 cell_specimens._cell_specimen_table[
                     cell_specimens._cell_specimen_table['cell_roi_id']
