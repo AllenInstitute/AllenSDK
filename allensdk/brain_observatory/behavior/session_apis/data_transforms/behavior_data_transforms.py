@@ -1,2 +1,0 @@
-class BehaviorDataTransforms:
-    pass
