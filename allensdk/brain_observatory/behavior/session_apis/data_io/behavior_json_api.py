@@ -1,2 +1,0 @@
-class BehaviorJsonApi:
-    pass

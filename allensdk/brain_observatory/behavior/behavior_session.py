@@ -19,10 +19,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     BehaviorMetadata
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.session_api_utils import ParamsMixin
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorJsonApi, BehaviorLimsApi)
-from allensdk.brain_observatory.behavior.session_apis.abcs.\
-    session_base.behavior_base import BehaviorBase
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.brain_observatory.behavior.data_objects import (
@@ -32,6 +28,11 @@ from allensdk.brain_observatory.behavior.data_objects import (
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
+
+
+class BehaviorBase:
+    # TODO remove this
+    pass
 
 
 BehaviorDataApi = Type[BehaviorBase]
@@ -89,7 +90,6 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         metadata = BehaviorMetadata.from_json(session_data)
 
         return cls(
-            api=BehaviorJsonApi(session_data),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
@@ -123,7 +123,6 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
         return cls(
-            api=BehaviorLimsApi(behavior_session_id.value),
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
