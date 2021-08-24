@@ -69,9 +69,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.subject_metadata import \
     SubjectMetadata
-from allensdk.brain_observatory.behavior.image_api import ImageApi
-from allensdk.brain_observatory.behavior.session_apis.data_transforms import \
-    BehaviorOphysDataTransforms
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplateFactory
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
