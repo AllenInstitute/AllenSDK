@@ -136,4 +136,5 @@ class Events(DataObject, DataFileReadableInterface, NwbReadableInterface,
     def filter_to_roi_ids(self, roi_ids: np.ndarray):
         """Limit events to roi_ids' traces.
         Use for, ie excluding events of invalid rois"""
-        self._value = self._value[self._value['cell_roi_id'].isin(roi_ids)]
+        self._value = self._value.set_index('cell_roi_id').loc[roi_ids]\
+            .reset_index()
