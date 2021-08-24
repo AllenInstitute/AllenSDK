@@ -126,7 +126,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                  events: Events,
                  ophys_timestamps: OphysTimestamps,
                  segmentation_mask_image_spacing: Tuple,
-                 exclude_invalid_rois=False):
+                 exclude_invalid_rois=True):
         """
         A container for cell specimens including traces, events, metadata, etc.
 
@@ -221,7 +221,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                   lims_db: PostgresQueryMixin,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  exclude_invalid_rois=False,
+                  exclude_invalid_rois=True,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
@@ -300,7 +300,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     def from_json(cls, dict_repr: dict,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  exclude_invalid_rois=False,
+                  exclude_invalid_rois=True,
                   events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
@@ -340,7 +340,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  segmentation_mask_image_spacing: Tuple,
-                 exclude_invalid_rois=False,
+                 exclude_invalid_rois=True,
                  events_params: Optional[EventsParams] = None) \
             -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
@@ -507,7 +507,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             array-like interface to segmentation_mask image data and
             metadata
         """
-        mask_data = np.sum(self.roi_masks['roi_mask'].values).astype(int)
+        mask_data = np.sum(self.roi_masks['roi_mask']).astype(int)
 
         mask_image = Image(
             data=mask_data,
