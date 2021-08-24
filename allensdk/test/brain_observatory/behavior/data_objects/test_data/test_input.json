@@ -103,8 +103,8 @@
         "2": 0.0
       },
       "valid_roi": {
-        "0": false,
-        "1": false,
+        "0": true,
+        "1": true,
         "2": false
       },
       "height": {

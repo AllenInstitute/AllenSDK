@@ -123,7 +123,7 @@ class TestJson:
             .iloc[current_order]
 
         # rearrange
-        private_trace_attr._value = private_trace_attr._value.iloc[[2, 0, 1]]
+        private_trace_attr._value = private_trace_attr._value.iloc[[1, 0]]
 
         # make sure same order
         np.testing.assert_array_equal(public_trace_attr.index, csp.table.index)
@@ -172,6 +172,7 @@ class TestJson:
                 events=csp._events,
                 ophys_timestamps=self.ophys_timestamps,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                exclude_invalid_rois=False,
                 **trace_args
             )
 
@@ -204,10 +205,6 @@ class TestNWB:
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture,
                             exclude_invalid_rois):
-        if exclude_invalid_rois:
-            # changing one of the rois to be valid
-            self.dict_repr['cell_specimen_table_dict']['valid_roi']['0'] = True
-
         cell_specimens = CellSpecimens.from_json(
             dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
