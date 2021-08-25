@@ -41,3 +41,6 @@ class RoisMixin:
             self._value = (self._value
                            .reset_index()
                            .set_index(original_index_name))
+            if original_index_name == 'index':
+                # Set it back to None
+                self._value.index.name = None
