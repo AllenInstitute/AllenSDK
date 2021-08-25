@@ -25,14 +25,14 @@ def get_raw_ophys_file_shape(raw_filepath):
     return raw_data_shape
 
 
-def validate_ophys_dff_length(ophys_experiment_id, dff_file: DFFFile):
+def validate_ophys_dff_length(ophys_experiment_id, dff_filepath: str):
     ophys_experiment_dir = _get_ophys_experiment_dir(
         ophys_experiment_id=ophys_experiment_id)
     raw_filepath = os.path.join(ophys_experiment_dir,
                                 str(ophys_experiment_id) + '.h5')
     raw_data_shape = get_raw_ophys_file_shape(raw_filepath)
 
-    dff_shape = get_raw_ophys_file_shape(dff_file.filepath)
+    dff_shape = get_raw_ophys_file_shape(dff_filepath)
 
     if raw_data_shape[0] != dff_shape[1]:
         raise ValidationError('dff length does not match raw data length')
@@ -66,10 +66,10 @@ def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None,
     ensure that the last trial ends sometime on the last flash/blank cycle
     i.e, if this is the last flash/blank iteration (high = stimulus
     present):
-              -------           -------           -------           -------
-             |       |         |       |         |       |         |       |
-    ---------         ---------         ---------         ---------         ------------------------------------------- # noqa #E501
-                                                                  ^
+              -------           -------
+             |       |         |       |
+    ---------         ---------         ----------------------------
+                               ^                                   ^
     The last trial has to have ended somewhere between the two carrots where:
       the first carrot represents the time of the last recorded stimulus flash
       the second carrot represents the time at which another flash
@@ -147,7 +147,8 @@ def main():
         validation_functions_to_run = [
             validate_ophys_timestamps,
             lambda ophys_experiment_id: validate_ophys_dff_length(
-                ophys_experiment_id=ophys_experiment_id, dff_file=dff_file),
+                ophys_experiment_id=ophys_experiment_id,
+                dff_filepath=dff_file.filepath),
             validate_last_trial_ends_adjacent_to_flash,
         ]
         for validation_function in validation_functions_to_run:
