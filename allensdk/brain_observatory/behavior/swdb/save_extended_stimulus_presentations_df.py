@@ -122,16 +122,16 @@ def get_extended_stimulus_presentations(session):
                 # block_rep_number starts as a copy of block_inds, so we can
                 # go write over the index number with the rep number
                 block_repetition_number[
-                    block_repetition_number == block_number
-                    ] = ind_block
+                    block_repetition_number == block_number] = ind_block
 
     intermediate_df["image_block_repetition"] = block_repetition_number
 
     # Repeat number within a block
     repeat_number = np.full(len(intermediate_df), np.nan)
-    assert (
-            intermediate_df.iloc[0].name == 0
-    )  # Assuming that the row index starts at zero
+    
+    # Assuming that the row index starts at zero
+    assert intermediate_df.iloc[0].name == 0
+
     for ind_group, group in intermediate_df.groupby("block_index"):
         repeat = 0
         for ind_row, row in group.iterrows():
