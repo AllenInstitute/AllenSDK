@@ -255,14 +255,18 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
     @staticmethod
     def _select_most_recent_geometry(rig_geometry: pd.DataFrame):
         """There can be multiple geometry entries in LIMS for a rig.
-        Select most recent one that precedes the date of acquisition
-        (only relevant for retrieving from LIMS)
+        Select most recent one.
 
         Parameters
         ----------
         rig_geometry
             Table of geometries for rig as returned by LIMS
 
+         Notes
+         ----------
+         The geometries in rig_geometry are assumed to precede the
+         date_of_acquisition of the session
+        (only relevant for retrieving from LIMS)
         """
         rig_geometry = rig_geometry.sort_values('active_date', ascending=False)
         rig_geometry = rig_geometry.groupby('config_type') \
