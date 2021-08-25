@@ -1,10 +1,12 @@
 import datetime
 import pickle
 import uuid
+from pathlib import Path
 
 import pynwb
 import pytest
 import pytz
+from uuid import UUID
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
@@ -47,6 +49,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.subject_metadata import \
     SubjectMetadata
+from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
+    LimsTest
 
 
 class BehaviorMetaTestCase:
@@ -81,6 +85,19 @@ class BehaviorMetaTestCase:
                 behavior_session_uuid=uuid.uuid4())
         )
         return behavior_meta
+
+
+class TestLims(LimsTest):
+    @pytest.mark.requires_bamboo
+    def test_behavior_session_uuid(self):
+        behavior_session_id = 823847007
+        meta = BehaviorMetadata.from_internal(
+            behavior_session_id=BehaviorSessionId(
+                behavior_session_id=behavior_session_id),
+            lims_db=self.dbconn
+        )
+        assert meta.behavior_session_uuid == \
+               uuid.UUID('394a910e-94c7-4472-9838-5345aff59ed8')
 
 
 class TestBehaviorMetadata(BehaviorMetaTestCase):
@@ -236,6 +253,34 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             indicator = reporter_line.parse_indicator(warn=True)
         assert indicator is expected
         assert str(record[0].message) == warning_msg
+
+
+class TestStimulusFile:
+    """Tests properties read from stimulus file"""
+    def setup_class(cls):
+        dir = Path(__file__).parent.parent.parent.resolve()
+        test_data_dir = dir / 'test_data'
+        sf_path = test_data_dir / 'stimulus_file.pkl'
+        cls.stimulus_file = StimulusFile.from_json(
+            dict_repr={'behavior_stimulus_file': str(sf_path)})
+
+    def test_session_uuid(self):
+        uuid = BehaviorSessionUUID.from_stimulus_file(
+            stimulus_file=self.stimulus_file)
+        expected = UUID('138531ab-fe59-4523-9154-07c8d97bbe03')
+        assert expected == uuid.value
+
+    def test_get_stimulus_frame_rate(self):
+        rate = StimulusFrameRate.from_stimulus_file(
+            stimulus_file=self.stimulus_file)
+        assert 62.0 == rate.value
+
+
+def test_get_date_of_acquisition():
+    expected = datetime.datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
+    doa = datetime.datetime(2019, 9, 26, 16)
+    actual = DateOfAcquisition.to_utc(date_of_acquisition=doa)
+    assert expected == actual
 
 
 class TestNWB(BehaviorMetaTestCase):

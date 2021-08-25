@@ -1,6 +1,7 @@
 {
   "log_level": "DEBUG",
   "session_data": {
+    "behavior_stimulus_file": "stimulus_file.pkl",
     "ophys_experiment_id": 1234,
     "ophys_session_id": 999,
     "behavior_session_id": 1071270468,
@@ -102,8 +103,8 @@
         "2": 0.0
       },
       "valid_roi": {
-        "0": false,
-        "1": false,
+        "0": true,
+        "1": true,
         "2": false
       },
       "height": {

@@ -11,15 +11,30 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 
 
-class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
+class CorrectedFluorescenceTraces(DataObject, RoisMixin,
+                                  DataFileReadableInterface,
                                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, traces: pd.DataFrame):
+        """
+
+        Parameters
+        ----------
+        traces
+            index cell_roi_id
+            columns:
+            - corrected_fluorescence
+                list of float
+        """
         super().__init__(name='corrected_fluorescence_traces', value=traces)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "CorrectedFluorescenceTraces":
+    def from_nwb(cls, nwbfile: NWBFile) \
+            -> "CorrectedFluorescenceTraces":
         corr_fluorescence_nwb = nwbfile.processing[
             'ophys'].data_interfaces[
             'corrected_fluorescence'].roi_response_series['traces']

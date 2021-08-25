@@ -54,7 +54,8 @@ class TestLims:
                               number_of_frames=number_of_frames)
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
-            ophys_timestamps=ots)
+            ophys_timestamps=ots,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
@@ -91,24 +92,101 @@ class TestJson:
             timestamps=np.array([.1, .2, .3]), number_of_frames=3)
 
     def test_from_json(self):
-        csp = CellSpecimens.from_json(dict_repr=self.dict_repr,
-                                      ophys_timestamps=self.ophys_timestamps)
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
         assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
+    @pytest.mark.parametrize('data',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces',
+                              'events'))
+    def test_roi_data_same_order_as_cell_specimen_table(self, data):
+        """tests that roi data are in same order as cell specimen table"""
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+        private_attr = getattr(csp, f'_{data}')
+        public_attr = getattr(csp, data)
+
+        # Events stores cell_roi_id as column whereas traces is index
+        data_cell_roi_ids = getattr(
+            private_attr.value,
+            'cell_roi_id' if data == 'events' else 'index').values
+
+        current_order = np.where(data_cell_roi_ids ==
+                                 csp._cell_specimen_table['cell_roi_id'])[0]
+
+        # make sure same order
+        private_attr._value = private_attr.value\
+            .iloc[current_order]
+
+        # rearrange
+        private_attr._value = private_attr._value.iloc[[1, 0]]
+
+        # make sure same order
+        np.testing.assert_array_equal(public_attr.index, csp.table.index)
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+        csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+        private_trace_attr = getattr(csp, f'_{trace_type}')
+
+        if extra_in_trace:
+            # Drop an roi from cell specimen table that is in trace
+            trace_rois = private_trace_attr.value.index
+            csp._cell_specimen_table = csp._cell_specimen_table[
+                csp._cell_specimen_table['cell_roi_id'] != trace_rois[0]]
+        else:
+            # Drop an roi from trace that is in cell specimen table
+            csp_rois = csp._cell_specimen_table['cell_roi_id']
+            private_trace_attr._value = private_trace_attr._value[
+                private_trace_attr._value.index != csp_rois.iloc[0]]
+
+        if trace_type == 'dff_traces':
+            trace_args = {
+                'dff_traces': private_trace_attr,
+                'corrected_fluorescence_traces':
+                    csp._corrected_fluorescence_traces
+            }
+        else:
+            trace_args = {
+                'dff_traces': csp._dff_traces,
+                'corrected_fluorescence_traces': private_trace_attr
+            }
+        with pytest.raises(RuntimeError):
+            # construct it again using trace/table combo with different rois
+            CellSpecimens(
+                cell_specimen_table=csp._cell_specimen_table,
+                meta=csp._meta,
+                events=csp._events,
+                ophys_timestamps=self.ophys_timestamps,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                exclude_invalid_rois=False,
+                **trace_args
+            )
+
 
 class TestNWB:
     @classmethod
     def setup_class(cls):
-        tj = TestJson()
-        tj.setup_class()
         cls.ophys_timestamps = OphysTimestamps(
             timestamps=np.array([.1, .2, .3]), number_of_frames=3)
-        cls.cell_specimen_table = CellSpecimens.from_json(
-            dict_repr=tj.dict_repr, ophys_timestamps=cls.ophys_timestamps)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -117,23 +195,49 @@ class TestNWB:
             session_start_time=datetime.now()
         )
 
+        tj = TestJson()
+        tj.setup_class()
+        self.dict_repr = tj.dict_repr
+
         # Write metadata, since csp requires other metdata
         tbom = TestBOM()
         tbom.setup_class()
         bom = tbom.meta
         bom.to_nwb(nwbfile=self.nwbfile)
 
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
-        self.cell_specimen_table.to_nwb(nwbfile=self.nwbfile,
-                                        ophys_timestamps=self.ophys_timestamps)
+                            data_object_roundtrip_fixture,
+                            exclude_invalid_rois):
+        cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            exclude_invalid_rois=exclude_invalid_rois)
+
+        csp = cell_specimens._cell_specimen_table
+
+        valid_roi_id = csp[csp['valid_roi']]['cell_roi_id']
+
+        cell_specimens.to_nwb(nwbfile=self.nwbfile,
+                              ophys_timestamps=self.ophys_timestamps)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=CellSpecimens)
+                data_object_cls=CellSpecimens,
+                exclude_invalid_rois=exclude_invalid_rois,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
         else:
-            obt = self.cell_specimen_table.from_nwb(nwbfile=self.nwbfile)
+            obt = cell_specimens.from_nwb(
+                nwbfile=self.nwbfile,
+                exclude_invalid_rois=exclude_invalid_rois,
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
 
-        assert obt == self.cell_specimen_table
+        if exclude_invalid_rois:
+            cell_specimens._cell_specimen_table = \
+                cell_specimens._cell_specimen_table[
+                    cell_specimens._cell_specimen_table['cell_roi_id']
+                    .isin(valid_roi_id)]
+
+        assert obt == cell_specimens

@@ -16,7 +16,7 @@ class Image(NamedTuple):
 
     data: np.ndarray
     spacing: tuple
-    unit: int = 0
+    unit: str = 'mm'
 
     def __eq__(self, other):
         a = np.array_equal(self.data, other.data)
@@ -26,6 +26,7 @@ class Image(NamedTuple):
 
     def __array__(self):
         return np.array(self.data)
+
 
 class ImageApi:
 

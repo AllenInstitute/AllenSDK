@@ -13,6 +13,9 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 from allensdk.brain_observatory.behavior.write_nwb.extensions\
@@ -20,8 +23,8 @@ from allensdk.brain_observatory.behavior.write_nwb.extensions\
     OphysEventDetection
 
 
-class Events(DataObject, DataFileReadableInterface, NwbReadableInterface,
-             NwbWritableInterface):
+class Events(DataObject, RoisMixin, DataFileReadableInterface,
+             NwbReadableInterface, NwbWritableInterface):
     """Events
     columns:
         events: np.array

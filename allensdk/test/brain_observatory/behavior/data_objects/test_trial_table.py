@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import pynwb
@@ -64,10 +65,26 @@ class TestFromStimulusFile(LimsTest):
         )
         assert trials == self.expected
 
-    def _get_trial_table_data(self):
+    def test_from_stimulus_file2(self):
+        dir = Path(__file__).parent.parent.resolve()
+        stimulus_filepath = dir / 'resources' / 'example_stimulus.pkl.gz'
+        stimulus_file = StimulusFile(filepath=stimulus_filepath)
+        stimulus_file, stimulus_timestamps, licks, rewards = \
+            self._get_trial_table_data(stimulus_file=stimulus_file)
+        TrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            monitor_delay=0.02115,
+            licks=licks,
+            rewards=rewards
+        )
+
+    def _get_trial_table_data(self,
+                              stimulus_file: Optional[StimulusFile] = None):
         """returns data required to instantiate a TrialTable"""
-        stimulus_file = StimulusFile.from_lims(
-            behavior_session_id=self.behavior_session_id, db=self.dbconn)
+        if stimulus_file is None:
+            stimulus_file = StimulusFile.from_lims(
+                behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file)
         licks = Licks.from_stimulus_file(

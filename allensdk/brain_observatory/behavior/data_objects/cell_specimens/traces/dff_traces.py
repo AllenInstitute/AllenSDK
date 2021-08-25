@@ -11,14 +11,26 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .ophys_timestamps import \
     OphysTimestamps
 
 
-class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
+class DFFTraces(DataObject, RoisMixin,
+                DataFileReadableInterface, NwbReadableInterface,
                 NwbWritableInterface):
     def __init__(self, traces: pd.DataFrame):
+        """
+        Parameters
+        ----------
+        traces
+            index cell_roi_id
+            columns:
+                dff: List of float
+        """
         super().__init__(name='dff_traces', value=traces)
 
     def to_nwb(self, nwbfile: NWBFile,

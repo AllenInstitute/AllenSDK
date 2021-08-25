@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-
+import numpy as np
 import pynwb
 import pytest
 
@@ -33,15 +33,6 @@ class TestFromStimulusFile(LimsTest):
 
 
 class TestNWB:
-    @classmethod
-    def setup_class(cls):
-        dir = Path(__file__).parent.resolve()
-        cls.test_data_dir = dir / 'test_data'
-
-        with open(cls.test_data_dir / 'task_parameters.json') as f:
-            tp = json.load(f)
-        cls.task_parameters = TaskParameters(**tp)
-
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
@@ -49,9 +40,21 @@ class TestNWB:
             session_start_time=datetime.now()
         )
 
+        dir = Path(__file__).parent.resolve()
+        self.test_data_dir = dir / 'test_data'
+
+        with open(self.test_data_dir / 'task_parameters.json') as f:
+            tp = json.load(f)
+        self.task_parameters = TaskParameters(**tp)
+
+    @pytest.mark.parametrize('is_stimulus_duration_sec_nan', [True, False])
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
+                            data_object_roundtrip_fixture,
+                            is_stimulus_duration_sec_nan):
+        if is_stimulus_duration_sec_nan:
+            self.task_parameters._stimulus_duration_sec = np.nan
+
         self.task_parameters.to_nwb(nwbfile=self.nwbfile)
 
         if roundtrip:
