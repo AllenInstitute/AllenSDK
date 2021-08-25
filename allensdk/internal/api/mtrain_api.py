@@ -11,10 +11,10 @@ from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
 from allensdk.core.auth_config import MTRAIN_DB_CREDENTIAL_MAP, \
     LIMS_DB_CREDENTIAL_MAP
 from allensdk.core.authentication import credential_injector
-from ...brain_observatory.behavior.data_objects import BehaviorSessionId
-from ...brain_observatory.behavior.data_objects.metadata.behavior_metadata\
-    .behavior_metadata import \
-    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects \
+    import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.\
+    behavior_metadata.behavior_metadata import BehaviorMetadata
 
 
 class MtrainApi:
