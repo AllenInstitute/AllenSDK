@@ -23,7 +23,7 @@ from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
     import \
     Events
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
-    .corrected_flourescence_traces import \
+    .corrected_fluorescence_traces import \
     CorrectedFluorescenceTraces
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
     .dff_traces import \
