@@ -10,7 +10,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
-from allensdk.brain_observatory.nwb.nwb_utils import get_image, add_image
+from allensdk.brain_observatory.nwb.nwb_utils import get_image, add_image_to_nwb
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
@@ -89,12 +89,12 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
                            avg_projection=avg_projection)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        add_image(nwbfile=nwbfile,
-                  image_data=self._max_projection,
-                  image_name='max_projection')
-        add_image(nwbfile=nwbfile,
-                  image_data=self._avg_projection,
-                  image_name='average_image')
+        add_image_to_nwb(nwbfile=nwbfile,
+                         image_data=self._max_projection,
+                         image_name='max_projection')
+        add_image_to_nwb(nwbfile=nwbfile,
+                         image_data=self._avg_projection,
+                         image_name='average_image')
 
         return nwbfile
 

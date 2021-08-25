@@ -39,7 +39,7 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps \
     OphysTimestamps
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
-from allensdk.brain_observatory.nwb.nwb_utils import add_image
+from allensdk.brain_observatory.nwb.nwb_utils import add_image_to_nwb
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -487,9 +487,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         self._events.to_nwb(nwbfile=nwbfile)
 
         # 5. Add segmentation mask image
-        add_image(nwbfile=nwbfile,
-                  image_data=self._segmentation_mask_image,
-                  image_name='segmentation_mask_image')
+        add_image_to_nwb(nwbfile=nwbfile,
+                         image_data=self._segmentation_mask_image,
+                         image_name='segmentation_mask_image')
 
         return nwbfile
 

@@ -70,7 +70,7 @@ def get_image(nwbfile: NWBFile, name: str, module: str) -> Image:
     return img
 
 
-def add_image(nwbfile: NWBFile, image_data: Image, image_name: str):
+def add_image_to_nwb(nwbfile: NWBFile, image_data: Image, image_name: str):
     """
     Adds image given by image_data with name image_name to nwbfile
 
