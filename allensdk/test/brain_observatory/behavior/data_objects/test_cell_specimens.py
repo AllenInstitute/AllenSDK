@@ -102,31 +102,36 @@ class TestJson:
         assert not csp.corrected_fluorescence_traces.empty
         assert csp.meta == self.expected_meta
 
-    @pytest.mark.parametrize('trace_type',
+    @pytest.mark.parametrize('data',
                              ('dff_traces',
-                              'corrected_fluorescence_traces'))
-    def test_traces_same_order_as_cell_specimen_table(self, trace_type):
-        """tests that traces are in same order as cell specimen table"""
+                              'corrected_fluorescence_traces',
+                              'events'))
+    def test_roi_data_same_order_as_cell_specimen_table(self, data):
+        """tests that roi data are in same order as cell specimen table"""
         csp = CellSpecimens.from_json(
             dict_repr=self.dict_repr,
             ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
-        private_trace_attr = getattr(csp, f'_{trace_type}')
-        public_trace_attr = getattr(csp, trace_type)
+        private_attr = getattr(csp, f'_{data}')
+        public_attr = getattr(csp, data)
 
-        current_order = np.where(
-            private_trace_attr.value.index ==
-            csp._cell_specimen_table['cell_roi_id'])[0]
+        # Events stores cell_roi_id as column whereas traces is index
+        data_cell_roi_ids = getattr(
+            private_attr.value,
+            'cell_roi_id' if data == 'events' else 'index').values
+
+        current_order = np.where(data_cell_roi_ids ==
+                                 csp._cell_specimen_table['cell_roi_id'])[0]
 
         # make sure same order
-        private_trace_attr._value = private_trace_attr.value\
+        private_attr._value = private_attr.value\
             .iloc[current_order]
 
         # rearrange
-        private_trace_attr._value = private_trace_attr._value.iloc[[1, 0]]
+        private_attr._value = private_attr._value.iloc[[1, 0]]
 
         # make sure same order
-        np.testing.assert_array_equal(public_trace_attr.index, csp.table.index)
+        np.testing.assert_array_equal(public_attr.index, csp.table.index)
 
     @pytest.mark.parametrize('extra_in_trace', (True, False))
     @pytest.mark.parametrize('trace_type',
