@@ -11,9 +11,13 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 
 
-class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
+class CorrectedFluorescenceTraces(DataObject, RoisMixin,
+                                  DataFileReadableInterface,
                                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, traces: pd.DataFrame):
         """
@@ -78,11 +82,3 @@ class CorrectedFluorescenceTraces(DataObject, DataFileReadableInterface,
             rois=roi_table_region,
             timestamps=ophys_timestamps)
         return nwbfile
-
-    def filter_to_roi_ids(self, roi_ids: np.ndarray):
-        """Limit traces to roi_ids' traces.
-        Use for, ie excluding traces of invalid rois"""
-        if not np.in1d(roi_ids, self._value.index).all():
-            raise RuntimeError('Not all roi ids to be filtered are in '
-                               'corrected fluorescence traces')
-        self._value = self._value.loc[roi_ids]

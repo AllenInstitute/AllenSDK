@@ -13,6 +13,9 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
 from allensdk.brain_observatory.behavior.write_nwb.extensions\
@@ -20,8 +23,8 @@ from allensdk.brain_observatory.behavior.write_nwb.extensions\
     OphysEventDetection
 
 
-class Events(DataObject, DataFileReadableInterface, NwbReadableInterface,
-             NwbWritableInterface):
+class Events(DataObject, RoisMixin, DataFileReadableInterface,
+             NwbReadableInterface, NwbWritableInterface):
     """Events
     columns:
         events: np.array
@@ -132,12 +135,3 @@ class Events(DataObject, DataFileReadableInterface, NwbReadableInterface,
         ophys_module.add_data_interface(events)
 
         return nwbfile
-
-    def filter_to_roi_ids(self, roi_ids: np.ndarray):
-        """Limit events to roi_ids' traces.
-        Use for, ie excluding events of invalid rois"""
-        if not np.in1d(roi_ids, self._value.index).all():
-            raise RuntimeError('Not all roi ids to be filtered are in '
-                               'events traces')
-        self._value = self._value.set_index('cell_roi_id').loc[roi_ids]\
-            .reset_index()

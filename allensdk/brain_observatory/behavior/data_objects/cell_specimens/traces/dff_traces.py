@@ -11,12 +11,16 @@ from allensdk.brain_observatory.behavior.data_objects.base \
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .ophys_timestamps import \
     OphysTimestamps
 
 
-class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
+class DFFTraces(DataObject, RoisMixin,
+                DataFileReadableInterface, NwbReadableInterface,
                 NwbWritableInterface):
     def __init__(self, traces: pd.DataFrame):
         """
@@ -76,11 +80,3 @@ class DFFTraces(DataObject, DataFileReadableInterface, NwbReadableInterface,
     def from_data_file(cls, dff_file: DFFFile) -> "DFFTraces":
         dff_traces = dff_file.data
         return DFFTraces(traces=dff_traces)
-
-    def filter_to_roi_ids(self, roi_ids: np.ndarray):
-        """Limit traces to roi_ids' traces.
-        Use for, ie excluding traces of invalid rois"""
-        if not np.in1d(roi_ids, self._value.index).all():
-            raise RuntimeError('Not all roi ids to be filtered are in dff '
-                               'traces')
-        self._value = self._value.loc[roi_ids]
