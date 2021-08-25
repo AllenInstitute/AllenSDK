@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, Union
+from pathlib import Path
 import warnings
 import re
 import urllib.parse as url_parse
@@ -65,13 +66,13 @@ def relative_path_from_url(url: str) -> str:
     return url_params.path[1:]
 
 
-def file_hash_from_path(file_path: str) -> str:
+def file_hash_from_path(file_path: Union[str, Path]) -> str:
     """
     Return the hexadecimal file hash for a file
 
     Parameters
     ----------
-    file_path: str
+    file_path: Union[str, Path]
         path to a file
 
     Returns

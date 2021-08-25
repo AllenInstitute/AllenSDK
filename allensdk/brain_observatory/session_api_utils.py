@@ -14,6 +14,7 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def is_equal(a: Any, b: Any) -> bool:

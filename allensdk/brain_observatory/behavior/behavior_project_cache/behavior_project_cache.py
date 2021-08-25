@@ -31,6 +31,7 @@ class VBOLimsCache(Cache):
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
     OPHYS_EXPERIMENTS_KEY = "ophys_experiments"
+    OPHYS_CELLS_KEY = "ophys_cells"
 
     MANIFEST_CONFIG = {
         OPHYS_SESSIONS_KEY: {
@@ -45,6 +46,11 @@ class VBOLimsCache(Cache):
         },
         OPHYS_EXPERIMENTS_KEY: {
             "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
+            "parent_key": "BASEDIR",
+            "typename": "file"
+        },
+        OPHYS_CELLS_KEY: {
+            "spec": f"{OPHYS_CELLS_KEY}.csv",
             "parent_key": "BASEDIR",
             "typename": "file"
         }
@@ -163,9 +169,12 @@ class VisualBehaviorOphysProjectCache(object):
         return cls(fetch_api=fetch_api)
 
     @classmethod
-    def from_local_cache(cls, cache_dir: Union[str, Path],
-                         project_name: str = "visual-behavior-ophys"
-                         ) -> "VisualBehaviorOphysProjectCache":
+    def from_local_cache(
+        cls,
+        cache_dir: Union[str, Path],
+        project_name: str = "visual-behavior-ophys",
+        use_static_cache: bool = False
+    ) -> "VisualBehaviorOphysProjectCache":
         """instantiates this object with a local cache.
 
         Parameters
@@ -184,8 +193,11 @@ class VisualBehaviorOphysProjectCache(object):
 
         """
         fetch_api = BehaviorProjectCloudApi.from_local_cache(
-                cache_dir, project_name,
-                ui_class_name=cls.__name__)
+            cache_dir,
+            project_name,
+            ui_class_name=cls.__name__,
+            use_static_cache=use_static_cache
+        )
         return cls(fetch_api=fetch_api)
 
     @classmethod
@@ -198,7 +210,7 @@ class VisualBehaviorOphysProjectCache(object):
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
                   asynchronous: bool = True,
-                  data_release_date: Optional[str] = None
+                  data_release_date: Optional[Union[str, List[str]]] = None
                   ) -> "VisualBehaviorOphysProjectCache":
         """
         Construct a VisualBehaviorOphysProjectCache with a lims api. Use this
@@ -231,9 +243,9 @@ class VisualBehaviorOphysProjectCache(object):
             included for consistency with EcephysProjectCache.from_lims.
         asynchronous : bool
             Whether to fetch from web asynchronously. Currently unused.
-        data_release_date: str
+        data_release_date: str or list of str
             Use to filter tables to only include data released on date
-            ie 2021-03-25
+            ie 2021-03-25 or ['2021-03-25', '2021-08-12']
         Returns
         =======
         VisualBehaviorOphysProjectCache
@@ -376,7 +388,8 @@ class VisualBehaviorOphysProjectCache(object):
             suppress: Optional[List[str]] = None,
             index_column: str = "ophys_session_id",
             as_df=True,
-            include_behavior_data=True) -> \
+            include_behavior_data=True,
+            passed_only=True) -> \
             Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
@@ -420,19 +433,30 @@ class VisualBehaviorOphysProjectCache(object):
         sessions = BehaviorOphysSessionsTable(df=ophys_sessions,
                                               suppress=suppress,
                                               index_column=index_column)
+        if passed_only:
+            oet = self.get_ophys_experiment_table(passed_only=True)
+            for i in sessions.table.index:
+                sub_df = oet.query(f"ophys_session_id=={i}")
+                values = list(set(sub_df["ophys_container_id"].values))
+                values.sort()
+                sessions.table.at[i, "ophys_container_id"] = values
 
         return sessions.table if as_df else sessions
 
     def get_ophys_experiment_table(
             self,
             suppress: Optional[List[str]] = None,
-            as_df=True) -> Union[pd.DataFrame, SessionsTable]:
+            as_df=True,
+            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all ophys_experiment_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
             dataframe.
         :type suppress: list of str
         :param as_df: whether to return as df or as SessionsTable
+        :param passed_only: if True, return only experiments flagged as
+                            'passed' and containers flagged as 'published'
+                            (default=True)
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -456,14 +480,37 @@ class VisualBehaviorOphysProjectCache(object):
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress)
+                                       suppress=suppress,
+                                       passed_only=passed_only)
         return experiments.table if as_df else experiments
+
+    def get_ophys_cells_table(self) -> pd.DataFrame:
+        """
+        Return summary table of all cells in this project cache
+        :rtype: pd.DataFrame
+        """
+        if isinstance(self.fetch_api, BehaviorProjectCloudApi):
+            return self.fetch_api.get_ophys_cells_table()
+        if self.cache is not None:
+            path = self.cache.get_cache_path(None,
+                                             self.cache.OPHyS_CELLS_KEY)
+            ophys_cells_table = one_file_call_caching(
+                path,
+                self.fetch_api.get_ophys_cells_table,
+                _write_json,
+                lambda path: _read_json(path,
+                                        index_name='cell_roi_id'))
+        else:
+            ophys_cells_table = self.fetch_api.get_ophys_cells_table()
+
+        return ophys_cells_table
 
     def get_behavior_session_table(
             self,
             suppress: Optional[List[str]] = None,
             as_df=True,
-            include_ophys_data=True) -> Union[pd.DataFrame, SessionsTable]:
+            include_ophys_data=True,
+            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -492,7 +539,8 @@ class VisualBehaviorOphysProjectCache(object):
             ophys_session_table = self.get_ophys_session_table(
                 suppress=suppress,
                 as_df=False,
-                include_behavior_data=False)
+                include_behavior_data=False,
+                passed_only=passed_only)
         else:
             ophys_session_table = None
         sessions = SessionsTable(df=sessions, suppress=suppress,

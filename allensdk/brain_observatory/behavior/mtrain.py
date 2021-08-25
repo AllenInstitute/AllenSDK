@@ -39,8 +39,10 @@ def assign_session_id(trials):
     --------
     io.load_trials
     """
-    trials['session_id'] = trials['mouse_id'] + '_' + trials[
-        'startdatetime'].map(lambda x: x.isoformat())
+    trials['session_id'] = (trials['mouse_id']
+                            + '_'
+                            + trials['startdatetime'].map(
+                                lambda x: x.isoformat()))
 
     return trials
 
@@ -60,7 +62,7 @@ def fix_change_time(trials):
     io.load_trials
     """
     trials['change_time'] = trials['change_time'].map(
-        lambda x: np.nan if x is None else x)
+            lambda x: np.nan if x is None else x)
 
     return trials
 
@@ -79,10 +81,10 @@ def explode_response_window(trials):
     --------
     io.load_trials
     """
-    trials['response_window_lower'] = trials['response_window'].map(
-        lambda x: x[0])
-    trials['response_window_upper'] = trials['response_window'].map(
-        lambda x: x[1])
+    trials['response_window_lower'] = \
+        trials['response_window'].map(lambda x: x[0])
+    trials['response_window_upper'] = \
+        trials['response_window'].map(lambda x: x[1])
 
     return trials
 
@@ -121,7 +123,7 @@ def annotate_trials(trials):
 
 
 class FriendlyDateTime(fields.DateTime):
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if isinstance(value, datetime):
             return value
         result = super(FriendlyDateTime, self)._deserialize(value, attr, data)
@@ -129,7 +131,7 @@ class FriendlyDateTime(fields.DateTime):
 
 
 class FriendlyDate(fields.Date):
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if isinstance(value, date):
             return value
         result = super(FriendlyDate, self)._deserialize(value, attr, data)
@@ -172,8 +174,8 @@ class ExtendedTrialSchema(Schema):
         allow_nan=True,
     )
     scheduled_change_time = fields.Float(
-        description='The time when the change was scheduled to occur on this '
-                    'trial',
+        description=("The time when the change was scheduled to occur "
+                     "on this trial"),
         required=True,
     )
     change_time = fields.Float(
@@ -189,8 +191,8 @@ class ExtendedTrialSchema(Schema):
         allow_none=True,
     )
     initial_image_name = fields.String(
-        description='The name of the last initial image before the change on'
-                    ' this trial',
+        description=("The name of the last initial image before the "
+                     "change on this trial"),
         required=True,
         allow_none=True,
     )
@@ -228,8 +230,8 @@ class ExtendedTrialSchema(Schema):
         allow_nan=True,
     )
     delta_ori = fields.Float(
-        description='The difference between the initial and change '
-                    'orientations on this trial',
+        description=("The difference between the initial and change "
+                     "orientations on this trial"),
         required=True,
         allow_none=True,
     )
@@ -241,8 +243,8 @@ class ExtendedTrialSchema(Schema):
         required=True,
     )
     response_latency = fields.Float(
-        description='The latency between the change and the first lick on '
-                    'this trial',
+        description=("The latency between the change and the first lick "
+                     "on this trial"),
         required=True,
         allow_nan=True,
     )
@@ -272,8 +274,8 @@ class ExtendedTrialSchema(Schema):
         allow_none=True,
     )
     cumulative_reward_number = fields.Int(
-        description='the cumulative number of rewards in the session at '
-                    'trial end',
+        description=("the cumulative number of rewards in the session at "
+                     "trial end"),
         required=True,
     )
     cumulative_volume = fields.Float(
@@ -283,8 +285,8 @@ class ExtendedTrialSchema(Schema):
 
     # optogenetics
     optogenetics = fields.Bool(
-        description='whether optogenetic stimulation was applied on this '
-                    'trial',
+        description=("whether optogenetic stimulation was applied "
+                     "on this trial"),
         required=True,
     )
 
