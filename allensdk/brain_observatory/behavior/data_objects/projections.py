@@ -10,7 +10,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
-from allensdk.brain_observatory.nwb.nwb_utils import get_image, add_image_to_nwb
+from allensdk.brain_observatory.nwb.nwb_utils import get_image, \
+    add_image_to_nwb
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
