@@ -128,7 +128,7 @@ def get_extended_stimulus_presentations(session):
 
     # Repeat number within a block
     repeat_number = np.full(len(intermediate_df), np.nan)
-    
+
     # Assuming that the row index starts at zero
     assert intermediate_df.iloc[0].name == 0
 
