@@ -1,9 +1,9 @@
-from typing import Any, Optional, List, Dict, Type, Tuple
-import logging
+import datetime
+from typing import Any, List, Dict
 import pynwb
 import pandas as pd
 import numpy as np
-import inspect
+import pytz
 
 from pynwb import NWBFile
 
@@ -13,12 +13,19 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
-    JsonWritableInterface, NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+    NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
-from allensdk.core.lazy_property import LazyPropertyMixin
-from allensdk.brain_observatory.session_api_utils import ParamsMixin
+    BehaviorMetadata, get_expt_description
+from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
+    Stimuli
+from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
+    TaskParameters
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
+    import \
+    TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.brain_observatory.behavior.data_objects import (
@@ -30,72 +37,72 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 
 
-class BehaviorBase:
-    # TODO remove this
-    pass
-
-
-BehaviorDataApi = Type[BehaviorBase]
-
-
 class BehaviorSession(DataObject, InternalReadableInterface,
                       NwbReadableInterface,
-                      JsonReadableInterface, NwbWritableInterface,
-                      JsonWritableInterface,
-                      LazyPropertyMixin):
+                      JsonReadableInterface, NwbWritableInterface):
     def __init__(
-        self, api: Optional[BehaviorDataApi] = None,
-        behavior_session_id: BehaviorSessionId = None,
-        stimulus_timestamps: StimulusTimestamps = None,
-        running_acquisition: RunningAcquisition = None,
-        raw_running_speed: RunningSpeed = None,
-        running_speed: RunningSpeed = None,
-        metadata: BehaviorMetadata = None
+        self,
+        behavior_session_id: BehaviorSessionId,
+        stimulus_timestamps: StimulusTimestamps,
+        running_acquisition: RunningAcquisition,
+        raw_running_speed: RunningSpeed,
+        running_speed: RunningSpeed,
+        licks: Licks,
+        rewards: Rewards,
+        stimuli: Stimuli,
+        task_parameters: TaskParameters,
+        trials: TrialTable,
+        metadata: BehaviorMetadata
     ):
         super().__init__(name='behavior_session', value=self)
-        self.api = api
 
-        # LazyProperty constructor provided by LazyPropertyMixin
-        LazyProperty = self.LazyProperty
-
-        # Initialize attributes to be lazily evaluated
         self._behavior_session_id = behavior_session_id
-        self._licks = LazyProperty(self.api.get_licks, settable=True)
-        self._rewards = LazyProperty(self.api.get_rewards, settable=True)
+        self._licks = licks
+        self._rewards = rewards
         self._running_acquisition = running_acquisition
         self._running_speed = running_speed
         self._raw_running_speed = raw_running_speed
-        self._stimulus_presentations = LazyProperty(
-            self.api.get_stimulus_presentations, settable=True)
-        self._stimulus_templates = LazyProperty(
-            self.api.get_stimulus_templates, settable=True
-        )
+        self._stimuli = stimuli
         self._stimulus_timestamps = stimulus_timestamps
-        self._task_parameters = LazyProperty(self.api.get_task_parameters,
-                                             settable=True)
-        self._trials = LazyProperty(self.api.get_trials, settable=True)
+        self._task_parameters = task_parameters
+        self._trials = trials
         self._metadata = metadata
 
     # ==================== class and utility methods ======================
 
     @classmethod
     def from_json(cls, session_data: dict) -> "BehaviorSession":
-        behavior_session_id = BehaviorSessionId.from_json(session_data)
-        stimulus_timestamps = StimulusTimestamps.from_json(session_data)
-        running_acquisition = RunningAcquisition.from_json(session_data)
+        behavior_session_id = BehaviorSessionId.from_json(
+            dict_repr=session_data)
+        stimulus_timestamps = StimulusTimestamps.from_json(
+            dict_repr=session_data)
+        running_acquisition = RunningAcquisition.from_json(
+            dict_repr=session_data)
         raw_running_speed = RunningSpeed.from_json(
-            session_data, filtered=False
+            dict_repr=session_data, filtered=False
         )
-        running_speed = RunningSpeed.from_json(session_data)
-        metadata = BehaviorMetadata.from_json(session_data)
+        running_speed = RunningSpeed.from_json(dict_repr=session_data)
+        metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
-        return cls(
+        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
+        licks, rewards, stimuli, task_parameters, trials = \
+            cls._read_data_from_stimulus_file(
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps
+            )
+
+        return BehaviorSession(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
             running_speed=running_speed,
-            metadata=metadata
+            metadata=metadata,
+            licks=licks,
+            rewards=rewards,
+            stimuli=stimuli,
+            task_parameters=task_parameters,
+            trials=trials
         )
 
     @classmethod
@@ -122,13 +129,26 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
-        return cls(
+        stimulus_file = StimulusFile.from_lims(
+            db=lims_db, behavior_session_id=behavior_session_id.value)
+        licks, rewards, stimuli, task_parameters, trials = \
+            cls._read_data_from_stimulus_file(
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps
+            )
+
+        return BehaviorSession(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
             running_speed=running_speed,
-            metadata=behavior_metadata
+            metadata=behavior_metadata,
+            licks=licks,
+            rewards=rewards,
+            stimuli=stimuli,
+            task_parameters=task_parameters,
+            trials=trials
         )
 
     @classmethod
@@ -139,14 +159,24 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
         running_speed = RunningSpeed.from_nwb(nwbfile)
         metadata = BehaviorMetadata.from_nwb(nwbfile)
+        licks = Licks.from_nwb(nwbfile=nwbfile)
+        rewards = Rewards.from_nwb(nwbfile=nwbfile)
+        stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
+        task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
+        trials = TrialTable.from_nwb(nwbfile=nwbfile)
 
-        return cls(
+        return BehaviorSession(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
             running_speed=running_speed,
-            metadata=metadata
+            metadata=metadata,
+            licks=licks,
+            rewards=rewards,
+            stimuli=stimuli,
+            task_parameters=task_parameters,
+            trials=trials
         )
 
     @classmethod
@@ -155,38 +185,30 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile)
 
-    def to_json(self) -> dict:
-        pass
+    def to_nwb(self) -> NWBFile:
+        nwbfile = NWBFile(
+            session_description=self._metadata.session_type,
+            identifier=str(self.behavior_session_id),
+            session_start_time=self._metadata.date_of_acquisition,
+            file_create_date=pytz.utc.localize(datetime.datetime.now()),
+            institution="Allen Institute for Brain Science",
+            keywords=["visual", "behavior", "task"],
+            experiment_description=get_expt_description(
+                session_type=self._metadata.session_type)
+        )
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
         self._running_acquisition.to_nwb(nwbfile=nwbfile)
+        self._raw_running_speed.to_nwb(nwbfile=nwbfile)
         self._running_speed.to_nwb(nwbfile=nwbfile)
         self._metadata.to_nwb(nwbfile=nwbfile)
+        self._licks.to_nwb(nwbfile=nwbfile)
+        self._rewards.to_nwb(nwbfile=nwbfile)
+        self._stimuli.to_nwb(nwbfile=nwbfile)
+        self._task_parameters.to_nwb(nwbfile=nwbfile)
+        self._trials.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
-
-    def cache_clear(self) -> None:
-        """Convenience method to clear the api cache, if applicable."""
-        try:
-            self.api.cache_clear()
-        except AttributeError:
-            logging.getLogger("BehaviorSession").warning(
-                "Attempted to clear API cache, but method `cache_clear`"
-                f" does not exist on {self.api.__class__.__name__}")
-
-    def list_api_methods(self) -> List[Tuple[str, str]]:
-        """Convenience method to expose list of API `get` methods. These
-        methods can be accessed by referencing the API used to initialize this
-        BehaviorSession via its `api` instance attribute.
-        :rtype: list of tuples, where the first value in the tuple is the
-        method name, and the second value is the method docstring.
-        """
-        methods = [m for m in inspect.getmembers(self.api, inspect.ismethod)
-                   if m[0].startswith("get_")]
-        docs = [inspect.getdoc(m[1]) or "" for m in methods]
-        method_names = [m[0] for m in methods]
-        return list(zip(method_names, docs))
 
     def list_data_attributes_and_methods(self) -> List[str]:
         """Convenience method for end-users to list attributes and methods
@@ -202,21 +224,14 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             to get data.
         """
         attrs_and_methods_to_ignore: set = {
-            "api",
-            "cache_clear",
             "from_json",
             "from_lims",
             "from_nwb_path",
-            "LazyProperty",
-            "list_api_methods",
             "list_data_attributes_and_methods"
         }
-        attrs_and_methods_to_ignore.update(dir(ParamsMixin))
-        attrs_and_methods_to_ignore.update(dir(LazyPropertyMixin))
         attrs_and_methods_to_ignore.update(dir(InternalReadableInterface))
         attrs_and_methods_to_ignore.update(dir(NwbReadableInterface))
         attrs_and_methods_to_ignore.update(dir(NwbWritableInterface))
-        attrs_and_methods_to_ignore.update(dir(JsonWritableInterface))
         attrs_and_methods_to_ignore.update(dir(DataObject))
         class_dir = dir(self)
         attrs_and_methods = [
@@ -447,7 +462,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     frame of lick
 
         """
-        return self._licks
+        return self._licks.value
 
     @licks.setter
     def licks(self, value):
@@ -481,7 +496,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     throughout as needed
 
         """
-        return self._rewards
+        return self._rewards.value
 
     @rewards.setter
     def rewards(self, value):
@@ -578,7 +593,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                 stop_time: (float)
                     image presentation end time in seconds
         """
-        return self._stimulus_presentations
+        return self._stimuli.presentations.value
 
     @stimulus_presentations.setter
     def stimulus_presentations(self, value):
@@ -604,7 +619,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     image array of warped stimulus image
 
         """
-        return self._stimulus_templates.to_dataframe()
+        return self._stimuli.templates.value.to_dataframe()
 
     @stimulus_templates.setter
     def stimulus_templates(self, value):
@@ -678,7 +693,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     Stimulus type ('gratings' or 'images').
 
         """
-        return self._task_parameters
+        return self._task_parameters.value
 
     @task_parameters.setter
     def task_parameters(self, value):
@@ -752,7 +767,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     name of image that is changed to at the change time,
                     on go trials
         """
-        return self._trials
+        return self._trials.value
 
     @trials.setter
     def trials(self, value):
@@ -797,14 +812,35 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
-        if isinstance(self._metadata, BehaviorMetadata):
-            metadata = self._metadata.to_dict()
-        else:
-            # NWB API returns as dict
-            metadata = self._metadata
-
-        return metadata
+        return self._metadata.to_dict()
 
     @metadata.setter
     def metadata(self, value):
         self._metadata = value
+
+    @staticmethod
+    def _read_data_from_stimulus_file(stimulus_file: StimulusFile,
+                                      stimulus_timestamps: StimulusTimestamps):
+        """Helper method to read data from stimulus file"""
+        licks = Licks.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        rewards = Rewards.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        stimuli = Stimuli.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        task_parameters = TaskParameters.from_stimulus_file(
+            stimulus_file=stimulus_file)
+        trials = TrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            licks=licks,
+            rewards=rewards,
+            # This is the median estimate across all rigs
+            # as discussed in
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            monitor_delay=0.02115
+        )
+        return licks, rewards, stimuli, task_parameters, trials

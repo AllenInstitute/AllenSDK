@@ -17,10 +17,12 @@ from allensdk.brain_observatory.behavior.stimulus_processing import \
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval, get_column_name
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
                     NwbReadableInterface, NwbWritableInterface):
+    """Stimulus presentations"""
     def __init__(self, presentations: pd.DataFrame):
         super().__init__(name='presentations', value=presentations)
 
@@ -29,6 +31,10 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         time point in a session) to an nwbfile as TimeIntervals.
         """
         stimulus_table = self.value.copy()
+
+        # search for omitted rows and add stop_time before writing to NWB file
+        set_omitted_stop_time(stimulus_table=stimulus_table)
+
         ts = nwbfile.processing['stimulus'].get_data_interface('timestamps')
         possible_names = {'stimulus_name', 'image_name'}
         stimulus_name_column = get_column_name(stimulus_table.columns,
