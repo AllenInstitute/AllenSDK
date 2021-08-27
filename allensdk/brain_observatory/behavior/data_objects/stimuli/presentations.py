@@ -17,7 +17,6 @@ from allensdk.brain_observatory.behavior.stimulus_processing import \
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval, get_column_name
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
-from allensdk.brain_observatory.nwb.nwb_utils import set_omitted_stop_time
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
@@ -31,9 +30,6 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         time point in a session) to an nwbfile as TimeIntervals.
         """
         stimulus_table = self.value.copy()
-
-        # search for omitted rows and add stop_time before writing to NWB file
-        set_omitted_stop_time(stimulus_table=stimulus_table)
 
         ts = nwbfile.processing['stimulus'].get_data_interface('timestamps')
         possible_names = {'stimulus_name', 'image_name'}
@@ -83,6 +79,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         df = nwbapi.get_stimulus_presentations()
 
         df['is_change'] = is_change_event(stimulus_presentations=df)
+        df = cls._postprocess(presentations=df, fill_omitted_values=False)
         return Presentations(presentations=df)
 
     @classmethod
@@ -155,4 +152,52 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 stim_pres_df[stim_pres_df['image_name'].isin(limit_to_images)]
             stim_pres_df.index = pd.Int64Index(
                 range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
+        stim_pres_df = cls._postprocess(presentations=stim_pres_df)
         return Presentations(presentations=stim_pres_df)
+
+    @staticmethod
+    def _postprocess(presentations: pd.DataFrame, fill_omitted_values=True,
+                     omitted_time_duration: float = 0.25) \
+            -> pd.DataFrame:
+        """
+        1. Filter/rearrange columns
+        2. Optionally fill missing values for omitted flashes (no need when
+            reading from NWB since already filled)
+
+        Parameters
+        ----------
+        presentations
+            Presentations df
+        fill_omitted_values
+            Whether to fill stop time and duration for omitted flashes
+        omitted_time_duration
+            Amount of time a stimuli is omitted for in seconds"""
+
+        def _filter_arrange_columns(df: pd.DataFrame):
+            df = df.drop(['index'], axis=1, errors='ignore')
+            df = df[['start_time', 'stop_time',
+                     'duration',
+                     'image_name', 'image_index',
+                     'is_change', 'omitted',
+                     'start_frame', 'end_frame',
+                     'image_set']]
+            return df
+
+        def _fill_missing_values_for_omitted_flashes(df: pd.DataFrame):
+            """
+            This function sets the stop time for a row that is an omitted
+            stimuli. An omitted stimuli is a stimuli where a mouse is
+            shown only a grey screen and these last for 250 milliseconds.
+            These do not include a stop_time or end_frame as other stimuli in
+            the stimulus table due to design choices.
+            """
+            omitted = df['omitted']
+            df.loc[omitted, 'stop_time'] = \
+                df.loc[omitted, 'start_time'] + omitted_time_duration
+            df.loc[omitted, 'duration'] = omitted_time_duration
+            return df
+
+        df = _filter_arrange_columns(df=presentations)
+        if fill_omitted_values:
+            _fill_missing_values_for_omitted_flashes(df=df)
+        return df
