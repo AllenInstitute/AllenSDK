@@ -1,6 +1,7 @@
 import inspect
 import logging
 import warnings
+from collections import Callable
 
 from itertools import zip_longest
 from typing import Any, Dict, List
@@ -15,6 +16,10 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+import sys
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)
 
 
 def is_equal(a: Any, b: Any) -> bool:
@@ -169,14 +174,9 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
     bool
         Whether the two sessions are equal to one another.
     """
-
-    field_set = set()
-    for key, val in A.__dict__.items():
-        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
-            field_set.add(key)
-    for key, val in B.__dict__.items():
-        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
-            field_set.add(key)
+    A_data_attrs_and_methods = A.list_data_attributes_and_methods()
+    B_data_attrs_and_methods = B.list_data_attributes_and_methods()
+    field_set = set(A_data_attrs_and_methods).union(B_data_attrs_and_methods)
 
     logger.info(f"Comparing the following fields: {field_set}")
 
@@ -184,6 +184,10 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
         try:
             logger.info(f"Comparing field: {field}")
             x1, x2 = getattr(A, field), getattr(B, field)
+            if isinstance(x1, Callable):
+                x1 = x1()
+                x2 = x2()
+
             err_msg = (f"{field} on {A} did not equal {field} "
                        f"on {B} (\n{x1} vs\n{x2}\n)")
             if isinstance(x1, DataObject):
