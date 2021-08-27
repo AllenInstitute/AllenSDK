@@ -693,7 +693,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     Stimulus type ('gratings' or 'images').
 
         """
-        return self._task_parameters.value
+        return self._task_parameters.to_dict()['task_parameters']
 
     @task_parameters.setter
     def task_parameters(self, value):
@@ -812,7 +812,21 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
-        return self._metadata.to_dict()
+        return {
+            'equipment_name': self._metadata.equipment.value,
+            'sex': self._metadata.subject_metadata.sex,
+            'age_in_days': self._metadata.subject_metadata.age_in_days,
+            'stimulus_frame_rate': self._metadata.stimulus_frame_rate,
+            'session_type': self._metadata.session_type,
+            'date_of_acquisition': self._metadata.date_of_acquisition,
+            'reporter_line': self._metadata.subject_metadata.reporter_line,
+            'cre_line': self._metadata.subject_metadata.cre_line,
+            'behavior_session_uuid': self._metadata.behavior_session_uuid,
+            'driver_line': self._metadata.subject_metadata.driver_line,
+            'mouse_id': self._metadata.subject_metadata.mouse_id,
+            'full_genotype': self._metadata.subject_metadata.full_genotype,
+            'behavior_session_id': self._metadata.behavior_session_id
+        }
 
     @metadata.setter
     def metadata(self, value):
