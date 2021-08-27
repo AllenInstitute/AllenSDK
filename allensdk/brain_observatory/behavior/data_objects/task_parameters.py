@@ -28,7 +28,7 @@ class StimulusDistribution(Enum):
 
 
 class TaskType(Enum):
-    CHANGE_DETECTION = 'change_detection'
+    CHANGE_DETECTION = 'change detection'
 
 
 class TaskParameters(DataObject, StimulusFileReadableInterface,
@@ -60,47 +60,47 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         self._n_stimulus_frames = n_stimulus_frames
 
     @property
-    def blank_duration_sec(self):
+    def blank_duration_sec(self) -> List[float]:
         return self._blank_duration_sec
 
     @property
-    def stimulus_duration_sec(self):
+    def stimulus_duration_sec(self) -> float:
         return self._stimulus_duration_sec
 
     @property
-    def omitted_flash_fraction(self):
+    def omitted_flash_fraction(self) -> float:
         return self._omitted_flash_fraction
 
     @property
-    def response_window_sec(self):
+    def response_window_sec(self) -> List[float]:
         return self._response_window_sec
 
     @property
-    def reward_volume(self):
+    def reward_volume(self) -> float:
         return self._reward_volume
 
     @property
-    def auto_reward_volume(self):
+    def auto_reward_volume(self) -> float:
         return self._auto_reward_volume
 
     @property
-    def session_type(self):
+    def session_type(self) -> str:
         return self._session_type
 
     @property
-    def stimulus(self):
+    def stimulus(self) -> str:
         return self._stimulus
 
     @property
-    def stimulus_distribution(self):
+    def stimulus_distribution(self) -> float:
         return self._stimulus_distribution
 
     @property
-    def task_type(self):
+    def task(self) -> TaskType:
         return self._task
 
     @property
-    def n_stimulus_frames(self):
+    def n_stimulus_frames(self) -> int:
         return self._n_stimulus_frames
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
@@ -108,7 +108,6 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
             BehaviorTaskParametersSchema, 'ndx-aibs-behavior-ophys'
         )
         task_parameters = self.to_dict()['task_parameters']
-        task_parameters['task'] = task_parameters['task_type']
         task_parameters_clean = BehaviorTaskParametersSchema().dump(
             task_parameters
         )
