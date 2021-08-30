@@ -15,7 +15,7 @@ from allensdk.internal.api import PostgresQueryMixin
 class DateOfAcquisition(DataObject, LimsReadableInterface,
                         JsonReadableInterface, NwbReadableInterface):
     """timestamp for when experiment was started in UTC"""
-    def __init__(self, date_of_acquisition: float):
+    def __init__(self, date_of_acquisition: datetime):
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
 
     @classmethod

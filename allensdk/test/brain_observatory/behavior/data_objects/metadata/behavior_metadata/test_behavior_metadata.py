@@ -276,10 +276,14 @@ class TestStimulusFile:
         assert 62.0 == rate.value
 
 
-def test_get_date_of_acquisition():
-    expected = datetime.datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    doa = datetime.datetime(2019, 9, 26, 16)
-    actual = DateOfAcquisition.to_utc(date_of_acquisition=doa)
+def test_date_of_acquisition_utc():
+    """Tests that when read from json (in Pacific time), that
+    date of acquisition is converted to utc"""
+    expected = DateOfAcquisition(
+        date_of_acquisition=datetime.datetime(2019, 9, 26, 16,
+                                              tzinfo=pytz.UTC))
+    actual = DateOfAcquisition.from_json(
+        dict_repr={'date_of_acquisition': '2019-09-26 09:00:00'})
     assert expected == actual
 
 
