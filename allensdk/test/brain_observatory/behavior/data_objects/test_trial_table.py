@@ -126,8 +126,8 @@ class TestMonitorDelay:
             ctx.setattr(OphysTimeAligner,
                         '_get_monitor_delay',
                         dummy_delay)
-            md = TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
-                                                     equipment=equipment)
+            md = TrialTable.calculate_monitor_delay(sync_file=self.sync_file,
+                                                    equipment=equipment)
             assert abs(md - 1.12) < 1.0e-6
 
     def test_monitor_delay_lookup(self, monkeypatch):
@@ -142,7 +142,7 @@ class TestMonitorDelay:
             for equipment, expected in \
                     self.lookup_table_expected_values.items():
                 equipment = Equipment(equipment_name=equipment)
-                md = TrialTable._calculate_monitor_delay(
+                md = TrialTable.calculate_monitor_delay(
                     sync_file=self.sync_file, equipment=equipment)
                 assert abs(md - expected) < 1e-6
 
@@ -157,8 +157,8 @@ class TestMonitorDelay:
                         dummy_delay)
             equipment = Equipment(equipment_name='spam')
             with pytest.raises(RuntimeError):
-                TrialTable._calculate_monitor_delay(sync_file=self.sync_file,
-                                                    equipment=equipment)
+                TrialTable.calculate_monitor_delay(sync_file=self.sync_file,
+                                                   equipment=equipment)
 
 
 class TestNWB:

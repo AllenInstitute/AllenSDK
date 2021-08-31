@@ -179,6 +179,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             spacing=segmentation_mask_image_spacing)
 
         self._validate_traces(ophys_timestamps=ophys_timestamps)
+        ophys_timestamps.validate(
+            number_of_frames=dff_traces.get_number_of_frames())
 
     @property
     def table(self) -> pd.DataFrame:

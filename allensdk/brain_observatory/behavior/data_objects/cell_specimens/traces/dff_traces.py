@@ -80,3 +80,9 @@ class DFFTraces(DataObject, RoisMixin,
     def from_data_file(cls, dff_file: DFFFile) -> "DFFTraces":
         dff_traces = dff_file.data
         return DFFTraces(traces=dff_traces)
+
+    def get_number_of_frames(self) -> int:
+        """Returns the number of frames in the movie"""
+        if self.value.empty:
+            raise RuntimeError('Cannot determine number of frames')
+        return len(self.value.iloc[0]['dff'])

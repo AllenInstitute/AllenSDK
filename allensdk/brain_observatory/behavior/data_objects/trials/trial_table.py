@@ -71,16 +71,8 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
                            rewards: Rewards,
-                           monitor_delay: Optional[float] = None,
-                           sync_file: Optional[SyncFile] = None,
-                           equipment: Optional[Equipment] = None
+                           monitor_delay: float
                            ) -> "TrialTable":
-        if monitor_delay is None:
-            if sync_file is None or equipment is None:
-                raise ValueError('Need sync file and equipment in order to '
-                                 'calculate monitor delay')
-            monitor_delay = cls._calculate_monitor_delay(sync_file=sync_file,
-                                                         equipment=equipment)
         bsf = stimulus_file.data
 
         stimuli = bsf["items"]["behavior"]["stimuli"]
@@ -109,8 +101,8 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         return TrialTable(trials=trials)
 
     @staticmethod
-    def _calculate_monitor_delay(sync_file: SyncFile,
-                                 equipment: Equipment) -> float:
+    def calculate_monitor_delay(sync_file: SyncFile,
+                                equipment: Equipment) -> float:
         aligner = OphysTimeAligner(sync_file=sync_file.filepath)
 
         try:

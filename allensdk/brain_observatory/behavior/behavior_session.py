@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 import pynwb
 import pandas as pd
 import numpy as np
@@ -7,7 +7,8 @@ import pytz
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
+    SyncFile
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
@@ -34,7 +35,7 @@ from allensdk.brain_observatory.behavior.data_objects import (
 )
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.internal.api import db_connection_creator
+from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 
 
 class BehaviorSession(DataObject, InternalReadableInterface,
@@ -74,8 +75,9 @@ class BehaviorSession(DataObject, InternalReadableInterface,
     def from_json(cls, session_data: dict) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
-        stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
+        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
+        stimulus_timestamps = cls._load_stimulus_timestamps_from_internal(
+            stimulus_file=stimulus_file)
         running_acquisition = RunningAcquisition.from_json(
             dict_repr=session_data)
         raw_running_speed = RunningSpeed.from_json(
@@ -84,7 +86,6 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         running_speed = RunningSpeed.from_json(dict_repr=session_data)
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
-        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
@@ -106,17 +107,19 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
 
     @classmethod
-    def from_internal(cls, behavior_session_id: int) -> "BehaviorSession":
-        lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
+    def from_internal(cls, behavior_session_id: int,
+                      lims_db: Optional[PostgresQueryMixin] = None) -> \
+            "BehaviorSession":
+        if lims_db is None:
+            lims_db = db_connection_creator(
+                fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+            )
 
         behavior_session_id = BehaviorSessionId(behavior_session_id)
         stimulus_file = StimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file
-        )
+        stimulus_timestamps = cls._load_stimulus_timestamps_from_internal(
+            stimulus_file=stimulus_file)
         running_acquisition = RunningAcquisition.from_lims(
             lims_db, behavior_session_id.value
         )
@@ -129,8 +132,6 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
-        stimulus_file = StimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value)
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
@@ -152,7 +153,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSession":
+    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
@@ -180,10 +181,23 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
 
     @classmethod
-    def from_nwb_path(cls, nwb_path: str):
+    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "BehaviorSession":
+        """
+
+        Parameters
+        ----------
+        nwb_path
+            Path to nwb file
+        kwargs
+            kwargs to send to `from_nwb`
+
+        Returns
+        -------
+        An instantiation of a `BehaviorSession`
+        """
         with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
             nwbfile = read_io.read()
-            return cls.from_nwb(nwbfile=nwbfile)
+            return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
     def to_nwb(self) -> NWBFile:
         nwbfile = NWBFile(
@@ -832,8 +846,8 @@ class BehaviorSession(DataObject, InternalReadableInterface,
     def metadata(self, value):
         self._metadata = value
 
-    @staticmethod
-    def _read_data_from_stimulus_file(stimulus_file: StimulusFile,
+    @classmethod
+    def _read_data_from_stimulus_file(cls, stimulus_file: StimulusFile,
                                       stimulus_timestamps: StimulusTimestamps):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(
@@ -847,14 +861,32 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             stimulus_timestamps=stimulus_timestamps)
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
+        trial_monitor_delay = cls._calculate_trial_monitor_delay()
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
             rewards=rewards,
-            # This is the median estimate across all rigs
-            # as discussed in
-            # https://github.com/AllenInstitute/AllenSDK/issues/1318
-            monitor_delay=0.02115
+            monitor_delay=trial_monitor_delay
         )
         return licks, rewards, stimuli, task_parameters, trials
+
+    @staticmethod
+    def _calculate_trial_monitor_delay(**kwargs) -> float:
+        """Returns monitor delay using hardcoded value"""
+        # This is the median estimate across all rigs
+        # as discussed in
+        # https://github.com/AllenInstitute/AllenSDK/issues/1318
+        return 0.02115
+
+    @staticmethod
+    def _load_stimulus_timestamps_from_internal(
+            **kwargs) -> StimulusTimestamps:
+        """Loads stimulus timestamps from stimulus file
+
+        Parameters
+        ----------
+        kwargs
+            kwargs to pass to StimulusTimestamps factory method
+        """
+        return StimulusTimestamps.from_stimulus_file(**kwargs)
