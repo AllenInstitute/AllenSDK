@@ -178,9 +178,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         self._segmentation_mask_image = self._get_segmentation_mask_image(
             spacing=segmentation_mask_image_spacing)
 
-        self._validate_traces(ophys_timestamps=ophys_timestamps)
         ophys_timestamps.validate(
             number_of_frames=dff_traces.get_number_of_frames())
+        self._validate_traces(ophys_timestamps=ophys_timestamps)
 
     @property
     def table(self) -> pd.DataFrame:
@@ -574,7 +574,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             num_ophys_timestamps = ophys_timestamps.value.shape[0]
             if num_trace_timepoints != num_ophys_timestamps:
                 raise RuntimeError(f'{traces.name} contains '
-                                   f'{num_trace_timepoints}'
+                                   f'{num_trace_timepoints} '
                                    f'but there are {num_ophys_timestamps} '
                                    f'ophys timestamps')
 
