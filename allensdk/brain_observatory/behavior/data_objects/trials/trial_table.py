@@ -96,7 +96,15 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         trials = pd.DataFrame(all_trial_data).set_index('trial')
         trials.index = trials.index.rename('trials_id')
-        del trials["sham_change"]
+
+        # Order/Filter columns
+        trials = trials[['initial_image_name', 'change_image_name',
+                         'stimulus_change', 'change_time',
+                         'go', 'catch', 'lick_times', 'response_time',
+                         'response_latency', 'reward_time', 'reward_volume',
+                         'hit', 'false_alarm', 'miss', 'correct_reject',
+                         'aborted', 'auto_rewarded', 'change_frame',
+                         'start_time', 'stop_time', 'trial_length']]
 
         return TrialTable(trials=trials)
 
