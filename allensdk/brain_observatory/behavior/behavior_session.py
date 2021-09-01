@@ -7,11 +7,11 @@ import pytz
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
-    SyncFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
@@ -19,6 +19,9 @@ from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata, get_expt_description
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
@@ -38,9 +41,12 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 
 
-class BehaviorSession(DataObject, InternalReadableInterface,
+class BehaviorSession(DataObject, LimsReadableInterface,
                       NwbReadableInterface,
                       JsonReadableInterface, NwbWritableInterface):
+    """Represents data from a single Visual Behavior behavior session.
+    Initialize by using class methods `from_lims` or `from_nwb_path`.
+    """
     def __init__(
         self,
         behavior_session_id: BehaviorSessionId,
@@ -53,7 +59,8 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         stimuli: Stimuli,
         task_parameters: TaskParameters,
         trials: TrialTable,
-        metadata: BehaviorMetadata
+        metadata: BehaviorMetadata,
+        date_of_acquisition: DateOfAcquisition
     ):
         super().__init__(name='behavior_session', value=self)
 
@@ -68,16 +75,20 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         self._task_parameters = task_parameters
         self._trials = trials
         self._metadata = metadata
+        self._date_of_acquisition = date_of_acquisition
 
     # ==================== class and utility methods ======================
 
     @classmethod
-    def from_json(cls, session_data: dict) -> "BehaviorSession":
+    def from_json(cls,
+                  session_data: dict,
+                  monitor_delay: Optional[float] = None) \
+            -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = StimulusFile.from_json(dict_repr=session_data)
-        stimulus_timestamps = cls._load_stimulus_timestamps_from_internal(
-            stimulus_file=stimulus_file)
+        stimulus_timestamps = StimulusTimestamps.from_json(
+            dict_repr=session_data)
         running_acquisition = RunningAcquisition.from_json(
             dict_repr=session_data)
         raw_running_speed = RunningSpeed.from_json(
@@ -89,8 +100,14 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps
+                stimulus_timestamps=stimulus_timestamps,
+                trial_monitor_delay=monitor_delay
             )
+        date_of_acquisition = DateOfAcquisition.from_json(
+            dict_repr=session_data)\
+            .validate(
+            stimulus_file=stimulus_file,
+            behavior_session_id=behavior_session_id.value)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -103,13 +120,17 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             rewards=rewards,
             stimuli=stimuli,
             task_parameters=task_parameters,
-            trials=trials
+            trials=trials,
+            date_of_acquisition=date_of_acquisition
         )
 
     @classmethod
-    def from_internal(cls, behavior_session_id: int,
-                      lims_db: Optional[PostgresQueryMixin] = None) -> \
-            "BehaviorSession":
+    def from_lims(cls, behavior_session_id: int,
+                  lims_db: Optional[PostgresQueryMixin] = None,
+                  stimulus_timestamps: Optional[StimulusTimestamps] = None,
+                  monitor_delay: Optional[float] = None,
+                  date_of_acquisition: Optional[DateOfAcquisition] = None) \
+            -> "BehaviorSession":
         if lims_db is None:
             lims_db = db_connection_creator(
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP
@@ -118,16 +139,19 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         behavior_session_id = BehaviorSessionId(behavior_session_id)
         stimulus_file = StimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
-        stimulus_timestamps = cls._load_stimulus_timestamps_from_internal(
-            stimulus_file=stimulus_file)
+        if stimulus_timestamps is None:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                stimulus_file=stimulus_file)
         running_acquisition = RunningAcquisition.from_lims(
             lims_db, behavior_session_id.value
         )
         raw_running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value, filtered=False
+            lims_db, behavior_session_id.value, filtered=False,
+            stimulus_timestamps=stimulus_timestamps
         )
         running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value
+            lims_db, behavior_session_id.value,
+            stimulus_timestamps=stimulus_timestamps
         )
         behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db
@@ -135,8 +159,15 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps
+                stimulus_timestamps=stimulus_timestamps,
+                trial_monitor_delay=monitor_delay
             )
+        if date_of_acquisition is None:
+            date_of_acquisition = DateOfAcquisition.from_lims(
+                behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        date_of_acquisition = date_of_acquisition.validate(
+            stimulus_file=stimulus_file,
+            behavior_session_id=behavior_session_id.value)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -149,7 +180,8 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             rewards=rewards,
             stimuli=stimuli,
             task_parameters=task_parameters,
-            trials=trials
+            trials=trials,
+            date_of_acquisition=date_of_acquisition
         )
 
     @classmethod
@@ -165,6 +197,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = TrialTable.from_nwb(nwbfile=nwbfile)
+        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -177,7 +210,8 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             rewards=rewards,
             stimuli=stimuli,
             task_parameters=task_parameters,
-            trials=trials
+            trials=trials,
+            date_of_acquisition=date_of_acquisition
         )
 
     @classmethod
@@ -199,23 +233,36 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
-    def to_nwb(self) -> NWBFile:
+    def to_nwb(self, add_metadata=True) -> NWBFile:
+        """
+
+        Parameters
+        ----------
+        add_metadata
+            Whether to add metadata. Because metadata needs to be added at
+            once, in subclasses which build upon this metadata,
+            in order to avoid writing metadata multiple times,
+            it should be set to False and added instead in subclass
+        """
         nwbfile = NWBFile(
-            session_description=self._metadata.session_type,
-            identifier=str(self.behavior_session_id),
-            session_start_time=self._metadata.date_of_acquisition,
+            session_description=self._get_session_type(),
+            identifier=self._get_identifier(),
+            session_start_time=self._date_of_acquisition.value,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
-            keywords=["visual", "behavior", "task"],
+            keywords=self._get_keywords(),
             experiment_description=get_expt_description(
-                session_type=self._metadata.session_type)
+                session_type=self._get_session_type())
         )
 
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
         self._running_acquisition.to_nwb(nwbfile=nwbfile)
         self._raw_running_speed.to_nwb(nwbfile=nwbfile)
         self._running_speed.to_nwb(nwbfile=nwbfile)
-        self._metadata.to_nwb(nwbfile=nwbfile)
+
+        if add_metadata:
+            self._metadata.to_nwb(nwbfile=nwbfile)
+
         self._licks.to_nwb(nwbfile=nwbfile)
         self._rewards.to_nwb(nwbfile=nwbfile)
         self._stimuli.to_nwb(nwbfile=nwbfile)
@@ -789,7 +836,7 @@ class BehaviorSession(DataObject, InternalReadableInterface,
 
     @property
     def metadata(self) -> Dict[str, Any]:
-        """metadata for a give session
+        """metadata for a given session
 
         Returns
         -------
@@ -826,29 +873,17 @@ class BehaviorSession(DataObject, InternalReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
-        return {
-            'equipment_name': self._metadata.equipment.value,
-            'sex': self._metadata.subject_metadata.sex,
-            'age_in_days': self._metadata.subject_metadata.age_in_days,
-            'stimulus_frame_rate': self._metadata.stimulus_frame_rate,
-            'session_type': self._metadata.session_type,
-            'date_of_acquisition': self._metadata.date_of_acquisition,
-            'reporter_line': self._metadata.subject_metadata.reporter_line,
-            'cre_line': self._metadata.subject_metadata.cre_line,
-            'behavior_session_uuid': self._metadata.behavior_session_uuid,
-            'driver_line': self._metadata.subject_metadata.driver_line,
-            'mouse_id': self._metadata.subject_metadata.mouse_id,
-            'full_genotype': self._metadata.subject_metadata.full_genotype,
-            'behavior_session_id': self._metadata.behavior_session_id
-        }
+        return self._get_metadata(behavior_metadata=self._metadata)
 
     @metadata.setter
     def metadata(self, value):
         self._metadata = value
 
     @classmethod
-    def _read_data_from_stimulus_file(cls, stimulus_file: StimulusFile,
-                                      stimulus_timestamps: StimulusTimestamps):
+    def _read_data_from_stimulus_file(
+            cls, stimulus_file: StimulusFile,
+            stimulus_timestamps: StimulusTimestamps,
+            trial_monitor_delay: Optional[float] = None):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -861,7 +896,11 @@ class BehaviorSession(DataObject, InternalReadableInterface,
             stimulus_timestamps=stimulus_timestamps)
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
-        trial_monitor_delay = cls._calculate_trial_monitor_delay()
+        if trial_monitor_delay is None:
+            # This is the median estimate across all rigs
+            # as discussed in
+            # https://github.com/AllenInstitute/AllenSDK/issues/1318
+            trial_monitor_delay = 0.02115
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
@@ -871,22 +910,30 @@ class BehaviorSession(DataObject, InternalReadableInterface,
         )
         return licks, rewards, stimuli, task_parameters, trials
 
-    @staticmethod
-    def _calculate_trial_monitor_delay(**kwargs) -> float:
-        """Returns monitor delay using hardcoded value"""
-        # This is the median estimate across all rigs
-        # as discussed in
-        # https://github.com/AllenInstitute/AllenSDK/issues/1318
-        return 0.02115
+    def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
+        """Returns dict of metadata"""
+        return {
+            'equipment_name': behavior_metadata.equipment.value,
+            'sex': behavior_metadata.subject_metadata.sex,
+            'age_in_days': behavior_metadata.subject_metadata.age_in_days,
+            'stimulus_frame_rate': behavior_metadata.stimulus_frame_rate,
+            'session_type': behavior_metadata.session_type,
+            'date_of_acquisition': self._date_of_acquisition.value,
+            'reporter_line': behavior_metadata.subject_metadata.reporter_line,
+            'cre_line': behavior_metadata.subject_metadata.cre_line,
+            'behavior_session_uuid': behavior_metadata.behavior_session_uuid,
+            'driver_line': behavior_metadata.subject_metadata.driver_line,
+            'mouse_id': behavior_metadata.subject_metadata.mouse_id,
+            'full_genotype': behavior_metadata.subject_metadata.full_genotype,
+            'behavior_session_id': behavior_metadata.behavior_session_id
+        }
+
+    def _get_identifier(self) -> str:
+        return str(self._behavior_session_id)
+
+    def _get_session_type(self) -> str:
+        return self._metadata.session_type
 
     @staticmethod
-    def _load_stimulus_timestamps_from_internal(
-            **kwargs) -> StimulusTimestamps:
-        """Loads stimulus timestamps from stimulus file
-
-        Parameters
-        ----------
-        kwargs
-            kwargs to pass to StimulusTimestamps factory method
-        """
-        return StimulusTimestamps.from_stimulus_file(**kwargs)
+    def _get_keywords():
+        return ["visual", "behavior", "task"]

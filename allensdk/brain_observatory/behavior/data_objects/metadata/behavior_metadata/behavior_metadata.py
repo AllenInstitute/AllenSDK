@@ -191,7 +191,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
                  equipment: Equipment,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
-                 date_of_acquisition: DateOfAcquisition,
                  behavior_session_uuid: BehaviorSessionUUID):
         super().__init__(name='behavior_metadata', value=self)
         self._subject_metadata = subject_metadata
@@ -199,7 +198,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         self._equipment = equipment
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
-        self._date_of_acquisition = date_of_acquisition
         self._behavior_session_uuid = behavior_session_uuid
 
         self._exclude_from_equals = set()
@@ -221,10 +219,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
-        date_of_acquisition = DateOfAcquisition.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)\
-            .validate(stimulus_file=stimulus_file,
-                      behavior_session_id=behavior_session_id.value)
 
         foraging_id = ForagingId.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
@@ -240,7 +234,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=behavior_session_uuid,
         )
 
@@ -249,7 +242,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
         equipment = Equipment.from_json(dict_repr=dict_repr)
-        date_of_acquisition = DateOfAcquisition.from_json(dict_repr=dict_repr)
 
         stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
@@ -265,7 +257,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=session_uuid,
         )
 
@@ -277,7 +268,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         equipment = Equipment.from_nwb(nwbfile=nwbfile)
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
-        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
         return cls(
@@ -286,7 +276,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=session_uuid
         )
 
@@ -301,10 +290,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     @property
     def session_type(self) -> str:
         return self._session_type.value
-
-    @property
-    def date_of_acquisition(self) -> datetime:
-        return self._date_of_acquisition.value
 
     @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:
