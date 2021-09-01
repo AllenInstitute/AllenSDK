@@ -59,7 +59,7 @@ class DFFFile(DataFile):
     @staticmethod
     def load_data(filepath: Union[str, Path]) -> pd.DataFrame:
         with h5py.File(filepath, 'r') as raw_file:
-            traces = np.asarray(raw_file['data'])
+            traces = np.asarray(raw_file['data'], dtype=np.float64)
             roi_names = np.asarray(raw_file['roi_names'])
             idx = pd.Index(roi_names, name='cell_roi_id', dtype=int)
             return pd.DataFrame({'dff': [x for x in traces]}, index=idx)
