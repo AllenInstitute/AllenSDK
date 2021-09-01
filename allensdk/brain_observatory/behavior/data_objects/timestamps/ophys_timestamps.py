@@ -41,6 +41,11 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
 
         :param number_of_frames
             number of frames in the movie
+
+        Notes
+        ---------
+        Modifies self._value if ophys timestamps exceed length of
+        number_of_frames
         """
         # Scientifica data has extra frames in the sync file relative
         # to the number of frames in the video. These sentinel frames
@@ -54,12 +59,11 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
                 "Truncating acquisition frames ('ophys_frames') "
                 f"(len={num_of_timestamps}) to the number of frames "
                 f"in the df/f trace ({number_of_frames}).")
-            ophys_timestamps = ophys_timestamps[:number_of_frames]
+            self._value = ophys_timestamps[:number_of_frames]
         elif number_of_frames > num_of_timestamps:
             raise RuntimeError(
                 f"dff_frames (len={number_of_frames}) is longer "
                 f"than timestamps (len={num_of_timestamps}).")
-        return ophys_timestamps
 
 
 class OphysTimestampsMultiplane(OphysTimestamps):
@@ -82,7 +86,7 @@ class OphysTimestampsMultiplane(OphysTimestamps):
 
         return cls(timestamps=ophys_timestamps)
 
-    def validate(self, number_of_frames: int) -> np.ndarray:
+    def validate(self, number_of_frames: int):
         """
         Raises error if length of timestamps and number of frames are not equal
         :param number_of_frames
@@ -94,4 +98,3 @@ class OphysTimestampsMultiplane(OphysTimestamps):
             raise RuntimeError(
                 f"dff_frames (len={number_of_frames}) is not equal to "
                 f"number of split timestamps (len={num_of_timestamps}).")
-        return ophys_timestamps
