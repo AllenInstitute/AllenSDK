@@ -4,7 +4,7 @@ import warnings
 from collections import Callable
 
 from itertools import zip_longest
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Set
 
 import numpy as np
 import pandas as pd
@@ -155,9 +155,11 @@ class ParamsMixin:
         self._updated_params -= data_params
 
 
-def sessions_are_equal(A, B, reraise=False) -> bool:
-    """Check if two Session objects are equal (have same methods and
-    attributes).
+def sessions_are_equal(A, B, reraise=False,
+                       ignore_keys: Optional[Dict[str, Set[str]]] = None) \
+        -> bool:
+    """Check if two Session objects are equal (have same property and
+    get method values).
 
     Parameters
     ----------
@@ -168,12 +170,18 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
     reraise : bool, optional
         Whether to reraise when encountering an Assertion or AttributeError,
         by default False
+    ignore_keys
+        Set of keys to ignore for property/method. Should be given as
+        {property/method name: {field_to_ignore, ...}, ...}
 
     Returns
     -------
     bool
         Whether the two sessions are equal to one another.
     """
+    if ignore_keys is None:
+        ignore_keys = dict()
+
     A_data_attrs_and_methods = A.list_data_attributes_and_methods()
     B_data_attrs_and_methods = B.list_data_attributes_and_methods()
     field_set = set(A_data_attrs_and_methods).union(B_data_attrs_and_methods)
@@ -194,7 +202,8 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
                 x1 = x1.value
             if isinstance(x2, DataObject):
                 x2 = x2.value
-            compare_fields(x1, x2, err_msg)
+            compare_fields(x1, x2, err_msg,
+                           ignore_keys=ignore_keys.get(field, None))
 
         except NotImplementedError:
             A_implements_get_field = hasattr(
