@@ -39,8 +39,10 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
         np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
     elif isinstance(x1, xr.DataArray):
         xr.testing.assert_allclose(x1, x2)
-    elif isinstance(x1, (list,)):
-        assert x1 == x2, err_msg
+    elif isinstance(x1, (list, tuple)):
+        assert len(x1) == len(x2)
+        for i in range(len(x1)):
+            compare_fields(x1=x1[i], x2=x2[i])
     elif isinstance(x1, (sitk.Image,)):
         assert x1.GetSize() == x2.GetSize(), err_msg
         assert x1 == x2, err_msg
