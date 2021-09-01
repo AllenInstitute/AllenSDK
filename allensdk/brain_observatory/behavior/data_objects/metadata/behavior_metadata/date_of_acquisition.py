@@ -41,7 +41,8 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                 """.format(behavior_session_id)
 
         experiment_date = lims_db.fetchone(query, strict=True)
-        experiment_date = pytz.utc.localize(experiment_date)
+        experiment_date = cls._postprocess_lims_datetime(
+            datetime=experiment_date)
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
@@ -85,3 +86,31 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                     f"{stimulus_file.filepath}"
                 )
         return self
+
+    @staticmethod
+    def _postprocess_lims_datetime(datetime: datetime):
+        """Applies postprocessing to datetime read from LIMS"""
+        # add utc tz
+        datetime = pytz.utc.localize(datetime)
+
+        return datetime
+
+
+class DateOfAcquisitionOphys(DateOfAcquisition):
+    """Ophys experiments read date of acquisition from the ophys_sessions
+    table in LIMS instead of the behavior_sessions table"""
+
+    @classmethod
+    def from_lims(
+            cls, ophys_experiment_id: int,
+            lims_db: PostgresQueryMixin) -> "DateOfAcquisitionOphys":
+        query = f"""
+            SELECT os.date_of_acquisition
+            FROM ophys_experiments oe
+            JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+            WHERE oe.id = {ophys_experiment_id};
+        """
+        doa = lims_db.fetchone(query=query)
+        doa = cls._postprocess_lims_datetime(
+            datetime=doa)
+        return DateOfAcquisitionOphys(date_of_acquisition=doa)
