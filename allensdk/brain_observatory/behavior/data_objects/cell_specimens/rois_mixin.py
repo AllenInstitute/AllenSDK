@@ -9,7 +9,7 @@ class RoisMixin:
     (._value is a dataframe)"""
     _value: pd.DataFrame
 
-    def order_rois(self, roi_ids: np.ndarray):
+    def order_rois(self, roi_ids: np.ndarray, raise_if_rois_missing=True):
         """Orders dataframe according to input roi_ids.
         Will also filter dataframe to contain only rois given by roi_ids.
         Use for, ie excluding invalid rois
@@ -18,6 +18,9 @@ class RoisMixin:
         ----------
         roi_ids
             Filter/reorder _value to these roi_ids
+        raise_if_rois_missing
+            Whether to raise exception if there are rois in the input roi_ids
+            not in the dataframe
 
         Notes
         ----------
@@ -26,6 +29,11 @@ class RoisMixin:
 
         If there are values in the input roi_ids that are not in the dataframe,
         then these roi ids will be ignored and a warning will be logged.
+
+        Raises
+        ----------
+        RuntimeError if raise_if_rois_missing and there are input roi_ids not
+        in dataframe
         """
         original_index_name = self._value.index.name
         if original_index_name is None:
@@ -43,8 +51,12 @@ class RoisMixin:
 
         if is_na.any():
             # There are some roi ids in input not in index.
-            warnings.warn(f'Input contains roi ids not in '
-                          f'{type(self).__name__}.')
+
+            msg = f'Input contains roi ids not in ' \
+                  f'{type(self).__name__}.'
+            if raise_if_rois_missing:
+                raise RuntimeError(msg)
+            warnings.warn(msg)
 
             # Drop rows where NaN
             self._value = self._value.dropna(axis=0)
