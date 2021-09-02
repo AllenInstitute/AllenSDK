@@ -34,7 +34,7 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
                  'traces'].timestamps[:]
         return cls(timestamps=ts)
 
-    def validate(self, number_of_frames: int):
+    def validate(self, number_of_frames: int) -> "OphysTimestamps":
         """Validates that number of ophys timestamps do not exceed number of
         dff traces. If so, truncates number of ophys timestamps to the same
         length as dff traces
@@ -64,6 +64,7 @@ class OphysTimestamps(DataObject, SyncFileReadableInterface,
             raise RuntimeError(
                 f"dff_frames (len={number_of_frames}) is longer "
                 f"than timestamps (len={num_of_timestamps}).")
+        return self
 
 
 class OphysTimestampsMultiplane(OphysTimestamps):
@@ -74,6 +75,9 @@ class OphysTimestampsMultiplane(OphysTimestamps):
     def from_sync_file(cls, sync_file: SyncFile,
                        group_count: int,
                        plane_group: int) -> "OphysTimestampsMultiplane":
+        if group_count == 0:
+            raise ValueError('Group count cannot be 0')
+
         ophys_timestamps = sync_file.data['ophys_frames']
         cls._logger.info(
             "Mesoscope data detected. Splitting timestamps "
@@ -86,7 +90,7 @@ class OphysTimestampsMultiplane(OphysTimestamps):
 
         return cls(timestamps=ophys_timestamps)
 
-    def validate(self, number_of_frames: int):
+    def validate(self, number_of_frames: int) -> "OphysTimestampsMultiplane":
         """
         Raises error if length of timestamps and number of frames are not equal
         :param number_of_frames
@@ -98,3 +102,4 @@ class OphysTimestampsMultiplane(OphysTimestamps):
             raise RuntimeError(
                 f"dff_frames (len={number_of_frames}) is not equal to "
                 f"number of split timestamps (len={num_of_timestamps}).")
+        return self
