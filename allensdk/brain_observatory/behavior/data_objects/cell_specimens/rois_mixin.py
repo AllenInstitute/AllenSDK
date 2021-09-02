@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -7,8 +9,9 @@ class RoisMixin:
     (._value is a dataframe)"""
     _value: pd.DataFrame
 
-    def filter_to_roi_ids(self, roi_ids: np.ndarray):
-        """Limit to only rois given by roi_ids
+    def order_rois(self, roi_ids: np.ndarray):
+        """Orders dataframe according to input roi_ids.
+        Will also filter dataframe to contain only rois given by roi_ids.
         Use for, ie excluding invalid rois
 
         Parameters
@@ -19,7 +22,10 @@ class RoisMixin:
         Notes
         ----------
         Will both filter and reorder dataframe to have same order as the
-        input roi_ids
+        input roi_ids.
+
+        If there are values in the input roi_ids that are not in the dataframe,
+        then these roi ids will be ignored and a warning will be logged.
         """
         original_index_name = self._value.index.name
         if original_index_name is None:
@@ -30,12 +36,18 @@ class RoisMixin:
                            .reset_index()
                            .set_index('cell_roi_id'))
 
-        if not np.in1d(roi_ids, self._value.index).all():
-            raise RuntimeError(f'Not all roi ids to be filtered are in '
-                               f'{type(self).__name__}')
+        # Reorders dataframe according to roi_ids
+        self._value = self._value.reindex(roi_ids)
 
-        # Filter, reorder _value to roi_ids
-        self._value = self._value.loc[roi_ids]
+        is_na = self._value.isna().any(axis=0)
+
+        if is_na.any():
+            # There are some roi ids in input not in index.
+            warnings.warn(f'Input contains roi ids not in '
+                          f'{type(self).__name__}.')
+
+            # Drop rows where NaN
+            self._value = self._value.dropna(axis=0)
 
         if original_index_name != 'cell_roi_id':
             self._value = (self._value

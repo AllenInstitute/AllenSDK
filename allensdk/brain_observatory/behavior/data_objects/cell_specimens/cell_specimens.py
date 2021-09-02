@@ -163,12 +163,14 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         if exclude_invalid_rois:
             cell_specimen_table = cell_specimen_table[
                 cell_specimen_table['valid_roi']]
-            dff_traces.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
-            corrected_fluorescence_traces.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
-            events.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
+
+        # Filter/reorder rois according to cell_specimen_table
+        dff_traces.order_rois(
+            roi_ids=cell_specimen_table['cell_roi_id'].values)
+        corrected_fluorescence_traces.order_rois(
+            roi_ids=cell_specimen_table['cell_roi_id'].values)
+        events.order_rois(
+            roi_ids=cell_specimen_table['cell_roi_id'].values)
 
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
