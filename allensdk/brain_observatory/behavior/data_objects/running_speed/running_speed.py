@@ -2,9 +2,6 @@
 import json
 from typing import Optional
 
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
-
 import pandas as pd
 
 from pynwb import NWBFile, ProcessingModule
@@ -27,25 +24,6 @@ from allensdk.brain_observatory.behavior.data_files import (
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
-
-
-def from_json_cache_key(
-    cls, dict_repr: dict,
-    filtered: bool = True,
-    zscore_threshold: float = 10.0
-):
-    return hashkey(json.dumps(dict_repr), filtered, zscore_threshold)
-
-
-def from_lims_cache_key(
-    cls, db,
-    behavior_session_id: int, ophys_experiment_id: Optional[int] = None,
-    filtered: bool = True, zscore_threshold: float = 10.0,
-    stimulus_timestamps: Optional[StimulusTimestamps] = None
-):
-    return hashkey(
-        behavior_session_id, ophys_experiment_id, filtered, zscore_threshold
-    )
 
 
 class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
@@ -96,7 +74,6 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         return running_speed
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(
         cls,
         dict_repr: dict,
@@ -128,12 +105,10 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         return output_dict
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls,
         db: PostgresQueryMixin,
         behavior_session_id: int,
-        ophys_experiment_id: Optional[int] = None,
         filtered: bool = True,
         zscore_threshold: float = 10.0,
         stimulus_timestamps: Optional[StimulusTimestamps] = None
