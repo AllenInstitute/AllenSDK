@@ -92,7 +92,7 @@ class TestNWB:
             # write cell specimen
             ij = NwbInputJson()
             ophys_timestamps = OphysTimestamps(
-                timestamps=np.array([.1, .2, .3]), number_of_frames=3)
+                timestamps=np.array([.1, .2, .3]))
             csp = CellSpecimens.from_json(
                 dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3))

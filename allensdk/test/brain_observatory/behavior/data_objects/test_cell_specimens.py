@@ -50,8 +50,7 @@ class TestLims:
         number_of_frames = 140296
         ots = OphysTimestamps(timestamps=np.linspace(start=.1,
                                                      stop=.1*number_of_frames,
-                                                     num=number_of_frames),
-                              number_of_frames=number_of_frames)
+                                                     num=number_of_frames))
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
             ophys_timestamps=ots,
@@ -89,7 +88,7 @@ class TestJson:
             )
         )
         cls.ophys_timestamps = OphysTimestamps(
-            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
+            timestamps=np.array([.1, .2, .3]))
 
     def test_from_json(self):
         csp = CellSpecimens.from_json(
@@ -186,7 +185,7 @@ class TestNWB:
     @classmethod
     def setup_class(cls):
         cls.ophys_timestamps = OphysTimestamps(
-            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
+            timestamps=np.array([.1, .2, .3]))
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(

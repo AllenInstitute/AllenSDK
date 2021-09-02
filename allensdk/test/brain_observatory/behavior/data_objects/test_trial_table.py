@@ -43,27 +43,14 @@ class TestFromStimulusFile(LimsTest):
             db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
         equipment = Equipment.from_lims(
             behavior_session_id=self.behavior_session_id, lims_db=self.dbconn)
+        monitor_delay = calculate_monitor_delay(sync_file=sync_file,
+                                                equipment=equipment)
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
             rewards=rewards,
-            sync_file=sync_file,
-            equipment=equipment
-        )
-        assert trials == self.expected
-
-    @pytest.mark.requires_bamboo
-    def test_monitor_delay_passed_in(self):
-        monitor_delay = 0.021578635252278967
-        stimulus_file, stimulus_timestamps, licks, rewards = \
-            self._get_trial_table_data()
-        trials = TrialTable.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps,
-            monitor_delay=monitor_delay,
-            licks=licks,
-            rewards=rewards
+            monitor_delay=monitor_delay
         )
         assert trials == self.expected
 
