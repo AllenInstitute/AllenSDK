@@ -42,6 +42,8 @@ from allensdk.brain_observatory.behavior.data_objects.motion_correction \
     MotionCorrection
 from allensdk.brain_observatory.behavior.data_objects.projections import \
     Projections
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
+    calculate_monitor_delay
 from allensdk.brain_observatory.behavior.data_objects.timestamps \
     .ophys_timestamps import \
     OphysTimestamps, OphysTimestampsMultiplane
@@ -165,7 +167,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             is_multiplane=is_multiplane_session
         )
-        trial_monitor_delay = TrialTable.calculate_monitor_delay(
+        monitor_delay = calculate_monitor_delay(
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
@@ -173,7 +175,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             lims_db=lims_db,
             behavior_session_id=behavior_session_id.value,
             stimulus_timestamps=stimulus_timestamps,
-            monitor_delay=trial_monitor_delay,
+            monitor_delay=monitor_delay,
             date_of_acquisition=date_of_acquisition
         )
         if is_multiplane_session:
@@ -337,7 +339,7 @@ class BehaviorOphysExperiment(BehaviorSession):
         is_multiplane_session = _is_multi_plane_session()
         meta = BehaviorOphysMetadata.from_json(
             dict_repr=session_data, is_multiplane=is_multiplane_session)
-        monitor_delay = TrialTable.calculate_monitor_delay(
+        monitor_delay = calculate_monitor_delay(
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
         behavior_session = BehaviorSession.from_json(
             session_data=session_data,

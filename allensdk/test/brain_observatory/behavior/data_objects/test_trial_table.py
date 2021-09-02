@@ -14,6 +14,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
+    calculate_monitor_delay
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     import TrialTable
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
@@ -126,7 +128,7 @@ class TestMonitorDelay:
             ctx.setattr(OphysTimeAligner,
                         '_get_monitor_delay',
                         dummy_delay)
-            md = TrialTable.calculate_monitor_delay(sync_file=self.sync_file,
+            md = calculate_monitor_delay(sync_file=self.sync_file,
                                                     equipment=equipment)
             assert abs(md - 1.12) < 1.0e-6
 
@@ -142,7 +144,7 @@ class TestMonitorDelay:
             for equipment, expected in \
                     self.lookup_table_expected_values.items():
                 equipment = Equipment(equipment_name=equipment)
-                md = TrialTable.calculate_monitor_delay(
+                md = calculate_monitor_delay(
                     sync_file=self.sync_file, equipment=equipment)
                 assert abs(md - expected) < 1e-6
 
@@ -157,7 +159,7 @@ class TestMonitorDelay:
                         dummy_delay)
             equipment = Equipment(equipment_name='spam')
             with pytest.raises(RuntimeError):
-                TrialTable.calculate_monitor_delay(sync_file=self.sync_file,
+                calculate_monitor_delay(sync_file=self.sync_file,
                                                    equipment=equipment)
 
 
