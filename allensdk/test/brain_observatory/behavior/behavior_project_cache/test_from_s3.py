@@ -1,4 +1,11 @@
+from unittest.mock import create_autospec
+
 import pytest
+
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 from .utils import create_bucket, load_dataset
 import boto3
 from moto import mock_s3
@@ -58,7 +65,7 @@ def test_manifest_methods(tmpdir, s3_cloud_cache_data):
 
 
 @mock_s3
-def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
+def test_local_cache_construction(tmpdir, s3_cloud_cache_data, monkeypatch):
 
     data, versions = s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_construction"
@@ -75,7 +82,12 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     cache.load_manifest(v_names[0])
-    cache.get_behavior_ophys_experiment(ophys_experiment_id=5111)
+
+    with monkeypatch.context() as ctx:
+        ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+                    lambda path: create_autospec(
+                        BehaviorOphysExperiment, instance=True))
+        cache.get_behavior_ophys_experiment(ophys_experiment_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
     cache.fetch_api.cache._downloaded_data_path.unlink()
     assert not cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -113,7 +125,7 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data):
 
 
 @mock_s3
-def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data):
+def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data, monkeypatch):
     """
     Test that VisualBehaviorOphysProjectCache can load a
     manifest other than the latest and download files
@@ -136,9 +148,17 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data):
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     cache.load_manifest(v_names[0])
     for sess_id in (333, 444):
-        cache.get_behavior_session(behavior_session_id=sess_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorSession, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorSession, instance=True))
+            cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
-        cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorOphysExperiment, instance=True))
+            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
     v1_dir = cache_dir / f'{project_name}-{versions[0]}/data'
 
@@ -167,7 +187,7 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data):
 
 @mock_s3
 @pytest.mark.parametrize("delete_cache", [True, False])
-def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
+def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
     """
     Test that symlinks are used where appropriate
 
@@ -200,9 +220,17 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
     assert cache.list_all_downloaded_manifests() == v_names
 
     for sess_id in (333, 444):
-        cache.get_behavior_session(behavior_session_id=sess_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorSession, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorSession, instance=True))
+            cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
-        cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorOphysExperiment, instance=True))
+            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
     v1_glob = v_dirs[0].glob('*')
     v1_paths = {}
@@ -224,9 +252,17 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache):
     cache.load_manifest(v_names[-1])
     assert cache.current_manifest() == v_names[-1]
     for sess_id in (777, 888):
-        cache.get_behavior_session(behavior_session_id=sess_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorSession, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorSession, instance=True))
+            cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5444, 5666, 5777):
-        cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+                        lambda path: create_autospec(
+                            BehaviorOphysExperiment, instance=True))
+            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
     v2_glob = v_dirs[-1].glob('*')
     v2_paths = {}

@@ -159,7 +159,8 @@ class TestJson(TestBOM):
     def test_from_json(self, meso):
         if meso:
             self.dict_repr['rig_name'] = 'MESO.1'
-        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
+        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr,
+                                              is_multiplane=meso)
 
         if meso:
             assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
