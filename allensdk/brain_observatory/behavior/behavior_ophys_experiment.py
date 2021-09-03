@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile
@@ -63,8 +65,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                  cell_specimens: CellSpecimens,
                  metadata: BehaviorOphysMetadata,
                  motion_correction: MotionCorrection,
-                 eye_tracking_table: EyeTrackingTable,
-                 eye_tracking_rig_geometry: EyeTrackingRigGeometry,
+                 eye_tracking_table: Optional[EyeTrackingTable],
+                 eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry],
                  date_of_acquisition: DateOfAcquisition):
         super().__init__(
             behavior_session_id=behavior_session._behavior_session_id,
@@ -110,7 +112,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale: float = 2.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True) -> \
+                  exclude_invalid_rois=True,
+                  skip_eye_tracking=True) -> \
             "BehaviorOphysExperiment":
         """
         Parameters
@@ -126,6 +129,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
+        skip_eye_tracking
+            Used to skip returning eye tracking data
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
@@ -198,9 +203,13 @@ class BehaviorOphysExperiment(BehaviorSession):
             exclude_invalid_rois=exclude_invalid_rois
         )
         motion_correction = _get_motion_correction()
-        eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
-        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+            eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
+                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         return BehaviorOphysExperiment(
             behavior_session=behavior_session,
@@ -296,7 +305,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale: float = 2.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True) -> \
+                  exclude_invalid_rois=True,
+                  skip_eye_tracking=False) -> \
             "BehaviorOphysExperiment":
         """
 
@@ -313,6 +323,9 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_json(
@@ -369,9 +382,13 @@ class BehaviorOphysExperiment(BehaviorSession):
             exclude_invalid_rois=exclude_invalid_rois
         )
         motion_correction = _get_motion_correction()
-        eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
-        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
-            dict_repr=session_data)
+        if skip_eye_tracking:
+            eye_tracking_table = False
+            eye_tracking_rig_geometry = False
+        else:
+            eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
+                dict_repr=session_data)
 
         return BehaviorOphysExperiment(
             behavior_session=behavior_session,
