@@ -1,5 +1,3 @@
-from collections import Callable
-
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile
@@ -114,7 +112,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale: float = 2.0,
-                  events_filter_n_time_steps: int = 20) -> \
+                  events_filter_n_time_steps: int = 20,
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
         Parameters
@@ -128,6 +127,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         events_filter_n_time_steps
             See `BehaviorOphysExperiment.from_nwb`
+        exclude_invalid_rois
+            Whether to exclude invalid rois
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
@@ -197,8 +198,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             events_params=EventsParams(
                 filter_scale=events_filter_scale,
                 filter_n_time_steps=events_filter_n_time_steps),
-            # TODO remove this, it is so that it is same as legacy
-            exclude_invalid_rois=False
+            exclude_invalid_rois=exclude_invalid_rois
         )
         motion_correction = _get_motion_correction()
         eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
@@ -222,7 +222,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                  eye_tracking_z_threshold: float = 3.0,
                  eye_tracking_dilation_frames: int = 2,
                  events_filter_scale: float = 2.0,
-                 events_filter_n_time_steps: int = 20
+                 events_filter_n_time_steps: int = 20,
+                 exclude_invalid_rois=True
                  ) -> "BehaviorOphysExperiment":
         """
 
@@ -243,6 +244,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             by default 2.0
         events_filter_n_time_steps : int, optional
             Number of time steps to use for convolution of ophys events
+        exclude_invalid_rois
+            Whether to exclude invalid rois
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_nwb(
@@ -259,8 +262,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                 filter_scale=events_filter_scale,
                 filter_n_time_steps=events_filter_n_time_steps
             ),
-            # TODO remove this, it is so that it is same as legacy
-            exclude_invalid_rois=False
+            exclude_invalid_rois=exclude_invalid_rois
         )
         eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
             nwbfile=nwbfile)
@@ -296,7 +298,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale: float = 2.0,
-                  events_filter_n_time_steps: int = 20) -> \
+                  events_filter_n_time_steps: int = 20,
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
 
@@ -311,6 +314,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         events_filter_n_time_steps
             See `BehaviorOphysExperiment.from_nwb`
+        exclude_invalid_rois
+            Whether to exclude invalid rois
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_json(
@@ -364,8 +369,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             events_params=EventsParams(
                 filter_scale=events_filter_scale,
                 filter_n_time_steps=events_filter_n_time_steps),
-            # TODO remove this, it is so that it is same as legacy
-            exclude_invalid_rois=False
+            exclude_invalid_rois=exclude_invalid_rois
         )
         motion_correction = _get_motion_correction()
         eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
@@ -413,6 +417,11 @@ class BehaviorOphysExperiment(BehaviorSession):
 
         assert (len(cell_specimen_ids), len(timestamps)) == dff_traces.shape
         return timestamps, dff_traces
+
+    @legacy()
+    def get_cell_specimen_indices(self, cell_specimen_ids):
+        return [self.cell_specimen_table.index.get_loc(csid)
+                for csid in cell_specimen_ids]
 
     @legacy("Consider using cell_specimen_table['cell_specimen_id'] instead.")
     def get_cell_specimen_ids(self):
