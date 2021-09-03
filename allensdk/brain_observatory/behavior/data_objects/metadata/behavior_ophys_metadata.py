@@ -57,7 +57,8 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         ophys_experiment_id
         lims_db
         is_multiplane
-            Whether to fetch multiplane metadata
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
         """
         behavior_session_id = BehaviorSessionId.from_lims(
             ophys_experiment_id=ophys_experiment_id, db=lims_db)
@@ -78,6 +79,19 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict,
                   is_multiplane=False) -> "BehaviorOphysMetadata":
+        """
+
+        Parameters
+        ----------
+        dict_repr
+        is_multiplane
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
+
+        Returns
+        -------
+
+        """
         behavior_metadata = BehaviorMetadata.from_json(dict_repr=dict_repr)
 
         if is_multiplane:
@@ -99,7 +113,8 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         ----------
         nwbfile
         is_multiplane
-            Whether to fetch multiplane metadata
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
         """
         behavior_metadata = BehaviorMetadata.from_nwb(nwbfile=nwbfile)
 
