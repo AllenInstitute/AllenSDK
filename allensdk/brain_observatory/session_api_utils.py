@@ -156,7 +156,8 @@ class ParamsMixin:
 
 
 def sessions_are_equal(A, B, reraise=False,
-                       ignore_keys: Optional[Dict[str, Set[str]]] = None) \
+                       ignore_keys: Optional[Dict[str, Set[str]]] = None,
+                       test_methods=False) \
         -> bool:
     """Check if two Session objects are equal (have same property and
     get method values).
@@ -173,6 +174,8 @@ def sessions_are_equal(A, B, reraise=False,
     ignore_keys
         Set of keys to ignore for property/method. Should be given as
         {property/method name: {field_to_ignore, ...}, ...}
+    test_methods
+        Whether to test get methods
 
     Returns
     -------
@@ -192,9 +195,12 @@ def sessions_are_equal(A, B, reraise=False,
         try:
             logger.info(f"Comparing field: {field}")
             x1, x2 = getattr(A, field), getattr(B, field)
-            if isinstance(x1, Callable):
-                x1 = x1()
-                x2 = x2()
+            if test_methods:
+                if isinstance(x1, Callable):
+                    x1 = x1()
+                    x2 = x2()
+            else:
+                continue
 
             err_msg = (f"{field} on {A} did not equal {field} "
                        f"on {B} (\n{x1} vs\n{x2}\n)")
