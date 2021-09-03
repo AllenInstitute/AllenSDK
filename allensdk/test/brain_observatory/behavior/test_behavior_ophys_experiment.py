@@ -50,8 +50,6 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .ophys_timestamps import \
     OphysTimestamps
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysLimsApi)
 from allensdk.brain_observatory.session_api_utils import (
     sessions_are_equal)
 from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
@@ -194,32 +192,6 @@ def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
     session = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
     df = session.stimulus_presentations
     assert df['omitted'].sum() == number_omitted
-
-
-@pytest.mark.skip
-@pytest.mark.requires_bamboo
-@pytest.mark.parametrize('ophys_experiment_id', [
-    pytest.param(789359614),
-    pytest.param(792813858)
-])
-def test_trial_response_window_bounds_reward(ophys_experiment_id):
-    api = BehaviorOphysLimsApi(ophys_experiment_id)
-    session = BehaviorOphysExperiment(api)
-    response_window = session.task_parameters['response_window_sec']
-    for _, row in session.trials.iterrows():
-
-        lick_times = [(t - row.change_time) for t in row.lick_times]
-        if not np.isnan(row.reward_time):
-
-            # monitor delay is incorporated into the trials table change time
-            # TODO: where is this set in the session object?
-            camstim_change_time = row.change_time - 0.0351
-
-            reward_time = (row.reward_time - camstim_change_time)
-            assert response_window[0] < reward_time + 1 / 60
-            assert reward_time < response_window[1] + 1 / 60
-            if len(session.licks) > 0:
-                assert lick_times[0] < reward_time
 
 
 @pytest.mark.parametrize(
