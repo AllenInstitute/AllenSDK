@@ -1,12 +1,10 @@
-import warnings
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
-    SyncFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.base \
@@ -16,12 +14,8 @@ from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.equipment import \
-    Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
-from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
 
 class TrialTable(DataObject, StimulusFileReadableInterface,

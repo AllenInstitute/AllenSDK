@@ -19,8 +19,8 @@ from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
 from allensdk.brain_observatory.behavior.data_files\
     .rigid_motion_transform_file import \
     RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId, \
-    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects import \
+    BehaviorSessionId, StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .cell_specimens import \
     CellSpecimens
@@ -299,7 +299,7 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value,
             CellSpecimens, 'from_lims',
             lambda lims_db, ophys_experiment_id, ophys_timestamps,
             segmentation_mask_image_spacing, events_params,
-                   exclude_invalid_rois: create_autospec(
+            exclude_invalid_rois: create_autospec(
                      BehaviorSession, instance=True))
         ctx.setattr(
             RigidMotionTransformFile, 'from_lims',
@@ -311,10 +311,9 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value,
         ctx.setattr(
             EyeTrackingTable, 'from_data_file',
             lambda data_file, sync_file, z_threshold, dilation_frames:
-            EyeTrackingTable_mock.from_data_file(data_file=data_file,
-                                                 sync_file=sync_file,
-                                  z_threshold=z_threshold,
-                                  dilation_frames=dilation_frames))
+            EyeTrackingTable_mock.from_data_file(
+                data_file=data_file, sync_file=sync_file,
+                z_threshold=z_threshold, dilation_frames=dilation_frames))
         ctx.setattr(
             EyeTrackingRigGeometry, 'from_lims',
             lambda lims_db, ophys_experiment_id: create_autospec(
@@ -370,7 +369,8 @@ def test_BehaviorOphysExperiment_property_data():
     assert dataset.ophys_experiment_id == 960410026
 
 
-def test_behavior_ophys_experiment_list_data_attributes_and_methods(monkeypatch):
+def test_behavior_ophys_experiment_list_data_attributes_and_methods(
+        monkeypatch):
     # Test that data related methods/attributes/properties for
     # BehaviorOphysExperiment are returned properly.
 

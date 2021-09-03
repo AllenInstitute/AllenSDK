@@ -1,8 +1,6 @@
 from typing import Dict, Union
 from pathlib import Path
 
-from cachetools import cached, LRUCache
-
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \

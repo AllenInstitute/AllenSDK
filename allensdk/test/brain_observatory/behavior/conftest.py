@@ -16,9 +16,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata\

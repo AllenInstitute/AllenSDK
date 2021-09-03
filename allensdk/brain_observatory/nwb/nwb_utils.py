@@ -1,4 +1,3 @@
-import pandas as pd
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.

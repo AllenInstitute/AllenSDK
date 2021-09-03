@@ -14,9 +14,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    EquipmentType
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.multi_plane_metadata\
     .multi_plane_metadata import \
     MultiplaneMetadata

@@ -10,8 +10,8 @@ from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
 from allensdk.brain_observatory.behavior.data_files\
     .rigid_motion_transform_file import \
     RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId, \
-    StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects import \
+    BehaviorSessionId, StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
     .cell_specimens import \
     CellSpecimens, EventsParams
@@ -45,9 +45,6 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
 from allensdk.brain_observatory.behavior.data_objects.timestamps \
     .ophys_timestamps import \
     OphysTimestamps, OphysTimestampsMultiplane
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
-    TrialTable
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.image_api import Image

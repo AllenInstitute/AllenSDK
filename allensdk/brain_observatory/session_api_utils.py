@@ -10,16 +10,11 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.comparison_utils import compare_fields
-from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-import sys
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.INFO)
-logger.addHandler(handler)
 
 
 def is_equal(a: Any, b: Any) -> bool:

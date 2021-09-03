@@ -116,7 +116,7 @@ class TestMonitorDelay:
                         '_get_monitor_delay',
                         dummy_delay)
             md = calculate_monitor_delay(sync_file=self.sync_file,
-                                                    equipment=equipment)
+                                         equipment=equipment)
             assert abs(md - 1.12) < 1.0e-6
 
     def test_monitor_delay_lookup(self, monkeypatch):
@@ -147,7 +147,7 @@ class TestMonitorDelay:
             equipment = Equipment(equipment_name='spam')
             with pytest.raises(RuntimeError):
                 calculate_monitor_delay(sync_file=self.sync_file,
-                                                   equipment=equipment)
+                                        equipment=equipment)
 
 
 class TestNWB:
