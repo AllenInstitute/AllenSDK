@@ -113,7 +113,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   events_filter_scale: float = 2.0,
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
-                  skip_eye_tracking=True) -> \
+                  skip_eye_tracking=False) -> \
             "BehaviorOphysExperiment":
         """
         Parameters
@@ -383,8 +383,8 @@ class BehaviorOphysExperiment(BehaviorSession):
         )
         motion_correction = _get_motion_correction()
         if skip_eye_tracking:
-            eye_tracking_table = False
-            eye_tracking_rig_geometry = False
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
         else:
             eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
