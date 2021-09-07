@@ -1,6 +1,4 @@
 import pytest
-import pandas as pd
-
 from allensdk.brain_observatory.nwb import nwb_utils
 
 
