@@ -782,5 +782,6 @@ class BehaviorOphysExperiment(BehaviorSession):
 
     @staticmethod
     def _get_keywords():
+        """Keywords for NWB file"""
         return ["2-photon", "calcium imaging", "visual cortex",
                 "behavior", "task"]

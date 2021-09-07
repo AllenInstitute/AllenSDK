@@ -84,6 +84,21 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                   session_data: dict,
                   monitor_delay: Optional[float] = None) \
             -> "BehaviorSession":
+        """
+
+        Parameters
+        ----------
+        session_data
+            Dict of input data necessary to construct a session
+        monitor_delay
+            Monitor delay. If not provided, will calculate monitor delay from
+            stimulus file.
+
+        Returns
+        -------
+        `BehaviorSession` instance
+
+        """
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = StimulusFile.from_json(dict_repr=session_data)
@@ -131,6 +146,27 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[DateOfAcquisition] = None) \
             -> "BehaviorSession":
+        """
+
+        Parameters
+        ----------
+        behavior_session_id
+            Behavior session id
+        lims_db
+            Database connection. If not provided will create a new one.
+        stimulus_timestamps
+            Stimulus timestamps. If not provided, will calculate stimulus
+            timestamps from stimulus file.
+        monitor_delay
+            Monitor delay. If not provided, will calculate monitor delay from
+            stimulus file.
+        date_of_acquisition
+            Date of acquisition. If not provided, will read from
+            behavior_sessions table.
+        Returns
+        -------
+        `BehaviorSession` instance
+        """
         if lims_db is None:
             lims_db = db_connection_creator(
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP
@@ -185,7 +221,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "BehaviorSession":
+    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
@@ -215,7 +251,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "BehaviorSession":
+    def from_nwb_path(cls, nwb_path: str) -> "BehaviorSession":
         """
 
         Parameters
@@ -231,7 +267,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
             nwbfile = read_io.read()
-            return cls.from_nwb(nwbfile=nwbfile, **kwargs)
+            return cls.from_nwb(nwbfile=nwbfile)
 
     def to_nwb(self, add_metadata=True) -> NWBFile:
         """
@@ -936,4 +972,5 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
     @staticmethod
     def _get_keywords():
+        """Keywords for NWB file"""
         return ["visual", "behavior", "task"]
