@@ -258,8 +258,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         ----------
         nwb_path
             Path to nwb file
-        kwargs
-            kwargs to send to `from_nwb`
 
         Returns
         -------
