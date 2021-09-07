@@ -156,5 +156,11 @@ class DataObject(abc.ABC):
                 compare_fields(x1=x1, x2=x2,
                                ignore_keys=self._exclude_from_equals)
             except AssertionError:
+                print(p)
+                print()
+                print(x1)
+                print()
+                print()
+                print(x2)
                 return False
         return True
