@@ -366,6 +366,10 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         def _read_table(cell_specimen_table):
             df = cell_specimen_table.to_dataframe()
 
+            # Ensure int64 used instead of int32
+            df = df.astype(
+                {col: 'int64' for col in df.select_dtypes('int32').columns})
+
             # Because pynwb stores this field as "image_mask", it is renamed
             # here
             df = df.rename(columns={'image_mask': 'roi_mask'})
@@ -537,12 +541,6 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         cell_specimen_table = pd.DataFrame.from_dict(
             cell_specimen_table).set_index(
             'cell_roi_id').sort_index()
-
-        # Ensure int64 used instead of int32
-        cell_specimen_table = cell_specimen_table.astype(
-            {col: 'int64' for col in cell_specimen_table
-                .select_dtypes('int32').columns})
-
         fov_width = fov_shape.width
         fov_height = fov_shape.height
 
