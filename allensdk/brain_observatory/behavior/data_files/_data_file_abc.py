@@ -16,7 +16,7 @@ class DataFile(abc.ABC):
 
     def __init__(self, filepath: Union[str, Path]):  # pragma: no cover
         self._filepath: str = str(filepath)
-        self._data = self.load_data(filepath=filepath)
+        self._data = self.load_data(filepath=self._filepath)
 
     @property
     def data(self) -> Any:  # pragma: no cover
