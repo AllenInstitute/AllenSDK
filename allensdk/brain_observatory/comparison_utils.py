@@ -34,9 +34,6 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
             assert_frame_equal(x1, x2, check_like=True)
         except Exception:
             print(err_msg)
-            for c in x1:
-                print(x1[c])
-                print(x2[c])
             raise
     elif isinstance(x1, np.ndarray):
         np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
