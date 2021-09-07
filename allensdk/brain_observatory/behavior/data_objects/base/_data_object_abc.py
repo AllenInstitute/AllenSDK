@@ -157,8 +157,5 @@ class DataObject(abc.ABC):
                                ignore_keys=self._exclude_from_equals)
             except AssertionError:
                 print(p)
-                for c in x2:
-                    print(x1[c])
-                    print(x2[c])
                 return False
         return True
