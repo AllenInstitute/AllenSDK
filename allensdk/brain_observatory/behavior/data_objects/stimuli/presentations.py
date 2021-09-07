@@ -155,8 +155,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         stim_pres_df = cls._postprocess(presentations=stim_pres_df)
         return Presentations(presentations=stim_pres_df)
 
-    @staticmethod
-    def _postprocess(presentations: pd.DataFrame, fill_omitted_values=True,
+    @classmethod
+    def _postprocess(cls, presentations: pd.DataFrame,
+                     fill_omitted_values=True,
                      omitted_time_duration: float = 0.25) \
             -> pd.DataFrame:
         """
@@ -183,21 +184,32 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                      'image_set']]
             return df
 
-        def _fill_missing_values_for_omitted_flashes(df: pd.DataFrame):
-            """
-            This function sets the stop time for a row that is an omitted
-            stimuli. An omitted stimuli is a stimuli where a mouse is
-            shown only a grey screen and these last for 250 milliseconds.
-            These do not include a stop_time or end_frame as other stimuli in
-            the stimulus table due to design choices.
-            """
-            omitted = df['omitted']
-            df.loc[omitted, 'stop_time'] = \
-                df.loc[omitted, 'start_time'] + omitted_time_duration
-            df.loc[omitted, 'duration'] = omitted_time_duration
-            return df
-
         df = _filter_arrange_columns(df=presentations)
         if fill_omitted_values:
-            _fill_missing_values_for_omitted_flashes(df=df)
+            cls._fill_missing_values_for_omitted_flashes(
+                df=df, omitted_time_duration=omitted_time_duration)
+        return df
+
+    @staticmethod
+    def _fill_missing_values_for_omitted_flashes(
+            df: pd.DataFrame, omitted_time_duration: float = 0.25) \
+            -> pd.DataFrame:
+        """
+        This function sets the stop time for a row that is an omitted
+        stimuli. An omitted stimuli is a stimuli where a mouse is
+        shown only a grey screen and these last for 250 milliseconds.
+        These do not include a stop_time or end_frame as other stimuli in
+        the stimulus table due to design choices.
+
+        Parameters
+        ----------
+        df
+            Stimuli presentations dataframe
+        omitted_time_duration
+            Amount of time a stimuli is omitted for in seconds
+        """
+        omitted = df['omitted']
+        df.loc[omitted, 'stop_time'] = \
+            df.loc[omitted, 'start_time'] + omitted_time_duration
+        df.loc[omitted, 'duration'] = omitted_time_duration
         return df
