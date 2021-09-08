@@ -91,8 +91,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         session_data
             Dict of input data necessary to construct a session
         monitor_delay
-            Monitor delay. If not provided, will calculate monitor delay from
-            stimulus file.
+            Monitor delay. If not provided, will use an estimate.
 
         Returns
         -------
@@ -111,6 +110,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
         running_speed = RunningSpeed.from_json(dict_repr=session_data)
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
+
+        if monitor_delay is None:
+            monitor_delay = cls._get_monitor_delay()
 
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
@@ -158,8 +160,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Stimulus timestamps. If not provided, will calculate stimulus
             timestamps from stimulus file.
         monitor_delay
-            Monitor delay. If not provided, will calculate monitor delay from
-            stimulus file.
+            Monitor delay. If not provided, will use an estimate.
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
@@ -192,6 +193,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         behavior_metadata = BehaviorMetadata.from_internal(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
+
+        if monitor_delay is None:
+            monitor_delay = cls._get_monitor_delay()
+
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
@@ -917,7 +922,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_data_from_stimulus_file(
             cls, stimulus_file: StimulusFile,
             stimulus_timestamps: StimulusTimestamps,
-            trial_monitor_delay: Optional[float] = None):
+            trial_monitor_delay: float):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -930,11 +935,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimulus_timestamps=stimulus_timestamps)
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
-        if trial_monitor_delay is None:
-            # This is the median estimate across all rigs
-            # as discussed in
-            # https://github.com/AllenInstitute/AllenSDK/issues/1318
-            trial_monitor_delay = 0.02115
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
@@ -972,3 +972,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _get_keywords():
         """Keywords for NWB file"""
         return ["visual", "behavior", "task"]
+
+    @staticmethod
+    def _get_monitor_delay():
+        # This is the median estimate across all rigs
+        # as discussed in
+        # https://github.com/AllenInstitute/AllenSDK/issues/1318
+        return 0.02115
