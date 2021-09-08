@@ -173,16 +173,16 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 cell_specimen_table['valid_roi']]
 
         # Filter/reorder rois according to cell_specimen_table
-        dff_traces.order_rois(
+        dff_traces.filter_and_reorder(
             roi_ids=cell_specimen_table['cell_roi_id'].values)
-        corrected_fluorescence_traces.order_rois(
+        corrected_fluorescence_traces.filter_and_reorder(
             roi_ids=cell_specimen_table['cell_roi_id'].values)
 
         # Note: setting raise_if_rois_missing to False for events, since
         # there seem to be cases where cell_specimen_table contains rois not in
         # events
         # See ie https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/2139     # noqa
-        events.order_rois(
+        events.filter_and_reorder(
             roi_ids=cell_specimen_table['cell_roi_id'].values,
             raise_if_rois_missing=False)
 

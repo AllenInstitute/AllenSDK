@@ -9,7 +9,8 @@ class RoisMixin:
     (._value is a dataframe)"""
     _value: pd.DataFrame
 
-    def order_rois(self, roi_ids: np.ndarray, raise_if_rois_missing=True):
+    def filter_and_reorder(self, roi_ids: np.ndarray,
+                           raise_if_rois_missing=True):
         """Orders dataframe according to input roi_ids.
         Will also filter dataframe to contain only rois given by roi_ids.
         Use for, ie excluding invalid rois
