@@ -271,4 +271,3 @@ class TestFilterAndReorder:
             expected = pd.DataFrame({'cell_roi_id': [1],
                                      'foo': [2]})
             pd.testing.assert_frame_equal(rois._value, expected)
-
