@@ -482,7 +482,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
-        return BehaviorSession.from_internal(
+        return BehaviorSession.from_lims(
             behavior_session_id=behavior_session_id)
 
     def get_ophys_experiment_table(
