@@ -5,7 +5,7 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, NwbReadableInterface, \
-    InternalReadableInterface
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
@@ -16,7 +16,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
+class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, max_projection: Image, avg_projection: Image):
         super().__init__(name='projections', value=self)
@@ -32,8 +32,8 @@ class Projections(DataObject, InternalReadableInterface, JsonReadableInterface,
         return self._avg_projection
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin) -> "Projections":
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin) -> "Projections":
         def _get_filepaths():
             query = """
                     SELECT

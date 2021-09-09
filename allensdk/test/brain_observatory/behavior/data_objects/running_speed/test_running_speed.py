@@ -235,7 +235,6 @@ def test_running_speed_to_json(
 
 
 @pytest.mark.parametrize("behavior_session_id", [12345, 1234])
-@pytest.mark.parametrize("ophys_experiment_id", [None, 5678])
 @pytest.mark.parametrize("filtered", [True, False])
 @pytest.mark.parametrize("zscore_threshold", [1.0, 4.2])
 @pytest.mark.parametrize(
@@ -264,7 +263,7 @@ def test_running_speed_to_json(
     ]
 )
 def test_running_speed_from_lims(
-    monkeypatch, behavior_session_id, ophys_experiment_id, returned_running_df,
+    monkeypatch, behavior_session_id, returned_running_df,
     expected_running_df, filtered, zscore_threshold
 ):
     mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
@@ -291,7 +290,7 @@ def test_running_speed_from_lims(
             mock_get_running_speed_df
         )
         obt = RunningSpeed.from_lims(
-            mock_db_conn, behavior_session_id, ophys_experiment_id, filtered,
+            mock_db_conn, behavior_session_id, filtered,
             zscore_threshold
         )
 

@@ -3,11 +3,16 @@ from datetime import datetime
 from pathlib import Path
 import numpy as np
 import pynwb
+import pandas as pd
 
 import pytest
 
+from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
     cell_specimens import CellSpecimens, CellSpecimenMeta
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
+    .rois_mixin import \
+    RoisMixin
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
@@ -46,12 +51,11 @@ class TestLims:
                     fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
     @pytest.mark.requires_bamboo
-    def test_from_internal(self):
+    def test_from_lims(self):
         number_of_frames = 140296
         ots = OphysTimestamps(timestamps=np.linspace(start=.1,
                                                      stop=.1*number_of_frames,
-                                                     num=number_of_frames),
-                              number_of_frames=number_of_frames)
+                                                     num=number_of_frames))
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
             ophys_timestamps=ots,
@@ -89,7 +93,7 @@ class TestJson:
             )
         )
         cls.ophys_timestamps = OphysTimestamps(
-            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
+            timestamps=np.array([.1, .2, .3]))
 
     def test_from_json(self):
         csp = CellSpecimens.from_json(
@@ -186,7 +190,7 @@ class TestNWB:
     @classmethod
     def setup_class(cls):
         cls.ophys_timestamps = OphysTimestamps(
-            timestamps=np.array([.1, .2, .3]), number_of_frames=3)
+            timestamps=np.array([.1, .2, .3]))
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -241,3 +245,29 @@ class TestNWB:
                     .isin(valid_roi_id)]
 
         assert obt == cell_specimens
+
+
+class TestFilterAndReorder:
+    @pytest.mark.parametrize('raise_if_rois_missing', (True, False))
+    def test_missing_rois(self, raise_if_rois_missing):
+        """Tests that when dataframe missing rois, that they are ignored"""
+        roi_ids = np.array([1, 2])
+        df = pd.DataFrame({'cell_roi_id': [1], 'foo': [2]})
+
+        class Rois(DataObject, RoisMixin):
+            def __init__(self):
+                super().__init__(name='test', value=df)
+
+        rois = Rois()
+        if raise_if_rois_missing:
+            with pytest.raises(RuntimeError):
+                rois.filter_and_reorder(
+                    roi_ids=roi_ids,
+                    raise_if_rois_missing=raise_if_rois_missing)
+        else:
+            rois.filter_and_reorder(
+                roi_ids=roi_ids,
+                raise_if_rois_missing=raise_if_rois_missing)
+            expected = pd.DataFrame({'cell_roi_id': [1],
+                                     'foo': [2]})
+            pd.testing.assert_frame_equal(rois._value, expected)

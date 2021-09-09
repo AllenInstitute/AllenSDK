@@ -1,9 +1,5 @@
-import json
 from typing import Dict, Union
 from pathlib import Path
-
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
 
 import pandas as pd
 
@@ -12,14 +8,6 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import \
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.data_files import DataFile
-
-
-def from_json_cache_key(cls, dict_repr: dict):
-    return hashkey(json.dumps(dict_repr))
-
-
-def from_lims_cache_key(cls, db, ophys_experiment_id: int):
-    return hashkey(ophys_experiment_id)
 
 
 class EyeTrackingFile(DataFile):
@@ -31,7 +19,6 @@ class EyeTrackingFile(DataFile):
         super().__init__(filepath=filepath)
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(cls, dict_repr: dict) -> "EyeTrackingFile":
         filepath = dict_repr["eye_tracking_filepath"]
         return cls(filepath=filepath)
@@ -40,7 +27,6 @@ class EyeTrackingFile(DataFile):
         return {"eye_tracking_filepath": str(self.filepath)}
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin,
         ophys_experiment_id: Union[int, str]

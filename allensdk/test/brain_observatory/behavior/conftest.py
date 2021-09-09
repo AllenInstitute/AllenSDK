@@ -16,9 +16,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -219,9 +216,6 @@ def behavior_only_metadata_fixture():
         equipment=Equipment(equipment_name='my_device'),
         stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
         session_type=SessionType(session_type='Unknown'),
-        date_of_acquisition=DateOfAcquisition(
-            date_of_acquisition=pytz.utc.localize(datetime.datetime.now())
-        ),
         behavior_session_uuid=BehaviorSessionUUID(
             behavior_session_uuid=uuid.uuid4())
     )

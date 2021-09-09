@@ -9,7 +9,7 @@ from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
-    Presentations
+    Presentations as StimulusPresentations
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
@@ -31,7 +31,8 @@ class TestFromStimulusFile(LimsTest):
             pd.read_pickle(str(test_data_dir / 'presentations.pkl'))
         templates = \
             pd.read_pickle(str(test_data_dir / 'templates.pkl'))
-        cls.expected_presentations = Presentations(presentations=presentations)
+        cls.expected_presentations = StimulusPresentations(
+            presentations=presentations)
         cls.expected_templates = Templates(templates=templates)
 
     @pytest.mark.requires_bamboo
@@ -59,7 +60,7 @@ class TestNWB:
         templates = \
             pd.read_pickle(str(cls.test_data_dir / 'templates.pkl'))
         presentations = presentations.drop('is_change', axis=1)
-        p = Presentations(presentations=presentations)
+        p = StimulusPresentations(presentations=presentations)
         t = Templates(templates=templates)
         cls.stimuli = Stimuli(presentations=p, templates=t)
 
@@ -92,3 +93,33 @@ class TestNWB:
         obt.presentations.value.drop('is_change', axis=1, inplace=True)
 
         assert obt == self.stimuli
+
+
+@pytest.mark.parametrize("stimulus_table, expected_table_data", [
+    ({'image_index': [8, 9],
+      'image_name': ['omitted', 'not_omitted'],
+      'image_set': ['omitted', 'not_omitted'],
+      'index': [201, 202],
+      'omitted': [True, False],
+      'start_frame': [231060, 232340],
+      'start_time': [0, 250],
+      'stop_time': [None, 1340509],
+      'duration': [None, 1340259]},
+     {'image_index': [8, 9],
+      'image_name': ['omitted', 'not_omitted'],
+      'image_set': ['omitted', 'not_omitted'],
+      'index': [201, 202],
+      'omitted': [True, False],
+      'start_frame': [231060, 232340],
+      'start_time': [0, 250],
+      'stop_time': [0.25, 1340509],
+      'duration': [0.25, 1340259]}
+     )
+])
+def test_set_omitted_stop_time(stimulus_table, expected_table_data):
+    stimulus_table = pd.DataFrame.from_dict(data=stimulus_table)
+    expected_table = pd.DataFrame.from_dict(data=expected_table_data)
+    stimulus_table = \
+        StimulusPresentations._fill_missing_values_for_omitted_flashes(
+            df=stimulus_table)
+    assert stimulus_table.equals(expected_table)

@@ -1,12 +1,10 @@
-import warnings
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
-    SyncFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.base \
@@ -16,12 +14,8 @@ from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.equipment import \
-    Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
-from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
 
 class TrialTable(DataObject, StimulusFileReadableInterface,
@@ -71,16 +65,8 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
                            rewards: Rewards,
-                           monitor_delay: Optional[float] = None,
-                           sync_file: Optional[SyncFile] = None,
-                           equipment: Optional[Equipment] = None
+                           monitor_delay: float
                            ) -> "TrialTable":
-        if monitor_delay is None:
-            if sync_file is None or equipment is None:
-                raise ValueError('Need sync file and equipment in order to '
-                                 'calculate monitor delay')
-            monitor_delay = cls._calculate_monitor_delay(sync_file=sync_file,
-                                                         equipment=equipment)
         bsf = stimulus_file.data
 
         stimuli = bsf["items"]["behavior"]["stimuli"]
@@ -104,45 +90,17 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         trials = pd.DataFrame(all_trial_data).set_index('trial')
         trials.index = trials.index.rename('trials_id')
-        del trials["sham_change"]
+
+        # Order/Filter columns
+        trials = trials[['initial_image_name', 'change_image_name',
+                         'stimulus_change', 'change_time',
+                         'go', 'catch', 'lick_times', 'response_time',
+                         'response_latency', 'reward_time', 'reward_volume',
+                         'hit', 'false_alarm', 'miss', 'correct_reject',
+                         'aborted', 'auto_rewarded', 'change_frame',
+                         'start_time', 'stop_time', 'trial_length']]
 
         return TrialTable(trials=trials)
-
-    @staticmethod
-    def _calculate_monitor_delay(sync_file: SyncFile,
-                                 equipment: Equipment) -> float:
-        aligner = OphysTimeAligner(sync_file=sync_file.filepath)
-
-        try:
-            delay = aligner.monitor_delay
-        except ValueError as ee:
-            equipment_name = equipment.value
-
-            warning_msg = 'Monitory delay calculation failed '
-            warning_msg += 'with ValueError\n'
-            warning_msg += f'    "{ee}"'
-            warning_msg += '\nlooking monitor delay up from table '
-            warning_msg += f'for rig: {equipment_name} '
-
-            # see
-            # https://github.com/AllenInstitute/AllenSDK/issues/1318
-            # https://github.com/AllenInstitute/AllenSDK/issues/1916
-            delay_lookup = {'CAM2P.1': 0.020842,
-                            'CAM2P.2': 0.037566,
-                            'CAM2P.3': 0.021390,
-                            'CAM2P.4': 0.021102,
-                            'CAM2P.5': 0.021192,
-                            'MESO.1': 0.03613}
-
-            if equipment_name not in delay_lookup:
-                msg = warning_msg
-                msg += f'\nequipment_name {equipment_name} not in lookup table'
-                raise RuntimeError(msg)
-            delay = delay_lookup[equipment_name]
-            warning_msg += f'\ndelay: {delay} seconds'
-            warnings.warn(warning_msg)
-
-        return delay
 
     @staticmethod
     def _get_trial_bounds(trial_log: List) -> List[Tuple[int, int]]:

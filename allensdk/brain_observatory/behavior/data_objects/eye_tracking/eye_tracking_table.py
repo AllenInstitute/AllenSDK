@@ -98,9 +98,9 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         -----------
         nwbfile
         z_threshold
-            See from_internal for description
+            See from_lims for description
         dilation_frames
-            See from_internal for description
+            See from_lims for description
         """
         try:
             eye_tracking_acquisition = nwbfile.acquisition['EyeTracking']
@@ -176,9 +176,9 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         data_file
         sync_file
         z_threshold : float, optional
-            See EyeTracking.from_internal
+            See EyeTracking.from_lims
         dilation_frames : int, optional
-             See EyeTracking.from_internal
+             See EyeTracking.from_lims
         """
         cls._logger.info(f"Getting eye_tracking_data with "
                          f"'z_threshold={z_threshold}', "

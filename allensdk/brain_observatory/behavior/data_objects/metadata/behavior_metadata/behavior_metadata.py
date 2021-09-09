@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Dict, Optional
 import re
 import numpy as np
@@ -7,19 +6,17 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps, BehaviorSessionId
+    BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -37,7 +34,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     SubjectMetadata
 from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
-from allensdk.brain_observatory.comparison_utils import compare_fields
 from allensdk.internal.api import PostgresQueryMixin
 
 description_dict = {
@@ -179,7 +175,7 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata(DataObject, InternalReadableInterface,
+class BehaviorMetadata(DataObject, LimsReadableInterface,
                        JsonReadableInterface,
                        NwbReadableInterface,
                        JsonWritableInterface,
@@ -191,7 +187,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
                  equipment: Equipment,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
-                 date_of_acquisition: DateOfAcquisition,
                  behavior_session_uuid: BehaviorSessionUUID):
         super().__init__(name='behavior_metadata', value=self)
         self._subject_metadata = subject_metadata
@@ -199,13 +194,12 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         self._equipment = equipment
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
-        self._date_of_acquisition = date_of_acquisition
         self._behavior_session_uuid = behavior_session_uuid
 
         self._exclude_from_equals = set()
 
     @classmethod
-    def from_internal(
+    def from_lims(
             cls,
             behavior_session_id: BehaviorSessionId,
             lims_db: PostgresQueryMixin
@@ -221,10 +215,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
-        date_of_acquisition = DateOfAcquisition.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)\
-            .validate(stimulus_file=stimulus_file,
-                      behavior_session_id=behavior_session_id.value)
 
         foraging_id = ForagingId.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
@@ -240,7 +230,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=behavior_session_uuid,
         )
 
@@ -249,7 +238,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
         equipment = Equipment.from_json(dict_repr=dict_repr)
-        date_of_acquisition = DateOfAcquisition.from_json(dict_repr=dict_repr)
 
         stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
@@ -265,7 +253,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=session_uuid,
         )
 
@@ -277,7 +264,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         equipment = Equipment.from_nwb(nwbfile=nwbfile)
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
-        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
         return cls(
@@ -286,7 +272,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            date_of_acquisition=date_of_acquisition,
             behavior_session_uuid=session_uuid
         )
 
@@ -301,10 +286,6 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
     @property
     def session_type(self) -> str:
         return self._session_type.value
-
-    @property
-    def date_of_acquisition(self) -> datetime:
-        return self._date_of_acquisition.value
 
     @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:

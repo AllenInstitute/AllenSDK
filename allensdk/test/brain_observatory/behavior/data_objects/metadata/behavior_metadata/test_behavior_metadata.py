@@ -78,9 +78,6 @@ class BehaviorMetaTestCase:
             equipment=Equipment(equipment_name='my_device'),
             stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
             session_type=SessionType(session_type='Unknown'),
-            date_of_acquisition=DateOfAcquisition(
-                date_of_acquisition=pytz.utc.localize(datetime.datetime.now())
-            ),
             behavior_session_uuid=BehaviorSessionUUID(
                 behavior_session_uuid=uuid.uuid4())
         )
@@ -91,7 +88,7 @@ class TestLims(LimsTest):
     @pytest.mark.requires_bamboo
     def test_behavior_session_uuid(self):
         behavior_session_id = 823847007
-        meta = BehaviorMetadata.from_internal(
+        meta = BehaviorMetadata.from_lims(
             behavior_session_id=BehaviorSessionId(
                 behavior_session_id=behavior_session_id),
             lims_db=self.dbconn
@@ -276,10 +273,14 @@ class TestStimulusFile:
         assert 62.0 == rate.value
 
 
-def test_get_date_of_acquisition():
-    expected = datetime.datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    doa = datetime.datetime(2019, 9, 26, 16)
-    actual = DateOfAcquisition.to_utc(date_of_acquisition=doa)
+def test_date_of_acquisition_utc():
+    """Tests that when read from json (in Pacific time), that
+    date of acquisition is converted to utc"""
+    expected = DateOfAcquisition(
+        date_of_acquisition=datetime.datetime(2019, 9, 26, 16,
+                                              tzinfo=pytz.UTC))
+    actual = DateOfAcquisition.from_json(
+        dict_repr={'date_of_acquisition': '2019-09-26 09:00:00'})
     assert expected == actual
 
 
@@ -288,7 +289,7 @@ class TestNWB(BehaviorMetaTestCase):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier='afile',
-            session_start_time=self.meta.date_of_acquisition
+            session_start_time=datetime.datetime.now()
         )
 
     @pytest.mark.parametrize('roundtrip', [True, False])

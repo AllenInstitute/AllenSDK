@@ -38,8 +38,8 @@ class TestLims:
                     fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
     @pytest.mark.requires_bamboo
-    def test_from_internal(self):
-        projections = Projections.from_internal(
+    def test_from_lims(self):
+        projections = Projections.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
 
         assert projections.max_projection == self.expected_max

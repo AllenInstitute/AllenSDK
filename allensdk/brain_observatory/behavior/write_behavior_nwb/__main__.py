@@ -3,11 +3,10 @@ import logging
 import sys
 import argschema
 import marshmallow
+from pynwb import NWBHDF5IO
 
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorNwbApi)
 from allensdk.brain_observatory.behavior.write_behavior_nwb._schemas import (
     InputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
@@ -37,7 +36,9 @@ def write_behavior_nwb(session_data, nwb_filepath):
                      "with a BehaviorSession created from LIMS")
         assert sessions_are_equal(json_session, lims_session, reraise=True)
 
-        BehaviorNwbApi(nwb_filepath_inprogress).save(json_session)
+        nwbfile = lims_session.to_nwb()
+        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
 
         logging.info("Comparing a BehaviorSession created from JSON "
                      "with a BehaviorSession created from NWB")

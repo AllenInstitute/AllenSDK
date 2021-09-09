@@ -1,9 +1,4 @@
-
-import json
 from typing import Optional
-
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
 
 import pandas as pd
 
@@ -27,24 +22,6 @@ from allensdk.brain_observatory.behavior.data_files import (
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
-
-
-def from_json_cache_key(
-    cls, dict_repr: dict,
-    filtered: bool = True,
-    zscore_threshold: float = 10.0
-):
-    return hashkey(json.dumps(dict_repr), filtered, zscore_threshold)
-
-
-def from_lims_cache_key(
-    cls, db,
-    behavior_session_id: int, ophys_experiment_id: Optional[int] = None,
-    filtered: bool = True, zscore_threshold: float = 10.0
-):
-    return hashkey(
-        behavior_session_id, ophys_experiment_id, filtered, zscore_threshold
-    )
 
 
 class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
@@ -95,7 +72,6 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         return running_speed
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(
         cls,
         dict_repr: dict,
@@ -127,19 +103,19 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         return output_dict
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls,
         db: PostgresQueryMixin,
         behavior_session_id: int,
-        ophys_experiment_id: Optional[int] = None,
         filtered: bool = True,
-        zscore_threshold: float = 10.0
+        zscore_threshold: float = 10.0,
+        stimulus_timestamps: Optional[StimulusTimestamps] = None
     ) -> "RunningSpeed":
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file
-        )
+        if stimulus_timestamps is None:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                stimulus_file=stimulus_file
+            )
 
         running_speed = cls._get_running_speed_df(
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold

@@ -14,8 +14,7 @@ from allensdk.brain_observatory.behavior.data_files.event_detection_file \
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface, \
-    InternalReadableInterface
+    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
@@ -67,7 +66,7 @@ class EventsParams:
         return self._filter_n_time_steps
 
 
-class CellSpecimenMeta(DataObject, InternalReadableInterface,
+class CellSpecimenMeta(DataObject, LimsReadableInterface,
                        JsonReadableInterface, NwbReadableInterface):
     """Cell specimen metadata"""
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
@@ -84,10 +83,10 @@ class CellSpecimenMeta(DataObject, InternalReadableInterface,
         return self._imaging_plane
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin,
-                      ophys_timestamps: OphysTimestamps) -> "CellSpecimenMeta":
-        imaging_plane_meta = ImagingPlane.from_internal(
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin,
+                  ophys_timestamps: OphysTimestamps) -> "CellSpecimenMeta":
+        imaging_plane_meta = ImagingPlane.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         return cls(imaging_plane=imaging_plane_meta)
@@ -160,15 +159,31 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         """
         super().__init__(name='cell_specimen_table', value=self)
 
+        # Validate ophys timestamps, traces
+        ophys_timestamps = ophys_timestamps.validate(
+            number_of_frames=dff_traces.get_number_of_frames())
+        self._validate_traces(
+            ophys_timestamps=ophys_timestamps, dff_traces=dff_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
+            cell_roi_ids=cell_specimen_table['cell_roi_id'].values)
+
         if exclude_invalid_rois:
             cell_specimen_table = cell_specimen_table[
                 cell_specimen_table['valid_roi']]
-            dff_traces.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
-            corrected_fluorescence_traces.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
-            events.filter_to_roi_ids(
-                roi_ids=cell_specimen_table['cell_roi_id'].values)
+
+        # Filter/reorder rois according to cell_specimen_table
+        dff_traces.filter_and_reorder(
+            roi_ids=cell_specimen_table['cell_roi_id'].values)
+        corrected_fluorescence_traces.filter_and_reorder(
+            roi_ids=cell_specimen_table['cell_roi_id'].values)
+
+        # Note: setting raise_if_rois_missing to False for events, since
+        # there seem to be cases where cell_specimen_table contains rois not in
+        # events
+        # See ie https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/2139     # noqa
+        events.filter_and_reorder(
+            roi_ids=cell_specimen_table['cell_roi_id'].values,
+            raise_if_rois_missing=False)
 
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
@@ -177,8 +192,6 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         self._events = events
         self._segmentation_mask_image = self._get_segmentation_mask_image(
             spacing=segmentation_mask_image_spacing)
-
-        self._validate_traces(ophys_timestamps=ophys_timestamps)
 
     @property
     def table(self) -> pd.DataFrame:
@@ -279,7 +292,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                                    events_params=events_params)
 
         cell_specimen_table = _get_cell_specimen_table()
-        meta = CellSpecimenMeta.from_internal(
+        meta = CellSpecimenMeta.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
@@ -351,6 +364,10 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
         def _read_table(cell_specimen_table):
             df = cell_specimen_table.to_dataframe()
+
+            # Ensure int64 used instead of int32
+            df = df.astype(
+                {col: 'int64' for col in df.select_dtypes('int32').columns})
 
             # Because pynwb stores this field as "image_mask", it is renamed
             # here
@@ -548,21 +565,23 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         cell_specimen_table.set_index('cell_specimen_id', inplace=True)
         return cell_specimen_table
 
-    def _validate_traces(self, ophys_timestamps: OphysTimestamps):
+    def _validate_traces(
+            self, ophys_timestamps: OphysTimestamps,
+            dff_traces: DFFTraces,
+            corrected_fluorescence_traces: CorrectedFluorescenceTraces,
+            cell_roi_ids: np.ndarray):
         """validates traces"""
         trace_col_map = {
             'dff_traces': 'dff',
             'corrected_fluorescence_traces': 'corrected_fluorescence'
         }
-        for traces in (self._dff_traces, self._corrected_fluorescence_traces):
+        for traces in (dff_traces, corrected_fluorescence_traces):
             # validate traces contain expected roi ids
-            if not np.in1d(traces.value.index,
-                           self.table[['cell_roi_id']]).all():
+            if not np.in1d(traces.value.index, cell_roi_ids).all():
                 raise RuntimeError(f"{traces.name} contains ROI IDs that "
                                    f"are not in "
                                    f"cell_specimen_table.cell_roi_id")
-            if not np.in1d(self.table[['cell_roi_id']],
-                           traces.value.index).all():
+            if not np.in1d(cell_roi_ids, traces.value.index).all():
                 raise RuntimeError(f"cell_specimen_table contains ROI IDs "
                                    f"that are not in {traces.name}")
 
@@ -572,7 +591,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             num_ophys_timestamps = ophys_timestamps.value.shape[0]
             if num_trace_timepoints != num_ophys_timestamps:
                 raise RuntimeError(f'{traces.name} contains '
-                                   f'{num_trace_timepoints}'
+                                   f'{num_trace_timepoints} '
                                    f'but there are {num_ophys_timestamps} '
                                    f'ophys timestamps')
 

@@ -45,10 +45,10 @@ class MultiplaneMetadata(OphysExperimentMetadata):
         self._imaging_plane_group = imaging_plane_group
 
     @classmethod
-    def from_internal(
+    def from_lims(
             cls, ophys_experiment_id: int,
             lims_db: PostgresQueryMixin) -> "MultiplaneMetadata":
-        ophys_experiment_metadata = OphysExperimentMetadata.from_internal(
+        ophys_experiment_metadata = OphysExperimentMetadata.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         imaging_plane_group = ImagingPlaneGroup.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)

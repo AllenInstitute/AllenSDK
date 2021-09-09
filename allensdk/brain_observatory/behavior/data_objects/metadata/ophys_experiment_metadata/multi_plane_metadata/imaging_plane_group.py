@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
@@ -24,7 +26,22 @@ class ImagingPlaneGroup(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "ImagingPlaneGroup":
+                  lims_db: PostgresQueryMixin) -> \
+            Optional["ImagingPlaneGroup"]:
+        """
+
+        Parameters
+        ----------
+        ophys_experiment_id
+        lims_db
+
+        Returns
+        -------
+        ImagingPlaneGroup instance if ophys_experiment given by
+            ophys_experiment_id is part of a plane group
+        else None
+
+        """
         query = f'''
             SELECT oe.id as ophys_experiment_id, pg.group_order AS plane_group
             FROM  ophys_experiments oe
@@ -38,6 +55,8 @@ class ImagingPlaneGroup(DataObject, LimsReadableInterface,
             )
         '''
         df = lims_db.select(query=query)
+        if df.empty:
+            return None
         df = df.set_index('ophys_experiment_id')
         plane_group = df.loc[ophys_experiment_id, 'plane_group']
         plane_group_count = df['plane_group'].nunique()

@@ -45,10 +45,20 @@ class Coordinates:
         yield self._z
 
     def __eq__(self, other):
-        if type(other) != type(self):
+        if type(other) not in (type(self), list):
             raise ValueError(f'Do not know how to compare with type '
                              f'{type(other)}')
-        return self._x == other.x and self._y == other.y and self._z == other.z
+        if isinstance(other, list):
+            return self._x == other[0] and \
+                   self._y == other[1] and \
+                   self._z == other[2]
+        else:
+            return self._x == other.x and \
+                   self._y == other.y and \
+                   self._z == other.z
+
+    def __str__(self):
+        return f'[{self._x}, {self._y}, {self._z}]'
 
 
 class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,

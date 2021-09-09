@@ -6,7 +6,8 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.reporter_line import \
     ReporterLine
@@ -17,7 +18,7 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ImagingPlane(DataObject, InternalReadableInterface,
+class ImagingPlane(DataObject, LimsReadableInterface,
                    JsonReadableInterface, NwbReadableInterface):
     def __init__(self, ophys_frame_rate: float,
                  targeted_structure: str,
@@ -30,10 +31,10 @@ class ImagingPlane(DataObject, InternalReadableInterface,
         self._indicator = indicator
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin,
-                      ophys_timestamps: OphysTimestamps,
-                      excitation_lambda=910.0) -> "ImagingPlane":
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin,
+                  ophys_timestamps: OphysTimestamps,
+                  excitation_lambda=910.0) -> "ImagingPlane":
         behavior_session_id = BehaviorSessionId.from_lims(
             db=lims_db, ophys_experiment_id=ophys_experiment_id)
         ophys_frame_rate = calc_frame_rate(timestamps=ophys_timestamps.value)

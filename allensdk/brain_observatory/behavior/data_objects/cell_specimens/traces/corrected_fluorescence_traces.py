@@ -55,16 +55,15 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
         return cls(traces=corrected_fluorescence_traces)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        corrected_fluorescence_traces = self.value[['corrected_fluorescence']]
+        corrected_fluorescence_traces = self.value['corrected_fluorescence']
+
+        # Convert from Series of lists to numpy array
+        # of shape ROIs x timepoints
+        traces = np.stack(
+            [x for x in corrected_fluorescence_traces])
 
         # Create/Add corrected_fluorescence_traces modules and interfaces:
-        assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
         ophys_module = nwbfile.processing['ophys']
-        # trace data in the form of rois x timepoints
-        f_trace_data = np.array(
-            [corrected_fluorescence_traces.loc[
-                 cell_roi_id].corrected_fluorescence
-             for cell_roi_id in corrected_fluorescence_traces.index.values])
 
         roi_table_region = \
             nwbfile.processing['ophys'].data_interfaces[
@@ -77,7 +76,7 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
 
         f_interface.create_roi_response_series(
             name='traces',
-            data=f_trace_data.T,  # Should be stored as timepoints x rois
+            data=traces.T,  # Should be stored as timepoints x rois
             unit='NA',
             rois=roi_table_region,
             timestamps=ophys_timestamps)

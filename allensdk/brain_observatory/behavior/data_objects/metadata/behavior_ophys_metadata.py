@@ -6,16 +6,14 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
     BehaviorMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    EquipmentType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.multi_plane_metadata\
     .multi_plane_metadata import \
@@ -29,7 +27,7 @@ from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
+class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
                             JsonReadableInterface, NwbReadableInterface,
                             NwbWritableInterface):
     def __init__(self, behavior_metadata: BehaviorMetadata,
@@ -45,33 +43,59 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         return self._behavior_metadata
 
     @property
-    def ophys_metadata(self) -> OphysExperimentMetadata:
+    def ophys_metadata(self) -> Union["OphysExperimentMetadata",
+                                      "MultiplaneMetadata"]:
         return self._ophys_metadata
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin) -> "BehaviorOphysMetadata":
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin,
+                  is_multiplane=False) -> "BehaviorOphysMetadata":
+        """
+
+        Parameters
+        ----------
+        ophys_experiment_id
+        lims_db
+        is_multiplane
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
+        """
         behavior_session_id = BehaviorSessionId.from_lims(
             ophys_experiment_id=ophys_experiment_id, db=lims_db)
 
-        behavior_metadata = BehaviorMetadata.from_internal(
+        behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
 
-        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
-            ophys_metadata = MultiplaneMetadata.from_internal(
+        if is_multiplane:
+            ophys_metadata = MultiplaneMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         else:
-            ophys_metadata = OphysExperimentMetadata.from_internal(
+            ophys_metadata = OphysExperimentMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         return cls(behavior_metadata=behavior_metadata,
                    ophys_metadata=ophys_metadata)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "BehaviorOphysMetadata":
+    def from_json(cls, dict_repr: dict,
+                  is_multiplane=False) -> "BehaviorOphysMetadata":
+        """
+
+        Parameters
+        ----------
+        dict_repr
+        is_multiplane
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
+
+        Returns
+        -------
+
+        """
         behavior_metadata = BehaviorMetadata.from_json(dict_repr=dict_repr)
 
-        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
+        if is_multiplane:
             ophys_metadata = MultiplaneMetadata.from_json(
                 dict_repr=dict_repr)
         else:
@@ -82,10 +106,20 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
                    ophys_metadata=ophys_metadata)
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorOphysMetadata":
+    def from_nwb(cls, nwbfile: NWBFile,
+                 is_multiplane=False) -> "BehaviorOphysMetadata":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        is_multiplane
+            Whether to fetch metadata for an experiment that is part of a
+            container containing multiple imaging planes
+        """
         behavior_metadata = BehaviorMetadata.from_nwb(nwbfile=nwbfile)
 
-        if behavior_metadata.equipment.type == EquipmentType.MESOSCOPE:
+        if is_multiplane:
             ophys_metadata = MultiplaneMetadata.from_nwb(
                 nwbfile=nwbfile)
         else:

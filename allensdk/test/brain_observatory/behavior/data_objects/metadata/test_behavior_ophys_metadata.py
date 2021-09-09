@@ -1,3 +1,4 @@
+import datetime
 import json
 from pathlib import Path
 import pynwb
@@ -102,13 +103,14 @@ class TestInternal(TestBOM):
 
     @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
-    def test_from_internal(self, meso):
+    def test_from_lims(self, meso):
         if meso:
             ophys_experiment_id = 951980471
         else:
             ophys_experiment_id = 994278291
-        bom = BehaviorOphysMetadata.from_internal(
-            ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn)
+        bom = BehaviorOphysMetadata.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn,
+            is_multiplane=meso)
 
         if meso:
             assert isinstance(bom.ophys_metadata,
@@ -157,7 +159,8 @@ class TestJson(TestBOM):
     def test_from_json(self, meso):
         if meso:
             self.dict_repr['rig_name'] = 'MESO.1'
-        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr)
+        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr,
+                                              is_multiplane=meso)
 
         if meso:
             assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
@@ -171,7 +174,7 @@ class TestNWB(TestBOM):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=self.meta.behavior_metadata.date_of_acquisition
+            session_start_time=datetime.datetime.now()
         )
 
     @pytest.mark.parametrize('meso', [True, False])
@@ -186,8 +189,10 @@ class TestNWB(TestBOM):
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=BehaviorOphysMetadata)
+                data_object_cls=BehaviorOphysMetadata,
+                is_multiplane=meso)
         else:
-            obt = self.meta.from_nwb(nwbfile=self.nwbfile)
+            obt = self.meta.from_nwb(nwbfile=self.nwbfile,
+                                     is_multiplane=meso)
 
         assert obt == self.meta

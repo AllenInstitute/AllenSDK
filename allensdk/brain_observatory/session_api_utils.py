@@ -1,15 +1,15 @@
 import inspect
 import logging
 import warnings
+from collections import Callable
 
 from itertools import zip_longest
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Set, Iterable
 
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.comparison_utils import compare_fields
-from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 
 
@@ -150,9 +150,13 @@ class ParamsMixin:
         self._updated_params -= data_params
 
 
-def sessions_are_equal(A, B, reraise=False) -> bool:
-    """Check if two Session objects are equal (have same methods and
-    attributes).
+def sessions_are_equal(A, B, reraise=False,
+                       ignore_keys: Optional[Dict[str, Set[str]]] = None,
+                       skip_fields: Optional[Iterable] = None,
+                       test_methods=False) \
+        -> bool:
+    """Check if two Session objects are equal (have same property and
+    get method values).
 
     Parameters
     ----------
@@ -163,34 +167,53 @@ def sessions_are_equal(A, B, reraise=False) -> bool:
     reraise : bool, optional
         Whether to reraise when encountering an Assertion or AttributeError,
         by default False
+    ignore_keys
+        Set of keys to ignore for property/method. Should be given as
+        {property/method name: {field_to_ignore, ...}, ...}
+    test_methods
+        Whether to test get methods
+    skip_fields
+        Do not compare these fields
 
     Returns
     -------
     bool
         Whether the two sessions are equal to one another.
     """
+    if ignore_keys is None:
+        ignore_keys = dict()
+    if skip_fields is None:
 
-    field_set = set()
-    for key, val in A.__dict__.items():
-        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
-            field_set.add(key)
-    for key, val in B.__dict__.items():
-        if isinstance(val, LazyProperty) or isinstance(val, DataObject):
-            field_set.add(key)
+        skip_fields = set()
+
+    A_data_attrs_and_methods = A.list_data_attributes_and_methods()
+    B_data_attrs_and_methods = B.list_data_attributes_and_methods()
+    field_set = set(A_data_attrs_and_methods).union(B_data_attrs_and_methods)
 
     logger.info(f"Comparing the following fields: {field_set}")
 
     for field in sorted(field_set):
+        if field in skip_fields:
+            continue
+
         try:
             logger.info(f"Comparing field: {field}")
             x1, x2 = getattr(A, field), getattr(B, field)
+            if test_methods:
+                if isinstance(x1, Callable):
+                    x1 = x1()
+                    x2 = x2()
+            else:
+                continue
+
             err_msg = (f"{field} on {A} did not equal {field} "
                        f"on {B} (\n{x1} vs\n{x2}\n)")
             if isinstance(x1, DataObject):
                 x1 = x1.value
             if isinstance(x2, DataObject):
                 x2 = x2.value
-            compare_fields(x1, x2, err_msg)
+            compare_fields(x1, x2, err_msg,
+                           ignore_keys=ignore_keys.get(field, None))
 
         except NotImplementedError:
             A_implements_get_field = hasattr(
