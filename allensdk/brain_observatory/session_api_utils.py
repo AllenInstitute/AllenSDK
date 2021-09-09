@@ -4,7 +4,7 @@ import warnings
 from collections import Callable
 
 from itertools import zip_longest
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Iterable
 
 import numpy as np
 import pandas as pd
@@ -152,6 +152,7 @@ class ParamsMixin:
 
 def sessions_are_equal(A, B, reraise=False,
                        ignore_keys: Optional[Dict[str, Set[str]]] = None,
+                       skip_fields: Optional[Iterable] = None,
                        test_methods=False) \
         -> bool:
     """Check if two Session objects are equal (have same property and
@@ -171,6 +172,8 @@ def sessions_are_equal(A, B, reraise=False,
         {property/method name: {field_to_ignore, ...}, ...}
     test_methods
         Whether to test get methods
+    skip_fields
+        Do not compare these fields
 
     Returns
     -------
@@ -179,6 +182,9 @@ def sessions_are_equal(A, B, reraise=False,
     """
     if ignore_keys is None:
         ignore_keys = dict()
+    if skip_fields is None:
+
+        skip_fields = set()
 
     A_data_attrs_and_methods = A.list_data_attributes_and_methods()
     B_data_attrs_and_methods = B.list_data_attributes_and_methods()
@@ -187,6 +193,9 @@ def sessions_are_equal(A, B, reraise=False,
     logger.info(f"Comparing the following fields: {field_set}")
 
     for field in sorted(field_set):
+        if field in skip_fields:
+            continue
+
         try:
             logger.info(f"Comparing field: {field}")
             x1, x2 = getattr(A, field), getattr(B, field)
