@@ -92,6 +92,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Dict of input data necessary to construct a session
         monitor_delay
             Monitor delay. If not provided, will use an estimate.
+            To provide this value, see for example
+            allensdk.brain_observatory.behavior.data_objects.stimuli.util.
+            calculate_monitor_delay
 
         Returns
         -------
@@ -161,6 +164,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             timestamps from stimulus file.
         monitor_delay
             Monitor delay. If not provided, will use an estimate.
+            To provide this value, see for example
+            allensdk.brain_observatory.behavior.data_objects.stimuli.util.
+            calculate_monitor_delay
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
