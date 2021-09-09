@@ -196,9 +196,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             -> pd.DataFrame:
         """
         This function sets the stop time for a row that is an omitted
-        stimuli. An omitted stimuli is a stimuli where a mouse is
+        stimulus. An omitted stimulus is a stimulus where a mouse is
         shown only a grey screen and these last for 250 milliseconds.
-        These do not include a stop_time or end_frame as other stimuli in
+        These do not include a stop_time or end_frame like other stimuli in
         the stimulus table due to design choices.
 
         Parameters
@@ -206,7 +206,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         df
             Stimuli presentations dataframe
         omitted_time_duration
-            Amount of time a stimuli is omitted for in seconds
+            Amount of time a stimulus is omitted for in seconds
         """
         omitted = df['omitted']
         df.loc[omitted, 'stop_time'] = \
