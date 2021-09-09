@@ -166,7 +166,7 @@ class BehaviorOphysExperiment(BehaviorSession):
         behavior_session_id = BehaviorSessionId.from_lims(
             db=lims_db, ophys_experiment_id=ophys_experiment_id)
         is_multiplane_session = _is_multi_plane_session()
-        meta = BehaviorOphysMetadata.from_internal(
+        meta = BehaviorOphysMetadata.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             is_multiplane=is_multiplane_session
         )
@@ -191,7 +191,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             ophys_timestamps = OphysTimestamps.from_sync_file(
                 sync_file=sync_file)
 
-        projections = Projections.from_internal(
+        projections = Projections.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         cell_specimens = CellSpecimens.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,

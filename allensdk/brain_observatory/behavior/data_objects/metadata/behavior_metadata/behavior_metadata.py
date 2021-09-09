@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Dict, Optional
 import re
 import numpy as np
@@ -7,19 +6,17 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps, BehaviorSessionId
+    BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
@@ -37,7 +34,6 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     SubjectMetadata
 from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
-from allensdk.brain_observatory.comparison_utils import compare_fields
 from allensdk.internal.api import PostgresQueryMixin
 
 description_dict = {
@@ -179,7 +175,7 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata(DataObject, InternalReadableInterface,
+class BehaviorMetadata(DataObject, LimsReadableInterface,
                        JsonReadableInterface,
                        NwbReadableInterface,
                        JsonWritableInterface,
@@ -203,7 +199,7 @@ class BehaviorMetadata(DataObject, InternalReadableInterface,
         self._exclude_from_equals = set()
 
     @classmethod
-    def from_internal(
+    def from_lims(
             cls,
             behavior_session_id: BehaviorSessionId,
             lims_db: PostgresQueryMixin
