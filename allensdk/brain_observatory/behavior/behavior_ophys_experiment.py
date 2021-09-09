@@ -447,7 +447,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                              f"for {self.ophys_experiment_id}")
         return cell_specimen_ids
 
-    # ====================== properties and setters ========================
+    # ====================== properties ========================
 
     @property
     def ophys_experiment_id(self) -> int:
@@ -523,10 +523,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
         return self._ophys_timestamps.value
 
-    @ophys_timestamps.setter
-    def ophys_timestamps(self, value):
-        self._ophys_timestamps = value
-
     @property
     def dff_traces(self) -> pd.DataFrame:
         """traces of change in fluoescence / fluorescence
@@ -550,10 +546,6 @@ class BehaviorOphysExperiment(BehaviorSession):
 
         """
         return self._cell_specimens.dff_traces
-
-    @dff_traces.setter
-    def dff_traces(self, value):
-        self._dff_traces = value
 
     @property
     def events(self) -> pd.DataFrame:
@@ -588,10 +580,6 @@ class BehaviorOphysExperiment(BehaviorSession):
 
         """
         return self._cell_specimens.events
-
-    @events.setter
-    def events(self, value):
-        self._events = value
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
@@ -639,10 +627,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
         return self._cell_specimens.table
 
-    @cell_specimen_table.setter
-    def cell_specimen_table(self, value):
-        self._cell_specimen_table = value
-
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
         """Corrected fluorescence traces which are neuropil corrected
@@ -668,10 +652,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
         return self._cell_specimens.corrected_fluorescence_traces
 
-    @corrected_fluorescence_traces.setter
-    def corrected_fluorescence_traces(self, value):
-        self._corrected_fluorescence_traces = value
-
     @property
     def motion_correction(self) -> pd.DataFrame:
         """a dataframe containing the x and y offsets applied during
@@ -688,20 +668,12 @@ class BehaviorOphysExperiment(BehaviorSession):
         """
         return self._motion_correction.value
 
-    @motion_correction.setter
-    def motion_correction(self, value):
-        self._motion_correction = value
-
     @property
     def segmentation_mask_image(self) -> Image:
         """A 2d binary image of all valid cell masks
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
         return self._cell_specimens.segmentation_mask_image
-
-    @segmentation_mask_image.setter
-    def segmentation_mask_image(self, value):
-        self._segmentation_mask_image = value
 
     @property
     def eye_tracking(self) -> pd.DataFrame:
@@ -740,10 +712,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         :rtype: pandas.DataFrame
         """
         return self._eye_tracking.value
-
-    @eye_tracking.setter
-    def eye_tracking(self, value):
-        self._eye_tracking = value
 
     @property
     def eye_tracking_rig_geometry(self) -> dict:

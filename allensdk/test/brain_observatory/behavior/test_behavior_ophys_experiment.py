@@ -195,13 +195,11 @@ def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
 
 
 @pytest.mark.parametrize(
-    "dilation_frames, z_threshold, eye_tracking_start_value", [
-        (5, 9, None),
-        (1, 2, None),
-        (3, 3, EyeTrackingTable(eye_tracking=pd.DataFrame([5, 6, 7])))
+    "dilation_frames, z_threshold", [
+        (5, 9),
+        (1, 2)
     ])
-def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value,
-                      monkeypatch):
+def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
     """A very long test just to test that eye tracking arguments are sent to
     EyeTrackingTable factory method from BehaviorOphysExperiment.from_lims"""
     expected = EyeTrackingTable(eye_tracking=pd.DataFrame([1, 2, 3]))
@@ -294,19 +292,13 @@ def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value,
             ophys_experiment_id=1, eye_tracking_z_threshold=z_threshold,
             eye_tracking_dilation_frames=dilation_frames)
 
-        if eye_tracking_start_value is not None:
-            # Tests that eye_tracking can be set
-            boe.eye_tracking = eye_tracking_start_value
-            obtained = boe.eye_tracking
-            assert obtained.equals(eye_tracking_start_value.value)
-        else:
-            obtained = boe.eye_tracking
-            assert obtained.equals(expected.value)
-            EyeTrackingTable_mock.from_data_file.assert_called_with(
-                data_file=etf,
-                sync_file=sf,
-                z_threshold=z_threshold,
-                dilation_frames=dilation_frames)
+        obtained = boe.eye_tracking
+        assert obtained.equals(expected.value)
+        EyeTrackingTable_mock.from_data_file.assert_called_with(
+            data_file=etf,
+            sync_file=sf,
+            z_threshold=z_threshold,
+            dilation_frames=dilation_frames)
 
 
 @pytest.mark.requires_bamboo

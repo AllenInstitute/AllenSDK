@@ -532,7 +532,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         return performance_metrics
 
-    # ====================== properties and setters ========================
+    # ====================== properties ========================
 
     @property
     def behavior_session_id(self) -> int:
@@ -564,10 +564,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._licks.value
 
-    @licks.setter
-    def licks(self, value):
-        self._licks = value
-
     @property
     def rewards(self) -> pd.DataFrame:
         """Retrieves rewards from data file saved at the end of the
@@ -598,10 +594,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._rewards.value
 
-    @rewards.setter
-    def rewards(self, value):
-        self._rewards = value
-
     @property
     def running_speed(self) -> pd.DataFrame:
         """Running speed and timestamps, sampled at 60Hz. By default
@@ -625,10 +617,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._running_speed.value
 
-    @running_speed.setter
-    def running_speed(self, value):
-        self._running_speed.value = value
-
     @property
     def raw_running_speed(self) -> pd.DataFrame:
         """Get unfiltered running speed data. Sampled at 60Hz.
@@ -649,10 +637,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     speed in cm/sec
         """
         return self._raw_running_speed.value
-
-    @raw_running_speed.setter
-    def raw_running_speed(self, value):
-        self._raw_running_speed.value = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
@@ -695,10 +679,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._stimuli.presentations.value
 
-    @stimulus_presentations.setter
-    def stimulus_presentations(self, value):
-        self._stimulus_presentations = value
-
     @property
     def stimulus_templates(self) -> pd.DataFrame:
         """Get stimulus templates (movies, scenes) for behavior session.
@@ -721,10 +701,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._stimuli.templates.value.to_dataframe()
 
-    @stimulus_templates.setter
-    def stimulus_templates(self, value):
-        self._stimulus_templates = value
-
     @property
     def stimulus_timestamps(self) -> np.ndarray:
         """Timestamps associated with the stimulus presetntation on
@@ -742,10 +718,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Timestamps associated with stimulus presentations on the monitor
         """
         return self._stimulus_timestamps.value
-
-    @stimulus_timestamps.setter
-    def stimulus_timestamps(self, value):
-        self._stimulus_timestamps.value = value
 
     @property
     def task_parameters(self) -> dict:
@@ -794,10 +766,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         """
         return self._task_parameters.to_dict()['task_parameters']
-
-    @task_parameters.setter
-    def task_parameters(self, value):
-        self._task_parameters = value
 
     @property
     def trials(self) -> pd.DataFrame:
@@ -869,10 +837,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         return self._trials.value
 
-    @trials.setter
-    def trials(self, value):
-        self._trials = value
-
     @property
     def metadata(self) -> Dict[str, Any]:
         """metadata for a given session
@@ -913,10 +877,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     displayed
         """
         return self._get_metadata(behavior_metadata=self._metadata)
-
-    @metadata.setter
-    def metadata(self, value):
-        self._metadata = value
 
     @classmethod
     def _read_data_from_stimulus_file(
