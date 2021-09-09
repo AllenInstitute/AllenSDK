@@ -284,10 +284,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         Parameters
         ----------
         add_metadata
-            Set this to False to avoid writing metadata multiple times.
-            An example use case is in BehaviorOphysExperiment, which builds on
-            behavior metadata. Metadata needs to be written at once to nwb, and
-            setting to False avoids writing metadata multiple times.
+            Set this to False to prevent adding metadata to the nwb
+            instance.
         """
         nwbfile = NWBFile(
             session_description=self._get_session_type(),
