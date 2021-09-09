@@ -6,7 +6,8 @@ from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base\
     .writable_interfaces import \
     NwbWritableInterface
@@ -26,7 +27,7 @@ from allensdk.brain_observatory.nwb import load_pynwb_extension
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
+class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
                             JsonReadableInterface, NwbReadableInterface,
                             NwbWritableInterface):
     def __init__(self, behavior_metadata: BehaviorMetadata,
@@ -47,9 +48,9 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         return self._ophys_metadata
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin,
-                      is_multiplane=False) -> "BehaviorOphysMetadata":
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin,
+                  is_multiplane=False) -> "BehaviorOphysMetadata":
         """
 
         Parameters
@@ -63,14 +64,14 @@ class BehaviorOphysMetadata(DataObject, InternalReadableInterface,
         behavior_session_id = BehaviorSessionId.from_lims(
             ophys_experiment_id=ophys_experiment_id, db=lims_db)
 
-        behavior_metadata = BehaviorMetadata.from_internal(
+        behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
 
         if is_multiplane:
-            ophys_metadata = MultiplaneMetadata.from_internal(
+            ophys_metadata = MultiplaneMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         else:
-            ophys_metadata = OphysExperimentMetadata.from_internal(
+            ophys_metadata = OphysExperimentMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         return cls(behavior_metadata=behavior_metadata,

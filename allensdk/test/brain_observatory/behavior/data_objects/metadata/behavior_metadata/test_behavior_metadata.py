@@ -88,7 +88,7 @@ class TestLims(LimsTest):
     @pytest.mark.requires_bamboo
     def test_behavior_session_uuid(self):
         behavior_session_id = 823847007
-        meta = BehaviorMetadata.from_internal(
+        meta = BehaviorMetadata.from_lims(
             behavior_session_id=BehaviorSessionId(
                 behavior_session_id=behavior_session_id),
             lims_db=self.dbconn

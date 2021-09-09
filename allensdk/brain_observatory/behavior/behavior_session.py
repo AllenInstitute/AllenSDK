@@ -10,7 +10,7 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface, \
+    JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
@@ -196,7 +196,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             lims_db, behavior_session_id.value,
             stimulus_timestamps=stimulus_timestamps
         )
-        behavior_metadata = BehaviorMetadata.from_internal(
+        behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
 
@@ -335,7 +335,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             "from_nwb_path",
             "list_data_attributes_and_methods"
         }
-        attrs_and_methods_to_ignore.update(dir(InternalReadableInterface))
         attrs_and_methods_to_ignore.update(dir(NwbReadableInterface))
         attrs_and_methods_to_ignore.update(dir(NwbWritableInterface))
         attrs_and_methods_to_ignore.update(dir(DataObject))

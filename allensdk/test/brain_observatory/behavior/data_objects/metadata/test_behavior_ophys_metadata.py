@@ -103,12 +103,12 @@ class TestInternal(TestBOM):
 
     @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
-    def test_from_internal(self, meso):
+    def test_from_lims(self, meso):
         if meso:
             ophys_experiment_id = 951980471
         else:
             ophys_experiment_id = 994278291
-        bom = BehaviorOphysMetadata.from_internal(
+        bom = BehaviorOphysMetadata.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn,
             is_multiplane=meso)
 

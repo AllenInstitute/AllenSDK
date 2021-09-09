@@ -69,7 +69,7 @@ class MtrainApi:
                 )
                 behavior_session_id_ = BehaviorSessionId(
                     behavior_session_id=behavior_session_id)
-                bm = BehaviorMetadata.from_internal(
+                bm = BehaviorMetadata.from_lims(
                     behavior_session_id=behavior_session_id_, lims_db=lims_db)
                 return bm
             bm = _get_behavior_metadata()

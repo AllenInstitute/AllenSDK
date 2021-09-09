@@ -14,8 +14,7 @@ from allensdk.brain_observatory.behavior.data_files.event_detection_file \
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface, \
-    InternalReadableInterface
+    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
@@ -67,7 +66,7 @@ class EventsParams:
         return self._filter_n_time_steps
 
 
-class CellSpecimenMeta(DataObject, InternalReadableInterface,
+class CellSpecimenMeta(DataObject, LimsReadableInterface,
                        JsonReadableInterface, NwbReadableInterface):
     """Cell specimen metadata"""
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
@@ -84,10 +83,10 @@ class CellSpecimenMeta(DataObject, InternalReadableInterface,
         return self._imaging_plane
 
     @classmethod
-    def from_internal(cls, ophys_experiment_id: int,
-                      lims_db: PostgresQueryMixin,
-                      ophys_timestamps: OphysTimestamps) -> "CellSpecimenMeta":
-        imaging_plane_meta = ImagingPlane.from_internal(
+    def from_lims(cls, ophys_experiment_id: int,
+                  lims_db: PostgresQueryMixin,
+                  ophys_timestamps: OphysTimestamps) -> "CellSpecimenMeta":
+        imaging_plane_meta = ImagingPlane.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         return cls(imaging_plane=imaging_plane_meta)
@@ -293,7 +292,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                                    events_params=events_params)
 
         cell_specimen_table = _get_cell_specimen_table()
-        meta = CellSpecimenMeta.from_internal(
+        meta = CellSpecimenMeta.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()

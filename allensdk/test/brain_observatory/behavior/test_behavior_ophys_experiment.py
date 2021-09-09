@@ -228,7 +228,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
             ImagingPlaneGroup, 'from_lims',
             lambda lims_db, ophys_experiment_id: None)
         ctx.setattr(
-            BehaviorOphysMetadata, 'from_internal',
+            BehaviorOphysMetadata, 'from_lims',
             lambda lims_db, ophys_experiment_id,
             is_multiplane: create_autospec(BehaviorOphysMetadata,
                                            instance=True))
@@ -262,7 +262,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
             lambda sync_file: create_autospec(OphysTimestamps,
                                               instance=True))
         ctx.setattr(
-            Projections, 'from_internal',
+            Projections, 'from_lims',
             lambda lims_db, ophys_experiment_id: create_autospec(
                 Projections, instance=True))
         ctx.setattr(

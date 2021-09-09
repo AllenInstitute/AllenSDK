@@ -51,7 +51,7 @@ class TestLims:
                     fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
     @pytest.mark.requires_bamboo
-    def test_from_internal(self):
+    def test_from_lims(self):
         number_of_frames = 140296
         ots = OphysTimestamps(timestamps=np.linspace(start=.1,
                                                      stop=.1*number_of_frames,

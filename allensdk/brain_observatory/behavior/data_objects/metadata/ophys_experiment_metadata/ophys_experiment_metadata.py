@@ -5,7 +5,8 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
-    InternalReadableInterface, JsonReadableInterface, NwbReadableInterface
+    JsonReadableInterface, NwbReadableInterface, \
+    LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
@@ -24,7 +25,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class OphysExperimentMetadata(DataObject, InternalReadableInterface,
+class OphysExperimentMetadata(DataObject, LimsReadableInterface,
                               JsonReadableInterface, NwbReadableInterface):
     """Container class for ophys experiment metadata"""
     def __init__(self,
@@ -47,7 +48,7 @@ class OphysExperimentMetadata(DataObject, InternalReadableInterface,
         self._exclude_from_equals = {'project_code'}
 
     @classmethod
-    def from_internal(
+    def from_lims(
             cls, ophys_experiment_id: int,
             lims_db: PostgresQueryMixin) -> "OphysExperimentMetadata":
         ophys_session_id = OphysSessionId.from_lims(
