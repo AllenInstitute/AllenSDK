@@ -1,0 +1,53 @@
+name: ci/github-actions
+on:
+  schedule:
+    - cron: '55 5 * * *'
+
+env:
+  TEST_NWB_FILES: skip
+  TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA: skip
+  TEST_API_ENDPOINT: http://api.brain-map.org
+  TEST_COMPLETE: false
+  TEST_BAMBOO: false
+  LIMS_DBNAME: db
+  LIMS_PORT: 1234
+  LIMS_PASSWORD: password
+  LIMS_HOST: host
+  LIMS_USER: user
+  MTRAIN_DBNAME: db
+  MTRAIN_USER: user
+  MTRAIN_HOST: host
+  MTRAIN_PORT: 1234
+  MTRAIN_PASSWORD: password
+
+jobs:
+  onprem:
+    name: python ${{ matrix.image }} on-prem test
+    runs-on: ["self-hosted"]
+    strategy:
+      matrix:
+        image: ["allensdk_local_py37:latest"]
+      branch: ["master", "rc/2.13.0"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+      - name: run test in docker
+        run: |
+          docker run \
+              --env-file /home/github_worker/env.list \
+              --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
+              --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
+              --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
+              ${{ matrix.image }} \
+                  /bin/bash -c "pip install -r requirements.txt; \
+                                pip install -r test_requirements.txt; \
+                                python -m pytest \
+                                    --capture=no \
+                                    --cov=allensdk \
+                                    --cov-config coveragerc \
+                                    --cov-report html \
+                                    --junitxml=test-reports/test.xml \
+                                    --boxed \
+                                    --numprocesses 4 \
+                                    --durations=0"
