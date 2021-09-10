@@ -1,7 +1,7 @@
-name: ci/github-actions
+name: ci/nightly
 on:
   schedule:
-    - cron: '55 5 * * *'
+    - cron: '05 6 * * *'
 
 env:
   TEST_NWB_FILES: skip
