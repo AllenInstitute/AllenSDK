@@ -232,7 +232,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSession":
+    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "BehaviorSession":
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
@@ -262,13 +262,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb_path(cls, nwb_path: str) -> "BehaviorSession":
+    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "BehaviorSession":
         """
 
         Parameters
         ----------
         nwb_path
             Path to nwb file
+        kwargs
+            Kwargs to be passed to `from_nwb`
 
         Returns
         -------
@@ -276,7 +278,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
             nwbfile = read_io.read()
-            return cls.from_nwb(nwbfile=nwbfile)
+            return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
     def to_nwb(self, add_metadata=True) -> NWBFile:
         """
