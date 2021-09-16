@@ -3,19 +3,6 @@ on:
   schedule:
     - cron: '05 6 * * *'
 
-env:
-  TEST_API_ENDPOINT: http://api.brain-map.org
-  LIMS_DBNAME: db
-  LIMS_PORT: 1234
-  LIMS_PASSWORD: password
-  LIMS_HOST: host
-  LIMS_USER: user
-  MTRAIN_DBNAME: db
-  MTRAIN_USER: user
-  MTRAIN_HOST: host
-  MTRAIN_PORT: 1234
-  MTRAIN_PASSWORD: password
-
 jobs:
   onprem:
     name: python ${{ matrix.image }} on-prem test
@@ -31,7 +18,7 @@ jobs:
       - name: run test in docker
         run: |
           docker run \
-              --env-file /home/github_worker/env.list \
+              --env-file /home/github_worker/env_nightly.list \
               --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
               --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
               --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
