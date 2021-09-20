@@ -649,6 +649,12 @@ class CloudCacheBase(BasicLocalCache):
             downloaded_data = {}
 
         abs_path = str(file_attributes.local_path.resolve())
+        if abs_path in downloaded_data:
+            if downloaded_data[abs_path] == file_attributes.file_hash:
+                # this file has already been logged;
+                # there is nothing to do
+                return None
+
         downloaded_data[abs_path] = file_attributes.file_hash
         with open(self._downloaded_data_path, 'w') as out_file:
             out_file.write(json.dumps(downloaded_data,
