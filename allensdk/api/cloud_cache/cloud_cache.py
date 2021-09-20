@@ -557,17 +557,8 @@ class CloudCacheBase(BasicLocalCache):
     @abstractmethod
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
         """
-        Check if a file exists and is in the expected state.
-
-        If it is, return True.
-
-        If it is not, download the file, creating the directory
-        where the file is to be stored if necessary.
-
-        If the download is successful, return True.
-
-        If the download fails (file hash does not match expectation),
-        return False.
+        Check if a file exists locally. If it does not, download it and
+        return True. Return False otherwise.
 
         Parameters
         ----------
@@ -772,8 +763,9 @@ class CloudCacheBase(BasicLocalCache):
         """
         super_attributes = self.data_path(file_id)
         file_attributes = super_attributes['file_attributes']
-        self._download_file(file_attributes)
-        self._update_list_of_downloads(file_attributes)
+        was_downloaded = self._download_file(file_attributes)
+        if was_downloaded:
+            self._update_list_of_downloads(file_attributes)
         return file_attributes.local_path
 
     def download_metadata(self, fname: str) -> pathlib.Path:
@@ -799,8 +791,9 @@ class CloudCacheBase(BasicLocalCache):
         """
         super_attributes = self.metadata_path(fname)
         file_attributes = super_attributes['file_attributes']
-        self._download_file(file_attributes)
-        self._update_list_of_downloads(file_attributes)
+        was_downloaded = self._download_file(file_attributes)
+        if was_downloaded:
+            self._update_list_of_downloads(file_attributes)
         return file_attributes.local_path
 
     def get_metadata(self, fname: str) -> pd.DataFrame:
@@ -1100,17 +1093,8 @@ class S3CloudCache(CloudCacheBase):
 
     def _download_file(self, file_attributes: CacheFileAttributes) -> bool:
         """
-        Check if a file exists and is in the expected state.
-
-        If it is, return True.
-
-        If it is not, download the file, creating the directory
-        where the file is to be stored if necessary.
-
-        If the download is successful, return True.
-
-        If the download fails (file hash does not match expectation),
-        return False.
+        Check if a file exists locally. If it does not, download it
+        and return True. Return False otherwise.
 
         Parameters
         ----------
@@ -1131,6 +1115,7 @@ class S3CloudCache(CloudCacheBase):
             If it is not able to successfully download the file after
             10 iterations
         """
+        was_downloaded = False
 
         local_path = file_attributes.local_path
 
@@ -1168,6 +1153,7 @@ class S3CloudCache(CloudCacheBase):
                              unit="MB")
 
         while not self._file_exists(file_attributes):
+            was_downloaded = True
             response = self.s3_client.get_object(Bucket=bucket_name,
                                                  Key=str(obj_key),
                                                  VersionId=version_id)
@@ -1194,7 +1180,7 @@ class S3CloudCache(CloudCacheBase):
         if pbar is not None:
             pbar.close()
 
-        return None
+        return was_downloaded
 
 
 class LocalCache(CloudCacheBase):
