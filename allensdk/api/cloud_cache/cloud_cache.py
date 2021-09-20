@@ -567,7 +567,8 @@ class CloudCacheBase(BasicLocalCache):
 
         Returns
         -------
-        None
+        bool
+            True if the file was downloaded; False otherwise
 
         Raises
         ------
@@ -1103,7 +1104,8 @@ class S3CloudCache(CloudCacheBase):
 
         Returns
         -------
-        None
+        bool
+            True if the file was downloaded; False otherwise
 
         Raises
         ------
