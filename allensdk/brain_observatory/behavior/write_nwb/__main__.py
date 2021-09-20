@@ -3,11 +3,10 @@ import logging
 import sys
 import argschema
 import marshmallow
+from pynwb import NWBHDF5IO
 
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi, BehaviorOphysJsonApi, BehaviorOphysLimsApi)
 from allensdk.brain_observatory.behavior.write_nwb._schemas import (
     InputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
@@ -30,24 +29,24 @@ def write_behavior_ophys_nwb(session_data: dict,
             os.remove(filename)
 
     try:
-        json_api = BehaviorOphysJsonApi(data=session_data,
-                                        skip_eye_tracking=skip_eye_tracking)
-        json_session = BehaviorOphysExperiment(api=json_api)
-        lims_api = BehaviorOphysLimsApi(
+        json_session = BehaviorOphysExperiment.from_json(
+            session_data=session_data, skip_eye_tracking=skip_eye_tracking)
+        lims_session = BehaviorOphysExperiment.from_lims(
             ophys_experiment_id=session_data['ophys_experiment_id'],
             skip_eye_tracking=skip_eye_tracking)
-        lims_session = BehaviorOphysExperiment(api=lims_api)
 
         logging.info("Comparing a BehaviorOphysExperiment created from JSON "
                      "with a BehaviorOphysExperiment created from LIMS")
-        assert sessions_are_equal(json_session, lims_session, reraise=True)
+        assert sessions_are_equal(json_session, lims_session, reraise=True,
+                                  ignore_keys={'metadata': {'project_code'}})
 
-        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(json_session)
+        nwbfile = json_session.to_nwb()
+        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
 
         logging.info("Comparing a BehaviorOphysExperiment created from JSON "
                      "with a BehaviorOphysExperiment created from NWB")
-        nwb_api = BehaviorOphysNwbApi(nwb_filepath_inprogress)
-        nwb_session = BehaviorOphysExperiment(api=nwb_api)
+        nwb_session = BehaviorOphysExperiment.from_nwb(nwbfile=nwbfile)
         assert sessions_are_equal(json_session, nwb_session, reraise=True)
 
         os.rename(nwb_filepath_inprogress, nwb_filepath)

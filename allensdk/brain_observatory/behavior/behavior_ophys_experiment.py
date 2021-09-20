@@ -1,33 +1,241 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
-from typing import Any
+from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.session_api_utils import ParamsMixin
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi, BehaviorOphysLimsApi)
+from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
+    EyeTrackingFile
+from allensdk.brain_observatory.behavior.data_files\
+    .rigid_motion_transform_file import \
+    RigidMotionTransformFile
+from allensdk.brain_observatory.behavior.data_objects import \
+    BehaviorSessionId, StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
+    .cell_specimens import \
+    CellSpecimens, EventsParams
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+    .eye_tracking_table import \
+    EyeTrackingTable
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+    .rig_geometry import \
+    RigGeometry as EyeTrackingRigGeometry
+from allensdk.brain_observatory.behavior.data_objects.metadata \
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisitionOphys, DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_ophys_metadata import \
+    BehaviorOphysMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group \
+    import \
+    ImagingPlaneGroup
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata \
+    import \
+    MultiplaneMetadata
+from allensdk.brain_observatory.behavior.data_objects.motion_correction \
+    import \
+    MotionCorrection
+from allensdk.brain_observatory.behavior.data_objects.projections import \
+    Projections
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
+    calculate_monitor_delay
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .ophys_timestamps import \
+    OphysTimestamps, OphysTimestampsMultiplane
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
+from allensdk.brain_observatory.behavior.image_api import Image
+from allensdk.internal.api import db_connection_creator
 
 
-class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
+class BehaviorOphysExperiment(BehaviorSession):
     """Represents data from a single Visual Behavior Ophys imaging session.
-    Can be initialized with an api that fetches data, or by using class methods
-    `from_lims` and `from_nwb_path`.
+    Initialize by using class methods `from_lims` or `from_nwb_path`.
     """
 
-    def __init__(self, api=None,
-                 eye_tracking_z_threshold: float = 3.0,
-                 eye_tracking_dilation_frames: int = 2,
-                 events_filter_scale: float = 2.0,
-                 events_filter_n_time_steps: int = 20):
+    def __init__(self,
+                 behavior_session: BehaviorSession,
+                 projections: Projections,
+                 ophys_timestamps: OphysTimestamps,
+                 cell_specimens: CellSpecimens,
+                 metadata: BehaviorOphysMetadata,
+                 motion_correction: MotionCorrection,
+                 eye_tracking_table: Optional[EyeTrackingTable],
+                 eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry],
+                 date_of_acquisition: DateOfAcquisition):
+        super().__init__(
+            behavior_session_id=behavior_session._behavior_session_id,
+            licks=behavior_session._licks,
+            metadata=behavior_session._metadata,
+            raw_running_speed=behavior_session._raw_running_speed,
+            rewards=behavior_session._rewards,
+            running_speed=behavior_session._running_speed,
+            running_acquisition=behavior_session._running_acquisition,
+            stimuli=behavior_session._stimuli,
+            stimulus_timestamps=behavior_session._stimulus_timestamps,
+            task_parameters=behavior_session._task_parameters,
+            trials=behavior_session._trials,
+            date_of_acquisition=date_of_acquisition
+        )
+
+        self._metadata = metadata
+        self._projections = projections
+        self._ophys_timestamps = ophys_timestamps
+        self._cell_specimens = cell_specimens
+        self._motion_correction = motion_correction
+        self._eye_tracking = eye_tracking_table
+        self._eye_tracking_rig_geometry = eye_tracking_rig_geometry
+
+    def to_nwb(self) -> NWBFile:
+        nwbfile = super().to_nwb(add_metadata=False)
+
+        self._metadata.to_nwb(nwbfile=nwbfile)
+        self._projections.to_nwb(nwbfile=nwbfile)
+        self._cell_specimens.to_nwb(nwbfile=nwbfile,
+                                    ophys_timestamps=self._ophys_timestamps)
+        self._motion_correction.to_nwb(nwbfile=nwbfile)
+        self._eye_tracking.to_nwb(nwbfile=nwbfile)
+        self._eye_tracking_rig_geometry.to_nwb(nwbfile=nwbfile)
+
+        return nwbfile
+    # ==================== class and utility methods ======================
+
+    @classmethod
+    def from_lims(cls,
+                  ophys_experiment_id: int,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2,
+                  events_filter_scale: float = 2.0,
+                  events_filter_n_time_steps: int = 20,
+                  exclude_invalid_rois=True,
+                  skip_eye_tracking=False) -> \
+            "BehaviorOphysExperiment":
         """
         Parameters
         ----------
-        api : object, optional
-            The backend api used by the session object to get behavior ophys
-            data, by default None.
+        ophys_experiment_id
+        eye_tracking_z_threshold
+            See `BehaviorOphysExperiment.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorOphysExperiment.from_nwb`
+        events_filter_scale
+            See `BehaviorOphysExperiment.from_nwb`
+        events_filter_n_time_steps
+            See `BehaviorOphysExperiment.from_nwb`
+        exclude_invalid_rois
+            Whether to exclude invalid rois
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+        """
+        def _is_multi_plane_session():
+            imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
+                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+            return cls._is_multi_plane_session(
+                imaging_plane_group_meta=imaging_plane_group_meta)
+
+        def _get_motion_correction():
+            rigid_motion_transform_file = RigidMotionTransformFile.from_lims(
+                ophys_experiment_id=ophys_experiment_id, db=lims_db
+            )
+            return MotionCorrection.from_data_file(
+                rigid_motion_transform_file=rigid_motion_transform_file)
+
+        def _get_eye_tracking_table(sync_file: SyncFile):
+            eye_tracking_file = EyeTrackingFile.from_lims(
+                db=lims_db, ophys_experiment_id=ophys_experiment_id)
+            eye_tracking_table = EyeTrackingTable.from_data_file(
+                data_file=eye_tracking_file,
+                sync_file=sync_file,
+                z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames
+            )
+            return eye_tracking_table
+
+        lims_db = db_connection_creator(
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+        )
+        sync_file = SyncFile.from_lims(db=lims_db,
+                                       ophys_experiment_id=ophys_experiment_id)
+        stimulus_timestamps = StimulusTimestamps.from_sync_file(
+            sync_file=sync_file)
+        behavior_session_id = BehaviorSessionId.from_lims(
+            db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        is_multiplane_session = _is_multi_plane_session()
+        meta = BehaviorOphysMetadata.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
+            is_multiplane=is_multiplane_session
+        )
+        monitor_delay = calculate_monitor_delay(
+            sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
+        date_of_acquisition = DateOfAcquisitionOphys.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        behavior_session = BehaviorSession.from_lims(
+            lims_db=lims_db,
+            behavior_session_id=behavior_session_id.value,
+            stimulus_timestamps=stimulus_timestamps,
+            monitor_delay=monitor_delay,
+            date_of_acquisition=date_of_acquisition
+        )
+        if is_multiplane_session:
+            ophys_timestamps = OphysTimestampsMultiplane.from_sync_file(
+                sync_file=sync_file,
+                group_count=meta.ophys_metadata.imaging_plane_group_count,
+                plane_group=meta.ophys_metadata.imaging_plane_group
+            )
+        else:
+            ophys_timestamps = OphysTimestamps.from_sync_file(
+                sync_file=sync_file)
+
+        projections = Projections.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        cell_specimens = CellSpecimens.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
+            ophys_timestamps=ophys_timestamps,
+            segmentation_mask_image_spacing=projections.max_projection.spacing,
+            events_params=EventsParams(
+                filter_scale=events_filter_scale,
+                filter_n_time_steps=events_filter_n_time_steps),
+            exclude_invalid_rois=exclude_invalid_rois
+        )
+        motion_correction = _get_motion_correction()
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+            eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
+                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+
+        return BehaviorOphysExperiment(
+            behavior_session=behavior_session,
+            cell_specimens=cell_specimens,
+            ophys_timestamps=ophys_timestamps,
+            metadata=meta,
+            projections=projections,
+            motion_correction=motion_correction,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry,
+            date_of_acquisition=date_of_acquisition
+        )
+
+    @classmethod
+    def from_nwb(cls, nwbfile: NWBFile,
+                 eye_tracking_z_threshold: float = 3.0,
+                 eye_tracking_dilation_frames: int = 2,
+                 events_filter_scale: float = 2.0,
+                 events_filter_n_time_steps: int = 20,
+                 exclude_invalid_rois=True
+                 ) -> "BehaviorOphysExperiment":
+        """
+
+        Parameters
+        ----------
+        nwbfile
         eye_tracking_z_threshold : float, optional
             The z-threshold when determining which frames likely contain
             outliers for eye or pupil areas. Influences which frames
@@ -42,72 +250,161 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
             by default 2.0
         events_filter_n_time_steps : int, optional
             Number of time steps to use for convolution of ophys events
+        exclude_invalid_rois
+            Whether to exclude invalid rois
+        """
+        def _is_multi_plane_session():
+            imaging_plane_group_meta = ImagingPlaneGroup.from_nwb(
+                nwbfile=nwbfile)
+            return cls._is_multi_plane_session(
+                imaging_plane_group_meta=imaging_plane_group_meta)
+
+        behavior_session = BehaviorSession.from_nwb(nwbfile=nwbfile)
+        projections = Projections.from_nwb(nwbfile=nwbfile)
+        cell_specimens = CellSpecimens.from_nwb(
+            nwbfile=nwbfile,
+            segmentation_mask_image_spacing=projections.max_projection.spacing,
+            events_params=EventsParams(
+                filter_scale=events_filter_scale,
+                filter_n_time_steps=events_filter_n_time_steps
+            ),
+            exclude_invalid_rois=exclude_invalid_rois
+        )
+        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
+            nwbfile=nwbfile)
+        eye_tracking_table = EyeTrackingTable.from_nwb(
+            nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
+            dilation_frames=eye_tracking_dilation_frames)
+        motion_correction = MotionCorrection.from_nwb(nwbfile=nwbfile)
+        is_multiplane_session = _is_multi_plane_session()
+        metadata = BehaviorOphysMetadata.from_nwb(
+            nwbfile=nwbfile, is_multiplane=is_multiplane_session)
+        if is_multiplane_session:
+            ophys_timestamps = OphysTimestampsMultiplane.from_nwb(
+                nwbfile=nwbfile)
+        else:
+            ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
+        date_of_acquisition = DateOfAcquisitionOphys.from_nwb(nwbfile=nwbfile)
+
+        return BehaviorOphysExperiment(
+            behavior_session=behavior_session,
+            cell_specimens=cell_specimens,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry,
+            eye_tracking_table=eye_tracking_table,
+            motion_correction=motion_correction,
+            metadata=metadata,
+            ophys_timestamps=ophys_timestamps,
+            projections=projections,
+            date_of_acquisition=date_of_acquisition
+        )
+
+    @classmethod
+    def from_json(cls,
+                  session_data: dict,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2,
+                  events_filter_scale: float = 2.0,
+                  events_filter_n_time_steps: int = 20,
+                  exclude_invalid_rois=True,
+                  skip_eye_tracking=False) -> \
+            "BehaviorOphysExperiment":
         """
 
-        BehaviorSession.__init__(self, api=api)
-        ParamsMixin.__init__(self, ignore={'api'})
+        Parameters
+        ----------
+        session_data
+        eye_tracking_z_threshold
+            See `BehaviorOphysExperiment.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorOphysExperiment.from_nwb`
+        events_filter_scale
+            See `BehaviorOphysExperiment.from_nwb`
+        events_filter_n_time_steps
+            See `BehaviorOphysExperiment.from_nwb`
+        exclude_invalid_rois
+            Whether to exclude invalid rois
+        skip_eye_tracking
+            Used to skip returning eye tracking data
 
-        # eye_tracking processing params
-        self._eye_tracking_z_threshold = eye_tracking_z_threshold
-        self._eye_tracking_dilation_frames = eye_tracking_dilation_frames
+        """
+        def _is_multi_plane_session():
+            imaging_plane_group_meta = ImagingPlaneGroup.from_json(
+                dict_repr=session_data)
+            return cls._is_multi_plane_session(
+                imaging_plane_group_meta=imaging_plane_group_meta)
 
-        # events processing params
-        self._events_filter_scale = events_filter_scale
-        self._events_filter_n_time_steps = events_filter_n_time_steps
+        def _get_motion_correction():
+            rigid_motion_transform_file = RigidMotionTransformFile.from_json(
+                dict_repr=session_data)
+            return MotionCorrection.from_data_file(
+                rigid_motion_transform_file=rigid_motion_transform_file)
 
-        # LazyProperty constructor provided by LazyPropertyMixin
-        LazyProperty = self.LazyProperty
+        def _get_eye_tracking_table(sync_file: SyncFile):
+            eye_tracking_file = EyeTrackingFile.from_json(
+                dict_repr=session_data)
+            eye_tracking_table = EyeTrackingTable.from_data_file(
+                data_file=eye_tracking_file,
+                sync_file=sync_file,
+                z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames
+            )
+            return eye_tracking_table
 
-        # Initialize attributes to be lazily evaluated
-        self._ophys_session_id = LazyProperty(
-            self.api.get_ophys_session_id)
-        self._ophys_experiment_id = LazyProperty(
-            self.api.get_ophys_experiment_id)
-        self._max_projection = LazyProperty(self.api.get_max_projection,
-                                            wrappers=[ImageApi.deserialize])
-        self._average_projection = LazyProperty(
-            self.api.get_average_projection, wrappers=[ImageApi.deserialize])
-        self._ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps,
-                                              settable=True)
-        self._dff_traces = LazyProperty(self.api.get_dff_traces, settable=True)
-        self._events = LazyProperty(self.api.get_events, settable=True)
-        self._cell_specimen_table = LazyProperty(
-            self.api.get_cell_specimen_table, settable=True)
-        self._corrected_fluorescence_traces = LazyProperty(
-            self.api.get_corrected_fluorescence_traces, settable=True)
-        self._motion_correction = LazyProperty(self.api.get_motion_correction,
-                                               settable=True)
-        self._segmentation_mask_image = LazyProperty(
-            self.get_segmentation_mask_image)
-        self._eye_tracking = LazyProperty(
-            self.api.get_eye_tracking, settable=True,
-            z_threshold=self._eye_tracking_z_threshold,
-            dilation_frames=self._eye_tracking_dilation_frames)
-        self._eye_tracking_rig_geometry = LazyProperty(
-             self.api.get_eye_tracking_rig_geometry)
+        sync_file = SyncFile.from_json(dict_repr=session_data)
+        is_multiplane_session = _is_multi_plane_session()
+        meta = BehaviorOphysMetadata.from_json(
+            dict_repr=session_data, is_multiplane=is_multiplane_session)
+        monitor_delay = calculate_monitor_delay(
+            sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
+        behavior_session = BehaviorSession.from_json(
+            session_data=session_data,
+            monitor_delay=monitor_delay
+        )
 
-    # ==================== class and utility methods ======================
+        if is_multiplane_session:
+            ophys_timestamps = OphysTimestampsMultiplane.from_sync_file(
+                sync_file=sync_file,
+                group_count=meta.ophys_metadata.imaging_plane_group_count,
+                plane_group=meta.ophys_metadata.imaging_plane_group
+            )
+        else:
+            ophys_timestamps = OphysTimestamps.from_sync_file(
+                sync_file=sync_file)
 
-    @classmethod
-    def from_lims(cls, ophys_experiment_id: int,
-                  eye_tracking_z_threshold: float = 3.0,
-                  eye_tracking_dilation_frames: int = 2
-                  ) -> "BehaviorOphysExperiment":
-        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id),
-                   eye_tracking_z_threshold=eye_tracking_z_threshold,
-                   eye_tracking_dilation_frames=eye_tracking_dilation_frames)
+        projections = Projections.from_json(dict_repr=session_data)
+        cell_specimens = CellSpecimens.from_json(
+            dict_repr=session_data,
+            ophys_timestamps=ophys_timestamps,
+            segmentation_mask_image_spacing=projections.max_projection.spacing,
+            events_params=EventsParams(
+                filter_scale=events_filter_scale,
+                filter_n_time_steps=events_filter_n_time_steps),
+            exclude_invalid_rois=exclude_invalid_rois
+        )
+        motion_correction = _get_motion_correction()
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+            eye_tracking_table = _get_eye_tracking_table(sync_file=sync_file)
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
+                dict_repr=session_data)
 
-    @classmethod
-    def from_nwb_path(
-            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysExperiment":  # noqa: E501
-        api_kwargs["filter_invalid_rois"] = api_kwargs.get(
-            "filter_invalid_rois", True)
-        return cls(api=BehaviorOphysNwbApi.from_path(
-            path=nwb_path, **api_kwargs))
+        return BehaviorOphysExperiment(
+            behavior_session=behavior_session,
+            cell_specimens=cell_specimens,
+            ophys_timestamps=ophys_timestamps,
+            metadata=meta,
+            projections=projections,
+            motion_correction=motion_correction,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry,
+            date_of_acquisition=behavior_session._date_of_acquisition
+        )
 
     # ========================= 'get' methods ==========================
 
-    def get_segmentation_mask_image(self):
+    def get_segmentation_mask_image(self) -> Image:
         """a 2D binary image of all valid cell masks
 
         Returns
@@ -116,16 +413,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
             array-like interface to segmentation_mask image data and
             metadata
         """
-        mask_data = np.sum(self.roi_masks['roi_mask'].values).astype(int)
-
-        max_projection_image = self.max_projection
-
-        mask_image = Image(
-            data=mask_data,
-            spacing=max_projection_image.spacing,
-            unit=max_projection_image.unit
-        )
-        return mask_image
+        return self._cell_specimens.segmentation_mask_image
 
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -159,47 +447,81 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                              f"for {self.ophys_experiment_id}")
         return cell_specimen_ids
 
-    # ====================== properties and setters ========================
+    # ====================== properties ========================
 
     @property
     def ophys_experiment_id(self) -> int:
         """Unique identifier for this experimental session.
         :rtype: int
         """
-        return self._ophys_experiment_id
+        return self._metadata.ophys_metadata.ophys_experiment_id
 
     @property
     def ophys_session_id(self) -> int:
         """Unique identifier for this ophys session.
         :rtype: int
         """
-        return self._ophys_session_id
+        return self._metadata.ophys_metadata.ophys_session_id
+
+    @property
+    def metadata(self):
+        behavior_meta = super()._get_metadata(
+            behavior_metadata=self._metadata.behavior_metadata)
+        ophys_meta = {
+            'indicator': self._cell_specimens.meta.imaging_plane.indicator,
+            'emission_lambda': self._cell_specimens.meta.emission_lambda,
+            'excitation_lambda':
+                self._cell_specimens.meta.imaging_plane.excitation_lambda,
+            'experiment_container_id':
+                self._metadata.ophys_metadata.experiment_container_id,
+            'field_of_view_height':
+                self._metadata.ophys_metadata.field_of_view_shape.height,
+            'field_of_view_width':
+                self._metadata.ophys_metadata.field_of_view_shape.width,
+            'imaging_depth': self._metadata.ophys_metadata.imaging_depth,
+            'imaging_plane_group':
+                self._metadata.ophys_metadata.imaging_plane_group
+                if isinstance(self._metadata.ophys_metadata,
+                              MultiplaneMetadata) else None,
+            'imaging_plane_group_count':
+                self._metadata.ophys_metadata.imaging_plane_group_count
+                if isinstance(self._metadata.ophys_metadata,
+                              MultiplaneMetadata) else 0,
+            'ophys_experiment_id':
+                self._metadata.ophys_metadata.ophys_experiment_id,
+            'ophys_frame_rate':
+                self._cell_specimens.meta.imaging_plane.ophys_frame_rate,
+            'ophys_session_id': self._metadata.ophys_metadata.ophys_session_id,
+            'project_code': self._metadata.ophys_metadata.project_code,
+            'targeted_structure':
+                self._cell_specimens.meta.imaging_plane.targeted_structure
+        }
+        return {
+            **behavior_meta,
+            **ophys_meta
+        }
 
     @property
     def max_projection(self) -> Image:
         """2D max projection image.
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        return self._max_projection
+        return self._projections.max_projection
 
     @property
-    def average_projection(self) -> pd.DataFrame:
+    def average_projection(self) -> Image:
         """2D image of the microscope field of view, averaged across the
         experiment
-        :rtype: pandas.DataFrame
+        :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        return self._average_projection
+        return self._projections.avg_projection
 
     @property
     def ophys_timestamps(self) -> np.ndarray:
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        return self._ophys_timestamps
-
-    @ophys_timestamps.setter
-    def ophys_timestamps(self, value):
-        self._ophys_timestamps = value
+        return self._ophys_timestamps.value
 
     @property
     def dff_traces(self) -> pd.DataFrame:
@@ -223,11 +545,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                     (arbitrary units)
 
         """
-        return self._dff_traces
-
-    @dff_traces.setter
-    def dff_traces(self, value):
-        self._dff_traces = value
+        return self._cell_specimens.dff_traces
 
     @property
     def events(self) -> pd.DataFrame:
@@ -261,20 +579,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                 estimated noise standard deviation for the events trace
 
         """
-        params = {'events_filter_scale', 'events_filter_n_time_steps'}
-
-        if self.needs_data_refresh(params):
-            self._events = self.LazyProperty(
-                self.api.get_events,
-                filter_scale=self._events_filter_scale,
-                filter_n_time_steps=self._events_filter_n_time_steps)
-            self.clear_updated_params(params)
-
-        return self._events
-
-    @events.setter
-    def events(self, value):
-        self._events = value
+        return self._cell_specimens.events
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
@@ -320,11 +625,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                     y position of ROI in field of view in pixels (top
                     left corner)
         """
-        return self._cell_specimen_table
-
-    @cell_specimen_table.setter
-    def cell_specimen_table(self, value):
-        self._cell_specimen_table = value
+        return self._cell_specimens.table
 
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
@@ -349,11 +650,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                     fluorescence values (arbitrary units)
 
         """
-        return self._corrected_fluorescence_traces
-
-    @corrected_fluorescence_traces.setter
-    def corrected_fluorescence_traces(self, value):
-        self._corrected_fluorescence_traces = value
+        return self._cell_specimens.corrected_fluorescence_traces
 
     @property
     def motion_correction(self) -> pd.DataFrame:
@@ -369,24 +666,14 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                 y: (int)
                     frame shift along y axis
         """
-        return self._motion_correction
-
-    @motion_correction.setter
-    def motion_correction(self, value):
-        self._motion_correction = value
+        return self._motion_correction.value
 
     @property
     def segmentation_mask_image(self) -> Image:
         """A 2d binary image of all valid cell masks
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        if self._segmentation_mask_image is None:
-            self._segmentation_mask_image = self.get_segmentation_mask_image()
-        return self._segmentation_mask_image
-
-    @segmentation_mask_image.setter
-    def segmentation_mask_image(self, value):
-        self._segmentation_mask_image = value
+        return self._cell_specimens.segmentation_mask_image
 
     @property
     def eye_tracking(self) -> pd.DataFrame:
@@ -424,20 +711,7 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
 
         :rtype: pandas.DataFrame
         """
-        params = {'eye_tracking_dilation_frames', 'eye_tracking_z_threshold'}
-
-        if self.needs_data_refresh(params):
-            self._eye_tracking = self.LazyProperty(
-                self.api.get_eye_tracking,
-                z_threshold=self._eye_tracking_z_threshold,
-                dilation_frames=self._eye_tracking_dilation_frames)
-            self.clear_updated_params(params)
-
-        return self._eye_tracking
-
-    @eye_tracking.setter
-    def eye_tracking(self, value):
-        self._eye_tracking = value
+        return self._eye_tracking.value
 
     @property
     def eye_tracking_rig_geometry(self) -> dict:
@@ -455,8 +729,27 @@ class BehaviorOphysExperiment(BehaviorSession, ParamsMixin):
                 monitor_position_mm (array of float)
                 monitor_rotation_deg (array of float)
         """
-        return self.api.get_eye_tracking_rig_geometry()
+        return self._eye_tracking_rig_geometry.to_dict()['rig_geometry']
 
     @property
     def roi_masks(self) -> pd.DataFrame:
         return self.cell_specimen_table[['cell_roi_id', 'roi_mask']]
+
+    def _get_identifier(self) -> str:
+        return str(self.ophys_experiment_id)
+
+    @staticmethod
+    def _is_multi_plane_session(
+            imaging_plane_group_meta: ImagingPlaneGroup) -> bool:
+        """Returns whether this experiment is part of a multiplane session"""
+        return imaging_plane_group_meta is not None and \
+            imaging_plane_group_meta.plane_group_count > 1
+
+    def _get_session_type(self) -> str:
+        return self._metadata.behavior_metadata.session_type
+
+    @staticmethod
+    def _get_keywords():
+        """Keywords for NWB file"""
+        return ["2-photon", "calcium imaging", "visual cortex",
+                "behavior", "task"]

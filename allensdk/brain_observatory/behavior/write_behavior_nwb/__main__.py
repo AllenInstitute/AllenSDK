@@ -3,11 +3,10 @@ import logging
 import sys
 import argschema
 import marshmallow
+from pynwb import NWBHDF5IO
 
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorNwbApi, BehaviorJsonApi, BehaviorLimsApi)
 from allensdk.brain_observatory.behavior.write_behavior_nwb._schemas import (
     InputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
@@ -28,21 +27,22 @@ def write_behavior_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
-        json_session = BehaviorSession(api=BehaviorJsonApi(session_data))
-        lims_api = BehaviorLimsApi(
-            behavior_session_id=session_data['behavior_session_id'])
-        lims_session = BehaviorSession(api=lims_api)
+        json_session = BehaviorSession.from_json(session_data)
+
+        behavior_session_id = session_data['behavior_session_id']
+        lims_session = BehaviorSession.from_lims(behavior_session_id)
 
         logging.info("Comparing a BehaviorSession created from JSON "
                      "with a BehaviorSession created from LIMS")
         assert sessions_are_equal(json_session, lims_session, reraise=True)
 
-        BehaviorNwbApi(nwb_filepath_inprogress).save(json_session)
+        nwbfile = lims_session.to_nwb()
+        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
 
         logging.info("Comparing a BehaviorSession created from JSON "
                      "with a BehaviorSession created from NWB")
-        nwb_api = BehaviorNwbApi(nwb_filepath_inprogress)
-        nwb_session = BehaviorSession(api=nwb_api)
+        nwb_session = BehaviorSession.from_nwb_path(nwb_filepath_inprogress)
         assert sessions_are_equal(json_session, nwb_session, reraise=True)
 
         os.rename(nwb_filepath_inprogress, nwb_filepath)
