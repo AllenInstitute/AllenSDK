@@ -1,8 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.12.4] = 2021-08-21
+## [2.12.4] = 2021-09-21
 - Documentation changes ahead of SWDB 2021
+- Bugfix to CloudCache; it is now possible for multiple users to share a cache.
 
 ## [2.12.3] = 2021-08-20
 - Reordered columns in Visual Behavior metadata tables to be more helpful
