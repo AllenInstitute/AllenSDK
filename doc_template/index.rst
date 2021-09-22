@@ -118,6 +118,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.13.0
+-----------------------------------------------------------------------
+- Major internal refactor to BehaviorSession, BehaviorOphysExperiment classes. Implements DataObject pattern for fetching and serialization of data.
+
 What's New - 2.12.4
 -----------------------------------------------------------------------
 - Documentation changes ahead of SWDB 2021

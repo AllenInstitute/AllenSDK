@@ -14,14 +14,17 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.\
         add_passive_flag_to_ophys_experiment_table,
         add_image_set_to_experiment_table)
 
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
-    BehaviorMetadata
-
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import \
     get_prior_exposures_to_session_type, \
     get_prior_exposures_to_image_set, \
     get_prior_exposures_to_omissions
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.full_genotype import \
+    FullGenotype
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
 
 
 @pytest.fixture(scope='session')
@@ -417,11 +420,11 @@ def intermediate_behavior_table(behavior_session_table,
     df = behavior_session_table.copy(deep=True)
 
     df['reporter_line'] = df['reporter_line'].apply(
-        BehaviorMetadata.parse_reporter_line)
+        ReporterLine.parse)
     df['cre_line'] = df['full_genotype'].apply(
-        BehaviorMetadata.parse_cre_line)
+        lambda x: FullGenotype(full_genotype=x).parse_cre_line())
     df['indicator'] = df['reporter_line'].apply(
-        BehaviorMetadata.parse_indicator)
+        lambda x: ReporterLine(reporter_line=x).parse_indicator())
 
     df['prior_exposures_to_session_type'] = \
         get_prior_exposures_to_session_type(df=df)

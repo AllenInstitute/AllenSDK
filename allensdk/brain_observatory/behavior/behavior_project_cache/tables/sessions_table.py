@@ -13,9 +13,15 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .project_table import \
     ProjectTable
-from allensdk.brain_observatory.behavior.metadata.behavior_metadata import \
-    BehaviorMetadata
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.full_genotype import \
+    FullGenotype
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
 
 
 class SessionsTable(ProjectTable):
@@ -45,11 +51,11 @@ class SessionsTable(ProjectTable):
 
     def postprocess_additional(self):
         self._df['reporter_line'] = self._df['reporter_line'].apply(
-            BehaviorMetadata.parse_reporter_line)
+            ReporterLine.parse)
         self._df['cre_line'] = self._df['full_genotype'].apply(
-            BehaviorMetadata.parse_cre_line)
+            lambda x: FullGenotype(x).parse_cre_line())
         self._df['indicator'] = self._df['reporter_line'].apply(
-            BehaviorMetadata.parse_indicator)
+            lambda x: ReporterLine(x).parse_indicator())
 
         self.__add_session_number()
 

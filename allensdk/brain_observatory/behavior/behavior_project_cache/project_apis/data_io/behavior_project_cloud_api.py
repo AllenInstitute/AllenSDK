@@ -271,7 +271,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                f" there are {row.shape[0]} entries.")
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
-        return BehaviorOphysExperiment.from_nwb_path(str(data_path))
+        return BehaviorOphysExperiment.from_nwb_path(
+            str(data_path))
 
     def _get_ophys_session_table(self):
         session_table_path = self._get_metadata_path(
