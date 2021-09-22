@@ -81,6 +81,8 @@ jobs:
               --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
               --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
               --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
+              --mount type=tmpfs,destination=/tmp \
+              --rm \
               ${{ matrix.image }} \
                   /bin/bash -c "pip install -r requirements.txt; \
                                 pip install -r test_requirements.txt; \

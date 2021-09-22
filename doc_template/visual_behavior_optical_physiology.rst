@@ -1,3 +1,37 @@
+GETTING STARTED
+---------------
+
+First, `install or update the AllenSDK <https://allensdk.readthedocs.io/en/latest/install.html>`_, 
+our Python based toolkit for accessing and working with Allen Institute datasets.
+
+Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloaded using the AllenSDK, 
+or accessed directly via an S3 bucket (instructions provided in notebook #1 below). Regardless of which method of file 
+download you choose, we recommend that you load and interact with the data 
+using the tools provided in the AllenSDK, which have been designed to simplify 
+data access and subsequent analysis. No knowledge of the NWB file format is required.
+
+Specific information about how Visual Behavior Optical Physiology data is stored 
+in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
+
+To get started, check out these jupyter notebooks to learn how to:
+
+1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
+2) `Identify experiments of interest using the dataset manifest <_static/examples/nb/visual_behavior_ophys_dataset_manifest.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_dataset_manifest.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_dataset_manifest.ipynb>`_
+3) `Load and visualize data from a 2-photon imaging experiment <_static/examples/nb/visual_behavior_load_ophys_data.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_load_ophys_data.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_load_ophys_data.ipynb>`_
+4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_mouse_history.ipynb>`_
+5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
+
+
+For a description of available AllenSDK methods and attributes for data access, see this 
+`further documentation <https://alleninstitute.sharepoint.com/:w:/s/VisualBehaviorAIBS/EUkWXB9X8wZKleIGtsviscMBTgesWXsrHESs84Ye9FvqzQ?e=Jm7GmA>`_.
+
+For detailed information about the experimental design, data acquisition, 
+and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/4e/be/4ebe2911-bd38-4230-86c8-01a86cfd758e/visual_behavior_2p_technical_whitepaper.pdf>`_.
+
+If you have questions about the dataset that aren’t addressed by the whitepaper 
+or any of our tutorials, please reach out by posting at 
+https://community.brain-map.org/  
+
 Visual Behavior - Optical Physiology
 ====================================
 
@@ -35,41 +69,6 @@ neurons for each transgenic line and imaging platform in the dataset:
 .. image:: /_static/visual_behavior_2p/variants_table.png
    :align: center
    :width: 850
-
-GETTING STARTED
----------------
-
-First, `install or update the AllenSDK <https://allensdk.readthedocs.io/en/latest/install.html>`_, 
-our Python based toolkit for accessing and working with Allen Institute datasets.
-
-Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloaded using the AllenSDK, 
-or accessed directly via an S3 bucket (instructions provided in notebook #1 below). Regardless of which method of file 
-download you choose, we recommend that you load and interact with the data 
-using the tools provided in the AllenSDK, which have been designed to simplify 
-data access and subsequent analysis. No knowledge of the NWB file format is required.
-
-Specific information about how Visual Behavior Optical Physiology data is stored 
-in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
-
-To get started, check out these jupyter notebooks to learn how to:
-
-1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
-2) `Identify experiments of interest using the dataset manifest <_static/examples/nb/visual_behavior_ophys_dataset_manifest.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_dataset_manifest.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_dataset_manifest.ipynb>`_
-3) `Load and visualize data from a 2-photon imaging experiment <_static/examples/nb/visual_behavior_load_ophys_data.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_load_ophys_data.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_load_ophys_data.ipynb>`_
-4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_mouse_history.ipynb>`_
-5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
-
-
-
-For a description of available AllenSDK methods and attributes for data access, see this 
-`further documentation <https://alleninstitute.sharepoint.com/:w:/s/VisualBehaviorAIBS/EUkWXB9X8wZKleIGtsviscMBTgesWXsrHESs84Ye9FvqzQ?e=Jm7GmA>`_.
-
-For detailed information about the experimental design, data acquisition, 
-and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/4e/be/4ebe2911-bd38-4230-86c8-01a86cfd758e/visual_behavior_2p_technical_whitepaper.pdf>`_.
-
-If you have questions about the dataset that aren’t addressed by the whitepaper 
-or any of our tutorials, please reach out by posting at 
-https://community.brain-map.org/  
 
 CHANGE DETECTION TASK
 ---------------------

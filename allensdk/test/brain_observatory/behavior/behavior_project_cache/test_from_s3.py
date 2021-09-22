@@ -101,18 +101,11 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data, monkeypatch):
     cmd = 'VisualBehaviorOphysProjectCache.construct_local_manifest()'
     assert cmd in f'{warnings[0].message}'
 
-    # check that downloaded data is not in local manifest
-    # before running construction function (because
-    # VisualBehaviorOphysProjectCache automatically
-    # downloads metadata files, those will already
-    # be in there)
+    # Because, at the point where the cache was reconstitute,
+    # the metadata files already existed at their expected local paths,
+    # the file at _downloaded_data_path file will not have been created
     manifest_path = cache.fetch_api.cache._downloaded_data_path
-    with open(manifest_path, 'rb') as in_file:
-        local_manifest = json.load(in_file)
-    fnames = set([pathlib.Path(k).name for k in local_manifest])
-    assert 'ophys_file_1.nwb' not in fnames
-    print(local_manifest)
-    assert len(local_manifest) == 4
+    assert not manifest_path.exists()
 
     cache.construct_local_manifest()
     assert cache.fetch_api.cache._downloaded_data_path.is_file()

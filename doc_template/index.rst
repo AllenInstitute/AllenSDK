@@ -118,10 +118,11 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - 2.13.0
+What's New - 2.12.4
 -----------------------------------------------------------------------
-- TBD
- 
+- Documentation changes ahead of SWDB 2021
+- Bugfix to CloudCache; it is now possible for multiple users to share a cache.
+
 What's New - 2.12.3
 -----------------------------------------------------------------------
 - Reordered columns in Visual Behavior metadata tables to be more helpful
