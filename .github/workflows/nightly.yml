@@ -1,7 +1,7 @@
 name: ci/nightly
 on:
   schedule:
-    - cron: '0 17 * * *'
+    - cron: '05 19 * * *'
 
 jobs:
   onprem:
