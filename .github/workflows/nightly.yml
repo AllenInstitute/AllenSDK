@@ -1,7 +1,7 @@
 name: ci/nightly
 on:
   schedule:
-    - cron: '05 6 * * *'
+    - cron: '0 17 * * *'
 
 jobs:
   onprem:
@@ -27,7 +27,7 @@ jobs:
               ${{ matrix.image }} \
                   /bin/bash -c "pip install -r requirements.txt; \
                                 pip install -r test_requirements.txt; \
-                                python -m pytest \
+                                python -m pytest allensdk/test/test_inline_examples.py \
                                     --cov=allensdk \
                                     --cov-config coveragerc \
                                     --cov-report html \
