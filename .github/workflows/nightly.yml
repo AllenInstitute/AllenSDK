@@ -1,7 +1,7 @@
 name: ci/nightly
 on:
   schedule:
-    - cron: '05 19 * * *'
+    - cron: '35 21 * * *'
 
 jobs:
   onprem:
@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         image: ["allensdk_local_py37:latest"]
-        branch: ["master", "rc/2.13.0"]
+        branch: ["master"]
     steps:
       - uses: actions/checkout@v2
         with:
