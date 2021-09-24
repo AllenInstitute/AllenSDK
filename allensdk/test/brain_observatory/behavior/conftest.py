@@ -8,6 +8,8 @@ import pandas as pd
 import pytest
 import pytz
 
+from collections import OrderedDict
+
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
@@ -70,6 +72,36 @@ from allensdk.brain_observatory.behavior.stimulus_processing import \
     StimulusTemplateFactory
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
+from allensdk.brain_observatory.behavior.\
+    data_objects.timestamps.stimulus_timestamps.stimulus_timestamps import (
+        StimulusTimestamps)
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.running_acquisition import (
+        RunningAcquisition)
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.running_speed import (
+        RunningSpeed)
+from allensdk.brain_observatory.behavior.data_objects.\
+    licks import Licks
+from allensdk.brain_observatory.behavior.data_objects.\
+    rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.\
+    stimuli.presentations import Presentations
+from allensdk.brain_observatory.behavior.data_objects.\
+    stimuli.stimuli import Stimuli
+from allensdk.brain_observatory.behavior.data_objects.\
+    stimuli.templates import Templates
+from allensdk.brain_observatory.behavior.data_objects.\
+    task_parameters import TaskParameters
+from allensdk.brain_observatory.behavior.data_objects.\
+    trials.trial_table import TrialTable
+from allensdk.brain_observatory.behavior.data_objects.\
+    metadata.behavior_metadata.date_of_acquisition import (
+        DateOfAcquisition)
+
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession)
+
 
 def get_resources_dir():
     behavior_dir = os.path.dirname(__file__)
@@ -97,22 +129,22 @@ def pytest_ignore_collect(path, config):
 
 
 @pytest.fixture
-def running_acquisition_df_fixture(running_speed):
-
-    v_sig = np.ones_like(running_speed.values)
-    v_in = np.ones_like(running_speed.values)
-    dx = np.ones_like(running_speed.values)
+def running_acquisition_df_fixture():
+    ntime = 10
+    v_sig = np.ones(ntime)
+    v_in = np.ones(ntime)
+    dx = np.ones(ntime)
+    timestamps = np.arange(ntime)+1.0
 
     return pd.DataFrame({
         'dx': dx,
         'v_sig': v_sig,
         'v_in': v_in,
-    }, index=pd.Index(running_speed.timestamps, name='timestamps'))
+    }, index=pd.Index(timestamps, name='timestamps'))
 
 
 @pytest.fixture
 def stimulus_templates():
-
     images = [np.zeros((4, 4)), np.ones((4, 4))]
 
     image_attributes = [{'image_name': 'test1'}, {'image_name': 'test2'}]
@@ -129,18 +161,19 @@ def ophys_timestamps():
 
 @pytest.fixture
 def trials():
-    return pd.DataFrame({
-        'start_time': [1., 2., 4., 5., 6.],
-        'stop_time': [2., 4., 5., 6., 8.],
-        'a': [0.5, 0.4, 0.3, 0.2, 0.1],
-        'b': [[], [1], [2, 2], [3], []],
-        'c': ['a', 'bb', 'ccc', 'dddd', 'eeeee'],
-        'd': [np.array([1]),
-              np.array([1, 2]),
-              np.array([1, 2, 3]),
-              np.array([1, 2, 3, 4]),
-              np.array([1, 2, 3, 4, 5])],
-    }, index=pd.Index(name='trials_id', data=[0, 1, 2, 3, 4]))
+    col_names = ['start_time', 'stop_time', 'lick_times',
+                 'reward_time', 'reward_volume', 'hit',
+                 'false_alarm', 'miss', 'stimulus_change',
+                 'aborted', 'go', 'catch', 'auto_rewarded',
+                 'correct_reject', 'trial_length', 'response_time',
+                 'change_frame', 'change_time', 'response_latency',
+                 'initial_image_name', 'change_image_name']
+    data_df = OrderedDict()
+    for col in col_names:
+        data_df[col] = np.ones(5)
+    return pd.DataFrame(
+                data_df,
+                index=pd.Index(name='trials_id', data=[0, 1, 2, 3, 4]))
 
 
 @pytest.fixture
@@ -178,21 +211,18 @@ def segmentation_mask_image(max_projection):
 
 
 @pytest.fixture
-def stimulus_presentations_behavior(stimulus_templates,
-                                    stimulus_presentations):
+def stimulus_presentations_behavior():
 
-    image_sets = ['test1', 'test1', 'test1', 'test2', 'test2']
-    start_time = stimulus_presentations['start_time']
-    stimulus_index_df = pd.DataFrame({'image_set': image_sets,
-                                      'image_index': [0] * len(image_sets)},
-                                     index=pd.Index(start_time,
-                                                    dtype=np.float64,
-                                                    name='timestamps'))
-
-    df = stimulus_presentations.merge(stimulus_index_df,
-                                      left_on='start_time',
-                                      right_index=True)
-    return df[sorted(df.columns)]
+    df_data = OrderedDict()
+    for col_name in ['start_time', 'stop_time', 'duration',
+                     'image_name', 'image_index', 'is_change',
+                     'omitted', 'start_frame', 'end_frame',
+                     'image_set']:
+        df_data[col_name] = np.zeros(7)
+    df = pd.DataFrame(df_data)
+    df.set_index(np.arange(7), append=True)
+    df.index.name = 'stimulus_presentations_id'
+    return df
 
 
 @pytest.fixture
@@ -289,9 +319,9 @@ def task_parameters():
             "session_type": "OPHYS_6_images_B",
             "stimulus": "images",
             "stimulus_distribution": "geometric",
-            "task": "DoC_untranslated",
             "n_stimulus_frames": 69882,
-            "auto_reward_volume": 0.005
+            "auto_reward_volume": 0.005,
+            "task_type": "change detection"
             }
 
 
@@ -462,3 +492,77 @@ def behavior_stimuli_data_fixture(request):
         data["items"]["behavior"]["stimuli"]["grating"] = grating_data
 
     return data
+
+
+@pytest.fixture
+def running_speed_fixture():
+    df = pd.DataFrame({'timestamps': np.arange(10)+1.0,
+                       'speed': 5.0*np.ones(10)})
+    return RunningSpeed(df)
+
+
+@pytest.fixture
+def populated_behavior_session_fixture(
+        running_acquisition_df_fixture,
+        running_speed_fixture,
+        licks,
+        rewards,
+        stimulus_templates,
+        stimulus_presentations_behavior,
+        task_parameters,
+        trials,
+        behavior_only_metadata_fixture,
+        ):
+    """
+    An example of a BehaviorSession with all data objects populated so
+    that we can test that the returned properties are all of the correct
+    shape
+
+    No guarantee is made that the contents of this BehaviorSession make
+    any sense. It will just have all the required properties and those
+    that are DataFrames will have the required columns.
+    """
+    stimulus_presentations = Presentations(stimulus_presentations_behavior)
+    stimuli = Stimuli(stimulus_presentations, Templates(stimulus_templates))
+    date_of_acq = DateOfAcquisition(pytz.utc.localize(datetime.datetime.now()))
+
+    session = BehaviorSession(
+                    BehaviorSessionId(behavior_session_id=1),
+                    StimulusTimestamps(np.arange(10)),
+                    RunningAcquisition(running_acquisition_df_fixture),
+                    running_speed_fixture,
+                    running_speed_fixture,
+                    Licks(licks),
+                    Rewards(rewards),
+                    stimuli,
+                    TaskParameters(**task_parameters),
+                    TrialTable(trials),
+                    behavior_only_metadata_fixture,
+                    date_of_acq)
+    return session
+
+
+@pytest.fixture
+def empty_behavior_session_fixture(
+        behavior_only_metadata_fixture,
+        ):
+    """
+    An example of a BehaviorSession in which all data objects are passed in as
+    None
+    """
+    date_of_acq = DateOfAcquisition(pytz.utc.localize(datetime.datetime.now()))
+
+    session = BehaviorSession(
+                    BehaviorSessionId(behavior_session_id=1),
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    behavior_only_metadata_fixture,
+                    date_of_acq)
+    return session
