@@ -937,6 +937,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
+        if self._metadata is None:
+            return dict()
         return self._get_metadata(behavior_metadata=self._metadata)
 
     @classmethod

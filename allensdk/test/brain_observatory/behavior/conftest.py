@@ -107,7 +107,6 @@ def behavior_stimuli_data_fixture(request):
 
 @pytest.fixture
 def empty_behavior_session_fixture(
-        behavior_only_metadata_fixture,
         ):
     """
     An example of a BehaviorSession in which all data objects are passed in as
@@ -126,6 +125,6 @@ def empty_behavior_session_fixture(
                     None,
                     None,
                     None,
-                    behavior_only_metadata_fixture,
+                    None,
                     date_of_acq)
     return session
