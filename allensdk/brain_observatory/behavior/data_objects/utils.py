@@ -1,6 +1,9 @@
 from typing import List, Union
 from collections import OrderedDict
 import pandas
+import numpy as np
+
+from allensdk.brain_observatory.behavior.image_api import Image
 
 
 def create_empty_dataframe(
@@ -30,3 +33,11 @@ def create_empty_dataframe(
     if index_name is not None:
         df.index.name = index_name
     return df
+
+
+def create_empty_image() -> Image:
+    """
+    Create and return an empty instance of the Image class
+    """
+    return Image(data=np.ones(0),
+                 spacing=tuple())

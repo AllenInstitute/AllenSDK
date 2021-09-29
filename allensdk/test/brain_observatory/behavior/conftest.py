@@ -16,6 +16,9 @@ from allensdk.brain_observatory.behavior.data_objects.\
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
+
 
 def get_resources_dir():
     behavior_dir = os.path.dirname(__file__)
@@ -128,3 +131,21 @@ def empty_behavior_session_fixture(
                     None,
                     date_of_acq)
     return session
+
+
+@pytest.fixture
+def empty_ophys_experiment_fixture(empty_behavior_session_fixture):
+
+    date_of_acq = DateOfAcquisition(pytz.utc.localize(datetime.datetime.now()))
+
+    experiment = BehaviorOphysExperiment(
+                      empty_behavior_session_fixture,
+                      None,
+                      None,
+                      None,
+                      None,
+                      None,
+                      None,
+                      None,
+                      date_of_acq)
+    return experiment
