@@ -46,7 +46,6 @@ class ProbeInputParameters(DefaultSchema):
         help="Timestamps files for this probe. Describe the times (in probe samples) when e.g. lfp samples were taken or spike events occured",
     )
 
-
 class InputParameters(ArgSchema):
     probes = Nested(
         ProbeInputParameters,
@@ -76,6 +75,11 @@ class ProbeOutputParameters(DefaultSchema):
         required=True,
         help="The sampling rate of LFP collected on this probe in Hz, assessed on the master clock.",
     )
+    split_times = List(
+        Float(),
+        required=True,
+        help="Start/stop times of likely dropped data, due to gaps in recording or irregular barcode intervals")
+
 
 
 class OutputSchema(DefaultSchema):

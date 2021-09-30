@@ -19,6 +19,8 @@ class BarcodeSyncDataset(EcephysSyncDataset):
             return self.line_labels.index("barcode")
         elif "barcodes" in self.line_labels:
             return self.line_labels.index("barcodes")
+        elif "barcode_ephys" in self.line_labels:
+            return self.line_labels.index("barcode_ephys")
         else:
             raise ValueError("no barcode line found")
 

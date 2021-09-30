@@ -59,37 +59,39 @@ def extract_barcodes_from_times(
             )[0]
         ]
 
-        currTime = offcode[0]
+        if len(offcode) > 0:
 
-        bits = np.zeros((nbits,))
+            currTime = offcode[0]
 
-        for bit in range(0, nbits):
+            bits = np.zeros((nbits,))
 
-            nextOn = np.where(oncode > currTime)[0]
-            nextOff = np.where(offcode > currTime)[0]
+            for bit in range(0, nbits):
 
-            if nextOn.size > 0:
-                nextOn = oncode[nextOn[0]]
-            else:
-                nextOn = t + inter_barcode_interval
+                nextOn = np.where(oncode > currTime)[0]
+                nextOff = np.where(offcode > currTime)[0]
 
-            if nextOff.size > 0:
-                nextOff = offcode[nextOff[0]]
-            else:
-                nextOff = t + inter_barcode_interval
+                if nextOn.size > 0:
+                    nextOn = oncode[nextOn[0]]
+                else:
+                    nextOn = t + inter_barcode_interval
 
-            if nextOn < nextOff:
-                bits[bit] = 1
+                if nextOff.size > 0:
+                    nextOff = offcode[nextOff[0]]
+                else:
+                    nextOff = t + inter_barcode_interval
 
-            currTime += bar_duration
+                if nextOn < nextOff:
+                    bits[bit] = 1
 
-        barcode = 0
+                currTime += bar_duration
 
-        # least sig left
-        for bit in range(0, nbits):
-            barcode += bits[bit] * pow(2, bit)
+            barcode = 0
 
-        barcodes.append(barcode)
+            # least sig left
+            for bit in range(0, nbits):
+                barcode += bits[bit] * pow(2, bit)
+
+            barcodes.append(barcode)
 
     return barcode_start_times, barcodes
 

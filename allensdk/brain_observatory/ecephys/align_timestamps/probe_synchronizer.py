@@ -134,6 +134,7 @@ class ProbeSynchronizer(object):
         barcodes_array = np.array(probe_barcodes)
 
         ok_barcodes = np.where((times_array > min_time) * (times_array < max_time))[0]
+        ok_barcodes = ok_barcodes[ok_barcodes < len(barcodes_array)]
         times_to_align = list(times_array[ok_barcodes])
         barcodes_to_align = list(barcodes_array[ok_barcodes])
 
