@@ -8,7 +8,6 @@ from . import naming_utilities as nu
 
 
 default_stimulus_renames = {
-    "": "spontaneous",
     "blank_stimulus" : "spontaneous",
 
     "natural_movie_1" : "natural_movie_one",

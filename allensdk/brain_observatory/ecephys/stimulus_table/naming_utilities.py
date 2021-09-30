@@ -168,12 +168,13 @@ def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
     if name_map is None:
         return table
 
-    if "" in name_map:
-        name_map[np.nan] = name_map[""]
+    name_map[np.nan] = "spontaneous"
 
     table[stim_colname] = table[stim_colname].replace(
         to_replace=name_map, inplace=False
     )
+
+    name_map.pop(np.nan)
  
     return table
 
