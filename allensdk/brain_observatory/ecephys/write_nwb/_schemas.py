@@ -106,8 +106,8 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
-    lfp = Nested(Lfp, many=False, required=True, allow_none=True)
-    csd_path = String(required=True,
+    lfp = Nested(Lfp, many=False, required=False, allow_none=True)
+    csd_path = String(required=False,
                       validate=check_read_access,
                       allow_none=True,
                       help="path to h5 file containing calculated current source density")
@@ -200,20 +200,6 @@ class InputSchema(ArgSchema):
         validate=check_read_access,
         help="Path to an h5 experiment session sync file (*.sync). This file relates events from different acquisition modalities to one another in time."
     )
-    eye_tracking_rig_geometry = Dict(
-        required=True,
-        help="Mapping containing information about session rig geometry used for eye gaze mapping."
-    )
-    eye_dlc_ellipses_path = String(
-        required=True,
-        validate=check_read_access,
-        help="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal reflections during experiment"
-    )
-    eye_gaze_mapping_path = String(
-        required=False,
-        allow_none=True,
-        help="h5 filepath containing eye gaze behavior of the experiment's subject"
-    )
     pool_size = Int(
         default=3,
         help="number of child processes used to write probewise lfp files"
@@ -222,6 +208,20 @@ class InputSchema(ArgSchema):
         required=False,
         validate=check_read_access,
         help="file at this path contains information about the optogenetic stimulation applied during this "
+    )
+    eye_tracking_rig_geometry = Dict(
+        required=False,
+        help="Mapping containing information about session rig geometry used for eye gaze mapping."
+    )
+    eye_dlc_ellipses_path = String(
+        required=False,
+        validate=check_read_access,
+        help="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal reflections during experiment"
+    )
+    eye_gaze_mapping_path = String(
+        required=False,
+        allow_none=True,
+        help="h5 filepath containing eye gaze behavior of the experiment's subject"
     )
     session_metadata = Nested(SessionMetadata, allow_none=True, required=False, help="miscellaneous information describing this session")
 

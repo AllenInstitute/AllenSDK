@@ -684,8 +684,9 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
 
     nwbfile.add_acquisition(lfp)
 
-    csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
-    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
+    if ("csd_path" in probe.keys()):
+        csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
+        nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
@@ -961,11 +962,11 @@ def write_ecephys_nwb(
     probes,
     running_speed_path,
     session_sync_path,
-    eye_tracking_rig_geometry,
-    eye_dlc_ellipses_path,
-    eye_gaze_mapping_path,
     pool_size,
     optotagging_table_path=None,
+    eye_tracking_rig_geometry=None,
+    eye_dlc_ellipses_path=None,
+    eye_gaze_mapping_path=None,
     session_metadata=None,
     **kwargs
 ):
@@ -975,7 +976,7 @@ def write_ecephys_nwb(
         identifier=f"{session_id}",
         session_id=f"{session_id}",
         session_start_time=session_start_time,
-        institution="Allen Institute for Brain Science"
+        institution="Allen Institute"
     )
 
     if session_metadata is not None:
@@ -1001,22 +1002,25 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
-    add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+    if eye_tracking_rig_geometry is not None:
+        add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                                                   eye_tracking_rig_geometry)
 
     # Collect eye tracking/gaze mapping data from files
-    eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_path,
+    if eye_dlc_ellipses_path is not None:
+        eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_path,
                                                                sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
-    eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
-    if eye_gaze_mapping_path:
-        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
-    else:
-        eye_gaze_data = None
+        eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
+        
+        if eye_gaze_mapping_path is not None:
+            eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+        else:
+            eye_gaze_data = None
 
-    add_eye_tracking_data_to_nwbfile(nwbfile,
-                                     eye_tracking_frame_times,
-                                     eye_dlc_tracking_data,
-                                     eye_gaze_data)
+        add_eye_tracking_data_to_nwbfile(nwbfile,
+                                         eye_tracking_frame_times,
+                                         eye_dlc_tracking_data,
+                                         eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     with pynwb.NWBHDF5IO(output_path, mode='w') as io:
