@@ -1028,10 +1028,14 @@ def write_ecephys_nwb(
         io.write(nwbfile, cache_spec=True)
 
     probes_with_lfp = [p for p in probes if p["lfp"] is not None]
+    probes_without_lfp = [p for p in probes if p["lfp"] is None]
+
     probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_id,
                                               session_metadata,
                                               session_start_time,
                                               pool_size=pool_size)
+
+    probe_outputs += [{'id' : p["id"], "nwb_path" : ""} for p in probes_without_lfp]
 
     return {
         'nwb_path': output_path,
@@ -1047,7 +1051,7 @@ def main():
     parser = optional_lims_inputs(sys.argv, InputSchema, OutputSchema, get_inputs_from_lims)
 
     output = write_ecephys_nwb(**parser.args)
-    write_or_print_outputs(output, parser)
+    #write_or_print_outputs(output, parser)
 
 
 if __name__ == "__main__":
