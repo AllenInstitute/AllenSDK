@@ -19,6 +19,9 @@ default_stimulus_renames = {
     "static_gratings" : "static_gratings",
 
     "contrast_response": "drifting_gratings_contrast",
+
+    "Natural_Images_Shuffled" : "natural_scenes_shuffled",
+    "Natural_Images_Sequential" : "natural_scenes_sequential",
     "natural_movie_1_more_repeats" : "natural_movie_one",
     "natural_movie_shuffled" : "natural_movie_one_shuffled",
     "motion_stimulus" : "dot_motion",

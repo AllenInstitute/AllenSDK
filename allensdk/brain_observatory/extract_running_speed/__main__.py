@@ -118,6 +118,12 @@ def main(
     vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
     vin = running_from_stim_file(stim_file, "vin", num_raw_timestamps)
 
+    if len(vin) != len(dx_deg):
+        vin = np.concatenate((vin, np.zeros((len(dx_deg) - len(vin)))))
+
+    if len(vsig) != len(dx_deg):
+        vsig = np.concatenate((vsig, np.zeros((len(dx_deg) - len(vsig)))))
+
     velocities = extract_running_speeds(
         frame_times=frame_times,
         dx_deg=dx_deg,
