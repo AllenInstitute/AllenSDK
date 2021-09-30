@@ -57,7 +57,7 @@ class LfpSubsamplingParameters(DefaultSchema):
     channel_stride = Int(default=4, description="Distance between channels to keep")
     surface_padding = Int(default=40, description="Number of channels above surface to include")
     start_channel_offset = Int(default=2, description="Offset of first channel (from bottom of the probe)")
-    reorder_channels = Boolean(default=True, description="Implement channel reordering")
+    reorder_channels = Boolean(default=False, description="Implement channel reordering")
     cutoff_frequency = Float(default=0.1, description="Cutoff frequency for DC offset filter (Butterworth)")
     filter_order = Int(default=1, description="Order of DC offset filter (Butterworth)")
     remove_reference_channels = Boolean(default=False,
