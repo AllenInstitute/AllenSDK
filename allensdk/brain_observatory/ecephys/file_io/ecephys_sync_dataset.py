@@ -53,24 +53,71 @@ class EcephysSyncDataset(Dataset):
 
         return led_times
 
+    def remove_zero_frames(self, frame_times):
 
-    def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS):
+        D = np.diff(frame_times)
+
+        a = np.where(D < 0.01)[0]
+        b = np.where((D > 0.018) * (D < 0.1))[0]
+
+        def find_match(b, value):
+            try:
+                return b[np.max(np.where((b < value))[0])] - value
+            except ValueError:
+                return None
+
+        c = [find_match(b, A) for A in a]
+
+        ft = np.copy(D)
+
+        for idx, d in enumerate(a):
+            if c[idx] is not None:
+                if c[idx] > -100:
+                    ft[d+c[idx]] = np.median(D)
+                    ft[d] = np.median(D)
+
+        t = np.concatenate(([np.min(frame_times)], np.cumsum(ft) + np.min(frame_times)))
+
+        return t
+
+
+    def extract_frame_times_from_photodiode(self, 
+            photodiode_cycle=60, 
+            frame_keys=Dataset.FRAME_KEYS, 
+            photodiode_keys=Dataset.PHOTODIODE_KEYS,
+            trim_discontiguous_frame_times=True):
+
         photodiode_times = self.get_edges('all', photodiode_keys)
         vsync_times = self.get_edges('falling', frame_keys)
-        vsync_times = sync_utilities.trim_discontiguous_times(vsync_times)
-        
+
+        if trim_discontiguous_frame_times:
+            vsync_times = stimulus_sync.trim_discontiguous_vsyncs(vsync_times)
+
+        vsync_times_chunked, pd_times_chunked = \
+            stimulus_sync.separate_vsyncs_and_photodiode_times(vsync_times, photodiode_times, photodiode_cycle)
+
+        logging.info(f"Total chunks: {len(vsync_times_chunked)}") 
+
+        frame_start_times = np.zeros((0,))
+
+        for i in range(len(vsync_times_chunked)):
+
+            photodiode_times = stimulus_sync.trim_border_pulses(pd_times_chunked[i], vsync_times_chunked[i])
+            photodiode_times = stimulus_sync.correct_on_off_effects(photodiode_times)
+            photodiode_times = stimulus_sync.fix_unexpected_edges(photodiode_times, cycle=photodiode_cycle)
+
+            frame_duration = stimulus_sync.estimate_frame_duration(photodiode_times, cycle=photodiode_cycle)
+            irregular_interval_policy = functools.partial(stimulus_sync.allocate_by_vsync, np.diff(vsync_times_chunked[i]))
+            frame_indices, frame_starts, frame_end_times = stimulus_sync.compute_frame_times(
+                photodiode_times, frame_duration, len(vsync_times_chunked[i]), 
+                cycle=photodiode_cycle, irregular_interval_policy=irregular_interval_policy
+            )
+
+            frame_start_times = np.concatenate((frame_start_times, frame_starts))
+
+        frame_start_times = self.remove_zero_frames(frame_start_times)
+
         logging.info(f"Total vsyncs: {len(vsync_times)}")
-
-        photodiode_times = stimulus_sync.trim_border_pulses(photodiode_times, vsync_times)
-        photodiode_times = stimulus_sync.correct_on_off_effects(photodiode_times)
-        photodiode_times = stimulus_sync.fix_unexpected_edges(photodiode_times, cycle=photodiode_cycle)
-
-        frame_duration = stimulus_sync.estimate_frame_duration(photodiode_times, cycle=photodiode_cycle)
-        irregular_interval_policy = functools.partial(stimulus_sync.allocate_by_vsync, np.diff(vsync_times))
-        frame_indices, frame_start_times, frame_end_times = stimulus_sync.compute_frame_times(
-            photodiode_times, frame_duration, len(vsync_times), 
-            cycle=photodiode_cycle, irregular_interval_policy=irregular_interval_policy
-        )
 
         return frame_start_times
 
@@ -82,12 +129,14 @@ class EcephysSyncDataset(Dataset):
 
 
     def extract_frame_times(self, strategy, photodiode_cycle=60, 
-        frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS
+        frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS,
+        trim_discontiguous_frame_times=True
     ):
 
         if strategy == 'use_photodiode':
             return self.extract_frame_times_from_photodiode(
-                photodiode_cycle=photodiode_cycle, frame_keys=frame_keys, photodiode_keys=photodiode_keys
+                photodiode_cycle=photodiode_cycle, frame_keys=frame_keys, photodiode_keys=photodiode_keys,
+                trim_discontiguous_frame_times=trim_discontiguous_frame_times
                 )
         elif strategy == 'use_vsyncs':
             return self.extract_frame_times_from_vsyncs(

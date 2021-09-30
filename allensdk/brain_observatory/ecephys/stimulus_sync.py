@@ -16,6 +16,54 @@ def trimmed_stats(data, pctiles=(10, 90)):
     return np.mean(trimmed), np.std(trimmed)
     
 
+def trim_discontiguous_vsyncs(vs_times, photodiode_cycle=60):
+    vs_times = np.array(vs_times)
+
+    breaks = np.where(np.diff(vs_times) > (1/photodiode_cycle)*100)[0]
+
+
+    if len(breaks) > 0:
+        chunk_sizes = np.diff(np.concatenate((np.array([0,]),
+                                              breaks, 
+                                              np.array([len(vs_times),]))))
+        largest_chunk = np.argmax(chunk_sizes)
+
+        if largest_chunk == 0:
+            return vs_times[:np.min(breaks+1)]
+        elif largest_chunk == len(breaks):
+            return vs_times[np.max(breaks+1):]
+        else:
+            return vs_times[breaks[largest_chunk-1]:breaks[largest_chunk]]
+    else:
+        return vs_times
+
+
+def separate_vsyncs_and_photodiode_times(vs_times, pd_times, photodiode_cycle=60):
+
+    vs_times = np.array(vs_times)
+    pd_times = np.array(pd_times)
+
+    breaks = np.where(np.diff(vs_times) > (1/photodiode_cycle)*100)[0]
+
+    shift = 2.0
+    break_times = [-shift]
+    break_times.extend(vs_times[breaks].tolist())
+    break_times.extend([np.inf])
+
+    vs_times_out = []
+    pd_times_out = []
+
+    for indx, b in enumerate(break_times[:-1]):
+
+        pd_in_range = np.where((pd_times > break_times[indx] + shift) * (pd_times <= break_times[indx+1] + shift))[0]
+        vs_in_range = np.where((vs_times > break_times[indx]) * (vs_times <= break_times[indx+1]))[0]
+
+        vs_times_out.append(vs_times[vs_in_range])
+        pd_times_out.append(pd_times[pd_in_range])
+
+    return vs_times_out, pd_times_out
+    
+
 def trim_border_pulses(pd_times, vs_times, frame_interval=1/60, num_frames=5):
     pd_times = np.array(pd_times)
     return pd_times[np.logical_and(

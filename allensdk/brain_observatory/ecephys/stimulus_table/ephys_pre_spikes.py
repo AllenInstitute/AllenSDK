@@ -246,7 +246,12 @@ def read_stimulus_name_from_path(stimulus):
 
     """
 
-    return stimulus["stim_path"].split("\\")[-1].split(".")[0]
+    stim_name = stimulus["stim_path"].split("\\")[-1].split(".")[0]
+
+    if len(stim_name) == 0:
+        stim_name = stimulus["stim_path"].split("\\\\")[-2]
+
+    return stim_name
 
 
 def build_stimuluswise_table(

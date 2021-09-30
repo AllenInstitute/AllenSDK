@@ -40,8 +40,12 @@ def validate_max_spontaneous_epoch_duration(
     durations = (
         spontaneous_epochs[end_key].values - spontaneous_epochs[start_key].values
     )
-    if np.amax(durations) > max_duration:
-        warnings.warn(
-            f"there is a spontaneous activity duration longer than {max_duration}",
-            UserWarning,
-        )
+
+    try:
+        if np.amax(durations) > max_duration:
+           warnings.warn(
+               f"there is a spontaneous activity duration longer than {max_duration}",
+              UserWarning,
+          )
+    except ValueError:
+        warnings.warn(f"No spontaneous intervals detected.", UserWarning)

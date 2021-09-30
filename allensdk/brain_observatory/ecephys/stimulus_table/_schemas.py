@@ -9,6 +9,7 @@ from . import naming_utilities as nu
 
 default_stimulus_renames = {
     "": "spontaneous",
+    "blank_stimulus" : "spontaneous",
 
     "natural_movie_1" : "natural_movie_one",
     "natural_movie_3" : "natural_movie_three",
@@ -27,7 +28,7 @@ default_stimulus_renames = {
     "signal_noise_test_0_200_repeats": "test_movie_one",
 
     "signal_noise_test_0": "test_movie_one",
-    "signal_noise_test_0": "test_movie_two",
+    "signal_noise_test_1": "test_movie_two",
     "signal_noise_session_1" : "dense_movie_one",
     "signal_noise_session_2" : "dense_movie_two",
     "signal_noise_session_3" : "dense_movie_three",
@@ -95,6 +96,11 @@ class InputParameters(ArgSchema):
     fail_on_negative_duration = Bool(
         default=False,
         help="Determine if the module should fail if a stimulus epoch has a negative duration."
+    )
+
+    trim_discontiguous_frame_times = Bool(
+        default=True,
+        help="set to False if stimulus was shown in chunks, and discontiguous vsyncs are expected"
     )
 
 

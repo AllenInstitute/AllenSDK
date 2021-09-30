@@ -174,6 +174,7 @@ def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
     table[stim_colname] = table[stim_colname].replace(
         to_replace=name_map, inplace=False
     )
+ 
     return table
 
 
