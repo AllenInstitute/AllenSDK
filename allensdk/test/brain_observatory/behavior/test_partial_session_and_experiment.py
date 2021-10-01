@@ -1,7 +1,7 @@
 """
-This script contains tests to ensure that behavior_sessions that are
-missing data objects return empty DataFrames with the same columns
-as completely populated behavior_session
+This script contains tests to ensure that behavior_sessions and
+ophys_experiments that are missing data objects return empty DataFrames
+with the the expected column and index names
 """
 import pytest
 import pandas as pd
@@ -34,8 +34,13 @@ def dataframes_same_shape(df1: pd.DataFrame,
 def test_empty_behavior_session(
         empty_behavior_session_fixture):
     """
-    Writing one massive test because instantiating the fixtures
-    is apparently expensive
+    Test that a BehaviorSession that is missing data objects returns
+    an empty dataframe with the expected column names. This test specifies
+    the column names by hand. There is an on-premises test that will
+    instantiate a complete BehaviorSession from_lims and verify
+    that the empty behavior session has the same column names
+    as the complete one (in case we end up changing the schema
+    in the API later on)
     """
 
     assert empty_behavior_session_fixture.licks.index.name is None
@@ -100,54 +105,60 @@ def test_empty_behavior_session(
 
 @pytest.mark.requires_bamboo
 def test_compare_session_from_lims(empty_behavior_session_fixture):
-
+    """
+    Coompare a complete BehaviorSession instnatiated from LIMS with an
+    empty one to make sure their constituent data objects have the
+    same schemas
+    """
     good_session_id = 948206919  # session with all data objects
-    good_session = BehaviorSession.from_lims(
+    baseline_session = BehaviorSession.from_lims(
                                      behavior_session_id=good_session_id)
+    test_session = empty_behavior_session_fixture
 
     # make sure that the empty session has dataframes with the same
     # column names as the complete session
-    assert len(good_session.licks) > 0
-    dataframes_same_shape(
-        good_session.licks,
-        empty_behavior_session_fixture.licks)
+    for df_pair in [(baseline_session.licks, test_session.licks),
+                    (baseline_session.raw_running_speed,
+                     test_session.raw_running_speed),
+                    (baseline_session.rewards, test_session.rewards),
+                    (baseline_session.running_speed,
+                     test_session.running_speed),
+                    (baseline_session.stimulus_presentations,
+                     test_session.stimulus_presentations),
+                    (baseline_session.stimulus_templates,
+                     test_session.stimulus_templates),
+                    (baseline_session.trials, test_session.trials)]:
 
-    assert len(good_session.raw_running_speed) > 0
-    dataframes_same_shape(
-        good_session.raw_running_speed,
-        empty_behavior_session_fixture.raw_running_speed)
+        baseline_df = df_pair[0]
+        test_df = df_pair[1]
+        assert len(baseline_df) > 0
+        assert len(test_df) == 0
+        dataframes_same_shape(test_df, baseline_df)
 
-    assert len(good_session.rewards) > 0
-    dataframes_same_shape(
-        good_session.rewards,
-        empty_behavior_session_fixture.rewards)
+    for obj_pair in [(baseline_session.stimulus_timestamps,
+                      test_session.stimulus_timestamps),
+                     (baseline_session.task_parameters,
+                      test_session.task_parameters),
+                     (baseline_session.metadata,
+                      test_session.metadata)]:
 
-    assert len(good_session.running_speed) > 0
-    dataframes_same_shape(
-        good_session.running_speed,
-        empty_behavior_session_fixture.running_speed)
-
-    assert len(good_session.stimulus_presentations) > 0
-    dataframes_same_shape(
-        good_session.stimulus_presentations,
-        empty_behavior_session_fixture.stimulus_presentations)
-
-    assert len(good_session.stimulus_templates) > 0
-    dataframes_same_shape(
-        good_session.stimulus_templates,
-        empty_behavior_session_fixture.stimulus_templates)
-
-    assert len(good_session.trials) > 0
-    dataframes_same_shape(
-        good_session.trials,
-        empty_behavior_session_fixture.trials)
+        baseline_obj = obj_pair[0]
+        test_obj = obj_pair[1]
+        assert len(baseline_obj) > 0
+        assert len(test_obj) == 0
+        assert isinstance(test_obj, type(baseline_obj))
 
 
 def test_empty_ophys_experiment(
         empty_ophys_experiment_fixture):
     """
-    Writing one massive test because instantiating the fixtures
-    is apparently expensive
+    Test that a BehaviorOphysExperiment that is missing data objects returns
+    an empty dataframe with the expected column names. This test specifies
+    the column names by hand. There is an on-premises test that will
+    instantiate a complete BehaviorOphysExperiment from_lims and verify
+    that the empty behavior session has the same column names
+    as the complete one (in case we end up changing the schema
+    in the API later on)
     """
 
     df = empty_ophys_experiment_fixture.cell_specimen_table
@@ -271,6 +282,11 @@ def test_empty_ophys_experiment(
 @pytest.mark.requires_bamboo
 def test_compare_ophys_exp_from_lims(
         empty_ophys_experiment_fixture):
+    """
+    Coompare a complete BehaviorOphysExperiment instnatiated from LIMS
+    with an empty one to make sure their constituent data objects have
+    the same schemas
+    """
 
     baseline_exp = BehaviorOphysExperiment.from_lims(
                           ophys_experiment_id=953443028)
