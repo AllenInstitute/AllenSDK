@@ -760,7 +760,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Timestamps associated with stimulus presentations on the monitor
         """
         if self._stimulus_timestamps is None:
-            return np.ndarray([])
+            return np.ones(0)
 
         return self._stimulus_timestamps.value
 
