@@ -2,7 +2,6 @@ import datetime
 import os
 import sys
 
-import numpy as np
 import pytest
 import pytz
 
@@ -109,8 +108,7 @@ def behavior_stimuli_data_fixture(request):
 
 
 @pytest.fixture
-def empty_behavior_session_fixture(
-        ):
+def empty_behavior_session_fixture():
     """
     An example of a BehaviorSession in which all data objects are passed in as
     None

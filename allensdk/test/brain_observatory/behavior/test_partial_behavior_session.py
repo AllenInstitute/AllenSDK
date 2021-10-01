@@ -161,7 +161,7 @@ def test_empty_ophys_experiment(
 
     df = empty_ophys_experiment_fixture.corrected_fluorescence_traces
     assert df.index.name == 'cell_specimen_id'
-    expected = set (['cell_roi_id', 'corrected_fluorescence'])
+    expected = set(['cell_roi_id', 'corrected_fluorescence'])
     actual = set(df.columns)
     assert actual == expected
 
@@ -273,7 +273,7 @@ def test_compare_ophys_exp_from_lims(
         empty_ophys_experiment_fixture):
 
     baseline_exp = BehaviorOphysExperiment.from_lims(
-                          ophys_experiment_id = 953443028)
+                          ophys_experiment_id=953443028)
     test_exp = empty_ophys_experiment_fixture
 
     assert not baseline_exp.max_projection == test_exp.max_projection
@@ -292,7 +292,7 @@ def test_compare_ophys_exp_from_lims(
     assert not np.array_equal(baseline_exp.ophys_timestamps,
                               test_exp.ophys_timestamps)
     assert isinstance(test_exp.ophys_timestamps,
-                       type(baseline_exp.ophys_timestamps))
+                      type(baseline_exp.ophys_timestamps))
 
     for df_pair in [(baseline_exp.cell_specimen_table,
                      test_exp.cell_specimen_table),
