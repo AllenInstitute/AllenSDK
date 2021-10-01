@@ -55,8 +55,6 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 'volume': volume, 'timestamps': time,
                 'autorewarded': autorewarded})
         else:
-            warnings.warn("This session "
-                          f"'{int(nwbfile.identifier)}' has no rewards data.")
             return None
         return cls(rewards=df)
 

@@ -92,8 +92,6 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 'frame': licks.data[:]
             })
         else:
-            warnings.warn("This session "
-                          f"'{int(nwbfile.identifier)}' has no rewards data.")
             return None
         return cls(licks=df)
 
