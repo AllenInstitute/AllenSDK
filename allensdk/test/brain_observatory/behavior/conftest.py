@@ -1,22 +1,9 @@
-import datetime
 import os
 import sys
 
 import pytest
-import pytz
 
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    metadata.behavior_metadata.date_of_acquisition import (
-        DateOfAcquisition)
-
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
 
 
 def get_resources_dir():
