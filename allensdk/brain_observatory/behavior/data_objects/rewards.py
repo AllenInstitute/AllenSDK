@@ -1,4 +1,3 @@
-import warnings
 from typing import Optional
 
 import pandas as pd
@@ -51,16 +50,25 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
             time = rewards.get_data_interface('autorewarded').timestamps[:]
             autorewarded = rewards.get_data_interface('autorewarded').data[:]
             volume = rewards.get_data_interface('volume').data[:]
-            df = pd.DataFrame({
-                'volume': volume, 'timestamps': time,
-                'autorewarded': autorewarded})
         else:
-            warnings.warn("This session "
-                          f"'{int(nwbfile.identifier)}' has no rewards data.")
-            return None
+            volume = []
+            time = []
+            autorewarded = []
+
+        df = pd.DataFrame({
+                'volume': volume,
+                'timestamps': time,
+                'autorewarded': autorewarded})
         return cls(rewards=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is no rewards data, do not
+        # write anything to the NWB file (this
+        # is expected for passive sessions)
+        if len(self.value['timestamps']) == 0:
+            return nwbfile
+
         reward_volume_ts = TimeSeries(
             name='volume',
             data=self.value['volume'].values,
