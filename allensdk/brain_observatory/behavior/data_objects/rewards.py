@@ -50,11 +50,15 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
             time = rewards.get_data_interface('autorewarded').timestamps[:]
             autorewarded = rewards.get_data_interface('autorewarded').data[:]
             volume = rewards.get_data_interface('volume').data[:]
-            df = pd.DataFrame({
-                'volume': volume, 'timestamps': time,
-                'autorewarded': autorewarded})
         else:
-            return None
+            volume = []
+            time = []
+            autorewarded = []
+
+        df = pd.DataFrame({
+                'volume': volume,
+                'timestamps': time,
+                'autorewarded': autorewarded})
         return cls(rewards=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:

@@ -52,10 +52,6 @@ from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.internal.api import db_connection_creator
 
-from allensdk.brain_observatory.behavior.data_objects.utils import (
-    create_empty_dataframe,
-    create_empty_image)
-
 
 class BehaviorOphysExperiment(BehaviorSession):
     """Represents data from a single Visual Behavior Ophys imaging session.
@@ -510,8 +506,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """2D max projection image.
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        if self._projections is None:
-            return create_empty_image()
         return self._projections.max_projection
 
     @property
@@ -520,8 +514,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         experiment
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        if self._projections is None:
-            return create_empty_image()
         return self._projections.avg_projection
 
     @property
@@ -529,8 +521,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        if self._ophys_timestamps is None:
-            return np.ones(0)
         return self._ophys_timestamps.value
 
     @property
@@ -555,11 +545,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                     (arbitrary units)
 
         """
-        if self._cell_specimens is None:
-            df = create_empty_dataframe(['cell_roi_id', 'dff'],
-                                        'cell_specimen_id')
-            return df
-
         return self._cell_specimens.dff_traces
 
     @property
@@ -594,13 +579,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                 estimated noise standard deviation for the events trace
 
         """
-        if self._cell_specimens is None:
-            df = create_empty_dataframe(
-                    ['cell_roi_id', 'events', 'filtered_events',
-                     'lambda', 'noise_std'],
-                    'cell_specimen_id')
-            return df
-
         return self._cell_specimens.events
 
     @property
@@ -647,15 +625,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                     y position of ROI in field of view in pixels (top
                     left corner)
         """
-        if self._cell_specimens is None:
-            df = create_empty_dataframe(
-                    ['cell_roi_id', 'height', 'mask_image_plane',
-                     'max_correction_down', 'max_correction_left',
-                     'max_correction_right', 'max_correction_up',
-                     'valid_roi', 'width', 'x', 'y', 'roi_mask'],
-                    'cell_specimen_id')
-            return df
-
         return self._cell_specimens.table
 
     @property
@@ -681,12 +650,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                     fluorescence values (arbitrary units)
 
         """
-        if self._cell_specimens is None:
-            df = create_empty_dataframe(
-                ['cell_roi_id', 'corrected_fluorescence'],
-                'cell_specimen_id')
-            return df
-
         return self._cell_specimens.corrected_fluorescence_traces
 
     @property
@@ -703,11 +666,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                 y: (int)
                     frame shift along y axis
         """
-        if self._motion_correction is None:
-            df = create_empty_dataframe(
-                      ['x', 'y'], None)
-            return df
-
         return self._motion_correction.value
 
     @property
@@ -715,8 +673,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         """A 2d binary image of all valid cell masks
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        if self._cell_specimens is None:
-            return create_empty_image()
         return self._cell_specimens.segmentation_mask_image
 
     @property
@@ -755,19 +711,6 @@ class BehaviorOphysExperiment(BehaviorSession):
 
         :rtype: pandas.DataFrame
         """
-        if self._eye_tracking is None:
-            df = create_empty_dataframe(
-                       ['timestamps', 'cr_area', 'eye_area',
-                        'pupil_area', 'likely_blink', 'pupil_area_raw',
-                        'cr_area_raw', 'eye_area_raw', 'cr_center_x',
-                        'cr_center_y', 'cr_width', 'cr_height', 'cr_phi',
-                        'eye_center_x', 'eye_center_y', 'eye_width',
-                        'eye_height', 'eye_phi', 'pupil_center_x',
-                        'pupil_center_y', 'pupil_width', 'pupil_height',
-                        'pupil_phi'],
-                       'frame')
-            return df
-
         return self._eye_tracking.value
 
     @property
@@ -786,9 +729,6 @@ class BehaviorOphysExperiment(BehaviorSession):
                 monitor_position_mm (array of float)
                 monitor_rotation_deg (array of float)
         """
-        if self._eye_tracking_rig_geometry is None:
-            return dict()
-
         return self._eye_tracking_rig_geometry.to_dict()['rig_geometry']
 
     @property

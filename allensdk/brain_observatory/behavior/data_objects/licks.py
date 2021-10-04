@@ -85,13 +85,17 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         if 'licking' in nwbfile.processing:
             lick_module = nwbfile.processing['licking']
             licks = lick_module.get_data_interface('licks')
-
-            df = pd.DataFrame({
-                'timestamps': licks.timestamps[:],
-                'frame': licks.data[:]
-            })
+            timestamps = licks.timestamps[:]
+            frame = licks.data[:]
         else:
-            return None
+            timestamps = []
+            frame = []
+
+        df = pd.DataFrame({
+            'timestamps': timestamps,
+            'frame': frame
+        })
+
         return cls(licks=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:

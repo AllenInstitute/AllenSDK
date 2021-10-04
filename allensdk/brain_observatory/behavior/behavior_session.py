@@ -40,9 +40,6 @@ from allensdk.brain_observatory.behavior.data_objects import (
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 
-from allensdk.brain_observatory.behavior.data_objects.utils import (
-    create_empty_dataframe)
-
 
 class BehaviorSession(DataObject, LimsReadableInterface,
                       NwbReadableInterface,
@@ -570,11 +567,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     frame of lick
 
         """
-        if self._licks is None:
-            df = create_empty_dataframe(['timestamps', 'frame'],
-                                        None)
-            return df
-
         return self._licks.value
 
     @property
@@ -605,11 +597,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     throughout as needed
 
         """
-        if self._rewards is None:
-            df = create_empty_dataframe(
-                    ['volume', 'timestamps', 'autorewarded'], None)
-            return df
-
         return self._rewards.value
 
     @property
@@ -633,10 +620,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 speed: (float)
                     speed in cm/sec
         """
-        if self._running_speed is None:
-            df = create_empty_dataframe(['timestamps', 'speed'], None)
-            return df
-
         return self._running_speed.value
 
     @property
@@ -658,11 +641,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 speed: (float)
                     speed in cm/sec
         """
-        if self._raw_running_speed is None:
-            df = create_empty_dataframe(['timestamps', 'speed'],
-                                        None)
-            return df
-
         return self._raw_running_speed.value
 
     @property
@@ -704,16 +682,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stop_time: (float)
                     image presentation end time in seconds
         """
-        if self._stimuli is None:
-            df = create_empty_dataframe(
-                   ['start_time', 'stop_time', 'duration',
-                    'image_name', 'image_index', 'is_change',
-                    'omitted', 'start_frame', 'end_frame',
-                    'image_set'],
-                   'stimulus_presentations_id')
-
-            return df
-
         return self._stimuli.presentations.value
 
     @property
@@ -736,11 +704,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     image array of warped stimulus image
 
         """
-        if self._stimuli is None:
-            df = create_empty_dataframe(['unwarped', 'warped'],
-                                        'image_name')
-            return df
-
         return self._stimuli.templates.value.to_dataframe()
 
     @property
@@ -759,9 +722,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         np.ndarray
             Timestamps associated with stimulus presentations on the monitor
         """
-        if self._stimulus_timestamps is None:
-            return np.ones(0)
-
         return self._stimulus_timestamps.value
 
     @property
@@ -810,9 +770,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     Stimulus type ('gratings' or 'images').
 
         """
-        if self._task_parameters is None:
-            return dict()
-
         return self._task_parameters.to_dict()['task_parameters']
 
     @property
@@ -883,19 +840,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     name of image that is changed to at the change time,
                     on go trials
         """
-        if self._trials is None:
-            df = create_empty_dataframe(
-                    ['start_time', 'stop_time', 'lick_times',
-                     'reward_time', 'reward_volume', 'hit',
-                     'false_alarm', 'miss', 'stimulus_change',
-                     'aborted', 'go', 'catch', 'auto_rewarded',
-                     'correct_reject', 'trial_length', 'response_time',
-                     'change_frame', 'change_time', 'response_latency',
-                     'initial_image_name', 'change_image_name'],
-                    'trials_id')
-
-            return df
-
         return self._trials.value
 
     @property
@@ -937,8 +881,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
-        if self._metadata is None:
-            return dict()
         return self._get_metadata(behavior_metadata=self._metadata)
 
     @classmethod
