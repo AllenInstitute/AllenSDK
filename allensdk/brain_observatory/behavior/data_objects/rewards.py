@@ -62,6 +62,13 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         return cls(rewards=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is no rewards data, do not
+        # write anything to the NWB file (this
+        # is expected for passive sessions)
+        if len(self.value['timestamps']) == 0:
+            return nwbfile
+
         reward_volume_ts = TimeSeries(
             name='volume',
             data=self.value['volume'].values,

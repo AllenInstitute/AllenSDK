@@ -99,6 +99,13 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         return cls(licks=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is no lick data, do not write
+        # anything to the NWB file (this is
+        # expected for passive sessions)
+        if len(self.value['frame']) == 0:
+            return nwbfile
+
         lick_timeseries = TimeSeries(
             name='licks',
             data=self.value['frame'].values,
