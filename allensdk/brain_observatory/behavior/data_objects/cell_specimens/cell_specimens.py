@@ -70,7 +70,7 @@ class CellSpecimenMeta(DataObject, LimsReadableInterface,
                        JsonReadableInterface, NwbReadableInterface):
     """Cell specimen metadata"""
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
-        super().__init__(name='cell_spcimen_meta', value=self)
+        super().__init__(name='cell_specimen_meta', value=self)
         self._emission_lambda = emission_lambda
         self._imaging_plane = imaging_plane
 
