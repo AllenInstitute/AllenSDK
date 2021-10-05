@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.2] = TBD
+
 ## [2.13.1] = 2021-10-04
 - Fixes bug that was preventing the BehaviorSession from properly instantiating passive sessions.
 
