@@ -110,7 +110,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   ophys_experiment_id: int,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
-                  events_filter_scale: float = 2.0,
+                  events_filter_scale: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
                   skip_eye_tracking=False) -> \
@@ -227,7 +227,7 @@ class BehaviorOphysExperiment(BehaviorSession):
     def from_nwb(cls, nwbfile: NWBFile,
                  eye_tracking_z_threshold: float = 3.0,
                  eye_tracking_dilation_frames: int = 2,
-                 events_filter_scale: float = 2.0,
+                 events_filter_scale: float = 2.0/31.0,
                  events_filter_n_time_steps: int = 20,
                  exclude_invalid_rois=True
                  ) -> "BehaviorOphysExperiment":
@@ -247,7 +247,7 @@ class BehaviorOphysExperiment(BehaviorSession):
         events_filter_scale : float, optional
             Stdev of halfnorm distribution used to convolve ophys events with
             a 1d causal half-gaussian filter to smooth it for visualization,
-            by default 2.0
+            in seconds (by default 2.0/31.0).
         events_filter_n_time_steps : int, optional
             Number of time steps to use for convolution of ophys events
         exclude_invalid_rois
@@ -303,7 +303,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   session_data: dict,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
-                  events_filter_scale: float = 2.0,
+                  events_filter_scale: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
                   skip_eye_tracking=False) -> \
