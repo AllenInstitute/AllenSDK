@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.1] = 2021-10-04
+- Fixes bug that was preventing the BehaviorSession from properly instantiating passive sessions.
+
 ## [2.13.0] = 2021-09-22
 - Major internal refactor to BehaviorSession, BehaviorOphysExperiment classes. Implements DataObject pattern for fetching and serialization of data.
 
