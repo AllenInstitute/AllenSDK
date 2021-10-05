@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         image: ["allensdk_local_py37:latest"]
-        branch: ["master", "rc/2.13.1"]
+        branch: ["master", "rc/2.13.2"]
     steps:
       - uses: actions/checkout@v2
         with:
