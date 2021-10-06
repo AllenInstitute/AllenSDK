@@ -36,9 +36,9 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
     def __init__(self,
                  events: np.ndarray,
                  events_meta: pd.DataFrame,
+                 frame_rate: float,
                  filter_scale: float = 2.0/31.0,
-                 filter_n_time_steps: int = 20,
-                 frame_rate: Optional[float] = None):
+                 filter_n_time_steps: int = 20):
         """
         Parameters
         ----------
@@ -46,18 +46,14 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
             events
         events_meta
             lambda, noise_std, cell_roi_id for each roi
+        frame_rate
+            The frame rate of the experiment in Hz;
+            filter_scale for filter_events_array is filter_scale*frame_rate
         filter_scale
             The filter scale for the events in seconds
         filter_n_time_steps
             See filter_events_array for description
-        frame_rate
-            The frame rate of the experiment in Hz;
-            filter_scale for filter_events_array is filter_scale*frame_rate
         """
-
-        if frame_rate is None:
-            msg = 'Cannot filter events without specifying a frame_rate'
-            raise RuntimeError(msg)
 
         filtered_events = filter_events_array(
             arr=events,
