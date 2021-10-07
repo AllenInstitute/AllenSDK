@@ -16,6 +16,7 @@ class Trial:
                  stimulus_timestamps: StimulusTimestamps,
                  licks: Licks, rewards: Rewards, stimuli: dict):
         self._trial = trial
+        #print(f'trial keys {self._trial.keys()}')
         self._start = start
         self._end = self._calculate_trial_end(
             trial_end=end, behavior_stimulus_file=behavior_stimulus_file)
@@ -285,10 +286,10 @@ class Trial:
         response_time = _get_response_time(licks, aborted)
 
         if go or auto_rewarded:
-            change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+            change_frame = event_dict.get(('stimulus_changed', ''))['frame']+1
             change_time = timestamps[change_frame]
         elif catch:
-            change_frame = event_dict.get(('sham_change', ''))['frame']
+            change_frame = event_dict.get(('sham_change', ''))['frame']+1
             change_time = timestamps[change_frame]
         else:
             change_time = float("nan")

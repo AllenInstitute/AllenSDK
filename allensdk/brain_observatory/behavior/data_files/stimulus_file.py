@@ -66,6 +66,7 @@ class StimulusFile(DataFile):
             behavior_session_id=behavior_session_id
         )
         filepath = db.fetchone(query, strict=True)
+        print(f'stimulus file path: {filepath}')
         return cls(filepath=filepath)
 
     @staticmethod
