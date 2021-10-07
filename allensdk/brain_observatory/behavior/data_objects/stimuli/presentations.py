@@ -102,10 +102,6 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         """
         stimulus_timestamps = stimulus_timestamps.value
         data = stimulus_file.data
-
-        print('stimulus data')
-        print(data.keys())
-
         raw_stim_pres_df = get_stimulus_presentations(
             data, stimulus_timestamps)
 
