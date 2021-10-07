@@ -160,19 +160,27 @@ class BehaviorOphysExperiment(BehaviorSession):
         lims_db = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         )
-        sync_file = SyncFile.from_lims(db=lims_db,
-                                       ophys_experiment_id=ophys_experiment_id)
-        stimulus_timestamps = StimulusTimestamps.from_sync_file(
-            sync_file=sync_file)
-        behavior_session_id = BehaviorSessionId.from_lims(
-            db=lims_db, ophys_experiment_id=ophys_experiment_id)
+
         is_multiplane_session = _is_multi_plane_session()
+
         meta = BehaviorOphysMetadata.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             is_multiplane=is_multiplane_session
         )
+
+
+        sync_file = SyncFile.from_lims(db=lims_db,
+                                       ophys_experiment_id=ophys_experiment_id)
+
         monitor_delay = calculate_monitor_delay(
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
+
+        stimulus_timestamps = StimulusTimestamps.from_sync_file(
+            sync_file=sync_file,
+            monitor_delay=monitor_delay)
+
+        behavior_session_id = BehaviorSessionId.from_lims(
+            db=lims_db, ophys_experiment_id=ophys_experiment_id)
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         behavior_session = BehaviorSession.from_lims(
