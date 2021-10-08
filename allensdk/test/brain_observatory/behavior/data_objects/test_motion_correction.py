@@ -98,7 +98,7 @@ class TestNWB:
                 dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
                 events_params=EventsParams(
-                               filter_scale=2.0/31.0,
+                               filter_scale_seconds=2.0/31.0,
                                filter_n_time_steps=20))
             csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
 

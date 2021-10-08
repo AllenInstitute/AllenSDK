@@ -110,7 +110,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   ophys_experiment_id: int,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
-                  events_filter_scale: float = 2.0/31.0,
+                  events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
                   skip_eye_tracking=False) -> \
@@ -123,7 +123,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         eye_tracking_dilation_frames
             See `BehaviorOphysExperiment.from_nwb`
-        events_filter_scale
+        events_filter_scale_seconds
             See `BehaviorOphysExperiment.from_nwb`
         events_filter_n_time_steps
             See `BehaviorOphysExperiment.from_nwb`
@@ -198,7 +198,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=projections.max_projection.spacing,
             events_params=EventsParams(
-                filter_scale=events_filter_scale,
+                filter_scale_seconds=events_filter_scale_seconds,
                 filter_n_time_steps=events_filter_n_time_steps),
             exclude_invalid_rois=exclude_invalid_rois
         )
@@ -227,7 +227,7 @@ class BehaviorOphysExperiment(BehaviorSession):
     def from_nwb(cls, nwbfile: NWBFile,
                  eye_tracking_z_threshold: float = 3.0,
                  eye_tracking_dilation_frames: int = 2,
-                 events_filter_scale: float = 2.0/31.0,
+                 events_filter_scale_seconds: float = 2.0/31.0,
                  events_filter_n_time_steps: int = 20,
                  exclude_invalid_rois=True
                  ) -> "BehaviorOphysExperiment":
@@ -244,10 +244,11 @@ class BehaviorOphysExperiment(BehaviorSession):
             Determines the number of adjacent frames that will be marked
             as 'likely_blink' when performing blink detection for
             `eye_tracking` data, by default 2
-        events_filter_scale : float, optional
+        events_filter_scale_seconds : float, optional
             Stdev of halfnorm distribution used to convolve ophys events with
             a 1d causal half-gaussian filter to smooth it for visualization,
-            in seconds (by default 2.0/31.0).
+            in seconds (by default 2.0/31.0; this value has been found to
+            perform well on Allen Institute data across multiple platforms).
         events_filter_n_time_steps : int, optional
             Number of time steps to use for convolution of ophys events
         exclude_invalid_rois
@@ -265,7 +266,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             nwbfile=nwbfile,
             segmentation_mask_image_spacing=projections.max_projection.spacing,
             events_params=EventsParams(
-                filter_scale=events_filter_scale,
+                filter_scale_seconds=events_filter_scale_seconds,
                 filter_n_time_steps=events_filter_n_time_steps
             ),
             exclude_invalid_rois=exclude_invalid_rois
@@ -303,7 +304,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   session_data: dict,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2,
-                  events_filter_scale: float = 2.0/31.0,
+                  events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
                   skip_eye_tracking=False) -> \
@@ -317,7 +318,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         eye_tracking_dilation_frames
             See `BehaviorOphysExperiment.from_nwb`
-        events_filter_scale
+        events_filter_scale_seconds
             See `BehaviorOphysExperiment.from_nwb`
         events_filter_n_time_steps
             See `BehaviorOphysExperiment.from_nwb`
@@ -377,7 +378,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             ophys_timestamps=ophys_timestamps,
             segmentation_mask_image_spacing=projections.max_projection.spacing,
             events_params=EventsParams(
-                filter_scale=events_filter_scale,
+                filter_scale_seconds=events_filter_scale_seconds,
                 filter_n_time_steps=events_filter_n_time_steps),
             exclude_invalid_rois=exclude_invalid_rois
         )

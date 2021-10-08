@@ -46,20 +46,20 @@ class EventsParams:
     """Container for arguments to event detection"""
 
     def __init__(self,
-                 filter_scale: float = 2.0/31.0,
+                 filter_scale_seconds: float = 2.0/31.0,
                  filter_n_time_steps: int = 20):
         """
-        :param filter_scale
-            See Events.filter_scale
+        :param filter_scale_seconds
+            See Events.filter_scale_seconds
         :param filter_n_time_steps
             See Events.filter_n_time_steps
         """
-        self._filter_scale = filter_scale
+        self._filter_scale_seconds = filter_scale_seconds
         self._filter_n_time_steps = filter_n_time_steps
 
     @property
-    def filter_scale(self):
-        return self._filter_scale
+    def filter_scale_seconds(self):
+        return self._filter_scale_seconds
 
     @property
     def filter_n_time_steps(self):
@@ -291,7 +291,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return cls._get_events(
                          events_file=events_file,
                          events_params=events_params,
-                         frame_rate=meta.imaging_plane.ophys_frame_rate)
+                         frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
 
         cell_specimen_table = _get_cell_specimen_table()
 
@@ -343,7 +343,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return cls._get_events(
                         events_file=events_file,
                         events_params=events_params,
-                        frame_rate=meta.imaging_plane.ophys_frame_rate)
+                        frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
 
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
@@ -397,9 +397,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         def _get_events():
             return Events.from_nwb(
                 nwbfile=nwbfile,
-                filter_scale=events_params.filter_scale,
+                filter_scale_seconds=events_params.filter_scale_seconds,
                 filter_n_time_steps=events_params.filter_n_time_steps,
-                frame_rate=meta.imaging_plane.ophys_frame_rate)
+                frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
 
         events = _get_events()
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
@@ -606,9 +606,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     @staticmethod
     def _get_events(events_file: EventDetectionFile,
                     events_params: EventsParams,
-                    frame_rate: float):
+                    frame_rate_hz: float):
         return Events.from_data_file(
             events_file=events_file,
-            filter_scale=events_params.filter_scale,
+            filter_scale_seconds=events_params.filter_scale_seconds,
             filter_n_time_steps=events_params.filter_n_time_steps,
-            frame_rate=frame_rate)
+            frame_rate_hz=frame_rate_hz)

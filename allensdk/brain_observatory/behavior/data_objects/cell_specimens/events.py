@@ -36,8 +36,8 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
     def __init__(self,
                  events: np.ndarray,
                  events_meta: pd.DataFrame,
-                 frame_rate: float,
-                 filter_scale: float = 2.0/31.0,
+                 frame_rate_hz: float,
+                 filter_scale_seconds: float = 2.0/31.0,
                  filter_n_time_steps: int = 20):
         """
         Parameters
@@ -46,10 +46,11 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
             events
         events_meta
             lambda, noise_std, cell_roi_id for each roi
-        frame_rate
+        frame_rate_hz
             The frame rate of the experiment in Hz;
-            filter_scale for filter_events_array is filter_scale*frame_rate
-        filter_scale
+            unitless filter_scale for filter_events_array
+            is filter_scale_seconds*frame_rate_hz
+        filter_scale_seconds
             The filter scale for the events in seconds
         filter_n_time_steps
             See filter_events_array for description
@@ -57,7 +58,7 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
 
         filtered_events = filter_events_array(
             arr=events,
-            scale=filter_scale*frame_rate,
+            scale=filter_scale_seconds*frame_rate_hz,
             n_time_steps=filter_n_time_steps)
 
         # Convert matrix to list of 1d arrays so that it can be stored
@@ -77,21 +78,22 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
     @classmethod
     def from_data_file(cls,
                        events_file: EventDetectionFile,
-                       filter_scale: float = 2.0/31.0,
+                       filter_scale_seconds: float = 2.0/31.0,
                        filter_n_time_steps: int = 20,
-                       frame_rate: Optional[float] = None) -> "Events":
+                       frame_rate_hz: Optional[float] = None) -> "Events":
         events, events_meta = events_file.data
-        return cls(events=events, events_meta=events_meta,
-                   filter_scale=filter_scale,
+        return cls(events=events,
+                   events_meta=events_meta,
+                   filter_scale_seconds=filter_scale_seconds,
                    filter_n_time_steps=filter_n_time_steps,
-                   frame_rate=frame_rate)
+                   frame_rate_hz=frame_rate_hz)
 
     @classmethod
     def from_nwb(cls,
                  nwbfile: NWBFile,
-                 filter_scale: float = 2.0/31.0,
+                 filter_scale_seconds: float = 2.0/31.0,
                  filter_n_time_steps: int = 20,
-                 frame_rate: Optional[float] = None) -> "Events":
+                 frame_rate_hz: Optional[float] = None) -> "Events":
         event_detection = nwbfile.processing['ophys']['event_detection']
         # NOTE: The rois with events are stored in event detection
         partial_cell_specimen_table = event_detection.rois.to_dataframe()
@@ -106,10 +108,11 @@ class Events(DataObject, RoisMixin, DataFileReadableInterface,
             'lambda': event_detection.lambdas[:],
             'noise_std': event_detection.noise_stds[:]
         })
-        return cls(events=events, events_meta=events_meta,
-                   filter_scale=filter_scale,
+        return cls(events=events,
+                   events_meta=events_meta,
+                   filter_scale_seconds=filter_scale_seconds,
                    filter_n_time_steps=filter_n_time_steps,
-                   frame_rate=frame_rate)
+                   frame_rate_hz=frame_rate_hz)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         events = self.value.set_index('cell_roi_id')

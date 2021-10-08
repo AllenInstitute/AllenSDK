@@ -61,7 +61,7 @@ class TestLims:
             ophys_timestamps=ots,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
             events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
         assert not csp.table.empty
         assert not csp.events.empty
@@ -104,7 +104,7 @@ class TestJson:
             ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
             events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
         assert not csp.table.empty
         assert not csp.events.empty
@@ -123,7 +123,7 @@ class TestJson:
             ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
             events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
         private_attr = getattr(csp, f'_{data}')
         public_attr = getattr(csp, data)
@@ -159,7 +159,7 @@ class TestJson:
             ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
             events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
         private_trace_attr = getattr(csp, f'_{trace_type}')
 
@@ -231,7 +231,7 @@ class TestNWB:
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
             exclude_invalid_rois=exclude_invalid_rois,
             events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
 
         csp = cell_specimens._cell_specimen_table
@@ -248,7 +248,7 @@ class TestNWB:
                 exclude_invalid_rois=exclude_invalid_rois,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
                 events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
         else:
             obt = cell_specimens.from_nwb(
@@ -256,7 +256,7 @@ class TestNWB:
                 exclude_invalid_rois=exclude_invalid_rois,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
                 events_params=EventsParams(
-                           filter_scale=2.0/31.0,
+                           filter_scale_seconds=2.0/31.0,
                            filter_n_time_steps=20))
 
         if exclude_invalid_rois:
