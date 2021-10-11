@@ -39,7 +39,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
 
         # If there is actually no data in this data object,
         # do not bother writing anything to the NWBFile
-        if len(self.value.index) == 0:
+        if self.value.empty:
             return nwbfile
 
         eye_tracking_df = self.value
@@ -113,8 +113,8 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
                         'pupil_phi']:
             empty_data[colname] = []
 
-        eye_tracking_data = pd.DataFrame(empty_data)
-        eye_tracking_data.index.name ='frame'
+        eye_tracking_data = pd.DataFrame(empty_data,
+                                         index=pd.Index([], name='frame'))
         return eye_tracking_data
 
     @classmethod
