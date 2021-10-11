@@ -62,7 +62,7 @@ def extract_splits_from_states(
 
 def extract_splits_from_barcode_times(
     barcode_times,
-    tolerance = 0.0001
+    tolerance=0.0001
 ):
     """Determine locations of likely dropped data from barcode times
     Parameters
@@ -80,7 +80,7 @@ def extract_splits_from_barcode_times(
     irregular_intervals = np.where(np.abs(barcode_intervals - median_interval) 
                                    > tolerance * median_interval)[0]
 
-    T_split = [0,]
+    T_split = [0]
 
     for i in irregular_intervals:
 
@@ -90,3 +90,4 @@ def extract_splits_from_barcode_times(
             T_split.append(barcode_times[i+1])
 
     return np.array(T_split)
+#

@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 UNIT_FILTER_DEFAULTS = {
     "amplitude_cutoff_maximum": {
         "value": 0.1,

@@ -1,5 +1,3 @@
-import warnings
-
 import numpy as np
 import scipy.spatial.distance as distance
 
@@ -21,11 +19,10 @@ def trim_discontiguous_vsyncs(vs_times, photodiode_cycle=60):
 
     breaks = np.where(np.diff(vs_times) > (1/photodiode_cycle)*100)[0]
 
-
     if len(breaks) > 0:
-        chunk_sizes = np.diff(np.concatenate((np.array([0,]),
+        chunk_sizes = np.diff(np.concatenate((np.array([0, ]),
                                               breaks, 
-                                              np.array([len(vs_times),]))))
+                                              np.array([len(vs_times), ]))))
         largest_chunk = np.argmax(chunk_sizes)
 
         if largest_chunk == 0:
@@ -38,7 +35,9 @@ def trim_discontiguous_vsyncs(vs_times, photodiode_cycle=60):
         return vs_times
 
 
-def separate_vsyncs_and_photodiode_times(vs_times, pd_times, photodiode_cycle=60):
+def separate_vsyncs_and_photodiode_times(vs_times, 
+                                         pd_times, 
+                                         photodiode_cycle=60):
 
     vs_times = np.array(vs_times)
     pd_times = np.array(pd_times)
@@ -55,8 +54,10 @@ def separate_vsyncs_and_photodiode_times(vs_times, pd_times, photodiode_cycle=60
 
     for indx, b in enumerate(break_times[:-1]):
 
-        pd_in_range = np.where((pd_times > break_times[indx] + shift) * (pd_times <= break_times[indx+1] + shift))[0]
-        vs_in_range = np.where((vs_times > break_times[indx]) * (vs_times <= break_times[indx+1]))[0]
+        pd_in_range = np.where((pd_times > break_times[indx] + shift) *
+                               (pd_times <= break_times[indx+1] + shift))[0]
+        vs_in_range = np.where((vs_times > break_times[indx]) * 
+                               (vs_times <= break_times[indx+1]))[0]
 
         vs_times_out.append(vs_times[vs_in_range])
         pd_times_out.append(pd_times[pd_in_range])
@@ -77,7 +78,8 @@ def correct_on_off_effects(pd_times):
     
     Notes
     -----
-    This cannot (without additional info) determine whether an assymmetric offset is odd-long or even-long.
+    This cannot (without additional info) determine whether an assymmetric 
+    offset is odd-long or even-long.
     '''
     
     pd_diff = np.diff(pd_times)    
@@ -86,7 +88,7 @@ def correct_on_off_effects(pd_times):
     
     half_diff = np.diff(pd_times[0::2])
     full_period_mean, full_period_std = trimmed_stats(half_diff)
-    half_period_mean = full_period_mean  / 2
+    half_period_mean = full_period_mean / 2
 
     odd_offset = odd_diff_mean - half_period_mean
     even_offset = even_diff_mean - half_period_mean
@@ -106,8 +108,10 @@ def flag_unexpected_edges(pd_times, ndevs=10):
         pd_diff < diff_mean - ndevs * diff_std,
         pd_diff > diff_mean + ndevs * diff_std
     )] = 0
-    expected_duration_mask[1:] = np.logical_and(expected_duration_mask[:-1], expected_duration_mask[1:])
-    expected_duration_mask = np.concatenate([expected_duration_mask, [expected_duration_mask[-1]]])
+    expected_duration_mask[1:] = np.logical_and(expected_duration_mask[:-1], 
+                                                expected_duration_mask[1:])
+    expected_duration_mask = np.concatenate([expected_duration_mask, 
+                                            [expected_duration_mask[-1]]])
     
     return expected_duration_mask
 
@@ -135,7 +139,8 @@ def fix_unexpected_edges(pd_times, ndevs=10, cycle=60, max_frame_offset=4):
         edges_missing = int(np.around((high_bound - low_bound) / diff_mean))
         expected = np.linspace(low_bound, high_bound, edges_missing + 1)
                          
-        distances = distance.cdist(current_bad_edges[:, None], expected[:, None])
+        distances = distance.cdist(current_bad_edges[:, None], 
+                                   expected[:, None])
         distances = np.around(distances / frame_interval).astype(int)
         
         min_offsets = np.amin(distances, axis=0)
@@ -143,10 +148,12 @@ def fix_unexpected_edges(pd_times, ndevs=10, cycle=60, max_frame_offset=4):
         output_edges = np.concatenate([
             output_edges,
             expected[min_offsets > max_frame_offset],
-            current_bad_edges[min_offset_indices[min_offsets <= max_frame_offset]]
+            current_bad_edges[min_offset_indices[min_offsets <= 
+                              max_frame_offset]]
         ])
                          
-    return np.sort(np.concatenate([output_edges, pd_times[expected_duration_mask > 0]]))
+    return np.sort(np.concatenate([output_edges, 
+                                   pd_times[expected_duration_mask > 0]]))
 
 
 def estimate_frame_duration(pd_times, cycle=60):
@@ -158,7 +165,13 @@ def assign_to_last(index, starts, ends, frame_duration, irregularity, cycle):
     return starts, ends
 
 
-def allocate_by_vsync(vs_diff, index, starts, ends, frame_duration, irregularity, cycle):
+def allocate_by_vsync(vs_diff, 
+                      index, 
+                      starts, 
+                      ends, 
+                      frame_duration, 
+                      irregularity, 
+                      cycle):
     current_vs_diff = vs_diff[index * cycle: (index + 1) * cycle]
     sign = np.sign(irregularity)
 
@@ -173,35 +186,49 @@ def allocate_by_vsync(vs_diff, index, starts, ends, frame_duration, irregularity
     return starts, ends
 
 
-def compute_frame_times(photodiode_times, frame_duration, num_frames, cycle, irregular_interval_policy=assign_to_last):
+def compute_frame_times(photodiode_times, 
+                        frame_duration,
+                        num_frames, 
+                        cycle, 
+                        irregular_interval_policy=assign_to_last):
 
     indices = np.arange(num_frames)
     starts = np.zeros(num_frames, dtype=float)
     ends = np.zeros(num_frames, dtype=float)
 
     num_intervals = len(photodiode_times) - 1
-    for start_index, (start_time, end_time) in enumerate(zip(photodiode_times[:-1], photodiode_times[1:])):
+    for start_index, (start_time, end_time) in \
+            enumerate(zip(photodiode_times[:-1], photodiode_times[1:])):
 
         interval_duration = end_time - start_time
-        irregularity = int(np.around((interval_duration) / frame_duration)) - cycle
+        irregularity = \
+            int(np.around((interval_duration) / frame_duration)) - cycle
 
         local_frame_duration = interval_duration / (cycle + irregularity)
-        durations = np.zeros(cycle + ( start_index == num_intervals - 1 )) + local_frame_duration
+        durations = \
+            np.zeros(cycle + 
+                     (start_index == num_intervals - 1)) + local_frame_duration
         
         current_ends = np.cumsum(durations) + start_time
         current_starts = current_ends - durations
 
         while irregularity != 0:
             current_starts, current_ends = irregular_interval_policy(
-                start_index, current_starts, current_ends, local_frame_duration, irregularity, cycle
+                start_index, 
+                current_starts, 
+                current_ends, 
+                local_frame_duration, 
+                irregularity, cycle
             )
             irregularity += -1 * np.sign(irregularity)
 
         early_frame = start_index * cycle
-        late_frame = (start_index + 1) * cycle + ( start_index == num_intervals - 1 )
+        late_frame = \
+            (start_index + 1) * cycle + (start_index == num_intervals - 1)
 
         remaining = starts[early_frame: late_frame].size
         starts[early_frame: late_frame] = current_starts[:remaining]
         ends[early_frame: late_frame] = current_ends[:remaining]
 
     return indices, starts, ends
+

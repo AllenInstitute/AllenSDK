@@ -1,18 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 16 15:11:23 2016
-
-@author: Xiaoxuan Jia
-"""
-
-import ast
-import re
 import logging
 
 import numpy as np
 import pandas as pd
-
-import warnings
 
 from . import stimulus_parameter_extraction as spe
 
@@ -30,25 +19,29 @@ def create_stim_table(
     Parameters
     ----------
     stimuli : list of dict
-        Each element is a stimulus dictionary, as provided by the stim.pkl file.
+        Each element is a stimulus dictionary, 
+        as provided by the stim.pkl file.
     stimulus_tabler : function 
-        A function which takes a single stimulus dictionary as its argument and returns a stimulus table dataframe.
+        A function which takes a single stimulus dictionary
+        as its argument and returns a stimulus table dataframe.
     spontaneous_activity_tabler : function
-        A function which takes a list of stimulus tables as arguments and returns a list of 0 or more tables 
+        A function which takes a list of stimulus tables as 
+        arguments and returns a list of 0 or more tables 
         describing spontaneous activity sweeps.
     sort_key : str, optional
-        Sort the final stimulus table in ascending order by this key. Defaults to 'Start'.
+        Sort the final stimulus table in ascending order by this key. 
+        Defaults to 'Start'.
 
     Returns
     -------
     stim_table_full : pandas.DataFrame
-        Each row is a sweep. Has columns describing (in frames) the start and end times of each sweep. Other columns 
+        Each row is a sweep. Has columns describing (in frames) the start 
+        and end times of each sweep. Other columns 
         describe the values of stimulus parameters on those sweeps.
 
     """
 
     stimulus_tables = []
-    max_index = 0
 
     for ii, stimulus in enumerate(stimuli):
         current_tables = stimulus_tabler(stimulus)
@@ -57,7 +50,8 @@ def create_stim_table(
 
         stimulus_tables.extend(current_tables)
 
-    stimulus_tables = sorted(stimulus_tables, key=lambda df: min(df[sort_key].values))
+    stimulus_tables = sorted(stimulus_tables, 
+                             key=lambda df: min(df[sort_key].values))
     for ii, stim_table in enumerate(stimulus_tables):
         stim_table[block_key] = ii
 
@@ -73,8 +67,8 @@ def create_stim_table(
 def make_spontaneous_activity_tables(
     stimulus_tables, start_key="Start", end_key="End", duration_threshold=0.0
 ):
-    """ Fills in frame gaps in a set of stimulus tables. Suitable for use as the spontaneous_activity_tabler in 
-    create_stim_table.
+    """ Fills in frame gaps in a set of stimulus tables. Suitable for use as 
+    the spontaneous_activity_tabler in create_stim_table.
 
     Parameters
     ----------
@@ -85,13 +79,14 @@ def make_spontaneous_activity_tables(
     end_key : str, optional
         Column name for the end of a sweep. Defaults to 'End'.
     duration_threshold : numeric or None
-        If not None (default is 0), remove spontaneous activity sweeps whose duration is 
-        less than this threshold. 
+        If not None (default is 0), remove spontaneous activity sweeps 
+        whose duration is less than this threshold. 
 
     Returns
     -------
     list : 
-        Either empty, or contains a single pd.DataFrame. The rows of the dataframe are spontenous activity sweeps.
+        Either empty, or contains a single pd.DataFrame. 
+        The rows of the dataframe are spontaneous activity sweeps.
 
     """
 
@@ -111,7 +106,9 @@ def make_spontaneous_activity_tables(
 
     if duration_threshold is not None:
         spon_sweeps = spon_sweeps[
-            np.fabs(spon_sweeps[start_key] - spon_sweeps[end_key]) > duration_threshold
+            np.fabs(spon_sweeps[start_key] 
+                    - spon_sweeps[end_key]) 
+            > duration_threshold
         ]
         spon_sweeps.reset_index(drop=True, inplace=True)
 
@@ -130,14 +127,18 @@ def apply_frame_times(
     Parameters
     ----------
     stimulus_table : pd.DataFrame
-        Rows are sweeps. Columns are stimulus parameters as well as start and end frames for each sweep.
+        Rows are sweeps. Columns are stimulus parameters as well as start 
+        and end frames for each sweep.
     frame_times : numpy.ndarrray
         Gives the time in seconds at which each frame (indices) began.
     frames_per_second : numeric, optional
-        If provided, and extra_frame_time is True, will be used to calculcate the extra_frame_time.
+        If provided, and extra_frame_time is True, will be used to calculcate 
+        the extra_frame_time.
     extra_frame_time : float, optional
-        If provided, an additional frame time will be appended. The time will be incremented by extra_frame_time from 
-        the previous last frame time, to denote the time at which the last frame ended. If False, no extra time will be 
+        If provided, an additional frame time will be appended. The time will 
+        be incremented by extra_frame_time from 
+        the previous last frame time, to denote the time at which the last 
+        frame ended. If False, no extra time will be 
         appended. If None (default), the increment will be 1.0/fps.
     map_columns : tuple of str, optional
         Which columns to replace with times. Defaults to 'Start' and 'End
@@ -154,7 +155,8 @@ def apply_frame_times(
     if extra_frame_time is True and frames_per_second is not None:
         extra_frame_time = 1.0 / frames_per_second
     if extra_frame_time is not False:
-        frame_times = np.append(frame_times, frame_times[-1] + extra_frame_time)
+        frame_times = np.append(frame_times, frame_times[-1] 
+                                + extra_frame_time)
 
     for column in map_columns:
         stimulus_table[column] = frame_times[
@@ -181,25 +183,27 @@ def apply_display_sequence(
         Each row is a sweep. Has two columns, 'start' and 'end', 
         which describe (in frames) when that sweep began and ended.
     frame_display_sequence : np.ndarray
-        2D array. Rows are display intervals. The 0th column is the start frame of 
-        that interval, the 1st the end frame.
+        2D array. Rows are display intervals. The 0th column is the start 
+        frame of that interval, the 1st the end frame.
 
     Returns
     -------
     sweep_frames_table : pd.DataFrame
-        As above, but start and end frames have been adjusted based on the display sequence.
+        As above, but start and end frames have been adjusted based on 
+        the display sequence.
 
     Notes
     -----
-    The frame values in the raw sweep_frames_table are given in 0-indexed offsets from the 
-    start of display for this stimulus. This domain only takes into account frames which are part
-    of a display interval for that stimulus, so the frame ids need to be adjusted to lie on the global 
+    The frame values in the raw sweep_frames_table are given in 0-indexed 
+    offsets from the start of display for this stimulus. This domain only 
+    takes into account frames which are part of a display interval for that 
+    stimulus, so the frame ids need to be adjusted to lie on the global 
     frame sequence.
 
     """
 
     sweep_frames_table = sweep_frames_table.copy()
-    if not block_key in sweep_frames_table.columns.values:
+    if block_key not in sweep_frames_table.columns.values:
         sweep_frames_table[block_key] = np.zeros(
             (sweep_frames_table.shape[0]), dtype=int
         )
@@ -210,7 +214,8 @@ def apply_display_sequence(
 
     sweep_frames_table[start_key] += frame_display_sequence[0, 0]
     for seg in range(len(frame_display_sequence) - 1):
-        match_inds = sweep_frames_table[start_key] >= frame_display_sequence[seg, 1]
+        match_inds = sweep_frames_table[start_key] \
+                     >= frame_display_sequence[seg, 1]
 
         sweep_frames_table.loc[match_inds, start_key] += (
             frame_display_sequence[seg + 1, 0] - frame_display_sequence[seg, 1]
@@ -232,7 +237,8 @@ def apply_display_sequence(
 
 
 def read_stimulus_name_from_path(stimulus):
-    """Obtains a human-readable stimulus name by looking at the filename of the 'stim_path' item.
+    """Obtains a human-readable stimulus name by looking at the filename of 
+    the 'stim_path' item.
 
     Parameters
     ----------
@@ -265,14 +271,14 @@ def build_stimuluswise_table(
     extract_const_params_from_repr=False,
     drop_const_params=spe.DROP_PARAMS,
 ):
-    """ Construct a table of sweeps, including their times on the experiment-global clock 
-    and the values of each relevant parameter.
+    """ Construct a table of sweeps, including their times on the 
+    experiment-global clock and the values of each relevant parameter.
 
     Parameters
     ----------
     stimulus : dict
-        Describes presentation of a stimulus on a particular experiment. Has a number of fields, 
-        of which we are using:
+        Describes presentation of a stimulus on a particular experiment. Has 
+        a number of fields, of which we are using:
             stim_path : str
                 windows file path to the stimulus data
             sweep_frames : list of lists
@@ -281,13 +287,14 @@ def build_stimuluswise_table(
             sweep_order : list of int
                 indices are frames, values are the sweep on that frame
             display_sequence : list of list
-                rows are intervals in which the stimulus was displayed. Columns are start 
-                and end times (s, global) of the display. C-order.
+                rows are intervals in which the stimulus was displayed. 
+                Columns are start and end times (s, global) of the display. 
+                C-order.
              dimnames : list of str
                 Names of parameters for this stimulus (such as "Contrast")
             sweep_table : list of tuple
-                Each element is a tuple of parameter values (1 per dimname) describing 
-                a single sweep.
+                Each element is a tuple of parameter values (1 per dimname) 
+                describing a single sweep.
     seconds_to_frames : function
         Converts experiment seconds to frames
     start_key : str, optional
@@ -299,13 +306,15 @@ def build_stimuluswise_table(
     block_key : str, optional
         key to use for the 0-index position of this stimulus block
     get_stimulus_name : function | dict -> str, optional
-        extracts stimulus name from the stimulus dictionary. Default is read_stimulus_name_from_path
+        extracts stimulus name from the stimulus dictionary. Default is 
+        read_stimulus_name_from_path
 
     Returns
     -------
     list of pandas.DataFrame :
         Each table corresponds to an entry in the display sequence. 
-        Rows are sweeps, columns are stimulus parameter values as well as "Start" and "End".
+        Rows are sweeps, columns are stimulus parameter values as well as 
+        "Start" and "End".
 
     """
 
@@ -317,7 +326,8 @@ def build_stimuluswise_table(
     sweep_frames_table = pd.DataFrame(
         stimulus["sweep_frames"], columns=(start_key, end_key)
     )
-    sweep_frames_table[block_key] = np.zeros([sweep_frames_table.shape[0]], dtype=int)
+    sweep_frames_table[block_key] = np.zeros([sweep_frames_table.shape[0]], 
+                                             dtype=int)
     sweep_frames_table = apply_display_sequence(
         sweep_frames_table, frame_display_sequence, block_key=block_key
     )
@@ -360,14 +370,18 @@ def build_stimuluswise_table(
             existing = const_param_key in existing_columns
 
             if not (existing_cap or existing_upper or existing):
-                stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
+                stim_table[const_param_key] = [const_param_value] * \
+                                              stim_table.shape[0]
             else:
                 logging.info(
-                    f"found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})"
+                    f"""found sweep_param named: {const_param_key}, 
+                    ignoring const param of the same name (value: 
+                    {const_param_value})"""
                 )
 
     unique_indices = np.unique(stim_table[block_key].values)
-    output = [stim_table.loc[stim_table[block_key] == ii, :] for ii in unique_indices]
+    output = [stim_table.loc[stim_table[block_key] == ii, :] 
+              for ii in unique_indices]
 
     return output
 
@@ -378,12 +392,14 @@ def split_column(table, column, new_columns, drop_old=True):
     Parameters
     ----------
     table : pandas.DataFrame
-        Columns will be drawn from and assigned to this dataframe. This dataframe will NOT be modified inplace.
+        Columns will be drawn from and assigned to this dataframe. This 
+        dataframe will NOT be modified inplace.
     column : str
         This column will be split.
     new_columns : dict, mapping strings to functions
-        Each key will be the name of a new column, while its value (a function) will be used to build the 
-        new column's values. The functions should map from a single value of the original column to a single value 
+        Each key will be the name of a new column, while its value (a function)
+        will be used to build the new column's values. The functions should map
+        from a single value of the original column to a single value 
         of the new column. 
     drop_old : bool, optional
         If True, the original column will be dropped from the table.
@@ -395,7 +411,7 @@ def split_column(table, column, new_columns, drop_old=True):
 
     """
 
-    if not column in table:
+    if column not in table:
         return table
     table = table.copy()
 
@@ -414,21 +430,25 @@ def assign_sweep_values(
     drop=True,
     tmp_suffix="_stimtable_todrop",
 ):
-    """ Left joins a stimulus table to a sweep table in order to associate epochs in time with stimulus characteristics.
+    """ Left joins a stimulus table to a sweep table in order to associate 
+        epochs in time with stimulus characteristics.
     
     Parameters
     ----------
     stim_table : pd.DataFrame
-        Each row is a stimulus epoch, with start and end times and a foreign key onto a particular sweep.
+        Each row is a stimulus epoch, with start and end times and a foreign 
+        key onto a particular sweep.
     sweep_table : pd.DataFrame
-        Each row is a sweep. Should have columns in common with the stim_table - the resulting table will use values from 
-        the sweep_table.
+        Each row is a sweep. Should have columns in common with the stim_table 
+        - the resulting table will use values from the sweep_table.
     on : str, optional
         Column on which to join.
     drop : bool, optional
-        If True (default), the join column (argument on) will be dropped from the output.
+        If True (default), the join column (argument on) will be dropped from 
+        the output.
     tmp_suffix : str, optional
-        Will be used to identify overlapping columns. Should not appear in the name of any column in either dataframe.
+        Will be used to identify overlapping columns. Should not appear in the
+        name of any column in either dataframe.
 
     """
 

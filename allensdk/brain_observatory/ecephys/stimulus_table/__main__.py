@@ -37,7 +37,10 @@ def build_stimulus_table(
     sync_dataset = EcephysSyncDataset.factory(sync_h5_path)
     frame_times = sync_dataset.extract_frame_times(
         strategy=frame_time_strategy,
-        trim_discontiguous_frame_times=kwargs.get('trim_discontiguous_frame_times', True))
+        trim_discontiguous_frame_times=kwargs.get(
+            'trim_discontiguous_frame_times',
+            True)
+        )
 
     def seconds_to_frames(seconds):
         return  \
