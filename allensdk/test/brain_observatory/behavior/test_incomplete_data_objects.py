@@ -17,16 +17,30 @@ def test_incomplete_eye_tracking(
         skeletal_nwb_fixture):
 
     populated_eye_tracking = behavior_ophys_experiment_fixture.eye_tracking
-    empty_eye_tracking = EyeTrackingTable.from_nwb(skeletal_nwb_fixture).value
+    empty_eye_tracking = EyeTrackingTable.from_nwb(skeletal_nwb_fixture)
+    empty_eye_tracking_df = empty_eye_tracking.value
 
     assert len(populated_eye_tracking) > 0
-    assert len(empty_eye_tracking) == 0
+    assert len(empty_eye_tracking_df) == 0
 
     populated_columns = set(populated_eye_tracking.columns)
-    empty_columns = set(empty_eye_tracking.columns)
+    empty_columns = set(empty_eye_tracking_df.columns)
     assert populated_columns == empty_columns
 
-    assert populated_eye_tracking.index.name == empty_eye_tracking.index.name
+    assert (populated_eye_tracking.index.name
+            == empty_eye_tracking_df.index.name)
+
+    # make sure, when round-tripping the experiments, that the
+    # populated experiment still writes out a populated data frame
+    nwb1 = behavior_ophys_experiment_fixture.to_nwb()
+    assert 'EyeTracking' in nwb1.acquisition.keys()
+    roundtrip1 = BehaviorOphysExperiment.from_nwb(nwb1)
+    assert len(roundtrip1.eye_tracking) > 0
+
+    nwb2 = empty_eye_tracking.to_nwb(skeletal_nwb_fixture)
+    assert 'EyeTracking' not in nwb2.acquisition.keys()
+    roundtrip2 = EyeTrackingTable.from_nwb(nwb2)
+    assert len(roundtrip2.value) == 0
 
 
 @pytest.mark.requires_bamboo
@@ -35,16 +49,29 @@ def test_incomplete_licks(
         skeletal_nwb_fixture):
 
     populated_licks = behavior_ophys_experiment_fixture.licks
-    empty_licks = Licks.from_nwb(skeletal_nwb_fixture).value
+    empty_licks = Licks.from_nwb(skeletal_nwb_fixture)
+    empty_licks_df = empty_licks.value
 
     assert len(populated_licks) > 0
-    assert len(empty_licks) == 0
+    assert len(empty_licks_df) == 0
 
     populated_columns = set(populated_licks.columns)
-    empty_columns = set(empty_licks.columns)
+    empty_columns = set(empty_licks_df.columns)
     assert populated_columns == empty_columns
 
-    assert populated_licks.index.name == empty_licks.index.name
+    assert populated_licks.index.name == empty_licks_df.index.name
+
+    # make sure, when round-tripping the experiments, that the
+    # populated experiment still writes out a populated data frame
+    nwb1 = behavior_ophys_experiment_fixture.to_nwb()
+    assert 'licking' in nwb1.processing.keys()
+    roundtrip1 = BehaviorOphysExperiment.from_nwb(nwb1)
+    assert len(roundtrip1.licks) > 0
+
+    nwb2 = empty_licks.to_nwb(skeletal_nwb_fixture)
+    assert 'licking' not in nwb2.processing.keys()
+    roundtrip2 = Licks.from_nwb(nwb2)
+    assert len(roundtrip2.value) == 0
 
 
 @pytest.mark.requires_bamboo
@@ -53,16 +80,29 @@ def test_incomplete_rewards(
         skeletal_nwb_fixture):
 
     populated_rewards = behavior_ophys_experiment_fixture.rewards
-    empty_rewards = Rewards.from_nwb(skeletal_nwb_fixture).value
+    empty_rewards = Rewards.from_nwb(skeletal_nwb_fixture)
+    empty_rewards_df = empty_rewards.value
 
     assert len(populated_rewards) > 0
-    assert len(empty_rewards) == 0
+    assert len(empty_rewards_df) == 0
 
     populated_columns = set(populated_rewards.columns)
-    empty_columns = set(empty_rewards.columns)
+    empty_columns = set(empty_rewards_df.columns)
     assert populated_columns == empty_columns
 
-    assert populated_rewards.index.name == empty_rewards.index.name
+    assert populated_rewards.index.name == empty_rewards_df.index.name
+
+    # make sure, when round-tripping the experiments, that the
+    # populated experiment still writes out a populated data frame
+    nwb1 = behavior_ophys_experiment_fixture.to_nwb()
+    assert 'rewards' in nwb1.processing.keys()
+    roundtrip1 = BehaviorOphysExperiment.from_nwb(nwb1)
+    assert len(roundtrip1.rewards) > 0
+
+    nwb2 = empty_rewards.to_nwb(skeletal_nwb_fixture)
+    assert 'rewards' not in nwb2.processing.keys()
+    roundtrip2 = Rewards.from_nwb(nwb2)
+    assert len(roundtrip2.value) == 0
 
 
 @pytest.mark.requires_bamboo
@@ -90,6 +130,7 @@ def test_incomplete_rig_geometry(
 
     nwb = no_rig_geom.to_nwb()
     test_ophys_experiment = BehaviorOphysExperiment.from_nwb(nwb)
+    assert 'eye_tracking_rig_metadata' not in nwb.processing.keys()
 
     assert len(test_ophys_experiment.eye_tracking_rig_geometry) == 0
 
@@ -100,5 +141,6 @@ def test_incomplete_rig_geometry(
     # make sure that the populated BehaviorOphysExperiment actually
     # writes out RigGeometry to NWB files
     nwb = behavior_ophys_experiment_fixture.to_nwb()
+    assert 'eye_tracking_rig_metadata' in nwb.processing.keys()
     roundtrip = BehaviorOphysExperiment.from_nwb(nwb)
     assert len(roundtrip.eye_tracking_rig_geometry) > 0
