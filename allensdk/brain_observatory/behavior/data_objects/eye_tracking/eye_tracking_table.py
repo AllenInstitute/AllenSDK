@@ -35,6 +35,12 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         super().__init__(name='eye_tracking', value=eye_tracking)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is actually no data in this data object,
+        # do not bother writing anything to the NWBFile
+        if len(self.value.index) == 0:
+            return nwbfile
+
         eye_tracking_df = self.value
 
         eye_tracking = EllipseSeries(
