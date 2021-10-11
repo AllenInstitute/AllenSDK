@@ -44,6 +44,28 @@ def test_incomplete_eye_tracking(
 
 
 @pytest.mark.requires_bamboo
+def test_incomplete_eye_tracking_from_lims(
+        behavior_ophys_experiment_fixture):
+    """
+    Compare a BehaviorOphysExperiment without eye tracking data
+    from_lims with a BehaviorOphysExperiment with eye tracking data.
+    Make sure the DataFrames have the same columns
+    """
+
+    incomplete_exp_id = 806456687
+    incomplete_experiment = BehaviorOphysExperiment.from_lims(
+                                   incomplete_exp_id)
+    complete = behavior_ophys_experiment_fixture.eye_tracking
+    incomplete = incomplete_experiment.eye_tracking
+
+    assert len(complete) > 0
+    assert len(incomplete) == 0
+
+    assert set(complete.columns) == set(incomplete.columns)
+    assert complete.index.name == incomplete.index.name
+
+
+@pytest.mark.requires_bamboo
 def test_incomplete_licks(
         behavior_ophys_experiment_fixture,
         skeletal_nwb_fixture):

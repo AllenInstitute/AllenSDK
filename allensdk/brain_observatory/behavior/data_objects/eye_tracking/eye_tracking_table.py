@@ -19,7 +19,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
-    process_eye_tracking_data, determine_outliers, determine_likely_blinks
+    process_eye_tracking_data, determine_outliers, determine_likely_blinks, \
+    EyeTrackingError
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
     import \
     EllipseSeries, EllipseEyeTracking
@@ -219,8 +220,17 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
             trim_after_spike=False)
 
-        eye_tracking_data = process_eye_tracking_data(data_file.data,
-                                                      frame_times,
-                                                      z_threshold,
-                                                      dilation_frames)
+        try:
+            eye_tracking_data = process_eye_tracking_data(
+                                             data_file.data,
+                                             frame_times,
+                                             z_threshold,
+                                             dilation_frames)
+        except EyeTrackingError as err:
+            msg = f"\nin sync_file: {sync_file.filepath}\n"
+            msg += f"{str(err)}\n"
+            msg += "returning empty eye_tracking DataFrame"
+            warnings.warn(msg)
+            eye_tracking_data = cls._get_empty_df()
+
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
