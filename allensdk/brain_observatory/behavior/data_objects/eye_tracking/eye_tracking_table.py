@@ -105,7 +105,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         try:
             eye_tracking_acquisition = nwbfile.acquisition['EyeTracking']
         except KeyError as e:
-            warnings.warn("This ophys session "
+            warnings.warn("This ophys experiment "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking data. (NWB error: {e})")
             empty_data = dict()
