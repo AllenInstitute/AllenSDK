@@ -96,6 +96,27 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         return nwbfile
 
     @classmethod
+    def _get_empty_df(cls) -> pd.DataFrame:
+        """
+        Return an empty dataframe with the correct column and index
+        names, but no data
+        """
+        empty_data = dict()
+        for colname in ['timestamps', 'cr_area', 'eye_area',
+                        'pupil_area', 'likely_blink', 'pupil_area_raw',
+                        'cr_area_raw', 'eye_area_raw', 'cr_center_x',
+                        'cr_center_y', 'cr_width', 'cr_height', 'cr_phi',
+                        'eye_center_x', 'eye_center_y', 'eye_width',
+                        'eye_height', 'eye_phi', 'pupil_center_x',
+                        'pupil_center_y', 'pupil_width', 'pupil_height',
+                        'pupil_phi']:
+            empty_data[colname] = []
+
+        eye_tracking_data = pd.DataFrame(empty_data)
+        eye_tracking_data.index.name ='frame'
+        return eye_tracking_data
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  z_threshold: float = 3.0,
                  dilation_frames: int = 2) -> Optional["EyeTrackingTable"]:
@@ -114,20 +135,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             warnings.warn("This ophys experiment "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking data. (NWB error: {e})")
-            empty_data = dict()
-            for colname in ['timestamps', 'cr_area', 'eye_area',
-                            'pupil_area', 'likely_blink', 'pupil_area_raw',
-                            'cr_area_raw', 'eye_area_raw', 'cr_center_x',
-                            'cr_center_y', 'cr_width', 'cr_height', 'cr_phi',
-                            'eye_center_x', 'eye_center_y', 'eye_width',
-                            'eye_height', 'eye_phi', 'pupil_center_x',
-                            'pupil_center_y', 'pupil_width', 'pupil_height',
-                            'pupil_phi']:
-                empty_data[colname] = []
-
-            eye_tracking_data = pd.DataFrame(empty_data)
-            eye_tracking_data.index.name ='frame'
-
+            eye_tracking_data = cls._get_empty_df()
             return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
         eye_tracking = eye_tracking_acquisition.eye_tracking
