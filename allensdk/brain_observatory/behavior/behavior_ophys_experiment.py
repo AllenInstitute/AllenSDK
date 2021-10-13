@@ -100,7 +100,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                                     ophys_timestamps=self._ophys_timestamps)
         self._motion_correction.to_nwb(nwbfile=nwbfile)
         self._eye_tracking.to_nwb(nwbfile=nwbfile)
-        self._eye_tracking_rig_geometry.to_nwb(nwbfile=nwbfile)
+        if self._eye_tracking_rig_geometry is not None:
+            self._eye_tracking_rig_geometry.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
     # ==================== class and utility methods ======================
@@ -730,6 +731,8 @@ class BehaviorOphysExperiment(BehaviorSession):
                 monitor_position_mm (array of float)
                 monitor_rotation_deg (array of float)
         """
+        if self._eye_tracking_rig_geometry is None:
+            return dict()
         return self._eye_tracking_rig_geometry.to_dict()['rig_geometry']
 
     @property
