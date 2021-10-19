@@ -13,9 +13,6 @@ from allensdk.brain_observatory.behavior.dprime import (
     get_trial_count_corrected_hit_rate,
     get_hit_rate, get_false_alarm_rate)
 
-# TODO: add trial column descriptions
-TRIAL_COLUMN_DESCRIPTION_DICT = {}
-
 RIG_NAME = {
     'W7DTMJ19R2F': 'A1',
     'W7DTMJ35Y0T': 'A2',
