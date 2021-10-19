@@ -127,31 +127,6 @@ def get_change_time_frame_response_latency(trial):
     return None, None, None
 
 
-def get_stimulus_attr_changes(stim_dict,
-                              change_frame,
-                              first_frame,
-                              last_frame):
-    """
-    Notes
-    -----
-    - assumes only two stimuli are ever shown
-    - converts attr_names to lowercase
-    - gets the net attr changes from the start of a trial to the end of a trial
-    """
-    initial_attr = {}
-    change_attr = {}
-
-    for attr_name, set_value, set_time, set_frame in stim_dict["set_log"]:
-        if set_frame <= first_frame:
-            initial_attr[attr_name.lower()] = set_value
-        elif set_frame <= last_frame:
-            change_attr[attr_name.lower()] = set_value
-        else:
-            pass
-
-    return initial_attr, change_attr
-
-
 def get_image_info_from_trial(trial_log, ti):
 
     if ti == -1:
