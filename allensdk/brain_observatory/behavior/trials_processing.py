@@ -74,19 +74,6 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 
 
-def find_licks(reward_times, licks, window=3.5):
-    if len(reward_times) == 0:
-        return []
-    else:
-        reward_time = one(reward_times)
-        reward_lick_mask = ((licks['timestamps'] > reward_time) &
-                            (licks['timestamps'] < (reward_time + window)))
-
-        tr_licks = licks[reward_lick_mask].copy()
-        tr_licks['timestamps'] -= reward_time
-        return tr_licks['timestamps'].values
-
-
 def calculate_reward_rate(response_latency=None,
                           starttime=None,
                           window=0.75,
