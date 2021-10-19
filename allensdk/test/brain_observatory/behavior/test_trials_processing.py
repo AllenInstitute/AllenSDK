@@ -9,40 +9,6 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 
 
-@pytest.mark.requires_bamboo
-@pytest.mark.parametrize(
-    'behavior_experiment_id, ti, expected, exception', [
-        (880293569, 5, (90, 90, None), None,),
-        (881236761, 0, None, IndexError,)
-    ]
-)
-def test_get_ori_info_from_trial(behavior_experiment_id,
-                                 ti,
-                                 expected,
-                                 exception, ):
-    """was feeling worried that the values would be wrong,
-    this helps reaffirm that maybe they are not...
-
-    Notes
-    -----
-    - i may be rewriting code here but its more a sanity check really...
-    """
-    def _get_stimulus_data():
-        lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
-        stimulus_file = StimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_experiment_id)
-        return stimulus_file.data
-    stim_output = _get_stimulus_data()
-    trial_log = stim_output['items']['behavior']['trial_log']
-
-    if exception:
-        with pytest.raises(exception):
-            trials_processing.get_ori_info_from_trial(trial_log, ti, )
-    else:
-        assert trials_processing.get_ori_info_from_trial(trial_log, ti, ) == expected  # noqa: E501
-
-
 _test_response_latency_0 = np.array(
     [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
      np.nan, np.nan, 0.3669842, np.nan, np.nan, np.nan, np.nan, np.nan,
