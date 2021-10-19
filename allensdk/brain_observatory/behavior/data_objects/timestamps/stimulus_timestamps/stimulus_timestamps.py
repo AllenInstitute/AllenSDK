@@ -25,17 +25,6 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps\
 from allensdk.internal.api import PostgresQueryMixin
 
 
-#def from_json_cache_key(cls, dict_repr: dict, monitor_delay: float):
-#    return hashkey(json.dumps(dict_repr), monitor_delay)
-
-
-#def from_lims_cache_key(
-#    cls, db, behavior_session_id: int,
-#    ophys_experiment_id: Optional[int] = None
-#):
-#    return hashkey(behavior_session_id, ophys_experiment_id)
-
-
 class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
                          SyncFileReadableInterface, JsonReadableInterface,
                          NwbReadableInterface, LimsReadableInterface,
