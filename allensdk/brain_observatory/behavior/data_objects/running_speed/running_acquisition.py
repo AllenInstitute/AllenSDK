@@ -31,7 +31,6 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 def from_json_cache_key(
     cls,
     dict_repr: dict,
-    monitor_delay:float
 ):
     return hashkey(json.dumps(dict_repr))
 
@@ -44,7 +43,7 @@ def from_lims_cache_key(
     ophys_experiment_id: Optional[int] = None
 ):
     return hashkey(
-        behavior_session_id, ophys_experiment_id
+        behavior_session_id, ophys_experiment_id, monitor_delay
     )
 
 
@@ -82,13 +81,11 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
     def from_json(
         cls,
         dict_repr: dict,
-        monitor_delay: float 
     ) -> "RunningAcquisition":
         stimulus_file = StimulusFile.from_json(dict_repr)
 
         stimulus_timestamps = StimulusTimestamps.from_json(
-                dict_repr=dict_repr,
-                monitor_delay=monitor_delay)
+                dict_repr=dict_repr)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,

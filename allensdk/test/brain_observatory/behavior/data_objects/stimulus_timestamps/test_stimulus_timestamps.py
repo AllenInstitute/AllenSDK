@@ -78,12 +78,14 @@ def test_stimulus_timestamps_from_json(
         )
         mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
         ts_from_stim = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=mock_stimulus_file_instance)
+            stimulus_file=mock_stimulus_file_instance,
+            monitor_delay=0.0)
 
         if has_pkl and has_sync:
             mock_sync_file_instance = mock_sync_file.from_json(dict_repr)
             ts_from_sync = StimulusTimestamps.from_sync_file(
-                sync_file=mock_sync_file_instance)
+                sync_file=mock_sync_file_instance,
+                monitor_delay=0.0)
 
     if has_pkl and has_sync:
         mock_get_ophys_stimulus_timestamps.assert_called_once_with(
@@ -105,7 +107,8 @@ def test_stimulus_timestamps_from_json2():
     sf = StimulusFile.from_json(
         dict_repr={'behavior_stimulus_file': str(sf_path)})
     stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-        stimulus_file=sf)
+        stimulus_file=sf,
+        monitor_delay=0.0)
     expected = np.array([0.016 * i for i in range(11)])
     assert np.allclose(expected, stimulus_timestamps.value)
 
@@ -127,7 +130,8 @@ def test_stimulus_timestamps_from_json3():
     sf._data['items']['behavior']['intervalsms'] = [0.1, 0.2, 0.3, 0.4]
 
     stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-        stimulus_file=sf)
+        stimulus_file=sf,
+        monitor_delay=0.0)
 
     expected = np.array([0., 0.0001, 0.0003, 0.0006, 0.001])
     np.testing.assert_array_almost_equal(stimulus_timestamps.value,
@@ -152,7 +156,8 @@ def test_stimulus_timestamps_from_json3():
             # raises
             False,
             # expected
-            {"behavior_stimulus_file": "stim.pkl", "sync_file": "sync.h5"}
+            {"behavior_stimulus_file": "stim.pkl", "sync_file": "sync.h5",
+             "monitor_delay": 0.0}
         ),
         # Test to_json with only stimulus_file
         (
@@ -167,7 +172,8 @@ def test_stimulus_timestamps_from_json3():
             # raises
             False,
             # expected
-            {"behavior_stimulus_file": "stim.pkl"}
+            {"behavior_stimulus_file": "stim.pkl",
+             "monitor_delay": 0.0}
         ),
         # Test to_json without stimulus_file nor sync_file
         (
@@ -196,7 +202,8 @@ def test_stimulus_timestamps_to_json(
         sync_file.to_json.return_value = sync_file_to_json_ret
 
     stimulus_timestamps = StimulusTimestamps(
-        timestamps=None,
+        timestamps=np.array([0.0]),
+        monitor_delay=0.0,
         stimulus_file=stimulus_file,
         sync_file=sync_file
     )
@@ -261,7 +268,8 @@ def test_stimulus_timestamps_from_lims(
             mock_db_conn, behavior_session_id
         )
         ts_from_stim = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=mock_stimulus_file_instance)
+            stimulus_file=mock_stimulus_file_instance,
+            monitor_delay=0.0)
         assert ts_from_stim._stimulus_file == mock_stimulus_file_instance
 
         if behavior_session_id is not None and ophys_experiment_id is not None:
@@ -269,7 +277,8 @@ def test_stimulus_timestamps_from_lims(
                 mock_db_conn, ophys_experiment_id
             )
             ts_from_sync = StimulusTimestamps.from_sync_file(
-                sync_file=mock_sync_file_instance)
+                sync_file=mock_sync_file_instance,
+                monitor_delay=0.0)
 
     if behavior_session_id is not None and ophys_experiment_id is not None:
         mock_get_ophys_stimulus_timestamps.assert_called_once_with(
@@ -300,7 +309,8 @@ def test_stimulus_timestamps_nwb_roundtrip(
     nwbfile, data_object_roundtrip_fixture, roundtrip, stimulus_timestamps_data
 ):
     stimulus_timestamps = StimulusTimestamps(
-        timestamps=stimulus_timestamps_data
+        timestamps=stimulus_timestamps_data,
+        monitor_delay=0.0
     )
     nwbfile = stimulus_timestamps.to_nwb(nwbfile)
 

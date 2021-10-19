@@ -49,8 +49,7 @@ class TestFromStimulusFile(LimsTest):
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
-            rewards=rewards,
-            monitor_delay=monitor_delay
+            rewards=rewards
         )
         assert trials == self.expected
 
@@ -63,7 +62,6 @@ class TestFromStimulusFile(LimsTest):
         TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            monitor_delay=0.02115,
             licks=licks,
             rewards=rewards
         )
@@ -75,7 +73,8 @@ class TestFromStimulusFile(LimsTest):
             stimulus_file = StimulusFile.from_lims(
                 behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
+            stimulus_file=stimulus_file,
+            monitor_delay=0.02115)
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps)

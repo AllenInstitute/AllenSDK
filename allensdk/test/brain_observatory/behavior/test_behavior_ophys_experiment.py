@@ -218,8 +218,9 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
             lambda db, ophys_experiment_id: sf)
         ctx.setattr(
             StimulusTimestamps, 'from_sync_file',
-            lambda sync_file: create_autospec(StimulusTimestamps,
-                                              instance=True))
+            lambda sync_file, monitor_delay:
+                            create_autospec(StimulusTimestamps,
+                            instance=True))
         ctx.setattr(
             BehaviorSessionId, 'from_lims',
             lambda db, ophys_experiment_id: create_autospec(BehaviorSessionId,
