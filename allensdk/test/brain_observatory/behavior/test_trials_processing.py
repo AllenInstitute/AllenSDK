@@ -374,20 +374,6 @@ def test_trial_data_from_log(data_exp_getter):
     assert trials_processing.trial_data_from_log(data) == expectation
 
 
-@pytest.mark.parametrize(
-    "licks, aborted, expected",
-    [
-        ([1.0, 2.0, 3.0], True, float("nan")),
-        ([1.0, 2.0, 3.0], False, 1.0),
-        ([], True, float("nan")),
-        ([], False, float("nan"))
-    ]
-)
-def test_get_response_time(licks, aborted, expected):
-    actual = trials_processing._get_response_time(licks, aborted)
-    np.testing.assert_equal(actual, expected)
-
-
 @pytest.mark.parametrize("trial_log,expected",
                          [([{'events': [('trial_start', 4),
                                         ('trial_end', 5)]},

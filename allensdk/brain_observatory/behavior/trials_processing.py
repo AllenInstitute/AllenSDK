@@ -188,36 +188,6 @@ def get_trial_reward_time(rebased_reward_times,
     return float('nan') if len(reward_times) == 0 else one(reward_times)
 
 
-def _get_response_time(licks: List[float], aborted: bool) -> float:
-    """
-    Return the time the first lick occurred in a non-"aborted" trial.
-    A response time is not returned for on an "aborted trial", since by
-    definition, the animal licked before the change stimulus.
-
-    Parameters
-    ==========
-    licks: List[float]
-        List of timestamps that a lick occurred during this trial.
-        The list should contain all licks that occurred while the trial
-        was active (between 'trial_start' and 'trial_end' events)
-    aborted: bool
-        Whether or not the trial was "aborted". This means that the
-        response occurred before the stimulus change and should not be
-        a valid response.
-    Returns
-    =======
-    float
-        Time of first lick if there was a valid response, otherwise
-        NaN. See rules above.
-    """
-    if aborted:
-        return float("nan")
-    if len(licks):
-        return licks[0]
-    else:
-        return float("nan")
-
-
 def get_trial_bounds(trial_log: List) -> List:
     """
     Adjust trial boundaries from a trial_log so that there is no dead time
