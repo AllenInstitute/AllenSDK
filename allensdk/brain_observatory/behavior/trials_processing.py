@@ -370,46 +370,6 @@ def get_trial_timing(
     }
 
 
-def get_trial_image_names(trial, stimuli) -> Dict[str, str]:
-    """
-    Gets the name of the stimulus presented at the beginning of the trial and
-    what is it changed to at the end of the trial.
-    Parameters
-    ----------
-    trial: A trial in a behavior ophys session
-    stimuli: The stimuli presentation log for the behavior session
-
-    Returns
-    -------
-        A dictionary indicating the starting_stimulus and what the stimulus is
-        changed to.
-
-    """
-    grating_oris = {'horizontal', 'vertical'}
-    trial_start_frame = trial["events"][0][3]
-    initial_image_category_name, _, initial_image_name = resolve_initial_image(
-        stimuli, trial_start_frame)
-    if len(trial["stimulus_changes"]) == 0:
-        change_image_name = initial_image_name
-    else:
-        ((from_set, from_name),
-         (to_set, to_name),
-         _, _) = trial["stimulus_changes"][0]
-
-        # do this to fix names if the stimuli is a grating
-        if from_set in grating_oris:
-            from_name = f'gratings_{from_name}'
-        if to_set in grating_oris:
-            to_name = f'gratings_{to_name}'
-        assert from_name == initial_image_name
-        change_image_name = to_name
-
-    return {
-        "initial_image_name": initial_image_name,
-        "change_image_name": change_image_name
-    }
-
-
 def get_trial_bounds(trial_log: List) -> List:
     """
     Adjust trial boundaries from a trial_log so that there is no dead time

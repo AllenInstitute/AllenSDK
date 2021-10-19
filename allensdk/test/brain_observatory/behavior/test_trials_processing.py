@@ -514,69 +514,6 @@ def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
     assert resolved == expected
 
 
-@pytest.mark.parametrize("behavior_stimuli_data_fixture, trial, expected",
-                         [({},
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 0)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'gratings_90',
-                               'change_image_name': 'gratings_90'
-                           }),
-                          ({},
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 0)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                       (('horizontal', 90),
-                                        ('vertical', 180),
-                                        None,
-                                        None)
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'gratings_90',
-                               'change_image_name': 'gratings_180'
-                           }),
-                          ({
-                              "images_set_log": [
-                                  ('Image', 'im065', 5, 0)],
-                              "grating_set_log": [
-                                  ("Ori", 270, 15, 6)]
-                          },
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 5)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                       (('im065', 'im065'), ('im057', 'im057'),
-                                        None, None)
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'im065',
-                               'change_image_name': 'im057'
-                           }
-                         )],
-                         indirect=['behavior_stimuli_data_fixture'])
-def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
-                               expected):
-    stimuli = behavior_stimuli_data_fixture['items']['behavior']['stimuli']
-    trial_image_names = trials_processing.get_trial_image_names(trial, stimuli)
-    assert trial_image_names == expected
-
-
 @pytest.mark.parametrize("trial_log,expected",
                          [([{'events': [('trial_start', 4),
                                         ('trial_end', 5)]},
