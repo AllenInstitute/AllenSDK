@@ -97,14 +97,6 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 
 
-def local_time(iso_timestamp, timezone=None):
-    datetime = pd.to_datetime(iso_timestamp)
-    if not datetime.tzinfo:
-        tzinfo = dateutil.tz.gettz('America/Los_Angeles')
-        datetime = datetime.replace(tzinfo=tzinfo)
-    return datetime.isoformat()
-
-
 def get_time(exp_data):
     vsyncs = exp_data["items"]["behavior"]["intervalsms"]
     return np.hstack((0, vsyncs)).cumsum() / 1000.0
@@ -115,98 +107,6 @@ def data_to_licks(data, time):
     lick_times = time[lick_frames]
     return pd.DataFrame(data={"timestamps": lick_times,
                               "frame": lick_frames})
-
-
-def get_mouse_id(exp_data):
-    return exp_data["items"]["behavior"]['config']['behavior']['mouse_id']
-
-
-def get_params(exp_data):
-
-    params = deepcopy(exp_data["items"]["behavior"].get("params", {}))
-    params.update(exp_data["items"]["behavior"].get("cl_params", {}))
-
-    if "response_window" in params:
-        # tuple to list
-        params["response_window"] = list(params["response_window"])
-
-    return params
-
-
-def get_even_sampling(data):
-    """Get status of even_sampling
-
-    Parameters
-    ----------
-    data: Mapping
-        foraging2 experiment output data
-
-    Returns
-    -------
-    bool:
-        True if even_sampling is enabled
-    """
-
-    stimuli = data['items']['behavior']['stimuli']
-    for stimuli_group_name, stim in stimuli.items():
-        if (stim['obj_type'].lower() == 'docimagestimulus'
-           and stim['sampling'] in ['even', 'file']):
-
-            return True
-
-    return False
-
-
-def data_to_metadata(data, time):
-
-    config = data['items']['behavior']['config']
-    doc = config['DoC']
-    stimuli = data['items']['behavior']['stimuli']
-
-    metadata = {
-        "startdatetime": local_time(data["start_time"],
-                                    timezone='America/Los_Angeles'),
-        "rig_id": RIG_NAME.get(data['platform_info']['computer_name'].lower(),
-                               'unknown'),
-        "computer_name": data['platform_info']['computer_name'],
-        "reward_vol": config["reward"]["reward_volume"],
-        "auto_reward_vol": doc["auto_reward_volume"],
-        "params": get_params(data),
-        "mouseid": config['behavior']['mouse_id'],
-        "response_window": list(data["items"]["behavior"].get("config", {}).get("DoC", {}).get("response_window")),  # noqa: E501
-        "task": config["behavior"]['task_id'],
-        "stage": data["items"]["behavior"]["params"]["stage"],
-        "stoptime": time[-1] - time[0],
-        "userid": data["items"]["behavior"]['cl_params']['user_id'],
-        "lick_detect_training_mode": "single",
-        "blankscreen_on_timeout": False,
-        "stim_duration": doc['stimulus_window'] * 1000,
-        "blank_duration_range": list(doc['blank_duration_range']),
-        "delta_minimum": doc['pre_change_time'],
-        "stimulus_distribution": doc["change_time_dist"],
-        "delta_mean": doc["change_time_scale"],
-        "trial_duration": None,
-        "n_stimulus_frames": sum([sum(s.get("draw_log", []))
-                                 for s in stimuli.values()]),
-        "stimulus": list(stimuli.keys())[0],
-        "warm_up_trials": doc["warm_up_trials"],
-        "stimulus_window": doc["stimulus_window"],
-        "volume_limit": config["behavior"]["volume_limit"],
-        "failure_repeats": doc["failure_repeats"],
-        "catch_frequency": doc["catch_freq"],
-        "auto_reward_delay": doc.get("auto_reward_delay", 0.0),
-        "free_reward_trials": doc["free_reward_trials"],
-        "min_no_lick_time": doc["min_no_lick_time"],
-        "max_session_duration": doc["max_task_duration_min"],
-        "abort_on_early_response": doc["abort_on_early_response"],
-        "initial_blank_duration": doc["initial_blank"],
-        "even_sampling_enabled": get_even_sampling(data),
-        "behavior_session_uuid": uuid.UUID(data["session_uuid"]),
-        "periodic_flash": doc['periodic_flash'],
-        "platform_info": data['platform_info']
-    }
-
-    return metadata
 
 
 def get_response_latency(change_event, trial):
