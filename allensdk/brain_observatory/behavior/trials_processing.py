@@ -98,45 +98,6 @@ RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 COMPUTER_NAME = dict((v, k) for k, v in RIG_NAME.items())
 
 
-def resolve_initial_image(stimuli, start_frame):
-    """Attempts to resolve the initial image for a given start_frame for a trial
-
-    Parameters
-    ----------
-    stimuli: Mapping
-        foraging2 shape stimuli mapping
-    start_frame: int
-        start frame of the trial
-
-    Returns
-    -------
-    initial_image_category_name: str
-        stimulus category of initial image
-    initial_image_group: str
-        group name of the initial image
-    initial_image_name: str
-        name of the initial image
-    """
-    max_frame = float("-inf")
-    initial_image_group = ''
-    initial_image_name = ''
-    initial_image_category_name = ''
-
-    for stim_category_name, stim_dict in stimuli.items():
-        for set_event in stim_dict["set_log"]:
-            set_frame = set_event[3]
-            if set_frame <= start_frame and set_frame >= max_frame:
-                # hack assumes initial_image_group == initial_image_name,
-                # only initial_image_name is present for natual_scenes
-                initial_image_group = initial_image_name = set_event[1]
-                initial_image_category_name = stim_category_name
-                if initial_image_category_name == 'grating':
-                    initial_image_name = f'gratings_{initial_image_name}'
-                max_frame = set_frame
-
-    return initial_image_category_name, initial_image_group, initial_image_name
-
-
 def trial_data_from_log(trial):
     '''
     Infer trial logic from trial log. Returns a dictionary.

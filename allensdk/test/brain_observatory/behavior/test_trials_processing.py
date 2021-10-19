@@ -493,27 +493,6 @@ def test_get_response_time(licks, aborted, expected):
     np.testing.assert_equal(actual, expected)
 
 
-@pytest.mark.parametrize("behavior_stimuli_data_fixture, start_frame,"
-                         "expected",
-                         [({}, 0, ('grating', 90, 'gratings_90')),
-                          ({
-                               "images_set_log": [
-                                   ('Image', 'im065', 5, 0)],
-                               "grating_set_log": [
-                                   ("Ori", 270, 15, 6)]}, 0,
-                           ('images', 'im065', 'im065')),
-                          ({
-                               "images_set_log": [],
-                               "grating_set_log": []
-                           }, 0, ('', '', ''))],
-                         indirect=['behavior_stimuli_data_fixture'])
-def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
-                               expected):
-    stimuli = behavior_stimuli_data_fixture['items']['behavior']['stimuli']
-    resolved = trials_processing.resolve_initial_image(stimuli, start_frame)
-    assert resolved == expected
-
-
 @pytest.mark.parametrize("trial_log,expected",
                          [([{'events': [('trial_start', 4),
                                         ('trial_end', 5)]},
