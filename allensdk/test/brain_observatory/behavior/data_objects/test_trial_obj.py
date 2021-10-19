@@ -1,4 +1,6 @@
 import pytest
+import numpy as np
+import pandas as pd
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
     Trial)
 
@@ -90,6 +92,7 @@ def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
     trial_image_names = trial_obj._get_trial_image_names(stimuli)
     assert trial_image_names == expected
 
+
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, start_frame,"
                          "expected",
                          [({}, 0, ('grating', 90, 'gratings_90')),
@@ -136,3 +139,105 @@ def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
     assert resolved == expected
 
 
+@pytest.mark.parametrize(
+    "go,catch,auto_rewarded,hit,false_alarm,aborted,errortext", [
+        (False, False, False, True, False, True,
+         "'aborted' trials cannot be"),  # aborted and hit
+        (False, False, False, False, True, True,
+         "'aborted' trials cannot be"),  # aborted and false alarm
+        (False, False, True, False, False, True,
+         "'aborted' trials cannot be"),  # aborted and auto_rewarded
+        (False, False, False, True, True, False,
+         "both `hit` and `false_alarm` cannot be True"),  # hit and false alarm
+        (True, True, False, False, False, False,
+         "both `go` and `catch` cannot be True"),  # go and catch
+        # go and auto_rewarded
+        (True, False, True, False, False, False,
+         "both `go` and `auto_rewarded` cannot be True")
+    ]
+)
+def test_get_trial_timing_exclusivity_assertions(
+        go, catch, auto_rewarded, hit, false_alarm, aborted, errortext):
+    with pytest.raises(AssertionError) as e:
+        Trial._get_trial_timing(
+            None, None, go, catch, auto_rewarded, hit, false_alarm,
+            aborted, np.array([]))
+    assert errortext in str(e.value)
+
+
+def test_get_trial_timing():
+    event_dict = {
+        ('trial_start', ''): {'timestamp': 306.4785879253758, 'frame': 18075},
+        ('initial_blank', 'enter'): {'timestamp': 306.47868008512637,
+                                     'frame': 18075},
+        ('initial_blank', 'exit'): {'timestamp': 306.4787637603285,
+                                    'frame': 18075},
+        ('pre_change', 'enter'): {'timestamp': 306.47883573270514,
+                                  'frame': 18075},
+        ('pre_change', 'exit'): {'timestamp': 306.4789062422286,
+                                 'frame': 18075},
+        ('stimulus_window', 'enter'): {'timestamp': 306.478977629464,
+                                       'frame': 18075},
+        ('stimulus_changed', ''): {'timestamp': 310.9827406729944,
+                                   'frame': 18345},
+        ('auto_reward', ''): {'timestamp': 310.98279450599154, 'frame': 18345},
+        ('response_window', 'enter'): {'timestamp': 311.13223900212347,
+                                       'frame': 18354},
+        ('response_window', 'exit'): {'timestamp': 311.73284526699706,
+                                      'frame': 18390},
+        ('miss', ''): {'timestamp': 311.7330193465259, 'frame': 18390},
+        ('stimulus_window', 'exit'): {'timestamp': 315.2356723770604,
+                                      'frame': 18600},
+        ('no_lick', 'exit'): {'timestamp': 315.23582480636213, 'frame': 18600},
+        ('trial_end', ''): {'timestamp': 315.23590438557534, 'frame': 18600}
+    }
+
+    licks = [
+        312.24876,
+        312.58027,
+        312.73126,
+        312.86627,
+        313.02635,
+        313.16292,
+        313.54016,
+        314.04408,
+        314.47449,
+        314.61011,
+        314.75495,
+    ]
+
+    # Only need to worry about the timestamp
+    # value at change_frame
+    # because get_trial_timing will only use
+    # timestamps to lookup the timestamp of
+    # change_frame
+    timestamps = np.zeros(20000, dtype=float)
+    timestamps[18345] = 311.77086
+
+    result = Trial._get_trial_timing(
+        event_dict,
+        licks,
+        go=False,
+        catch=False,
+        auto_rewarded=True,
+        hit=False,
+        false_alarm=False,
+        aborted=False,
+        timestamps=timestamps
+    )
+
+    expected_result = {
+        'start_time': 306.4785879253758,
+        'stop_time': 315.23590438557534,
+        'trial_length': 8.757316460199547,
+        'response_time': 312.24876,
+        'change_frame': 18345,
+        'change_time': 311.77086,
+        'response_latency': 0.4778999999999769
+    }
+
+    # use assert_frame_equal to take advantage of the
+    # nice way it deals with NaNs
+    pd.testing.assert_frame_equal(pd.DataFrame(result, index=[0]),
+                                  pd.DataFrame(expected_result, index=[0]),
+                                  check_names=False)
