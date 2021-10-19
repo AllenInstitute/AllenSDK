@@ -74,24 +74,6 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 
 
-def categorize_one_trial(tr):
-    if pd.isnull(tr['change_time']):
-        if (len(tr['lick_times']) > 0):
-            trial_type = 'aborted'
-        else:
-            trial_type = 'other'
-    else:
-        if (tr['auto_rewarded'] is True):
-            return 'autorewarded'
-        elif (tr['rewarded'] is True):
-            return 'go'
-        elif (tr['rewarded'] == 0):
-            return 'catch'
-        else:
-            return 'other'
-    return trial_type
-
-
 def find_licks(reward_times, licks, window=3.5):
     if len(reward_times) == 0:
         return []
