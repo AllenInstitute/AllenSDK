@@ -74,11 +74,6 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 
 
-def get_time(exp_data):
-    vsyncs = exp_data["items"]["behavior"]["intervalsms"]
-    return np.hstack((0, vsyncs)).cumsum() / 1000.0
-
-
 def data_to_licks(data, time):
     lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
     lick_times = time[lick_frames]
