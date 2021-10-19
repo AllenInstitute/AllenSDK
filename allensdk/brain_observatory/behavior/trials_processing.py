@@ -177,17 +177,6 @@ def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
         raise AssertionError(msg)
 
 
-def get_trial_reward_time(rebased_reward_times,
-                          start_time,
-                          stop_time):
-    '''extract reward times in time range'''
-    reward_times = rebased_reward_times[np.where(np.logical_and(
-        rebased_reward_times >= start_time,
-        rebased_reward_times <= stop_time
-    ))]
-    return float('nan') if len(reward_times) == 0 else one(reward_times)
-
-
 def get_trial_bounds(trial_log: List) -> List:
     """
     Adjust trial boundaries from a trial_log so that there is no dead time
