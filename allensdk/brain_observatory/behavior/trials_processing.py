@@ -74,13 +74,6 @@ RIG_NAME = {
 RIG_NAME = {k.lower(): v for k, v in RIG_NAME.items()}
 
 
-def data_to_licks(data, time):
-    lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
-    lick_times = time[lick_frames]
-    return pd.DataFrame(data={"timestamps": lick_times,
-                              "frame": lick_frames})
-
-
 def get_response_latency(change_event, trial):
 
     for response_event in trial['events']:
