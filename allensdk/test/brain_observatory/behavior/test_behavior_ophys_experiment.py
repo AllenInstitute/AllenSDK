@@ -219,7 +219,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
         ctx.setattr(
             StimulusTimestamps, 'from_sync_file',
             lambda sync_file, monitor_delay:
-                            create_autospec(StimulusTimestamps,
+            create_autospec(StimulusTimestamps,
                             instance=True))
         ctx.setattr(
             BehaviorSessionId, 'from_lims',
@@ -387,6 +387,7 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods(
 
     assert any(expected ^ set(obt)) is False
 
+
 @pytest.mark.requires_bamboo
 def test_stim_v_trials_time(
         behavior_ophys_experiment_fixture):
@@ -399,12 +400,15 @@ def test_stim_v_trials_time(
     one index in the StimulusTimestamps array
     """
     exp = behavior_ophys_experiment_fixture
+
     stim = exp.stimulus_presentations.\
-                 query('is_change').start_time.reset_index(drop=True)
+        query('is_change').\
+        start_time.reset_index(drop=True)
+
     trials = exp.trials.\
-                 query('not aborted').\
-                 query('go or auto_rewarded')['change_time'].\
-                 reset_index(drop=True)
+        query('not aborted').\
+        query('go or auto_rewarded')['change_time'].\
+        reset_index(drop=True)
 
     delta = np.abs(stim-trials)
     assert delta.max() < 1.0e-6
