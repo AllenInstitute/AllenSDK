@@ -168,7 +168,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             is_multiplane=is_multiplane_session
         )
 
-
         sync_file = SyncFile.from_lims(db=lims_db,
                                        ophys_experiment_id=ophys_experiment_id)
 
