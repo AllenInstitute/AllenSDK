@@ -7,59 +7,27 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
 
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, trial, expected",
                          [({},
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 0)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'gratings_90',
-                               'change_image_name': 'gratings_90'
-                           }),
+                           {'events': [(None, None, None, 0)],
+                            'stimulus_changes': []},
+                           {'initial_image_name': 'gratings_90',
+                            'change_image_name': 'gratings_90'}),
                           ({},
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 0)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                       (('horizontal', 90),
-                                        ('vertical', 180),
-                                        None,
-                                        None)
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'gratings_90',
-                               'change_image_name': 'gratings_180'
-                           }),
-                           ({
-                              "images_set_log": [
-                                  ('Image', 'im065', 5, 0)],
-                              "grating_set_log": [
-                                  ("Ori", 270, 15, 6)]
-                          },
-                           {
-                               'events':
-                                   [
-                                       (None, None, None, 5)
-                                   ],
-                               'stimulus_changes':
-                                   [
-                                       (('im065', 'im065'), ('im057', 'im057'),
-                                        None, None)
-                                   ]
-                           },
-                           {
-                               'initial_image_name': 'im065',
-                               'change_image_name': 'im057'
-                           }
-                         )],
+                           {'events': [(None, None, None, 0)],
+                            'stimulus_changes':[
+                                (('horizontal', 90),
+                                 ('vertical', 180),
+                                 None, None)]},
+                           {'initial_image_name': 'gratings_90',
+                            'change_image_name': 'gratings_180'}),
+                          ({"images_set_log": [('Image', 'im065', 5, 0)],
+                            "grating_set_log": [("Ori", 270, 15, 6)]},
+                           {'events': [(None, None, None, 5)],
+                            'stimulus_changes':
+                                [(('im065', 'im065'),
+                                  ('im057', 'im057'),
+                                  None, None)]},
+                           {'initial_image_name': 'im065',
+                            'change_image_name': 'im057'})],
                          indirect=['behavior_stimuli_data_fixture'])
 def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
                                expected):
@@ -69,6 +37,7 @@ def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
         def _calculate_trial_end(trial_end,
                                  behavior_stimulus_file):
             return -999
+
         def _match_to_sync_timestamps(
                 self,
                 stimulus_timestamps,
@@ -115,6 +84,7 @@ def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
         def _calculate_trial_end(trial_end,
                                  behavior_stimulus_file):
             return -999
+
         def _match_to_sync_timestamps(
                 self,
                 stimulus_timestamps,
