@@ -1,12 +1,8 @@
 import pytest
 import pandas as pd
 import numpy as np
-from itertools import combinations
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior import trials_processing
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.internal.api import db_connection_creator
 
 
 _test_response_latency_0 = np.array(
