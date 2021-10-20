@@ -1,13 +1,8 @@
-from typing import List, Dict
-import uuid
-from copy import deepcopy
-import collections
-import dateutil
+from typing import List
 
 import pandas as pd
 import numpy as np
 
-from allensdk import one
 from allensdk.brain_observatory.behavior.dprime import (
     get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
     get_trial_count_corrected_hit_rate,
