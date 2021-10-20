@@ -32,6 +32,12 @@ class TestFromStimulusFile(LimsTest):
         dir = Path(__file__).parent.resolve()
         test_data_dir = dir / 'test_data'
 
+        # Note: trials.pkl must be created from a BehaviorSession,
+        # not a BehaviorOphysExperiment. If it is created from
+        # a BehaviorOphysExperiment, the stimulus timestamps will be
+        # instantiated from a sync file, rather than a stimulus file.
+        # The tests expect stimulus_timestamps to be instantiated
+        # from a stimulus file.
         expected = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
         cls.expected = TrialTable(trials=expected)
 
