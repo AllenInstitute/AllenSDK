@@ -212,7 +212,7 @@ def test_get_trial_timing():
     # timestamps to lookup the timestamp of
     # change_frame
     timestamps = np.zeros(20000, dtype=float)
-    timestamps[18345] = 311.77086
+    timestamps[18346] = 311.77086
 
     result = Trial._get_trial_timing(
         event_dict,
@@ -231,7 +231,7 @@ def test_get_trial_timing():
         'stop_time': 315.23590438557534,
         'trial_length': 8.757316460199547,
         'response_time': 312.24876,
-        'change_frame': 18345,
+        'change_frame': 18346,
         'change_time': 311.77086,
         'response_latency': 0.4778999999999769
     }
