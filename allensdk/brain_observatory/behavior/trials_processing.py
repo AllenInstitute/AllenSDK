@@ -129,6 +129,17 @@ def calculate_response_latency_list(
         len() = trials.shape[0]
         value is 'inf' if there are no valid licks in the trial
 
+    Note
+    -----
+    response_window_start is listed as
+    "relative to the non-display-lag-compensated..." because it
+    comes directly from the stimulus file, which knows nothing
+    about the display lag. However, response_window_start is
+    only ever compared to the difference between
+    trial.lick_times and trial.change_time, both of which are
+    corrected for monitor delay, so it does not matter
+    (the two instance of monitor delay cancel out in the
+    difference).
     """
     response_latency_list = []
     for _, t in trials.iterrows():
