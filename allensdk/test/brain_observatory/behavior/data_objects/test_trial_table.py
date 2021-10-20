@@ -45,12 +45,7 @@ class TestFromStimulusFile(LimsTest):
     def test_from_stimulus_file(self):
         stimulus_file, stimulus_timestamps, licks, rewards = \
             self._get_trial_table_data()
-        sync_file = SyncFile.from_lims(
-            db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
-        equipment = Equipment.from_lims(
-            behavior_session_id=self.behavior_session_id, lims_db=self.dbconn)
-        monitor_delay = calculate_monitor_delay(sync_file=sync_file,
-                                                equipment=equipment)
+
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
