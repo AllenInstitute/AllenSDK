@@ -18,6 +18,10 @@ from allensdk.api.cloud_cache.cloud_cache import (
 MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
 
+class BehaviorCloudCacheManifestException(Exception):
+    pass
+
+
 class BehaviorCloudCacheVersionException(Exception):
     pass
 
@@ -83,6 +87,37 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         self._local = local
         self.load_manifest()
 
+    def _validate_cache_metadata(self):
+        """
+        Validate that self.cache._manifest refers to the expected
+        metadata files.
+
+        Raises
+        ------
+        BehaviorCloudCacheManifestException
+            If the manifest does not contain the correct metadata files
+        """
+        expected_metadata = set(["behavior_session_table",
+                                 "ophys_session_table",
+                                 "ophys_experiment_table",
+                                 "ophys_cells_table"])
+
+        if self.cache._manifest.metadata_file_names is None:
+            raise BehaviorCloudCacheManifestException(
+                        "S3CloudCache object has no metadata "
+                        "file names. BehaviorProjectCloudApi "
+                        "expects a S3CloudCache passed which "
+                        "has already run load_manifest()")
+
+        cache_metadata = set(self.cache._manifest.metadata_file_names)
+
+        if cache_metadata != expected_metadata:
+            raise BehaviorCloudCacheManifestException(
+                        "expected S3CloudCache object to have "
+                        f"metadata file names: {expected_metadata} "
+                        f"but it has {cache_metadata}")
+
+
     def load_manifest(self, manifest_name: Optional[str] = None):
         """
         Load the specified manifest file into the CloudCache
@@ -98,22 +133,19 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         else:
             self.cache.load_manifest(manifest_name)
 
-        expected_metadata = set(["behavior_session_table",
-                                 "ophys_session_table",
-                                 "ophys_experiment_table",
-                                 "ophys_cells_table"])
+        try:
+            self._validate_cache_metadata()
+        except BehaviorCloudCacheManifestException:
+            msg = 'The manifest you tried to load\n'
+            msg += f'{self.cache._manifest_name}\n'
+            msg += ' is out of date '
+            msg += 'with this version of the SDK. We will try to load '
+            msg += 'the most up-to-date manifest'
+            print(msg)
 
-        if self.cache._manifest.metadata_file_names is None:
-            raise RuntimeError("S3CloudCache object has no metadata "
-                               "file names. BehaviorProjectCloudApi "
-                               "expects a S3CloudCache passed which "
-                               "has already run load_manifest()")
-        cache_metadata = set(self.cache._manifest.metadata_file_names)
-
-        if cache_metadata != expected_metadata:
-            raise RuntimeError("expected S3CloudCache object to have "
-                               f"metadata file names: {expected_metadata} "
-                               f"but it has {cache_metadata}")
+            self.cache.load_latest_manifest()
+            self._validate_cache_metadata()
+            print(f'successfully loaded\n{self.cache._manifest_name}')
 
         if not self.skip_version_check:
             data_sdk_version = [i for i in self.cache._manifest._data_pipeline
