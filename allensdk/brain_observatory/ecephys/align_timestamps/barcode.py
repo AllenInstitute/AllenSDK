@@ -21,7 +21,7 @@ def extract_barcodes_from_times(
         Minimun duration of time between barcodes.
     bar_duration : numeric, optional
         A value slightly shorter than the expected duration of each bar
-    barcode_duration_ceiling : numeric, optional 
+    barcode_duration_ceiling : numeric, optional
         The maximum duration of a single barcode
     nbits : int, optional
         The bit-depth of each barcode
@@ -36,7 +36,7 @@ def extract_barcodes_from_times(
     Notes
     -----
     ignores first code in prod (ok, but not intended)
-    ignores first on pulse (intended - this is needed to identify that a 
+    ignores first on pulse (intended - this is needed to identify that a
     barcode is starting)
 
     """
@@ -51,13 +51,13 @@ def extract_barcodes_from_times(
 
         oncode = on_times[
             np.where(
-                np.logical_and(on_times > t, 
+                np.logical_and(on_times > t,
                                on_times < t + barcode_duration_ceiling)
             )[0]
         ]
         offcode = off_times[
             np.where(
-                np.logical_and(off_times > t, 
+                np.logical_and(off_times > t,
                                off_times < t + barcode_duration_ceiling)
             )[0]
         ]
@@ -99,8 +99,8 @@ def extract_barcodes_from_times(
     return barcode_start_times, barcodes
 
 
-def find_matching_index(master_barcodes, 
-                        probe_barcodes, 
+def find_matching_index(master_barcodes,
+                        probe_barcodes,
                         alignment_type="start"):
     """Given a set of barcodes for the master clock and the probe clock, find the
     indices of a matching set, either starting from the beginning or the end
@@ -154,24 +154,24 @@ def find_matching_index(master_barcodes,
 
 
 def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
-    """Given sequences of barcode values and (local) times on a probe line 
-    and a master line, find the time points on each clock corresponding to 
+    """Given sequences of barcode values and (local) times on a probe line
+    and a master line, find the time points on each clock corresponding to
     the first and last shared barcode.
 
-    If there's only one probe barcode, only the first matching timepoint 
+    If there's only one probe barcode, only the first matching timepoint
     is returned.
 
     Parameters
     ----------
     master_times : np.ndarray
-        start times of barcodes (according to the master clock) on the 
-        master line. 
+        start times of barcodes (according to the master clock) on the
+        master line.
         One per barcode.
     master_barcodes : np.ndarray
         barcode values on the master line. One per barcode
     probe_times : np.ndarray
-        start times (according to the probe clock) of barcodes on the 
-        probe line. 
+        start times (according to the probe clock) of barcodes on the
+        probe line.
         One per barcode
     probe_barcodes : np.ndarray
         barcode values on the probe_line. One per barcode
@@ -179,10 +179,10 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     Returns
     -------
     probe_interval : np.ndarray
-        Start and end times of the matched interval according to the 
+        Start and end times of the matched interval according to the
         probe_clock.
     master_interval : np.ndarray
-        Start and end times of the matched interval according to the 
+        Start and end times of the matched interval according to the
         master clock
 
     """
@@ -203,10 +203,10 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     print("Master start index: " + str(master_start_index))
     if len(probe_barcodes) > 2:
         master_end_index, probe_end_index = \
-            find_matching_index(master_barcodes, 
-                                probe_barcodes, 
+            find_matching_index(master_barcodes,
+                                probe_barcodes,
                                 alignment_type='end')
-        
+
         if probe_end_index is not None:
             print("Probe end index: " + str(probe_end_index))
             t_m_end = master_times[master_end_index]
@@ -233,14 +233,14 @@ def linear_transform_from_intervals(master, probe):
     Returns
     -------
     scale : float
-        Scale factor. If > 1.0, the probe clock is running fast compared to the 
+        Scale factor. If > 1.0, the probe clock is running fast compared to the
         master clock. If < 1.0, the probe clock is running slow.
     translation : float
         If > 0, the probe clock started before the master clock. If > 0, after.
 
     Notes
     -----
-    solves 
+    solves
         (master + translation) * scale = probe
     for scale and translation
     """
@@ -266,20 +266,20 @@ def get_probe_time_offset(
     acq_start_index,
     local_probe_rate,
 ):
-    """Time offset between master clock and recording probes. For converting 
+    """Time offset between master clock and recording probes. For converting
     probe time to master clock.
-    
+
     Parameters
     ----------
     master_times : np.ndarray
-        start times of barcodes (according to the master clock) on the master 
-        line. 
+        start times of barcodes (according to the master clock) on the master
+        line.
         One per barcode.
     master_barcodes : np.ndarray
         barcode values on the master line. One per barcode
     probe_times : np.ndarray
-        start times (according to the probe clock) of barcodes on the probe 
-        line. 
+        start times (according to the probe clock) of barcodes on the probe
+        line.
         One per barcode
     probe_barcodes : np.ndarray
         barcode values on the probe_line. One per barcode
@@ -287,20 +287,20 @@ def get_probe_time_offset(
         sample index of probe acquisition start time
     local_probe_rate : float
         the probe's apparent sampling rate
-    
+
 
     Returns
     -------
     total_time_shift : float
-        Time at which the probe started acquisition, assessed on 
-        the master clock. If < 0, the probe started earlier than the master 
+        Time at which the probe started acquisition, assessed on
+        the master clock. If < 0, the probe started earlier than the master
         line.
     probe_rate : float
         The probe's sampling rate, assessed on the master clock
     master_endpoints : iterable
-        Defines the start and end times of the sync interval on the master 
+        Defines the start and end times of the sync interval on the master
         clock
-    
+
     """
 
     probe_endpoints, master_endpoints = match_barcodes(

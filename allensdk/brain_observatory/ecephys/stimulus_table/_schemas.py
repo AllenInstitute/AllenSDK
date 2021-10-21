@@ -6,7 +6,7 @@ from argschema.fields import Nested, String, Float, Dict, List, Bool
 
 
 default_stimulus_renames = {
-    "blank_stimulus": "spontaneous",
+    "": "spontaneous",
 
     "natural_movie_1": "natural_movie_one",
     "natural_movie_3": "natural_movie_three",
@@ -24,7 +24,7 @@ default_stimulus_renames = {
     "natural_movie_shuffled": "natural_movie_one_shuffled",
     "motion_stimulus": "dot_motion",
     "drifting_gratings_more_repeats": "drifting_gratings_75_repeats",
-    
+
     "signal_noise_test_0_200_repeats": "test_movie_one",
 
     "signal_noise_test_0": "test_movie_one",
@@ -53,19 +53,19 @@ default_column_renames = {
 
 class InputParameters(ArgSchema):
     stimulus_pkl_path = String(
-        required=True, 
+        required=True,
         help="""path to pkl file containing raw stimulus information"""
     )
     sync_h5_path = String(
-        required=True, 
+        required=True,
         help="""path to h5 file containing syncronization information"""
     )
     output_stimulus_table_path = String(
-        required=True, 
+        required=True,
         help="""the output stimulus table csv will be written here"""
     )
     output_frame_times_path = String(
-        required=True, 
+        required=True,
         help="""output all frame times here""")
     minimum_spontaneous_activity_duration = Float(
         default=sys.float_info.epsilon,
@@ -74,14 +74,14 @@ class InputParameters(ArgSchema):
     )
     maximum_expected_spontanous_activity_duration = Float(
         default=1225.02541,
-        help="""validation will fail if a spontanous activity epoch longer 
+        help="""validation will fail if a spontanous activity epoch longer
         than this one is computed.""",
     )
     frame_time_strategy = String(
         default="use_photodiode",
-        help="""technique used to align frame times. Options are 'use_photodiode', 
-        which interpolates frame times between photodiode edge times 
-        (preferred when vsync times are unreliable) and 'use_vsyncs', 
+        help="""technique used to align frame times. Options are 'use_photodiode',
+        which interpolates frame times between photodiode edge times
+        (preferred when vsync times are unreliable) and 'use_vsyncs',
         which is preferred when reliable vsync times are available.""",
     )
     stimulus_name_map = Dict(
@@ -91,9 +91,9 @@ class InputParameters(ArgSchema):
         default=default_stimulus_renames
     )
     column_name_map = Dict(
-        keys=String(), 
-        values=String(), 
-        help="optionally rename stimulus parameters", 
+        keys=String(),
+        values=String(),
+        help="optionally rename stimulus parameters",
         default=default_column_renames
     )
     extract_const_params_from_repr = Bool(default=True)
@@ -105,13 +105,13 @@ class InputParameters(ArgSchema):
 
     fail_on_negative_duration = Bool(
         default=False,
-        help="""Determine if the module should fail if a 
+        help="""Determine if the module should fail if a
         stimulus epoch has a negative duration."""
     )
 
     trim_discontiguous_frame_times = Bool(
         default=True,
-        help="""set to False if stimulus was shown in chunks, 
+        help="""set to False if stimulus was shown in chunks,
         and discontiguous vsyncs are expected"""
     )
 

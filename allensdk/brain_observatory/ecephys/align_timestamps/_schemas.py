@@ -10,12 +10,12 @@ class ProbeMappable(DefaultSchema):
     )
     input_path = String(
         required=True,
-        help="""Input path for this file. Should point to a file containing a 1D 
+        help="""Input path for this file. Should point to a file containing a 1D
                 timestamps array with values in probe samples.""",
     )
     output_path = String(
         required=True,
-        help="""Output path for the mapped version of this file. Will write a 1D 
+        help="""Output path for the mapped version of this file. Will write a 1D
                 timestamps array with values in seconds on the master clock."""
     )
 
@@ -24,35 +24,35 @@ class ProbeInputParameters(DefaultSchema):
     name = String(required=True, help="Identifier for this probe")
     sampling_rate = Float(
         required=True,
-        help="""The sampling rate of the probe, in Hz, assessed on 
+        help="""The sampling rate of the probe, in Hz, assessed on
                 the probe clock.""",
     )
     lfp_sampling_rate = Float(
-        required=True, help="""The sampling rate of the LFP collected on this 
+        required=True, help="""The sampling rate of the LFP collected on this
                             probe."""
     )
     start_index = Int(
-        default=0, help="""Sample index of probe recording start time. 
+        default=0, help="""Sample index of probe recording start time.
         Defaults to 0."""
     )
     barcode_channel_states_path = String(
         required=True,
-        help="""Path to the channel states file. This file contains a 
+        help="""Path to the channel states file. This file contains a
                 1-dimensional array whose axis is events and whose
-                values indicate the state of the channel line (rising or 
+                values indicate the state of the channel line (rising or
                 falling) at that event.""",
     )
     barcode_timestamps_path = String(
         required=True,
         help="""Path to the timestamps file. This file contains a 1-dimensional
-         array whose axis is events and whose values indicate the sample 
+         array whose axis is events and whose values indicate the sample
          on which each event was detected.""",
     )
     mappable_timestamp_files = Nested(
         ProbeMappable,
         many=True,
-        help="""Timestamps files for this probe. Describe the times (in probe 
-                samples) when e.g. lfp samples were taken or spike events 
+        help="""Timestamps files for this probe. Describe the times (in probe
+                samples) when e.g. lfp samples were taken or spike events
                 occured""",
     )
 
@@ -64,8 +64,8 @@ class InputParameters(ArgSchema):
         help="Probes whose data will be aligned to the master clock.",
     )
     sync_h5_path = String(
-        required=True, 
-        help="""path to h5 file containing syncronization 
+        required=True,
+        help="""path to h5 file containing syncronization
                 information"""
     )
 
@@ -83,7 +83,7 @@ class ProbeOutputParameters(DefaultSchema):
     )
     global_probe_sampling_rate = Float(
         required=True,
-        help="""The sampling rate of this probe in Hz, assessed on the master 
+        help="""The sampling rate of this probe in Hz, assessed on the master
                 clock.""",
     )
     global_probe_lfp_sampling_rate = Float(
@@ -94,7 +94,7 @@ class ProbeOutputParameters(DefaultSchema):
     split_times = List(
         Float(),
         required=True,
-        help="""Start/stop times of likely dropped data, due to gaps in 
+        help="""Start/stop times of likely dropped data, due to gaps in
                 recording or irregular barcode intervals"""
     )
 

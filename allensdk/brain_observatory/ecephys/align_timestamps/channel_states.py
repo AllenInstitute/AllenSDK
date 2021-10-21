@@ -16,7 +16,7 @@ def extract_barcodes_from_states(
         Sample index of each event.
     sampling_rate : numeric
         Samples / second
-    **barcode_kwargs : 
+    **barcode_kwargs :
         Additional parameters describing the barcodes.
 
 
@@ -44,7 +44,7 @@ def extract_splits_from_states(
         Sample index of each event.
     sampling_rate : numeric
         Samples / second
-    **barcode_kwargs : 
+    **barcode_kwargs :
         Additional parameters describing the barcodes.
 
 
@@ -77,7 +77,7 @@ def extract_splits_from_barcode_times(
 
     median_interval = np.median(barcode_intervals)
 
-    irregular_intervals = np.where(np.abs(barcode_intervals - median_interval) 
+    irregular_intervals = np.where(np.abs(barcode_intervals - median_interval)
                                    > tolerance * median_interval)[0]
 
     T_split = [0]

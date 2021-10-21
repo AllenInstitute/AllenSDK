@@ -110,24 +110,24 @@ class Probe(RaisingSchema):
     csd_path = String(required=False,
                       validate=check_read_access,
                       allow_none=True,
-                      help="""path to h5 file containing calculated current 
+                      help="""path to h5 file containing calculated current
                               source density""")
     sampling_rate = Float(
-        default=30000.0, 
+        default=30000.0,
         help="""sampling rate (Hz, master clock) at which raw data were
                 acquired on this probe""")
     lfp_sampling_rate = Float(
-        default=2500.0, 
-        allow_none=True, 
+        default=2500.0,
+        allow_none=True,
         help="""sampling rate of LFP data on this probe""")
     temporal_subsampling_factor = Float(
-        default=2.0, 
-        allow_none=True, 
-        help="""subsampling factor applied to lfp data for 
+        default=2.0,
+        allow_none=True,
+        help="""subsampling factor applied to lfp data for
                 this probe (across time)""")
     spike_amplitudes_path = String(
         validate=check_read_access,
-        help="""path to npy file containing scale factor applied to the 
+        help="""path to npy file containing scale factor applied to the
                 kilosort template used to extract each spike"""
     )
     spike_templates_path = String(
@@ -136,18 +136,18 @@ class Probe(RaisingSchema):
     )
     templates_path = String(
         validate=check_read_access,
-        help="""path to file containing an (nTemplates)x(nSamples)x(nUnits) 
+        help="""path to file containing an (nTemplates)x(nSamples)x(nUnits)
                 array of kilosort templates"""
     )
     inverse_whitening_matrix_path = String(
         validate=check_read_access,
-        help="""Kilosort templates are whitened. In order to use them for 
-                scaling spike amplitudes to volts, we need to remove 
+        help="""Kilosort templates are whitened. In order to use them for
+                scaling spike amplitudes to volts, we need to remove
                 the whitening"""
     )
     amplitude_scale_factor = Float(
         default=0.195e-6,
-        help="""amplitude scale factor converting raw amplitudes to Volts. 
+        help="""amplitude scale factor converting raw amplitudes to Volts.
                 Default converts from bits -> uV -> V"""
     )
 
@@ -209,14 +209,14 @@ class InputSchema(ArgSchema):
     )
     running_speed_path = String(
         required=True,
-        help="""data collected about the running behavior of the experiment's 
+        help="""data collected about the running behavior of the experiment's
                 subject""",
     )
     session_sync_path = String(
         required=True,
         validate=check_read_access,
         help="""Path to an h5 experiment session sync file (*.sync). This file
-                relates events from different acquisition modalities to one 
+                relates events from different acquisition modalities to one
                 another in time."""
     )
     pool_size = Int(
@@ -226,31 +226,31 @@ class InputSchema(ArgSchema):
     optotagging_table_path = String(
         required=False,
         validate=check_read_access,
-        help="""file at this path contains information about the optogenetic 
+        help="""file at this path contains information about the optogenetic
                 stimulation applied during this experiment"""
     )
     eye_tracking_rig_geometry = Dict(
         required=False,
-        help="""Mapping containing information about session rig geometry used 
+        help="""Mapping containing information about session rig geometry used
                 for eye gaze mapping."""
     )
     eye_dlc_ellipses_path = String(
         required=False,
         validate=check_read_access,
-        help="""h5 filepath containing raw ellipse fits produced by Deep Lab 
-                Cuts of subject eye, pupil, and corneal reflections during 
+        help="""h5 filepath containing raw ellipse fits produced by Deep Lab
+                Cuts of subject eye, pupil, and corneal reflections during
                 experiment"""
     )
     eye_gaze_mapping_path = String(
         required=False,
         allow_none=True,
-        help="""h5 filepath containing eye gaze behavior of the 
+        help="""h5 filepath containing eye gaze behavior of the
                 experiment's subject"""
     )
     session_metadata = Nested(
-        SessionMetadata, 
-        allow_none=True, 
-        required=False, 
+        SessionMetadata,
+        allow_none=True,
+        required=False,
         help="miscellaneous information describing this session""")
 
 

@@ -22,13 +22,13 @@ class InputParameters(ArgSchema):
     use_median_duration = Boolean(
         default=True,
         help="frame timestamps are often too noisy to use as the " +
-             "denominator in the velocity calculation. " + 
+             "denominator in the velocity calculation. " +
              "Can instead use the median frame duration."
     )
 
     trim_discontiguous_frame_times = Boolean(
         default=True,
-        help="set to False if stimulus was shown in chunks, " + 
+        help="set to False if stimulus was shown in chunks, " +
              "and discontiguous vsyncs are expected."
     )
 
