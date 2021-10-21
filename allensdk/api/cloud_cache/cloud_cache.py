@@ -494,7 +494,7 @@ class CloudCacheBase(BasicLocalCache):
             return None
 
         with open(self._manifest_last_used, 'r') as in_file:
-            to_load = in_file.read()
+            to_load = in_file.read().strip()
 
         latest = self.latest_manifest_file
 
