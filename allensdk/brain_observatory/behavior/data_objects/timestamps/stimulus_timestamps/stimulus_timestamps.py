@@ -130,6 +130,10 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         stim_module = nwbfile.processing["stimulus"]
         stim_ts_interface = stim_module.get_data_interface("timestamps")
         stim_timestamps = stim_ts_interface.timestamps[:]
+
+        # Because the monitor delay was already applied when
+        # saving the stimulus timestamps to the NWB file,
+        # we set it to zero here.
         return cls(timestamps=stim_timestamps,
                    monitor_delay=0.0)
 
