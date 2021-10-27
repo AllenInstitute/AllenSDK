@@ -5,6 +5,8 @@ from unittest.mock import create_autospec
 
 import numpy as np
 
+from itertools import product
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
@@ -299,18 +301,21 @@ def test_stimulus_timestamps_from_lims(
 #   test/brain_observatory/behavior/conftest.py
 # data_object_roundtrip_fixture:
 #   test/brain_observatory/behavior/data_objects/conftest.py
-@pytest.mark.parametrize('roundtrip, stimulus_timestamps_data', [
-    (True, np.array([1, 2, 3, 4, 5])),
-    (True, np.array([6, 7, 8, 9, 10])),
-    (False, np.array([11, 12, 13, 14, 15])),
-    (False, np.array([16, 17, 18, 19, 20]))
-])
+@pytest.mark.parametrize(
+    'roundtrip, raw_stimulus_timestamps_data, monitor_delay',
+    product((True, False),
+            (np.arange(1, 6, 1), np.arange(6, 11, 1)),
+            (0.1, 0.2)))
 def test_stimulus_timestamps_nwb_roundtrip(
-    nwbfile, data_object_roundtrip_fixture, roundtrip, stimulus_timestamps_data
+    nwbfile,
+    data_object_roundtrip_fixture,
+    roundtrip,
+    raw_stimulus_timestamps_data,
+    monitor_delay
 ):
     stimulus_timestamps = StimulusTimestamps(
-        timestamps=stimulus_timestamps_data,
-        monitor_delay=0.0
+        timestamps=raw_stimulus_timestamps_data,
+        monitor_delay=monitor_delay
     )
     nwbfile = stimulus_timestamps.to_nwb(nwbfile)
 
@@ -319,4 +324,5 @@ def test_stimulus_timestamps_nwb_roundtrip(
     else:
         obt = StimulusTimestamps.from_nwb(nwbfile)
 
-    assert np.allclose(obt.value, stimulus_timestamps_data)
+    assert np.allclose(obt.value,
+                       raw_stimulus_timestamps_data+monitor_delay)
