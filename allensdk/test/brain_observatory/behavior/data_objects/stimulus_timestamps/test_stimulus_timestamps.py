@@ -326,3 +326,30 @@ def test_stimulus_timestamps_nwb_roundtrip(
 
     assert np.allclose(obt.value,
                        raw_stimulus_timestamps_data+monitor_delay)
+
+
+def test_stimulus_timestamps_from_nwb_to_json(
+    nwbfile
+):
+    """
+    Make sure that, if a StimulusTimestamps is created from_nwb,
+    it cannot be written to_json.
+
+    When writing StimulusTimestamps to_nwb, monitor delay is already
+    folded into the timestamp values so that from_nwb reads the
+    timestamps in and sets monitor_delay=0.0. from_json and to_json
+    depend on storing the StimulusFile and a non-zero monitor
+    delay. If we ever decide to make it possible to read a
+    StimulusTimetamps from_nwb and then write it to_json, we will
+    need to start writing the monitor_delay to the NWB file in a
+    consistent manner.
+    """
+    stimulus_timestamps = StimulusTimestamps(
+        timestamps=np.arange(1, 10, 1),
+        monitor_delay=0.1
+    )
+    nwbfile = stimulus_timestamps.to_nwb(nwbfile)
+    obt = StimulusTimestamps.from_nwb(nwbfile)
+    with pytest.raises(RuntimeError,
+                       match="information about the StimulusFile"):
+        obt.to_json()
