@@ -504,6 +504,11 @@ class CloudCacheBase(BasicLocalCache):
             msg += 'is not a valid manifest for this dataset. '
             msg += f'Loading latest version -- {latest} -- '
             msg += 'instead.'
+            msg += '\n'
+            msg += 'valid manifests would have been\n'
+            msg += f'{self.manifest_file_names}'
+            msg += f'\n{type(self.manifest_file_names[0])}'
+            msg += f'\n{type(to_load)}'
             warnings.warn(msg, UserWarning)
             self.load_latest_manifest()
             return None
