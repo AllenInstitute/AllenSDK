@@ -19,6 +19,7 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api \
     import EcephysNwbSessionApi
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing \
     import create_preload_eye_tracking_df
+from allensdk.brain_observatory.nwb import setup_table_for_invalid_times
 
 
 @pytest.fixture
@@ -877,7 +878,7 @@ def test_add_invalid_times(invalid_epochs, tmpdir_factory):
 
 def test_roundtrip_add_invalid_times(nwbfile, invalid_epochs, roundtripper):
 
-    expected = write_nwb.setup_table_for_invalid_times(invalid_epochs)
+    expected = setup_table_for_invalid_times(invalid_epochs)
 
     nwbfile = write_nwb.add_invalid_times(nwbfile, invalid_epochs)
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
@@ -889,7 +890,7 @@ def test_roundtrip_add_invalid_times(nwbfile, invalid_epochs, roundtripper):
 def test_no_invalid_times_table():
 
     epochs = []
-    assert write_nwb.setup_table_for_invalid_times(epochs).empty is True
+    assert setup_table_for_invalid_times(epochs).empty is True
 
 
 def test_setup_table_for_invalid_times():
@@ -902,7 +903,7 @@ def test_setup_table_for_invalid_times():
         "end_time": 2005.0,
     }
 
-    s = write_nwb.setup_table_for_invalid_times([epoch]).loc[0]
+    s = setup_table_for_invalid_times([epoch]).loc[0]
 
     assert s["start_time"] == epoch["start_time"]
     assert s["stop_time"] == epoch["end_time"]
@@ -1127,7 +1128,7 @@ def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-@pytest.mark.parametrize("eye_tracking_rig_geometry, expected", [
+@pytest.mark.parametrize("eye_tracking_rig_geom, expected", [
     ({"monitor_position_mm": [1., 2., 3.],
       "monitor_rotation_deg": [4., 5., 6.],
       "camera_position_mm": [7., 8., 9.],

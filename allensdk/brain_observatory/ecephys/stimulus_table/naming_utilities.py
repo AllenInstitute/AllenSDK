@@ -84,11 +84,9 @@ def add_number_to_shuffled_movie(
         return table
     table = table.copy()
 
-    table[tmp_colname] = table[stim_colname].str.extract(natural_movie_re,
-                                                         expand=True)
-    [
-        "number"
-    ]
+    table[tmp_colname] = \
+        table[stim_colname].str.extract(natural_movie_re,
+                                        expand=True)["number"]
 
     unique_numbers = [
         item for item in table[tmp_colname].dropna(inplace=False).unique()
@@ -109,6 +107,7 @@ def add_number_to_shuffled_movie(
             return template.format(movie_number)
 
     table[stim_colname] = table.apply(renamer, axis=1)
+    print(table.keys())
     table.drop(columns=tmp_colname, inplace=True)
     return table
 
@@ -147,15 +146,14 @@ def standardize_movie_numbers(
     """
 
     def replace(match_obj):
-        digit_names[match_obj["number"]]
+        return digit_names[match_obj["number"]]
 
     # for some reason pandas really wants us to use the captures
     warnings.filterwarnings("ignore", "This pattern has match groups")
 
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
-    table.loc[movie_rows, stim_colname] = table.loc[
-        movie_rows, stim_colname
-    ].str.replace(numeral_re, replace)
+    table.loc[movie_rows, stim_colname] = \
+        table.loc[movie_rows, stim_colname].str.replace(numeral_re, replace)
 
     return table
 
@@ -193,5 +191,7 @@ def map_column_names(table, name_map=None, ignore_case=True):
     if ignore_case and name_map is not None:
         name_map = {key.lower(): value for key, value in name_map.items()}
 
-    return table.rename(columns=name_map)
+    output = table.rename(columns=name_map)
+
+    return output
 #

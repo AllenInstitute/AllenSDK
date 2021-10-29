@@ -91,7 +91,8 @@ def build_stimulus_table(
     print(column_name_map)
 
     stim_table_full = naming_utilities.map_column_names(stim_table_full,
-                                                        column_name_map)
+                                                        column_name_map,
+                                                        ignore_case=False)
 
     print(stim_table_full.keys())
 

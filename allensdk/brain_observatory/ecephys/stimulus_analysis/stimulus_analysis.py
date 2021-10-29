@@ -10,15 +10,16 @@ from scipy.ndimage import gaussian_filter
 
 
 from ..ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
+from allensdk.brain_observatory.ecephys.ecephys_session_api import \
+    EcephysNwbSessionApi
 
-import warnings
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
+
 
 class StimulusAnalysis(object):
     def __init__(self, ecephys_session, trial_duration=None, **kwargs):
         """
-        :param ecephys_session: an EcephySession object or path to ece nwb file.
+        :param ecephys_session: an EcephySession object or path to NWB file.
         """
         # TODO: Create a set of a class methods.
         if isinstance(ecephys_session, EcephysSession):
@@ -183,7 +184,7 @@ class StimulusAnalysis(object):
     def total_presentations(self):
         """ Total nmber of presentations / trials"""
         return len(self.stim_table)
-    
+
     @property
     def metrics_names(self):
         return [c[0] for c in self.METRICS_COLUMNS]
@@ -301,7 +302,7 @@ class StimulusAnalysis(object):
         -------
         presentationwise_statistics: pd.DataFrame
             MultiIndex : unit_id, stimulus_presentation_id
-            Columns : spike_count, stimulus_condition_id, running_speed 
+            Columns : spike_count, stimulus_condition_id, running_speed
 
         """
         if self._presentationwise_statistics is None:
@@ -347,7 +348,7 @@ class StimulusAnalysis(object):
         -------
         running_speed: pd.DataFrame:
             For each stimulus_presenation_id (index) contains the averaged running velocity.
-        
+
         """
         if self._running_speed is None:
             def get_velocity(presentation_id):
@@ -389,10 +390,10 @@ class StimulusAnalysis(object):
             self._sweep_p_values = self._calc_sweep_p_values()
 
         return self._sweep_p_values
-    
+
     def _calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
-        """ Calculates the probability, for each unit and stimulus presentation, that the number of spikes emitted by 
-        that unit during that presentation could have been produced by that unit's spontaneous activity. This is 
+        """ Calculates the probability, for each unit and stimulus presentation, that the number of spikes emitted by
+        that unit during that presentation could have been produced by that unit's spontaneous activity. This is
         implemented as a permutation test using spontaneous activity (gray screen) periods as input data.
 
         Parameters
@@ -401,7 +402,7 @@ class StimulusAnalysis(object):
         Returns
         =======
         sweep_p_values : pd.DataFrame
-            Each row is a stimulus presentation. Each column is a unit. Cells contain the probability that the 
+            Each row is a stimulus presentation. Each column is a unit. Cells contain the probability that the
             unit's spontaneous activity could account for its observed spiking activity during that presentation
             (uncorrected for multiple comparisons).
 
@@ -456,7 +457,7 @@ class StimulusAnalysis(object):
             # value.
             try:
                 df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-            except (IndexError, NotImplementedError) as err:
+            except (IndexError, NotImplementedError, KeyError) as err:
                 df = self.conditionwise_statistics
 
             # TODO: Calculated preferred condition_id once for all units and store in a table.
@@ -482,13 +483,16 @@ class StimulusAnalysis(object):
             self.presentationwise_statistics['stimulus_condition_id'] == preferred_condition
         ].xs(unit_id, level='unit_id')
 
-        spike_counts = subset['spike_counts'].values 
+        spike_counts = subset['spike_counts'].values
         running_speeds = subset['running_speed'].values
         return running_modulation(spike_counts, running_speeds, threshold)
 
     def _get_lifetime_sparseness(self, unit_id):
         """Computes lifetime sparseness of responses for one unit"""
-        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        try:
+            df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        except (IndexError, NotImplementedError, KeyError) as err:
+            df = self.conditionwise_statistics
         responses = df.loc[unit_id]['spike_count'].values
 
         return lifetime_sparseness(responses)
@@ -809,14 +813,14 @@ def deg2rad(arr):
     return arr / 180 * np.pi
 
 def fit_exp(rsc_time_matrix):
-    
+
     intr = abs(rsc_time_matrix)
     tmp = np.nanmean(intr, axis=0)
     n=intr.shape[0]
-    
+
     t = np.arange(len(tmp))[1:]
     y=gaussian_filter(np.nanmean(tmp, axis=0)[1:],0.8)
-    
+
     p, amo = curve_fit(lambda t,a,b,c: a*np.exp(-1/b*t)+c,  t,  y,  p0=(-4, 2, 1), maxfev = 1000000000)
 
     a=p[0]
@@ -835,7 +839,7 @@ def calculate_time_delayed_correlation(dataset):
     rsc_time_matrix = np.zeros((num_units, nbins, nbins)) * np.nan
 
     for unit_idx, unit in enumerate(dataset.unit_id):
-        
+
         spikes_for_unit = dataset.sel(unit_id=unit).data
 
         for i in np.arange(nbins-1):
