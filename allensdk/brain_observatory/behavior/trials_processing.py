@@ -8,6 +8,26 @@ from allensdk.brain_observatory.behavior.dprime import (
     get_trial_count_corrected_hit_rate,
     get_hit_rate, get_false_alarm_rate)
 
+EDF_COLUMNS = ['index', 'lick_times', 'auto_rewarded', 'cumulative_volume',
+               'cumulative_reward_number', 'reward_volume', 'reward_times',
+               'reward_frames', 'rewarded', 'optogenetics', 'response_type',
+               'response_time', 'change_time', 'change_frame',
+               'response_latency', 'starttime', 'startframe', 'trial_length',
+               'scheduled_change_time', 'endtime', 'endframe',
+               'initial_image_category', 'initial_image_name',
+               'change_image_name', 'change_image_category', 'change_ori',
+               'change_contrast', 'initial_ori', 'initial_contrast',
+               'delta_ori', 'mouse_id', 'response_window', 'task', 'stage',
+               'session_duration', 'user_id', 'LDT_mode',
+               'blank_screen_timeout', 'stim_duration',
+               'blank_duration_range', 'prechange_minimum',
+               'stimulus_distribution', 'stimulus', 'distribution_mean',
+               'computer_name', 'behavior_session_uuid', 'startdatetime',
+               'date', 'year', 'month', 'day', 'hour', 'dayofweek',
+               'number_of_rewards', 'rig_id', 'trial_type',
+               'lick_frames', 'reward_licks', 'reward_lick_count',
+               'reward_lick_latency', 'reward_rate', 'response', 'color']
+
 RIG_NAME = {
     'W7DTMJ19R2F': 'A1',
     'W7DTMJ35Y0T': 'A2',
