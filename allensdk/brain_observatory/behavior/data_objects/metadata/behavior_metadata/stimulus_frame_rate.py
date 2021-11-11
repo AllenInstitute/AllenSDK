@@ -1,6 +1,6 @@
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import StimulusFile, SyncFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
