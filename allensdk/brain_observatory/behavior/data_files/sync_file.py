@@ -46,6 +46,10 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
 
+def from_lims_cache_key_session(cls, db, behavior_session_id: int):
+    return hashkey(behavior_session_id)
+
+
 class SyncFile(DataFile):
     """A DataFile which contains methods for accessing and loading visual
     behavior stimulus *.pkl files.
