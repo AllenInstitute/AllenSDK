@@ -28,6 +28,15 @@ class StimulusFrameRate(DataObject, StimulusFileReadableInterface,
         return cls(stimulus_frame_rate=frame_rate)
 
     @classmethod
+    def from_sync_file(
+            cls,
+            sync_file: SyncFile) -> "StimulusFrameRate":
+        stimulus_timestamps = StimulusTimestamps.from_sync_file(
+            sync_file=sync_file)
+        frame_rate = calc_frame_rate(timestamps=stimulus_timestamps.value)
+        return cls(stimulus_frame_rate=frame_rate)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "StimulusFrameRate":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(stimulus_frame_rate=metadata.stimulus_frame_rate)
