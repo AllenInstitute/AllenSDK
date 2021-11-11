@@ -71,7 +71,7 @@ class SyncFile(DataFile):
         return {"sync_file": str(self.filepath)}
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key_session)
     def from_lims(
         cls, db: PostgresQueryMixin,
         ophys_experiment_id: Union[int, str]
