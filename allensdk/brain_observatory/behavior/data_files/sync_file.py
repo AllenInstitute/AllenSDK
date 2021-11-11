@@ -92,7 +92,7 @@ class SyncFile(DataFile):
         query = SYNC_FILE_SESSION_QUERY_TEMPLATE.format(
             behavior_session_id=behavior_session_id
         )
-        filepath = db.fetchone(query, strict=True)
+        filepath = db.fetchall(query, strict=True)[0]
         return cls(filepath=filepath)
 
     @staticmethod
