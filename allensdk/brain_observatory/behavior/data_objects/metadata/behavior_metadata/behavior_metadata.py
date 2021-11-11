@@ -213,7 +213,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             db=lims_db, behavior_session_id=behavior_session_id.value)
         # stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
         #     stimulus_file=stimulus_file)
-        sync_file = SyncFile.from_lims(db=lims_db, ophys_experiment_id=behavior_session_id.value)
+        sync_file = SyncFile.from_lims_for_session(db=lims_db, behavior_session_id=behavior_session_id.value)
         stimulus_frame_rate = StimulusFrameRate.from_sync_file(
             sync_file=sync_file)
         session_type = SessionType.from_stimulus_file(

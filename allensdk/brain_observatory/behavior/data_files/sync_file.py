@@ -24,6 +24,19 @@ SYNC_FILE_QUERY_TEMPLATE = """
     AND oe.id = {ophys_experiment_id};
 """
 
+SYNC_FILE_SESSION_QUERY_TEMPLATE = """
+    SELECT wkf.storage_directory || wkf.filename AS sync_file
+    FROM ophys_experiments oe
+    JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+    JOIN well_known_files wkf ON wkf.attachable_id = os.id
+    JOIN well_known_file_types wkft
+    ON wkft.id = wkf.well_known_file_type_id
+    WHERE wkf.attachable_type = 'OphysSession'
+    AND wkft.name = 'OphysRigSync'
+    AND os.id = {behavior_session_id};
+"""
+
+
 
 def from_json_cache_key(cls, dict_repr: dict):
     return hashkey(json.dumps(dict_repr))
@@ -61,6 +74,19 @@ class SyncFile(DataFile):
     ) -> "SyncFile":
         query = SYNC_FILE_QUERY_TEMPLATE.format(
             ophys_experiment_id=ophys_experiment_id
+        )
+        filepath = db.fetchone(query, strict=True)
+        return cls(filepath=filepath)
+
+
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
+    def from_lims_for_session(
+        cls, db: PostgresQueryMixin,
+        behavior_session_id: Union[int, str]
+    ) -> "SyncFile":
+        query = SYNC_FILE_SESSION_QUERY_TEMPLATE.format(
+            behavior_session_id=behavior_session_id
         )
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)
