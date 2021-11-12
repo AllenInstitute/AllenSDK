@@ -377,7 +377,11 @@ def get_running_df(
     # dx = 'd_theta' = angular change
     # There are some issues with angular change in the raw data so we
     # recompute this value
-    dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
+    try:
+        dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
+    except KeyError:
+        dx_raw = data["items"]["foraging"]["encoders"][0]["dx"]
+        
     # Identify "wraps" in the voltage signal that need to be unwrapped
     # This is where the encoder switches from 0V to 5V or vice versa
     pos_wraps, neg_wraps = _identify_wraps(
