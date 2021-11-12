@@ -149,7 +149,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
     ) -> "RunningAcquisition":
 
         stimulus_file = StimulusFile.from_lims_for_ophys_session(db, ophys_session_id)
-        sync_file = SyncFile.from_lims_for_ophys_session(db=db, ophys_session_id=ophys_session_id.value)
+        sync_file = SyncFile.from_lims_for_ophys_session(db=db, ophys_session_id=ophys_session_id)
         stimulus_timestamps = StimulusTimestamps.from_sync_file(
             sync_file=sync_file)
 
