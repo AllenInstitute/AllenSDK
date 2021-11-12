@@ -33,7 +33,7 @@ SYNC_FILE_SESSION_QUERY_TEMPLATE = """
     ON wkft.id = wkf.well_known_file_type_id
     WHERE wkf.attachable_type = 'OphysSession'
     AND wkft.name = 'OphysRigSync'
-    AND os.id = {behavior_session_id};
+    AND os.id = {ophys_session_id};
 """
 
 
@@ -46,8 +46,8 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
 
-def from_lims_cache_key_session(cls, db, behavior_session_id: int):
-    return hashkey(behavior_session_id)
+def from_lims_cache_key_session(cls, db, ophys_session_id: int):
+    return hashkey(ophys_session_id)
 
 
 class SyncFile(DataFile):
@@ -85,12 +85,12 @@ class SyncFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key_session)
-    def from_lims_for_session(
+    def from_lims_for_ophys_session(
         cls, db: PostgresQueryMixin,
-        behavior_session_id: Union[int, str]
+        ophys_session_id: Union[int, str]
     ) -> "SyncFile":
         query = SYNC_FILE_SESSION_QUERY_TEMPLATE.format(
-            behavior_session_id=behavior_session_id
+            ophys_session_id=ophys_session_id
         )
         filepath = db.fetchall(query, strict=True)[0]
         return cls(filepath=filepath)

@@ -27,12 +27,30 @@ STIMULUS_FILE_QUERY_TEMPLATE = """
 """
 
 
+STIMULUS_FILE_SESSION_QUERY_TEMPLATE = """
+    SELECT
+        wkf.storage_directory || wkf.filename AS stim_file
+    FROM
+        well_known_files wkf
+    WHERE
+        wkf.attachable_id = {ophys_session_id}
+        AND wkf.attachable_type = 'OphysSession'
+        AND wkf.well_known_file_type_id IN (
+            SELECT id
+            FROM well_known_file_types
+            WHERE name = 'StimulusPickle');
+"""
+
+
 def from_json_cache_key(cls, dict_repr: dict):
     return hashkey(json.dumps(dict_repr))
 
 
 def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id)
+
+def from_lims_cache_key_ophys(cls, db, ophys_session_id: int):
+    return hashkey(ophys_session_id)
 
 
 class StimulusFile(DataFile):
@@ -64,6 +82,18 @@ class StimulusFile(DataFile):
     ) -> "StimulusFile":
         query = STIMULUS_FILE_QUERY_TEMPLATE.format(
             behavior_session_id=behavior_session_id
+        )
+        filepath = db.fetchone(query, strict=True)
+        return cls(filepath=filepath)
+
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key_ophys)
+    def from_lims_for_ophys_session(
+        cls, db: PostgresQueryMixin,
+        ophys_session_id: Union[int, str]
+    ) -> "StimulusFile":
+        query = STIMULUS_FILE_QUERY_TEMPLATE.format(
+            ophys_session_id=ophys_session_id
         )
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)

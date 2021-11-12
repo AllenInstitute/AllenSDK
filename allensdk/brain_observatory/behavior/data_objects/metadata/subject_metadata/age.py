@@ -38,6 +38,21 @@ class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
         return cls(age=age)
 
     @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "Age":
+        query = f"""
+            SELECT a.name AS age
+            FROM ophys_sessions os
+            JOIN specimens s ON os.specimen_id = s.id
+            JOIN donors d ON s.donor_id = d.id
+            JOIN ages a ON a.id = d.age_id
+            WHERE os.id = {ophys_session_id};
+        """
+        age = lims_db.fetchone(query, strict=True)
+        age = cls._age_code_to_days(age=age)
+        return cls(age=age)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Age":
         age = cls._age_code_to_days(age=nwbfile.subject.age)
         return cls(age=age)
