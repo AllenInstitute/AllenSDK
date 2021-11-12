@@ -38,7 +38,7 @@ class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(mouse_id=mouse_id)
 
     @classmethod
-    def from_lims_from_ophys_session(cls, ophys_session_id: int,
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
                   lims_db: PostgresQueryMixin) -> "MouseId":
         # TODO: Should this even be included?
         # Found sometimes there were entries with NONE which is

@@ -204,10 +204,10 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
             ophys_session_id: VisualCodingSessionId,
             lims_db: PostgresQueryMixin
         ) -> "VisualCodingMetadata":
-        subject_metadata = SubjectMetadata.from_lims(
-            behavior_session_id=ophys_session_id.value, lims_db=lims_db)
-        equipment = Equipment.from_lims(
-            behavior_session_id=ophys_session_id.value, lims_db=lims_db)
+        subject_metadata = SubjectMetadata.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id, lims_db=lims_db)
+        equipment = Equipment.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
 
         stimulus_file = StimulusFile.from_lims_for_ophys_session(
             db=lims_db, ophys_session_id=ophys_session_id.value)

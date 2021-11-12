@@ -33,7 +33,7 @@ from allensdk.internal.api import PostgresQueryMixin
 class VisualCodingOphysMetadata(DataObject, LimsReadableInterface,
                             JsonReadableInterface, NwbReadableInterface,
                             NwbWritableInterface):
-    def __init__(self, visualcoding_metadata: VisualCodingOphysMetadata,
+    def __init__(self, visualcoding_metadata: VisualCodingMetadata,
                  ophys_metadata: Union[OphysExperimentMetadata,
                                        MultiplaneMetadata]):
         super().__init__(name='visualcoding_ophys_metadata', value=self)

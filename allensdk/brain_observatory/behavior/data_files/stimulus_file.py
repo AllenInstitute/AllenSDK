@@ -92,7 +92,7 @@ class StimulusFile(DataFile):
         cls, db: PostgresQueryMixin,
         ophys_session_id: Union[int, str]
     ) -> "StimulusFile":
-        query = STIMULUS_FILE_QUERY_TEMPLATE.format(
+        query = STIMULUS_FILE_SESSION_QUERY_TEMPLATE.format(
             ophys_session_id=ophys_session_id
         )
         filepath = db.fetchone(query, strict=True)
