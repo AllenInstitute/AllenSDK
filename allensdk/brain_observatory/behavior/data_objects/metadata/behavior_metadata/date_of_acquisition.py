@@ -46,6 +46,22 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
+    def from_lims_for_ophys_session(
+            cls, ophys_session_id: int,
+            lims_db: PostgresQueryMixin) -> "DateOfAcquisition":
+        query = """
+                SELECT os.date_of_acquisition
+                FROM ophys_sessions os
+                WHERE os.id = {};
+                """.format(ophys_session_id)
+
+        experiment_date = lims_db.fetchone(query, strict=True)
+        experiment_date = cls._postprocess_lims_datetime(
+            datetime=experiment_date)
+        return cls(date_of_acquisition=experiment_date)
+
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
         return cls(date_of_acquisition=nwbfile.session_start_time)
 
