@@ -192,7 +192,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
             stimulus_timestamps = StimulusTimestamps.from_sync_file(
                 sync_file=sync_file)
 
-        running_acquisition = RunningAcquisition.from_lims(
+        running_acquisition = RunningAcquisition.from_lims_for_ophys_session(
             lims_db, ophys_session_id.value
         )
         raw_running_speed = RunningSpeed.from_lims_for_ophys_session(
