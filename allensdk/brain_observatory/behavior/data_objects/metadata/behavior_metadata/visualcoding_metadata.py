@@ -186,7 +186,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
                  ophys_session_id: VisualCodingSessionId,
                  equipment: Equipment,
                  stimulus_frame_rate: StimulusFrameRate,
-                 session_type: SessionType,
+                 session_type: VisualCodingSessionType,
                  behavior_session_uuid: BehaviorSessionUUID):
         super().__init__(name='behavior_metadata', value=self)
         self._subject_metadata = subject_metadata
@@ -230,7 +230,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
 
         return cls(
             subject_metadata=subject_metadata,
-            behavior_session_id=behavior_session_id,
+            ophys_session_id=ophys_session_id,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,

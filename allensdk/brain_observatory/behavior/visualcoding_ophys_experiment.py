@@ -66,7 +66,7 @@ class VisualCodingOphysExperiment(BehaviorSession):
                  projections: Projections,
                  ophys_timestamps: OphysTimestamps,
                  cell_specimens: CellSpecimens,
-                 metadata: BehaviorOphysMetadata,
+                 metadata: VisualCodingOphysMetadata,
                  motion_correction: MotionCorrection,
                  eye_tracking_table: Optional[EyeTrackingTable],
                  eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry],
@@ -174,7 +174,7 @@ class VisualCodingOphysExperiment(BehaviorSession):
             is_multiplane=is_multiplane_session
         )
         monitor_delay = calculate_monitor_delay(
-            sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
+            sync_file=sync_file, equipment=meta.visualcoding_metadata.equipment)
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         behavior_session = BehaviorSession.from_lims(
@@ -214,7 +214,7 @@ class VisualCodingOphysExperiment(BehaviorSession):
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
-        return BehaviorOphysExperiment(
+        return VisualCodingOphysExperiment(
             behavior_session=behavior_session,
             cell_specimens=cell_specimens,
             ophys_timestamps=ophys_timestamps,
