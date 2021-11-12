@@ -1,5 +1,6 @@
 import datetime
 from typing import Any, List, Dict, Optional
+from allensdk.brain_observatory.behavior.data_objects import task_parameters
 import pynwb
 import pandas as pd
 import numpy as np
@@ -210,12 +211,17 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         if monitor_delay is None:
             monitor_delay = cls._get_monitor_delay()
 
-        licks, rewards, stimuli, task_parameters, trials = \
-            cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
-                trial_monitor_delay=monitor_delay
-            )
+        # licks, rewards, stimuli, task_parameters, trials = \
+        #     cls._read_data_from_stimulus_file(
+        #         stimulus_file=stimulus_file,
+        #         stimulus_timestamps=stimulus_timestamps,
+        #         trial_monitor_delay=monitor_delay
+        #     )
+        licks = None
+        rewards = None
+        stimuli = None
+        task_parameters = None
+        trials = None
         if date_of_acquisition is None:
             date_of_acquisition = DateOfAcquisition.from_lims_for_ophys_session(
                 ophys_session_id=ophys_session_id.value, lims_db=lims_db)
