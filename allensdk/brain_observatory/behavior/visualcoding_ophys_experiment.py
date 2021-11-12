@@ -2,6 +2,8 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.visualcoding_session_id import VisualCodingSessionId
+from allensdk.brain_observatory.behavior.visualcoding_session import VisualCodingSession
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.behavior_session import (
@@ -56,33 +58,33 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.internal.api import db_connection_creator
 
 
-class VisualCodingOphysExperiment(BehaviorSession):
+class VisualCodingOphysExperiment(VisualCodingSession):
     """Represents data from a single Visual Behavior Ophys imaging session.
     Initialize by using class methods `from_lims` or `from_nwb_path`.
     """
 
     def __init__(self,
-                 behavior_session: BehaviorSession,
+                 visualcoding_session: VisualCodingSession,
                  projections: Projections,
                  ophys_timestamps: OphysTimestamps,
                  cell_specimens: CellSpecimens,
-                 metadata: BehaviorOphysMetadata,
+                 metadata: VisualCodingOphysMetadata,
                  motion_correction: MotionCorrection,
                  eye_tracking_table: Optional[EyeTrackingTable],
                  eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry],
                  date_of_acquisition: DateOfAcquisition):
         super().__init__(
-            behavior_session_id=behavior_session._behavior_session_id,
-            licks=behavior_session._licks,
-            metadata=behavior_session._metadata,
-            raw_running_speed=behavior_session._raw_running_speed,
-            rewards=behavior_session._rewards,
-            running_speed=behavior_session._running_speed,
-            running_acquisition=behavior_session._running_acquisition,
-            stimuli=behavior_session._stimuli,
-            stimulus_timestamps=behavior_session._stimulus_timestamps,
-            task_parameters=behavior_session._task_parameters,
-            trials=behavior_session._trials,
+            ophys_session_id=visualcoding_session._ophys_session_id,
+            licks=visualcoding_session._licks,
+            metadata=visualcoding_session._metadata,
+            raw_running_speed=visualcoding_session._raw_running_speed,
+            rewards=visualcoding_session._rewards,
+            running_speed=visualcoding_session._running_speed,
+            running_acquisition=visualcoding_session._running_acquisition,
+            stimuli=visualcoding_session._stimuli,
+            stimulus_timestamps=visualcoding_session._stimulus_timestamps,
+            task_parameters=visualcoding_session._task_parameters,
+            trials=visualcoding_session._trials,
             date_of_acquisition=date_of_acquisition
         )
 
@@ -166,8 +168,7 @@ class VisualCodingOphysExperiment(BehaviorSession):
                                        ophys_experiment_id=ophys_experiment_id)
         stimulus_timestamps = StimulusTimestamps.from_sync_file(
             sync_file=sync_file)
-        behavior_session_id = BehaviorSessionId.from_lims(
-            db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        ophys_session_id = VisualCodingSessionId.from_lims(db=lims_db, ophys_experiment_id=ophys_experiment_id)
         is_multiplane_session = _is_multi_plane_session()
         meta = VisualCodingOphysMetadata.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
@@ -177,9 +178,9 @@ class VisualCodingOphysExperiment(BehaviorSession):
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        behavior_session = BehaviorSession.from_lims(
+        visualcoding_session = VisualCodingSession.from_lims(
             lims_db=lims_db,
-            behavior_session_id=behavior_session_id.value,
+            ophys_session_id=ophys_session_id.value,
             stimulus_timestamps=stimulus_timestamps,
             monitor_delay=monitor_delay,
             date_of_acquisition=date_of_acquisition
@@ -214,8 +215,8 @@ class VisualCodingOphysExperiment(BehaviorSession):
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
-        return BehaviorOphysExperiment(
-            behavior_session=behavior_session,
+        return VisualCodingOphysExperiment(
+            visualcoding_session=visualcoding_session,
             cell_specimens=cell_specimens,
             ophys_timestamps=ophys_timestamps,
             metadata=meta,

@@ -17,7 +17,7 @@ from allensdk.brain_observatory.behavior.data_objects import (
     DataObject, StimulusTimestamps
 )
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile
+    StimulusFile, SyncFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -126,6 +126,32 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered
         )
+
+    @classmethod
+    def from_lims_for_ophys_session(
+        cls,
+        db: PostgresQueryMixin,
+        ophys_session_id: int,
+        filtered: bool = True,
+        zscore_threshold: float = 10.0,
+        stimulus_timestamps: Optional[StimulusTimestamps] = None
+    ) -> "RunningSpeed":
+        stimulus_file = StimulusFile.from_lims_for_ophys_session(db, ophys_session_id)
+        if stimulus_timestamps is None:
+            sync_file = SyncFile.from_lims_for_ophys_session(db=db, ophys_session_id=ophys_session_id.value)
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                sync_file=sync_file)
+
+        running_speed = cls._get_running_speed_df(
+            stimulus_file, stimulus_timestamps, filtered, zscore_threshold
+        )
+        return cls(
+            running_speed=running_speed,
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            filtered=filtered
+        )
+
 
     @classmethod
     def from_nwb(
