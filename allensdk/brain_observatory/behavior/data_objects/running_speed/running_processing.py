@@ -351,8 +351,13 @@ def get_running_df(
     their own corrections and compute running speed from the raw
     source.
     """
-    v_sig = data["items"]["behavior"]["encoders"][0]["vsig"]
-    v_in = data["items"]["behavior"]["encoders"][0]["vin"]
+    try:
+        v_sig = data["items"]["behavior"]["encoders"][0]["vsig"]
+        v_in = data["items"]["behavior"]["encoders"][0]["vin"]
+    except KeyError:
+        v_sig = data["items"]["foraging"]["encoders"][0]["vsig"]
+        v_in = data["items"]["foraging"]["encoders"][0]["vin"]
+
 
     if len(v_in) > len(time) + 1:
         error_string = ("length of v_in ({}) cannot be longer than length of "
