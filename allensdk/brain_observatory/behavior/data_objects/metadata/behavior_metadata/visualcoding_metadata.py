@@ -24,8 +24,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.foraging_id import \
     ForagingId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.session_type import \
-    SessionType
+    .behavior_metadata.visualcoding_session_type import \
+    VisualCodingSessionType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
@@ -216,7 +216,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
         sync_file = SyncFile.from_lims_for_ophys_session(db=lims_db, ophys_session_id=ophys_session_id.value)
         stimulus_frame_rate = StimulusFrameRate.from_sync_file(
             sync_file=sync_file)
-        session_type = SessionType.from_stimulus_file(
+        session_type = VisualCodingSessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
 
         # foraging_id = ForagingId.from_lims(
