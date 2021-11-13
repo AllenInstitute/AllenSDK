@@ -197,6 +197,15 @@ class VisualCodingOphysExperiment(VisualCodingSession):
 
         projections = Projections.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        # cell_specimens = CellSpecimens.from_lims(
+        #     ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
+        #     ophys_timestamps=ophys_timestamps,
+        #     segmentation_mask_image_spacing=projections.max_projection.spacing,
+        #     events_params=EventsParams(
+        #         filter_scale=events_filter_scale,
+        #         filter_n_time_steps=events_filter_n_time_steps),
+        #     exclude_invalid_rois=exclude_invalid_rois
+        # )
         cell_specimens = CellSpecimens.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps,
@@ -204,7 +213,8 @@ class VisualCodingOphysExperiment(VisualCodingSession):
             events_params=EventsParams(
                 filter_scale=events_filter_scale,
                 filter_n_time_steps=events_filter_n_time_steps),
-            exclude_invalid_rois=exclude_invalid_rois
+            exclude_invalid_rois=exclude_invalid_rois,
+            include_events=False
         )
         motion_correction = _get_motion_correction()
         if skip_eye_tracking:

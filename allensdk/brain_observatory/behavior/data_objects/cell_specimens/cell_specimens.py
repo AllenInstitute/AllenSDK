@@ -235,7 +235,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
                   exclude_invalid_rois=True,
-                  events_params: Optional[EventsParams] = None) \
+                  events_params: Optional[EventsParams] = None,
+                  include_events:  bool = True) \
             -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
             """Get the ophys cell segmentation run id associated with an
@@ -297,8 +298,11 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             ophys_timestamps=ophys_timestamps)
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
-        events = _get_events()
-
+        if include_events:
+            events = _get_events()
+        else:
+            events = None
+            
         return CellSpecimens(
             cell_specimen_table=cell_specimen_table, meta=meta,
             dff_traces=dff_traces,
