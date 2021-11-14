@@ -172,14 +172,14 @@ class EphysSweepFeatureExtractor:
             spikes_df[k + "_v"] = np.nan
 
             if len(vals) > 0:
-                spikes_df.ix[valid_ind, k + "_index"] = vals
-                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
-                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_index"] = vals
+                spikes_df.iloc[valid_ind,].loc[, k + "_t"] = t[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
                 if len(vals) > 0:
-                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
+                    spikes_df.iloc[valid_ind,].loc[, k + "_i"] = self.i[vals]
 
             if k in base_clipped_list:
                 self._affected_by_clipping += [
@@ -195,10 +195,10 @@ class EphysSweepFeatureExtractor:
             spikes_df[k + "_index"] = np.nan
             spikes_df[k] = np.nan
             if len(vals) > 0:
-                spikes_df.ix[valid_ind, k + "_index"] = vals
-                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
-                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
-                spikes_df.ix[valid_ind, k] = dvdt[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_index"] = vals
+                spikes_df.iloc[valid_ind,].loc[, k + "_t"] = t[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_v"] = v[vals]
+                spikes_df.iloc[valid_ind,].loc[, k] = dvdt[vals]
 
                 if k in base_clipped_list:
                     self._affected_by_clipping += [
@@ -218,14 +218,14 @@ class EphysSweepFeatureExtractor:
             spikes_df[k + "_t"] = np.nan
             spikes_df[k + "_v"] = np.nan
             if len(vals) > 0:
-                spikes_df.ix[valid_ind, k + "_index"] = vals
-                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
-                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_index"] = vals
+                spikes_df.iloc[valid_ind,].loc[, k + "_t"] = t[vals]
+                spikes_df.iloc[valid_ind,].loc[, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
                 if len(vals) > 0:
-                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
+                    spikes_df.iloc[valid_ind,].loc[, k + "_i"] = self.i[vals]
 
             if k in base_clipped_list:
                 self._affected_by_clipping += [
