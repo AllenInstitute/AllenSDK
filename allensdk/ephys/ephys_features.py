@@ -466,8 +466,7 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes, clipped=None)
 
     # Some spikes in burst may have deep trough but short height, so can't use same
     # definition for width
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RuntimeWarning)
+    with np.errstate(invalid='ignore'):
         width_levels[width_levels < v[spike_indexes]] = thresh_to_peak_levels[width_levels < v[spike_indexes]]
 
     width_starts = np.zeros_like(trough_indexes) * np.nan
