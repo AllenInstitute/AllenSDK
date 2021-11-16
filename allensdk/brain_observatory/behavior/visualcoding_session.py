@@ -219,7 +219,9 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         #     )
         licks = None
         rewards = None
-        stimuli = None
+        stimuli = cls._read_data_from_visualcoding_stimulus_file(
+                    stimulus_file=stimulus_file, 
+                    stimulus_timestamps=stimulus_timestamps)
         task_parameters = None
         trials = None
         if date_of_acquisition is None:
@@ -894,7 +896,18 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
                     frame rate (Hz) at which the visual stimulus is
                     displayed
         """
-        return self._get_metadata(behavior_metadata=self._metadata)
+        return self._get_metadata(visualcoding_metadata=self._metadata)
+
+    @classmethod
+    def _read_data_from_visualcoding_stimulus_file(
+            cls, stimulus_file: StimulusFile,
+            stimulus_timestamps: StimulusTimestamps):
+        """Helper method to read data from stimulus file"""
+        stimuli = Stimuli.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        return stimuli
+
 
     @classmethod
     def _read_data_from_stimulus_file(
@@ -922,22 +935,22 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         )
         return licks, rewards, stimuli, task_parameters, trials
 
-    def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
+    def _get_metadata(self, visualcoding_metadata: VisualCodingMetadata) -> dict:
         """Returns dict of metadata"""
         return {
-            'equipment_name': behavior_metadata.equipment.value,
-            'sex': behavior_metadata.subject_metadata.sex,
-            'age_in_days': behavior_metadata.subject_metadata.age_in_days,
-            'stimulus_frame_rate': behavior_metadata.stimulus_frame_rate,
-            'session_type': behavior_metadata.session_type,
+            'equipment_name': visualcoding_metadata.equipment.value,
+            'sex': visualcoding_metadata.subject_metadata.sex,
+            'age_in_days': visualcoding_metadata.subject_metadata.age_in_days,
+            'stimulus_frame_rate': visualcoding_metadata.stimulus_frame_rate,
+            'session_type': visualcoding_metadata.session_type,
             'date_of_acquisition': self._date_of_acquisition.value,
-            'reporter_line': behavior_metadata.subject_metadata.reporter_line,
-            'cre_line': behavior_metadata.subject_metadata.cre_line,
-            'behavior_session_uuid': behavior_metadata.behavior_session_uuid,
-            'driver_line': behavior_metadata.subject_metadata.driver_line,
-            'mouse_id': behavior_metadata.subject_metadata.mouse_id,
-            'full_genotype': behavior_metadata.subject_metadata.full_genotype,
-            'behavior_session_id': behavior_metadata.behavior_session_id
+            'reporter_line': visualcoding_metadata.subject_metadata.reporter_line,
+            'cre_line': visualcoding_metadata.subject_metadata.cre_line,
+            'behavior_session_uuid': visualcoding_metadata.behavior_session_uuid,
+            'driver_line': visualcoding_metadata.subject_metadata.driver_line,
+            'mouse_id': visualcoding_metadata.subject_metadata.mouse_id,
+            'full_genotype': visualcoding_metadata.subject_metadata.full_genotype,
+            'behavior_session_id': visualcoding_metadata.behavior_session_id
         }
 
     def _get_identifier(self) -> str:
