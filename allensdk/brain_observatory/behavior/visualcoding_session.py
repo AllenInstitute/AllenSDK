@@ -219,9 +219,10 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         #     )
         licks = None
         rewards = None
-        stimuli = cls._read_data_from_visualcoding_stimulus_file(
-                    stimulus_file=stimulus_file, 
-                    stimulus_timestamps=stimulus_timestamps)
+        stimuli = None
+        # stimuli = cls._read_data_from_visualcoding_stimulus_file(
+        #             stimulus_file=stimulus_file, 
+        #             stimulus_timestamps=stimulus_timestamps)
         task_parameters = None
         trials = None
         if date_of_acquisition is None:
