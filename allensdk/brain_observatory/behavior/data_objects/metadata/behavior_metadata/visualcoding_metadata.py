@@ -293,7 +293,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
 
     @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:
-        return self._behavior_session_uuid.value
+        return None  # self._behavior_session_uuid.value
 
     @property
     def ophys_session_id(self) -> int:
