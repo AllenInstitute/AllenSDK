@@ -180,7 +180,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
                        NwbReadableInterface,
                        JsonWritableInterface,
                        NwbWritableInterface):
-    """Container class for behavior metadata"""
+    """Container class for visual coding metadata"""
     def __init__(self,
                  subject_metadata: SubjectMetadata,
                  ophys_session_id: VisualCodingSessionId,
@@ -188,7 +188,7 @@ class VisualCodingMetadata(DataObject, LimsReadableInterface,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: VisualCodingSessionType,
                  behavior_session_uuid: BehaviorSessionUUID):
-        super().__init__(name='behavior_metadata', value=self)
+        super().__init__(name='visualcoding_metadata', value=self)
         self._subject_metadata = subject_metadata
         self._ophys_session_id = ophys_session_id
         self._equipment = equipment

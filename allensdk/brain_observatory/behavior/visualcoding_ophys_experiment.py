@@ -119,7 +119,7 @@ class VisualCodingOphysExperiment(VisualCodingSession):
                   events_filter_n_time_steps: int = 20,
                   exclude_invalid_rois=True,
                   skip_eye_tracking=False) -> \
-            "BehaviorOphysExperiment":
+            "VisualCodingOphysExperiment":
         """
         Parameters
         ----------
@@ -479,8 +479,8 @@ class VisualCodingOphysExperiment(VisualCodingSession):
 
     @property
     def metadata(self):
-        behavior_meta = super()._get_metadata(
-            behavior_metadata=self._metadata.behavior_metadata)
+        visualcoding_meta = super()._get_metadata(
+            visualcoding_metadata=self._metadata.visualcoding_metadata)
         ophys_meta = {
             'indicator': self._cell_specimens.meta.imaging_plane.indicator,
             'emission_lambda': self._cell_specimens.meta.emission_lambda,
@@ -511,7 +511,7 @@ class VisualCodingOphysExperiment(VisualCodingSession):
                 self._cell_specimens.meta.imaging_plane.targeted_structure
         }
         return {
-            **behavior_meta,
+            **visualcoding_meta,
             **ophys_meta
         }
 
