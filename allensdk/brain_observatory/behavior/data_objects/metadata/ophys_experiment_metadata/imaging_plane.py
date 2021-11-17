@@ -44,7 +44,7 @@ class ImagingPlane(DataObject, LimsReadableInterface,
         # reporter_line = ReporterLine.from_lims(
         #     behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         reporter_line = ReporterLine.from_lims_for_ophys_session(
-            behavior_session_id=ophys_session_id.value, lims_db=lims_db)
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
         indicator = reporter_line.parse_indicator(warn=True)
         return cls(ophys_frame_rate=ophys_frame_rate,
                    targeted_structure=targeted_structure,

@@ -951,7 +951,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
             'driver_line': visualcoding_metadata.subject_metadata.driver_line,
             'mouse_id': visualcoding_metadata.subject_metadata.mouse_id,
             'full_genotype': visualcoding_metadata.subject_metadata.full_genotype,
-            'behavior_session_id': visualcoding_metadata.behavior_session_id
+            'ophys_session_id': visualcoding_metadata.ophys_session_id
         }
 
     def _get_identifier(self) -> str:
