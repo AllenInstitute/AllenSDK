@@ -51,6 +51,29 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
             SELECT g.name AS reporter_line
             FROM ophys_sessions os
             JOIN specimens s ON os.specimen_id = s.id
+            JOIN donors d ON s.donor_id=d.id
+            JOIN donors_genotypes dg ON dg.donor_id=d.id
+            JOIN genotypes g ON g.id=dg.genotype_id
+            JOIN genotype_types gt
+                ON gt.id=g.genotype_type_id AND gt.name = 'reporter'
+            WHERE bs.id={ophys_session_id};
+        """
+        result = lims_db.fetchall(query)
+        if result is None or len(result) < 1:
+            raise OneOrMoreResultExpectedError(
+                f"Expected one or more, but received: '{result}' "
+                f"from query:\n'{query}'")
+        reporter_line = cls.parse(reporter_line=result, warn=True)
+        return cls(reporter_line=reporter_line)
+
+
+    @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "ReporterLine":
+        query = f"""
+            SELECT g.name AS reporter_line
+            FROM ophys_sessions os
+            JOIN specimens s ON os.specimen_id = s.id
             JOIN donors d ON s.donor_id = d.id
             JOIN donors_genotypes dg ON dg.donor_id=d.id
             JOIN genotypes g ON g.id=dg.genotype_id
