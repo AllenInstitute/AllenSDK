@@ -1,0 +1,44 @@
+[
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569494121.nwb", 
+    "version": 2, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569494121_three_session_C2_analysis.h5", 
+    "ophys_experiment_id": 569494121, 
+    "session_type": "three_session_C2"
+  }, 
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/570305847.nwb", 
+    "version": 2, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/570305847_three_session_A_analysis.h5", 
+    "ophys_experiment_id": 570305847, 
+    "session_type": "three_session_A"
+  }, 
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569407590.nwb", 
+    "version": 2, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569407590_three_session_B_analysis.h5", 
+    "ophys_experiment_id": 569407590, 
+    "session_type": "three_session_B"
+  }, 
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory/plots/510532780.nwb", 
+    "version": 3, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/510532780_three_session_C_analysis.h5", 
+    "ophys_experiment_id": 510532780, 
+    "session_type": "three_session_C"
+  }, 
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory//plots/510859641.nwb", 
+    "version": 3, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/510859641_three_session_A_analysis.h5", 
+    "ophys_experiment_id": 510859641, 
+    "session_type": "three_session_A"
+  }, 
+  {
+    "nwb_file": "/allen/aibs/informatics/module_test_data/observatory/plots/510698988.nwb", 
+    "version": 3, 
+    "analysis_file": "/allen/aibs/informatics/module_test_data/observatory/py3_analysis/510698988_three_session_B_analysis.h5", 
+    "ophys_experiment_id": 510698988, 
+    "session_type": "three_session_B"
+  }
+]

@@ -1,0 +1,39 @@
+name: ci/nightly
+on:
+  schedule:
+    - cron: '05 6 * * *'
+
+jobs:
+  onprem:
+    name: python ${{ matrix.image }} on-prem test
+    runs-on: ["self-hosted"]
+    strategy:
+      matrix:
+        image: ["allensdk_local_py37:latest"]
+        branch: ["master", "rc/2.13.2"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+      - name: run test in docker
+        run: |
+          docker run \
+              --env-file /home/github_worker/env_nightly.list \
+              --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
+              --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
+              --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
+              --mount type=tmpfs,destination=/tmp \
+              --rm \
+              ${{ matrix.image }} \
+                  /bin/bash -c "pip install -r requirements.txt; \
+                                pip install -r test_requirements.txt; \
+                                pip install -e .; \
+                                python -m pytest \
+                                    --capture=no \
+                                    --cov=allensdk \
+                                    --cov-config coveragerc \
+                                    --cov-report html \
+                                    --junitxml=test-reports/test.xml \
+                                    --boxed \
+                                    --numprocesses 4 \
+                                    --durations=0"

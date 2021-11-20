@@ -1,0 +1,227 @@
+{
+  "total_rows": 9440, 
+  "success": true, 
+  "msg": [
+    {
+      "name": "Biophysical - perisomatic_Nr5a1-Cre;Ai14-177334.05.01.01", 
+      "specimen_id": 386049446, 
+      "specimen": {
+        "rna_integrity_number": null, 
+        "weight": 9000, 
+        "parent_y_coord": 0, 
+        "ephys_sweeps": [
+          {
+            "stimulus_interval": null, 
+            "stimulus_name": "Long Square", 
+            "num_spikes": 2, 
+            "id": 396429050, 
+            "pre_vm_mv": -85.3548278808594, 
+            "stimulus_duration": 0.999995, 
+            "stimulus_start_time": 1.02, 
+            "slow_noise_rms_mv": 0.0742162764072418, 
+            "peak_deflection": null, 
+            "stimulus_description": "C1LSFINEST150112[0]", 
+            "stimulus_units": "Amps", 
+            "specimen_id": 386049446, 
+            "sweep_number": 42, 
+            "vm_delta_mv": 0.374382019042969, 
+            "leak_pa": -3.0070378780365, 
+            "pre_noise_rms_mv": 0.0360921323299408, 
+            "post_noise_rms_mv": 0.0375288389623165, 
+            "bridge_balance_mohm": 18.0097675323486, 
+            "post_vm_mv": -85.7292098999023, 
+            "stimulus_absolute_amplitude": 110.000002162547, 
+            "slow_vm_mv": -85.3548278808594, 
+            "stimulus_relative_amplitude": 1.1
+          }
+        ], 
+        "parent_x_coord": 0, 
+        "ephys_result_id": 386049444, 
+        "is_cell_specimen": true, 
+        "id": 386049446, 
+        "neuron_reconstructions": [
+          {
+            "max_euclidean_distance": 346.003240593379, 
+            "number_tips": 22, 
+            "max_path_distance": 377.118073486042, 
+            "overall_depth": 70.56, 
+            "neuron_reconstruction_type": "dendrite-only", 
+            "number_bifurcations": 17, 
+            "total_volume": 403.245425875963, 
+            "scale_factor_z": 0.28, 
+            "scale_factor_y": 0.1144, 
+            "scale_factor_x": 0.1144, 
+            "number_nodes": 1947, 
+            "tags": "3D Neuron Reconstruction morphology", 
+            "average_parent_daughter_ratio": 0.882944233914226, 
+            "id": 491459171, 
+            "average_diameter": 0.439679792761665, 
+            "well_known_files": [
+              {
+                "well_known_file_type": {
+                  "id": 303941301, 
+                  "name": "3DNeuronReconstruction"
+                }, 
+                "attachable_type": "NeuronReconstruction", 
+                "download_link": "/api/v2/well_known_file_download/491459173", 
+                "well_known_file_type_id": 303941301, 
+                "path": "/external/mousecelltypes/prod256/specimen_386049446/Nr5a1-Cre_Ai14-177334.05.01.01_491459171_m.swc", 
+                "attachable_id": 491459171, 
+                "id": 491459173
+              }, 
+              {
+                "well_known_file_type": {
+                  "id": 486753749, 
+                  "name": "3DNeuronMarker"
+                }, 
+                "attachable_type": "NeuronReconstruction", 
+                "download_link": "/api/v2/well_known_file_download/496607103", 
+                "well_known_file_type_id": 486753749, 
+                "path": "/external/mousecelltypes/prod256/specimen_386049446/Nr5a1-Cre_Ai14-177334.05.01.01_491459171_marker_m.swc", 
+                "attachable_id": 491459171, 
+                "id": 496607103
+              }
+            ], 
+            "specimen_id": 386049446, 
+            "total_length": 2268.08172534129, 
+            "overall_width": 271.753540218214, 
+            "number_stems": 5, 
+            "average_bifurcation_angle_local": 70.6136901015225, 
+            "number_branches": 39, 
+            "average_fragmentation": 53.3823529411765, 
+            "average_contraction": 0.924610944456856, 
+            "average_bifurcation_angle_remote": null, 
+            "hausdorff_dimension": null, 
+            "total_surface": 3133.71153328341, 
+            "max_branch_order": 6.0, 
+            "soma_surface": 290.085763487108, 
+            "overall_height": 429.56158255954
+          }
+        ], 
+        "pinned_radius": null, 
+        "sphinx_id": 256671, 
+        "parent_id": 383680643, 
+        "is_ish": false, 
+        "cortex_layer_id": null, 
+        "ephys_result": {
+          "failed": false, 
+          "well_known_files": [
+            {
+              "well_known_file_type": {
+                "id": 488673261, 
+                "name": "EphysInstantaneousThresholdThumbnail"
+              }, 
+              "attachable_type": "EphysResult", 
+              "download_link": "/api/v2/well_known_file_download/491383263", 
+              "well_known_file_type_id": 488673261, 
+              "path": "/external/mousecelltypes/prod207/Ephys_Specimen_Roi_plan_386049444/ephys_inst_threshold.png", 
+              "attachable_id": 386049444, 
+              "id": 491383263
+            }, 
+            {
+              "well_known_file_type": {
+                "id": 480715721, 
+                "name": "MorphologyThumbnail"
+              }, 
+              "attachable_type": "EphysResult", 
+              "download_link": "/api/v2/well_known_file_download/487660477", 
+              "well_known_file_type_id": 480715721, 
+              "path": "/external/mousecelltypes/prod207/Ephys_Specimen_Roi_plan_386049444/morphology_summary.png", 
+              "attachable_id": 386049444, 
+              "id": 487660477
+            }, 
+            {
+              "well_known_file_type": {
+                "id": 481007198, 
+                "name": "NWBDownload"
+              }, 
+              "attachable_type": "EphysResult", 
+              "download_link": "/api/v2/well_known_file_download/491198851", 
+              "well_known_file_type_id": 481007198, 
+              "path": "/external/mousecelltypes/prod207/Ephys_Specimen_Roi_plan_386049444/386049444_ephys.nwb", 
+              "attachable_id": 386049444, 
+              "id": 491198851
+            }, 
+            {
+              "well_known_file_type": {
+                "id": 478840678, 
+                "name": "NWBUncompressed"
+              }, 
+              "attachable_type": "EphysResult", 
+              "download_link": "/api/v2/well_known_file_download/491198854", 
+              "well_known_file_type_id": 478840678, 
+              "path": "/external/mousecelltypes/prod207/Ephys_Specimen_Roi_plan_386049444/386049444_uncompressed.nwb", 
+              "attachable_id": 386049444, 
+              "id": 491198854
+            }, 
+            {
+              "well_known_file_type": {
+                "id": 480715749, 
+                "name": "EphysSummaryThumbnail"
+              }, 
+              "attachable_type": "EphysResult", 
+              "download_link": "/api/v2/well_known_file_download/487614229", 
+              "well_known_file_type_id": 480715749, 
+              "path": "/external/mousecelltypes/prod207/Ephys_Specimen_Roi_plan_386049444/ephys_summary.png", 
+              "attachable_id": 386049444, 
+              "id": 487614229
+            }
+          ], 
+          "id": 386049444, 
+          "sampling_rate": 200000
+        }, 
+        "failed_facet": 734881840, 
+        "treatment_id": 598634036, 
+        "tissue_ph": null, 
+        "hemisphere": "left", 
+        "cell_reporter_id": 491913822, 
+        "cell_prep_sample_id": null, 
+        "data": null, 
+        "structure_id": 721, 
+        "parent_z_coord": 1, 
+        "name": "Nr5a1-Cre;Ai14-177334.05.01.01", 
+        "specimen_id_path": "/339692365/383309938/383680643/386049446/", 
+        "donor_id": 339692362, 
+        "external_specimen_name": null
+      }, 
+      "neuronal_model_template": {
+        "well_known_files": [
+          {
+            "well_known_file_type": {
+              "id": 292178729, 
+              "name": "BiophysicalModelDescription"
+            }, 
+            "attachable_type": "Product", 
+            "download_link": "/api/v2/well_known_file_download/395337293", 
+            "well_known_file_type_id": 292178729, 
+            "path": "/external/mousecelltypes/prod210/project_in vitro Single Cell Characterization_T301/SK.mod", 
+            "attachable_id": 305094322, 
+            "id": 395337293
+          }
+        ], 
+        "description": "Biophysical Neuronal Model Template", 
+        "name": "Biophysical - perisomatic", 
+        "id": 329230710
+      }, 
+      "neuronal_model_template_id": 329230710, 
+      "well_known_files": [
+        {
+          "well_known_file_type": {
+            "id": 329230374, 
+            "name": "NeuronalModelParameters"
+          }, 
+          "attachable_type": "NeuronalModel", 
+          "download_link": "/api/v2/well_known_file_download/497235805", 
+          "well_known_file_type_id": 329230374, 
+          "path": "/external/mousecelltypes/prod297/neuronal_model_472451419/386049446_fit.json", 
+          "attachable_id": 472451419, 
+          "id": 497235805
+        }
+      ], 
+      "id": 472451419
+    }
+  ], 
+  "num_rows": 1, 
+  "start_row": 0, 
+  "id": 0
+}

@@ -1,0 +1,131 @@
+{
+  "biophys": [
+    {
+      "model_file": [
+        "manifest.json",
+        "468193142_fit.json"
+      ],
+      "model_type": "Biophysical - all active"
+    }
+  ],
+  "runs": [
+    {
+      "sweeps": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        55,
+        58,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76
+      ]
+    }
+  ],
+  "neuron": [
+    {
+      "hoc": [
+        "stdgui.hoc",
+        "import3d.hoc"
+      ]
+    }
+  ],
+  "manifest": [
+    {
+      "type": "dir",
+      "spec": ".",
+      "key": "BASEDIR"
+    },
+    {
+      "type": "dir",
+      "spec": "work",
+      "key": "WORKDIR",
+      "parent": "BASEDIR"
+    },
+    {
+      "type": "file",
+      "spec": "Scnn1a-Tg3-Cre_Ai14-177297.06.01.01_491120155_m.swc",
+      "key": "MORPHOLOGY"
+    },
+    {
+      "type": "file",
+      "spec": "Scnn1a-Tg3-Cre_Ai14-177297.06.01.01_491120155_marker_m.swc",
+      "key": "MARKER"
+    },
+    {
+      "type": "dir",
+      "spec": "modfiles",
+      "key": "MODFILE_DIR"
+    },
+    {
+      "type": "file",
+      "format": "NWB",
+      "spec": "468193140.nwb",
+      "key": "stimulus_path"
+    },
+    {
+      "parent_key": "WORKDIR",
+      "type": "file",
+      "format": "NWB",
+      "spec": "468193140.nwb",
+      "key": "output_path"
+    }
+  ]
+}

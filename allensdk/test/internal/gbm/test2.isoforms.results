@@ -1,0 +1,4 @@
+transcript_id	gene_id	length	effective_length	expected_count	TPM	FPKM	IsoPct
+NM_130786_3	1	1766	1705.65	146.00	12.74	7.65	100.00
+NM_000015_2	10	1317	1256.65	0.00	0.00	0.00	0.00
+tRNA-Tyr.100009601.chr14	100	1532	1471.65	21.00	2.13	1.28	0.00

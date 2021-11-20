@@ -1,0 +1,4 @@
+/allen/aibs/informatics/module_test_data/observatory/test_nwb/506954308.nwb
+/allen/aibs/informatics/module_test_data/observatory/test_nwb/out_510221121.nwb
+/allen/aibs/informatics/module_test_data/observatory/test_nwb/out_510390912.nwb
+/allen/aibs/informatics/module_test_data/observatory/test_nwb/out_510524416.nwb
