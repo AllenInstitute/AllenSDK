@@ -1,0 +1,144 @@
+{
+  "log_level": "DEBUG",
+  "session_data": {
+    "behavior_stimulus_file": "stimulus_file.pkl",
+    "ophys_experiment_id": 1234,
+    "ophys_session_id": 999,
+    "behavior_session_id": 1071270468,
+    "foraging_id": "968ff5ae-e0d5-4661-bb6d-242bee28c7ac",
+    "full_genotype": "Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt",
+    "reporter_line": [
+      "Ai148(TIT2L-GC6f-ICL-tTA2)"
+    ],
+    "driver_line": [
+      "Vip-IRES-Cre"
+    ],
+    "ophys_cell_segmentation_run_id": 1080628312,
+    "rig_name": "CAM2P.4",
+    "movie_height": 512,
+    "movie_width": 451,
+    "container_id": 5678,
+    "surface_2p_pixel_size_um": 0.78125,
+    "max_projection_file": "max_projection.png",
+    "demix_file": "demix_file.h5",
+    "average_intensity_projection_image_file": "avg_projection.png",
+    "date_of_acquisition": "2020-12-17 10:01:12",
+    "external_specimen_name": 544261,
+    "targeted_structure": "VISp",
+    "targeted_depth": 175,
+    "stimulus_name": "OPHYS_6_images_B",
+    "sex": "F",
+    "age": "P156",
+    "eye_tracking_rig_geometry": {
+      "monitor_position_mm": [
+        118.6,
+        86.2,
+        31.6
+      ],
+      "monitor_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_position_mm": [
+        102.8,
+        74.7,
+        31.6
+      ],
+      "camera_rotation_deg": [
+        0.0,
+        0.0,
+        2.8
+      ],
+      "led_position": [
+        246.0,
+        92.3,
+        52.6
+      ],
+      "equipment": "CAM2P.4"
+    },
+    "eye_tracking_filepath": "/allen/programs/braintv/production/visualbehavior/prod4/specimen_1050612336/ophys_session_1071202230/eye_tracking/1071202230_ellipse.h5",
+    "events_file": "/allen/programs/braintv/production/visualbehavior/prod4/specimen_1050612336/ophys_session_1071202230/ophys_experiment_1071440875/1071440875_event.h5",
+    "imaging_plane_group": null,
+    "plane_group_count": 0,
+    "cell_specimen_table_dict": {
+      "cell_roi_id": {
+        "0": 1080639771,
+        "1": 1080639729,
+        "2": 1080639652
+      },
+      "cell_specimen_id": {
+        "0": 1086633380,
+        "1": 1086633339,
+        "2": 1086633332
+      },
+      "x": {
+        "0": 422,
+        "1": 185,
+        "2": 2
+      },
+      "y": {
+        "0": 147,
+        "1": 2,
+        "2": 336
+      },
+      "max_correction_up": {
+        "0": 20.0,
+        "1": 20.0,
+        "2": 20.0
+      },
+      "max_correction_right": {
+        "0": 10.0,
+        "1": 10.0,
+        "2": 10.0
+      },
+      "max_correction_down": {
+        "0": 10.0,
+        "1": 10.0,
+        "2": 10.0
+      },
+      "max_correction_left": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0
+      },
+      "valid_roi": {
+        "0": true,
+        "1": true,
+        "2": false
+      },
+      "height": {
+        "0": 1,
+        "1": 1,
+        "2": 1
+      },
+      "width": {
+        "0": 1,
+        "1": 1,
+        "2": 1
+      },
+      "mask_image_plane": {
+        "0": 0,
+        "1": 0,
+        "2": 0
+      },
+      "roi_mask": {
+        "0": [
+          [
+            true
+          ]
+        ],
+        "1": [
+          [
+            true
+          ]
+        ],
+        "2": [
+          [
+            true
+          ]
+        ]
+      }
+    }
+  }
+}

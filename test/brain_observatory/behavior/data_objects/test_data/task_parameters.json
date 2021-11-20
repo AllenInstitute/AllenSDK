@@ -1,0 +1,13 @@
+{
+	"auto_reward_volume": 0.005,
+	"blank_duration_sec": [0.5, 0.5],
+	"n_stimulus_frames": 69195,
+	"omitted_flash_fraction": 0.05,
+	"response_window_sec": [0.15, 0.75],
+	"reward_volume": 0.007,
+	"session_type": "OPHYS_4_images_A",
+	"stimulus": "images",
+	"stimulus_distribution": "geometric",
+	"stimulus_duration_sec": 0.25,
+	"task_type": "change detection"
+}

@@ -1,0 +1,20 @@
+{
+    "nikon": {
+        "scanner": "NIKONA1RMP",
+        "sync_file": "/allen/aibs/informatics/module_test_data/observatory/time_sync/501254258_sync.h5",
+        "dff_file": "/allen/aibs/informatics/module_test_data/observatory/time_sync/501254258_dff.h5",
+        "stimulus_pkl": "/allen/aibs/informatics/module_test_data/observatory/time_sync/501254258_stim.pkl",
+        "eye_video": "/allen/aibs/informatics/module_test_data/observatory/time_sync/501254258_video-1.avi",
+        "behavior_video": "/allen/aibs/informatics/module_test_data/observatory/time_sync/501254258_video-0.avi",
+        "ophys_experiment_id": 501254258
+    },
+    "scientifica": {
+        "scanner": "SCIVIVO",
+        "sync_file": "/allen/aibs/informatics/module_test_data/observatory/time_sync/547573479_sync.h5",
+        "dff_file": "/allen/aibs/informatics/module_test_data/observatory/time_sync/547573479_dff.h5",
+        "stimulus_pkl": "/allen/aibs/informatics/module_test_data/observatory/time_sync/547573479_stim.pkl",
+        "eye_video": "/allen/aibs/informatics/module_test_data/observatory/time_sync/547573479_video-1.avi",
+        "behavior_video": "/allen/aibs/informatics/module_test_data/observatory/time_sync/547573479_video-0.avi",
+        "ophys_experiment_id": 547573479
+    }
+}
