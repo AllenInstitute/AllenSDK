@@ -295,9 +295,6 @@ class OphysSession(DataObject, LimsReadableInterface,
         """Convenience method for end-users to list attributes and methods
         that can be called to access data for a BehaviorSession.
 
-        NOTE: Because BehaviorOphysExperiment inherits from BehaviorSession,
-        this method will also be available there.
-
         Returns
         -------
         List[str]
@@ -337,186 +334,13 @@ class OphysSession(DataObject, LimsReadableInterface,
                 self.trials,
                 self.task_parameters['response_window_sec'][0])
 
-    def get_rolling_performance_df(self) -> pd.DataFrame:
-        """Return a DataFrame containing trial by trial behavior response
-        performance metrics.
-
-        Returns
-        -------
-        pd.DataFrame
-            A pandas DataFrame containing:
-                trials_id [index]: (int)
-                    Index of the trial. All trials, including aborted trials,
-                    are assigned an index starting at 0 for the first trial.
-                reward_rate: (float)
-                    Rewards earned in the previous 25 trials, normalized by
-                    the elapsed time of the same 25 trials. Units are
-                    rewards/minute.
-                hit_rate_raw: (float)
-                    Fraction of go trials where the mouse licked in the
-                    response window, calculated over the previous 100
-                    non-aborted trials. Without trial count correction applied.
-                hit_rate: (float)
-                    Fraction of go trials where the mouse licked in the
-                    response window, calculated over the previous 100
-                    non-aborted trials. With trial count correction applied.
-                false_alarm_rate_raw: (float)
-                    Fraction of catch trials where the mouse licked in the
-                    response window, calculated over the previous 100
-                    non-aborted trials. Without trial count correction applied.
-                false_alarm_rate: (float)
-                    Fraction of catch trials where the mouse licked in
-                    the response window, calculated over the previous 100
-                    non-aborted trials. Without trial count correction applied.
-                rolling_dprime: (float)
-                    d prime calculated using the rolling hit_rate and
-                    rolling false_alarm _rate.
-
-        """
-        return construct_rolling_performance_df(
-                self.trials,
-                self.task_parameters['response_window_sec'][0],
-                self.task_parameters["session_type"])
-
-    def get_performance_metrics(
-            self,
-            engaged_trial_reward_rate_threshold: float = 2.0
-            ) -> dict:
-        """Get a dictionary containing a subject's behavior response
-        summary data.
-
-        Parameters
-        ----------
-        engaged_trial_reward_rate_threshold : float, optional
-            The number of rewards per minute that needs to be attained
-            before a subject is considered 'engaged', by default 2.0
-
-        Returns
-        -------
-        dict
-            Returns a dict of performance metrics with the following fields:
-                trial_count: (int)
-                    The length of the trial dataframe
-                    (including all 'go', 'catch', and 'aborted' trials)
-                go_trial_count: (int)
-                    Number of 'go' trials in a behavior session
-                catch_trial_count: (int)
-                    Number of 'catch' trial types during a behavior session
-                hit_trial_count: (int)
-                    Number of trials with a hit behavior response
-                    type in a behavior session
-                miss_trial_count: (int)
-                    Number of trials with a miss behavior response
-                    type in a behavior session
-                false_alarm_trial_count: (int)
-                    Number of trials where the mouse had a false alarm
-                    behavior response
-                correct_reject_trial_count: (int)
-                    Number of trials with a correct reject behavior
-                    response during a behavior session
-                auto_reward_count:
-                    Number of trials where the mouse received an auto
-                    reward of water.
-                earned_reward_count:
-                    Number of trials where the mouse was eligible to receive a
-                    water reward ('go' trials) and did receive an earned
-                    water reward
-                total_reward_count:
-                    Number of trials where the mouse received a
-                    water reward (earned or auto rewarded)
-                total_reward_volume: (float)
-                    Volume of all water rewards received during a
-                    behavior session (earned and auto rewarded)
-                maximum_reward_rate: (float)
-                    The peak of the rolling reward rate (rewards/minute)
-                engaged_trial_count: (int)
-                    Number of trials where the mouse is engaged
-                    (reward rate > 2 rewards/minute)
-                mean_hit_rate: (float)
-                    The mean of the rolling hit_rate
-                mean_hit_rate_uncorrected:
-                    The mean of the rolling hit_rate_raw
-                mean_hit_rate_engaged: (float)
-                    The mean of the rolling hit_rate, excluding epochs
-                    when the rolling reward rate was below 2 rewards/minute
-                mean_false_alarm_rate: (float)
-                    The mean of the rolling false_alarm_rate, excluding
-                    epochs when the rolling reward rate was below 2
-                    rewards/minute
-                mean_false_alarm_rate_uncorrected: (float)
-                    The mean of the rolling false_alarm_rate_raw
-                mean_false_alarm_rate_engaged: (float)
-                    The mean of the rolling false_alarm_rate,
-                    excluding epochs when the rolling reward rate
-                    was below 2 rewards/minute
-                mean_dprime: (float)
-                    The mean of the rolling d_prime
-                mean_dprime_engaged: (float)
-                    The mean of the rolling d_prime, excluding
-                    epochs when the rolling reward rate was
-                    below 2 rewards/minute
-                max_dprime: (float)
-                    The peak of the rolling d_prime
-                max_dprime_engaged: (float)
-                    The peak of the rolling d_prime, excluding epochs
-                    when the rolling reward rate was below 2 rewards/minute
-        """
-        performance_metrics = {}
-        performance_metrics['trial_count'] = len(self.trials)
-        performance_metrics['go_trial_count'] = self.trials.go.sum()
-        performance_metrics['catch_trial_count'] = self.trials.catch.sum()
-        performance_metrics['hit_trial_count'] = self.trials.hit.sum()
-        performance_metrics['miss_trial_count'] = self.trials.miss.sum()
-        performance_metrics['false_alarm_trial_count'] = \
-            self.trials.false_alarm.sum()
-        performance_metrics['correct_reject_trial_count'] = \
-            self.trials.correct_reject.sum()
-        performance_metrics['auto_reward_count'] = \
-            self.trials.auto_rewarded.sum()
-        # Although 'earned_reward_count' will currently have the same value as
-        # 'hit_trial_count', in the future there may be variants of the
-        # task where rewards are withheld. In that case the
-        # 'earned_reward_count' will be smaller than (and different from)
-        # the 'hit_trial_count'.
-        performance_metrics['earned_reward_count'] = self.trials.hit.sum()
-        performance_metrics['total_reward_count'] = len(self.rewards)
-        performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
-
-        rpdf = self.get_rolling_performance_df()
-        engaged_trial_mask = (
-                rpdf['reward_rate'] >
-                engaged_trial_reward_rate_threshold)
-        performance_metrics['maximum_reward_rate'] = \
-            np.nanmax(rpdf['reward_rate'].values)
-        performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
-        performance_metrics['mean_hit_rate'] = \
-            rpdf['hit_rate'].mean()
-        performance_metrics['mean_hit_rate_uncorrected'] = \
-            rpdf['hit_rate_raw'].mean()
-        performance_metrics['mean_hit_rate_engaged'] = \
-            rpdf['hit_rate'][engaged_trial_mask].mean()
-        performance_metrics['mean_false_alarm_rate'] = \
-            rpdf['false_alarm_rate'].mean()
-        performance_metrics['mean_false_alarm_rate_uncorrected'] = \
-            rpdf['false_alarm_rate_raw'].mean()
-        performance_metrics['mean_false_alarm_rate_engaged'] = \
-            rpdf['false_alarm_rate'][engaged_trial_mask].mean()
-        performance_metrics['mean_dprime'] = \
-            rpdf['rolling_dprime'].mean()
-        performance_metrics['mean_dprime_engaged'] = \
-            rpdf['rolling_dprime'][engaged_trial_mask].mean()
-        performance_metrics['max_dprime'] = \
-            rpdf['rolling_dprime'].max()
-        performance_metrics['max_dprime_engaged'] = \
-            rpdf['rolling_dprime'][engaged_trial_mask].max()
-
-        return performance_metrics
+ 
 
     # ====================== properties ========================
 
     @property
     def ophys(self) -> int:
-        """Unique identifier for a behavioral session.
+        """Unique identifier for a ophys session.
         :rtype: int
         """
         return self._ophys_session_id.value
@@ -580,10 +404,6 @@ class OphysSession(DataObject, LimsReadableInterface,
         applies a 10Hz low pass filter to the data. To get the
         running speed without the filter, use `raw_running_speed`.
 
-        NOTE: For BehaviorSessions, returned timestamps are not
-        aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for
-        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -601,10 +421,6 @@ class OphysSession(DataObject, LimsReadableInterface,
     def raw_running_speed(self) -> pd.DataFrame:
         """Get unfiltered running speed data. Sampled at 60Hz.
 
-        NOTE: For BehaviorSessions, returned timestamps are not
-        aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for
-        BehaviorOphysExperiments.
 
         Returns
         -------
@@ -685,12 +501,7 @@ class OphysSession(DataObject, LimsReadableInterface,
     def stimulus_timestamps(self) -> np.ndarray:
         """Timestamps associated with the stimulus presetntation on
         the monitor retrieveddata file saved at the end of the
-        behavior session. Sampled at 60Hz.
-
-        NOTE: For BehaviorSessions, returned timestamps are not
-        aligned to external 'synchronization' reference timestamps.
-        Synchronized timestamps are only available for
-        BehaviorOphysExperiments.
+        ophys session. Sampled at 60Hz.
 
         Returns
         -------
@@ -699,123 +510,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         """
         return self._stimulus_timestamps.value
 
-    @property
-    def task_parameters(self) -> dict:
-        """Get task parameters from data file saved at the end of
-        the behavior session file.
-
-        Returns
-        -------
-        dict
-            A dictionary containing parameters used to define the task runtime
-            behavior.
-                auto_reward_volume: (float)
-                    Volume of auto rewards in ml.
-                blank_duration_sec : (list of floats)
-                    Duration in seconds of inter stimulus interval.
-                    Inter-stimulus interval chosen as a uniform random value.
-                    between the range defined by the two values.
-                    Values are ignored if `stimulus_duration_sec` is null.
-                response_window_sec: (list of floats)
-                    Range of period following an image change, in seconds,
-                    where mouse response influences trial outcome.
-                    First value represents response window start.
-                    Second value represents response window end.
-                    Values represent time before display lag is
-                    accounted for and applied.
-                n_stimulus_frames: (int)
-                    Total number of visual stimulus frames presented during
-                    a behavior session.
-                task: (string)
-                    Type of visual stimulus task.
-                session_type: (string)
-                    Visual stimulus type run during behavior session.
-                omitted_flash_fraction: (float)
-                    Probability that a stimulus image presentations is omitted.
-                    Change stimuli, and the stimulus immediately preceding the
-                    change, are never omitted.
-                stimulus_distribution: (string)
-                    Distribution for drawing change times.
-                    Either 'exponential' or 'geometric'.
-                stimulus_duration_sec: (float)
-                    Duration in seconds of each stimulus image presentation
-                reward_volume: (float)
-                    Volume of earned water reward in ml.
-                stimulus: (string)
-                    Stimulus type ('gratings' or 'images').
-
-        """
-        return self._task_parameters.to_dict()['task_parameters']
-
-    @property
-    def trials(self) -> pd.DataFrame:
-        """Get trials from data file saved at the end of the
-        behavior session.
-
-        Returns
-        -------
-        pd.DataFrame
-            A dataframe containing trial and behavioral response data,
-            by cell specimen id
-
-            dataframe columns:
-                trials_id: (int)
-                    trial identifier
-                lick_times: (array of float)
-                    array of lick times in seconds during that trial.
-                    Empty array if no licks occured during the trial.
-                reward_time: (NaN or float)
-                    Time the reward is delivered following a correct
-                    response or on auto rewarded trials.
-                reward_volume: (float)
-                    volume of reward in ml. 0.005 for auto reward
-                    0.007 for earned reward
-                hit: (bool)
-                    Behavior response type. On catch trial mouse licks
-                    within reward window.
-                false_alarm: (bool)
-                    Behavior response type. On catch trial mouse licks
-                    within reward window.
-                miss: (bool)
-                    Behavior response type. On a go trial, mouse either
-                    does not lick at all, or licks after reward window
-                stimulus_change: (bool)
-                    True if an image change occurs during the trial
-                    (if the trial was both a 'go' trial and the trial
-                    was not aborted)
-                aborted: (bool)
-                    Behavior response type. True if the mouse licks
-                    before the scheduled change time.
-                go: (bool)
-                    Trial type. True if there was a change in stimulus
-                    image identity on this trial
-                catch: (bool)
-                    Trial type. True if there was not a change in stimulus
-                    identity on this trial
-                auto_rewarded: (bool)
-                    True if free reward was delivered for that trial.
-                    Occurs during the first 5 trials of a session and
-                    throughout as needed.
-                correct_reject: (bool)
-                    Behavior response type. On a catch trial, mouse
-                    either does not lick at all or licks after reward
-                    window
-                start_time: (float)
-                    start time of the trial in seconds
-                stop_time: (float)
-                    end time of the trial in seconds
-                trial_length: (float)
-                    duration of trial in seconds (stop_time -start_time)
-                response_time: (float)
-                    time of first lick in trial in seconds and NaN if
-                    trial aborted
-                initial_image_name: (string)
-                    name of image presented at start of trial
-                change_image_name: (string)
-                    name of image that is changed to at the change time,
-                    on go trials
-        """
-        return self._trials.value
+ 
 
     @property
     def metadata(self) -> Dict[str, Any]:
