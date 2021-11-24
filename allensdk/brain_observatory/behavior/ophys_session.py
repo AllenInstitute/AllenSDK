@@ -80,67 +80,6 @@ class OphysSession(DataObject, LimsReadableInterface,
 
     # ==================== class and utility methods ======================
 
-    @classmethod
-    def from_json(cls,
-                  session_data: dict,
-                  monitor_delay: Optional[float] = None) \
-            -> "OphysSession":
-        """
-
-        Parameters
-        ----------
-        session_data
-            Dict of input data necessary to construct a session
-        monitor_delay
-            Monitor delay. If not provided, will use an estimate.
-            To provide this value, see for example
-            allensdk.brain_observatory.behavior.data_objects.stimuli.util.
-            calculate_monitor_delay
-
-        Returns
-        -------
-        `OphysSession` instance
-
-        """
-        ophys_session_id = OphysSessionId.from_json(
-            dict_repr=session_data)
-        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
-        stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
-        running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data)
-        raw_running_speed = RunningSpeed.from_json(
-            dict_repr=session_data, filtered=False
-        )
-        running_speed = RunningSpeed.from_json(dict_repr=session_data)
-        metadata = MultiplaneMetadata.from_json(dict_repr=session_data)
-
-        if monitor_delay is None:
-            monitor_delay = cls._get_monitor_delay()
-
-        stimuli, task_parameters = \
-            cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
-                trial_monitor_delay=monitor_delay
-            )
-        date_of_acquisition = DateOfAcquisitionOphys.from_json(
-            dict_repr=session_data)\
-            .validate(
-            stimulus_file=stimulus_file,
-            behavior_session_id=ophys_session_id.value)
-
-        return OphysSession(
-            ophys_session_id=ophys_session_id,
-            stimulus_timestamps=stimulus_timestamps,
-            running_acquisition=running_acquisition,
-            raw_running_speed=raw_running_speed,
-            running_speed=running_speed,
-            stimuli=stimuli,
-            task_parameters=task_parameters,
-            #trials=trials,
-            date_of_acquisition=date_of_acquisition
-        )
 
     @classmethod
     def from_lims(cls, ophys_session_id: int,
@@ -218,48 +157,6 @@ class OphysSession(DataObject, LimsReadableInterface,
             #trials=trials,
         )
 
-    @classmethod
-    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "OphysSession":
-        ophys_session_id = OphysSessionId.from_nwb(nwbfile)
-        stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
-        running_acquisition = RunningAcquisition.from_nwb(nwbfile)
-        raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
-        running_speed = RunningSpeed.from_nwb(nwbfile)
-        stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
-        task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        #trials = TrialTable.from_nwb(nwbfile=nwbfile)
-        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
-
-        return OphysSession(
-            ophys_session_id=ophys_session_id,
-            stimulus_timestamps=stimulus_timestamps,
-            running_acquisition=running_acquisition,
-            raw_running_speed=raw_running_speed,
-            running_speed=running_speed,
-            stimuli=stimuli,
-            task_parameters=task_parameters,
-            #trials=trials,
-            date_of_acquisition=date_of_acquisition
-        )
-
-    @classmethod
-    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "OphysSession":
-        """
-
-        Parameters
-        ----------
-        nwb_path
-            Path to nwb file
-        kwargs
-            Kwargs to be passed to `from_nwb`
-
-        Returns
-        -------
-        An instantiation of a `OphysSession`
-        """
-        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
-            nwbfile = read_io.read()
-            return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
     def to_nwb(self, add_metadata=False) -> NWBFile:
         """
@@ -270,7 +167,7 @@ class OphysSession(DataObject, LimsReadableInterface,
             Set this to False to prevent adding metadata to the nwb
             instance.
         """
-        #TODO: Updates session description, start time, and experiment description
+        #TODO: Updates session description and experiment description
         nwbfile = NWBFile(
             session_description='Ophys Session',
             identifier=self._get_identifier(),
