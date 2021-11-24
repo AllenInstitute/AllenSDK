@@ -123,9 +123,32 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         behavior_session_id: int,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
-
+        print("TEST", behavior_session_id)
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file
+        )
+        running_acq_df = get_running_df(
+            data=stimulus_file.data, time=stimulus_timestamps.value,
+        )
+        running_acq_df.drop("speed", axis=1, inplace=True)
+
+        return cls(
+            running_acquisition=running_acq_df,
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+        )
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
+    def from_ophys_lims(
+        cls,
+        db: PostgresQueryMixin,
+        behavior_session_id: int,
+        ophys_experiment_id: Optional[int] = None,
+    ) -> "RunningAcquisition":
+        print("TEST", behavior_session_id)
+        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
+        stimulus_timestamps = StimulusTimestamps.from_ophys_stimulus_file(
             stimulus_file=stimulus_file
         )
         running_acq_df = get_running_df(

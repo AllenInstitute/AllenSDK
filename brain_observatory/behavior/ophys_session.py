@@ -21,7 +21,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     BehaviorMetadata, get_expt_description
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
+    DateOfAcquisitionOphys
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
@@ -54,7 +54,7 @@ class OphysSession(DataObject, LimsReadableInterface,
     """
     def __init__(
         self,
-        behavior_session_id: OphysSessionId,
+        ophys_session_id: OphysSessionId,
         stimulus_timestamps: StimulusTimestamps,
         running_acquisition: RunningAcquisition,
         raw_running_speed: RunningSpeed,
@@ -63,11 +63,11 @@ class OphysSession(DataObject, LimsReadableInterface,
         #task_parameters: TaskParameters,
         #trials: TrialTable,
         metadata: MultiplaneMetadata,
-        #date_of_acquisition: DateOfAcquisition
+        date_of_acquisition: DateOfAcquisitionOphys
     ):
-        super().__init__(name='behavior_session', value=self)
+        super().__init__(name='ophys_session', value=self)
 
-        self._behavior_session_id = behavior_session_id
+        self._ophys_session_id = ophys_session_id
         self._running_acquisition = running_acquisition
         self._running_speed = running_speed
         self._raw_running_speed = raw_running_speed
@@ -76,7 +76,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         #self._task_parameters = task_parameters
         self._metadata = metadata
         #self._trials = trials
-        #self._date_of_acquisition = date_of_acquisition
+        self._date_of_acquisition = date_of_acquisition
 
     # ==================== class and utility methods ======================
 
@@ -102,7 +102,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         `OphysSession` instance
 
         """
-        behavior_session_id = OphysSessionId.from_json(
+        ophys_session_id = OphysSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = StimulusFile.from_json(dict_repr=session_data)
         stimulus_timestamps = StimulusTimestamps.from_json(
@@ -124,14 +124,14 @@ class OphysSession(DataObject, LimsReadableInterface,
                 stimulus_timestamps=stimulus_timestamps,
                 trial_monitor_delay=monitor_delay
             )
-        date_of_acquisition = DateOfAcquisition.from_json(
+        date_of_acquisition = DateOfAcquisitionOphys.from_json(
             dict_repr=session_data)\
             .validate(
             stimulus_file=stimulus_file,
-            behavior_session_id=behavior_session_id.value)
+            behavior_session_id=ophys_session_id.value)
 
         return OphysSession(
-            behavior_session_id=behavior_session_id,
+            ophys_session_id=ophys_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
@@ -143,18 +143,18 @@ class OphysSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
+    def from_lims(cls, ophys_session_id: int,
                   lims_db: Optional[PostgresQueryMixin] = None,
                   stimulus_timestamps: Optional[StimulusTimestamps] = None,
                   monitor_delay: Optional[float] = None,
-                  date_of_acquisition: Optional[DateOfAcquisition] = None) \
+                  date_of_acquisition: Optional[DateOfAcquisitionOphys] = None) \
             -> "OphysSession":
         """
 
         Parameters
         ----------
-        behavior_session_id
-            Behavior session id
+        ophys_session_id
+            ophys session id
         lims_db
             Database connection. If not provided will create a new one.
         stimulus_timestamps
@@ -167,10 +167,10 @@ class OphysSession(DataObject, LimsReadableInterface,
             calculate_monitor_delay
         date_of_acquisition
             Date of acquisition. If not provided, will read from
-            behavior_sessions table.
+            ophys_sessions table.
         Returns
         -------
-        `BehaviorSession` instance
+        `ophysSession` instance
         """
         if lims_db is None:
             lims_db = db_connection_creator(
@@ -178,18 +178,29 @@ class OphysSession(DataObject, LimsReadableInterface,
             )
 
         metadata = MultiplaneMetadata.from_lims(
-            ophys_experiment_id=behavior_session_id, lims_db=lims_db
+            ophys_experiment_id=ophys_session_id, lims_db=lims_db
         )
-        running_acquisition = RunningAcquisition.from_lims(
-            lims_db, behavior_session_id
+        sess_id = OphysSessionId.from_lims(
+            ophys_experiment_id=ophys_session_id, lims_db=lims_db
+        )
+        running_acquisition = RunningAcquisition.from_ophys_lims(
+            db = lims_db,
+            behavior_session_id = sess_id.value
         )
         raw_running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value, filtered=False,
+            db = lims_db,
+            behavior_session_id =sess_id.value,
+            filtered=False,
             stimulus_timestamps=stimulus_timestamps
         )
         running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value,
+            db = lims_db,
+            behavior_session_id =sess_id.value,
             stimulus_timestamps=stimulus_timestamps
+        )
+        date_of_acquisition = DateOfAcquisitionOphys.from_lims(
+            ophys_experiment_id=ophys_session_id, 
+            lims_db=lims_db
         )
         if monitor_delay is None:
             monitor_delay = cls._get_monitor_delay()
@@ -197,18 +208,19 @@ class OphysSession(DataObject, LimsReadableInterface,
 
 
         return OphysSession(
-            behavior_session_id=behavior_session_id,
+            ophys_session_id=ophys_session_id,
             stimulus_timestamps=stimulus_timestamps,
             metadata=metadata,
             raw_running_speed=raw_running_speed,
             running_acquisition=running_acquisition,
-            running_speed=running_speed
+            running_speed=running_speed,
+            date_of_acquisition=date_of_acquisition
             #trials=trials,
         )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "OphysSession":
-        behavior_session_id = OphysSessionId.from_nwb(nwbfile)
+        ophys_session_id = OphysSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
         raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
@@ -219,7 +231,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
 
         return OphysSession(
-            behavior_session_id=behavior_session_id,
+            ophys_session_id=ophys_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
             raw_running_speed=raw_running_speed,
@@ -262,7 +274,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         nwbfile = NWBFile(
             session_description='Ophys Session',
             identifier=self._get_identifier(),
-            session_start_time=pytz.utc.localize(datetime.datetime.now()),
+            session_start_time=self._date_of_acquisition.value,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=self._get_keywords(),
@@ -270,10 +282,9 @@ class OphysSession(DataObject, LimsReadableInterface,
         )
 
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
-        #self._running_acquisition.to_nwb(nwbfile=nwbfile)
-        #self._raw_running_speed.to_nwb(nwbfile=nwbfile)
-        #self._running_speed.to_nwb(nwbfile=nwbfile)
-
+        self._running_acquisition.to_nwb(nwbfile=nwbfile)
+        self._raw_running_speed.to_nwb(nwbfile=nwbfile)
+        self._running_speed.to_nwb(nwbfile=nwbfile)
         #self._stimuli.to_nwb(nwbfile=nwbfile)
         #self._task_parameters.to_nwb(nwbfile=nwbfile)
         #self._trials.to_nwb(nwbfile=nwbfile)
@@ -504,11 +515,11 @@ class OphysSession(DataObject, LimsReadableInterface,
     # ====================== properties ========================
 
     @property
-    def behavior_session_id(self) -> int:
+    def ophys(self) -> int:
         """Unique identifier for a behavioral session.
         :rtype: int
         """
-        return self._behavior_session_id.value
+        return self._ophys_session_id.value
 
     @property
     def licks(self) -> pd.DataFrame:
@@ -863,7 +874,7 @@ class OphysSession(DataObject, LimsReadableInterface,
 
 
     def _get_identifier(self) -> str:
-        return str(self._behavior_session_id)
+        return str(self._ophys_session_id)
 
     def _get_session_type(self) -> str:
         return self._metadata.session_type

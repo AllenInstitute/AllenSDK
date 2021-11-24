@@ -21,7 +21,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
-        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps,
+        get_wheel_timestamps)
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -71,7 +72,19 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
             timestamps=stimulus_timestamps,
             stimulus_file=stimulus_file
         )
+    @classmethod
+    def from_ophys_stimulus_file(
+            cls,
+            stimulus_file: StimulusFile) -> "StimulusTimestamps":
+        print("Stimulus File:", stimulus_file)
+        stimulus_timestamps = get_wheel_timestamps(
+            stimulus_pkl=stimulus_file.data
+        )
 
+        return cls(
+            timestamps=stimulus_timestamps,
+            stimulus_file=stimulus_file
+        )    
     @classmethod
     def from_sync_file(cls, sync_file: SyncFile) -> "StimulusTimestamps":
         stimulus_timestamps = get_ophys_stimulus_timestamps(

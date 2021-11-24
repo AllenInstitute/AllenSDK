@@ -27,6 +27,27 @@ def get_behavior_stimulus_timestamps(stimulus_pkl: dict) -> np.ndarray:
     stimulus_timestamps = np.hstack((0, vsyncs)).cumsum() / 1000.0
     return stimulus_timestamps
 
+def get_wheel_timestamps(stimulus_pkl: dict) -> np.ndarray:
+    """Obtain visual behavior stimuli timing information from a behavior
+    stimulus *.pkl file.
+
+    Parameters
+    ----------
+    stimulus_pkl : dict
+        A dictionary containing stimulus presentation timing information
+        during a behavior session. Presentation timing info is stored as
+        an array of times between frames (frame time intervals) in
+        milliseconds.
+
+    Returns
+    -------
+    np.ndarray
+        Timestamps (in seconds) for presented stimulus frames during a session.
+    """
+    vsyncs = stimulus_pkl["intervalsms"]
+    stimulus_timestamps = np.hstack((0, vsyncs)).cumsum() / 1000.0
+    return stimulus_timestamps
+
 
 def get_ophys_stimulus_timestamps(sync_path: Union[str, Path]) -> np.ndarray:
     """Obtain visual behavior stimuli timing information from a sync *.h5 file.

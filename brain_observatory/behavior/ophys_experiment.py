@@ -62,7 +62,7 @@ class OphysExperiment(OphysSession):
     """
 
     def __init__(self,
-                 behavior_session: OphysSession,
+                 ophys_session: OphysSession,
                  projections: Projections,
                  ophys_timestamps: OphysTimestamps,
                  cell_specimens: CellSpecimens,
@@ -70,19 +70,19 @@ class OphysExperiment(OphysSession):
                  motion_correction: MotionCorrection,
                  #eye_tracking_table: Optional[EyeTrackingTable],
                  #eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry],
-                 date_of_acquisition: DateOfAcquisition):
+                 date_of_acquisition: DateOfAcquisitionOphys):
         super().__init__(
-            behavior_session_id=behavior_session._behavior_session_id,
-            metadata=behavior_session._metadata,
-            raw_running_speed=behavior_session._raw_running_speed,
-            running_speed=behavior_session._running_speed,
-            running_acquisition=behavior_session._running_acquisition,
-            #stimuli=behavior_session._stimuli,
-            stimulus_timestamps=behavior_session._stimulus_timestamps,
-            #task_parameters=behavior_session._task_parameters,
-            #date_of_acquisition=date_of_acquisition
+            ophys_session_id=ophys_session._ophys_session_id,
+            metadata=ophys_session._metadata,
+            raw_running_speed=ophys_session._raw_running_speed,
+            running_speed=ophys_session._running_speed,
+            running_acquisition=ophys_session._running_acquisition,
+            #stimuli=ophys_session._stimuli,
+            stimulus_timestamps=ophys_session._stimulus_timestamps,
+            #task_parameters=ophys_session._task_parameters,
+            date_of_acquisition=date_of_acquisition
         )
-
+        self._ophys_session = ophys_session
         self._metadata = metadata
         self._projections = projections
         self._ophys_timestamps = ophys_timestamps
@@ -93,7 +93,7 @@ class OphysExperiment(OphysSession):
 
     def to_nwb(self) -> NWBFile:
         nwbfile = super().to_nwb(add_metadata=False)
-
+        self._ophys_session.to_nwb()
         self._metadata.to_nwb(nwbfile=nwbfile)
         self._projections.to_nwb(nwbfile=nwbfile)
         self._cell_specimens.to_nwb(nwbfile=nwbfile,
@@ -163,7 +163,7 @@ class OphysExperiment(OphysSession):
                                        ophys_experiment_id=ophys_experiment_id)
         stimulus_timestamps = StimulusTimestamps.from_sync_file(
             sync_file=sync_file)
-        #behavior_session_id = OphysSessionId.from_lims(
+        #ophys_session_id = OphysSessionId.from_lims(
          #   lims_db=lims_db, ophys_experiment_id=ophys_experiment_id)
         is_multiplane_session = _is_multi_plane_session()
         meta = MultiplaneMetadata.from_lims(
@@ -171,9 +171,9 @@ class OphysExperiment(OphysSession):
         )
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        behavior_session = OphysSession.from_lims(
+        ophys_session = OphysSession.from_lims(
             lims_db=lims_db,
-            behavior_session_id=ophys_experiment_id,
+            ophys_session_id=ophys_experiment_id,
             stimulus_timestamps=stimulus_timestamps,
             date_of_acquisition=date_of_acquisition
         )
@@ -208,7 +208,7 @@ class OphysExperiment(OphysSession):
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         return OphysExperiment(
-            behavior_session=behavior_session,
+            ophys_session=ophys_session,
             cell_specimens=cell_specimens,
             ophys_timestamps=ophys_timestamps,
             metadata=meta,
@@ -255,7 +255,7 @@ class OphysExperiment(OphysSession):
             return cls._is_multi_plane_session(
                 imaging_plane_group_meta=imaging_plane_group_meta)
 
-        behavior_session = OphysSession.from_nwb(nwbfile=nwbfile)
+        ophys_session = OphysSession.from_nwb(nwbfile=nwbfile)
         projections = Projections.from_nwb(nwbfile=nwbfile)
         cell_specimens = CellSpecimens.from_nwb(
             nwbfile=nwbfile,
@@ -283,7 +283,7 @@ class OphysExperiment(OphysSession):
         date_of_acquisition = DateOfAcquisitionOphys.from_nwb(nwbfile=nwbfile)
 
         return OphysExperiment(
-            behavior_session=behavior_session,
+            ophys_session=ophys_session,
             cell_specimens=cell_specimens,
             eye_tracking_rig_geometry=eye_tracking_rig_geometry,
             eye_tracking_table=eye_tracking_table,
@@ -352,7 +352,7 @@ class OphysExperiment(OphysSession):
             dict_repr=session_data, is_multiplane=is_multiplane_session)
         monitor_delay = calculate_monitor_delay(
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
-        behavior_session = OphysSession.from_json(
+        ophys_session = OphysSession.from_json(
             session_data=session_data,
             monitor_delay=monitor_delay
         )
@@ -387,7 +387,7 @@ class OphysExperiment(OphysSession):
                 dict_repr=session_data)
 
         return OphysExperiment(
-            behavior_session=behavior_session,
+            ophys_session=ophys_session,
             cell_specimens=cell_specimens,
             ophys_timestamps=ophys_timestamps,
             metadata=meta,
@@ -395,7 +395,7 @@ class OphysExperiment(OphysSession):
             motion_correction=motion_correction,
             eye_tracking_table=eye_tracking_table,
             eye_tracking_rig_geometry=eye_tracking_rig_geometry,
-            date_of_acquisition=behavior_session._date_of_acquisition
+            date_of_acquisition=ophys_session._date_of_acquisition
         )
 
     # ========================= 'get' methods ==========================
