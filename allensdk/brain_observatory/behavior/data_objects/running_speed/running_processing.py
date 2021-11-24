@@ -351,8 +351,115 @@ def get_running_df(
     their own corrections and compute running speed from the raw
     source.
     """
-    v_sig = data["items"]['foraging']["encoders"][0]["vsig"]
-    v_in = data["items"]['foraging']["encoders"][0]["vin"]
+    v_sig = data["items"]['behavior']["encoders"][0]["vsig"]
+    v_in = data["items"]['behavior']["encoders"][0]["vin"]
+
+    if len(v_in) > len(time) + 1:
+        error_string = ("length of v_in ({}) cannot be longer than length of "
+                        "time ({}) + 1, they are off by {}").format(
+            len(v_in),
+            len(time),
+            abs(len(v_in) - len(time))
+        )
+        raise ValueError(error_string)
+    if len(v_in) == len(time) + 1:
+        warnings.warn(
+            "Time array is 1 value shorter than encoder array. Last encoder "
+            "value removed\n", UserWarning, stacklevel=1)
+        v_in = v_in[:-1]
+        v_sig = v_sig[:-1]
+
+    # dx = 'd_theta' = angular change
+    # There are some issues with angular change in the raw data so we
+    # recompute this value
+    dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
+    # Identify "wraps" in the voltage signal that need to be unwrapped
+    # This is where the encoder switches from 0V to 5V or vice versa
+    pos_wraps, neg_wraps = _identify_wraps(
+        v_sig, min_threshold=1.5, max_threshold=3.5)
+    # Unwrap the voltage signal and apply correction for transient spikes
+    unwrapped_vsig = _unwrap_voltage_signal(
+        v_sig, pos_wraps, neg_wraps, max_threshold=5.1, max_diff=1.0)
+    angular_change_point = _angular_change(unwrapped_vsig, v_in)
+    angular_change = np.nancumsum(angular_change_point)
+    # Add the nans back in (get turned to 0 in nancumsum)
+    angular_change[np.isnan(angular_change_point)] = np.nan
+    angular_speed = calc_deriv(angular_change, time)  # speed in radians/s
+    linear_speed = deg_to_dist(angular_speed)
+    # Artifact correction to speed data
+    wrap_corrected_linear_speed = _clip_speed_wraps(
+        linear_speed, time, np.concatenate([pos_wraps, neg_wraps]),
+        t_span=0.25)
+    outlier_corrected_linear_speed = _zscore_threshold_1d(
+        wrap_corrected_linear_speed, threshold=zscore_threshold)
+
+    # Final filtering (optional) for smoothing out the speed data
+    if lowpass:
+        b, a = signal.butter(3, Wn=4, fs=60, btype="lowpass")
+        outlier_corrected_linear_speed = signal.filtfilt(
+            b, a, np.nan_to_num(outlier_corrected_linear_speed))
+
+    return pd.DataFrame({
+        'speed': outlier_corrected_linear_speed[:len(time)],
+        'dx': dx_raw[:len(time)],
+        'v_sig': v_sig[:len(time)],
+        'v_in': v_in[:len(time)],
+    }, index=pd.Index(time, name='timestamps'))
+
+def get_running_ophys_df(
+    data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0
+):
+    """
+    Given the data from the 'pkl' file object and a 1d
+    array of timestamps, compute the running speed. Returns a
+    dataframe with the raw voltage data as well as the computed speed
+    at each timestamp. By default, the running speed is filtered with
+    a 10 Hz Butterworth lowpass filter to remove artifacts caused by
+    the rotary encoder.
+
+    Parameters
+    ----------
+    data
+        Deserialized 'behavior pkl' file data
+    time: np.ndarray (1d)
+        Timestamps for running data measurements
+    lowpass: bool (default=True)
+        Whether to apply a 10Hz low-pass filter to the running speed
+        data.
+    zscore_threshold: float
+        The threshold to use for removing outlier running speeds which might
+        be noise and not true signal.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with an index of timestamps and the following
+        columns:
+            "speed": computed running speed
+            "dx": angular change, computed during data collection
+            "v_sig": voltage signal from the encoder
+            "v_in": the theoretical maximum voltage that the encoder
+                will reach prior to "wrapping". This should
+                theoretically be 5V (after crossing 5V goes to 0V, or
+                vice versa). In practice the encoder does not always
+                reach this value before wrapping, which can cause
+                transient spikes in speed at the voltage "wraps".
+        The raw data are provided so that the user may compute their
+        own speed from source, if desired.
+
+    Notes
+    -----
+    Though the angular change is available in the raw data
+    (key="dx"), this method recomputes the angular change from the
+    voltage signal (key="vsig") due to very specific, low-level
+    artifacts in the data caused by the encoder. See method
+    docstrings for more detailed information. The raw data is
+    included in the final output in case the end user wants to apply
+    their own corrections and compute running speed from the raw
+    source.
+    """
+    v_sig = data["items"]["foraging"]["encoders"][0]["vsig"]
+    v_in = data["items"]["foraging"]["encoders"][0]["vin"]
 
     if len(v_in) > len(time) + 1:
         error_string = ("length of v_in ({}) cannot be longer than length of "
