@@ -24,7 +24,7 @@ from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
-    get_running_df
+    get_running_df, get_running_ophys_df
 )
 
 
@@ -150,7 +150,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         stimulus_timestamps = StimulusTimestamps.from_ophys_stimulus_file(
             stimulus_file=stimulus_file
         )
-        running_acq_df = get_running_df(
+        running_acq_df = get_running_ophys_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
         )
         running_acq_df.drop("speed", axis=1, inplace=True)
