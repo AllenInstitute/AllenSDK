@@ -57,7 +57,7 @@ from allensdk.internal.api import db_connection_creator
 
 
 class OphysExperiment(OphysSession):
-    """Represents data from a single Visual Behavior Ophys imaging session.
+    """Represents data from a single Ophys imaging session.
     Initialize by using class methods `from_lims` or `from_nwb_path`.
     """
 
