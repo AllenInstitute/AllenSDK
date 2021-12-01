@@ -170,7 +170,7 @@ def get_eye_tracking(
 
     """
     return dataset.get_edges(
-        "rising", ["cam2_exposure", "eye_tracking"], "seconds", permissive)
+        "rising", ["cam2_exposure", "eye_tracking", "eye_frame_received"], "seconds", permissive)
 
 
 def get_behavior_monitoring(
@@ -194,7 +194,7 @@ def get_behavior_monitoring(
 
     """
     return dataset.get_edges(
-        "rising", ["cam1_exposure", "behavior_monitoring"], "seconds", 
+        "rising", ["cam1_exposure", "behavior_monitoring", "beh_frame_received"], "seconds", 
         permissive)
 
 
