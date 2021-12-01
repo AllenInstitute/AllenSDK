@@ -32,7 +32,7 @@ def get_raw_stimulus_frames(
 
     """
     try:
-        return dataset.get_edges("falling",'stim_vsync', "seconds")
+        return dataset.get_edges("falling",['stim_vsync','vsync_stim'], "seconds")
     except KeyError:
         if not permissive:
             raise
