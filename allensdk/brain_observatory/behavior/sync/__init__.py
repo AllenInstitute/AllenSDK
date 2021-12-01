@@ -63,14 +63,14 @@ def get_ophys_frames(
 
     """
     try:
-        return dataset.get_edges("rising", '2p_vsync', "seconds")
+        return dataset.get_edges("rising", ['2p_vsync','vsync_2p'], "seconds")
     except KeyError:
-        try:
-            return dataset.get_edges("rising", 'vsync_2p', "seconds")
-        except KeyError:
-            if not permissive:
-                raise
-            return
+        # try:
+        #     return dataset.get_edges("rising", 'vsync_2p', "seconds")
+        # except KeyError:
+        if not permissive:
+            raise
+        return
         
 
 
@@ -147,7 +147,7 @@ def get_trigger(
 
     """
     return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger"], "seconds", permissive)
+        "rising", ["2p_trigger", "acq_trigger", "stim_running"], "seconds", permissive)
 
 
 def get_eye_tracking(
