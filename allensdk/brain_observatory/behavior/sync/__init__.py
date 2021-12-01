@@ -65,9 +65,13 @@ def get_ophys_frames(
     try:
         return dataset.get_edges("rising", '2p_vsync', "seconds")
     except KeyError:
-        if not permissive:
-            raise
-        return
+        try:
+            return dataset.get_edges("rising", 'vsync_2p', "seconds")
+        except KeyError:
+            if not permissive:
+                raise
+            return
+        
 
 
 def get_lick_times(
