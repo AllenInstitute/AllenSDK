@@ -37,13 +37,13 @@ def get_keys(sync_dset: Dataset) -> dict:
     # line labels
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
-            "2p": ["2p_vsync"],
+            "2p": ["2p_vsync", "vsync_2p"],
             "stimulus": ["stim_vsync", "vsync_stim"],
             "eye_camera": ["cam2_exposure", "eye_tracking",
                            "eye_frame_received"],
             "behavior_camera": ["cam1_exposure", "behavior_monitoring",
                                 "beh_frame_received"],
-            "acquiring": ["2p_acquiring", "acq_trigger"],
+            "acquiring": ["2p_acquiring", "acq_trigger","2p_acq_trigger"],
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
     label_set = set(sync_dset.line_labels)
