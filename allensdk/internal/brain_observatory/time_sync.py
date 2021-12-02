@@ -43,7 +43,7 @@ def get_keys(sync_dset: Dataset) -> dict:
                            "eye_frame_received"],
             "behavior_camera": ["cam1_exposure", "behavior_monitoring",
                                 "beh_frame_received"],
-            "acquiring": ["2p_acquiring", "acq_trigger","2p_acq_trigger"],
+            "acquiring": ["2p_acquiring", "acq_trigger","2p_acq_trigger", "stim_running"],
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
     label_set = set(sync_dset.line_labels)
