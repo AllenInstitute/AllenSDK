@@ -146,9 +146,11 @@ def get_trigger(
         correspond to acquired ophys frames.
 
     """
-    return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger", "2p_acq_trigger","stim_running"], "seconds", permissive)
-
+    try:
+        return dataset.get_edges(
+        "rising", ["2p_trigger", "acq_trigger", "2p_acq_trigger"], "seconds", permissive)
+    except KeyError:
+        return None
 
 def get_eye_tracking(
     dataset: SyncDataset, 
