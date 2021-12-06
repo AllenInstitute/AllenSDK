@@ -148,7 +148,7 @@ def get_trigger(
     """
     try:
         return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger", "2p_acq_trigger"], "seconds", permissive)
+        "rising", ["2p_trigger", "acq_trigger", "2p_acq_trigger","stim_running"], "seconds", permissive)
     except KeyError:
         return None
 
