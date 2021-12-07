@@ -15,8 +15,8 @@ base_dir = os.path.join(
     "specimen_789992909",
     "ophys_session_819949602",
 )
-sync_path=os.path.join(
-    base_dir, 
+sync_path = os.path.join(
+    base_dir,
     "819949602_sync.h5"
 )
 
@@ -46,18 +46,24 @@ def test_get_time_sync_integration(sync_path, sync_key, count_exp, last_exp):
     [sync.get_trigger, "stim_running", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
     [sync.get_eye_tracking, "cam2_exposure", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
     [sync.get_eye_tracking, "eye_tracking", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
-    [sync.get_eye_tracking, "eye_frame_received", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
-    [sync.get_behavior_monitoring, "cam1_exposure", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
-    [sync.get_behavior_monitoring, "behavior_monitoring", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
+    [sync.get_eye_tracking, "eye_frame_received", [1, 2, 3], [4, 5, 6],
+        [1, 2, 3]],
+    [sync.get_behavior_monitoring, "cam1_exposure", [1, 2, 3], [4, 5, 6],
+        [1, 2, 3]],
+    [sync.get_behavior_monitoring, "behavior_monitoring", [1, 2, 3], [4, 5, 6],
+        [1, 2, 3]],
     [sync.get_behavior_monitoring, "beh_frame_received", [1, 2, 3], [4, 5, 6],
      [1, 2, 3]],
-    [sync.get_stim_photodiode, "stim_photodiode", [1, 2, 3], [4, 5, 6], [1, 2, 3, 4, 5, 6]],
-    [sync.get_stim_photodiode, "photodiode", [1, 2, 3], [4, 5, 6], [1, 2, 3, 4, 5, 6]],
+    [sync.get_stim_photodiode, "stim_photodiode", [1, 2, 3], [4, 5, 6],
+        [1, 2, 3, 4, 5, 6]],
+    [sync.get_stim_photodiode, "photodiode", [1, 2, 3], [4, 5, 6],
+        [1, 2, 3, 4, 5, 6]],
     [sync.get_lick_times, "lick_times", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
     [sync.get_lick_times, "lick_sensor", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
     [sync.get_ophys_frames, "2p_vsync", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
     [sync.get_ophys_frames, "vsync_2p", [1, 2, 3], [4, 5, 6], [1, 2, 3]],
-    [sync.get_raw_stimulus_frames, "stim_vsync", [1, 2, 3], [4, 5, 6], [4, 5, 6]],
+    [sync.get_raw_stimulus_frames, "stim_vsync", [1, 2, 3], [4, 5, 6],
+        [4, 5, 6]],
 ])
 def test_timestamp_extractors(fn, key, rise, fall, expect):
 
@@ -66,18 +72,17 @@ def test_timestamp_extractors(fn, key, rise, fall, expect):
             self.line_labels = [key, "1", "2"]
 
         def get_rising_edges(self, line, units):
-            if not line in self.line_labels:
+            if line not in self.line_labels:
                 raise ValueError
             return rise
 
         def get_falling_edges(self, line, units):
-            if not line in self.line_labels:
+            if line not in self.line_labels:
                 raise ValueError
             return fall
 
     if expect is None:
-        with pytest.raises(KeyError) as _err:
+        with pytest.raises(KeyError):
             fn(Ds())
     else:
         assert np.allclose(expect, fn(Ds()))
-
