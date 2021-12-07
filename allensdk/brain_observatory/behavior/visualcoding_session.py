@@ -62,7 +62,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         running_speed: RunningSpeed,
         licks: Licks,
         rewards: Rewards,
-        stimuli: Stimuli,
+        stimuli: DenseMovieStimuli,
         task_parameters: TaskParameters,
         trials: TrialTable,
         metadata: VisualCodingMetadata,
@@ -723,7 +723,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
 
         """
         # return self._stimuli.templates.value.to_dataframe()
-        return self._stimuli.templates
+        return self._stimuli.templates.value
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:

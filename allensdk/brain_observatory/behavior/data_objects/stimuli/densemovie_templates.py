@@ -57,7 +57,7 @@ class DenseMovieTemplates(DataObject, StimulusFileReadableInterface,
             stage_number, segment_number, test_or_train = stim_name_parse(warped_stim_name)
             original_stim_name = get_original_stim_name(stage_number, segment_number, test_or_train)
 
-            stim_dict['warped'][warped_stim_name] = warped_path / warped_stim_name
+            stim_dict['warped'][original_stim_name] = warped_path / warped_stim_name
             stim_dict['unwarped'][original_stim_name] = unwarped_path / original_stim_name
 
         return DenseMovieTemplates(templates=stim_dict)
