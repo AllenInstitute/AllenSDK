@@ -11,8 +11,9 @@ from allensdk.brain_observatory.behavior.data_files\
     .rigid_motion_transform_file import \
     RigidMotionTransformFile
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .cell_specimens import \
-    CellSpecimens
+    .cell_specimens import (
+        CellSpecimens,
+        EventsParams)
 from allensdk.brain_observatory.behavior.data_objects.motion_correction \
     import \
     MotionCorrection
@@ -95,7 +96,10 @@ class TestNWB:
                 timestamps=np.array([.1, .2, .3]))
             csp = CellSpecimens.from_json(
                 dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
-                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                events_params=EventsParams(
+                               filter_scale_seconds=2.0/31.0,
+                               filter_n_time_steps=20))
             csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
 
         # need to write cell specimen, since it is a dependency

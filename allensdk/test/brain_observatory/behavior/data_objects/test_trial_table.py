@@ -32,6 +32,12 @@ class TestFromStimulusFile(LimsTest):
         dir = Path(__file__).parent.resolve()
         test_data_dir = dir / 'test_data'
 
+        # Note: trials.pkl must be created from a BehaviorSession,
+        # not a BehaviorOphysExperiment. If it is created from
+        # a BehaviorOphysExperiment, the stimulus timestamps will be
+        # instantiated from a sync file, rather than a stimulus file.
+        # The tests expect stimulus_timestamps to be instantiated
+        # from a stimulus file.
         expected = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
         cls.expected = TrialTable(trials=expected)
 
@@ -39,18 +45,12 @@ class TestFromStimulusFile(LimsTest):
     def test_from_stimulus_file(self):
         stimulus_file, stimulus_timestamps, licks, rewards = \
             self._get_trial_table_data()
-        sync_file = SyncFile.from_lims(
-            db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
-        equipment = Equipment.from_lims(
-            behavior_session_id=self.behavior_session_id, lims_db=self.dbconn)
-        monitor_delay = calculate_monitor_delay(sync_file=sync_file,
-                                                equipment=equipment)
+
         trials = TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
-            rewards=rewards,
-            monitor_delay=monitor_delay
+            rewards=rewards
         )
         assert trials == self.expected
 
@@ -63,7 +63,6 @@ class TestFromStimulusFile(LimsTest):
         TrialTable.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            monitor_delay=0.02115,
             licks=licks,
             rewards=rewards
         )
@@ -75,7 +74,8 @@ class TestFromStimulusFile(LimsTest):
             stimulus_file = StimulusFile.from_lims(
                 behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
+            stimulus_file=stimulus_file,
+            monitor_delay=0.02115)
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps)
