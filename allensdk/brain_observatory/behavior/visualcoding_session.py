@@ -27,8 +27,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
-    Stimuli
+# from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
+#     Stimuli
+from allensdk.brain_observatory.behavior.data_objects.stimuli.densemovie_stimuli import \
+    DenseMovieStimuli
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
@@ -159,8 +161,8 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
 
         Parameters
         ----------
-        behavior_session_id
-            Behavior session id
+        ophys_session_id
+            ophys session id
         lims_db
             Database connection. If not provided will create a new one.
         stimulus_timestamps
@@ -219,10 +221,10 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         #     )
         licks = None
         rewards = None
-        stimuli = None
-        # stimuli = cls._read_data_from_visualcoding_stimulus_file(
-        #             stimulus_file=stimulus_file, 
-        #             stimulus_timestamps=stimulus_timestamps)
+        # stimuli = None
+        stimuli = cls._read_data_from_visualcoding_stimulus_file(
+                    stimulus_file=stimulus_file, 
+                    stimulus_timestamps=stimulus_timestamps)
         task_parameters = None
         trials = None
         if date_of_acquisition is None:
@@ -720,7 +722,8 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
                     image array of warped stimulus image
 
         """
-        return self._stimuli.templates.value.to_dataframe()
+        # return self._stimuli.templates.value.to_dataframe()
+        return self._stimuli.templates
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
@@ -904,7 +907,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
             cls, stimulus_file: StimulusFile,
             stimulus_timestamps: StimulusTimestamps):
         """Helper method to read data from stimulus file"""
-        stimuli = Stimuli.from_stimulus_file(
+        stimuli = DenseMovieStimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps)
         return stimuli
