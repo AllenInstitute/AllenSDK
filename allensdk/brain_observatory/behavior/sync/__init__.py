@@ -32,7 +32,9 @@ def get_raw_stimulus_frames(
 
     """
     try:
-        return dataset.get_edges("falling",'stim_vsync', "seconds")
+        return dataset.get_edges(kind="falling",
+                                 keys=["vsync_stim", "stim_vsync"],
+                                 units="seconds")
     except KeyError:
         if not permissive:
             raise
@@ -63,7 +65,9 @@ def get_ophys_frames(
 
     """
     try:
-        return dataset.get_edges("rising", '2p_vsync', "seconds")
+        return dataset.get_edges(kind="rising",
+                                 keys=["vsync_2p", "2p_vsync"],
+                                 units="seconds")
     except KeyError:
         if not permissive:
             raise
@@ -142,8 +146,12 @@ def get_trigger(
         correspond to acquired ophys frames.
 
     """
-    return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger"], "seconds", permissive)
+    keys = ["2p_trigger", "acq_trigger", "2p_acq_trigger", "2p_acquiring",
+            "stim_running"]
+    return dataset.get_edges(kind="rising",
+                             keys=keys,
+                             units="seconds",
+                             permissive=permissive)
 
 
 def get_eye_tracking(
@@ -165,8 +173,11 @@ def get_eye_tracking(
         dataset.
 
     """
-    return dataset.get_edges(
-        "rising", ["cam2_exposure", "eye_tracking"], "seconds", permissive)
+    keys = ["cam2_exposure", "eye_tracking", "eye_frame_received"]
+    return dataset.get_edges(kind="rising",
+                             keys=keys,
+                             units="seconds",
+                             permissive=permissive)
 
 
 def get_behavior_monitoring(
@@ -189,9 +200,11 @@ def get_behavior_monitoring(
         sync dataset.
 
     """
-    return dataset.get_edges(
-        "rising", ["cam1_exposure", "behavior_monitoring"], "seconds", 
-        permissive)
+    keys = ["cam1_exposure", "behavior_monitoring", "beh_frame_received"]
+    return dataset.get_edges(kind="rising",
+                             keys=keys,
+                             units="seconds",
+                             permissive=permissive)
 
 
 def get_sync_data(
