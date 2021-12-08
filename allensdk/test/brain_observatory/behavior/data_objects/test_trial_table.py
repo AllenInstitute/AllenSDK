@@ -105,8 +105,9 @@ class TestMonitorDelay:
         self.sync_file = SyncFile(filepath=str(test_data_dir / 'sync.h5'))
         self.trials = TrialTable(trials=trials)
 
-    def test_monitor_delay(self, monkeypatch):
-        equipment = Equipment(equipment_name='CAM2P.1')
+    @pytest.mark.parametrize('equipment_name', ('CAMP2.1', 'MESO.2'))
+    def test_monitor_delay(self, monkeypatch, equipment_name):
+        equipment = Equipment(equipment_name=equipment_name)
 
         def dummy_delay(self):
             return 1.12
