@@ -2,7 +2,6 @@ import re
 from typing import Union
 import difflib
 import pandas as pd
-import numpy as np
 
 
 class WhitespaceStrippedString(object):

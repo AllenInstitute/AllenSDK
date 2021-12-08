@@ -48,7 +48,7 @@ from allensdk.api.queries.brain_observatory_api \
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
-except:
+except ModuleNotFoundError:
     import builtins  # @UnresolvedImport
 
 CELL_SPECIMEN_ZIP_URL = ("http://observatory.brain-map.org/visualcoding/"
@@ -96,8 +96,7 @@ def cells():
              u'locally_sparse_noise_off_large': None,
              u'locally_sparse_noise_off_small': None,
              u'cell_specimen_id': 517394843,
-             u'pref_phase_sg': 0.5
-            },
+             u'pref_phase_sg': 0.5},
             {u'tld1_id': 177839004,
              u'natural_movie_two_small': None,
              u'natural_movie_one_a_small': None,
@@ -161,11 +160,7 @@ def unmocked_boc(fn_temp_dir):
 def brain_observatory_cache(fn_temp_dir):
     boc = None
 
-    try:
-        manifest_data = bytes(CACHE_MANIFEST,
-                              'UTF-8')  # Python 3
-    except:
-        manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
+    manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')
 
     with patch('os.path.exists',
                return_value=True):
@@ -199,15 +194,14 @@ def cell_specimen_table(tmpdir_factory):
 def example_filters():
     f = [{"field": "p_dg",
           "op": "<=",
-          "value": 0.001 },
+          "value": 0.001},
          {"field": "pref_dir_dg",
-          "op": "=", "value": 45 },
-         {"field": "area", "op": "in", "value": [ "VISpm" ] },
+          "op": "=", "value": 45},
+         {"field": "area", "op": "in", "value": ["VISpm"]},
          {"field": "tld1_name",
           "op": "in",
-          "value": [ "Rbp4-Cre", "Cux2-CreERT2", "Rorb-IRES2-Cre" ] }
-    ]
-    
+          "value": ["Rbp4-Cre", "Cux2-CreERT2", "Rorb-IRES2-Cre"]}]
+
     return f
 
 
@@ -215,9 +209,8 @@ def example_filters():
 def between_filter():
     f = [{"field": "p_ns",
           "op": "between",
-          "value": [ 0.00034, 0.00035 ] }
-    ]
-    
+          "value": [0.00034, 0.00035]}]
+
     return f
 
 
@@ -263,7 +256,7 @@ def test_dataframe_query_unmocked(unmocked_boc,
         file_name=cell_specimen_table)
 
     # total lines = 18260, can make fail by passing no filters
-    #expected = 105
+    # expected = 105
     assert len(cells) > 0 and len(cells) < 1000
 
 
@@ -279,8 +272,8 @@ def test_dataframe_query_between_unmocked(unmocked_boc,
         file_name=cell_specimen_table)
 
     # total lines = 18260, can make fail by passing no filters
-    #expected = 15
-    assert len(cells) > 0 and len (cells) < 1000
+    # expected = 15
+    assert len(cells) > 0 and len(cells) < 1000
 
 
 @pytest.mark.todo_flaky
@@ -292,8 +285,7 @@ def test_dataframe_query_is_unmocked(unmocked_boc,
     is_filter = [
         {"field": "all_stim",
          "op": "is",
-         "value": True }
-    ]
+         "value": True}]
 
     cells = brain_observatory_cache.get_cell_specimens(
         filters=is_filter,
@@ -306,8 +298,7 @@ def test_dataframe_query_string_between(api):
     filters = [
         {"field": "p_ns",
          "op": "between",
-         "value": [ 0.00034, 0.00035 ] }
-    ]
+         "value": [0.00034, 0.00035]}]
 
     query_string = api.dataframe_query_string(filters)
 
@@ -318,8 +309,7 @@ def test_dataframe_query_string_in(api):
     filters = [
         {"field": "name",
          "op": "in",
-         "value": [ 'Abc', 'Def', 'Ghi' ] }
-    ]
+         "value": ['Abc', 'Def', 'Ghi']}]
 
     query_string = api.dataframe_query_string(filters)
 
@@ -330,8 +320,7 @@ def test_dataframe_query_string_in_floats(api):
     filters = [
         {"field": "rating",
          "op": "in",
-         "value": [ 9.9, 8.7, 0.1 ] }
-    ]
+         "value": [9.9, 8.7, 0.1]}]
 
     query_string = api.dataframe_query_string(filters)
 
@@ -342,8 +331,7 @@ def test_dataframe_query_string_is_boolean(api):
     filters = [
         {"field": "fact_check",
          "op": "is",
-         "value": False }
-    ]
+         "value": False}]
 
     query_string = api.dataframe_query_string(filters)
 
@@ -355,6 +343,6 @@ def test_dataframe_query_string_multi_filters(api,
     query_string = api.dataframe_query_string(example_filters)
 
     assert query_string == ("(p_dg <= 0.001) & (pref_dir_dg == 45) & "
-                            "(area == ['VISpm']) & " 
+                            "(area == ['VISpm']) & "
                             "(tld1_name == "
                             "['Rbp4-Cre', 'Cux2-CreERT2', 'Rorb-IRES2-Cre'])")

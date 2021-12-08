@@ -43,6 +43,7 @@ from . import observatory_plots as oplots
 from . import circle_plots as cplots
 from .brain_observatory_exceptions import MissingStimulusException
 
+
 class NaturalScenes(StimulusAnalysis):
     """ Perform tuning analysis specific to natural scenes stimulus.
 
@@ -93,15 +94,18 @@ class NaturalScenes(StimulusAnalysis):
         self._stim_table = self.data_set.get_stimulus_table('natural_scenes')
         self._number_scenes = len(np.unique(self._stim_table.frame))
         self._sweeplength = self._stim_table.end.iloc[
-            1] - self._stim_table.start.iloc[1]
+                                1] - self._stim_table.start.iloc[1]
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
 
     def get_response(self):
-        ''' Computes the mean response for each cell to each stimulus condition.  Return is
+        ''' Computes the mean response for each cell to each stimulus
+        condition.  Return is
         a (# scenes, # cells, 3) np.ndarray.  The final dimension
-        contains the mean response to the condition (index 0), standard error of the mean of the response
-        to the condition (index 1), and the number of trials with a significant (p < 0.05) response 
+        contains the mean response to the condition (index 0), standard
+        error of the mean of the response
+        to the condition (index 1), and the number of trials with a
+        significant (p < 0.05) response
         to that condition (index 2).
 
         Returns
@@ -142,30 +146,32 @@ class NaturalScenes(StimulusAnalysis):
             * time_to_peak_ns
         '''
         NaturalScenes._log.info('Calculating peak response properties')
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'reliability_ns', 'peak_dff_ns',
-                                                                    'ptest_ns', 'p_run_ns', 'run_modulation_ns', 
-                                                                    'time_to_peak_ns', 
-                                                                    'cell_specimen_id','image_selectivity_ns'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=(
+            'scene_ns', 'reliability_ns', 'peak_dff_ns',
+            'ptest_ns', 'p_run_ns', 'run_modulation_ns',
+            'time_to_peak_ns',
+            'cell_specimen_id', 'image_selectivity_ns'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
             nsp = np.argmax(self.response[1:, nc, 0])
             peak.cell_specimen_id.iloc[nc] = cids[nc]
             peak.scene_ns[nc] = nsp
-#            peak.response_reliability_ns[nc] = self.response[
-#                nsp + 1, nc, 2] / 0.50  # assume 50 trials
+            #            peak.response_reliability_ns[nc] = self.response[
+            #                nsp + 1, nc, 2] / 0.50  # assume 50 trials
             peak.peak_dff_ns[nc] = self.response[nsp + 1, nc, 0]
-#            subset = self.mean_sweep_response[self.stim_table.frame == nsp]
-#            subset_stat = subset[subset.dx < 2]
-#            subset_run = subset[subset.dx >= 2]
-#            if (len(subset_run) > 5) & (len(subset_stat) > 5):
-#                (_, peak.p_run_ns[nc]) = st.ks_2samp(
-#                    subset_run[str(nc)], subset_stat[str(nc)])
-#                peak.run_modulation_ns[nc] = subset_run[
-#                    str(nc)].mean() / subset_stat[str(nc)].mean()
-#            else:
-#                peak.p_run_ns[nc] = np.NaN
-#                peak.run_modulation_ns[nc] = np.NaN
+            #            subset = self.mean_sweep_response[
+            #            self.stim_table.frame == nsp]
+            #            subset_stat = subset[subset.dx < 2]
+            #            subset_run = subset[subset.dx >= 2]
+            #            if (len(subset_run) > 5) & (len(subset_stat) > 5):
+            #                (_, peak.p_run_ns[nc]) = st.ks_2samp(
+            #                    subset_run[str(nc)], subset_stat[str(nc)])
+            #                peak.run_modulation_ns[nc] = subset_run[
+            #                    str(nc)].mean() / subset_stat[str(nc)].mean()
+            #            else:
+            #                peak.p_run_ns[nc] = np.NaN
+            #                peak.run_modulation_ns[nc] = np.NaN
             groups = []
             for im in range(self.number_scenes):
                 subset = self.mean_sweep_response[
@@ -174,83 +180,108 @@ class NaturalScenes(StimulusAnalysis):
             (_, peak.ptest_ns[nc]) = st.f_oneway(*groups)
             test = self.sweep_response[
                 self.stim_table.frame == nsp][str(nc)].mean()
-            peak.time_to_peak_ns[nc] = (
-                np.argmax(test) - self.interlength) / self.acquisition_rate
-            
-            #running modulation
-            subset = self.mean_sweep_response[self.stim_table.frame==nsp]            
-            subset_run = subset[subset.dx>=1]
-            subset_stat = subset[subset.dx<1]
-            if (len(subset_run)>4) & (len(subset_stat)>4):
-                (_,peak.p_run_ns.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
-                
-                if subset_run[str(nc)].mean()>subset_stat[str(nc)].mean():
-                    peak.run_modulation_ns.iloc[nc] = (subset_run[str(nc)].mean() - subset_stat[str(nc)].mean())/np.abs(subset_run[str(nc)].mean())
-                elif subset_run[str(nc)].mean()<subset_stat[str(nc)].mean():
-                    peak.run_modulation_ns.iloc[nc] = -1*((subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())/np.abs(subset_stat[str(nc)].mean()))
+            peak.time_to_peak_ns[nc] = \
+                (np.argmax(test) - self.interlength) / self.acquisition_rate
+
+            # running modulation
+            subset = self.mean_sweep_response[self.stim_table.frame == nsp]
+            subset_run = subset[subset.dx >= 1]
+            subset_stat = subset[subset.dx < 1]
+            if (len(subset_run) > 4) & (len(subset_stat) > 4):
+                (_, peak.p_run_ns.iloc[nc]) = st.ttest_ind(subset_run[str(nc)],
+                                                           subset_stat[
+                                                               str(nc)],
+                                                           equal_var=False)
+
+                if subset_run[str(nc)].mean() > subset_stat[str(nc)].mean():
+                    peak.run_modulation_ns.iloc[nc] = (subset_run[
+                                                           str(nc)].mean() -
+                                                       subset_stat[
+                                                           str(nc)].mean()) \
+                                                      / np.abs(
+                        subset_run[str(nc)].mean())
+                elif subset_run[str(nc)].mean() < subset_stat[str(nc)].mean():
+                    peak.run_modulation_ns.iloc[nc] = \
+                        (-1 * ((subset_stat[str(nc)].mean() -
+                                subset_run[str(nc)].mean()) /
+                               np.abs(subset_stat[str(nc)].mean())))
             else:
                 peak.p_run_ns.iloc[nc] = np.NaN
-                peak.run_modulation_ns.iloc[nc] = np.NaN                
-            
-            #reliability
-            subset = self.sweep_response[self.stim_table.frame==nsp]            
-            corr_matrix = np.empty((len(subset),len(subset)))
+                peak.run_modulation_ns.iloc[nc] = np.NaN
+
+                # reliability
+            subset = self.sweep_response[self.stim_table.frame == nsp]
+            corr_matrix = np.empty((len(subset), len(subset)))
             for i in range(len(subset)):
                 for j in range(len(subset)):
-                    r,p = st.pearsonr(subset[str(nc)].iloc[i][28:42], subset[str(nc)].iloc[j][28:42])
-                    corr_matrix[i,j] = r
+                    r, p = st.pearsonr(subset[str(nc)].iloc[i][28:42],
+                                       subset[str(nc)].iloc[j][28:42])
+                    corr_matrix[i, j] = r
             mask = np.ones((len(subset), len(subset)))
             for i in range(len(subset)):
                 for j in range(len(subset)):
-                    if i>=j:
-                        mask[i,j] = np.NaN
+                    if i >= j:
+                        mask[i, j] = np.NaN
             corr_matrix *= mask
             peak.reliability_ns.iloc[nc] = np.nanmean(corr_matrix)
-            
-            #image selectivity
-            fmin = self.response[1:,nc,0].min()
-            fmax = self.response[1:,nc,0].max()
-            rtj = np.empty((1000,1))
+
+            # image selectivity
+            fmin = self.response[1:, nc, 0].min()
+            fmax = self.response[1:, nc, 0].max()
+            rtj = np.empty((1000, 1))
             for j in range(1000):
-                thresh = fmin + j*((fmax-fmin)/1000.)
-                theta = np.empty((118,1))
+                thresh = fmin + j * ((fmax - fmin) / 1000.)
+                theta = np.empty((118, 1))
                 for im in range(118):
-                    if self.response[im+1,nc,0] > thresh:  #im+1 to only look at images, not blanksweep
+                    # im+1 to only look at
+                    if self.response[im + 1, nc, 0] > thresh:
+                        # images, not blanksweep
                         theta[im] = 1
                     else:
                         theta[im] = 0
                 rtj[j] = theta.mean()
-            
+
             biga = rtj.mean()
-            bigs = 1 - (2*biga)
+            bigs = 1 - (2 * biga)
             peak.image_selectivity_ns.iloc[nc] = bigs
 
         return peak
 
-    def plot_time_to_peak(self, 
-                          p_value_max=oplots.P_VALUE_MAX, 
+    def plot_time_to_peak(self,
+                          p_value_max=oplots.P_VALUE_MAX,
                           color_map=oplots.STIMULUS_COLOR_MAP):
         stimulus_table = self.data_set.get_stimulus_table('natural_scenes')
 
         resps = []
 
-        for index, row in self.peak.iterrows():    
-            mean_response = self.sweep_response.loc[stimulus_table.frame==row.scene_ns][str(index)].mean()
-            resps.append((mean_response - mean_response.mean() / mean_response.std()))
+        for index, row in self.peak.iterrows():
+            mean_response = \
+                self.sweep_response.loc[stimulus_table.frame == row.scene_ns][
+                    str(index)].mean()
+            resps.append(
+                (mean_response - mean_response.mean() / mean_response.std()))
 
         mean_responses = np.array(resps)
 
-        sorted_table = self.peak[self.peak.ptest_ns < p_value_max].sort_values('time_to_peak_ns')
+        sorted_table = self.peak[self.peak.ptest_ns < p_value_max].sort_values(
+            'time_to_peak_ns')
         cell_order = sorted_table.index
 
         # time to peak is relative to stimulus start in seconds
-        ttps = sorted_table.time_to_peak_ns.values + self.interlength / self.acquisition_rate
-        msrs_sorted = mean_responses[cell_order,:]
+        ttps = sorted_table.time_to_peak_ns.values + self.interlength / \
+            self.acquisition_rate
+        msrs_sorted = mean_responses[cell_order, :]
 
         oplots.plot_time_to_peak(msrs_sorted, ttps,
-                                 0, (2*self.interlength + self.sweeplength) / self.acquisition_rate,
-                                 (self.interlength) / self.acquisition_rate, 
-                                 (self.interlength + self.sweeplength) / self.acquisition_rate, 
+                                 0, (
+                                             2 * self.interlength +
+                                             self.sweeplength) /
+                                 self.acquisition_rate,
+                                 (self.interlength) / self.acquisition_rate,
+                                 (
+                                             self.interlength +
+                                             self.sweeplength) /
+                                 self.acquisition_rate,
                                  color_map)
 
     def open_corona_plot(self, cell_specimen_id=None, cell_index=None):
@@ -262,11 +293,11 @@ class NaturalScenes(StimulusAnalysis):
         st = self.data_set.get_stimulus_table('natural_scenes')
         mask = st[st.frame >= 0].index
 
-        cmin = self.response[0,cell_index,0]
-        cmax = max(cmin, data.mean() + data.std()*3)
+        cmin = self.response[0, cell_index, 0]
+        cmax = max(cmin, data.mean() + data.std() * 3)
 
         cp = cplots.CoronaPlotter()
-        cp.plot(st.frame.loc[mask].values, 
+        cp.plot(st.frame.loc[mask].values,
                 data=df.loc[mask].values,
                 clim=[cmin, cmax])
         cp.show_arrow()
@@ -274,18 +305,23 @@ class NaturalScenes(StimulusAnalysis):
 
     def reshape_response_array(self):
         '''
-        :return: response array in cells x stim x repetition for noise correlations
+        :return: response array in cells x stim x repetition for noise
+        correlations
         '''
 
-        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells]
+        mean_sweep_response = \
+            self.mean_sweep_response.values[:, :self.numbercells]
 
         stim_table = self.stim_table
         frames = np.unique(stim_table.frame.values)
 
-        reps = [len(np.where(stim_table.frame.values == frame)[0]) for frame in frames]
-        Nreps = min(reps) # just in case there are different numbers of repetitions
+        reps = [len(np.where(stim_table.frame.values == frame)[0]) for frame in
+                frames]
+        Nreps = min(
+            reps)  # just in case there are different numbers of repetitions
 
-        response_new = np.zeros((self.numbercells, self.number_scenes), dtype='object')
+        response_new = np.zeros((self.numbercells, self.number_scenes),
+                                dtype='object')
         for i, frame in enumerate(frames):
             ind = np.where(stim_table.frame.values == frame)[0][:Nreps]
             for c in range(self.numbercells):
@@ -304,19 +340,24 @@ class NaturalScenes(StimulusAnalysis):
         signal_p = np.empty((N, N))
         if corr == 'pearson':
             for i in range(N):
-                for j in range(i, N): # matrix is symmetric
-                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(response[i], response[j])
+                for j in range(i, N):  # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(
+                        response[i], response[j])
 
         elif corr == 'spearman':
             for i in range(N):
-                for j in range(i, N): # matrix is symmetric
-                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(response[i], response[j])
+                for j in range(i, N):  # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(
+                        response[i], response[j])
 
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        signal_corr = np.triu(signal_corr) + np.triu(signal_corr, 1).T  # fill in lower triangle
-        signal_p = np.triu(signal_p) + np.triu(signal_p, 1).T  # fill in lower triangle
+        signal_corr = np.triu(signal_corr) + np.triu(signal_corr,
+                                                     1).T  # fill in lower
+        # triangle
+        signal_p = np.triu(signal_p) + np.triu(signal_p,
+                                               1).T  # fill in lower triangle
 
         return signal_corr, signal_p
 
@@ -331,19 +372,23 @@ class NaturalScenes(StimulusAnalysis):
         rep_sim_p = np.empty((Nstim, Nstim))
         if corr == 'pearson':
             for i in range(Nstim):
-                for j in range(i, Nstim): # matrix is symmetric
-                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i], response[j])
+                for j in range(i, Nstim):  # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i],
+                                                                 response[j])
 
         elif corr == 'spearman':
             for i in range(Nstim):
-                for j in range(i, Nstim): # matrix is symmetric
-                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i], response[j])
+                for j in range(i, Nstim):  # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i],
+                                                                  response[j])
 
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        rep_sim = np.triu(rep_sim) + np.triu(rep_sim, 1).T # fill in lower triangle
-        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
+        rep_sim = np.triu(rep_sim) + np.triu(rep_sim,
+                                             1).T  # fill in lower triangle
+        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p,
+                                                 1).T  # fill in lower triangle
 
         return rep_sim, rep_sim_p
 
@@ -351,26 +396,38 @@ class NaturalScenes(StimulusAnalysis):
         logging.debug("Calculating noise correlations")
 
         response = self.reshape_response_array()
-        noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_scenes))
-        noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_scenes))
+        noise_corr = np.zeros(
+            (self.numbercells, self.numbercells, self.number_scenes))
+        noise_corr_p = np.zeros(
+            (self.numbercells, self.numbercells, self.number_scenes))
 
         if corr == 'pearson':
             for k in range(self.number_scenes):
                 for i in range(self.numbercells):
                     for j in range(i, self.numbercells):
-                        noise_corr[i, j, k], noise_corr_p[i, j, k] = st.pearsonr(response[i, k], response[j, k])
+                        noise_corr[i, j, k], noise_corr_p[
+                            i, j, k] = st.pearsonr(response[i, k],
+                                                   response[j, k])
 
-                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(noise_corr[:, :, k], 1).T
-                noise_corr_p[:, :, k] = np.triu(noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k], 1).T
+                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(
+                    noise_corr[:, :, k], 1).T
+                noise_corr_p[:, :, k] = np.triu(
+                    noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k],
+                                                     1).T
 
         elif corr == 'spearman':
             for k in range(self.number_scenes):
                 for i in range(self.numbercells):
                     for j in range(i, self.numbercells):
-                        noise_corr[i, j, k], noise_corr_p[i, j, k] = st.spearmanr(response[i, k], response[j, k])
+                        noise_corr[i, j, k], noise_corr_p[
+                            i, j, k] = st.spearmanr(response[i, k],
+                                                    response[j, k])
 
-                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(noise_corr[:, :, k], 1).T
-                noise_corr_p[:, :, k] = np.triu(noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k], 1).T
+                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(
+                    noise_corr[:, :, k], 1).T
+                noise_corr_p[:, :, k] = np.triu(
+                    noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k],
+                                                     1).T
 
         else:
             raise Exception('correlation should be pearson or spearman')
@@ -383,8 +440,10 @@ class NaturalScenes(StimulusAnalysis):
         ns.populate_stimulus_table()
 
         try:
-            ns._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_ns")
-            ns._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_ns")
+            ns._sweep_response = pd.read_hdf(analysis_file,
+                                             "analysis/sweep_response_ns")
+            ns._mean_sweep_response = pd.read_hdf(
+                analysis_file, "analysis/mean_sweep_response_ns")
             ns._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
@@ -399,10 +458,10 @@ class NaturalScenes(StimulusAnalysis):
                 if "analysis/signal_corr_ns" in f:
                     ns.signal_correlation = f["analysis/signal_corr_ns"].value
                 if "analysis/rep_similarity_ns" in f:
-                    ns.representational_similarity = f["analysis/rep_similarity_ns"].value
+                    ns.representational_similarity = f[
+                        "analysis/rep_similarity_ns"].value
 
         except Exception as e:
             raise MissingStimulusException(e.args)
 
         return ns
-
