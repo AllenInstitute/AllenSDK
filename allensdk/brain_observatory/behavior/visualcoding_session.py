@@ -31,6 +31,8 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 #     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.stimuli.densemovie_stimuli import \
     DenseMovieStimuli
+from allensdk.brain_observatory.behavior.data_objects.stimuli.densemovie_presentations import \
+    shorten_stimulus_presentation
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
@@ -703,6 +705,15 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
         return self._stimuli.presentations.value
 
     @property
+    def stimulus_presentations_short(self) -> pd.DataFrame:
+        """Table whose rows are stimulus presentations (i.e. a given image,
+        for a given duration, typically 250 ms) and whose columns are
+        presentation characteristics.
+
+        """
+        return shorten_stimulus_presentation(self.stimulus_presentations)
+
+    @property
     def stimulus_templates(self) -> pd.DataFrame:
         """Get stimulus templates (movies, scenes) for behavior session.
 
@@ -723,7 +734,7 @@ class VisualCodingSession(DataObject, LimsReadableInterface,
 
         """
         # return self._stimuli.templates.value.to_dataframe()
-        return self._stimuli.templates.value
+        return pd.DataFrame(self._stimuli.templates.value)
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:

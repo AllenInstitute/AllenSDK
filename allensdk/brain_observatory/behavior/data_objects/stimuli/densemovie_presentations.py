@@ -44,6 +44,22 @@ def get_original_stim_name(stage_number, segment_number, test_or_train):
 
     return original_stim_name
 
+def shorten_stimulus_presentation(msn_stim_table):
+
+    min_table=msn_stim_table.groupby(['stimulus_template', 'trial_number'],as_index=False).min()
+    max_table=msn_stim_table.groupby(['stimulus_template', 'trial_number'],as_index=False).max()
+
+    min_table['end_frame'] = max_table['end_frame']
+    min_table['end_time'] = max_table['end_time']
+    min_table['duration'] = min_table['end_time']-min_table['start_time']
+    min_table['stimulus_start_index'] = min_table['stimulus_index']
+    min_table['stimulus_length'] = max_table['stimulus_index']+1
+
+    short_table = min_table
+    short_table = short_table.drop(columns=['stimulus_index'])
+    
+    return short_table.sort_values(by='start_frame').reset_index(drop=True)
+
 
 class DenseMoviePresentations(DataObject, StimulusFileReadableInterface,
                     NwbReadableInterface, NwbWritableInterface):
