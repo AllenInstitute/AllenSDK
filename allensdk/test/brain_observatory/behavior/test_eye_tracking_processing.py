@@ -8,7 +8,7 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
     load_eye_tracking_hdf, determine_outliers, compute_circular_area,
     compute_elliptical_area, determine_likely_blinks,
-    process_eye_tracking_data)
+    process_eye_tracking_data, EyeTrackingError)
 
 
 def create_preload_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
@@ -182,7 +182,8 @@ def test_process_eye_tracking_data_raises_on_sync_error(eye_tracking_df,
     Test that an error is raised when the number of sync timestamps exceeds
     the number of eye tracking frames by more than 15
     """
-    with pytest.raises(RuntimeError, match='Error! The number of sync file'):
+    with pytest.raises(EyeTrackingError,
+                       match='Error! The number of sync file'):
         process_eye_tracking_data(eye_tracking_df, frame_times)
 
 

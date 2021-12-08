@@ -2,6 +2,8 @@ import abc
 from typing import Any, Union
 from pathlib import Path
 
+from allensdk.internal.core.lims_utilities import safe_system_path
+
 
 class DataFile(abc.ABC):
     """An abstract class that prototypes methods for accessing internal
@@ -15,7 +17,7 @@ class DataFile(abc.ABC):
     """
 
     def __init__(self, filepath: Union[str, Path]):  # pragma: no cover
-        self._filepath: str = str(filepath)
+        self._filepath: str = safe_system_path(str(filepath))
         self._data = self.load_data(filepath=self._filepath)
 
     @property

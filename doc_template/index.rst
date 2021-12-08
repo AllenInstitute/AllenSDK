@@ -118,6 +118,11 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 2.13.2
+-----------------------------------------------------------------------
+- Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
+- Updates to support MESO.2
+
 What's New - 2.13.1
 -----------------------------------------------------------------------
 - Fixes bug that was preventing the BehaviorSession from properly instantiating passive sessions.

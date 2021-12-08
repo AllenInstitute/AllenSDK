@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -46,20 +46,20 @@ class EventsParams:
     """Container for arguments to event detection"""
 
     def __init__(self,
-                 filter_scale: float = 2,
+                 filter_scale_seconds: float = 2.0/31.0,
                  filter_n_time_steps: int = 20):
         """
-        :param filter_scale
-            See Events.filter_scale
+        :param filter_scale_seconds
+            See Events.filter_scale_seconds
         :param filter_n_time_steps
             See Events.filter_n_time_steps
         """
-        self._filter_scale = filter_scale
+        self._filter_scale_seconds = filter_scale_seconds
         self._filter_n_time_steps = filter_n_time_steps
 
     @property
-    def filter_scale(self):
-        return self._filter_scale
+    def filter_scale_seconds(self):
+        return self._filter_scale_seconds
 
     @property
     def filter_n_time_steps(self):
@@ -70,7 +70,7 @@ class CellSpecimenMeta(DataObject, LimsReadableInterface,
                        JsonReadableInterface, NwbReadableInterface):
     """Cell specimen metadata"""
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
-        super().__init__(name='cell_spcimen_meta', value=self)
+        super().__init__(name='cell_specimen_meta', value=self)
         self._emission_lambda = emission_lambda
         self._imaging_plane = imaging_plane
 
@@ -234,8 +234,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                   lims_db: PostgresQueryMixin,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  exclude_invalid_rois=True,
-                  events_params: Optional[EventsParams] = None) \
+                  events_params: EventsParams,
+                  exclude_invalid_rois=True) \
             -> "CellSpecimens":
         def _get_ophys_cell_segmentation_run_id() -> int:
             """Get the ophys cell segmentation run id associated with an
@@ -288,13 +288,17 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             events_file = EventDetectionFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id,
                 db=lims_db)
-            return cls._get_events(events_file=events_file,
-                                   events_params=events_params)
+            return cls._get_events(
+                         events_file=events_file,
+                         events_params=events_params,
+                         frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
 
         cell_specimen_table = _get_cell_specimen_table()
+
         meta = CellSpecimenMeta.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db,
             ophys_timestamps=ophys_timestamps)
+
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
@@ -313,8 +317,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     def from_json(cls, dict_repr: dict,
                   ophys_timestamps: OphysTimestamps,
                   segmentation_mask_image_spacing: Tuple,
-                  exclude_invalid_rois=True,
-                  events_params: Optional[EventsParams] = None) \
+                  events_params: EventsParams,
+                  exclude_invalid_rois=True) \
             -> "CellSpecimens":
         cell_specimen_table = dict_repr['cell_specimen_table_dict']
         fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
@@ -331,13 +335,16 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             return CorrectedFluorescenceTraces.from_data_file(
                 demix_file=demix_file)
 
-        def _get_events():
-            events_file = EventDetectionFile.from_json(dict_repr=dict_repr)
-            return cls._get_events(events_file=events_file,
-                                   events_params=events_params)
-
         meta = CellSpecimenMeta.from_json(dict_repr=dict_repr,
                                           ophys_timestamps=ophys_timestamps)
+
+        def _get_events():
+            events_file = EventDetectionFile.from_json(dict_repr=dict_repr)
+            return cls._get_events(
+                        events_file=events_file,
+                        events_params=events_params,
+                        frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
+
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
@@ -353,8 +360,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  segmentation_mask_image_spacing: Tuple,
-                 exclude_invalid_rois=True,
-                 events_params: Optional[EventsParams] = None) \
+                 events_params: EventsParams,
+                 exclude_invalid_rois=True) \
             -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
         ophys_module = nwbfile.processing['ophys']
@@ -388,10 +395,11 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             nwbfile=nwbfile)
 
         def _get_events():
-            ep = EventsParams() if events_params is None else events_params
             return Events.from_nwb(
-                nwbfile=nwbfile, filter_scale=ep.filter_scale,
-                filter_n_time_steps=ep.filter_n_time_steps)
+                nwbfile=nwbfile,
+                filter_scale_seconds=events_params.filter_scale_seconds,
+                filter_n_time_steps=events_params.filter_n_time_steps,
+                frame_rate_hz=meta.imaging_plane.ophys_frame_rate)
 
         events = _get_events()
         ophys_timestamps = OphysTimestamps.from_nwb(nwbfile=nwbfile)
@@ -597,10 +605,10 @@ class CellSpecimens(DataObject, LimsReadableInterface,
 
     @staticmethod
     def _get_events(events_file: EventDetectionFile,
-                    events_params: Optional[EventsParams] = None):
-        if events_params is None:
-            events_params = EventsParams()
+                    events_params: EventsParams,
+                    frame_rate_hz: float):
         return Events.from_data_file(
             events_file=events_file,
-            filter_scale=events_params.filter_scale,
-            filter_n_time_steps=events_params.filter_n_time_steps)
+            filter_scale_seconds=events_params.filter_scale_seconds,
+            filter_n_time_steps=events_params.filter_n_time_steps,
+            frame_rate_hz=frame_rate_hz)

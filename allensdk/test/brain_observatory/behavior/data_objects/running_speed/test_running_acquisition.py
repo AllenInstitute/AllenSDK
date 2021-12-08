@@ -19,7 +19,8 @@ from allensdk.brain_observatory.behavior.data_objects import (
         (
             # dict_repr
             {
-                "behavior_stimulus_file": "mock_stimulus_file.pkl"
+                "behavior_stimulus_file": "mock_stimulus_file.pkl",
+                "monitor_delay": 0.0
             },
             # returned_running_acq_df
             pd.DataFrame(
@@ -249,7 +250,10 @@ def test_running_acquisition_from_lims(
             mock_get_running_df
         )
         obt = RunningAcquisition.from_lims(
-            mock_db_conn, behavior_session_id, ophys_experiment_id
+            mock_db_conn,
+            behavior_session_id=behavior_session_id,
+            ophys_experiment_id=ophys_experiment_id,
+            monitor_delay=0.0
         )
 
     mock_stimulus_file.from_lims.assert_called_once_with(
@@ -261,10 +265,12 @@ def test_running_acquisition_from_lims(
     assert obt._stimulus_file == mock_stimulus_file_instance
 
     mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
-        mock_stimulus_file_instance
+        mock_stimulus_file_instance,
+        monitor_delay=0.0
     )
     mock_stimulus_timestamps_instance = mock_stimulus_timestamps.\
-        from_stimulus_file(stimulus_file=mock_stimulus_file)
+        from_stimulus_file(stimulus_file=mock_stimulus_file,
+                           monitor_delay=0.0)
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_df.assert_called_once_with(
