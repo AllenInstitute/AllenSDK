@@ -436,12 +436,13 @@ class StimulusAnalysis(object):
         raise NotImplementedError()
 
     def empty_metrics_table(self):
-        empty_array = np.empty((self.unit_count, len(self.METRICS_COLUMNS)))
+        empty_array = np.zeros((self.unit_count, len(self.METRICS_COLUMNS)))
 
         df = pd.DataFrame(empty_array,
                             index=pd.Index(self.unit_ids, name='unit_id'),
                             columns=[x[0] for x in self.METRICS_COLUMNS])
         df = df.astype(dict(self.METRICS_COLUMNS))
+        df[df == 0] = np.nan
         return df
 
 
