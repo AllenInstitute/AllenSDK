@@ -61,6 +61,6 @@ class DemixFile(DataFile):
         with h5py.File(filepath, 'r') as in_file:
             traces = in_file['data'][()]
             roi_id = in_file['roi_names'][()]
-            idx = pd.Index(roi_id, name='cell_roi_id', dtype=int)
+            idx = pd.Index(roi_id, name='cell_roi_id').astype('int')
             return pd.DataFrame({'corrected_fluorescence': list(traces)},
                                 index=idx)

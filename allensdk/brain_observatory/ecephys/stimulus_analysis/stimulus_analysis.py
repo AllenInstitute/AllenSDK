@@ -456,7 +456,7 @@ class StimulusAnalysis(object):
             # value.
             try:
                 df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-            except (IndexError, NotImplementedError) as err:
+            except (IndexError, NotImplementedError, KeyError):
                 df = self.conditionwise_statistics
 
             # TODO: Calculated preferred condition_id once for all units and store in a table.
@@ -488,7 +488,8 @@ class StimulusAnalysis(object):
 
     def _get_lifetime_sparseness(self, unit_id):
         """Computes lifetime sparseness of responses for one unit"""
-        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        df = self.conditionwise_statistics.drop(index=self.null_condition,
+                                                level=1, errors='ignore')
         responses = df.loc[unit_id]['spike_count'].values
 
         return lifetime_sparseness(responses)

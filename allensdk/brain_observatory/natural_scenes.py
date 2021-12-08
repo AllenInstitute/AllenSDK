@@ -235,7 +235,7 @@ class NaturalScenes(StimulusAnalysis):
         resps = []
 
         for index, row in self.peak.iterrows():    
-            mean_response = self.sweep_response.ix[stimulus_table.frame==row.scene_ns][str(index)].mean()
+            mean_response = self.sweep_response.loc[stimulus_table.frame==row.scene_ns][str(index)].mean()
             resps.append((mean_response - mean_response.mean() / mean_response.std()))
 
         mean_responses = np.array(resps)
@@ -266,8 +266,8 @@ class NaturalScenes(StimulusAnalysis):
         cmax = max(cmin, data.mean() + data.std()*3)
 
         cp = cplots.CoronaPlotter()
-        cp.plot(st.frame.ix[mask].values, 
-                data=df.ix[mask].values,
+        cp.plot(st.frame.loc[mask].values, 
+                data=df.loc[mask].values,
                 clim=[cmin, cmax])
         cp.show_arrow()
         cp.show_circle()

@@ -611,9 +611,10 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         obt_electrodes = obt_f.electrodes.to_dataframe().loc[
             :, ["local_index", "probe_horizontal_position",
                 "probe_id", "probe_vertical_position",
-                "valid_data", "x", "y", "z", "location", "impedence",
+                "valid_data", "x", "y", "z", "location",
                 "filtering"]
         ]
+        obt_electrodes["impedence"] = np.nan
 
         assert obt_f.session_id == "4242"
         assert obt_f.subject.subject_id == "42"

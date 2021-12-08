@@ -45,8 +45,7 @@ _orig_get_stimulus_table = BrainObservatoryNwbDataSet.get_stimulus_table
 
 def mock_stimulus_table(dset, name):
     t = _orig_get_stimulus_table(dset, name)
-    t.set_value(0, 'end',
-                t.loc[0,'start'] + 10)
+    t.at[0, 'end'] = t.loc[0, 'start'] + 10
 
     return t
 
