@@ -436,13 +436,13 @@ class StimulusAnalysis(object):
         raise NotImplementedError()
 
     def empty_metrics_table(self):
-        # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
-        # correct data type for each column
-        empty_array = np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS))
-        empty_array[:] = np.nan
+        empty_array = np.empty((self.unit_count, len(self.METRICS_COLUMNS)))
 
-        return pd.DataFrame(empty_array, index=self.unit_ids).rename_axis('unit_id')
-
+        df = pd.DataFrame(empty_array,
+                            index=pd.Index(self.unit_ids, name='unit_id'),
+                            columns=[x[0] for x in self.METRICS_COLUMNS])
+        df = df.astype(dict(self.METRICS_COLUMNS))
+        return df
 
     def _find_stimuli(self):
         raise NotImplementedError()
