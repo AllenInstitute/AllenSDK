@@ -186,7 +186,8 @@ def test_drifting_gratings(dg, nwb_a, analysis_a_new):
     #assert np.allclose(dg.sweep_response, dg_new.sweep_response)
     assert np.allclose(dg.mean_sweep_response, dg_new.mean_sweep_response, equal_nan=True)
         
-    assert np.allclose(dg.response, dg_new.response, equal_nan=True)
+    assert np.allclose(dg.response, dg_new.response, equal_nan=True,
+                       atol=1e-4, rtol=1e-4)
     assert np.allclose(dg.noise_correlation, dg_new.noise_correlation, equal_nan=True)
     assert np.allclose(dg.signal_correlation, dg_new.signal_correlation, equal_nan=True)
     assert np.allclose(dg.representational_similarity, dg_new.representational_similarity, equal_nan=True)
