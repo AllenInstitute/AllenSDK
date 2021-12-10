@@ -167,7 +167,7 @@ def compare_peak(p1, p2):
             continue
 
         logging.debug("checking " + col)
-        assert np.allclose(p1[col], p2[col], equal_nan=True)
+        assert np.allclose(p1[col], p2[col], equal_nan=True, atol=1e-4)
 
     for col in p1.select_dtypes(include=['O']):
         logging.debug("checking " + col)
@@ -178,7 +178,6 @@ def test_session_a(analysis_a, analysis_a_new):
     peak = pd.read_hdf(analysis_a, "analysis/peak")
     new_peak = pd.read_hdf(analysis_a_new, "analysis/peak")
     compare_peak(peak, new_peak)
-
 
 @pytest.mark.nightly
 def test_drifting_gratings(dg, nwb_a, analysis_a_new):
