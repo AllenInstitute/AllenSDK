@@ -220,7 +220,8 @@ def test_static_gratings(sg, nwb_b, analysis_b_new):
     #assert np.allclose(sg.sweep_response, sg_new.sweep_response)
     assert np.allclose(sg.mean_sweep_response, sg_new.mean_sweep_response, equal_nan=True)
 
-    assert np.allclose(sg.response, sg_new.response, equal_nan=True)
+    assert np.allclose(sg.response, sg_new.response, equal_nan=True,
+                       atol=1e-4, rtol=1e-4)
     assert np.allclose(sg.noise_correlation, sg_new.noise_correlation, equal_nan=True)
     assert np.allclose(sg.signal_correlation, sg_new.signal_correlation, equal_nan=True)
     assert np.allclose(sg.representational_similarity, sg_new.representational_similarity, equal_nan=True)
