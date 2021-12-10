@@ -168,6 +168,8 @@ class StaticGratings(StimulusAnalysis):
                              self.number_phase, self.numbercells + 1, 3))
 
         def ptest(x):
+            if x.empty:
+                return np.nan
             return len(np.where(
                 x < (0.05 / (self.number_ori * (self.number_sf - 1))))[0])
 
