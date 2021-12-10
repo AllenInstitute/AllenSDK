@@ -126,6 +126,8 @@ class DriftingGratings(StimulusAnalysis):
             (self.number_ori, self.number_tf, self.numbercells + 1, 3))
 
         def ptest(x):
+            if x.empty:
+                return np.nan
             return len(np.where(x < (0.05 / (8 * 5)))[0])
 
         for ori in self.orivals:
