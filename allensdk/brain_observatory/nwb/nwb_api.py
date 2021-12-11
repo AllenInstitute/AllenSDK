@@ -85,10 +85,11 @@ class NwbApi:
                     if col.name not in columns_to_ignore:
                         presentations[col.name].extend(col.data)
                 df = pd.DataFrame(presentations).replace({'N/A': ''})
-                df['image_index'] = df['image_index'].astype('int64')
                 presentation_dfs.append(df)
 
         table = pd.concat(presentation_dfs, sort=False)
+        table = table.astype(
+            {c: 'int64' for c in table.select_dtypes(include='int')})
         table = table.sort_values(by=["start_time"])
         table = table.reset_index(drop=True)
         table.index.name = 'stimulus_presentations_id'
