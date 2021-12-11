@@ -30,8 +30,12 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
         ignore_keys = set()
 
     if isinstance(x1, pd.DataFrame):
-        assert_frame_equal(x1, x2, check_like=True)
-        
+        try:
+            assert_frame_equal(x1, x2, check_like=True)
+        except AssertionError as e:
+            print(e)
+            print(err_msg)
+            raise
     elif isinstance(x1, np.ndarray):
         np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
     elif isinstance(x1, xr.DataArray):
