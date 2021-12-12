@@ -37,13 +37,12 @@ import logging
 import os
 import argparse
 import matplotlib.pyplot as plt
-import warnings
 import h5py
 import numpy as np
-from functools import partial
 from scipy.ndimage.filters import median_filter
 
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import \
+    BrainObservatoryNwbDataSet
 
 GAUSSIAN_MAD_STD_SCALE = 1.4826
 
