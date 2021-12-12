@@ -121,7 +121,7 @@ def main():
     for num in sweep_nums:
         ts = nd.file_pointer["acquisition/timeseries/Sweep_" + num]
         # sweep epoch
-        t0 = ts["starting_time"].value
+        t0 = ts["starting_time"][()]
         rate = float(ts["starting_time"].attrs["rate"])
         n = float(ts["num_samples"].value)
         t1 = t0 + (n-1) * rate
@@ -131,14 +131,14 @@ def main():
         ep.finalize()
         if "CurrentClampSeries" in ts.attrs["ancestry"]:
             # test pulse epoch
-            t0 = ts["starting_time"].value
+            t0 = ts["starting_time"][()]
             t1 = t0 + PULSE_LEN
             ep = nd.create_epoch("TestPulse_" + num, t0, t1)
             ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_"+num)
             ep.add_timeseries("response", "acquisition/timeseries/Sweep_"+num)
             ep.finalize()
             # experiment epoch
-            t0 = ts["starting_time"].value
+            t0 = ts["starting_time"][()]
             t1 = t0 + (n-1) * rate
             t0 += EXPERIMENT_START_TIME
             ep = nd.create_epoch("Experiment_" + num, t0, t1)

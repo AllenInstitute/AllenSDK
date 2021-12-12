@@ -126,10 +126,10 @@ class LabNotebookReaderIvscc(LabNotebookReader):
         #
         notebook = h5["MIES/LabNoteBook/ITC18USB/Device0"]
         # load column data into memory
-        self.colname_number = notebook["KeyWave/keyWave"].value
-        self.val_number = notebook["settingsHistory/settingsHistory"].value
-        self.colname_text = notebook["TextDocKeyWave/txtDocKeyWave"].value
-        self.val_text = notebook["textDocumentation/txtDocWave"].value
+        self.colname_number = notebook["KeyWave/keyWave"][()]
+        self.val_number = notebook["settingsHistory/settingsHistory"][()]
+        self.colname_text = notebook["TextDocKeyWave/txtDocKeyWave"][()]
+        self.val_text = notebook["textDocumentation/txtDocWave"][()]
         h5.close()
 
 
@@ -153,10 +153,10 @@ class LabNotebookReaderIgorNwb(LabNotebookReader):
             notebook = h5["general/labnotebook"][k]
             break
         # load column data into memory
-        self.val_text = notebook["textualValues"].value
-        self.colname_text = notebook["textualKeys"].value
-        self.val_number = notebook["numericalValues"].value
-        self.colname_number = notebook["numericalKeys"].value
+        self.val_text = notebook["textualValues"][()]
+        self.colname_text = notebook["textualKeys"][()]
+        self.val_number = notebook["numericalValues"][()]
+        self.colname_number = notebook["numericalKeys"][()]
         h5.close()
         #
         self.register_enabled_names()

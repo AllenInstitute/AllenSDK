@@ -9,7 +9,8 @@ import allensdk.core.h5_utilities as h5_utilities
 
 @pytest.fixture
 def mem_h5(request):
-    my_file = h5py.File('my_file.h5', driver='core', backing_store=False)
+    my_file = h5py.File('my_file.h5', driver='core', backing_store=False,
+                        mode='w')
 
     def fin():
         my_file.close()

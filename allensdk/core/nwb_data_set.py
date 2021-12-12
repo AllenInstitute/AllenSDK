@@ -106,7 +106,7 @@ class NwbDataSet(object):
             else:   # old file version
                 stimulus_dataset = swp['stimulus']['timeseries']['data']
                 stimulus = stimulus_dataset.value
-                response = swp['response']['timeseries']['data'].value
+                response = swp['response']['timeseries']['data'][()]
 
             if 'unit' in stimulus_dataset.attrs:
                 unit = stimulus_dataset.attrs["unit"].decode('UTF-8')
@@ -122,8 +122,8 @@ class NwbDataSet(object):
                 unit = None
                 unit_str = 'Unknown'
 
-            swp_idx_start = swp['stimulus']['idx_start'].value
-            swp_length = swp['stimulus']['count'].value
+            swp_idx_start = swp['stimulus']['idx_start'][()]
+            swp_length = swp['stimulus']['count'][()]
 
             swp_idx_stop = swp_idx_start + swp_length - 1
             sweep_index_range = (swp_idx_start, swp_idx_stop)
@@ -132,8 +132,8 @@ class NwbDataSet(object):
             # range
             try:
                 exp = f['epochs']['Experiment_%d' % sweep_number]
-                exp_idx_start = exp['stimulus']['idx_start'].value
-                exp_length = exp['stimulus']['count'].value
+                exp_idx_start = exp['stimulus']['idx_start'][()]
+                exp_length = exp['stimulus']['count'][()]
                 exp_idx_stop = exp_idx_start + exp_length - 1
                 experiment_index_range = (exp_idx_start, exp_idx_stop)
             except KeyError:
@@ -178,7 +178,7 @@ class NwbDataSet(object):
             if 'idx_stop' in swp['stimulus']:
                 sweep_length = swp['stimulus']['idx_stop'].value + 1
             else:
-                sweep_length = swp['stimulus']['count'].value
+                sweep_length = swp['stimulus']['count'][()]
 
             if stimulus is not None:
                 # if the data is shorter than the sweep, pad it with zeros
@@ -252,7 +252,7 @@ class NwbDataSet(object):
 
             for ds in datasets:
                 if ds in f:
-                    return f[ds].value
+                    return f[ds][()]
             return []
 
     def set_spike_times(self, sweep_number, spike_times, key=None):
@@ -343,7 +343,7 @@ class NwbDataSet(object):
                 if extend_experiment:
                     epoch = "Experiment_%d" % sweep_number
                     if epoch in f['epochs']:
-                        idx_start = f['epochs'][epoch]['stimulus']['idx_start'].value
+                        idx_start = f['epochs'][epoch]['stimulus']['idx_start'][()]
                         count = f['epochs'][epoch]['stimulus']['timeseries']['data'].shape[0]
 
                         del f['epochs'][epoch]['stimulus']['count']
@@ -383,7 +383,7 @@ class NwbDataSet(object):
                 for field in metadata_fields:
                     # check if sweep contains the specific metadata field
                     if field in stim_details.keys():
-                        sweep_metadata[field] = stim_details[field].value
+                        sweep_metadata[field] = stim_details[field][()]
 
             except KeyError:
                 sweep_metadata = {}

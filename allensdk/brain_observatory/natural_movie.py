@@ -202,10 +202,10 @@ class NaturalMovie(StimulusAnalysis):
             nm._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
-                nm._binned_dx_sp = f["analysis/binned_dx_sp"].value
-                nm._binned_cells_sp = f["analysis/binned_cells_sp"].value
-                nm._binned_dx_vis = f["analysis/binned_dx_vis"].value
-                nm._binned_cells_vis = f["analysis/binned_cells_vis"].value
+                nm._binned_dx_sp = f["analysis/binned_dx_sp"][()]
+                nm._binned_cells_sp = f["analysis/binned_cells_sp"][()]
+                nm._binned_dx_vis = f["analysis/binned_dx_vis"][()]
+                nm._binned_cells_vis = f["analysis/binned_cells_vis"][()]
         except Exception as e:
             raise MissingStimulusException(e.args)
 

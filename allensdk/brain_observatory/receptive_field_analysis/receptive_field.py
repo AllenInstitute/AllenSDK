@@ -183,7 +183,7 @@ def read_h5_group(g):
         return_dict['attrs'] = dict(g.attrs)
     for key in g:
         if key == 'data':
-            return_dict[key] = g[key].value
+            return_dict[key] = g[key][()]
         else:
             return_dict[key] = read_h5_group(g[key])
 

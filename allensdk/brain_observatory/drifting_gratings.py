@@ -564,18 +564,18 @@ class DriftingGratings(StimulusAnalysis):
             dg._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
-                dg._response = f["analysis/response_dg"].value
-                dg._binned_dx_sp = f["analysis/binned_dx_sp"].value
-                dg._binned_cells_sp = f["analysis/binned_cells_sp"].value
-                dg._binned_dx_vis = f["analysis/binned_dx_vis"].value
-                dg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+                dg._response = f["analysis/response_dg"][()]
+                dg._binned_dx_sp = f["analysis/binned_dx_sp"][()]
+                dg._binned_cells_sp = f["analysis/binned_cells_sp"][()]
+                dg._binned_dx_vis = f["analysis/binned_dx_vis"][()]
+                dg._binned_cells_vis = f["analysis/binned_cells_vis"][()]
                 if "analysis/noise_corr_dg" in f:
-                    dg.noise_correlation = f["analysis/noise_corr_dg"].value
+                    dg.noise_correlation = f["analysis/noise_corr_dg"][()]
                 if "analysis/signal_corr_dg" in f:
-                    dg.signal_correlation = f["analysis/signal_corr_dg"].value
+                    dg.signal_correlation = f["analysis/signal_corr_dg"][()]
                 if "analysis/rep_similarity_dg" in f:
                     dg.representational_similarity = f[
-                        "analysis/rep_similarity_dg"].value
+                        "analysis/rep_similarity_dg"][()]
 
         except Exception as e:
             raise MissingStimulusException(e.args)

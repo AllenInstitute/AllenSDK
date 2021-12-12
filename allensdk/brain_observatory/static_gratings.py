@@ -674,19 +674,19 @@ class StaticGratings(StimulusAnalysis):
             sg._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
-                sg._response = f["analysis/response_sg"].value
-                sg._binned_dx_sp = f["analysis/binned_dx_sp"].value
-                sg._binned_cells_sp = f["analysis/binned_cells_sp"].value
-                sg._binned_dx_vis = f["analysis/binned_dx_vis"].value
-                sg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+                sg._response = f["analysis/response_sg"][()]
+                sg._binned_dx_sp = f["analysis/binned_dx_sp"][()]
+                sg._binned_cells_sp = f["analysis/binned_cells_sp"][()]
+                sg._binned_dx_vis = f["analysis/binned_dx_vis"][()]
+                sg._binned_cells_vis = f["analysis/binned_cells_vis"][()]
 
                 if "analysis/noise_corr_sg" in f:
-                    sg.noise_correlation = f["analysis/noise_corr_sg"].value
+                    sg.noise_correlation = f["analysis/noise_corr_sg"][()]
                 if "analysis/signal_corr_sg" in f:
-                    sg.signal_correlation = f["analysis/signal_corr_sg"].value
+                    sg.signal_correlation = f["analysis/signal_corr_sg"][()]
                 if "analysis/rep_similarity_sg" in f:
                     sg.representational_similarity = f[
-                        "analysis/rep_similarity_sg"].value
+                        "analysis/rep_similarity_sg"][()]
 
         except Exception as e:
             raise MissingStimulusException(e.args)

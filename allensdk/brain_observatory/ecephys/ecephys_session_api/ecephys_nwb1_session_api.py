@@ -56,7 +56,8 @@ class EcephysNwb1Api(EcephysSessionApi):
         try:
             # check file is a valid NWB 1 file
             version_str = self._h5_root['nwb_version'][()]
-            if not (version_str.startswith('NWB-1.') or version_str.startswith('1.')):
+            if not (version_str.startswith(b'NWB-1.') or
+                    version_str.startswith(b'1.')):
                 raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
         except Exception:
             raise

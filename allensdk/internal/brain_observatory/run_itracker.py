@@ -72,7 +72,7 @@ def get_experiment_info(experiment_id):
 
 def get_movie_shape_from_metadata(metadata_file):
     with h5py.File(metadata_file, "r") as f:
-        metadata_str = f["video_metadata"].value
+        metadata_str = f["video_metadata"][()]
         metadata = ast.literal_eval(metadata_str)
 
     # assuming 3 channels

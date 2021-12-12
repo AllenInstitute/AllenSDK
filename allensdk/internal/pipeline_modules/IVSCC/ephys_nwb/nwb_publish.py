@@ -40,7 +40,7 @@ PIPELINE_VERSION = "1.0"
 
 def copy_val(old_ts, new_ts, name):
     if name in old_ts:
-        val = old_ts[name].value
+        val = old_ts[name][()]
         attrs = {}
         for x in old_ts[name].attrs:
             # these are handled by nwb-api natively, no need to copy manually
@@ -71,8 +71,8 @@ def copy_timeseries(timeseries, old_file, new_file, folder, metadata):
                 raise Exception("Time series '%s' is of unknown type" % name)
             new_ts = new_file.create_timeseries(family, name, category)
             # copy data
-            num_samples = old_ts["num_samples"].value
-            data = old_ts["data"].value
+            num_samples = old_ts["num_samples"][()]
+            data = old_ts["data"][()]
             conversion = old_ts["data"].attrs["conversion"]
             resolution = old_ts["data"].attrs["resolution"]
 
@@ -85,7 +85,7 @@ def copy_timeseries(timeseries, old_file, new_file, folder, metadata):
 
             new_ts.set_data(data, conversion=conversion, resolution=resolution, unit=unit)
 
-            start_time = old_ts["starting_time"].value
+            start_time = old_ts["starting_time"][()]
             sampling_rate = old_ts["starting_time"].attrs["rate"]
             new_ts.set_time_by_rate(start_time, sampling_rate)
             new_ts.set_value("num_samples", num_samples)
@@ -131,9 +131,9 @@ def copy_epochs(timeseries, old_file, new_file, folder):
             # experiment block
             epname = "Experiment_%d" % num
             ep = old_file["epochs/%s" % epname]
-            start = ep["start_time"].value
-            stop = ep["stop_time"].value
-            desc = ep["description"].value
+            start = ep["start_time"][()]
+            stop = ep["stop_time"][()]
+            desc = ep["description"][()]
             ep = new_file.create_epoch(epname, start, stop)
             ep.set_value("description", desc)
             ep.add_timeseries("stimulus", "/stimulus/presentation/Sweep_%d" % num)
@@ -142,9 +142,9 @@ def copy_epochs(timeseries, old_file, new_file, folder):
             # test-pulse block
             epname = "TestPulse_%d" % num
             ep = old_file["epochs/%s" % epname]
-            start = ep["start_time"].value
-            stop = ep["stop_time"].value
-            desc = ep["description"].value
+            start = ep["start_time"][()]
+            stop = ep["stop_time"][()]
+            desc = ep["description"][()]
             ep = new_file.create_epoch(epname, start, stop)
             ep.set_value("description", desc)
             ep.add_timeseries("stimulus", "/stimulus/presentation/Sweep_%d" % num)
@@ -153,9 +153,9 @@ def copy_epochs(timeseries, old_file, new_file, folder):
             # sweep block
             epname = name
             ep = old_file["epochs/%s" % epname]
-            start = ep["start_time"].value
-            stop = ep["stop_time"].value
-            desc = ep["description"].value
+            start = ep["start_time"][()]
+            stop = ep["stop_time"][()]
+            desc = ep["description"][()]
             ep = new_file.create_epoch(epname, start, stop)
             ep.set_value("description", desc)
             ep.add_timeseries("stimulus", "/stimulus/presentation/Sweep_%d" % num)

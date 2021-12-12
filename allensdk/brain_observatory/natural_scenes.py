@@ -447,19 +447,19 @@ class NaturalScenes(StimulusAnalysis):
             ns._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
-                ns._response = f["analysis/response_ns"].value
-                ns._binned_dx_sp = f["analysis/binned_dx_sp"].value
-                ns._binned_cells_sp = f["analysis/binned_cells_sp"].value
-                ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
-                ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
+                ns._response = f["analysis/response_ns"][()]
+                ns._binned_dx_sp = f["analysis/binned_dx_sp"][()]
+                ns._binned_cells_sp = f["analysis/binned_cells_sp"][()]
+                ns._binned_dx_vis = f["analysis/binned_dx_vis"][()]
+                ns._binned_cells_vis = f["analysis/binned_cells_vis"][()]
 
                 if "analysis/noise_corr_ns" in f:
-                    ns.noise_correlation = f["analysis/noise_corr_ns"].value
+                    ns.noise_correlation = f["analysis/noise_corr_ns"][()]
                 if "analysis/signal_corr_ns" in f:
-                    ns.signal_correlation = f["analysis/signal_corr_ns"].value
+                    ns.signal_correlation = f["analysis/signal_corr_ns"][()]
                 if "analysis/rep_similarity_ns" in f:
                     ns.representational_similarity = f[
-                        "analysis/rep_similarity_ns"].value
+                        "analysis/rep_similarity_ns"][()]
 
         except Exception as e:
             raise MissingStimulusException(e.args)

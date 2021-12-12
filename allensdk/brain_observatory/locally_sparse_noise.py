@@ -435,7 +435,7 @@ class LocallySparseNoise(StimulusAnalysis):
             with h5py.File(analysis_file, "r") as f:
                 k = "analysis/mean_response_%s" % stimulus_suffix
                 if k in f:
-                    lsn._mean_response = f[k].value
+                    lsn._mean_response = f[k][()]
 
             lsn._sweep_response = pd.read_hdf(analysis_file,
                                               "analysis/sweep_response_%s" %

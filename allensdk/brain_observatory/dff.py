@@ -408,7 +408,7 @@ def main():
             args.input_h5).get_corrected_fluorescence_traces()
     else:
         input_h5 = h5py.File(args.input_h5, "r")
-        traces = input_h5["data"].value
+        traces = input_h5["data"][()]
         input_h5.close()
 
     dff = calculate_dff(traces, save_plot_dir=args.plot_dir)
