@@ -114,8 +114,12 @@ def test_fill_sweep_responses_extend(mock_data_set):
         def __init__(self, i):
             self.i = i
             self.value = i
+
         def __eq__(self, j):
             return j == self.i
+
+        def __getitem__(self, item):
+            return self.value
         
     h5 = {
         'epochs': {
