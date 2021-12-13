@@ -47,7 +47,7 @@ if 'TEST_EPHYS_NWB_FILES' in os.environ:
 else:
     nwb_list_file = resource_filename(__name__, 'nwb_ephys_files.txt')
 with open(nwb_list_file, 'r') as f:
-    NWB_FLAVORS = [l.strip() for l in f]
+    NWB_FLAVORS = [x.strip() for x in f]
 
 
 @pytest.fixture(params=NWB_FLAVORS)
@@ -55,6 +55,7 @@ def data_set(request):
     nwb_file = request.param
     data_set = NwbDataSet(nwb_file)
     return data_set
+
 
 @pytest.mark.nightly
 def test_get_sweep_numbers(data_set):
@@ -82,6 +83,7 @@ def test_get_spike_times(data_set):
             found_spikes = True
 
     assert found_spikes is True
+
 
 def mock_h5py_file(m=None, data=None):
     if m is None:
@@ -120,7 +122,7 @@ def test_fill_sweep_responses_extend(mock_data_set):
 
         def __getitem__(self, item):
             return self.value
-        
+
     h5 = {
         'epochs': {
             'Sweep_1': {
@@ -133,21 +135,23 @@ def test_fill_sweep_responses_extend(mock_data_set):
             'Experiment_1': {
                 'stimulus': {
                     'idx_start': H5Scalar(1),
-                    'count': H5Scalar(3), # truncation is here
+                    'count': H5Scalar(3),  # truncation is here
                     'timeseries': {
                         'data': np.ones(DATA_LENGTH)
-                        }
                     }
                 }
+            }
         }
-        }
+    }
 
     with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1], extend_experiment=True)
 
     assert h5['epochs']['Experiment_1']['stimulus']['count'] == 4
     assert h5['epochs']['Experiment_1']['stimulus']['idx_start'] == 1
-    assert np.all(h5['epochs']['Sweep_1']['response']['timeseries']['data']== 0.0)
+    assert np.all(
+        h5['epochs']['Sweep_1']['response']['timeseries']['data'] == 0.0)
+
 
 def test_fill_sweep_responses(mock_data_set):
     data_set = mock_data_set
@@ -178,14 +182,15 @@ def test_fill_sweep_responses(mock_data_set):
                 }
             }
         }
-        }
+    }
 
     with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1])
 
-    assert not np.any(h5['epochs']['Sweep_1']['response']['timeseries']['data'])
+    assert not np.any(
+        h5['epochs']['Sweep_1']['response']['timeseries']['data'])
     assert len(h5['epochs']['Sweep_1']['response']['timeseries']['data']) == \
-        DATA_LENGTH
+           DATA_LENGTH
 
 
 @pytest.mark.xfail
@@ -229,6 +234,7 @@ def test_set_spike_times(mock_data_set):
         data_set.set_spike_times(1, [0.1, 0.2, 0.3, 0.4, 0.5])
 
     assert False
+
 
 @pytest.mark.nightly
 def test_get_sweep_metadata(data_set):
