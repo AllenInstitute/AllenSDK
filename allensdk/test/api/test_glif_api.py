@@ -87,6 +87,7 @@ def test_get_neuronal_model_templates(glif_api):
 
 
 @pytest.mark.requires_api_endpoint
+@pytest.mark.todo_flaky
 def test_get_neuronal_models(glif_api, specimen_id):
 
     cells = glif_api.get_neuronal_models([specimen_id])
@@ -94,13 +95,16 @@ def test_get_neuronal_models(glif_api, specimen_id):
     assert len(cells) == 1
     assert len(cells[0]['neuronal_models']) == 2
 
+
 @pytest.mark.requires_api_endpoint
+@pytest.mark.todo_flaky
 def test_get_neuronal_models_no_ids(glif_api):
     cells = glif_api.get_neuronal_models()
     assert len(cells) > 0
 
 
 @pytest.mark.requires_api_endpoint
+@pytest.mark.todo_flaky
 def test_get_neuron_configs(glif_api, specimen_id):
     model = glif_api.get_neuronal_models([specimen_id])
 
@@ -110,6 +114,7 @@ def test_get_neuron_configs(glif_api, specimen_id):
     test_id = 566283950 
 
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]['th_inf'], 0.024561992461740227)
+
 
 @pytest.mark.requires_api_endpoint
 @pytest.mark.todo_flaky
