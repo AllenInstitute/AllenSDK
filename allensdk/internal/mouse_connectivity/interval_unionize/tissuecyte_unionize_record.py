@@ -102,7 +102,8 @@ class TissuecyteBaseUnionize(Unionize):
 
         if self.max_voxel_index > 0:
             self.max_voxel_index = sort[self.max_voxel_index]
-            mv_pos = np.unravel_index([self.max_voxel_index], dims=target_shape, order='C')
+            mv_pos = np.unravel_index([self.max_voxel_index],
+                                      shape=target_shape, order='C')
             if len(mv_pos[0]) == 0:
                 mv_pos = [[0], [0], [0]]
         else:

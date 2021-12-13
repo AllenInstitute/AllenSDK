@@ -98,14 +98,14 @@ class NwbDataSet(object):
                 # stimulus
                 stimulus_dataset = swp['stimulus']['timeseries']['data']
                 conversion = float(stimulus_dataset.attrs["conversion"])
-                stimulus = stimulus_dataset.value * conversion
+                stimulus = stimulus_dataset[()] * conversion
                 # acquisition
                 response_dataset = swp['response']['timeseries']['data']
                 conversion = float(response_dataset.attrs["conversion"])
-                response = response_dataset.value * conversion
+                response = response_dataset[()] * conversion
             else:  # old file version
                 stimulus_dataset = swp['stimulus']['timeseries']['data']
-                stimulus = stimulus_dataset.value
+                stimulus = stimulus_dataset[()]
                 response = swp['response']['timeseries']['data'][()]
 
             if 'unit' in stimulus_dataset.attrs:
@@ -180,7 +180,7 @@ class NwbDataSet(object):
             # whatever might be in front of it
             # TODO: remove deprecated 'idx_stop'
             if 'idx_stop' in swp['stimulus']:
-                sweep_length = swp['stimulus']['idx_stop'].value + 1
+                sweep_length = swp['stimulus']['idx_stop'][()] + 1
             else:
                 sweep_length = swp['stimulus']['count'][()]
 

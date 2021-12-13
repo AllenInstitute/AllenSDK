@@ -72,7 +72,7 @@ def test_write_output_h5(writer, outputs, h5_key, expected):
         if isinstance(expected, np.ndarray):
             assert np.allclose(obtained, expected)
         else:
-            assert obtained.value == expected
+            assert obtained[()] == expected
 
 
 @pytest.mark.parametrize("json_key,expected", [
