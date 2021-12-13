@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [2.13.2] = TBD
 - Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
 - Updates to support MESO.2
-- Changes minimum required version for pandas, hdmf
+- Loosens/updates required versions for several dependencies
 
 ## [2.13.1] = 2021-10-04
 - Fixes bug that was preventing the BehaviorSession from properly instantiating passive sessions.
