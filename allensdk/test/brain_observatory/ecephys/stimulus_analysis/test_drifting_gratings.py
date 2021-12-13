@@ -206,10 +206,9 @@ def test_metric_with_contrast(ecephys_api_w_contrast):
     # version dependencies, the underlying 'c50' calculation
     # (drifting_gratings.py) very occasionally is off by one index
     # in estimating the halfway point in the contrast curve.
-    # accommodating these two possibilities here:
-    index_one = np.allclose(dg.metrics['c50_dg'].loc[[5]], 0.17585882)
-    index_two = np.allclose(dg.metrics['c50_dg'].loc[[5]], 0.17158039)
-    assert any([index_one, index_two])
+    # accommodating that possibility here:
+    assert np.allclose(dg.metrics['c50_dg'].loc[[5]], 0.17585882, atol=1e-2,
+                       rtol=1e-2)
 
 
 @pytest.mark.parametrize('response,tf,sampling_rate,expected',
