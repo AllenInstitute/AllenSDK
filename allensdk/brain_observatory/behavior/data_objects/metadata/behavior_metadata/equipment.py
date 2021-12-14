@@ -44,6 +44,18 @@ class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
         return cls(equipment_name=equipment_name)
 
     @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "Equipment":
+        query = f"""
+            SELECT e.name AS device_name
+            FROM ophys_sessions os
+            JOIN equipment e ON e.id = os.equipment_id
+            WHERE os.id = {ophys_session_id};
+        """
+        equipment_name = lims_db.fetchone(query, strict=True)
+        return cls(equipment_name=equipment_name)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Equipment":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(equipment_name=metadata.equipment_name)

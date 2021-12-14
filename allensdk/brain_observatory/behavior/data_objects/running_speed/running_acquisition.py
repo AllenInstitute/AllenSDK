@@ -21,7 +21,7 @@ from allensdk.brain_observatory.behavior.data_objects import (
     DataObject, StimulusTimestamps
 )
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile
+    StimulusFile, SyncFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -128,6 +128,31 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file
         )
+        running_acq_df = get_running_df(
+            data=stimulus_file.data, time=stimulus_timestamps.value,
+        )
+        running_acq_df.drop("speed", axis=1, inplace=True)
+
+        return cls(
+            running_acquisition=running_acq_df,
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+        )
+
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
+    def from_lims_for_ophys_session(
+        cls,
+        db: PostgresQueryMixin,
+        ophys_session_id: int,
+        ophys_experiment_id: Optional[int] = None,
+    ) -> "RunningAcquisition":
+
+        stimulus_file = StimulusFile.from_lims_for_ophys_session(db, ophys_session_id)
+        sync_file = SyncFile.from_lims_for_ophys_session(db=db, ophys_session_id=ophys_session_id)
+        stimulus_timestamps = StimulusTimestamps.from_sync_file(
+            sync_file=sync_file)
+
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
         )

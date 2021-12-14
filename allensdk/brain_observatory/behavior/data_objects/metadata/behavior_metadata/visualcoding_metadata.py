@@ -6,7 +6,7 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile, SyncFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
+    BehaviorSessionId, VisualCodingSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, NwbReadableInterface, \
@@ -24,8 +24,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.foraging_id import \
     ForagingId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.session_type import \
-    SessionType
+    .behavior_metadata.visualcoding_session_type import \
+    VisualCodingSessionType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
@@ -175,22 +175,22 @@ def get_task_parameters(data: Dict) -> Dict:
     return task_parameters
 
 
-class BehaviorMetadata(DataObject, LimsReadableInterface,
+class VisualCodingMetadata(DataObject, LimsReadableInterface,
                        JsonReadableInterface,
                        NwbReadableInterface,
                        JsonWritableInterface,
                        NwbWritableInterface):
-    """Container class for behavior metadata"""
+    """Container class for visual coding metadata"""
     def __init__(self,
                  subject_metadata: SubjectMetadata,
-                 behavior_session_id: BehaviorSessionId,
+                 ophys_session_id: VisualCodingSessionId,
                  equipment: Equipment,
                  stimulus_frame_rate: StimulusFrameRate,
-                 session_type: SessionType,
+                 session_type: VisualCodingSessionType,
                  behavior_session_uuid: BehaviorSessionUUID):
-        super().__init__(name='behavior_metadata', value=self)
+        super().__init__(name='visualcoding_metadata', value=self)
         self._subject_metadata = subject_metadata
-        self._behavior_session_id = behavior_session_id
+        self._ophys_session_id = ophys_session_id
         self._equipment = equipment
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
@@ -201,35 +201,36 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
     @classmethod
     def from_lims(
             cls,
-            behavior_session_id: BehaviorSessionId,
+            ophys_session_id: VisualCodingSessionId,
             lims_db: PostgresQueryMixin
-        ) -> "BehaviorMetadata":
-        subject_metadata = SubjectMetadata.from_lims(
-            behavior_session_id=behavior_session_id, lims_db=lims_db)
-        equipment = Equipment.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        ) -> "VisualCodingMetadata":
+        subject_metadata = SubjectMetadata.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id, lims_db=lims_db)
+        equipment = Equipment.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
 
-        stimulus_file = StimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value)
+        stimulus_file = StimulusFile.from_lims_for_ophys_session(
+            db=lims_db, ophys_session_id=ophys_session_id.value)
         # stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
         #     stimulus_file=stimulus_file)
-        sync_file = SyncFile.from_lims_for_session(db=lims_db, behavior_session_id=behavior_session_id.value)
+        sync_file = SyncFile.from_lims_for_ophys_session(db=lims_db, ophys_session_id=ophys_session_id.value)
         stimulus_frame_rate = StimulusFrameRate.from_sync_file(
             sync_file=sync_file)
-        session_type = SessionType.from_stimulus_file(
+        session_type = VisualCodingSessionType.from_stimulus_file(
             stimulus_file=stimulus_file)
 
-        foraging_id = ForagingId.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
-        behavior_session_uuid = BehaviorSessionUUID.from_stimulus_file(
-            stimulus_file=stimulus_file)\
-            .validate(behavior_session_id=behavior_session_id.value,
-                                       foraging_id=foraging_id.value,
-                                       stimulus_file=stimulus_file)
+        # foraging_id = ForagingId.from_lims(
+        #     behavior_session_id=ophys_session_id.value, lims_db=lims_db)
+        # behavior_session_uuid = BehaviorSessionUUID.from_stimulus_file(
+        #     stimulus_file=stimulus_file)\
+        #     .validate(behavior_session_id=behavior_session_id.value,
+        #                                foraging_id=foraging_id.value,
+        #                                stimulus_file=stimulus_file)
+        behavior_session_uuid=None
 
         return cls(
             subject_metadata=subject_metadata,
-            behavior_session_id=behavior_session_id,
+            ophys_session_id=ophys_session_id,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
@@ -292,11 +293,11 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
 
     @property
     def behavior_session_uuid(self) -> Optional[uuid.UUID]:
-        return self._behavior_session_uuid.value
+        return None  # self._behavior_session_uuid.value
 
     @property
-    def behavior_session_id(self) -> int:
-        return self._behavior_session_id.value
+    def ophys_session_id(self) -> int:
+        return self._ophys_session_id.value
 
     @property
     def subject_metadata(self):

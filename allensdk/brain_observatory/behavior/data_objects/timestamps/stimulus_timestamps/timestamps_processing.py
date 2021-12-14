@@ -23,7 +23,10 @@ def get_behavior_stimulus_timestamps(stimulus_pkl: dict) -> np.ndarray:
     np.ndarray
         Timestamps (in seconds) for presented stimulus frames during a session.
     """
-    vsyncs = stimulus_pkl["items"]["behavior"]["intervalsms"]
+    try:
+        vsyncs = stimulus_pkl["items"]["behavior"]["intervalsms"]
+    except KeyError as ke:
+        vsyncs = stimulus_pkl["items"]["foraging"]["intervalsms"]
     stimulus_timestamps = np.hstack((0, vsyncs)).cumsum() / 1000.0
     return stimulus_timestamps
 

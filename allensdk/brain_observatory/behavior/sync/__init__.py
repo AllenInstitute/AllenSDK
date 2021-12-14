@@ -32,7 +32,7 @@ def get_raw_stimulus_frames(
 
     """
     try:
-        return dataset.get_edges("falling",'stim_vsync', "seconds")
+        return dataset.get_edges("falling",['stim_vsync','vsync_stim'], "seconds")
     except KeyError:
         if not permissive:
             raise
@@ -63,11 +63,15 @@ def get_ophys_frames(
 
     """
     try:
-        return dataset.get_edges("rising", '2p_vsync', "seconds")
+        return dataset.get_edges("rising", ['2p_vsync','vsync_2p'], "seconds")
     except KeyError:
+        # try:
+        #     return dataset.get_edges("rising", 'vsync_2p', "seconds")
+        # except KeyError:
         if not permissive:
             raise
         return
+        
 
 
 def get_lick_times(
@@ -142,9 +146,11 @@ def get_trigger(
         correspond to acquired ophys frames.
 
     """
-    return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger"], "seconds", permissive)
-
+    try:
+        return dataset.get_edges(
+        "rising", ["2p_trigger", "acq_trigger", "2p_acq_trigger","stim_running"], "seconds", permissive)
+    except KeyError:
+        return None
 
 def get_eye_tracking(
     dataset: SyncDataset, 
@@ -166,7 +172,7 @@ def get_eye_tracking(
 
     """
     return dataset.get_edges(
-        "rising", ["cam2_exposure", "eye_tracking"], "seconds", permissive)
+        "rising", ["cam2_exposure", "eye_tracking", "eye_frame_received"], "seconds", permissive)
 
 
 def get_behavior_monitoring(
@@ -190,7 +196,7 @@ def get_behavior_monitoring(
 
     """
     return dataset.get_edges(
-        "rising", ["cam1_exposure", "behavior_monitoring"], "seconds", 
+        "rising", ["cam1_exposure", "behavior_monitoring", "beh_frame_received"], "seconds", 
         permissive)
 
 

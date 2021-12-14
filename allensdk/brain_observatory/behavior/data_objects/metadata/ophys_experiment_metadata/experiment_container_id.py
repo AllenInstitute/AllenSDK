@@ -5,6 +5,7 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk import OneResultExpectedError
 
 
 class ExperimentContainerId(DataObject, LimsReadableInterface,
@@ -22,7 +23,12 @@ class ExperimentContainerId(DataObject, LimsReadableInterface,
                 FROM ophys_experiments_visual_behavior_experiment_containers
                 WHERE ophys_experiment_id = {};
                 """.format(ophys_experiment_id)
-        container_id = lims_db.fetchone(query, strict=False)
+        try:
+            container_id = lims_db.fetchone(query, strict=False)
+        except OneResultExpectedError:
+            print("No single container id found for {}!".format(ophys_experiment_id))
+            container_id = lims_db.fetchall(query, strict=False)
+            print("Container id query returned {}".format(container_id))
         return cls(experiment_container_id=container_id)
 
     @classmethod

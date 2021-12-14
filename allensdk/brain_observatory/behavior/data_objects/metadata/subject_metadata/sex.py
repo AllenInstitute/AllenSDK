@@ -36,6 +36,21 @@ class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
         sex = lims_db.fetchone(query, strict=True)
         return cls(sex=sex)
 
+
+    @classmethod    
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "Sex":
+        query = f"""
+                 SELECT g.name AS sex
+                 FROM ophys_sessions os
+                 JOIN specimens s ON os.specimen_id = s.id
+                 JOIN donors d ON s.donor_id = d.id
+                 JOIN genders g ON g.id = d.gender_id
+                 WHERE os.id = {ophys_session_id};
+                 """
+        sex = lims_db.fetchone(query, strict=True)
+        return cls(sex=sex)
+
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Sex":
         return cls(sex=nwbfile.subject.sex)

@@ -3,6 +3,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import logging
+
 from scipy import ndimage, stats
 
 
@@ -199,6 +201,13 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
         frame_times = frame_times[:n_eye_frames]
         n_sync = len(frame_times)
+
+    if n_eye_frames > n_sync:
+        logging.warning("The number of eye tracking frames is greater than the number of sync file frame times. \
+                        Truncating extra eye tracking frames.")
+        eye_data = eye_data.head(n_sync)
+        n_eye_frames = len(eye_data.index)
+
 
     if n_sync != n_eye_frames:
         raise RuntimeError(f"Error! The number of sync file frame times "

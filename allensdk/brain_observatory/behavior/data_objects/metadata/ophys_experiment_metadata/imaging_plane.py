@@ -3,7 +3,7 @@ from typing import Optional
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
+    BehaviorSessionId, VisualCodingSessionId
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, NwbReadableInterface, \
@@ -35,13 +35,16 @@ class ImagingPlane(DataObject, LimsReadableInterface,
                   lims_db: PostgresQueryMixin,
                   ophys_timestamps: OphysTimestamps,
                   excitation_lambda=910.0) -> "ImagingPlane":
-        behavior_session_id = BehaviorSessionId.from_lims(
-            db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        # behavior_session_id = BehaviorSessionId.from_lims(
+        #    db=lims_db, ophys_experiment_id=ophys_experiment_id)
+        ophys_session_id = VisualCodingSessionId.from_lims(db=lims_db, ophys_experiment_id=ophys_experiment_id)
         ophys_frame_rate = calc_frame_rate(timestamps=ophys_timestamps.value)
         targeted_structure = cls._get_targeted_structure_from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        reporter_line = ReporterLine.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        # reporter_line = ReporterLine.from_lims(
+        #     behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+        reporter_line = ReporterLine.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
         indicator = reporter_line.parse_indicator(warn=True)
         return cls(ophys_frame_rate=ophys_frame_rate,
                    targeted_structure=targeted_structure,

@@ -80,6 +80,32 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         )
 
     @classmethod
+    def from_lims_for_ophys_session(cls,
+                  ophys_session_id: BehaviorSessionId,
+                  lims_db: PostgresQueryMixin) -> "SubjectMetadata":
+        sex = Sex.from_lims_for_ophys_session(ophys_session_id=ophys_session_id.value,
+                            lims_db=lims_db)
+        age = Age.from_lims_for_ophys_session(ophys_session_id=ophys_session_id.value,
+                            lims_db=lims_db)
+        reporter_line = ReporterLine.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
+        full_genotype = FullGenotype.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
+        driver_line = DriverLine.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value, lims_db=lims_db)
+        mouse_id = MouseId.from_lims_for_ophys_session(
+            ophys_session_id=ophys_session_id.value,
+            lims_db=lims_db)
+        return cls(
+            sex=sex,
+            age=age,
+            full_genotype=full_genotype,
+            driver_line=driver_line,
+            mouse_id=mouse_id,
+            reporter_line=reporter_line
+        )
+
+    @classmethod
     def from_json(cls, dict_repr: dict) -> "SubjectMetadata":
         sex = Sex.from_json(dict_repr=dict_repr)
         age = Age.from_json(dict_repr=dict_repr)

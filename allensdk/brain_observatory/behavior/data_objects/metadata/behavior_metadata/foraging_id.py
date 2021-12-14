@@ -30,3 +30,18 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
         foraging_id = lims_db.fetchone(query, strict=True)
         foraging_id = uuid.UUID(foraging_id)
         return cls(foraging_id=foraging_id)
+
+    @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "ForagingId":
+        query = f"""
+            SELECT
+                foraging_id
+            FROM
+                ophys_sessions
+            WHERE
+                ophys_sessions.id = {ophys_session_id};
+        """
+        foraging_id = lims_db.fetchone(query, strict=True)
+        foraging_id = uuid.UUID(foraging_id)
+        return cls(foraging_id=foraging_id)

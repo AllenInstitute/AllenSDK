@@ -33,6 +33,19 @@ class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(full_genotype=genotype)
 
     @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "FullGenotype":
+        query = f"""
+                SELECT d.full_genotype
+                FROM ophys_sessions os
+                JOIN specimens s ON os.specimen_id = s.id
+                JOIN donors d ON s.donor_id = d.id
+                WHERE os.id= {ophys_session_id};
+                """
+        genotype = lims_db.fetchone(query, strict=True)
+        return cls(full_genotype=genotype)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "FullGenotype":
         return cls(full_genotype=nwbfile.subject.genotype)
 

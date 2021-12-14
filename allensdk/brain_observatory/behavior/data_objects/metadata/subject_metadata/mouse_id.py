@@ -38,5 +38,24 @@ class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(mouse_id=mouse_id)
 
     @classmethod
+    def from_lims_for_ophys_session(cls, ophys_session_id: int,
+                  lims_db: PostgresQueryMixin) -> "MouseId":
+        # TODO: Should this even be included?
+        # Found sometimes there were entries with NONE which is
+        # why they are filtered out; also many entries in the table
+        # match the donor_id, which is why used DISTINCT
+        query = f"""
+            SELECT DISTINCT(sp.external_specimen_name)
+            FROM ophys_sessions os
+            JOIN specimens s ON os.specimen_id = s.id
+            JOIN donors d ON s.donor_id = d.id
+            JOIN specimens sp ON sp.donor_id=d.id
+            WHERE os.id={ophys_session_id}
+            AND sp.external_specimen_name IS NOT NULL;
+            """
+        mouse_id = int(lims_db.fetchone(query, strict=True))
+        return cls(mouse_id=mouse_id)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "MouseId":
         return cls(mouse_id=int(nwbfile.subject.subject_id))
