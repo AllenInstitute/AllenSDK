@@ -90,9 +90,6 @@ def ecephys_api():
     return MockDGSessionApi()
 
 
-# def mock_ecephys_api():
-#    return MockDGSessionApi()
-
 @pytest.fixture
 def ecephys_api_w_contrast():
     return MockDGSessionApi(with_dg_contrast=True)

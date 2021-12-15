@@ -93,8 +93,9 @@ class NaturalScenes(StimulusAnalysis):
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table('natural_scenes')
         self._number_scenes = len(np.unique(self._stim_table.frame))
-        self._sweeplength = self._stim_table.end.iloc[
-                                1] - self._stim_table.start.iloc[1]
+        self._sweeplength = (
+                self._stim_table.end.iloc[1] -
+                self._stim_table.start.iloc[1])
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
 
@@ -272,17 +273,14 @@ class NaturalScenes(StimulusAnalysis):
             self.acquisition_rate
         msrs_sorted = mean_responses[cell_order, :]
 
-        oplots.plot_time_to_peak(msrs_sorted, ttps,
-                                 0, (
-                                             2 * self.interlength +
-                                             self.sweeplength) /
-                                 self.acquisition_rate,
-                                 (self.interlength) / self.acquisition_rate,
-                                 (
-                                             self.interlength +
-                                             self.sweeplength) /
-                                 self.acquisition_rate,
-                                 color_map)
+        oplots.plot_time_to_peak(
+            msrs_sorted,
+            ttps,
+            0,
+            (2 * self.interlength + self.sweeplength) / self.acquisition_rate,
+            self.interlength / self.acquisition_rate,
+            (self.interlength + self.sweeplength) / self.acquisition_rate,
+            color_map)
 
     def open_corona_plot(self, cell_specimen_id=None, cell_index=None):
         cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
@@ -317,8 +315,9 @@ class NaturalScenes(StimulusAnalysis):
 
         reps = [len(np.where(stim_table.frame.values == frame)[0]) for frame in
                 frames]
-        Nreps = min(
-            reps)  # just in case there are different numbers of repetitions
+
+        # just in case there are different numbers of repetitions
+        Nreps = min(reps)
 
         response_new = np.zeros((self.numbercells, self.number_scenes),
                                 dtype='object')
@@ -353,11 +352,15 @@ class NaturalScenes(StimulusAnalysis):
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        signal_corr = np.triu(signal_corr) + np.triu(signal_corr,
-                                                     1).T  # fill in lower
-        # triangle
-        signal_p = np.triu(signal_p) + np.triu(signal_p,
-                                               1).T  # fill in lower triangle
+        # fill in lower triangle
+        signal_corr = (
+                np.triu(signal_corr) +
+                np.triu(signal_corr, 1).T)
+
+        # fill in lower triangle
+        signal_p = (
+                np.triu(signal_p) +
+                np.triu(signal_p, 1).T)
 
         return signal_corr, signal_p
 

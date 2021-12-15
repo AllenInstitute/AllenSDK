@@ -136,8 +136,8 @@ class StaticGratings(StimulusAnalysis):
     def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')
         self._stim_table = stimulus_table.fillna(value=0.)
-        self._sweeplength = self.stim_table['end'].iloc[
-                                1] - self.stim_table['start'].iloc[1]
+        self._sweeplength = (self.stim_table['end'].iloc[1] -
+                             self.stim_table['start'].iloc[1])
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
         self._orivals = np.unique(self._stim_table.orientation.dropna())
@@ -150,7 +150,7 @@ class StaticGratings(StimulusAnalysis):
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus
         condition.  Return is
-        a (# orientations, # spatial frequencies, # phasees, # cells,
+        a (# orientations, # spatial frequencies, # phases, # cells,
         3) np.ndarray.  The final dimension
         contains the mean response to the condition (index 0), standard
         error of the mean of the response
@@ -379,17 +379,14 @@ class StaticGratings(StimulusAnalysis):
                 self.interlength / self.acquisition_rate)
         msrs_sorted = mean_responses[cell_order, :]
 
-        oplots.plot_time_to_peak(msrs_sorted, ttps,
-                                 0, (
-                                             2 * self.interlength +
-                                             self.sweeplength) /
-                                 self.acquisition_rate,
-                                 (self.interlength) / self.acquisition_rate,
-                                 (
-                                             self.interlength +
-                                             self.sweeplength) /
-                                 self.acquisition_rate,
-                                 color_map)
+        oplots.plot_time_to_peak(
+            msrs_sorted,
+            ttps,
+            0,
+            (2 * self.interlength + self.sweeplength) / self.acquisition_rate,
+            self.interlength / self.acquisition_rate,
+            (self.interlength + self.sweeplength) / self.acquisition_rate,
+            color_map)
 
     def plot_orientation_selectivity(self,
                                      si_range=oplots.SI_RANGE,
@@ -556,11 +553,15 @@ class StaticGratings(StimulusAnalysis):
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        signal_corr = np.triu(signal_corr) + np.triu(signal_corr,
-                                                     1).T  # fill in lower
-        # triangle
-        signal_p = np.triu(signal_p) + np.triu(signal_p,
-                                               1).T  # fill in lower triangle
+        # fill in lower triangle
+        signal_corr = (
+                np.triu(signal_corr) +
+                np.triu(signal_corr, 1).T)
+
+        # fill in lower triangle
+        signal_p = (
+                np.triu(signal_p) +
+                np.triu(signal_p, 1).T)
 
         return signal_corr, signal_p
 

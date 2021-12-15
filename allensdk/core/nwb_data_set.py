@@ -377,8 +377,8 @@ class NwbDataSet(object):
             A dictionary with 'aibs_stimulus_amplitude_pa',
             'aibs_stimulus_name',
             'gain', 'initial_access_resistance', 'seal' elements.  These
-            specific
-            fields are ones encoded in the original AIBS in vitro .nwb files.
+            specific fields are ones encoded in the original AIBS in vitro
+            .nwb files.
         """
         with h5py.File(self.file_name, 'r') as f:
 

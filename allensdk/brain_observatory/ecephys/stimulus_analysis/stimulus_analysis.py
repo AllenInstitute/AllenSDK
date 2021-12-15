@@ -67,13 +67,13 @@ class StimulusAnalysis(object):
 
         self._psth_resolution = kwargs.get('psth_resolution', 0.001)
 
-        # Duration a sponteous stimulus should last for before it gets
+        # Duration a spontaneous stimulus should last for before it gets
         # included in the analysis.
         self._spontaneous_threshold = kwargs.get('spontaneous_threshold',
                                                  100.0)
 
         # Roughly the length of each stimulus duration, used for calculating
-        # spike statististics
+        # spike statistics
         self._trial_duration = trial_duration
 
         # Keeps track of preferred stimulus_condition_id for each unit
@@ -133,8 +133,8 @@ class StimulusAnalysis(object):
     @property
     def trial_duration(self):
         if self._trial_duration is None or self._trial_duration < 0.0:
-            # TODO: Should we calculate trial_duration from min(stim_table[
-            #  'duration']) if not set by user/subclass?
+            # TODO: Should we calculate trial_duration from
+            #  min(stim_table[duration']) if not set by user/subclass?
             raise TypeError(
                 f'Invalid value {self._trial_duration} for parameter '
                 f'"trial_duration".')
@@ -166,7 +166,7 @@ class StimulusAnalysis(object):
                 self._stimulus_key = self._find_stimulus_key(stims_table)
                 if self._stimulus_key is None:
                     raise Exception(
-                        'Could not find approipate stimulus_name key for '
+                        'Could not find appropriate stimulus_name key for '
                         'current stimulus type. Please '
                         'specify using the stimulus_key parameter.')
 
@@ -295,8 +295,8 @@ class StimulusAnalysis(object):
             n_cond_ids = len(
                 np.unique(da.coords['stimulus_condition_id'].values))
             if n_stimuli == n_cond_ids:
-                # If every condition_id is unique then calling groupby(
-                # ).mean() is unnecessary and will raise an error.
+                # If every condition_id is unique then calling
+                # groupby().mean() is unnecessary and will raise an error.
                 self._conditionwise_psth = da
             else:
                 self._conditionwise_psth = da.groupby(
@@ -642,8 +642,8 @@ def running_modulation(spike_counts, running_speeds, speed_threshold=1.0):
             'shape.')
         return np.NaN, np.NaN
 
-    is_running = running_speeds >= speed_threshold  # keep track of when the
-    # animal is and isn't running
+    # keep track of when the animal is and isn't running
+    is_running = running_speeds >= speed_threshold
 
     # Requires at-least two periods when the mouse is running and two when
     # the mouse is not running.
@@ -718,8 +718,7 @@ def fano_factor(spike_counts):
 
 def overall_firing_rate(start_times, stop_times, spike_times):
     """Computes the global firing rate of a series of spikes, for only those
-    values within the given start and
-    stop times.
+    values within the given start and stop times.
 
     Parameters
     ----------
@@ -795,8 +794,9 @@ def reliability(unit_sweeps, padding=1.0, num_timestep_second=30,
     if isinstance(unit_sweeps, (list, tuple)):
         unit_sweeps = np.array([np.array(x) for x in unit_sweeps])
 
-    unit_sweeps = unit_sweeps + padding  # DO NOT use the += as for python
-    # arrays that will do in-place modification
+    # DO NOT use the += as for python arrays that will do in-place modification
+    unit_sweeps = unit_sweeps + padding
+
     corr_matrix = np.empty((len(unit_sweeps), len(unit_sweeps)))
     fr_window = slice(window_beg, window_end)
     for i in range(len(unit_sweeps)):

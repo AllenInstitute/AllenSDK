@@ -144,8 +144,10 @@ class TissuecyteProjectionUnionize(TissuecyteBaseUnionize):
     def calculate(self, low, high, data_arrays, ij_record):
         data_arrays = self.slice_arrays(low, high, data_arrays)
 
-        nex = np.logical_or(data_arrays['injection_fraction'], np.logical_not(
-            data_arrays['aav_exclusion_fraction']))
+        nex = np.logical_or(
+            data_arrays['injection_fraction'],
+            np.logical_not(data_arrays['aav_exclusion_fraction'])
+        )
 
         self.sum_pixels = data_arrays['sum_pixels'][nex].sum()
         self.sum_pixels -= ij_record.sum_pixels

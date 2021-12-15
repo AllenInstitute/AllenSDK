@@ -86,8 +86,7 @@ def get_movie_shape_from_metadata(metadata_file):
     # movie_shape = (metadata['frames'], metadata['height'], metadata[
     # 'width'], 3)
     # in the metadata file from lims, the 'width' and 'height' variables are
-    # swapped,
-    # hopefully this is the same for every single experiment.
+    # swapped, hopefully this is the same for every single experiment.
     movie_shape = (
         metadata['frames'], metadata['width'], metadata['height'], 3)
     logging.info("movie_shape from metadata_file = %s", str(movie_shape))

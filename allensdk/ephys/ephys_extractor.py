@@ -71,8 +71,8 @@ class EphysSweepFeatureExtractor:
         i : ndarray of currents (pA)
         start : start of time window for feature analysis (optional)
         end : end of time window for feature analysis (optional)
-        filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (
-        optional, default 10)
+        filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz
+        (optional, default 10)
         dv_cutoff : minimum dV/dt to qualify as a spike in V/s (optional,
         default 20)
         max_interval : maximum acceptable time between start of spike and
@@ -529,8 +529,8 @@ class EphysSweepFeatureExtractor:
 
         Parameters
         ----------
-        peak_width : window width to get more robust peak estimate in sec (
-        default 0.005)
+        peak_width : window width to get more robust peak estimate in sec
+        (default 0.005)
 
         Returns
         -------
@@ -656,8 +656,8 @@ class EphysSweepFeatureExtractor:
         """Add new spike-level feature calculation function
 
            The function should take this sweep extractor as its argument.
-           Its results
-           can be accessed by calling the method spike_feature(<feature_name>).
+           Its results can be accessed by calling the method
+           spike_feature(<feature_name>).
         """
 
         if feature_name in self._spikes_df.columns:
@@ -715,8 +715,8 @@ class EphysSweepSetFeatureExtractor:
         start : start of time window for feature analysis (optional, can be
         list)
         end : end of time window for feature analysis (optional, can be list)
-        filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (
-        optional, default 10)
+        filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz
+        (optional, default 10)
         dv_cutoff : minimum dV/dt to qualify as a spike in V/s (optional,
         default 20)
         max_interval : maximum acceptable time between start of spike and
@@ -901,8 +901,8 @@ class EphysCellFeatureExtractor:
         self._all_ramps_ext = ext
 
         # pull out the spiking sweeps
-        spiking_sweeps = [sweep for sweep in self._ramps_ext.sweeps() if
-                          sweep.sweep_feature("avg_rate") > 0]
+        spiking_sweeps = [sweep for sweep in self._ramps_ext.sweeps()
+                          if sweep.sweep_feature("avg_rate") > 0]
         ext = EphysSweepSetFeatureExtractor.from_sweeps(spiking_sweeps)
         self._ramps_ext = ext
 
@@ -920,8 +920,8 @@ class EphysCellFeatureExtractor:
 
         # Need to count how many had spikes at each amplitude; find most;
         # ties go to lower amplitude
-        spiking_sweeps = [sweep for sweep in ext.sweeps() if
-                          sweep.sweep_feature("avg_rate") > 0]
+        spiking_sweeps = [sweep for sweep in ext.sweeps()
+                          if sweep.sweep_feature("avg_rate") > 0]
 
         if len(spiking_sweeps) == 0:
             raise ft.FeatureError(
@@ -939,8 +939,8 @@ class EphysCellFeatureExtractor:
 
         self._features["short_squares"]["stimulus_amplitude"] = common_amp
         ext = EphysSweepSetFeatureExtractor.from_sweeps(
-            [sweep for sweep in spiking_sweeps if
-             _short_step_stim_amp(sweep) == common_amp])
+            [sweep for sweep in spiking_sweeps
+             if _short_step_stim_amp(sweep) == common_amp])
         self._short_squares_ext = ext
 
         self._features["short_squares"]["common_amp_sweeps"] = ext.sweeps()
@@ -980,8 +980,8 @@ class EphysCellFeatureExtractor:
         self._features["long_squares"]["rheobase_i"] = rheobase_i
         self._features["long_squares"]["rheobase_sweep"] = ext.sweeps()[
             rheobase_index]
-        spiking_sweeps = [sweep for sweep in ext.sweeps() if
-                          sweep.sweep_feature("avg_rate") > 0]
+        spiking_sweeps = [sweep for sweep in ext.sweeps()
+                          if sweep.sweep_feature("avg_rate") > 0]
         self._spiking_long_squares_ext = \
             EphysSweepSetFeatureExtractor.from_sweeps(
                 spiking_sweeps)
@@ -993,8 +993,8 @@ class EphysCellFeatureExtractor:
 
     def _analyze_long_squares_subthreshold(self):
         ext = self._long_squares_ext
-        subthresh_sweeps = [sweep for sweep in ext.sweeps() if
-                            sweep.sweep_feature("avg_rate") == 0]
+        subthresh_sweeps = [sweep for sweep in ext.sweeps()
+                            if sweep.sweep_feature("avg_rate") == 0]
         subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(
             subthresh_sweeps)
         self._subthreshold_long_squares_ext = subthresh_ext
@@ -1018,11 +1018,9 @@ class EphysCellFeatureExtractor:
             s.set_stimulus_amplitude_calculator(_step_stim_amp)
 
         logging.debug("subthresh_sweeps: %d", len(subthresh_sweeps))
-        calc_subthresh_sweeps = [sweep for sweep in subthresh_sweeps if
-                                 sweep.sweep_feature(
-                                     "stim_amp") < self.SUBTHRESH_MAX_AMP and
-                                 sweep.sweep_feature(
-                                     "stim_amp") > self._subthresh_min_amp]
+        calc_subthresh_sweeps = \
+            [sweep for sweep in subthresh_sweeps
+             if self._subthresh_min_amp < sweep.sweep_feature("stim_amp") < self.SUBTHRESH_MAX_AMP]    # noqa F501
 
         logging.debug("calc_subthresh_sweeps: %d", len(calc_subthresh_sweeps))
         calc_subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(
@@ -1128,8 +1126,7 @@ def input_resistance(ext):
 
     if len(v) == 1:
         # If there's just one sweep, we'll have to use its own baseline to
-        # estimate
-        # the input resistance
+        # estimate the input resistance
         v = np.append(v, sweeps[0].sweep_feature("v_baseline"))
         i = np.append(i, 0.)
 

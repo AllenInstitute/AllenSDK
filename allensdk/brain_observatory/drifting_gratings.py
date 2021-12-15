@@ -450,11 +450,15 @@ class DriftingGratings(StimulusAnalysis):
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        signal_corr = np.triu(signal_corr) + np.triu(signal_corr,
-                                                     1).T  # fill in lower
-        # triangle
-        signal_p = np.triu(signal_p) + np.triu(signal_p,
-                                               1).T  # fill in lower triangle
+        # fill in lower triangle
+        signal_corr = \
+            np.triu(signal_corr) + \
+            np.triu(signal_corr, 1).T
+
+        # fill in lower triangle
+        signal_p = \
+            np.triu(signal_p) + \
+            np.triu(signal_p, 1).T
 
         return signal_corr, signal_p
 
@@ -466,6 +470,8 @@ class DriftingGratings(StimulusAnalysis):
 
         response = response.reshape(self.number_ori * (self.number_tf - 1),
                                     self.numbercells)
+
+        # TODO 25 lines of repeated code!!!!!!!!
         Nstim, N = response.shape
 
         rep_sim = np.zeros((Nstim, Nstim))

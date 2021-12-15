@@ -52,7 +52,7 @@ class NaturalMovie(StimulusAnalysis):
 
     movie_name: string
         one of [ stimulus_info.NATURAL_MOVIE_ONE,
-        stimulus_info.NATURAL_MOVIE_TWO,
+                 stimulus_info.NATURAL_MOVIE_TWO,
                  stimulus_info.NATURAL_MOVIE_THREE ]
     """
 

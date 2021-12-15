@@ -190,9 +190,10 @@ class EcephysNwb1Api(EcephysSessionApi):
             'description': ""  # TODO: Find description
         })
         probes_df.set_index('id', inplace=True)
-        probes_df[
-            'sampling_rate'] = 30000.0  # TODO: calculate real sampling rate
-        # for each probe.
+
+        # TODO: calculate real sampling rate for each probe.
+        probes_df['sampling_rate'] = 30000.0
+
         return probes_df
 
     def get_channels(self) -> pd.DataFrame:
@@ -258,14 +259,14 @@ class EcephysNwb1Api(EcephysSessionApi):
         waveforms = {}
         for prb_name, prb_grp in self._probe_groups():
             # There is one waveform for any given spike, but still calling
-            # it "mean" wavefor
+            # it "mean" waveform
             for indx, uid in enumerate(prb_grp['unit_list']):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 unit_id = self._unit_ids[(prb_name, uid)]
-                waveforms[unit_id] = np.array([unit_grp['waveform'][
-                                                   ()], ])  # EcephysSession
-                # is expecting an array of waveforms
 
+                # EcephysSession is expecting an array of waveforms
+                waveforms[unit_id] = \
+                    np.array([unit_grp['waveform'][()], ])
         return waveforms
 
     def get_spike_times(self) -> Dict[int, np.ndarray]:
@@ -312,7 +313,7 @@ class EcephysNwb1Api(EcephysSessionApi):
             'snr': snrs,
             'quality': "good"
             # TODO: NWB 1.0 is missing quality table, need to find an
-            #  equivelent
+            #  equivalent
         })
 
         units_df.set_index('unit_id', inplace=True)

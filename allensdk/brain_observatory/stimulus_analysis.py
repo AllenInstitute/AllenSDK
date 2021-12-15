@@ -434,10 +434,11 @@ class StimulusAnalysis(object):
                     dx_sorted[:offset]) / np.sqrt(offset)
                 binned_cells_vis[:, i, 0] = np.mean(
                     celltraces_sorted_vis[:, :offset], axis=1)
-                binned_cells_vis[:, i, 1] = np.std(
-                    celltraces_sorted_vis[:, :offset], axis=1) / np.sqrt(
-                    offset)
+                binned_cells_vis[:, i, 1] = (
+                        np.std(celltraces_sorted_vis[:, :offset], axis=1) /
+                        np.sqrt(offset))
             else:
+                # TODO 9 lines of repeated code!!!!!!!!!!!!
                 start = offset + (i - 1) * binsize
                 binned_dx_vis[i, 0] = np.mean(dx_sorted[start:start + binsize])
                 binned_dx_vis[i, 1] = np.std(

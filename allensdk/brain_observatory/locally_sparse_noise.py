@@ -242,8 +242,9 @@ class LocallySparseNoise(StimulusAnalysis):
         self._LSN, self._LSN_mask = \
             self.data_set.get_locally_sparse_noise_stimulus_template(
                 self.stimulus, mask_off_screen=False)
-        self._sweeplength = self._stim_table['end'][
-                                1] - self._stim_table['start'][1]
+        self._sweeplength = (
+                self._stim_table['end'][1] -
+                self._stim_table['start'][1])
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
 
@@ -292,10 +293,10 @@ class LocallySparseNoise(StimulusAnalysis):
 
         csid_rf = {}
         for cell_index in range(self.data_set.number_of_cells):
-            csid_rf[
-                str(cell_index)] = compute_receptive_field_with_postprocessing(
-                self.data_set, cell_index, self.stimulus, alpha=.05,
-                number_of_shuffles=10000)
+            csid_rf[str(cell_index)] = \
+                compute_receptive_field_with_postprocessing(
+                    self.data_set, cell_index, self.stimulus, alpha=.05,
+                    number_of_shuffles=10000)
 
         return csid_rf
 
