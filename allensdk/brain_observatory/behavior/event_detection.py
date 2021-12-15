@@ -17,7 +17,7 @@ def filter_events_array(arr: np.ndarray, scale: float = 2,
     arr: np.ndarray
         Trace matrix of dimension n traces x n frames
     scale: float
-        std deviation of halfnorm distribution
+        std deviation of halfnorm distribution in units of timesteps
     n_time_steps: int
         number of time steps to use for the convolution operation
 

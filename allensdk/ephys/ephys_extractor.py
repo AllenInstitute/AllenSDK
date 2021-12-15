@@ -55,10 +55,10 @@ SHORT_SQUARE_TRIPLE_WINDOW_END = 2.021
 class EphysSweepFeatureExtractor:
     """Feature calculation for a sweep (voltage and/or current time series)."""
 
-    def __init__(self, t=None, v=None, i=None, start=None,
-                 end=None, filter=10.,
-                 dv_cutoff=20., max_interval=0.005,
-                 min_height=2., min_peak=-30.,
+    def __init__(self, t=None, v=None, i=None, start=None, end=None,
+                 filter=10.,
+                 dv_cutoff=20., max_interval=0.005, min_height=2.,
+                 min_peak=-30.,
                  thresh_frac=0.05, baseline_interval=0.1,
                  baseline_detect_thresh=0.3,
                  id=None):
@@ -72,21 +72,21 @@ class EphysSweepFeatureExtractor:
         start : start of time window for feature analysis (optional)
         end : end of time window for feature analysis (optional)
         filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz
-            (optional, default 10)
+        (optional, default 10)
         dv_cutoff : minimum dV/dt to qualify as a spike in V/s (optional,
-            default 20)
-        max_interval : maximum acceptable time between start of spike
-            and time of peak in sec (optional, default 0.005)
-        min_height : minimum acceptable height from threshold to peak in
-            mV (optional, default 2)
+        default 20)
+        max_interval : maximum acceptable time between start of spike and
+        time of peak in sec (optional, default 0.005)
+        min_height : minimum acceptable height from threshold to peak in mV
+        (optional, default 2)
         min_peak : minimum acceptable absolute peak level in mV (optional,
-            default -30)
+        default -30)
         thresh_frac : fraction of average upstroke for threshold calculation
-            (optional, default 0.05)
+        (optional, default 0.05)
         baseline_interval: interval length for baseline voltage calculation
-            (before start if start is defined, default 0.1)
+        (before start if start is defined, default 0.1)
         baseline_detect_thresh : dV/dt threshold for evaluating flatness of
-            baseline region (optional, default 0.3)
+        baseline region (optional, default 0.3)
         """
         self.id = id
         self.t = t
@@ -140,11 +140,10 @@ class EphysSweepFeatureExtractor:
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes,
                                                  self.thresh_frac,
                                                  self.filter, dvdt)
-        thresholds, peaks, upstrokes, clipped = \
-            ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
-                                          upstrokes, self.end,
-                                          self.max_interval,
-                                          dvdt=dvdt, filter=self.filter)
+        thresholds, peaks, upstrokes, clipped = ft.check_thresholds_and_peaks(
+            v, t, thresholds, peaks,
+            upstrokes, self.end, self.max_interval,
+            dvdt=dvdt, filter=self.filter)
         if not thresholds.size:
             # Save time if no spikes detected
             self._spikes_df = DataFrame()
@@ -153,16 +152,17 @@ class EphysSweepFeatureExtractor:
         # Spike list and thresholds have been refined - now find other features
         upstrokes = ft.find_upstroke_indexes(v, t, thresholds, peaks,
                                              self.filter, dvdt)
-        troughs = ft.find_trough_indexes(v, t, thresholds, peaks,
-                                         clipped, self.end)
-        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs,
-                                                 clipped, self.filter, dvdt)
-        trough_details, clipped = \
-            ft.analyze_trough_details(v, t, thresholds, peaks,
-                                      clipped, self.end,
-                                      self.filter, dvdt=dvdt)
-        widths = ft.find_widths(v, t, thresholds, peaks,
-                                trough_details[1], clipped)
+        troughs = ft.find_trough_indexes(v, t, thresholds, peaks, clipped,
+                                         self.end)
+        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs, clipped,
+                                                 self.filter, dvdt)
+        trough_details, clipped = ft.analyze_trough_details(v, t, thresholds,
+                                                            peaks, clipped,
+                                                            self.end,
+                                                            self.filter,
+                                                            dvdt=dvdt)
+        widths = ft.find_widths(v, t, thresholds, peaks, trough_details[1],
+                                clipped)
 
         base_clipped_list = []
 
@@ -183,8 +183,8 @@ class EphysSweepFeatureExtractor:
 
         # Trough details
         isi_types = trough_details[0]
-        trough_detail_indexes = dict(zip(["fast_trough", "adp", "slow_trough"],
-                                         trough_details[1:]))
+        trough_detail_indexes = dict(
+            zip(["fast_trough", "adp", "slow_trough"], trough_details[1:]))
         base_clipped_list += ["fast_trough", "adp", "slow_trough"]
 
         # Redundant, but ensures that DataFrame has right number of rows
@@ -266,8 +266,8 @@ class EphysSweepFeatureExtractor:
         spikes_df["width"] = widths
         self._affected_by_clipping += ["width"]
 
-        spikes_df["upstroke_downstroke_ratio"] = spikes_df["upstroke"] \
-            / -spikes_df["downstroke"]
+        spikes_df["upstroke_downstroke_ratio"] = \
+            (spikes_df["upstroke"] / -spikes_df["downstroke"])
         self._affected_by_clipping += ["upstroke_downstroke_ratio"]
 
         self._spikes_df = spikes_df
@@ -289,21 +289,21 @@ class EphysSweepFeatureExtractor:
             sweep_level_features = {
                 "adapt": ft.adaptation_index(isis),
                 "latency": ft.latency(t, thresholds, self.start),
-                "isi_cv": (isis.std() /
-                           isis.mean()) if len(isis) >= 1 else np.nan,
+                "isi_cv": (isis.std() / isis.mean()) if len(
+                    isis) >= 1 else np.nan,
                 "mean_isi": isis.mean() if len(isis) > 0 else np.nan,
                 "median_isi": np.median(isis),
                 "first_isi": isis[0] if len(isis) >= 1 else np.nan,
-                "avg_rate": ft.average_rate(t, thresholds,
-                                            self.start, self.end),
+                "avg_rate": ft.average_rate(t, thresholds, self.start,
+                                            self.end),
             }
 
         for k, v in six.iteritems(sweep_level_features):
             self._sweep_features[k] = v
 
     def _process_pauses(self, cost_weight=1.0):
-        # Pauses are unusually long ISIs with a "detour reset" among
-        # delay resets
+        # Pauses are unusually long ISIs with a "detour reset" among delay
+        # resets
         thresholds = self._spikes_df["threshold_index"].values.astype(int)
         isis = ft.get_isis(self.t, thresholds)
         isi_types = self._spikes_df["isi_type"][:-1].values
@@ -322,10 +322,10 @@ class EphysSweepFeatureExtractor:
         Returns
         -------
         avg_n_pauses : average number of pauses detected across conditions
-        avg_pause_frac : average fraction of interval (between start and end)
-            spent in a pause
+        avg_pause_frac : average fraction of interval (between start and
+        end) spent in a pause
         max_reliability : max fraction of times most reliable pause was
-            detected given weights tested
+        detected given weights tested
         n_max_rel_pauses : number of pauses detected with `max_reliability`
         """
 
@@ -363,8 +363,8 @@ class EphysSweepFeatureExtractor:
         return np.array(bursts)
 
     def burst_metrics(self):
-        """Find bursts and return max "burstiness" index (normalized max rate
-         in burst vs out).
+        """Find bursts and return max "burstiness" index (normalized max
+        rate in burst vs out).
 
         Returns
         -------
@@ -380,7 +380,8 @@ class EphysSweepFeatureExtractor:
             return 0., 0
 
     def delay_metrics(self):
-        """Calculates ratio of latency to dominant time constant of rise before spike
+        """Calculates ratio of latency to dominant time constant of rise
+        before spike
 
         Returns
         -------
@@ -407,29 +408,29 @@ class EphysSweepFeatureExtractor:
 
         # Look at baseline interval before start if start is defined
         if self.start is not None:
-            return ft.average_voltage(
-                v, t, self.start - self.baseline_interval, self.start
-                )
+            return ft.average_voltage(v, t,
+                                      self.start - self.baseline_interval,
+                                      self.start)
 
         # Otherwise try to find an interval where things are pretty flat
         dv = ft.calculate_dvdt(v, t, filter_frequency)
         non_flat_points = np.flatnonzero(
-            np.abs(dv >= self.baseline_detect_thresh)
-            )
+            np.abs(dv >= self.baseline_detect_thresh))
         flat_intervals = t[non_flat_points[1:]] - t[non_flat_points[:-1]]
         long_flat_intervals = np.flatnonzero(
-            flat_intervals >= self.baseline_interval
-            )
+            flat_intervals >= self.baseline_interval)
         if long_flat_intervals.size > 0:
             interval_index = long_flat_intervals[0] + 1
             baseline_end_time = t[non_flat_points[interval_index]]
-            return ft.average_voltage(
-                v, t,
-                baseline_end_time - self.baseline_interval,
-                baseline_end_time)
+            return ft.average_voltage(v, t,
+                                      baseline_end_time -
+                                      self.baseline_interval,
+                                      baseline_end_time)
         else:
-            logging.info("Could not find sufficiently flat interval for "
-                         "automatic baseline voltage", RuntimeWarning)
+            logging.info(
+                "Could not find sufficiently flat interval for automatic "
+                "baseline voltage",
+                RuntimeWarning)
             return np.nan
 
     def voltage_deflection(self, deflect_type=None):
@@ -438,9 +439,10 @@ class EphysSweepFeatureExtractor:
         Parameters
         ----------
         deflect_type : measure minimal ('min') or maximal ('max') voltage
-            deflection. If not specified, it will check to see if the
-            current (i) is positive or negative between start and end,
-            then choose 'max' or 'min', respectively.
+        deflection
+            If not specified, it will check to see if the current (i) is
+            positive or negative
+            between start and end, then choose 'max' or 'min', respectively
             If the current is not defined, it will default to 'min'.
 
         Returns
@@ -466,9 +468,8 @@ class EphysSweepFeatureExtractor:
 
         if deflect_type is None:
             if self.i is not None:
-                halfway_index = ft.find_time_index(
-                    self.t, (end - start) / 2. + start
-                    )
+                halfway_index = ft.find_time_index(self.t,
+                                                   (end - start) / 2. + start)
                 if self.i[halfway_index] >= 0:
                     deflect_type = "max"
                 else:
@@ -491,7 +492,8 @@ class EphysSweepFeatureExtractor:
             return np.nan
 
     def estimate_time_constant(self):
-        """Calculate the membrane time constant by fitting the voltage response with a
+        """Calculate the membrane time constant by fitting the voltage
+        response with a
         single exponential.
 
         Returns
@@ -510,11 +512,10 @@ class EphysSweepFeatureExtractor:
 
         frac = 0.1
         search_result = np.flatnonzero(
-            self.v[start_index:] <= frac * (v_peak - v_baseline) + v_baseline
-            )
+            self.v[start_index:] <= frac * (v_peak - v_baseline) + v_baseline)
         if not search_result.size:
-            raise ft.FeatureError("could not find interval for time constant "
-                                  "estimate")
+            raise ft.FeatureError(
+                "could not find interval for time constant estimate")
         fit_start = self.t[search_result[0] + start_index]
         fit_end = self.t[peak_index]
 
@@ -529,7 +530,7 @@ class EphysSweepFeatureExtractor:
         Parameters
         ----------
         peak_width : window width to get more robust peak estimate in sec
-            (default 0.005)
+        (default 0.005)
 
         Returns
         -------
@@ -548,13 +549,12 @@ class EphysSweepFeatureExtractor:
             end = self.t[-1]
 
         v_peak, peak_index = self.voltage_deflection("min")
-        v_peak_avg = \
-            ft.average_voltage(v, t, start=t[peak_index] - peak_width / 2.,
-                               end=t[peak_index] + peak_width / 2.)
+        v_peak_avg = ft.average_voltage(v, t,
+                                        start=t[peak_index] - peak_width / 2.,
+                                        end=t[peak_index] + peak_width / 2.)
         v_baseline = self.sweep_feature("v_baseline")
-        v_steady = \
-            ft.average_voltage(v, t, start=end - self.baseline_interval,
-                               end=end)
+        v_steady = ft.average_voltage(v, t, start=end - self.baseline_interval,
+                                      end=end)
         sag = (v_peak_avg - v_steady) / (v_peak_avg - v_baseline)
         return sag
 
@@ -570,7 +570,7 @@ class EphysSweepFeatureExtractor:
         ----------
         key : feature name
         include_clipped: return values for every identified spike, even when
-            clipping means they will be incorrect/undefined
+        clipping means they will be incorrect/undefined
 
         Returns
         -------
@@ -578,9 +578,9 @@ class EphysSweepFeatureExtractor:
         """
 
         if not hasattr(self, "_spikes_df"):
-            raise AttributeError("EphysSweepFeatureExtractor instance "
-                                 " attribute with spike information does "
-                                 "not exist yet - have spikes been processed?")
+            raise AttributeError(
+                "EphysSweepFeatureExtractor instance attribute with spike "
+                "information does not exist yet - have spikes been processed?")
 
         if len(self._spikes_df) == 0:
             return np.array([])
@@ -592,11 +592,12 @@ class EphysSweepFeatureExtractor:
         values = self._spikes_df[key].values
 
         if include_clipped and force_exclude_clipped:
-            raise ValueError("include_clipped and force_exclude_clipped "
-                             "cannot both be true")
+            raise ValueError(
+                "include_clipped and force_exclude_clipped cannot both be "
+                "true")
 
-        if not include_clipped and \
-                self.is_spike_feature_affected_by_clipping(key):
+        if not include_clipped and self.is_spike_feature_affected_by_clipping(
+                key):
             values = values[~self._spikes_df["clipped"].values]
         elif force_exclude_clipped:
             values = values[~self._spikes_df["clipped"].values]
@@ -616,8 +617,8 @@ class EphysSweepFeatureExtractor:
         Parameters
         ----------
         key : name of sweep-level feature
-        allow_missing : return np.nan if key is missing for sweep
-            (default False)
+        allow_missing : return np.nan if key is missing for sweep (default
+        False)
 
         Returns
         -------
@@ -632,14 +633,13 @@ class EphysSweepFeatureExtractor:
             "stim_amp": self.stimulus_amplitude,
         }
 
-        if allow_missing and key not in self._sweep_features and \
-                key not in on_request_dispatch:
+        if allow_missing and key not in self._sweep_features and key not in \
+                on_request_dispatch:
             return np.nan
-        elif key not in self._sweep_features and \
-                key not in on_request_dispatch:
+        elif key not in self._sweep_features and key not in \
+                on_request_dispatch:
             raise KeyError(
-                "requested feature '{:s}' not available".format(key)
-                )
+                "requested feature '{:s}' not available".format(key))
 
         if key not in self._sweep_features and key in on_request_dispatch:
             fn = on_request_dispatch[key]
@@ -647,18 +647,16 @@ class EphysSweepFeatureExtractor:
                 self._sweep_features[key] = fn()
             else:
                 raise KeyError(
-                    "requested feature '{:s}' not defined".format(key)
-                    )
+                    "requested feature '{:s}' not defined".format(key))
 
         return self._sweep_features[key]
 
-    def process_new_spike_feature(self, feature_name,
-                                  feature_func,
+    def process_new_spike_feature(self, feature_name, feature_func,
                                   affected_by_clipping=False):
         """Add new spike-level feature calculation function
 
-           The function should take this sweep extractor as its argument. Its
-           results can be accessed by calling the method
+           The function should take this sweep extractor as its argument.
+           Its results can be accessed by calling the method
            spike_feature(<feature_name>).
         """
 
@@ -674,9 +672,9 @@ class EphysSweepFeatureExtractor:
     def process_new_sweep_feature(self, feature_name, feature_func):
         """Add new sweep-level feature calculation function
 
-           The function should take this sweep extractor as its argument. Its
-           results can be accessed by calling the method
-           sweep_feature(<feature_name>).
+           The function should take this sweep extractor as its argument.
+           Its results
+           can be accessed by calling the method sweep_feature(<feature_name>).
         """
 
         if feature_name in self._sweep_features:
@@ -714,25 +712,25 @@ class EphysSweepSetFeatureExtractor:
         t_set : list of ndarray of times in seconds
         v_set : list of ndarray of voltages in mV
         i_set : list of ndarray of currents in pA
-        start : start of time window for feature analysis (optional, can
-            be list)
+        start : start of time window for feature analysis (optional, can be
+        list)
         end : end of time window for feature analysis (optional, can be list)
         filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz
-            (optional, default 10)
+        (optional, default 10)
         dv_cutoff : minimum dV/dt to qualify as a spike in V/s (optional,
-            default 20)
+        default 20)
         max_interval : maximum acceptable time between start of spike and
-            time of peak in sec (optional, default 0.005)
+        time of peak in sec (optional, default 0.005)
         min_height : minimum acceptable height from threshold to peak in mV
-            (optional, default 2)
+        (optional, default 2)
         min_peak : minimum acceptable absolute peak level in mV (optional,
-            default -30)
+        default -30)
         thresh_frac : fraction of average upstroke for threshold calculation
-            (optional, default 0.05)
+        (optional, default 0.05)
         baseline_interval: interval length for baseline voltage calculation
-            (before start if start is defined, default 0.1)
+        (before start if start is defined, default 0.1)
         baseline_detect_thresh : dV/dt threshold for evaluating flatness of
-            baseline region (optional, default 0.3)
+        baseline region (optional, default 0.3)
         """
 
         if t_set is not None and v_set is not None:
@@ -746,7 +744,8 @@ class EphysSweepSetFeatureExtractor:
 
     @classmethod
     def from_sweeps(cls, sweep_list):
-        """Initialize EphysSweepSetFeatureExtractor object with a list of pre-existing
+        """Initialize EphysSweepSetFeatureExtractor object with a list of
+        pre-existing
         sweep feature extractor objects.
         """
 
@@ -768,18 +767,18 @@ class EphysSweepSetFeatureExtractor:
             raise ValueError("i_set must be a list")
 
         if len(t_set) != len(v_set):
-            raise ValueError("t_set and v_set must have the "
-                             "same number of items")
+            raise ValueError(
+                "t_set and v_set must have the same number of items")
 
         if i_set and len(t_set) != len(i_set):
-            raise ValueError("t_set and i_set must have the "
-                             "same number of items")
+            raise ValueError(
+                "t_set and i_set must have the same number of items")
 
         if id_set is None:
             id_set = range(len(t_set))
         if len(id_set) != len(t_set):
-            raise ValueError("t_set and id_set must have the "
-                             "same number of items")
+            raise ValueError(
+                "t_set and id_set must have the same number of items")
 
         sweeps = []
         if i_set is None:
@@ -789,20 +788,20 @@ class EphysSweepSetFeatureExtractor:
             start = [start] * len(t_set)
             end = [end] * len(t_set)
 
-        sweeps = [EphysSweepFeatureExtractor(
-                     t, v, i, start, end,
-                     filter=filter,
-                     dv_cutoff=dv_cutoff,
-                     max_interval=max_interval,
-                     min_height=min_height,
-                     min_peak=min_peak,
-                     thresh_frac=thresh_frac,
-                     baseline_interval=baseline_interval,
-                     baseline_detect_thresh=baseline_detect_thresh,
-                     id=sid
-                    )
-                  for t, v, i, start, end, sid in
-                  zip(t_set, v_set, i_set, start, end, id_set)]
+        sweeps = [
+            EphysSweepFeatureExtractor(
+                t, v, i, start, end,
+                filter=filter,
+                dv_cutoff=dv_cutoff,
+                max_interval=max_interval,
+                min_height=min_height,
+                min_peak=min_peak,
+                thresh_frac=thresh_frac,
+                baseline_interval=baseline_interval,
+                baseline_detect_thresh=baseline_detect_thresh,
+                id=sid)
+            for t, v, i, start, end, sid in zip(t_set, v_set, i_set, start,
+                                                end, id_set)]
 
         self._sweeps = sweeps
 
@@ -822,20 +821,20 @@ class EphysSweepSetFeatureExtractor:
         ----------
         key : name of sweep-level feature
         allow_missing : return np.nan if key is missing for sweep (default
-            False)
+        False)
 
         Returns
         -------
         sweep_feature : nparray of sweep-level feature values
         """
 
-        return np.array([swp.sweep_feature(key, allow_missing)
-                         for swp in self._sweeps])
+        return np.array(
+            [swp.sweep_feature(key, allow_missing) for swp in self._sweeps])
 
     def spike_feature_averages(self, key):
         """Get nparray of average spike-level feature (`key`) for all sweeps"""
-        return np.array([swp.spike_feature(key).mean()
-                         for swp in self._sweeps])
+        return np.array(
+            [swp.spike_feature(key).mean() for swp in self._sweeps])
 
 
 class EphysCellFeatureExtractor:
@@ -845,17 +844,18 @@ class EphysCellFeatureExtractor:
 
     def __init__(self, ramps_ext, short_squares_ext, long_squares_ext,
                  subthresh_min_amp=-100):
-        """Initialize EphysCellFeatureExtractor object from EphysSweepSetExtractors for
+        """Initialize EphysCellFeatureExtractor object from
+        EphysSweepSetExtractors for
         ramp, short square, and long square sweeps.
 
         Parameters
         ----------
         dataset : NwbDataSet
         ramps_ext : EphysSweepSetFeatureExtractor prepared with ramp sweeps
-        short_squares_ext : EphysSweepSetFeatureExtractor prepared with short
-            square sweeps
+        short_squares_ext : EphysSweepSetFeatureExtractor prepared with
+        short square sweeps
         long_squares_ext : EphysSweepSetFeatureExtractor prepared with long
-            square sweeps
+        square sweeps
         """
 
         self._ramps_ext = ramps_ext
@@ -875,8 +875,8 @@ class EphysCellFeatureExtractor:
         self._subthreshold_membrane_property_ext = None
 
     def process(self, keys=None):
-        """Processes features. Can take a specific key (or set of keys) to do
-        a subset of processing."""
+        """Processes features. Can take a specific key (or set of keys) to
+        do a subset of processing."""
 
         dispatch = {
             "ramps": self._analyze_ramps,
@@ -924,12 +924,12 @@ class EphysCellFeatureExtractor:
                           if sweep.sweep_feature("avg_rate") > 0]
 
         if len(spiking_sweeps) == 0:
-            raise ft.FeatureError("No spiking short square sweeps, "
-                                  "cannot compute cell features.")
+            raise ft.FeatureError(
+                "No spiking short square sweeps, cannot compute cell "
+                "features.")
 
         most_common = Counter(
-                map(_short_step_stim_amp, spiking_sweeps)
-            ).most_common()
+            map(_short_step_stim_amp, spiking_sweeps)).most_common()
         common_amp, common_count = most_common[0]
         for c in most_common[1:]:
             if c[1] < common_count:
@@ -938,11 +938,9 @@ class EphysCellFeatureExtractor:
                 common_amp = c[0]
 
         self._features["short_squares"]["stimulus_amplitude"] = common_amp
-        ext = \
-            EphysSweepSetFeatureExtractor.from_sweeps(
-                [sweep for sweep in spiking_sweeps
-                 if _short_step_stim_amp(sweep) == common_amp]
-                 )
+        ext = EphysSweepSetFeatureExtractor.from_sweeps(
+            [sweep for sweep in spiking_sweeps
+             if _short_step_stim_amp(sweep) == common_amp])
         self._short_squares_ext = ext
 
         self._features["short_squares"]["common_amp_sweeps"] = ext.sweeps()
@@ -969,88 +967,81 @@ class EphysCellFeatureExtractor:
         spiking_indexes = np.flatnonzero(ext.sweep_features("avg_rate"))
 
         if len(spiking_indexes) == 0:
-            raise ft.FeatureError("No spiking long square sweeps, "
-                                  "cannot compute cell features.")
+            raise ft.FeatureError(
+                "No spiking long square sweeps, cannot compute cell features.")
 
         amps = ext.sweep_features("stim_amp")  # self.long_squares_stim_amps()
         min_index = np.argmin(amps[spiking_indexes])
         rheobase_index = spiking_indexes[min_index]
         rheobase_i = _step_stim_amp(ext.sweeps()[rheobase_index])
 
-        self._features["long_squares"]["rheobase_extractor_index"] = \
-            rheobase_index
+        self._features["long_squares"][
+            "rheobase_extractor_index"] = rheobase_index
         self._features["long_squares"]["rheobase_i"] = rheobase_i
-        self._features["long_squares"]["rheobase_sweep"] = \
-            ext.sweeps()[rheobase_index]
+        self._features["long_squares"]["rheobase_sweep"] = ext.sweeps()[
+            rheobase_index]
         spiking_sweeps = [sweep for sweep in ext.sweeps()
                           if sweep.sweep_feature("avg_rate") > 0]
         self._spiking_long_squares_ext = \
-            EphysSweepSetFeatureExtractor.from_sweeps(spiking_sweeps)
-        self._features["long_squares"]["spiking_sweeps"] = \
-            self._spiking_long_squares_ext.sweeps()
+            EphysSweepSetFeatureExtractor.from_sweeps(
+                spiking_sweeps)
+        self._features["long_squares"][
+            "spiking_sweeps"] = self._spiking_long_squares_ext.sweeps()
 
-        self._features["long_squares"]["fi_fit_slope"] = \
-            fit_fi_slope(self._spiking_long_squares_ext)
+        self._features["long_squares"]["fi_fit_slope"] = fit_fi_slope(
+            self._spiking_long_squares_ext)
 
     def _analyze_long_squares_subthreshold(self):
         ext = self._long_squares_ext
-        subthresh_sweeps = [sweep for sweep in ext.sweeps() if
-                            sweep.sweep_feature("avg_rate") == 0]
-        subthresh_ext = \
-            EphysSweepSetFeatureExtractor.from_sweeps(subthresh_sweeps)
+        subthresh_sweeps = [sweep for sweep in ext.sweeps()
+                            if sweep.sweep_feature("avg_rate") == 0]
+        subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(
+            subthresh_sweeps)
         self._subthreshold_long_squares_ext = subthresh_ext
 
         if len(subthresh_ext.sweeps()) == 0:
-            raise ft.FeatureError("No subthreshold long square sweeps, "
-                                  "cannot evaluate cell features.")
+            raise ft.FeatureError(
+                "No subthreshold long square sweeps, cannot evaluate cell "
+                "features.")
 
         sags = subthresh_ext.sweep_features("sag")
-        sag_eval_levels = np.array([sweep.voltage_deflection()[0]
-                                    for sweep in subthresh_ext.sweeps()])
+        sag_eval_levels = np.array([sweep.voltage_deflection()[0] for sweep in
+                                    subthresh_ext.sweeps()])
         target_level = self.SAG_TARGET
         closest_index = np.argmin(np.abs(sag_eval_levels - target_level))
         self._features["long_squares"]["sag"] = sags[closest_index]
-        self._features["long_squares"]["vm_for_sag"] = \
-            sag_eval_levels[closest_index]
-        self._features["long_squares"]["subthreshold_sweeps"] = \
-            subthresh_ext.sweeps()
+        self._features["long_squares"]["vm_for_sag"] = sag_eval_levels[
+            closest_index]
+        self._features["long_squares"][
+            "subthreshold_sweeps"] = subthresh_ext.sweeps()
         for s in self._features["long_squares"]["subthreshold_sweeps"]:
             s.set_stimulus_amplitude_calculator(_step_stim_amp)
 
         logging.debug("subthresh_sweeps: %d", len(subthresh_sweeps))
-        calc_subthresh_sweeps = [sweep for sweep in subthresh_sweeps if
-                                 sweep.sweep_feature("stim_amp")
-                                 < self.SUBTHRESH_MAX_AMP and
-                                 sweep.sweep_feature("stim_amp")
-                                 > self._subthresh_min_amp]
+        calc_subthresh_sweeps = \
+            [sweep for sweep in subthresh_sweeps
+             if self._subthresh_min_amp < sweep.sweep_feature("stim_amp") < self.SUBTHRESH_MAX_AMP]    # noqa F501
 
         logging.debug("calc_subthresh_sweeps: %d", len(calc_subthresh_sweeps))
-        calc_subthresh_ext = \
-            EphysSweepSetFeatureExtractor.from_sweeps(calc_subthresh_sweeps)
+        calc_subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(
+            calc_subthresh_sweeps)
         self._subthreshold_membrane_property_ext = calc_subthresh_ext
-        self._features[
-            "long_squares"][
+        self._features["long_squares"][
             "subthreshold_membrane_property_sweeps"] = \
             calc_subthresh_ext.sweeps()
-        self._features[
-            "long_squares"][
-            "input_resistance"] = \
-            input_resistance(calc_subthresh_ext)
-        self._features[
-            "long_squares"][
-            "tau"] = membrane_time_constant(calc_subthresh_ext)
-        self._features[
-            "long_squares"][
-            "v_baseline"] = np.nanmean(ext.sweep_features("v_baseline"))
+        self._features["long_squares"]["input_resistance"] = input_resistance(
+            calc_subthresh_ext)
+        self._features["long_squares"]["tau"] = membrane_time_constant(
+            calc_subthresh_ext)
+        self._features["long_squares"]["v_baseline"] = np.nanmean(
+            ext.sweep_features("v_baseline"))
 
     def long_squares_features(self, option=None):
-
-        smpe = self._subthreshold_membrane_property_ext
-
         option_table = {
             "spiking": self._spiking_long_squares_ext,
             "subthreshold": self._subthreshold_long_squares_ext,
-            "subthreshold_membrane_property": smpe,
+            "subthreshold_membrane_property":
+                self._subthreshold_membrane_property_ext,
         }
         if option:
             return option_table[option]
@@ -1058,13 +1049,11 @@ class EphysCellFeatureExtractor:
         return self._long_squares_ext
 
     def long_squares_stim_amps(self, option=None):
-
-        smpe = self._subthreshold_membrane_property_ext
-
         option_table = {
             "spiking": self._spiking_long_squares_ext,
             "subthreshold": self._subthreshold_long_squares_ext,
-            "subthreshold_membrane_property": smpe,
+            "subthreshold_membrane_property":
+                self._subthreshold_membrane_property_ext,
         }
         if option:
             ext = option_table[option]
@@ -1084,7 +1073,7 @@ class EphysCellFeatureExtractor:
             "long_squares": self._features["long_squares"].copy(),
             "short_squares": self._features["short_squares"].copy(),
             "ramps": self._features["ramps"].copy(),
-            }
+        }
 
         # convert feature extractor lists to sweep dictionarsweep extract lists
         ls_sweeps = [s.as_dict() for s in out["long_squares"]["sweeps"]]
@@ -1093,9 +1082,8 @@ class EphysCellFeatureExtractor:
         rheo_sweep = out["long_squares"]["rheobase_sweep"].as_dict()
         ls_sub_sweeps = [s.as_dict() for s in
                          out["long_squares"]["subthreshold_sweeps"]]
-        ls_sub_mem_sweeps = \
-            [s.as_dict() for s in
-             out["long_squares"]["subthreshold_membrane_property_sweeps"]]
+        ls_sub_mem_sweeps = [s.as_dict() for s in out["long_squares"][
+            "subthreshold_membrane_property_sweeps"]]
         ss_sweeps = [s.as_dict() for s in
                      out["short_squares"]["common_amp_sweeps"]]
         ramp_sweeps = [s.as_dict() for s in out["ramps"]["spiking_sweeps"]]
@@ -1103,8 +1091,8 @@ class EphysCellFeatureExtractor:
         out["long_squares"]["sweeps"] = ls_sweeps
         out["long_squares"]["spiking_sweeps"] = ls_spike_sweeps
         out["long_squares"]["subthreshold_sweeps"] = ls_sub_sweeps
-        out["long_squares"]["subthreshold_membrane_property_sweeps"] = \
-            ls_sub_mem_sweeps
+        out["long_squares"][
+            "subthreshold_membrane_property_sweeps"] = ls_sub_mem_sweeps
         out["long_squares"]["rheobase_sweep"] = rheo_sweep
         out["short_squares"]["common_amp_sweeps"] = ss_sweeps
         out["ramps"]["spiking_sweeps"] = ramp_sweeps
@@ -1113,20 +1101,21 @@ class EphysCellFeatureExtractor:
 
 
 def input_resistance(ext):
-    """Estimate input resistance in MOhms, assuming all sweeps in passed extractor
+    """Estimate input resistance in MOhms, assuming all sweeps in passed
+    extractor
     are hyperpolarizing responses."""
 
     sweeps = ext.sweeps()
     if not sweeps:
-        raise ft.FeatureError("no sweeps available for input resistance "
-                              "calculation")
+        raise ft.FeatureError(
+            "no sweeps available for input resistance calculation")
 
     v_vals = []
     i_vals = []
     for sweep in sweeps:
         if sweep.i is None:
-            raise ft.FeatureError("cannot calculate input resistance: i "
-                                  "not defined for a sweep")
+            raise ft.FeatureError(
+                "cannot calculate input resistance: i not defined for a sweep")
 
         v_peak, min_index = sweep.voltage_deflection('min')
         v_vals.append(v_peak)
@@ -1162,8 +1151,9 @@ def fit_fi_slope(ext):
     """Fit the rate and stimulus amplitude to a line and return the slope of
     the fit."""
     if len(ext.sweeps()) < 2:
-        raise ft.FeatureError("Cannot fit f-I curve slope with less than "
-                              "two suprathreshold sweeps")
+        raise ft.FeatureError(
+            "Cannot fit f-I curve slope with less than two suprathreshold "
+            "sweeps")
 
     x = np.array(list(map(_step_stim_amp, ext.sweeps())))
     y = ext.sweep_features("avg_rate")
@@ -1181,8 +1171,8 @@ def reset_long_squares_start(when):
     LONG_SQUARES_END = when + delta
 
 
-def cell_extractor_for_nwb(dataset, ramps, short_squares,
-                           long_squares, subthresh_min_amp=-100):
+def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares,
+                           subthresh_min_amp=-100):
     """Initialize EphysCellFeatureExtractor object from NWB data set
 
     Parameters
@@ -1207,10 +1197,9 @@ def cell_extractor_for_nwb(dataset, ramps, short_squares,
     t_set = [s.t for s in temp_short_sq_ext.sweeps()]
     v_set = [s.v for s in temp_short_sq_ext.sweeps()]
     cutoff, thresh_frac = \
-        ft.estimate_adjusted_detection_parameters(
-            v_set, t_set,
-            SHORT_SQUARES_WINDOW_START,
-            SHORT_SQUARES_WINDOW_END)
+        ft.estimate_adjusted_detection_parameters(v_set, t_set,
+                                                  SHORT_SQUARES_WINDOW_START,
+                                                  SHORT_SQUARES_WINDOW_END)
 
     thresh_frac = max(thresh_frac, 0.1)
 
@@ -1256,8 +1245,8 @@ def extractor_for_nwb_sweeps(dataset, sweep_numbers,
         start = fixed_start
         end = fixed_end
 
-    return EphysSweepSetFeatureExtractor(t_set, v_set, i_set,
-                                         start=start, end=end,
+    return EphysSweepSetFeatureExtractor(t_set, v_set, i_set, start=start,
+                                         end=end,
                                          dv_cutoff=dv_cutoff,
                                          thresh_frac=thresh_frac,
                                          id_set=sweep_numbers)

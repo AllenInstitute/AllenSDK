@@ -1,12 +1,12 @@
 import argparse
 import allensdk.internal.core.lims_utilities as lu
 import glob
-import time
-import shutil
 import logging
 from allensdk.config.manifest import Manifest
 from allensdk.internal.brain_observatory.itracker import iTracker
-from allensdk.internal.brain_observatory.frame_stream import FfmpegInputStream, FfmpegOutputStream
+from allensdk.internal.brain_observatory.frame_stream import \
+    FfmpegInputStream, \
+    FfmpegOutputStream
 import h5py
 import ast
 import sys
@@ -14,17 +14,19 @@ import numpy as np
 
 DEFAULT_THRESHOLD_FACTOR = 1.6
 
-if sys.platform=='linux2':
+if sys.platform == 'linux2':
     FFMPEG_BIN = "/shared/utils.x86_64/ffmpeg/bin/ffmpeg"
-elif sys.platform=='darwin':
+elif sys.platform == 'darwin':
     FFMPEG_BIN = "/usr/local/bin/ffmpeg"
+
 
 def compute_bounding_box(points):
     if not points:
         return None
     points = np.array(points)
-    return [ points[:,0].min(), points[:,0].max(),
-             points[:,1].min(), points[:,1].max() ]
+    return [points[:, 0].min(), points[:, 0].max(),
+            points[:, 1].min(), points[:, 1].max()]
+
 
 def get_polygon(experiment_id, group_name):
     query = """
@@ -39,25 +41,29 @@ and os.id = %d
 """ % (group_name, experiment_id)
 
     try:
-        path = np.array([ int(v) for v in lu.query(query)[0]['path'].split(',') ])
-    except KeyError as e:
+        path = np.array(
+            [int(v) for v in lu.query(query)[0]['path'].split(',')])
+    except KeyError:
         return []
-    except IndexError as e:
+    except IndexError:
         return []
 
-    points = path.reshape((len(path)/2, 2))
+    points = path.reshape((len(path) / 2, 2))
 
     return points
 
+
 def get_experiment_info(experiment_id):
-    logging.info("Downloading paths/metadata for experiment ID: %d", experiment_id)
-    query = "select storage_directory, id from ophys_sessions where id = "+str(experiment_id)
+    logging.info("Downloading paths/metadata for experiment ID: %d",
+                 experiment_id)
+    query = "select storage_directory, id from ophys_sessions where id = " + \
+            str(experiment_id)
 
     storage_directory = lu.query(query)[0]['storage_directory']
     logging.info("\tStorage directory: %s", storage_directory)
 
-    movie_file = glob.glob(storage_directory+'*video-1.avi')[0]
-    metadata_file = glob.glob(storage_directory+'*video-1.h5')[0]
+    movie_file = glob.glob(storage_directory + '*video-1.avi')[0]
+    metadata_file = glob.glob(storage_directory + '*video-1.h5')[0]
 
     cr_points = get_polygon(experiment_id, 'Corneal Reflection Bounding Box')
     pupil_points = get_polygon(experiment_id, 'Pupil Bounding Box')
@@ -70,19 +76,23 @@ def get_experiment_info(experiment_id):
                 corneal_reflection_points=cr_points,
                 pupil_points=pupil_points)
 
+
 def get_movie_shape_from_metadata(metadata_file):
     with h5py.File(metadata_file, "r") as f:
-        metadata_str = f["video_metadata"].value
+        metadata_str = f["video_metadata"][()]
         metadata = ast.literal_eval(metadata_str)
 
     # assuming 3 channels
-    # movie_shape = (metadata['frames'], metadata['height'], metadata['width'], 3)
-    # in the metadata file from lims, the 'width' and 'height' variables are swapped,
-    # hopefully this is the same for every single experiment.
-    movie_shape = (metadata['frames'], metadata['width'], metadata['height'], 3)
+    # movie_shape = (metadata['frames'], metadata['height'], metadata[
+    # 'width'], 3)
+    # in the metadata file from lims, the 'width' and 'height' variables are
+    # swapped, hopefully this is the same for every single experiment.
+    movie_shape = (
+        metadata['frames'], metadata['width'], metadata['height'], 3)
     logging.info("movie_shape from metadata_file = %s", str(movie_shape))
 
     return movie_shape
+
 
 def run_itracker(movie_file, output_directory,
                  output_frames=False,
@@ -98,20 +108,19 @@ def run_itracker(movie_file, output_directory,
                  metadata_file=None,
                  movie_shape=None,
                  **kwargs):
-
     if output_directory is not None:
         Manifest.safe_mkdir(output_directory)
 
-    assert(metadata_file is not None and movie_shape is not None, "Must provide either metadata_file or movie_shape")
+    assert metadata_file is not None and movie_shape is not None, \
+        "Must provide either metadata_file or movie_shape"
 
     if metadata_file:
         movie_shape = get_movie_shape_from_metadata(metadata_file)
-       
+
     frame_shape = movie_shape[1:]
 
     if num_frames is None:
         num_frames = movie_shape[0]
-
 
     input_stream = FfmpegInputStream(movie_file, frame_shape,
                                      ffmpeg_bin=FFMPEG_BIN,
@@ -119,9 +128,11 @@ def run_itracker(movie_file, output_directory,
                                      cache_frames=cache_input_frames,
                                      block_size=input_block_size)
 
-    movie_output_stream = FfmpegOutputStream(frame_shape, 
-                                             block_size=output_annotated_movie_block_size,
-                                             ffmpeg_bin=FFMPEG_BIN) if output_annotated_movie else None
+    movie_output_stream = FfmpegOutputStream(
+        frame_shape,
+        block_size=output_annotated_movie_block_size,
+        ffmpeg_bin=FFMPEG_BIN) if \
+        output_annotated_movie else None
 
     itracker = iTracker(output_directory, input_stream=input_stream,
                         im_shape=(movie_shape[1], movie_shape[2]),
@@ -137,7 +148,6 @@ def run_itracker(movie_file, output_directory,
 
     if estimate_bbox:
         bbox_pupil, bbox_cr = itracker.estimate_bbox_from_mean_frame()
-
 
     itracker.process_movie(movie_output_stream=movie_output_stream,
                            output_frames=output_frames,
@@ -168,7 +178,7 @@ def main():
         output_directory=args.output_directory,
         num_frames=args.num_frames,
         estimate_bbox=args.estimate_bbox
-        )
+    )
 
     if args.experiment_id:
         info = get_experiment_info(args.experiment_id)
@@ -179,11 +189,14 @@ def main():
         if info.get('pupil_points', None):
             data['bbox_pupil'] = compute_bounding_box(info['pupil_points'])
         if info.get('corneal_reflection_points', None):
-            data['bbox_cr'] = compute_bounding_box(info['corneal_reflection_points'])
+            data['bbox_cr'] = compute_bounding_box(
+                info['corneal_reflection_points'])
     else:
         data['movie_file'] = args.movie_file
         data['metadata_file'] = args.metdata_file
 
     run_itracker(**data)
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()

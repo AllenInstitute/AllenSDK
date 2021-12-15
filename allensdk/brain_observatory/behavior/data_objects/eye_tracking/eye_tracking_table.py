@@ -19,7 +19,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     .writable_interfaces import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
-    process_eye_tracking_data, determine_outliers, determine_likely_blinks
+    process_eye_tracking_data, determine_outliers, determine_likely_blinks, \
+    EyeTrackingError
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
     import \
     EllipseSeries, EllipseEyeTracking
@@ -35,6 +36,12 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         super().__init__(name='eye_tracking', value=eye_tracking)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is actually no data in this data object,
+        # do not bother writing anything to the NWBFile
+        if self.value.empty:
+            return nwbfile
+
         eye_tracking_df = self.value
 
         eye_tracking = EllipseSeries(
@@ -90,6 +97,27 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         return nwbfile
 
     @classmethod
+    def _get_empty_df(cls) -> pd.DataFrame:
+        """
+        Return an empty dataframe with the correct column and index
+        names, but no data
+        """
+        empty_data = dict()
+        for colname in ['timestamps', 'cr_area', 'eye_area',
+                        'pupil_area', 'likely_blink', 'pupil_area_raw',
+                        'cr_area_raw', 'eye_area_raw', 'cr_center_x',
+                        'cr_center_y', 'cr_width', 'cr_height', 'cr_phi',
+                        'eye_center_x', 'eye_center_y', 'eye_width',
+                        'eye_height', 'eye_phi', 'pupil_center_x',
+                        'pupil_center_y', 'pupil_width', 'pupil_height',
+                        'pupil_phi']:
+            empty_data[colname] = []
+
+        eye_tracking_data = pd.DataFrame(empty_data,
+                                         index=pd.Index([], name='frame'))
+        return eye_tracking_data
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile,
                  z_threshold: float = 3.0,
                  dilation_frames: int = 2) -> Optional["EyeTrackingTable"]:
@@ -105,10 +133,11 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         try:
             eye_tracking_acquisition = nwbfile.acquisition['EyeTracking']
         except KeyError as e:
-            warnings.warn("This ophys session "
+            warnings.warn("This ophys experiment "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking data. (NWB error: {e})")
-            return None
+            eye_tracking_data = cls._get_empty_df()
+            return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
         eye_tracking = eye_tracking_acquisition.eye_tracking
         pupil_tracking = eye_tracking_acquisition.pupil_tracking
@@ -191,8 +220,17 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
             trim_after_spike=False)
 
-        eye_tracking_data = process_eye_tracking_data(data_file.data,
-                                                      frame_times,
-                                                      z_threshold,
-                                                      dilation_frames)
+        try:
+            eye_tracking_data = process_eye_tracking_data(
+                                             data_file.data,
+                                             frame_times,
+                                             z_threshold,
+                                             dilation_frames)
+        except EyeTrackingError as err:
+            msg = f"\nin sync_file: {sync_file.filepath}\n"
+            msg += f"{str(err)}\n"
+            msg += "returning empty eye_tracking DataFrame"
+            warnings.warn(msg)
+            eye_tracking_data = cls._get_empty_df()
+
         return EyeTrackingTable(eye_tracking=eye_tracking_data)

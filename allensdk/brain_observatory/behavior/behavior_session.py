@@ -101,21 +101,23 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         `BehaviorSession` instance
 
         """
+        if monitor_delay is None:
+            monitor_delay = cls._get_monitor_delay()
+
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = StimulusFile.from_json(dict_repr=session_data)
         stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
+            dict_repr=session_data,
+            monitor_delay=monitor_delay)
         running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data)
+            dict_repr=session_data,
+            monitor_delay=monitor_delay)
         raw_running_speed = RunningSpeed.from_json(
             dict_repr=session_data, filtered=False
         )
         running_speed = RunningSpeed.from_json(dict_repr=session_data)
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
-
-        if monitor_delay is None:
-            monitor_delay = cls._get_monitor_delay()
 
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
@@ -179,14 +181,20 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP
             )
 
+        if monitor_delay is None:
+            monitor_delay = cls._get_monitor_delay()
+
         behavior_session_id = BehaviorSessionId(behavior_session_id)
         stimulus_file = StimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
         if stimulus_timestamps is None:
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file)
+                stimulus_file=stimulus_file,
+                monitor_delay=monitor_delay)
         running_acquisition = RunningAcquisition.from_lims(
-            lims_db, behavior_session_id.value
+            lims_db,
+            behavior_session_id.value,
+            monitor_delay=monitor_delay
         )
         raw_running_speed = RunningSpeed.from_lims(
             lims_db, behavior_session_id.value, filtered=False,
@@ -199,9 +207,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
-
-        if monitor_delay is None:
-            monitor_delay = cls._get_monitor_delay()
 
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
@@ -904,8 +909,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
-            rewards=rewards,
-            monitor_delay=trial_monitor_delay
+            rewards=rewards
         )
         return licks, rewards, stimuli, task_parameters, trials
 

@@ -32,7 +32,8 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
     if isinstance(x1, pd.DataFrame):
         try:
             assert_frame_equal(x1, x2, check_like=True)
-        except Exception:
+        except AssertionError as e:
+            print(e)
             print(err_msg)
             raise
     elif isinstance(x1, np.ndarray):

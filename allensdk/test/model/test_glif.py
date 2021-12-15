@@ -121,6 +121,7 @@ def stimulus(neuron_config_file, ephys_sweeps_file):
     return stimulus
 
 
+@pytest.mark.todo_flaky
 def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # initialize the neuron
     neuron_config = json_utilities.read(neuron_config_file)

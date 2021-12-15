@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.2] = TBD
+- Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
+- Updates to support MESO.2
+- Loosens/updates required versions for several dependencies
+
+## [2.13.1] = 2021-10-04
+- Fixes bug that was preventing the BehaviorSession from properly instantiating passive sessions.
+
 ## [2.13.0] = 2021-09-22
 - Major internal refactor to BehaviorSession, BehaviorOphysExperiment classes. Implements DataObject pattern for fetching and serialization of data.
 

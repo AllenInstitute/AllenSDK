@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 class Trial:
     def __init__(self, trial: dict, start: float, end: float,
                  behavior_stimulus_file: StimulusFile,
-                 index: int, monitor_delay: float,
+                 index: int,
                  stimulus_timestamps: StimulusTimestamps,
                  licks: Licks, rewards: Rewards, stimuli: dict):
         self._trial = trial
@@ -21,7 +21,6 @@ class Trial:
             trial_end=end, behavior_stimulus_file=behavior_stimulus_file)
         self._index = index
         self._data = self._match_to_sync_timestamps(
-            monitor_delay=monitor_delay,
             stimulus_timestamps=stimulus_timestamps, licks=licks,
             rewards=rewards, stimuli=stimuli)
 
@@ -30,7 +29,7 @@ class Trial:
         return self._data
 
     def _match_to_sync_timestamps(
-            self, monitor_delay: float,
+            self,
             stimulus_timestamps: StimulusTimestamps,
             licks: Licks, rewards: Rewards,
             stimuli: dict) -> Dict[str, Any]:
@@ -93,8 +92,7 @@ class Trial:
             tr_data['hit'],
             tr_data['false_alarm'],
             tr_data["aborted"],
-            timestamps,
-            monitor_delay
+            timestamps
         ))
         tr_data.update(self._get_trial_image_names(stimuli))
 
@@ -193,8 +191,7 @@ class Trial:
             event_dict: dict,
             licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
             hit: bool, false_alarm: bool, aborted: bool,
-            timestamps: np.ndarray,
-            monitor_delay: float) -> Dict[str, Any]:
+            timestamps: np.ndarray) -> Dict[str, Any]:
         """
         Extract a dictionary of trial timing data.
         See trial_data_from_log for a description of the trial types.
@@ -221,10 +218,8 @@ class Trial:
         aborted: bool
             True if "aborted" trial, False otherwise
         timestamps: np.ndarray[1d]
-            Array of ground truth timestamps for the session
-            (sync times, if available)
-        monitor_delay: float
-            The monitor delay in seconds associated with the session
+            Array of ground truth timestamps for the session with
+            monitor_delay already added
 
         Returns
         =======
@@ -289,12 +284,22 @@ class Trial:
 
         response_time = _get_response_time(licks, aborted)
 
+        # In the code below, change_frame is incremented by one
+        # relative to its naive value in the pickle file. This
+        # is because the visual stimulus does not actually
+        # change until the start of the following frame.
+        #
+        # This behavior was confirmed with the MPE team
+        # over email in mid October 2021
+
         if go or auto_rewarded:
             change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-            change_time = timestamps[change_frame] + monitor_delay
+            change_frame += 1
+            change_time = timestamps[change_frame]
         elif catch:
             change_frame = event_dict.get(('sham_change', ''))['frame']
-            change_time = timestamps[change_frame] + monitor_delay
+            change_frame += 1
+            change_time = timestamps[change_frame]
         else:
             change_time = float("nan")
             change_frame = float("nan")

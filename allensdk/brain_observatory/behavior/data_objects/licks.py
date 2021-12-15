@@ -1,5 +1,4 @@
 import logging
-import warnings
 from typing import Optional
 
 import pandas as pd
@@ -86,18 +85,27 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         if 'licking' in nwbfile.processing:
             lick_module = nwbfile.processing['licking']
             licks = lick_module.get_data_interface('licks')
-
-            df = pd.DataFrame({
-                'timestamps': licks.timestamps[:],
-                'frame': licks.data[:]
-            })
+            timestamps = licks.timestamps[:]
+            frame = licks.data[:]
         else:
-            warnings.warn("This session "
-                          f"'{int(nwbfile.identifier)}' has no rewards data.")
-            return None
+            timestamps = []
+            frame = []
+
+        df = pd.DataFrame({
+            'timestamps': timestamps,
+            'frame': frame
+        })
+
         return cls(licks=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+
+        # If there is no lick data, do not write
+        # anything to the NWB file (this is
+        # expected for passive sessions)
+        if len(self.value['frame']) == 0:
+            return nwbfile
+
         lick_timeseries = TimeSeries(
             name='licks',
             data=self.value['frame'].values,

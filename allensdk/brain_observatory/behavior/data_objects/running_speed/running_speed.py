@@ -109,12 +109,18 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         behavior_session_id: int,
         filtered: bool = True,
         zscore_threshold: float = 10.0,
-        stimulus_timestamps: Optional[StimulusTimestamps] = None
+        stimulus_timestamps: Optional[StimulusTimestamps] = None,
+        monitor_delay: Optional[float] = None,
     ) -> "RunningSpeed":
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
         if stimulus_timestamps is None:
+            if monitor_delay is None:
+                raise RuntimeError("Must specify monitor delay "
+                                   "if you are not specifying "
+                                   "stimulus_timestamps")
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file
+                stimulus_file=stimulus_file,
+                monitor_delay=monitor_delay
             )
 
         running_speed = cls._get_running_speed_df(

@@ -34,7 +34,7 @@ def add_experience_level_to_experiment_table(
     session_123 = experiments_table.session_number.isin([1, 2, 3])
     familiar_indices = experiments_table[session_123].index.values
 
-    experiments_table.at[familiar_indices, 'experience_level'] = 'Familiar'
+    experiments_table.loc[familiar_indices, 'experience_level'] = 'Familiar'
 
     session_4 = (experiments_table.session_number == 4)
     zero_prior_exp = (experiments_table.prior_exposures_to_image_set == 0)
@@ -43,8 +43,7 @@ def add_experience_level_to_experiment_table(
                           session_4
                           & zero_prior_exp].index.values
 
-    experiments_table.at[novel_indices,
-                         'experience_level'] = 'Novel 1'
+    experiments_table.loc[novel_indices, 'experience_level'] = 'Novel 1'
 
     session_456 = experiments_table.session_number.isin([4, 5, 6])
     nonzero_prior_exp = (experiments_table.prior_exposures_to_image_set != 0)
@@ -52,8 +51,7 @@ def add_experience_level_to_experiment_table(
                              session_456
                              & nonzero_prior_exp].index.values
 
-    experiments_table.at[novel_gt_1_indices,
-                         'experience_level'] = 'Novel >1'
+    experiments_table.loc[novel_gt_1_indices, 'experience_level'] = 'Novel >1'
 
     return experiments_table
 
@@ -88,7 +86,7 @@ def add_passive_flag_to_ophys_experiment_table(
 
     session_25 = experiments_table.session_number.isin([2, 5])
     passive_indices = experiments_table[session_25].index.values
-    experiments_table.at[passive_indices, 'passive'] = True
+    experiments_table.loc[passive_indices, 'passive'] = True
 
     return experiments_table
 
