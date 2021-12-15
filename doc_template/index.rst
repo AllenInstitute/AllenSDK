@@ -123,6 +123,7 @@ What's New - 2.13.2
 - Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
 - Updates to support MESO.2
 - Loosens/updates required versions for several dependencies
+- Updates in order to generate valid NWB files for Neuropixels Visual Coding data collected between 2019 and 2021
 
 What's New - 2.13.1
 -----------------------------------------------------------------------
