@@ -34,15 +34,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 def list_of_dicts_to_dict_of_lists(list_of_dicts):
-    return {key:[item[key] for item in list_of_dicts] for key in list_of_dicts[0].keys() }
+    return {key: [item[key] for item in list_of_dicts] for key in
+            list_of_dicts[0].keys()}
+
 
 def dict_generator(indict, pre=None):
-
     pre = pre[:] if pre else []
     if isinstance(indict, dict):
         for key, value in indict.items():
             if isinstance(value, dict):
-                for d in dict_generator(value, pre + [key] ):
+                for d in dict_generator(value, pre + [key]):
                     yield d
             elif isinstance(value, list):
                 for v in value:
@@ -53,15 +54,15 @@ def dict_generator(indict, pre=None):
     else:
         yield indict
 
+
 def read_h5_group(g):
     return_dict = {}
     if len(g.attrs) > 0:
         return_dict['attrs'] = dict(g.attrs)
     for key in g:
         if key == 'data':
-            return_dict[key] = g[key].value
+            return_dict[key] = g[key][()]
         else:
             return_dict[key] = read_h5_group(g[key])
 
     return return_dict
-

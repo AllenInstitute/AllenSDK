@@ -439,21 +439,21 @@ def test_module(input_json):
     aligner = ts.OphysTimeAligner(sync_file, **input_data)
     with h5py.File(output_file) as f:
         t, d = aligner.corrected_ophys_timestamps
-        assert np.all(t == f['twop_vsync_fall'].value)
-        assert np.all(d == f['ophys_delta'].value)
+        assert np.all(t == f['twop_vsync_fall'][()])
+        assert np.all(d == f['ophys_delta'][()])
         st, sd, stim_delay = aligner.corrected_stim_timestamps
         align = ts.get_alignment_array(t, st)
-        assert np.allclose(align, f['stimulus_alignment'].value,
+        assert np.allclose(align, f['stimulus_alignment'][()],
                            equal_nan=True)
-        assert np.all(sd == f['stim_delta'].value)
+        assert np.all(sd == f['stim_delta'][()])
         et, ed = aligner.corrected_eye_video_timestamps
         align = ts.get_alignment_array(et, t, int_method=np.ceil)
-        assert np.allclose(align, f['eye_tracking_alignment'].value,
+        assert np.allclose(align, f['eye_tracking_alignment'][()],
                            equal_nan=True)
-        assert np.all(ed == f['eye_delta'].value)
+        assert np.all(ed == f['eye_delta'][()])
         bt, bd = aligner.corrected_behavior_video_timestamps
         align = ts.get_alignment_array(bt, t, int_method=np.ceil)
-        assert np.allclose(align, f['body_camera_alignment'].value,
+        assert np.allclose(align, f['body_camera_alignment'][()],
                            equal_nan=True)
 
 

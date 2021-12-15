@@ -122,6 +122,7 @@ What's New - 2.13.2
 -----------------------------------------------------------------------
 - Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
 - Updates to support MESO.2
+- Loosens/updates required versions for several dependencies
 
 What's New - 2.13.1
 -----------------------------------------------------------------------

@@ -2,7 +2,6 @@ import re
 from typing import Union
 import difflib
 import pandas as pd
-import numpy as np
 
 
 class WhitespaceStrippedString(object):
@@ -110,11 +109,11 @@ def safe_df_comparison(expected: pd.DataFrame,
             msg += '\nindex mismatch in non-null when checking '
             msg += f'{col}\n'
         for index_val in expected_valid.index.values:
-            e = expected_valid.at[index_val, col]
-            o = obtained_valid.at[index_val, col]
-            if isinstance(e, np.ndarray):
+            e = expected_valid.loc[index_val, col]
+            o = obtained_valid.loc[index_val, col]
+            if isinstance(e, pd.Series):
                 e = list(e)
-            if isinstance(o, np.ndarray):
+            if isinstance(o, pd.Series):
                 o = list(o)
             if not e == o:
                 msg += f'\n{col}\n'
