@@ -514,14 +514,6 @@ class StimulusAnalysis(object):
 
         return lifetime_sparseness(responses)
 
-    def _get_reliability(self, unit_id, preferred_condition):
-        # Reliability calculation goes here:
-        #   Depends on the trial-to-trial correlation of the smoothed response
-        #   What smoothing window is appropriate for ephys? We need to test
-        #   this more
-        # TODO: If not implemented soon should be removed
-        return np.nan
-
     def _get_fano_factor(self, unit_id, preferred_condition):
         #   See: https://en.wikipedia.org/wiki/Fano_factor
         subset = self.presentationwise_statistics[
