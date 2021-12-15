@@ -683,6 +683,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
 
     exp_electrodes = \
         pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
+    exp_electrodes = exp_electrodes.rename(columns={'impedence': 'imp'})
     exp_electrodes.rename(columns={"anterior_posterior_ccf_coordinate": "x",
                                    "dorsal_ventral_ccf_coordinate": "y",
                                    "left_right_ccf_coordinate": "z",
