@@ -6,7 +6,7 @@ import SimpleITK as sitk
 import numpy as np
 import pandas as pd
 import xarray as xr
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 
 def compare_fields(x1: Any, x2: Any, err_msg="",
