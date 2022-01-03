@@ -84,7 +84,8 @@ jobs:
               --mount type=tmpfs,destination=/tmp \
               --rm \
               ${{ matrix.image }} \
-                  /bin/bash -c "pip install -r requirements.txt; \
+                  /bin/bash -c "conda install pytables; \
+                                pip install -r requirements.txt; \
                                 pip install -r test_requirements.txt; \
                                 python -m pytest \
                                     --capture=no \
