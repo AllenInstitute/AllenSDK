@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.13.2] = TBD
+## [2.13.2] = 2022-01-03
 - Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
 - Updates to support MESO.2
 - Loosens/updates required versions for several dependencies
