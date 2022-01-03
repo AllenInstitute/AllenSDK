@@ -129,6 +129,11 @@ class NwbOphysMetadataSchema(RaisingSchema):
 
 
 class OphysMetadataSchema(NwbOphysMetadataSchema):
+    neurodata_type = 'OphysMetadata'
+    neurodata_type_inc = 'LabMetaData'
+    neurodata_doc = "Metadata for ophys experiments"
+    neurodata_skip = {"date_of_acquisition"}
+
     """This schema contains metadata pertaining to optical physiology (ophys).
     """
     ophys_experiment_id = fields.Int(

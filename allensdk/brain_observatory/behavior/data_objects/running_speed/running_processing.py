@@ -298,7 +298,7 @@ def _zscore_threshold_1d(data: np.ndarray,
         corrected_data[np.abs(scores) > threshold] = np.nan
     return corrected_data
 
-
+# TODO: Use a check to verify vsig location
 def get_running_df(
     data, time: np.ndarray, lowpass: bool = True, zscore_threshold=10.0
 ):
@@ -351,8 +351,8 @@ def get_running_df(
     their own corrections and compute running speed from the raw
     source.
     """
-    v_sig = data["items"]["behavior"]["encoders"][0]["vsig"]
-    v_in = data["items"]["behavior"]["encoders"][0]["vin"]
+    v_sig = data["items"]['foraging']["encoders"][0]["vsig"]
+    v_in = data["items"]['foraging']["encoders"][0]["vin"]
 
     if len(v_in) > len(time) + 1:
         error_string = ("length of v_in ({}) cannot be longer than length of "
@@ -372,7 +372,7 @@ def get_running_df(
     # dx = 'd_theta' = angular change
     # There are some issues with angular change in the raw data so we
     # recompute this value
-    dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
+    dx_raw = data["items"]["foraging"]["encoders"][0]["dx"]
     # Identify "wraps" in the voltage signal that need to be unwrapped
     # This is where the encoder switches from 0V to 5V or vice versa
     pos_wraps, neg_wraps = _identify_wraps(

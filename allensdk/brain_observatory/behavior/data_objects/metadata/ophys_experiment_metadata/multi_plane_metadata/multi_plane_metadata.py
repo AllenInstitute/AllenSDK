@@ -25,11 +25,12 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.internal.api import PostgresQueryMixin
 
 
+#TODO: Implement a check to see if experiment containers exist
 class MultiplaneMetadata(OphysExperimentMetadata):
     def __init__(self,
                  ophys_experiment_id: int,
                  ophys_session_id: OphysSessionId,
-                 experiment_container_id: ExperimentContainerId,
+                 #experiment_container_id: ExperimentContainerId,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  imaging_plane_group: ImagingPlaneGroup,
@@ -37,7 +38,7 @@ class MultiplaneMetadata(OphysExperimentMetadata):
         super().__init__(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            experiment_container_id=experiment_container_id,
+            #experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
             project_code=project_code
@@ -55,7 +56,7 @@ class MultiplaneMetadata(OphysExperimentMetadata):
         return cls(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            experiment_container_id=ophys_experiment_metadata._experiment_container_id,     # noqa E501
+            #experiment_container_id=ophys_experiment_metadata._experiment_container_id,     # noqa E501
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,

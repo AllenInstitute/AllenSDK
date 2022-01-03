@@ -73,6 +73,36 @@ groups:
   - name: stimulus_frame_rate
     dtype: float
     doc: Frame rate (frames/second) of the visual_stimulus from the monitor
+- neurodata_type_def: OphysMetadata
+  neurodata_type_inc: LabMetaData
+  doc: Metadata for ophys experiments
+  attributes:
+  - name: ophys_experiment_id
+    dtype: int
+    doc: Unique ID for the ophys experiment (aka imaging plane)
+  - name: ophys_session_id
+    dtype: int
+    doc: Unique ID for the ophys session
+  - name: experiment_container_id
+    dtype: int
+    doc: Container ID for the container that contains this ophys session
+  - name: imaging_depth
+    dtype: int
+    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: field_of_view_width
+    dtype: int
+    doc: Width of optical physiology imaging plane in pixels
+  - name: field_of_view_height
+    dtype: int
+    doc: Height of optical physiology imaging plane in pixels
+  - name: imaging_plane_group
+    dtype: int
+    doc: A numeric index which indicates the order that an imaging plane was acquired
+      for a mesoscope experiment. Will be -1 for non-mesoscope data
+  - name: imaging_plane_group_count
+    dtype: int
+    doc: The total number of plane groups collected in a session for a mesoscope experiment.
+      Will be 0 if the scope did not capture multiple concurrent imaging planes.
 - neurodata_type_def: OphysBehaviorMetadata
   neurodata_type_inc: BehaviorMetadata
   doc: Metadata for behavior + ophys experiments
