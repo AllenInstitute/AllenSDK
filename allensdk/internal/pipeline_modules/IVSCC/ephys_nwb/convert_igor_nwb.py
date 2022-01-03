@@ -11,13 +11,13 @@ import nwb
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 # development/debugging code
-#infile = "Ndnf-IRES2-dgCre_Ai14-256189.05.01-compressed.nwb"
-#outfile = "foo.nwb"
-#if len(sys.argv) == 1:
+# infile = "Ndnf-IRES2-dgCre_Ai14-256189.05.01-compressed.nwb"
+# outfile = "foo.nwb"
+# if len(sys.argv) == 1:
 #    sys.argv.append(infile)
 #    sys.argv.append(outfile)
 
-# this script is meant to clone the core functionality of the 
+# this script is meant to clone the core functionality of the
 #   existing (Igor) Hdf5->Nwb converter.
 # the previous converter performed two distinct tasks. In this iteration,
 #   those tasks will be split into separate modules. This module will
@@ -52,7 +52,7 @@ def main():
         # parse out sweep number
         try:
             num = int(k[5:10])
-        except:
+        except Exception:
             print("Error - unexpected sweep name encountered in IGOR nwb file")
             print("Sweep called: '%s'" % k)
             print("Expecting 5-digit sweep number between chars 5 and 9")
@@ -63,7 +63,7 @@ def main():
             acq.move(k, swp)
             ts = acq[swp]
             ts.move("stimulus_description", "aibs_stimulus_description")
-        except:
+        except Exception:
             print("*** Error renaming HDF5 object in %s" % swp)
             type_, value_, traceback_ = sys.exc_info()
             print(traceback.print_tb(traceback_))
@@ -74,22 +74,22 @@ def main():
             scale = float(data.attrs["conversion"])
             data[...] = data.value * scale
             data.attrs["conversion"] = 1.0
-        except:
+        except Exception:
             print("*** Error rescaling data in %s" % swp)
             type_, value_, traceback_ = sys.exc_info()
             print(traceback.print_tb(traceback_))
             sys.exit(1)
         # keep track of sweep numbers
-        sweep_nums.append("%d"%num)
-        
+        sweep_nums.append("%d" % num)
+
     ###################################
-    #... ditto for stimulus time series
+    # ... ditto for stimulus time series
     stim = f["stimulus/presentation"]
     for k, v in iteritems(stim):
         # parse out sweep number
         try:
             num = int(k[5:10])
-        except:
+        except Exception:
             print("Error - unexpected sweep name encountered in IGOR nwb file")
             print("Sweep called: '%s'" % k)
             print("Expecting 5-digit sweep number between chars 5 and 9")
@@ -97,7 +97,7 @@ def main():
         swp = "Sweep_%d" % num
         try:
             stim.move(k, swp)
-        except:
+        except Exception:
             print("Error renaming HDF5 group from %s to %s" % (k, swp))
             sys.exit(1)
         # rescale contents of data so conversion is 1.0
@@ -107,12 +107,12 @@ def main():
             scale = float(data.attrs["conversion"])
             data[...] = data.value * scale
             data.attrs["conversion"] = 1.0
-        except:
+        except Exception:
             print("*** Error rescaling data in %s" % swp)
             type_, value_, traceback_ = sys.exc_info()
             print(traceback.print_tb(traceback_))
             sys.exit(1)
-        
+
     f.close()
 
     ####################################################################
@@ -121,29 +121,31 @@ def main():
     for num in sweep_nums:
         ts = nd.file_pointer["acquisition/timeseries/Sweep_" + num]
         # sweep epoch
-        t0 = ts["starting_time"].value
+        t0 = ts["starting_time"][()]
         rate = float(ts["starting_time"].attrs["rate"])
         n = float(ts["num_samples"].value)
-        t1 = t0 + (n-1) * rate
+        t1 = t0 + (n - 1) * rate
         ep = nd.create_epoch("Sweep_" + num, t0, t1)
-        ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_"+num)
-        ep.add_timeseries("response", "acquisition/timeseries/Sweep_"+num)
+        ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_" + num)
+        ep.add_timeseries("response", "acquisition/timeseries/Sweep_" + num)
         ep.finalize()
         if "CurrentClampSeries" in ts.attrs["ancestry"]:
             # test pulse epoch
-            t0 = ts["starting_time"].value
+            t0 = ts["starting_time"][()]
             t1 = t0 + PULSE_LEN
             ep = nd.create_epoch("TestPulse_" + num, t0, t1)
-            ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_"+num)
-            ep.add_timeseries("response", "acquisition/timeseries/Sweep_"+num)
+            ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_" + num)
+            ep.add_timeseries("response",
+                              "acquisition/timeseries/Sweep_" + num)
             ep.finalize()
             # experiment epoch
-            t0 = ts["starting_time"].value
-            t1 = t0 + (n-1) * rate
+            t0 = ts["starting_time"][()]
+            t1 = t0 + (n - 1) * rate
             t0 += EXPERIMENT_START_TIME
             ep = nd.create_epoch("Experiment_" + num, t0, t1)
-            ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_"+num)
-            ep.add_timeseries("response", "acquisition/timeseries/Sweep_"+num)
+            ep.add_timeseries("stimulus", "stimulus/presentation/Sweep_" + num)
+            ep.add_timeseries("response",
+                              "acquisition/timeseries/Sweep_" + num)
             ep.finalize()
     nd.close()
 
@@ -151,9 +153,11 @@ def main():
     # execute hdf5-repack to get it back to its original size
     try:
         print("Repacking hdf5 file with compression")
-        process = subprocess.Popen(["h5repack", "-f", "GZIP=4", tmpfile, outfile], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ["h5repack", "-f", "GZIP=4", tmpfile, outfile],
+            stdout=subprocess.PIPE)
         process.wait()
-    except:
+    except Exception:
         print("Unable to run h5repack on temporary nwb file")
         print("--------------------------------------------")
         raise
@@ -161,7 +165,7 @@ def main():
     try:
         print("Removing temporary file")
         os.remove(tmpfile)
-    except:
+    except Exception:
         print("Unable to delete temporary file ('%s')" % tmpfile)
         raise
 
@@ -169,6 +173,5 @@ def main():
     module.write_output_data({})
 
 
-
-if __name__=='__main__': main()
-
+if __name__ == '__main__':
+    main()

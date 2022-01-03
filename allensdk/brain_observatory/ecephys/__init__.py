@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 UNIT_FILTER_DEFAULTS = {
     "amplitude_cutoff_maximum": {
         "value": 0.1,
@@ -23,7 +22,7 @@ def get_unit_filter_value(key, pop=True, replace_none=True, **source):
         value = source.pop(key, UNIT_FILTER_DEFAULTS[key]["value"])
     else:
         value = source.get(key, UNIT_FILTER_DEFAULTS[key]["value"])
-    
+
     if value is None and replace_none:
         value = UNIT_FILTER_DEFAULTS[key]["missing"]
 

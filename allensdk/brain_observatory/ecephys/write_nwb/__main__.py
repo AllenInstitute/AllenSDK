@@ -15,7 +15,6 @@ from hdmf.backends.hdf5.h5_utils import H5DataIO
 from allensdk.config.manifest import Manifest
 
 from ._schemas import InputSchema, OutputSchema
-from allensdk.brain_observatory.nwb import setup_table_for_invalid_times  # noqa: F401
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
@@ -28,15 +27,18 @@ from allensdk.brain_observatory.nwb import (
     eye_tracking_data_is_valid
 )
 from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs, optional_lims_inputs
+    optional_lims_inputs
 )
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.ecephys.nwb import (EcephysProbe,
-                                                    EcephysElectrodeGroup,
-                                                    EcephysSpecimen,
-                                                    EcephysEyeTrackingRigMetadata,
-                                                    EcephysCSD)
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import (
+    ContinuousFile
+)
+from allensdk.brain_observatory.ecephys.nwb import (
+    EcephysProbe,
+    EcephysElectrodeGroup,
+    EcephysSpecimen,
+    EcephysEyeTrackingRigMetadata,
+    EcephysCSD)
 from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
 
@@ -64,10 +66,15 @@ def fill_df(df, str_fill=""):
     return df
 
 
-def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
+def get_inputs_from_lims(host,
+                         ecephys_session_id,
+                         output_root,
+                         job_queue,
+                         strategy):
     """
-     This is a development / testing utility for running this module from the Allen Institute for Brain Science's
-    Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
+     This is a development / testing utility for running this module from the
+     Allen Institute for Brain Science's Laboratory Information Management
+     System (LIMS). It will only work if you are on our internal network.
 
     Parameters
     ----------
@@ -87,7 +94,10 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
 
     """
 
-    uri = f"{host}/input_jsons?object_id={ecephys_session_id}&object_class=EcephysSession&strategy_class={strategy}&job_queue_name={job_queue}&output_directory={output_root}"
+    uri = f"{host}/input_jsons?object_id={ecephys_session_id}" + \
+          f"&object_class=EcephysSession&strategy_class={strategy}" + \
+          f"&job_queue_name={job_queue}&output_directory={output_root}"
+
     response = requests.get(uri)
     data = response.json()
 
@@ -148,8 +158,9 @@ def read_spike_times_to_dictionary(
     spike_times_path : str
         npy file identifying, per spike, the time at which that spike occurred.
     spike_units_path : str
-        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a
-        local_to_global_unit_map is used to associate spikes with global unit identifiers.
+        npy file identifying, per spike, the unit associated with that spike.
+        These are probe-local, so a local_to_global_unit_map is used to
+        associate spikes with global unit identifiers.
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
 
@@ -178,7 +189,8 @@ def read_spike_amplitudes_to_dictionary(
 
     templates = load_and_squeeze_npy(templates_path)
     spike_templates = load_and_squeeze_npy(spike_templates_path)
-    inverse_whitening_matrix = load_and_squeeze_npy(inverse_whitening_matrix_path)
+    inverse_whitening_matrix = \
+        load_and_squeeze_npy(inverse_whitening_matrix_path)
 
     for temp_idx in range(templates.shape[0]):
         templates[temp_idx, :, :] = np.dot(
@@ -186,11 +198,20 @@ def read_spike_amplitudes_to_dictionary(
             np.ascontiguousarray(inverse_whitening_matrix)
         )
 
-    scaled_amplitudes = scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=scale_factor)
-    return group_1d_by_unit(scaled_amplitudes, spike_units, local_to_global_unit_map)
+    scaled_amplitudes = scale_amplitudes(spike_amplitudes,
+                                         templates,
+                                         spike_templates,
+                                         scale_factor=scale_factor)
+
+    return group_1d_by_unit(scaled_amplitudes,
+                            spike_units,
+                            local_to_global_unit_map)
 
 
-def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=1.0):
+def scale_amplitudes(spike_amplitudes,
+                     templates,
+                     spike_templates,
+                     scale_factor=1.0):
 
     template_full_amplitudes = templates.max(axis=1) - templates.min(axis=1)
     template_amplitudes = template_full_amplitudes.max(axis=1)
@@ -200,8 +221,13 @@ def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=
     return spike_amplitudes
 
 
-def filter_and_sort_spikes(spike_times_mapping: Dict[int, np.ndarray],
-                           spike_amplitudes_mapping: Dict[int, np.ndarray]) -> Tuple[Dict[int, np.ndarray], Dict[int, np.ndarray]]:
+def filter_and_sort_spikes(spike_times_mapping:
+                           Dict[int, np.ndarray],
+                           spike_amplitudes_mapping:
+                           Dict[int, np.ndarray]) -> Tuple[Dict[int,
+                                                                np.ndarray],
+                                                           Dict[int,
+                                                                np.ndarray]]:
     """Filter out invalid spike timepoints and sort spike data
     (times + amplitudes) by times.
 
@@ -298,11 +324,13 @@ def read_waveforms_to_dictionary(
     Parameters
     ----------
     waveforms_path : str
-        npy file containing waveform data for each unit. Dimensions ought to be units X samples X channels
+        npy file containing waveform data for each unit. Dimensions ought to
+        be units X samples X channels
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
     peak_channel_map : dict, optional
-        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak
+        Maps unit identifiers to indices of peak channels. If provided,
+        the output will contain only samples on the peak
         channel for each unit.
 
     Returns
@@ -320,7 +348,8 @@ def read_waveforms_to_dictionary(
         if local_to_global_unit_map is not None:
             if unit_id not in local_to_global_unit_map:
                 logging.warning(
-                    f"unable to find unit at local position {unit_id} while reading waveforms"
+                    f"""unable to find unit at local position
+                        {unit_id} while reading waveforms"""
                 )
                 continue
             unit_id = local_to_global_unit_map[unit_id]
@@ -395,7 +424,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
 
     """
     probe_nwb_device = EcephysProbe(name=name,
-                                    description="Neuropixels 1.0 Probe",  # required field
+                                    description="Neuropixels 1.0 Probe",
                                     manufacturer="imec",
                                     probe_id=probe_id,
                                     sampling_rate=sampling_rate)
@@ -417,7 +446,8 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
 
 
 def add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
-                                  columns_to_add: Optional[List[Tuple[str, str]]] = None):
+                                  columns_to_add:
+                                  Optional[List[Tuple[str, str]]] = None):
     """Add additional columns to ecephys nwbfile electrode table.
 
     Parameters
@@ -430,8 +460,10 @@ def add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
         columns are added.
     """
     default_columns = [
-        ("probe_vertical_position", "Length-wise position of electrode/channel on device (microns)"),
-        ("probe_horizontal_position", "Width-wise position of electrode/channel on device (microns)"),
+        ("probe_vertical_position",
+         "Length-wise position of electrode/channel on device (microns)"),
+        ("probe_horizontal_position",
+         "Width-wise position of electrode/channel on device (microns)"),
         ("probe_id", "The unique id of this electrode's/channel's device"),
         ("local_index", "The local index of electrode/channel on device"),
         ("valid_data", "Whether data from this electrode/channel is usable")
@@ -441,7 +473,8 @@ def add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
         columns_to_add = default_columns
 
     for col_name, col_description in columns_to_add:
-        if (not nwbfile.electrodes) or (col_name not in nwbfile.electrodes.colnames):
+        if (not nwbfile.electrodes) or \
+                (col_name not in nwbfile.electrodes.colnames):
             nwbfile.add_electrode_column(name=col_name,
                                          description=col_description)
 
@@ -461,11 +494,16 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
             id: The unique id for a given electrode/channel
             probe_id: The unique id for an electrode's/channel's device
             valid_data: Whether the data for an electrode/channel is usable
-            local_index: The local index of an electrode/channel on a given device
-            probe_vertical_position: Length-wise position of electrode/channel on device (microns)
-            probe_horizontal_position: Width-wise position of electrode/channel on device (microns)
-            manual_structure_id: The LIMS id associated with an anatomical structure
-            manual_structure_acronym: Acronym associated with an anatomical structure
+            local_index: The local index of an electrode/channel on a
+                         given device
+            probe_vertical_position: Length-wise position of electrode/channel
+                         on device (microns)
+            probe_horizontal_position: Width-wise position of electrode/channel
+                         on device (microns)
+            manual_structure_id: The LIMS id associated with an anatomical
+                         structure
+            manual_structure_acronym: Acronym associated with an anatomical
+                         structure
             anterior_posterior_ccf_coordinate
             dorsal_ventral_ccf_coordinate
             left_right_ccf_coordinate
@@ -515,7 +553,8 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
 def add_ragged_data_to_dynamic_table(
     table, data, column_name, column_description=""
 ):
-    """ Builds the index and data vectors required for writing ragged array data to a pynwb dynamic table
+    """ Builds the index and data vectors required for writing ragged array
+    data to a pynwb dynamic table
 
     Parameters
     ----------
@@ -538,7 +577,10 @@ def add_ragged_data_to_dynamic_table(
     del data
 
     table.add_column(
-        name=column_name, description=column_description, data=values, index=idx
+        name=column_name,
+        description=column_description,
+        data=values,
+        index=idx
     )
 
 
@@ -629,7 +671,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     logging.info(f"writing lfp file for probe {probe['id']}")
 
     nwbfile = pynwb.NWBFile(
-        session_description='LFP data and associated channel info for a single Ecephys probe',
+        session_description='LFP data and associated info for one probe',
         identifier=f"{probe['id']}",
         session_id=f"{session_id}",
         session_start_time=session_start_time,
@@ -640,16 +682,18 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
         nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
     if probe.get("temporal_subsampling_factor", None) is not None:
-        probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
+        probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / \
+            probe["temporal_subsampling_factor"]
 
-    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
-        nwbfile,
-        probe_id=probe["id"],
-        name=probe["name"],
-        sampling_rate=probe["sampling_rate"],
-        lfp_sampling_rate=probe["lfp_sampling_rate"],
-        has_lfp_data=probe["lfp"] is not None
-    )
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = \
+        add_probe_to_nwbfile(
+            nwbfile,
+            probe_id=probe["id"],
+            name=probe["name"],
+            sampling_rate=probe["sampling_rate"],
+            lfp_sampling_rate=probe["lfp_sampling_rate"],
+            has_lfp_data=probe["lfp"] is not None
+        )
 
     lfp_channels = np.load(probe['lfp']['input_channels_path'],
                            allow_pickle=False)
@@ -659,7 +703,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
                            local_index_whitelist=lfp_channels)
 
     electrode_table_region = nwbfile.create_electrode_table_region(
-        region=np.arange(len(nwbfile.electrodes)).tolist(),  # must use raw indices here
+        region=np.arange(len(nwbfile.electrodes)).tolist(),  # use raw inds
         name='electrodes',
         description=f"lfp channels on probe {probe['id']}"
     )
@@ -678,17 +722,20 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     nwbfile.add_acquisition(lfp.create_electrical_series(
         name=f"probe_{probe['id']}_lfp_data",
         data=H5DataIO(data=lfp_data, compression='gzip', compression_opts=9),
-        timestamps=H5DataIO(data=lfp_timestamps, compression='gzip', compression_opts=9),
+        timestamps=H5DataIO(data=lfp_timestamps,
+                            compression='gzip',
+                            compression_opts=9),
         electrodes=electrode_table_region
     ))
 
     nwbfile.add_acquisition(lfp)
 
-    csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
-    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
+    if ("csd_path" in probe.keys()):
+        csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
+        nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
-        logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
+        logging.info(f"writing lfp file to {probe['lfp']['output_path']}")
         lfp_writer.write(nwbfile, cache_spec=True)
     return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
 
@@ -726,17 +773,20 @@ def add_csd_to_nwbfile(nwbfile: pynwb.NWBFile, csd: np.ndarray,
         nwbfile which has had CSD data added
     """
 
-    csd_mod = pynwb.ProcessingModule("current_source_density", "Precalculated current source density from interpolated channel locations.")
+    csd_mod = pynwb.ProcessingModule("current_source_density",
+                                     "Precalculated current source density")
     nwbfile.add_processing_module(csd_mod)
 
     csd_ts = pynwb.base.TimeSeries(
         name="current_source_density",
-        data=csd.T,  # TimeSeries should have data in (timepoints x channels) format
+        data=csd.T,  # TimeSeries should have data in (time x channels) format
         timestamps=times,
         unit=csd_unit
     )
 
-    x_locs, y_locs = np.split(csd_virt_channel_locs.astype(np.uint64), 2, axis=1)
+    x_locs, y_locs = np.split(csd_virt_channel_locs.astype(np.uint64),
+                              2,
+                              axis=1)
 
     csd = EcephysCSD(name="ecephys_csd",
                      time_series=csd_ts,
@@ -756,8 +806,11 @@ def write_probewise_lfp_files(probes, session_id, session_metadata,
     output_paths = []
 
     pool = mp.Pool(processes=pool_size)
-    write = partial(write_probe_lfp_file, session_id, session_metadata,
-                    session_start_time, logging.getLogger("").getEffectiveLevel())
+    write = partial(write_probe_lfp_file,
+                    session_id,
+                    session_metadata,
+                    session_start_time,
+                    logging.getLogger("").getEffectiveLevel())
 
     for pout in pool.imap_unordered(write, probes):
         output_paths.append(pout)
@@ -804,18 +857,25 @@ def parse_probes_data(probes: List[Dict[str, Any]]) -> ParsedProbeData:
     for probe in probes:
         unit_tables.append(pd.DataFrame(probe['units']))
 
-        local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
+        local_to_global_unit_map = \
+            {unit['cluster_id']: unit['id'] for unit in probe['units']}
 
         spike_times.update(read_spike_times_to_dictionary(
-            probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map
+            probe['spike_times_path'],
+            probe['spike_clusters_file'],
+            local_to_global_unit_map
         ))
         mean_waveforms.update(read_waveforms_to_dictionary(
-            probe['mean_waveforms_path'], local_to_global_unit_map
+            probe['mean_waveforms_path'],
+            local_to_global_unit_map
         ))
 
         spike_amplitudes.update(read_spike_amplitudes_to_dictionary(
-            probe["spike_amplitudes_path"], probe["spike_clusters_file"],
-            probe["templates_path"], probe["spike_templates_path"], probe["inverse_whitening_matrix_path"],
+            probe["spike_amplitudes_path"],
+            probe["spike_clusters_file"],
+            probe["templates_path"],
+            probe["spike_templates_path"],
+            probe["inverse_whitening_matrix_path"],
             local_to_global_unit_map=local_to_global_unit_map,
             scale_factor=probe["amplitude_scale_factor"]
         ))
@@ -826,29 +886,37 @@ def parse_probes_data(probes: List[Dict[str, Any]]) -> ParsedProbeData:
 
 
 def add_probewise_data_to_nwbfile(nwbfile, probes):
-    """ Adds channel (electrode) and spike data for a single probe to the session-level nwb file.
+    """ Adds channel (electrode) and spike data for a single probe to
+        the session-level nwb file.
     """
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
         if probe.get("temporal_subsampling_factor", None) is not None:
-            probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
+            probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / \
+                probe["temporal_subsampling_factor"]
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
-            nwbfile,
-            probe_id=probe["id"],
-            name=probe["name"],
-            sampling_rate=probe["sampling_rate"],
-            lfp_sampling_rate=probe["lfp_sampling_rate"],
-            has_lfp_data=probe["lfp"] is not None
-        )
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = \
+            add_probe_to_nwbfile(
+                nwbfile,
+                probe_id=probe["id"],
+                name=probe["name"],
+                sampling_rate=probe["sampling_rate"],
+                lfp_sampling_rate=probe["lfp_sampling_rate"],
+                has_lfp_data=probe["lfp"] is not None
+            )
 
-        add_ecephys_electrodes(nwbfile, probe["channels"], probe_nwb_electrode_group)
+        add_ecephys_electrodes(nwbfile,
+                               probe["channels"],
+                               probe_nwb_electrode_group)
 
-    units_table, spike_times, spike_amplitudes, mean_waveforms = parse_probes_data(probes)
-    nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
+    units_table, spike_times, spike_amplitudes, mean_waveforms = \
+        parse_probes_data(probes)
+    nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table),
+                                                    name='units')
 
-    sorted_spike_times, sorted_spike_amplitudes = filter_and_sort_spikes(spike_times, spike_amplitudes)
+    sorted_spike_times, sorted_spike_amplitudes = \
+        filter_and_sort_spikes(spike_times, spike_amplitudes)
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units,
@@ -868,17 +936,20 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         table=nwbfile.units,
         data=mean_waveforms,
         column_name="waveform_mean",
-        column_description="mean waveforms on peak channels (and over samples)",
+        column_description="mean waveforms on peak channels (over samples)",
     )
 
     return nwbfile
 
 
-def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
+def add_optotagging_table_to_nwbfile(nwbfile,
+                                     optotagging_table,
+                                     tag="optical_stimulation"):
     # "name" is a pynwb reserved column name that older versions of the
     # pre-processed optotagging_table may use.
     if "name" in optotagging_table.columns:
-        optotagging_table = optotagging_table.rename(columns={"name": "stimulus_name"})
+        optotagging_table = \
+            optotagging_table.rename(columns={"name": "stimulus_name"})
 
     opto_ts = pynwb.base.TimeSeries(
         name="optotagging",
@@ -887,21 +958,26 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
         unit="seconds"
     )
 
-    opto_mod = pynwb.ProcessingModule("optotagging", "optogenetic stimulution data")
+    opto_mod = pynwb.ProcessingModule("optotagging",
+                                      "optogenetic stimulution data")
     opto_mod.add_data_interface(opto_ts)
     nwbfile.add_processing_module(opto_mod)
 
     optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
 
     if len(optotagging_table) > 0:
-        container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimulation")
+        container = \
+            pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table,
+                                                     "optogenetic_stimulation")
         opto_mod.add_data_interface(container)
 
     return nwbfile
 
 
-def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
-                                                  eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
+def add_eye_tracking_rig_geometry_data_to_nwbfile(
+        nwbfile: pynwb.NWBFile,
+        eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
+
     """ Rig geometry dict should consist of the following fields:
     monitor_position_mm: [x, y, z]
     monitor_rotation_deg: [x, y, z]
@@ -910,8 +986,9 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     led_position: [x, y, z]
     equipment: A string describing rig
     """
-    eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
-                                                  description='Eye tracking rig metadata module')
+    eye_tracking_rig_mod = \
+        pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
+                               description='Eye tracking rig metadata module')
 
     rig_metadata = EcephysEyeTrackingRigMetadata(
         name="eye_tracking_rig_metadata",
@@ -934,16 +1011,19 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     return nwbfile
 
 
-def add_eye_tracking_data_to_nwbfile(nwbfile: pynwb.NWBFile,
-                                     eye_tracking_frame_times: pd.Series,
-                                     eye_dlc_tracking_data: Dict[str, pd.DataFrame],
-                                     eye_gaze_data: Dict[str, pd.DataFrame]) -> pynwb.NWBFile:
+def add_eye_tracking_data_to_nwbfile(
+        nwbfile: pynwb.NWBFile,
+        eye_tracking_frame_times: pd.Series,
+        eye_dlc_tracking_data: Dict[str, pd.DataFrame],
+        eye_gaze_data: Dict[str, pd.DataFrame]) -> pynwb.NWBFile:
 
     if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
                                   synced_timestamps=eye_tracking_frame_times):
-        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
-                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                                     synced_timestamps=eye_tracking_frame_times)
+
+        add_eye_tracking_ellipse_fit_data_to_nwbfile(
+            nwbfile,
+            eye_dlc_tracking_data=eye_dlc_tracking_data,
+            synced_timestamps=eye_tracking_frame_times)
 
         # --- Add gaze mapped positions to nwb file ---
         if eye_gaze_data:
@@ -961,11 +1041,11 @@ def write_ecephys_nwb(
     probes,
     running_speed_path,
     session_sync_path,
-    eye_tracking_rig_geometry,
-    eye_dlc_ellipses_path,
-    eye_gaze_mapping_path,
     pool_size,
     optotagging_table_path=None,
+    eye_tracking_rig_geometry=None,
+    eye_dlc_ellipses_path=None,
+    eye_gaze_mapping_path=None,
     session_metadata=None,
     **kwargs
 ):
@@ -975,7 +1055,7 @@ def write_ecephys_nwb(
         identifier=f"{session_id}",
         session_id=f"{session_id}",
         session_start_time=session_start_time,
-        institution="Allen Institute for Brain Science"
+        institution="Allen Institute"
     )
 
     if session_metadata is not None:
@@ -985,9 +1065,11 @@ def write_ecephys_nwb(
         "colorSpace", "depth", "interpolate", "pos", "rgbPedestal", "tex",
         "texRes", "flipHoriz", "flipVert", "rgb", "signalDots"
     ]
-    stimulus_table = read_stimulus_table(stimulus_table_path,
-                                         columns_to_drop=stimulus_columns_to_drop)
-    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)  # TODO: patch until full timestamps are output by stim table module
+    stimulus_table = \
+        read_stimulus_table(stimulus_table_path,
+                            columns_to_drop=stimulus_columns_to_drop)
+    nwbfile = \
+        add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
 
@@ -1001,22 +1083,31 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
-    add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
-                                                  eye_tracking_rig_geometry)
+    if eye_tracking_rig_geometry is not None:
+        add_eye_tracking_rig_geometry_data_to_nwbfile(
+            nwbfile,
+            eye_tracking_rig_geometry
+        )
 
     # Collect eye tracking/gaze mapping data from files
-    eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_path,
-                                                               sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
-    eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
-    if eye_gaze_mapping_path:
-        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
-    else:
-        eye_gaze_data = None
+    if eye_dlc_ellipses_path is not None:
+        eye_tracking_frame_times = \
+            su.get_synchronized_frame_times(
+                session_sync_file=session_sync_path,
+                sync_line_label_keys=Dataset.EYE_TRACKING_KEYS
+            )
+        eye_dlc_tracking_data = \
+            read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
 
-    add_eye_tracking_data_to_nwbfile(nwbfile,
-                                     eye_tracking_frame_times,
-                                     eye_dlc_tracking_data,
-                                     eye_gaze_data)
+        if eye_gaze_mapping_path is not None:
+            eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+        else:
+            eye_gaze_data = None
+
+        add_eye_tracking_data_to_nwbfile(nwbfile,
+                                         eye_tracking_frame_times,
+                                         eye_dlc_tracking_data,
+                                         eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     with pynwb.NWBHDF5IO(output_path, mode='w') as io:
@@ -1024,10 +1115,15 @@ def write_ecephys_nwb(
         io.write(nwbfile, cache_spec=True)
 
     probes_with_lfp = [p for p in probes if p["lfp"] is not None]
+    probes_without_lfp = [p for p in probes if p["lfp"] is None]
+
     probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_id,
                                               session_metadata,
                                               session_start_time,
                                               pool_size=pool_size)
+
+    probe_outputs += \
+        [{'id': p["id"], "nwb_path": ""} for p in probes_without_lfp]
 
     return {
         'nwb_path': output_path,
@@ -1040,10 +1136,18 @@ def main():
         format="%(asctime)s - %(process)s - %(levelname)s - %(message)s"
     )
 
-    parser = optional_lims_inputs(sys.argv, InputSchema, OutputSchema, get_inputs_from_lims)
+    parser = optional_lims_inputs(
+        sys.argv,
+        InputSchema,
+        OutputSchema,
+        get_inputs_from_lims
+    )
 
-    output = write_ecephys_nwb(**parser.args)
-    write_or_print_outputs(output, parser)
+    write_ecephys_nwb(**parser.args)
+
+    # output = write_ecephys_nwb(**parser.args)
+
+    # write_or_print_outputs(output, parser)
 
 
 if __name__ == "__main__":

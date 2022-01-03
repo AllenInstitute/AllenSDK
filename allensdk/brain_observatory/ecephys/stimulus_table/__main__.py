@@ -36,7 +36,11 @@ def build_stimulus_table(
 
     sync_dataset = EcephysSyncDataset.factory(sync_h5_path)
     frame_times = sync_dataset.extract_frame_times(
-        strategy=frame_time_strategy)
+        strategy=frame_time_strategy,
+        trim_discontiguous_frame_times=kwargs.get(
+            'trim_discontiguous_frame_times',
+            True)
+        )
 
     def seconds_to_frames(seconds):
         return  \
@@ -71,6 +75,8 @@ def build_stimulus_table(
         stim_table_full, maximum_expected_spontanous_activity_duration
     )
 
+    print(stim_table_full.keys())
+
     stim_table_full = naming_utilities.collapse_columns(stim_table_full)
     stim_table_full = naming_utilities.drop_empty_columns(stim_table_full)
     stim_table_full = naming_utilities.standardize_movie_numbers(
@@ -80,8 +86,15 @@ def build_stimulus_table(
     stim_table_full = naming_utilities.map_stimulus_names(
         stim_table_full, stimulus_name_map
     )
+
+    print(stim_table_full.keys())
+    print(column_name_map)
+
     stim_table_full = naming_utilities.map_column_names(stim_table_full,
-                                                        column_name_map)
+                                                        column_name_map,
+                                                        ignore_case=False)
+
+    print(stim_table_full.keys())
 
     stim_table_full.to_csv(output_stimulus_table_path, index=False)
     np.save(output_frame_times_path, frame_times, allow_pickle=False)

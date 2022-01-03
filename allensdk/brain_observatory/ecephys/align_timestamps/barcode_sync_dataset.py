@@ -19,6 +19,8 @@ class BarcodeSyncDataset(EcephysSyncDataset):
             return self.line_labels.index("barcode")
         elif "barcodes" in self.line_labels:
             return self.line_labels.index("barcodes")
+        elif "barcode_ephys" in self.line_labels:
+            return self.line_labels.index("barcode_ephys")
         else:
             raise ValueError("no barcode line found")
 
@@ -27,10 +29,10 @@ class BarcodeSyncDataset(EcephysSyncDataset):
 
         Parameters
         ----------
-        **barcode_kwargs : 
+        **barcode_kwargs :
             Will be passed to .barcode.extract_barcodes_from_times
 
-        Returns 
+        Returns
         -------
         times : np.ndarray
             The start times of each detected barcode.
@@ -57,12 +59,13 @@ class BarcodeSyncDataset(EcephysSyncDataset):
 
         Notes
         -----
-        This method is deprecated! 
+        This method is deprecated!
 
         """
         warnings.warn(
             np.VisibleDeprecationWarning(
-                "This function is deprecated as unecessary (and slated for removal). Instead, simply use extract_barcodes."
+                """This function is deprecated as unecessary (and slated for
+                removal). Instead, simply use extract_barcodes."""
             )
         )
 

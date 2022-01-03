@@ -24,7 +24,8 @@ class TestFromStimulusFile:
 
     def test_from_stimulus_file(self):
         st = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=self.stimulus_file)
+            stimulus_file=self.stimulus_file,
+            monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=self.stimulus_file,
                                          stimulus_timestamps=st)
         assert licks == self.expected
@@ -39,7 +40,8 @@ class TestFromStimulusFile:
             lick_events=[12, 15, 90, 136], tmpdir=tmpdir)
         stimulus_file = StimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
+                                        monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
                                          stimulus_timestamps=timestamps)
 
@@ -65,7 +67,8 @@ class TestFromStimulusFile:
             lick_events=[], tmpdir=tmpdir)
         stimulus_file = StimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
+                                        monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
                                          stimulus_timestamps=timestamps)
 
@@ -93,7 +96,8 @@ class TestFromStimulusFile:
             tmpdir=tmpdir)
         stimulus_file = StimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
+                                        monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
                                          stimulus_timestamps=timestamps)
 
@@ -115,7 +119,8 @@ class TestFromStimulusFile:
             tmpdir=tmpdir)
         stimulus_file = StimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
+                                        monitor_delay=0.0)
 
         with pytest.raises(IndexError):
             Licks.from_stimulus_file(stimulus_file=stimulus_file,
@@ -156,7 +161,8 @@ class TestNWB:
         stimulus_file = StimulusFile(
             filepath=test_data_dir / 'behavior_stimulus_file.pkl')
         ts = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
+            stimulus_file=stimulus_file,
+            monitor_delay=0.0)
         cls.licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
                                              stimulus_timestamps=ts)
 

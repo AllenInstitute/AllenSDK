@@ -6,7 +6,7 @@ import SimpleITK as sitk
 import numpy as np
 import pandas as pd
 import xarray as xr
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 
 def compare_fields(x1: Any, x2: Any, err_msg="",
@@ -32,7 +32,8 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
     if isinstance(x1, pd.DataFrame):
         try:
             assert_frame_equal(x1, x2, check_like=True)
-        except Exception:
+        except AssertionError as e:
+            print(e)
             print(err_msg)
             raise
     elif isinstance(x1, np.ndarray):

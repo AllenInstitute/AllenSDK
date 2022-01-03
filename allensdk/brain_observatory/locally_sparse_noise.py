@@ -39,7 +39,8 @@ import h5py
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-from .receptive_field_analysis.receptive_field import compute_receptive_field_with_postprocessing
+from .receptive_field_analysis.receptive_field import \
+    compute_receptive_field_with_postprocessing
 from .receptive_field_analysis.visualization import plot_receptive_field_data
 
 from . import circle_plots as cplots
@@ -47,9 +48,7 @@ from . import observatory_plots as oplots
 from .brain_observatory_exceptions import MissingStimulusException
 from .stimulus_analysis import StimulusAnalysis
 from .receptive_field_analysis.tools import dict_generator, read_h5_group
-from scipy.stats.mstats import zscore
 
-import matplotlib.pyplot as plt
 
 class LocallySparseNoise(StimulusAnalysis):
     """ Perform tuning analysis specific to the locally sparse noise stimulus.
@@ -59,7 +58,8 @@ class LocallySparseNoise(StimulusAnalysis):
     data_set: BrainObservatoryNwbDataSet object
 
     stimulus: string
-       Name of locally sparse noise stimulus.  See brain_observatory.stimulus_info.
+       Name of locally sparse noise stimulus.  See
+       brain_observatory.stimulus_info.
 
     nrows: int
        Number of rows in the stimulus template
@@ -81,13 +81,14 @@ class LocallySparseNoise(StimulusAnalysis):
             self.stimulus = stimulus
 
         try:
-            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[self.stimulus]
-        except KeyError as e:
+            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[
+                self.stimulus]
+        except KeyError:
             raise KeyError("Unknown stimulus name: %s" % self.stimulus)
-        
+
         self.nrows = lsn_dims[0]
         self.ncols = lsn_dims[1]
-        
+
         self._LSN = LocallySparseNoise._PRELOAD
         self._LSN_mask = LocallySparseNoise._PRELOAD
         self._sweeplength = LocallySparseNoise._PRELOAD
@@ -95,7 +96,8 @@ class LocallySparseNoise(StimulusAnalysis):
         self._extralength = LocallySparseNoise._PRELOAD
         self._mean_response = LocallySparseNoise._PRELOAD
         self._receptive_field = LocallySparseNoise._PRELOAD
-        self._cell_index_receptive_field_analysis_data = LocallySparseNoise._PRELOAD
+        self._cell_index_receptive_field_analysis_data = \
+            LocallySparseNoise._PRELOAD
 
     @property
     def LSN(self):
@@ -141,8 +143,10 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @property
     def cell_index_receptive_field_analysis_data(self):
-        if self._cell_index_receptive_field_analysis_data is LocallySparseNoise._PRELOAD:
-            self._cell_index_receptive_field_analysis_data = self.get_receptive_field_analysis_data()
+        if self._cell_index_receptive_field_analysis_data is \
+                LocallySparseNoise._PRELOAD:
+            self._cell_index_receptive_field_analysis_data = \
+                self.get_receptive_field_analysis_data()
 
         return self._cell_index_receptive_field_analysis_data
 
@@ -153,23 +157,24 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return self._mean_response
 
-
     def get_peak(self):
         LocallySparseNoise._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('rf_center_on_x_lsn', 'rf_center_on_y_lsn',
-                                                                    'rf_center_off_x_lsn', 'rf_center_off_y_lsn',
-                                                                    'rf_area_on_lsn', 'rf_area_off_lsn',
-                                                                    'rf_distance_lsn', 'rf_overlap_index_lsn',
-                                                                    'rf_chi2_lsn',
-                                                                    'cell_specimen_id'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=(
+            'rf_center_on_x_lsn', 'rf_center_on_y_lsn',
+            'rf_center_off_x_lsn', 'rf_center_off_y_lsn',
+            'rf_area_on_lsn', 'rf_area_off_lsn',
+            'rf_distance_lsn', 'rf_overlap_index_lsn',
+            'rf_chi2_lsn',
+            'cell_specimen_id'))
         csids = self.data_set.get_cell_specimen_ids()
 
         df = self.get_receptive_field_attribute_df()
         peak.cell_specimen_id = csids
 
         for nc in range(self.numbercells):
-            peak['rf_chi2_lsn'].iloc[nc] = df['chi_squared_analysis/min_p'].iloc[nc]
+            peak['rf_chi2_lsn'].iloc[nc] = \
+                df['chi_squared_analysis/min_p'].iloc[nc]
 
             # find the index of the largest on subunit, if it exists
             on_i = None
@@ -189,9 +194,12 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_on_x_lsn'].iloc[nc] = np.nan
                 peak['rf_center_on_y_lsn'].iloc[nc] = np.nan
             else:
-                peak['rf_area_on_lsn'].iloc[nc] = df['on/gaussian_fit/area'].iloc[nc][on_i]
-                peak['rf_center_on_x_lsn'].iloc[nc] = df['on/gaussian_fit/center_x'].iloc[nc][on_i]
-                peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
+                peak['rf_area_on_lsn'].iloc[nc] = \
+                    df['on/gaussian_fit/area'].iloc[nc][on_i]
+                peak['rf_center_on_x_lsn'].iloc[nc] = \
+                    df['on/gaussian_fit/center_x'].iloc[nc][on_i]
+                peak['rf_center_on_y_lsn'].iloc[nc] = \
+                    df['on/gaussian_fit/center_y'].iloc[nc][on_i]
 
             # find the index of the largest off subunit, if it exists
             off_i = None
@@ -211,14 +219,18 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_off_x_lsn'].iloc[nc] = np.nan
                 peak['rf_center_off_y_lsn'].iloc[nc] = np.nan
             else:
-                peak['rf_area_off_lsn'].iloc[nc] = df['off/gaussian_fit/area'].iloc[nc][off_i]
-                peak['rf_center_off_x_lsn'].iloc[nc] = df['off/gaussian_fit/center_x'].iloc[nc][off_i]
-                peak['rf_center_off_y_lsn'].iloc[nc] = df['off/gaussian_fit/center_y'].iloc[nc][off_i]
-
+                peak['rf_area_off_lsn'].iloc[nc] = \
+                    df['off/gaussian_fit/area'].iloc[nc][off_i]
+                peak['rf_center_off_x_lsn'].iloc[nc] = \
+                    df['off/gaussian_fit/center_x'].iloc[nc][off_i]
+                peak['rf_center_off_y_lsn'].iloc[nc] = \
+                    df['off/gaussian_fit/center_y'].iloc[nc][off_i]
 
             if on_i is not None and off_i is not None:
-                peak['rf_distance_lsn'].iloc[nc] = df['on/gaussian_fit/distance'].iloc[nc][on_i][off_i]
-                peak['rf_overlap_index_lsn'].iloc[nc] = df['on/gaussian_fit/overlap'].iloc[nc][on_i][off_i]
+                peak['rf_distance_lsn'].iloc[nc] = \
+                    df['on/gaussian_fit/distance'].iloc[nc][on_i][off_i]
+                peak['rf_overlap_index_lsn'].iloc[nc] = \
+                    df['on/gaussian_fit/overlap'].iloc[nc][on_i][off_i]
             else:
                 peak['rf_distance_lsn'].iloc[nc] = np.nan
                 peak['rf_overlap_index_lsn'].iloc[nc] = np.nan
@@ -227,13 +239,14 @@ class LocallySparseNoise(StimulusAnalysis):
 
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table(self.stimulus)
-        self._LSN, self._LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
-            self.stimulus, mask_off_screen=False)
-        self._sweeplength = self._stim_table['end'][
-            1] - self._stim_table['start'][1]
+        self._LSN, self._LSN_mask = \
+            self.data_set.get_locally_sparse_noise_stimulus_template(
+                self.stimulus, mask_off_screen=False)
+        self._sweeplength = (
+                self._stim_table['end'][1] -
+                self._stim_table['start'][1])
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
-
 
     def get_mean_response(self):
         logging.debug("Calculating mean responses")
@@ -256,19 +269,23 @@ class LocallySparseNoise(StimulusAnalysis):
         ''' Calculates receptive fields for each cell
         '''
 
-        receptive_field = np.zeros((self.nrows, self.ncols, self.numbercells, 2))
+        receptive_field = np.zeros(
+            (self.nrows, self.ncols, self.numbercells, 2))
 
-        for cell_index in range(len(self.cell_index_receptive_field_analysis_data)):
-            curr_rf = self.cell_index_receptive_field_analysis_data[str(cell_index)]
+        for cell_index in range(
+                len(self.cell_index_receptive_field_analysis_data)):
+            curr_rf = self.cell_index_receptive_field_analysis_data[
+                str(cell_index)]
             rf_on = curr_rf['on']['rts_convolution']['data'].copy()
             rf_off = curr_rf['off']['rts_convolution']['data'].copy()
-            rf_on[np.logical_not(curr_rf['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
-            rf_off[np.logical_not(curr_rf['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
-            receptive_field[:,:,cell_index, 0] = rf_on
+            rf_on[np.logical_not(
+                curr_rf['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
+            rf_off[np.logical_not(
+                curr_rf['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
+            receptive_field[:, :, cell_index, 0] = rf_on
             receptive_field[:, :, cell_index, 1] = rf_off
 
         return receptive_field
-
 
     def get_receptive_field_analysis_data(self):
         ''' Calculates receptive fields for each cell
@@ -276,11 +293,12 @@ class LocallySparseNoise(StimulusAnalysis):
 
         csid_rf = {}
         for cell_index in range(self.data_set.number_of_cells):
-            csid_rf[str(cell_index)] = compute_receptive_field_with_postprocessing(
-                self.data_set, cell_index, self.stimulus, alpha=.05, number_of_shuffles=10000)
+            csid_rf[str(cell_index)] = \
+                compute_receptive_field_with_postprocessing(
+                    self.data_set, cell_index, self.stimulus, alpha=.05,
+                    number_of_shuffles=10000)
 
         return csid_rf
-
 
     def plot_receptive_field_analysis_data(self, cell_index, **kwargs):
         rf = self._cell_index_receptive_field_analysis_data[str(cell_index)]
@@ -289,7 +307,8 @@ class LocallySparseNoise(StimulusAnalysis):
     def get_receptive_field_attribute_df(self):
 
         df_list = []
-        for cell_index_as_str, rf in self.cell_index_receptive_field_analysis_data.items():
+        for cell_index_as_str, rf in \
+                self.cell_index_receptive_field_analysis_data.items():
 
             attribute_dict = {}
             for x in dict_generator(rf):
@@ -304,7 +323,8 @@ class LocallySparseNoise(StimulusAnalysis):
             for key, val in attribute_dict.items():
                 massaged_dict[key] = [val]
 
-            massaged_dict['oeid'] = self.data_set.get_metadata()['ophys_experiment_id']
+            massaged_dict['oeid'] = self.data_set.get_metadata()[
+                'ophys_experiment_id']
 
             curr_df = pd.DataFrame.from_dict(massaged_dict)
             df_list.append(curr_df)
@@ -328,7 +348,9 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None, scalebar=True):
+    def plot_cell_receptive_field(self, on, cell_specimen_id=None,
+                                  color_map=None, clim=None, mask=None,
+                                  cell_index=None, scalebar=True):
         if color_map is None:
             color_map = 'Reds' if on else 'Blues'
 
@@ -338,14 +360,15 @@ class LocallySparseNoise(StimulusAnalysis):
         rts = rf[onst]['rts']['data']
         rts[np.logical_not(rf[onst]['fdr_mask']['data'].sum(axis=0))] = np.nan
 
-        oplots.plot_receptive_field(rts, 
-                                    color_map=color_map, 
-                                    clim=clim, 
+        oplots.plot_receptive_field(rts,
+                                    color_map=color_map,
+                                    clim=clim,
                                     mask=mask,
                                     scalebar=scalebar)
 
-    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None, scalebar=True):
-        rf = np.nansum(self.receptive_field, axis=(2,3))
+    def plot_population_receptive_field(self, color_map='RdPu', clim=None,
+                                        mask=None, scalebar=True):
+        rf = np.nansum(self.receptive_field, axis=(2, 3))
         oplots.plot_receptive_field(rf,
                                     color_map=color_map,
                                     clim=clim,
@@ -355,38 +378,45 @@ class LocallySparseNoise(StimulusAnalysis):
     def sort_trials(self):
         ds = self.data_set
 
-        lsn_movie, lsn_mask = ds.get_locally_sparse_noise_stimulus_template(self.stimulus, 
-                                                                            mask_off_screen=False)
+        lsn_movie, lsn_mask = ds.get_locally_sparse_noise_stimulus_template(
+            self.stimulus,
+            mask_off_screen=False)
 
-        baseline_trials = np.unique(np.where(lsn_movie[:,-5:,-1] != LocallySparseNoise.LSN_GREY)[0])
-        baseline_df = self.mean_sweep_response.loc[baseline_trials]
+        baseline_trials = np.unique(
+            np.where(lsn_movie[:, -5:, -1] != LocallySparseNoise.LSN_GREY)[0])
+        valid_indices = pd.Index(set(baseline_trials) &
+                                 set(self.mean_sweep_response.index.tolist()))
+        baseline_df = self.mean_sweep_response.loc[valid_indices]
         cell_baselines = np.nanmean(baseline_df.values, axis=0)
 
-        lsn_movie[:,~lsn_mask] = LocallySparseNoise.LSN_OFF_SCREEN
+        lsn_movie[:, ~lsn_mask] = LocallySparseNoise.LSN_OFF_SCREEN
 
         trials = {}
         for row in range(self.nrows):
             for col in range(self.ncols):
-                on_trials = np.where(lsn_movie[:,row,col] == LocallySparseNoise.LSN_ON)
-                off_trials = np.where(lsn_movie[:,row,col] == LocallySparseNoise.LSN_OFF)
+                on_trials = np.where(
+                    lsn_movie[:, row, col] == LocallySparseNoise.LSN_ON)
+                off_trials = np.where(
+                    lsn_movie[:, row, col] == LocallySparseNoise.LSN_OFF)
 
-                trials[(col,row,True)] = on_trials
-                trials[(col,row,False)] = off_trials
+                trials[(col, row, True)] = on_trials
+                trials[(col, row, False)] = off_trials
 
         return trials, cell_baselines
 
-
-    def open_pincushion_plot(self, on, cell_specimen_id=None, color_map=None, cell_index=None):
+    def open_pincushion_plot(self, on, cell_specimen_id=None, color_map=None,
+                             cell_index=None):
         cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         trials, baselines = self.sort_trials()
         data = self.mean_sweep_response[str(cell_index)].values
-        
-        cplots.make_pincushion_plot(data, trials, on, 
+
+        cplots.make_pincushion_plot(data, trials, on,
                                     self.nrows, self.ncols,
-                                    clim=[ baselines[cell_index], data.mean() + data.std() * 3 ],
+                                    clim=[baselines[cell_index],
+                                          data.mean() + data.std() * 3],
                                     color_map=color_map,
-                                    radius=1.0/16.0)
+                                    radius=1.0 / 16.0)
 
     @staticmethod
     def from_analysis_file(data_set, analysis_file, stimulus):
@@ -406,13 +436,19 @@ class LocallySparseNoise(StimulusAnalysis):
             with h5py.File(analysis_file, "r") as f:
                 k = "analysis/mean_response_%s" % stimulus_suffix
                 if k in f:
-                    lsn._mean_response = f[k].value
+                    lsn._mean_response = f[k][()]
 
-            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_%s" % stimulus_suffix)
-            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_%s" % stimulus_suffix)
+            lsn._sweep_response = pd.read_hdf(analysis_file,
+                                              "analysis/sweep_response_%s" %
+                                              stimulus_suffix)
+            lsn._mean_sweep_response = pd.read_hdf(
+                analysis_file, "analysis/mean_sweep_response_%s" %
+                               stimulus_suffix)
 
             with h5py.File(analysis_file, "r") as f:
-                lsn._cell_index_receptive_field_analysis_data = LocallySparseNoise.read_cell_index_receptive_field_analysis(f, stimulus)
+                lsn._cell_index_receptive_field_analysis_data = \
+                    LocallySparseNoise.\
+                    read_cell_index_receptive_field_analysis(f, stimulus)
 
         except Exception as e:
             raise MissingStimulusException(e.args)
@@ -420,7 +456,8 @@ class LocallySparseNoise(StimulusAnalysis):
         return lsn
 
     @staticmethod
-    def save_cell_index_receptive_field_analysis(cell_index_receptive_field_analysis_data, new_nwb, prefix):
+    def save_cell_index_receptive_field_analysis(
+            cell_index_receptive_field_analysis_data, new_nwb, prefix):
 
         attr_list = []
         file_handle = h5py.File(new_nwb.nwb_file, 'a')
@@ -440,9 +477,9 @@ class LocallySparseNoise(StimulusAnalysis):
             # replace None => nan before writing
             # set array type to float
             for ii, item in enumerate(x):
-                if isinstance( item, np.ndarray ):
+                if isinstance(item, np.ndarray):
                     if item.dtype == np.dtype('O'):
-                        item[ item == None ] = np.nan
+                        item[item == None] = np.nan     # noqa E711
                         x[ii] = np.array(item, dtype=float)
 
             if len(x) > 3:
@@ -456,10 +493,10 @@ class LocallySparseNoise(StimulusAnalysis):
                     f.attrs[x[-2]] = x[-1]
 
         file_handle.close()
-        
 
     @staticmethod
-    def read_cell_index_receptive_field_analysis(file_handle, prefix, path=None):
+    def read_cell_index_receptive_field_analysis(file_handle, prefix,
+                                                 path=None):
         k = 'analysis/%s' % prefix
         if k in file_handle:
             f = file_handle['analysis/%s' % prefix]
@@ -471,6 +508,3 @@ class LocallySparseNoise(StimulusAnalysis):
             return rf
         else:
             return None
-
-            
-

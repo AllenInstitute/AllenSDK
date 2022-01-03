@@ -1,8 +1,4 @@
-
-import json
 from typing import Optional
-
-from cachetools.keys import hashkey
 
 import numpy as np
 from pynwb import NWBFile, ProcessingModule
@@ -25,17 +21,6 @@ from allensdk.brain_observatory.behavior.data_objects.timestamps\
 from allensdk.internal.api import PostgresQueryMixin
 
 
-def from_json_cache_key(cls, dict_repr: dict):
-    return hashkey(json.dumps(dict_repr))
-
-
-def from_lims_cache_key(
-    cls, db, behavior_session_id: int,
-    ophys_experiment_id: Optional[int] = None
-):
-    return hashkey(behavior_session_id, ophys_experiment_id)
-
-
 class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
                          SyncFileReadableInterface, JsonReadableInterface,
                          NwbReadableInterface, LimsReadableInterface,
@@ -52,48 +37,64 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
     def __init__(
         self,
         timestamps: np.ndarray,
+        monitor_delay: float,
         stimulus_file: Optional[StimulusFile] = None,
         sync_file: Optional[SyncFile] = None
     ):
-        super().__init__(name="stimulus_timestamps", value=timestamps)
+        super().__init__(name="stimulus_timestamps",
+                         value=timestamps+monitor_delay)
         self._stimulus_file = stimulus_file
         self._sync_file = sync_file
+        self._monitor_delay = monitor_delay
 
     @classmethod
     def from_stimulus_file(
             cls,
-            stimulus_file: StimulusFile) -> "StimulusTimestamps":
+            stimulus_file: StimulusFile,
+            monitor_delay: float) -> "StimulusTimestamps":
         stimulus_timestamps = get_behavior_stimulus_timestamps(
             stimulus_pkl=stimulus_file.data
         )
 
         return cls(
             timestamps=stimulus_timestamps,
+            monitor_delay=monitor_delay,
             stimulus_file=stimulus_file
         )
 
     @classmethod
-    def from_sync_file(cls, sync_file: SyncFile) -> "StimulusTimestamps":
+    def from_sync_file(
+            cls,
+            sync_file: SyncFile,
+            monitor_delay: float) -> "StimulusTimestamps":
         stimulus_timestamps = get_ophys_stimulus_timestamps(
             sync_path=sync_file.filepath
         )
         return cls(
             timestamps=stimulus_timestamps,
+            monitor_delay=monitor_delay,
             sync_file=sync_file
         )
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "StimulusTimestamps":
+    def from_json(
+            cls,
+            dict_repr: dict) -> "StimulusTimestamps":
         if 'sync_file' in dict_repr:
             sync_file = SyncFile.from_json(dict_repr=dict_repr)
-            return cls.from_sync_file(sync_file=sync_file)
+            return cls.from_sync_file(
+                        sync_file=sync_file,
+                        monitor_delay=dict_repr['monitor_delay'])
         else:
             stim_file = StimulusFile.from_json(dict_repr=dict_repr)
-            return cls.from_stimulus_file(stimulus_file=stim_file)
+            return cls.from_stimulus_file(
+                        stimulus_file=stim_file,
+                        monitor_delay=dict_repr['monitor_delay'])
 
     def from_lims(
         cls,
         db: PostgresQueryMixin,
+        monitor_delay: float,
         behavior_session_id: int,
         ophys_experiment_id: Optional[int] = None
     ) -> "StimulusTimestamps":
@@ -102,9 +103,11 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         if ophys_experiment_id:
             sync_file = SyncFile.from_lims(
                 db=db, ophys_experiment_id=ophys_experiment_id)
-            return cls.from_sync_file(sync_file=sync_file)
+            return cls.from_sync_file(sync_file=sync_file,
+                                      monitor_delay=monitor_delay)
         else:
-            return cls.from_stimulus_file(stimulus_file=stimulus_file)
+            return cls.from_stimulus_file(stimulus_file=stimulus_file,
+                                          monitor_delay=monitor_delay)
 
     def to_json(self) -> dict:
         if self._stimulus_file is None:
@@ -118,14 +121,21 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         output_dict.update(self._stimulus_file.to_json())
         if self._sync_file is not None:
             output_dict.update(self._sync_file.to_json())
+        output_dict['monitor_delay'] = self._monitor_delay
         return output_dict
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "StimulusTimestamps":
+    def from_nwb(cls,
+                 nwbfile: NWBFile) -> "StimulusTimestamps":
         stim_module = nwbfile.processing["stimulus"]
         stim_ts_interface = stim_module.get_data_interface("timestamps")
         stim_timestamps = stim_ts_interface.timestamps[:]
-        return cls(timestamps=stim_timestamps)
+
+        # Because the monitor delay was already applied when
+        # saving the stimulus timestamps to the NWB file,
+        # we set it to zero here.
+        return cls(timestamps=stim_timestamps,
+                   monitor_delay=0.0)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         stimulus_ts = TimeSeries(

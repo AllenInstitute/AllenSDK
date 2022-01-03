@@ -1,6 +1,7 @@
 import h5py
 import math
 
+
 class LabNotebookReader(object):
     def __init__(self):
         self.register_enabled_names()
@@ -20,11 +21,11 @@ class LabNotebookReader(object):
         self.enabled["Neut Cap Value"] = "Neut Cap Enable"
         self.enabled["Bridge Bal Value"] = "Bridge Bal Enable"
 
-
     # lab notebook has two sections, one for numeric data and the other
     #   for text data. this is an internal function to fetch data from
     #   the numeric part of the notebook
-    def get_numeric_value(self, name, data_col, sweep_col, enable_col, sweep_num, default_val):
+    def get_numeric_value(self, name, data_col, sweep_col, enable_col,
+                          sweep_num, default_val):
         data = self.val_number
         # val_number has 3 dimensions -- the first has a shape of
         #   (#fields * 9). there are many hundreds of elements in this
@@ -43,14 +44,15 @@ class LabNotebookReader(object):
                 continue
             if int(swp) == sweep_num:
                 if enable_col is not None and sample[enable_col][0] != 1.0:
-                    continue # 'enable' flag present and it's turned off
+                    continue  # 'enable' flag present and it's turned off
                 val = sample[data_col][0]
                 if not math.isnan(val):
                     return_val = val
         return return_val
 
     # internal function for fetching data from the text part of the notebook
-    def get_text_value(self, name, data_col, sweep_col, enable_col, sweep_num, default_val):
+    def get_text_value(self, name, data_col, sweep_col, enable_col, sweep_num,
+                       default_val):
         data = self.val_text
         # algorithm mirrors get_numeric_value
         # return value is last non-empty entry in specified column
@@ -61,12 +63,12 @@ class LabNotebookReader(object):
             if len(swp) == 0:
                 continue
             if int(swp) == int(sweep_num):
-                if enable_col is not None: # and sample[enable_col][0] != 1.0:
+                if enable_col is not None:  # and sample[enable_col][0] != 1.0:
                     # this shouldn't happen, but if it does then bitch
-                    #   as this situation hasn't been tested (eg, is 
+                    #   as this situation hasn't been tested (eg, is
                     #   enabled indicated by 1.0, or "1.0" or "true" or ??)
                     Exception("Enable flag not expected for text values")
-                    #continue # 'enable' flag present and it's turned off
+                    # continue # 'enable' flag present and it's turned off
                 val = sample[data_col][0]
                 if len(val) > 0:
                     return_val = val
@@ -94,7 +96,8 @@ class LabNotebookReader(object):
                 enable_col = self.enabled[name]
                 enable_idx = numeric_fields.tolist().index(enable_col)
             field_idx = numeric_fields.tolist().index(name)
-            return self.get_numeric_value(name, field_idx, sweep_idx, enable_idx, sweep_num, default_val)
+            return self.get_numeric_value(name, field_idx, sweep_idx,
+                                          enable_idx, sweep_num, default_val)
         elif name in text_fields:
             # first check to see if file includes old version of column name
             if "Sweep #" in text_fields:
@@ -106,32 +109,33 @@ class LabNotebookReader(object):
                 enable_col = self.enabled[name]
                 enable_idx = text_fields.tolist().index(enable_col)
             field_idx = text_fields.tolist().index(name)
-            return self.get_text_value(name, field_idx, sweep_idx, enable_idx, sweep_num, default_val)
+            return self.get_text_value(name, field_idx, sweep_idx, enable_idx,
+                                       sweep_num, default_val)
         else:
             return default_val
-            
-        
+
 
 """ Loads lab notebook data out of a first-generation IVSCC NWB file,
     that was manually translated from the IGOR h5 dump.
     Notebook data can be read through get_value() function
 """
+
+
 class LabNotebookReaderIvscc(LabNotebookReader):
     def __init__(self, nwb_file, h5_file):
         LabNotebookReader.__init__(self)
-        # for lab notebook, select first group 
+        # for lab notebook, select first group
         h5 = h5py.File(h5_file, "r")
         #
         # TODO FIXME check notebook version... but how?
         #
         notebook = h5["MIES/LabNoteBook/ITC18USB/Device0"]
         # load column data into memory
-        self.colname_number = notebook["KeyWave/keyWave"].value
-        self.val_number = notebook["settingsHistory/settingsHistory"].value
-        self.colname_text = notebook["TextDocKeyWave/txtDocKeyWave"].value
-        self.val_text = notebook["textDocumentation/txtDocWave"].value
+        self.colname_number = notebook["KeyWave/keyWave"][()]
+        self.val_number = notebook["settingsHistory/settingsHistory"][()]
+        self.colname_text = notebook["TextDocKeyWave/txtDocKeyWave"][()]
+        self.val_text = notebook["textDocumentation/txtDocWave"][()]
         h5.close()
-
 
 
 ########################################################################
@@ -140,10 +144,12 @@ class LabNotebookReaderIvscc(LabNotebookReader):
     Module input is the name of the nwb file.
     Notebook data can be read through get_value() function
 """
+
+
 class LabNotebookReaderIgorNwb(LabNotebookReader):
     def __init__(self, nwb_file):
         LabNotebookReader.__init__(self)
-        # for lab notebook, select first group 
+        # for lab notebook, select first group
         # NOTE this probably won't work for multipatch
         h5 = h5py.File(nwb_file, "r")
         #
@@ -153,15 +159,14 @@ class LabNotebookReaderIgorNwb(LabNotebookReader):
             notebook = h5["general/labnotebook"][k]
             break
         # load column data into memory
-        self.val_text = notebook["textualValues"].value
-        self.colname_text = notebook["textualKeys"].value
-        self.val_number = notebook["numericalValues"].value
-        self.colname_number = notebook["numericalKeys"].value
+        self.val_text = notebook["textualValues"][()]
+        self.colname_text = notebook["textualKeys"][()]
+        self.val_number = notebook["numericalValues"][()]
+        self.colname_number = notebook["numericalKeys"][()]
         h5.close()
         #
         self.register_enabled_names()
 
-        
 
 # creates LabNotebookReader appropriate to ivscc-NWB file version
 def create_lab_notebook_reader(nwb_file, h5_file=None):
@@ -178,4 +183,3 @@ def create_lab_notebook_reader(nwb_file, h5_file=None):
         return LabNotebookReaderIvscc(nwb_file, h5_file)
     else:
         Exception("Unable to determine NWB input type")
-

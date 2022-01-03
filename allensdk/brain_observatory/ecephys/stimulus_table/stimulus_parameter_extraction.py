@@ -21,7 +21,8 @@ def parse_stim_repr(
     array_re=ARRAY_RE,
     raise_on_unrecognized=False,
 ):
-    """ Read the string representation of a psychopy stimulus and extract stimulus parameters.
+    """ Read the string representation of a psychopy stimulus and extract
+    stimulus parameters.
 
     Parameters
     ----------
@@ -33,7 +34,7 @@ def parse_stim_repr(
 
     Returns
     -------
-    dict : 
+    dict :
         maps extracted parameter names to values
 
     """
@@ -49,7 +50,8 @@ def parse_stim_repr(
     return stim_params
 
 
-# This is not currently in use by the stimulus_table module, but is a potentially handy utility
+# This is not currently in use by the stimulus_table module, but is a
+# potentially handy utility
 def extract_stim_class_from_repr(stim_repr, repr_class_re=REPR_CLASS_RE):
     match = repr_class_re.match(stim_repr)
     if match is not None and "class_name" in match.groupdict():
@@ -59,14 +61,16 @@ def extract_stim_class_from_repr(stim_repr, repr_class_re=REPR_CLASS_RE):
 def extract_const_params_from_stim_repr(
     stim_repr, repr_params_re=REPR_PARAMS_RE, array_re=ARRAY_RE
 ):
-    """Parameters which are not set as sweep_params in the stimulus script (usually because they are not 
-    varied during the course of the session) are not output in an easily machine-readable format. This function 
+    """Parameters which are not set as sweep_params in the stimulus script
+    (usually because they are not varied during the course of the session) are
+    not output in an easily machine-readable format. This function
     attempts to recover them by parsing the string repr of the stimulus.
 
     Parameters
     ----------
         stim_repr : str
-            The repr of the camstim stimulus object. Served up per-stimulus in the stim pickle.
+            The repr of the camstim stimulus object. Served up per-stimulus
+            in the stim pickle.
         repr_params_re : re.Pattern
             Extracts attributes as "="-seperated strings
         array_re : re.Pattern
@@ -75,8 +79,8 @@ def extract_const_params_from_stim_repr(
     Returns
     -------
     repr_params : dict
-        dictionary of paramater keys and values extracted from the stim repr. Where possible, the values are converted 
-        to native Python types.
+        dictionary of paramater keys and values extracted from the stim repr.
+        Where possible, the values are converted to native Python types.
 
     """
 
@@ -93,7 +97,7 @@ def extract_const_params_from_stim_repr(
 
             try:
                 v = ast.literal_eval(v)
-            except ValueError as err:
+            except ValueError:
                 pass
 
             repr_params[k] = v

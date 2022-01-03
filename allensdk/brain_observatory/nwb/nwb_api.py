@@ -8,7 +8,8 @@ import collections
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
-namespace_path = Path(__file__).parent / 'ndx-aibs-behavior-ophys.namespace.yaml'
+namespace_path = Path(__file__).parent / \
+                 'ndx-aibs-behavior-ophys.namespace.yaml'
 pynwb.load_namespaces(str(namespace_path))
 
 
@@ -51,7 +52,8 @@ class NwbApi:
         Parameters
         ----------
         lowpass: bool
-            Whether to return the running speed with lowpass filter applied or without
+            Whether to return the running speed with lowpass filter applied
+            or without
 
         Returns
         -------
@@ -60,8 +62,10 @@ class NwbApi:
         """
 
         interface_name = 'speed' if lowpass else 'speed_unfiltered'
-        values = self.nwbfile.modules['running'].get_data_interface(interface_name).data[:]
-        timestamps = self.nwbfile.modules['running'].get_data_interface(interface_name).timestamps[:]
+        values = self.nwbfile.modules['running'].get_data_interface(
+            interface_name).data[:]
+        timestamps = self.nwbfile.modules['running'].get_data_interface(
+            interface_name).timestamps[:]
 
         return RunningSpeed(
             timestamps=timestamps,
@@ -70,7 +74,8 @@ class NwbApi:
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
 
-        columns_to_ignore = set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        columns_to_ignore = set(['tags', 'timeseries', 'tags_index',
+                                 'timeseries_index'])
 
         presentation_dfs = []
         for interval_name, interval in self.nwbfile.intervals.items():
@@ -83,10 +88,12 @@ class NwbApi:
                 presentation_dfs.append(df)
 
         table = pd.concat(presentation_dfs, sort=False)
+        table = table.astype(
+            {c: 'int64' for c in table.select_dtypes(include='int')})
         table = table.sort_values(by=["start_time"])
         table = table.reset_index(drop=True)
         table.index.name = 'stimulus_presentations_id'
-        table.index = table.index.astype(int)
+        table.index = table.index.astype('int64')
 
         for colname, series in table.items():
             types = set(series.map(type))
@@ -109,7 +116,8 @@ class NwbApi:
         if image_api is None:
             image_api = ImageApi
 
-        nwb_img = self.nwbfile.modules[module].get_data_interface('images')[name]
+        nwb_img = self.nwbfile.modules[module].get_data_interface(
+            'images')[name]
         data = nwb_img.data
         resolution = nwb_img.resolution  # px/cm
         spacing = [resolution * 10, resolution * 10]

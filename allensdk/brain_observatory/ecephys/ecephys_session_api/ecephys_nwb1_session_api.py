@@ -3,11 +3,8 @@ import pandas as pd
 import numpy as np
 import h5py
 import collections
-import warnings
 
-# from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from .ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
 class IDCreator(object):
@@ -34,19 +31,28 @@ class IDCreator(object):
 class EcephysNwb1Api(EcephysSessionApi):
     """An EcephySession adaptor for reading NWB1.0 files.
 
-    Was created by sight using an assortment of existing NWB1 files. It is possible that parts of the NWB1 standard (?!)
+    Was created by sight using an assortment of existing NWB1 files. It is
+    possible that parts of the NWB1 standard (?!)
     is missing or not properly implemented.
 
     NWB1 vs NWB2 issues:
-    * In NWB 1 there is no difference between global unit-ids and probe's local-index. A unit is unique to one channel
-    * Units are missing information about firing_rate, isi_violation, and quality.
-      - So that EcephysSession._build_units() actually return values I had to set quality=good for all units
-    * NWB Stimulus_presentations missing stimulus_block, stimulus_index and Image column
-      - To get EcephysSession.conditionwise_spikes() working had to make up a block number for every stimulus type
-    * NWB1 missing a 'valid_data' tag for channels. Had to set to True otherwise EcephysSession won't see any channels
-    * There were no 'channels' table/group in NWB1. Instead we had to iterate through all the units and pull out the
+    * In NWB 1 there is no difference between global unit-ids and probe's
+    local-index. A unit is unique to one channel
+    * Units are missing information about firing_rate, isi_violation,
+    and quality.
+      - So that EcephysSession._build_units() actually return values I had
+      to set quality=good for all units
+    * NWB Stimulus_presentations missing stimulus_block, stimulus_index and
+    Image column
+      - To get EcephysSession.conditionwise_spikes() working had to make up
+      a block number for every stimulus type
+    * NWB1 missing a 'valid_data' tag for channels. Had to set to True
+    otherwise EcephysSession won't see any channels
+    * There were no 'channels' table/group in NWB1. Instead we had to
+    iterate through all the units and pull out the
       distinct channel info.
-    * In NWB2 each unit has a mean-waveform for every channel on the probe. In NWB1 A unit only has a single waveform
+    * In NWB2 each unit has a mean-waveform for every channel on the probe.
+    In NWB1 A unit only has a single waveform
     * The NWB1 identifier is a string
     """
 
@@ -56,18 +62,21 @@ class EcephysNwb1Api(EcephysSessionApi):
         try:
             # check file is a valid NWB 1 file
             version_str = self._h5_root['nwb_version'][()]
-            if not (version_str.startswith('NWB-1.') or version_str.startswith('1.')):
-                raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
+            if not (version_str.startswith(b'NWB-1.') or
+                    version_str.startswith(b'1.')):
+                raise Exception(
+                    '{} is not a valid NWB 1 file path'.format(self._path))
         except Exception:
             raise
 
-        # EcephysSession requires session wide ids for units/channels/etc but NWB 1 doesn't have such a thing (ids
-        # are relative to the probe). The following data-stuctures are used build and fetch session ids without having
+        # EcephysSession requires session wide ids for units/channels/etc
+        # but NWB 1 doesn't have such a thing (ids
+        # are relative to the probe). The following data-stuctures are used
+        # build and fetch session ids without having
         # to parse all the tables.
         self._unit_ids = IDCreator()
         self._channel_ids = IDCreator()
         self._probe_ids = IDCreator()
-
 
     @property
     def processing_grp(self):
@@ -79,18 +88,21 @@ class EcephysNwb1Api(EcephysSessionApi):
 
     def _probe_groups(self):
         return [(pname, pgrp) for pname, pgrp in self.processing_grp.items()
-                if isinstance(pgrp, h5py.Group) and pname.lower().startswith('probe')]
+                if isinstance(pgrp, h5py.Group) and pname.lower().startswith(
+                'probe')]
 
     def get_running_speed(self):
         running_speed_grp = self.running_speed_grp
 
         return pd.DataFrame({
             "start_time": running_speed_grp['timestamps'][:],
-            "velocity": running_speed_grp['data'][:]  # average velocities over a given interval
+            "velocity": running_speed_grp['data'][:]
+            # average velocities over a given interval
         })
 
     __stim_col_map = {
-        # Used for mapping column names from NWB 1.0 features ds to their appropiate NWB 2.0 name
+        # Used for mapping column names from NWB 1.0 features ds to their
+        # appropiate NWB 2.0 name
         b'temporal_frequency': 'TF',
         b'spatial_frequency': 'SF',
         b'pos_x': 'Pos_x',
@@ -107,7 +119,8 @@ class EcephysNwb1Api(EcephysSessionApi):
         presentation_ids = 0  # make up a id for every stim-presentation
         stim_pres_grp = self._h5_root['/stimulus/presentation']
 
-        # Stimulus-presentations are heirarchily grouped by presentation name. Iterate through all of them and build
+        # Stimulus-presentations are heirarchily grouped by presentation
+        # name. Iterate through all of them and build
         # a single table.
         for block_i, (stim_name, stim_grp) in enumerate(stim_pres_grp.items()):
             timestamps = stim_grp['timestamps'][()]
@@ -115,20 +128,26 @@ class EcephysNwb1Api(EcephysSessionApi):
             if timestamps.shape[1] == 2:
                 stop_times = timestamps[:, 1]
             else:
-                # Some of the datasets have an optotagging stimulus with no stop time.
+                # Some of the datasets have an optotagging stimulus with no
+                # stop time.
                 continue
                 stop_times = np.nan
 
             n_stims = stim_grp['num_samples'][()]
             try:
-                # parse the features/data datasets, map old column names (temporal freq->TF, phase-> phase, etc).
-                stim_props = {self.__stim_col_map.get(ftr_name, ftr_name): stim_grp['data'][:, i]
-                              for i, ftr_name in enumerate(stim_grp['features'][()])}
+                # parse the features/data datasets, map old column names (
+                # temporal freq->TF, phase-> phase, etc).
+                stim_props = {
+                    self.__stim_col_map.get(
+                        ftr_name, ftr_name): stim_grp['data'][:, i]
+                    for i, ftr_name in enumerate(stim_grp['features'][()])}
             except Exception:
                 stim_props = {}
 
             stim_df = pd.DataFrame({
-                'stimulus_presentation_id': np.arange(presentation_ids, presentation_ids + n_stims),
+                'stimulus_presentation_id': np.arange(presentation_ids,
+                                                      presentation_ids +
+                                                      n_stims),
                 'start_time': start_times,
                 'stop_time': stop_times,
                 'stimulus_name': stim_name,
@@ -140,19 +159,23 @@ class EcephysNwb1Api(EcephysSessionApi):
                 'Color': stim_props.get('Color', np.nan),
                 'Phase': stim_props.get('Phase', np.nan),
                 'Image': stim_props.get('Image', np.nan),
-                'stimulus_block': block_i  # Required by conditionwise_spike_counts(), add made-up number
+                'stimulus_block': block_i
+                # Required by conditionwise_spike_counts(), add made-up number
             })
 
             presentation_ids += n_stims
             if stimulus_presentations_df is None:
                 stimulus_presentations_df = stim_df
             else:
-                stimulus_presentations_df = stimulus_presentations_df.append(stim_df)
+                stimulus_presentations_df = stimulus_presentations_df.append(
+                    stim_df)
 
-        stimulus_presentations_df['stimulus_index'] = 0  # I'm not sure what column is, but is droped by EcephysSession
-        stimulus_presentations_df.set_index('stimulus_presentation_id', inplace=True)
+        stimulus_presentations_df[
+            'stimulus_index'] = 0  # I'm not sure what column is, but is
+        # droped by EcephysSession
+        stimulus_presentations_df.set_index('stimulus_presentation_id',
+                                            inplace=True)
         return stimulus_presentations_df
-
 
     def get_probes(self) -> pd.DataFrame:
         probe_ids = []
@@ -167,15 +190,18 @@ class EcephysNwb1Api(EcephysSessionApi):
             'description': ""  # TODO: Find description
         })
         probes_df.set_index('id', inplace=True)
-        probes_df['sampling_rate'] = 30000.0  # TODO: calculate real sampling rate for each probe.
-        return probes_df
 
+        # TODO: calculate real sampling rate for each probe.
+        probes_df['sampling_rate'] = 30000.0
+
+        return probes_df
 
     def get_channels(self) -> pd.DataFrame:
         # TODO: Missing: manual_structure_id
         processing_grp = self.processing_grp
 
-        max_channels = sum(len(prb_grp['unit_list']) for prb_grp in processing_grp.values())
+        max_channels = sum(
+            len(prb_grp['unit_list']) for prb_grp in processing_grp.values())
         channel_ids = np.zeros(max_channels, dtype=np.uint64)
         local_channel_indices = np.zeros(max_channels, dtype=np.int64)
         prb_ids = np.zeros(max_channels, dtype=np.uint64)
@@ -185,7 +211,8 @@ class EcephysNwb1Api(EcephysSessionApi):
 
         channel_indx = 0
         existing_channels = set()
-        # In NWB 1.0 files I used I couldn't find a channel group/dataset. Instead we have to iterate through all units
+        # In NWB 1.0 files I used I couldn't find a channel group/dataset.
+        # Instead we have to iterate through all units
         # to get information about all available channels
         for prb_name, prb_grp in self._probe_groups():
             prb_id = self._probe_ids[prb_name]
@@ -195,7 +222,8 @@ class EcephysNwb1Api(EcephysSessionApi):
                 local_channel_index = unit_grp['channel'][()]
                 channel_id = self._channel_ids[(prb_name, local_channel_index)]
                 if channel_id in existing_channels:
-                    # If a channel has already been processed (ie it's shared by another unit) skip it. I'm assuming
+                    # If a channel has already been processed (ie it's
+                    # shared by another unit) skip it. I'm assuming
                     # position/ccf info is the same for every probe/channel_id.
                     continue
                 else:
@@ -205,10 +233,11 @@ class EcephysNwb1Api(EcephysSessionApi):
                     prb_hrz_pos[channel_indx] = unit_grp['xpos_probe'][()]
                     prb_vert_pos[channel_indx] = unit_grp['ypos_probe'][()]
                     try:
-                        struct_acronyms[channel_indx] = str(unit_grp['ccf_structure'][()], encoding='ascii')
+                        struct_acronyms[channel_indx] = str(
+                            unit_grp['ccf_structure'][()], encoding='ascii')
                     except TypeError:
-                        struct_acronyms[channel_indx] = unit_grp['ccf_structure'][()]
-
+                        struct_acronyms[channel_indx] = \
+                            unit_grp['ccf_structure'][()]
 
                     existing_channels.add(channel_id)
                     channel_indx += 1
@@ -229,12 +258,15 @@ class EcephysNwb1Api(EcephysSessionApi):
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
         waveforms = {}
         for prb_name, prb_grp in self._probe_groups():
-            # There is one waveform for any given spike, but still calling it "mean" wavefor
+            # There is one waveform for any given spike, but still calling
+            # it "mean" waveform
             for indx, uid in enumerate(prb_grp['unit_list']):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 unit_id = self._unit_ids[(prb_name, uid)]
-                waveforms[unit_id] = np.array([unit_grp['waveform'][()],])  # EcephysSession is expecting an array of waveforms
 
+                # EcephysSession is expecting an array of waveforms
+                waveforms[unit_id] = \
+                    np.array([unit_grp['waveform'][()], ])
         return waveforms
 
     def get_spike_times(self) -> Dict[int, np.ndarray]:
@@ -256,7 +288,8 @@ class EcephysNwb1Api(EcephysSessionApi):
 
         for prb_name, prb_grp in self._probe_groups():
             # visit every /processing/probeN/UnitList/N/ group to build
-            # TODO: Since just visting the tree is so expensive, maybe build the channels and probes at the same time.
+            # TODO: Since just visting the tree is so expensive, maybe build
+            #  the channels and probes at the same time.
             unit_list = prb_grp['unit_list'][()]
             prb_uids = np.zeros(len(unit_list), dtype=np.uint64)
             prb_channels = np.zeros(len(unit_list), dtype=np.int64)
@@ -264,7 +297,8 @@ class EcephysNwb1Api(EcephysSessionApi):
             for indx, uid in enumerate(unit_list):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 prb_uids[indx] = self._unit_ids[(prb_name, uid)]
-                prb_channels[indx] = self._channel_ids[(prb_name, unit_grp['channel'][()])]
+                prb_channels[indx] = self._channel_ids[
+                    (prb_name, unit_grp['channel'][()])]
                 prb_snr[indx] = unit_grp['snr'][()]
 
             unit_ids = np.append(unit_ids, prb_uids)
@@ -277,7 +311,9 @@ class EcephysNwb1Api(EcephysSessionApi):
             'local_index': local_indices,
             'peak_channel_id': peak_channel_ids,
             'snr': snrs,
-            'quality': "good"  # TODO: NWB 1.0 is missing quality table, need to find an equivelent
+            'quality': "good"
+            # TODO: NWB 1.0 is missing quality table, need to find an
+            #  equivalent
         })
 
         units_df.set_index('unit_id', inplace=True)
