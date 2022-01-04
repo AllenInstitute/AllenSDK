@@ -20,7 +20,7 @@ argschema>=3.0.1,<4.0.0
 glymur==0.8.19
 xarray<0.16.0
 pynwb
-tables>=3.6.0,<3.7.0  # Upper bound due to https://github.com/PyTables/PyTables/issues/933
+tables>=3.6.0,<3.7.0
 seaborn<1.0.0
 aiohttp==3.7.4
 nest_asyncio
