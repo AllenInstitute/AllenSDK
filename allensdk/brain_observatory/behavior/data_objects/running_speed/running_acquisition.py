@@ -148,7 +148,8 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
         )
-  @classmethod
+
+    @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_ophys_lims(
         cls,
@@ -171,7 +172,6 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
         )
-
 
     @classmethod
     def from_nwb(

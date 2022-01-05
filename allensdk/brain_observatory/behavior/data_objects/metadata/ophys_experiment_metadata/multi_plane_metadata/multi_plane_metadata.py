@@ -1,9 +1,6 @@
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .ophys_experiment_metadata.experiment_container_id import \
-    ExperimentContainerId
-from allensdk.brain_observatory.behavior.data_objects.metadata \
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -25,12 +22,11 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
 from allensdk.internal.api import PostgresQueryMixin
 
 
-#TODO: Implement a check to see if experiment containers exist
+# TODO: Implement a check to see if experiment containers exist
 class MultiplaneMetadata(OphysExperimentMetadata):
     def __init__(self,
                  ophys_experiment_id: int,
                  ophys_session_id: OphysSessionId,
-                 #experiment_container_id: ExperimentContainerId,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  imaging_plane_group: ImagingPlaneGroup,
@@ -38,7 +34,6 @@ class MultiplaneMetadata(OphysExperimentMetadata):
         super().__init__(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            #experiment_container_id=experiment_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
             project_code=project_code

@@ -62,7 +62,8 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
             monitor_delay=monitor_delay,
             stimulus_file=stimulus_file
         )
-@classmethod
+
+    @classmethod
     def from_ophys_stimulus_file(
             cls,
             stimulus_file: StimulusFile) -> "StimulusTimestamps":

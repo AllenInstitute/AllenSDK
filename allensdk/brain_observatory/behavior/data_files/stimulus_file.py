@@ -18,14 +18,13 @@ STIMULUS_FILE_QUERY_TEMPLATE = """
         wkf.storage_directory || wkf.filename AS stim_file
     FROM
         well_known_files wkf
-    JOIN 
+    JOIN
         well_known_file_types wkft
         ON wkf.well_known_file_type_id = wkft.id
     WHERE
         wkf.attachable_id = {behavior_session_id}
         AND wkft.name = 'StimulusPickle'
 """
-
 
 
 def from_json_cache_key(cls, dict_repr: dict):

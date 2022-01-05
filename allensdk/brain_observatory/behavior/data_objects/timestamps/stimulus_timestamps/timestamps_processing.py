@@ -49,6 +49,7 @@ def get_wheel_timestamps(stimulus_pkl: dict) -> np.ndarray:
     stimulus_timestamps = np.hstack((0, vsyncs)).cumsum() / 1000.0
     return stimulus_timestamps
 
+
 def get_ophys_stimulus_timestamps(sync_path: Union[str, Path]) -> np.ndarray:
     """Obtain visual behavior stimuli timing information from a sync *.h5 file.
 
