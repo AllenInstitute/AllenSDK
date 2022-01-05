@@ -75,7 +75,7 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         return cls(
             timestamps=stimulus_timestamps,
             stimulus_file=stimulus_file
-        )    
+        )
 
     @classmethod
     def from_sync_file(
