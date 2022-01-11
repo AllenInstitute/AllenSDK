@@ -44,7 +44,8 @@ class DenseMovieTemplates(DataObject, StimulusFileReadableInterface,
         FOR NOW:  This returns a dict of dicts for warped and unwarped stimuli.  Keys are stim names from the presentation table and values are paths to the npy array."""
 
         warped_path = Path('/allen/programs/braintv/workgroups/nc-ophys/ImageData/Dan/ten_session_movies')
-        unwarped_path = Path('/allen/programs/braintv/workgroups/cortexmodels/michaelbu/Stimuli/SignalNoise/arrays')
+        original_path = Path('/allen/programs/braintv/workgroups/cortexmodels/michaelbu/Stimuli/SignalNoise/arrays')
+        unwarped_path = Path('/allen/programs/mindscope/workgroups/task-trained/michaelbu/signal_noise/stimuli/')
 
         stim_dict = {'warped': {}, 'unwarped': {}}
 
@@ -53,12 +54,14 @@ class DenseMovieTemplates(DataObject, StimulusFileReadableInterface,
         for stim in pkl_data['stimuli']:
 
             warped_stim_name = str(stim['movie_path']).split('\\')[-1]
+            unwarped_stim_name = warped_stim_name.replace('warped', 'unwarped')
 
             stage_number, segment_number, test_or_train = stim_name_parse(warped_stim_name)
             original_stim_name = get_original_stim_name(stage_number, segment_number, test_or_train)
 
             stim_dict['warped'][original_stim_name] = warped_path / warped_stim_name
-            stim_dict['unwarped'][original_stim_name] = unwarped_path / original_stim_name
+            stim_dict['original'][original_stim_name] = original_path / original_stim_name
+            stim_dict['unwarped'][original_stim_name] = unwarped_path / unwarped_stim_name
 
         return DenseMovieTemplates(templates=stim_dict)
 
