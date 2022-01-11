@@ -56,7 +56,7 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.internal.api import db_connection_creator
-
+import os
 
 class VisualCodingOphysExperiment(VisualCodingSession):
     """Represents data from a single Visual Behavior Ophys imaging session.
@@ -95,6 +95,8 @@ class VisualCodingOphysExperiment(VisualCodingSession):
         self._motion_correction = motion_correction
         self._eye_tracking = eye_tracking_table
         self._eye_tracking_rig_geometry = eye_tracking_rig_geometry
+
+        self._event_table = None
 
     def to_nwb(self) -> NWBFile:
         nwbfile = super().to_nwb(add_metadata=False)
@@ -593,7 +595,28 @@ class VisualCodingOphysExperiment(VisualCodingSession):
                 estimated noise standard deviation for the events trace
 
         """
-        return self._cell_specimens.events
+
+        if self._event_table is None:
+            events_file_name = 'events_' + str(self.ophys_experiment_id) + '.npz'
+            events_file_path = os.path.join('/allen/programs/mindscope/workgroups/task-trained/michaelbu/signal_noise/events', events_file_name)
+
+            events_data = np.load(events_file_path, allow_pickle=True)
+
+            self.event_min_size = events_data['event_min_size']
+
+            event_table = self.dff_traces.copy()
+
+            event_table['events'] = [row for row in events_data['events']]
+
+            event_table['noise_std'] = events_data['noise_stds']
+
+            event_table['lambda'] = events_data['lambdas']     
+
+            
+            self._event_table = event_table
+
+        return self._event_table
+
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
