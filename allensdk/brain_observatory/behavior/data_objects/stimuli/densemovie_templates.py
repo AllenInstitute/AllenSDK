@@ -47,7 +47,7 @@ class DenseMovieTemplates(DataObject, StimulusFileReadableInterface,
         original_path = Path('/allen/programs/braintv/workgroups/cortexmodels/michaelbu/Stimuli/SignalNoise/arrays')
         unwarped_path = Path('/allen/programs/mindscope/workgroups/task-trained/michaelbu/signal_noise/stimuli/')
 
-        stim_dict = {'warped': {}, 'unwarped': {}}
+        stim_dict = {'warped': {}, 'unwarped': {}, 'original': {}}
 
         pkl_data = stimulus_file.data
 
