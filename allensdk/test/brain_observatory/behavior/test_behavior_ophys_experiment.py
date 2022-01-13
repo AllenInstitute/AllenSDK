@@ -218,8 +218,9 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
             lambda db, ophys_experiment_id: sf)
         ctx.setattr(
             StimulusTimestamps, 'from_sync_file',
-            lambda sync_file: create_autospec(StimulusTimestamps,
-                                              instance=True))
+            lambda sync_file, monitor_delay:
+            create_autospec(StimulusTimestamps,
+                            instance=True))
         ctx.setattr(
             BehaviorSessionId, 'from_lims',
             lambda db, ophys_experiment_id: create_autospec(BehaviorSessionId,
@@ -385,3 +386,29 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods(
         obt = boe.list_data_attributes_and_methods()
 
     assert any(expected ^ set(obt)) is False
+
+
+@pytest.mark.requires_bamboo
+def test_stim_v_trials_time(
+        behavior_ophys_experiment_fixture):
+    """
+    Check that the stimulus and trials tables list the same times
+    for frame changes. This was a problem in autumn 2021 because
+
+    a) monitor_delay was not being applied to the stimulus timestamps
+    b) the stimulus frame changes and trial frame changes were off by
+    one index in the StimulusTimestamps array
+    """
+    exp = behavior_ophys_experiment_fixture
+
+    stim = exp.stimulus_presentations.\
+        query('is_change').\
+        start_time.reset_index(drop=True)
+
+    trials = exp.trials.\
+        query('not aborted').\
+        query('go or auto_rewarded')['change_time'].\
+        reset_index(drop=True)
+
+    delta = np.abs(stim-trials)
+    assert delta.max() < 1.0e-6

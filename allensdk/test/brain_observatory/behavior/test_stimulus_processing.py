@@ -22,7 +22,8 @@ def behavior_stimuli_time_fixture(request):
     timestamp_count = request.param["timestamp_count"]
     time_step = request.param["time_step"]
 
-    timestamps = np.array([time_step * i for i in range(timestamp_count)])
+    timestamps = np.array([time_step * i for i in range(
+        timestamp_count)]).astype('int64')
 
     return timestamps
 
@@ -345,6 +346,7 @@ def test_get_stimulus_presentations(behavior_stimuli_time_fixture,
         behavior_stimuli_time_fixture)
 
     expected_df = pd.DataFrame.from_dict(expected)
+    expected_df.index.name = 'stimulus_presentations_id'
 
     assert presentations_df.equals(expected_df)
 

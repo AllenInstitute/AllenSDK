@@ -3,7 +3,13 @@ import sys
 
 import pytest
 
+import datetime
+import pytz
+from pynwb import NWBFile
+
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
+    BehaviorOphysExperiment)
 
 
 def get_resources_dir():
@@ -92,3 +98,33 @@ def behavior_stimuli_data_fixture(request):
         data["items"]["behavior"]["stimuli"]["grating"] = grating_data
 
     return data
+
+
+@pytest.fixture()
+def skeletal_nwb_fixture():
+    """
+    Instantiate an NWB file that has no real data in it
+    """
+
+    timezone = pytz.timezone('UTC')
+    date = timezone.localize(datetime.datetime.now())
+
+    nwbfile = NWBFile(
+            session_description="dummy",
+            identifier="00001",
+            session_start_time=date,
+            file_create_date=date,
+            institution="Allen Institute for Brain Science"
+        )
+    return nwbfile
+
+
+@pytest.fixture(scope='session')
+def behavior_ophys_experiment_fixture():
+    """
+    A valid BehaviorOphysExperiment instantiated from_lims
+    """
+
+    experiment_id = 953443028
+    experiment = BehaviorOphysExperiment.from_lims(experiment_id)
+    return experiment

@@ -93,7 +93,7 @@ class Dataset(object):
 
 
     """
-    FRAME_KEYS = ('frames', 'stim_vsync')
+    FRAME_KEYS = ('frames', 'stim_vsync', 'vsync_stim')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
     EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking

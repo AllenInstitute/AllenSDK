@@ -3,32 +3,39 @@ import numpy as np
 import pandas as pd
 
 from .conftest import MockSessionApi
-from allensdk.brain_observatory.ecephys.stimulus_analysis.dot_motion import DotMotion
+from allensdk.brain_observatory.ecephys.stimulus_analysis.dot_motion \
+    import DotMotion
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
 class MockDMSessionApi(MockSessionApi):
     def get_stimulus_presentations(self):
-        features = np.array(np.meshgrid([0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0],  # Dir
-                                        [0.001, 0.005, 0.01, 0.02])                            # Speed
+        features = np.array(np.meshgrid([0.0, 45.0, 90.0, 135.0, 180.0,
+                                         225.0, 270.0, 315.0],  # Dir
+                                        [0.001, 0.005, 0.01, 0.02])  # Speed
                             ).reshape(2, 32)
 
-        features = np.concatenate((features, np.array([np.nan, np.nan]).reshape((2, 1))), axis=1) # null case
+        features = np.concatenate((features,
+                                   np.array([np.nan, np.nan]).reshape((2, 1))),
+                                  axis=1)  # null case
 
         return pd.DataFrame({
-            'start_time': np.concatenate(([0.0], np.linspace(0.5, 32.5, 33, endpoint=True), [33.5])),
-            'stop_time': np.concatenate(([0.5], np.linspace(1.5, 33.5, 33, endpoint=True), [34.0])),
-            'stimulus_name': ['spontaneous'] + ['dot_motion']*33 + ['spontaneous'],
+            'start_time': np.concatenate(([0.0], np.linspace(0.5, 32.5, 33,
+                                         endpoint=True), [33.5])),
+            'stop_time': np.concatenate(([0.5], np.linspace(1.5, 33.5, 33,
+                                        endpoint=True), [34.0])),
+            'stimulus_name': ['spontaneous'] +
+                             ['dot_motion']*33 +
+                             ['spontaneous'],
             'stimulus_block': [0] + [1]*33 + [0],
             'duration': [0.5] + [1.0]*33 + [0.5],
             'stimulus_index': [0] + [1]*33 + [0],
-            'Dir': np.concatenate(([np.nan], features[0,:], [np.nan])),
+            'Dir': np.concatenate(([np.nan], features[0, :], [np.nan])),
             'Speed': np.concatenate(([np.nan], features[1, :], [np.nan]))
         }, index=pd.Index(name='id', data=np.arange(35)))
 
     def get_invalid_times(self):
         return pd.DataFrame()
-
 
 
 @pytest.fixture
@@ -53,9 +60,13 @@ def test_stimulus(ecephys_api):
     dm = DotMotion(ecephys_session=session)
     assert(isinstance(dm.stim_table, pd.DataFrame))
     assert(len(dm.stim_table) == 33)
-    assert(set(dm.stim_table.columns).issuperset({'Dir', 'Speed', 'start_time', 'stop_time'}))
+    assert(set(dm.stim_table.columns).issuperset({'Dir',
+                                                  'Speed',
+                                                  'start_time',
+                                                  'stop_time'}))
 
-    assert(set(dm.directions) == {0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0})
+    assert(set(dm.directions) == {0.0, 45.0, 90.0, 135.0,
+                                  180.0, 225.0, 270.0, 315.0})
     assert(dm.number_directions == 8)
 
     assert(set(dm.speeds) == {0.001, 0.005, 0.01, 0.02})

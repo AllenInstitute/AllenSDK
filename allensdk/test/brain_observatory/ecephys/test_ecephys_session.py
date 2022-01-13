@@ -4,19 +4,21 @@ import numpy as np
 import xarray as xr
 import types
 
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession, nan_intervals, build_spike_histogram
+from allensdk.brain_observatory.ecephys.ecephys_session_api import \
+    EcephysSessionApi
+from allensdk.brain_observatory.ecephys.ecephys_session import \
+    EcephysSession, nan_intervals, build_spike_histogram
 
 
 @pytest.fixture
 def raw_stimulus_table():
     return pd.DataFrame({
         'start_time': np.arange(4)/2,
-        'stop_time':np.arange(1, 5)/2,
-        'stimulus_name':['a', 'a', 'a', 'a_movie'],
-        'stimulus_block':[0, 0, 0, 1],
+        'stop_time': np.arange(1, 5)/2,
+        'stimulus_name': ['a', 'a', 'a', 'a_movie'],
+        'stimulus_block': [0, 0, 0, 1],
         'TF': np.empty(4) * np.nan,
-        'SF':np.empty(4) * np.nan,
+        'SF': np.empty(4) * np.nan,
         'Ori': np.empty(4) * np.nan,
         'Contrast': np.empty(4) * np.nan,
         'Pos_x': np.empty(4) * np.nan,
@@ -27,6 +29,7 @@ def raw_stimulus_table():
         'Phase': np.linspace(0, 180, 4),
         "texRes": np.ones([4])
     }, index=pd.Index(name='id', data=np.arange(4)))
+
 
 @pytest.fixture
 def raw_invalid_times_table():
@@ -49,7 +52,6 @@ def raw_spike_times():
         1: np.array([2.5]),
         2: np.array([1.01, 1.03, 1.02])
     }
-
 
 
 @pytest.fixture
@@ -106,11 +108,13 @@ def raw_lfp():
         )
     }
 
+
 @pytest.fixture
-def just_stimulus_table_api(raw_stimulus_table):
+def just_stim_table_api(raw_stimulus_table):
     class EcephysJustStimulusTableApi(EcephysSessionApi):
         def get_stimulus_presentations(self):
             return raw_stimulus_table
+
         def get_invalid_times(self):
             return pd.DataFrame()
     return EcephysJustStimulusTableApi()
@@ -121,12 +125,16 @@ def channels_table_api(raw_channels, raw_probes, raw_lfp, raw_stimulus_table):
     class EcephysChannelsTableApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
+
         def get_probes(self):
             return raw_probes
+
         def get_lfp(self, pid):
             return raw_lfp[pid]
+
         def get_stimulus_presentations(self):
             return raw_stimulus_table
+
         def get_invalid_times(self):
             return pd.DataFrame()
 
@@ -134,16 +142,24 @@ def channels_table_api(raw_channels, raw_probes, raw_lfp, raw_stimulus_table):
 
 
 @pytest.fixture
-def lfp_masking_api(raw_channels, raw_probes, raw_lfp, raw_stimulus_table, raw_invalid_times_table):
+def lfp_masking_api(raw_channels,
+                    raw_probes,
+                    raw_lfp,
+                    raw_stimulus_table,
+                    raw_invalid_times_table):
     class EcephysMaskInvalidLFPApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
+
         def get_probes(self):
             return raw_probes
+
         def get_lfp(self, pid):
             return raw_lfp[pid]
+
         def get_stimulus_presentations(self):
             return raw_stimulus_table
+
         def get_invalid_times(self):
             return raw_invalid_times_table
     return EcephysMaskInvalidLFPApi()
@@ -154,47 +170,65 @@ def units_table_api(raw_channels, raw_units, raw_probes):
     class EcephysUnitsTableApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
+
         def get_units(self):
             return raw_units
+
         def get_probes(self):
-            return raw_probes  
+            return raw_probes
     return EcephysUnitsTableApi()
 
+
 @pytest.fixture
-def valid_stimulus_table_api(raw_stimulus_table,raw_invalid_times_table):
+def valid_stimulus_table_api(raw_stimulus_table, raw_invalid_times_table):
     class EcephysValidStimulusTableApi(EcephysSessionApi):
         def get_invalid_times(self):
             return raw_invalid_times_table
+
         def get_stimulus_presentations(self):
             return raw_stimulus_table
     return EcephysValidStimulusTableApi()
 
 
 @pytest.fixture
-def mean_waveforms_api(raw_mean_waveforms, raw_channels, raw_units, raw_probes):
+def mean_waveforms_api(raw_mean_waveforms,
+                       raw_channels,
+                       raw_units,
+                       raw_probes):
     class EcephysMeanWaveformsApi(EcephysSessionApi):
         def get_mean_waveforms(self):
             return raw_mean_waveforms
+
         def get_channels(self):
             return raw_channels
+
         def get_units(self):
             return raw_units
+
         def get_probes(self):
             return raw_probes
     return EcephysMeanWaveformsApi()
 
 
 @pytest.fixture
-def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw_spike_times):
+def spike_times_api(raw_units,
+                    raw_channels,
+                    raw_probes,
+                    raw_stimulus_table,
+                    raw_spike_times):
     class EcephysSpikeTimesApi(EcephysSessionApi):
         def get_spike_times(self):
             return raw_spike_times
+
         def get_channels(self):
             return raw_channels
+
         def get_units(self):
             return raw_units
+
         def get_probes(self):
             return raw_probes
+
         def get_stimulus_presentations(self):
             return raw_stimulus_table
 
@@ -205,8 +239,8 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
 
 
 def get_no_spikes_times(self):
-    # A special method used for testing cases when there are no spikes for a given session, will be swapped out for
-    # get_spike_times()
+    # A special method used for testing cases when there are no spikes for a
+    # given session, will be swapped out for get_spike_times()
     return {
         0: np.array([]),
         1: np.array([]),
@@ -222,7 +256,7 @@ def session_metadata_api():
     return EcephysSessionMetadataApi()
 
 
-def test_get_stimulus_epochs(just_stimulus_table_api):
+def test_get_stimulus_epochs(just_stim_table_api):
 
     expected = pd.DataFrame({
         "start_time": [0, 3/2],
@@ -232,13 +266,16 @@ def test_get_stimulus_epochs(just_stimulus_table_api):
         "stimulus_block": [0, 1]
     })
 
-    session = EcephysSession(api=just_stimulus_table_api)
+    session = EcephysSession(api=just_stim_table_api)
     obtained = session.get_stimulus_epochs()
 
     print(expected)
     print(obtained)
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
 def test_get_invalid_times(valid_stimulus_table_api, raw_invalid_times_table):
@@ -249,7 +286,10 @@ def test_get_invalid_times(valid_stimulus_table_api, raw_invalid_times_table):
 
     obtained = session.get_invalid_times()
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
 def test_get_stimulus_presentations(valid_stimulus_table_api):
@@ -257,19 +297,26 @@ def test_get_stimulus_presentations(valid_stimulus_table_api):
     expected = pd.DataFrame({
         "start_time": [0, 1/2, 1, 3/2],
         "stop_time": [1/2, 1, 3/2, 2],
-        "stimulus_name": ['invalid_presentation', 'invalid_presentation', 'a', 'a_movie'],
+        "stimulus_name": ['invalid_presentation',
+                          'invalid_presentation', 'a', 'a_movie'],
         "phase": [np.nan, np.nan, 120.0, 180.0]
     }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
 
     session = EcephysSession(api=valid_stimulus_table_api)
-    obtained = session.stimulus_presentations[["start_time", "stop_time", "stimulus_name", "phase"]]
+    obtained = session.stimulus_presentations[["start_time",
+                                               "stop_time",
+                                               "stimulus_name",
+                                               "phase"]]
 
     print(expected)
     print(obtained)
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
-def test_get_stimulus_presentations_no_invalid_times(just_stimulus_table_api):
+def test_get_stimulus_presentations_no_invalid_times(just_stim_table_api):
 
     expected = pd.DataFrame({
         "start_time": [0, 1/2, 1, 3/2],
@@ -278,13 +325,19 @@ def test_get_stimulus_presentations_no_invalid_times(just_stimulus_table_api):
 
     }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
 
-    session = EcephysSession(api=just_stimulus_table_api)
+    session = EcephysSession(api=just_stim_table_api)
 
-    obtained = session.stimulus_presentations[["start_time", "stop_time", "stimulus_name"]]
+    obtained = session.stimulus_presentations[["start_time",
+                                               "stop_time",
+                                               "stimulus_name"]]
     print(expected)
     print(obtained)
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
+
 
 def test_session_metadata(session_metadata_api):
     session = EcephysSession(api=session_metadata_api)
@@ -292,14 +345,15 @@ def test_session_metadata(session_metadata_api):
     assert 12345 == session.ecephys_session_id
 
 
-def test_build_stimulus_presentations(just_stimulus_table_api):
+def test_build_stimulus_presentations(just_stim_table_api):
     expected_columns = [
-        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 
-        'temporal_frequency', 'spatial_frequency', 'orientation', 'contrast', 
-        'x_position', 'y_position', 'color', 'frame', 'phase', 'duration', "stimulus_condition_id"
+        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block',
+        'temporal_frequency', 'spatial_frequency', 'orientation', 'contrast',
+        'x_position', 'y_position', 'color', 'frame', 'phase',
+        'duration', "stimulus_condition_id"
     ]
 
-    session = EcephysSession(api=just_stimulus_table_api)
+    session = EcephysSession(api=just_stim_table_api)
     obtained = session.stimulus_presentations
 
     print(obtained.head())
@@ -330,7 +384,11 @@ def test_build_units_table(units_table_api):
 
 def test_presentationwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
+    obtained = \
+        session.presentationwise_spike_counts(
+            np.linspace(-.1, .1, 3),
+            session.stimulus_presentations.index.values,
+            session.units.index.values)
 
     first = obtained.loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
     assert np.allclose([0, 3], first)
@@ -343,32 +401,34 @@ def test_presentationwise_spike_counts(spike_times_api):
 
 @pytest.mark.parametrize("spike_times,time_domain,expected", [
     [
-        {1: [1.5, 2.5]}, 
+        {1: [1.5, 2.5]},
         [[1, 2, 3, 4], [1.1, 2.1, 3.1, 4.1]],
         np.array([[1, 1, 0], [1, 1, 0]])[:, :, None]
     ],
     [
-        {1: [1.5, 2.5]}, 
+        {1: [1.5, 2.5]},
         [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
         np.array([[1, 1, 0], [0, 1, 0]])[:, :, None]
     ],
     [
-        {1: [1.5, 2.5], 2: [1.5, 2.5]}, 
+        {1: [1.5, 2.5], 2: [1.5, 2.5]},
         [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
         np.stack(([[1, 1, 0], [0, 1, 0]], [[1, 1, 0], [0, 1, 0]]), axis=2)
-    ]
-,
+    ],
     [
-        {1: [1.5, 2.5], 2: [1.5, 1.55]}, 
+        {1: [1.5, 2.5], 2: [1.5, 1.55]},
         [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
         np.stack(([[1, 1, 0], [0, 1, 0]], [[2, 0, 0], [0, 0, 0]]), axis=2)
     ]
 ])
 @pytest.mark.parametrize("binarize", [True, False])
 def test_build_spike_histogram(spike_times, time_domain, expected, binarize):
-    
+
     unit_ids = [k for k in spike_times.keys()]
-    obtained = build_spike_histogram(time_domain, spike_times, unit_ids, binarize=binarize)
+    obtained = build_spike_histogram(time_domain,
+                                     spike_times,
+                                     unit_ids,
+                                     binarize=binarize)
 
     expected = np.array(expected)
     if binarize:
@@ -380,7 +440,10 @@ def test_build_spike_histogram(spike_times, time_domain, expected, binarize):
 
 def test_presentationwise_spike_times(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.presentationwise_spike_times(session.stimulus_presentations.index.values, session.units.index.values)
+    obtained = \
+        session.presentationwise_spike_times(
+            session.stimulus_presentations.index.values,
+            session.units.index.values)
 
     expected = pd.DataFrame({
         'unit_id': [2, 2, 2],
@@ -388,22 +451,32 @@ def test_presentationwise_spike_times(spike_times_api):
         'time_since_stimulus_presentation_onset': [0.01, 0.02, 0.03]
     }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)    
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
 def test_empty_presentationwise_spike_times(spike_times_api):
-    # Test that when there are no spikes presentationwise_spike_times doesn't fail and instead returns a empty dataframe
-    spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times, spike_times_api)
+    # Test that when there are no spikes presentationwise_spike_times
+    # doesn't fail and instead returns a empty dataframe
+    spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times,
+                                                       spike_times_api)
     session = EcephysSession(api=spike_times_api)
-    obtained = session.presentationwise_spike_times(session.stimulus_presentations.index.values,
-                                                    session.units.index.values)
+    obtained = \
+        session.presentationwise_spike_times(
+            session.stimulus_presentations.index.values,
+            session.units.index.values)
+
     assert(isinstance(obtained, pd.DataFrame))
     assert(obtained.empty)
 
 
 def test_conditionwise_spike_statistics(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2])
+    obtained = \
+        session.conditionwise_spike_statistics(
+            stimulus_presentation_ids=[0, 1, 2])
 
     pd.set_option('display.max_columns', None)
 
@@ -413,7 +486,9 @@ def test_conditionwise_spike_statistics(spike_times_api):
 
 def test_conditionwise_spike_statistics_using_rates(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2], use_rates=True)
+    obtained = \
+        session.conditionwise_spike_statistics(
+            stimulus_presentation_ids=[0, 1, 2], use_rates=True)
 
     pd.set_option('display.max_columns', None)
     assert np.allclose([0, 0, 6], obtained["spike_mean"].values)
@@ -421,7 +496,8 @@ def test_conditionwise_spike_statistics_using_rates(spike_times_api):
 
 def test_empty_conditionwise_spike_statistics(spike_times_api):
     # special case when there are no spikes
-    spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times, spike_times_api)
+    spike_times_api.get_spike_times = \
+        types.MethodType(get_no_spikes_times, spike_times_api)
     session = EcephysSession(api=spike_times_api)
     obtained = session.conditionwise_spike_statistics(
         stimulus_presentation_ids=session.stimulus_presentations.index.values,
@@ -430,30 +506,39 @@ def test_empty_conditionwise_spike_statistics(spike_times_api):
     assert(len(obtained) == 12)
     assert(not np.any(obtained['spike_count']))  # check all spike_counts are 0
     assert(not np.any(obtained['spike_mean']))  # spike_means are 0
-    assert(np.all(np.isnan(obtained['spike_std'])))  # std/sem will be undefined
+    assert(np.all(np.isnan(obtained['spike_std'])))  # std/sem is undefined
     assert(np.all(np.isnan(obtained['spike_sem'])))
 
 
-def test_get_stimulus_parameter_values(just_stimulus_table_api):
-    session = EcephysSession(api=just_stimulus_table_api)
+def test_get_stimulus_parameter_values(just_stim_table_api):
+    session = EcephysSession(api=just_stim_table_api)
     obtained = session.get_stimulus_parameter_values()
 
     expected = {
         'color': [0, 5.5, 11, 16.5],
         'phase': [0, 60, 120, 180]
     }
-    
+
     for k, v in expected.items():
         assert np.allclose(v, obtained[k])
     assert len(expected) == len(obtained)
 
 
 @pytest.mark.parametrize("detailed", [True, False])
-def test_get_stimulus_table(detailed, just_stimulus_table_api, raw_stimulus_table):
-    session = EcephysSession(api=just_stimulus_table_api)
-    obtained = session.get_stimulus_table(['a'], include_detailed_parameters=detailed)
+def test_get_stimulus_table(detailed,
+                            just_stim_table_api,
+                            raw_stimulus_table):
+    session = EcephysSession(api=just_stim_table_api)
+    obtained = session.get_stimulus_table(
+        ['a'],
+        include_detailed_parameters=detailed)
 
-    expected_columns = ['start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase']
+    expected_columns = ['start_time',
+                        'stop_time',
+                        'stimulus_name',
+                        'stimulus_block',
+                        'Color',
+                        'Phase']
     if detailed:
         expected_columns.append("texRes")
     expected = raw_stimulus_table.loc[:2, expected_columns]
@@ -465,27 +550,30 @@ def test_get_stimulus_table(detailed, just_stimulus_table_api, raw_stimulus_tabl
     print(expected)
     print(obtained)
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
-def test_filter_owned_df(just_stimulus_table_api):
-    session = EcephysSession(api=just_stimulus_table_api)
+def test_filter_owned_df(just_stim_table_api):
+    session = EcephysSession(api=just_stim_table_api)
     ids = [0, 2]
     obtained = session._filter_owned_df('stimulus_presentations', ids)
 
     assert np.allclose([0, 120], obtained['phase'].values)
 
 
-def test_filter_owned_df_scalar(just_stimulus_table_api):
-    session = EcephysSession(api=just_stimulus_table_api)
+def test_filter_owned_df_scalar(just_stim_table_api):
+    session = EcephysSession(api=just_stim_table_api)
     ids = 3
 
     obtained = session._filter_owned_df('stimulus_presentations', ids)
     assert obtained['phase'].values[0] == 180
 
 
-def test_build_inter_presentation_intervals(just_stimulus_table_api):
-    session = EcephysSession(api=just_stimulus_table_api)
+def test_build_inter_presentation_intervals(just_stim_table_api):
+    session = EcephysSession(api=just_stim_table_api)
     obtained = session.inter_presentation_intervals
 
     expected = pd.DataFrame({
@@ -497,11 +585,14 @@ def test_build_inter_presentation_intervals(just_stimulus_table_api):
         )
     )
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
-def test_get_inter_presentation_intervals_for_stimulus(just_stimulus_table_api):
-    session = EcephysSession(api=just_stimulus_table_api)
+def test_get_inter_presentation_intervals_for_stimulus(just_stim_table_api):
+    session = EcephysSession(api=just_stim_table_api)
     obtained = session.get_inter_presentation_intervals_for_stimulus('a')
 
     expected = pd.DataFrame({
@@ -513,7 +604,10 @@ def test_get_inter_presentation_intervals_for_stimulus(just_stimulus_table_api):
         )
     )
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected,
+                                  obtained,
+                                  check_like=True,
+                                  check_dtype=False)
 
 
 def test_get_lfp(channels_table_api):

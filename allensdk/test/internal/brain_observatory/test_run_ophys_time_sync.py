@@ -1,5 +1,5 @@
 """ Tests for the executable that synchronizes distinct data streams within an
-ophys experiment. For tests of the logic used by this executable, see 
+ophys experiment. For tests of the logic used by this executable, see
 test_time_sync
 """
 
@@ -35,6 +35,7 @@ def outputs():
         np.arange(20, 30)
     )
 
+
 @pytest.fixture
 def writer(tmpdir_factory):
     tmpdir_path = str(tmpdir_factory.mktemp("run_ophys_time_sync_tests"))
@@ -48,7 +49,8 @@ def test_validate_paths_writable(writer):
     try:
         writer.validate_paths()
     except Exception as err:
-        pytest.fail(f"expected no error. Got: {err.__class__.__name__}(\"{err}\")")
+        pytest.fail(
+            f"expected no error. Got: {err.__class__.__name__}(\"{err}\")")
 
 
 @pytest.mark.parametrize("h5_key,expected", [
@@ -63,16 +65,15 @@ def test_validate_paths_writable(writer):
     ["behavior_delta", 3]
 ])
 def test_write_output_h5(writer, outputs, h5_key, expected):
-    
     writer.write_output_h5(outputs)
 
     with h5py.File(writer.output_h5_path, "r") as obtained_file:
         obtained = obtained_file[h5_key]
-        
+
         if isinstance(expected, np.ndarray):
             assert np.allclose(obtained, expected)
         else:
-            assert obtained.value == expected
+            assert obtained[()] == expected
 
 
 @pytest.mark.parametrize("json_key,expected", [
@@ -85,7 +86,6 @@ def test_write_output_h5(writer, outputs, h5_key, expected):
     ["behavior_delta", 3]
 ])
 def test_write_output_json(writer, outputs, json_key, expected):
-
     writer.write_output_json(outputs)
 
     with open(writer.output_json_path, "r") as jf:
@@ -99,7 +99,6 @@ def test_write_output_json(writer, outputs, json_key, expected):
 @pytest.mark.parametrize("mn", np.linspace(0, 1, 4))
 @pytest.mark.parametrize("mx", np.linspace(0, 1, 4))
 def test_check_stimulus_delay(obt, mn, mx):
-
     if obt < mn or obt > mx:
         with pytest.raises(ValueError):
             check_stimulus_delay(obt, mn, mx)
@@ -108,17 +107,16 @@ def test_check_stimulus_delay(obt, mn, mx):
 
 
 def test_run_ophys_time_sync():
-
     class Aligner(NamedTuple):
         corrected_stim_timestamps: np.ndarray
         corrected_ophys_timestamps: np.ndarray
         corrected_eye_video_timestamps: np.ndarray
         corrected_behavior_video_timestamps: np.ndarray
-    
+
     aligner = Aligner(
-        (np.arange(10), 0, 0.5), 
-        (np.arange(10), 1), 
-        (np.arange(10), 2), 
+        (np.arange(10), 0, 0.5),
+        (np.arange(10), 1),
+        (np.arange(10), 2),
         (np.arange(10), 3)
     )
 

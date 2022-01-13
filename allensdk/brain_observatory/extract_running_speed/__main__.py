@@ -102,7 +102,9 @@ def main(
 
     # occasionally an extra set of frame times are acquired after the rest of
     # the signals. We detect and remove these
-    frame_times = sync_utilities.trim_discontiguous_times(frame_times)
+    if kwargs.get('trim_discontiguous_frame_times', True):
+        frame_times = sync_utilities.trim_discontiguous_times(frame_times)
+
     num_raw_timestamps = len(frame_times)
 
     dx_deg = running_from_stim_file(stim_file, "dx", num_raw_timestamps)
@@ -115,6 +117,12 @@ def main(
 
     vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
     vin = running_from_stim_file(stim_file, "vin", num_raw_timestamps)
+
+    if len(vin) != len(dx_deg):
+        vin = np.concatenate((vin, np.zeros((len(dx_deg) - len(vin)))))
+
+    if len(vsig) != len(dx_deg):
+        vsig = np.concatenate((vsig, np.zeros((len(dx_deg) - len(vsig)))))
 
     velocities = extract_running_speeds(
         frame_times=frame_times,

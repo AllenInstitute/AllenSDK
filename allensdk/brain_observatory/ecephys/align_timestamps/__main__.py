@@ -6,7 +6,8 @@ from allensdk.brain_observatory.argschema_utilities import \
 from ._schemas import InputParameters, OutputParameters
 from .barcode_sync_dataset import BarcodeSyncDataset
 from .channel_states import extract_barcodes_from_states, \
-    extract_splits_from_states
+    extract_splits_from_states, \
+    extract_splits_from_barcode_times
 from .probe_synchronizer import ProbeSynchronizer
 
 
@@ -28,6 +29,12 @@ def align_timestamps(args):
         probe_split_times = extract_splits_from_states(
             channel_states, timestamps, probe["sampling_rate"]
         )
+
+        barcode_split_times = extract_splits_from_barcode_times(
+            probe_barcode_times
+        )
+
+        probe_split_times = np.union1d(probe_split_times, barcode_split_times)
 
         print("Split times:")
         print(probe_split_times)
@@ -92,6 +99,7 @@ def align_timestamps(args):
             "global_probe_lfp_sampling_rate"] = lfp_sampling_rate
         this_probe_output_info["output_paths"] = mapped_files
         this_probe_output_info["name"] = probe["name"]
+        this_probe_output_info["split_times"] = probe_split_times
 
         probe_output_info.append(this_probe_output_info)
 

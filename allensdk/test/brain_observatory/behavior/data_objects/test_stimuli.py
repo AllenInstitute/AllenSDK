@@ -40,7 +40,8 @@ class TestFromStimulusFile(LimsTest):
         stimulus_file = StimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
+            stimulus_file=stimulus_file,
+            monitor_delay=0.0)
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
@@ -74,7 +75,8 @@ class TestNWB:
         # Need to write stimulus timestamps first
         bsf = StimulusFile(
             filepath=self.test_data_dir / 'behavior_stimulus_file.pkl')
-        ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf)
+        ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf,
+                                                   monitor_delay=0.0)
         ts.to_nwb(nwbfile=self.nwbfile)
 
     @pytest.mark.parametrize('roundtrip', [True, False])
