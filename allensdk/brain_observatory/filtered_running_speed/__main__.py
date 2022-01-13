@@ -686,30 +686,32 @@ def merge_dx_data(
 
     velocity = np.concatenate(
         (
-            mapping_velocities['velocity'],
             behavior_velocities['velocity'],
+            mapping_velocities['velocity'],
             replay_velocities['velocity']),
         axis=None
     )
 
     dx_rad = np.concatenate(
-        (mapping_velocities['net_rotation'],
+        (
             behavior_velocities['net_rotation'],
+            mapping_velocities['net_rotation'],
             replay_velocities['net_rotation']),
         axis=None
     )
 
     vsig = np.concatenate(
-        (mapping_raw_data['vsig'],
+        (
             behavior_raw_data['vsig'],
+            mapping_raw_data['vsig'],
             replay_raw_data['vsig']),
         axis=None
     )
 
     vin = np.concatenate(
         (
-            mapping_raw_data['vin'],
             behavior_raw_data['vin'],
+            mapping_raw_data['vin'],
             replay_raw_data['vin']
         ),
         axis=None
@@ -717,8 +719,8 @@ def merge_dx_data(
 
     frame_time = np.concatenate(
         (
-            mapping_raw_data['frame_time'],
             behavior_raw_data['frame_time'],
+            mapping_raw_data['frame_time'],
             replay_raw_data['frame_time']
         ),
         axis=None
@@ -726,8 +728,8 @@ def merge_dx_data(
 
     dx_deg = np.concatenate(
         (
-            mapping_raw_data['dx'],
             behavior_raw_data['dx'],
+            mapping_raw_data['dx'],
             replay_raw_data['dx']
         ),
         axis=None
