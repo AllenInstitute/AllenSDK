@@ -24,31 +24,68 @@ DEGREES_TO_RADIANS = np.pi / 180.0
 INDEX_TO_BEHAVIOR = 0
 INDEX_TO_MAPPING = 1
 INDEX_TO_REPLAY = 2
+DEFAULT_SAMPLING_FREQUENCY = 60
+CRITICAL_FREQUENCY = 4
+FILTER_ORDER = 3
+DEFAULT_ZSCORE_THRESHOLD = 10.0
+USE_LOWPASS_FILTER = True
+WHEEL_DIAMETER_IN_INCHES = 6.5
+START_FRAME = 0
 
-# 6.5" wheel diameter, 2.54 = cm/in
-WHEEL_DIAMETER = 6.5 * 2.54
+# in cm/in
+WHEEL_DIAMETER = WHEEL_DIAMETER_IN_INCHES * 2.54
 
 
 def check_encoder(parent, key):
-    if len(parent["encoders"]) != 1:
-        return False
-    if key not in parent["encoders"][0]:
-        return False
-    if len(parent["encoders"][0][key]) == 0:
-        return False
+    """
+    checks if encoder exists
+    ---------
+    parent: dict
+        stim file data
+    key: string
+        A key to check
+    Returns
+    -------
+    boolean
+        True if encoder exists in stim data
+    """
+    result = True
 
-    return True
+    if len(parent["encoders"]) != 1:
+        result = False
+
+    elif key not in parent["encoders"][0]:
+        result = False
+
+    elif len(parent["encoders"][0][key]) == 0:
+        result = False
+
+    return result
 
 
 def calc_deriv(x, time):
+    """
+    Calculate the derivative
+    ---------
+    x: np.ndarray
+        data values
+    time: np.ndarray
+        time values
+    Returns
+    -------
+    np.ndarray
+        The derivative
+    """
     dx = np.diff(x, prepend=np.nan)
     dt = np.diff(time, prepend=np.nan)
 
     return dx / dt
 
 
-def _zscore_threshold_1d(data: np.ndarray,
-                         threshold: float = 5.0) -> np.ndarray:
+def _zscore_threshold_1d(
+            data: np.ndarray,
+            threshold: float = 5.0
+        ) -> np.ndarray:
     """
     Replace values in 1d array `data` that exceed `threshold` number
     of SDs from the mean with NaN.
@@ -390,7 +427,7 @@ def extract_running_speeds(
     vsig,
     vin,
     lowpass: bool = True,
-    zscore_threshold=10.0
+    zscore_threshold=DEFAULT_ZSCORE_THRESHOLD
 ):
     """
     Given the dx_deg from the 'pkl' file object and a 1d
@@ -402,10 +439,14 @@ def extract_running_speeds(
 
     Parameters
     ----------
-    dx_deg
-        Deserialized 'behavior pkl' file dx_deg
+    dx_raw
+        Deserialized 'pkl' file dx_deg
     frame_times: np.ndarray (1d)
         Timestamps for running data measurements
+    vsig: np.ndarray (1d),
+        raw analog data for encoder
+    vin: np.ndarray (1d),
+        input voltage to the encoder
     lowpass: bool (default=True)
         Whether to apply a 10Hz low-pass filter to the running speed
         data.
@@ -418,17 +459,8 @@ def extract_running_speeds(
     pd.DataFrame
         Dataframe with an index of timestamps and the following
         columns:
-            "speed": computed running speed
-            "dx": angular change, computed during data collection
-            "vsig": voltage signal from the encoder
-            "vin": the theoretical maximum voltage that the encoder
-                will reach prior to "wrapping". This should
-                theoretically be 5V (after crossing 5V goes to 0V, or
-                vice versa). In practice the encoder does not always
-                reach this value before wrapping, which can cause
-                transient spikes in speed at the voltage "wraps".
-        The raw data are provided so that the user may compute their
-        own speed from source, if desired.
+            "velocity": computed running speed
+            "net_rotation": dx in radians
 
     Notes
     -----
@@ -450,6 +482,7 @@ def extract_running_speeds(
     # Unwrap the voltage signal and apply correction for transient spikes
     unwrapped_vsig = _unwrap_voltage_signal(
         vsig, pos_wraps, neg_wraps, max_threshold=5.1, max_diff=1.0)
+
     angular_change_point = _angular_change(unwrapped_vsig, vin)
     angular_change = np.nancumsum(angular_change_point)
 
@@ -472,9 +505,18 @@ def extract_running_speeds(
 
     # Final filtering (optional) for smoothing out the speed data
     if lowpass:
-        b, a = signal.butter(3, Wn=4, fs=60, btype="lowpass")
+        polynomial_b, polynomial_a = signal.butter(
+            FILTER_ORDER,
+            Wn=CRITICAL_FREQUENCY,
+            fs=DEFAULT_SAMPLING_FREQUENCY,
+            btype="lowpass"
+        )
+
         outlier_corrected_linear_speed = signal.filtfilt(
-            b, a, np.nan_to_num(outlier_corrected_linear_speed))
+            polynomial_b,
+            polynomial_a,
+            np.nan_to_num(outlier_corrected_linear_speed)
+        )
 
     dx_rad = degrees_to_radians(dx_raw)
 
@@ -494,10 +536,28 @@ def extract_running_speeds(
 
 
 def match_timestamps(num_raw_timestamps, signal, label):
+    """
+    Sometimes the timestamp has one fewer value than
+    the signal does, if this is the case, we can remove the extra value
+    from the end of the signal
 
-    # sometimes the timestamp has one fewer length than
-    # the signal does, if this is the case, we can remove the extra
-    # from the end
+    Argument defaults and implementation suggestion via @dougo
+
+    Parameters
+    ----------
+    num_raw_timestamps: list
+        A list of timestamps
+    signal: list
+        A list of signal values
+    label: string
+        Name of the signal
+
+    Returns
+    -------
+    list
+        An adjusted signal to match the timestamp's length
+    """
+
     if num_raw_timestamps == (len(signal) - 1):
         signal = signal[0:len(signal) - 1]
 
@@ -516,6 +576,49 @@ def extract_dx_info(
     end_index,
     pkl_path
 ):
+    """
+    Extract all of the running speed data
+
+    Parameters
+    ----------
+    frame_times: numpy.ndarray
+        list of the vsync times
+    start_index: int
+        Index to the first frame of the stimulus
+    end_index: int
+       Index to the last frame of the stimulus
+    pkl_path: string
+        Path to the stimulus pickle file
+
+    Returns
+    -------
+    list[pd.DataFrame, pd.DataFrame]
+        the velocity data and the raw data
+
+    Notes
+    -------
+            velocity pd.DataFrame:
+                columns:
+                    "velocity": computed running speed
+                    "net_rotation": dx in radians
+
+            raw data pd.DataFrame:
+                Dataframe with an index of timestamps and the following
+                columns:
+                    "vsig": voltage signal from the encoder
+                    "vin": the theoretical maximum voltage that the encoder
+                        will reach prior to "wrapping". This should
+                        theoretically be 5V (after crossing 5V goes to 0V, or
+                        vice versa). In practice the encoder does not always
+                        reach this value before wrapping, which can cause
+                        transient spikes in speed at the voltage "wraps".
+                    "frame_time": list of the vsync times
+                    "dx": angular change, computed during data collection
+                The raw data are provided so that the user may compute their
+                own speed from source, if desired.
+
+    """
+
     stim_file = pd.read_pickle(pkl_path)
 
     frame_times = frame_times[start_index:end_index]
@@ -536,9 +639,10 @@ def extract_dx_info(
     velocities = extract_running_speeds(
         dx_deg,
         frame_times,
-        vsig, vin,
-        True,
-        10.0
+        vsig,
+        vin,
+        USE_LOWPASS_FILTER,
+        DEFAULT_ZSCORE_THRESHOLD
     )
 
     raw_data = pd.DataFrame(
@@ -556,6 +660,29 @@ def merge_dx_data(
         replay_velocities,
         replay_raw_data
 ):
+    """
+    Concatenate all of the running speed data
+
+    Parameters
+    ----------
+    mapping_velocities: pandas.core.frame.DataFrame
+        Velocity data from mapping stimulus
+    mapping_raw_data: pandas.core.frame.DataFrame
+        Raw data from mapping stimulus
+    behavior_velocities: pandas.core.frame.DataFrame
+       Velocity data from behavior stimulus
+    behavior_raw_data: pandas.core.frame.DataFrame
+         Raw data from behavior stimulus
+    replay_velocities: pandas.core.frame.DataFrame
+        Velocity data from replay stimulus
+    replay_raw_data: pandas.core.frame.DataFrame
+         Raw data from replay stimulus
+
+    Returns
+    -------
+    list[pd.DataFrame, pd.DataFrame]
+        concatenated velocity data, concatenated raw data
+    """
 
     velocity = np.concatenate(
         (
@@ -621,7 +748,20 @@ def merge_dx_data(
 
 
 def process_single_simulus_experiment(pkl_path, sync_h5_path, output_path):
-    start_index = 0
+    """
+    Process an experiment with a single simulus session
+
+    Parameters
+    ----------
+    pkl_path: string
+        A path to the stimulus pickle file
+    sync_h5_path: string
+        A path to the sync file
+    output_path: string
+        A path to the output file
+    """
+
+    start_index = START_FRAME
 
     sync_data = Dataset(sync_h5_path)
 
@@ -651,6 +791,23 @@ def process_multi_simulus_experiment(
     sync_h5_path,
     output_path
 ):
+    """
+    Process an experiment with a three simulus sessions
+
+    Parameters
+    ----------
+    mapping_pkl_path: string
+        A path to the mapping stimulus pickle file
+    behavior_pkl_path: string
+        A path to the behavior stimulus pickle file
+    replay_pkl_path: string
+        A path to the replay stimulus pickle file
+    sync_h5_path: string
+        A path to the sync file
+    output_path: string
+        A path to the output file
+    """
+
     sync_data = Dataset(sync_h5_path)
     mapping_data = CamStimOnePickleStimFile.factory(mapping_pkl_path)
     behavior_data = BehaviorPickleFile.factory(behavior_pkl_path)
@@ -664,7 +821,7 @@ def process_multi_simulus_experiment(
     mapping_frame_count = frame_counts[INDEX_TO_MAPPING]
     replay_frames_count = frame_counts[INDEX_TO_REPLAY]
 
-    behavior_start = 0
+    behavior_start = START_FRAME
     behavior_end = behavior_frame_count
 
     mapping_start = behavior_end
@@ -729,7 +886,7 @@ def main(
         use_median_duration,
         **kwargs
 ):
-    print('running filtered running speed...')
+    print('running...')
 
     if mapping_pkl_path is not None:
         if behavior_pkl_path is not None and replay_pkl_path is not None:
