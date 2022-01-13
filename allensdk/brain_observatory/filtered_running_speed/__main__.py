@@ -12,7 +12,7 @@ from allensdk.brain_observatory.argschema_utilities import \
     write_or_print_outputs
 from allensdk.brain_observatory.sync_dataset import Dataset
 from ._schemas import InputParameters, OutputParameters
-from typing import List, Union, Tuple, Iterable, Optional
+from typing import Union, Iterable, Optional
 
 from ecephys_etl.data_extractors.stim_file import (
     CamStimOnePickleStimFile,
@@ -25,6 +25,10 @@ INDEX_TO_BEHAVIOR = 0
 INDEX_TO_MAPPING = 1
 INDEX_TO_REPLAY = 2
 
+# 6.5" wheel diameter, 2.54 = cm/in
+WHEEL_DIAMETER = 6.5 * 2.54
+
+
 def check_encoder(parent, key):
     if len(parent["encoders"]) != 1:
         return False
@@ -32,12 +36,16 @@ def check_encoder(parent, key):
         return False
     if len(parent["encoders"][0][key]) == 0:
         return False
+
     return True
+
 
 def calc_deriv(x, time):
     dx = np.diff(x, prepend=np.nan)
     dt = np.diff(time, prepend=np.nan)
+
     return dx / dt
+
 
 def _zscore_threshold_1d(data: np.ndarray,
                          threshold: float = 5.0) -> np.ndarray:
@@ -58,10 +66,12 @@ def _zscore_threshold_1d(data: np.ndarray,
     """
     corrected_data = data.copy().astype("float")
     scores = zscore(data, nan_policy="omit")
+
     # Suppress warnings when comparing to nan values to reduce noise
     with np.errstate(invalid='ignore'):
         corrected_data[np.abs(scores) > threshold] = np.nan
     return corrected_data
+
 
 def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     """
@@ -93,9 +103,11 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
     t_val = time[index]
     max_val = t_val + abs(span)
     min_val = t_val - abs(span)
+
     eligible_indices = np.nonzero((time <= max_val) & (time >= min_val))[0]
     max_ix = eligible_indices.max()
     min_ix = eligible_indices.min()
+
     if (min_ix == index) or (max_ix == index):
         warnings.warn("Unable to find two data points around index "
                       f"for span={span} that do not include the index. "
@@ -104,7 +116,9 @@ def _local_boundaries(time, index, span: float = 0.25) -> tuple:
                       "monotonically increasing, or that you are trying "
                       "to find a neighborhood at the beginning/end of the "
                       "data stream.")
+
     return min_ix, max_ix
+
 
 def _clip_speed_wraps(speed, time, wrap_indices, t_span: float = 0.25):
     """
@@ -116,13 +130,18 @@ def _clip_speed_wraps(speed, time, wrap_indices, t_span: float = 0.25):
     such that it does not exceed the min/max values in the neighborhood.
     """
     corrected_speed = speed.copy()
+
     for wrap in wrap_indices:
         start_ix, end_ix = _local_boundaries(time, wrap, t_span)
+
         local_slice = np.concatenate(       # Remove the wrap point
             (speed[start_ix:wrap], speed[wrap+1:end_ix+1]))
+
         corrected_speed[wrap] = np.clip(
             speed[wrap], np.nanmin(local_slice), np.nanmax(local_slice))
+
     return corrected_speed
+
 
 def deg_to_dist(angular_speed: np.ndarray) -> np.ndarray:
     """
@@ -138,12 +157,13 @@ def deg_to_dist(angular_speed: np.ndarray) -> np.ndarray:
     np.ndarray (1d)
         Linear speed in cm/s at each time point.
     """
-    wheel_diameter = 6.5 * 2.54  # 6.5" wheel diameter, 2.54 = cm/in
+
     running_radius = 0.5 * (
         # assume the animal runs at 2/3 the distance from the wheel center
-        2.0 * wheel_diameter / 3.0)
+        2.0 * WHEEL_DIAMETER / 3.0)
     running_speed_cm_per_sec = angular_speed * running_radius
     return running_speed_cm_per_sec
+
 
 def running_from_stim_file(stim_file, key, expected_length):
     if "behavior" in stim_file["items"] and check_encoder(
@@ -168,6 +188,7 @@ def degrees_to_radians(degrees):
 def angular_to_linear_velocity(angular_velocity, radius):
     return np.multiply(angular_velocity, radius)
 
+
 def _angular_change(summed_voltage: np.ndarray,
                     vmax: Union[np.ndarray, float]) -> np.ndarray:
     """
@@ -190,7 +211,9 @@ def _angular_change(summed_voltage: np.ndarray,
         1d array of change in degrees in radians from each point
     """
     delta_theta = np.diff(summed_voltage, prepend=np.nan) / vmax * 2 * np.pi
+
     return delta_theta
+
 
 def _unwrap_voltage_signal(
         vsig: Iterable,
@@ -238,34 +261,44 @@ def _unwrap_voltage_signal(
     """
     if not isinstance(vsig, np.ndarray):
         vsig = np.array(vsig)
+
     if vmax is None:
         vmax = vsig[vsig < max_threshold].max()
+
     unwrapped_diff = np.zeros(vsig.shape)
     vsig_last = _shift(vsig)
+
     if len(pos_wrap_ix):
         # positive wraps: subtract from the previous value and add vmax
         unwrapped_diff[pos_wrap_ix] = (
             (vsig[pos_wrap_ix] + vmax) - vsig_last[pos_wrap_ix])
+
     # negative: subtract vmax and the previous value
     if len(neg_wrap_ix):
         unwrapped_diff[neg_wrap_ix] = (
             vsig[neg_wrap_ix] - (vsig_last[neg_wrap_ix] + vmax))
+
     # Other indices, just compute straight diff from previous value
     wrap_ix = np.concatenate((pos_wrap_ix, neg_wrap_ix))
     other_ix = np.array(list(set(range(len(vsig_last))).difference(wrap_ix)))
     unwrapped_diff[other_ix] = vsig[other_ix] - vsig_last[other_ix]
+
     # Correct for wrap artifacts based on allowed `max_diff` value
     # (fill with nan)
     # Suppress warnings when comparing with nan values to reduce noise
     with np.errstate(invalid='ignore'):
         unwrapped_diff = np.where(
             np.abs(unwrapped_diff) <= max_diff, unwrapped_diff, np.nan)
+
     # Get nan indices to propogate to the cumulative sum (otherwise
     # treated as 0)
     unwrapped_nans = np.array(np.isnan(unwrapped_diff)).nonzero()
     summed_diff = np.nancumsum(unwrapped_diff) + vsig[0]    # Add the baseline
+
     summed_diff[unwrapped_nans] = np.nan
+
     return summed_diff
+
 
 def _shift(
         arr: Iterable,
@@ -291,14 +324,19 @@ def _shift(
     """
     if periods <= 0:
         raise ValueError("Can only shift for periods > 0.")
+
     if fill_value is None:
         fill_value = np.nan
+
     if isinstance(fill_value, float):
         # Circumvent issue if int-like array with np.nan as fill
         shifted = np.roll(arr, periods).astype(float)
+
     else:
         shifted = np.roll(arr, periods)
+
     shifted[:periods] = fill_value
+
     return shifted
 
 
@@ -330,8 +368,10 @@ def _identify_wraps(vsig: Iterable, *,
     """
     # Compare against previous value
     shifted_vsig = _shift(vsig)
+
     if not isinstance(vsig, np.ndarray):
         vsig = np.array(vsig)
+
     # Suppress warnings for when comparing to nan values
     with np.errstate(invalid='ignore'):
         pos_wraps = np.asarray(
@@ -343,8 +383,14 @@ def _identify_wraps(vsig: Iterable, *,
 
     return pos_wraps, neg_wraps
 
+
 def extract_running_speeds(
-    dx_raw, frame_times: np.ndarray, vsig, vin, wheel_radius, subject_position, use_median_duration, lowpass: bool = True, zscore_threshold=10.0
+    dx_raw,
+    frame_times,
+    vsig,
+    vin,
+    lowpass: bool = True,
+    zscore_threshold=10.0
 ):
     """
     Given the dx_deg from the 'pkl' file object and a 1d
@@ -396,44 +442,30 @@ def extract_running_speeds(
     source.
     """
 
-    # if len(vin) > len(frame_times) + 1:
-    #     error_string = ("length of vin ({}) cannot be longer than length of "
-    #                     "frame_times ({}) + 1, they are off by {}").format(
-    #         len(vin),
-    #         len(frame_times),
-    #         abs(len(vin) - len(frame_times))
-    #     )
-    #     raise ValueError(error_string)
-    # if len(vin) == len(frame_times) + 1:
-    #     warnings.warn(
-    #         "frame_times array is 1 value shorter than encoder array. Last encoder "
-    #         "value removed\n", UserWarning, stacklevel=1)
-    #     vin = vin[:-1]
-    #     vsig = vsig[:-1]
-
-    # dx = 'd_theta' = angular change
-    # There are some issues with angular change in the raw data so we
-    # recompute this value
-    # dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
-
     # Identify "wraps" in the voltage signal that need to be unwrapped
     # This is where the encoder switches from 0V to 5V or vice versa
     pos_wraps, neg_wraps = _identify_wraps(
         vsig, min_threshold=1.5, max_threshold=3.5)
+
     # Unwrap the voltage signal and apply correction for transient spikes
     unwrapped_vsig = _unwrap_voltage_signal(
         vsig, pos_wraps, neg_wraps, max_threshold=5.1, max_diff=1.0)
     angular_change_point = _angular_change(unwrapped_vsig, vin)
     angular_change = np.nancumsum(angular_change_point)
+
     # Add the nans back in (get turned to 0 in nancumsum)
     angular_change[np.isnan(angular_change_point)] = np.nan
-    angular_speed = calc_deriv(angular_change, frame_times)  # speed in radians/s
+    angular_speed = calc_deriv(
+        angular_change,
+        frame_times
+    )  # speed in radians/s
+
     linear_speed = deg_to_dist(angular_speed)
+
     # Artifact correction to speed data
     wrap_corrected_linear_speed = _clip_speed_wraps(
         linear_speed, frame_times, np.concatenate([pos_wraps, neg_wraps]),
         t_span=0.25)
-
 
     outlier_corrected_linear_speed = _zscore_threshold_1d(
         wrap_corrected_linear_speed, threshold=zscore_threshold)
@@ -444,20 +476,7 @@ def extract_running_speeds(
         outlier_corrected_linear_speed = signal.filtfilt(
             b, a, np.nan_to_num(outlier_corrected_linear_speed))
 
-    # return pd.DataFrame({
-    #     'speed': outlier_corrected_linear_speed[:len(frame_times)],
-    #     'dx': dx_raw[:len(frame_times)],
-    #     'vsig': vsig[:len(frame_times)],
-    #     'vin': vin[:len(frame_times)],
-    # }, index=pd.Index(frame_times, name='timestamps'))
-
     dx_rad = degrees_to_radians(dx_raw)
-
-    # durations = end_times - start_times
-    # if use_median_duration:
-    #     angular_velocity = dx_rad / np.median(durations)
-    # else:
-    #     angular_velocity = dx_rad / durations
 
     df = pd.DataFrame(
         {
@@ -473,156 +492,31 @@ def extract_running_speeds(
 
     return df
 
-def old_extract_running_speeds(
-        frame_times, dx_deg, vsig, vin, wheel_radius, subject_position,
-        use_median_duration=False
-):
-    # the first interval does not have a known start time, so we can't compute
-    # an average velocity from dx
-    dx_rad = degrees_to_radians(dx_deg[1:])
 
-    start_times = frame_times[:-1]
-    end_times = frame_times[1:]
+def match_timestamps(num_raw_timestamps, signal, label):
 
-    durations = end_times - start_times
-    if use_median_duration:
-        angular_velocity = dx_rad / np.median(durations)
-    else:
-        angular_velocity = dx_rad / durations
+    # sometimes the timestamp has one fewer length than
+    # the signal does, if this is the case, we can remove the extra
+    # from the end
+    if num_raw_timestamps == (len(signal) - 1):
+        signal = signal[0:len(signal) - 1]
 
-    radius = wheel_radius * subject_position
-    linear_velocity = angular_to_linear_velocity(angular_velocity, radius)
-
-    df = pd.DataFrame(
-        {
-            "start_time": start_times,
-            "end_time": end_times,
-            "velocity": linear_velocity,
-            "net_rotation": dx_rad,
-        }
-    )
-
-    # due to an acquisition bug (the buffer of raw orientations may be updated
-    # more slowly than it is read, leading to a 0 value for the change in
-    # orientation over an interval) there may be exact zeros in the velocity.
-    df = df[~(np.isclose(df["net_rotation"], 0.0))]
-
-    return df
-
-def extract_all_dx_info(behavior_pkl_path, mapping_pkl_path, replay_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration, use_old_running_speed_method=True):
-
-
-    behavior_pkl = pd.read_pickle(behavior_pkl_path)
-    mapping_pkl = pd.read_pickle(mapping_pkl_path)
-    replay_pkl = pd.read_pickle(replay_pkl_path)
-
-    sync_dataset = Dataset(sync_h5_path)
-
-
-    # print('pkl_path', pkl_path)
-
-    # Why the rising edge? See Sweepstim.update in camstim. This method does:
-    # 1. updates the stimuli
-    # 2. updates the "items", causing a running speed sample to be acquired
-    # 3. sets the vsync line high
-    # 4. flips the buffer
-    frame_times = sync_dataset.get_edges(
-        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
-    )
-
-    # print('frame_times' , len(frame_times))
-
-    # frame_times = frame_times[start_index:end_index]
-
-    # occasionally an extra set of frame times are acquired after the rest of
-    # the signals. We detect and remove these
-    # frame_times = sync_utilities.trim_discontiguous_times(frame_times)
-    num_raw_timestamps = len(frame_times)
-    # num_raw_timestamps = 0
-
-    # print('stim_file' , stimulus_pkl_path)
-
-    behavior_dx_deg = running_from_stim_file(behavior_pkl, "dx", num_raw_timestamps)
-    mapping_dx_deg = running_from_stim_file(mapping_pkl, "dx", num_raw_timestamps)
-    replay_dx_deg = running_from_stim_file(replay_pkl, "dx", num_raw_timestamps)
-
-    dx_deg = np.concatenate((behavior_dx_deg, mapping_dx_deg, replay_dx_deg), axis=None)
-
-    #TODO take out
-    # dx_deg = dx_deg[0:len(dx_deg) - 1]
-
-    # print('sum2', len(dx_deg))
-    # np.concatenate((a, b), axis=None)
-    # np.concatenate((a, b), axis=None)
-
-    # print('type', mapping_dx_deg)
-
-    # dx_deg = behavior_dx_deg + mapping_dx_deg + replay_dx_deg
-
-    # if num_raw_timestamps != len(dx_deg):
-    #     raise ValueError(
-    #         f"found {num_raw_timestamps} rising edges on the vsync line, "
-    #         f"but only {len(dx_deg)} rotation samples"
-    #     )
-    # else:
-    #     print('found', num_raw_timestamps, ' and ', len(dx_deg))
-
-    behavior_vsig = running_from_stim_file(behavior_pkl, "vsig", num_raw_timestamps)
-    behavior_vin = running_from_stim_file(behavior_pkl, "vin", num_raw_timestamps)
-
-    mapping_vsig = running_from_stim_file(mapping_pkl, "vsig", num_raw_timestamps)
-    mapping_vin = running_from_stim_file(mapping_pkl, "vin", num_raw_timestamps)
-
-    replay_vsig = running_from_stim_file(replay_pkl, "vsig", num_raw_timestamps)
-    replay_vin = running_from_stim_file(replay_pkl, "vin", num_raw_timestamps)
-
-    vsig = np.concatenate((behavior_vsig, mapping_vsig, replay_vsig), axis=None)
-    vin =  np.concatenate((behavior_vin, mapping_vin, replay_vin), axis=None)
-
-    velocities = None
-
-    if use_old_running_speed_method:
-        velocities = old_extract_running_speeds(
-            frame_times=frame_times,
-            dx_deg=dx_deg,
-            vsig=vsig,
-            vin=vin,
-            wheel_radius=wheel_radius,
-            subject_position=subject_position,
-            use_median_duration=use_median_duration
+    if num_raw_timestamps != len(signal):
+        raise ValueError(
+            f"found {num_raw_timestamps} rising edges on the vsync line, "
+            f"but found {len(signal)} samples for  {label}"
         )
-    else:
-        velocities = extract_running_speeds(dx_deg, frame_times, vsig, vin, wheel_radius, subject_position, use_median_duration, True, 10.0)
+
+    return signal
 
 
-
-    # print('vsig', len(vsig))
-    # print('vin', len(vin))
-    # print('frame_times', len(frame_times))
-    # print('dx_deg', len(dx_deg))
-
-    raw_data = pd.DataFrame(
-        {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg}
-    )
-
-    return velocities, raw_data
-
-def extract_dx_info(start_index, end_index, pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration, use_old_running_speed_method=False):
+def extract_dx_info(
+    frame_times,
+    start_index,
+    end_index,
+    pkl_path
+):
     stim_file = pd.read_pickle(pkl_path)
-    sync_dataset = Dataset(sync_h5_path)
-
-
-
-    # Why the rising edge? See Sweepstim.update in camstim. This method does:
-    # 1. updates the stimuli
-    # 2. updates the "items", causing a running speed sample to be acquired
-    # 3. sets the vsync line high
-    # 4. flips the buffer
-    frame_times = sync_dataset.get_edges(
-        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
-    )
-
-    # print('pkl_path', pkl_path)
 
     frame_times = frame_times[start_index:end_index]
 
@@ -631,43 +525,21 @@ def extract_dx_info(start_index, end_index, pkl_path, sync_h5_path, wheel_radius
     frame_times = sync_utilities.trim_discontiguous_times(frame_times)
     num_raw_timestamps = len(frame_times)
 
-    # print('stim_file' , stimulus_pkl_path)
-
     dx_deg = running_from_stim_file(stim_file, "dx", num_raw_timestamps)
-
-    if num_raw_timestamps == (len(dx_deg) - 1):
-        dx_deg = dx_deg[0:len(dx_deg) - 1]
-
-
-    if num_raw_timestamps != len(dx_deg):
-        raise ValueError(
-            f"found {num_raw_timestamps} rising edges on the vsync line, "
-            f"but only {len(dx_deg)} rotation samples"
-        )
-
     vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
     vin = running_from_stim_file(stim_file, "vin", num_raw_timestamps)
 
-    if num_raw_timestamps == (len(vsig) - 1):
-        vsig = vsig[0:len(vsig) - 1]
+    dx_deg = match_timestamps(num_raw_timestamps, dx_deg, 'dx')
+    vsig = match_timestamps(num_raw_timestamps, vsig, 'vsig')
+    vin = match_timestamps(num_raw_timestamps, vin, 'vin')
 
-    if num_raw_timestamps == (len(vin) - 1):
-        vin = vin[0:len(vin) - 1]
-
-    velocities = None
-
-    if use_old_running_speed_method:
-        velocities = old_extract_running_speeds(
-            frame_times=frame_times,
-            dx_deg=dx_deg,
-            vsig=vsig,
-            vin=vin,
-            wheel_radius=wheel_radius,
-            subject_position=subject_position,
-            use_median_duration=use_median_duration
-        )
-    else:
-        velocities = extract_running_speeds(dx_deg, frame_times, vsig, vin, wheel_radius, subject_position, use_median_duration, True, 10.0)
+    velocities = extract_running_speeds(
+        dx_deg,
+        frame_times,
+        vsig, vin,
+        True,
+        10.0
+    )
 
     raw_data = pd.DataFrame(
         {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg}
@@ -675,33 +547,67 @@ def extract_dx_info(start_index, end_index, pkl_path, sync_h5_path, wheel_radius
 
     return velocities, raw_data
 
-def merge_dx_data(sync_h5_path, mapping_velocities, mapping_raw_data, behavior_velocities, behavior_raw_data, replay_velocities, replay_raw_data):
 
-    # start_time = mapping_velocities['start_time'] + behavior_velocities['start_time'] + replay_velocities['start_time']
-    # end_time = mapping_velocities['end_time'] + behavior_velocities['end_time'] + replay_velocities['end_time']
-    velocity = np.concatenate((mapping_velocities['velocity'], behavior_velocities['velocity'], replay_velocities['velocity']), axis=None)
-    dx_rad = np.concatenate((mapping_velocities['net_rotation'], behavior_velocities['net_rotation'], replay_velocities['net_rotation']), axis=None)
+def merge_dx_data(
+        mapping_velocities,
+        mapping_raw_data,
+        behavior_velocities,
+        behavior_raw_data,
+        replay_velocities,
+        replay_raw_data
+):
 
-    vsig = np.concatenate((mapping_raw_data['vsig'], behavior_raw_data['vsig'], replay_raw_data['vsig']), axis=None)
-    vin = np.concatenate((mapping_raw_data['vin'], behavior_raw_data['vin'], replay_raw_data['vin']), axis=None)
-    frame_time = np.concatenate((mapping_raw_data['frame_time'], behavior_raw_data['frame_time'], replay_raw_data['frame_time']), axis=None)
-    dx_deg = np.concatenate((mapping_raw_data['dx'], behavior_raw_data['dx'], replay_raw_data['dx']), axis=None)
-
-    # frame_times
-
-    sync_dataset = Dataset(sync_h5_path)
-
-    frame_times = sync_dataset.get_edges(
-        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
+    velocity = np.concatenate(
+        (
+            mapping_velocities['velocity'],
+            behavior_velocities['velocity'],
+            replay_velocities['velocity']),
+        axis=None
     )
 
-    start_times = frame_times[:-1]
-    end_times = frame_times[1:]
+    dx_rad = np.concatenate(
+        (mapping_velocities['net_rotation'],
+            behavior_velocities['net_rotation'],
+            replay_velocities['net_rotation']),
+        axis=None
+    )
+
+    vsig = np.concatenate(
+        (mapping_raw_data['vsig'],
+            behavior_raw_data['vsig'],
+            replay_raw_data['vsig']),
+        axis=None
+    )
+
+    vin = np.concatenate(
+        (
+            mapping_raw_data['vin'],
+            behavior_raw_data['vin'],
+            replay_raw_data['vin']
+        ),
+        axis=None
+    )
+
+    frame_time = np.concatenate(
+        (
+            mapping_raw_data['frame_time'],
+            behavior_raw_data['frame_time'],
+            replay_raw_data['frame_time']
+        ),
+        axis=None
+    )
+
+    dx_deg = np.concatenate(
+        (
+            mapping_raw_data['dx'],
+            behavior_raw_data['dx'],
+            replay_raw_data['dx']
+        ),
+        axis=None
+    )
 
     velocities = pd.DataFrame(
         {
-            # "start_time": start_times,
-            # "end_time": end_times,
             "velocity": velocity,
             "net_rotation": dx_rad,
         }
@@ -713,7 +619,8 @@ def merge_dx_data(sync_h5_path, mapping_velocities, mapping_raw_data, behavior_v
 
     return velocities, raw_data
 
-def process_single_simulus_experiment(pkl_path, sync_h5_path, output_path, wheel_radius, subject_position, use_median_duration):
+
+def process_single_simulus_experiment(pkl_path, sync_h5_path, output_path):
     start_index = 0
 
     sync_data = Dataset(sync_h5_path)
@@ -724,14 +631,26 @@ def process_single_simulus_experiment(pkl_path, sync_h5_path, output_path, wheel
 
     end_index = len(frame_times)
 
-    velocities, raw_data = extract_dx_info(start_index, end_index, pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
+    velocities, raw_data = extract_dx_info(
+        frame_times,
+        start_index,
+        end_index,
+        pkl_path
+    )
 
     store = pd.HDFStore(output_path)
     store.put("running_speed", velocities)
     store.put("raw_data", raw_data)
     store.close()
 
-def process_multi_simulus_experiment(mapping_pkl_path, behavior_pkl_path, replay_pkl_path, sync_h5_path, output_path, wheel_radius, subject_position, use_median_duration):
+
+def process_multi_simulus_experiment(
+    mapping_pkl_path,
+    behavior_pkl_path,
+    replay_pkl_path,
+    sync_h5_path,
+    output_path
+):
     sync_data = Dataset(sync_h5_path)
     mapping_data = CamStimOnePickleStimFile.factory(mapping_pkl_path)
     behavior_data = BehaviorPickleFile.factory(behavior_pkl_path)
@@ -741,15 +660,11 @@ def process_multi_simulus_experiment(mapping_pkl_path, behavior_pkl_path, replay
         pkl.num_frames for pkl in (behavior_data, mapping_data, replay_data)
     ]
 
-    # frame_offsets, stim_starts, stim_ends = (
-    #     get_frame_offsets(sync_data, frame_counts)
-    # )
-
     behavior_frame_count = frame_counts[INDEX_TO_BEHAVIOR]
     mapping_frame_count = frame_counts[INDEX_TO_MAPPING]
     replay_frames_count = frame_counts[INDEX_TO_REPLAY]
 
-    behavior_start = 0 
+    behavior_start = 0
     behavior_end = behavior_frame_count
 
     mapping_start = behavior_end
@@ -758,40 +673,84 @@ def process_multi_simulus_experiment(mapping_pkl_path, behavior_pkl_path, replay
     replay_start = mapping_end
     replay_end = replay_start + replay_frames_count
 
-    # extract_all_dx_info(behavior_pkl_path, mapping_pkl_path, replay_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
+    # Why the rising edge? See Sweepstim.update in camstim. This method does:
+    # 1. updates the stimuli
+    # 2. updates the "items", causing a running speed sample to be acquired
+    # 3. sets the vsync line high
+    # 4. flips the buffer
+    frame_times = sync_data.get_edges(
+        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
+    )
 
-    behavior_velocities, behavior_raw_data = extract_dx_info(behavior_start, behavior_end, behavior_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
+    behavior_velocities, behavior_raw_data = extract_dx_info(
+        frame_times,
+        behavior_start,
+        behavior_end,
+        behavior_pkl_path
+    )
 
-    mapping_velocities, mapping_raw_data = extract_dx_info(mapping_start, mapping_end, mapping_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
+    mapping_velocities, mapping_raw_data = extract_dx_info(
+        frame_times,
+        mapping_start,
+        mapping_end,
+        mapping_pkl_path
+    )
 
-    replay_velocities, replay_raw_data = extract_dx_info(replay_start, replay_end, replay_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
+    replay_velocities, replay_raw_data = extract_dx_info(
+        frame_times,
+        replay_start,
+        replay_end,
+        replay_pkl_path
+    )
 
-    # mapping_velocities, mapping_raw_data = extract_dx_info(replay_start, replay_end, replay_pkl_path, sync_h5_path, wheel_radius, subject_position, use_median_duration)
-
-    velocities, raw_data = merge_dx_data(sync_h5_path, mapping_velocities, mapping_raw_data, behavior_velocities, behavior_raw_data, replay_velocities, replay_raw_data)
+    velocities, raw_data = merge_dx_data(
+        mapping_velocities,
+        mapping_raw_data,
+        behavior_velocities,
+        behavior_raw_data,
+        replay_velocities,
+        replay_raw_data
+    )
 
     store = pd.HDFStore(output_path)
     store.put("running_speed", velocities)
     store.put("raw_data", raw_data)
     store.close()
 
-def main(
-        mapping_pkl_path, behavior_pkl_path, replay_pkl_path, sync_h5_path, output_path, wheel_radius,
-        subject_position, use_median_duration, **kwargs
-):
-    print('running...   ', mapping_pkl_path)
 
-    result = None
+def main(
+        mapping_pkl_path,
+        behavior_pkl_path,
+        replay_pkl_path,
+        sync_h5_path,
+        output_path,
+        wheel_radius,
+        subject_position,
+        use_median_duration,
+        **kwargs
+):
+    print('running filtered running speed...')
 
     if mapping_pkl_path is not None:
         if behavior_pkl_path is not None and replay_pkl_path is not None:
-            process_multi_simulus_experiment(mapping_pkl_path, behavior_pkl_path, replay_pkl_path, sync_h5_path, output_path, wheel_radius, subject_position, use_median_duration)
-        else: 
-            process_single_simulus_experiment(mapping_pkl_path, sync_h5_path, output_path, wheel_radius, subject_position, use_median_duration)
+            process_multi_simulus_experiment(
+                mapping_pkl_path,
+                behavior_pkl_path,
+                replay_pkl_path,
+                sync_h5_path,
+                output_path
+            )
+        else:
+            process_single_simulus_experiment(
+                mapping_pkl_path,
+                sync_h5_path,
+                output_path
+            )
     else:
         raise ValueError('Mapping pickle file has not been set')
 
     return {"output_path": output_path}
+
 
 if __name__ == "__main__":
     mod = ArgSchemaParserPlus(

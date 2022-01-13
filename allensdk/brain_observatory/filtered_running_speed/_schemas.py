@@ -1,6 +1,6 @@
-from argschema import ArgSchema, ArgSchemaParser
+from argschema import ArgSchema
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, InputDir, String, Float, Dict, Int, Boolean
+from argschema.fields import Nested, String, Float, Boolean
 
 
 class InputParameters(ArgSchema):
@@ -26,11 +26,18 @@ class InputParameters(ArgSchema):
     wheel_radius = Float(default=8.255, help="radius, in cm, of running wheel")
     subject_position = Float(
         default=2 / 3,
-        help="normalized distance of the subject from the center of the running wheel (1 is rim, 0 is center)",
+        help=(
+            "normalized distance of the subject from the center of the "
+            "running wheel (1 is rim, 0 is center)"
+        )
     )
     use_median_duration = Boolean(
         default=True,
-        help="frame timestamps are often too noisy to use as the denominator in the velocity calculation. Can instead use the median frame duration."
+        help=(
+            "frame timestamps are often too noisy to use as the denominator "
+            "in the velocity calculation. Can instead use the median "
+            "frame duration."
+        )
     )
 
 
