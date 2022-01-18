@@ -9,7 +9,7 @@ import pytest
 
 from allensdk.brain_observatory.behavior.data_objects import DataObject
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
-    cell_specimens import CellSpecimens, CellSpecimenMeta
+    cell_specimens import CellSpecimens, CellSpecimenMeta, EventsParams
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .rois_mixin import \
     RoisMixin
@@ -59,7 +59,10 @@ class TestLims:
         csp = CellSpecimens.from_lims(
             ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn,
             ophys_timestamps=ots,
-            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
@@ -99,7 +102,10 @@ class TestJson:
         csp = CellSpecimens.from_json(
             dict_repr=self.dict_repr,
             ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
         assert not csp.table.empty
         assert not csp.events.empty
         assert not csp.dff_traces.empty
@@ -115,7 +121,10 @@ class TestJson:
         csp = CellSpecimens.from_json(
             dict_repr=self.dict_repr,
             ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
         private_attr = getattr(csp, f'_{data}')
         public_attr = getattr(csp, data)
 
@@ -148,7 +157,10 @@ class TestJson:
         csp = CellSpecimens.from_json(
             dict_repr=self.dict_repr,
             ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
         private_trace_attr = getattr(csp, f'_{trace_type}')
 
         if extra_in_trace:
@@ -217,7 +229,10 @@ class TestNWB:
         cell_specimens = CellSpecimens.from_json(
             dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
             segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
-            exclude_invalid_rois=exclude_invalid_rois)
+            exclude_invalid_rois=exclude_invalid_rois,
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
 
         csp = cell_specimens._cell_specimen_table
 
@@ -231,12 +246,18 @@ class TestNWB:
                 nwbfile=self.nwbfile,
                 data_object_cls=CellSpecimens,
                 exclude_invalid_rois=exclude_invalid_rois,
-                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
         else:
             obt = cell_specimens.from_nwb(
                 nwbfile=self.nwbfile,
                 exclude_invalid_rois=exclude_invalid_rois,
-                segmentation_mask_image_spacing=(.78125e-3, .78125e-3))
+                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+                events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
 
         if exclude_invalid_rois:
             cell_specimens._cell_specimen_table = \

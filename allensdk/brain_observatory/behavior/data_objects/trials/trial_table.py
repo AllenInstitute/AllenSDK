@@ -64,8 +64,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
     def from_stimulus_file(cls, stimulus_file: StimulusFile,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
-                           rewards: Rewards,
-                           monitor_delay: float
+                           rewards: Rewards
                            ) -> "TrialTable":
         bsf = stimulus_file.data
 
@@ -81,7 +80,6 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
             t = Trial(trial=trial, start=trial_start, end=trial_end,
                       behavior_stimulus_file=stimulus_file,
                       index=idx,
-                      monitor_delay=monitor_delay,
                       stimulus_timestamps=stimulus_timestamps,
                       licks=licks, rewards=rewards,
                       stimuli=stimuli

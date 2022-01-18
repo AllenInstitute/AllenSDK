@@ -37,13 +37,12 @@ import logging
 import os
 import argparse
 import matplotlib.pyplot as plt
-import warnings
 import h5py
 import numpy as np
-from functools import partial
 from scipy.ndimage.filters import median_filter
 
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import \
+    BrainObservatoryNwbDataSet
 
 GAUSSIAN_MAD_STD_SCALE = 1.4826
 
@@ -408,7 +407,7 @@ def main():
             args.input_h5).get_corrected_fluorescence_traces()
     else:
         input_h5 = h5py.File(args.input_h5, "r")
-        traces = input_h5["data"].value
+        traces = input_h5["data"][()]
         input_h5.close()
 
     dff = calculate_dff(traces, save_plot_dir=args.plot_dir)

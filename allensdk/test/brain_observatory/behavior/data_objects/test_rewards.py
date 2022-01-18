@@ -29,7 +29,8 @@ class TestFromStimulusFile(LimsTest):
         stimulus_file = StimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file)
+            stimulus_file=stimulus_file,
+            monitor_delay=0.0)
         rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
                                              stimulus_timestamps=timestamps)
         assert rewards == self.expected
@@ -67,7 +68,8 @@ class TestFromStimulusFile(LimsTest):
         stimulus_filepath = _create_dummy_stimulus_file()
         stimulus_file = StimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
-        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01))
+        timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
+                                        monitor_delay=0.0)
         rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,
                                              stimulus_timestamps=timestamps)
 

@@ -39,12 +39,12 @@ def main():
 
     # read from "data"
     input_h5 = h5py.File(input_file, "r")
-    traces = input_h5[args.input_dataset].value
+    traces = input_h5[args.input_dataset][()]
     roi_names = input_h5[args.roi_field][:]
     input_h5.close()
 
     dff = calculate_dff(traces)
-    
+
     # write to "data"
     output_h5 = h5py.File(output_file, "w")
     output_h5[args.output_dataset] = dff
@@ -54,6 +54,7 @@ def main():
     output_data = {}
 
     ju.write(args.output_json, output_data)
-    
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()
