@@ -47,17 +47,14 @@ def use_temp_dir(tmpdir_factory):
     return fn
 
 
-DATA_DIR = os.environ.get(
-    "ECEPHYS_PIPELINE_DATA",
-    os.path.join(
-        "/",
-        "allen",
-        "aibs",
-        "informatics",
-        "module_test_data",
-        "ecephys",
-        "filtered_running_speed"
-    ),
+DATA_DIR = os.path.join(
+    "/",
+    "allen",
+    "aibs",
+    "informatics",
+    "module_test_data",
+    "ecephys",
+    "extract_running_speed"
 )
 
 
