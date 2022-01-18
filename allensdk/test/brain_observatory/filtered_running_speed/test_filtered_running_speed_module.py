@@ -113,4 +113,11 @@ def test_extract_running_speed_module(
         key="raw_data"
     )
 
-    assert(len(obtained_velocity['net_rotation']) == len(obtained_raw['dx']))
+    assert('net_rotation' in obtained_velocity)
+    assert('velocity' in obtained_velocity)
+    assert('frame_indexes' in obtained_velocity)
+    assert('frame_time' in obtained_velocity)
+    assert('vsig' in obtained_raw)
+    assert('vin' in obtained_raw)
+    assert('frame_time' in obtained_raw)
+    assert('dx' in obtained_raw)

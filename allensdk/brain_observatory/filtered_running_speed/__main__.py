@@ -426,8 +426,10 @@ def extract_running_speeds(
     frame_times,
     vsig,
     vin,
+    start_index,
+    end_index,
     lowpass: bool = True,
-    zscore_threshold=DEFAULT_ZSCORE_THRESHOLD
+    zscore_threshold=DEFAULT_ZSCORE_THRESHOLD,
 ):
     """
     Given the dx_deg from the 'pkl' file object and a 1d
@@ -447,6 +449,10 @@ def extract_running_speeds(
         raw analog data for encoder
     vin: np.ndarray (1d),
         input voltage to the encoder
+    start_index: int,
+        the start index of the stimulus in reference to the full vsync times
+    end_index: int,
+        the end index of the stimulus in reference to the full vsync times
     lowpass: bool (default=True)
         Whether to apply a 10Hz low-pass filter to the running speed
         data.
@@ -461,6 +467,8 @@ def extract_running_speeds(
         columns:
             "velocity": computed running speed
             "net_rotation": dx in radians
+            "frame_indexes": frame indexes into the raw frame time,
+            "frame_times": the frame times for the timestamp data
 
     Notes
     -----
@@ -520,10 +528,14 @@ def extract_running_speeds(
 
     dx_rad = degrees_to_radians(dx_raw)
 
+    frame_indexes = list(range(start_index, end_index))
+
     df = pd.DataFrame(
         {
             "velocity": outlier_corrected_linear_speed[:len(frame_times)],
             "net_rotation": dx_rad[:len(frame_times)],
+            "frame_indexes": frame_indexes,
+            "frame_times": frame_times
         }
     )
 
@@ -601,6 +613,8 @@ def extract_dx_info(
                 columns:
                     "velocity": computed running speed
                     "net_rotation": dx in radians
+                    "frame_indexes": frame indexes into
+                        the full vsync times list
 
             raw data pd.DataFrame:
                 Dataframe with an index of timestamps and the following
@@ -641,8 +655,10 @@ def extract_dx_info(
         frame_times,
         vsig,
         vin,
+        start_index,
+        end_index,
         USE_LOWPASS_FILTER,
-        DEFAULT_ZSCORE_THRESHOLD
+        DEFAULT_ZSCORE_THRESHOLD,
     )
 
     raw_data = pd.DataFrame(
@@ -692,11 +708,27 @@ def merge_dx_data(
         axis=None
     )
 
-    dx_rad = np.concatenate(
+    net_rotation = np.concatenate(
         (
             behavior_velocities['net_rotation'],
             mapping_velocities['net_rotation'],
             replay_velocities['net_rotation']),
+        axis=None
+    )
+
+    frame_indexes = np.concatenate(
+        (
+            behavior_velocities['frame_indexes'],
+            mapping_velocities['frame_indexes'],
+            replay_velocities['frame_indexes']),
+        axis=None
+    )
+
+    frame_times = np.concatenate(
+        (
+            behavior_velocities['frame_times'],
+            mapping_velocities['frame_times'],
+            replay_velocities['frame_times']),
         axis=None
     )
 
@@ -717,7 +749,7 @@ def merge_dx_data(
         axis=None
     )
 
-    frame_time = np.concatenate(
+    raw_frame_times = np.concatenate(
         (
             behavior_raw_data['frame_time'],
             mapping_raw_data['frame_time'],
@@ -738,12 +770,14 @@ def merge_dx_data(
     velocities = pd.DataFrame(
         {
             "velocity": velocity,
-            "net_rotation": dx_rad,
+            "net_rotation": net_rotation,
+            "frame_indexes": frame_indexes,
+            "frame_time": frame_times
         }
     )
 
     raw_data = pd.DataFrame(
-        {"vsig": vsig, "vin": vin, "frame_time": frame_time, "dx": dx_deg}
+        {"vsig": vsig, "vin": vin, "frame_time": raw_frame_times, "dx": dx_deg}
     )
 
     return velocities, raw_data
