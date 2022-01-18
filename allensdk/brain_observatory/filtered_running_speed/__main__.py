@@ -802,7 +802,7 @@ def process_single_simulus_experiment(pkl_path, sync_h5_path, output_path):
     sync_data = Dataset(sync_h5_path)
 
     frame_times = sync_data.get_edges(
-        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
+        "rising", Dataset.FRAME_KEYS, units="seconds"
     )
 
     end_index = len(frame_times)
@@ -872,7 +872,7 @@ def process_multi_simulus_experiment(
     # 3. sets the vsync line high
     # 4. flips the buffer
     frame_times = sync_data.get_edges(
-        "rising", Dataset.UPDATED_FRAME_KEYS, units="seconds"
+        "rising", Dataset.FRAME_KEYS, units="seconds"
     )
 
     behavior_velocities, behavior_raw_data = extract_dx_info(
