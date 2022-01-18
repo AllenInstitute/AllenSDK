@@ -82,8 +82,18 @@ def test_extract_running_speed_module(
             data_dir
         )
 
-        input_json_data['stimulus_pkl_path'] = reparent(
-            input_json_data['stimulus_pkl_path'],
+        input_json_data['mapping_pkl_path'] = reparent(
+            input_json_data['mapping_pkl_path'],
+            data_dir
+        )
+
+        input_json_data['behavior_pkl_path'] = reparent(
+            input_json_data['behavior_pkl_path'],
+            data_dir
+        )
+
+        input_json_data['replay_pkl_path'] = reparent(
+            input_json_data['replay_pkl_path'],
             data_dir
         )
 
