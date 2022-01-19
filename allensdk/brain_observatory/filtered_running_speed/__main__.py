@@ -14,7 +14,7 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from ._schemas import InputParameters, OutputParameters
 from typing import Union, Iterable, Optional
 
-from ecephys_etl.data_extractors.stim_file import (
+from allensdk.brain_observatory.filtered_running_speed.stim_file import (
     CamStimOnePickleStimFile,
     BehaviorPickleFile,
     ReplayPickleFile
