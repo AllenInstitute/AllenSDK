@@ -33,11 +33,23 @@ def use_temp_dir(tmpdir_factory):
         with open(new_input_json_path, 'w') as new_input_json:
             json.dump(input_json_data, new_input_json)
 
-        sp.check_call([
+        process = sp.Popen([
             'python', '-m', module,
             '--input_json', new_input_json_path,
             '--output_json', output_json_path
         ])
+
+        process.wait()
+
+        (stdout, stderr) = process.communicate()
+
+        if process.returncode != 0:
+            raise Exception(stderr)
+
+        with open(output_json_path, 'r') as output_json:
+            output_json_data = json.load(output_json)
+
+        return output_json_data
 
         with open(output_json_path, 'r') as output_json:
             output_json_data = json.load(output_json)
