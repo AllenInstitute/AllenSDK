@@ -36,8 +36,8 @@ def use_temp_dir(tmpdir_factory):
         process = sp.Popen([
             'python', '-m', module,
             '--input_json', new_input_json_path,
-            '--output_json', output_json_path
-        ])
+            '--output_json', output_json_path,
+        ], stdout=sp.PIPE, stderr=sp.PIPE)
 
         process.wait()
 
@@ -59,14 +59,17 @@ def use_temp_dir(tmpdir_factory):
     return fn
 
 
-DATA_DIR = os.path.join(
-    "/",
-    "allen",
-    "aibs",
-    "informatics",
-    "module_test_data",
-    "ecephys",
-    "filtered_running_speed"
+DATA_DIR = os.environ.get(
+    "ECEPHYS_PIPELINE_DATA",
+    os.path.join(
+        "/",
+        "allen",
+        "aibs",
+        "informatics",
+        "module_test_data",
+        "ecephys",
+        "filtered_running_speed"
+    ),
 )
 
 
