@@ -54,7 +54,7 @@ DATA_DIR = os.path.join(
     "informatics",
     "module_test_data",
     "ecephys",
-    "extract_running_speed"
+    "filtered_running_speed"
 )
 
 
