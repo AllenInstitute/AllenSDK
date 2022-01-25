@@ -1,18 +1,12 @@
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.sync_dataset import Dataset
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 import argschema
 
 from allensdk.brain_observatory.filtered_running_speed._schemas import (
     InputParameters,
     OutputParameters
-)
-
-from allensdk.brain_observatory.filtered_running_speed.stim_file import (
-    CamStimOnePickleStimFile,
-    BehaviorPickleFile,
-    ReplayPickleFile
 )
 
 from allensdk.brain_observatory.behavior.data_objects.\
@@ -25,9 +19,6 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
     default_schema = InputParameters
     default_output_schema = OutputParameters
 
-    INDEX_TO_BEHAVIOR = 0
-    INDEX_TO_MAPPING = 1
-    INDEX_TO_REPLAY = 2
     START_FRAME = 0
 
     def __init__(
@@ -122,34 +113,44 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return velocities
 
+    def _get_behavior_frame_count(self, pkl_file_path):
+        """
+        Get the number of frames in a behavior pickle file
+
+        Parameters
+        ----------
+        pkl_file_path: string
+            A path to a behavior pickle file
+        """
+        data = pd.read_pickle(pkl_file_path)
+
+        return len(data["items"]["behavior"]['intervalsms']) + 1
+
+    def _get_frame_count(self, pkl_file_path):
+        """
+        Get the number of frames in a mapping or replay pickle file
+
+        Parameters
+        ----------
+        pkl_file_path: string
+            A path to a mapping or replay pickle file
+        """
+
+        data = pd.read_pickle(pkl_file_path)
+
+        return len(data['intervalsms']) + 1
+
     def _get_frame_counts(self):
         """
         Get the number of frames for each stimulus
         """
 
-        mapping_data = CamStimOnePickleStimFile.factory(self.mapping_pkl_path)
-        behavior_data = BehaviorPickleFile.factory(self.behavior_pkl_path)
-        replay_data = ReplayPickleFile.factory(self.replay_pkl_path)
+        behavior_frame_count = self._get_behavior_frame_count(
+            self.behavior_pkl_path
+        )
 
-        frame_counts = [
-            pkl.num_frames for pkl in (
-                behavior_data,
-                mapping_data,
-                replay_data
-            )
-        ]
-
-        behavior_frame_count = frame_counts[
-            FilteredRunningSpeed.INDEX_TO_BEHAVIOR
-        ]
-
-        mapping_frame_count = frame_counts[
-            FilteredRunningSpeed.INDEX_TO_MAPPING
-        ]
-
-        replay_frames_count = frame_counts[
-            FilteredRunningSpeed.INDEX_TO_REPLAY
-        ]
+        mapping_frame_count = self._get_frame_count(self.mapping_pkl_path)
+        replay_frames_count = self._get_frame_count(self.replay_pkl_path)
 
         return behavior_frame_count, mapping_frame_count, replay_frames_count
 
@@ -157,10 +158,10 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         """
         Get the vsync frame times
         """
-        sync_data = Dataset(self.sync_h5_path)
+        sync_data = SyncDataset(self.sync_h5_path)
 
         return sync_data.get_edges(
-            "rising", Dataset.FRAME_KEYS, units="seconds"
+            "rising", SyncDataset.FRAME_KEYS, units="seconds"
         )
 
     def _get_stimulus_starts_and_ends(self):

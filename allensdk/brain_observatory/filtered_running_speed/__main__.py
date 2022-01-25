@@ -12,3 +12,5 @@ if __name__ == "__main__":
         DEFAULT_ZSCORE_THRESHOLD,
         USE_LOWPASS_FILTER
     )
+
+    filtered_running_speed.process()
