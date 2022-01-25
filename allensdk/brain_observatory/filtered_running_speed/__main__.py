@@ -8,9 +8,9 @@ DEFAULT_ZSCORE_THRESHOLD = 10.0
 USE_LOWPASS_FILTER = True
 
 if __name__ == "__main__":
-    filtered_running_speed = FilteredRunningSpeed(
+    filtered_running_speed = FilteredRunningSpeed()
+
+    filtered_running_speed.process(
         DEFAULT_ZSCORE_THRESHOLD,
         USE_LOWPASS_FILTER
     )
-
-    filtered_running_speed.process()

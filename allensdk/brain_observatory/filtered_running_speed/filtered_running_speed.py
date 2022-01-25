@@ -3,6 +3,7 @@ import pandas as pd
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 import argschema
+import json
 
 from allensdk.brain_observatory.filtered_running_speed._schemas import (
     InputParameters,
@@ -20,29 +21,6 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
     default_output_schema = OutputParameters
 
     START_FRAME = 0
-
-    def __init__(
-        self,
-        default_zscore_threshold,
-        use_lowpass_filter
-    ):
-        """
-        Parameters
-        ----------
-        default_zscore_threshold: float
-            The default zscore threshold to use
-        use_lowpass_filter: boolean
-            Whether to use the lowpass filter
-        """
-
-        self.mapping_pkl_path = self.args['mapping_pkl_path']
-        self.behavior_pkl_path = self.args['behavior_pkl_path']
-        self.replay_pkl_path = self.args['replay_pkl_path']
-        self.sync_h5_path = self.args['sync_h5_path']
-        self.output_path = self.args['output_path']
-
-        self.default_zscore_threshold = default_zscore_threshold
-        self.use_lowpass_filter = use_lowpass_filter
 
     def _extract_dx_info(
         self,
@@ -146,11 +124,16 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         """
 
         behavior_frame_count = self._get_behavior_frame_count(
-            self.behavior_pkl_path
+            self.args['behavior_pkl_path']
         )
 
-        mapping_frame_count = self._get_frame_count(self.mapping_pkl_path)
-        replay_frames_count = self._get_frame_count(self.replay_pkl_path)
+        mapping_frame_count = self._get_frame_count(
+            self.args['mapping_pkl_path']
+        )
+
+        replay_frames_count = self._get_frame_count(
+            self.args['replay_pkl_path']
+        )
 
         return behavior_frame_count, mapping_frame_count, replay_frames_count
 
@@ -158,7 +141,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         """
         Get the vsync frame times
         """
-        sync_data = SyncDataset(self.sync_h5_path)
+        sync_data = SyncDataset(self.args['sync_h5_path'])
 
         return sync_data.get_edges(
             "rising", SyncDataset.FRAME_KEYS, units="seconds"
@@ -297,10 +280,24 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             self.pkl_path
         )
 
-        store = pd.HDFStore(self.output_path)
+        store = pd.HDFStore(self.args['output_path'])
         store.put("running_speed", velocities)
         store.put("raw_data", raw_data)
         store.close()
+
+        self._write_output_file()
+
+    def _write_output_file(self):
+        """
+        Write the output json file
+        """
+
+        ouput_data = {}
+        ouput_data['output_path'] = self.args['output_path']
+        ouput_data['input_parameters'] = self.args
+
+        with open(self.args['output_json'], 'w') as output_file:
+            json.dump(ouput_data, output_file, indent=2)
 
     def _process_multi_simulus_experiment(
         self
@@ -324,21 +321,21 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             frame_times,
             behavior_start,
             behavior_end,
-            self.behavior_pkl_path
+            self.args['behavior_pkl_path']
         )
 
         mapping_velocities = self._extract_dx_info(
             frame_times,
             mapping_start,
             mapping_end,
-            self.mapping_pkl_path
+            self.args['mapping_pkl_path']
         )
 
         replay_velocities = self._extract_dx_info(
             frame_times,
             replay_start,
             replay_end,
-            self.replay_pkl_path
+            self.args['replay_pkl_path']
         )
 
         velocities, raw_data = self._merge_dx_data(
@@ -348,19 +345,24 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             frame_times
         )
 
-        store = pd.HDFStore(self.output_path)
+        store = pd.HDFStore(self.args['output_path'])
         store.put("running_speed", velocities)
         store.put("raw_data", raw_data)
         store.close()
 
-    def process(self):
+        self._write_output_file()
+
+    def process(self, default_zscore_threshold, use_lowpass_filter):
         """
         Process an experiment
         """
 
-        if self.mapping_pkl_path is not None:
-            if (self.behavior_pkl_path is not None
-                    and self.replay_pkl_path is not None):
+        self.default_zscore_threshold = default_zscore_threshold
+        self.use_lowpass_filter = use_lowpass_filter
+
+        if self.args['mapping_pkl_path'] is not None:
+            if (self.args['behavior_pkl_path'] is not None
+                    and self.args['replay_pkl_path'] is not None):
                 self._process_multi_simulus_experiment()
             else:
                 self._process_single_simulus_experiment()
