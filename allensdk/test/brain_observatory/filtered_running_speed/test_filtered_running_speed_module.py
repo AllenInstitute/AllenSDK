@@ -56,11 +56,6 @@ def use_temp_dir(tmpdir_factory):
 
         return output_json_data
 
-        with open(output_json_path, 'r') as output_json:
-            output_json_data = json.load(output_json)
-
-        return output_json_data
-
     return fn
 
 
