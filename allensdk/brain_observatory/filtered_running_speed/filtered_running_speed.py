@@ -244,7 +244,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
                 "velocity": speed,
                 "net_rotation": dx,
                 "frame_indexes": frame_indexes,
-                "frame_times": frame_times
+                "frame_time": frame_times
             }
         )
 

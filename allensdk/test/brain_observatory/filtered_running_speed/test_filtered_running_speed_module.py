@@ -17,6 +17,11 @@ def use_temp_dir(tmpdir_factory):
         module,
         renamer_cb
     ):
+        """
+        Test the filtered running speed filtered_running_speed
+        module by creating inputs in a temp directory and
+        then by running the module using command line arguments
+        """
 
         temp_dir = str(tmpdir_factory.mktemp(tempdir_name))
 
