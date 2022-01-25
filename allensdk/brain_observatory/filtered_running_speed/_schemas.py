@@ -8,21 +8,21 @@ class InputParameters(argschema.ArgSchema):
         description="Filtered running speed hdf5 output file."
     )
 
-    mapping_pkl_path = argschema.fields.String(
+    mapping_pkl_path = argschema.fields.InputFile(
         required=True,
         help="path to pkl file containing raw stimulus information",
     )
-    behavior_pkl_path = argschema.fields.String(
-        required=True,
-        allow_none=True,
-        help="path to pkl file containing raw stimulus information",
-    )
-    replay_pkl_path = argschema.fields.String(
+    behavior_pkl_path = argschema.fields.InputFile(
         required=True,
         allow_none=True,
         help="path to pkl file containing raw stimulus information",
     )
-    sync_h5_path = argschema.fields.String(
+    replay_pkl_path = argschema.fields.InputFile(
+        required=True,
+        allow_none=True,
+        help="path to pkl file containing raw stimulus information",
+    )
+    sync_h5_path = argschema.fields.InputFile(
         required=True,
         help="path to h5 file containing synchronization information",
     )
