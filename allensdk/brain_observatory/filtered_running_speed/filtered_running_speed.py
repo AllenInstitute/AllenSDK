@@ -4,7 +4,6 @@ from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 import argschema
 import json
-import h5py
 
 from allensdk.brain_observatory.filtered_running_speed._schemas import (
     InputParameters,
@@ -46,8 +45,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         Returns
         -------
-        list[pd.DataFrame, pd.DataFrame]
-            the velocity data and the raw data
+        pd.DataFrame
 
         Notes
         -------
@@ -259,6 +257,9 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             }
         )
 
+        # Warning - the 'iscose' line below needs to be refactored
+        # is it exists in multiple places
+
         # due to an acquisition bug (the buffer of raw orientations
         # may be updated more slowly than it is read, leading to
         # a 0 value for the change in orientation over an interval)
@@ -291,9 +292,10 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             self.pkl_path
         )
 
-        with h5py.File(self.args['output_path'], 'w') as raw_file:
-            raw_file.create_dataset(name='running_speed', data=velocities)
-            raw_file.create_dataset(name='raw_data', data=raw_data)
+        store = pd.HDFStore(self.args['output_path'])
+        store.put("running_speed", velocities)
+        store.put("raw_data", raw_data)
+        store.close()
 
         self._write_output_file()
 
@@ -355,9 +357,10 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             frame_times
         )
 
-        with h5py.File(self.args['output_path'], 'w') as raw_file:
-            raw_file.create_dataset(name='running_speed', data=velocities)
-            raw_file.create_dataset(name='raw_data', data=raw_data)
+        store = pd.HDFStore(self.args['output_path'])
+        store.put("running_speed", velocities)
+        store.put("raw_data", raw_data)
+        store.close()
 
         self._write_output_file()
 

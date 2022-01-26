@@ -27,9 +27,6 @@ class InputParameters(argschema.ArgSchema):
         help="path to h5 file containing synchronization information",
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class OutputSchema(argschema.schemas.DefaultSchema):
     input_parameters = Nested(
