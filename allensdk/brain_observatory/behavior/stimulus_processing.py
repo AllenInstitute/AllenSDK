@@ -283,13 +283,21 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         stimulus_index_df = pd.DataFrame(columns=[
             'image_name', 'image_category', 'image_set', 'phase',
             'spatial_frequency', 'image_index'])
+        stimulus_index_df = stimulus_index_df.astype({
+            'image_name': str,
+            'image_category': str,
+            'image_set': str,
+            'phase': float,
+            'spatial_frequency': float,
+            'image_index': int
+        })
 
     # get the grating metadata will be empty if gratings are absent
     grating_df = get_gratings_metadata(stimuli,
                                        start_idx=len(stimulus_index_df))
-    stimulus_index_df = stimulus_index_df.append(grating_df,
-                                                 ignore_index=True,
-                                                 sort=False)
+    stimulus_index_df = pd.concat([stimulus_index_df, grating_df],
+                                  ignore_index=True,
+                                  sort=False)
 
     # Add an entry for omitted stimuli
     omitted_df = pd.DataFrame({'image_category': ['omitted'],
@@ -299,8 +307,9 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
                                'phase': np.NaN,
                                'spatial_frequency': np.NaN,
                                'image_index': len(stimulus_index_df)})
-    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True,
-                                                 sort=False)
+    stimulus_index_df = pd.concat([stimulus_index_df, omitted_df],
+                                  ignore_index=True,
+                                  sort=False)
     stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
     return stimulus_index_df
 
