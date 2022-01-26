@@ -4,6 +4,7 @@ from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 import argschema
 import json
+import h5py
 
 from allensdk.brain_observatory.filtered_running_speed._schemas import (
     InputParameters,
@@ -24,11 +25,11 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
     def _extract_dx_info(
         self,
-        frame_times,
-        start_index,
-        end_index,
-        pkl_path
-    ):
+        frame_times: np.ndarray,
+        start_index: int,
+        end_index: int,
+        pkl_path: str
+    ) -> pd.core.frame.DataFrame:
         """
         Extract all of the running speed data
 
@@ -50,28 +51,28 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         Notes
         -------
-                velocity pd.DataFrame:
-                    columns:
-                        "velocity": computed running speed
-                        "net_rotation": dx in radians
-                        "frame_indexes": frame indexes into
-                            the full vsync times list
+            velocity pd.DataFrame:
+                columns:
+                    "velocity": computed running speed
+                    "net_rotation": dx in radians
+                    "frame_indexes": frame indexes into
+                        the full vsync times list
 
-                raw data pd.DataFrame:
-                    Dataframe with an index of timestamps and the following
-                    columns:
-                        "vsig": voltage signal from the encoder
-                        "vin": the theoretical maximum voltage that the encoder
-                            will reach prior to "wrapping". This should
-                            theoretically be 5V (after crossing
-                            5V goes to 0V, or vice versa). In
-                            practice the encoder does not always
-                            reach this value before wrapping, which can cause
-                            transient spikes in speed at the voltage "wraps".
-                        "frame_time": list of the vsync times
-                        "dx": angular change, computed during data collection
-                    The raw data are provided so that the user may compute
-                    their own speed from source, if desired.
+            raw data pd.DataFrame:
+                Dataframe with an index of timestamps and the following
+                columns:
+                    "vsig": voltage signal from the encoder
+                    "vin": the theoretical maximum voltage that the encoder
+                        will reach prior to "wrapping". This should
+                        theoretically be 5V (after crossing
+                        5V goes to 0V, or vice versa). In
+                        practice the encoder does not always
+                        reach this value before wrapping, which can cause
+                        transient spikes in speed at the voltage "wraps".
+                    "frame_time": list of the vsync times
+                    "dx": angular change, computed during data collection
+                The raw data are provided so that the user may compute
+                their own speed from source, if desired.
 
         """
 
@@ -91,7 +92,10 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return velocities
 
-    def _get_behavior_frame_count(self, pkl_file_path):
+    def _get_behavior_frame_count(
+        self,
+        pkl_file_path: str
+    ) -> int:
         """
         Get the number of frames in a behavior pickle file
 
@@ -104,7 +108,10 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return len(data["items"]["behavior"]['intervalsms']) + 1
 
-    def _get_frame_count(self, pkl_file_path):
+    def _get_frame_count(
+        self,
+        pkl_file_path: str
+    ) -> int:
         """
         Get the number of frames in a mapping or replay pickle file
 
@@ -118,7 +125,9 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return len(data['intervalsms']) + 1
 
-    def _get_frame_counts(self):
+    def _get_frame_counts(
+        self
+    ) -> list:
         """
         Get the number of frames for each stimulus
         """
@@ -137,7 +146,9 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return behavior_frame_count, mapping_frame_count, replay_frames_count
 
-    def _get_frame_times(self):
+    def _get_frame_times(
+        self
+    ) -> np.ndarray:
         """
         Get the vsync frame times
         """
@@ -147,7 +158,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             "rising", SyncDataset.FRAME_KEYS, units="seconds"
         )
 
-    def _get_stimulus_starts_and_ends(self):
+    def _get_stimulus_starts_and_ends(self) -> list:
         """
         Get the start and stop frame indexes for each stimulus
         """
@@ -178,11 +189,11 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
     def _merge_dx_data(
         self,
-        mapping_velocities,
-        behavior_velocities,
-        replay_velocities,
-        frame_times
-    ):
+        mapping_velocities: pd.core.frame.DataFrame,
+        behavior_velocities: pd.core.frame.DataFrame,
+        replay_velocities: pd.core.frame.DataFrame,
+        frame_times: np.ndarray
+    ) -> list:
         """
         Concatenate all of the running speed data
 
@@ -280,10 +291,9 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             self.pkl_path
         )
 
-        store = pd.HDFStore(self.args['output_path'])
-        store.put("running_speed", velocities)
-        store.put("raw_data", raw_data)
-        store.close()
+        with h5py.File(self.args['output_path'], 'w') as raw_file:
+            raw_file.create_dataset(name='running_speed', data=velocities)
+            raw_file.create_dataset(name='raw_data', data=raw_data)
 
         self._write_output_file()
 
@@ -345,10 +355,9 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             frame_times
         )
 
-        store = pd.HDFStore(self.args['output_path'])
-        store.put("running_speed", velocities)
-        store.put("raw_data", raw_data)
-        store.close()
+        with h5py.File(self.args['output_path'], 'w') as raw_file:
+            raw_file.create_dataset(name='running_speed', data=velocities)
+            raw_file.create_dataset(name='raw_data', data=raw_data)
 
         self._write_output_file()
 

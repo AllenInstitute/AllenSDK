@@ -34,7 +34,7 @@ class InputParameters(argschema.ArgSchema):
 class OutputSchema(argschema.schemas.DefaultSchema):
     input_parameters = Nested(
         InputParameters,
-        description=("Input parameters the module " "was run with"),
+        description=("Input parameters the module was run with"),
         required=True,
     )
 
