@@ -29,6 +29,7 @@ MAPPING_START = 215999
 REPLAY_START = 307199
 
 
+@pytest.mark.requires_bamboo
 @pytest.fixture(scope="session")
 def multi_stimulus_fixture(tmpdir_factory):
 
@@ -84,6 +85,7 @@ def multi_stimulus_fixture(tmpdir_factory):
 
 
 # smoke test
+@pytest.mark.requires_bamboo
 def test_proccessing(multi_stimulus_fixture):
     try:
         multi_stimulus_fixture.process()
@@ -119,6 +121,7 @@ def test_proccessing(multi_stimulus_fixture):
     )
 
 
+@pytest.mark.requires_bamboo
 def test_get_stimulus_starts_and_ends(multi_stimulus_fixture):
     (
         behavior_start,
@@ -133,6 +136,7 @@ def test_get_stimulus_starts_and_ends(multi_stimulus_fixture):
     assert(replay_end == NUMBER_OF_VSYNCS)
 
 
+@pytest.mark.requires_bamboo
 def test_get_frame_times(multi_stimulus_fixture):
     number_of_frames = len(multi_stimulus_fixture._get_frame_times())
 
