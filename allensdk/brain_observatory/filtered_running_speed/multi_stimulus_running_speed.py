@@ -168,19 +168,13 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
         ) = self._get_frame_counts()
 
         behavior_start = MultiStimulusRunningSpeed.START_FRAME
-        behavior_end = behavior_frame_count
-
-        mapping_start = behavior_end
-        mapping_end = mapping_start + mapping_frame_count
-
-        replay_start = mapping_end
+        mapping_start = behavior_frame_count
+        replay_start = mapping_start + mapping_frame_count
         replay_end = replay_start + replay_frames_count
 
         return (
             behavior_start,
-            behavior_end,
             mapping_start,
-            mapping_end,
             replay_start,
             replay_end
         )
@@ -293,9 +287,7 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
 
         (
             behavior_start,
-            behavior_end,
             mapping_start,
-            mapping_end,
             replay_start,
             replay_end
         ) = self._get_stimulus_starts_and_ends()
@@ -305,14 +297,14 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
         behavior_velocities = self._extract_dx_info(
             frame_times,
             behavior_start,
-            behavior_end,
+            mapping_start,
             self.args['behavior_pkl_path']
         )
 
         mapping_velocities = self._extract_dx_info(
             frame_times,
             mapping_start,
-            mapping_end,
+            replay_start,
             self.args['mapping_pkl_path']
         )
 
