@@ -6,8 +6,8 @@ import argschema
 import json
 
 from allensdk.brain_observatory.filtered_running_speed._schemas import (
-    InputParameters,
-    OutputParameters
+    MultiStimulusRunningSpeedInputParameters,
+    MultiStimulusRunningSpeedOutputParameters
 )
 
 from allensdk.brain_observatory.behavior.data_objects.\
@@ -16,9 +16,9 @@ from allensdk.brain_observatory.behavior.data_objects.\
     )
 
 
-class FilteredRunningSpeed(argschema.ArgSchemaParser):
-    default_schema = InputParameters
-    default_output_schema = OutputParameters
+class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
+    default_schema = MultiStimulusRunningSpeedInputParameters
+    default_output_schema = MultiStimulusRunningSpeedOutputParameters
 
     START_FRAME = 0
 
@@ -84,8 +84,8 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         velocities = get_running_df(
                         stim_file,
                         frame_times,
-                        self.use_lowpass_filter,
-                        self.default_zscore_threshold
+                        self.args['use_lowpass_filter'],
+                        self.args['zscore_threshold']
         )
 
         return velocities
@@ -167,7 +167,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
             replay_frames_count
         ) = self._get_frame_counts()
 
-        behavior_start = FilteredRunningSpeed.START_FRAME
+        behavior_start = MultiStimulusRunningSpeed.START_FRAME
         behavior_end = behavior_frame_count
 
         mapping_start = behavior_end
@@ -245,7 +245,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         )
 
         frame_indexes = list(
-            range(FilteredRunningSpeed.START_FRAME, len(frame_times))
+            range(MultiStimulusRunningSpeed.START_FRAME, len(frame_times))
         )
 
         velocities = pd.DataFrame(
@@ -272,34 +272,7 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
 
         return velocities, raw_data
 
-    def _process_single_simulus_experiment(
-        self
-    ):
-        """
-        Process an experiment with a single simulus sessions
-        """
-
-        start_index = FilteredRunningSpeed.START_FRAME
-
-        frame_times = self._get_frame_times()
-
-        end_index = len(frame_times)
-
-        velocities, raw_data = self._extract_dx_info(
-            frame_times,
-            start_index,
-            end_index,
-            self.pkl_path
-        )
-
-        store = pd.HDFStore(self.args['output_path'])
-        store.put("running_speed", velocities)
-        store.put("raw_data", raw_data)
-        store.close()
-
-        self._write_output_file()
-
-    def _write_output_file(self):
+    def _write_output_json(self):
         """
         Write the output json file
         """
@@ -311,11 +284,11 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         with open(self.args['output_json'], 'w') as output_file:
             json.dump(ouput_data, output_file, indent=2)
 
-    def _process_multi_simulus_experiment(
+    def process(
         self
     ):
         """
-        Process an experiment with a three simulus sessions
+        Process an experiment with a three stimulus sessions
         """
 
         (
@@ -362,21 +335,4 @@ class FilteredRunningSpeed(argschema.ArgSchemaParser):
         store.put("raw_data", raw_data)
         store.close()
 
-        self._write_output_file()
-
-    def process(self, default_zscore_threshold, use_lowpass_filter):
-        """
-        Process an experiment
-        """
-
-        self.default_zscore_threshold = default_zscore_threshold
-        self.use_lowpass_filter = use_lowpass_filter
-
-        if self.args['mapping_pkl_path'] is not None:
-            if (self.args['behavior_pkl_path'] is not None
-                    and self.args['replay_pkl_path'] is not None):
-                self._process_multi_simulus_experiment()
-            else:
-                self._process_single_simulus_experiment()
-        else:
-            raise ValueError('Mapping pickle file cannot be nil')
+        self._write_output_json()
