@@ -3,7 +3,7 @@ from argschema.fields import Nested
 
 
 class MultiStimulusRunningSpeedInputParameters(argschema.ArgSchema):
-    output_path = argschema.fields.InputFile(
+    output_path = argschema.fields.OutputFile(
         required=True,
         description="The location to write the output file"
     )

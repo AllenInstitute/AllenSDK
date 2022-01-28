@@ -1,5 +1,5 @@
 from allensdk.brain_observatory.\
-    filtered_running_speed.multi_stimulus_running_speed import (
+    multi_stimulus_running_speed.multi_stimulus_running_speed import (
         MultiStimulusRunningSpeed
     )
 

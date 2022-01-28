@@ -5,7 +5,7 @@ import pathlib
 import pandas as pd
 
 from allensdk.brain_observatory.\
-    filtered_running_speed.multi_stimulus_running_speed import (
+    multi_stimulus_running_speed.multi_stimulus_running_speed import (
         MultiStimulusRunningSpeed
     )
 
@@ -87,10 +87,8 @@ def multi_stimulus_fixture(tmpdir_factory):
 # smoke test
 @pytest.mark.requires_bamboo
 def test_proccessing(multi_stimulus_fixture):
-    try:
-        multi_stimulus_fixture.process()
-    except Exception as exception:
-        assert False, f"raised an exception {exception}"
+
+    multi_stimulus_fixture.process()
 
     output_path = multi_stimulus_fixture.args['output_path']
 

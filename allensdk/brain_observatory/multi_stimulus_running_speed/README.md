@@ -6,7 +6,7 @@ Calculates an average running speed for the subject on each stimulus frame.
 Running
 -------
 ```
-python -m allensdk.brain_observatory.filtered_running_speed --input_json <path to input json> --output_json <path to output json>
+python -m allensdk.brain_observatory.multi_stimulus_running_speed --input_json <path to input json> --output_json <path to output json>
 ```
 See the schema file for detailed information about input json contents.
 

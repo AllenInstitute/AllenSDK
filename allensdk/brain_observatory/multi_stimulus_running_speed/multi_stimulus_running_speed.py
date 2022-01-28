@@ -5,7 +5,7 @@ from allensdk.brain_observatory import sync_utilities
 import argschema
 import json
 
-from allensdk.brain_observatory.filtered_running_speed._schemas import (
+from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
     MultiStimulusRunningSpeedInputParameters,
     MultiStimulusRunningSpeedOutputParameters
 )
@@ -251,7 +251,7 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
             }
         )
 
-        # Warning - the 'iscose' line below needs to be refactored
+        # Warning - the 'isclose' line below needs to be refactored
         # is it exists in multiple places
 
         # due to an acquisition bug (the buffer of raw orientations
