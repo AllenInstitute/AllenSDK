@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.3] = 2022-02-02
+- Add ability to extract running speed from mulit-stimulus experiments
+- Compatible with pandas 1.4
+
 ## [2.13.2] = 2022-01-03
 - Fixes bug that caused file paths on windows machines to be incorrect in Visual behavior user-facing classes
 - Updates to support MESO.2
