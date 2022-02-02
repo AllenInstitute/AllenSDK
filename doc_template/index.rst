@@ -118,6 +118,9 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's new - 2.13.4
+----------------------------------------------------------------------
+
 What's new - 2.13.3
 ----------------------------------------------------------------------
 - Add ability to extract running speed from mulit-stimulus experiments

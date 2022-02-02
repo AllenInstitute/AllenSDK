@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.4]
+
 ## [2.13.3] = 2022-02-02
 - Add ability to extract running speed from mulit-stimulus experiments
 - Compatible with pandas 1.4
