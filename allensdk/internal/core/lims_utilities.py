@@ -79,7 +79,7 @@ def _connect(user="limsreader", host="limsdb2", database="lims2", password="lims
 
 def _select(cursor, query):
     cursor.execute(query)
-    columns = [ d[0].decode("utf-8") for d in cursor.description ]
+    columns = [ d[0].decode("utf-8") if isinstance(d[0], bytes) else d[0] for d in cursor.description ]
     return [ dict(zip(columns, c)) for c in cursor.fetchall() ]
 
 def select(cursor, query):
