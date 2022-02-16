@@ -83,6 +83,8 @@ class InputParameters(ArgSchema):
     noisy_channel_threshold = Float(default=1500.0,
                                     help='Threshold for removing noisy '
                                          'channels from analysis')
+    start_field = String(default='Start',
+         help='Column from which to extract start times.')
 
 
 class ProbeOutputParameters(DefaultSchema):

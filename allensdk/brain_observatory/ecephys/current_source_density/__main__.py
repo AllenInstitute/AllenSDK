@@ -85,7 +85,8 @@ def run_csd(args: dict) -> dict:
             pre_stimulus_time=args['pre_stimulus_time'],
             post_stimulus_time=args['post_stimulus_time'],
             num_trials=args['num_trials'],
-            stimulus_index=args['stimulus']['index']
+            stimulus_index=args['stimulus']['index'],
+            start_field=args['start_field']
         )
 
         logging.info('Loading LFP data')
