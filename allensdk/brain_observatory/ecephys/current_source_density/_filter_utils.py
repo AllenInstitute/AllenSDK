@@ -31,7 +31,12 @@ def select_good_channels(lfp: np.ndarray,
     channel_variance = np.mean(np.std(lfp, 2), 0)
     noisy_channels = np.where(channel_variance > noisy_channel_threshold)[0]
 
-    to_remove = np.concatenate((np.array(reference_channels), noisy_channels)).astype(int)
+    to_remove = np.concatenate(
+        (
+            np.array(reference_channels),
+            noisy_channels
+        )
+    ).astype(int)
     good_indices = np.delete(np.arange(0, lfp.shape[1]), to_remove)
 
     # Remove noisy or reference channels (axis=1)
