@@ -120,6 +120,9 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 What's new - 2.13.4
 ----------------------------------------------------------------------
+- Bug fix in ecephys
+- Added support for VBN source density jobs.
+- Bug fix for pg8000
 
 What's new - 2.13.3
 ----------------------------------------------------------------------
