@@ -114,6 +114,16 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         assert str(record[0].message) == 'Unable to parse cre_line from ' \
                                          'full_genotype'
 
+    def test_cre_line_full_genotype_is_none(self):
+        """Test that cre_line is None and no error raised"""
+        fg = FullGenotype(full_genotype=None)
+
+        with pytest.warns(UserWarning) as record:
+            cre_line = fg.parse_cre_line(warn=True)
+        assert cre_line is None
+        assert str(record[0].message) == 'Unable to parse cre_line from ' \
+                                         'full_genotype'
+
     def test_reporter_line(self):
         """Test that reporter line properly parsed from list"""
         reporter_line = ReporterLine.parse(reporter_line=['foo'])

@@ -14,7 +14,7 @@ class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
                    NwbReadableInterface):
     """the name of the subject's genotype"""
     def __init__(self, full_genotype: str):
-        super().__init__(name="full_genotype", value=full_genotype)
+        super().__init__(name="full_genotype", value=str(full_genotype))
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "FullGenotype":
