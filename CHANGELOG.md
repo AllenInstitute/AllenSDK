@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.4] = 2022-02-23
+- Bug fix in ecephys
+- Added support for VBN source density jobs.
+- Bug fix for pg8000
+
 ## [2.13.3] = 2022-02-02
 - Add ability to extract running speed from mulit-stimulus experiments
 - Compatible with pandas 1.4
