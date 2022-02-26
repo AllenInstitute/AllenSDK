@@ -65,7 +65,7 @@ def get_ophys_frames(
     """
     try:
         return dataset.get_edges(kind="rising",
-                                 keys=["vsync_2p", "2p_vsync"],
+                                 keys=["vsync_2p", "2p_vsync", 'vsync_stim'],
                                  units="seconds")
     except KeyError:
         if not permissive:
