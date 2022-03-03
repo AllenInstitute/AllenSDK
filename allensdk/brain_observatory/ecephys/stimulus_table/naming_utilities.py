@@ -150,6 +150,7 @@ def standardize_movie_numbers(
 
     # for some reason pandas really wants us to use the captures
     warnings.filterwarnings("ignore", "This pattern has match groups")
+    warnings.filterwarnings("ignore", category=UserWarning)
 
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
     table.loc[movie_rows, stim_colname] = \
