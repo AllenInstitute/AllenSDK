@@ -83,7 +83,7 @@ class NwbApi:
                 presentations = collections.defaultdict(list)
                 for col in interval.columns:
                     if col.name not in columns_to_ignore:
-                        presentations[col.name].extend(col.data)
+                        presentations[col.name].extend(col.data[:])
                 df = pd.DataFrame(presentations).replace({'N/A': ''})
                 presentation_dfs.append(df)
 
