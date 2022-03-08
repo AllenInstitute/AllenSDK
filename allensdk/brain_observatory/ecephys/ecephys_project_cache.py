@@ -315,6 +315,11 @@ class EcephysProjectCache(Cache):
         channels.drop(columns=suppress, inplace=True, errors="ignore")
         channels.rename(columns={"name": "probe_name"}, inplace=True, errors="ignore")
 
+        # this if block is to preserve legacy behavior on October 2019
+        # release, which relied on the WarehouseApi
+        if not isinstance(self.fetch_api, EcephysProjectWarehouseApi):
+            channels.index.name = "ecephys_channel_id"
+
         return channels
 
     def get_units(self, suppress: Optional[List[str]] = None, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
