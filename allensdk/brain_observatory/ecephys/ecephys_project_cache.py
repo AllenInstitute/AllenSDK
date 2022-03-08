@@ -296,6 +296,11 @@ class EcephysProjectCache(Cache):
             suppress = list(self.SUPPRESS_FROM_PROBES)
         probes.drop(columns=suppress, inplace=True, errors="ignore")
 
+        # this if block is to preserve legacy behavior on October 2019
+        # release, which relied on the WarehouseApi
+        if not isinstance(self.fetch_api, EcephysProjectWarehouseApi):
+            probes.index.name = "ecephys_probe_id"
+
         return probes
 
     def get_channels(self, suppress=None):
