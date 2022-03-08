@@ -348,6 +348,19 @@ class EcephysProjectCache(Cache):
         units = self._get_annotated_units(filter_by_validity=filter_by_validity, **unit_filter_kwargs)
         units.drop(columns=suppress, inplace=True, errors="ignore")
 
+        # this if block is to preserve legacy behavior on October 2019
+        # release, which relied on the WarehouseApi
+        if not isinstance(self.fetch_api, EcephysProjectWarehouseApi):
+            units.index.name = "unit_id"
+            units.rename(columns={'specimen_id': 'mouse_id',
+                                  'name': 'name_probe'},
+                         inplace=True,
+                         errors='raise')
+            units.drop(columns=['sampling_rate', 'lfp_sampling_rate',
+                                'phase', 'has_lfp_data'],
+                       inplace=True,
+                       errors='raise')
+
         return units
 
     def get_session_data(self, session_id: int, filter_by_validity: bool = True, **unit_filter_kwargs):
