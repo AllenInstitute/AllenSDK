@@ -363,11 +363,15 @@ class BehaviorOphysExperiment(BehaviorSession):
         is_multiplane_session = _is_multi_plane_session()
         meta = BehaviorOphysMetadata.from_json(
             dict_repr=session_data, is_multiplane=is_multiplane_session)
-        monitor_delay = calculate_monitor_delay(
-            sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
+        if 'monitor_delay' not in session_data:
+            monitor_delay = calculate_monitor_delay(
+                sync_file=sync_file,
+                equipment=meta.behavior_metadata.equipment
+            )
+            session_data['monitor_delay'] = monitor_delay
+
         behavior_session = BehaviorSession.from_json(
-            session_data=session_data,
-            monitor_delay=monitor_delay
+            session_data=session_data
         )
 
         if is_multiplane_session:

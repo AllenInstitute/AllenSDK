@@ -101,13 +101,19 @@ def test_stimulus_timestamps_from_json(
         )
 
 
-def test_stimulus_timestamps_from_json2():
+@pytest.fixture
+def stimulus_file_fixture():
     dir = Path(__file__).parent.parent.resolve()
     test_data_dir = dir / 'test_data'
     sf_path = test_data_dir / 'stimulus_file.pkl'
 
-    sf = StimulusFile.from_json(
+    return StimulusFile.from_json(
         dict_repr={'behavior_stimulus_file': str(sf_path)})
+
+
+def test_stimulus_timestamps_from_json2(stimulus_file_fixture):
+
+    sf = stimulus_file_fixture
     stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
         stimulus_file=sf,
         monitor_delay=0.0)
@@ -115,20 +121,31 @@ def test_stimulus_timestamps_from_json2():
     assert np.allclose(expected, stimulus_timestamps.value)
 
 
-def test_stimulus_timestamps_from_json3():
+@pytest.mark.parametrize("delay", [0.0, 0.5])
+def test_stimulus_timestamps_json_roundtrip(stimulus_file_fixture, delay):
+
+    sf = stimulus_file_fixture
+    stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+        stimulus_file=sf,
+        monitor_delay=delay)
+
+    dict_repr = stimulus_timestamps.to_json()
+    stimulus_timestamps_from_json = StimulusTimestamps.from_json(dict_repr)
+    assert np.allclose(
+        stimulus_timestamps.value,
+        stimulus_timestamps_from_json.value
+    )
+
+
+def test_stimulus_timestamps_from_json3(stimulus_file_fixture):
     """
     Test that StimulusTimestamps.from_stimulus_file
     just returns the sum of the intervalsms field in the
     behavior stimulus pickle file, padded with a zero at the
     first timestamp.
     """
-    dir = Path(__file__).parent.parent.resolve()
-    test_data_dir = dir / 'test_data'
-    sf_path = test_data_dir / 'stimulus_file.pkl'
 
-    sf = StimulusFile.from_json(
-        dict_repr={'behavior_stimulus_file': str(sf_path)})
-
+    sf = stimulus_file_fixture
     sf._data['items']['behavior']['intervalsms'] = [0.1, 0.2, 0.3, 0.4]
 
     stimulus_timestamps = StimulusTimestamps.from_stimulus_file(

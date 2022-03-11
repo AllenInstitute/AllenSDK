@@ -1,5 +1,5 @@
 from argschema import ArgSchema
-from argschema.fields import (LogLevel, String, Int, Nested, List)
+from argschema.fields import (LogLevel, String, Int, Nested, List, Float)
 import marshmallow as mm
 import pandas as pd
 
@@ -42,6 +42,8 @@ class BehaviorSessionData(RaisingSchema):
     stimulus_name = String(required=True,
                            description=("Name of stimulus presented during "
                                         "behavior session"))
+    monitor_delay = Float(required=False,
+                          description=("Value of delay to adjust timestamps"))
 
     @mm.pre_load
     def set_stimulus_name(self, data, **kwargs):
