@@ -81,38 +81,30 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_json(cls,
-                  session_data: dict,
-                  monitor_delay: Optional[float] = None) \
-            -> "BehaviorSession":
+                  session_data: dict) -> "BehaviorSession":
         """
 
         Parameters
         ----------
         session_data
             Dict of input data necessary to construct a session
-        monitor_delay
-            Monitor delay. If not provided, will use an estimate.
-            To provide this value, see for example
-            allensdk.brain_observatory.behavior.data_objects.stimuli.util.
-            calculate_monitor_delay
 
         Returns
         -------
         `BehaviorSession` instance
 
         """
-        if monitor_delay is None:
+        if 'monitor_delay' not in session_data:
             monitor_delay = cls._get_monitor_delay()
+            session_data['monitor_delay'] = monitor_delay
 
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = StimulusFile.from_json(dict_repr=session_data)
         stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data,
-            monitor_delay=monitor_delay)
+            dict_repr=session_data)
         running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data,
-            monitor_delay=monitor_delay)
+            dict_repr=session_data)
         raw_running_speed = RunningSpeed.from_json(
             dict_repr=session_data, filtered=False
         )
@@ -122,8 +114,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
-                trial_monitor_delay=monitor_delay
+                stimulus_timestamps=stimulus_timestamps
             )
         date_of_acquisition = DateOfAcquisition.from_json(
             dict_repr=session_data)\
@@ -212,7 +203,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
                 stimulus_timestamps=stimulus_timestamps,
-                trial_monitor_delay=monitor_delay
             )
         if date_of_acquisition is None:
             date_of_acquisition = DateOfAcquisition.from_lims(
@@ -891,8 +881,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     @classmethod
     def _read_data_from_stimulus_file(
             cls, stimulus_file: StimulusFile,
-            stimulus_timestamps: StimulusTimestamps,
-            trial_monitor_delay: float):
+            stimulus_timestamps: StimulusTimestamps):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
