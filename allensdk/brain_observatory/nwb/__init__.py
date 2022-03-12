@@ -532,7 +532,8 @@ def add_stimulus_presentations(nwbfile, stimulus_table,
     """
     stimulus_table = stimulus_table.copy()
     ts = nwbfile.processing['stimulus'].get_data_interface('timestamps')
-    possible_names = {'stimulus_name', 'image_name'}
+    # possible_names = {'stimulus_name', 'image_name'}
+    possible_names = {'stimulus_name'}
     stimulus_name_column = get_column_name(stimulus_table.columns,
                                            possible_names)
     stimulus_names = stimulus_table[stimulus_name_column].unique()

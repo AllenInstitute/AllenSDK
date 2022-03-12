@@ -214,6 +214,23 @@ class BehaviorSessionData(RaisingSchema):
         help="path to running speed file",
     )
 
+    optotagging_table_path = InputFile(
+        required=True,
+        help="path to optotagging table file",
+    )
+
+    
+    eye_tracking_rig_geometry = Dict(
+        required=False,
+        help="""Mapping containing information about session rig geometry used
+                for eye gaze mapping."""
+    )
+
+    monitor_delay = Float(
+        required=True,
+        help="Monitor delay offset",
+    )
+
 
 
     date_of_birth = String(required=True, description="Subject date of birth")

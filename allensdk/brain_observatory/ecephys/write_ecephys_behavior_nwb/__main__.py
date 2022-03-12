@@ -78,7 +78,7 @@ def main():
         print(err)
         raise err
 
-    write_or_print_outputs(output, parser)
+    # write_or_print_outputs(output, parser)
 
 
 if __name__ == "__main__":
