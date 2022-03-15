@@ -16,7 +16,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
 
     @property
     def ecephys_sessions(self):
-        return """(829720705, 755434585)"""
+        return """(829720705, 755434585, 1039257177)"""
 
 
     def _get_behavior_summary_table(self) -> pd.DataFrame:
