@@ -308,10 +308,13 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN stages ON stages.id = bs.state_id
             {foraging_ids_query};
         """
-        print(f"SFD _get_behavior_stage_table query: \n {query}")
-        print(f"from {foraging_ids}")
+        #print(f"SFD _get_behavior_stage_table query: \n {query}")
+        #print(f"from {foraging_ids}")
         self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
-        return self.mtrain_engine.select(query)
+        results =  self.mtrain_engine.select(query)
+
+        print(f"SFD mtrain_engine results {results}")
+        return results
 
     def get_behavior_stage_parameters(self,
                                       foraging_ids: List[str]) -> pd.Series:
