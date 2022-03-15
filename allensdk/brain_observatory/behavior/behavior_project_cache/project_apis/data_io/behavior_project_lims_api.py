@@ -253,9 +253,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     def _get_foraging_ids_from_behavior_session(
             self, behavior_session_ids: List[int]) -> List[str]:
+
+        # ignore cases where behavior_session_id is None
+        safe_behavior_session_ids = []
+        for b_id in behavior_session_ids:
+            if b_id is None:
+                continue
+            safe_behavior_session_ids.append(b_id)
+
+        if len(safe_behavior_session_ids) == 0:
+            return []
+
         behav_ids = self._build_in_list_selector_query("id",
-                                                       behavior_session_ids,
+                                                       safe_behavior_session_ids,
                                                        operator="AND")
+
         forag_ids_query = f"""
             SELECT foraging_id
             FROM behavior_sessions
