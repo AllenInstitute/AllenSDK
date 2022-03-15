@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
 
@@ -259,7 +260,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         for b_id in behavior_session_ids:
             if b_id is None:
                 continue
-            safe_behavior_session_ids.append(b_id)
+            if np.isnan(b_id):
+                continue
+            safe_behavior_session_ids.append(int(b_id))
 
         if len(safe_behavior_session_ids) == 0:
             return []
