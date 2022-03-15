@@ -13,7 +13,10 @@ from allensdk.internal.api import PostgresQueryMixin
 class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
                    NwbReadableInterface):
     """the name of the subject's genotype"""
-    def __init__(self, full_genotype: str):
+    def __init__(self, full_genotype: Optional[str]):
+
+        # casting full_genotype into a str because there are instances
+        # in LIMS of full_genotype == NULL
         super().__init__(name="full_genotype", value=str(full_genotype))
 
     @classmethod
