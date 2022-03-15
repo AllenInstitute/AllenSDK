@@ -29,6 +29,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         query = """
             SELECT
             es.id AS ecephys_session_id
+            ,bs.id as behavior_session_id
             ,es.date_of_acquisition
             ,equipment.name as equipment_name
             ,d.id as donor_id
@@ -46,6 +47,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
             JOIN donors d on s.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
             LEFT OUTER JOIN equipment on equipment.id = es.equipment_id
+            LEFT OUTER JOIN behavior_sessions bs on bs.ecephys_session_id = es.id
             WHERE es.id in {self.ecephys_sessions}"""
 
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
