@@ -523,7 +523,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         summary_tbl = self._get_behavior_summary_table()
         stimulus_names = self._get_behavior_stage_table(
-            behavior_session_ids=summary_tbl.index.tolist())
+            behavior_session_ids=summary_tbl.behavior_session_id.tolist())
+
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
                 .set_index(self.index_column_name))
