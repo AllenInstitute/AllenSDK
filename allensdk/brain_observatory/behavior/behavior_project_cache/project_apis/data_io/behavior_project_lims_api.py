@@ -308,6 +308,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN stages ON stages.id = bs.state_id
             {foraging_ids_query};
         """
+        print(f"SFD _get_behavior_stage_table query: \n {query}")
+        print(f"from {foraging_ids}")
         self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
         return self.mtrain_engine.select(query)
 
@@ -539,6 +541,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         summary_tbl = self._get_behavior_summary_table()
         stimulus_names = self._get_behavior_stage_table(
             behavior_session_ids=summary_tbl.behavior_session_id.tolist())
+
+        print(f"SFD stimulus_names.columns {stimulus_names.columns}")
+        print(f"SFD summary_tbl.columns {summary_tbl.columns}")
 
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
