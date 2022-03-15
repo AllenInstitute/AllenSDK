@@ -147,6 +147,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     def data_release_date(self):
         return self._data_release_date
 
+    @property
+    def index_column_name(self):
+        return "behavior_session_id"
+
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
         with a single ophys_session_id."""
@@ -522,7 +526,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             behavior_session_ids=summary_tbl.index.tolist())
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
-                .set_index("behavior_session_id"))
+                .set_index(self.index_column_name))
 
     def get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
         """Gets the release nwb files.

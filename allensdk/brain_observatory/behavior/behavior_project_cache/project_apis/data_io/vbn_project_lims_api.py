@@ -11,6 +11,10 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         raise RuntimeError("should not be relying on data release date")
 
     @property
+    def index_column_name(self):
+        return "ecephys_session_id"
+
+    @property
     def ecephys_sessions(self):
         return """(829720705, 755434585)"""
 
