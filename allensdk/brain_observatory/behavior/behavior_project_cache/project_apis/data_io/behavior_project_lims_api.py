@@ -64,7 +64,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.lims_engine = lims_engine
         self.mtrain_engine = mtrain_engine
         self.app_engine = app_engine
-        self.data_release_date = data_release_date
+        self._data_release_date = data_release_date
         self.logger = logging.getLogger("BehaviorProjectLimsApi")
 
     @classmethod
@@ -142,6 +142,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             f"""{operator} {col} IN ({",".join(
                 sorted(set(map(str, valid_list))))})""")
         return session_query
+
+    @property
+    def data_release_date(self):
+        return self._data_release_date
 
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
