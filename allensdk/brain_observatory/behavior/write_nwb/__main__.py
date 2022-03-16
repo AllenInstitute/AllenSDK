@@ -40,6 +40,10 @@ def write_behavior_ophys_nwb(session_data: dict,
         assert sessions_are_equal(json_session, lims_session, reraise=True,
                                   ignore_keys={'metadata': {'project_code'}})
 
+        # it is important that the to_nwb() invocation happen before
+        # you enter the NWBHDF5IO context manager, otherwise the
+        # nwb_file_writer does not see the Allen-specific metadata
+        # extensions we added to support our data model
         nwbfile = json_session.to_nwb()
         with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
