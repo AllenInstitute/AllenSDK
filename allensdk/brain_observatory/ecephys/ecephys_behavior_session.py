@@ -43,8 +43,13 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+# from allensdk.brain_observatory.behavior.data_objects import (
+#     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
+#     DataObject
+# )
+
 from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
+    BehaviorSessionId, StimulusTimestamps, RunningAcquisition,
     DataObject
 )
 
@@ -75,6 +80,8 @@ from allensdk.brain_observatory.ecephys.data_files \
 from allensdk.brain_observatory.ecephys.write_nwb.nwb_helper import \
     NwbHelper
 
+from allensdk.brain_observatory.ecephys.data_objects.running_speed.running_speed import RunningSpeed
+
 class EcephysBehaviorSession(
     DataObject,
     NwbReadableInterface,
@@ -96,7 +103,9 @@ class EcephysBehaviorSession(
         rewards: Rewards,
         stimuli: Stimuli,
         task_parameters: TaskParameters,
-        trials: TrialTable
+        trials: TrialTable,
+        running_speed: RunningSpeed,
+        raw_running_speed: RunningSpeed,
     ):
         self._metadata = metadata
         self._ecephys_session_id = ecephys_session_id
@@ -111,6 +120,8 @@ class EcephysBehaviorSession(
         self._stimuli = stimuli
         self._task_parameters = task_parameters
         self._trials = trials
+        self._running_speed = running_speed
+        self._raw_running_speed = raw_running_speed
 
         super().__init__(name='ecephys_behavior_session', value=self)
 
@@ -182,6 +193,8 @@ class EcephysBehaviorSession(
 
         #This does not work
         # running_speed = RunningSpeed.from_json(dict_repr=session_data)
+        # raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
+
 
         # running_speed_path
 
@@ -190,6 +203,9 @@ class EcephysBehaviorSession(
         replay_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='replay_pkl_path')
         sync_file = SyncFile.from_json(dict_repr=session_data)
         stimulus_table = EcephysStimulusTable.from_json(dict_repr=session_data)
+
+        running_speed = RunningSpeed.from_json(dict_repr=session_data)
+        raw_running_speed = RunningSpeed.from_json(dict_repr=session_data, filtered=False)
         
 
         metadata = EcephysBehaviorMetadata.from_json(dict_repr=session_data)
@@ -197,10 +213,11 @@ class EcephysBehaviorSession(
 
         licks = EcephysLicks.from_stimulus_file(sync_file=sync_file, stimulus_file=behavior_stimulus_file, stimulus_timestamps=stimulus_timestamps,)
         # stimuli = EcephysStimuli.from_stimulus_table(stimulus_table=stimulus_table)
+        stimuli = None
 
-        elicks, rewards, stimuli, task_parameters, trials = \
+        old_licks, rewards, stimuli, task_parameters, trials = \
         cls._read_data_from_stimulus_file(
-            stimulus_file=mapping_stimulus_file,
+            stimulus_file=behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps
         )
 
@@ -257,7 +274,10 @@ class EcephysBehaviorSession(
             rewards=rewards,
             stimuli=stimuli,
             task_parameters=task_parameters,
-            trials=trials
+            trials=trials,
+            running_speed=running_speed,
+            raw_running_speed=raw_running_speed
+
         )
 
     @classmethod
@@ -353,10 +373,15 @@ class EcephysBehaviorSession(
 
         self._licks.to_nwb(nwbfile=nwbfile)
         self._rewards.to_nwb(nwbfile=nwbfile)
-        # self._stimuli.to_nwb(nwbfile=nwbfile)
+        
         self._task_parameters.to_nwb(nwbfile=nwbfile)
         self._trials.to_nwb(nwbfile=nwbfile)
         self._nwb_helper.to_nwb(nwbfile=nwbfile)
+
+        self._running_speed.to_nwb(nwbfile=nwbfile)
+        self._raw_running_speed.to_nwb(nwbfile=nwbfile)
+
+        self._stimuli.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
 
@@ -940,9 +965,9 @@ class EcephysBehaviorSession(
         rewards = Rewards.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps)
-        # stimuli = Stimuli.from_stimulus_file(
-        #     stimulus_file=stimulus_file,
-        #     stimulus_timestamps=stimulus_timestamps)
+        stimuli = Stimuli.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
         trials = TrialTable.from_stimulus_file(
@@ -951,7 +976,6 @@ class EcephysBehaviorSession(
             licks=licks,
             rewards=rewards
         )
-        stimuli = None
         return licks, rewards, stimuli, task_parameters, trials
 
     def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
