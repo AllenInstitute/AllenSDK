@@ -59,6 +59,57 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         return """(829720705, 755434585, 1039257177)"""
 
 
+    def get_units_table(self) -> pd.DataFrame:
+        query = """
+        select
+        eu.id as unit_id
+        ,eu.ecephys_channel_id
+        ,ep.id as ecephys_probe_id
+        ,es.id as ecephys_session_id
+        ,eu.snr
+        ,eu.firing_rate
+        ,eu.isi_violations
+        ,eu.presence_ratio
+        ,eu.amplitude_cutoff
+        ,eu.isolation_distance
+        ,eu.l_ratio
+        ,eu.d_prime
+        ,eu.nn_hit_rate
+        ,eu.nn_miss_rate
+        ,eu.silhouette_score
+        ,eu.max_drift
+        ,eu.cumulative_drift
+        ,eu.duration as waveform_duration
+        ,eu.halfwidth as waveform_halfwidth
+        ,eu.\"PT_ratio\" as waveform_PT_ratio
+        ,eu.repolarization_slope as waveform_repolarization_slope
+        ,eu.recovery_slope as waveform_recovery_slope
+        ,eu.amplitude as waveform_amplitude
+        ,eu.spread as waveform_spread
+        ,eu.velocity_above as waveform_velocity_above
+        ,eu.velocity_below as waveform_velocity_below
+        ,eu.local_index
+        ,ec.probe_vertical_position
+        ,ec.probe_horizontal_position
+        ,ec.anterior_posterior_ccf_coordinate
+        ,ec.dorsal_ventral_ccf_coordinate
+        ,ec.manual_structure_id as ecephys_structure_id
+        ,st.acronym as ecephys_structure_acronym
+        """
+
+        query += """
+        FROM ecephys_units as eu
+        JOIN ecephys_channels as ec on ec.id = eu.ecephys_channel_id
+        JOIN ecephys_probes as ep on ep.id = ec.ecephys_probe_id
+        JOIN ecephys_sessions as es on ep.ecephys_session_id = es.id
+        LEFT JOIN structures as st on st.id = ec.manual_structure_id
+        """
+
+        query += f"""
+        WHERE es.id IN {self.ecephys_sessions}
+        """
+        return self.lims_engine.select(query)
+
 
     def _get_behavior_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,
