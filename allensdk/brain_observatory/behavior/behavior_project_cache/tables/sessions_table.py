@@ -11,7 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import \
     get_prior_exposures_to_session_type, get_prior_exposures_to_image_set, \
-    get_prior_exposures_to_omissions
+    get_prior_exposures_to_omissions, get_image_set
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .project_table import \
     ProjectTable
@@ -160,6 +160,9 @@ class VBNSessionsTable(SessionsTable):
 
         self._df['prior_exposures_to_image_set'] = \
             get_prior_exposures_to_image_set(df=self._df)
+
+        image_set = get_image_set(df=self._df)
+        self._df['image_set'] = image_set
 
         # From communication with Corbett Bennett:
         # As for omissions, the only scripts that have them are
