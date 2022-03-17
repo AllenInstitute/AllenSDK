@@ -73,13 +73,14 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
             ,bs.id as behavior_session_id
             ,es.date_of_acquisition
             ,equipment.name as equipment_name
+            ,es.stimulus_name as session_type
             ,d.id as donor_id
             ,d.full_genotype
             ,d.external_donor_name AS mouse_id
             ,g.name AS sex
+            ,pr.code as project_code
             ,DATE_PART('day', es.date_of_acquisition - d.date_of_birth)
                   AS age_in_days
-            ,es.foraging_id
             """
 
         query += f"""
@@ -87,6 +88,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
             JOIN specimens s on s.id = es.specimen_id
             JOIN donors d on s.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
+            JOIN projects pr on pr.id = es.project_id
             LEFT OUTER JOIN equipment on equipment.id = es.equipment_id
             LEFT OUTER JOIN behavior_sessions bs on bs.ecephys_session_id = es.id
             WHERE es.id in {self.ecephys_sessions}"""
