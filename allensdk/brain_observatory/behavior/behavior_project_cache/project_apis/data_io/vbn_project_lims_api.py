@@ -96,7 +96,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_counts_per_session(self) -> pd.DataFrame:
+    def _get_counts_per_session(self) -> pd.DataFrame:
         query = f"""
         SELECT ecephys_sessions.id as ecephys_session_id,
         COUNT(DISTINCT(ecephys_units.id)) as unit_count,
@@ -122,5 +122,10 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         :rtype: pd.DataFrame
         """
         summary_tbl = self._get_behavior_summary_table()
+        ct_tbl = self._get_counts_per_session()
+        summary_tbl = summary_tbl.join(
+                               ct_tbl.set_index(self.index_column_name),
+                               on=self.index_column_name,
+                               how='left')
         return summary_tbl
 
