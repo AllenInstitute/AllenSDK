@@ -108,6 +108,20 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
+    def get_units_per_session(self) -> pd.DataFrame:
+        query = """
+        SELECT ecephys_sessions.id,
+        COUNT(DISTINCT(ecephys_units.id))
+        FROM ecephys_sessions
+        JOIN ecephys_probes ON
+        ecephys_probes.ecephys_session_id = ecephys_sessions.id
+        JOIN ecephys_channels ON
+        ecephys_channels.ecephys_probe_id = ecephys_probes.id
+        JOIN ecephys_units ON
+        ecephys_units.ecephys_channel_id = ecephys_channels.id
+        GROUP BY ecephys_sessions.id"""
+        return self.lims_engine.select(query)
+
     def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
