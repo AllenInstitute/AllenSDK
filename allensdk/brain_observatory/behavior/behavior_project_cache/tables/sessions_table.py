@@ -117,3 +117,34 @@ class SessionsTable(ProjectTable):
             self._df[behavior_only]['session_type_behavior']
         behavior_ophys_session = self._df[~behavior_only]['session_type_ophys']
         return pd.concat([behavior_only_session, behavior_ophys_session])
+
+
+class VBNSessionsTable(SessionsTable):
+
+    def __add_session_number(self):
+        """Parses session number from session type and and adds to dataframe"""
+
+        def parse_session_number(session_type: str):
+            """Parse the session number from session type"""
+            match = re.match(r'OPHYS_(?P<session_number>\d+)',
+                             session_type)
+            if match is None:
+                return None
+            return int(match.group('session_number'))
+
+        session_type = self._df['session_type']
+        session_type = session_type[session_type.notnull()]
+
+        self._df.loc[session_type.index, 'session_number'] = \
+            session_type.apply(parse_session_number)
+
+    def postprocess_additional(self):
+        self.__add_session_number()
+
+        self._df['prior_exposures_to_session_type'] = \
+            get_prior_exposures_to_session_type(df=self._df)
+        self._df['prior_exposures_to_image_set'] = \
+            get_prior_exposures_to_image_set(df=self._df)
+        self._df['prior_exposures_to_omissions'] = \
+            get_prior_exposures_to_omissions(df=self._df,
+                                             fetch_api=self._fetch_api)
