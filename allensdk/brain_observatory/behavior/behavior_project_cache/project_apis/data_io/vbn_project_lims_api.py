@@ -110,6 +110,32 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         """
         return self.lims_engine.select(query)
 
+    def get_probes_table(self) -> pd.DataFrame:
+        query = """
+        select
+        ep.id as ecephys_probe_id
+        ,ep.ecephys_session_id
+        ,ep.name
+        ,ep.global_probe_sampling_rate as sampling_rate
+        ,ep.global_probe_lfp_sampling_rate as lfp_sampling_rate
+        ,ep.phase
+        ,ep.use_lfp_data as has_lfp_data
+        ,count(distinct(eu.id)) as unit_count
+        ,count(distinct(ec.id)) as channel_count
+        ,array_agg(distinct(st.acronym)) as ecephys_structure_acronyms"""
+
+        query += """
+        FROM  ecephys_probes as ep
+        JOIN ecephys_sessions as es on ep.ecephys_session_id = es.id
+        JOIN ecephys_channels as ec on ec.ecephys_probe_id = ep.id
+        JOIN ecephys_units as eu on eu.ecephys_channel_id=ec.id
+        LEFT JOIN structures st on st.id = ec.manual_structure_id"""
+
+        query += f"""
+        WHERE es.id in {self.ecephys_sessions}"""
+
+        query += """group by ep.id"""
+        return self.lims_engine.select(query)
 
     def _get_behavior_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,
