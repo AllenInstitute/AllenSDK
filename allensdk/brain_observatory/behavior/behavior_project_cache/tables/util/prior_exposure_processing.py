@@ -41,14 +41,13 @@ def get_image_set(df: pd.DataFrame) -> pd.Series:
     Series with index same as df whose values are image_set
     """
     def __get_image_set_name(session_type: Optional[str]):
-        if not isinstance(session_type, str):
-            return None
         match = re.match(r'.*images_(?P<image_set>\w)', session_type)
         if match is None:
             return None
         return match.group('image_set')
 
-    session_type = df['session_type']
+    session_type = df['session_type'][
+        df['session_type'].notnull()]
     image_set = session_type.apply(__get_image_set_name)
     return image_set
 
