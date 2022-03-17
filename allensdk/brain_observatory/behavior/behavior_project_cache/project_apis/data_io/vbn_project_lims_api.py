@@ -113,6 +113,21 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
+    def _get_structure_acronyms(self) -> pd.DataFrame:
+        query = f"""
+        SELECT ecephys_sessions.id as ecephys_session_id,
+        array_agg(distinct(structures.acronym)) as ecephys_structure_acronyms
+        FROM ecephys_sessions
+        JOIN ecephys_probes
+        ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
+        JOIN ecephys_channels
+        ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
+        LEFT JOIN structures
+        ON structures.id = ecephys_channels.manual_structure_id
+        WHERE ecephys_sessions.id in {self.ecephys_sessions}
+        GROUP BY ecephys_sessions.id"""
+        return self.lims_engine.select(query)
+
     def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
@@ -127,5 +142,13 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
                                ct_tbl.set_index(self.index_column_name),
                                on=self.index_column_name,
                                how='left')
+
+        struct_tbl = self._get_structure_acronyms()
+        summary_tbl = summary_tbl.join(
+                         struct_tbl.set_index(self.index_column_name),
+                         on=self.index_column_name,
+                         how='left')
+
+
         return summary_tbl
 
