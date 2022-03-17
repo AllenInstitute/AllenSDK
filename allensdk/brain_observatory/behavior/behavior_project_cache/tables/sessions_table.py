@@ -161,6 +161,16 @@ class VBNSessionsTable(SessionsTable):
             get_prior_exposures_to_session_type(df=self._df)
         self._df['prior_exposures_to_image_set'] = \
             get_prior_exposures_to_image_set(df=self._df)
+
+        # From communication with Corbett Bennett:
+        # As for omissions, the only scripts that have them are
+        # the EPHYS scripts. So prior exposure to omissions is
+        # just a matter of labeling whether this was the first EPHYS
+        # day or the second.
+        #
+        # which I take to mean that prior_exposure_to_omissions should
+        # just be session_number-1 (so it is 0 on the first day, 1 on
+        # the second day, etc.)
+
         self._df['prior_exposures_to_omissions'] = \
-            get_prior_exposures_to_omissions(df=self._df,
-                                             fetch_api=self._fetch_api)
+                    self._df['session_number'] - 1
