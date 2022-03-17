@@ -75,7 +75,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
             ,equipment.name as equipment_name
             ,es.stimulus_name as session_type
             ,d.id as donor_id
-            ,d.full_genotype
+            ,d.full_genotype as genotype
             ,d.external_donor_name AS mouse_id
             ,g.name AS sex
             ,pr.code as project_code
