@@ -95,3 +95,15 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
 
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
+
+    def get_behavior_session_table(self) -> pd.DataFrame:
+        """Returns a pd.DataFrame table with all behavior session_ids to the
+        user with additional metadata.
+
+        Can't return age at time of session because there is no field for
+        acquisition date for behavior sessions (only in the stimulus pkl file)
+        :rtype: pd.DataFrame
+        """
+        summary_tbl = self._get_behavior_summary_table()
+        return summary_tbl
+
