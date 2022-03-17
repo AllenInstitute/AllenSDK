@@ -98,8 +98,8 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
 
     def get_channels_per_session(self) -> pd.DataFrame:
         query = """
-        SELECT ecephys_sessions.id,
-        COUNT(DISTINCT(ecephys_channels.id))
+        SELECT ecephys_sessions.id as ecephys_session_id,
+        COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
         FROM ecephys_sessions
         JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
@@ -108,10 +108,20 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
+    def get_probes_per_session(self) -> pd.DataFrame:
+        query = """
+        SELECT ecephys_sessions.id as ecephys_session_id,
+        COUNT(DISTINCT(ecephys_probes.id)) AS probe_count
+        FROM ecephys_sessions
+        JOIN ecephys_probes ON
+        ecephys_probes.ecephys_session_id = ecephys_sessions.id
+        GROUP BY ecephys_sessions.id"""
+        return self.lims_engine.select(query)
+
     def get_units_per_session(self) -> pd.DataFrame:
         query = """
-        SELECT ecephys_sessions.id,
-        COUNT(DISTINCT(ecephys_units.id))
+        SELECT ecephys_sessions.id as ecephys_session_id,
+        COUNT(DISTINCT(ecephys_units.id)) as unit_count
         FROM ecephys_sessions
         JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
