@@ -387,7 +387,8 @@ def _get_draw_epochs(draw_log: List[int], start_frame: int,
 
     while current_frame <= stop_frame:
         epoch_length = 0
-        while current_frame < stop_frame and draw_log[current_frame] == 1:
+        #this len check should not be here
+        while current_frame < stop_frame and current_frame < len(draw_log) and draw_log[current_frame] == 1:
             epoch_length += 1
             current_frame += 1
         else:

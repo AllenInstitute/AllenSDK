@@ -198,9 +198,9 @@ class EcephysBehaviorSession(
 
         # running_speed_path
 
-        behavior_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='behavior_pkl_path')
-        mapping_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='mapping_pkl_path')
-        replay_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='replay_pkl_path')
+        behavior_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='behavior_stimulus_file')
+        mapping_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='mapping_stimulus_file')
+        replay_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='replay_stimulus_file')
         sync_file = SyncFile.from_json(dict_repr=session_data)
         stimulus_table = EcephysStimulusTable.from_json(dict_repr=session_data)
 

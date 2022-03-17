@@ -178,21 +178,21 @@ class BehaviorSessionData(RaisingSchema):
                                               "format"))
     external_specimen_name = Int(required=True,
                                  description='LabTracks ID of the subject')
-    behavior_pkl_path = InputFile(
+    behavior_stimulus_file = InputFile(
         required=True,
         validate=check_read_access,
         description=("Path of behavior_stimulus "
                      "camstim *.pkl file")
     )
 
-    replay_pkl_path = InputFile(
+    replay_stimulus_file = InputFile(
         required=True,
         validate=check_read_access,
         description=("Path of replay stimulus "
                      "camstim *.pkl file")
     )
 
-    mapping_pkl_path = InputFile(
+    mapping_stimulus_file = InputFile(
         required=True,
         validate=check_read_access,
         description=("Path of mapping stimulus "
@@ -213,6 +213,12 @@ class BehaviorSessionData(RaisingSchema):
         required=True,
         help="path to running speed file",
     )
+
+    raw_running_speed_path = InputFile(
+        required=True,
+        help="path to raw running speed file",
+    )
+
 
     optotagging_table_path = InputFile(
         required=True,
