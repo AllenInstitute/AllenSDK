@@ -158,8 +158,6 @@ class VBNSessionsTable(SessionsTable):
     def postprocess_additional(self):
         self.__add_session_number()
 
-        self._df['prior_exposures_to_session_type'] = \
-            get_prior_exposures_to_session_type(df=self._df)
         self._df['prior_exposures_to_image_set'] = \
             get_prior_exposures_to_image_set(df=self._df)
 
