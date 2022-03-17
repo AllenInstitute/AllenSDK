@@ -50,6 +50,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     session_type = df['session_type'][
         df['session_type'].notnull()]
     image_set = session_type.apply(__get_image_set_name)
+    print(f"image_set = {image_set}")
     return __get_prior_exposure_count(df=df, to=image_set)
 
 
