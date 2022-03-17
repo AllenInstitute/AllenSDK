@@ -1,6 +1,8 @@
 import re
 from typing import Optional, List
 
+import numpy as np
+import json
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
@@ -124,19 +126,33 @@ class VBNSessionsTable(SessionsTable):
     def __add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""
 
-        def parse_session_number(session_type: str):
-            """Parse the session number from session type"""
-            match = re.match(r'OPHYS_(?P<session_number>\d+)',
-                             session_type)
-            if match is None:
-                return None
-            return int(match.group('session_number'))
+        index_col = 'ecephys_session_id'
+        date_col = 'date_of_acquisition'
+        mouse_col = 'donor_id'
 
-        session_type = self._df['session_type']
-        session_type = session_type[session_type.notnull()]
-
-        self._df.loc[session_type.index, 'session_number'] = \
-            session_type.apply(parse_session_number)
+        mouse_id_values = np.unique(self._df[mouse_col].values)
+        new_data = []
+        for mouse_id in mouse_id_values:
+            sub_df = self._df.query(f'{mouse_col}=={mouse_id}')
+            sub_df = json.loads(sub_df.to_json(orient='index'))
+            session_arr = []
+            date_arr = []
+            for index_val in sub_df.keys():
+                session_arr.append(sub_df[index_val][index_col])
+                date_arr.append(sub_df[index_val][date_col])
+            session_arr = np.array(session_arr)
+            date_arr = np.array(date_arr)
+            sorted_dex = np.argsort(date_arr)
+            session_arr = session_arr[sorted_dex]
+            for session_number, session_id in enumerate(session_arr):
+                element = {index_col: session_id,
+                           'session_number': session_number+1}
+                new_data.append(element)
+        new_df = pd.DataFrame(data=new_data)
+        self._df = self._df.join(
+                            new_df.set_index(index_col),
+                            on=index_col,
+                            how='left')
 
     def postprocess_additional(self):
         self.__add_session_number()
