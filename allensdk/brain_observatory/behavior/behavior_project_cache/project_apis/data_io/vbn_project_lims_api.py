@@ -137,6 +137,35 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         query += """group by ep.id"""
         return self.lims_engine.select(query)
 
+    def get_channels_table(self) -> pd.DataFrame:
+        query = """
+        select
+        ec.id as ecephys_channel_id
+        ,ec.ecephys_probe_id
+        ,es.id as ecephys_session_id
+        ,ec.local_index
+        ,ec.probe_vertical_position
+        ,ec.probe_horizontal_position
+        ,ec.anterior_posterior_ccf_coordinate
+        ,ec.dorsal_ventral_ccf_coordinate
+        ,ec.left_right_ccf_coordinate
+        ,st.acronym as ecephys_structure_acronym
+        ,count(distinct(eu.id)) as unit_count
+        """
+
+        query += """
+        FROM  ecephys_channels as ec
+        JOIN ecephys_probes as ep on ec.ecephys_probe_id = ep.id
+        JOIN ecephys_sessions as es on ep.ecephys_session_id = es.id
+        JOIN ecephys_units as eu on eu.ecephys_channel_id=ec.id
+        LEFT JOIN structures st on st.id = ec.manual_structure_id"""
+
+        query += f"""
+        WHERE es.id in {self.ecephys_sessions}"""
+
+        query += """group by ec.id, es.id, st.acronym"""
+        return self.lims_engine.select(query)
+
     def _get_behavior_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,
         or a subset of session_ids (via the session_sub_query).
