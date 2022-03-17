@@ -128,12 +128,12 @@ class VBNSessionsTable(SessionsTable):
 
         index_col = 'ecephys_session_id'
         date_col = 'date_of_acquisition'
-        mouse_col = 'donor_id'
+        mouse_col = 'mouse_id'
 
         mouse_id_values = np.unique(self._df[mouse_col].values)
         new_data = []
         for mouse_id in mouse_id_values:
-            sub_df = self._df.query(f'{mouse_col}=={mouse_id}')
+            sub_df = self._df.query(f"{mouse_col}=='{mouse_id}'")
             sub_df = json.loads(sub_df.to_json(orient='index'))
             session_arr = []
             date_arr = []
@@ -153,6 +153,7 @@ class VBNSessionsTable(SessionsTable):
                             new_df.set_index(index_col),
                             on=index_col,
                             how='left')
+
 
     def postprocess_additional(self):
         self.__add_session_number()
