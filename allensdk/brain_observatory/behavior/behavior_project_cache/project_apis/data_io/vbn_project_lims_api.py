@@ -96,34 +96,12 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_channels_per_session(self) -> pd.DataFrame:
+    def get_counts_per_session(self) -> pd.DataFrame:
         query = f"""
         SELECT ecephys_sessions.id as ecephys_session_id,
-        COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
-        FROM ecephys_sessions
-        LEFT OUTER JOIN ecephys_probes ON
-        ecephys_probes.ecephys_session_id = ecephys_sessions.id
-        LEFT OUTER JOIN ecephys_channels ON
-        ecephys_channels.ecephys_probe_id = ecephys_probes.id
-        WHERE ecephys_sessions.id in {self.ecephys_sessions}
-        GROUP BY ecephys_sessions.id"""
-        return self.lims_engine.select(query)
-
-    def get_probes_per_session(self) -> pd.DataFrame:
-        query = f"""
-        SELECT ecephys_sessions.id as ecephys_session_id,
-        COUNT(DISTINCT(ecephys_probes.id)) AS probe_count
-        FROM ecephys_sessions
-        LEFT OUTER JOIN ecephys_probes ON
-        ecephys_probes.ecephys_session_id = ecephys_sessions.id
-        WHERE ecephys_sessions.id in {self.ecephys_sessions}
-        GROUP BY ecephys_sessions.id"""
-        return self.lims_engine.select(query)
-
-    def get_units_per_session(self) -> pd.DataFrame:
-        query = f"""
-        SELECT ecephys_sessions.id as ecephys_session_id,
-        COUNT(DISTINCT(ecephys_units.id)) as unit_count
+        COUNT(DISTINCT(ecephys_units.id)) as unit_count,
+        COUNT(DISTINCT(ecephys_probes.id)) as probe_count,
+        COUNT(DISTINCT(ecephys_channels.id)) as channel_count
         FROM ecephys_sessions
         LEFT OUTER JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
