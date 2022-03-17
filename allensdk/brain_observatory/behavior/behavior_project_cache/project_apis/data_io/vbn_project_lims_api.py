@@ -97,38 +97,41 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         return self.lims_engine.select(query)
 
     def get_channels_per_session(self) -> pd.DataFrame:
-        query = """
+        query = f"""
         SELECT ecephys_sessions.id as ecephys_session_id,
         COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
         FROM ecephys_sessions
-        JOIN ecephys_probes ON
+        LEFT OUTER JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
-        JOIN ecephys_channels ON
+        LEFT OUTER JOIN ecephys_channels ON
         ecephys_channels.ecephys_probe_id = ecephys_probes.id
+        WHERE ecephys_sessions.id in {self.ecephys_sessions}
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
     def get_probes_per_session(self) -> pd.DataFrame:
-        query = """
+        query = f"""
         SELECT ecephys_sessions.id as ecephys_session_id,
         COUNT(DISTINCT(ecephys_probes.id)) AS probe_count
         FROM ecephys_sessions
-        JOIN ecephys_probes ON
+        LEFT OUTER JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
+        WHERE ecephys_sessions.id in {self.ecephys_sessions}
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
     def get_units_per_session(self) -> pd.DataFrame:
-        query = """
+        query = f"""
         SELECT ecephys_sessions.id as ecephys_session_id,
         COUNT(DISTINCT(ecephys_units.id)) as unit_count
         FROM ecephys_sessions
-        JOIN ecephys_probes ON
+        LEFT OUTER JOIN ecephys_probes ON
         ecephys_probes.ecephys_session_id = ecephys_sessions.id
-        JOIN ecephys_channels ON
+        LEFT OUTER JOIN ecephys_channels ON
         ecephys_channels.ecephys_probe_id = ecephys_probes.id
-        JOIN ecephys_units ON
+        LEFT OUTER JOIN ecephys_units ON
         ecephys_units.ecephys_channel_id = ecephys_channels.id
+        WHERE ecephys_sessions.id in {self.ecephys_sessions}
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
