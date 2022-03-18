@@ -155,7 +155,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
         with a single ophys_session_id."""
-        if self.data_release_date:
+        if len(self.ophys_experiments) > 0:
             release_filter = self._get_ophys_experiment_release_filter()
         else:
             release_filter = ''
@@ -174,7 +174,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     def _build_container_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_container_ids associated
         with a single ophys_session_id."""
-        if self.data_release_date:
+        if len(self.ophys_experiments) > 0:
             release_filter = self._get_ophys_experiment_release_filter()
         else:
             release_filter = ''
@@ -246,7 +246,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             LEFT OUTER JOIN equipment ON equipment.id = bs.equipment_id
         """
 
-        if self.data_release_date is not None:
+        if len(self.behavior_sessions) > 0:
             query += self._get_behavior_session_release_filter()
 
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
@@ -397,7 +397,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN structures st ON st.id = oe.targeted_structure_id
         """
 
-        if self.data_release_date is not None:
+        if len(self.ophys_experiments) > 0:
             query += self._get_ophys_experiment_release_filter()
 
         self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
@@ -426,7 +426,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN ophys_experiments AS oe
             ON oe.id=cr.ophys_experiment_id
         """
-        if self.data_release_date is not None:
+        if len(self.ophys_experiments) > 0:
             query += self._get_ophys_experiment_release_filter()
             query += "\nAND cr.valid_roi = True"
         else:
@@ -480,7 +480,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             ) cntr_ids ON os.id = cntr_ids.id
         """
 
-        if self.data_release_date is not None:
+        if len(self.behavior_ophys_sessions) > 0:
             query += self._get_ophys_session_release_filter()
         self.logger.debug(f"get_ophys_session_table query: \n{query}")
         return self.lims_engine.select(query)
@@ -618,6 +618,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     @property
     def behavior_only_sessions(self):
+        if self.data_release_date is None:
+            return []
         behavior_only_release_files = self.get_release_files(
             file_type='BehaviorNwb')
         release_behavior_only_session_ids = \
@@ -626,6 +628,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     @property
     def behavior_ophys_sessions(self):
+        if self.data_release_date is None:
+            return []
         ophys_release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
         release_behavior_with_ophys_session_ids = \
@@ -633,18 +637,20 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return release_behavior_with_ophys_session_ids
 
     @property
+    def behavior_sessions(self):
+        return self.behavior_only_sessions + self.behavior_ophys_sessions
+
+    @property
     def ophys_experiments(self):
+        if self.data_release_date is None:
+            return []
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
         return release_files.index.tolist()
 
     def _get_behavior_session_release_filter(self):
-        release_behavior_session_ids = \
-            self.behavior_only_sessions + \
-            self.behavior_ophys_sessions
-
         return self._build_in_list_selector_query(
-            "bs.id", release_behavior_session_ids)
+            "bs.id", self.behavior_sessions)
 
     def _get_ophys_session_release_filter(self):
         return self._build_in_list_selector_query(
