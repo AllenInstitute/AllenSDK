@@ -183,3 +183,13 @@ class VBNSessionsTable(SessionsTable):
                               self._df['prior_exposures_to_image_set'].isnull()),
                           'Novel',
                           'Familiar')
+
+        self._df = self._df[['ecephys_session_id', 'behavior_session_id',
+                             'mouse_id', 'genotype', 'equipment_name',
+                             'session_type',
+                             'prior_exposures_to_image_set',
+                             'prior_exposures_to_omissions',
+                             'sex', 'age_in_days', 'session_number',
+                             'date_of_acquisition', 'experience_level',
+                             'image_set', 'unit_count', 'channel_count',
+                             'probe_count', 'ecephys_structure_acronyms']]
