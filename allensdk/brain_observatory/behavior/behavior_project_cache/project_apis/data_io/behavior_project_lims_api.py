@@ -643,10 +643,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             "bs.id", release_behavior_session_ids)
 
     def _get_ophys_session_release_filter(self):
-        release_files = self.get_release_files(
-            file_type='BehaviorOphysNwb')
         return self._build_in_list_selector_query(
-            "bs.id", release_files['behavior_session_id'].tolist())
+            "bs.id", self.behavior_ophys_sessions)
 
     def _get_ophys_experiment_release_filter(self):
         release_files = self.get_release_files(
