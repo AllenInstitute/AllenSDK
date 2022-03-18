@@ -204,6 +204,26 @@ class BehaviorSessionData(RaisingSchema):
         help="path to h5 file containing synchronization information",
     )
 
+    eye_dlc_file = InputFile(
+        required=True,
+        help="path to h5 file containing eye dlc information for behavior tracking",
+    )
+
+    side_dlc_file = InputFile(
+        required=True,
+        help="path to h5 file containing side dlc information for behavior tracking",
+    )
+
+    face_dlc_file = InputFile(
+        required=True,
+        help="path to h5 file containing face dlc information for behavior tracking",
+    )
+
+    eye_dlc_ellipses_path = InputFile(
+        required=True,
+        help="path to h5 file containing eye tracking information",
+    )
+
     stim_table_file = InputFile(
         required=True,
         help="path to csv file containing stimulus information",
