@@ -616,23 +616,28 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         res = res.drop(['filename', 'storage_directory'], axis=1)
         return res.set_index(attachable_id_alias)
 
-    def _get_behavior_session_release_filter(self):
-        # 1) Get release behavior only session ids
+    @property
+    def behavior_only_sessions(self):
         behavior_only_release_files = self.get_release_files(
             file_type='BehaviorNwb')
         release_behavior_only_session_ids = \
             behavior_only_release_files.index.tolist()
+        return release_behavior_only_session_ids
 
-        # 2) Get release behavior with ophys session ids
+    @property
+    def behavior_ophys_sessions(self):
         ophys_release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
         release_behavior_with_ophys_session_ids = \
             ophys_release_files['behavior_session_id'].tolist()
+        return release_behavior_with_ophys_session_ids
 
+
+    def _get_behavior_session_release_filter(self):
         # 3) release behavior session ids is combination
         release_behavior_session_ids = \
-            release_behavior_only_session_ids + \
-            release_behavior_with_ophys_session_ids
+            self.behavior_only_sessions + \
+            self.behavior_ophys_sessions
 
         return self._build_in_list_selector_query(
             "bs.id", release_behavior_session_ids)
