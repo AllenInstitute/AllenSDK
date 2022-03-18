@@ -123,7 +123,7 @@ class SessionsTable(ProjectTable):
 
 class VBNSessionsTable(SessionsTable):
 
-    def __add_session_number(self):
+    def _add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""
 
         index_col = 'ecephys_session_id'
@@ -155,15 +155,15 @@ class VBNSessionsTable(SessionsTable):
                             how='left')
 
 
-    def postprocess_additional(self):
-        self.__add_session_number()
+    def _add_experience_level(self):
+        self._df['experience_level'] = np.where(
+                          np.logical_or(
+                              self._df['prior_exposures_to_image_set'] == 0,
+                              self._df['prior_exposures_to_image_set'].isnull()),
+                          'Novel',
+                          'Familiar')
 
-        self._df['prior_exposures_to_image_set'] = \
-            get_prior_exposures_to_image_set(df=self._df)
-
-        image_set = get_image_set(df=self._df)
-        self._df['image_set'] = image_set
-
+    def _add_prior_omissions(self):
         # From communication with Corbett Bennett:
         # As for omissions, the only scripts that have them are
         # the EPHYS scripts. So prior exposure to omissions is
@@ -177,12 +177,21 @@ class VBNSessionsTable(SessionsTable):
         self._df['prior_exposures_to_omissions'] = \
                     self._df['session_number'] - 1
 
-        self._df['experience_level'] = np.where(
-                          np.logical_or(
-                              self._df['prior_exposures_to_image_set'] == 0,
-                              self._df['prior_exposures_to_image_set'].isnull()),
-                          'Novel',
-                          'Familiar')
+    def _add_image_set(self):
+        image_set = get_image_set(df=self._df)
+        self._df['image_set'] = image_set
+
+    def _add_prior_images(self):
+        self._df['prior_exposures_to_image_set'] = \
+            get_prior_exposures_to_image_set(df=self._df)
+
+
+    def postprocess_additional(self):
+        self._add_session_number()
+        self._add_prior_images()
+        self._add_image_set()
+        self._add_prior_omissions()
+        self._add_experience_level()
 
         self._df = self._df[['ecephys_session_id', 'behavior_session_id',
                              'mouse_id', 'genotype', 'equipment_name',
