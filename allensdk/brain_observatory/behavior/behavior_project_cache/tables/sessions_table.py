@@ -178,6 +178,8 @@ class VBNSessionsTable(SessionsTable):
                     self._df['session_number'] - 1
 
         self._df['experience_level'] = np.where(
-                          self._df['prior_exposures_to_image_set'] == 0,
+                          np.logical_or(
+                              self._df['prior_exposures_to_image_set'] == 0,
+                              self._df['prior_exposures_to_image_set'].isnull()),
                           'Novel',
                           'Familiar')
