@@ -634,7 +634,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
 
     def _get_behavior_session_release_filter(self):
-        # 3) release behavior session ids is combination
         release_behavior_session_ids = \
             self.behavior_only_sessions + \
             self.behavior_ophys_sessions
