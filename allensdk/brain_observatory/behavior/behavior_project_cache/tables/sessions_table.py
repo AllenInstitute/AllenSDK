@@ -1,6 +1,7 @@
 import re
 from typing import Optional, List
 
+import copy
 import numpy as np
 import json
 import pandas as pd
@@ -199,6 +200,7 @@ class VBNSessionsTable(SessionsTable):
                              'prior_exposures_to_image_set',
                              'prior_exposures_to_omissions',
                              'sex', 'age_in_days', 'session_number',
+                             'project_code',
                              'date_of_acquisition', 'experience_level',
                              'image_set', 'unit_count', 'channel_count',
                              'probe_count', 'ecephys_structure_acronyms']]
@@ -211,6 +213,7 @@ class VBNBehaviorSessionsTable(VBNSessionsTable):
             get_prior_exposures_to_session_type(df=self._df)
 
     def postprocess_additional(self):
+
         self._add_session_number()
         self._add_prior_images()
         self._add_prior_omissions()
@@ -235,3 +238,22 @@ class VBNBehaviorSessionsTable(VBNSessionsTable):
                       'project_code',
                       'date_of_acquisition',
                       'session_type']]
+
+        vbo_api = copy.deepcopy(self._fetch_api)
+        vbo_api._index_column_name = 'behavior_session_id'
+        vbo_data = SessionsTable(
+                     df=vbo_api.get_behavior_session_table(),
+                     fetch_api=vbo_api)
+
+        vbo_data = vbo_data.table.reset_index()
+        vbo_data = vbo_data[['behavior_session_id',
+                             'session_type',
+                             'prior_exposures_to_session_type',
+                             'prior_exposures_to_omissions']]
+
+        self._df = self._df.set_index('behavior_session_id')
+        self._df.update(vbo_data.set_index('behavior_session_id'),
+                        errors='ignore')
+        self._df = self._df.reset_index()
+
+

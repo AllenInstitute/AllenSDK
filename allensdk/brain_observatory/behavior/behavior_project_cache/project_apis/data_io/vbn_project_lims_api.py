@@ -6,16 +6,16 @@ from allensdk.brain_observatory.behavior.\
 
 class VBNProjectLimsApi(BehaviorProjectLimsApi):
 
-    def _get_behavior_summary_table(self):
-        raise NotImplementedError()
+    #def _get_behavior_summary_table(self):
+    #    raise NotImplementedError()
 
     @property
     def data_release_date(self):
         raise RuntimeError("should not be relying on data release date")
 
     @property
-    def index_column_name(self):
-        return "ecephys_session_id"
+    def behavior_ophys_sessions(self):
+        return []
 
     @property
     def behavior_only_sessions(self):
@@ -33,7 +33,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         return result.behavior_session_id.tolist()
 
     @property
-    def behavior_sessions(self):
+    def behavior_sessions_query(self):
         full_list = self.behavior_only_sessions + self.behavior_ecephys_sessions
         full_set = set(full_list)
         full_list = list(full_set)
@@ -196,7 +196,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         query += """group by ec.id, es.id, st.acronym"""
         return self.lims_engine.select(query)
 
-    def get_behavior_session_table(self) -> pd.DataFrame:
+    def get_vbn_behavior_only_session_table(self) -> pd.DataFrame:
         query = """
             SELECT
             coalesce(es.id, -999) AS ecephys_session_id
@@ -219,12 +219,10 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
             LEFT OUTER JOIN equipment on equipment.id = bs.equipment_id
             LEFT OUTER JOIN ecephys_sessions es on bs.ecephys_session_id = es.id
             LEFT OUTER JOIN projects pr on pr.id = es.project_id
-            WHERE bs.id in {self.behavior_sessions}"""
+            WHERE bs.id in {self.behavior_sessions_query}"""
 
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
-
-
 
     def _get_ecephys_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,

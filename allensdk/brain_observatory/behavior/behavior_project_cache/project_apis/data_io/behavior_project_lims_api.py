@@ -19,7 +19,8 @@ from allensdk.core.auth_config import (
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(self, lims_engine, mtrain_engine, app_engine,
-                 data_release_date: Optional[Union[str, List[str]]] = None):
+                 data_release_date: Optional[Union[str, List[str]]] = None,
+                 index_column_name='behavior_session_id'):
         """ Downloads visual behavior data from the Allen Institute's
         internal Laboratory Information Management System (LIMS). Only
         functional if connected to the Allen Institute Network. Used to load
@@ -61,11 +62,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         data_release_date: str or list of str
             Use to filter tables to only include data released on date
             ie 2021-03-25 or ['2021-03-25', '2021-08-12']
+        index_column_name: str
+            Default column to use as index on returned dataframes
         """
         self.lims_engine = lims_engine
         self.mtrain_engine = mtrain_engine
         self.app_engine = app_engine
         self._data_release_date = data_release_date
+        self._index_column_name = index_column_name
         self.logger = logging.getLogger("BehaviorProjectLimsApi")
 
     @classmethod
@@ -74,7 +78,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             lims_credentials: Optional[DbCredentials] = None,
             mtrain_credentials: Optional[DbCredentials] = None,
             app_kwargs: Optional[Dict[str, Any]] = None,
-            data_release_date: Optional[Union[str, List[str]]] = None) -> \
+            data_release_date: Optional[Union[str, List[str]]] = None,
+            index_column_name='behavior_session_id') -> \
             "BehaviorProjectLimsApi":
         """Construct a BehaviorProjectLimsApi instance with default
         postgres and app engines.
@@ -92,6 +97,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         data_release_date: Optional[Union[str, List[str]]
             Filters tables to include only data released on date
             ie 2021-03-25 or ['2021-03-25', '2021-08-12']
+        index_column_name: str
+            Name of column to use as index in returned dataframes
         app_kwargs: Dict
             Dict of arguments to pass to the app engine. Currently unused.
 
@@ -113,7 +120,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         app_engine = HttpEngine(**_app_kwargs)
         return cls(lims_engine, mtrain_engine, app_engine,
-                   data_release_date=data_release_date)
+                   data_release_date=data_release_date,
+                   index_column_name=index_column_name)
 
     @staticmethod
     def _build_in_list_selector_query(
@@ -150,7 +158,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     @property
     def index_column_name(self):
-        return "behavior_session_id"
+        return self._index_column_name
 
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
