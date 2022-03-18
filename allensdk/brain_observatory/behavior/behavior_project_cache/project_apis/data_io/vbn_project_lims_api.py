@@ -6,6 +6,9 @@ from allensdk.brain_observatory.behavior.\
 
 class VBNProjectLimsApi(BehaviorProjectLimsApi):
 
+    def _get_behavior_summary_table(self):
+        raise NotImplementedError()
+
     @property
     def data_release_date(self):
         raise RuntimeError("should not be relying on data release date")
@@ -13,6 +16,33 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
     @property
     def index_column_name(self):
         return "ecephys_session_id"
+
+    @property
+    def behavior_only_sessions(self):
+        return [1010991549,]
+
+    @property
+    def behavior_ecephys_sessions(self):
+        query = f"""
+        SELECT behavior_sessions.id as behavior_session_id
+        FROM behavior_sessions
+        JOIN ecephys_sessions
+        ON behavior_sessions.ecephys_session_id=ecephys_sessions.id
+        WHERE ecephys_sessions.id in {self.ecephys_sessions}"""
+        result = self.lims_engine.select(query)
+        return result.behavior_session_id.tolist()
+
+    @property
+    def behavior_sessions(self):
+        full_list = self.behavior_only_sessions + self.behavior_ecephys_sessions
+        full_set = set(full_list)
+        full_list = list(full_set)
+        full_list.sort()
+        result = """("""
+        for session_id in full_list:
+            result += f"""{session_id},"""
+        result = result[:-1]+""")"""
+        return result
 
     @property
     def ecephys_sessions(self):
@@ -55,8 +85,8 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
 1113751921,1113957627,1111013640,1111216934,1152632711,
 1152811536)
 """
-        return new_sessions
-        return """(829720705, 755434585, 1039257177)"""
+        #return new_sessions
+        return """(829720705, 755434585, 1039257177, 1041083421, 1041287144)"""
 
 
     def get_units_table(self) -> pd.DataFrame:
@@ -166,7 +196,37 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         query += """group by ec.id, es.id, st.acronym"""
         return self.lims_engine.select(query)
 
-    def _get_behavior_summary_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
+        query = """
+            SELECT
+            coalesce(es.id, -999) AS ecephys_session_id
+            ,bs.id as behavior_session_id
+            ,coalesce(bs.date_of_acquisition, es.date_of_acquisition) as date_of_acquisition
+            ,equipment.name as equipment_name
+            ,es.stimulus_name as session_type
+            ,d.full_genotype as genotype
+            ,d.external_donor_name AS mouse_id
+            ,g.name AS sex
+            ,pr.code as project_code
+            ,DATE_PART('day', coalesce(bs.date_of_acquisition, es.date_of_acquisition) - d.date_of_birth)
+                  AS age_in_days
+            """
+
+        query += f"""
+            FROM behavior_sessions as bs
+            JOIN donors d on bs.donor_id = d.id
+            JOIN genders g on g.id = d.gender_id
+            LEFT OUTER JOIN equipment on equipment.id = bs.equipment_id
+            LEFT OUTER JOIN ecephys_sessions es on bs.ecephys_session_id = es.id
+            LEFT OUTER JOIN projects pr on pr.id = es.project_id
+            WHERE bs.id in {self.behavior_sessions}"""
+
+        self.logger.debug(f"get_behavior_session_table query: \n{query}")
+        return self.lims_engine.select(query)
+
+
+
+    def _get_ecephys_summary_table(self) -> pd.DataFrame:
         """Build and execute query to retrieve summary data for all data,
         or a subset of session_ids (via the session_sub_query).
         Should pass an empty string to `session_sub_query` if want to get
@@ -233,7 +293,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         GROUP BY ecephys_sessions.id"""
         return self.lims_engine.select(query)
 
-    def get_behavior_session_table(self) -> pd.DataFrame:
+    def get_ecephys_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
@@ -241,7 +301,7 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         :rtype: pd.DataFrame
         """
-        summary_tbl = self._get_behavior_summary_table()
+        summary_tbl = self._get_ecephys_summary_table()
         ct_tbl = self._get_counts_per_session()
         summary_tbl = summary_tbl.join(
                                ct_tbl.set_index(self.index_column_name),
@@ -253,7 +313,6 @@ class VBNProjectLimsApi(BehaviorProjectLimsApi):
                          struct_tbl.set_index(self.index_column_name),
                          on=self.index_column_name,
                          how='left')
-
 
         return summary_tbl
 
