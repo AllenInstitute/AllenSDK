@@ -632,6 +632,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             ophys_release_files['behavior_session_id'].tolist()
         return release_behavior_with_ophys_session_ids
 
+    @property
+    def ophys_experiments(self):
+        release_files = self.get_release_files(
+            file_type='BehaviorOphysNwb')
+        return release_files.index.tolist()
 
     def _get_behavior_session_release_filter(self):
         release_behavior_session_ids = \
@@ -646,10 +651,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             "bs.id", self.behavior_ophys_sessions)
 
     def _get_ophys_experiment_release_filter(self):
-        release_files = self.get_release_files(
-            file_type='BehaviorOphysNwb')
         return self._build_in_list_selector_query(
-            "oe.id", release_files.index.tolist())
+            "oe.id", self.ophys_experiments)
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
         """ Download a template for the natural movie stimulus. This is the
