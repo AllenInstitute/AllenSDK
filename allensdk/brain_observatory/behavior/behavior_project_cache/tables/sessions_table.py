@@ -202,3 +202,36 @@ class VBNSessionsTable(SessionsTable):
                              'date_of_acquisition', 'experience_level',
                              'image_set', 'unit_count', 'channel_count',
                              'probe_count', 'ecephys_structure_acronyms']]
+
+
+class VBNBehaviorSessionsTable(VBNSessionsTable):
+
+    def _add_prior_session_type(self):
+        self._df['prior_exposures_to_session_type'] = \
+            get_prior_exposures_to_session_type(df=self._df)
+
+    def postprocess_additional(self):
+        self._add_session_number()
+        self._add_prior_images()
+        self._add_prior_omissions()
+        self._add_prior_session_type()
+
+        self._df['ecephys_session_id'] = np.where(
+                self._df['ecephys_session_id'] > 0,
+                self._df['ecephys_session_id'], None)
+
+        self._df = self._df[[
+                      'behavior_session_id',
+                      'equipment_name',
+                      'genotype',
+                      'mouse_id',
+                      'sex',
+                      'age_in_days',
+                      'session_number',
+                      'prior_exposures_to_session_type',
+                      'prior_exposures_to_image_set',
+                      'prior_exposures_to_omissions',
+                      'ecephys_session_id',
+                      'project_code',
+                      'date_of_acquisition',
+                      'session_type']]
