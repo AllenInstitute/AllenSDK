@@ -131,6 +131,9 @@ class VBNSessionsTable(SessionsTable):
         date_col = 'date_of_acquisition'
         mouse_col = 'mouse_id'
 
+        print("adding session number to")
+        print(self._df.date_of_acquisition.values)
+
         mouse_id_values = np.unique(self._df[mouse_col].values)
         new_data = []
         for mouse_id in mouse_id_values:
