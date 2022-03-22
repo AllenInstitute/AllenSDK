@@ -219,7 +219,7 @@ class BehaviorSessionData(RaisingSchema):
         help="path to h5 file containing face dlc information for behavior tracking",
     )
 
-    eye_dlc_ellipses_path = InputFile(
+    eye_tracking_filepath = InputFile(
         required=True,
         help="path to h5 file containing eye tracking information",
     )
@@ -239,6 +239,10 @@ class BehaviorSessionData(RaisingSchema):
         help="path to raw running speed file",
     )
 
+    raw_eye_tracking_video_meta_data = InputFile(
+        required=True,
+        help="path to json raw eye tracking video meta data",
+    )
 
     optotagging_table_path = InputFile(
         required=True,

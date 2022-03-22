@@ -48,6 +48,13 @@ from allensdk.brain_observatory.behavior.trials_processing import (
 #     DataObject
 # )
 
+# from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+#     .eye_tracking_table import \
+#     EyeTrackingTable
+
+
+from allensdk.brain_observatory.ecephys.data_objects.eye_tracking.eye_tracking_table import EyeTrackingTable
+
 from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningAcquisition,
     DataObject
@@ -77,7 +84,10 @@ from allensdk.brain_observatory.ecephys.data_files \
     .ecephys_stimulus_table import \
     EcephysStimulusTable
 
-from allensdk.brain_observatory.ecephys.write_nwb.nwb_helper import \
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
+    EyeTrackingFile
+
+from allensdk.brain_observatory.ecephys.write_ecephys_behabior_nwb.nwb_helper import \
     NwbHelper
 
 from allensdk.brain_observatory.ecephys.data_objects.running_speed.running_speed import RunningSpeed
@@ -106,6 +116,7 @@ class EcephysBehaviorSession(
         trials: TrialTable,
         running_speed: RunningSpeed,
         raw_running_speed: RunningSpeed,
+        eye_tracking_table: EyeTrackingTable
     ):
         self._metadata = metadata
         self._ecephys_session_id = ecephys_session_id
@@ -122,6 +133,7 @@ class EcephysBehaviorSession(
         self._trials = trials
         self._running_speed = running_speed
         self._raw_running_speed = raw_running_speed
+        self._eye_tracking = eye_tracking_table
 
         super().__init__(name='ecephys_behavior_session', value=self)
 
@@ -201,8 +213,11 @@ class EcephysBehaviorSession(
         behavior_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='behavior_stimulus_file')
         mapping_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='mapping_stimulus_file')
         replay_stimulus_file = EcephysStimulusFile.from_json(dict_repr=session_data, file_type='replay_stimulus_file')
+
         sync_file = SyncFile.from_json(dict_repr=session_data)
         stimulus_table = EcephysStimulusTable.from_json(dict_repr=session_data)
+
+        eye_tracking_table = cls._get_eye_tracking_table(sync_file=sync_file, session_data=session_data)
 
         running_speed = RunningSpeed.from_json(dict_repr=session_data)
         raw_running_speed = RunningSpeed.from_json(dict_repr=session_data, filtered=False)
@@ -213,7 +228,7 @@ class EcephysBehaviorSession(
 
         licks = EcephysLicks.from_stimulus_file(sync_file=sync_file, stimulus_file=behavior_stimulus_file, stimulus_timestamps=stimulus_timestamps,)
         # stimuli = EcephysStimuli.from_stimulus_table(stimulus_table=stimulus_table)
-        stimuli = None
+        # stimuli = None
 
         old_licks, rewards, stimuli, task_parameters, trials = \
         cls._read_data_from_stimulus_file(
@@ -276,7 +291,8 @@ class EcephysBehaviorSession(
             task_parameters=task_parameters,
             trials=trials,
             running_speed=running_speed,
-            raw_running_speed=raw_running_speed
+            raw_running_speed=raw_running_speed,
+            eye_tracking_table=eye_tracking_table,
 
         )
 
@@ -329,6 +345,18 @@ class EcephysBehaviorSession(
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
+    def _get_eye_tracking_table(sync_file: SyncFile, session_data: dict, eye_tracking_z_threshold: float = 3.0, eye_tracking_dilation_frames: int = 2):
+        eye_tracking_file = EyeTrackingFile.from_json(
+            dict_repr=session_data)
+        eye_tracking_table = EyeTrackingTable.from_data_file(
+            session_data=session_data,
+            data_file=eye_tracking_file,
+            sync_file=sync_file,
+            z_threshold=eye_tracking_z_threshold,
+            dilation_frames=eye_tracking_dilation_frames
+        )
+        return eye_tracking_table
+
     def to_nwb(self, add_metadata=True) -> NWBFile:
         """
 
@@ -373,15 +401,21 @@ class EcephysBehaviorSession(
 
         self._licks.to_nwb(nwbfile=nwbfile)
         self._rewards.to_nwb(nwbfile=nwbfile)
+
+        self._eye_tracking.to_nwb(nwbfile=nwbfile)
         
         self._task_parameters.to_nwb(nwbfile=nwbfile)
         self._trials.to_nwb(nwbfile=nwbfile)
         self._nwb_helper.to_nwb(nwbfile=nwbfile)
 
+        
+
         self._running_speed.to_nwb(nwbfile=nwbfile)
         self._raw_running_speed.to_nwb(nwbfile=nwbfile)
 
         self._stimuli.to_nwb(nwbfile=nwbfile)
+
+
 
         return nwbfile
 

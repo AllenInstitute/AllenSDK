@@ -333,7 +333,11 @@ class EcephysBehaviorMetadata(DataObject,
         pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        self._subject_metadata.to_nwb(nwbfile=nwbfile)
+        try:
+            self._subject_metadata.to_nwb(nwbfile=nwbfile)
+        except Exception as error:
+            pass
+
         self._equipment.to_nwb(nwbfile=nwbfile)
         # extension = load_pynwb_extension(BehaviorMetadataSchema,
         #                                         'ndx-aibs-behavior-ophys')
