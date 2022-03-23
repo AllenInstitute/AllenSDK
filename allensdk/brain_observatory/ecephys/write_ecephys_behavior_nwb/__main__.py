@@ -4,6 +4,7 @@ import sys
 import argschema
 import marshmallow
 from pynwb import NWBHDF5IO
+import json
 
 from allensdk.brain_observatory.ecephys.ecephys_behavior_session import (
     EcephysBehaviorSession)
@@ -44,7 +45,18 @@ def write_ecephy_behavior_nwb(session_data, nwb_filepath, probes):
 
 
     print('created nwb_filepath' , nwb_filepath)
-    return {'output_path': nwb_filepath}
+
+def write_output_json(args):
+    """
+    Write the output json file
+    """
+
+    ouput_data = {}
+    ouput_data['output_path'] = args['output_path']
+    ouput_data['input_parameters'] = args
+
+    with open(args['output_json'], 'w') as output_file:
+        json.dump(ouput_data, output_file, indent=2)
 
 
 def main():
@@ -53,6 +65,7 @@ def main():
         format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
 
     args = sys.argv[1:]
+
     try:
         parser = argschema.ArgSchemaParser(
             args=args,
@@ -78,8 +91,7 @@ def main():
         print(err)
         raise err
 
-    # write_or_print_outputs(output, parser)
-
+    write_output_json(parser.args)
 
 if __name__ == "__main__":
     main()
