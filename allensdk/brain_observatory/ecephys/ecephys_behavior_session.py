@@ -43,6 +43,14 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.brain_observatory.behavior.data_objects import (
+    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
+    DataObject
+)
+
+# from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+#     .eye_tracking_table import \
+#     EyeTrackingTable
 
 
 from allensdk.brain_observatory.ecephys.data_objects.eye_tracking.eye_tracking_table import EyeTrackingTable
@@ -95,6 +103,7 @@ class EcephysBehaviorSession(
         behavior_stimulus_file: EcephysStimulusFile,
         mapping_stimulus_file: EcephysStimulusFile,
         replay_stimulus_file: EcephysStimulusFile,
+#        running_acquisition: RunningAcquisition,
         date_of_acquisition: DateOfAcquisition,
         licks: EcephysLicks,
         nwb_helper: NwbHelper,
@@ -207,37 +216,36 @@ class EcephysBehaviorSession(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "EcephysBehaviorSession":
-        # behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
-        # stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
-        # running_acquisition = RunningAcquisition.from_nwb(nwbfile)
-        # raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
-        # running_speed = RunningSpeed.from_nwb(nwbfile)
-        # metadata = BehaviorMetadata.from_nwb(nwbfile)
-        # licks = Licks.from_nwb(nwbfile=nwbfile)
-        # rewards = Rewards.from_nwb(nwbfile=nwbfile)
-        # stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
-        # task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        # trials = TrialTable.from_nwb(nwbfile=nwbfile)
-        # date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
+        behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
+        stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
+        running_acquisition = RunningAcquisition.from_nwb(nwbfile)
+        raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
+        running_speed = RunningSpeed.from_nwb(nwbfile)
+        metadata = BehaviorMetadata.from_nwb(nwbfile)
+        licks = Licks.from_nwb(nwbfile=nwbfile)
+        rewards = Rewards.from_nwb(nwbfile=nwbfile)
+        stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
+        task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
+        trials = TrialTable.from_nwb(nwbfile=nwbfile)
+        date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
 
-        # return BehaviorSession(
-        #     behavior_session_id=behavior_session_id,
-        #     stimulus_timestamps=stimulus_timestamps,
-        #     running_acquisition=running_acquisition,
-        #     raw_running_speed=raw_running_speed,
-        #     running_speed=running_speed,
-        #     metadata=metadata,
-        #     licks=licks,
-        #     rewards=rewards,
-        #     stimuli=stimuli,
-        #     task_parameters=task_parameters,
-        #     trials=trials,
-        #     date_of_acquisition=date_of_acquisition
-        # )
-        pass
+        return EcephysBehaviorSession(
+            behavior_session_id=behavior_session_id,
+            stimulus_timestamps=stimulus_timestamps,
+            running_acquisition=running_acquisition,
+            raw_running_speed=raw_running_speed,
+            running_speed=running_speed,
+            metadata=metadata,
+            licks=licks,
+            rewards=rewards,
+            stimuli=stimuli,
+            task_parameters=task_parameters,
+            trials=trials,
+            date_of_acquisition=date_of_acquisition
+        )
 
     @classmethod
-    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "BehaviorSession":
+    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "EcephysBehaviorSession":
         """
 
         Parameters

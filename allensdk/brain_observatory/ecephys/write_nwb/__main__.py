@@ -634,21 +634,21 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
         units = DEFAULT_RUNNING_SPEED_UNITS
 
     raw_rotation_timeseries = pynwb.base.TimeSeries(
-        name="raw_running_wheel_rotation",
+        name="dx",
         timestamps=np.array(raw_running_data["frame_time"]),
         data=raw_running_data["dx"].values,
         unit=units["rotation"]
     )
 
     vsig_ts = pynwb.base.TimeSeries(
-        name="running_wheel_signal_voltage",
+        name="v_sig",
         timestamps=raw_rotation_timeseries,
         data=raw_running_data["vsig"].values,
         unit=units["vsig"]
     )
 
     vin_ts = pynwb.base.TimeSeries(
-        name="running_wheel_supply_voltage",
+        name="v_in",
         timestamps=raw_rotation_timeseries,
         data=raw_running_data["vin"].values,
         unit=units["vin"]

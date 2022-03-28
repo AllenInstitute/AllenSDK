@@ -112,8 +112,7 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         # Because the monitor delay was already applied when
         # saving the stimulus timestamps to the NWB file,
         # we set it to zero here.
-        return cls(timestamps=stim_timestamps,
-                   monitor_delay=0.0)
+        return cls(timestamps=stim_timestamps)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         stimulus_ts = TimeSeries(

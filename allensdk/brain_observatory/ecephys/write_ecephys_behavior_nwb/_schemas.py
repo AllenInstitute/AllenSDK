@@ -157,6 +157,11 @@ class BehaviorSessionData(RaisingSchema):
     foraging_id = String(required=True,
                          description=("The foraging_id for the behavior "
                                       "session"))
+    behavior_session_id = Int(required=True,
+                              description='The behavior session id that the '
+                                          'ophys experiment to be written to '
+                                          'written to NWB is from')
+
     driver_line = List(String,
                        required=True,
                        description='Genetic driver line(s) of subject')

@@ -39,9 +39,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.subject_metadata import \
     SubjectMetadata
-# from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
-# from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
+from allensdk.brain_observatory.nwb import load_pynwb_extension
 # from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 
 description_dict = {
     # key is a regex and value is returned on match
@@ -215,6 +216,7 @@ class EcephysBehaviorMetadata(DataObject,
         stimulus_frame_rate: StimulusFrameRate,
         session_type: SessionType,
         behavior_session_uuid: BehaviorSessionUUID,
+        behavior_session_id: BehaviorSessionId
 
     ):
         self._subject_metadata = subject_metadata
@@ -226,14 +228,14 @@ class EcephysBehaviorMetadata(DataObject,
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
         self._behavior_session_uuid = behavior_session_uuid
-
+        self._behavior_session_id = behavior_session_id
         super().__init__(name='ecephys_behavior_metadata', value=self)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "EcephysBehaviorMetadata":
         subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
         ecephys_session_id = EcephysSessionId.from_json(dict_repr=dict_repr)
-
+        behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
 
         behavior_stimulus_file = EcephysStimulusFile.from_json(dict_repr=dict_repr, file_type='behavior_pkl_path')
         mapping_stimulus_file = EcephysStimulusFile.from_json(dict_repr=dict_repr, file_type='mapping_pkl_path')
@@ -259,6 +261,7 @@ class EcephysBehaviorMetadata(DataObject,
         return cls(
             subject_metadata=subject_metadata,
             ecephys_session_id=ecephys_session_id,
+            behavior_session_id=behavior_session_id,
             behavior_stimulus_file=behavior_stimulus_file,
             mapping_stimulus_file=mapping_stimulus_file,
             replay_stimulus_file=replay_stimulus_file,
@@ -329,6 +332,10 @@ class EcephysBehaviorMetadata(DataObject,
     def subject_metadata(self):
         return self._subject_metadata
 
+    @property
+    def behavior_session_id(self):
+        return self._behavior_session_id.value
+
     def to_json(self) -> dict:
         pass
 
@@ -339,16 +346,16 @@ class EcephysBehaviorMetadata(DataObject,
             pass
 
         self._equipment.to_nwb(nwbfile=nwbfile)
-        # extension = load_pynwb_extension(BehaviorMetadataSchema,
-        #                                         'ndx-aibs-behavior-ophys')
-        # nwb_metadata = extension(
-        #     name='metadata',
-        #     behavior_session_id=self.behavior_session_id,
-        #     behavior_session_uuid=str(self.behavior_session_uuid),
-        #     stimulus_frame_rate=self.stimulus_frame_rate,
-        #     session_type=self.session_type,
-        #     equipment_name=self.equipment.value
-        # )
-        # nwbfile.add_lab_meta_data(nwb_metadata)
+        extension = load_pynwb_extension(BehaviorMetadataSchema,
+                                                'ndx-aibs-behavior-ophys')
+        nwb_metadata = extension(
+            name='metadata',
+            behavior_session_id=self.behavior_session_id,
+            behavior_session_uuid=str(self.behavior_session_uuid),
+            stimulus_frame_rate=self.stimulus_frame_rate,
+            session_type=self.session_type,
+            equipment_name=self.equipment.value
+        )
+        nwbfile.add_lab_meta_data(nwb_metadata)
 
         return nwbfile
