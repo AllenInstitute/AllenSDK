@@ -322,3 +322,93 @@ def _merge_dx_data(
     )
 
     return (velocities, raw_data)
+
+
+def multi_stim_running_df_from_raw_data(
+    sync_path: str,
+    behavior_pkl_path: str,
+    mapping_pkl_path: str,
+    replay_pkl_path: str,
+    use_lowpass_filter: bool,
+    zscore_threshold: float,
+    behavior_start_frame: int
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Derive running speed data frames from sync file and
+    pickle files
+
+    Parameters
+    ----------
+    sync_path: str
+        The path to the sync file
+    behavior_pkl_path: str
+        path to behavior pickle file
+    mapping_pkl_path: str
+        path to mapping pickle file
+    replay_pkl_path: str
+        path to replay pickle file
+    use_lowpass_filter: bool
+        whther or not to apply a low pass filter to the
+        running speed results
+    zscore_threshold: float
+        The threshold to use for removing outlier
+        running speeds which might be noise and not true signal
+    behavior_start_frame: int
+        the frame on which behavior data starts
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, pd.DataFrame]
+        concatenated velocity data, raw data
+    """
+
+    (
+        behavior_start,
+        mapping_start,
+        replay_start,
+        replay_end
+    ) = _get_stimulus_starts_and_ends(
+            behavior_pkl_path=behavior_pkl_path,
+            mapping_pkl_path=mapping_pkl_path,
+            replay_pkl_path=replay_pkl_path,
+            behavior_start_frame=behavior_start_frame)
+
+    frame_times = _get_frame_times(
+                      sync_path=sync_path)
+
+    behavior_velocities = _extract_dx_info(
+        frame_times=frame_times,
+        start_index=behavior_start,
+        end_index=mapping_start,
+        pkl_path=behavior_pkl_path,
+        zscore_threshold=zscore_threshold,
+        use_lowpass_filter=use_lowpass_filter
+    )
+
+    mapping_velocities = _extract_dx_info(
+        frame_times=frame_times,
+        start_index=mapping_start,
+        end_index=replay_start,
+        pkl_path=mapping_pkl_path,
+        zscore_threshold=zscore_threshold,
+        use_lowpass_filter=use_lowpass_filter
+    )
+
+    replay_velocities = _extract_dx_info(
+        frame_times=frame_times,
+        start_index=replay_start,
+        end_index=replay_end,
+        pkl_path=replay_pkl_path,
+        zscore_threshold=zscore_threshold,
+        use_lowpass_filter=use_lowpass_filter
+    )
+
+    velocities, raw_data = _merge_dx_data(
+        mapping_velocities=mapping_velocities,
+        behavior_velocities=behavior_velocities,
+        replay_velocities=replay_velocities,
+        frame_times=frame_times,
+        behavior_start_frame=behavior_start_frame
+    )
+
+    return (velocities, raw_data)
