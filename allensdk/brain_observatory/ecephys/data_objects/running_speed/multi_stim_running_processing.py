@@ -2,6 +2,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 from allensdk.brain_observatory import sync_utilities
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 
 from allensdk.brain_observatory.behavior.data_objects.\
     running_speed.running_processing import (
@@ -156,3 +157,26 @@ def _get_frame_counts(
     return (behavior_frame_count,
             mapping_frame_count,
             replay_frames_count)
+
+
+def _get_frame_times(
+    sync_path: str
+) -> np.ndarray:
+    """
+    Get the vsync frame times
+
+    Parameters
+    ----------
+    sync_path: str
+        Path to sync file
+
+    Returns
+    -------
+    timestamps: np.ndarray
+        numpy array of timestamps
+    """
+    sync_data = SyncDataset(sync_path)
+
+    return sync_data.get_edges(
+        "rising", SyncDataset.FRAME_KEYS, units="seconds"
+    )

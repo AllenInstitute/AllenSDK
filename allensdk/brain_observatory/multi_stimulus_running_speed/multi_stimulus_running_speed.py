@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 import argschema
 import json
 
@@ -12,7 +11,8 @@ from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
 from allensdk.brain_observatory.ecephys.data_objects.\
     running_speed.multi_stim_running_processing import (
         _extract_dx_info,
-        _get_frame_counts)
+        _get_frame_counts,
+        _get_frame_times)
 
 
 class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
@@ -20,18 +20,6 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
     default_output_schema = MultiStimulusRunningSpeedOutputParameters
 
     START_FRAME = 0
-
-    def _get_frame_times(
-        self
-    ) -> np.ndarray:
-        """
-        Get the vsync frame times
-        """
-        sync_data = SyncDataset(self.args['sync_h5_path'])
-
-        return sync_data.get_edges(
-            "rising", SyncDataset.FRAME_KEYS, units="seconds"
-        )
 
     def _get_stimulus_starts_and_ends(self) -> list:
         """
@@ -172,7 +160,8 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
             replay_end
         ) = self._get_stimulus_starts_and_ends()
 
-        frame_times = self._get_frame_times()
+        frame_times = _get_frame_times(
+                          sync_path=self.args['sync_h5_path'])
 
         behavior_velocities = _extract_dx_info(
             frame_times,
