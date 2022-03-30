@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 import pandas as pd
 from allensdk.brain_observatory import sync_utilities
@@ -82,3 +83,76 @@ def _extract_dx_info(
     )
 
     return velocities
+
+
+def _get_behavior_frame_count(
+    pkl_file_path: str
+) -> int:
+    """
+    Get the number of frames in a behavior pickle file
+
+    Parameters
+    ----------
+    pkl_file_path: string
+        A path to a behavior pickle file
+    """
+    data = pd.read_pickle(pkl_file_path)
+
+    return len(data["items"]["behavior"]['intervalsms']) + 1
+
+
+def _get_frame_count(
+    pkl_file_path: str
+) -> int:
+    """
+    Get the number of frames in a mapping or replay pickle file
+
+    Parameters
+    ----------
+    pkl_file_path: string
+        A path to a mapping or replay pickle file
+    """
+
+    data = pd.read_pickle(pkl_file_path)
+
+    return len(data['intervalsms']) + 1
+
+
+def _get_frame_counts(
+    behavior_pkl_path: str,
+    mapping_pkl_path: str,
+    replay_pkl_path: str
+) -> Tuple[int, int, int]:
+    """
+    Get the number of frames for each stimulus
+
+    Parameters
+    ----------
+    behavior_pkl_path: str
+        path to behavior pickle file
+    mapping_pkl_path: str
+        path to mapping pickle file
+    replay_pkl_path: str
+        path to replay pickle file
+
+    Return
+    ------
+    frame_counts: Tuple[int, int, int]
+        (n_behavior, n_mapping, n_replay)
+    """
+
+    behavior_frame_count = _get_behavior_frame_count(
+        pkl_file_path=behavior_pkl_path
+    )
+
+    mapping_frame_count = _get_frame_count(
+        pkl_file_path=mapping_pkl_path
+    )
+
+    replay_frames_count = _get_frame_count(
+        pkl_file_path=replay_pkl_path
+    )
+
+    return (behavior_frame_count,
+            mapping_frame_count,
+            replay_frames_count)

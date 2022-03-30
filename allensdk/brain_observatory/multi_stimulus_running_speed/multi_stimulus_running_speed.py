@@ -11,7 +11,8 @@ from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
 
 from allensdk.brain_observatory.ecephys.data_objects.\
     running_speed.multi_stim_running_processing import (
-        _extract_dx_info)
+        _extract_dx_info,
+        _get_frame_counts)
 
 
 class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
@@ -19,60 +20,6 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
     default_output_schema = MultiStimulusRunningSpeedOutputParameters
 
     START_FRAME = 0
-
-    def _get_behavior_frame_count(
-        self,
-        pkl_file_path: str
-    ) -> int:
-        """
-        Get the number of frames in a behavior pickle file
-
-        Parameters
-        ----------
-        pkl_file_path: string
-            A path to a behavior pickle file
-        """
-        data = pd.read_pickle(pkl_file_path)
-
-        return len(data["items"]["behavior"]['intervalsms']) + 1
-
-    def _get_frame_count(
-        self,
-        pkl_file_path: str
-    ) -> int:
-        """
-        Get the number of frames in a mapping or replay pickle file
-
-        Parameters
-        ----------
-        pkl_file_path: string
-            A path to a mapping or replay pickle file
-        """
-
-        data = pd.read_pickle(pkl_file_path)
-
-        return len(data['intervalsms']) + 1
-
-    def _get_frame_counts(
-        self
-    ) -> list:
-        """
-        Get the number of frames for each stimulus
-        """
-
-        behavior_frame_count = self._get_behavior_frame_count(
-            self.args['behavior_pkl_path']
-        )
-
-        mapping_frame_count = self._get_frame_count(
-            self.args['mapping_pkl_path']
-        )
-
-        replay_frames_count = self._get_frame_count(
-            self.args['replay_pkl_path']
-        )
-
-        return behavior_frame_count, mapping_frame_count, replay_frames_count
 
     def _get_frame_times(
         self
@@ -95,7 +42,10 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
             behavior_frame_count,
             mapping_frame_count,
             replay_frames_count
-        ) = self._get_frame_counts()
+        ) = _get_frame_counts(
+                behavior_pkl_path=self.args['behavior_pkl_path'],
+                mapping_pkl_path=self.args['mapping_pkl_path'],
+                replay_pkl_path=self.args['replay_pkl_path'])
 
         behavior_start = MultiStimulusRunningSpeed.START_FRAME
         mapping_start = behavior_frame_count
