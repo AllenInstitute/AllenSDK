@@ -13,11 +13,18 @@ from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile
+    BehaviorStimulusFile,
+    ReplayStimulusFile,
+    MappingStimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
+
+
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.multi_stim_running_processing import (
+        _get_multi_stim_running_df)
 
 
 class RunningSpeed(DataObject,
@@ -85,6 +92,10 @@ class RunningSpeed(DataObject,
             sync_file: Optional[SyncFile] = None,
             filtered: bool = True,
             zscore_threshold: float = 10.0) -> "RunningSpeed":
+        """
+        sync_file is used for generating timestamps. If None, timestamps
+        will be generated from the stimulus file.
+        """
 
         if sync_file is not None:
             stimulus_timestamps = StimulusTimestamps.from_sync_file(
@@ -107,6 +118,39 @@ class RunningSpeed(DataObject,
             stimulus_file=behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered)
+
+    @classmethod
+    def from_multiple_stimulus_files(
+            cls,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            mapping_stimulus_file: MappingStimulusFile,
+            replay_stimulus_file: ReplayStimulusFile,
+            sync_file: SyncFile,
+            filtered: bool = True,
+            zscore_threshold: float = 10.0) -> "RunningSpeed":
+        """
+        sync_file is used for generating timestamps.
+
+        Stimulus blocks are assumed to be presented in the order
+        behavior_stimulus_file
+        mapping_stimulus_file
+        replay_stimulus_file
+        """
+
+        df = _get_multi_stim_running_df(
+                sync_path=sync_file.filepath,
+                behavior_stimulus_file=behavior_stimulus_file,
+                mapping_stimulus_file=mapping_stimulus_file,
+                replay_stimulus_file=replay_stimulus_file,
+                use_lowpass_filter=filtered,
+                zscore_threshold=zscore_threshold)['running_speed']
+
+        return cls(
+               running_speed=df,
+               filtered=filtered,
+               sync_file=None,
+               stimulus_file=None,
+               stimulus_timestamps=None)
 
     @classmethod
     def from_nwb(
