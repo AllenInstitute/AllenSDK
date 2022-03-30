@@ -24,7 +24,63 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 )
 
 
-class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
+class RunningSpeedNWBMixin(object):
+    """
+    Mixin defining to_nwb and from_nwb for RunningSpeed
+    data objects
+    """
+
+    @classmethod
+    def from_nwb(
+        cls,
+        nwbfile: NWBFile,
+        filtered=True
+    ) -> "RunningSpeed":
+        running_module = nwbfile.modules['running']
+        interface_name = 'speed' if filtered else 'speed_unfiltered'
+        running_interface = running_module.get_data_interface(interface_name)
+
+        timestamps = running_interface.timestamps[:]
+        values = running_interface.data[:]
+
+        running_speed = pd.DataFrame(
+            {
+                "timestamps": timestamps,
+                "speed": values
+            }
+        )
+        return cls(running_speed=running_speed, filtered=filtered)
+
+    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+        running_speed: pd.DataFrame = self.value
+        data = running_speed['speed'].values
+        timestamps = running_speed['timestamps'].values
+
+        if self._filtered:
+            data_interface_name = "speed"
+        else:
+            data_interface_name = "speed_unfiltered"
+
+        running_speed_series = TimeSeries(
+            name=data_interface_name,
+            data=data,
+            timestamps=timestamps,
+            unit='cm/s')
+
+        if 'running' in nwbfile.processing:
+            running_mod = nwbfile.processing['running']
+        else:
+            running_mod = ProcessingModule('running',
+                                           'Running speed processing module')
+            nwbfile.add_processing_module(running_mod)
+
+        running_mod.add_data_interface(running_speed_series)
+
+        return nwbfile
+
+
+class RunningSpeed(RunningSpeedNWBMixin,
+                   DataObject, LimsReadableInterface, NwbReadableInterface,
                    NwbWritableInterface, JsonReadableInterface,
                    JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
@@ -132,51 +188,3 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered
         )
-
-    @classmethod
-    def from_nwb(
-        cls,
-        nwbfile: NWBFile,
-        filtered=True
-    ) -> "RunningSpeed":
-        running_module = nwbfile.modules['running']
-        interface_name = 'speed' if filtered else 'speed_unfiltered'
-        running_interface = running_module.get_data_interface(interface_name)
-
-        timestamps = running_interface.timestamps[:]
-        values = running_interface.data[:]
-
-        running_speed = pd.DataFrame(
-            {
-                "timestamps": timestamps,
-                "speed": values
-            }
-        )
-        return cls(running_speed=running_speed, filtered=filtered)
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        running_speed: pd.DataFrame = self.value
-        data = running_speed['speed'].values
-        timestamps = running_speed['timestamps'].values
-
-        if self._filtered:
-            data_interface_name = "speed"
-        else:
-            data_interface_name = "speed_unfiltered"
-
-        running_speed_series = TimeSeries(
-            name=data_interface_name,
-            data=data,
-            timestamps=timestamps,
-            unit='cm/s')
-
-        if 'running' in nwbfile.processing:
-            running_mod = nwbfile.processing['running']
-        else:
-            running_mod = ProcessingModule('running',
-                                           'Running speed processing module')
-            nwbfile.add_processing_module(running_mod)
-
-        running_mod.add_data_interface(running_speed_series)
-
-        return nwbfile
