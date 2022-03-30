@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
-from allensdk.brain_observatory import sync_utilities
 import argschema
 import json
 
@@ -10,10 +9,9 @@ from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
     MultiStimulusRunningSpeedOutputParameters
 )
 
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.running_processing import (
-        get_running_df
-    )
+from allensdk.brain_observatory.ecephys.data_objects.\
+    running_speed.multi_stim_running_processing import (
+        _extract_dx_info)
 
 
 class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
@@ -21,74 +19,6 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
     default_output_schema = MultiStimulusRunningSpeedOutputParameters
 
     START_FRAME = 0
-
-    def _extract_dx_info(
-        self,
-        frame_times: np.ndarray,
-        start_index: int,
-        end_index: int,
-        pkl_path: str
-    ) -> pd.core.frame.DataFrame:
-        """
-        Extract all of the running speed data
-
-        Parameters
-        ----------
-        frame_times: numpy.ndarray
-            list of the vsync times
-        start_index: int
-            Index to the first frame of the stimulus
-        end_index: int
-           Index to the last frame of the stimulus
-        pkl_path: string
-            Path to the stimulus pickle file
-
-        Returns
-        -------
-        pd.DataFrame
-
-        Notes
-        -------
-            velocity pd.DataFrame:
-                columns:
-                    "velocity": computed running speed
-                    "net_rotation": dx in radians
-                    "frame_indexes": frame indexes into
-                        the full vsync times list
-
-            raw data pd.DataFrame:
-                Dataframe with an index of timestamps and the following
-                columns:
-                    "vsig": voltage signal from the encoder
-                    "vin": the theoretical maximum voltage that the encoder
-                        will reach prior to "wrapping". This should
-                        theoretically be 5V (after crossing
-                        5V goes to 0V, or vice versa). In
-                        practice the encoder does not always
-                        reach this value before wrapping, which can cause
-                        transient spikes in speed at the voltage "wraps".
-                    "frame_time": list of the vsync times
-                    "dx": angular change, computed during data collection
-                The raw data are provided so that the user may compute
-                their own speed from source, if desired.
-
-        """
-
-        stim_file = pd.read_pickle(pkl_path)
-        frame_times = frame_times[start_index:end_index]
-
-        # occasionally an extra set of frame times are acquired
-        # after the rest of the signals. We detect and remove these
-        frame_times = sync_utilities.trim_discontiguous_times(frame_times)
-
-        velocities = get_running_df(
-                        stim_file,
-                        frame_times,
-                        self.args['use_lowpass_filter'],
-                        self.args['zscore_threshold']
-        )
-
-        return velocities
 
     def _get_behavior_frame_count(
         self,
@@ -294,25 +224,31 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
 
         frame_times = self._get_frame_times()
 
-        behavior_velocities = self._extract_dx_info(
+        behavior_velocities = _extract_dx_info(
             frame_times,
             behavior_start,
             mapping_start,
-            self.args['behavior_pkl_path']
+            self.args['behavior_pkl_path'],
+            zscore_threshold=self.args['zscore_threshold'],
+            use_lowpass_filter=self.args['use_lowpass_filter']
         )
 
-        mapping_velocities = self._extract_dx_info(
+        mapping_velocities = _extract_dx_info(
             frame_times,
             mapping_start,
             replay_start,
-            self.args['mapping_pkl_path']
+            self.args['mapping_pkl_path'],
+            zscore_threshold=self.args['zscore_threshold'],
+            use_lowpass_filter=self.args['use_lowpass_filter']
         )
 
-        replay_velocities = self._extract_dx_info(
+        replay_velocities = _extract_dx_info(
             frame_times,
             replay_start,
             replay_end,
-            self.args['replay_pkl_path']
+            self.args['replay_pkl_path'],
+            zscore_threshold=self.args['zscore_threshold'],
+            use_lowpass_filter=self.args['use_lowpass_filter']
         )
 
         velocities, raw_data = self._merge_dx_data(
