@@ -11,8 +11,8 @@ from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
 from allensdk.brain_observatory.ecephys.data_objects.\
     running_speed.multi_stim_running_processing import (
         _extract_dx_info,
-        _get_frame_counts,
-        _get_frame_times)
+        _get_frame_times,
+        _get_stimulus_starts_and_ends)
 
 
 class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
@@ -20,32 +20,6 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
     default_output_schema = MultiStimulusRunningSpeedOutputParameters
 
     START_FRAME = 0
-
-    def _get_stimulus_starts_and_ends(self) -> list:
-        """
-        Get the start and stop frame indexes for each stimulus
-        """
-
-        (
-            behavior_frame_count,
-            mapping_frame_count,
-            replay_frames_count
-        ) = _get_frame_counts(
-                behavior_pkl_path=self.args['behavior_pkl_path'],
-                mapping_pkl_path=self.args['mapping_pkl_path'],
-                replay_pkl_path=self.args['replay_pkl_path'])
-
-        behavior_start = MultiStimulusRunningSpeed.START_FRAME
-        mapping_start = behavior_frame_count
-        replay_start = mapping_start + mapping_frame_count
-        replay_end = replay_start + replay_frames_count
-
-        return (
-            behavior_start,
-            mapping_start,
-            replay_start,
-            replay_end
-        )
 
     def _merge_dx_data(
         self,
@@ -158,7 +132,11 @@ class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):
             mapping_start,
             replay_start,
             replay_end
-        ) = self._get_stimulus_starts_and_ends()
+        ) = _get_stimulus_starts_and_ends(
+                behavior_pkl_path=self.args['behavior_pkl_path'],
+                mapping_pkl_path=self.args['mapping_pkl_path'],
+                replay_pkl_path=self.args['replay_pkl_path'],
+                behavior_start_frame=MultiStimulusRunningSpeed.START_FRAME)
 
         frame_times = _get_frame_times(
                           sync_path=self.args['sync_h5_path'])

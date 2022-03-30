@@ -180,3 +180,55 @@ def _get_frame_times(
     return sync_data.get_edges(
         "rising", SyncDataset.FRAME_KEYS, units="seconds"
     )
+
+
+def _get_stimulus_starts_and_ends(
+        behavior_pkl_path: str,
+        mapping_pkl_path: str,
+        replay_pkl_path: str,
+        behavior_start_frame: int
+) -> Tuple[int, int, int, int]:
+    """
+    Get the start and stop frame indexes for each stimulus
+
+    Parameters
+    ----------
+    behavior_pkl_path: str
+        path to behavior pickle file
+    mapping_pkl_path: str
+        path to mapping pickle file
+    replay_pkl_path: str
+        path to replay pickle file
+    behavior_start_frame: int
+        the frame at which behavior data is meant to start
+
+    Returns
+    -------
+    transition_frames: Tuple[int, int, int ,int]
+        behavior start frame
+        mapping start frame
+        replay start frame
+        replay end frame
+
+    """
+
+    (
+        behavior_frame_count,
+        mapping_frame_count,
+        replay_frames_count
+    ) = _get_frame_counts(
+                behavior_pkl_path=behavior_pkl_path,
+                mapping_pkl_path=mapping_pkl_path,
+                replay_pkl_path=replay_pkl_path)
+
+    behavior_start = behavior_start_frame
+    mapping_start = behavior_frame_count
+    replay_start = mapping_start + mapping_frame_count
+    replay_end = replay_start + replay_frames_count
+
+    return (
+        behavior_start,
+        mapping_start,
+        replay_start,
+        replay_end
+    )
