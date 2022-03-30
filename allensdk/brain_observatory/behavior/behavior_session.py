@@ -35,6 +35,8 @@ from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
 
+from allensdk.brain_observatory.behavior.data_files import SyncFile
+
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 
@@ -98,15 +100,32 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
+
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr=session_data)
+
+        if 'sync_file' in session_data:
+            sync_file = SyncFile.from_json(dict_repr=session_data)
+        else:
+            sync_file = None
+
         stimulus_timestamps = StimulusTimestamps.from_json(
             dict_repr=session_data)
-        running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data)
-        raw_running_speed = RunningSpeed.from_json(
-            dict_repr=session_data, filtered=False
+
+        running_acquisition = RunningAcquisition.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file,
+            sync_file=sync_file)
+
+        raw_running_speed = RunningSpeed.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file,
+            sync_file=sync_file,
+            filtered=False
         )
-        running_speed = RunningSpeed.from_json(dict_repr=session_data)
+
+        running_speed = RunningSpeed.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file,
+            sync_file=sync_file
+        )
+
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
         licks, rewards, stimuli, task_parameters, trials = \
@@ -176,22 +195,31 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         behavior_session_id = BehaviorSessionId(behavior_session_id)
         stimulus_file = BehaviorStimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
+
+        if stimulus_timestamps is not None:
+            sync_file = stimulus_timestamps._sync_file
+        else:
+            sync_file = None
+
         if stimulus_timestamps is None:
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
                 monitor_delay=monitor_delay)
-        running_acquisition = RunningAcquisition.from_lims(
-            lims_db,
-            behavior_session_id.value
-        )
-        raw_running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value, filtered=False,
-            stimulus_timestamps=stimulus_timestamps
-        )
-        running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value,
-            stimulus_timestamps=stimulus_timestamps
-        )
+
+        running_acquisition = RunningAcquisition.from_stimulus_file(
+                behavior_stimulus_file=stimulus_file,
+                sync_file=sync_file)
+
+        raw_running_speed = RunningSpeed.from_stimulus_file(
+                behavior_stimulus_file=stimulus_file,
+                sync_file=sync_file,
+                filtered=False)
+
+        running_speed = RunningSpeed.from_stimulus_file(
+                behavior_stimulus_file=stimulus_file,
+                sync_file=sync_file,
+                filtered=True)
+
         behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )

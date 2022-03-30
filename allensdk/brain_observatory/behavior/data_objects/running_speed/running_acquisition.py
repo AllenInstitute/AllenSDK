@@ -11,13 +11,11 @@ import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.core import \
-    LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core import NwbReadableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files import (
     BehaviorStimulusFile
 )
@@ -44,9 +42,9 @@ def from_lims_cache_key(
     )
 
 
-class RunningAcquisition(DataObject, LimsReadableInterface,
-                         NwbReadableInterface, NwbWritableInterface,
-                         JsonWritableInterface):
+class RunningAcquisition(DataObject,
+                         NwbReadableInterface,
+                         NwbWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running acquisition data.
 
@@ -83,77 +81,29 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         self._stimulus_timestamps = stimulus_timestamps
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(
-        cls,
-        dict_repr: dict,
-    ) -> "RunningAcquisition":
-        stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
-                                                           monitor_delay=0.0)
+    def from_stimulus_file(
+            cls,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            sync_file: Optional[SyncFile] = None) -> "RunningAcquisition":
+
+        if sync_file is not None:
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                                        sync_file=sync_file,
+                                        monitor_delay=0.0)
+        else:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                                        stimulus_file=behavior_stimulus_file,
+                                        monitor_delay=0.0)
 
         running_acq_df = get_running_df(
-            data=stimulus_file.data, time=stimulus_timestamps.value,
+            data=behavior_stimulus_file.data,
+            time=stimulus_timestamps.value,
         )
         running_acq_df.drop("speed", axis=1, inplace=True)
 
         return cls(
             running_acquisition=running_acq_df,
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps,
-        )
-
-    def to_json(self) -> dict:
-        """[summary]
-
-        Returns
-        -------
-        dict
-            [description]
-
-        Raises
-        ------
-        RuntimeError
-            [description]
-        """
-        if self._stimulus_file is None or self._stimulus_timestamps is None:
-            raise RuntimeError(
-                "RunningAcquisition DataObject lacks information about the "
-                "BehaviorStimulusFile or StimulusTimestamps. This is likely "
-                "due to instantiating from NWB which prevents to_json() "
-                "functionality"
-            )
-        output_dict = dict()
-        output_dict.update(self._stimulus_file.to_json())
-        if self._stimulus_timestamps is not None:
-            if self._stimulus_timestamps._sync_file is not None:
-                output_dict.update(
-                    self._stimulus_timestamps._sync_file.to_json())
-        return output_dict
-
-    @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls,
-        db: PostgresQueryMixin,
-        behavior_session_id: int,
-        ophys_experiment_id: Optional[int] = None,
-    ) -> "RunningAcquisition":
-
-        stimulus_file = BehaviorStimulusFile.from_lims(db, behavior_session_id)
-
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file,
-                monitor_delay=0.0)
-
-        running_acq_df = get_running_df(
-            data=stimulus_file.data, time=stimulus_timestamps.value,
-        )
-        running_acq_df.drop("speed", axis=1, inplace=True)
-
-        return cls(
-            running_acquisition=running_acq_df,
-            stimulus_file=stimulus_file,
+            stimulus_file=behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
         )
 

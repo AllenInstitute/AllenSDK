@@ -4,7 +4,6 @@ from unittest.mock import create_autospec
 import pandas as pd
 
 from allensdk.core.exceptions import DataFrameIndexError
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -172,11 +171,13 @@ def test_running_speed_from_json(
             ".running_speed.running_speed.get_running_df",
             mock_get_running_speed_df
         )
-        obt = RunningSpeed.from_json(dict_repr, filtered, zscore_threshold)
 
-    mock_stimulus_file.from_json.assert_called_once_with(dict_repr)
+        obt = RunningSpeed.from_stimulus_file(
+                    behavior_stimulus_file=mock_stimulus_file,
+                    filtered=filtered,
+                    zscore_threshold=zscore_threshold)
+
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
-    assert obt._stimulus_file == mock_stimulus_file_instance
 
     mock_stimulus_timestamps_instance = \
         mock_stimulus_timestamps.from_stimulus_file(
@@ -186,7 +187,7 @@ def test_running_speed_from_json(
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_speed_df.assert_called_once_with(
-        data=mock_stimulus_file_instance.data,
+        data=mock_stimulus_file.data,
         time=mock_stimulus_timestamps_instance.value,
         lowpass=filtered,
         zscore_threshold=zscore_threshold
@@ -280,97 +281,6 @@ def test_running_speed_to_json(
     else:
         obt = running_speed.to_json()
         assert obt == expected
-
-
-@pytest.mark.parametrize("behavior_session_id", [12345, 1234])
-@pytest.mark.parametrize("filtered", [True, False])
-@pytest.mark.parametrize("zscore_threshold", [1.0, 4.2])
-@pytest.mark.parametrize(
-    "returned_running_df, expected_running_df",
-    [
-        (
-            # returned_running_df
-            pd.DataFrame(
-                {"timestamps": [1, 2], "speed": [3, 4]}
-            ).set_index("timestamps"),
-            # expected_running_df
-            pd.DataFrame(
-                {"timestamps": [1, 2], "speed": [3, 4]}
-            ),
-        ),
-        (
-            # returned_running_df
-            pd.DataFrame(
-                {"timestamps": [1, 2], "speed": [3, 4]}
-            ).set_index("timestamps"),
-            # expected_running_df
-            pd.DataFrame(
-                {"timestamps": [1, 2], "speed": [3, 4]}
-            ),
-        )
-    ]
-)
-def test_running_speed_from_lims(
-    monkeypatch, behavior_session_id, returned_running_df,
-    expected_running_df, filtered, zscore_threshold
-):
-    mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
-
-    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
-    mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
-
-    dummy_ts = DummyTimestamps()
-    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
-
-    mock_get_running_speed_df = create_autospec(get_running_df)
-    mock_get_running_speed_df.return_value = returned_running_df
-
-    with monkeypatch.context() as m:
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_speed.BehaviorStimulusFile",
-            mock_stimulus_file
-        )
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_speed.StimulusTimestamps",
-            mock_stimulus_timestamps
-        )
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_speed.get_running_df",
-            mock_get_running_speed_df
-        )
-        obt = RunningSpeed.from_lims(
-            mock_db_conn, behavior_session_id, filtered,
-            zscore_threshold
-        )
-
-    mock_stimulus_file.from_lims.assert_called_once_with(
-        mock_db_conn, behavior_session_id
-    )
-    mock_stimulus_file_instance = mock_stimulus_file.from_lims(
-        mock_db_conn, behavior_session_id
-    )
-    assert obt._stimulus_file == mock_stimulus_file_instance
-
-    mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
-        mock_stimulus_file_instance, monitor_delay=0.0
-    )
-    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.\
-        from_stimulus_file(stimulus_file=mock_stimulus_file,
-                           monitor_delay=0.0)
-    assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
-
-    mock_get_running_speed_df.assert_called_once_with(
-        data=mock_stimulus_file_instance.data,
-        time=mock_stimulus_timestamps_instance.value,
-        lowpass=filtered,
-        zscore_threshold=zscore_threshold
-    )
-
-    assert obt._filtered == filtered
-    pd.testing.assert_frame_equal(obt.value, expected_running_df)
 
 
 # Fixtures:
