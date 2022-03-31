@@ -17,10 +17,8 @@ from allensdk.brain_observatory.behavior.data_objects.base \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 
-
 from allensdk.brain_observatory.ecephys.data_objects.ecephys_licks import EcephysLicks
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-
 
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.behavior_metadata import \
@@ -44,7 +42,7 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
+    BehaviorSessionId, StimulusTimestamps, RunningAcquisition,
     DataObject
 )
 
@@ -86,7 +84,8 @@ from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
 from allensdk.brain_observatory.ecephys.write_ecephys_behavior_nwb.nwb_helper import \
     NwbHelper
 
-from allensdk.brain_observatory.ecephys.data_objects.running_speed.running_speed import RunningSpeed
+from allensdk.brain_observatory.ecephys.data_objects.running_speed.\
+    vbn_running_speed import VBNRunningSpeed
 
 class EcephysBehaviorSession(
     DataObject,
@@ -111,8 +110,8 @@ class EcephysBehaviorSession(
         stimuli: Stimuli,
         task_parameters: TaskParameters,
         trials: TrialTable,
-        running_speed: RunningSpeed,
-        raw_running_speed: RunningSpeed,
+        running_speed: VBNRunningSpeed,
+        raw_running_speed: VBNRunningSpeed,
         eye_tracking_table: EyeTrackingTable
     ):
         self._metadata = metadata
@@ -173,8 +172,10 @@ class EcephysBehaviorSession(
 
         eye_tracking_table = cls._get_eye_tracking_table(sync_file=sync_file, session_data=session_data)
 
-        running_speed = RunningSpeed.from_json(dict_repr=session_data)
-        raw_running_speed = RunningSpeed.from_json(dict_repr=session_data, filtered=False)
+        running_speed = VBNRunningSpeed.from_json(dict_repr=session_data,
+                                                  filtered=True)
+        raw_running_speed = VBNRunningSpeed.from_json(dict_repr=session_data,
+                                                      filtered=False)
         
         metadata = EcephysBehaviorMetadata.from_json(dict_repr=session_data)
         ecephys_session_id = EcephysSessionId.from_json(dict_repr=session_data)
@@ -219,8 +220,8 @@ class EcephysBehaviorSession(
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
-        raw_running_speed = RunningSpeed.from_nwb(nwbfile, filtered=False)
-        running_speed = RunningSpeed.from_nwb(nwbfile)
+        raw_running_speed = VBNRunningSpeed.from_nwb(nwbfile, filtered=False)
+        running_speed = VBNRunningSpeed.from_nwb(nwbfile, filtered=True)
         metadata = BehaviorMetadata.from_nwb(nwbfile)
         licks = Licks.from_nwb(nwbfile=nwbfile)
         rewards = Rewards.from_nwb(nwbfile=nwbfile)
