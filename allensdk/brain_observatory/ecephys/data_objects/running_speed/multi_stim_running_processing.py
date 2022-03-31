@@ -1,7 +1,6 @@
 from typing import Tuple
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory import sync_utilities
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 
 from allensdk.brain_observatory.behavior.data_objects.\
@@ -60,10 +59,6 @@ def _extract_dx_info(
 
     stim_file = pd.read_pickle(pkl_path)
     frame_times = frame_times[start_index:end_index]
-
-    # occasionally an extra set of frame times are acquired
-    # after the rest of the signals. We detect and remove these
-    frame_times = sync_utilities.trim_discontiguous_times(frame_times)
 
     velocities = get_running_df(
                     stim_file,
