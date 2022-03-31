@@ -302,7 +302,7 @@ def _merge_dx_data(
     )
 
     # Warning - the 'isclose' line below needs to be refactored
-    # is it exists in multiple places
+    # as it exists in multiple places
 
     # due to an acquisition bug (the buffer of raw orientations
     # may be updated more slowly than it is read, leading to
