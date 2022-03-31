@@ -13,7 +13,8 @@ from allensdk.brain_observatory.behavior.\
 from allensdk.brain_observatory.ecephys.\
     data_objects.running_speed.multi_stim_running_processing import (
         _extract_dx_info,
-        _get_behavior_frame_count)
+        _get_behavior_frame_count,
+        _get_frame_count)
 
 
 @pytest.mark.parametrize(
@@ -117,6 +118,23 @@ def test_get_behavior_frame_count(frame_count, tmp_path_factory):
     data = {'items': {'behavior': {'intervalsms': list(range(frame_count-1))}}}
     pd.to_pickle(data, pkl_path)
     actual = _get_behavior_frame_count(str(pkl_path.resolve().absolute()))
+    assert actual == frame_count
+    if pkl_path.exists():
+        pkl_path.unlink()
+
+
+@pytest.mark.parametrize('frame_count', [10, 12, 27])
+def test_get_frame_count(frame_count, tmp_path_factory):
+    """
+    Test that _get_frame_count measure the correct value
+    """
+    tmpdir = tmp_path_factory.mktemp('behavior_frame_count_test')
+    pkl_path = pathlib.Path(
+                    tempfile.mkstemp(dir=tmpdir, suffix='.pkl')[1])
+
+    data = {'intervalsms': list(range(frame_count-1))}
+    pd.to_pickle(data, pkl_path)
+    actual = _get_frame_count(str(pkl_path.resolve().absolute()))
     assert actual == frame_count
     if pkl_path.exists():
         pkl_path.unlink()
