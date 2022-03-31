@@ -47,9 +47,9 @@ class NwbHelper:
     self._probes = probes
 
   def to_nwb(self, nwbfile: NWBFile):
-    running_speed, raw_running_data = read_running_speed(self._running_speed_path)
+    #running_speed, raw_running_data = read_running_speed(self._running_speed_path)
     # add_running_speed_to_nwbfile(nwbfile, running_speed)
-    add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
+    #add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
     # running_speed, raw_running_data = self.read_running_speed(self._running_speed_path)
     # self.add_running_speed_to_nwbfile(nwbfile, running_speed)
