@@ -124,7 +124,7 @@ class VBNRunningObject(DataObject, LimsReadableInterface, NwbReadableInterface,
     def from_json(
             cls,
             dict_repr: dict,
-            filtered: bool) -> "VBNRunningObject":
+            filtered: bool = False) -> "VBNRunningObject":
 
         behavior_stimulus_file = dict_repr['behavior_stimulus_file']
         replay_stimulus_file = dict_repr['replay_stimulus_file']
