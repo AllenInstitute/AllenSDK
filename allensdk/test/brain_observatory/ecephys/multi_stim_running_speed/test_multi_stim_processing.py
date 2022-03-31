@@ -333,7 +333,8 @@ def test_multi_stim_running_df_from_raw_data(
                   'running_speed.multi_stim_running_processing.'
                   '_get_frame_times')
     with patch(to_replace, new=dummy_get_frame_times):
-        multi_stim_running_df_from_raw_data(
+        (velocities_df,
+         raw_df) = multi_stim_running_df_from_raw_data(
             sync_path='garbage',
             behavior_pkl_path=behavior_pkl_fixture['path_to_pkl'],
             mapping_pkl_path=mapping_pkl_fixture['path_to_pkl'],

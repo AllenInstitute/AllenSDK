@@ -157,9 +157,17 @@ def behavior_pkl_fixture(
                         dir=pkl_tmp_dir_fixture,
                         prefix='behavior_',
                         suffix='.pkl')[1])
-    n_frames = 20
+    n_frames = 77
+
+    n_skip = rng.integers(10, n_frames//2, 1)[0]
+    to_skip = rng.choice(np.arange(n_frames, dtype=int),
+                         n_skip,
+                         replace=False)
+    kept_mask = np.ones(n_frames, dtype=bool)
+    kept_mask[to_skip] = False
 
     dx = rng.random((n_frames,))
+    dx[to_skip] = 0.0
     vsig = rng.uniform(low=0.0, high=5.1, size=(n_frames,))
     vin = rng.uniform(low=4.9, high=5.0, size=(n_frames,))
 
@@ -182,7 +190,8 @@ def behavior_pkl_fixture(
         'dx': dx,
         'vsig': vsig,
         'vin': vin,
-        'n_frames': n_frames}
+        'n_frames': n_frames,
+        'kept_mask': kept_mask}
 
     yield output
 
@@ -211,9 +220,17 @@ def mapping_pkl_fixture(
                         dir=pkl_tmp_dir_fixture,
                         prefix='mapping_',
                         suffix='.pkl')[1])
-    n_frames = 13
+    n_frames = 53
+
+    n_skip = rng.integers(10, n_frames//2, 1)[0]
+    to_skip = rng.choice(np.arange(n_frames, dtype=int),
+                         n_skip,
+                         replace=False)
+    kept_mask = np.ones(n_frames, dtype=bool)
+    kept_mask[to_skip] = False
 
     dx = rng.random((n_frames,))
+    dx[to_skip] = 0.0
     vsig = rng.uniform(low=0.0, high=5.1, size=(n_frames,))
     vin = rng.uniform(low=4.9, high=5.0, size=(n_frames,))
 
@@ -236,7 +253,8 @@ def mapping_pkl_fixture(
         'dx': dx,
         'vsig': vsig,
         'vin': vin,
-        'n_frames': n_frames}
+        'n_frames': n_frames,
+        'kept_mask': kept_mask}
 
     yield output
 
@@ -267,7 +285,15 @@ def replay_pkl_fixture(
                         suffix='.pkl')[1])
     n_frames = 47
 
+    n_skip = rng.integers(10, n_frames//2, 1)[0]
+    to_skip = rng.choice(np.arange(n_frames, dtype=int),
+                         n_skip,
+                         replace=False)
+    kept_mask = np.ones(n_frames, dtype=bool)
+    kept_mask[to_skip] = False
+
     dx = rng.random((n_frames,))
+    dx[to_skip] = 0.0
     vsig = rng.uniform(low=0.0, high=5.1, size=(n_frames,))
     vin = rng.uniform(low=4.9, high=5.0, size=(n_frames,))
 
@@ -290,7 +316,8 @@ def replay_pkl_fixture(
         'dx': dx,
         'vsig': vsig,
         'vin': vin,
-        'n_frames': n_frames}
+        'n_frames': n_frames,
+        'kept_mask': kept_mask}
 
     yield output
 
