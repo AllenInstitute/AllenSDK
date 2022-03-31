@@ -5,6 +5,7 @@ import numpy as np
 import tempfile
 import pathlib
 import pandas as pd
+from unittest.mock import patch
 
 from allensdk.brain_observatory.behavior.\
     data_objects.running_speed.running_processing import (
@@ -15,7 +16,8 @@ from allensdk.brain_observatory.ecephys.\
         _extract_dx_info,
         _get_behavior_frame_count,
         _get_frame_count,
-        _get_frame_counts)
+        _get_frame_counts,
+        _get_frame_times)
 
 
 @pytest.mark.parametrize(
@@ -183,3 +185,28 @@ def test_get_frame_counts(tmp_path_factory):
         pth = pkl_path_lookup[key]
         if pth.exists():
             pth.unlink()
+
+
+def test_get_frame_times():
+    """
+    Test that _get_frame_times invokes sync_data.get_edges to find the
+    rising edges with units='seconds'
+    """
+
+    def dummy_init(self, sync_path):
+        pass
+
+    def dummy_get_edges(self, kind, frame_keys, units=None):
+        if kind != "rising":
+            msg = f"asked for {kind} edges; must be rising"
+            raise RuntimeError(msg)
+        if units != "seconds":
+            msg = f"units must be 'seconds'; gave {units}"
+            raise RuntimeError(msg)
+        return None
+
+    with patch('allensdk.brain_observatory.sync_dataset.Dataset.__init__',
+               new=dummy_init):
+        with patch('allensdk.brain_observatory.sync_dataset.Dataset.get_edges',
+                   new=dummy_get_edges):
+            _get_frame_times('nonsense')
