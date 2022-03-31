@@ -21,22 +21,22 @@ from allensdk.brain_observatory.ecephys.data_objects.\
 
 
 def _get_multi_stim_running_df(
-        sync_path: str,
-        behavior_pkl_path: str,
-        mapping_pkl_path: str,
-        replay_pkl_path: str,
+        sync_file: str,
+        behavior_stimulus_file: str,
+        mapping_stimulus_file: str,
+        replay_stimulus_file: str,
         use_lowpass_filter: bool,
         zscore_threshold: float) -> pd.DataFrame:
     """
     Parameters
     ----------
-    sync_path: str
+    sync_file: str
         The path to the sync file
-    behavior_pkl_path: str
+    behavior_stimulus_file: str
         path to behavior pickle file
-    mapping_pkl_path: str
+    mapping_stimulus_file: str
         path to mapping pickle file
-    replay_pkl_path: str
+    replay_stimulus_file: str
         path to replay pickle file
     use_lowpass_filter: bool
         whther or not to apply a low pass filter to the
@@ -52,10 +52,10 @@ def _get_multi_stim_running_df(
 
     (velocity_data,
      _) = multi_stim_running_df_from_raw_data(
-             sync_path=sync_path,
-             behavior_pkl_path=behavior_pkl_path,
-             mapping_pkl_path=mapping_pkl_path,
-             replay_pkl_path=replay_pkl_path,
+             sync_path=sync_file,
+             behavior_pkl_path=behavior_stimulus_file,
+             mapping_pkl_path=mapping_stimulus_file,
+             replay_pkl_path=replay_stimulus_file,
              use_lowpass_filter=use_lowpass_filter,
              zscore_threshold=zscore_threshold,
              behavior_start_frame=0)
@@ -84,19 +84,19 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
     def __init__(
             self,
             running_speed: pd.DataFrame,
-            sync_path: Optional[str] = None,
-            behavior_pkl_path: Optional[str] = None,
-            replay_pkl_path: Optional[str] = None,
-            mapping_pkl_path: Optional[str] = None,
+            sync_file: Optional[str] = None,
+            behavior_stimulus_file: Optional[str] = None,
+            replay_stimulus_file: Optional[str] = None,
+            mapping_stimulus_file: Optional[str] = None,
             use_lowpass_filter: bool = True,
             zscore_threshold: float = 10.0,
             filtered: bool = False):
 
         super().__init__(name='running_speed', value=running_speed)
-        self._sync_path = sync_path
-        self._behavior_pkl_path = behavior_pkl_path
-        self._replay_pkl_path = replay_pkl_path
-        self._mapping_pkl_path = mapping_pkl_path
+        self._sync_file = sync_file
+        self._behavior_stimulus_file = behavior_stimulus_file
+        self._replay_stimulus_file = replay_stimulus_file
+        self._mapping_stimulus_file = mapping_stimulus_file
         self._use_lowpass_filter = use_lowpass_filter
         self._zscore_threshold = zscore_threshold
         self._filtered = filtered
@@ -106,10 +106,10 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
             cls,
             dict_repr: dict) -> "VBNRunningSpeed":
 
-        behavior_pkl_path = dict_repr['behavior_pkl_path']
-        replay_pkl_path = dict_repr['replay_pkl_path']
-        mapping_pkl_path = dict_repr['mapping_pkl_path']
-        sync_path = dict_repr['sync_h5_path']
+        behavior_stimulus_file = dict_repr['behavior_stimulus_file']
+        replay_stimulus_file = dict_repr['replay_stimulus_file']
+        mapping_stimulus_file = dict_repr['mapping_stimulus_file']
+        sync_file = dict_repr['sync_file']
         if 'use_lowpass_filter' in dict_repr:
             use_lowpass_filter = dict_repr['use_lowpass_filter']
         else:
@@ -121,33 +121,33 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
             zscore_threshold = 10.0
 
         df = _get_multi_stim_running_df(
-                sync_path=sync_path,
-                behavior_pkl_path=behavior_pkl_path,
-                replay_pkl_path=replay_pkl_path,
-                mapping_pkl_path=mapping_pkl_path,
+                sync_file=sync_file,
+                behavior_stimulus_file=behavior_stimulus_file,
+                replay_stimulus_file=replay_stimulus_file,
+                mapping_stimulus_file=mapping_stimulus_file,
                 use_lowpass_filter=use_lowpass_filter,
                 zscore_threshold=zscore_threshold)
 
         return cls(
                 running_speed=df,
-                sync_path=sync_path,
-                behavior_pkl_path=behavior_pkl_path,
-                mapping_pkl_path=mapping_pkl_path,
-                replay_pkl_path=replay_pkl_path,
+                sync_file=sync_file,
+                behavior_stimulus_file=behavior_stimulus_file,
+                mapping_stimulus_file=mapping_stimulus_file,
+                replay_stimulus_file=replay_stimulus_file,
                 use_lowpass_filter=use_lowpass_filter,
                 zscore_threshold=zscore_threshold)
 
     def to_json(self) -> dict:
         output = dict()
         msg = ""
-        for value, key in zip((self._sync_path,
-                               self._behavior_pkl_path,
-                               self._mapping_pkl_path,
-                               self._replay_pkl_path),
-                              ('sync_h5_path',
-                               'behavior_pkl_path',
-                               'mapping_pkl_path',
-                               'replay_pkl_path')):
+        for value, key in zip((self._sync_file,
+                               self._behavior_stimulus_file,
+                               self._mapping_stimulus_file,
+                               self._replay_stimulus_file),
+                              ('sync_file',
+                               'behavior_stimulus_file',
+                               'mapping_stimulus_file',
+                               'replay_stimulus_file')):
             if value is None:
                 msg += (f"{key} is None; must be specified "
                         "for VBNRunningSpeed.to_json")
