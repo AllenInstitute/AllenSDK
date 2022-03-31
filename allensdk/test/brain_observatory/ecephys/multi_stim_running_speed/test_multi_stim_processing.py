@@ -143,33 +143,14 @@ def test_get_frame_count(frame_count, tmp_path_factory):
         pkl_path.unlink()
 
 
-def test_get_frame_counts(tmp_path_factory):
+def test_get_frame_counts(
+        stimulus_file_frame_fixture):
     """
     Test that _get_frame_counts returns the right
     frame counts in the right order
     """
-    tmpdir = tmp_path_factory.mktemp('all_frame_count_test')
-    pkl_path_lookup = dict()
-    pkl_path_lookup['behavior'] = pathlib.Path(
-                          tempfile.mkstemp(dir=tmpdir, suffix='.pkl')[1])
-
-    pkl_path_lookup['mapping'] = pathlib.Path(
-                          tempfile.mkstemp(dir=tmpdir, suffix='.pkl')[1])
-
-    pkl_path_lookup['replay'] = pathlib.Path(
-                          tempfile.mkstemp(dir=tmpdir, suffix='.pkl')[1])
-
-    frame_count_lookup = {'behavior': 13, 'mapping': 44, 'replay': 76}
-
-    data = {'items':
-            {'behavior':
-             {'intervalsms':
-              list(range(frame_count_lookup['behavior']-1))}}}
-    pd.to_pickle(data, pkl_path_lookup['behavior'])
-
-    for key in ('mapping', 'replay'):
-        data = {'intervalsms': list(range(frame_count_lookup[key]-1))}
-        pd.to_pickle(data, pkl_path_lookup[key])
+    (frame_count_lookup,
+     pkl_path_lookup) = stimulus_file_frame_fixture
 
     actual = _get_frame_counts(
        behavior_pkl_path=str(pkl_path_lookup['behavior'].resolve().absolute()),
@@ -180,11 +161,6 @@ def test_get_frame_counts(tmp_path_factory):
     assert actual[1] == frame_count_lookup['mapping']
     assert actual[2] == frame_count_lookup['replay']
     assert len(actual) == 3
-
-    for key in pkl_path_lookup:
-        pth = pkl_path_lookup[key]
-        if pth.exists():
-            pth.unlink()
 
 
 def test_get_frame_times():
