@@ -102,16 +102,13 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
     @classmethod
     def from_json(
             cls,
-            dict_repr: dict) -> "VBNRunningSpeed":
+            dict_repr: dict,
+            filtered: bool) -> "VBNRunningSpeed":
 
         behavior_stimulus_file = dict_repr['behavior_stimulus_file']
         replay_stimulus_file = dict_repr['replay_stimulus_file']
         mapping_stimulus_file = dict_repr['mapping_stimulus_file']
         sync_file = dict_repr['sync_file']
-        if 'filtered' in dict_repr:
-            filtered = dict_repr['filtered']
-        else:
-            filtered = True
 
         if 'zscore_threshold' in dict_repr:
             zscore_threshold = dict_repr['zscore_threshold']
@@ -156,7 +153,6 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
             raise RuntimeError(msg)
 
         output["zscore_threshold"] = self._zscore_threshold
-        output["filtered"] = self._filtered
         return output
 
     @classmethod
