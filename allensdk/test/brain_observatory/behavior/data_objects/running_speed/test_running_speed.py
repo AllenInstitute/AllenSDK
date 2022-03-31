@@ -221,7 +221,7 @@ def test_running_speed_to_json(
         )
 
     running_speed = RunningSpeed(
-        running_speed=None,
+        data=None,
         stimulus_file=stimulus_file,
         stimulus_timestamps=stimulus_timestamps
     )
@@ -336,7 +336,7 @@ def test_running_speed_nwb_roundtrip(
     filtered
 ):
     running_speed = RunningSpeed(
-        running_speed=running_speed_data, filtered=filtered
+        data=running_speed_data, filtered=filtered
     )
     nwbfile = running_speed.to_nwb(nwbfile)
 

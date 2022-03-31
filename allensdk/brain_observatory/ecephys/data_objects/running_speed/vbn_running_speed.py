@@ -73,10 +73,9 @@ def _get_multi_stim_running_df(
             'running_acquistion': acq_data}
 
 
-class VBNRunningSpeed(RunningSpeedNWBMixin,
-                      DataObject, LimsReadableInterface, NwbReadableInterface,
-                      NwbWritableInterface, JsonReadableInterface,
-                      JsonWritableInterface):
+class VBNRunningObject(DataObject, LimsReadableInterface, NwbReadableInterface,
+                       NwbWritableInterface, JsonReadableInterface,
+                       JsonWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running speed data.
 
@@ -93,7 +92,7 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
 
     def __init__(
             self,
-            running_speed: pd.DataFrame,
+            data: pd.DataFrame,
             sync_file: Optional[str] = None,
             behavior_stimulus_file: Optional[str] = None,
             replay_stimulus_file: Optional[str] = None,
@@ -101,7 +100,7 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
             filtered: bool = True,
             zscore_threshold: float = 10.0):
 
-        super().__init__(name='running_speed', value=running_speed)
+        super().__init__(name=self._data_object_name(), value=data)
         self._sync_file = sync_file
         self._behavior_stimulus_file = behavior_stimulus_file
         self._replay_stimulus_file = replay_stimulus_file
@@ -131,10 +130,10 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
                 replay_stimulus_file=replay_stimulus_file,
                 mapping_stimulus_file=mapping_stimulus_file,
                 use_lowpass_filter=filtered,
-                zscore_threshold=zscore_threshold)['running_speed']
+                zscore_threshold=zscore_threshold)[cls._data_object_name()]
 
         return cls(
-                running_speed=df,
+                data=df,
                 sync_file=sync_file,
                 behavior_stimulus_file=behavior_stimulus_file,
                 mapping_stimulus_file=mapping_stimulus_file,
@@ -155,7 +154,7 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
                                'replay_stimulus_file')):
             if value is None:
                 msg += (f"{key} is None; must be specified "
-                        "for VBNRunningSpeed.to_json")
+                        f"for {type(self)}.to_json")
 
             output[key] = value
 
@@ -168,3 +167,10 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
     @classmethod
     def from_lims(cls):
         raise NotImplementedError()
+
+
+class VBNRunningSpeed(RunningSpeedNWBMixin, VBNRunningObject):
+
+    @classmethod
+    def _data_object_name(self):
+        return 'running_speed'

@@ -49,7 +49,7 @@ class RunningSpeedNWBMixin(object):
                 "speed": values
             }
         )
-        return cls(running_speed=running_speed, filtered=filtered)
+        return cls(data=running_speed, filtered=filtered)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         running_speed: pd.DataFrame = self.value
@@ -95,12 +95,12 @@ class RunningSpeed(RunningSpeedNWBMixin,
 
     def __init__(
         self,
-        running_speed: pd.DataFrame,
+        data: pd.DataFrame,
         stimulus_file: Optional[StimulusFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         filtered: bool = True
     ):
-        super().__init__(name='running_speed', value=running_speed)
+        super().__init__(name='running_speed', value=data)
         self._stimulus_file = stimulus_file
         self._stimulus_timestamps = stimulus_timestamps
         self._filtered = filtered
@@ -141,7 +141,7 @@ class RunningSpeed(RunningSpeedNWBMixin,
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold
         )
         return cls(
-            running_speed=running_speed,
+            data=running_speed,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered)
@@ -183,7 +183,7 @@ class RunningSpeed(RunningSpeedNWBMixin,
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold
         )
         return cls(
-            running_speed=running_speed,
+            data=running_speed,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered
