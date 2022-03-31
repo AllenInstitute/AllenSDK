@@ -40,33 +40,22 @@ def _extract_dx_info(
 
     Returns
     -------
-    pd.DataFrame
+    velocities: pd.DataFrame
 
     Notes
-    -------
-        velocity pd.DataFrame:
-            columns:
-                "velocity": computed running speed
-                "net_rotation": dx in radians
-                "frame_indexes": frame indexes into
-                    the full vsync times list
+    -----
+    see allensdk.brain_observatory.behavior.data_objects.\
+        running_speed.running_processing.get_running_df
 
-        raw data pd.DataFrame:
-            Dataframe with an index of timestamps and the following
-            columns:
-                "vsig": voltage signal from the encoder
-                "vin": the theoretical maximum voltage that the encoder
-                    will reach prior to "wrapping". This should
-                    theoretically be 5V (after crossing
-                    5V goes to 0V, or vice versa). In
-                    practice the encoder does not always
-                    reach this value before wrapping, which can cause
-                    transient spikes in speed at the voltage "wraps".
-                "frame_time": list of the vsync times
-                "dx": angular change, computed during data collection
-            The raw data are provided so that the user may compute
-            their own speed from source, if desired.
+    for detailed contents of output dataframe
 
+    frame_times will be longer than the data arrays in the
+    pickle file because frame_times encompasses all of the
+    frames in the sync file, while the pickle file comprises
+    just one of the stimulus files associated with this
+    session. start_index and end_index are meant to trim
+    the frame_times down to match the size of the data arrays
+    stored in the pickle file.
     """
 
     stim_file = pd.read_pickle(pkl_path)
@@ -360,6 +349,32 @@ def multi_stim_running_df_from_raw_data(
     -------
     Tuple[pd.DataFrame, pd.DataFrame]
         concatenated velocity data, raw data
+
+
+    Notes
+    -----
+    velocities pd.DataFrame:
+        columns:
+            "velocity": computed running speed
+            "net_rotation": dx in radians
+            "frame_indexes": frame indexes into
+                the full vsync times list
+
+    raw data pd.DataFrame:
+        Dataframe with an index of timestamps and the following
+        columns:
+            "vsig": voltage signal from the encoder
+            "vin": the theoretical maximum voltage that the encoder
+                will reach prior to "wrapping". This should
+                theoretically be 5V (after crossing
+                5V goes to 0V, or vice versa). In
+                practice the encoder does not always
+                reach this value before wrapping, which can cause
+                transient spikes in speed at the voltage "wraps".
+            "frame_time": list of the vsync times
+            "dx": angular change, computed during data collection
+        The raw data are provided so that the user may compute
+        their own speed from source, if desired.
     """
 
     (
