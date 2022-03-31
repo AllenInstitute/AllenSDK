@@ -15,6 +15,10 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.data_objects.\
     running_speed.running_speed import RunningSpeedNWBMixin
 
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.running_acquisition import RunningAcquisitionNWBMixin
+
+
 from allensdk.brain_observatory.ecephys.data_objects.\
     running_speed.multi_stim_running_processing import (
         multi_stim_running_df_from_raw_data)
@@ -69,8 +73,16 @@ def _get_multi_stim_running_df(
                             'speed': velocity_data.velocity.values
                       })
 
+    running_acq = pd.DataFrame(
+                     data={
+                         'dx': acq_data.dx.values,
+                         'timestamps': acq_data.frame_time.values,
+                         'v_in': acq_data.vin.values,
+                         'v_sig': acq_data.vsig.values
+                     }).set_index('timestamps')
+
     return {'running_speed': running_speed,
-            'running_acquistion': acq_data}
+            'running_acquisition': running_acq}
 
 
 class VBNRunningObject(DataObject, LimsReadableInterface, NwbReadableInterface,
@@ -169,8 +181,19 @@ class VBNRunningObject(DataObject, LimsReadableInterface, NwbReadableInterface,
         raise NotImplementedError()
 
 
-class VBNRunningSpeed(RunningSpeedNWBMixin, VBNRunningObject):
+class VBNRunningSpeed(
+            RunningSpeedNWBMixin,
+            VBNRunningObject):
 
     @classmethod
-    def _data_object_name(self):
+    def _data_object_name(cls):
         return 'running_speed'
+
+
+class VBNRunningAcquisition(
+            RunningAcquisitionNWBMixin,
+            VBNRunningObject):
+
+    @classmethod
+    def _data_object_name(cls):
+        return 'running_acquisition'

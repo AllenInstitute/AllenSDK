@@ -152,7 +152,7 @@ def test_running_acquisition_to_json(
         )
 
     running_acq = RunningAcquisition(
-        running_acquisition=None,
+        data=None,
         stimulus_file=stimulus_file,
         stimulus_timestamps=stimulus_timestamps
     )
@@ -305,7 +305,7 @@ def test_running_acquisition_from_lims(
 def test_running_acquisition_nwb_roundtrip(
     nwbfile, data_object_roundtrip_fixture, roundtrip, running_acq_data
 ):
-    running_acq = RunningAcquisition(running_acquisition=running_acq_data)
+    running_acq = RunningAcquisition(data=running_acq_data)
     nwbfile = running_acq.to_nwb(nwbfile)
 
     if roundtrip:
