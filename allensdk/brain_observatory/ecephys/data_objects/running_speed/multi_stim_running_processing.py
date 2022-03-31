@@ -185,6 +185,9 @@ def _get_stimulus_starts_and_ends(
         path to replay pickle file
     behavior_start_frame: int
         the frame at which behavior data is meant to start
+        (this is effectively a truncation of the behavior
+        frames, trimming off the first behavior_start_frame
+        frames)
 
     Returns
     -------
@@ -209,6 +212,12 @@ def _get_stimulus_starts_and_ends(
     mapping_start = behavior_frame_count
     replay_start = mapping_start + mapping_frame_count
     replay_end = replay_start + replay_frames_count
+
+    if mapping_start <= behavior_start:
+        raise RuntimeError(
+             f"behavior_start_frame {behavior_start_frame} >= "
+             f"mapping_start_frame {mapping_start}; "
+             "unclear how to proceed")
 
     return (
         behavior_start,

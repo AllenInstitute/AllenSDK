@@ -17,7 +17,8 @@ from allensdk.brain_observatory.ecephys.\
         _get_behavior_frame_count,
         _get_frame_count,
         _get_frame_counts,
-        _get_frame_times)
+        _get_frame_times,
+        _get_stimulus_starts_and_ends)
 
 
 @pytest.mark.parametrize(
@@ -153,9 +154,9 @@ def test_get_frame_counts(
      pkl_path_lookup) = stimulus_file_frame_fixture
 
     actual = _get_frame_counts(
-       behavior_pkl_path=str(pkl_path_lookup['behavior'].resolve().absolute()),
-       mapping_pkl_path=str(pkl_path_lookup['mapping'].resolve().absolute()),
-       replay_pkl_path=str(pkl_path_lookup['replay'].resolve().absolute()))
+           behavior_pkl_path=pkl_path_lookup['behavior'],
+           mapping_pkl_path=pkl_path_lookup['mapping'],
+           replay_pkl_path=pkl_path_lookup['replay'])
 
     assert actual[0] == frame_count_lookup['behavior']
     assert actual[1] == frame_count_lookup['mapping']
@@ -186,3 +187,53 @@ def test_get_frame_times():
         with patch('allensdk.brain_observatory.sync_dataset.Dataset.get_edges',
                    new=dummy_get_edges):
             _get_frame_times('nonsense')
+
+
+@pytest.mark.parametrize('start_frame', [1, 5, 9])
+def test_get_stimulus_starts_ends(
+        stimulus_file_frame_fixture,
+        start_frame):
+    """
+    Test that _get_stimulus_starts_and_ends returns the correct frame
+    indices in the correct order
+    """
+    (frame_ct,
+     pkl_path_lookup) = stimulus_file_frame_fixture
+
+    actual = _get_stimulus_starts_and_ends(
+           behavior_pkl_path=pkl_path_lookup['behavior'],
+           mapping_pkl_path=pkl_path_lookup['mapping'],
+           replay_pkl_path=pkl_path_lookup['replay'],
+           behavior_start_frame=start_frame)
+
+    expected = (
+        start_frame,
+        frame_ct['behavior'],
+        frame_ct['behavior']+frame_ct['mapping'],
+        frame_ct['behavior']+frame_ct['mapping']+frame_ct['replay'])
+
+    assert actual == expected
+
+
+def test_get_stimulus_starts_ends_error(
+        stimulus_file_frame_fixture):
+    """
+    Test that _get_stimulus_starts_and_ends raises an error
+    if maping_start <= behavior_start
+    """
+    (frame_ct,
+     pkl_path_lookup) = stimulus_file_frame_fixture
+
+    with pytest.raises(RuntimeError, match="behavior_start_frame"):
+        _get_stimulus_starts_and_ends(
+              behavior_pkl_path=pkl_path_lookup['behavior'],
+              mapping_pkl_path=pkl_path_lookup['mapping'],
+              replay_pkl_path=pkl_path_lookup['replay'],
+              behavior_start_frame=frame_ct['behavior'])
+
+    with pytest.raises(RuntimeError, match="behavior_start_frame"):
+        _get_stimulus_starts_and_ends(
+              behavior_pkl_path=pkl_path_lookup['behavior'],
+              mapping_pkl_path=pkl_path_lookup['mapping'],
+              replay_pkl_path=pkl_path_lookup['replay'],
+              behavior_start_frame=frame_ct['behavior']+6)

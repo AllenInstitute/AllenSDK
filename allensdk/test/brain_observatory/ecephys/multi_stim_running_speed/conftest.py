@@ -19,7 +19,7 @@ def basic_running_stim_file_fixture():
                     }]}}}
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def stimulus_file_frame_fixture(
         tmp_path_factory):
     """
@@ -57,7 +57,13 @@ def stimulus_file_frame_fixture(
         data = {'intervalsms': list(range(frame_count_lookup[key]-1))}
         pd.to_pickle(data, pkl_path_lookup[key])
 
-    yield (frame_count_lookup, pkl_path_lookup)
+    output_pkl_path = dict()
+    for key in pkl_path_lookup:
+        val = pkl_path_lookup[key]
+        val = str(val.resolve().absolute())
+        output_pkl_path[key] = val
+
+    yield (frame_count_lookup, output_pkl_path)
 
     for key in pkl_path_lookup:
         pth = pkl_path_lookup[key]
