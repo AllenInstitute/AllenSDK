@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict
 
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
@@ -26,7 +26,7 @@ def _get_multi_stim_running_df(
         mapping_stimulus_file: str,
         replay_stimulus_file: str,
         use_lowpass_filter: bool,
-        zscore_threshold: float) -> pd.DataFrame:
+        zscore_threshold: float) -> Dict[str, pd.DataFrame]:
     """
     Parameters
     ----------
@@ -47,20 +47,30 @@ def _get_multi_stim_running_df(
 
     Returns
     -------
-    A dataframe with columns 'timestamps' and 'speed'
+    A dict containing two data frames.
+        'running_speed': A dataframe with mapping time to speed
+        'running_acquisition': A dataframe mapping time to raw data
+                               coming off the running wheel
     """
 
     (velocity_data,
-     _) = multi_stim_running_df_from_raw_data(
-             sync_path=sync_file,
-             behavior_pkl_path=behavior_stimulus_file,
-             mapping_pkl_path=mapping_stimulus_file,
-             replay_pkl_path=replay_stimulus_file,
-             use_lowpass_filter=use_lowpass_filter,
-             zscore_threshold=zscore_threshold,
-             behavior_start_frame=0)
-    return pd.DataFrame(data={'timestamps': velocity_data.frame_time.values,
-                              'speed': velocity_data.velocity.values})
+     acq_data) = multi_stim_running_df_from_raw_data(
+                    sync_path=sync_file,
+                    behavior_pkl_path=behavior_stimulus_file,
+                    mapping_pkl_path=mapping_stimulus_file,
+                    replay_pkl_path=replay_stimulus_file,
+                    use_lowpass_filter=use_lowpass_filter,
+                    zscore_threshold=zscore_threshold,
+                    behavior_start_frame=0)
+
+    running_speed = pd.DataFrame(
+                      data={
+                            'timestamps': velocity_data.frame_time.values,
+                            'speed': velocity_data.velocity.values
+                      })
+
+    return {'running_speed': running_speed,
+            'running_acquistion': acq_data}
 
 
 class VBNRunningSpeed(RunningSpeedNWBMixin,
@@ -121,7 +131,7 @@ class VBNRunningSpeed(RunningSpeedNWBMixin,
                 replay_stimulus_file=replay_stimulus_file,
                 mapping_stimulus_file=mapping_stimulus_file,
                 use_lowpass_filter=filtered,
-                zscore_threshold=zscore_threshold)
+                zscore_threshold=zscore_threshold)['running_speed']
 
         return cls(
                 running_speed=df,
