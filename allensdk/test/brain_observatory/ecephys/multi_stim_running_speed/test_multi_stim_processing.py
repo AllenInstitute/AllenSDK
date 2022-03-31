@@ -19,7 +19,8 @@ from allensdk.brain_observatory.ecephys.\
         _get_frame_counts,
         _get_frame_times,
         _get_stimulus_starts_and_ends,
-        _merge_dx_data)
+        _merge_dx_data,
+        multi_stim_running_df_from_raw_data)
 
 
 @pytest.mark.parametrize(
@@ -305,3 +306,38 @@ def test_merge_dx_data(merge_data_fixture,
 
     np.testing.assert_array_equal(raw_df.frame_time.values,
                                   frame_times[start_frame:])
+
+
+@pytest.mark.parametrize("start_frame", [0, ])
+def test_multi_stim_running_df_from_raw_data(
+        start_frame,
+        behavior_pkl_fixture,
+        replay_pkl_fixture,
+        mapping_pkl_fixture):
+    """
+    test that multi_stim_running_df_from_raw_data
+    can properly process stimulus pickle files
+    """
+
+    use_lowpass = True
+    zscore = 10.0
+
+    def dummy_get_frame_times(sync_path=None):
+        nt = behavior_pkl_fixture['n_frames']
+        nt += replay_pkl_fixture['n_frames']
+        nt += mapping_pkl_fixture['n_frames']
+        nt += start_frame
+        return np.linspace(0., 10., nt)
+
+    to_replace = ('allensdk.brain_observatory.ecephys.data_objects.'
+                  'running_speed.multi_stim_running_processing.'
+                  '_get_frame_times')
+    with patch(to_replace, new=dummy_get_frame_times):
+        multi_stim_running_df_from_raw_data(
+            sync_path='garbage',
+            behavior_pkl_path=behavior_pkl_fixture['path_to_pkl'],
+            mapping_pkl_path=mapping_pkl_fixture['path_to_pkl'],
+            replay_pkl_path=replay_pkl_fixture['path_to_pkl'],
+            use_lowpass_filter=use_lowpass,
+            zscore_threshold=zscore,
+            behavior_start_frame=start_frame)

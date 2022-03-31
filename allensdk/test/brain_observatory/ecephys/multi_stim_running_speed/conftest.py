@@ -131,16 +131,9 @@ def pkl_tmp_dir_fixture(
     """
     A directory where the temporary data files can be written
     """
-    tmpdir = pathlib.Path(tmp_path_factory('self_consistent_multi_stim'))
+    tmpdir = pathlib.Path(tmp_path_factory.mktemp(
+                               'self_consistent_multi_stim'))
     return tmpdir
-
-
-@pytest.fixture(scope='session')
-def sync_times_fixture():
-    """
-    A numpy array representing the sync times
-    """
-    return np.linspace(0.0, 8.0, 80)
 
 
 @pytest.fixture(scope='session')
@@ -180,7 +173,7 @@ def behavior_pkl_fixture(
                         "vin": vin,
                     }]}}}
 
-    data['items']['behavior']['intervalsms'] = n_frames-1
+    data['items']['behavior']['intervalsms'] = list(range(n_frames-1))
 
     pd.to_pickle(data, pkl_path)
 
@@ -234,7 +227,7 @@ def mapping_pkl_fixture(
                         "vin": vin,
                     }]}}}
 
-    data['intervalsms'] = n_frames-1
+    data['intervalsms'] = list(range(n_frames-1))
 
     pd.to_pickle(data, pkl_path)
 
@@ -288,7 +281,7 @@ def replay_pkl_fixture(
                         "vin": vin,
                     }]}}}
 
-    data['intervalsms'] = n_frames-1
+    data['intervalsms'] = list(range(n_frames-1))
 
     pd.to_pickle(data, pkl_path)
 
