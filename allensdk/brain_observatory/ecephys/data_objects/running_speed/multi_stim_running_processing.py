@@ -249,6 +249,9 @@ def _merge_dx_data(
         list of the vsync times
     behavior_start_frame: int
         frame on which behavior data starts
+        (this is effectively a truncation of the behavior
+        frames, trimming off the first behavior_start_frame
+        frames)
 
     Returns
     -------
@@ -291,6 +294,7 @@ def _merge_dx_data(
     frame_indexes = list(
         range(behavior_start_frame, len(frame_times))
     )
+    frame_times = frame_times[behavior_start_frame:]
 
     velocities = pd.DataFrame(
         {
