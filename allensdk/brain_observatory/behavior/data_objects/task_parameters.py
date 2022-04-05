@@ -5,12 +5,12 @@ from typing import List
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.schemas import \
     BehaviorTaskParametersSchema

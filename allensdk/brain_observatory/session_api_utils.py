@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.comparison_utils import compare_fields
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import DataObject
 
 
 logger = logging.getLogger(__name__)

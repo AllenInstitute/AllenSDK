@@ -4,16 +4,17 @@ import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface, \
-    StimulusFileReadableInterface, SyncFileReadableInterface
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import \
+    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.sync_file import \
+    SyncFileReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile, SyncFile
 )
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (

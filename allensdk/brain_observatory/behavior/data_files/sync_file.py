@@ -1,3 +1,4 @@
+import abc
 import json
 from typing import Dict, Union
 from pathlib import Path
@@ -7,8 +8,9 @@ from cachetools.keys import hashkey
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.internal.core import DataFile
 from allensdk.brain_observatory.behavior.sync import get_sync_data
-from allensdk.brain_observatory.behavior.data_files import DataFile
+from allensdk.core import DataObject
 
 
 # Query returns path to sync timing file associated with ophys experiment
@@ -69,3 +71,18 @@ class SyncFile(DataFile):
     def load_data(filepath: Union[str, Path]) -> dict:
         filepath = safe_system_path(file_name=filepath)
         return get_sync_data(sync_path=filepath)
+
+
+class SyncFileReadableInterface(abc.ABC):
+    """Marks a data object as readable from sync file"""
+    @classmethod
+    @abc.abstractmethod
+    def from_sync_file(cls, *args) -> "DataObject":
+        """Populate a DataObject from the sync file
+
+        Returns
+        -------
+        DataObject:
+            An instantiated DataObject which has `name` and `value` properties
+        """
+        raise NotImplementedError()

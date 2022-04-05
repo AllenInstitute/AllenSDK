@@ -7,12 +7,10 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_files.event_detection_file \
     import \
     EventDetectionFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     DataFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .rois_mixin import \
