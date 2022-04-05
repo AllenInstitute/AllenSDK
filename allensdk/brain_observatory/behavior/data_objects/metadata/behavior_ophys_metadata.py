@@ -2,14 +2,12 @@ from typing import Union
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \

@@ -3,14 +3,12 @@ from pynwb import NWBFile
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import \
     JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import DataObject
 
 
 def from_lims_cache_key(cls, db, ophys_experiment_id: int):

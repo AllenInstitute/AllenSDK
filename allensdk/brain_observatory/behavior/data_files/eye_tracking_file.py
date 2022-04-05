@@ -7,7 +7,7 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import \
     load_eye_tracking_hdf
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.data_files import DataFile
+from allensdk.internal.core import DataFile
 
 
 class EyeTrackingFile(DataFile):

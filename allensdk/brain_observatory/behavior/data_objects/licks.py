@@ -5,13 +5,13 @@ import pandas as pd
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import \
     NwbWritableInterface
 
 

@@ -1,3 +1,4 @@
+import abc
 import json
 from typing import Dict, Union
 from pathlib import Path
@@ -9,7 +10,8 @@ import pandas as pd
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.data_files import DataFile
+from allensdk.internal.core import DataFile
+from allensdk.core import DataObject
 
 # Query returns path to StimulusPickle file for given behavior session
 STIMULUS_FILE_QUERY_TEMPLATE = """
@@ -72,3 +74,18 @@ class StimulusFile(DataFile):
     def load_data(filepath: Union[str, Path]) -> dict:
         filepath = safe_system_path(file_name=filepath)
         return pd.read_pickle(filepath)
+
+
+class StimulusFileReadableInterface(abc.ABC):
+    """Marks a data object as readable from stimulus file"""
+    @classmethod
+    @abc.abstractmethod
+    def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "DataObject":
+        """Populate a DataObject from the stimulus file
+
+        Returns
+        -------
+        DataObject:
+            An instantiated DataObject which has `name` and `value` properties
+        """
+        raise NotImplementedError()

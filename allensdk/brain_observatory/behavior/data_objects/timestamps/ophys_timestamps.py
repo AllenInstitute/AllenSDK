@@ -4,10 +4,11 @@ import numpy as np
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    SyncFileReadableInterface, NwbReadableInterface
+from allensdk.core import DataObject
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.sync_file import \
+    SyncFileReadableInterface
 
 
 class OphysTimestamps(DataObject, SyncFileReadableInterface,

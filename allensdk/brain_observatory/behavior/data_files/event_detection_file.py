@@ -10,8 +10,8 @@ from cachetools.keys import hashkey
 import pandas as pd
 
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.data_files import DataFile
 from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.internal.core import DataFile
 
 
 def from_json_cache_key(cls, dict_repr: dict):

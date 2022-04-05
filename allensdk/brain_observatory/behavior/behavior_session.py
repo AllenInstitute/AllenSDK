@@ -8,12 +8,10 @@ import pytz
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -32,9 +30,9 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
-    DataObject
+    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP

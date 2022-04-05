@@ -1,6 +1,6 @@
 import abc
-from typing import Any, Union
 from pathlib import Path
+from typing import Union, Any
 
 from allensdk.internal.core.lims_utilities import safe_system_path
 
@@ -9,7 +9,7 @@ class DataFile(abc.ABC):
     """An abstract class that prototypes methods for accessing internal
     data files.
 
-    These data files contain information necessary to sucessfully instantiate
+    These data files contain information necessary to successfully instantiate
     one or many `DataObject`(s).
 
     External users should ignore this class (and subclasses) as as they

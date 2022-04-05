@@ -10,16 +10,13 @@ import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import \
     LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.data_objects import (
-    DataObject, StimulusTimestamps
-)
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
     StimulusFile
 )

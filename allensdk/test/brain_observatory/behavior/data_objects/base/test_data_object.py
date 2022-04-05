@@ -1,6 +1,6 @@
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import DataObject
 
 
 class TestDataObject:

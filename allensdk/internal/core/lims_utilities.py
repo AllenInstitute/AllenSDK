@@ -2,6 +2,7 @@ import os
 import platform
 import re
 import logging
+
 from allensdk.core.json_utilities import read_url_get
 
 HDF5_FILE_TYPE_ID = 306905526
