@@ -6,18 +6,18 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 
 
-class TestFromStimulusFile:
+class TestFromBehaviorStimulusFile:
     @classmethod
     def setup_class(cls):
         dir = Path(__file__).parent.resolve()
         test_data_dir = dir / 'test_data'
 
-        cls.stimulus_file = StimulusFile(
+        cls.stimulus_file = BehaviorStimulusFile(
             filepath=test_data_dir / 'behavior_stimulus_file.pkl')
         expected = pd.read_pickle(str(test_data_dir / 'licks.pkl'))
         cls.expected = Licks(licks=expected)
@@ -38,7 +38,7 @@ class TestFromStimulusFile:
         """
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136], tmpdir=tmpdir)
-        stimulus_file = StimulusFile.from_json(
+        stimulus_file = BehaviorStimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
@@ -65,7 +65,7 @@ class TestFromStimulusFile:
 
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[], tmpdir=tmpdir)
-        stimulus_file = StimulusFile.from_json(
+        stimulus_file = BehaviorStimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
@@ -94,7 +94,7 @@ class TestFromStimulusFile:
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136, 200],  # len(timestamps) == 200,
             tmpdir=tmpdir)
-        stimulus_file = StimulusFile.from_json(
+        stimulus_file = BehaviorStimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
@@ -117,7 +117,7 @@ class TestFromStimulusFile:
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136, 201],  # len(timestamps) == 200,
             tmpdir=tmpdir)
-        stimulus_file = StimulusFile.from_json(
+        stimulus_file = BehaviorStimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
@@ -158,7 +158,7 @@ class TestNWB:
         dir = Path(__file__).parent.resolve()
         test_data_dir = dir / 'test_data'
 
-        stimulus_file = StimulusFile(
+        stimulus_file = BehaviorStimulusFile(
             filepath=test_data_dir / 'behavior_stimulus_file.pkl')
         ts = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file,

@@ -3,7 +3,7 @@ from typing import Optional
 import pandas as pd
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -21,7 +21,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps) -> "Rewards":
         """Get reward data from pkl file, based on timestamps
         (not sync file).

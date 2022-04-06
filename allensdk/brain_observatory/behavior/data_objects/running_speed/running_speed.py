@@ -14,7 +14,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile
+    BehaviorStimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -37,7 +37,7 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
     def __init__(
         self,
         running_speed: pd.DataFrame,
-        stimulus_file: Optional[StimulusFile] = None,
+        stimulus_file: Optional[BehaviorStimulusFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         filtered: bool = True
     ):
@@ -48,7 +48,7 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
 
     @staticmethod
     def _get_running_speed_df(
-        stimulus_file: StimulusFile,
+        stimulus_file: BehaviorStimulusFile,
         stimulus_timestamps: StimulusTimestamps,
         filtered: bool = True,
         zscore_threshold: float = 1.0
@@ -75,7 +75,7 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         filtered: bool = True,
         zscore_threshold: float = 10.0
     ) -> "RunningSpeed":
-        stimulus_file = StimulusFile.from_json(dict_repr)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
         stimulus_timestamps = StimulusTimestamps.from_json(dict_repr)
 
         running_speed = cls._get_running_speed_df(
@@ -91,8 +91,9 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         if self._stimulus_file is None or self._stimulus_timestamps is None:
             raise RuntimeError(
                 "RunningSpeed DataObject lacks information about the "
-                "StimulusFile or StimulusTimestamps. This is likely due to "
-                "instantiating from NWB which prevents to_json() functionality"
+                "BehaviorStimulusFile or StimulusTimestamps. This is "
+                "likely due to instantiating from NWB which prevents "
+                "to_json() functionality"
             )
         output_dict = dict()
         output_dict.update(self._stimulus_file.to_json())
@@ -109,7 +110,9 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         monitor_delay: Optional[float] = None,
     ) -> "RunningSpeed":
-        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
+        stimulus_file = BehaviorStimulusFile.from_lims(
+                                db,
+                                behavior_session_id)
         if stimulus_timestamps is None:
             if monitor_delay is None:
                 raise RuntimeError("Must specify monitor delay "

@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
@@ -48,7 +48,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
         return cls(date_of_acquisition=nwbfile.session_start_time)
 
-    def validate(self, stimulus_file: StimulusFile,
+    def validate(self, stimulus_file: BehaviorStimulusFile,
                  behavior_session_id: int) -> "DateOfAcquisition":
         """raise a warning if the date differs too much from the
         datetime obtained from the behavior stimulus (*.pkl) file."""

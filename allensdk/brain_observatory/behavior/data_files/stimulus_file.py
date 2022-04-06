@@ -37,7 +37,7 @@ def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id)
 
 
-class StimulusFile(DataFile):
+class BehaviorStimulusFile(DataFile):
     """A DataFile which contains methods for accessing and loading visual
     behavior stimulus *.pkl files.
 
@@ -80,7 +80,9 @@ class StimulusFileReadableInterface(abc.ABC):
     """Marks a data object as readable from stimulus file"""
     @classmethod
     @abc.abstractmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "DataObject":
+    def from_stimulus_file(
+            cls,
+            stimulus_file: BehaviorStimulusFile) -> "DataObject":
         """Populate a DataObject from the stimulus file
 
         Returns

@@ -18,7 +18,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile
+    BehaviorStimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -66,7 +66,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
     def __init__(
         self,
         running_acquisition: pd.DataFrame,
-        stimulus_file: Optional[StimulusFile] = None,
+        stimulus_file: Optional[BehaviorStimulusFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
     ):
         super().__init__(name="running_acquisition", value=running_acquisition)
@@ -79,7 +79,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         cls,
         dict_repr: dict,
     ) -> "RunningAcquisition":
-        stimulus_file = StimulusFile.from_json(dict_repr)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
 
         stimulus_timestamps = StimulusTimestamps.from_json(
                 dict_repr=dict_repr)
@@ -111,8 +111,9 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         if self._stimulus_file is None or self._stimulus_timestamps is None:
             raise RuntimeError(
                 "RunningAcquisition DataObject lacks information about the "
-                "StimulusFile or StimulusTimestamps. This is likely due to "
-                "instantiating from NWB which prevents to_json() functionality"
+                "BehaviorStimulusFile or StimulusTimestamps. This is likely "
+                "due to instantiating from NWB which prevents to_json() "
+                "functionality"
             )
         output_dict = dict()
         output_dict.update(self._stimulus_file.to_json())
@@ -129,7 +130,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
 
-        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
+        stimulus_file = BehaviorStimulusFile.from_lims(db, behavior_session_id)
 
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,

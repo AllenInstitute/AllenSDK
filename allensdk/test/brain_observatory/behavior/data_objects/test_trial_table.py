@@ -6,8 +6,9 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile, \
-    SyncFile
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile,
+    SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -23,7 +24,7 @@ from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
 
-class TestFromStimulusFile(LimsTest):
+class TestFromBehaviorStimulusFile(LimsTest):
     @classmethod
     def setup_class(cls):
         cls.behavior_session_id = 994174745
@@ -57,7 +58,7 @@ class TestFromStimulusFile(LimsTest):
     def test_from_stimulus_file2(self):
         dir = Path(__file__).parent.parent.resolve()
         stimulus_filepath = dir / 'resources' / 'example_stimulus.pkl.gz'
-        stimulus_file = StimulusFile(filepath=stimulus_filepath)
+        stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         stimulus_file, stimulus_timestamps, licks, rewards = \
             self._get_trial_table_data(stimulus_file=stimulus_file)
         TrialTable.from_stimulus_file(
@@ -67,11 +68,12 @@ class TestFromStimulusFile(LimsTest):
             rewards=rewards
         )
 
-    def _get_trial_table_data(self,
-                              stimulus_file: Optional[StimulusFile] = None):
+    def _get_trial_table_data(
+            self,
+            stimulus_file: Optional[BehaviorStimulusFile] = None):
         """returns data required to instantiate a TrialTable"""
         if stimulus_file is None:
-            stimulus_file = StimulusFile.from_lims(
+            stimulus_file = BehaviorStimulusFile.from_lims(
                 behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file,

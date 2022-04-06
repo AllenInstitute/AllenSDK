@@ -3,7 +3,7 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface
@@ -20,7 +20,8 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile) -> "BehaviorSessionUUID":
+            cls,
+            stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         id = stimulus_file.data.get('session_uuid')
         if id:
             id = uuid.UUID(id)
@@ -34,7 +35,7 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
 
     def validate(self, behavior_session_id: int,
                  foraging_id: int,
-                 stimulus_file: StimulusFile) -> "BehaviorSessionUUID":
+                 stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         """
         Sanity check to ensure that pkl file data matches up with
         the behavior session that the pkl file has been associated with.

@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Tuple
 import numpy as np
 
 from allensdk import one
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
@@ -11,7 +11,7 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 
 class Trial:
     def __init__(self, trial: dict, start: float, end: float,
-                 behavior_stimulus_file: StimulusFile,
+                 behavior_stimulus_file: BehaviorStimulusFile,
                  index: int,
                  stimulus_timestamps: StimulusTimestamps,
                  licks: Licks, rewards: Rewards, stimuli: dict):
@@ -113,8 +113,9 @@ class Trial:
             reward_times)
 
     @staticmethod
-    def _calculate_trial_end(trial_end,
-                             behavior_stimulus_file: StimulusFile) -> int:
+    def _calculate_trial_end(
+            trial_end,
+            behavior_stimulus_file: BehaviorStimulusFile) -> int:
         if trial_end < 0:
             bhv = behavior_stimulus_file.data['items']['behavior']['items']
             if 'fingerprint' in bhv.keys():

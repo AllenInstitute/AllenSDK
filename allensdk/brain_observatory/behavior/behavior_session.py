@@ -7,7 +7,7 @@ import pytz
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
@@ -98,7 +98,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
-        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr=session_data)
         stimulus_timestamps = StimulusTimestamps.from_json(
             dict_repr=session_data)
         running_acquisition = RunningAcquisition.from_json(
@@ -174,7 +174,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             monitor_delay = cls._get_monitor_delay()
 
         behavior_session_id = BehaviorSessionId(behavior_session_id)
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
         if stimulus_timestamps is None:
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
@@ -878,7 +878,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
     @classmethod
     def _read_data_from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(

@@ -6,7 +6,7 @@ import imageio
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import nwb
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface
@@ -35,7 +35,7 @@ class Templates(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             limit_to_images: Optional[List] = None) -> "Templates":
         """Get stimulus templates (movies, scenes) for behavior session."""
 

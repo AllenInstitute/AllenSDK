@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -42,7 +42,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
             limit_to_images: Optional[List] = None) -> "Stimuli":
         p = Presentations.from_stimulus_file(
