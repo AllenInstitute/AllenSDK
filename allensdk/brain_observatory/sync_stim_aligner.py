@@ -4,7 +4,11 @@
 from typing import Tuple, Union, List
 import numpy as np
 import logging
+import pathlib
 from allensdk.brain_observatory import sync_dataset
+from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    _StimulusFile)
 
 
 def _choose_line(
@@ -281,7 +285,11 @@ def _get_start_frames(
                 )
             else:
                 raise RuntimeError(
-                    f"Could not find matching sync frames for stim: {stim_idx}"
+                    "Could not find matching sync frames "
+                    f"for stim: {stim_idx}\n"
+                    f"expected n_frames {fc}; "
+                    f"best_match {epoch_frame_counts[best_match]}; "
+                    f"tolerance {tolerance}"
                 )
     else:
         raise RuntimeError(
@@ -290,4 +298,71 @@ def _get_start_frames(
             f"entries ({epoch_frame_counts})!"
         )
 
+    return start_frames
+
+
+def get_start_frames_from_stimulus_blocks(
+        stimulus_files: Union[_StimulusFile, List[_StimulusFile]],
+        sync_file: Union[str, pathlib.Path],
+        raw_frame_time_lines: Union[str, List[str]],
+        raw_frame_time_direction: str,
+        frame_count_tolerance: float) -> List[int]:
+    """
+    Find the start frames for a series of stimuli that need to be
+    registered to a single sync file.
+
+    Parameters
+    ----------
+    stimulus_files: Union[_StimulusFile, List[_StimulusFile]]
+        The _StimulusFile objects being registered to the sync file
+    sync_file: Union[str, pathlib.Path]
+        The path to the sync file
+    raw_frame_time_lines: Union[str, List[str]]
+        The line to be used to find raw frame times (usually 'vsync_stim').
+        If a list, the code will scan the list in order until a line
+        that is present in the sync file is found. That line will be used.
+    raw_frame_time_direction: str
+        Either 'rising' or 'falling' indicating which edge to use in finding
+        the raw frame times
+    frame_count_tolerance: float
+        The tolerance to within two blocks of frame counts are considered
+        equal
+
+    Returns
+    -------
+    start_frames: List[int]
+        The list of starting frames corresponding to the provided
+        _StimulusFiles. **The order of stimulus_files will dictate
+        the order of start_frames**.
+
+    Notes
+    -----
+    See the notes in _get_start_frames
+    """
+
+    if raw_frame_time_direction == 'rising':
+        frame_time_fn = _get_rising_times
+    elif raw_frame_time_direction == 'falling':
+        frame_time_fn = _get_falling_times
+    else:
+        msg = ("Cannot parse raw_frame_time_direction = "
+               f"'{raw_frame_time_direction}'\n"
+               "must be either 'rising' or 'falling'")
+        raise ValueError(msg)
+
+    if not isinstance(stimulus_files, list):
+        stimulus_files = [stimulus_files, ]
+
+    safe_sync_path = safe_system_path(file_name=sync_file)
+    with sync_dataset.Dataset(safe_sync_path) as sync_data:
+        raw_frame_times = frame_time_fn(
+                            data=sync_data,
+                            sync_lines=raw_frame_time_lines)
+
+        frame_count_list = [s.num_frames() for s in stimulus_files]
+        start_frames = _get_start_frames(
+                            data=sync_data,
+                            raw_frame_times=raw_frame_times,
+                            stimulus_frame_counts=frame_count_list,
+                            tolerance=frame_count_tolerance)
     return start_frames
