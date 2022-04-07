@@ -1,28 +1,9 @@
-import pickle
-from datetime import datetime
-
 import pytest
 import numpy as np
-import pandas as pd
-import pytz
 
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import (
-    description_dict, get_task_parameters, get_expt_description,
-    BehaviorMetadata)
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.age import \
-    Age
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.full_genotype import \
-    FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.reporter_line import \
-    ReporterLine
+        description_dict, get_task_parameters, get_expt_description)
 
 
 @pytest.mark.parametrize("data, expected",

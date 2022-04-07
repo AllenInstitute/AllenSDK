@@ -24,8 +24,11 @@ def behavior_pkl_fixture(
     pd.to_pickle(result, pkl_path)
     yield {'path': pkl_path, 'expected_frames': nframes}
 
-    if pkl_path.exists():
-        pkl_path.unlink()
+    try:
+        if pkl_path.exists():
+            pkl_path.unlink()
+    except PermissionError:
+        pass
 
 
 @pytest.fixture
@@ -46,5 +49,8 @@ def general_pkl_fixture(
     pd.to_pickle(result, pkl_path)
     yield {'path': pkl_path, 'expected_frames': nframes}
 
-    if pkl_path.exists():
-        pkl_path.unlink()
+    try:
+        if pkl_path.exists():
+            pkl_path.unlink()
+    except PermissionError:
+        pass

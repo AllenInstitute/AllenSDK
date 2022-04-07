@@ -6,7 +6,7 @@ import json
 import numpy as np
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def sync_freq_fixture():
     """
     Frequency of test sync file in Hz
@@ -14,7 +14,7 @@ def sync_freq_fixture():
     return 100.0
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def sync_sample_fixture():
     """
     numpy array indicating the sample
@@ -27,7 +27,7 @@ def sync_sample_fixture():
     return values
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def line_name_fixture():
     """
     List of line names to use in test sync file
@@ -35,7 +35,7 @@ def line_name_fixture():
     return ['lineA', '', 'lineB', 'lineC', 'lineD']
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def line_to_edges_fixture(
         line_name_fixture,
         sync_sample_fixture):
@@ -78,7 +78,7 @@ def line_to_edges_fixture(
     return result
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def sync_metadata_fixture(
         sync_freq_fixture,
         line_name_fixture):
@@ -104,7 +104,7 @@ def sync_metadata_fixture(
     return metadata
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def sync_file_fixture(
         sync_metadata_fixture,
         line_name_fixture,
@@ -137,5 +137,8 @@ def sync_file_fixture(
 
     yield sync_path
 
-    if sync_path.exists():
-        sync_path.unlink()
+    try:
+        if sync_path.exists():
+            sync_path.unlink()
+    except PermissionError:
+        pass

@@ -20,12 +20,12 @@ class DummyStim(object):
         return self._n_frames
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def line_name_fixture():
     return ['lineA', 'stim_running', 'lineB', 'vsync_stim']
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def line_to_edges_fixture(
         sync_sample_fixture):
     n_samples = len(sync_sample_fixture)
@@ -65,7 +65,7 @@ def line_to_edges_fixture(
     return result
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def expected_start_frames_fixture(
         line_to_edges_fixture):
     """

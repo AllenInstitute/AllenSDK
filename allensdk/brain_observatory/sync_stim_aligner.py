@@ -353,7 +353,12 @@ def get_start_frames_from_stimulus_blocks(
     if not isinstance(stimulus_files, list):
         stimulus_files = [stimulus_files, ]
 
-    safe_sync_path = safe_system_path(file_name=sync_file)
+    if isinstance(sync_file, pathlib.Path):
+        str_path = str(sync_file.resolve().absolute())
+    else:
+        str_path = sync_file
+    safe_sync_path = safe_system_path(file_name=str_path)
+
     with sync_dataset.Dataset(safe_sync_path) as sync_data:
         raw_frame_times = frame_time_fn(
                             data=sync_data,
