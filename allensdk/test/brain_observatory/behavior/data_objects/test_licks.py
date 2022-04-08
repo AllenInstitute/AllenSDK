@@ -6,7 +6,8 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 
@@ -19,6 +20,8 @@ class TestFromBehaviorStimulusFile:
 
         cls.stimulus_file = BehaviorStimulusFile(
             filepath=test_data_dir / 'behavior_stimulus_file.pkl')
+        cls.sync_file = SyncFile(
+            filepath=test_data_dir / 'sync.h5')
         expected = pd.read_pickle(str(test_data_dir / 'licks.pkl'))
         cls.expected = Licks(licks=expected)
 
@@ -29,6 +32,17 @@ class TestFromBehaviorStimulusFile:
         licks = Licks.from_stimulus_file(stimulus_file=self.stimulus_file,
                                          stimulus_timestamps=st)
         assert licks == self.expected
+
+    def test_from_stimulus_and_sync_file(self):
+        """Test that the expected data is loaded from the sync and stim file.
+        Test is slightly different from other tests as the sync file data is
+        not matched up to the stim data.
+        """
+        lick_times = self.sync_file.data['lick_times']
+        licks = Licks.from_stimulus_file(stimulus_file=self.stimulus_file,
+                                         stimulus_timestamps=lick_times)
+        assert licks.value['timestamps'][0] == lick_times[0]
+        assert licks.value['frame'][0] == self.expected.value['frame'][0]
 
     def test_from_stimulus_file2(self, tmpdir):
         """
