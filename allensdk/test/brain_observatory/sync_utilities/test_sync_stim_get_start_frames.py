@@ -3,7 +3,7 @@ import numpy as np
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory.sync_stim_aligner import (
     _get_start_frames,
-    get_start_frames_from_stimulus_blocks)
+    get_stim_timestamps_from_stimulus_blocks)
 
 
 class DummyStim(object):
@@ -199,12 +199,12 @@ def test_get_start_frames_too_many_pkl(
 def test_user_facing_get_stims_error(
        sync_file_fixture):
     """
-    Make sure that get_start_frames_from_stimulus_blocks raises
+    Make sure that get_stim_timestamps_from_stimulus_blocks raises
     the expected error if you give it a bad raw_frame_time_direction
     """
     with pytest.raises(ValueError,
                        match="Cannot parse raw_frame_time_direction"):
-        get_start_frames_from_stimulus_blocks(
+        get_stim_timestamps_from_stimulus_blocks(
             stimulus_files=[DummyStim(n_frames=2),
                             DummyStim(n_frames=4)],
             sync_file=sync_file_fixture,
@@ -215,12 +215,15 @@ def test_user_facing_get_stims_error(
 
 @pytest.mark.parametrize(
         "edge_type", ["rising", "falling"])
-def test_user_facing_get_start_frames_smoke(
+def test_user_facing_get_stim_timestamps_smoke(
         sync_file_fixture,
         edge_type,
-        expected_start_frames_fixture):
+        expected_start_frames_fixture,
+        line_to_edges_fixture,
+        sync_sample_fixture,
+        sync_freq_fixture):
     """
-    Test user-facing get_start_frames_from_stimulus_blocks
+    Test user-facing get_stim_timestaps_from_stimulus_blocks
     in case where the number of blocks in stim_running matches
     the expected number of stimulus blocks exactly
     """
@@ -230,21 +233,26 @@ def test_user_facing_get_start_frames_smoke(
     # found by analyzing stim_running matches the expected
     # number of blocks exactly, the start_frames of those
     # blocks will be returned
-    stim_list = [DummyStim(n_frames=44),
-                 DummyStim(n_frames=55),
+    stim_list = [DummyStim(n_frames=33),
                  DummyStim(n_frames=66),
-                 DummyStim(n_frames=77)]
+                 DummyStim(n_frames=99),
+                 DummyStim(n_frames=132)]
 
-    result = get_start_frames_from_stimulus_blocks(
+    result = get_stim_timestamps_from_stimulus_blocks(
                stimulus_files=stim_list,
                sync_file=sync_file_fixture,
                raw_frame_time_lines='vsync_stim',
                raw_frame_time_direction=edge_type,
                frame_count_tolerance=0.0)
 
-    np.testing.assert_array_equal(
-                  result,
-                  expected_start_frames_fixture[edge_type])
+    assert len(result) == 4
+    for ii, (this_array, this_stim) in enumerate(zip(result,
+                                                     stim_list)):
+        raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
+        raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
+        idx0 = expected_start_frames_fixture[edge_type][ii]
+        expected = raw_times[idx0: idx0+this_stim.num_frames()]
+        np.testing.assert_array_equal(this_array, expected)
 
 
 @pytest.mark.parametrize(
@@ -253,27 +261,37 @@ def test_user_facing_get_start_frames_smoke(
          ('falling', (11, 33, 44), 0.0, [0, 2, 3]),
          ('rising', (21, 34, 45), 0.05, [1, 2, 3]),
          ('falling', (31, 47), 0.1, [2, 3])])
-def test_user_facing_get_start_frames(
+def test_user_facing_get_stim_timestamps(
         sync_file_fixture,
         edge_type,
         stim_frame_inputs,
         tolerance,
         expected_idx,
-        expected_start_frames_fixture):
+        expected_start_frames_fixture,
+        line_to_edges_fixture,
+        sync_sample_fixture,
+        sync_freq_fixture):
     """
     Test the user-facing get_start_frames_from_stimulus_blocks
     in cases of differing stimulus specifications and tolerances
     """
 
     stim_list = [DummyStim(n_frames=n) for n in stim_frame_inputs]
-    expected = [expected_start_frames_fixture[edge_type][idx]
-                for idx in expected_idx]
+    expected_start = [expected_start_frames_fixture[edge_type][idx]
+                      for idx in expected_idx]
 
-    result = get_start_frames_from_stimulus_blocks(
+    result = get_stim_timestamps_from_stimulus_blocks(
                 stimulus_files=stim_list,
                 sync_file=sync_file_fixture,
                 raw_frame_time_lines='vsync_stim',
                 raw_frame_time_direction=edge_type,
                 frame_count_tolerance=tolerance)
 
-    np.testing.assert_array_equal(result, expected)
+    assert len(result) == len(expected_idx)
+    for ii, (this_array, this_stim) in enumerate(zip(result,
+                                                     stim_list)):
+        raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
+        raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
+        idx0 = expected_start[ii]
+        expected = raw_times[idx0: idx0+this_stim.num_frames()]
+        np.testing.assert_array_equal(this_array, expected)
