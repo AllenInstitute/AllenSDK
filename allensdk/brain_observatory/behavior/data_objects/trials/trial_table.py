@@ -4,7 +4,7 @@ import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -61,7 +61,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         return TrialTable(trials=trials)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile,
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
                            rewards: Rewards

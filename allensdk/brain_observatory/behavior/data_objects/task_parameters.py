@@ -4,7 +4,7 @@ from typing import List
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface
@@ -132,8 +132,9 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         return TaskParameters(**data)
 
     @classmethod
-    def from_stimulus_file(cls,
-                           stimulus_file: StimulusFile) -> "TaskParameters":
+    def from_stimulus_file(
+            cls,
+            stimulus_file: BehaviorStimulusFile) -> "TaskParameters":
         data = stimulus_file.data
 
         behavior = data["items"]["behavior"]
@@ -169,7 +170,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         )
 
     @staticmethod
-    def _calculate_stimulus_duration(stimulus_file: StimulusFile) -> float:
+    def _calculate_stimulus_duration(
+            stimulus_file: BehaviorStimulusFile) -> float:
         data = stimulus_file.data
 
         behavior = data["items"]["behavior"]
@@ -210,7 +212,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         return stim_duration
 
     @staticmethod
-    def _parse_task(stimulus_file: StimulusFile) -> TaskType:
+    def _parse_task(
+            stimulus_file: BehaviorStimulusFile) -> TaskType:
         data = stimulus_file.data
         config = data["items"]["behavior"]["config"]
 
@@ -224,7 +227,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         return task
 
     @staticmethod
-    def _calculuate_n_stimulus_frames(stimulus_file: StimulusFile) -> int:
+    def _calculuate_n_stimulus_frames(
+            stimulus_file: BehaviorStimulusFile) -> int:
         data = stimulus_file.data
         behavior = data["items"]["behavior"]
 

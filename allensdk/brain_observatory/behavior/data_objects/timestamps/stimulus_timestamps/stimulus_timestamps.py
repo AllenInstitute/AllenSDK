@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile, SyncFile
+    BehaviorStimulusFile, SyncFile
 )
 from allensdk.core import \
     JsonWritableInterface, NwbWritableInterface
@@ -39,7 +39,7 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         self,
         timestamps: np.ndarray,
         monitor_delay: float,
-        stimulus_file: Optional[StimulusFile] = None,
+        stimulus_file: Optional[BehaviorStimulusFile] = None,
         sync_file: Optional[SyncFile] = None
     ):
         super().__init__(name="stimulus_timestamps",
@@ -51,7 +51,7 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
     @classmethod
     def from_stimulus_file(
             cls,
-            stimulus_file: StimulusFile,
+            stimulus_file: BehaviorStimulusFile,
             monitor_delay: float) -> "StimulusTimestamps":
         stimulus_timestamps = get_behavior_stimulus_timestamps(
             stimulus_pkl=stimulus_file.data
@@ -87,7 +87,7 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
                         sync_file=sync_file,
                         monitor_delay=dict_repr['monitor_delay'])
         else:
-            stim_file = StimulusFile.from_json(dict_repr=dict_repr)
+            stim_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
             return cls.from_stimulus_file(
                         stimulus_file=stim_file,
                         monitor_delay=dict_repr['monitor_delay'])
@@ -99,7 +99,9 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         behavior_session_id: int,
         ophys_experiment_id: Optional[int] = None
     ) -> "StimulusTimestamps":
-        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
+        stimulus_file = BehaviorStimulusFile.from_lims(
+                            db,
+                            behavior_session_id)
 
         if ophys_experiment_id:
             sync_file = SyncFile.from_lims(
@@ -114,8 +116,8 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         if self._stimulus_file is None:
             raise RuntimeError(
                 "StimulusTimestamps DataObject lacks information about the "
-                "StimulusFile. This is likely due to instantiating from NWB "
-                "which prevents to_json() functionality"
+                "BehaviorStimulusFile. This is likely due to instantiating "
+                "from NWB which prevents to_json() functionality"
             )
 
         output_dict = dict()

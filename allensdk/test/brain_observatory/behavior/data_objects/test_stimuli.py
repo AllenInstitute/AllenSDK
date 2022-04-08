@@ -5,7 +5,7 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
@@ -19,7 +19,7 @@ from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
 
-class TestFromStimulusFile(LimsTest):
+class TestFromBehaviorStimulusFile(LimsTest):
     @classmethod
     def setup_class(cls):
         cls.behavior_session_id = 994174745
@@ -37,7 +37,7 @@ class TestFromStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -73,7 +73,7 @@ class TestNWB:
         )
 
         # Need to write stimulus timestamps first
-        bsf = StimulusFile(
+        bsf = BehaviorStimulusFile(
             filepath=self.test_data_dir / 'behavior_stimulus_file.pkl')
         ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf,
                                                    monitor_delay=0.0)

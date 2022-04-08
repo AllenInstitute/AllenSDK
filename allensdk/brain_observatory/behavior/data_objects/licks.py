@@ -4,7 +4,7 @@ from typing import Optional
 import pandas as pd
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -31,7 +31,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         super().__init__(name='licks', value=licks)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile,
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile,
                            stimulus_timestamps: StimulusTimestamps) -> "Licks":
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of

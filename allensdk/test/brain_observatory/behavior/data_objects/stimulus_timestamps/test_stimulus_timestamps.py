@@ -9,7 +9,7 @@ from itertools import product
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile, SyncFile
+    BehaviorStimulusFile, SyncFile
 )
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
@@ -45,7 +45,7 @@ from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 def test_stimulus_timestamps_from_json(
     monkeypatch, dict_repr, has_pkl, has_sync
 ):
-    mock_stimulus_file = create_autospec(StimulusFile)
+    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_sync_file = create_autospec(SyncFile)
 
     mock_get_behavior_stimulus_timestamps = create_autospec(
@@ -58,7 +58,8 @@ def test_stimulus_timestamps_from_json(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".timestamps.stimulus_timestamps.stimulus_timestamps.StimulusFile",
+            ".timestamps.stimulus_timestamps"
+            ".stimulus_timestamps.BehaviorStimulusFile",
             mock_stimulus_file
         )
         m.setattr(
@@ -107,7 +108,7 @@ def stimulus_file_fixture():
     test_data_dir = dir / 'test_data'
     sf_path = test_data_dir / 'stimulus_file.pkl'
 
-    return StimulusFile.from_json(
+    return BehaviorStimulusFile.from_json(
         dict_repr={'behavior_stimulus_file': str(sf_path)})
 
 
@@ -165,7 +166,7 @@ def test_stimulus_timestamps_from_json3(stimulus_file_fixture):
         # Test to_json with both stimulus_file and sync_file
         (
             # stimulus_file
-            create_autospec(StimulusFile, instance=True),
+            create_autospec(BehaviorStimulusFile, instance=True),
             # stimulus_file_to_json_ret
             {"behavior_stimulus_file": "stim.pkl"},
             # sync_file
@@ -181,7 +182,7 @@ def test_stimulus_timestamps_from_json3(stimulus_file_fixture):
         # Test to_json with only stimulus_file
         (
             # stimulus_file
-            create_autospec(StimulusFile, instance=True),
+            create_autospec(BehaviorStimulusFile, instance=True),
             # stimulus_file_to_json_ret
             {"behavior_stimulus_file": "stim.pkl"},
             # sync_file
@@ -250,7 +251,7 @@ def test_stimulus_timestamps_from_lims(
 ):
     mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
 
-    mock_stimulus_file = create_autospec(StimulusFile)
+    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_sync_file = create_autospec(SyncFile)
 
     mock_get_behavior_stimulus_timestamps = create_autospec(
@@ -263,7 +264,8 @@ def test_stimulus_timestamps_from_lims(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".timestamps.stimulus_timestamps.stimulus_timestamps.StimulusFile",
+            ".timestamps.stimulus_timestamps"
+            ".stimulus_timestamps.BehaviorStimulusFile",
             mock_stimulus_file
         )
         m.setattr(
@@ -355,7 +357,7 @@ def test_stimulus_timestamps_from_nwb_to_json(
     When writing StimulusTimestamps to_nwb, monitor delay is already
     folded into the timestamp values so that from_nwb reads the
     timestamps in and sets monitor_delay=0.0. from_json and to_json
-    depend on storing the StimulusFile and a non-zero monitor
+    depend on storing the BehaviorStimulusFile and a non-zero monitor
     delay. If we ever decide to make it possible to read a
     StimulusTimetamps from_nwb and then write it to_json, we will
     need to start writing the monitor_delay to the NWB file in a
@@ -368,5 +370,5 @@ def test_stimulus_timestamps_from_nwb_to_json(
     nwbfile = stimulus_timestamps.to_nwb(nwbfile)
     obt = StimulusTimestamps.from_nwb(nwbfile)
     with pytest.raises(RuntimeError,
-                       match="information about the StimulusFile"):
+                       match="information about the BehaviorStimulusFile"):
         obt.to_json()

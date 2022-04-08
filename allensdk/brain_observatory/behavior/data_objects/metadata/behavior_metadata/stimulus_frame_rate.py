@@ -1,6 +1,6 @@
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface
@@ -22,7 +22,7 @@ class StimulusFrameRate(DataObject, StimulusFileReadableInterface,
     @classmethod
     def from_stimulus_file(
             cls,
-            stimulus_file: StimulusFile) -> "StimulusFrameRate":
+            stimulus_file: BehaviorStimulusFile) -> "StimulusFrameRate":
 
         # in this data object, we only care about the difference between
         # timestamps, so we can set the monitor_delay to any

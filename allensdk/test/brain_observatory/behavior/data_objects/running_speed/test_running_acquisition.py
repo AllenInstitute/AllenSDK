@@ -4,7 +4,7 @@ from unittest.mock import create_autospec
 import pandas as pd
 
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
@@ -47,7 +47,7 @@ from allensdk.brain_observatory.behavior.data_objects import (
 def test_running_acquisition_from_json(
     monkeypatch, dict_repr, returned_running_acq_df, expected_running_acq_df
 ):
-    mock_stimulus_file = create_autospec(StimulusFile)
+    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
     mock_get_running_df = create_autospec(get_running_df)
 
@@ -56,7 +56,7 @@ def test_running_acquisition_from_json(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_acquisition.StimulusFile",
+            ".running_speed.running_acquisition.BehaviorStimulusFile",
             mock_stimulus_file
         )
         m.setattr(
@@ -96,7 +96,7 @@ def test_running_acquisition_from_json(
         # Test to_json with both stimulus_file and sync_file
         (
             # stimulus_file
-            create_autospec(StimulusFile, instance=True),
+            create_autospec(BehaviorStimulusFile, instance=True),
             # stimulus_file_to_json_ret
             {"behavior_stimulus_file": "stim.pkl"},
             # stimulus_timestamps
@@ -126,7 +126,7 @@ def test_running_acquisition_from_json(
         # Test to_json without stimulus_timestamps
         (
             # stimulus_file
-            create_autospec(StimulusFile, instance=True),
+            create_autospec(BehaviorStimulusFile, instance=True),
             # stimulus_file_to_json_ret
             {"behavior_stimulus_file": "stim.pkl"},
             # stimulus_timestamps_to_json_ret
@@ -227,7 +227,7 @@ def test_running_acquisition_from_lims(
 ):
     mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
 
-    mock_stimulus_file = create_autospec(StimulusFile)
+    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
     mock_get_running_df = create_autospec(get_running_df)
 
@@ -236,7 +236,7 @@ def test_running_acquisition_from_lims(
     with monkeypatch.context() as m:
         m.setattr(
             "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_acquisition.StimulusFile",
+            ".running_speed.running_acquisition.BehaviorStimulusFile",
             mock_stimulus_file
         )
         m.setattr(

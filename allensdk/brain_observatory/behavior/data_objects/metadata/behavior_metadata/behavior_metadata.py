@@ -4,7 +4,7 @@ import re
 import numpy as np
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
@@ -208,7 +208,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         equipment = Equipment.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_file=stimulus_file)
@@ -238,7 +238,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
         equipment = Equipment.from_json(dict_repr=dict_repr)
 
-        stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
