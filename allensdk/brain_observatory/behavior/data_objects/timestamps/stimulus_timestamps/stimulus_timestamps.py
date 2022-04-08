@@ -5,7 +5,7 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
 from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+    LimsReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.sync_file import \
     SyncFileReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
@@ -14,18 +14,19 @@ from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
     BehaviorStimulusFile, SyncFile
 )
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
         get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
-                         SyncFileReadableInterface, JsonReadableInterface,
-                         NwbReadableInterface, LimsReadableInterface,
-                         NwbWritableInterface, JsonWritableInterface):
+class StimulusTimestamps(DataObject,
+                         StimulusFileReadableInterface,
+                         SyncFileReadableInterface,
+                         NwbReadableInterface,
+                         LimsReadableInterface,
+                         NwbWritableInterface,):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 
@@ -77,21 +78,6 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
             sync_file=sync_file
         )
 
-    @classmethod
-    def from_json(
-            cls,
-            dict_repr: dict) -> "StimulusTimestamps":
-        if 'sync_file' in dict_repr:
-            sync_file = SyncFile.from_json(dict_repr=dict_repr)
-            return cls.from_sync_file(
-                        sync_file=sync_file,
-                        monitor_delay=dict_repr['monitor_delay'])
-        else:
-            stim_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
-            return cls.from_stimulus_file(
-                        stimulus_file=stim_file,
-                        monitor_delay=dict_repr['monitor_delay'])
-
     def from_lims(
         cls,
         db: PostgresQueryMixin,
@@ -111,21 +97,6 @@ class StimulusTimestamps(DataObject, StimulusFileReadableInterface,
         else:
             return cls.from_stimulus_file(stimulus_file=stimulus_file,
                                           monitor_delay=monitor_delay)
-
-    def to_json(self) -> dict:
-        if self._stimulus_file is None:
-            raise RuntimeError(
-                "StimulusTimestamps DataObject lacks information about the "
-                "BehaviorStimulusFile. This is likely due to instantiating "
-                "from NWB which prevents to_json() functionality"
-            )
-
-        output_dict = dict()
-        output_dict.update(self._stimulus_file.to_json())
-        if self._sync_file is not None:
-            output_dict.update(self._sync_file.to_json())
-        output_dict['monitor_delay'] = self._monitor_delay
-        return output_dict
 
     @classmethod
     def from_nwb(cls,

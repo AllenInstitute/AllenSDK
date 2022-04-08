@@ -36,11 +36,10 @@ def from_lims_cache_key(
     cls,
     db,
     behavior_session_id: int,
-    monitor_delay: float,
     ophys_experiment_id: Optional[int] = None
 ):
     return hashkey(
-        behavior_session_id, ophys_experiment_id, monitor_delay
+        behavior_session_id, ophys_experiment_id
     )
 
 
@@ -81,8 +80,18 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
     ) -> "RunningAcquisition":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
 
-        stimulus_timestamps = StimulusTimestamps.from_json(
-                dict_repr=dict_repr)
+        sync_file = None
+        if 'sync_file' in dict_repr:
+            sync_file=SyncFile.from_json(dict_repr=dict_repr),
+
+        if sync_file is not None:
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                                   sync_file=sync_file,
+                                   monitor_delay=0.0)
+        else:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                                    stimulus_file=stimulus_file,
+                                    monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
@@ -117,7 +126,10 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
             )
         output_dict = dict()
         output_dict.update(self._stimulus_file.to_json())
-        output_dict.update(self._stimulus_timestamps.to_json())
+        if self._stimulus_timestamps is not None:
+            if self._stimulus_timestamps._sync_file is not None:
+                output_dict.update(
+                    self._stimulus_timestamps._sync_file.to_json())
         return output_dict
 
     @classmethod
@@ -126,7 +138,6 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         cls,
         db: PostgresQueryMixin,
         behavior_session_id: int,
-        monitor_delay: float,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
 
@@ -134,7 +145,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
 
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay)
+                monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
