@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
@@ -44,6 +45,15 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         filtered: bool = True
     ):
         super().__init__(name='running_speed', value=running_speed)
+
+        if stimulus_timestamps is not None:
+            if not np.isclose(stimulus_timestamps._monitor_delay, 0.0):
+                raise RuntimeError(
+                    "Running speed timestamps have montior delay "
+                    f"{stimulus_timestamps._monitor_delay}; there "
+                    "should be no monitor delay applied to the timestamps "
+                    "associated with running speed")
+
         self._stimulus_file = stimulus_file
         self._sync_file = sync_file
         self._stimulus_timestamps = stimulus_timestamps
@@ -130,15 +140,7 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
                                 db,
                                 behavior_session_id)
 
-        if stimulus_timestamps is not None:
-            if np.abs(stimulus_timestamps._monitor_delay) > 1.0e-6:
-                raise RuntimeError(
-                    "Running speed timestamps have montior delay "
-                    f"{stimulus_timestamps._monitor_delay}; there "
-                    "should be no monitor delay applied to the timestamps "
-                    "associated with running speed")
-
-        else:
+        if stimulus_timestamps is None:
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
                 monitor_delay=0.0

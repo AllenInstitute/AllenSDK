@@ -16,6 +16,34 @@ from allensdk.brain_observatory.behavior.data_objects import (
 )
 
 
+class DummyTimestamps(object):
+    """
+    A class meant to mock the StimulusTimestamps API by providing
+    monitor_delay=0.0, and value=0.0
+    """
+    _monitor_delay = 0.0
+    value = 0.0
+
+
+def test_nonzero_monitor_delay_speed():
+    """
+    Test that RunningSpeed throws an exception if instantiated
+    with a timestamps object that has non-zero monitor_delay
+    """
+    class OtherTimestamps(object):
+        _monitor_delay = 0.01
+        value = 0.0
+
+    with pytest.raises(RuntimeError,
+                       match="should be no monitor delay"):
+
+        RunningSpeed(
+            running_speed=4.0,
+            stimulus_file=None,
+            sync_file=None,
+            stimulus_timestamps=OtherTimestamps())
+
+
 @pytest.mark.parametrize("filtered", [True, False])
 @pytest.mark.parametrize("zscore_threshold", [1.0, 4.2])
 @pytest.mark.parametrize("returned_running_df, expected_running_df, raises", [
@@ -119,6 +147,10 @@ def test_running_speed_from_json(
 ):
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value=dummy_ts
+
     mock_get_running_speed_df = create_autospec(get_running_df)
 
     mock_get_running_speed_df.return_value = returned_running_df
@@ -231,6 +263,8 @@ def test_running_speed_to_json(
         stimulus_file.to_json.return_value = stimulus_file_to_json_ret
     if sync_file is not None:
         sync_file.to_json.return_value = sync_file_to_json_ret
+    if stimulus_timestamps is not None:
+        stimulus_timestamps._monitor_delay = 0.0
 
     running_speed = RunningSpeed(
         running_speed=None,
@@ -283,6 +317,10 @@ def test_running_speed_from_lims(
 
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+
     mock_get_running_speed_df = create_autospec(get_running_df)
     mock_get_running_speed_df.return_value = returned_running_df
 

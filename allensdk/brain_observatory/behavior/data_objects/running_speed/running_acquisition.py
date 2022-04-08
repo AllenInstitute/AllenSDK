@@ -6,6 +6,7 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 import pandas as pd
+import numpy as np
 
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
@@ -69,6 +70,15 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
     ):
         super().__init__(name="running_acquisition", value=running_acquisition)
+
+        if stimulus_timestamps is not None:
+            if not np.isclose(stimulus_timestamps._monitor_delay, 0.0):
+                raise RuntimeError(
+                    "Running acquisition timestamps have montior delay "
+                    f"{stimulus_timestamps._monitor_delay}; there "
+                    "should be no monitor delay applied to the timestamps "
+                    "associated with running acquisition")
+
         self._stimulus_file = stimulus_file
         self._stimulus_timestamps = stimulus_timestamps
 

@@ -15,6 +15,24 @@ from allensdk.brain_observatory.behavior.data_files import (
     SyncFile)
 
 
+def test_nonzero_monitor_delay_acq():
+    """
+    Test that RunningAcquisition throws an exception if instantiated
+    with a timestamps object that has non-zero monitor_delay
+    """
+    class OtherTimestamps(object):
+        _monitor_delay = 0.01
+        value = 0.0
+
+    with pytest.raises(RuntimeError,
+                       match="should be no monitor delay"):
+
+        RunningAcquisition(
+            running_acquisition=4.0,
+            stimulus_file=None,
+            stimulus_timestamps=OtherTimestamps())
+
+
 @pytest.mark.parametrize(
     "dict_repr, returned_running_acq_df, expected_running_acq_df",
     [
@@ -51,6 +69,13 @@ def test_running_acquisition_from_json(
 ):
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    class DummyTimestamps(object):
+        _monitor_delay = 0.0
+        value = 0.0
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+
     mock_get_running_df = create_autospec(get_running_df)
 
     mock_get_running_df.return_value = returned_running_acq_df
@@ -154,6 +179,7 @@ def test_running_acquisition_to_json(
     if stimulus_timestamps is not None:
         stimulus_timestamps._sync_file = create_autospec(SyncFile,
                                                          instance=True)
+        stimulus_timestamps._monitor_delay = 0.0
         stimulus_timestamps._sync_file.to_json.return_value = (
             stimulus_timestamps_to_json_ret
         )
@@ -236,6 +262,14 @@ def test_running_acquisition_from_lims(
 
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    class DummyTimestamps(object):
+        _monitor_delay = 0.0
+        value = 0.0
+    dummy_ts = DummyTimestamps()
+
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+
     mock_get_running_df = create_autospec(get_running_df)
 
     mock_get_running_df.return_value = returned_running_acq_df
