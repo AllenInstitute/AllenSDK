@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, List
 
 import numpy as np
 from pynwb import NWBFile, ProcessingModule
@@ -12,13 +12,18 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile, SyncFile
+    BehaviorStimulusFile,
+    MappingStimulusFile,
+    ReplayStimulusFile,
+    SyncFile
 )
 from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
         get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.sync_stim_aligner import (
+    get_stim_timestamps_from_stimulus_blocks)
 
 
 class StimulusTimestamps(DataObject,
@@ -77,6 +82,76 @@ class StimulusTimestamps(DataObject,
             monitor_delay=monitor_delay,
             sync_file=sync_file
         )
+
+    @classmethod
+    def from_multiple_stimulus_blocks(
+            cls,
+            sync_file: SyncFile,
+            list_of_stims: List[Union[BehaviorStimulusFile,
+                                      MappingStimulusFile,
+                                      ReplayStimulusFile]],
+            stims_of_interest: List[int],
+            monitor_delay: float = 0.0,
+            frame_time_lines: Union[str, List[str]] = 'vsync_stim',
+            frame_time_line_direction: str = 'rising',
+            frame_count_tolerance: float = 0.0) -> "StimulusTimestamps":
+        """
+        Construct a StimulusTimestamps instance by registering
+        mulitple stimulus blocks to one sync file and (optionally)
+        concatenating the results
+
+        Parameters
+        ----------
+        sync_file: SyncFile
+
+t        list_of_stims: List[Union[BehaviorStimulusFile,
+                                  MappingStimulusFile,
+                                  ReplayStimulusFile]]
+            The list of StimulusFiles to be registered to the SyncFile
+            **in the order that they were presented to the mouse**
+
+        stims_of_interest: List[int]
+            The indexes in list_of_stims of the timestamps to be
+            concatenated into this one StimulusTimestamps object
+
+        monitor_delay: float
+            in seconds
+
+        frame_time_lines: Union[str, List[str]]
+            The line to be used to find raw frame times (usually 'vsync_stim').
+            If a list, the code will scan the list in order until a line
+            that is present in the sync file is found. That line will be used.
+
+        frame_time_line_direction: str
+            Either 'rising' or 'falling' indicating which edge
+            to use in finding the raw frame times
+
+        frame_count_tolerance: float
+            The tolerance to within two blocks of frame counts are considered
+            equal
+        """
+
+        stimulus_times = get_stim_timestamps_from_stimulus_blocks(
+                        stimulus_files=list_of_stims,
+                        sync_file=SyncFile.filepath,
+                        raw_frame_time_lines=frame_time_lines,
+                        raw_frame_time_direction=frame_time_line_direction,
+                        frame_count_tolerance=frame_count_tolerance)
+
+        to_concatenate = [stimulus_times[idx]
+                          for idx in stims_of_interest]
+
+        raise RuntimeError(
+            "We need to implement a ListOfStims class that can be passed "
+            "into the stimulus_file kwarg below; that class will need to "
+            "implement to_json so that, for instance, a RunningSpeed object "
+            "based on one of these Timestamps that calls .to_json will record "
+            "all of the necessary stimulus files to the dict representation")
+        timestamps = np.concatenate(to_concatenate)
+        return cls(timestamps=timestamps,
+                   monitor_delay=monitor_delay,
+                   sync_file=SyncFile,
+                   stimulus_file=list_of_stims[0])
 
     def from_lims(
         cls,
