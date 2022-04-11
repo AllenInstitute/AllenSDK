@@ -9,12 +9,13 @@ import SimpleITK as sitk
 import pynwb
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
+import allensdk.brain_observatory.ecephys.nwb_util
 from allensdk.core.authentication import DbCredentials
-import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine, HttpEngine,
-    DEFAULT_TIMEOUT as HTTP_ENGINE_DEFAULT_TIMEOUT
-)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
+    import (
+        write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine,
+        HttpEngine, DEFAULT_TIMEOUT as HTTP_ENGINE_DEFAULT_TIMEOUT
+    )
 
 mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
                                       host='mock_host', port='mock_port',
@@ -24,7 +25,8 @@ mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
 @pytest.fixture
 def raw_sessions():
     return pd.DataFrame({
-        'session_type': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
+        'session_type': ['stimulus_set_one', 'stimulus_set_two',
+                         'stimulus_set_two'],
         "unit_count": [500, 1000, 1500],
         "channel_count": [40, 90, 140],
         "probe_count": [3, 4, 5],
@@ -35,7 +37,8 @@ def raw_sessions():
 @pytest.fixture
 def sessions():
     return pd.DataFrame({
-        'session_type': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
+        'session_type': ['stimulus_set_one', 'stimulus_set_two',
+                         'stimulus_set_two'],
         "unit_count": [500, 1000, 1500],
         "channel_count": [40, 90, 140],
         "probe_count": [3, 4, 5],
@@ -97,17 +100,20 @@ def probes():
 
 @pytest.fixture
 def annotated_probes(probes, sessions):
-    return pd.merge(probes, sessions, left_on="ecephys_session_id", right_index=True, suffixes=["_probe", "_session"])
+    return pd.merge(probes, sessions, left_on="ecephys_session_id",
+                    right_index=True, suffixes=["_probe", "_session"])
 
 
 @pytest.fixture
 def annotated_channels(channels, annotated_probes):
-    return pd.merge(channels, annotated_probes, left_on="ecephys_probe_id", right_index=True, suffixes=["_channel", "_probe"])
+    return pd.merge(channels, annotated_probes, left_on="ecephys_probe_id",
+                    right_index=True, suffixes=["_channel", "_probe"])
 
 
 @pytest.fixture
 def annotated_units(units, annotated_channels):
-    return pd.merge(units, annotated_channels, left_on="ecephys_channel_id", right_index=True, suffixes=["_unit", "_channel"])
+    return pd.merge(units, annotated_channels, left_on="ecephys_channel_id",
+                    right_index=True, suffixes=["_unit", "_channel"])
 
 
 @pytest.fixture
@@ -121,7 +127,8 @@ class MockEngine:
 
 
 @pytest.fixture
-def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_metrics):
+def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes,
+             analysis_metrics):
     class MockApi:
 
         def __init__(self, **kwargs):
@@ -152,10 +159,11 @@ def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_
                 session_start_time=datetime.now()
             )
 
-            write_nwb.add_probe_to_nwbfile(nwbfile, 11, sampling_rate=1.0,
-                                           lfp_sampling_rate=2.0,
-                                           has_lfp_data=True,
-                                           name="Test Probe")
+            allensdk.brain_observatory.ecephys.nwb_util.add_probe_to_nwbfile(
+                nwbfile, 11, sampling_rate=1.0,
+                lfp_sampling_rate=2.0,
+                has_lfp_data=True,
+                name="Test Probe")
 
             with pynwb.NWBHDF5IO(path, "w") as io:
                 io.write(nwbfile)
@@ -195,7 +203,6 @@ def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_
 
 @pytest.fixture
 def tmpdir_cache(shared_tmpdir, mock_api):
-
     man_path = os.path.join(shared_tmpdir, 'manifest.json')
 
     return epc.EcephysProjectCache(
@@ -222,10 +229,12 @@ def test_get_sessions(tmpdir_cache, sessions):
 def test_get_units(tmpdir_cache, units, filter_by_validity):
     if filter_by_validity:
         units = units[units["quality"] == "good"].drop(columns="quality")
-        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units, filter_by_validity=filter_by_validity)
+        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units,
+                        filter_by_validity=filter_by_validity)
     else:
         units = units[units["amplitude_cutoff"] <= 0.1]
-        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units, filter_by_validity=filter_by_validity)
+        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units,
+                        filter_by_validity=filter_by_validity)
 
 
 def test_get_probes(tmpdir_cache, probes):
@@ -237,27 +246,31 @@ def test_get_channels(tmpdir_cache, channels):
 
 
 def test_get_annotated_probes(tmpdir_cache, probes, annotated_probes):
-    lazy_cache_test(tmpdir_cache, "_get_annotated_probes", "get_probes", annotated_probes)
+    lazy_cache_test(tmpdir_cache, "_get_annotated_probes", "get_probes",
+                    annotated_probes)
 
 
 def test_get_annotated_channels(tmpdir_cache, channels, annotated_channels):
-    lazy_cache_test(tmpdir_cache, "_get_annotated_channels", "get_channels", annotated_channels)
+    lazy_cache_test(tmpdir_cache, "_get_annotated_channels", "get_channels",
+                    annotated_channels)
 
 
 def test_get_annotated_units(tmpdir_cache, units, annotated_units):
-    annotated_units = annotated_units[annotated_units["amplitude_cutoff"] < 0.1]
+    annotated_units = annotated_units[
+        annotated_units["amplitude_cutoff"] < 0.1]
 
-    lazy_cache_test(tmpdir_cache, "_get_annotated_units", "get_units", annotated_units, filter_by_validity=False)
+    lazy_cache_test(tmpdir_cache, "_get_annotated_units", "get_units",
+                    annotated_units, filter_by_validity=False)
 
 
 def test_get_session_data(shared_tmpdir, tmpdir_cache):
-
     sid = 12345
 
     data_one = tmpdir_cache.get_session_data(sid)
 
     assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
-    assert os.path.join(shared_tmpdir, f"session_{sid}", f"session_{sid}.nwb") == data_one.api.path
+    assert os.path.join(shared_tmpdir, f"session_{sid}",
+                        f"session_{sid}.nwb") == data_one.api.path
 
 
 def test_get_natural_scene_template(shared_tmpdir, tmpdir_cache):
@@ -289,7 +302,8 @@ def test_get_unit_analysis_metrics_for_session(tmpdir_cache, analysis_metrics):
     )
 
 
-def test_get_unit_analysis_metrics_by_session_type(tmpdir_cache, analysis_metrics):
+def test_get_unit_analysis_metrics_by_session_type(tmpdir_cache,
+                                                   analysis_metrics):
     lazy_cache_test(
         tmpdir_cache,
         'get_unit_analysis_metrics_by_session_type',
@@ -310,7 +324,8 @@ def test_get_session_data_eventual_success(tmpdir_factory, mock_api):
         def get_session_data(self, session_id, **kwargs):
             if self.accesses["get_session_data"] < 1:
                 raise ValueError("bad news!")
-            return super(InitiallyFailingApi, self).get_session_data(session_id, **kwargs)
+            return super(InitiallyFailingApi, self).get_session_data(
+                session_id, **kwargs)
 
     api = InitiallyFailingApi()
     cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
@@ -348,7 +363,8 @@ def test_get_probe_lfp_data(tmpdir_factory, mock_api):
         def get_probe_lfp_data(self, probe_id, **kwargs):
             if self.accesses["get_probe_data"] < 1:
                 raise ValueError("bad news!")
-            return super(InitiallyFailingApi, self).get_probe_lfp_data(probe_id, **kwargs)
+            return super(InitiallyFailingApi, self).get_probe_lfp_data(
+                probe_id, **kwargs)
 
     api = InitiallyFailingApi()
     cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
@@ -424,14 +440,14 @@ def test_init_default(tmpdir_factory):
     ("cache_constructor, asynchronous, engine_attr, expected_engine,"
      "expected_scheme, expected_host, expected_stream_writer"), [
         (
-            epc.EcephysProjectCache.from_lims, True,
-            "app_engine", AsyncHttpEngine, "http", "lims2",
-            write_bytes_from_coroutine
+                epc.EcephysProjectCache.from_lims, True,
+                "app_engine", AsyncHttpEngine, "http", "lims2",
+                write_bytes_from_coroutine
         ),
         (
-            epc.EcephysProjectCache.from_lims, False,
-            "app_engine", HttpEngine, "http", "lims2",
-            write_from_stream
+                epc.EcephysProjectCache.from_lims, False,
+                "app_engine", HttpEngine, "http", "lims2",
+                write_from_stream
         )
     ])
 def test_stream_asynchronous_arg_from_lims(
@@ -457,14 +473,14 @@ def test_stream_asynchronous_arg_from_lims(
     ("cache_constructor, asynchronous, engine_attr, expected_engine,"
      "expected_scheme, expected_host, expected_stream_writer"), [
         (
-            epc.EcephysProjectCache.from_warehouse, True,
-            "rma_engine", AsyncHttpEngine, "http", "api.brain-map.org",
-            write_bytes_from_coroutine
+                epc.EcephysProjectCache.from_warehouse, True,
+                "rma_engine", AsyncHttpEngine, "http", "api.brain-map.org",
+                write_bytes_from_coroutine
         ),
         (
-            epc.EcephysProjectCache.from_warehouse, False,
-            "rma_engine", HttpEngine, "http", "api.brain-map.org",
-            write_from_stream
+                epc.EcephysProjectCache.from_warehouse, False,
+                "rma_engine", HttpEngine, "http", "api.brain-map.org",
+                write_from_stream
         )
     ])
 def test_stream_asynchronous_arg_from_warehouse(
@@ -495,6 +511,7 @@ def test_stream_writer_method_default_correct(tmpdir_factory):
     cache = epc.EcephysProjectCache(stream_writer=None, manifest=manifest)
     assert cache.stream_writer == cache.fetch_api.rma_engine.write_bytes
 
+
 def test_default_timeout_from_warehouse(tmpdir_factory):
     tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
     cache = epc.EcephysProjectCache.from_warehouse(
@@ -502,11 +519,12 @@ def test_default_timeout_from_warehouse(tmpdir_factory):
     )
     assert cache.fetch_api.rma_engine.timeout == HTTP_ENGINE_DEFAULT_TIMEOUT
 
+
 def test_user_provided_timeout_from_warehouse(tmpdir_factory):
     user_provided_timeout = 3
     tmpdir = str(tmpdir_factory.mktemp("test_from_warehouse_default"))
     cache = epc.EcephysProjectCache.from_warehouse(
         manifest=os.path.join(tmpdir, "manifest.json"),
-        timeout = user_provided_timeout
+        timeout=user_provided_timeout
     )
     assert cache.fetch_api.rma_engine.timeout == user_provided_timeout
