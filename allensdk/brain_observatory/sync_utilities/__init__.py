@@ -1,13 +1,25 @@
 from pathlib import Path
-from typing import Tuple
-
+from typing import Tuple, Optional, List
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.sync_dataset import Dataset
 
 
-def trim_discontiguous_times(times, threshold=100):
+def trim_discontiguous_times(times: np.ndarray, threshold=100) -> np.ndarray:
+    """
+    If the time sequence is discontigous,
+    detect the first instance occurance and trim off the tail of the sequence
+
+    Parameters
+    ----------
+    times : frame times
+
+    Returns
+    -------
+    trimmed frame times
+    """
+
     times = np.array(times)
     intervals = np.diff(times)
 
@@ -28,8 +40,16 @@ def trim_discontiguous_times(times, threshold=100):
 
 def get_synchronized_frame_times(session_sync_file: Path,
                                  sync_line_label_keys: Tuple[str, ...],
-                                 trim_after_spike: bool = True) -> pd.Series:
+                                 drop_frames: Optional[List[int]] = None,
+                                 trim_after_spike: bool = True,
+                                 ) -> pd.Series:
     """Get experimental frame times from an experiment session sync file.
+
+    1. Get rising edges from the sync dataset
+    2. Occasionally an extra set of frame times are acquired after the rest of
+        the signals. These are manifested by a discontiguous time sequence.
+        We detect and remove these.
+    3. Remove dropped frames
 
     Parameters
     ----------
@@ -42,6 +62,8 @@ def get_synchronized_frame_times(session_sync_file: Path,
         Line label keys to get times for. See class attributes of
         allensdk.brain_observatory.sync_dataset.Dataset for a listing of
         possible keys.
+    drop_frames : List
+        frame indices to be removed from frame times
     trim_after_spike : bool = True
         If True, will call trim_discontiguous_times on the frame times
         before returning them, which will detect any spikes in the data
@@ -50,16 +72,16 @@ def get_synchronized_frame_times(session_sync_file: Path,
     Returns
     -------
     pd.Series
-        An array of times when frames for the eye tracking camera were acquired.
+        An array of times when eye tracking frames were acquired.
     """
     sync_dataset = Dataset(str(session_sync_file))
 
-    frame_times = sync_dataset.get_edges(
+    times = sync_dataset.get_edges(
         "rising", sync_line_label_keys, units="seconds"
     )
 
-    # Occasionally an extra set of frame times are acquired after the rest of
-    # the signals. We detect and remove these.
-    frame_times = trim_discontiguous_times(frame_times) if trim_after_spike else frame_times
+    times = trim_discontiguous_times(times) if trim_after_spike else times
+    if drop_frames:
+        times = [t for ix, t in enumerate(times) if ix not in drop_frames]
 
-    return pd.Series(frame_times)
+    return pd.Series(times)
