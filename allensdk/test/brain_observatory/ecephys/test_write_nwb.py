@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import logging
 import platform
+from unittest.mock import patch
 
 import pytest
 import pynwb
@@ -12,6 +13,12 @@ import xarray as xr
 
 from pynwb import NWBFile, NWBHDF5IO
 
+from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.ecephys._unit import Unit, \
+    _get_filtered_and_sorted_spikes
+from allensdk.brain_observatory.ecephys._units import Units
+import allensdk.brain_observatory.ecephys.nwb_util
+import allensdk.brain_observatory.ecephys.utils
 from allensdk.brain_observatory.ecephys.current_source_density.__main__ \
     import write_csd_to_h5
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
@@ -90,24 +97,24 @@ def test_roundtrip_basic_metadata(roundtripper):
 
 @pytest.mark.parametrize("metadata, expected_metadata", [
     ({
-        "specimen_name": "mouse_1",
-        "age_in_days": 100.0,
-        "full_genotype": "wt",
-        "strain": "c57",
-        "sex": "F",
-        "stimulus_name": "brain_observatory_2.0",
-        "donor_id": 12345,
-        "species": "Mus musculus"},
+         "specimen_name": "mouse_1",
+         "age_in_days": 100.0,
+         "full_genotype": "wt",
+         "strain": "c57",
+         "sex": "F",
+         "stimulus_name": "brain_observatory_2.0",
+         "donor_id": 12345,
+         "species": "Mus musculus"},
      {
-        "specimen_name": "mouse_1",
-        "age_in_days": 100.0,
-        "age": "P100D",
-        "full_genotype": "wt",
-        "strain": "c57",
-        "sex": "F",
-        "stimulus_name": "brain_observatory_2.0",
-        "subject_id": "12345",
-        "species": "Mus musculus"})
+         "specimen_name": "mouse_1",
+         "age_in_days": 100.0,
+         "age": "P100D",
+         "full_genotype": "wt",
+         "strain": "c57",
+         "sex": "F",
+         "stimulus_name": "brain_observatory_2.0",
+         "subject_id": "12345",
+         "species": "Mus musculus"})
 ])
 def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
     nwbfile = write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
@@ -213,7 +220,6 @@ def test_add_optotagging_table_to_nwbfile(
         roundtripper,
         opto_table,
         expected):
-
     opto_table["duration"] = opto_table["stop_time"] - opto_table["start_time"]
 
     opto_table = OptotaggingTable(table=opto_table)
@@ -255,12 +261,12 @@ def test_add_probe_to_nwbfile(
         lfp_srate,
         has_lfp,
         expected):
-
-    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid,
-                                                   name=name,
-                                                   sampling_rate=srate,
-                                                   lfp_sampling_rate=lfp_srate,
-                                                   has_lfp_data=has_lfp)
+    nwbfile, _, _ = allensdk.brain_observatory.ecephys.nwb_util \
+        .add_probe_to_nwbfile(nwbfile, pid,
+                              name=name,
+                              sampling_rate=srate,
+                              lfp_sampling_rate=lfp_srate,
+                              has_lfp_data=has_lfp)
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
@@ -284,69 +290,73 @@ def test_add_probe_to_nwbfile(
 ])
 def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                                        expected_columns):
-
-    write_nwb.add_ecephys_electrode_columns(nwbfile, columns_to_add)
+    allensdk.brain_observatory.ecephys.nwb_util._add_ecephys_electrode_columns(
+        nwbfile, columns_to_add)
 
     assert set(nwbfile.electrodes.colnames) == expected_columns
 
 
 @pytest.mark.parametrize(("channels, local_index_whitelist, "
                           "expected_electrode_table"), [
-    ([{"id": 1,
-       "probe_id": 1234,
-       "valid_data": True,
-       "local_index": 23,
-       "probe_vertical_position": 10,
-       "probe_horizontal_position": 10,
-       "anterior_posterior_ccf_coordinate": 15.0,
-       "dorsal_ventral_ccf_coordinate": 20.0,
-       "left_right_ccf_coordinate": 25.0,
-       "manual_structure_acronym": "CA1",
-       "impedence": np.nan,
-       "filtering": "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"},
-      {"id": 2,
-       "probe_id": 1234,
-       "valid_data": True,
-       "local_index": 15,
-       "probe_vertical_position": 20,
-       "probe_horizontal_position": 20,
-       "anterior_posterior_ccf_coordinate": 25.0,
-       "dorsal_ventral_ccf_coordinate": 30.0,
-       "left_right_ccf_coordinate": 35.0,
-       "manual_structure_acronym": "CA3",
-       "impedence": 42.0,
-       "filtering": "custom"}],
+                             ([{"id": 1,
+                                "probe_id": 1234,
+                                "valid_data": True,
+                                "local_index": 23,
+                                "probe_vertical_position": 10,
+                                "probe_horizontal_position": 10,
+                                "anterior_posterior_ccf_coordinate": 15.0,
+                                "dorsal_ventral_ccf_coordinate": 20.0,
+                                "left_right_ccf_coordinate": 25.0,
+                                "manual_structure_acronym": "CA1",
+                                "impedence": np.nan,
+                                "filtering": "AP band: 500 Hz high-pass; LFP "
+                                             "band: 1000 Hz low-pass"},
+                               {"id": 2,
+                                "probe_id": 1234,
+                                "valid_data": True,
+                                "local_index": 15,
+                                "probe_vertical_position": 20,
+                                "probe_horizontal_position": 20,
+                                "anterior_posterior_ccf_coordinate": 25.0,
+                                "dorsal_ventral_ccf_coordinate": 30.0,
+                                "left_right_ccf_coordinate": 35.0,
+                                "manual_structure_acronym": "CA3",
+                                "impedence": 42.0,
+                                "filtering": "custom"}],
 
-     [15, 23],
+                              [15, 23],
 
-     pd.DataFrame({
-         "id": [2, 1],
-         "probe_id": [1234, 1234],
-         "valid_data": [True, True],
-         "local_index": [15, 23],
-         "probe_vertical_position": [20, 10],
-         "probe_horizontal_position": [20, 10],
-         "x": [25.0, 15.0],
-         "y": [30.0, 20.0],
-         "z": [35.0, 25.0],
-         "location": ["CA3", "CA1"],
-         "imp": [42.0, np.nan],
-         "filtering": ["custom",
-                       "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"]
-     }).set_index("id"))
+                              pd.DataFrame({
+                                  "id": [2, 1],
+                                  "probe_id": [1234, 1234],
+                                  "valid_data": [True, True],
+                                  "local_index": [15, 23],
+                                  "probe_vertical_position": [20, 10],
+                                  "probe_horizontal_position": [20, 10],
+                                  "x": [25.0, 15.0],
+                                  "y": [30.0, 20.0],
+                                  "z": [35.0, 25.0],
+                                  "location": ["CA3", "CA1"],
+                                  "imp": [42.0, np.nan],
+                                  "filtering": ["custom",
+                                                "AP band: 500 Hz high-pass; "
+                                                "LFP band: 1000 Hz low-pass"]
+                              }).set_index("id"))
 
-])
+                         ])
 def test_add_ecephys_electrodes(nwbfile, channels, local_index_whitelist,
                                 expected_electrode_table):
-
     mock_device = pynwb.device.Device(name="mock_device")
     mock_electrode_group = pynwb.ecephys.ElectrodeGroup(name="mock_group",
                                                         description="",
                                                         location="",
                                                         device=mock_device)
 
-    write_nwb.add_ecephys_electrodes(nwbfile, channels, mock_electrode_group,
-                                     local_index_whitelist)
+    allensdk.brain_observatory.ecephys.nwb_util.add_ecephys_electrodes(
+        nwbfile,
+        channels,
+        mock_electrode_group,
+        local_index_whitelist)
 
     obt_electrode_table = \
         nwbfile.electrodes.to_dataframe().drop(columns=["group", "group_name"])
@@ -360,19 +370,18 @@ def test_add_ecephys_electrodes(nwbfile, channels, local_index_whitelist,
     [{"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], [3, 6], [1, 2, 3, 4, 5, 6]]
 ])
 def test_dict_to_indexed_array(dc, order, exp_idx, exp_data):
-
-    obt_idx, obt_data = write_nwb.dict_to_indexed_array(dc, order)
+    obt_idx, obt_data = dict_to_indexed_array(dc, order)
     assert np.allclose(exp_idx, obt_idx)
     assert np.allclose(exp_data, obt_data)
 
 
 def test_add_ragged_data_to_dynamic_table(units_table, spike_times):
-
-    write_nwb.add_ragged_data_to_dynamic_table(
-        table=units_table,
-        data=spike_times,
-        column_name="spike_times"
-    )
+    allensdk.brain_observatory.ecephys.nwb_util \
+        .add_ragged_data_to_dynamic_table(
+            table=units_table,
+            data=spike_times,
+            column_name="spike_times"
+        )
 
     assert np.allclose([1, 2, 3, 4, 5, 6], units_table["spike_times"][0])
     assert np.allclose([], units_table["spike_times"][1])
@@ -389,7 +398,6 @@ def test_add_running_speed_to_nwbfile(
         roundtripper,
         roundtrip,
         include_rotation):
-
     nwbfile = write_nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
     if roundtrip:
         api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
@@ -410,10 +418,9 @@ def test_add_raw_running_data_to_nwbfile(
         raw_running_data,
         roundtripper,
         roundtrip):
-
     nwbfile = write_nwb.add_raw_running_data_to_nwbfile(
-                nwbfile,
-                raw_running_data)
+        nwbfile,
+        raw_running_data)
     if roundtrip:
         api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
@@ -485,7 +492,7 @@ def test_add_raw_running_data_to_nwbfile(
                                          'gabors'],
                        'start_time': [1., 2., 4., 5., 6.],
                        'stop_time': [2., 4., 5., 6., 8.]})),
-                        ])
+    ])
 def test_read_stimulus_table(tmpdir_factory, presentations,
                              column_renames_map, columns_to_drop, expected):
     dirname = str(tmpdir_factory.mktemp("ecephys_nwb_test"))
@@ -512,7 +519,8 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
 
     local_to_global_unit_map = {ii: -ii for ii in spike_units}
 
-    obtained = write_nwb.read_spike_times_to_dictionary(
+    obtained = allensdk.brain_observatory.ecephys._units \
+        ._read_spike_times_to_dictionary(
             spike_times_path,
             spike_units_path,
             local_to_global_unit_map)
@@ -535,9 +543,10 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
     mean_waveforms = np.random.rand(nunits, nsamples, nchannels)
     np.save(waveforms_path, mean_waveforms, allow_pickle=False)
 
-    obtained = write_nwb.read_waveforms_to_dictionary(
-        waveforms_path,
-        local_to_global_unit_map)
+    obtained = allensdk.brain_observatory.ecephys._units \
+        ._read_waveforms_to_dictionary(
+            waveforms_path,
+            local_to_global_unit_map)
     for ii in range(nunits):
         assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
 
@@ -636,7 +645,6 @@ def csd_data():
 
 
 def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
-
     tmpdir = Path(tmpdir_factory.mktemp("probe_lfp_nwb"))
     input_data_path = tmpdir / Path("lfp_data.dat")
     input_timestamps_path = tmpdir / Path("lfp_timestamps.npy")
@@ -678,10 +686,10 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         input_data_file.write(lfp_data["data"].tobytes())
 
     write_nwb.write_probe_lfp_file(
-            4242,
-            test_session_metadata,
-            datetime.now(),
-            logging.INFO, probe_data)
+        4242,
+        test_session_metadata,
+        datetime.now(),
+        logging.INFO, probe_data)
 
     exp_electrodes = \
         pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
@@ -704,11 +712,11 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         obt_electrodes_df = obt_f.electrodes.to_dataframe()
 
         obt_electrodes = obt_electrodes_df.loc[
-            :, ["local_index", "probe_horizontal_position",
-                "probe_id", "probe_vertical_position",
-                "valid_data", "x", "y", "z", "location", "imp",
-                "filtering"]
-        ]
+                         :, ["local_index", "probe_horizontal_position",
+                             "probe_id", "probe_vertical_position",
+                             "valid_data", "x", "y", "z", "location", "imp",
+                             "filtering"]
+                         ]
 
         assert obt_f.session_id == "4242"
         assert obt_f.subject.subject_id == "42"
@@ -751,7 +759,6 @@ def test_write_probe_lfp_file_roundtrip(
         lfp_data,
         probe_data,
         csd_data):
-
     expected_csd = xr.DataArray(
         name="CSD",
         data=csd_data["csd"],
@@ -762,11 +769,11 @@ def test_write_probe_lfp_file_roundtrip(
             "vertical_position": (
                 ("virtual_channel_index",),
                 csd_data["csd_locations"][:, 1]
-                ),
+            ),
             "horizontal_position": (
                 ("virtual_channel_index",),
                 csd_data["csd_locations"][:, 0]
-                ),
+            ),
         }
     )
 
@@ -825,7 +832,6 @@ def test_write_probe_lfp_file_roundtrip(
 
 @pytest.fixture
 def invalid_epochs():
-
     epochs = [
         {
             "type": "EcephysSession",
@@ -854,7 +860,6 @@ def invalid_epochs():
 
 
 def test_add_invalid_times(invalid_epochs, tmpdir_factory):
-
     nwbfile_name = \
         str(tmpdir_factory.mktemp("test").join("test_invalid_times.nwb"))
 
@@ -880,7 +885,6 @@ def test_add_invalid_times(invalid_epochs, tmpdir_factory):
 
 
 def test_roundtrip_add_invalid_times(nwbfile, invalid_epochs, roundtripper):
-
     expected = setup_table_for_invalid_times(invalid_epochs)
 
     nwbfile = write_nwb.add_invalid_times(nwbfile, invalid_epochs)
@@ -891,13 +895,11 @@ def test_roundtrip_add_invalid_times(nwbfile, invalid_epochs, roundtripper):
 
 
 def test_no_invalid_times_table():
-
     epochs = []
     assert setup_table_for_invalid_times(epochs).empty is True
 
 
 def test_setup_table_for_invalid_times():
-
     epoch = {
         "type": "EcephysSession",
         "id": 739448407,
@@ -951,15 +953,14 @@ def test_scale_amplitudes(
         templates,
         spike_templates,
         expected_amplitudes):
-
     scale_factor = 0.195
 
     expected = expected_amplitudes * scale_factor
-    obtained = write_nwb.scale_amplitudes(
-                    spike_amplitudes,
-                    templates,
-                    spike_templates,
-                    scale_factor)
+    obtained = allensdk.brain_observatory.ecephys.utils.scale_amplitudes(
+        spike_amplitudes,
+        templates,
+        spike_templates,
+        scale_factor)
 
     assert np.allclose(expected, obtained)
 
@@ -997,13 +998,15 @@ def test_read_spike_amplitudes_to_dictionary(
             inverse_whitening_matrix,
             allow_pickle=False)
 
-    obtained = write_nwb.read_spike_amplitudes_to_dictionary(
-        spike_amplitudes_path,
-        spike_units_path,
-        templates_path,
-        spike_templates_path,
-        inverse_whitening_matrix_path
-    )
+    obtained = allensdk.brain_observatory.ecephys._units \
+        ._read_spike_amplitudes_to_dictionary(
+            spike_amplitudes_path,
+            spike_units_path,
+            templates_path,
+            spike_templates_path,
+            inverse_whitening_matrix_path,
+            scale_factor=1.0
+        )
 
     assert np.allclose(expected_amplitudes[:3], obtained[0])
     assert np.allclose(expected_amplitudes[3:], obtained[1])
@@ -1034,23 +1037,25 @@ def test_filter_and_sort_spikes(
         spike_times_mapping,
         spike_amplitudes_mapping,
         expected):
-    expected_spike_times, expected_spike_amplitudes = expected
+    for unit in spike_times_mapping:
+        expected_spike_times, expected_spike_amplitudes = expected
 
-    obtained_spike_times, obtained_spike_amplitudes = \
-        write_nwb.filter_and_sort_spikes(spike_times_mapping,
-                                         spike_amplitudes_mapping)
+        obtained_spike_times, obtained_spike_amplitudes = \
+            _get_filtered_and_sorted_spikes(
+                spike_times_mapping[unit], spike_amplitudes_mapping[unit])
 
-    np.testing.assert_equal(obtained_spike_times, expected_spike_times)
-    np.testing.assert_equal(obtained_spike_amplitudes,
-                            expected_spike_amplitudes)
+        np.testing.assert_equal(obtained_spike_times,
+                                expected_spike_times[unit])
+        np.testing.assert_equal(obtained_spike_amplitudes,
+                                expected_spike_amplitudes[unit])
 
 
 @pytest.mark.parametrize("roundtrip", [True, False])
-@pytest.mark.parametrize("probes, parsed_probe_data, expected_units_table", [
+@pytest.mark.parametrize("probes, parsed_probe_data", [
     ([{"id": 1234,
        "name": "probeA",
        "sampling_rate": 29999.9655245905,
-       "lfp_sampling_rate": 2499.99712704921,
+       "lfp_sampling_rate": np.nan,
        "temporal_subsampling_factor": 2.0,
        "lfp": {},
        "spike_times_path": "/dummy_path",
@@ -1100,26 +1105,31 @@ def test_filter_and_sort_spikes(
       {777: np.array([0., 1., 2., 3., 4., 5.]),  # spike_amplitudes
        778: np.array([0., 1., 2., 3., 4.])},
       {777: np.array([1., 2., 3., 4., 5., 6.]),  # mean_waveforms
-       778: np.array([1., 2., 3., 4., 5.])}),
-
-     pd.DataFrame({"id": [777, 778], "local_index": [7, 9],  # units_table
-                   "a": [0.5, 1.0], "b": [5, 10],
-                   "spike_times": [[0., 1., 2., 4., 5.], [3., 4., 5., 6.]],
-                   "spike_amplitudes": [[0., 1., 2., 5., 4.],
-                                        [2., 1., 0., 4.]],
-                   "waveform_mean": [[1., 2., 3., 4., 5., 6.],
-                                     [1., 2., 3., 4., 5.]]}
-                  ).set_index(keys="id", drop=True)),
+       778: np.array([1., 2., 3., 4., 5.])}))
 ])
 def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
-                                       roundtrip, probes, parsed_probe_data,
-                                       expected_units_table):
+                                       roundtrip, probes, parsed_probe_data):
+    expected_units_table = pd.read_pickle(
+        Path(__file__).absolute().parent / 'resources' /
+        'expected_units_table.pkl')
 
-    def mock_parse_probes_data(probes):
-        return parsed_probe_data
+    units = Units([Unit(
+        amplitude_cutoff=1.0,
+        cluster_id=1,
+        firing_rate=1.0,
+        id=unit['id'],
+        isi_violations=1.0,
+        local_index=unit['local_index'],
+        peak_channel_id=1,
+        presence_ratio=1.0,
+        quality=unit['quality'],
+        spike_times=parsed_probe_data[1][unit['id']],
+        spike_amplitudes=parsed_probe_data[2][unit['id']],
+        mean_waveforms=parsed_probe_data[3][unit['id']]
+    ) for unit in probes[0]['units']])
 
-    monkeypatch.setattr(write_nwb, "parse_probes_data", mock_parse_probes_data)
-    nwbfile = write_nwb.add_probewise_data_to_nwbfile(nwbfile, probes)
+    with patch.object(Units, 'from_json', return_value=units):
+        nwbfile = write_nwb.add_probewise_data_to_nwbfile(nwbfile, probes)
 
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
@@ -1153,7 +1163,6 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                                                        roundtrip,
                                                        eye_tracking_rig_geom,
                                                        expected):
-
     nwbfile = \
         write_nwb.add_eye_tracking_rig_geometry_data_to_nwbfile(
             nwbfile,
@@ -1277,7 +1286,7 @@ def test_add_eye_tracking_data_to_nwbfile(nwbfile,
     obtained_pupil_data = obt.get_pupil_data()
     obtained_screen_gaze_data = obt.get_screen_gaze_data(
         include_filtered_data=True
-        )
+    )
 
     pd.testing.assert_frame_equal(obtained_pupil_data,
                                   expected_pupil_data, check_like=True)

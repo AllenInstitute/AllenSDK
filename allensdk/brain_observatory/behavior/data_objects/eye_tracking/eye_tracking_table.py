@@ -1,8 +1,7 @@
 import logging
 import warnings
 from pathlib import Path
-from typing import Optional
-
+from typing import Optional, List
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
@@ -195,13 +194,19 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
     @classmethod
     def from_data_file(cls, data_file: EyeTrackingFile,
                        sync_file: SyncFile,
-                       z_threshold: float = 3.0, dilation_frames: int = 2
+                       drop_frames: Optional[List[int]] = None,
+                       z_threshold: float = 3.0,
+                       dilation_frames: int = 2,
                        ) -> "EyeTrackingTable":
         """
         Parameters
         ----------
         data_file
         sync_file
+        drop_frames : List[int], optional
+            List of frame indices to be dropped from the table.
+            If provided, will drop the corresponding frame frame times read
+            from the sync file to syncronize frame times and frames.
         z_threshold : float, optional
             See EyeTracking.from_lims
         dilation_frames : int, optional
@@ -216,6 +221,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         frame_times = sync_utilities.get_synchronized_frame_times(
             session_sync_file=sync_path,
             sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
+            drop_frames=drop_frames,
             trim_after_spike=False)
 
         try:
