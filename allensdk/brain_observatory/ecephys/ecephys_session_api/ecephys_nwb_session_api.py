@@ -14,6 +14,7 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.brain_observatory.nwb import check_nwbfile_version
+from ..optotagging import OptotaggingTable
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
@@ -363,10 +364,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return csd
 
     def get_optogenetic_stimulation(self) -> pd.DataFrame:
-        mod = self.nwbfile.get_processing_module("optotagging")
-        table = mod.get_data_interface("optogenetic_stimulation").to_dataframe()
-        table.drop(columns=["tags", "timeseries"], inplace=True)
-        return table
+        table = OptotaggingTable.from_nwb(nwbfile=self.nwbfile)
+        return table.value
 
     def _get_full_units_table(self) -> pd.DataFrame:
         units = self.nwbfile.units.to_dataframe()
