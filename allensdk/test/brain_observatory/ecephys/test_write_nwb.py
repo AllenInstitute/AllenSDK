@@ -24,6 +24,7 @@ from allensdk.brain_observatory.ecephys.current_source_density.__main__ \
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_session_api \
     import EcephysNwbSessionApi
+from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing \
     import create_preload_eye_tracking_df
 from allensdk.brain_observatory.nwb import setup_table_for_invalid_times
@@ -221,13 +222,14 @@ def test_add_optotagging_table_to_nwbfile(
         expected):
     opto_table["duration"] = opto_table["stop_time"] - opto_table["start_time"]
 
-    nwbfile = write_nwb.add_optotagging_table_to_nwbfile(nwbfile, opto_table)
+    opto_table = OptotaggingTable(table=opto_table)
+    nwbfile = opto_table.to_nwb(nwbfile=nwbfile)
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
 
     obtained = api.get_optogenetic_stimulation()
 
     if expected is None:
-        expected = opto_table
+        expected = opto_table.value
 
     pd.testing.assert_frame_equal(obtained, expected, check_like=True)
 

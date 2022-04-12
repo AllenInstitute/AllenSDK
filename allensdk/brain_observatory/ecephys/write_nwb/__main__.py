@@ -14,6 +14,7 @@ from hdmf.backends.hdf5.h5_utils import H5DataIO
 
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
+from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
 from allensdk.config.manifest import Manifest
 
@@ -22,7 +23,6 @@ from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
     add_invalid_times,
-    setup_table_for_epochs,
     read_eye_dlc_tracking_ellipses,
     read_eye_gaze_mappings,
     add_eye_tracking_ellipse_fit_data_to_nwbfile,
@@ -451,38 +451,6 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     return nwbfile
 
 
-def add_optotagging_table_to_nwbfile(nwbfile,
-                                     optotagging_table,
-                                     tag="optical_stimulation"):
-    # "name" is a pynwb reserved column name that older versions of the
-    # pre-processed optotagging_table may use.
-    if "name" in optotagging_table.columns:
-        optotagging_table = \
-            optotagging_table.rename(columns={"name": "stimulus_name"})
-
-    opto_ts = pynwb.base.TimeSeries(
-        name="optotagging",
-        timestamps=optotagging_table["start_time"].values,
-        data=optotagging_table["duration"].values,
-        unit="seconds"
-    )
-
-    opto_mod = pynwb.ProcessingModule("optotagging",
-                                      "optogenetic stimulution data")
-    opto_mod.add_data_interface(opto_ts)
-    nwbfile.add_processing_module(opto_mod)
-
-    optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
-
-    if len(optotagging_table) > 0:
-        container = \
-            pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table,
-                                                     "optogenetic_stimulation")
-        opto_mod.add_data_interface(container)
-
-    return nwbfile
-
-
 def add_eye_tracking_rig_geometry_data_to_nwbfile(
         nwbfile: pynwb.NWBFile,
         eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
@@ -583,8 +551,9 @@ def write_ecephys_nwb(
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
 
     if optotagging_table_path is not None:
-        optotagging_table = pd.read_csv(optotagging_table_path)
-        nwbfile = add_optotagging_table_to_nwbfile(nwbfile, optotagging_table)
+        optotagging_table = OptotaggingTable.from_json(
+            dict_repr={'optotagging_table_path': optotagging_table_path})
+        nwbfile = optotagging_table.to_nwb(nwbfile=nwbfile)
 
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 

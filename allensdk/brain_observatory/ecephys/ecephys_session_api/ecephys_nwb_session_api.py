@@ -15,6 +15,7 @@ import \
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.brain_observatory.nwb import check_nwbfile_version
 from .._channels import Channels
+from ..optotagging import OptotaggingTable
 from ..probes import Probes
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
@@ -371,11 +372,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return csd
 
     def get_optogenetic_stimulation(self) -> pd.DataFrame:
-        mod = self.nwbfile.get_processing_module("optotagging")
-        table = mod.get_data_interface(
-            "optogenetic_stimulation").to_dataframe()
-        table.drop(columns=["tags", "timeseries"], inplace=True)
-        return table
+        table = OptotaggingTable.from_nwb(nwbfile=self.nwbfile)
+        return table.value
 
     def get_metadata(self):
         nwb_subject = self.nwbfile.subject
