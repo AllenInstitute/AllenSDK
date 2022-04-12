@@ -11,19 +11,28 @@ class OptotaggingTable(DataObject, JsonReadableInterface,
                        NwbWritableInterface, NwbReadableInterface):
     """Optotagging table - optotagging stimulation"""
     def __init__(self, table: pd.DataFrame):
+        # "name" is a pynwb reserved column name that older versions of the
+        # pre-processed optotagging_table may use.
+        table = \
+            table.rename(columns={"name": "stimulus_name"})
+
+        super().__init__(name='optotaggging_table', value=table)
+
+    @property
+    def value(self) -> pd.DataFrame:
         """
 
-        Parameters
-        ----------
-        table: A dataframe with columns:
+        Returns
+        -------
+        A dataframe with columns:
             - start_time: onset of stimulation
             - condition: optical stimulation pattern
             - level: intensity (in volts output to the LED) of stimulation
             - stop_time: stop time of stimulation
-            - stimulus_name
+            - stimulus_name: stimulus name
             - duration: duration of stimulation
         """
-        super().__init__(name='optotaggging_table', value=table)
+        return self._value
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "OptotaggingTable":
@@ -40,11 +49,6 @@ class OptotaggingTable(DataObject, JsonReadableInterface,
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         optotagging_table = self.value
-
-        # "name" is a pynwb reserved column name that older versions of the
-        # pre-processed optotagging_table may use.
-        optotagging_table = \
-            optotagging_table.rename(columns={"name": "stimulus_name"})
 
         opto_ts = pynwb.base.TimeSeries(
             name="optotagging",
