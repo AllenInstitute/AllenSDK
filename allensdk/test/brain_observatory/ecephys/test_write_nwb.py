@@ -14,6 +14,9 @@ import xarray as xr
 from pynwb import NWBFile, NWBHDF5IO
 
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
+    import \
+    Presentations
 from allensdk.brain_observatory.ecephys._unit import Unit, \
     _get_filtered_and_sorted_spikes
 from allensdk.brain_observatory.ecephys._units import Units
@@ -154,13 +157,14 @@ def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
 ])
 def test_add_stimulus_presentations(nwbfile, presentations, roundtripper):
     write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
-    write_nwb.add_stimulus_presentations(nwbfile, presentations)
+    presentations = Presentations(presentations=presentations)
+    presentations.to_nwb(nwbfile=nwbfile, stimulus_name_column='stimulus_name')
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
 
     pd.testing.assert_frame_equal(
-        presentations,
+        presentations.value,
         obtained_stimulus_table,
         check_dtype=False)
 
@@ -170,7 +174,8 @@ def test_add_stimulus_presentations_color(
         stimulus_presentations_color,
         roundtripper):
     write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
-    write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_color)
+    presentations = Presentations(presentations=stimulus_presentations_color)
+    presentations.to_nwb(nwbfile=nwbfile, stimulus_name_column='stimulus_name')
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
@@ -495,15 +500,23 @@ def test_add_raw_running_data_to_nwbfile(
     ])
 def test_read_stimulus_table(tmpdir_factory, presentations,
                              column_renames_map, columns_to_drop, expected):
+    expected = expected.set_index(
+        pd.Int64Index(range(expected.shape[0]),
+                      name='stimulus_presentations_id'))
     dirname = str(tmpdir_factory.mktemp("ecephys_nwb_test"))
     stim_table_path = os.path.join(dirname, "stim_table.csv")
 
     presentations.to_csv(stim_table_path, index=False)
-    obt = write_nwb.read_stimulus_table(stim_table_path,
-                                        column_renames_map=column_renames_map,
-                                        columns_to_drop=columns_to_drop)
+    if column_renames_map is None:
+        column_renames_map = write_nwb.STIM_TABLE_RENAMES_MAP
+    obt = Presentations.from_path(
+        path=stim_table_path,
+        exclude_columns=columns_to_drop,
+        columns_to_rename=column_renames_map,
+        sort_columns=False
+    )
 
-    pd.testing.assert_frame_equal(obt, expected)
+    pd.testing.assert_frame_equal(obt.value, expected)
 
 
 def test_read_spike_times_to_dictionary(tmpdir_factory):

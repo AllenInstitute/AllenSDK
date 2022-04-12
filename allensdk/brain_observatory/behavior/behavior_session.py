@@ -889,7 +889,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimulus_timestamps=stimulus_timestamps)
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
+            stimulus_timestamps=stimulus_timestamps,
+            presentation_columns=[
+                'start_time', 'stop_time',
+                'duration',
+                'image_name', 'image_index',
+                'is_change', 'omitted',
+                'start_frame', 'end_frame',
+                'image_set']
+        )
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
         trials = TrialTable.from_stimulus_file(

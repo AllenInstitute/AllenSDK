@@ -20,7 +20,6 @@ from pynwb.ophys import (
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import StimulusTemplate
 from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import StimulusTemplateExtension  # noqa: E501
-from allensdk.brain_observatory.nwb.nwb_utils import (get_column_name)
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -503,70 +502,6 @@ def create_stimulus_presentation_time_interval(
             interval.add_column(name=column_name, description=description)
 
     return interval
-
-
-def add_stimulus_presentations(nwbfile, stimulus_table,
-                               tag='stimulus_time_interval'):
-    """Adds a stimulus table (defining stimulus characteristics for each
-    time point in a session) to an nwbfile as TimeIntervals.
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-    stimulus_table: pd.DataFrame
-        Each row corresponds to an interval of time. Columns define the
-        interval (start and stop time) and its characteristics.
-        Nans in columns with string data will be replaced with the empty
-        strings.
-        Required columns are:
-            start_time :: the time at which this interval started
-            stop_time :: the time  at which this interval ended
-    tag : str, optional
-        Each interval in an nwb file has one or more tags. This string will be
-        applied as a tag to all TimeIntervals created here
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    """
-    stimulus_table = stimulus_table.copy()
-    ts = nwbfile.processing['stimulus'].get_data_interface('timestamps')
-    possible_names = {'stimulus_name', 'image_name'}
-    stimulus_name_column = get_column_name(stimulus_table.columns,
-                                           possible_names)
-    stimulus_names = stimulus_table[stimulus_name_column].unique()
-
-    for stim_name in sorted(stimulus_names):
-        specific_stimulus_table = stimulus_table[stimulus_table[stimulus_name_column] == stim_name]  # noqa: E501
-        # Drop columns where all values in column are NaN
-        cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
-        # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
-        for colname, series in cleaned_table.items():
-            types = set(series.map(type))
-            if len(types) > 1 and str in types:
-                series.fillna('N/A', inplace=True)
-                cleaned_table[colname] = series.transform(str)
-
-        interval_description = (f"Presentation times and stimuli details "
-                                f"for '{stim_name}' stimuli. "
-                                f"\n"
-                                f"Note: image_name references "
-                                f"control_description in stimulus/templates")
-        presentation_interval = create_stimulus_presentation_time_interval(
-            name=f"{stim_name}_presentations",
-            description=interval_description,
-            columns_to_add=cleaned_table.columns
-        )
-
-        for row in cleaned_table.itertuples(index=False):
-            row = row._asdict()
-
-            presentation_interval.add_interval(**row, tags=tag, timeseries=ts)
-
-        nwbfile.add_time_intervals(presentation_interval)
-
-    return nwbfile
 
 
 def add_invalid_times(nwbfile, epochs):
