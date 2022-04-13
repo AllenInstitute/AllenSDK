@@ -17,6 +17,7 @@ from allensdk.brain_observatory.nwb import check_nwbfile_version
 from .._channels import Channels
 from ..optotagging import OptotaggingTable
 from ..probes import Probes
+from ...behavior.data_objects.stimuli.presentations import Presentations
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
@@ -78,7 +79,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return self.nwbfile.session_start_time
 
     def get_stimulus_presentations(self):
-        table = super(EcephysNwbSessionApi, self).get_stimulus_presentations()
+        table = Presentations.from_nwb(nwbfile=self.nwbfile,
+                                       add_is_change=False)
+        table = table.value
 
         if "color" in table.columns:
             # the color column actually contains two parameters. One is

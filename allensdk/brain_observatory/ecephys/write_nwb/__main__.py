@@ -12,6 +12,9 @@ import pandas as pd
 import numpy as np
 from hdmf.backends.hdf5.h5_utils import H5DataIO
 
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
+    import \
+    Presentations
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
@@ -20,7 +23,6 @@ from allensdk.config.manifest import Manifest
 
 from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
-    add_stimulus_presentations,
     add_stimulus_timestamps,
     add_invalid_times,
     read_eye_dlc_tracking_ellipses,
@@ -542,12 +544,17 @@ def write_ecephys_nwb(
         "colorSpace", "depth", "interpolate", "pos", "rgbPedestal", "tex",
         "texRes", "flipHoriz", "flipVert", "rgb", "signalDots"
     ]
-    stimulus_table = \
-        read_stimulus_table(stimulus_table_path,
-                            columns_to_drop=stimulus_columns_to_drop)
+    stimulus_table = Presentations.from_path(
+        path=stimulus_table_path,
+        exclude_columns=stimulus_columns_to_drop,
+        columns_to_rename=STIM_TABLE_RENAMES_MAP,
+        sort_columns=False
+    )
     nwbfile = \
-        add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)
-    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+        add_stimulus_timestamps(nwbfile,
+                                stimulus_table.value['start_time'].values)
+    nwbfile = stimulus_table.to_nwb(nwbfile=nwbfile)
+
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
 
     if optotagging_table_path is not None:

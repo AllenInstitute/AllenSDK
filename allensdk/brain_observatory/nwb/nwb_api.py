@@ -3,8 +3,10 @@ from pathlib import Path
 import pandas as pd
 import pynwb
 import SimpleITK as sitk
-import collections
 
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
+    import \
+    Presentations
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
@@ -73,35 +75,9 @@ class NwbApi:
         )
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
-
-        columns_to_ignore = set(['tags', 'timeseries', 'tags_index',
-                                 'timeseries_index'])
-
-        presentation_dfs = []
-        for interval_name, interval in self.nwbfile.intervals.items():
-            if interval_name.endswith('_presentations'):
-                presentations = collections.defaultdict(list)
-                for col in interval.columns:
-                    if col.name not in columns_to_ignore:
-                        presentations[col.name].extend(col.data[:])
-                df = pd.DataFrame(presentations).replace({'N/A': ''})
-                presentation_dfs.append(df)
-
-        table = pd.concat(presentation_dfs, sort=False)
-        table = table.astype(
-            {c: 'int64' for c in table.select_dtypes(include='int')})
-        table = table.sort_values(by=["start_time"])
-        table = table.reset_index(drop=True)
-        table.index.name = 'stimulus_presentations_id'
-        table.index = table.index.astype('int64')
-
-        for colname, series in table.items():
-            types = set(series.map(type))
-            if len(types) > 1 and str in types:
-                series.fillna('', inplace=True)
-                table[colname] = series.transform(str)
-
-        return table[sorted(table.columns)]
+        presentations = Presentations.from_nwb(nwbfile=self.nwbfile,
+                                               add_is_change=False)
+        return presentations.value
 
     def get_invalid_times(self) -> pd.DataFrame:
 

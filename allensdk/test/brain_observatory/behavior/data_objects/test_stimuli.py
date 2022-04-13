@@ -1,15 +1,17 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import pynwb
 import pytest
+from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
-    Presentations as StimulusPresentations
+    Presentations as StimulusPresentations, Presentations
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
@@ -48,6 +50,49 @@ class TestFromBehaviorStimulusFile(LimsTest):
             limit_to_images=['im065'])
         assert stimuli.presentations == self.expected_presentations
         assert stimuli.templates == self.expected_templates
+
+
+class TestPresentations:
+    @classmethod
+    def setup_class(cls):
+        with open('/allen/aibs/informatics/module_test_data/ecephys/'
+                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                as f:
+            cls.input_data = json.load(f)['session_data']
+        cls._table_from_json = Presentations.from_path(
+            path=cls.input_data['stim_table_file'])
+
+    def setup_method(self, method):
+        self._nwbfile = NWBFile(
+            session_description='foo',
+            identifier='foo',
+            session_id='foo',
+            session_start_time=datetime.now(),
+            institution="Allen Institute"
+        )
+        # Need to write stimulus timestamps first
+        bsf = BehaviorStimulusFile.from_json(dict_repr=self.input_data)
+        ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf,
+                                                   monitor_delay=0.0)
+        ts.to_nwb(nwbfile=self._nwbfile)
+
+    @pytest.mark.requires_bamboo
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture):
+        self._table_from_json.to_nwb(nwbfile=self._nwbfile)
+
+        if roundtrip:
+            obt = data_object_roundtrip_fixture(
+                nwbfile=self._nwbfile,
+                data_object_cls=Presentations,
+                add_is_change=False
+            )
+        else:
+            obt = Presentations.from_nwb(nwbfile=self._nwbfile,
+                                         add_is_change=False)
+
+        assert obt == self._table_from_json
 
 
 class TestNWB:
