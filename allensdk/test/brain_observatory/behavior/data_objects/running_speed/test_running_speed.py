@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import create_autospec, MagicMock
+from unittest.mock import create_autospec
 
 import pandas as pd
 
