@@ -90,29 +90,30 @@ class StimulusTimestamps(DataObject,
             list_of_stims: List[Union[BehaviorStimulusFile,
                                       MappingStimulusFile,
                                       ReplayStimulusFile]],
-            stims_of_interest: List[int],
+            stims_of_interest: Optional[List[int]] = None,
             monitor_delay: float = 0.0,
             frame_time_lines: Union[str, List[str]] = 'vsync_stim',
             frame_time_line_direction: str = 'rising',
             frame_count_tolerance: float = 0.0) -> "StimulusTimestamps":
         """
         Construct a StimulusTimestamps instance by registering
-        mulitple stimulus blocks to one sync file and (optionally)
-        concatenating the results
+        multiple stimulus blocks to one sync file and concatenating the results
 
         Parameters
         ----------
         sync_file: SyncFile
 
-t        list_of_stims: List[Union[BehaviorStimulusFile,
+        list_of_stims: List[Union[BehaviorStimulusFile,
                                   MappingStimulusFile,
                                   ReplayStimulusFile]]
             The list of StimulusFiles to be registered to the SyncFile
             **in the order that they were presented to the mouse**
 
-        stims_of_interest: List[int]
+        stims_of_interest: Optional[List[int]]
             The indexes in list_of_stims of the timestamps to be
-            concatenated into this one StimulusTimestamps object
+            concatenated into this one StimulusTimestamps object.
+            If `None` (default), the timestamps from all stimulus files
+            are concatenated
 
         monitor_delay: float
             in seconds
@@ -130,28 +131,45 @@ t        list_of_stims: List[Union[BehaviorStimulusFile,
             The tolerance to within two blocks of frame counts are considered
             equal
         """
+        behavior_stimulus_files = [x for x in list_of_stims
+                                   if isinstance(x, BehaviorStimulusFile)]
+        if len(behavior_stimulus_files) == 0:
+            raise ValueError(
+                'One of the values in `list_of_stims` must be a '
+                '`BehaviorStimulusFile`')
+        elif len(behavior_stimulus_files) > 1:
+            raise ValueError('You passed multiple `BehaviorStimulusFile` to '
+                             '`list_of_stims`. Please pass only 1.')
 
+        if stims_of_interest:
+            if len(stims_of_interest) > len(list_of_stims):
+                raise ValueError(
+                    f'stims_of_interest has length {len(stims_of_interest)} '
+                    f'but list_of_stims has length {len(list_of_stims)}. '
+                    f'len(stims_of_interest) should be <= len(list_of_stims)')
+            if any([x < 0 for x in stims_of_interest]):
+                raise ValueError('stims_of_interest should not be negative')
+            if any([x >= len(list_of_stims) for x in stims_of_interest]):
+                raise ValueError('stims_of_interest contains an index '
+                                 'greater than the number of elements in '
+                                 'list_of_stims')
         stimulus_times = get_stim_timestamps_from_stimulus_blocks(
                         stimulus_files=list_of_stims,
-                        sync_file=SyncFile.filepath,
+                        sync_file=sync_file.filepath,
                         raw_frame_time_lines=frame_time_lines,
                         raw_frame_time_direction=frame_time_line_direction,
                         frame_count_tolerance=frame_count_tolerance)
 
-        to_concatenate = [stimulus_times[idx]
-                          for idx in stims_of_interest]
+        to_concatenate = \
+            [t for t in stimulus_times] if stims_of_interest is None else \
+            [stimulus_times[idx] for idx in stims_of_interest]
 
-        raise RuntimeError(
-            "We need to implement a ListOfStims class that can be passed "
-            "into the stimulus_file kwarg below; that class will need to "
-            "implement to_json so that, for instance, a RunningSpeed object "
-            "based on one of these Timestamps that calls .to_json will record "
-            "all of the necessary stimulus files to the dict representation")
         timestamps = np.concatenate(to_concatenate)
+
         return cls(timestamps=timestamps,
                    monitor_delay=monitor_delay,
-                   sync_file=SyncFile,
-                   stimulus_file=list_of_stims[0])
+                   sync_file=sync_file,
+                   stimulus_file=behavior_stimulus_files[0])
 
     def from_lims(
         cls,
