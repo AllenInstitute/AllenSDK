@@ -223,7 +223,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
                       foraging_id=foraging_id.value,
                       stimulus_file=stimulus_file)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
@@ -246,7 +246,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         session_uuid = BehaviorSessionUUID.from_stimulus_file(
             stimulus_file=stimulus_file)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
@@ -265,7 +265,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
