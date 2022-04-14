@@ -301,15 +301,15 @@ def _get_start_frames(
     return start_frames
 
 
-def get_start_frames_from_stimulus_blocks(
+def get_stim_timestamps_from_stimulus_blocks(
         stimulus_files: Union[_StimulusFile, List[_StimulusFile]],
         sync_file: Union[str, pathlib.Path],
         raw_frame_time_lines: Union[str, List[str]],
         raw_frame_time_direction: str,
-        frame_count_tolerance: float) -> List[int]:
+        frame_count_tolerance: float) -> List[np.ndarray]:
     """
-    Find the start frames for a series of stimuli that need to be
-    registered to a single sync file.
+    Find the timestamps associated a set of stimulus blocks
+    that have to be aligned with a single sync file
 
     Parameters
     ----------
@@ -330,14 +330,17 @@ def get_start_frames_from_stimulus_blocks(
 
     Returns
     -------
-    start_frames: List[int]
-        The list of starting frames corresponding to the provided
+    list_of_timestamps: List[np.ndarray]
+        The list of timestamp arrays corresponding to the provided
         _StimulusFiles. **The order of stimulus_files will dictate
         the order of start_frames**.
 
     Notes
     -----
-    See the notes in _get_start_frames
+    This method operates by finding the start frames associated
+    with each stimulus block according to _get_start_frames and
+    then assigning the timestamps associated with
+    stimulus_block.num_frames to each stimulus block.
     """
 
     if raw_frame_time_direction == 'rising':
@@ -359,6 +362,7 @@ def get_start_frames_from_stimulus_blocks(
         str_path = sync_file
     safe_sync_path = safe_system_path(file_name=str_path)
 
+    list_of_timestamps = []
     with sync_dataset.Dataset(safe_sync_path) as sync_data:
         raw_frame_times = frame_time_fn(
                             data=sync_data,
@@ -370,4 +374,8 @@ def get_start_frames_from_stimulus_blocks(
                             raw_frame_times=raw_frame_times,
                             stimulus_frame_counts=frame_count_list,
                             tolerance=frame_count_tolerance)
-    return start_frames
+
+        for f0, nf in zip(start_frames, frame_count_list):
+            this_array = raw_frame_times[f0:f0+nf]
+            list_of_timestamps.append(this_array)
+    return list_of_timestamps

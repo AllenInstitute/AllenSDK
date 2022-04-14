@@ -1,5 +1,4 @@
 import abc
-import json
 from typing import Dict, Union
 from pathlib import Path
 
@@ -29,8 +28,8 @@ BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
 """
 
 
-def from_json_cache_key(cls, dict_repr: dict):
-    return hashkey(json.dumps(dict_repr))
+def from_json_cache_key(cls, stimulus_file_path: str):
+    return hashkey(stimulus_file_path)
 
 
 def from_lims_cache_key(cls, db, behavior_session_id: int):
@@ -96,10 +95,14 @@ class _StimulusFile(DataFile):
         super().__init__(filepath=filepath)
 
     @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
     def from_json(cls, dict_repr: dict) -> "_StimulusFile":
         filepath = dict_repr[cls.file_path_key()]
-        return cls(filepath=filepath)
+        return cls._from_json(stimulus_file_path=filepath)
+
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
+    def _from_json(cls, stimulus_file_path: str) -> "_StimulusFile":
+        return cls(filepath=stimulus_file_path)
 
     def to_json(self) -> Dict[str, str]:
         return {self.file_path_key(): str(self.filepath)}

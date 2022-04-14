@@ -9,9 +9,39 @@ from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
+from allensdk.brain_observatory.behavior.data_files import (
+    SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningSpeed, StimulusTimestamps
 )
+
+
+class DummyTimestamps(object):
+    """
+    A class meant to mock the StimulusTimestamps API by providing
+    monitor_delay=0.0, and value=0.0
+    """
+    monitor_delay = 0.0
+    value = 0.0
+
+
+def test_nonzero_monitor_delay_speed():
+    """
+    Test that RunningSpeed throws an exception if instantiated
+    with a timestamps object that has non-zero monitor_delay
+    """
+    class OtherTimestamps(object):
+        monitor_delay = 0.01
+        value = 0.0
+
+    with pytest.raises(RuntimeError,
+                       match="should be no monitor delay"):
+
+        RunningSpeed(
+            running_speed=4.0,
+            stimulus_file=None,
+            sync_file=None,
+            stimulus_timestamps=OtherTimestamps())
 
 
 @pytest.mark.parametrize("filtered", [True, False])
@@ -117,6 +147,11 @@ def test_running_speed_from_json(
 ):
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+    mock_stimulus_timestamps.from_json.return_value = dummy_ts
+
     mock_get_running_speed_df = create_autospec(get_running_df)
 
     mock_get_running_speed_df.return_value = returned_running_df
@@ -143,10 +178,11 @@ def test_running_speed_from_json(
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps.from_json.assert_called_once_with(dict_repr)
-    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.from_json(
-        dict_repr
-    )
+    mock_stimulus_timestamps_instance = \
+        mock_stimulus_timestamps.from_stimulus_file(
+                stimulus_file=mock_stimulus_file_instance,
+                monitor_delay=0.0
+        )
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_speed_df.assert_called_once_with(
@@ -160,9 +196,11 @@ def test_running_speed_from_json(
     pd.testing.assert_frame_equal(obt.value, expected_running_df)
 
 
+@pytest.mark.skip('to_json not supported yet')
 @pytest.mark.parametrize(
     "stimulus_file, stimulus_file_to_json_ret, "
-    "stimulus_timestamps, stimulus_timestamps_to_json_ret, raises, expected",
+    "stimulus_timestamps, "
+    "sync_file, sync_file_to_json_ret, raises, expected",
     [
         # Test to_json with both stimulus_file and sync_file
         (
@@ -172,7 +210,9 @@ def test_running_speed_from_json(
             {"behavior_stimulus_file": "stim.pkl"},
             # stimulus_timestamps
             create_autospec(StimulusTimestamps, instance=True),
-            # stimulus_timestamps_to_json_ret
+            # sync_file
+            create_autospec(SyncFile, instance=True),
+            # sync_file_to_json_ret
             {"sync_file": "sync.h5"},
             # raises
             False,
@@ -187,7 +227,9 @@ def test_running_speed_from_json(
             None,
             # stimulus_timestamps
             create_autospec(StimulusTimestamps, instance=True),
-            # stimulus_timestamps_to_json_ret
+            # sync_file
+            create_autospec(SyncFile, instance=True),
+            # sync_file_to_json_ret
             {"sync_file": "sync.h5"},
             # raises
             "RunningSpeed DataObject lacks information about",
@@ -200,7 +242,9 @@ def test_running_speed_from_json(
             create_autospec(BehaviorStimulusFile, instance=True),
             # stimulus_file_to_json_ret
             {"behavior_stimulus_file": "stim.pkl"},
-            # stimulus_timestamps_to_json_ret
+            # stimulus_timestamps
+            None,
+            # sync_file
             None,
             # sync_file_to_json_ret
             None,
@@ -213,19 +257,21 @@ def test_running_speed_from_json(
 )
 def test_running_speed_to_json(
     stimulus_file, stimulus_file_to_json_ret,
-    stimulus_timestamps, stimulus_timestamps_to_json_ret, raises, expected
+    stimulus_timestamps, sync_file,
+    sync_file_to_json_ret, raises, expected
 ):
     if stimulus_file is not None:
         stimulus_file.to_json.return_value = stimulus_file_to_json_ret
+    if sync_file is not None:
+        sync_file.to_json.return_value = sync_file_to_json_ret
     if stimulus_timestamps is not None:
-        stimulus_timestamps.to_json.return_value = (
-            stimulus_timestamps_to_json_ret
-        )
+        stimulus_timestamps._monitor_delay = 0.0
 
     running_speed = RunningSpeed(
         running_speed=None,
         stimulus_file=stimulus_file,
-        stimulus_timestamps=stimulus_timestamps
+        stimulus_timestamps=stimulus_timestamps,
+        sync_file=sync_file
     )
 
     if raises:
@@ -272,6 +318,10 @@ def test_running_speed_from_lims(
 
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+
     mock_get_running_speed_df = create_autospec(get_running_df)
     mock_get_running_speed_df.return_value = returned_running_df
 
@@ -293,7 +343,7 @@ def test_running_speed_from_lims(
         )
         obt = RunningSpeed.from_lims(
             mock_db_conn, behavior_session_id, filtered,
-            zscore_threshold, monitor_delay=0.0
+            zscore_threshold
         )
 
     mock_stimulus_file.from_lims.assert_called_once_with(

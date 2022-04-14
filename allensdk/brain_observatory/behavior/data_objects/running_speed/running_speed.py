@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
@@ -12,6 +13,7 @@ from allensdk.core import \
 from allensdk.core.exceptions import DataFrameIndexError
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
     BehaviorStimulusFile
@@ -38,11 +40,22 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         self,
         running_speed: pd.DataFrame,
         stimulus_file: Optional[BehaviorStimulusFile] = None,
+        sync_file: Optional[SyncFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         filtered: bool = True
     ):
         super().__init__(name='running_speed', value=running_speed)
+
+        if stimulus_timestamps is not None:
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+                raise RuntimeError(
+                    "Running speed timestamps have monitor delay "
+                    f"{stimulus_timestamps.monitor_delay}; there "
+                    "should be no monitor delay applied to the timestamps "
+                    "associated with running speed")
+
         self._stimulus_file = stimulus_file
+        self._sync_file = sync_file
         self._stimulus_timestamps = stimulus_timestamps
         self._filtered = filtered
 
@@ -76,7 +89,8 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         zscore_threshold: float = 10.0
     ) -> "RunningSpeed":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr)
+        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
+                                                           monitor_delay=0.0)
 
         running_speed = cls._get_running_speed_df(
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold
@@ -97,7 +111,8 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
             )
         output_dict = dict()
         output_dict.update(self._stimulus_file.to_json())
-        output_dict.update(self._stimulus_timestamps.to_json())
+        if self._sync_file is not None:
+            output_dict.update(self._sync_file.to_json())
         return output_dict
 
     @classmethod
@@ -108,19 +123,17 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         filtered: bool = True,
         zscore_threshold: float = 10.0,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
-        monitor_delay: Optional[float] = None,
     ) -> "RunningSpeed":
         stimulus_file = BehaviorStimulusFile.from_lims(
                                 db,
                                 behavior_session_id)
-        if stimulus_timestamps is None:
-            if monitor_delay is None:
-                raise RuntimeError("Must specify monitor delay "
-                                   "if you are not specifying "
-                                   "stimulus_timestamps")
+
+        if stimulus_timestamps is None or \
+                (stimulus_timestamps is not None and
+                 stimulus_timestamps.monitor_delay != 0.0):
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay
+                monitor_delay=0.0
             )
 
         running_speed = cls._get_running_speed_df(

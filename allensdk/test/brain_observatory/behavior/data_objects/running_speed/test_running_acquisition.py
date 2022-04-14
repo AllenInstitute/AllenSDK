@@ -11,6 +11,26 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningAcquisition, StimulusTimestamps
 )
+from allensdk.brain_observatory.behavior.data_files import (
+    SyncFile)
+
+
+def test_nonzero_monitor_delay_acq():
+    """
+    Test that RunningAcquisition throws an exception if instantiated
+    with a timestamps object that has non-zero monitor_delay
+    """
+    class OtherTimestamps(object):
+        monitor_delay = 0.01
+        value = 0.0
+
+    with pytest.raises(RuntimeError,
+                       match="should be no monitor delay"):
+
+        RunningAcquisition(
+            running_acquisition=4.0,
+            stimulus_file=None,
+            stimulus_timestamps=OtherTimestamps())
 
 
 @pytest.mark.parametrize(
@@ -49,6 +69,14 @@ def test_running_acquisition_from_json(
 ):
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    class DummyTimestamps(object):
+        monitor_delay = 0.0
+        value = 0.0
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+    mock_stimulus_timestamps.from_json.return_value = dummy_ts
+
     mock_get_running_df = create_autospec(get_running_df)
 
     mock_get_running_df.return_value = returned_running_acq_df
@@ -75,10 +103,13 @@ def test_running_acquisition_from_json(
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps.from_json.assert_called_once_with(dict_repr)
-    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.from_json(
-        dict_repr
-    )
+    mock_stimulus_timestamps.from_json.assert_called_once_with(
+            dict_repr, monitor_delay=0.0)
+    mock_stimulus_timestamps_instance = \
+        mock_stimulus_timestamps.from_stimulus_file(
+            stimulus_file=mock_stimulus_file_instance,
+            monitor_delay=0.0
+        )
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_df.assert_called_once_with(
@@ -89,6 +120,7 @@ def test_running_acquisition_from_json(
     pd.testing.assert_frame_equal(obt.value, expected_running_acq_df)
 
 
+@pytest.mark.skip('to_json not supported yet')
 @pytest.mark.parametrize(
     "stimulus_file, stimulus_file_to_json_ret, "
     "stimulus_timestamps, stimulus_timestamps_to_json_ret, raises, expected",
@@ -147,7 +179,10 @@ def test_running_acquisition_to_json(
     if stimulus_file is not None:
         stimulus_file.to_json.return_value = stimulus_file_to_json_ret
     if stimulus_timestamps is not None:
-        stimulus_timestamps.to_json.return_value = (
+        stimulus_timestamps._sync_file = create_autospec(SyncFile,
+                                                         instance=True)
+        stimulus_timestamps._monitor_delay = 0.0
+        stimulus_timestamps._sync_file.to_json.return_value = (
             stimulus_timestamps_to_json_ret
         )
 
@@ -229,6 +264,14 @@ def test_running_acquisition_from_lims(
 
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
+
+    class DummyTimestamps(object):
+        monitor_delay = 0.0
+        value = 0.0
+    dummy_ts = DummyTimestamps()
+
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+
     mock_get_running_df = create_autospec(get_running_df)
 
     mock_get_running_df.return_value = returned_running_acq_df
@@ -252,8 +295,7 @@ def test_running_acquisition_from_lims(
         obt = RunningAcquisition.from_lims(
             mock_db_conn,
             behavior_session_id=behavior_session_id,
-            ophys_experiment_id=ophys_experiment_id,
-            monitor_delay=0.0
+            ophys_experiment_id=ophys_experiment_id
         )
 
     mock_stimulus_file.from_lims.assert_called_once_with(

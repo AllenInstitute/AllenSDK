@@ -6,6 +6,7 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 import pandas as pd
+import numpy as np
 
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
@@ -36,11 +37,10 @@ def from_lims_cache_key(
     cls,
     db,
     behavior_session_id: int,
-    monitor_delay: float,
     ophys_experiment_id: Optional[int] = None
 ):
     return hashkey(
-        behavior_session_id, ophys_experiment_id, monitor_delay
+        behavior_session_id, ophys_experiment_id
     )
 
 
@@ -70,6 +70,15 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
     ):
         super().__init__(name="running_acquisition", value=running_acquisition)
+
+        if stimulus_timestamps is not None:
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+                raise RuntimeError(
+                    "Running acquisition timestamps have montior delay "
+                    f"{stimulus_timestamps.monitor_delay}; there "
+                    "should be no monitor delay applied to the timestamps "
+                    "associated with running acquisition")
+
         self._stimulus_file = stimulus_file
         self._stimulus_timestamps = stimulus_timestamps
 
@@ -80,9 +89,8 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         dict_repr: dict,
     ) -> "RunningAcquisition":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-
-        stimulus_timestamps = StimulusTimestamps.from_json(
-                dict_repr=dict_repr)
+        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
+                                                           monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
@@ -117,7 +125,10 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
             )
         output_dict = dict()
         output_dict.update(self._stimulus_file.to_json())
-        output_dict.update(self._stimulus_timestamps.to_json())
+        if self._stimulus_timestamps is not None:
+            if self._stimulus_timestamps._sync_file is not None:
+                output_dict.update(
+                    self._stimulus_timestamps._sync_file.to_json())
         return output_dict
 
     @classmethod
@@ -126,7 +137,6 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         cls,
         db: PostgresQueryMixin,
         behavior_session_id: int,
-        monitor_delay: float,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
 
@@ -134,7 +144,7 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
 
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay)
+                monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,
