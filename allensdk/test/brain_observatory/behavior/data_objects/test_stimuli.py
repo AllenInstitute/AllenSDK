@@ -170,3 +170,47 @@ def test_set_omitted_stop_time(stimulus_table, expected_table_data):
         StimulusPresentations._fill_missing_values_for_omitted_flashes(
             df=stimulus_table)
     assert stimulus_table.equals(expected_table)
+
+
+class TestTemplates:
+    @classmethod
+    def setup_class(cls):
+        with open('/allen/aibs/informatics/module_test_data/ecephys/'
+                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                as f:
+            cls.input_data = json.load(f)['session_data']
+        sf = BehaviorStimulusFile.from_json(
+            dict_repr=cls.input_data)
+        cls._presentations_from_json = Presentations.from_path(
+            path=cls.input_data['stim_table_file'])
+        cls._templates_from_stim = \
+            Templates.from_stimulus_file(stimulus_file=sf)
+
+    def setup_method(self, method):
+        self._nwbfile = NWBFile(
+            session_description='foo',
+            identifier='foo',
+            session_id='foo',
+            session_start_time=datetime.now(),
+            institution="Allen Institute"
+        )
+
+    @pytest.mark.requires_bamboo
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb_no_image_index(
+            self, roundtrip, data_object_roundtrip_fixture):
+        """This presentations table has no image_index.
+        Make sure the roundtrip doesn't break"""
+        self._templates_from_stim.to_nwb(
+            nwbfile=self._nwbfile,
+            stimulus_presentations=self._presentations_from_json)
+
+        if roundtrip:
+            obt = data_object_roundtrip_fixture(
+                nwbfile=self._nwbfile,
+                data_object_cls=Templates
+            )
+        else:
+            obt = Templates.from_nwb(nwbfile=self._nwbfile)
+
+        assert obt == self._templates_from_stim
