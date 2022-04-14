@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import create_autospec
+from unittest.mock import create_autospec, MagicMock
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ class DummyTimestamps(object):
     A class meant to mock the StimulusTimestamps API by providing
     monitor_delay=0.0, and value=0.0
     """
-    _monitor_delay = 0.0
+    monitor_delay = 0.0
     value = 0.0
 
 
@@ -31,7 +31,7 @@ def test_nonzero_monitor_delay_speed():
     with a timestamps object that has non-zero monitor_delay
     """
     class OtherTimestamps(object):
-        _monitor_delay = 0.01
+        monitor_delay = 0.01
         value = 0.0
 
     with pytest.raises(RuntimeError,
@@ -150,6 +150,7 @@ def test_running_speed_from_json(
 
     dummy_ts = DummyTimestamps()
     mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+    mock_stimulus_timestamps.from_json.return_value = dummy_ts
 
     mock_get_running_speed_df = create_autospec(get_running_df)
 
@@ -182,7 +183,6 @@ def test_running_speed_from_json(
                 stimulus_file=mock_stimulus_file_instance,
                 monitor_delay=0.0
         )
-
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_speed_df.assert_called_once_with(
@@ -196,6 +196,7 @@ def test_running_speed_from_json(
     pd.testing.assert_frame_equal(obt.value, expected_running_df)
 
 
+@pytest.mark.skip('to_json not supported yet')
 @pytest.mark.parametrize(
     "stimulus_file, stimulus_file_to_json_ret, "
     "stimulus_timestamps, "

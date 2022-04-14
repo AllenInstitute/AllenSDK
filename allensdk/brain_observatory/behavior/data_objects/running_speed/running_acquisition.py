@@ -72,10 +72,10 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         super().__init__(name="running_acquisition", value=running_acquisition)
 
         if stimulus_timestamps is not None:
-            if not np.isclose(stimulus_timestamps._monitor_delay, 0.0):
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
                 raise RuntimeError(
                     "Running acquisition timestamps have montior delay "
-                    f"{stimulus_timestamps._monitor_delay}; there "
+                    f"{stimulus_timestamps.monitor_delay}; there "
                     "should be no monitor delay applied to the timestamps "
                     "associated with running acquisition")
 

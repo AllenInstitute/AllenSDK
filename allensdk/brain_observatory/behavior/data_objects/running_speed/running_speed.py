@@ -47,10 +47,10 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         super().__init__(name='running_speed', value=running_speed)
 
         if stimulus_timestamps is not None:
-            if not np.isclose(stimulus_timestamps._monitor_delay, 0.0):
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
                 raise RuntimeError(
-                    "Running speed timestamps have montior delay "
-                    f"{stimulus_timestamps._monitor_delay}; there "
+                    "Running speed timestamps have monitor delay "
+                    f"{stimulus_timestamps.monitor_delay}; there "
                     "should be no monitor delay applied to the timestamps "
                     "associated with running speed")
 

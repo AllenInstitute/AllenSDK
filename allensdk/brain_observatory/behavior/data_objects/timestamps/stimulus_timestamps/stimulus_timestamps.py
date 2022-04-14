@@ -55,6 +55,10 @@ class StimulusTimestamps(DataObject,
         self._sync_file = sync_file
         self._monitor_delay = monitor_delay
 
+    @property
+    def monitor_delay(self) -> float:
+        return self._monitor_delay
+
     @classmethod
     def from_stimulus_file(
             cls,
