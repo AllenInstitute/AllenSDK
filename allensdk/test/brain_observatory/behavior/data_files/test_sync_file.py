@@ -26,7 +26,7 @@ def sync_file_fixture(request, tmp_path) -> Tuple[Path, dict]:
     return (sync_path, sync_data)
 
 
-def mock_get_sync_data(sync_path):
+def mock_get_sync_data(sync_path, permissive):
     with h5py.File(sync_path, "r") as f:
         data = f["data"][:]
     return data

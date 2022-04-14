@@ -147,6 +147,7 @@ class Probe(RaisingSchema):
     )
     amplitude_scale_factor = Float(
         default=0.195e-6,
+        allow_none=True,
         help="""amplitude scale factor converting raw amplitudes to Volts.
                 Default converts from bits -> uV -> V"""
     )

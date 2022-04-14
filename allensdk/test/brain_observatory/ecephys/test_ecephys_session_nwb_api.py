@@ -1,12 +1,9 @@
 # most of the tests for this functionality are actually in test_write_nwb
 
-import warnings
-
-import h5py
 import pytest
 import pandas as pd
 
-import allensdk.brain_observatory.ecephys.ecephys_session_api.ecephys_nwb_session_api as ensa
+import allensdk.brain_observatory.ecephys.utils
 
 
 @pytest.mark.parametrize("left,right,expected,left_on,right_on", [
@@ -26,5 +23,9 @@ import allensdk.brain_observatory.ecephys.ecephys_session_api.ecephys_nwb_sessio
     ]
 ])
 def test_clobbering_merge(left, right, expected, left_on, right_on):
-    obtained = ensa.clobbering_merge(left, right, left_on=left_on, right_on=left_on)
+    obtained = allensdk.brain_observatory.ecephys.utils.clobbering_merge(
+        left,
+        right,
+        left_on=left_on,
+        right_on=left_on)
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)

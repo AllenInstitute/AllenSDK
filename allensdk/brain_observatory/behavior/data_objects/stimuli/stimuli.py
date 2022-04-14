@@ -35,8 +35,13 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         return self._templates
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Stimuli":
-        p = Presentations.from_nwb(nwbfile=nwbfile)
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            presentation_columns: Optional[List[str]] = None
+    ) -> "Stimuli":
+        p = Presentations.from_nwb(nwbfile=nwbfile,
+                                   column_list=presentation_columns)
         t = Templates.from_nwb(nwbfile=nwbfile)
         return Stimuli(presentations=p, templates=t)
 
@@ -44,18 +49,55 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
     def from_stimulus_file(
             cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
-            limit_to_images: Optional[List] = None) -> "Stimuli":
+            limit_to_images: Optional[List] = None,
+            presentation_columns: Optional[List[str]] = None,
+            presentation_fill_omitted_values: bool = True
+    ) -> "Stimuli":
+        """
+
+        Parameters
+        ----------
+        stimulus_file
+        stimulus_timestamps
+        limit_to_images: limit to certain images. Used for testing.
+        presentation_columns: The columns and order of columns
+            in the final presentations dataframe
+        presentation_fill_omitted_values: Whether to fill stop_time and
+            duration for omitted frames
+
+        Returns
+        -------
+
+        """
         p = Presentations.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            limit_to_images=limit_to_images)
+            limit_to_images=limit_to_images,
+            column_list=presentation_columns,
+            fill_omitted_values=presentation_fill_omitted_values
+        )
         t = Templates.from_stimulus_file(stimulus_file=stimulus_file,
                                          limit_to_images=limit_to_images)
         return Stimuli(presentations=p, templates=t)
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+    def to_nwb(self, nwbfile: NWBFile,
+               presentations_stimulus_column_name='image_set') -> NWBFile:
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        presentations_stimulus_column_name: Name of the column in the
+            presentations table that denotes the stimulus name
+
+        Returns
+        -------
+        NWBFile
+        """
         nwbfile = self._templates.to_nwb(
             nwbfile=nwbfile, stimulus_presentations=self._presentations)
-        nwbfile = self._presentations.to_nwb(nwbfile=nwbfile)
+        nwbfile = self._presentations.to_nwb(
+            nwbfile=nwbfile,
+            stimulus_name_column=presentations_stimulus_column_name)
 
         return nwbfile

@@ -27,7 +27,7 @@ SYNC_FILE_QUERY_TEMPLATE = """
 """
 
 
-def from_json_cache_key(cls, dict_repr: dict):
+def from_json_cache_key(cls, dict_repr: dict, permissive: bool = False):
     return hashkey(json.dumps(dict_repr))
 
 
@@ -41,16 +41,31 @@ class SyncFile(DataFile):
 
     This file type contains global timing information for different data
     streams collected during a behavior + ophys session.
+
+    Attributes
+    ----------
+    filepath : str or Path
+        Full path to sync file on disk.
+    permissive : bool
+        Permissively load from sync file. If True, do no raise when a given
+        sync line is not present. Default False.
     """
 
-    def __init__(self, filepath: Union[str, Path]):
-        super().__init__(filepath=filepath)
+    def __init__(self, filepath: Union[str, Path], permissive: bool = False):
+        self._permissive = permissive
+        super().__init__(filepath=filepath, permissive=permissive)
+
+    @property
+    def permissive(self) -> bool:  # pragma: no cover
+        return self._permissive
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls, dict_repr: dict) -> "SyncFile":
+    def from_json(cls,
+                  dict_repr: dict,
+                  permissive: bool = False) -> "SyncFile":
         filepath = dict_repr["sync_file"]
-        return cls(filepath=filepath)
+        return cls(filepath=filepath, permissive=permissive)
 
     def to_json(self) -> Dict[str, str]:
         return {"sync_file": str(self.filepath)}
@@ -59,18 +74,20 @@ class SyncFile(DataFile):
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin,
-        ophys_experiment_id: Union[int, str]
+        ophys_experiment_id: Union[int, str],
+        permissive: bool = False
     ) -> "SyncFile":
         query = SYNC_FILE_QUERY_TEMPLATE.format(
             ophys_experiment_id=ophys_experiment_id
         )
         filepath = db.fetchone(query, strict=True)
-        return cls(filepath=filepath)
+        return cls(filepath=filepath, permissive=permissive)
 
     @staticmethod
-    def load_data(filepath: Union[str, Path]) -> dict:
+    def load_data(filepath: Union[str, Path],
+                  permissive: bool = False) -> dict:
         filepath = safe_system_path(file_name=filepath)
-        return get_sync_data(sync_path=filepath)
+        return get_sync_data(sync_path=filepath, permissive=permissive)
 
 
 class SyncFileReadableInterface(abc.ABC):
