@@ -13,13 +13,10 @@ import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb import ProcessingModule, NWBFile
-from pynwb.image import GrayscaleImage, IndexSeries
+from pynwb.image import GrayscaleImage
 from pynwb.ophys import (
     DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
 
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_templates import StimulusTemplate
-from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import StimulusTemplateExtension  # noqa: E501
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -431,34 +428,6 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
     return nwbfile
 
 
-def add_stimulus_template(nwbfile: NWBFile,
-                          stimulus_template: StimulusTemplate):
-    unwarped_images = []
-    warped_images = []
-    image_names = []
-    for image_name, image_data in stimulus_template.items():
-        image_names.append(image_name)
-        unwarped_images.append(image_data.unwarped)
-        warped_images.append(image_data.warped)
-
-    image_index = np.zeros(len(image_names))
-    image_index[:] = np.nan
-
-    visual_stimulus_image_series = \
-        StimulusTemplateExtension(
-            name=stimulus_template.image_set_name,
-            data=warped_images,
-            unwarped=unwarped_images,
-            control=list(range(len(image_names))),
-            control_description=image_names,
-            unit='NA',
-            format='raw',
-            timestamps=image_index)
-
-    nwbfile.add_stimulus_template(visual_stimulus_image_series)
-    return nwbfile
-
-
 def create_stimulus_presentation_time_interval(
         name: str, description: str,
         columns_to_add: Iterable) -> pynwb.epoch.TimeIntervals:
@@ -744,18 +713,6 @@ def add_segmentation_mask_image(nwbfile,
               'ophys',
               'Ophys processing module',
               image_api=image_api)
-
-
-def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
-
-    image_index = IndexSeries(
-        name=nwb_template.name,
-        data=stimulus_index['image_index'].values,
-        unit='None',
-        indexed_timeseries=nwb_template,
-        timestamps=stimulus_index['start_time'].values)
-
-    nwbfile.add_stimulus(image_index)
 
 
 def add_metadata(nwbfile, metadata: dict, behavior_only: bool):

@@ -35,11 +35,13 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         return self._templates
 
     @classmethod
-    def from_nwb(cls,
-                 nwbfile: NWBFile,
-                 presentation_columns: Optional[List[str]] = None,
-                 presentation_fill_omitted_values: bool = True) -> "Stimuli":
-        p = Presentations.from_nwb(nwbfile=nwbfile)
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            presentation_columns: Optional[List[str]] = None
+    ) -> "Stimuli":
+        p = Presentations.from_nwb(nwbfile=nwbfile,
+                                   column_list=presentation_columns)
         t = Templates.from_nwb(nwbfile=nwbfile)
         return Stimuli(presentations=p, templates=t)
 
