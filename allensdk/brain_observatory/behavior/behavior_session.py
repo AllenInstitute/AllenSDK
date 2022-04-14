@@ -182,8 +182,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 monitor_delay=monitor_delay)
         running_acquisition = RunningAcquisition.from_lims(
             lims_db,
-            behavior_session_id.value,
-            monitor_delay=monitor_delay
+            behavior_session_id.value
         )
         raw_running_speed = RunningSpeed.from_lims(
             lims_db, behavior_session_id.value, filtered=False,

@@ -128,7 +128,9 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
                                 db,
                                 behavior_session_id)
 
-        if stimulus_timestamps is None:
+        if stimulus_timestamps is None or \
+                (stimulus_timestamps is not None and
+                 stimulus_timestamps.monitor_delay != 0.0):
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
                 stimulus_file=stimulus_file,
                 monitor_delay=0.0
