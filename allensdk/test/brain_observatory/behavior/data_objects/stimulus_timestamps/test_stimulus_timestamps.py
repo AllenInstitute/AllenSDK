@@ -1,3 +1,5 @@
+import datetime
+import json
 from pathlib import Path
 
 import pytest
@@ -7,9 +9,11 @@ import numpy as np
 
 from itertools import product
 
+from pynwb import NWBFile
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile, SyncFile
+    BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
@@ -252,3 +256,46 @@ def test_stimulus_timestamps_nwb_roundtrip(
 
     assert np.allclose(obt.value,
                        raw_stimulus_timestamps_data+monitor_delay)
+
+
+class TestStimulusTimestampsFromMultipleStimulusBlocks:
+    @classmethod
+    def setup_class(cls):
+        with open('/allen/aibs/informatics/module_test_data/ecephys/'
+                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                as f:
+            input_data = json.load(f)
+        input_data = input_data['session_data']
+        sync_file = SyncFile.from_json(dict_repr=input_data, permissive=True)
+        bsf = BehaviorStimulusFile.from_json(dict_repr=input_data)
+        msf = MappingStimulusFile.from_json(dict_repr=input_data)
+        rsf = ReplayStimulusFile.from_json(dict_repr=input_data)
+        cls._timestamps_from_json = \
+            StimulusTimestamps.from_multiple_stimulus_blocks(
+                sync_file=sync_file,
+                list_of_stims=[bsf, msf, rsf]
+        )
+
+    def setup_method(self, method):
+        self._nwbfile = NWBFile(
+            session_description='foo',
+            identifier='foo',
+            session_id='foo',
+            session_start_time=datetime.datetime.now(),
+            institution="Allen Institute"
+        )
+
+    @pytest.mark.requires_bamboo
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture):
+        self._timestamps_from_json.to_nwb(nwbfile=self._nwbfile)
+
+        if roundtrip:
+            obt = data_object_roundtrip_fixture(
+                nwbfile=self._nwbfile,
+                data_object_cls=StimulusTimestamps)
+        else:
+            obt = StimulusTimestamps.from_nwb(nwbfile=self._nwbfile)
+
+        assert obt == self._timestamps_from_json
