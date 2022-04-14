@@ -149,7 +149,7 @@ def test_running_speed_from_json(
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
 
     dummy_ts = DummyTimestamps()
-    mock_stimulus_timestamps.from_stimulus_file.return_value=dummy_ts
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
 
     mock_get_running_speed_df = create_autospec(get_running_df)
 

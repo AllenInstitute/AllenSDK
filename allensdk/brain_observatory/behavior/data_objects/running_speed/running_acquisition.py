@@ -89,19 +89,8 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         dict_repr: dict,
     ) -> "RunningAcquisition":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-
-        sync_file = None
-        if 'sync_file' in dict_repr:
-            sync_file=SyncFile.from_json(dict_repr=dict_repr),
-
-        if sync_file is not None:
-            stimulus_timestamps = StimulusTimestamps.from_sync_file(
-                                   sync_file=sync_file,
-                                   monitor_delay=0.0)
-        else:
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                                    stimulus_file=stimulus_file,
-                                    monitor_delay=0.0)
+        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
+                                                           monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,

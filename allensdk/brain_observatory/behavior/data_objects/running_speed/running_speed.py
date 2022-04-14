@@ -89,19 +89,8 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         zscore_threshold: float = 10.0
     ) -> "RunningSpeed":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-
-        sync_file = None
-        if 'sync_file' in dict_repr:
-            sync_file=SyncFile.from_json(dict_repr=dict_repr),
-
-        if sync_file is not None:
-            stimulus_timestamps = StimulusTimestamps.from_sync_file(
-                                   sync_file=sync_file,
-                                   monitor_delay=0.0)
-        else:
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                                    stimulus_file=stimulus_file,
-                                    monitor_delay=0.0)
+        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
+                                                           monitor_delay=0.0)
 
         running_speed = cls._get_running_speed_df(
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold
@@ -110,7 +99,6 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
             running_speed=running_speed,
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            sync_file=sync_file,
             filtered=filtered)
 
     def to_json(self) -> dict:

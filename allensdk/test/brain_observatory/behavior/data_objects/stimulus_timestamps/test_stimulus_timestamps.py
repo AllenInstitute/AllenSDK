@@ -274,7 +274,7 @@ class TestStimulusTimestampsFromMultipleStimulusBlocks:
             StimulusTimestamps.from_multiple_stimulus_blocks(
                 sync_file=sync_file,
                 list_of_stims=[bsf, msf, rsf]
-        )
+            )
 
     def setup_method(self, method):
         self._nwbfile = NWBFile(

@@ -105,10 +105,10 @@ def test_running_acquisition_from_json(
     mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
             mock_stimulus_file_instance, monitor_delay=0.0)
     mock_stimulus_timestamps_instance = \
-    mock_stimulus_timestamps.from_stimulus_file(
-        stimulus_file=mock_stimulus_file_instance,
-        monitor_delay=0.0
-    )
+        mock_stimulus_timestamps.from_stimulus_file(
+            stimulus_file=mock_stimulus_file_instance,
+            monitor_delay=0.0
+        )
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     mock_get_running_df.assert_called_once_with(
