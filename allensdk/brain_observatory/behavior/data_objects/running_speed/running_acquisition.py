@@ -29,6 +29,7 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 def from_json_cache_key(
     cls,
     dict_repr: dict,
+    stimulus_timestamps: StimulusTimestamps
 ):
     return hashkey(json.dumps(dict_repr))
 
@@ -87,10 +88,9 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
     def from_json(
         cls,
         dict_repr: dict,
+        stimulus_timestamps: StimulusTimestamps
     ) -> "RunningAcquisition":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
-                                                           monitor_delay=0.0)
 
         running_acq_df = get_running_df(
             data=stimulus_file.data, time=stimulus_timestamps.value,

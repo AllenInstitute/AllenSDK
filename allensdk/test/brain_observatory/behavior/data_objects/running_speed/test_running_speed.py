@@ -148,9 +148,8 @@ def test_running_speed_from_json(
     mock_stimulus_file = create_autospec(BehaviorStimulusFile)
     mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
 
-    dummy_ts = DummyTimestamps()
+    dummy_ts: StimulusTimestamps = DummyTimestamps()
     mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
-    mock_stimulus_timestamps.from_json.return_value = dummy_ts
 
     mock_get_running_speed_df = create_autospec(get_running_df)
 
@@ -172,22 +171,22 @@ def test_running_speed_from_json(
             ".running_speed.running_speed.get_running_df",
             mock_get_running_speed_df
         )
-        obt = RunningSpeed.from_json(dict_repr, filtered, zscore_threshold)
+        obt = RunningSpeed.from_json(
+            dict_repr=dict_repr,
+            filtered=filtered,
+            zscore_threshold=zscore_threshold,
+            stimulus_timestamps=dummy_ts
+        )
 
     mock_stimulus_file.from_json.assert_called_once_with(dict_repr)
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps_instance = \
-        mock_stimulus_timestamps.from_stimulus_file(
-                stimulus_file=mock_stimulus_file_instance,
-                monitor_delay=0.0
-        )
-    assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
+    assert obt._stimulus_timestamps == dummy_ts
 
     mock_get_running_speed_df.assert_called_once_with(
         data=mock_stimulus_file_instance.data,
-        time=mock_stimulus_timestamps_instance.value,
+        time=dummy_ts.value,
         lowpass=filtered,
         zscore_threshold=zscore_threshold
     )

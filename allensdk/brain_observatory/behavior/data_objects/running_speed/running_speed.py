@@ -85,12 +85,11 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
     def from_json(
         cls,
         dict_repr: dict,
+        stimulus_timestamps: StimulusTimestamps,
         filtered: bool = True,
-        zscore_threshold: float = 10.0
+        zscore_threshold: float = 10.0,
     ) -> "RunningSpeed":
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr=dict_repr,
-                                                           monitor_delay=0.0)
 
         running_speed = cls._get_running_speed_df(
             stimulus_file, stimulus_timestamps, filtered, zscore_threshold

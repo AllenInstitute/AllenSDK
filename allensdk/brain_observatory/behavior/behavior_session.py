@@ -78,14 +78,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     # ==================== class and utility methods ======================
 
     @classmethod
-    def from_json(cls,
-                  session_data: dict) -> "BehaviorSession":
+    def from_json(
+            cls,
+            session_data: dict,
+            stimulus_timestamps: Optional[StimulusTimestamps] = None
+    ) -> "BehaviorSession":
         """
 
         Parameters
         ----------
         session_data
             Dict of input data necessary to construct a session
+        stimulus_timestamps
+            Optional `StimulusTimestamps`
 
         Returns
         -------
@@ -99,14 +104,21 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr=session_data)
-        stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
+        if stimulus_timestamps is not None:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                stimulus_file=stimulus_file, monitor_delay=monitor_delay)
         running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data)
-        raw_running_speed = RunningSpeed.from_json(
-            dict_repr=session_data, filtered=False
+            dict_repr=session_data,
+            stimulus_timestamps=stimulus_timestamps.without_monitor_delay()
         )
-        running_speed = RunningSpeed.from_json(dict_repr=session_data)
+        raw_running_speed = RunningSpeed.from_json(
+            dict_repr=session_data,
+            filtered=False,
+            stimulus_timestamps=stimulus_timestamps.without_monitor_delay()
+        )
+        running_speed = RunningSpeed.from_json(
+            dict_repr=session_data,
+            stimulus_timestamps=stimulus_timestamps.without_monitor_delay())
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
         licks, rewards, stimuli, task_parameters, trials = \

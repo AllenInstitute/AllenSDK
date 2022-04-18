@@ -73,9 +73,7 @@ def test_running_acquisition_from_json(
     class DummyTimestamps(object):
         monitor_delay = 0.0
         value = 0.0
-    dummy_ts = DummyTimestamps()
-    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
-    mock_stimulus_timestamps.from_json.return_value = dummy_ts
+    dummy_ts: StimulusTimestamps = DummyTimestamps()
 
     mock_get_running_df = create_autospec(get_running_df)
 
@@ -97,24 +95,18 @@ def test_running_acquisition_from_json(
             ".running_speed.running_acquisition.get_running_df",
             mock_get_running_df
         )
-        obt = RunningAcquisition.from_json(dict_repr)
+        obt = RunningAcquisition.from_json(dict_repr,
+                                           stimulus_timestamps=dummy_ts)
 
     mock_stimulus_file.from_json.assert_called_once_with(dict_repr)
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps.from_json.assert_called_once_with(
-            dict_repr, monitor_delay=0.0)
-    mock_stimulus_timestamps_instance = \
-        mock_stimulus_timestamps.from_stimulus_file(
-            stimulus_file=mock_stimulus_file_instance,
-            monitor_delay=0.0
-        )
-    assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
+    assert obt._stimulus_timestamps == dummy_ts
 
     mock_get_running_df.assert_called_once_with(
         data=mock_stimulus_file_instance.data,
-        time=mock_stimulus_timestamps_instance.value,
+        time=dummy_ts.value,
     )
 
     pd.testing.assert_frame_equal(obt.value, expected_running_acq_df)

@@ -253,3 +253,15 @@ class StimulusTimestamps(DataObject,
         nwbfile.add_processing_module(stim_mod)
 
         return nwbfile
+
+    def without_monitor_delay(self) -> "StimulusTimestamps":
+        """
+
+        Returns
+        -------
+        `StimulusTimestamps` without monitor delay added
+        """
+        return StimulusTimestamps(
+            timestamps=self.value - self.monitor_delay,
+            monitor_delay=0.0
+        )
