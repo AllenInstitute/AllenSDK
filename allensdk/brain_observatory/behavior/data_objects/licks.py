@@ -60,10 +60,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
 
         Returns
         -------
-        licks_data : pd.DataFrame
-            Two columns: "time", which contains the sync time
-            of the licks that occurred in this session and "frame",
-            the frame numbers of licks that occurred in this session
+        `Licks` instance
         """
         data = stimulus_file.data
 
