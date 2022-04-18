@@ -21,7 +21,23 @@ class Units(DataObject, JsonReadableInterface, NwbReadableInterface):
         super().__init__(name='units', value=units)
 
     @classmethod
-    def from_json(cls, probe: dict) -> "Units":
+    def from_json(
+            cls,
+            probe: dict,
+            amplitude_scale_factor=0.195e-6
+    ) -> "Units":
+        """
+
+        Parameters
+        ----------
+        probe
+        amplitude_scale_factor: amplitude scale factor converting raw
+        amplitudes to Volts. Default converts from bits -> uV -> V
+
+        Returns
+        -------
+
+        """
         local_to_global_unit_map = {
             unit['cluster_id']: unit['id'] for unit in probe['units']}
         spike_times = _read_spike_times_to_dictionary(
@@ -40,7 +56,8 @@ class Units(DataObject, JsonReadableInterface, NwbReadableInterface):
             probe["spike_templates_path"],
             probe["inverse_whitening_matrix_path"],
             local_to_global_unit_map=local_to_global_unit_map,
-            scale_factor=probe['amplitude_scale_factor']
+            scale_factor=probe.get('amplitude_scale_factor',
+                                   amplitude_scale_factor)
         )
         units = [
             Unit(**unit,

@@ -8,6 +8,12 @@ import pytz
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
+    import \
+    Presentations
+from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
+    import \
+    Templates
 from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
@@ -81,7 +87,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def from_json(
             cls,
             session_data: dict,
-            stimulus_timestamps: Optional[StimulusTimestamps] = None
+            stimulus_timestamps: Optional[StimulusTimestamps] = None,
+            read_stimulus_presentations_table_from_file=False,
+            stimulus_presentation_columns: Optional[List[str]] = None,
+            stimulus_presentation_exclude_columns: Optional[List[str]] = None
     ) -> "BehaviorSession":
         """
 
@@ -91,6 +100,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Dict of input data necessary to construct a session
         stimulus_timestamps
             Optional `StimulusTimestamps`
+        read_stimulus_presentations_table_from_file
+            Whether to read the stimulus table from a file rather than
+            construct it here
+        stimulus_presentation_columns
+            Columns to include in the stimulus presentation table. This also
+            specifies the order of the columns.
+        stimulus_presentation_exclude_columns
+            Optional list of columns to exclude from stimulus presentations
+            table
 
         Returns
         -------
@@ -104,9 +122,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
         stimulus_file = BehaviorStimulusFile.from_json(dict_repr=session_data)
-        if stimulus_timestamps is not None:
+        if stimulus_timestamps is None:
             stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file, monitor_delay=monitor_delay)
+                stimulus_file=stimulus_file,
+                monitor_delay=session_data['monitor_delay'])
         running_acquisition = RunningAcquisition.from_json(
             dict_repr=session_data,
             stimulus_timestamps=stimulus_timestamps.without_monitor_delay()
@@ -124,7 +143,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         licks, rewards, stimuli, task_parameters, trials = \
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps
+                stimulus_timestamps=stimulus_timestamps,
+                include_stimuli=
+                not read_stimulus_presentations_table_from_file,
+                stimulus_presentation_columns=stimulus_presentation_columns
+            )
+        if read_stimulus_presentations_table_from_file:
+            stimuli = Stimuli(
+                presentations=Presentations.from_path(
+                    path=session_data['stim_table_file'],
+                    exclude_columns=stimulus_presentation_exclude_columns
+                ),
+                templates=Templates.from_stimulus_file(
+                    stimulus_file=stimulus_file)
             )
         date_of_acquisition = DateOfAcquisition.from_json(
             dict_repr=session_data)\
@@ -236,7 +267,24 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "BehaviorSession":
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            add_is_change_to_stimulus_presentations_table=True
+    ) -> "BehaviorSession":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        add_is_change_to_stimulus_presentations_table: Whether to add a column
+            denoting whether the stimulus presentation represented a change
+            event. May not be needed in case this column is precomputed
+
+        Returns
+        -------
+
+        """
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
@@ -245,7 +293,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         metadata = BehaviorMetadata.from_nwb(nwbfile)
         licks = Licks.from_nwb(nwbfile=nwbfile)
         rewards = Rewards.from_nwb(nwbfile=nwbfile)
-        stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
+        stimuli = Stimuli.from_nwb(
+            nwbfile=nwbfile,
+            add_is_change_to_presentations_table=
+            add_is_change_to_stimulus_presentations_table)
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = TrialTable.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
@@ -284,7 +335,12 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
-    def to_nwb(self, add_metadata=True) -> NWBFile:
+    def to_nwb(
+            self,
+            add_metadata=True,
+            include_experiment_description=True,
+            stimulus_presentations_stimulus_column_name: str = 'image_set'
+        ) -> NWBFile:
         """
 
         Parameters
@@ -292,7 +348,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_metadata
             Set this to False to prevent adding metadata to the nwb
             instance.
+        include_experiment_description: Whether to include a description of the
+            experiment in the nwbfile
+        stimulus_presentations_stimulus_column_name: Name of the column
+            denoting the stimulus name in the presentations table
         """
+        if include_experiment_description:
+            experiment_description = get_expt_description(
+                session_type=self._get_session_type())
+        else:
+            experiment_description = None
+
         nwbfile = NWBFile(
             session_description=self._get_session_type(),
             identifier=self._get_identifier(),
@@ -300,9 +366,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=self._get_keywords(),
-            experiment_description=get_expt_description(
-                session_type=self._get_session_type())
-        )
+            experiment_description=experiment_description)
 
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
         self._running_acquisition.to_nwb(nwbfile=nwbfile)
@@ -314,7 +378,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         self._licks.to_nwb(nwbfile=nwbfile)
         self._rewards.to_nwb(nwbfile=nwbfile)
-        self._stimuli.to_nwb(nwbfile=nwbfile)
+        self._stimuli.to_nwb(
+            nwbfile=nwbfile,
+            presentations_stimulus_column_name=
+            stimulus_presentations_stimulus_column_name)
         self._task_parameters.to_nwb(nwbfile=nwbfile)
         self._trials.to_nwb(nwbfile=nwbfile)
 
@@ -890,7 +957,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     @classmethod
     def _read_data_from_stimulus_file(
             cls, stimulus_file: BehaviorStimulusFile,
-            stimulus_timestamps: StimulusTimestamps):
+            stimulus_timestamps: StimulusTimestamps,
+            include_stimuli=True,
+            stimulus_presentation_columns: Optional[List[str]] = None
+    ):
         """Helper method to read data from stimulus file"""
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -901,14 +971,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            presentation_columns=[
-                'start_time', 'stop_time',
-                'duration',
-                'image_name', 'image_index',
-                'is_change', 'omitted',
-                'start_frame', 'end_frame',
-                'image_set']
-        )
+            presentation_columns=stimulus_presentation_columns
+        ) if include_stimuli else None
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file)
         trials = TrialTable.from_stimulus_file(
