@@ -341,8 +341,9 @@ def test_running_speed_from_lims(
             mock_get_running_speed_df
         )
         obt = RunningSpeed.from_lims(
-            mock_db_conn, behavior_session_id, filtered,
-            zscore_threshold
+            db=mock_db_conn, behavior_session_id=behavior_session_id,
+            filtered=filtered, zscore_threshold=zscore_threshold,
+            stimulus_timestamps=dummy_ts
         )
 
     mock_stimulus_file.from_lims.assert_called_once_with(
@@ -353,9 +354,6 @@ def test_running_speed_from_lims(
     )
     assert obt._stimulus_file == mock_stimulus_file_instance
 
-    mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
-        mock_stimulus_file_instance, monitor_delay=0.0
-    )
     mock_stimulus_timestamps_instance = mock_stimulus_timestamps.\
         from_stimulus_file(stimulus_file=mock_stimulus_file,
                            monitor_delay=0.0)
