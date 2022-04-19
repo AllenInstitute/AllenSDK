@@ -1,3 +1,4 @@
+import json
 import logging
 import warnings
 from pathlib import Path
@@ -130,7 +131,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         try:
             eye_tracking_acquisition = nwbfile.acquisition['EyeTracking']
         except KeyError as e:
-            warnings.warn("This ophys experiment "
+            warnings.warn("This nwb file with identifier "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking data. (NWB error: {e})")
             eye_tracking_data = cls._get_empty_df()
@@ -238,3 +239,28 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             eye_tracking_data = cls._get_empty_df()
 
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
+
+
+def get_lost_frames(file_path: str) -> List[int]:
+    """
+    Get lost frames from the video metadata json
+    Must subtract one since the json starts indexing at 1
+
+    Parameters
+    ----------
+    file_path: str
+        Path to the metadata json
+
+    Returns
+    -------
+        indices of lost frames
+    """
+    with open(file_path, 'r') as f:
+        video_metadata = json.load(f)
+
+    lost_frames = video_metadata['RecordingReport']['LostFrames']
+
+    if lost_frames:
+        return [int(f) - 1 for f in lost_frames]
+    else:
+        return []

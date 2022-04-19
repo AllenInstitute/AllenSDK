@@ -13,26 +13,30 @@ from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.core import DataObject
 
 
-# Query returns path to sync timing file associated with ophys experiment
-SYNC_FILE_QUERY_TEMPLATE = """
-    SELECT wkf.storage_directory || wkf.filename AS sync_file
-    FROM ophys_experiments oe
-    JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-    JOIN well_known_files wkf ON wkf.attachable_id = os.id
-    JOIN well_known_file_types wkft
-    ON wkft.id = wkf.well_known_file_type_id
-    WHERE wkf.attachable_type = 'OphysSession'
-    AND wkft.name = 'OphysRigSync'
-    AND oe.id = {ophys_experiment_id};
-"""
+def _get_sync_file_query_template(behavior_session_id: int):
+
+    """Query returns path to sync timing file associated with behavior session
+    """
+    SYNC_FILE_QUERY_TEMPLATE = f"""
+        SELECT wkf.storage_directory || wkf.filename AS sync_file
+        FROM behavior_sessions bs
+        JOIN ophys_sessions os ON bs.ophys_session_id = os.id
+        JOIN well_known_files wkf ON wkf.attachable_id = os.id
+        JOIN well_known_file_types wkft
+        ON wkft.id = wkf.well_known_file_type_id
+        WHERE wkf.attachable_type = 'OphysSession'
+        AND wkft.name = 'OphysRigSync'
+        AND bs.id = {behavior_session_id}
+    """
+    return SYNC_FILE_QUERY_TEMPLATE
 
 
 def from_json_cache_key(cls, dict_repr: dict, permissive: bool = False):
     return hashkey(json.dumps(dict_repr))
 
 
-def from_lims_cache_key(cls, db, ophys_experiment_id: int):
-    return hashkey(ophys_experiment_id)
+def from_lims_cache_key(cls, db, behavior_session_id: int):
+    return hashkey(behavior_session_id)
 
 
 class SyncFile(DataFile):
@@ -74,12 +78,11 @@ class SyncFile(DataFile):
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin,
-        ophys_experiment_id: Union[int, str],
+        behavior_session_id: Union[int, str],
         permissive: bool = False
     ) -> "SyncFile":
-        query = SYNC_FILE_QUERY_TEMPLATE.format(
-            ophys_experiment_id=ophys_experiment_id
-        )
+        query = _get_sync_file_query_template(
+            behavior_session_id=behavior_session_id)
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath, permissive=permissive)
 

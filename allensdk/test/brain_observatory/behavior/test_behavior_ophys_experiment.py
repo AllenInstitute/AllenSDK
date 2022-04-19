@@ -215,7 +215,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
                     create_autospec(db_connection_creator, instance=True))
         ctx.setattr(
             SyncFile, 'from_lims',
-            lambda db, ophys_experiment_id: sf)
+            lambda db, behavior_session_id: sf)
         ctx.setattr(
             StimulusTimestamps, 'from_sync_file',
             lambda sync_file, monitor_delay:
@@ -243,7 +243,9 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
         ctx.setattr(
             BehaviorSession, 'from_lims',
             lambda lims_db, behavior_session_id,
-            stimulus_timestamps, monitor_delay, date_of_acquisition:
+            stimulus_timestamps, monitor_delay, date_of_acquisition,
+            skip_eye_tracking, eye_tracking_z_threshold,
+            eye_tracking_dilation_frames:
             BehaviorSession(
                 behavior_session_id=None,
                 stimulus_timestamps=None,
@@ -257,7 +259,17 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
                 trials=None,
                 metadata=None,
                 date_of_acquisition=None,
-            ))
+                eye_tracking_table=EyeTrackingTable.from_data_file(
+                    data_file=EyeTrackingFile.from_lims(
+                        db=lims_db,
+                        behavior_session_id=behavior_session_id.value),
+                    sync_file=SyncFile.from_lims(
+                        db=lims_db,
+                        behavior_session_id=behavior_session_id.value),
+                    z_threshold=eye_tracking_z_threshold,
+                    dilation_frames=eye_tracking_dilation_frames)
+                )
+            )
         ctx.setattr(
             OphysTimestamps, 'from_sync_file',
             lambda sync_file: create_autospec(OphysTimestamps,
@@ -278,7 +290,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
                 RigidMotionTransformFile, instance=True))
         ctx.setattr(
             EyeTrackingFile, 'from_lims',
-            lambda db, ophys_experiment_id: etf)
+            lambda db, behavior_session_id: etf)
         ctx.setattr(
             EyeTrackingTable, 'from_data_file',
             lambda data_file, sync_file, z_threshold, dilation_frames:
@@ -287,7 +299,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
                 z_threshold=z_threshold, dilation_frames=dilation_frames))
         ctx.setattr(
             EyeTrackingRigGeometry, 'from_lims',
-            lambda lims_db, ophys_experiment_id: create_autospec(
+            lambda lims_db, behavior_session_id: create_autospec(
                 EyeTrackingRigGeometry, instance=True))
         boe = BehaviorOphysExperiment.from_lims(
             ophys_experiment_id=1, eye_tracking_z_threshold=z_threshold,

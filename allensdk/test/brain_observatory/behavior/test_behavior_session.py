@@ -59,7 +59,9 @@ def test_behavior_session_list_data_attributes_and_methods(monkeypatch):
         'stimulus_templates',
         'stimulus_timestamps',
         'task_parameters',
-        'trials'
+        'trials',
+        'eye_tracking',
+        'eye_tracking_rig_geometry'
     }
 
     assert any(expected ^ set(obt)) is False

@@ -37,7 +37,10 @@ class BehaviorEcephysSession(BehaviorSession):
             stimuli=behavior_session._stimuli,
             stimulus_timestamps=behavior_session._stimulus_timestamps,
             task_parameters=behavior_session._task_parameters,
-            trials=behavior_session._trials
+            trials=behavior_session._trials,
+            eye_tracking_table=behavior_session._eye_tracking,
+            eye_tracking_rig_geometry=(
+                behavior_session._eye_tracking_rig_geometry)
         )
         self._probes = probes
         self._optotagging_table = optotagging_table
@@ -128,8 +131,10 @@ class BehaviorEcephysSession(BehaviorSession):
             session_data=session_data,
             stimulus_timestamps=stimulus_timestamps,
             read_stimulus_presentations_table_from_file=True,
-            stimulus_presentation_exclude_columns=
-            stimulus_presentation_exclude_columns
+            stimulus_presentation_exclude_columns=(
+                stimulus_presentation_exclude_columns),
+            sync_file_permissive=True,
+            eye_tracking_drop_frames=True
         )
         probes = Probes.from_json(probes=probes)
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)

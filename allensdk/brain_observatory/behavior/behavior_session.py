@@ -7,7 +7,16 @@ import pytz
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_files import \
+    BehaviorStimulusFile, SyncFile
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
+    EyeTrackingFile
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
+    .eye_tracking_table import \
+    EyeTrackingTable, get_lost_frames
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+    .rig_geometry import \
+    RigGeometry as EyeTrackingRigGeometry
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
     Presentations
@@ -64,7 +73,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         task_parameters: TaskParameters,
         trials: TrialTable,
         metadata: BehaviorMetadata,
-        date_of_acquisition: DateOfAcquisition
+        date_of_acquisition: DateOfAcquisition,
+        eye_tracking_table: Optional[EyeTrackingTable] = None,
+        eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry] = None,
     ):
         super().__init__(name='behavior_session', value=self)
 
@@ -80,6 +91,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         self._trials = trials
         self._metadata = metadata
         self._date_of_acquisition = date_of_acquisition
+        self._eye_tracking = eye_tracking_table
+        self._eye_tracking_rig_geometry = eye_tracking_rig_geometry
 
     # ==================== class and utility methods ======================
 
@@ -90,7 +103,12 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimulus_timestamps: Optional[StimulusTimestamps] = None,
             read_stimulus_presentations_table_from_file=False,
             stimulus_presentation_columns: Optional[List[str]] = None,
-            stimulus_presentation_exclude_columns: Optional[List[str]] = None
+            stimulus_presentation_exclude_columns: Optional[List[str]] = None,
+            skip_eye_tracking=False,
+            eye_tracking_z_threshold: float = 3.0,
+            eye_tracking_dilation_frames: int = 2,
+            eye_tracking_drop_frames: bool = False,
+            sync_file_permissive: bool = False
     ) -> "BehaviorSession":
         """
 
@@ -109,6 +127,18 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         stimulus_presentation_exclude_columns
             Optional list of columns to exclude from stimulus presentations
             table
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+        eye_tracking_z_threshold
+            See `BehaviorSession.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorSession.from_nwb`
+        eye_tracking_drop_frames
+            See `drop_frames` arg in `allensdk.brain_observatory.behavior.
+            data_objects.eye_tracking.eye_tracking_table.EyeTrackingTable.
+            from_data_file`
+        sync_file_permissive
+            See `permissive` arg in `SyncFile` constructor
 
         Returns
         -------
@@ -144,8 +174,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             cls._read_data_from_stimulus_file(
                 stimulus_file=stimulus_file,
                 stimulus_timestamps=stimulus_timestamps,
-                include_stimuli=
-                not read_stimulus_presentations_table_from_file,
+                include_stimuli=(
+                    not read_stimulus_presentations_table_from_file),
                 stimulus_presentation_columns=stimulus_presentation_columns
             )
         if read_stimulus_presentations_table_from_file:
@@ -162,6 +192,24 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             .validate(
             stimulus_file=stimulus_file,
             behavior_session_id=behavior_session_id.value)
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+            eye_tracking_table = EyeTrackingTable.from_data_file(
+                data_file=EyeTrackingFile.from_json(
+                    dict_repr=session_data),
+                sync_file=SyncFile.from_json(
+                    dict_repr=session_data,
+                    permissive=sync_file_permissive),
+                z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames,
+                drop_frames=get_lost_frames(
+                    file_path=session_data['raw_eye_tracking_video_meta_data'])
+                if eye_tracking_drop_frames else None
+            )
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
+                dict_repr=session_data)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -175,7 +223,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
@@ -183,7 +233,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                   lims_db: Optional[PostgresQueryMixin] = None,
                   stimulus_timestamps: Optional[StimulusTimestamps] = None,
                   monitor_delay: Optional[float] = None,
-                  date_of_acquisition: Optional[DateOfAcquisition] = None) \
+                  date_of_acquisition: Optional[DateOfAcquisition] = None,
+                  skip_eye_tracking=False,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2) \
             -> "BehaviorSession":
         """
 
@@ -204,6 +257,12 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+        eye_tracking_z_threshold
+            See `BehaviorSession.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorSession.from_nwb`
         Returns
         -------
         `BehaviorSession` instance
@@ -250,6 +309,22 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition = date_of_acquisition.validate(
             stimulus_file=stimulus_file,
             behavior_session_id=behavior_session_id.value)
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+            eye_tracking_table = EyeTrackingTable.from_data_file(
+                data_file=EyeTrackingFile.from_lims(
+                    db=lims_db,
+                    behavior_session_id=behavior_session_id.value),
+                sync_file=SyncFile.from_lims(
+                    db=lims_db,
+                    behavior_session_id=behavior_session_id.value),
+                z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames
+            )
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
+                behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -263,14 +338,18 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
     def from_nwb(
             cls,
             nwbfile: NWBFile,
-            add_is_change_to_stimulus_presentations_table=True
+            add_is_change_to_stimulus_presentations_table=True,
+            eye_tracking_z_threshold: float = 3.0,
+            eye_tracking_dilation_frames: int = 2
     ) -> "BehaviorSession":
         """
 
@@ -280,6 +359,14 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_is_change_to_stimulus_presentations_table: Whether to add a column
             denoting whether the stimulus presentation represented a change
             event. May not be needed in case this column is precomputed
+        eye_tracking_z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        eye_tracking_dilation_frames : int, optional
+            Determines the number of adjacent frames that will be marked
+            as 'likely_blink' when performing blink detection for
+            `eye_tracking` data, by default 2
 
         Returns
         -------
@@ -295,11 +382,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         rewards = Rewards.from_nwb(nwbfile=nwbfile)
         stimuli = Stimuli.from_nwb(
             nwbfile=nwbfile,
-            add_is_change_to_presentations_table=
-            add_is_change_to_stimulus_presentations_table)
+            add_is_change_to_presentations_table=(
+                add_is_change_to_stimulus_presentations_table)
+        )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = TrialTable.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
+        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
+            nwbfile=nwbfile)
+        eye_tracking_table = EyeTrackingTable.from_nwb(
+            nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
+            dilation_frames=eye_tracking_dilation_frames)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -313,7 +406,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
@@ -340,7 +435,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             add_metadata=True,
             include_experiment_description=True,
             stimulus_presentations_stimulus_column_name: str = 'image_set'
-        ) -> NWBFile:
+    ) -> NWBFile:
         """
 
         Parameters
@@ -380,10 +475,14 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         self._rewards.to_nwb(nwbfile=nwbfile)
         self._stimuli.to_nwb(
             nwbfile=nwbfile,
-            presentations_stimulus_column_name=
-            stimulus_presentations_stimulus_column_name)
+            presentations_stimulus_column_name=(
+                stimulus_presentations_stimulus_column_name))
         self._task_parameters.to_nwb(nwbfile=nwbfile)
         self._trials.to_nwb(nwbfile=nwbfile)
+        if self._eye_tracking is not None:
+            self._eye_tracking.to_nwb(nwbfile=nwbfile)
+        if self._eye_tracking_rig_geometry is not None:
+            self._eye_tracking_rig_geometry.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
 
@@ -616,6 +715,64 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         :rtype: int
         """
         return self._behavior_session_id.value
+
+    @property
+    def eye_tracking(self) -> pd.DataFrame:
+        """A dataframe containing ellipse fit parameters for the eye, pupil
+        and corneal reflection (cr). Fits are derived from tracking points
+        from a DeepLabCut model applied to video frames of a subject's
+        right eye. Raw tracking points and raw video frames are not exposed
+        by the SDK.
+
+        Notes:
+        - All columns starting with 'pupil_' represent ellipse fit parameters
+          relating to the pupil.
+        - All columns starting with 'eye_' represent ellipse fit parameters
+          relating to the eyelid.
+        - All columns starting with 'cr_' represent ellipse fit parameters
+          relating to the corneal reflection, which is caused by an infrared
+          LED positioned near the eye tracking camera.
+        - All positions are in units of pixels.
+        - All areas are in units of pixels^2
+        - All values are in the coordinate space of the eye tracking camera,
+          NOT the coordinate space of the stimulus display (i.e. this is not
+          gaze location), with (0, 0) being the upper-left corner of the
+          eye-tracking image.
+        - The 'likely_blink' column is True for any row (frame) where the pupil
+          fit failed OR eye fit failed OR an outlier fit was identified on the
+          pupil or eye fit.
+        - The pupil_area, cr_area, eye_area columns are set to NaN wherever
+          'likely_blink' == True.
+        - The pupil_area_raw, cr_area_raw, eye_area_raw columns contains all
+          pupil fit values (including where 'likely_blink' == True).
+        - All ellipse fits are derived from tracking points that were output by
+          a DeepLabCut model that was trained on hand-annotated data from a
+          subset of imaging sessions on optical physiology rigs.
+        - Raw DeepLabCut tracking points are not publicly available.
+
+        :rtype: pandas.DataFrame
+        """
+        return self._eye_tracking.value
+
+    @property
+    def eye_tracking_rig_geometry(self) -> dict:
+        """the eye tracking equipment geometry associated with a
+        given behavior session.
+
+        Returns
+        -------
+        dict
+            dictionary with the following keys:
+                camera_eye_position_mm (array of float)
+                camera_rotation_deg (array of float)
+                equipment (string)
+                led_position (array of float)
+                monitor_position_mm (array of float)
+                monitor_rotation_deg (array of float)
+        """
+        if self._eye_tracking_rig_geometry is None:
+            return dict()
+        return self._eye_tracking_rig_geometry.to_dict()['rig_geometry']
 
     @property
     def licks(self) -> pd.DataFrame:

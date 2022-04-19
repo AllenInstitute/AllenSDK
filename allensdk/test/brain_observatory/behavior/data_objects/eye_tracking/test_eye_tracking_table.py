@@ -10,6 +10,7 @@ from allensdk.brain_observatory.behavior.data_files import \
     SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import \
     EyeTrackingTable
@@ -33,10 +34,12 @@ class TestFromDataFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_data_file(self):
+        behavior_session_id = BehaviorSessionId.from_lims(
+            db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
         etf = EyeTrackingFile.from_lims(
-            ophys_experiment_id=self.ophys_experiment_id, db=self.dbconn)
+            behavior_session_id=behavior_session_id.value, db=self.dbconn)
         sync_file = SyncFile.from_lims(
-            ophys_experiment_id=self.ophys_experiment_id, db=self.dbconn)
+            behavior_session_id=behavior_session_id.value, db=self.dbconn)
         ett = EyeTrackingTable.from_data_file(data_file=etf,
                                               sync_file=sync_file)
 
