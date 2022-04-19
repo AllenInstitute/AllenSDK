@@ -95,7 +95,8 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Returns
         -------
         Dataframe containing all units detected by probes
-        Columns are the properties of `allensdk.ecephys._unit.Unit`
+        Columns:
+            - properties of `allensdk.ecephys._unit.Unit`
             except for 'spike_times', 'spike_amplitudes', 'mean_waveforms'
             which are returned separately
         """

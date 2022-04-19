@@ -1,5 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 
+import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
@@ -86,6 +87,65 @@ class BehaviorEcephysSession(BehaviorSession):
             **behavior_meta,
             **ecephys_meta
         }
+
+    @property
+    def mean_waveforms(self) -> Dict[int, np.ndarray]:
+        """
+
+        Returns
+        -------
+        Dictionary mapping unit id to mean_waveforms for all probes
+        """
+        return self._probes.mean_waveforms
+
+    @property
+    def spike_times(self) -> Dict[int, np.ndarray]:
+        """
+
+        Returns
+        -------
+        Dictionary mapping unit id to spike_times for all probes
+        """
+        return self._probes.spike_times
+
+    @property
+    def spike_amplitudes(self) -> Dict[int, np.ndarray]:
+        """
+
+        Returns
+        -------
+        Dictionary mapping unit id to spike_amplitudes for all probes
+        """
+        return self._probes.spike_amplitudes
+
+    def get_channels(self, filter_by_validity: bool = True) -> pd.DataFrame:
+        """
+
+        Parameters
+        ----------
+        filter_by_validity: Whether to filter channels based on whether
+            the channel is marked as "valid_data"
+
+        Returns
+        -------
+        `pd.DataFrame` of channels
+        """
+        return pd.concat([
+            p.channels.to_dataframe(filter_by_validity=filter_by_validity)
+            for p in self._probes.probes])
+
+    def get_units(self, **kwargs) -> pd.DataFrame:
+        """
+
+        Parameters
+        ----------
+        kwargs: kwargs sent to `Probes.get_units_table`
+
+        Returns
+        -------
+        `pd.DataFrame` of units detected by all probes
+        """
+        return self._probes.get_units_table(**kwargs)
 
     @classmethod
     def from_json(
