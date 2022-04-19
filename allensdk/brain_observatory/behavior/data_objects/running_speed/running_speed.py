@@ -119,19 +119,19 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         cls,
         db: PostgresQueryMixin,
         behavior_session_id: int,
+        stimulus_timestamps: StimulusTimestamps,
         filtered: bool = True,
         zscore_threshold: float = 10.0,
-        stimulus_timestamps: Optional[StimulusTimestamps] = None,
     ) -> "RunningSpeed":
         stimulus_file = BehaviorStimulusFile.from_lims(
                                 db,
                                 behavior_session_id)
 
-        if stimulus_timestamps is None or \
-                (stimulus_timestamps is not None and
-                 stimulus_timestamps.monitor_delay != 0.0):
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file,
+        if stimulus_timestamps.monitor_delay != 0.0:
+            stimulus_timestamps = StimulusTimestamps(
+                timestamps=(
+                        stimulus_timestamps.value -
+                        stimulus_timestamps.monitor_delay),
                 monitor_delay=0.0
             )
 
