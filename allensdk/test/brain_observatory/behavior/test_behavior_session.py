@@ -70,9 +70,11 @@ def test_behavior_session_list_data_attributes_and_methods(monkeypatch):
 @pytest.mark.nightly
 def test_behavior_session_equivalent_json_lims(session_data_fixture):
 
-    json_session = BehaviorSession.from_json(session_data_fixture)
+    json_session = BehaviorSession.from_json(session_data_fixture,
+                                             skip_eye_tracking=True)
 
     behavior_session_id = session_data_fixture['behavior_session_id']
-    lims_session = BehaviorSession.from_lims(behavior_session_id)
+    lims_session = BehaviorSession.from_lims(behavior_session_id,
+                                             skip_eye_tracking=True)
 
     assert sessions_are_equal(json_session, lims_session, reraise=True)
