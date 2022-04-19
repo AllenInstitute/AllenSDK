@@ -1,9 +1,5 @@
 
-import json
 from typing import Optional
-
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
 
 import pandas as pd
 import numpy as np
@@ -28,23 +24,6 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 from allensdk.brain_observatory.behavior.data_objects.\
     running_speed.multi_stim_running_processing import (
         _get_multi_stim_running_df)
-
-def from_json_cache_key(
-    cls,
-    dict_repr: dict,
-):
-    return hashkey(json.dumps(dict_repr))
-
-
-def from_lims_cache_key(
-    cls,
-    db,
-    behavior_session_id: int,
-    ophys_experiment_id: Optional[int] = None
-):
-    return hashkey(
-        behavior_session_id, ophys_experiment_id
-    )
 
 
 class RunningAcquisition(DataObject,
