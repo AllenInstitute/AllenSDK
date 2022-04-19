@@ -115,8 +115,7 @@ def sync_file_fixture(
     Yields the path to a sync file for testing
     """
     tmpdir = pathlib.Path(tmp_path_factory.mktemp('external_sync_test'))
-    sync_path = tmpdir / tempfile.mkstemp(suffix='sync')[1]
-
+    sync_path = pathlib.Path(tempfile.mkstemp(dir=tmpdir, suffix='sync')[1])
     n_samples = len(sync_sample_fixture)
     data = np.zeros((n_samples, 2), dtype=np.uint32)
     data[:, 0] = sync_sample_fixture

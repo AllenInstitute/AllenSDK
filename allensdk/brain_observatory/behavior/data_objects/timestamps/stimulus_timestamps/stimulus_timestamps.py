@@ -197,8 +197,9 @@ class StimulusTimestamps(DataObject,
                         frame_count_tolerance=frame_count_tolerance)
 
         to_concatenate = \
-            [t for t in stimulus_times] if stims_of_interest is None else \
-            [stimulus_times[idx] for idx in stims_of_interest]
+            [t for t in stimulus_times["timestamps"]] \
+            if stims_of_interest is None else  \
+            [stimulus_times["timestamps"][idx] for idx in stims_of_interest]
 
         timestamps = np.concatenate(to_concatenate)
 
