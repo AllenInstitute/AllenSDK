@@ -5,7 +5,6 @@ import numpy as np
 import tempfile
 import pathlib
 import pandas as pd
-from unittest.mock import patch
 
 from allensdk.brain_observatory.behavior.\
     data_objects.running_speed.running_processing import (

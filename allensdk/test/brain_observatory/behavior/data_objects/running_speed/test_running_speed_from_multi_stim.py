@@ -1,13 +1,10 @@
 import pytest
-import numpy as np
 import pandas as pd
 from pynwb import NWBHDF5IO, NWBFile
 import tempfile
 import pathlib
 import pytz
 import datetime
-
-from unittest.mock import patch
 
 from allensdk.brain_observatory.behavior.data_objects.\
     running_speed.running_speed import (
