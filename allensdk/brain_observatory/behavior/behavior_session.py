@@ -717,7 +717,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return self._behavior_session_id.value
 
     @property
-    def eye_tracking(self) -> pd.DataFrame:
+    def eye_tracking(self) -> Optional[pd.DataFrame]:
         """A dataframe containing ellipse fit parameters for the eye, pupil
         and corneal reflection (cr). Fits are derived from tracking points
         from a DeepLabCut model applied to video frames of a subject's
@@ -752,7 +752,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         :rtype: pandas.DataFrame
         """
-        return self._eye_tracking.value
+        return self._eye_tracking.value \
+            if self._eye_tracking is not None \
+            else None
 
     @property
     def eye_tracking_rig_geometry(self) -> dict:
