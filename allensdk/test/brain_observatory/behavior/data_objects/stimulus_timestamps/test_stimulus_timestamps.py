@@ -299,3 +299,26 @@ class TestStimulusTimestampsFromMultipleStimulusBlocks:
             obt = StimulusTimestamps.from_nwb(nwbfile=self._nwbfile)
 
         assert obt == self._timestamps_from_json
+
+
+def test_substract_monitor_delay():
+    """
+    Test that StimulusTimestamps.subtract_monitor_delay
+    returns a copy of itself with the monitor_delay subtracted
+    """
+    rng = np.random.default_rng(22)
+    timestamps = np.sort(rng.random(100))
+    monitor_delay = 0.57
+    original_ts = StimulusTimestamps(
+                        timestamps=timestamps,
+                        monitor_delay=monitor_delay)
+
+    np.testing.assert_array_equal(
+        original_ts.value,
+        timestamps+monitor_delay)
+    assert np.isclose(original_ts.monitor_delay, monitor_delay)
+
+    new_ts = original_ts.subtract_monitor_delay()
+    assert isinstance(new_ts, StimulusTimestamps)
+    assert np.isclose(new_ts.monitor_delay, 0.0)
+    np.testing.assert_allclose(timestamps, new_ts.value)

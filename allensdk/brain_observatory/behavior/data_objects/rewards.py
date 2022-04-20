@@ -31,7 +31,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
             msg = ("Instantiating rewards with monitor_delay = "
                    f"{stimulus_timestamps.monitor_delay: .2e}; "
-                   "monitor_delay should be zero for Licks "
+                   "monitor_delay should be zero for Rewards "
                    "data object")
             raise RuntimeError(msg)
 
