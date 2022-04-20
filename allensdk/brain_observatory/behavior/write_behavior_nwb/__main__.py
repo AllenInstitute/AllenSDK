@@ -27,7 +27,16 @@ def write_behavior_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
-        json_session = BehaviorSession.from_json(session_data)
+        json_session = BehaviorSession.from_json(
+            session_data,
+            stimulus_presentation_columns=[
+                    'start_time', 'stop_time',
+                    'duration',
+                    'image_name', 'image_index',
+                    'is_change', 'omitted',
+                    'start_frame', 'end_frame',
+                    'image_set']
+        )
 
         behavior_session_id = session_data['behavior_session_id']
         lims_session = BehaviorSession.from_lims(behavior_session_id)
