@@ -25,6 +25,20 @@ class TestFromBehaviorStimulusFile:
         expected = pd.read_pickle(str(test_data_dir / 'licks.pkl'))
         cls.expected = Licks(licks=expected)
 
+    def test_monitor_delay_error(self):
+        """
+        Test that an error is raised if Licks are instantiated with
+        non-zero monitor delay
+        """
+        timestamps = StimulusTimestamps(
+                        np.arange(10),
+                        0.1)
+        with pytest.raises(RuntimeError,
+                           match="monitor_delay should be zero"):
+            Licks.from_stimulus_file(
+                     stimulus_file=self.stimulus_file,
+                     stimulus_timestamps=timestamps)
+
     def test_from_stimulus_file(self):
         st = StimulusTimestamps.from_stimulus_file(
             stimulus_file=self.stimulus_file,
