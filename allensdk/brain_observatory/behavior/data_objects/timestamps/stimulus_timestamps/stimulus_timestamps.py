@@ -197,8 +197,9 @@ class StimulusTimestamps(DataObject,
                         frame_count_tolerance=frame_count_tolerance)
 
         to_concatenate = \
-            [t for t in stimulus_times] if stims_of_interest is None else \
-            [stimulus_times[idx] for idx in stims_of_interest]
+            [t for t in stimulus_times["timestamps"]] \
+            if stims_of_interest is None else  \
+            [stimulus_times["timestamps"][idx] for idx in stims_of_interest]
 
         timestamps = np.concatenate(to_concatenate)
 
@@ -253,15 +254,3 @@ class StimulusTimestamps(DataObject,
         nwbfile.add_processing_module(stim_mod)
 
         return nwbfile
-
-    def without_monitor_delay(self) -> "StimulusTimestamps":
-        """
-
-        Returns
-        -------
-        `StimulusTimestamps` without monitor delay added
-        """
-        return StimulusTimestamps(
-            timestamps=self.value - self.monitor_delay,
-            monitor_delay=0.0
-        )

@@ -152,7 +152,8 @@ class BehaviorEcephysSession(BehaviorSession):
             cls,
             session_data: dict,
             stimulus_timestamps: Optional[StimulusTimestamps] = None,
-            stimulus_presentation_exclude_columns: Optional[List[str]] = None
+            stimulus_presentation_exclude_columns: Optional[List[str]] = None,
+            running_speed_load_from_multiple_stimulus_files: bool = True
     ) -> "BehaviorEcephysSession":
         """
 
@@ -162,12 +163,13 @@ class BehaviorEcephysSession(BehaviorSession):
         stimulus_timestamps: Optional `StimulusTimestamps`
         stimulus_presentation_exclude_columns:  Optional list of columns to
             exclude from stimulus presentations table
+        Whether to load running speed from multiple stimulus files
+            If False, will just load from a single behavior stimulus file
 
         Returns
         -------
         Instantiated `BehaviorEcephysSession`
         """
-        probes = session_data['probes']
         session_data = session_data['session_data']
 
         monitor_delay = cls._get_monitor_delay() \
@@ -194,9 +196,11 @@ class BehaviorEcephysSession(BehaviorSession):
             stimulus_presentation_exclude_columns=(
                 stimulus_presentation_exclude_columns),
             sync_file_permissive=True,
-            eye_tracking_drop_frames=True
+            eye_tracking_drop_frames=True,
+            running_speed_load_from_multiple_stimulus_files=(
+                running_speed_load_from_multiple_stimulus_files)
         )
-        probes = Probes.from_json(probes=probes)
+        probes = Probes.from_json(probes=session_data['probes'])
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
 
         return BehaviorEcephysSession(

@@ -245,14 +245,18 @@ def test_user_facing_get_stim_timestamps_smoke(
                raw_frame_time_direction=edge_type,
                frame_count_tolerance=0.0)
 
-    assert len(result) == 4
-    for ii, (this_array, this_stim) in enumerate(zip(result,
-                                                     stim_list)):
+    assert len(result["timestamps"]) == 4
+    for ii, (this_array,
+             this_start_frame,
+             this_stim) in enumerate(zip(result["timestamps"],
+                                         result["start_frames"],
+                                         stim_list)):
         raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
         raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
         idx0 = expected_start_frames_fixture[edge_type][ii]
         expected = raw_times[idx0: idx0+this_stim.num_frames()]
         np.testing.assert_array_equal(this_array, expected)
+        assert this_start_frame == expected_start_frames_fixture[edge_type][ii]
 
 
 @pytest.mark.parametrize(
@@ -287,11 +291,15 @@ def test_user_facing_get_stim_timestamps(
                 raw_frame_time_direction=edge_type,
                 frame_count_tolerance=tolerance)
 
-    assert len(result) == len(expected_idx)
-    for ii, (this_array, this_stim) in enumerate(zip(result,
-                                                     stim_list)):
+    assert len(result["timestamps"]) == len(expected_idx)
+    for ii, (this_array,
+             this_start_frame,
+             this_stim) in enumerate(zip(result["timestamps"],
+                                         result["start_frames"],
+                                         stim_list)):
         raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
         raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
         idx0 = expected_start[ii]
         expected = raw_times[idx0: idx0+this_stim.num_frames()]
         np.testing.assert_array_equal(this_array, expected)
+        assert this_start_frame == expected_start[ii]

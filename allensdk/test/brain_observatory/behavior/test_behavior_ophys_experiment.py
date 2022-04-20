@@ -114,10 +114,13 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
         set(data_set.corrected_fluorescence_traces.columns) == \
         set(['cell_roi_id', 'corrected_fluorescence'])
+
+    monitor_delay = data_set._stimulus_timestamps.monitor_delay
+
     np.testing.assert_array_almost_equal(
         data_set.running_speed.timestamps,
-        data_set.stimulus_timestamps -
-        data_set._stimulus_timestamps.monitor_delay)
+        data_set.stimulus_timestamps-monitor_delay)
+
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
     assert data_set.average_projection.data.shape == \
         data_set.max_projection.data.shape
@@ -270,8 +273,8 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
                         behavior_session_id=behavior_session_id.value),
                     z_threshold=eye_tracking_z_threshold,
                     dilation_frames=eye_tracking_dilation_frames)
-                )
             )
+        )
         ctx.setattr(
             OphysTimestamps, 'from_sync_file',
             lambda sync_file: create_autospec(OphysTimestamps,

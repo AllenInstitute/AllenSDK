@@ -2,8 +2,6 @@ import json
 
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
 
@@ -15,16 +13,8 @@ class TestBehaviorEcephysSession:
                   'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
-        # TODO remove passing of stimulus timestamps here, once
-        #  https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/2337   # noqa
-        # is addressed
-        ts = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=BehaviorStimulusFile.from_json(
-                dict_repr=input_data['session_data']),
-            monitor_delay=input_data['session_data']['monitor_delay'])
         cls._session_from_json = BehaviorEcephysSession.from_json(
-            session_data=input_data,
-            stimulus_timestamps=ts
+            session_data=input_data
         )
 
     @pytest.mark.requires_bamboo

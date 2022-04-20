@@ -3,7 +3,6 @@ from unittest.mock import create_autospec
 
 import pandas as pd
 
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
@@ -73,7 +72,9 @@ def test_running_acquisition_from_json(
     class DummyTimestamps(object):
         monitor_delay = 0.0
         value = 0.0
-    dummy_ts: StimulusTimestamps = DummyTimestamps()
+    dummy_ts = DummyTimestamps()
+    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
+    mock_stimulus_timestamps.from_json.return_value = dummy_ts
 
     mock_get_running_df = create_autospec(get_running_df)
 
@@ -95,19 +96,17 @@ def test_running_acquisition_from_json(
             ".running_speed.running_acquisition.get_running_df",
             mock_get_running_df
         )
-        obt = RunningAcquisition.from_json(dict_repr,
-                                           stimulus_timestamps=dummy_ts)
+        obt = RunningAcquisition.from_stimulus_file(
+                    behavior_stimulus_file=mock_stimulus_file)
 
-    mock_stimulus_file.from_json.assert_called_once_with(dict_repr)
     mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
-    assert obt._stimulus_file == mock_stimulus_file_instance
 
-    assert obt._stimulus_timestamps == dummy_ts
-
-    mock_get_running_df.assert_called_once_with(
-        data=mock_stimulus_file_instance.data,
-        time=dummy_ts.value,
-    )
+    mock_stimulus_timestamps_instance = \
+        mock_stimulus_timestamps.from_stimulus_file(
+            stimulus_file=mock_stimulus_file_instance,
+            monitor_delay=0.0
+        )
+    assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     pd.testing.assert_frame_equal(obt.value, expected_running_acq_df)
 
@@ -190,131 +189,6 @@ def test_running_acquisition_to_json(
     else:
         obt = running_acq.to_json()
         assert obt == expected
-
-
-@pytest.mark.parametrize(
-    "behavior_session_id, ophys_experiment_id, "
-    "returned_running_acq_df, expected_running_acq_df",
-    [
-        (
-            # behavior_session_id
-            12345,
-            # ophys_experiment_id
-            None,
-            # returned_running_acq_df
-            pd.DataFrame(
-                {
-                    "timestamps": [1, 2],
-                    "speed": [3, 4],
-                    "dx": [5, 6],
-                    "v_sig": [7, 8],
-                    "v_in": [9, 10]
-                }
-            ).set_index("timestamps"),
-            # expected_running_acq_df
-            pd.DataFrame(
-                {
-                    "timestamps": [1, 2],
-                    "dx": [5, 6],
-                    "v_sig": [7, 8],
-                    "v_in": [9, 10]
-                }
-            ).set_index("timestamps")
-        ),
-        (
-            # behavior_session_id
-            1234,
-            # ophys_experiment_id
-            5678,
-            # returned_running_acq_df
-            pd.DataFrame(
-                {
-                    "timestamps": [2, 4],
-                    "speed": [6, 8],
-                    "dx": [10, 12],
-                    "v_sig": [14, 16],
-                    "v_in": [18, 20]
-                }
-            ).set_index("timestamps"),
-            # expected_running_acq_df
-            pd.DataFrame(
-                {
-                    "timestamps": [2, 4],
-                    "dx": [10, 12],
-                    "v_sig": [14, 16],
-                    "v_in": [18, 20]
-                }
-            ).set_index("timestamps")
-        )
-    ]
-)
-def test_running_acquisition_from_lims(
-    monkeypatch, behavior_session_id, ophys_experiment_id,
-    returned_running_acq_df, expected_running_acq_df
-):
-    mock_db_conn = create_autospec(PostgresQueryMixin, instance=True)
-
-    mock_stimulus_file = create_autospec(BehaviorStimulusFile)
-    mock_stimulus_timestamps = create_autospec(StimulusTimestamps)
-
-    class DummyTimestamps(object):
-        monitor_delay = 0.0
-        value = 0.0
-    dummy_ts = DummyTimestamps()
-
-    mock_stimulus_timestamps.from_stimulus_file.return_value = dummy_ts
-
-    mock_get_running_df = create_autospec(get_running_df)
-
-    mock_get_running_df.return_value = returned_running_acq_df
-
-    with monkeypatch.context() as m:
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_acquisition.BehaviorStimulusFile",
-            mock_stimulus_file
-        )
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_acquisition.StimulusTimestamps",
-            mock_stimulus_timestamps
-        )
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_objects"
-            ".running_speed.running_acquisition.get_running_df",
-            mock_get_running_df
-        )
-        obt = RunningAcquisition.from_lims(
-            mock_db_conn,
-            behavior_session_id=behavior_session_id,
-            ophys_experiment_id=ophys_experiment_id
-        )
-
-    mock_stimulus_file.from_lims.assert_called_once_with(
-        mock_db_conn, behavior_session_id
-    )
-    mock_stimulus_file_instance = mock_stimulus_file.from_lims(
-        mock_db_conn, behavior_session_id
-    )
-    assert obt._stimulus_file == mock_stimulus_file_instance
-
-    mock_stimulus_timestamps.from_stimulus_file.assert_called_once_with(
-        mock_stimulus_file_instance,
-        monitor_delay=0.0
-    )
-    mock_stimulus_timestamps_instance = mock_stimulus_timestamps.\
-        from_stimulus_file(stimulus_file=mock_stimulus_file,
-                           monitor_delay=0.0)
-    assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
-
-    mock_get_running_df.assert_called_once_with(
-        data=mock_stimulus_file_instance.data,
-        time=mock_stimulus_timestamps_instance.value,
-    )
-
-    pd.testing.assert_frame_equal(
-        obt.value, expected_running_acq_df, check_like=True
-    )
 
 
 # Fixtures:

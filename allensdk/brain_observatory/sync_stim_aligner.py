@@ -1,7 +1,7 @@
 # Here we will define a class for aligning the timesteps in a sync
 # file with the frames listed in a stimulus pickle file.
 
-from typing import Tuple, Union, List
+from typing import Tuple, Union, List, Dict, Any
 import numpy as np
 import logging
 import pathlib
@@ -306,7 +306,7 @@ def get_stim_timestamps_from_stimulus_blocks(
         sync_file: Union[str, pathlib.Path],
         raw_frame_time_lines: Union[str, List[str]],
         raw_frame_time_direction: str,
-        frame_count_tolerance: float) -> List[np.ndarray]:
+        frame_count_tolerance: float) -> Dict[str, Any]:
     """
     Find the timestamps associated a set of stimulus blocks
     that have to be aligned with a single sync file
@@ -330,10 +330,17 @@ def get_stim_timestamps_from_stimulus_blocks(
 
     Returns
     -------
-    list_of_timestamps: List[np.ndarray]
+    A dict in which
+
+    "timestamps" -> List[np.ndarray]
         The list of timestamp arrays corresponding to the provided
-        _StimulusFiles. **The order of stimulus_files will dictate
-        the order of start_frames**.
+        _StimulusFiles.
+
+    "start_frames" -> List[int]
+        The list of starting frames for the provided _StimulusFiles
+
+     **The order of stimulus_files will dictate the order of these
+     lists.**
 
     Notes
     -----
@@ -378,4 +385,6 @@ def get_stim_timestamps_from_stimulus_blocks(
         for f0, nf in zip(start_frames, frame_count_list):
             this_array = raw_frame_times[f0:f0+nf]
             list_of_timestamps.append(this_array)
-    return list_of_timestamps
+
+    return {"timestamps": list_of_timestamps,
+            "start_frames": start_frames}
