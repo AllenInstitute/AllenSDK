@@ -50,8 +50,6 @@ from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
 
-from allensdk.brain_observatory.behavior.data_files import SyncFile
-
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
 
