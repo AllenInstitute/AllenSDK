@@ -207,7 +207,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         drop_frames : List[int], optional
             List of frame indices to be dropped from the table.
             If provided, will drop the corresponding frame frame times read
-            from the sync file to syncronize frame times and frames.
+            from the sync file to synchronize frame times and frames.
         z_threshold : float, optional
             See EyeTracking.from_lims
         dilation_frames : int, optional

@@ -137,12 +137,18 @@ class NWBWriter:
         """Path to write nwb file"""
         return self._nwb_filepath
 
-    def write_nwb(self):
+    def write_nwb(self, **kwargs):
         """Tries to write nwb to disk. If it fails, the filepath has ".error"
-        appended"""
+        appended
+
+        Parameters
+        ----------
+        kwargs: kwargs sent to `from_json`
+
+        """
         try:
             json_session, nwbfile = self._write_nwb(
-                session_data=self._session_data)
+                session_data=self._session_data, **kwargs)
             self._compare_sessions(nwbfile=nwbfile, json_session=json_session)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:

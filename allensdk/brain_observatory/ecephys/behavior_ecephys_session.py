@@ -149,7 +149,8 @@ class BehaviorEcephysSession(BehaviorSession):
             cls,
             session_data: dict,
             stimulus_presentation_exclude_columns: Optional[List[str]] = None,
-            running_speed_load_from_multiple_stimulus_files: bool = True
+            running_speed_load_from_multiple_stimulus_files: bool = True,
+            skip_probes: Optional[List[str]] = None
     ) -> "BehaviorEcephysSession":
         """
 
@@ -158,8 +159,11 @@ class BehaviorEcephysSession(BehaviorSession):
         session_data: Dict of input data necessary to construct a session
         stimulus_presentation_exclude_columns:  Optional list of columns to
             exclude from stimulus presentations table
-        Whether to load running speed from multiple stimulus files
+        running_speed_load_from_multiple_stimulus_files: Whether to load
+            running speed from multiple stimulus files
             If False, will just load from a single behavior stimulus file
+        skip_probes: Names of probes to exclude (due to known bad data
+            for example)
 
         Returns
         -------
@@ -175,7 +179,8 @@ class BehaviorEcephysSession(BehaviorSession):
             running_speed_load_from_multiple_stimulus_files=(
                 running_speed_load_from_multiple_stimulus_files)
         )
-        probes = Probes.from_json(probes=session_data['probes'])
+        probes = Probes.from_json(probes=session_data['probes'],
+                                  skip_probes=skip_probes)
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
 
         return BehaviorEcephysSession(

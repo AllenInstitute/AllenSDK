@@ -30,7 +30,7 @@ def main():
     )
 
     try:
-        nwb_writer.write_nwb()
+        nwb_writer.write_nwb(skip_probes=parser.args['skip_probes'])
         logging.info('File successfully created')
     except Exception as err:
         logging.error('NWB write failure')

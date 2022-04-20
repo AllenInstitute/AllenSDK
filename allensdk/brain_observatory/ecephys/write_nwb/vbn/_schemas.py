@@ -70,6 +70,12 @@ class VBNInputSchema(ArgSchema):
         _VBNSessionDataSchema,
         required=True,
         description='Data pertaining to a behavior session')
+    skip_probes = argschema.fields.List(
+        argschema.fields.Str,
+        cli_as_single_argument=True,
+        default=None,
+        allow_none=True
+    )
     output_path = argschema.fields.OutputFile(
         required=True,
         description='Path of output.json to be written')
