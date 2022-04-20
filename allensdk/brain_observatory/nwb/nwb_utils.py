@@ -3,16 +3,12 @@
 # team.
 import logging
 import os
-from typing import Tuple, Type, Union
+from typing import Tuple, Union
 
-import argschema
-from argschema import ArgSchema
 from pynwb import NWBFile, ProcessingModule, NWBHDF5IO
 from pynwb.base import Images
 from pynwb.image import GrayscaleImage
 
-from allensdk.brain_observatory.argschema_utilities import \
-    write_or_print_outputs
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.core import DataObject, JsonReadableInterface, \
