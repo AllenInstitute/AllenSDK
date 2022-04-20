@@ -6,9 +6,6 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
-from allensdk.brain_observatory.behavior.data_files import SyncFile, \
-    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
     BehaviorEcephysMetadata
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
@@ -169,10 +166,6 @@ class BehaviorEcephysSession(BehaviorSession):
         Instantiated `BehaviorEcephysSession`
         """
         session_data = session_data['session_data']
-
-        monitor_delay = cls._get_monitor_delay() \
-            if 'monitor_delay' not in session_data \
-            else session_data['monitor_delay']
 
         behavior_session = BehaviorSession.from_json(
             session_data=session_data,
