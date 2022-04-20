@@ -100,7 +100,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def from_json(
             cls,
             session_data: dict,
-            stimulus_timestamps: Optional[StimulusTimestamps] = None,
             read_stimulus_presentations_table_from_file=False,
             stimulus_presentation_columns: Optional[List[str]] = None,
             stimulus_presentation_exclude_columns: Optional[List[str]] = None,
@@ -117,8 +116,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         ----------
         session_data
             Dict of input data necessary to construct a session
-        stimulus_timestamps
-            Optional `StimulusTimestamps`
         read_stimulus_presentations_table_from_file
             Whether to read the stimulus table from a file rather than
             construct it here

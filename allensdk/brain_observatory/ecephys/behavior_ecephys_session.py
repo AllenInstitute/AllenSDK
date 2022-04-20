@@ -151,7 +151,6 @@ class BehaviorEcephysSession(BehaviorSession):
     def from_json(
             cls,
             session_data: dict,
-            stimulus_timestamps: Optional[StimulusTimestamps] = None,
             stimulus_presentation_exclude_columns: Optional[List[str]] = None,
             running_speed_load_from_multiple_stimulus_files: bool = True
     ) -> "BehaviorEcephysSession":
@@ -160,7 +159,6 @@ class BehaviorEcephysSession(BehaviorSession):
         Parameters
         ----------
         session_data: Dict of input data necessary to construct a session
-        stimulus_timestamps: Optional `StimulusTimestamps`
         stimulus_presentation_exclude_columns:  Optional list of columns to
             exclude from stimulus presentations table
         Whether to load running speed from multiple stimulus files
@@ -176,22 +174,8 @@ class BehaviorEcephysSession(BehaviorSession):
             if 'monitor_delay' not in session_data \
             else session_data['monitor_delay']
 
-        if stimulus_timestamps is None:
-            stimulus_timestamps = StimulusTimestamps\
-                .from_multiple_stimulus_blocks(
-                    sync_file=SyncFile.from_json(dict_repr=session_data,
-                                                 permissive=True),
-                    list_of_stims=[
-                        BehaviorStimulusFile.from_json(dict_repr=session_data),
-                        MappingStimulusFile.from_json(dict_repr=session_data),
-                        ReplayStimulusFile.from_json(dict_repr=session_data)
-                    ],
-                    monitor_delay=monitor_delay
-                )
-
         behavior_session = BehaviorSession.from_json(
             session_data=session_data,
-            stimulus_timestamps=stimulus_timestamps,
             read_stimulus_presentations_table_from_file=True,
             stimulus_presentation_exclude_columns=(
                 stimulus_presentation_exclude_columns),
