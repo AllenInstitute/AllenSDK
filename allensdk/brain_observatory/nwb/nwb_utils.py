@@ -1,11 +1,22 @@
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.
-from pynwb import NWBFile, ProcessingModule
+import logging
+import os
+from typing import Tuple, Type, Union
+
+import argschema
+from argschema import ArgSchema
+from pynwb import NWBFile, ProcessingModule, NWBHDF5IO
 from pynwb.base import Images
 from pynwb.image import GrayscaleImage
 
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
+from allensdk.core import DataObject, JsonReadableInterface, \
+    NwbReadableInterface, NwbWritableInterface
 
 
 def get_column_name(table_cols: list,
@@ -83,3 +94,86 @@ def add_image_to_nwb(nwbfile: NWBFile, image_data: Image, image_name: str):
     else:
         images = ophys_mod['images']
     images.add_image(image)
+
+
+class NWBWriter:
+    """Base class for writing NWB files"""
+    def __init__(self,
+                 nwb_filepath: str,
+                 session_data: dict,
+                 serializer: Union[
+                     JsonReadableInterface,
+                     NwbReadableInterface,
+                     NwbWritableInterface]):
+        """
+
+        Parameters
+        ----------
+        nwb_filepath: path to write nwb
+        session_data: dict representation of data to instantiate `serializer`
+            and write nwb
+        serializer: The class to use to read `session_data` and write nwb.
+            Must implement `JsonReadableInterface`, `NwbReadableInterface`,
+            `NwbWritableInterface`
+        """
+        self._serializer = serializer
+        self._session_data = session_data
+        self._nwb_filepath = nwb_filepath
+        self.nwb_filepath_inprogress = nwb_filepath + '.inprogress'
+        self._nwb_filepath_error = nwb_filepath + '.error'
+
+        logging.basicConfig(
+            format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+
+        # Clean out files from previous runs:
+        for filename in [self.nwb_filepath_inprogress,
+                         self._nwb_filepath_error,
+                         nwb_filepath]:
+            if os.path.exists(filename):
+                os.remove(filename)
+
+    @property
+    def nwb_filepath(self) -> str:
+        """Path to write nwb file"""
+        return self._nwb_filepath
+
+    def write_nwb(self):
+        """Tries to write nwb to disk. If it fails, the filepath has ".error"
+        appended"""
+        try:
+            json_session, nwbfile = self._write_nwb(
+                session_data=self._session_data)
+            self._compare_sessions(nwbfile=nwbfile, json_session=json_session)
+            os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
+        except Exception as e:
+            if os.path.isfile(self.nwb_filepath_inprogress):
+                os.rename(self.nwb_filepath_inprogress,
+                          self._nwb_filepath_error)
+            raise e
+
+    def _write_nwb(
+            self,
+            session_data: dict,
+            **kwargs) -> Tuple[DataObject, NWBFile]:
+        """
+
+        Parameters
+        ----------
+        session_data
+        kwargs: kwargs to pass to `from_json`
+
+        Returns
+        -------
+
+        """
+        json_session = self._serializer.from_json(
+            session_data=session_data, **kwargs)
+        nwbfile = json_session.to_nwb()
+
+        with NWBHDF5IO(self.nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
+        return json_session, nwbfile
+
+    def _compare_sessions(self, nwbfile: NWBFile, json_session: DataObject):
+        nwb_session = self._serializer.from_nwb(nwbfile)
+        assert sessions_are_equal(json_session, nwb_session, reraise=True)

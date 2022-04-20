@@ -8,7 +8,7 @@ from pynwb import NWBHDF5IO
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.write_behavior_nwb._schemas import (
-    InputSchema, OutputSchema)
+    BehaviorInputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs)
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
@@ -71,7 +71,7 @@ def main():
     try:
         parser = argschema.ArgSchemaParser(
             args=args,
-            schema_type=InputSchema,
+            schema_type=BehaviorInputSchema,
             output_schema_type=OutputSchema,
         )
         logging.info('Input successfully parsed')

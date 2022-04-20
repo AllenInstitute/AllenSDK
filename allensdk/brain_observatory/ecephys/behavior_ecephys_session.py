@@ -165,8 +165,6 @@ class BehaviorEcephysSession(BehaviorSession):
         -------
         Instantiated `BehaviorEcephysSession`
         """
-        session_data = session_data['session_data']
-
         behavior_session = BehaviorSession.from_json(
             session_data=session_data,
             read_stimulus_presentations_table_from_file=True,

@@ -1,3 +1,4 @@
+"""Module for writing NWB files for the VCN project"""
 import logging
 import sys
 from typing import Any, Dict, List, Tuple
@@ -21,7 +22,7 @@ from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
 from allensdk.config.manifest import Manifest
 
-from ._schemas import InputSchema, OutputSchema
+from ._schemas import VCNInputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_timestamps,
     add_invalid_times,
@@ -623,7 +624,7 @@ def main():
 
     parser = optional_lims_inputs(
         sys.argv,
-        InputSchema,
+        VCNInputSchema,
         OutputSchema,
         get_inputs_from_lims
     )

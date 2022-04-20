@@ -1,3 +1,4 @@
+import argschema.fields
 import marshmallow as mm
 import numpy as np
 
@@ -172,7 +173,34 @@ class SessionMetadata(RaisingSchema):
     donor_id = Int(required=True)
 
 
-class InputSchema(ArgSchema):
+class BaseNeuropixelsSchema(ArgSchema):
+    """Base schema for writing NWB files for projects with
+    behavior + ecephys"""
+    probes = Nested(
+        Probe,
+        many=True,
+        required=True,
+        help="records of the individual probes used for this experiment",
+    )
+    optotagging_table_path = argschema.fields.InputFile(
+        required=False,
+        help="""file at this path contains information about the optogenetic
+                stimulation applied during this experiment"""
+    )
+    running_speed_path = String(
+        required=True,
+        help="""data collected about the running behavior of the experiment's
+                subject""",
+    )
+    eye_tracking_rig_geometry = Dict(
+        required=False,
+        help="""Mapping containing information about session rig geometry used
+                for eye gaze mapping."""
+    )
+
+
+class VCNInputSchema(BaseNeuropixelsSchema):
+    """Input schema for visual coding neuropixels project"""
     class Meta:
         unknown = mm.RAISE
 
@@ -202,17 +230,6 @@ class InputSchema(ArgSchema):
         required=True,
         help="epochs with invalid data"
     )
-    probes = Nested(
-        Probe,
-        many=True,
-        required=True,
-        help="records of the individual probes used for this experiment",
-    )
-    running_speed_path = String(
-        required=True,
-        help="""data collected about the running behavior of the experiment's
-                subject""",
-    )
     session_sync_path = String(
         required=True,
         validate=check_read_access,
@@ -223,17 +240,6 @@ class InputSchema(ArgSchema):
     pool_size = Int(
         default=3,
         help="number of child processes used to write probewise lfp files"
-    )
-    optotagging_table_path = String(
-        required=False,
-        validate=check_read_access,
-        help="""file at this path contains information about the optogenetic
-                stimulation applied during this experiment"""
-    )
-    eye_tracking_rig_geometry = Dict(
-        required=False,
-        help="""Mapping containing information about session rig geometry used
-                for eye gaze mapping."""
     )
     eye_dlc_ellipses_path = String(
         required=False,
