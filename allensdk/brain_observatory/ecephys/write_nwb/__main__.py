@@ -22,7 +22,7 @@ from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
 from allensdk.config.manifest import Manifest
 
-from ._schemas import VCNInputSchema, OutputSchema
+from .schemas import VCNInputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_timestamps,
     add_invalid_times,

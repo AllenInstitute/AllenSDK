@@ -7,7 +7,7 @@ from pynwb import NWBHDF5IO
 
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.write_behavior_nwb._schemas import (
+from allensdk.brain_observatory.behavior.write_behavior_nwb.schemas import (
     BehaviorInputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs)

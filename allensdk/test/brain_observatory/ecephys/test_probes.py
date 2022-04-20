@@ -5,7 +5,7 @@ import pytest
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys.probes import Probes
-from allensdk.brain_observatory.ecephys.write_nwb._schemas import Probe
+from allensdk.brain_observatory.ecephys.write_nwb.schemas import Probe
 
 
 class TestProbes:
