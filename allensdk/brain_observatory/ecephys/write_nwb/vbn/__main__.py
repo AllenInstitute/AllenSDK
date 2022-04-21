@@ -1,3 +1,5 @@
+"""Module for writing NWB files for the Visual Behavior Neuropixels project"""
+
 import logging
 import sys
 import argschema

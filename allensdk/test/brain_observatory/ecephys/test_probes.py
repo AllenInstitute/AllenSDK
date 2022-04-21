@@ -15,7 +15,8 @@ class TestProbes:
                   'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
-        probes = Probe().load(input_data['probes'], many=True)
+        cls.input_data = input_data['session_data']['probes']
+        probes = Probe().load(cls.input_data, many=True)
         cls._probes_from_json = Probes.from_json(probes=probes)
 
     def setup_method(self, method):
@@ -41,3 +42,13 @@ class TestProbes:
             obt = Probes.from_nwb(nwbfile=self._nwbfile)
 
         assert obt == self._probes_from_json
+
+    @pytest.mark.requires_bamboo
+    def test_skip_probes(self):
+        """tests that when skip_probes is passed that the probe is skipped"""
+        names = [p['name'] for p in self.input_data]
+        skip_probes = [names[0]]
+        probes = Probes.from_json(
+            probes=self.input_data, skip_probes=skip_probes)
+        assert sorted([p.name for p in probes]) == \
+               sorted([p for p in names if p not in skip_probes])

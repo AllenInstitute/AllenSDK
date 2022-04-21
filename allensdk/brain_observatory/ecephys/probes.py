@@ -216,3 +216,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         )
 
         return nwbfile
+
+    def __iter__(self):
+        for p in self.probes:
+            yield p

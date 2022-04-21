@@ -1,6 +1,7 @@
 # All of the omitted stimuli have a duration of 250ms as defined
 # by the Visual Behavior team. For questions about duration contact that
 # team.
+import inspect
 import logging
 import os
 from typing import Tuple, Union
@@ -139,13 +140,14 @@ class NWBWriter:
 
         Parameters
         ----------
-        kwargs: kwargs sent to `from_json`
+        kwargs: kwargs sent to `from_json`, `from_nwb`, `to_nwb`
 
         """
         try:
             json_session, nwbfile = self._write_nwb(
                 session_data=self._session_data, **kwargs)
-            self._compare_sessions(nwbfile=nwbfile, json_session=json_session)
+            self._compare_sessions(nwbfile=nwbfile, json_session=json_session,
+                                   **kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:
             if os.path.isfile(self.nwb_filepath_inprogress):
@@ -162,20 +164,30 @@ class NWBWriter:
         Parameters
         ----------
         session_data
-        kwargs: kwargs to pass to `from_json`
+        kwargs: kwargs to pass to `from_json` and `to_nwb`
 
         Returns
         -------
 
         """
+        from_json_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_json).parameters}
+        to_nwb_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.to_nwb).parameters}
         json_session = self._serializer.from_json(
-            session_data=session_data, **kwargs)
-        nwbfile = json_session.to_nwb()
+            session_data=session_data, **from_json_kwargs)
+        nwbfile = json_session.to_nwb(**to_nwb_kwargs)
 
         with NWBHDF5IO(self.nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
         return json_session, nwbfile
 
-    def _compare_sessions(self, nwbfile: NWBFile, json_session: DataObject):
-        nwb_session = self._serializer.from_nwb(nwbfile)
+    def _compare_sessions(self, nwbfile: NWBFile, json_session: DataObject,
+                          **kwargs):
+        kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_nwb).parameters}
+        nwb_session = self._serializer.from_nwb(nwbfile, **kwargs)
         assert sessions_are_equal(json_session, nwb_session, reraise=True)
