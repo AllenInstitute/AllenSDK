@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 import numpy as np
 import pandas as pd
@@ -11,11 +11,149 @@ from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
 
+from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.behavior_session import (
+    StimulusFileLookup)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import (
+    Stimuli)
+
+
+class VBNBehaviorSession(BehaviorSession):
+    """
+    A class to create the behavior parts of a VBN session,
+    performing all of the specialized timestamp calculations
+    that implies.
+    """
+
+    @classmethod
+    def from_lims(cls, behavior_session_id: int,
+                  lims_db: Optional[Any] = None,
+                  sync_file: Optional[Any] = None,
+                  monitor_delay: Optional[float] = None,
+                  date_of_acquisition: Optional[Any] = None,
+                  skip_eye_tracking=False,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2) \
+            -> "VBNBehaviorSession":
+        raise NotImplementedError(
+                "from_lims is not supported for a VBNBehaviorSession")
+
+    @classmethod
+    def _read_stimuli(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            stimulus_presentation_columns: Optional[List[str]] = None
+    ) -> Stimuli:
+        raise NotImplementedError(
+            "VBNBehaviorSessions read their stimulus tables from "
+            "a precomputed csv file; they should not be computed "
+            "on the fly by the AllenSDK")
+
+    @classmethod
+    def _read_behavior_stimulus_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps by registering behavior_
+        mapping_ and replay_stimulus blocks to a single sync file
+        """
+        timestamps = StimulusTimestamps.from_multiple_stimulus_blocks(
+                sync_file=sync_file,
+                list_of_stims=[
+                     stimulus_file_lookup.behavior_stimulus_file,
+                     stimulus_file_lookup.mapping_stimulus_file,
+                     stimulus_file_lookup.replay_stimulus_file],
+                stims_of_interest=[0, ],
+                monitor_delay=monitor_delay)
+        return timestamps
+
+    @classmethod
+    def _read_session_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps (with monitor delay) that will
+        be associated with this session
+        """
+        timestamps = StimulusTimestamps.from_multiple_stimulus_blocks(
+                sync_file=sync_file,
+                list_of_stims=[
+                     stimulus_file_lookup.behavior_stimulus_file,
+                     stimulus_file_lookup.mapping_stimulus_file,
+                     stimulus_file_lookup.replay_stimulus_file],
+                stims_of_interest=None,
+                monitor_delay=monitor_delay)
+        return timestamps
+
+    @classmethod
+    def _read_licks(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile]) -> Licks:
+        """
+        Construct the Licks data object for this session,
+        reading the lick times directly from the sync file,
+        accepting only those licks that occur during the time
+        of the behavior stimulus block
+        """
+        lick_times = StimulusTimestamps(
+                       timestamps=sync_file.data['lick_times'],
+                       monitor_delay=0.0)
+
+        # get the timestamps of the behavior stimulus presentations
+        behavior_stim_times = cls._read_behavior_stimulus_timestamps(
+                                 sync_file=sync_file,
+                                 stimulus_file_lookup=stimulus_file_lookup,
+                                 monitor_delay=0.0)
+
+        # only accept lick times that are within the temporal bounds of
+        # the behavior stimulus presentations
+        min_time = behavior_stim_times.value.min()
+        max_time = behavior_stim_times.value.max()
+
+        valid = np.logical_and(
+                  lick_times.value >= min_time,
+                  lick_times.value <= max_time)
+
+        lick_times = lick_times.value[valid]
+
+        behavior_stim = stimulus_file_lookup.behavior_stimulus_file
+        behavior_data = behavior_stim.data
+        lick_sensor = behavior_data['items']['behavior']['lick_sensors'][0]
+        lick_frames = lick_sensor['lick_events']
+
+        if len(lick_frames) != len(lick_times):
+            msg = (f"{len(lick_frames)} lick frames; "
+                   f"{len(lick_times)} lick timestamps "
+                   "in the Sync file. Should be equal")
+            raise RuntimeError(msg)
+
+        df = pd.DataFrame({"timestamps": lick_times,
+                           "frame": lick_frames})
+        return Licks(licks=df)
+
 
 class BehaviorEcephysSession(BehaviorSession):
     """
     Represents a session with behavior + ecephys
     """
+
+    @classmethod
+    def behavior_data_class(cls):
+        """
+        Return the class that is used to store the behavior data
+        in this BehaviorEcephysSession
+        """
+        return VBNBehaviorSession
+
     def __init__(
             self,
             behavior_session: BehaviorSession,
@@ -167,7 +305,7 @@ class BehaviorEcephysSession(BehaviorSession):
         """
         session_data = session_data['session_data']
 
-        behavior_session = BehaviorSession.from_json(
+        behavior_session = cls.behavior_data_class().from_json(
             session_data=session_data,
             read_stimulus_presentations_table_from_file=True,
             stimulus_presentation_exclude_columns=(
@@ -216,7 +354,7 @@ class BehaviorEcephysSession(BehaviorSession):
         instantiated `BehaviorEcephysSession`
         """
         kwargs['add_is_change_to_stimulus_presentations_table'] = False
-        behavior_session = BehaviorSession.from_nwb(
+        behavior_session = VBNBehaviorSession.from_nwb(
             nwbfile=nwbfile,
             **kwargs
         )
