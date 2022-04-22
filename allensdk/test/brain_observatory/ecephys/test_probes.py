@@ -15,7 +15,8 @@ class TestProbes:
                   'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
-        probes = Probe().load(input_data['probes'], many=True)
+        probes = Probe().load(input_data['session_data']['probes'],
+                              many=True)
         cls._probes_from_json = Probes.from_json(probes=probes)
 
     def setup_method(self, method):

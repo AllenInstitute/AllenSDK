@@ -12,6 +12,10 @@ from allensdk.brain_observatory.behavior.data_files import (
     MappingStimulusFile)
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileLookup,
+    stimulus_lookup_from_json)
+
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE
 )
 
@@ -191,3 +195,125 @@ def test_malformed_mapping_pkl(
     with pytest.raises(RuntimeError,
                        match="When getting num_frames from"):  # noqa W605
         stim.num_frames()
+
+
+def test_stimulus_file_lookup(
+        behavior_stim_fixture,
+        mapping_stim_fixture,
+        replay_stim_fixture):
+    """
+    Smoke test of StimulusFileLookup
+    """
+    lookup = StimulusFileLookup()
+
+    with pytest.raises(ValueError, match="has no BehaviorStimulusFile"):
+        lookup.behavior_stimulus_file
+
+    with pytest.raises(ValueError, match="has no ReplayStimulusFile"):
+        lookup.replay_stimulus_file
+
+    with pytest.raises(ValueError, match="has no MappingStimulusFile"):
+        lookup.mapping_stimulus_file
+
+    lookup.behavior_stimulus_file = behavior_stim_fixture
+    lookup.mapping_stimulus_file = mapping_stim_fixture
+    lookup.replay_stimulus_file = replay_stim_fixture
+
+    assert isinstance(lookup.behavior_stimulus_file, BehaviorStimulusFile)
+    assert lookup.behavior_stimulus_file.data == behavior_stim_fixture.data
+
+    assert isinstance(lookup.replay_stimulus_file, ReplayStimulusFile)
+    assert lookup.replay_stimulus_file.data == replay_stim_fixture.data
+
+    assert isinstance(lookup.mapping_stimulus_file, MappingStimulusFile)
+    assert lookup.mapping_stimulus_file.data == mapping_stim_fixture.data
+
+
+@pytest.mark.parametrize(
+    "to_set, set_from",
+    [('behavior', 'replay'),
+     ('behavior', 'mapping'),
+     ('replay', 'behavior'),
+     ('replay', 'mapping'),
+     ('mapping', 'behavior'),
+     ('mapping', 'replay')])
+def test_stimulus_file_lookup_errors(
+        behavior_stim_fixture,
+        mapping_stim_fixture,
+        replay_stim_fixture,
+        to_set,
+        set_from):
+    """
+    Test that errors get raised when the wrong StimulusFile
+    is passed into lookup
+    """
+    if set_from == 'behavior':
+        src = behavior_stim_fixture
+    elif set_from == 'mapping':
+        src = mapping_stim_fixture
+    elif set_from == 'replay':
+        src = replay_stim_fixture
+
+    lookup = StimulusFileLookup()
+    if to_set == 'behavior':
+        with pytest.raises(ValueError, match="should be BehaviorStimulusFile"):
+            lookup.behavior_stimulus_file = src
+    elif to_set == 'replay':
+        with pytest.raises(ValueError, match="should be ReplayStimulusFile"):
+            lookup.replay_stimulus_file = src
+    else:
+        with pytest.raises(ValueError, match="should be MappingStimulusFile"):
+            lookup.mapping_stimulus_file = src
+
+
+@pytest.mark.parametrize(
+    "to_use",
+    [('behavior',),
+     ('mapping',),
+     ('replay',),
+     ('behavior', 'replay'),
+     ('behavior', 'mapping'),
+     ('mapping', 'replay'),
+     ('behavior', 'mapping', 'replay')])
+def test_stimulus_lookup_from_json(
+        behavior_stim_fixture,
+        mapping_stim_fixture,
+        replay_stim_fixture,
+        general_pkl_fixture,
+        behavior_pkl_fixture,
+        to_use):
+    """
+    Smoke test for stimulus_lookup_from_json
+    """
+
+    dict_repr = dict()
+    if 'behavior' in to_use:
+        dict_repr['behavior_stimulus_file'] = behavior_pkl_fixture['path']
+    if 'mapping' in to_use:
+        dict_repr['mapping_stimulus_file'] = general_pkl_fixture['path']
+    if 'replay' in to_use:
+        dict_repr['replay_stimulus_file'] = general_pkl_fixture['path']
+
+    lookup = stimulus_lookup_from_json(dict_repr=dict_repr)
+    assert isinstance(lookup, StimulusFileLookup)
+
+    if 'behavior' in to_use:
+        assert isinstance(lookup.behavior_stimulus_file, BehaviorStimulusFile)
+        assert lookup.behavior_stimulus_file.data == behavior_stim_fixture.data
+    else:
+        with pytest.raises(ValueError, match="has no BehaviorStimulusFile"):
+            lookup.behavior_stimulus_file
+
+    if 'mapping' in to_use:
+        assert isinstance(lookup.mapping_stimulus_file, MappingStimulusFile)
+        assert lookup.mapping_stimulus_file.data == mapping_stim_fixture.data
+    else:
+        with pytest.raises(ValueError, match="has no MappingStimulusFile"):
+            lookup.mapping_stimulus_file
+
+    if 'replay' in to_use:
+        assert isinstance(lookup.replay_stimulus_file, ReplayStimulusFile)
+        assert lookup.replay_stimulus_file.data == replay_stim_fixture.data
+    else:
+        with pytest.raises(ValueError, match="has no ReplayStimulusFile"):
+            lookup.replay_stimulus_file

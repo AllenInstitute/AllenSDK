@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
@@ -26,6 +27,14 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         """Get reward data from pkl file, based on timestamps
         (not sync file).
         """
+
+        if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+            msg = ("Instantiating rewards with monitor_delay = "
+                   f"{stimulus_timestamps.monitor_delay: .2e}; "
+                   "monitor_delay should be zero for Rewards "
+                   "data object")
+            raise RuntimeError(msg)
+
         data = stimulus_file.data
 
         trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])

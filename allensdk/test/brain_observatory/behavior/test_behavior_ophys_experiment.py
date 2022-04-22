@@ -248,7 +248,7 @@ def test_eye_tracking(dilation_frames, z_threshold, monkeypatch):
         ctx.setattr(
             BehaviorSession, 'from_lims',
             lambda lims_db, behavior_session_id,
-            stimulus_timestamps, monitor_delay, date_of_acquisition,
+            sync_file, monitor_delay, date_of_acquisition,
             skip_eye_tracking, eye_tracking_z_threshold,
             eye_tracking_dilation_frames:
             BehaviorSession(

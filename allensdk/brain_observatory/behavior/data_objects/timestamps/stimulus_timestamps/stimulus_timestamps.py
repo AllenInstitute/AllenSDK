@@ -55,6 +55,17 @@ class StimulusTimestamps(DataObject,
         self._sync_file = sync_file
         self._monitor_delay = monitor_delay
 
+    def subtract_monitor_delay(self) -> "StimulusTimestamps":
+        """
+        Return a version of this StimulusTimestamps object with
+        monitor_delay = 0 by subtracting self.monitor_delay from
+        self.value
+        """
+        new_value = self.value-self.monitor_delay
+        return StimulusTimestamps(
+                    timestamps=new_value,
+                    monitor_delay=0.0)
+
     @property
     def monitor_delay(self) -> float:
         return self._monitor_delay

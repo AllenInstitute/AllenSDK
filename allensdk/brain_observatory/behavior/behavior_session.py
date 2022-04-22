@@ -9,6 +9,11 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import \
     BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
+
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileLookup,
+    stimulus_lookup_from_json)
+
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
@@ -148,21 +153,20 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         if 'monitor_delay' not in session_data:
             monitor_delay = cls._get_monitor_delay()
-            session_data['monitor_delay'] = monitor_delay
+        else:
+            monitor_delay = session_data['monitor_delay']
 
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
 
-        stimulus_file = BehaviorStimulusFile.from_json(dict_repr=session_data)
+        stimulus_file_lookup = stimulus_lookup_from_json(
+                                   dict_repr=session_data)
 
         if 'sync_file' in session_data:
             sync_file = SyncFile.from_json(dict_repr=session_data,
                                            permissive=sync_file_permissive)
         else:
             sync_file = None
-
-        stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
 
         if running_speed_load_from_multiple_stimulus_files:
             running_acquisition = \
@@ -202,31 +206,39 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     filtered=True
                 )
         else:
+            behavior_stimulus_file = \
+              stimulus_file_lookup.behavior_stimulus_file
+
             running_acquisition = RunningAcquisition.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
+                behavior_stimulus_file=behavior_stimulus_file,
                 sync_file=sync_file)
 
             raw_running_speed = RunningSpeed.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
+                behavior_stimulus_file=behavior_stimulus_file,
                 sync_file=sync_file,
                 filtered=False
             )
 
             running_speed = RunningSpeed.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
+                behavior_stimulus_file=behavior_stimulus_file,
                 sync_file=sync_file
             )
 
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
-        licks, rewards, stimuli, task_parameters, trials = \
-            cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
-                include_stimuli=(
-                    not read_stimulus_presentations_table_from_file),
-                stimulus_presentation_columns=stimulus_presentation_columns
-            )
+        (stimulus_timestamps,
+         licks,
+         rewards,
+         stimuli,
+         task_parameters,
+         trials) = cls._read_data_from_stimulus_file(
+                  stimulus_file_lookup=stimulus_file_lookup,
+                  sync_file=sync_file,
+                  monitor_delay=monitor_delay,
+                  include_stimuli=(
+                      not read_stimulus_presentations_table_from_file),
+                  stimulus_presentation_columns=stimulus_presentation_columns)
+
         if read_stimulus_presentations_table_from_file:
             stimuli = Stimuli(
                 presentations=Presentations.from_path(
@@ -234,12 +246,12 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     exclude_columns=stimulus_presentation_exclude_columns
                 ),
                 templates=Templates.from_stimulus_file(
-                    stimulus_file=stimulus_file)
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file)
             )
         date_of_acquisition = DateOfAcquisition.from_json(
             dict_repr=session_data)\
             .validate(
-            stimulus_file=stimulus_file,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
         if skip_eye_tracking:
             eye_tracking_table = None
@@ -280,7 +292,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: Optional[PostgresQueryMixin] = None,
-                  stimulus_timestamps: Optional[StimulusTimestamps] = None,
+                  sync_file: Optional[SyncFile] = None,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[DateOfAcquisition] = None,
                   skip_eye_tracking=False,
@@ -295,9 +307,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Behavior session id
         lims_db
             Database connection. If not provided will create a new one.
-        stimulus_timestamps
-            Stimulus timestamps. If not provided, will calculate stimulus
-            timestamps from stimulus file.
+        sync_file:
+            If provided, will be used to compute the stimulus timestamps
+            associated with this session. Otherwise, the stimulus timestamps
+            will be computed from the stimulus file.
         monitor_delay
             Monitor delay. If not provided, will use an estimate.
             To provide this value, see for example
@@ -325,49 +338,49 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             monitor_delay = cls._get_monitor_delay()
 
         behavior_session_id = BehaviorSessionId(behavior_session_id)
-        stimulus_file = BehaviorStimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value)
 
-        if stimulus_timestamps is not None:
-            sync_file = SyncFile.from_lims(
-                db=lims_db,
-                behavior_session_id=behavior_session_id.value)
-        else:
-            sync_file = None
+        stimulus_file_lookup = StimulusFileLookup()
 
-        if stimulus_timestamps is None:
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay)
+        stimulus_file_lookup.behavior_stimulus_file = (
+                BehaviorStimulusFile.from_lims(
+                    db=lims_db,
+                    behavior_session_id=behavior_session_id.value))
 
         running_acquisition = RunningAcquisition.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
-                sync_file=sync_file)
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file)
 
         raw_running_speed = RunningSpeed.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
-                sync_file=sync_file,
-                filtered=False)
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file,
+            filtered=False)
 
         running_speed = RunningSpeed.from_stimulus_file(
-                behavior_stimulus_file=stimulus_file,
-                sync_file=sync_file,
-                filtered=True)
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file,
+            filtered=True)
 
         behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
 
-        licks, rewards, stimuli, task_parameters, trials = \
+        (stimulus_timestamps,
+         licks,
+         rewards,
+         stimuli,
+         task_parameters,
+         trials) = \
             cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
+                stimulus_file_lookup=stimulus_file_lookup,
+                sync_file=sync_file,
+                monitor_delay=monitor_delay
             )
+
         if date_of_acquisition is None:
             date_of_acquisition = DateOfAcquisition.from_lims(
                 behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         date_of_acquisition = date_of_acquisition.validate(
-            stimulus_file=stimulus_file,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
         if skip_eye_tracking:
             eye_tracking_table = None
@@ -1174,33 +1187,172 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return self._get_metadata(behavior_metadata=self._metadata)
 
     @classmethod
+    def _read_licks(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile]) -> Licks:
+        """
+        Construct the Licks data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                        sync_file=sync_file,
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        monitor_delay=0.0)
+
+        return Licks.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+
+    @classmethod
+    def _read_rewards(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile]) -> Rewards:
+        """
+        Construct the Rewards data object for this session
+        """
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                        sync_file=sync_file,
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        monitor_delay=0.0)
+
+        return Rewards.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps.subtract_monitor_delay())
+
+    @classmethod
+    def _read_stimuli(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            stimulus_presentation_columns: Optional[List[str]] = None
+    ) -> Stimuli:
+        """
+        Construct the Stimuli data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                sync_file=sync_file,
+                stimulus_file_lookup=stimulus_file_lookup,
+                monitor_delay=monitor_delay)
+
+        return Stimuli.from_stimulus_file(
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+                    stimulus_timestamps=stimulus_timestamps,
+                    presentation_columns=stimulus_presentation_columns)
+
+    @classmethod
+    def _read_trials(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            licks: Licks,
+            rewards: Rewards) -> TrialTable:
+        """
+        Construct the Trials data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                sync_file=sync_file,
+                stimulus_file_lookup=stimulus_file_lookup,
+                monitor_delay=monitor_delay)
+
+        return TrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            licks=licks,
+            rewards=rewards)
+
+    @classmethod
+    def _read_behavior_stimulus_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps from the SyncFile.
+        If a SyncFile is not available, use the
+        behavior_stimulus_file
+        """
+        if sync_file is not None:
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                    sync_file=sync_file,
+                    monitor_delay=monitor_delay)
+        else:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+                    monitor_delay=monitor_delay)
+
+        return stimulus_timestamps
+
+    @classmethod
+    def _read_session_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps (with monitor delay) that will
+        be associated with this session
+        """
+        return cls._read_behavior_stimulus_timestamps(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file,
+            monitor_delay=monitor_delay)
+
+    @classmethod
     def _read_data_from_stimulus_file(
-            cls, stimulus_file: BehaviorStimulusFile,
-            stimulus_timestamps: StimulusTimestamps,
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
             include_stimuli=True,
             stimulus_presentation_columns: Optional[List[str]] = None
     ):
         """Helper method to read data from stimulus file"""
-        licks = Licks.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
-        rewards = Rewards.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
-        stimuli = Stimuli.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps,
-            presentation_columns=stimulus_presentation_columns
-        ) if include_stimuli else None
-        task_parameters = TaskParameters.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        trials = TrialTable.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps,
+
+        licks = cls._read_licks(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file)
+
+        rewards = cls._read_rewards(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file)
+
+        session_stimulus_timestamps = cls._read_session_timestamps(
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        sync_file=sync_file,
+                        monitor_delay=monitor_delay)
+
+        if include_stimuli:
+            stimuli = cls._read_stimuli(
+                stimulus_file_lookup=stimulus_file_lookup,
+                sync_file=sync_file,
+                monitor_delay=monitor_delay,
+                stimulus_presentation_columns=stimulus_presentation_columns)
+        else:
+            stimuli = None
+
+        trials = cls._read_trials(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file,
+            monitor_delay=monitor_delay,
             licks=licks,
             rewards=rewards
         )
-        return licks, rewards, stimuli, task_parameters, trials
+
+        task_parameters = TaskParameters.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file)
+
+        return (session_stimulus_timestamps.subtract_monitor_delay(),
+                licks,
+                rewards,
+                stimuli,
+                task_parameters,
+                trials)
 
     def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
         """Returns dict of metadata"""
