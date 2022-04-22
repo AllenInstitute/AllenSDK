@@ -189,7 +189,8 @@ class VBNBehaviorSession(BehaviorSession):
                     data_file=eye_tracking_file,
                     stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
-                    dilation_frames=dilation_frames)
+                    dilation_frames=dilation_frames,
+                    empty_on_fail=False)
 
 
 class BehaviorEcephysSession(BehaviorSession):

@@ -197,7 +197,8 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             data_file: EyeTrackingFile,
             stimulus_timestamps: StimulusTimestamps,
             z_threshold: float = 3.0,
-            dilation_frames: int = 2) -> "EyeTrackingTable":
+            dilation_frames: int = 2,
+            empty_on_fail: bool = False) -> "EyeTrackingTable":
         """
         Parameters
         ----------
@@ -208,6 +209,11 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             See EyeTracking.from_lims
         dilation_frames : int, optional
              See EyeTracking.from_lims
+        empyt_on_fail: bool
+            If True, this method will return an empty dataframe
+            if an EyeTrackingError is raised (usually because
+            timestamps and eye tracking video frames do not
+            align). If false, the error will get raised.
         """
         cls._logger.info(f"Getting eye_tracking_data with "
                          f"'z_threshold={z_threshold}', "
@@ -220,10 +226,13 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
                                      z_threshold,
                                      dilation_frames)
         except EyeTrackingError as err:
-            msg = f"{str(err)}\n"
-            msg += "returning empty eye_tracking DataFrame"
-            warnings.warn(msg)
-            eye_tracking_data = cls._get_empty_df()
+            if empty_on_fail:
+                msg = f"{str(err)}\n"
+                msg += "returning empty eye_tracking DataFrame"
+                warnings.warn(msg)
+                eye_tracking_data = cls._get_empty_df()
+            else:
+                raise
 
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
