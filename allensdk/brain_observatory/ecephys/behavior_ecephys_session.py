@@ -359,7 +359,7 @@ class BehaviorEcephysSession(BehaviorSession):
         instantiated `BehaviorEcephysSession`
         """
         kwargs['add_is_change_to_stimulus_presentations_table'] = False
-        behavior_session = VBNBehaviorSession.from_nwb(
+        behavior_session = cls.behavior_data_class().from_nwb(
             nwbfile=nwbfile,
             **kwargs
         )
