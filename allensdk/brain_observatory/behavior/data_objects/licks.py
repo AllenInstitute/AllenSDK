@@ -68,6 +68,13 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                        ["lick_events"])
 
         if isinstance(stimulus_timestamps, StimulusTimestamps):
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+                msg = ("Instantiating licks with monitor_delay = "
+                       f"{stimulus_timestamps.monitor_delay: .2e}; "
+                       "monitor_delay should be zero for Licks "
+                       "data object")
+                raise RuntimeError(msg)
+
             lick_times = stimulus_timestamps.value
         else:
             lick_times = stimulus_timestamps

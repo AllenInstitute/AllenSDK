@@ -40,7 +40,7 @@ def test_get_trial_image_names(behavior_stimuli_data_fixture, trial,
 
         def _match_to_sync_timestamps(
                 self,
-                stimulus_timestamps,
+                raw_stimulus_timestamps,
                 licks,
                 rewards,
                 stimuli):
@@ -87,7 +87,7 @@ def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
 
         def _match_to_sync_timestamps(
                 self,
-                stimulus_timestamps,
+                raw_stimulus_timestamps,
                 licks,
                 rewards,
                 stimuli):
@@ -131,7 +131,7 @@ def test_get_trial_timing_exclusivity_assertions(
     with pytest.raises(AssertionError) as e:
         Trial._get_trial_timing(
             None, None, go, catch, auto_rewarded, hit, false_alarm,
-            aborted, np.array([]))
+            aborted, np.array([]), 0.0)
     assert errortext in str(e.value)
 
 
@@ -183,6 +183,7 @@ def test_get_trial_timing():
     # change_frame
     timestamps = np.zeros(20000, dtype=float)
     timestamps[18346] = 311.77086
+    monitor_delay = 0.01
 
     result = Trial._get_trial_timing(
         event_dict,
@@ -193,7 +194,8 @@ def test_get_trial_timing():
         hit=False,
         false_alarm=False,
         aborted=False,
-        timestamps=timestamps
+        timestamps=timestamps,
+        monitor_delay=monitor_delay
     )
 
     expected_result = {
@@ -202,8 +204,8 @@ def test_get_trial_timing():
         'trial_length': 8.757316460199547,
         'response_time': 312.24876,
         'change_frame': 18346,
-        'change_time': 311.77086,
-        'response_latency': 0.4778999999999769
+        'change_time': 311.78086,
+        'response_latency': 0.4678999999999769
     }
 
     # use assert_frame_equal to take advantage of the

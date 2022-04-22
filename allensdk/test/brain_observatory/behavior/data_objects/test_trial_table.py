@@ -78,12 +78,17 @@ class TestFromBehaviorStimulusFile(LimsTest):
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file,
             monitor_delay=0.02115)
+
+        stimulus_timestamps_no_delay = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            monitor_delay=0.0)
+
         licks = Licks.from_stimulus_file(
             stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
+            stimulus_timestamps=stimulus_timestamps_no_delay)
         rewards = Rewards.from_stimulus_file(
             stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
+            stimulus_timestamps=stimulus_timestamps_no_delay)
         return stimulus_file, stimulus_timestamps, licks, rewards
 
 

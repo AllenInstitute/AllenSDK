@@ -29,11 +29,11 @@ BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
 
 
 def from_json_cache_key(cls, stimulus_file_path: str):
-    return hashkey(stimulus_file_path)
+    return hashkey(stimulus_file_path, cls.file_path_key())
 
 
 def from_lims_cache_key(cls, db, behavior_session_id: int):
-    return hashkey(behavior_session_id)
+    return hashkey(behavior_session_id, cls.file_path_key())
 
 
 class _NumFramesMixin(object):
@@ -208,3 +208,78 @@ class StimulusFileReadableInterface(abc.ABC):
             An instantiated DataObject which has `name` and `value` properties
         """
         raise NotImplementedError()
+
+
+class StimulusFileLookup(object):
+    """
+    A container class to carry around the StimulusFile(s) associated
+    with a BehaviorSession
+    """
+
+    def __init__(self):
+        self._values = dict()
+
+    @property
+    def behavior_stimulus_file(self) -> BehaviorStimulusFile:
+        if 'behavior' not in self._values:
+            raise ValueError("This StimulusFileLookup has no "
+                             "BehaviorStimulusFile")
+        return self._values['behavior']
+
+    @behavior_stimulus_file.setter
+    def behavior_stimulus_file(self, value: BehaviorStimulusFile):
+        if not isinstance(value, BehaviorStimulusFile):
+            raise ValueError("Trying to set behavior_stimulus_file to "
+                             f"value of type {type(value)}; type should "
+                             "be BehaviorStimulusFile")
+        self._values['behavior'] = value
+
+    @property
+    def replay_stimulus_file(self) -> ReplayStimulusFile:
+        if 'replay' not in self._values:
+            raise ValueError("This StimulusFileLookup has no "
+                             "ReplayStimulusFile")
+        return self._values['replay']
+
+    @replay_stimulus_file.setter
+    def replay_stimulus_file(self, value: ReplayStimulusFile):
+        if not isinstance(value, ReplayStimulusFile):
+            raise ValueError("Trying to set replay_stimulus_file to "
+                             f"value of type {type(value)}; type should "
+                             "be ReplayStimulusFile")
+        self._values['replay'] = value
+
+    @property
+    def mapping_stimulus_file(self) -> MappingStimulusFile:
+        if 'mapping' not in self._values:
+            raise ValueError("This StimulusFileLookup has no "
+                             "MappingStimulusFile")
+        return self._values['mapping']
+
+    @mapping_stimulus_file.setter
+    def mapping_stimulus_file(self, value: MappingStimulusFile):
+        if not isinstance(value, MappingStimulusFile):
+            raise ValueError("Trying to set mapping_stimulus_file to "
+                             f"value of type {type(value)}; type should "
+                             "be MappingStimulusFile")
+        self._values['mapping'] = value
+
+
+def stimulus_lookup_from_json(
+        dict_repr: dict) -> StimulusFileLookup:
+    """
+    Load a lookup table of the stimulus files associated with a
+    BehaviorSession from the dict representation of that session's
+    session_data
+    """
+    lookup_table = StimulusFileLookup()
+    if BehaviorStimulusFile.file_path_key() in dict_repr:
+        stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
+        lookup_table.behavior_stimulus_file = stim
+    if MappingStimulusFile.file_path_key() in dict_repr:
+        stim = MappingStimulusFile.from_json(dict_repr=dict_repr)
+        lookup_table.mapping_stimulus_file = stim
+    if ReplayStimulusFile.file_path_key() in dict_repr:
+        stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
+        lookup_table.replay_stimulus_file = stim
+    return lookup_table

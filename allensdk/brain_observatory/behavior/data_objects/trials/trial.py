@@ -21,8 +21,10 @@ class Trial:
             trial_end=end, behavior_stimulus_file=behavior_stimulus_file)
         self._index = index
         self._data = self._match_to_sync_timestamps(
-            stimulus_timestamps=stimulus_timestamps, licks=licks,
-            rewards=rewards, stimuli=stimuli)
+            raw_stimulus_timestamps=stimulus_timestamps,
+            licks=licks,
+            rewards=rewards,
+            stimuli=stimuli)
 
     @property
     def data(self):
@@ -30,9 +32,19 @@ class Trial:
 
     def _match_to_sync_timestamps(
             self,
-            stimulus_timestamps: StimulusTimestamps,
-            licks: Licks, rewards: Rewards,
+            raw_stimulus_timestamps: StimulusTimestamps,
+            licks: Licks,
+            rewards: Rewards,
             stimuli: dict) -> Dict[str, Any]:
+        """
+        raw_stimulus_timestamps include monitor_delay
+        """
+
+        # need to separate out the monitor_delay from the
+        # un-corrected timestamps
+        monitor_delay = raw_stimulus_timestamps.monitor_delay
+        stimulus_timestamps = raw_stimulus_timestamps.subtract_monitor_delay()
+
         event_dict = {
             (e[0], e[1]): {
                 'timestamp': stimulus_timestamps.value[e[3]],
@@ -92,7 +104,8 @@ class Trial:
             tr_data['hit'],
             tr_data['false_alarm'],
             tr_data["aborted"],
-            timestamps
+            timestamps,
+            monitor_delay
         ))
         tr_data.update(self._get_trial_image_names(stimuli))
 
@@ -190,9 +203,15 @@ class Trial:
     @staticmethod
     def _get_trial_timing(
             event_dict: dict,
-            licks: List[float], go: bool, catch: bool, auto_rewarded: bool,
-            hit: bool, false_alarm: bool, aborted: bool,
-            timestamps: np.ndarray) -> Dict[str, Any]:
+            licks: List[float],
+            go: bool,
+            catch: bool,
+            auto_rewarded: bool,
+            hit: bool,
+            false_alarm: bool,
+            aborted: bool,
+            timestamps: np.ndarray,
+            monitor_delay: float) -> Dict[str, Any]:
         """
         Extract a dictionary of trial timing data.
         See trial_data_from_log for a description of the trial types.
@@ -219,8 +238,10 @@ class Trial:
         aborted: bool
             True if "aborted" trial, False otherwise
         timestamps: np.ndarray[1d]
-            Array of ground truth timestamps for the session with
-            monitor_delay already added
+            Array of ground truth timestamps for the session.
+        monitor_delay: float
+            The monitor delay to be added to timestamps when computing
+            the trial's change_time
 
         Returns
         =======
@@ -296,11 +317,11 @@ class Trial:
         if go or auto_rewarded:
             change_frame = event_dict.get(('stimulus_changed', ''))['frame']
             change_frame += 1
-            change_time = timestamps[change_frame]
+            change_time = timestamps[change_frame] + monitor_delay
         elif catch:
             change_frame = event_dict.get(('sham_change', ''))['frame']
             change_frame += 1
-            change_time = timestamps[change_frame]
+            change_time = timestamps[change_frame] + monitor_delay
         else:
             change_time = float("nan")
             change_frame = float("nan")

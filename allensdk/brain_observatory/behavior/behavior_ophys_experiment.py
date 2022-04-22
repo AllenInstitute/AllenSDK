@@ -9,7 +9,7 @@ from allensdk.brain_observatory.behavior.data_files\
     .rigid_motion_transform_file import \
     RigidMotionTransformFile
 from allensdk.brain_observatory.behavior.data_objects import \
-    BehaviorSessionId, StimulusTimestamps
+    BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
     .cell_specimens import \
     CellSpecimens, EventsParams
@@ -154,16 +154,12 @@ class BehaviorOphysExperiment(BehaviorSession):
         monitor_delay = calculate_monitor_delay(
             sync_file=sync_file, equipment=meta.behavior_metadata.equipment)
 
-        stimulus_timestamps = StimulusTimestamps.from_sync_file(
-            sync_file=sync_file,
-            monitor_delay=monitor_delay)
-
         date_of_acquisition = DateOfAcquisitionOphys.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         behavior_session = BehaviorSession.from_lims(
             lims_db=lims_db,
             behavior_session_id=behavior_session_id.value,
-            stimulus_timestamps=stimulus_timestamps,
+            sync_file=sync_file,
             monitor_delay=monitor_delay,
             date_of_acquisition=date_of_acquisition,
             skip_eye_tracking=skip_eye_tracking,

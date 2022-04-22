@@ -35,6 +35,20 @@ class TestFromBehaviorStimulusFile(LimsTest):
                                              stimulus_timestamps=timestamps)
         assert rewards == self.expected
 
+    def test_monitor_delay_error(self):
+        """
+        Test that an error is raised if Rewards are instantiated with
+        non-zero monitor delay
+        """
+        timestamps = StimulusTimestamps(
+                        np.arange(10),
+                        0.1)
+        with pytest.raises(RuntimeError,
+                           match="monitor_delay should be zero"):
+            Rewards.from_stimulus_file(
+                     stimulus_file=None,
+                     stimulus_timestamps=timestamps)
+
     def test_from_stimulus_file2(self, tmpdir):
         """
         Test that Rewards.from_stimulus_file returns
