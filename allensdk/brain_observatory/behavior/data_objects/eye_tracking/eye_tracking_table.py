@@ -197,7 +197,6 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             cls,
             data_file: EyeTrackingFile,
             stimulus_timestamps: StimulusTimestamps,
-            drop_frames: Optional[List[int]] = None,
             z_threshold: float = 3.0,
             dilation_frames: int = 2) -> "EyeTrackingTable":
         """
@@ -206,10 +205,6 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         data_file
         stimulus_timestamps: StimulusTimestamps
             The timestamps associated with this eye tracking table
-        drop_frames : List[int], optional
-            List of frame indices to be dropped from the table.
-            If provided, will drop the corresponding frame frame times read
-            from the sync file to synchronize frame times and frames.
         z_threshold : float, optional
             See EyeTracking.from_lims
         dilation_frames : int, optional

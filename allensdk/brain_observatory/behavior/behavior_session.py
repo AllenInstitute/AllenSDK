@@ -24,8 +24,7 @@ from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
 from allensdk.brain_observatory.behavior.\
     data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import \
-    EyeTrackingTable, get_lost_frames
+    .eye_tracking_table import EyeTrackingTable
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
     .rig_geometry import \
     RigGeometry as EyeTrackingRigGeometry
@@ -278,8 +277,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     eye_tracking_metadata_file=eye_tracking_metadata_file,
                     sync_file=sync_file,
                     z_threshold=eye_tracking_z_threshold,
-                    dilation_frames=eye_tracking_dilation_frames,
-                    drop_frames=eye_tracking_drop_frames)
+                    dilation_frames=eye_tracking_dilation_frames)
 
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
                 dict_repr=session_data)
@@ -418,8 +416,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 eye_tracking_metadata_file=eye_tracking_metadata_file,
                 sync_file=sync_file,
                 z_threshold=eye_tracking_z_threshold,
-                dilation_frames=eye_tracking_dilation_frames,
-                drop_frames=False)
+                dilation_frames=eye_tracking_dilation_frames)
 
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
                 behavior_session_id=behavior_session_id.value, lims_db=lims_db)
@@ -1386,8 +1383,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             eye_tracking_metadata_file: EyeTrackingMetadataFile,
             sync_file: SyncFile,
             z_threshold: float,
-            dilation_frames: int,
-            drop_frames: bool) -> EyeTrackingTable:
+            dilation_frames: int) -> EyeTrackingTable:
 
         # this is possible if instantiating from_lims
         if sync_file is None:
@@ -1401,7 +1397,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         frame_times = sync_utilities.get_synchronized_frame_times(
             session_sync_file=sync_path,
             sync_line_label_keys=SyncDataset.EYE_TRACKING_KEYS,
-            drop_frames=drop_frames,
+            drop_frames=None,
             trim_after_spike=False)
 
         stimulus_timestamps = StimulusTimestamps(
@@ -1412,8 +1408,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     data_file=eye_tracking_file,
                     stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
-                    dilation_frames=dilation_frames,
-                    drop_frames=drop_frames)
+                    dilation_frames=dilation_frames)
 
     def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
         """Returns dict of metadata"""

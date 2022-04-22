@@ -156,8 +156,7 @@ class VBNBehaviorSession(BehaviorSession):
             eye_tracking_metadata_file: EyeTrackingMetadataFile,
             sync_file: SyncFile,
             z_threshold: float,
-            dilation_frames: int,
-            drop_frames: bool) -> EyeTrackingTable:
+            dilation_frames: int) -> EyeTrackingTable:
         """
         Notes
         -----
