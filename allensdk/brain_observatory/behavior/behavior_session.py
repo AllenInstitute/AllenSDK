@@ -4,10 +4,13 @@ import pynwb
 import pandas as pd
 import numpy as np
 import pytz
+import pathlib
 
 from pynwb import NWBFile
 
 from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
+from allensdk.brain_observatory import sync_utilities
 
 from allensdk.brain_observatory.behavior.data_files import \
     BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
@@ -1381,9 +1384,21 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                    "table without a sync_file")
             raise RuntimeError(msg)
 
+        sync_path = pathlib.Path(sync_file.filepath)
+
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_path,
+            sync_line_label_keys=SyncDataset.EYE_TRACKING_KEYS,
+            drop_frames=drop_frames,
+            trim_after_spike=False)
+
+        stimulus_timestamps = StimulusTimestamps(
+                timestamps=frame_times,
+                monitor_delay=0.0)
+
         return EyeTrackingTable.from_data_file(
                     data_file=eye_tracking_file,
-                    sync_file=sync_file,
+                    stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
                     dilation_frames=dilation_frames,
                     drop_frames=drop_frames)

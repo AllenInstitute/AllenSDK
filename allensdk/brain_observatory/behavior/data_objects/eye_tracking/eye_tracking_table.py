@@ -1,14 +1,13 @@
 import json
 import logging
 import warnings
-from pathlib import Path
 from typing import Optional, List
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
-from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_objects import (
+    StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
 from allensdk.core import DataObject
@@ -22,7 +21,6 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import \
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
     import \
     EllipseSeries, EllipseEyeTracking
-from allensdk.brain_observatory.sync_dataset import Dataset
 
 
 class EyeTrackingTable(DataObject, DataFileReadableInterface,
@@ -193,17 +191,19 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
     @classmethod
-    def from_data_file(cls, data_file: EyeTrackingFile,
-                       sync_file: SyncFile,
-                       drop_frames: Optional[List[int]] = None,
-                       z_threshold: float = 3.0,
-                       dilation_frames: int = 2,
-                       ) -> "EyeTrackingTable":
+    def from_data_file(
+            cls,
+            data_file: EyeTrackingFile,
+            stimulus_timestamps: StimulusTimestamps,
+            drop_frames: Optional[List[int]] = None,
+            z_threshold: float = 3.0,
+            dilation_frames: int = 2) -> "EyeTrackingTable":
         """
         Parameters
         ----------
         data_file
-        sync_file
+        stimulus_timestamps: StimulusTimestamps
+            The timestamps associated with this eye tracking table
         drop_frames : List[int], optional
             List of frame indices to be dropped from the table.
             If provided, will drop the corresponding frame frame times read
@@ -217,23 +217,14 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
                          f"'z_threshold={z_threshold}', "
                          f"'dilation_frames={dilation_frames}'")
 
-        sync_path = Path(sync_file.filepath)
-
-        frame_times = sync_utilities.get_synchronized_frame_times(
-            session_sync_file=sync_path,
-            sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
-            drop_frames=drop_frames,
-            trim_after_spike=False)
-
         try:
             eye_tracking_data = process_eye_tracking_data(
-                                             data_file.data,
-                                             frame_times,
-                                             z_threshold,
-                                             dilation_frames)
+                                     data_file.data,
+                                     stimulus_timestamps.value,
+                                     z_threshold,
+                                     dilation_frames)
         except EyeTrackingError as err:
-            msg = f"\nin sync_file: {sync_file.filepath}\n"
-            msg += f"{str(err)}\n"
+            msg = f"{str(err)}\n"
             msg += "returning empty eye_tracking DataFrame"
             warnings.warn(msg)
             eye_tracking_data = cls._get_empty_df()
