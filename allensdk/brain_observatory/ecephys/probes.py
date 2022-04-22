@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict, Any, Optional
 
 import numpy as np
@@ -16,7 +17,8 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
              NwbWritableInterface):
     """Probes"""
 
-    def __init__(self, probes: List[Probe]):
+    def __init__(self,
+                 probes: List[Probe]):
         """
 
         Parameters
@@ -136,7 +138,32 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         return units_table
 
     @classmethod
-    def from_json(cls, probes: List[Dict[str, Any]]) -> "Probes":
+    def from_json(
+            cls,
+            probes: List[Dict[str, Any]],
+            skip_probes: Optional[List[str]] = None
+    ) -> "Probes":
+        """
+
+        Parameters
+        ----------
+        probes
+        skip_probes: Names of probes to exclude (due to known bad data
+            for example)
+        Returns
+        -------
+        `Probes` instance
+        """
+        skip_probes = skip_probes if skip_probes is not None else []
+        invalid_skip_probes = set(skip_probes).difference(
+            [p['name'] for p in probes])
+        if invalid_skip_probes:
+            raise ValueError(
+                f'You passed invalid probes to skip: {invalid_skip_probes} '
+                f'are not valid probe names')
+        for probe in skip_probes:
+            logging.info(f'Skipping {probe}')
+        probes = [p for p in probes if p['name'] not in skip_probes]
         probes = sorted(probes, key=lambda probe: probe['name'])
         probes = [Probe.from_json(probe=probe) for probe in probes]
         return Probes(probes=probes)
@@ -189,3 +216,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         )
 
         return nwbfile
+
+    def __iter__(self):
+        for p in self.probes:
+            yield p

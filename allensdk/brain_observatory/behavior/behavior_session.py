@@ -1373,7 +1373,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         }
 
     def _get_identifier(self) -> str:
-        return str(self._behavior_session_id)
+        return str(self._behavior_session_id.value)
 
     def _get_session_type(self) -> str:
         return self._metadata.session_type

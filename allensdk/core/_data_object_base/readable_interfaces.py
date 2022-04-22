@@ -42,7 +42,11 @@ class NwbReadableInterface(abc.ABC):
     """Marks a data object as readable from NWB"""
     @classmethod
     @abc.abstractmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "DataObject":  # pragma: no cover
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            **kwargs
+    ) -> "DataObject":  # pragma: no cover
         """Populate a DataObject from a pyNWB file object.
 
         Parameters
