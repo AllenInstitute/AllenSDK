@@ -1401,7 +1401,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             trim_after_spike=False)
 
         stimulus_timestamps = StimulusTimestamps(
-                timestamps=frame_times,
+                timestamps=frame_times.to_numpy(),
                 monitor_delay=0.0)
 
         return EyeTrackingTable.from_data_file(
