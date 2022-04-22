@@ -2,7 +2,6 @@ from typing import Union
 import pathlib
 import json
 from allensdk.internal.core import DataFile
-from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class EyeTrackingMetadataFile(DataFile):
@@ -16,7 +15,6 @@ class EyeTrackingMetadataFile(DataFile):
 
     @staticmethod
     def load_data(filepath: Union[str, pathlib.Path]) -> dict:
-        filepath = safe_system_path(file_name=filepath)
         with open(filepath, 'rb') as in_file:
             return json.load(in_file)
 
