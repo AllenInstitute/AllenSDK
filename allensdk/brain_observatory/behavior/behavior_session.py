@@ -21,6 +21,8 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
 
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import \
     EyeTrackingTable, get_lost_frames
@@ -265,9 +267,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
             eye_tracking_file = EyeTrackingFile.from_json(
                                     dict_repr=session_data)
+            try:
+                eye_tracking_metadata_file = EyeTrackingMetadataFile.from_json(
+                                    dict_repr=session_data)
+            except KeyError:
+                eye_tracking_metadata_file = None
 
             eye_tracking_table = cls._read_eye_tracking_table(
                     eye_tracking_file=eye_tracking_file,
+                    eye_tracking_metadata_file=eye_tracking_metadata_file,
                     sync_file=sync_file,
                     z_threshold=eye_tracking_z_threshold,
                     dilation_frames=eye_tracking_dilation_frames,
@@ -403,8 +411,11 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     db=lims_db,
                     behavior_session_id=behavior_session_id.value)
 
+            eye_tracking_metadata_file = None
+
             eye_tracking_table = cls._read_eye_tracking_table(
                 eye_tracking_file=eye_tracking_file,
+                eye_tracking_metadata_file=eye_tracking_metadata_file,
                 sync_file=sync_file,
                 z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames,
@@ -1372,6 +1383,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_eye_tracking_table(
             cls,
             eye_tracking_file: EyeTrackingFile,
+            eye_tracking_metadata_file: EyeTrackingMetadataFile,
             sync_file: SyncFile,
             z_threshold: float,
             dilation_frames: int,

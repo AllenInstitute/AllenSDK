@@ -4,6 +4,9 @@ import json
 import pathlib
 import numpy as np
 
+from allensdk.brain_observatory.behavior.data_files.\
+    eye_tracking_metadata_file import EyeTrackingMetadataFile
+
 from allensdk.brain_observatory.behavior.\
     data_objects.eye_tracking.eye_tracking_table import (
         get_lost_frames)
@@ -39,7 +42,13 @@ def test_get_lost_frames(
     with open(json_path, 'w') as output_file:
         output_file.write(json.dumps(metadata))
 
-    actual = get_lost_frames(file_path=json_path)
+    dict_repr = {'raw_eye_tracking_video_meta_data':
+                 str(json_path.resolve().absolute())}
+
+    metadata = EyeTrackingMetadataFile.from_json(
+                    dict_repr=dict_repr)
+
+    actual = get_lost_frames(eye_tracking_metadata=metadata)
     np.testing.assert_array_equal(actual, np.array(expected_array))
 
     helper_functions.windows_safe_cleanup_dir(dir_path=tmpdir)

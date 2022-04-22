@@ -10,6 +10,8 @@ from allensdk.brain_observatory.behavior.data_objects import (
     StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface, DataFileReadableInterface
@@ -232,7 +234,8 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
 
-def get_lost_frames(file_path: str) -> List[int]:
+def get_lost_frames(
+        eye_tracking_metadata: EyeTrackingMetadataFile) -> List[int]:
     """
     Get lost frames from the video metadata json
     Must subtract one since the json starts indexing at 1
@@ -246,8 +249,7 @@ def get_lost_frames(file_path: str) -> List[int]:
 
     Parameters
     ----------
-    file_path: str
-        Path to the metadata json
+    eye_tracking_metadata_file: EyeTrackingMetadataFile
 
     Returns
     -------
@@ -259,8 +261,7 @@ def get_lost_frames(file_path: str) -> List[int]:
     https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py
     """
 
-    with open(file_path, 'rb') as in_file:
-        camera_metadata = json.load(in_file)
+    camera_metadata = eye_tracking_metadata.data
 
     lost_count = camera_metadata['RecordingReport']['FramesLostCount']
     if lost_count == 0:
