@@ -1,6 +1,6 @@
 import logging
 import warnings
-from typing import Optional, List
+from typing import Optional
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
@@ -238,7 +238,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
 
 
 def get_lost_frames(
-        eye_tracking_metadata: EyeTrackingMetadataFile) -> List[int]:
+        eye_tracking_metadata: EyeTrackingMetadataFile) -> np.ndarray:
     """
     Get lost frames from the video metadata json
     Must subtract one since the json starts indexing at 1
