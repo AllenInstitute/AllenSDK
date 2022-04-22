@@ -252,7 +252,7 @@ def get_lost_frames(
 
     Parameters
     ----------
-    eye_tracking_metadata_file: EyeTrackingMetadataFile
+    eye_tracking_metadata: EyeTrackingMetadataFile
 
     Returns
     -------
