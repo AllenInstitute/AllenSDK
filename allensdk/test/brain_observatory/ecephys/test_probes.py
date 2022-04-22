@@ -15,6 +15,11 @@ class TestProbes:
                   'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
+
+        # trim down the number of probes to reduce memory footprint of test
+        input_data['session_data']['probes'] = (
+                input_data['session_data']['probes'][:3])
+
         cls.input_data = input_data['session_data']['probes']
         probes = Probe().load(cls.input_data, many=True)
         cls._probes_from_json = Probes.from_json(probes=probes)
