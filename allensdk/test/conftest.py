@@ -21,6 +21,43 @@ class HelperFunctions(object):
                 else:
                     raise
 
+    @staticmethod
+    def _first_pass_safe_cleanup_dir(dir_path: pathlib.Path):
+        """
+        Unlink all of the files in the directory, then remove the directory.
+        If a PermissionError is raised, ignore if the system is Windows
+        (this has been observed on our CI systems)
+        """
+        contents_list = [n for n in dir_path.iterdir()]
+        for this_path in contents_list:
+            if this_path.is_file():
+                HelperFunctions.windows_safe_cleanup(file_path=this_path)
+            elif this_path.is_dir():
+                HelperFunctions.windows_safe_cleanup_dir(
+                        dir_path=this_path)
+                try:
+                    this_path.rmdir()
+                except Exception:
+                    pass
+
+    @staticmethod
+    def windows_safe_cleanup_dir(dir_path: pathlib.Path):
+        """
+        Unlink all of the files in the directory, then remove the directory.
+        If a PermissionError is raised, ignore if the system is Windows
+        (this has been observed on our CI systems)
+        """
+        HelperFunctions._first_pass_safe_cleanup_dir(
+                dir_path=dir_path)
+
+        contents_list = [n for n in dir_path.iterdir()]
+        for this_path in contents_list:
+            if this_path.is_dir():
+                try:
+                    this_path.rmdir()
+                except Exception:
+                    raise
+
 
 @pytest.fixture(scope='session')
 def helper_functions():

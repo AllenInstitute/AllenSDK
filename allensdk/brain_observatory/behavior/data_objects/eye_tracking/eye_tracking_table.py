@@ -246,6 +246,13 @@ def get_lost_frames(file_path: str) -> List[int]:
     Get lost frames from the video metadata json
     Must subtract one since the json starts indexing at 1
 
+    The lost frames are recorded like
+    ['13-14,67395-67398']
+    which would mean frames 13, 15, 67395, 67396, 67397, 67398
+    were lost.
+
+    This method needs to parse these strings into lists of integers.
+
     Parameters
     ----------
     file_path: str
@@ -254,13 +261,30 @@ def get_lost_frames(file_path: str) -> List[int]:
     Returns
     -------
         indices of lost frames
+
+    Notes
+    -----
+    This algorithm was copied almost directly from an implementation at
+    https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py
     """
-    with open(file_path, 'r') as f:
-        video_metadata = json.load(f)
 
-    lost_frames = video_metadata['RecordingReport']['LostFrames']
+    with open(file_path, 'rb') as in_file:
+        camera_metadata = json.load(in_file)
 
-    if lost_frames:
-        return [int(f) - 1 for f in lost_frames]
-    else:
+    lost_count = camera_metadata['RecordingReport']['FramesLostCount']
+    if lost_count == 0:
         return []
+
+    lost_string = camera_metadata['RecordingReport']['LostFrames'][0]
+    lost_spans = lost_string.split(',')
+
+    lost_frames = []
+    for span in lost_spans:
+        start_end = span.split('-')
+        if len(start_end) == 1:
+            lost_frames.append(int(start_end[0]))
+        else:
+            lost_frames.extend(np.arange(int(start_end[0]),
+                                         int(start_end[1])+1))
+
+    return np.array(lost_frames)-1
