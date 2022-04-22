@@ -81,7 +81,7 @@ def get_synchronized_frame_times(session_sync_file: Path,
     )
 
     times = trim_discontiguous_times(times) if trim_after_spike else times
-    if drop_frames:
+    if drop_frames is not None:
         times = [t for ix, t in enumerate(times) if ix not in drop_frames]
 
     return pd.Series(times)
