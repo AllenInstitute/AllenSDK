@@ -1,16 +1,16 @@
-import json
 import logging
 import warnings
-from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
-from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_objects import (
+    StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
 from allensdk.core import DataObject
 from allensdk.core import \
     NwbReadableInterface, DataFileReadableInterface
@@ -22,7 +22,6 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import \
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
     import \
     EllipseSeries, EllipseEyeTracking
-from allensdk.brain_observatory.sync_dataset import Dataset
 
 
 class EyeTrackingTable(DataObject, DataFileReadableInterface,
@@ -193,74 +192,94 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
     @classmethod
-    def from_data_file(cls, data_file: EyeTrackingFile,
-                       sync_file: SyncFile,
-                       drop_frames: Optional[List[int]] = None,
-                       z_threshold: float = 3.0,
-                       dilation_frames: int = 2,
-                       ) -> "EyeTrackingTable":
+    def from_data_file(
+            cls,
+            data_file: EyeTrackingFile,
+            stimulus_timestamps: StimulusTimestamps,
+            z_threshold: float = 3.0,
+            dilation_frames: int = 2,
+            empty_on_fail: bool = False) -> "EyeTrackingTable":
         """
         Parameters
         ----------
         data_file
-        sync_file
-        drop_frames : List[int], optional
-            List of frame indices to be dropped from the table.
-            If provided, will drop the corresponding frame frame times read
-            from the sync file to synchronize frame times and frames.
+        stimulus_timestamps: StimulusTimestamps
+            The timestamps associated with this eye tracking table
         z_threshold : float, optional
             See EyeTracking.from_lims
         dilation_frames : int, optional
              See EyeTracking.from_lims
+        empyt_on_fail: bool
+            If True, this method will return an empty dataframe
+            if an EyeTrackingError is raised (usually because
+            timestamps and eye tracking video frames do not
+            align). If false, the error will get raised.
         """
         cls._logger.info(f"Getting eye_tracking_data with "
                          f"'z_threshold={z_threshold}', "
                          f"'dilation_frames={dilation_frames}'")
 
-        sync_path = Path(sync_file.filepath)
-
-        frame_times = sync_utilities.get_synchronized_frame_times(
-            session_sync_file=sync_path,
-            sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
-            drop_frames=drop_frames,
-            trim_after_spike=False)
-
         try:
             eye_tracking_data = process_eye_tracking_data(
-                                             data_file.data,
-                                             frame_times,
-                                             z_threshold,
-                                             dilation_frames)
+                                     data_file.data,
+                                     stimulus_timestamps.value,
+                                     z_threshold,
+                                     dilation_frames)
         except EyeTrackingError as err:
-            msg = f"\nin sync_file: {sync_file.filepath}\n"
-            msg += f"{str(err)}\n"
-            msg += "returning empty eye_tracking DataFrame"
-            warnings.warn(msg)
-            eye_tracking_data = cls._get_empty_df()
+            if empty_on_fail:
+                msg = f"{str(err)}\n"
+                msg += "returning empty eye_tracking DataFrame"
+                warnings.warn(msg)
+                eye_tracking_data = cls._get_empty_df()
+            else:
+                raise
 
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 
 
-def get_lost_frames(file_path: str) -> List[int]:
+def get_lost_frames(
+        eye_tracking_metadata: EyeTrackingMetadataFile) -> np.ndarray:
     """
     Get lost frames from the video metadata json
     Must subtract one since the json starts indexing at 1
 
+    The lost frames are recorded like
+    ['13-14,67395-67398']
+    which would mean frames 13, 15, 67395, 67396, 67397, 67398
+    were lost.
+
+    This method needs to parse these strings into lists of integers.
+
     Parameters
     ----------
-    file_path: str
-        Path to the metadata json
+    eye_tracking_metadata: EyeTrackingMetadataFile
 
     Returns
     -------
         indices of lost frames
+
+    Notes
+    -----
+    This algorithm was copied almost directly from an implementation at
+    https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py
     """
-    with open(file_path, 'r') as f:
-        video_metadata = json.load(f)
 
-    lost_frames = video_metadata['RecordingReport']['LostFrames']
+    camera_metadata = eye_tracking_metadata.data
 
-    if lost_frames:
-        return [int(f) - 1 for f in lost_frames]
-    else:
+    lost_count = camera_metadata['RecordingReport']['FramesLostCount']
+    if lost_count == 0:
         return []
+
+    lost_string = camera_metadata['RecordingReport']['LostFrames'][0]
+    lost_spans = lost_string.split(',')
+
+    lost_frames = []
+    for span in lost_spans:
+        start_end = span.split('-')
+        if len(start_end) == 1:
+            lost_frames.append(int(start_end[0]))
+        else:
+            lost_frames.extend(np.arange(int(start_end[0]),
+                                         int(start_end[1])+1))
+
+    return np.array(lost_frames)-1

@@ -6,6 +6,10 @@ import pandas as pd
 import pynwb
 import pytest
 
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory import sync_utilities
+
 from allensdk.brain_observatory.behavior.data_files import \
     SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
@@ -40,8 +44,22 @@ class TestFromDataFile(LimsTest):
             behavior_session_id=behavior_session_id.value, db=self.dbconn)
         sync_file = SyncFile.from_lims(
             behavior_session_id=behavior_session_id.value, db=self.dbconn)
-        ett = EyeTrackingTable.from_data_file(data_file=etf,
-                                              sync_file=sync_file)
+
+        sync_path = Path(sync_file.filepath)
+
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_path,
+            sync_line_label_keys=SyncDataset.EYE_TRACKING_KEYS,
+            drop_frames=None,
+            trim_after_spike=False)
+
+        stimulus_timestamps = StimulusTimestamps(
+                timestamps=frame_times,
+                monitor_delay=0.0)
+
+        ett = EyeTrackingTable.from_data_file(
+                    data_file=etf,
+                    stimulus_timestamps=stimulus_timestamps)
 
         # filter to first 100 values for testing
         ett = EyeTrackingTable(eye_tracking=ett.value.iloc[:100])

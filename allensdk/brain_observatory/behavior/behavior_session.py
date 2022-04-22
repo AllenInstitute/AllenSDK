@@ -4,8 +4,13 @@ import pynwb
 import pandas as pd
 import numpy as np
 import pytz
+import pathlib
 
 from pynwb import NWBFile
+
+from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
+from allensdk.brain_observatory import sync_utilities
 
 from allensdk.brain_observatory.behavior.data_files import \
     BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
@@ -16,9 +21,10 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
 
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import \
-    EyeTrackingTable, get_lost_frames
+    .eye_tracking_table import EyeTrackingTable
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
     .rig_geometry import \
     RigGeometry as EyeTrackingRigGeometry
@@ -257,18 +263,22 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             eye_tracking_table = None
             eye_tracking_rig_geometry = None
         else:
-            eye_tracking_table = EyeTrackingTable.from_data_file(
-                data_file=EyeTrackingFile.from_json(
-                    dict_repr=session_data),
-                sync_file=SyncFile.from_json(
-                    dict_repr=session_data,
-                    permissive=sync_file_permissive),
-                z_threshold=eye_tracking_z_threshold,
-                dilation_frames=eye_tracking_dilation_frames,
-                drop_frames=get_lost_frames(
-                    file_path=session_data['raw_eye_tracking_video_meta_data'])
-                if eye_tracking_drop_frames else None
-            )
+
+            eye_tracking_file = EyeTrackingFile.from_json(
+                                    dict_repr=session_data)
+            try:
+                eye_tracking_metadata_file = EyeTrackingMetadataFile.from_json(
+                                    dict_repr=session_data)
+            except KeyError:
+                eye_tracking_metadata_file = None
+
+            eye_tracking_table = cls._read_eye_tracking_table(
+                    eye_tracking_file=eye_tracking_file,
+                    eye_tracking_metadata_file=eye_tracking_metadata_file,
+                    sync_file=sync_file,
+                    z_threshold=eye_tracking_z_threshold,
+                    dilation_frames=eye_tracking_dilation_frames)
+
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
                 dict_repr=session_data)
 
@@ -337,6 +347,14 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         if monitor_delay is None:
             monitor_delay = cls._get_monitor_delay()
 
+        if sync_file is None:
+            try:
+                sync_file = SyncFile.from_lims(
+                                db=lims_db,
+                                behavior_session_id=behavior_session_id)
+            except OneResultExpectedError:
+                sync_file = None
+
         behavior_session_id = BehaviorSessionId(behavior_session_id)
 
         stimulus_file_lookup = StimulusFileLookup()
@@ -386,16 +404,20 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             eye_tracking_table = None
             eye_tracking_rig_geometry = None
         else:
-            eye_tracking_table = EyeTrackingTable.from_data_file(
-                data_file=EyeTrackingFile.from_lims(
+
+            eye_tracking_file = EyeTrackingFile.from_lims(
                     db=lims_db,
-                    behavior_session_id=behavior_session_id.value),
-                sync_file=SyncFile.from_lims(
-                    db=lims_db,
-                    behavior_session_id=behavior_session_id.value),
+                    behavior_session_id=behavior_session_id.value)
+
+            eye_tracking_metadata_file = None
+
+            eye_tracking_table = cls._read_eye_tracking_table(
+                eye_tracking_file=eye_tracking_file,
+                eye_tracking_metadata_file=eye_tracking_metadata_file,
+                sync_file=sync_file,
                 z_threshold=eye_tracking_z_threshold,
-                dilation_frames=eye_tracking_dilation_frames
-            )
+                dilation_frames=eye_tracking_dilation_frames)
+
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
                 behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
@@ -1353,6 +1375,41 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimuli,
                 task_parameters,
                 trials)
+
+    @classmethod
+    def _read_eye_tracking_table(
+            cls,
+            eye_tracking_file: EyeTrackingFile,
+            eye_tracking_metadata_file: EyeTrackingMetadataFile,
+            sync_file: SyncFile,
+            z_threshold: float,
+            dilation_frames: int) -> EyeTrackingTable:
+
+        # this is possible if instantiating from_lims
+        if sync_file is None:
+            msg = ("sync_file is None for this session; "
+                   "do not know how to create an eye tracking "
+                   "table without a sync_file")
+            raise RuntimeError(msg)
+
+        sync_path = pathlib.Path(sync_file.filepath)
+
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_path,
+            sync_line_label_keys=SyncDataset.EYE_TRACKING_KEYS,
+            drop_frames=None,
+            trim_after_spike=False)
+
+        stimulus_timestamps = StimulusTimestamps(
+                timestamps=frame_times.to_numpy(),
+                monitor_delay=0.0)
+
+        return EyeTrackingTable.from_data_file(
+                    data_file=eye_tracking_file,
+                    stimulus_timestamps=stimulus_timestamps,
+                    z_threshold=z_threshold,
+                    dilation_frames=dilation_frames,
+                    empty_on_fail=True)
 
     def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
         """Returns dict of metadata"""

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
+from allensdk.brain_observatory import sync_utilities
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
@@ -18,6 +19,14 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     StimulusFileLookup)
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import (
     Stimuli)
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
+    EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
+
+
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
+    .eye_tracking_table import EyeTrackingTable, get_lost_frames
 
 
 class VBNBehaviorSession(BehaviorSession):
@@ -139,6 +148,49 @@ class VBNBehaviorSession(BehaviorSession):
         df = pd.DataFrame({"timestamps": lick_times,
                            "frame": lick_frames})
         return Licks(licks=df)
+
+    @classmethod
+    def _read_eye_tracking_table(
+            cls,
+            eye_tracking_file: EyeTrackingFile,
+            eye_tracking_metadata_file: EyeTrackingMetadataFile,
+            sync_file: SyncFile,
+            z_threshold: float,
+            dilation_frames: int) -> EyeTrackingTable:
+        """
+        Notes
+        -----
+        more or less copied from
+        https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py
+        """
+
+        eye_metadata = eye_tracking_metadata_file.data
+        camera_label = eye_metadata['RecordingReport']['CameraLabel']
+        exposure_sync_line_label_dict = {
+            'Eye': 'eye_cam_exposing',
+            'Face': 'face_cam_exposing',
+            'Behavior': 'beh_cam_exposing'}
+        camera_line = exposure_sync_line_label_dict[camera_label]
+
+        lost_frames = get_lost_frames(
+                        eye_tracking_metadata=eye_tracking_metadata_file)
+
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_file.filepath,
+            sync_line_label_keys=(camera_line,),
+            drop_frames=lost_frames,
+            trim_after_spike=False)
+
+        stimulus_timestamps = StimulusTimestamps(
+                                timestamps=frame_times,
+                                monitor_delay=0.0)
+
+        return EyeTrackingTable.from_data_file(
+                    data_file=eye_tracking_file,
+                    stimulus_timestamps=stimulus_timestamps,
+                    z_threshold=z_threshold,
+                    dilation_frames=dilation_frames,
+                    empty_on_fail=False)
 
 
 class BehaviorEcephysSession(BehaviorSession):
@@ -359,7 +411,7 @@ class BehaviorEcephysSession(BehaviorSession):
         instantiated `BehaviorEcephysSession`
         """
         kwargs['add_is_change_to_stimulus_presentations_table'] = False
-        behavior_session = VBNBehaviorSession.from_nwb(
+        behavior_session = cls.behavior_data_class().from_nwb(
             nwbfile=nwbfile,
             **kwargs
         )

@@ -13,6 +13,11 @@ class TestBehaviorEcephysSession:
                   'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
+
+        # trim down the number of probes to reduce memory footprint of test
+        input_data['session_data']['probes'] = (
+                input_data['session_data']['probes'][:3])
+
         cls._session_from_json = BehaviorEcephysSession.from_json(
             session_data=input_data
         )
