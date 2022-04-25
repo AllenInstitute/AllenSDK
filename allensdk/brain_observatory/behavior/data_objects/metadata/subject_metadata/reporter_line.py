@@ -45,7 +45,11 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ReporterLine":
-        return cls(reporter_line=nwbfile.subject.reporter_line)
+        if nwbfile.subject.reporter_line == "None":
+            reporter_line = None
+        else:
+            reporter_line = nwbfile.subject.reporter_line
+        return cls(reporter_line=reporter_line)
 
     @staticmethod
     def parse(reporter_line: Union[Optional[List[str]], str],

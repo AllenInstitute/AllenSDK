@@ -125,7 +125,7 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             driver_line=self.driver_line,
             genotype=self.full_genotype,
             subject_id=str(self.mouse_id),
-            reporter_line=self.reporter_line,
+            reporter_line=str(self.reporter_line),
             sex=self.sex,
             species='Mus musculus')
         nwbfile.subject = nwb_subject
