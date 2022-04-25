@@ -16,6 +16,7 @@ class DummyStim(object):
     def __init__(self, n_frames):
         self._n_frames = n_frames
 
+    @property
     def num_frames(self):
         return self._n_frames
 
@@ -254,7 +255,7 @@ def test_user_facing_get_stim_timestamps_smoke(
         raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
         raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
         idx0 = expected_start_frames_fixture[edge_type][ii]
-        expected = raw_times[idx0: idx0+this_stim.num_frames()]
+        expected = raw_times[idx0: idx0+this_stim.num_frames]
         np.testing.assert_array_equal(this_array, expected)
         assert this_start_frame == expected_start_frames_fixture[edge_type][ii]
 
@@ -300,6 +301,6 @@ def test_user_facing_get_stim_timestamps(
         raw_idx = line_to_edges_fixture['vsync_stim'][f'{edge_type}_idx']
         raw_times = sync_sample_fixture[raw_idx]/sync_freq_fixture
         idx0 = expected_start[ii]
-        expected = raw_times[idx0: idx0+this_stim.num_frames()]
+        expected = raw_times[idx0: idx0+this_stim.num_frames]
         np.testing.assert_array_equal(this_array, expected)
         assert this_start_frame == expected_start[ii]

@@ -187,11 +187,6 @@ class BaseNeuropixelsSchema(ArgSchema):
         help="""file at this path contains information about the optogenetic
                 stimulation applied during this experiment"""
     )
-    running_speed_path = String(
-        required=True,
-        help="""data collected about the running behavior of the experiment's
-                subject""",
-    )
     eye_tracking_rig_geometry = Dict(
         required=False,
         help="""Mapping containing information about session rig geometry used
@@ -259,6 +254,11 @@ class VCNInputSchema(BaseNeuropixelsSchema):
         allow_none=True,
         required=False,
         help="miscellaneous information describing this session""")
+    running_speed_path = String(
+        required=True,
+        help="""data collected about the running behavior of the experiment's
+                subject""",
+    )
 
 
 class ProbeOutputs(RaisingSchema):

@@ -23,10 +23,6 @@ class _VBNSessionDataSchema(BaseBehaviorSessionDataSchema,
         required=True,
         description='path to stimulus presentations csv file'
     )
-    raw_running_speed_path = argschema.fields.InputFile(
-        required=True,
-        description='path to raw running speed h5 file'
-    )
     raw_eye_tracking_video_meta_data = argschema.fields.InputFile(
         required=True,
         description='path to eye tracking metadata'

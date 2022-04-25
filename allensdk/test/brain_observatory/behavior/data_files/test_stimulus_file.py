@@ -128,7 +128,7 @@ def test_behavior_num_frames(
     str_path = str(behavior_pkl_fixture['path'].resolve().absolute())
     dict_repr = {"behavior_stimulus_file": str_path}
     beh_stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
-    assert beh_stim.num_frames() == behavior_pkl_fixture['expected_frames']
+    assert beh_stim.num_frames == behavior_pkl_fixture['expected_frames']
 
 
 def test_replay_num_frames(
@@ -140,7 +140,7 @@ def test_replay_num_frames(
     str_path = str(general_pkl_fixture['path'].resolve().absolute())
     dict_repr = {"replay_stimulus_file": str_path}
     rep_stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
-    assert rep_stim.num_frames() == general_pkl_fixture['expected_frames']
+    assert rep_stim.num_frames == general_pkl_fixture['expected_frames']
 
 
 def test_mapping_num_frames(
@@ -152,7 +152,7 @@ def test_mapping_num_frames(
     str_path = str(general_pkl_fixture['path'].resolve().absolute())
     dict_repr = {"mapping_stimulus_file": str_path}
     map_stim = MappingStimulusFile.from_json(dict_repr=dict_repr)
-    assert map_stim.num_frames() == general_pkl_fixture['expected_frames']
+    assert map_stim.num_frames == general_pkl_fixture['expected_frames']
 
 
 def test_malformed_behavior_pkl(
@@ -166,35 +166,7 @@ def test_malformed_behavior_pkl(
     stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
     with pytest.raises(RuntimeError,
                        match="When getting num_frames from"):
-        stim.num_frames()
-
-
-def test_malformed_replay_pkl(
-        behavior_pkl_fixture):
-    """
-    Test that the correct error is raised when a replay pickle file
-    is mal-formed and num_frames is called
-    """
-    str_path = str(behavior_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"replay_stimulus_file": str_path}
-    stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
-    with pytest.raises(RuntimeError,
-                       match="When getting num_frames from"):
-        stim.num_frames()
-
-
-def test_malformed_mapping_pkl(
-        behavior_pkl_fixture):
-    """
-    Test that the correct error is raised when a mapping pickle file
-    is mal-formed and num_frames is called
-    """
-    str_path = str(behavior_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"mapping_stimulus_file": str_path}
-    stim = MappingStimulusFile.from_json(dict_repr=dict_repr)
-    with pytest.raises(RuntimeError,
-                       match="When getting num_frames from"):  # noqa W605
-        stim.num_frames()
+        _ = stim.num_frames
 
 
 def test_stimulus_file_lookup(
