@@ -375,7 +375,7 @@ def get_stim_timestamps_from_stimulus_blocks(
                             data=sync_data,
                             sync_lines=raw_frame_time_lines)
 
-        frame_count_list = [s.num_frames() for s in stimulus_files]
+        frame_count_list = [s.num_frames for s in stimulus_files]
         start_frames = _get_start_frames(
                             data=sync_data,
                             raw_frame_times=raw_frame_times,

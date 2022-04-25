@@ -36,44 +36,6 @@ def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id, cls.file_path_key())
 
 
-class _NumFramesMixin(object):
-    """
-    Mixin to implement num_frames for a generic (i.e. non-behavior)
-    StimulusFile
-    """
-
-    def _validate_frame_data(self) -> None:
-        """
-        Check that self.data['intervalsms'] is present and
-        that self.data['items']['behavior']['intervalsms'] is empty
-        """
-        msg = ""
-        if 'intervalsms' not in self.data:
-            msg += "self.data['intervalsms'] not present\n"
-        if "items" in self.data:
-            if "behavior" in self.data["items"]:
-                if "intervalsms" in self.data["items"]["behavior"]:
-                    val = self.data["items"]["behavior"]["intervalsms"]
-                    if len(val) > 0:
-                        msg += ("len(self.data['items']['behavior']"
-                                f"['intervalsms'] == {len(val)}; "
-                                "expected zero\n")
-        if len(msg) > 0:
-            full_msg = f"When getting num_frames from {type(self)}\n"
-            full_msg += msg
-            full_msg += f"\nfilepath: {self.filepath}"
-            raise RuntimeError(full_msg)
-
-        return None
-
-    def num_frames(self) -> int:
-        """
-        Return the number of frames associated with this StimulusFile
-        """
-        self._validate_frame_data()
-        return len(self.data['intervalsms']) + 1
-
-
 class _StimulusFile(DataFile):
     """A DataFile which contains methods for accessing and loading visual
     behavior stimulus *.pkl files.
@@ -120,11 +82,12 @@ class _StimulusFile(DataFile):
         filepath = safe_system_path(file_name=filepath)
         return pd.read_pickle(filepath)
 
+    @property
     def num_frames(self) -> int:
         """
         Return the number of frames associated with this StimulusFile
         """
-        raise NotImplementedError()
+        return len(self.data['intervalsms']) + 1
 
 
 class BehaviorStimulusFile(_StimulusFile):
@@ -171,6 +134,7 @@ class BehaviorStimulusFile(_StimulusFile):
 
         return None
 
+    @property
     def num_frames(self) -> int:
         """
         Return the number of frames associated with this StimulusFile
@@ -179,14 +143,14 @@ class BehaviorStimulusFile(_StimulusFile):
         return len(self.data['items']['behavior']['intervalsms']) + 1
 
 
-class ReplayStimulusFile(_NumFramesMixin, _StimulusFile):
+class ReplayStimulusFile(_StimulusFile):
 
     @classmethod
     def file_path_key(cls) -> str:
         return "replay_stimulus_file"
 
 
-class MappingStimulusFile(_NumFramesMixin, _StimulusFile):
+class MappingStimulusFile(_StimulusFile):
 
     @classmethod
     def file_path_key(cls) -> str:
