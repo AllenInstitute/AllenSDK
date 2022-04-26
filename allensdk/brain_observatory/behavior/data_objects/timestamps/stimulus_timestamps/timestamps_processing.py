@@ -57,9 +57,10 @@ def get_frame_indices(
     and an array of timestamps corresponding to some event (i.e.
     licks), return an array of indexes indicating which frame
     each event occured on. Indexes will be chosen to be the
-    smallest index satisfying
+    first index satisfying
 
-    frame_timestamps[event_indices] >= event_timestamps
+    frame_timestamps[event_indices] <= event_timestamps
+    event_timestamps < frame_timestamps[event_indices+1]
 
     Parameters
     ----------
