@@ -10,10 +10,14 @@ from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
-from allensdk.core.typing import SupportsStr
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
+from allensdk.internal.api.queries.lims_queries import (
+    build_in_list_selector_query,
+    foraging_id_map_from_behavior_session_id)
+from allensdk.internal.api.queries.mtrain_queries import (
+    session_stage_from_foraging_id)
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -113,35 +117,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         app_engine = HttpEngine(**_app_kwargs)
         return cls(lims_engine, mtrain_engine, app_engine,
                    data_release_date=data_release_date)
-
-    @staticmethod
-    def _build_in_list_selector_query(
-            col,
-            valid_list: Optional[SupportsStr] = None,
-            operator: str = "WHERE") -> str:
-        """
-        Filter for rows where the value of a column is contained in a list.
-        If no list is specified in `valid_list`, return an empty string.
-
-        NOTE: if string ids are used, then the strings in `valid_list` must
-        be enclosed in single quotes, or else the query will throw a column
-        does not exist error. E.g. ["'mystringid1'", "'mystringid2'"...]
-
-        :param col: name of column to compare if in a list
-        :type col: str
-        :param valid_list: iterable of values that can be mapped to str
-            (e.g. string, int, float).
-        :type valid_list: list
-        :param operator: SQL operator to start the clause. Default="WHERE".
-            Valid inputs: "AND", "OR", "WHERE" (not case-sensitive).
-        :type operator: str
-        """
-        if not valid_list:
-            return ""
-        session_query = (
-            f"""{operator} {col} IN ({",".join(
-                sorted(set(map(str, valid_list))))})""")
-        return session_query
 
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
@@ -243,51 +218,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def _get_foraging_ids_from_behavior_session(
-            self, behavior_session_ids: List[int]) -> List[str]:
-        behav_ids = self._build_in_list_selector_query("id",
-                                                       behavior_session_ids,
-                                                       operator="AND")
-        forag_ids_query = f"""
-            SELECT foraging_id
-            FROM behavior_sessions
-            WHERE foraging_id IS NOT NULL
-            {behav_ids};
-            """
-        self.logger.debug("get_foraging_ids_from_behavior_session query: \n"
-                          f"{forag_ids_query}")
-        foraging_ids = self.lims_engine.fetchall(forag_ids_query)
-
-        self.logger.debug(f"Retrieved {len(foraging_ids)} foraging ids for"
-                          f" behavior stage query. Ids = {foraging_ids}")
-        return foraging_ids
-
-    def _get_behavior_stage_table(
-            self,
-            behavior_session_ids: Optional[List[int]] = None):
-        # Select fewer rows if possible via behavior_session_id
-        if behavior_session_ids:
-            foraging_ids = self._get_foraging_ids_from_behavior_session(
-                behavior_session_ids)
-            foraging_ids = [f"'{fid}'" for fid in foraging_ids]
-        # Otherwise just get the full table from mtrain
-        else:
-            foraging_ids = None
-
-        foraging_ids_query = self._build_in_list_selector_query(
-            "bs.id", foraging_ids)
-
-        query = f"""
-            SELECT
-                stages.name as session_type,
-                bs.id AS foraging_id
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            {foraging_ids_query};
-        """
-        self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
-        return self.mtrain_engine.select(query)
-
     def get_behavior_stage_parameters(self,
                                       foraging_ids: List[str]) -> pd.Series:
         """Gets the stage parameters for each foraging id from mtrain
@@ -302,7 +232,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         ---------
         Series with index of foraging id and values stage parameters
         """
-        foraging_ids_query = self._build_in_list_selector_query(
+        foraging_ids_query = build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -514,8 +444,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: pd.DataFrame
         """
         summary_tbl = self._get_behavior_summary_table()
-        stimulus_names = self._get_behavior_stage_table(
-            behavior_session_ids=summary_tbl.index.tolist())
+
+        foraging_id_map = foraging_id_map_from_behavior_session_id(
+                lims_engine=self.lims_engine,
+                behavior_session_ids=summary_tbl.behavior_session_id.tolist(),
+                logger=self.logger)
+
+        foraging_ids = list(foraging_id_map.foraging_id)
+
+        stimulus_names = session_stage_from_foraging_id(
+                            mtrain_engine=self.mtrain_engine,
+                            foraging_ids=foraging_ids,
+                            logger=self.logger)
+
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
                 .set_index("behavior_session_id"))
@@ -602,19 +543,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             release_behavior_only_session_ids + \
             release_behavior_with_ophys_session_ids
 
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "bs.id", release_behavior_session_ids)
 
     def _get_ophys_session_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "bs.id", release_files['behavior_session_id'].tolist())
 
     def _get_ophys_experiment_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "oe.id", release_files.index.tolist())
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
