@@ -28,6 +28,10 @@ from allensdk.brain_observatory.behavior.\
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import EyeTrackingTable, get_lost_frames
 
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .stimulus_timestamps.timestamps_processing import (
+        get_frame_indices)
+
 
 class VBNBehaviorSession(BehaviorSession):
     """
@@ -113,6 +117,12 @@ class VBNBehaviorSession(BehaviorSession):
         accepting only those licks that occur during the time
         of the behavior stimulus block
         """
+
+        if sync_file is None:
+            msg = (f"{cls}._read_licks requires a sync_file; "
+                   "you passed in sync_file=None")
+            raise ValueError(msg)
+
         lick_times = StimulusTimestamps(
                        timestamps=sync_file.data['lick_times'],
                        monitor_delay=0.0)
@@ -134,10 +144,9 @@ class VBNBehaviorSession(BehaviorSession):
 
         lick_times = lick_times.value[valid]
 
-        behavior_stim = stimulus_file_lookup.behavior_stimulus_file
-        behavior_data = behavior_stim.data
-        lick_sensor = behavior_data['items']['behavior']['lick_sensors'][0]
-        lick_frames = lick_sensor['lick_events']
+        lick_frames = get_frame_indices(
+                        frame_timestamps=behavior_stim_times.value,
+                        event_timestamps=lick_times)
 
         if len(lick_frames) != len(lick_times):
             msg = (f"{len(lick_frames)} lick frames; "
