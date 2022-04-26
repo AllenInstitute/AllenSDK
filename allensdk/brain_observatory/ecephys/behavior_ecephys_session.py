@@ -28,6 +28,10 @@ from allensdk.brain_observatory.behavior.\
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import EyeTrackingTable, get_lost_frames
 
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .stimulus_timestamps.timestamps_processing import (
+        get_frame_indices)
+
 
 class VBNBehaviorSession(BehaviorSession):
     """
@@ -106,27 +110,39 @@ class VBNBehaviorSession(BehaviorSession):
     def _read_licks(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile]) -> Licks:
+            sync_file: Optional[SyncFile],
+            monitor_delay) -> Licks:
         """
         Construct the Licks data object for this session,
         reading the lick times directly from the sync file,
         accepting only those licks that occur during the time
         of the behavior stimulus block
         """
+
+        if sync_file is None:
+            msg = (f"{cls}._read_licks requires a sync_file; "
+                   "you passed in sync_file=None")
+            raise ValueError(msg)
+
         lick_times = StimulusTimestamps(
                        timestamps=sync_file.data['lick_times'],
                        monitor_delay=0.0)
 
         # get the timestamps of the behavior stimulus presentations
-        behavior_stim_times = cls._read_behavior_stimulus_timestamps(
+        beh_stim_times = cls._read_behavior_stimulus_timestamps(
                                  sync_file=sync_file,
                                  stimulus_file_lookup=stimulus_file_lookup,
-                                 monitor_delay=0.0)
+                                 monitor_delay=monitor_delay)
+
+        beh_stim_times_no_monitor = beh_stim_times.subtract_monitor_delay()
 
         # only accept lick times that are within the temporal bounds of
-        # the behavior stimulus presentations
-        min_time = behavior_stim_times.value.min()
-        max_time = behavior_stim_times.value.max()
+        # the behavior stimulus presentations;
+        # use the version of beh_stim_times with monitor_delay=0.0 because
+        # monitor_delay should have no impact on when a particular stimuls
+        # block begins or ends
+        min_time = beh_stim_times_no_monitor.value.min()
+        max_time = beh_stim_times_no_monitor.value.max()
 
         valid = np.logical_and(
                   lick_times.value >= min_time,
@@ -134,10 +150,12 @@ class VBNBehaviorSession(BehaviorSession):
 
         lick_times = lick_times.value[valid]
 
-        behavior_stim = stimulus_file_lookup.behavior_stimulus_file
-        behavior_data = behavior_stim.data
-        lick_sensor = behavior_data['items']['behavior']['lick_sensors'][0]
-        lick_frames = lick_sensor['lick_events']
+        # use the version of beh_stim_times with non-zero monitor_delay
+        # because we are interested in which frame the mouse was seeing
+        # when it licked
+        lick_frames = get_frame_indices(
+                        frame_timestamps=beh_stim_times.value,
+                        event_timestamps=lick_times)
 
         if len(lick_frames) != len(lick_times):
             msg = (f"{len(lick_frames)} lick frames; "

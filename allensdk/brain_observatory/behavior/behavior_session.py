@@ -1212,9 +1212,13 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_licks(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile]) -> Licks:
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> Licks:
         """
         Construct the Licks data object for this session
+
+        Note: monitor_delay is a part of the call signature so that
+        it can be used in sub-class implementations of this method.
         """
 
         stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
@@ -1338,7 +1342,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         licks = cls._read_licks(
             stimulus_file_lookup=stimulus_file_lookup,
-            sync_file=sync_file)
+            sync_file=sync_file,
+            monitor_delay=monitor_delay)
 
         rewards = cls._read_rewards(
             stimulus_file_lookup=stimulus_file_lookup,
