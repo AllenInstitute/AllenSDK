@@ -19,7 +19,7 @@ class TestBehaviorEcephysSession:
                 input_data['session_data']['probes'][:3])
 
         cls._session_from_json = BehaviorEcephysSession.from_json(
-            session_data=input_data
+            session_data=input_data['session_data']
         )
 
     @pytest.mark.requires_bamboo
