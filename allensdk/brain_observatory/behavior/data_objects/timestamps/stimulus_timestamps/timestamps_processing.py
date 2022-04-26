@@ -80,8 +80,7 @@ def get_frame_indices(
     frame index is returned for a given event_timestamp
     """
 
-    delta_t = np.diff(frame_timestamps)
-    if delta_t.min() < -1.0e-10:
+    if np.any(np.diff(frame_timestamps) < -1.0e-10):
         raise ValueError("frame_timestamps are not in ascending order")
 
     n_frames = len(frame_timestamps)
