@@ -5,7 +5,9 @@ from pathlib import Path
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
+import datetime
 import pandas as pd
+import copy
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
@@ -141,6 +143,62 @@ class BehaviorStimulusFile(_StimulusFile):
         """
         self._validate_frame_data()
         return len(self.data['items']['behavior']['intervalsms']) + 1
+
+    @property
+    def date_of_acquisition(self) -> datetime.datetime:
+        """
+        Return the date_of_acquisition as a datetime.datetime.
+
+        This will be read from self.data['start_time']
+        """
+        assert isinstance(self.data, dict)
+        if 'start_time' not in self.data:
+            raise KeyError(
+                "No 'start_time' listed in pickle file "
+                f"{self.filepath}")
+
+        return copy.deepcopy(self.data['start_time'])
+
+    @property
+    def session_type(self) -> str:
+        """
+        Return the session type as read from the pickle file. This can
+        be read either from
+
+        data['items']['behavior']['params']['stage']
+        or
+        data['items']['behavior']['cl_params']['stage']
+
+        if both are present and they disagree, raise an exception
+        """
+        param_value = None
+        if 'params' in self.data['items']['behavior']:
+            if 'stage' in self.data['items']['behavior']['params']:
+                param_value = self.data['items']['behavior']['params']['stage']
+
+        cl_value = None
+        if 'cl_params' in self.data['items']['behavior']:
+            if 'stage' in self.data['items']['behavior']['cl_params']:
+                cl_value = self.data['items']['behavior']['cl_params']['stage']
+
+        if cl_value is None and param_value is None:
+            raise RuntimeError("Could not find stage in pickle file "
+                               f"{self.filepath}")
+
+        if param_value is None:
+            return cl_value
+
+        if cl_value is None:
+            return param_value
+
+        if cl_value != param_value:
+            raise RuntimeError(
+                "Conflicting session_types in pickle file "
+                f"{self.filepath}\n"
+                f"cl_params: {cl_value}\n"
+                f"params: {param_value}\n")
+
+        return self.data['items']['behavior']['params']['stage']
 
 
 class ReplayStimulusFile(_StimulusFile):
