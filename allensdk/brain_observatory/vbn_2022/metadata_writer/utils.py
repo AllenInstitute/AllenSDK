@@ -369,6 +369,51 @@ def _get_behavior_sessions_from_ecephys_sessions(
     return mouse_to_behavior
 
 
+def _get_pickle_paths_from_behavior_sessions(
+        lims_connection: PostgresQueryMixin,
+        behavior_session_id_list: List[int]) -> pd.DataFrame:
+    """
+    Get a DataFrame mapping behavior_session_id to
+    stimulus_pickle_path
+
+    Parameters
+    ----------
+    lims_connection: PostgresQueryMixin
+
+    behavior_session_id_list: List[int]
+
+    Returns
+    -------
+    beh_to_path: pd.DataFrame
+        with columns
+            behavior_session_id
+            pkl_path
+    """
+
+    query = f"""
+    SELECT
+    beh.id as behavior_session_id
+    ,wkf.storage_directory || wkf.filename as pkl_path
+    FROM behavior_sessions AS beh
+    JOIN
+    well_known_files AS wkf
+    ON wkf.attachable_id = beh.id
+    JOIN
+    well_known_file_types as wkft
+    ON
+    wkf.well_known_file_type_id = wkft.id
+    WHERE
+    wkft.name = 'StimulusPickle'
+    AND
+    wkf.attachable_type = 'BehaviorSession'
+    AND
+    beh.id in {tuple(behavior_session_id_list)}
+    """
+
+    beh_to_path = lims_connection.select(query)
+    return beh_to_path
+
+
 def _get_ecephys_session_table(
         lims_connection: PostgresQueryMixin,
         session_id_list: List[int]) -> pd.DataFrame:
