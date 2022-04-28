@@ -233,6 +233,10 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             )
             eye_data = data_file.data.loc[frames]
 
+            if is_metadata_frame_present:
+                # Reset index to start at 0 if metadata frame was dropped
+                eye_data.index -= 1
+
             eye_tracking_data = process_eye_tracking_data(
                                      eye_data,
                                      stimulus_timestamps.value,
