@@ -5,6 +5,10 @@ import json
 
 from allensdk.internal.api import PostgresQueryMixin
 
+from allensdk.brain_observatory.behavior.data_objects.timestamps \
+    .stimulus_timestamps.timestamps_processing import (
+        get_frame_indices)
+
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BehaviorStimulusFile)
 
@@ -62,13 +66,6 @@ def _add_session_number(
     return sessions_df
 
 
-def _add_image_set(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
-    image_set = get_image_set(df=sessions_df)
-    sessions_df['image_set'] = image_set
-    return sessions_df
-
-
 def _add_prior_images(
         sessions_df: pd.DataFrame) -> pd.DataFrame:
     sessions_df['prior_exposures_to_image_set'] = \
@@ -76,7 +73,7 @@ def _add_prior_images(
     return sessions_df
 
 
-def _add_prior_omissions(
+def _add_prior_omissions_ecephys(
         sessions_df: pd.DataFrame) -> pd.DataFrame:
     # From communication with Corbett Bennett:
     # As for omissions, the only scripts that have them are
@@ -91,6 +88,53 @@ def _add_prior_omissions(
     sessions_df['prior_exposures_to_omissions'] = \
                 sessions_df['session_number'] - 1
     return sessions_df
+
+
+def _add_prior_omissions_behavior(
+        behavior_df: pd.DataFrame,
+        ecephys_df: pd.DataFrame) -> pd.DataFrame:
+    mouse_col = 'mouse_id'
+
+    mouse_id_values = np.unique(behavior_df[mouse_col].values)
+    new_data = []
+    for mouse_id in mouse_id_values:
+        sub_beh = behavior_df.query(f"{mouse_col}=='{mouse_id}'")
+        sub_ecephys = ecephys_df.query(f"{mouse_col}=='{mouse_id}'")
+
+        ecephys_dates = []
+        ecephys_prior = []
+        for date, prior in zip(sub_ecephys.date_of_acquisition,
+                               sub_ecephys.prior_exposures_to_omissions):
+            ecephys_dates.append(date.to_julian_date())
+            ecephys_prior.append(prior)
+        ecephys_dates = np.array(ecephys_dates)
+        ecephys_prior = np.array(ecephys_prior)
+        sorted_dex = np.argsort(ecephys_dates)
+        ecephys_dates = ecephys_dates[sorted_dex]
+        ecephys_prior = ecephys_prior[sorted_dex]
+
+        beh_id_arr = []
+        beh_dates = []
+        for beh_id, date in zip(sub_beh.behavior_session_id,
+                                sub_beh.date_of_acquisition):
+            beh_dates.append(date.to_julian_date())
+            beh_id_arr.append(beh_id)
+
+        insert_indices = get_frame_indices(
+                            frame_timestamps=ecephys_dates,
+                            event_timestamps=beh_dates)
+
+        for beh_id, idx in zip(beh_id_arr, insert_indices):
+            new_data.append(
+                {'behavior_session_id': beh_id,
+                 'prior_exposures_to_omissions': ecephys_prior[idx]})
+
+    new_data = pd.DataFrame(data=new_data)
+    behavior_df = behavior_df.join(
+            new_data.set_index('behavior_session_id'),
+            on='behavior_session_id',
+            how='left')
+    return behavior_df
 
 
 def _add_experience_level(
@@ -127,10 +171,6 @@ def _patch_df_from_pickle_file(
                             lims_connection=lims_connection,
                             behavior_session_id_list=invalid_beh)
 
-        print("the pickles we need are")
-        print(pickle_path_df)
-
-        ct = 0
         for beh_id, pkl_path in zip(pickle_path_df.behavior_session_id,
                                     pickle_path_df.pkl_path):
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
@@ -140,17 +180,7 @@ def _patch_df_from_pickle_file(
                 behavior_df.behavior_session_id == beh_id,
                 ('date_of_acquisition', 'session_type')] = (new_date,
                                                             new_session_type)
-            ct += 1
-            if ct % 50 == 0:
-                print(f'patched {ct} of {len(pickle_path_df)}')
 
-    n_invalid = np.logical_or(
-                    behavior_df.date_of_acquisition.isna(),
-                    behavior_df.session_type.isna()).sum()
-
-    print(f'n_invalid {n_invalid}')
-
-    print(behavior_df.columns)
     return behavior_df
 
 
@@ -212,12 +242,6 @@ def behavior_session_table_from_ecephys_session_id(
                              lims_connection=lims_connection,
                              behavior_df=behavior_session_df)
 
-    unq_id = np.unique(behavior_session_df.ecephys_session_id)
-    print(f'unq ecephys {len(unq_id)}')
-    unq_id = set(unq_id)
-    for ee in ecephys_session_ids:
-        assert ee in unq_id
-
     behavior_session_df['image_set'] = get_image_set(
             df=behavior_session_df)
 
@@ -236,11 +260,7 @@ def behavior_session_table_from_ecephys_session_id(
         sessions_df=behavior_session_df,
         index_col="behavior_session_id")
 
-    print('age')
-    print(behavior_session_df.age_in_days)
-    print(behavior_session_df.columns)
-
-    return
+    return behavior_session_df
 
 
 def _postprocess_sessions(
@@ -248,9 +268,7 @@ def _postprocess_sessions(
 
     sessions_df = _add_session_number(sessions_df=sessions_df,
                                       index_col="ecephys_session_id")
-    sessions_df = _add_image_set(sessions_df=sessions_df)
-    sessions_df = _add_prior_images(sessions_df=sessions_df)
-    sessions_df = _add_prior_omissions(sessions_df=sessions_df)
+    sessions_df = _add_prior_omissions_ecephys(sessions_df=sessions_df)
     sessions_df = _add_experience_level(sessions_df=sessions_df)
 
     return sessions_df
