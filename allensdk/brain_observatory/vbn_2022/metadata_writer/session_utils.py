@@ -1,18 +1,38 @@
+from typing import List
 import pandas as pd
 import numpy as np
 import json
 
+from allensdk.internal.api import PostgresQueryMixin
+
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    BehaviorStimulusFile)
+
+from allensdk.internal.api.queries.lims_queries import (
+    behavior_sessions_from_ecephys_session_ids,
+    foraging_id_map_from_behavior_session_id,
+    stimulus_pickle_paths_from_behavior_session_ids,
+    _sanitize_uuid_list)
+
+from allensdk.internal.api.queries.mtrain_queries import (
+    session_stage_from_foraging_id)
+
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
         get_image_set,
-        get_prior_exposures_to_image_set)
+        get_prior_exposures_to_image_set,
+        get_prior_exposures_to_session_type)
 
 
 def _add_session_number(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
-    """Parses session number from session type and and adds to dataframe"""
+        sessions_df: pd.DataFrame,
+        index_col: str) -> pd.DataFrame:
+    """
+    Parses session number from session type and and adds to dataframe
 
-    index_col = 'ecephys_session_id'
+    index_col should be either "ecephys_session_id" or "behavior_session_id"
+    """
+
     date_col = 'date_of_acquisition'
     mouse_col = 'mouse_id'
 
@@ -84,10 +104,150 @@ def _add_experience_level(
     return sessions_df
 
 
+def _patch_df_from_pickle_file(
+        lims_connection: PostgresQueryMixin,
+        behavior_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Take a DataFrame and patch date_of_acquisition, session_type
+    from the pickle file
+    """
+
+    invalid_beh = behavior_df[
+            np.logical_or(
+                behavior_df.date_of_acquisition.isna(),
+                np.logical_or(
+                    behavior_df.foraging_id.isna(),
+                    behavior_df.session_type.isna()))
+    ].behavior_session_id.values
+
+    assert len(invalid_beh) == len(np.unique(invalid_beh))
+
+    if len(invalid_beh) > 0:
+        pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
+                            lims_connection=lims_connection,
+                            behavior_session_id_list=invalid_beh)
+
+        print("the pickles we need are")
+        print(pickle_path_df)
+
+        ct = 0
+        for beh_id, pkl_path in zip(pickle_path_df.behavior_session_id,
+                                    pickle_path_df.pkl_path):
+            stim_file = BehaviorStimulusFile(filepath=pkl_path)
+            new_date = stim_file.date_of_acquisition
+            new_session_type = stim_file.session_type
+            behavior_df.loc[
+                behavior_df.behavior_session_id == beh_id,
+                ('date_of_acquisition', 'session_type')] = (new_date,
+                                                            new_session_type)
+            ct += 1
+            if ct % 50 == 0:
+                print(f'patched {ct} of {len(pickle_path_df)}')
+
+    n_invalid = np.logical_or(
+                    behavior_df.date_of_acquisition.isna(),
+                    behavior_df.session_type.isna()).sum()
+
+    print(f'n_invalid {n_invalid}')
+
+    print(behavior_df.columns)
+    return behavior_df
+
+
+def _add_age_in_days(df: pd.DataFrame) -> pd.DataFrame:
+    # get age in days
+    age_in_days = []
+    for beh_id, acq, birth in zip(
+                df.behavior_session_id,
+                df.date_of_acquisition,
+                df.date_of_birth):
+        age = (acq-birth).days
+        age_in_days.append({'behavior_session_id': beh_id,
+                            'age_in_days': age})
+    age_in_days = pd.DataFrame(data=age_in_days)
+    df = df.join(
+            age_in_days.set_index('behavior_session_id'),
+            on='behavior_session_id',
+            how='left')
+    return df
+
+
+def behavior_session_table_from_ecephys_session_id(
+        lims_connection: PostgresQueryMixin,
+        mtrain_connection: PostgresQueryMixin,
+        ecephys_session_ids: List[int]) -> pd.DataFrame:
+    """
+    """
+    behavior_session_df = behavior_sessions_from_ecephys_session_ids(
+                            lims_connection=lims_connection,
+                            ecephys_session_id_list=ecephys_session_ids)
+
+    beh_to_foraging_df = foraging_id_map_from_behavior_session_id(
+        lims_engine=lims_connection,
+        behavior_session_ids=behavior_session_df.behavior_session_id.tolist())
+
+    # add foraging_id
+    behavior_session_df = behavior_session_df.join(
+                    beh_to_foraging_df.set_index('behavior_session_id'),
+                    on='behavior_session_id',
+                    how='left')
+
+    foraging_ids = beh_to_foraging_df.foraging_id.tolist()
+
+    # this is necessary because there are some sessions with the
+    # invalid foraging_id entry 'DoC' in MTRAIN
+    foraging_ids = _sanitize_uuid_list(foraging_ids)
+
+    foraging_to_stage_df = session_stage_from_foraging_id(
+            mtrain_engine=mtrain_connection,
+            foraging_ids=foraging_ids)
+
+    # add session_type
+    behavior_session_df = behavior_session_df.join(
+                foraging_to_stage_df.set_index('foraging_id'),
+                on='foraging_id',
+                how='left')
+
+    behavior_session_df = _patch_df_from_pickle_file(
+                             lims_connection=lims_connection,
+                             behavior_df=behavior_session_df)
+
+    unq_id = np.unique(behavior_session_df.ecephys_session_id)
+    print(f'unq ecephys {len(unq_id)}')
+    unq_id = set(unq_id)
+    for ee in ecephys_session_ids:
+        assert ee in unq_id
+
+    behavior_session_df['image_set'] = get_image_set(
+            df=behavior_session_df)
+
+    behavior_session_df['prior_exposures_to_session_type'] = \
+        get_prior_exposures_to_session_type(
+            df=behavior_session_df)
+
+    behavior_session_df['prior_exposures_to_image_set'] = \
+        get_prior_exposures_to_image_set(
+            df=behavior_session_df)
+
+    behavior_session_df = _add_age_in_days(
+        df=behavior_session_df)
+
+    behavior_session_df = _add_session_number(
+        sessions_df=behavior_session_df,
+        index_col="behavior_session_id")
+
+    print('age')
+    print(behavior_session_df.age_in_days)
+    print(behavior_session_df.columns)
+
+    return
+
+
 def _postprocess_sessions(
         sessions_df: pd.DataFrame) -> pd.DataFrame:
 
-    sessions_df = _add_session_number(sessions_df=sessions_df)
+    sessions_df = _add_session_number(sessions_df=sessions_df,
+                                      index_col="ecephys_session_id")
     sessions_df = _add_image_set(sessions_df=sessions_df)
     sessions_df = _add_prior_images(sessions_df=sessions_df)
     sessions_df = _add_prior_omissions(sessions_df=sessions_df)

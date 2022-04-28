@@ -151,6 +151,11 @@ def behavior_sessions_from_ecephys_session_ids(
             mouse_id
             behavior_session_id
             date_of_acquisition
+            date_of_birth
+            ecephys_session_id
+            genotype
+            sex
+            equipment_name
         listing every behavior session the mice in question went through
     """
     donor_id_list = donor_id_list_from_ecephys_session_ids(
@@ -162,9 +167,18 @@ def behavior_sessions_from_ecephys_session_ids(
     donors.external_donor_name as mouse_id
     ,behavior.id as behavior_session_id
     ,behavior.date_of_acquisition as date_of_acquisition
+    ,behavior.ecephys_session_id as ecephys_session_id
+    ,donors.date_of_birth as date_of_birth
+    ,donors.full_genotype as genotype
+    ,genders.name as sex
+    ,equipment.name as equipment_name
     FROM donors
     JOIN behavior_sessions AS behavior
     ON behavior.donor_id = donors.id
+    JOIN genders
+    ON genders.id = donors.gender_id
+    JOIN equipment
+    ON equipment.id = behavior.equipment_id
     WHERE
     donors.id in {tuple(donor_id_list)}
     """
