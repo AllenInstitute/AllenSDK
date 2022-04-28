@@ -200,7 +200,7 @@ class VBNBehaviorSession(BehaviorSession):
             trim_after_spike=False)
 
         stimulus_timestamps = StimulusTimestamps(
-                                timestamps=frame_times,
+                                timestamps=frame_times.values,
                                 monitor_delay=0.0)
 
         return EyeTrackingTable.from_data_file(
@@ -208,6 +208,7 @@ class VBNBehaviorSession(BehaviorSession):
                     stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
                     dilation_frames=dilation_frames,
+                    metadata_file=eye_tracking_metadata_file,
                     empty_on_fail=False)
 
 

@@ -1,6 +1,7 @@
 import logging
 import warnings
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Tuple
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
@@ -196,6 +197,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             cls,
             data_file: EyeTrackingFile,
             stimulus_timestamps: StimulusTimestamps,
+            metadata_file: Optional[EyeTrackingMetadataFile] = None,
             z_threshold: float = 3.0,
             dilation_frames: int = 2,
             empty_on_fail: bool = False) -> "EyeTrackingTable":
@@ -209,19 +211,30 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             See EyeTracking.from_lims
         dilation_frames : int, optional
              See EyeTracking.from_lims
-        empyt_on_fail: bool
+        empty_on_fail: bool
             If True, this method will return an empty dataframe
             if an EyeTrackingError is raised (usually because
             timestamps and eye tracking video frames do not
             align). If false, the error will get raised.
+        metadata_file: EyeTrackingMetadataFile
         """
         cls._logger.info(f"Getting eye_tracking_data with "
                          f"'z_threshold={z_threshold}', "
                          f"'dilation_frames={dilation_frames}'")
 
+        is_metadata_frame_present = (
+            _is_metadata_frame_present(metadata_file=metadata_file)
+            if metadata_file is not None else False)
+
         try:
+            frames, stimulus_timestamps = cls._validate_frame_time_alignment(
+                frames=data_file.data.index.values, times=stimulus_timestamps,
+                is_metadata_frame_present=is_metadata_frame_present
+            )
+            eye_data = data_file.data.loc[frames]
+
             eye_tracking_data = process_eye_tracking_data(
-                                     data_file.data,
+                                     eye_data,
                                      stimulus_timestamps.value,
                                      z_threshold,
                                      dilation_frames)
@@ -235,6 +248,60 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
                 raise
 
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
+
+    @classmethod
+    def _validate_frame_time_alignment(
+            cls,
+            frames: np.ndarray,
+            times: StimulusTimestamps,
+            is_metadata_frame_present: bool = False
+    ) -> Tuple[np.ndarray, StimulusTimestamps]:
+        """
+        Checks whether frames or timestamps need to be modified in order to be
+            aligned with each other. If so, does the alignment.
+
+        Algorithm:
+        1. Remove metadata frame, if present
+        2. If # frames > # timestamps: raise error
+           else if # timestamps > # frames: truncate frames
+
+        Parameters
+        ----------
+        frames: eye tracking frames
+        times: eye tracking timestamps
+        is_metadata_frame_present: Whether frames contains a metadata frame as
+            the first frame
+
+        Returns
+        -------
+        Tuple of frames, timestamps, where frames and timestamps have been
+            corrected to be aligned with each other
+        """
+        if is_metadata_frame_present:
+            # Remove the metadata frame
+            cls._logger.info(
+                f'Number of eye tracking timestamps: {len(times.value)}. '
+                f'Number of eye tracking frames: {len(frames)}. '
+                f'Removing metadata frame')
+            frames = frames[1:]
+
+        if len(times) > len(frames):
+            # It's possible for there to be more timestamps than frames in a
+            # case of non-transferred frames/aborted frames
+            # See discussion in https://github.com/AllenInstitute/AllenSDK/issues/2376 # noqa
+            # Truncate timestamps to match the number of frames
+            cls._logger.info(
+                f'Number of eye tracking timestamps: {len(times.value)}. '
+                f'Number of eye tracking frames: {len(frames)}. '
+                f'Truncating timestamps')
+            times = times.update_timestamps(
+                timestamps=times.value[:len(frames)])
+        elif len(frames) > len(times):
+            raise EyeTrackingError(
+                f'Number of eye tracking timestamps: {len(times.value)}. '
+                f'Number of eye tracking frames: {len(frames)}. '
+                f'We expect these to be equal')
+        return frames, times
 
 
 def get_lost_frames(
@@ -283,3 +350,18 @@ def get_lost_frames(
                                          int(start_end[1])+1))
 
     return np.array(lost_frames)-1
+
+
+def _is_metadata_frame_present(metadata_file: EyeTrackingMetadataFile) -> bool:
+    """Return whether a metadata frame was placed at the front of the eye
+    tracking movie. Tries to determine this by using the fact that the MVR
+    (multi-video-recorder) software always places a metadata frame at the
+    front. Detect MVR by the filetype. MVR outputs mp4 while predecessors
+    output a different format.
+    """
+    video_file_name = \
+        metadata_file.data['RecordingReport']['VideoOutputFileName'].lower()
+    video_file_name = Path(video_file_name)
+
+    return video_file_name.suffix == '.mp4' or \
+        'mvr' in video_file_name.name

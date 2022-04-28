@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -5,6 +6,9 @@ import numpy as np
 import pandas as pd
 import pynwb
 import pytest
+from allensdk.brain_observatory.behavior.data_files\
+    .eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
 
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -104,3 +108,63 @@ class TestNWB:
             obt = EyeTrackingTable.from_nwb(nwbfile=self.nwbfile)
 
         assert obt == self.eye_tracking_table
+
+
+class TestTimeFrameAlignment:
+    @classmethod
+    def setup_class(cls):
+        with open('/allen/aibs/informatics/module_test_data/ecephys/'
+                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1044594870_input.json') \
+                as f:
+            input_data = json.load(f)
+
+        cls.input_data = input_data['session_data']
+
+        cls.eye_tracking_file = EyeTrackingFile.from_json(
+            dict_repr=cls.input_data)
+
+        cls.metadata_file = EyeTrackingMetadataFile.from_json(
+            dict_repr=cls.input_data)
+        # Making up timestamps
+        cls.stimulus_timestamps = StimulusTimestamps(
+            timestamps=(
+                np.linspace(1.33955, 9.72219322e+03,
+                            cls.eye_tracking_file.data.shape[0])),
+            monitor_delay=0)
+
+    @pytest.mark.requires_bamboo
+    def test_metadata_frame_is_dropped(self):
+        """Tests that when an eye tracking movie produced by MVR
+        (adds extra metadata frame at front), that this extra frame is
+        dropped"""
+        # Make it 1 shorter than # frames
+        timestamps = self.stimulus_timestamps.update_timestamps(
+            timestamps=self.stimulus_timestamps.value[:-1])
+
+        ett = EyeTrackingTable.from_data_file(
+            data_file=self.eye_tracking_file,
+            stimulus_timestamps=timestamps,
+            metadata_file=self.metadata_file
+        )
+        assert (ett.value.shape[0] ==
+                # Subtract 1 for the metadata frame
+                self.eye_tracking_file.data.shape[0] - 1)
+
+    @pytest.mark.requires_bamboo
+    def test_timestamps_are_truncated(self):
+        """Tests that when the sync file contains more timestamps than frames,
+        that the timestamps are truncated"""
+        # Make it 2 longer than # frames
+        timestamps = self.stimulus_timestamps.update_timestamps(
+            timestamps=np.concatenate([self.stimulus_timestamps.value,
+                                       self.stimulus_timestamps.value[-2:]]))
+
+        ett = EyeTrackingTable.from_data_file(
+            data_file=self.eye_tracking_file,
+            stimulus_timestamps=timestamps,
+            metadata_file=self.metadata_file
+        )
+
+        assert (ett.value.shape[0] ==
+                # subtract off metadata frame
+               self.eye_tracking_file.data.shape[0] - 1)
