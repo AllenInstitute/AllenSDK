@@ -55,6 +55,28 @@ class StimulusTimestamps(DataObject,
         self._sync_file = sync_file
         self._monitor_delay = monitor_delay
 
+    def update_timestamps(
+            self,
+            timestamps: np.ndarray
+    ) -> "StimulusTimestamps":
+        """
+        Returns newly instantiated `StimulusTimestamps` with `timestamps`
+
+        Parameters
+        ----------
+        timestamps
+
+        Returns
+        -------
+        `StimulusTimestamps` with `timestamps`
+        """
+        return StimulusTimestamps(
+            timestamps=timestamps,
+            monitor_delay=self._monitor_delay,
+            stimulus_file=self._stimulus_file,
+            sync_file=self._sync_file
+        )
+
     def subtract_monitor_delay(self) -> "StimulusTimestamps":
         """
         Return a version of this StimulusTimestamps object with
@@ -265,3 +287,6 @@ class StimulusTimestamps(DataObject,
         nwbfile.add_processing_module(stim_mod)
 
         return nwbfile
+
+    def __len__(self):
+        return len(self.value)
