@@ -17,9 +17,29 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
         super().__init__(name='channels', value=channels)
 
     @classmethod
-    def from_json(cls, channels: dict) -> "Channels":
-        channels = [Channel(**{f'{"impedance" if k == "impedence" else k}': v
-                               for k, v in channel.items()})
+    def from_json(
+            cls,
+            channels: dict
+    ) -> "Channels":
+        for channel in channels:
+            if 'impedence' in channel:
+                # Correct misspelling
+                channel['impedance'] = channel.pop('impedence')
+
+        channels = [Channel(
+            id=channel['id'],
+            probe_id=channel['probe_id'],
+            valid_data=channel['valid_data'],
+            local_index=channel['local_index'],
+            probe_vertical_position=channel['probe_vertical_position'],
+            probe_horizontal_position=channel['probe_horizontal_position'],
+            manual_structure_acronym=channel['manual_structure_acronym'],
+            anterior_posterior_ccf_coordinate=(
+                channel['anterior_posterior_ccf_coordinate']),
+            dorsal_ventral_ccf_coordinate=(
+                channel['dorsal_ventral_ccf_coordinate']),
+            left_right_ccf_coordinate=channel['left_right_ccf_coordinate']
+        )
                     for channel in channels]
         return Channels(channels=channels)
 
@@ -81,27 +101,8 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
                 probe_id=row['probe_id'],
                 valid_data=row['valid_data'],
                 manual_structure_acronym=manual_structure_acronym,
-                manual_structure_id=STRUCTURE_ACRONYM_ID_MAP.get(
-                    manual_structure_acronym, np.nan),
                 anterior_posterior_ccf_coordinate=row['x'],
                 dorsal_ventral_ccf_coordinate=row['y'],
                 left_right_ccf_coordinate=row['z']
             ))
         return Channels(channels=channels)
-
-
-STRUCTURE_ACRONYM_ID_MAP = {
-    "grey": 8, "SCig": 10, "SCiw": 17, "IGL": 27, "LT": 66, "VL": 81,
-    "MRN": 128, "LD": 155, "LGd": 170, "LGv": 178, "APN": 215, "LP": 218,
-    "RT": 262, "MB": 313, "SGN": 325, "BMAa": 327, "CA": 375, "CA1": 382,
-    "VISp": 385, "VISam": 394, "VISal": 402, "VISl": 409, "VISrl": 417,
-    "CA2": 423, "CA3": 463, "SUB": 502, "VISpm": 533, "TH": 549,
-    "NOT": 628, "COAa": 639, "COApm": 663, "VIS": 669, "CP": 672,
-    "OLF": 698, "OP": 706, "VPL": 718, "DG": 726, "VPM": 733, "ZI": 797,
-    "SCzo": 834, "SCsg": 842, "SCop": 851, "PF": 930, "PO": 1020,
-    "POL": 1029, "POST": 1037, "PP": 1044, "PPT": 1061, "MGd": 1072,
-    "MGv": 1079, "PRE": 1084, "MGm": 1088, "HPF": 1089,
-    "VISli": 312782574, "VISmma": 480149258, "VISmmp": 480149286,
-    "ProS": 484682470, "RPF": 549009203, "Eth": 560581551,
-    "PIL": 560581563, "PoT": 563807435, "IntG": 563807439
-}

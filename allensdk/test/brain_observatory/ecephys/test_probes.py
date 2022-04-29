@@ -4,6 +4,7 @@ import json
 import pytest
 from pynwb import NWBFile
 
+from allensdk.brain_observatory.ecephys._channel import Channel
 from allensdk.brain_observatory.ecephys.probes import Probes
 from allensdk.brain_observatory.ecephys.write_nwb.schemas import Probe
 
@@ -57,3 +58,42 @@ class TestProbes:
             probes=self.input_data, skip_probes=skip_probes)
         assert sorted([p.name for p in probes]) == \
                sorted([p for p in names if p not in skip_probes])
+
+    @pytest.mark.requires_bamboo
+    def test_units_from_structure_with_acronym(self):
+        """Checks that if there are channels with subregion in manual
+        structure id, that units detected from this region are still included
+        in units table"""
+        expected_n_units = self._probes_from_json.get_units_table().shape[0]
+
+        # Set the _manual_structure_acronym to something with a hyphen
+        for probe in self._probes_from_json.probes:
+            for channel in probe.channels.value:
+                if channel._manual_structure_acronym == 'MGd':
+                    channel._manual_structure_acronym = 'MGd-foo'
+        obtained_n_units = self._probes_from_json.get_units_table().shape[0]
+
+        assert expected_n_units == obtained_n_units
+
+
+@pytest.mark.parametrize('manual_structure_acronym', ('LGd-sh', 'LGd'))
+@pytest.mark.parametrize('strip_structure_subregion', (True, False))
+def test_probe_channels_strip_subregion(
+        manual_structure_acronym, strip_structure_subregion):
+    """Tests that subregion is stripped from manual structure acronym"""
+    c = Channel(
+        id=1,
+        local_index=1,
+        probe_vertical_position=1,
+        probe_horizontal_position=1,
+        probe_id=1,
+        valid_data=True,
+        manual_structure_acronym=manual_structure_acronym,
+        strip_structure_subregion=strip_structure_subregion
+    )
+    if strip_structure_subregion:
+        expected = 'LGd'
+    else:
+        expected = 'LGd-sh' if manual_structure_acronym == 'LGd-sh' else 'LGd'
+
+    assert c.manual_structure_acronym == expected
