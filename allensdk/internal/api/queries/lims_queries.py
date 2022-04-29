@@ -41,8 +41,17 @@ def foraging_id_map_from_behavior_session_id(
         logger: Optional[logging.RootLogger] = None) -> pd.DataFrame:
     """
     Returns DataFrame with two columns:
-    foraging_id
-    behavior_session_id
+        foraging_id
+        behavior_session_id
+
+    Parameters
+    ----------
+    lims_engine: PostgresQueryMixin
+        Means of connecting to the LIMS database
+
+    behavior_session_ids: List[int]
+        List of behavior_session_ids for which we want
+        the foraging_id
     """
 
     behav_ids = build_in_list_selector_query("id",
@@ -70,15 +79,33 @@ def _sanitize_uuid_list(uuid_list: List[str]) -> List[str]:
     """
     Loop over a string, removing any that cannot be cast
     into a valid UUID
+
+    Parameters
+    ----------
+    uuid_list: List[str]
+        List of strings that would ideally be cast into
+        UUIDs
+
+    Returns
+    -------
+    sanitized_list: List[str]
+        A list containing all of the elements from uuid_list
+        that could successfully be cast into a UUID
+
+    Note
+    ----
+    This method is meant to be used as a pre-processing step
+    for queries to MTRAIN. foraging_id values need to be valid
+    string representations of UUIDs.
     """
-    new_list = []
+    sanitized_list = []
     for val in uuid_list:
         try:
             UUID(val)
-            new_list.append(val)
+            sanitized_list.append(val)
         except ValueError:
             pass
-    return new_list
+    return sanitized_list
 
 
 def donor_id_list_from_ecephys_session_ids(
