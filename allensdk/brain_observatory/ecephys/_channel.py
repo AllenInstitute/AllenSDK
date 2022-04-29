@@ -74,9 +74,11 @@ class Channel(DataObject):
 
     @property
     def manual_structure_acronym(self) -> str:
-        return self._manual_structure_acronym.split('-')[0] \
-            if self._strip_structure_subregion \
-            else self._manual_structure_acronym
+        acronym = self._manual_structure_acronym
+        if type(self._manual_structure_acronym) is str and \
+                self._strip_structure_subregion:
+            acronym = self._manual_structure_acronym.split('-')[0]
+        return acronym
 
     @property
     def anterior_posterior_ccf_coordinate(self) -> Optional[float]:
