@@ -15,14 +15,23 @@ class Channel(DataObject):
             probe_vertical_position: int,
             probe_horizontal_position: int,
             manual_structure_acronym: str = '',
-            manual_structure_id: Optional[int] = None,
             anterior_posterior_ccf_coordinate: Optional[float] = None,
             dorsal_ventral_ccf_coordinate: Optional[float] = None,
             left_right_ccf_coordinate: Optional[float] = None,
             impedance: float = np.nan,
             filtering: str = 'AP band: 500 Hz high-pass; '
-                             'LFP band: 1000 Hz low-pass'
+                             'LFP band: 1000 Hz low-pass',
+            strip_structure_subregion: bool = True
     ):
+        """
+
+        Parameters
+        ----------
+        strip_structure_subregion: Whether to remove the subregion from the
+            structure acronym. I.e if the acronym is "LGd-sh" then it will get
+            parsed as "LGd". You might want to strip it if the subregion is
+            beyond annotation accuracy.
+        """
         super().__init__(name='channel', value=self)
         self._id = id
         self._probe_id = probe_id
@@ -31,13 +40,13 @@ class Channel(DataObject):
         self._probe_vertical_position = probe_vertical_position
         self._probe_horizontal_position = probe_horizontal_position
         self._manual_structure_acronym = manual_structure_acronym
-        self._manual_structure_id = manual_structure_id
         self._anterior_posterior_ccf_coordinate = \
             anterior_posterior_ccf_coordinate
         self._dorsal_ventral_ccf_coordinate = dorsal_ventral_ccf_coordinate
         self._left_right_ccf_coordinate = left_right_ccf_coordinate
         self._impedance = impedance
         self._filtering = filtering
+        self._strip_structure_subregion = strip_structure_subregion
 
     @property
     def id(self) -> int:
@@ -65,11 +74,9 @@ class Channel(DataObject):
 
     @property
     def manual_structure_acronym(self) -> str:
-        return self._manual_structure_acronym
-
-    @property
-    def manual_structure_id(self) -> Optional[int]:
-        return self._manual_structure_id
+        return self._manual_structure_acronym.split('-')[0] \
+            if self._strip_structure_subregion \
+            else self._manual_structure_acronym
 
     @property
     def anterior_posterior_ccf_coordinate(self) -> Optional[float]:

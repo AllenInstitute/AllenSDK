@@ -13,23 +13,6 @@ from allensdk.core import DataObject, JsonReadableInterface, \
     NwbReadableInterface, NwbWritableInterface
 
 
-def _get_structure_key(channels: pd.DataFrame) -> str:
-    """
-    Scan a channels dataframe to determine if the structure
-    column is 'ecephys_structure_id' or 'manual_structure_id',
-
-    Return the appropriate key.
-    """
-    candidate_list = ('ecephys_structure_id',
-                      'manual_structure_id')
-    for candidate in candidate_list:
-        if candidate in channels.columns:
-            return candidate
-    msg = (f"Could not find {candidate_list} in channels data frame. "
-           f"Columns present are {channels.columns}")
-    raise RuntimeError(msg)
-
-
 class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
              NwbWritableInterface):
     """Probes"""
@@ -104,7 +87,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         filter_by_validity
             Whether to filter out units without quality == "good"
         filter_out_of_brain_units
-            Whether to filter out units with missing ecephys_structure_id
+            Whether to filter out units with missing ecephys_structure_acronym
         amplitude_cutoff_maximum
             Filter units by this upper bound
         presence_ratio_minimum
@@ -131,10 +114,9 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
                 ) for p in self.probes
             ])
 
-            structure_key = _get_structure_key(channels)
-
             if filter_out_of_brain_units:
-                channels = channels[~(channels[structure_key].isna())]
+                channels = channels[
+                    ~(channels['manual_structure_acronym'].isna())]
 
             # noinspection PyTypeChecker
             channel_ids = set(channels.index.values.tolist())
