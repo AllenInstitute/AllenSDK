@@ -191,6 +191,15 @@ def _add_prior_omissions_to_behavior(
 
 def _add_experience_level(
         sessions_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add the column 'experience_level' to a dataframe. This column
+    will be 'Novel' for any rows with
+    'prior_exposures_to_image_set' == 0 (or NULL) and 'Familiar'
+    otherwise.
+
+    Return the same dataframe with the column added
+    """
+
     sessions_df['experience_level'] = np.where(
                   np.logical_or(
                       sessions_df['prior_exposures_to_image_set'] == 0,
@@ -204,8 +213,23 @@ def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
         behavior_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Take a DataFrame and patch date_of_acquisition, session_type
-    from the pickle file
+    Fill in missing date_of_acquisition and session_type
+    directly from the stimulus pickle file
+
+    Parameters
+    ----------
+    lims_connection: PostgresQueryMixin
+
+    behavior_df: pd.DataFrame
+        The dataframe to be patched
+
+    Returns
+    -------
+    behavior_df: pd.DataFrame
+        Identical to behavior_df, except any rows with NULL
+        date_of_acquisition or foraging_id will have their
+        date_of_acquisition and session_type overwritten with
+        values from the stimulus pickle file.
     """
 
     invalid_beh = behavior_df[
@@ -237,7 +261,11 @@ def _patch_date_and_stage_from_pickle_file(
 
 
 def _add_age_in_days(df: pd.DataFrame) -> pd.DataFrame:
-    # get age in days
+    """
+    Add an 'age_in_days' column to a dataframe by subtracting
+    'date_of_birth' from 'date_of_acquisition'. Return the
+    dataframe with the new column added.
+    """
     age_in_days = []
     for beh_id, acq, birth in zip(
                 df.behavior_session_id,
