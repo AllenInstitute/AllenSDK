@@ -5,28 +5,6 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.id_generator import (
     FileIDGenerator)
 
 
-@pytest.fixture(scope='session')
-def some_files_fixture(
-        tmp_path_factory,
-        helper_functions):
-    """
-    Create some temporary files; return a list of paths to them
-    """
-    tmpdir = tmp_path_factory.mktemp('id_generator')
-    path_list = []
-    for idx in range(4):
-        this_path = pathlib.Path(
-                        tempfile.mkstemp(
-                            dir=tmpdir,
-                            suffix='.txt')[1])
-        with open(this_path, 'w') as out_file:
-            out_file.write(f'this is file {idx}')
-        path_list.append(this_path)
-
-    yield path_list
-    helper_functions.windows_safe_cleanup_dir(dir_path=pathlib.Path(tmpdir))
-
-
 def test_not_a_file_error():
     """
     Test that an error is raised when you try to assign an ID to
