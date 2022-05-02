@@ -3,12 +3,12 @@ import argschema
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema)
 
-from allensdk.brain_observatory.vbn_2022.metadata_writer.utils import (
+from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     get_list_of_bad_probe_ids,
-    _get_units_table,
-    _get_probes_table,
-    _get_channels_table,
-    _get_session_tables)
+    units_table_from_ecephys_session_ids,
+    probes_table_from_ecephys_session_id_list,
+    channels_table_from_ecephys_session_id_list,
+    session_tables_from_ecephys_session_id_list)
 
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
@@ -37,29 +37,29 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
 
         session_id_list = self.args['ecephys_session_id_list']
 
-        units_table = _get_units_table(
+        units_table = units_table_from_ecephys_session_ids(
                     lims_connection=lims_connection,
-                    session_id_list=session_id_list,
+                    ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
         units_table.to_csv(self.args['units_path'], index=False)
 
-        probes_table = _get_probes_table(
+        probes_table = probes_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
-                    session_id_list=session_id_list,
+                    ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
         probes_table.to_csv(self.args['probes_path'], index=False)
 
-        channels_table = _get_channels_table(
+        channels_table = channels_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
-                    session_id_list=session_id_list,
+                    ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
         channels_table.to_csv(self.args['channels_path'], index=False)
 
         (session_table,
-         behavior_session_table) = _get_session_tables(
+         behavior_session_table) = session_tables_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     mtrain_connection=mtrain_connection,
-                    session_id_list=session_id_list,
+                    ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
         session_table.to_csv(self.args['ecephys_sessions_path'],
                              index=False)

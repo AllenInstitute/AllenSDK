@@ -2,19 +2,40 @@ from typing import List, Tuple, Dict, Any, Optional
 import numpy as np
 import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.vbn_2022.metadata_writer.session_utils import (
-    behavior_session_table_from_ecephys_session_id,
-    _postprocess_sessions,
-    _add_prior_omissions_behavior)
+
+from allensdk.internal.api.queries.lims_queries import (
+    behavior_sessions_from_ecephys_session_ids,
+    foraging_id_map_from_behavior_session_id,
+    _sanitize_uuid_list)
+
+from allensdk.internal.api.queries.mtrain_queries import (
+    session_stage_from_foraging_id)
+
+from allensdk.brain_observatory.vbn_2022.\
+    metadata_writer.dataframe_manipulations import (
+        _add_prior_omissions_to_behavior,
+        _add_prior_omissions_to_ecephys,
+        _add_session_number,
+        _add_age_in_days,
+        _patch_date_and_stage_from_pickle_file,
+        _add_experience_level)
+
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
+    .util.prior_exposure_processing import (
+        get_image_set,
+        get_prior_exposures_to_image_set,
+        get_prior_exposures_to_session_type)
 
 
 def get_list_of_bad_probe_ids(
         lims_connection: PostgresQueryMixin,
         probes_to_skip: List[Dict[str, Any]]) -> List[int]:
     """
-    Given a list of probes to skip (each of the form
+    Given a list of probes to skip,each of the form
+
     {'session': ecephys_session_id,
      'probe': probe_name}
+
     return a list of the ecephys_probe_ids associated with
     the bad probes.
     """
@@ -38,9 +59,9 @@ def get_list_of_bad_probe_ids(
     return result
 
 
-def _get_units_table(
+def units_table_from_ecephys_session_ids(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will return the units table.
@@ -49,7 +70,7 @@ def _get_units_table(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -60,6 +81,42 @@ def _get_units_table(
     -------
     units_table: pd.DataFrame
         A pandas DataFrame corresponding to the units metadata table
+
+        The columns of the dataframe are
+        ================================
+        unit_id -- int64 uniquely identifying this unit
+        ecephys_channel_id -- int64 uniquely identifying the channel
+        ecephys_probe_id -- int64 uniquely identifying the probe
+        ecephys_session_id -- int64 uniquely identifying teh session
+        snr -- float64
+        firing_rate -- float64
+        isi_violations -- float64
+        presence_ratio -- float64
+        amplitude_cutoff -- float64
+        isolation_distance -- float64
+        l_ratio -- float64
+        d_prime -- float64
+        nn_hit_rate -- float64
+        nn_miss_rate -- float64
+        silhouette_score -- float64
+        max_drift -- float64
+        cumulative_drift -- float64
+        waveform_duration -- float64
+        waveform_halfwidth -- float64
+        waveform_pt_ratio -- float64
+        waveform_repolarization_slope -- float64
+        waveform_recovery_slope -- float64
+        waveform_amplitude -- float64
+        waveform_spread -- float64
+        waveform_velocity_above -- float64
+        waveform_velocity_below -- float64
+        local_index -- int64
+        probe_vertical_position -- float64
+        probe_horizontal_position -- float64
+        anterior_posterior_ccf_coordinate -- float64
+        dorsal_ventral_ccf_coordinate -- float64
+        ecephys_structure_id -- int64 uniquely identifying the structure
+        ecephys_structure_acronym -- a string naming the structure
     """
 
     query = """
@@ -112,7 +169,7 @@ def _get_units_table(
     """
 
     query += f"""
-    WHERE ecephys_sessions.id IN {tuple(session_id_list)}
+    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
     if probe_ids_to_skip is not None:
@@ -125,9 +182,9 @@ def _get_units_table(
     return units_table
 
 
-def _get_probes_table(
+def probes_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will return the probes table.
@@ -136,7 +193,7 @@ def _get_probes_table(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -147,6 +204,20 @@ def _get_probes_table(
     -------
     probes_table: pd.DataFrame
         A pandas DataFrame corresponding to the probes metadata table
+
+        Columns in this dataframe are
+        ==============================
+        ecephys_probe_id -- int64
+        ecephys_session_id -- int64
+        name -- string like 'probeA', 'probeB', etc.
+        sampling_rate -- float64
+        lfp_sampling_rate -- float64
+        phase -- float64
+        has_lfp_data -- bool
+        unit_count -- int64 number of units on this probe
+        channel_count -- int64 number of channels on this probe
+        ecephys_structure_acronyms -- a list of strings identifing all
+                                      structures incident to this probe
     """
 
     query = """
@@ -174,7 +245,7 @@ def _get_probes_table(
     ON structures.id = ecephys_channels.manual_structure_id"""
 
     query += f"""
-    WHERE ecephys_sessions.id IN {tuple(session_id_list)}"""
+    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     if probe_ids_to_skip is not None:
         query += f"""
@@ -187,9 +258,9 @@ def _get_probes_table(
     return probes_table
 
 
-def _get_channels_table(
+def channels_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will return the channels table.
@@ -198,7 +269,7 @@ def _get_channels_table(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -209,6 +280,20 @@ def _get_channels_table(
     -------
     channels_table: pd.DataFrame
         A pandas DataFrame corresponding to the channels metadata table
+
+        Columns in this dataframe are
+        =============================
+        ecephys_channel_id -- int64
+        ecephys_probe_id -- int64
+        ecephys_session_id -- int64
+        local_index -- int64
+        probe_vertical_position -- float64
+        probe_horizontal_position -- float64
+        anterior_posterior_ccf_coordinate -- float64
+        dorsal_ventral_ccf_coordinate -- float64
+        left_right_ccf_coordinate -- float64
+        ecephys_structure_acronym -- string
+        unit_count -- int64 number of units on this channel
     """
 
     query = """
@@ -238,7 +323,7 @@ def _get_channels_table(
     ON structures.id = ecephys_channels.manual_structure_id"""
 
     query += f"""
-    WHERE ecephys_sessions.id IN {tuple(session_id_list)}"""
+    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     if probe_ids_to_skip is not None:
         query += f"""
@@ -254,9 +339,9 @@ def _get_channels_table(
     return channels_table
 
 
-def _get_ecephys_summary_table(
+def ecephys_summary_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int]) -> pd.DataFrame:
+        ecephys_session_id_list: List[int]) -> pd.DataFrame:
     """
     Perform the database query that will return the session summary table.
 
@@ -272,6 +357,19 @@ def _get_ecephys_summary_table(
     -------
     sumary_table: pd.DataFrame
         A pandas DataFrame corresponding to the session summary table
+
+        Columns in this dataframe will be
+        =================================
+        ecephys_session_id -- int
+        behavior_session_id -- int
+        date_of_acquisition -- pd.Timestamp
+        equipment_name -- string
+        mouse_id -- string
+        genotype -- tring
+        sex -- string
+        project_code -- string
+        age_in_days -- int
+
     """
     query = """
         SELECT
@@ -303,15 +401,15 @@ def _get_ecephys_summary_table(
         ON equipment.id = ecephys_sessions.equipment_id
         LEFT OUTER JOIN behavior_sessions
         ON behavior_sessions.ecephys_session_id = ecephys_sessions.id
-        WHERE ecephys_sessions.id IN {tuple(session_id_list)}"""
+        WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     summary_table = lims_connection.select(query)
     return summary_table
 
 
-def _get_ecephys_counts_per_session(
+def ecephys_counts_per_session_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will produce a table enumerating
@@ -334,6 +432,13 @@ def _get_ecephys_counts_per_session(
     counts_table: pd.DataFrame
         A pandas DataFrame corresponding to the counts_per_session
         table
+
+        Columns in this dataframe will be
+        =================================
+        ecephys_session_id -- int
+        unit_count -- int (the number of units in this session)
+        probe_count -- int (the number of probes in this session)
+        channel_count -- int(the number of channels in this session)
     """
 
     query = f"""
@@ -348,7 +453,7 @@ def _get_ecephys_counts_per_session(
     ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT OUTER JOIN ecephys_units ON
     ecephys_units.ecephys_channel_id = ecephys_channels.id
-    WHERE ecephys_sessions.id IN {tuple(session_id_list)}
+    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
     if probe_ids_to_skip is not None:
@@ -363,9 +468,9 @@ def _get_ecephys_counts_per_session(
     return counts_table
 
 
-def _get_ecephys_structure_acronyms(
+def ecephys_structure_acronyms_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will produce a table listing the
@@ -388,6 +493,11 @@ def _get_ecephys_structure_acronyms(
     structure_table: pd.DataFrame
         A pandas DataFrame corresponding to the table of
         structure acronyms per session
+
+        Columns in this dataframe will be
+        =================================
+        ecephys_session_id -- int
+        ecephys_structure_acronyms -- a list of strings
     """
     query = f"""
     SELECT ecephys_sessions.id as ecephys_session_id,
@@ -399,7 +509,7 @@ def _get_ecephys_structure_acronyms(
     ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT JOIN structures
     ON structures.id = ecephys_channels.manual_structure_id
-    WHERE ecephys_sessions.id IN {tuple(session_id_list)}
+    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
     if probe_ids_to_skip is not None:
@@ -419,7 +529,30 @@ def _add_images_from_behavior(
         behavior_table: pd.DataFrame) -> pd.DataFrame:
     """
     Use the behavior sessions table to add image_set and
-    prior_exposurs to image_set to ecephys table
+    prior_exposures_to_image_set to ecephys table.
+
+    Parameters
+    ----------
+    ecephys_table: pd.DataFrame
+        A dataframe of ecephys_sessions
+
+    behavior_table: pd.DataFrame
+        A dataframe of behavior_sessions
+
+    Returns
+    -------
+    ecephys_sessions:
+        Same as input, except that image_set and
+        prior_exposures_to_image_set have been copied
+        from behavior_table where appropriate
+
+    Notes
+    -----
+    Because images are more appropriately associated with
+    behavior sessions, it is easiest to just assemble
+    a table of behavior sessions and then join this to
+    the ecephys_sessions using behavior_sessions.ecephys_session_id,
+    which is effectively what this method does.
     """
     # add prior exposure to image_set to session_table
 
@@ -434,10 +567,108 @@ def _add_images_from_behavior(
     return ecephys_table
 
 
-def _get_session_tables(
+def behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
-        session_id_list: List[int],
+        ecephys_session_id_list: List[int]) -> pd.DataFrame:
+    """
+    Given a list of ecephys_session_ids, find all of the behavior_sessions
+    experienced by the same mice and return a table summarizing those
+    sessions.
+
+    Parameters
+    ----------
+    lims_connection: PostgresQueryMixin
+
+    mtrain_connection: PostgresQueryMixin
+
+    ecephys_session_id_lit: List[int]
+        The list of ecephys_session_ids used to lookup the mice
+        we are interested in following
+
+    Returns
+    -------
+    behavior_session_df: pd.DataFrame
+        A dataframe summarizing the behavior sessions involving the
+        mice in question.
+
+        The columns in this dataframe are
+        =================================
+        mouse_id  --  str
+        behavior_session_id  --  int64
+        date_of_acquisition  --  datetime64[ns]
+        ecephys_session_id  --  float64
+        date_of_birth  --  datetime64[ns]
+        genotype  --  str
+        sex  --  str
+        equipment_name  --  str
+        foraging_id  --  str
+        session_type  --  str
+        image_set  --  str
+        prior_exposures_to_session_type  --  int64
+        prior_exposures_to_image_set  --  float64
+        age_in_days  --  int64
+        session_number  --  int64
+    """
+    behavior_session_df = behavior_sessions_from_ecephys_session_ids(
+                            lims_connection=lims_connection,
+                            ecephys_session_id_list=ecephys_session_id_list)
+
+    beh_to_foraging_df = foraging_id_map_from_behavior_session_id(
+        lims_engine=lims_connection,
+        behavior_session_ids=behavior_session_df.behavior_session_id.tolist())
+
+    # add foraging_id
+    behavior_session_df = behavior_session_df.join(
+                    beh_to_foraging_df.set_index('behavior_session_id'),
+                    on='behavior_session_id',
+                    how='left')
+
+    foraging_ids = beh_to_foraging_df.foraging_id.tolist()
+
+    # this is necessary because there are some sessions with the
+    # invalid foraging_id entry 'DoC' in MTRAIN
+    foraging_ids = _sanitize_uuid_list(foraging_ids)
+
+    foraging_to_stage_df = session_stage_from_foraging_id(
+            mtrain_engine=mtrain_connection,
+            foraging_ids=foraging_ids)
+
+    # add session_type
+    behavior_session_df = behavior_session_df.join(
+                foraging_to_stage_df.set_index('foraging_id'),
+                on='foraging_id',
+                how='left')
+
+    behavior_session_df = _patch_date_and_stage_from_pickle_file(
+                             lims_connection=lims_connection,
+                             behavior_df=behavior_session_df)
+
+    behavior_session_df['image_set'] = get_image_set(
+            df=behavior_session_df)
+
+    behavior_session_df['prior_exposures_to_session_type'] = \
+        get_prior_exposures_to_session_type(
+            df=behavior_session_df)
+
+    behavior_session_df['prior_exposures_to_image_set'] = \
+        get_prior_exposures_to_image_set(
+            df=behavior_session_df)
+
+    behavior_session_df = _add_age_in_days(
+        df=behavior_session_df)
+
+    behavior_session_df = _add_session_number(
+        sessions_df=behavior_session_df,
+        index_col="behavior_session_id")
+
+    return behavior_session_df
+
+
+def session_tables_from_ecephys_session_id_list(
+        lims_connection: PostgresQueryMixin,
+        mtrain_connection: PostgresQueryMixin,
+        ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -449,7 +680,7 @@ def _get_session_tables(
 
     mtrain_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -461,21 +692,60 @@ def _get_session_tables(
     session_table: pd.DataFrame
         A pandas DataFrame corresponding to the session table
 
+        This dataframe has columns
+        ==========================
+        ecephys_session_id -- int64
+        behavior_session_id -- int64
+        date_of_acquisition -- pd.Timestamp
+        equipment_name -- str
+        session_type -- str
+        mouse_id -- int64
+        genotype -- str
+        sex -- str
+        project_code -- str
+        age_in_days -- float64
+        unit_count -- int64
+        probe_count -- int64
+        channel_count -- int64
+        ecephys_structure_acronyms -- list of strings
+        image_set -- str
+        prior_exposures_to_image_set -- float64
+        session_number -- int64
+        prior_exposures_to_omissions -- int64
+        experience_level -- str
+
     behavior_session-table: pd.DataFrame
+
+        This dataframe has columns
+        ==========================
+        behavior_session_id -- int64
+        equipment_name -- str
+        genotype -- str
+        mouse_id -- int64
+        sex -- str
+        age_in_days -- int64
+        session_number -- int64
+        prior_exposures_to_session_type -- int64
+        prior_exposures_to_image_set -- float64
+        prior_exposures_to_omissions -- int64
+        ecephys_session_id -- float64
+        date_of_acquisition -- str
+        session_type -- str
+        image_set -- str
     """
 
-    behavior_session_table = behavior_session_table_from_ecephys_session_id(
+    beh_table = behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
             mtrain_connection=mtrain_connection,
-            ecephys_session_ids=session_id_list)
+            ecephys_session_id_list=ecephys_session_id_list)
 
-    summary_tbl = _get_ecephys_summary_table(
+    summary_tbl = ecephys_summary_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
-                        session_id_list=session_id_list)
+                        ecephys_session_id_list=ecephys_session_id_list)
 
-    ct_tbl = _get_ecephys_counts_per_session(
+    ct_tbl = ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
-                        session_id_list=session_id_list,
+                        ecephys_session_id_list=ecephys_session_id_list,
                         probe_ids_to_skip=probe_ids_to_skip)
 
     summary_tbl = summary_tbl.join(
@@ -483,9 +753,9 @@ def _get_session_tables(
                         on="ecephys_session_id",
                         how='left')
 
-    struct_tbl = _get_ecephys_structure_acronyms(
+    struct_tbl = ecephys_structure_acronyms_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
-                        session_id_list=session_id_list,
+                        ecephys_session_id_list=ecephys_session_id_list,
                         probe_ids_to_skip=probe_ids_to_skip)
 
     summary_tbl = summary_tbl.join(
@@ -495,19 +765,24 @@ def _get_session_tables(
 
     summary_tbl = _add_images_from_behavior(
             ecephys_table=summary_tbl,
-            behavior_table=behavior_session_table)
+            behavior_table=beh_table)
 
-    session_table = _postprocess_sessions(
-                        sessions_df=summary_tbl)
+    sessions_table = _add_session_number(
+                            sessions_df=summary_tbl,
+                            index_col="ecephys_session_id")
+    sessions_table = _add_prior_omissions_to_ecephys(
+                            sessions_df=sessions_table)
+    sessions_table = _add_experience_level(
+                            sessions_df=sessions_table)
 
     # there are only omissions in the ecephys sessions,
     # so behavior.prior_exposures_to_omissions should be zero
     # except for the sessions with non-null ecephys_sessions
-    behavior_session_table = _add_prior_omissions_behavior(
-            behavior_df=behavior_session_table,
-            ecephys_df=session_table)
+    beh_table = _add_prior_omissions_to_behavior(
+            behavior_df=beh_table,
+            ecephys_df=sessions_table)
 
-    behavior_session_table = behavior_session_table[
+    beh_table = beh_table[
             ['behavior_session_id',
              'equipment_name',
              'genotype',
@@ -523,4 +798,4 @@ def _get_session_tables(
              'session_type',
              'image_set']]
 
-    return (session_table, behavior_session_table)
+    return (sessions_table, beh_table)

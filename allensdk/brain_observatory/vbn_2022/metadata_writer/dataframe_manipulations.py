@@ -1,4 +1,7 @@
-from typing import List
+# This module contains utility methods for extending
+# the VBN 2022 metadata dataframes as they are directly queried
+# from LIMS.
+
 import pandas as pd
 import numpy as np
 import json
@@ -13,28 +16,33 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BehaviorStimulusFile)
 
 from allensdk.internal.api.queries.lims_queries import (
-    behavior_sessions_from_ecephys_session_ids,
-    foraging_id_map_from_behavior_session_id,
-    stimulus_pickle_paths_from_behavior_session_ids,
-    _sanitize_uuid_list)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.prior_exposure_processing import (
-        get_image_set,
-        get_prior_exposures_to_image_set,
-        get_prior_exposures_to_session_type)
+    stimulus_pickle_paths_from_behavior_session_ids)
 
 
 def _add_session_number(
         sessions_df: pd.DataFrame,
         index_col: str) -> pd.DataFrame:
     """
-    Parses session number from session type and and adds to dataframe
+    For each mouse: order sessions by date_of_acquisition. Add a session_number
+    column corresponding to where that session falls in the mouse's history.
 
-    index_col should be either "ecephys_session_id" or "behavior_session_id"
+    Parameters
+    ----------
+        sessions_df: pd.DataFrame
+
+        index_col: str
+            The column denoting the unique ID of each
+            session. Should be either "ecephys_session_id"
+            or "behavior_session_id"
+
+    Returns
+    -------
+    sessions_df: pd.DataFrame
+        The input dataframe with a session_number column added
+
+    Note
+    ----
+    session_number will be 1-indexed
     """
 
     date_col = 'date_of_acquisition'
@@ -59,6 +67,7 @@ def _add_session_number(
                        'session_number': session_number+1}
             new_data.append(element)
     new_df = pd.DataFrame(data=new_data)
+
     sessions_df = sessions_df.join(
                         new_df.set_index(index_col),
                         on=index_col,
@@ -66,15 +75,14 @@ def _add_session_number(
     return sessions_df
 
 
-def _add_prior_images(
+def _add_prior_omissions_to_ecephys(
         sessions_df: pd.DataFrame) -> pd.DataFrame:
-    sessions_df['prior_exposures_to_image_set'] = \
-            get_prior_exposures_to_image_set(df=sessions_df)
-    return sessions_df
+    """
+    Add the 'prior_exposures_to_omissions' columns to a dataframe
+    of ecephys sessions. Return that dataframe with the column
+    added.
+    """
 
-
-def _add_prior_omissions_ecephys(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
     # From communication with Corbett Bennett:
     # As for omissions, the only scripts that have them are
     # the EPHYS scripts. So prior exposure to omissions is
@@ -85,12 +93,12 @@ def _add_prior_omissions_ecephys(
     # just be session_number-1 (so it is 0 on the first day, 1 on
     # the second day, etc.)
 
-    sessions_df['prior_exposures_to_omissions'] = \
-                sessions_df['session_number'] - 1
+    sessions_df['prior_exposures_to_omissions'] = (
+        sessions_df['session_number'] - 1)
     return sessions_df
 
 
-def _add_prior_omissions_behavior(
+def _add_prior_omissions_to_behavior(
         behavior_df: pd.DataFrame,
         ecephys_df: pd.DataFrame) -> pd.DataFrame:
     mouse_col = 'mouse_id'
@@ -148,7 +156,7 @@ def _add_experience_level(
     return sessions_df
 
 
-def _patch_df_from_pickle_file(
+def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
         behavior_df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -200,75 +208,3 @@ def _add_age_in_days(df: pd.DataFrame) -> pd.DataFrame:
             on='behavior_session_id',
             how='left')
     return df
-
-
-def behavior_session_table_from_ecephys_session_id(
-        lims_connection: PostgresQueryMixin,
-        mtrain_connection: PostgresQueryMixin,
-        ecephys_session_ids: List[int]) -> pd.DataFrame:
-    """
-    """
-    behavior_session_df = behavior_sessions_from_ecephys_session_ids(
-                            lims_connection=lims_connection,
-                            ecephys_session_id_list=ecephys_session_ids)
-
-    beh_to_foraging_df = foraging_id_map_from_behavior_session_id(
-        lims_engine=lims_connection,
-        behavior_session_ids=behavior_session_df.behavior_session_id.tolist())
-
-    # add foraging_id
-    behavior_session_df = behavior_session_df.join(
-                    beh_to_foraging_df.set_index('behavior_session_id'),
-                    on='behavior_session_id',
-                    how='left')
-
-    foraging_ids = beh_to_foraging_df.foraging_id.tolist()
-
-    # this is necessary because there are some sessions with the
-    # invalid foraging_id entry 'DoC' in MTRAIN
-    foraging_ids = _sanitize_uuid_list(foraging_ids)
-
-    foraging_to_stage_df = session_stage_from_foraging_id(
-            mtrain_engine=mtrain_connection,
-            foraging_ids=foraging_ids)
-
-    # add session_type
-    behavior_session_df = behavior_session_df.join(
-                foraging_to_stage_df.set_index('foraging_id'),
-                on='foraging_id',
-                how='left')
-
-    behavior_session_df = _patch_df_from_pickle_file(
-                             lims_connection=lims_connection,
-                             behavior_df=behavior_session_df)
-
-    behavior_session_df['image_set'] = get_image_set(
-            df=behavior_session_df)
-
-    behavior_session_df['prior_exposures_to_session_type'] = \
-        get_prior_exposures_to_session_type(
-            df=behavior_session_df)
-
-    behavior_session_df['prior_exposures_to_image_set'] = \
-        get_prior_exposures_to_image_set(
-            df=behavior_session_df)
-
-    behavior_session_df = _add_age_in_days(
-        df=behavior_session_df)
-
-    behavior_session_df = _add_session_number(
-        sessions_df=behavior_session_df,
-        index_col="behavior_session_id")
-
-    return behavior_session_df
-
-
-def _postprocess_sessions(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
-
-    sessions_df = _add_session_number(sessions_df=sessions_df,
-                                      index_col="ecephys_session_id")
-    sessions_df = _add_prior_omissions_ecephys(sessions_df=sessions_df)
-    sessions_df = _add_experience_level(sessions_df=sessions_df)
-
-    return sessions_df
