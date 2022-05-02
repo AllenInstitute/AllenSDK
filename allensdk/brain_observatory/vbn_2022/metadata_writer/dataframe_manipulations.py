@@ -101,6 +101,41 @@ def _add_prior_omissions_to_ecephys(
 def _add_prior_omissions_to_behavior(
         behavior_df: pd.DataFrame,
         ecephys_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add 'prior_exposures_to_omissions' column to behavior sessions
+    dataframe. Return that dataframe with the column added.
+
+    Parameters
+    ----------
+    behavior_df: pd.DataFrame
+        A dataframe of behavior sessions. This is the dataframe
+        to which `prior_exposures_to_omissions` will be added
+
+    ecephys_df: pd.DataFrame
+        A dataframe of ecephys_sessions which contains
+        `prior_exposures_to_omissions`. This will be used to add
+        `prior_exposures_to_omissions` as described in the notes
+        below.
+
+    Returns
+    -------
+    behavior_df: pd.DataFrame
+        The input behavior sessions dataframe with
+        the 'prior_exposures_to_omissions` column added.
+
+    Notes
+    -----
+    Because, in this project, only the ecephys sessions include
+    omissions, this function sets prior_exposures_to_omissions
+    to be equal to the number of ecephys_sessions the mouse
+    has already seen.
+
+    In cases where the date of the behavior session exactly
+    matches the date of the ecephys session, the mouse is assumed
+    not to have seen the ecephys session (i.e.
+    `prior_exposures_to_omissions` will assume the ecephys
+    session has not happened yet)
+    """
     mouse_col = 'mouse_id'
 
     mouse_id_values = np.unique(behavior_df[mouse_col].values)
@@ -115,11 +150,7 @@ def _add_prior_omissions_to_behavior(
                                sub_ecephys.prior_exposures_to_omissions):
             ecephys_dates.append(date.to_julian_date())
             ecephys_prior.append(prior)
-        ecephys_dates = np.array(ecephys_dates)
-        ecephys_prior = np.array(ecephys_prior)
-        sorted_dex = np.argsort(ecephys_dates)
-        ecephys_dates = ecephys_dates[sorted_dex]
-        ecephys_prior = ecephys_prior[sorted_dex]
+        ecephys_dates = np.sort(np.array(ecephys_dates))
 
         beh_id_arr = []
         beh_dates = []
@@ -132,10 +163,23 @@ def _add_prior_omissions_to_behavior(
                             frame_timestamps=ecephys_dates,
                             event_timestamps=beh_dates)
 
-        for beh_id, idx in zip(beh_id_arr, insert_indices):
+        for beh_id, beh_date, idx in zip(beh_id_arr,
+                                         beh_dates,
+                                         insert_indices):
+
+            if np.allclose(beh_date,
+                           ecephys_dates[idx],
+                           rtol=0.0,
+                           atol=1.0e-6):
+                n_omissions = idx
+            elif beh_date < ecephys_dates[idx]:
+                n_omissions = max(0, idx-1)
+            else:
+                n_omissions = idx+1
+
             new_data.append(
                 {'behavior_session_id': beh_id,
-                 'prior_exposures_to_omissions': ecephys_prior[idx]})
+                 'prior_exposures_to_omissions': n_omissions})
 
     new_data = pd.DataFrame(data=new_data)
     behavior_df = behavior_df.join(
