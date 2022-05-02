@@ -2,6 +2,7 @@ import argschema
 import pathlib
 import re
 from marshmallow import post_load
+from marshmallow.validate import OneOf
 
 
 class ProbeToSkip(argschema.ArgSchema):
@@ -49,6 +50,34 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
             default=False,
             description=("If false, throw an error if output files "
                          "already exist"))
+
+    ecephys_nwb_dir = argschema.fields.InputDir(
+            required=True,
+            allow_none=False,
+            description=("The directory where ecephys_nwb sessions are "
+                         "to be found"))
+
+    ecephys_nwb_prefix = argschema.fields.Str(
+        required=False,
+        default='ecephys_session',
+        description=(
+          "Ecephys session NWB files will be looked for "
+          "in the form "
+          "{ecephys_nwb_dir}/{ecephys_nwb_prefix}_{ecephys_session_id}.nwb")
+    )
+
+    on_missing_file = argschema.fields.Str(
+            default='error',
+            required=False,
+            validation=OneOf(('error', 'warn', 'skip')),
+            description=("What to do if an input datafile is missing. "
+                         "If 'error', raise an exception. "
+                         "If 'warn', assign a dummy ID and issue a warning. "
+                         "If 'skip', do not list in metadata and issue a "
+                         "warning (note, any sessions thus skipped will still "
+                         "show up in aggregate metadata; there just will "
+                         "be no line for those sessions in tables that list "
+                         "data files for release, like sessions.csv)."))
 
     @post_load
     def validate_paths(self, data, **kwargs):

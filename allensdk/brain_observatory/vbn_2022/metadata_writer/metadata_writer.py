@@ -1,7 +1,11 @@
 import argschema
+import pathlib
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema)
+
+from allensdk.brain_observatory.vbn_2022.metadata_writer.id_generator import (
+    FileIDGenerator)
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     get_list_of_bad_probe_ids,
@@ -9,6 +13,10 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     probes_table_from_ecephys_session_id_list,
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
+
+from allensdk.brain_observatory.vbn_2022 \
+    .metadata_writer.dataframe_manipulations import (
+        add_file_paths_to_session_table)
 
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
@@ -21,6 +29,9 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
     default_schema = VBN2022MetadataWriterInputSchema
 
     def run(self):
+
+        file_id_generator = FileIDGenerator()
+
         lims_connection = db_connection_creator(
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP
             )
@@ -61,6 +72,18 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     mtrain_connection=mtrain_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        ecephys_nwb_dir = pathlib.Path(
+                                self.args['ecephys_nwb_dir'])
+
+        session_table = add_file_paths_to_session_table(
+                    session_table=session_table,
+                    id_generator=file_id_generator,
+                    file_dir=ecephys_nwb_dir,
+                    file_prefix=self.args['ecephys_nwb_prefix'],
+                    index_col='ecephys_session_id',
+                    on_missing_file=self.args['on_missing_file'])
+
         session_table.to_csv(self.args['ecephys_sessions_path'],
                              index=False)
         behavior_session_table.to_csv(
