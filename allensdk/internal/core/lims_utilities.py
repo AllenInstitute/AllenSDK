@@ -1,4 +1,3 @@
-from typing import Optional
 import os
 import platform
 import re
