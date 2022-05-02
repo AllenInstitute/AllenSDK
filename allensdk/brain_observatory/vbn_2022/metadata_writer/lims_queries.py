@@ -1,5 +1,4 @@
 from typing import List, Tuple, Dict, Any, Optional
-import numpy as np
 import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -18,7 +17,8 @@ from allensdk.brain_observatory.vbn_2022.\
         _add_session_number,
         _add_age_in_days,
         _patch_date_and_stage_from_pickle_file,
-        _add_experience_level)
+        _add_experience_level,
+        _add_images_from_behavior)
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
@@ -522,49 +522,6 @@ def ecephys_structure_acronyms_from_ecephys_session_id_list(
 
     struct_tbl = lims_connection.select(query)
     return struct_tbl
-
-
-def _add_images_from_behavior(
-        ecephys_table: pd.DataFrame,
-        behavior_table: pd.DataFrame) -> pd.DataFrame:
-    """
-    Use the behavior sessions table to add image_set and
-    prior_exposures_to_image_set to ecephys table.
-
-    Parameters
-    ----------
-    ecephys_table: pd.DataFrame
-        A dataframe of ecephys_sessions
-
-    behavior_table: pd.DataFrame
-        A dataframe of behavior_sessions
-
-    Returns
-    -------
-    ecephys_sessions:
-        Same as input, except that image_set and
-        prior_exposures_to_image_set have been copied
-        from behavior_table where appropriate
-
-    Notes
-    -----
-    Because images are more appropriately associated with
-    behavior sessions, it is easiest to just assemble
-    a table of behavior sessions and then join this to
-    the ecephys_sessions using behavior_sessions.ecephys_session_id,
-    which is effectively what this method does.
-    """
-    # add prior exposure to image_set to session_table
-
-    sub_df = behavior_table.loc[
-        np.logical_not(behavior_table.ecephys_session_id.isna()),
-        ('ecephys_session_id', 'image_set', 'prior_exposures_to_image_set')]
-
-    ecephys_table = ecephys_table.merge(
-            sub_df.set_index('ecephys_session_id'),
-            on='ecephys_session_id',
-            how='left')
-    return ecephys_table
 
 
 def behavior_session_table_from_ecephys_session_id_list(

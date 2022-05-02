@@ -15,7 +15,64 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         _add_experience_level,
         _patch_date_and_stage_from_pickle_file,
         _add_age_in_days,
+        _add_images_from_behavior,
         add_file_paths_to_session_table)
+
+
+def test_add_images_from_behavior():
+    """
+    Test that _add_images_from_behavior
+    maps the right values from the behavior session
+    table to the ecephys_session_table
+    """
+    beh_data = []
+    beh_data.append({'ecephys_session_id': 1,
+                     'image_set': 'zebra',
+                     'prior_exposures_to_image_set': 22})
+
+    beh_data.append({'ecephys_session_id': 2,
+                     'image_set': 'fish',
+                     'prior_exposures_to_image_set': 14})
+
+    beh_data.append({'ecephys_session_id': None,
+                     'image_set': 'lion',
+                     'prior_exposures_to_image_set': 5})
+
+    beh_data.append({'ecephys_session_id': 7,
+                     'image_set': 'tiger',
+                     'prior_exposures_to_image_set': 4})
+
+    beh_table = pd.DataFrame(data=beh_data)
+
+    ecephys_data = []
+    ecephys_data.append({'ecephys_session_id': 2,
+                         'figure': 3})
+    ecephys_data.append({'ecephys_session_id': 1,
+                         'figure': 7})
+    ecephys_data.append({'ecephys_session_id': 3,
+                         'figure': 8})
+
+    ecephys_table = pd.DataFrame(data=ecephys_data)
+    ecephys_table = _add_images_from_behavior(
+                ecephys_table=ecephys_table,
+                behavior_table=beh_table)
+
+    expected_data = []
+    expected_data.append({'ecephys_session_id': 2,
+                          'figure': 3,
+                          'image_set': 'fish',
+                          'prior_exposures_to_image_set': 14})
+    expected_data.append({'ecephys_session_id': 1,
+                          'figure': 7,
+                          'image_set': 'zebra',
+                          'prior_exposures_to_image_set': 22})
+    expected_data.append({'ecephys_session_id': 3,
+                          'figure': 8,
+                          'image_set': None,
+                          'prior_exposures_to_image_set': None})
+
+    expected_df = pd.DataFrame(data=expected_data)
+    pd.testing.assert_frame_equal(ecephys_table, expected_df)
 
 
 def test_add_session_number():
