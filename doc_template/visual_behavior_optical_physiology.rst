@@ -23,7 +23,7 @@ To get started, check out these jupyter notebooks to learn how to:
 
 
 For a description of available AllenSDK methods and attributes for data access, see this 
-`further documentation <https://alleninstitute.sharepoint.com/:w:/s/VisualBehaviorAIBS/EUkWXB9X8wZKleIGtsviscMBTgesWXsrHESs84Ye9FvqzQ?e=Jm7GmA>`_.
+`further documentation <https://visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/VBP_WhitePaper_SDK_Documentation.pdf>`_.
 
 For detailed information about the experimental design, data acquisition, 
 and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/4e/be/4ebe2911-bd38-4230-86c8-01a86cfd758e/visual_behavior_2p_technical_whitepaper.pdf>`_.
