@@ -1,6 +1,5 @@
 import pytest
 import pathlib
-import tempfile
 from allensdk.brain_observatory.vbn_2022.metadata_writer.id_generator import (
     FileIDGenerator)
 
@@ -29,18 +28,21 @@ def test_not_a_path_error(
 
 
 def test_symlink_error(
-        some_files_fixture):
+        some_files_fixture,
+        tmp_path_factory,
+        helper_functions):
     """
     Test that an error is raised if you try to get an ID for a symlink
     """
-    symlink_path = pathlib.Path(tempfile.mkstemp(suffix='.txt')[1])
-    symlink_path.unlink()  # because tempfile makes the file
+    tmp_dir = pathlib.Path(tmp_path_factory.mktemp('symlink_test'))
+    symlink_path = tmp_dir / 'a_silly_symlink.nwb'
     symlink_path.symlink_to(some_files_fixture[2])
     assert symlink_path.is_symlink()
     generator = FileIDGenerator()
     with pytest.raises(ValueError,
                        match="is a symlink; must be an actual path"):
         generator.id_from_path(file_path=symlink_path)
+    helper_functions.windows_safe_cleanup(file_path=symlink_path)
 
 
 def test_file_id_generator(
