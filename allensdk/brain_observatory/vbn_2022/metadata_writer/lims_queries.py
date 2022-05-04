@@ -38,6 +38,20 @@ def get_list_of_bad_probe_ids(
 
     return a list of the ecephys_probe_ids associated with
     the bad probes.
+
+    Parameters
+    ----------
+    lims_connection: PostgressQueryMixin
+
+    probes_to_skip: List[Dict[str, Any]]
+        List of dicts specifying the probes to skip (see above
+        for the form each dict needs to take)
+
+    Returns
+    -------
+    bad_probe_id_list: List[int]
+        List of the globally unique ecephys_probe_id values
+        that need to be skipped
     """
 
     where_clause = ""
@@ -55,8 +69,8 @@ def get_list_of_bad_probe_ids(
       {where_clause}
     """
 
-    result = lims_connection.fetchall(query)
-    return result
+    bad_probe_id_list = lims_connection.fetchall(query)
+    return bad_probe_id_list
 
 
 def units_table_from_ecephys_session_ids(
@@ -350,7 +364,7 @@ def ecephys_summary_table_from_ecephys_session_id_list(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -421,7 +435,7 @@ def ecephys_counts_per_session_from_ecephys_session_id_list(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -482,7 +496,7 @@ def ecephys_structure_acronyms_from_ecephys_session_id_list(
     ----------
     lims_connection: PostgresQueryMixin
 
-    session_id_list: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
 
@@ -541,7 +555,7 @@ def behavior_session_table_from_ecephys_session_id_list(
 
     mtrain_connection: PostgresQueryMixin
 
-    ecephys_session_id_lit: List[int]
+    ecephys_session_id_list: List[int]
         The list of ecephys_session_ids used to lookup the mice
         we are interested in following
 
