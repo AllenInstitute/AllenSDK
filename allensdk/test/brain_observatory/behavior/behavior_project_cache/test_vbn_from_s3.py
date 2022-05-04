@@ -2,8 +2,8 @@ from unittest.mock import create_autospec
 
 import pytest
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-    BehaviorOphysExperiment
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
+    BehaviorEcephysSession
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from .utils import create_bucket, load_dataset
@@ -16,26 +16,23 @@ import semver
 from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
 from allensdk.brain_observatory.\
-    behavior.behavior_project_cache.behavior_project_cache \
-    import VisualBehaviorOphysProjectCache
+    behavior.behavior_project_cache.behavior_neuropixels_project_cache \
+    import VisualBehaviorNeuropixelsProjectCache
 
 
 @mock_s3
-def test_manifest_methods(tmpdir, s3_cloud_cache_data):
+def test_manifest_methods(tmpdir, vbn_s3_cloud_cache_data):
 
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
 
     cache_dir = pathlib.Path(tmpdir) / "test_manifest_list"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
-
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     m_list = cache.list_manifest_file_names()
@@ -52,53 +49,51 @@ def test_manifest_methods(tmpdir, s3_cloud_cache_data):
 
     change_msg = cache.compare_manifests(v_names[0], v_names[-1])
 
-    for mname in ('behavior_session_table',
-                  'ophys_session_table',
-                  'ophys_experiment_table'):
+    for mname in ('behavior_sessions',
+                  'ecephys_sessions',
+                  'probes'):
+        print(change_msg)
         assert f'project_metadata/{mname} changed' in change_msg
 
-    assert 'ophys_file_1.nwb changed' in change_msg
-    assert 'ophys_file_5.nwb created' in change_msg
-    assert 'ophys_file_2.nwb' not in change_msg
-    assert 'behavior_file_3.nwb' not in change_msg
-    assert 'behavior_file_4.nwb' not in change_msg
+    assert 'ecephys_file_1.nwb changed' in change_msg
+    assert 'ecephys_file_3.nwb created' in change_msg
 
 
 @mock_s3
-def test_local_cache_construction(tmpdir, s3_cloud_cache_data, monkeypatch):
+def test_local_cache_construction(
+    tmpdir,
+    vbn_s3_cloud_cache_data,
+    monkeypatch
+):
 
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_construction"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
 
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     cache.load_manifest(v_names[0])
 
     with monkeypatch.context() as ctx:
-        ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+        ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
                     lambda path: create_autospec(
-                        BehaviorOphysExperiment, instance=True))
-        cache.get_behavior_ophys_experiment(ophys_experiment_id=5111)
+                        BehaviorEcephysSession, instance=True))
+        cache.get_ecephys_session(ecephys_session_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
     cache.fetch_api.cache._downloaded_data_path.unlink()
     assert not cache.fetch_api.cache._downloaded_data_path.is_file()
     del cache
 
     with pytest.warns(MissingLocalManifestWarning) as warnings:
-        cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                              bucket_name,
-                                                              project_name)
+        cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
-    cmd = 'VisualBehaviorOphysProjectCache.construct_local_manifest()'
+    cmd = 'VisualBehaviorNeuropixelsProjectCache.construct_local_manifest()'
     assert cmd in f'{warnings[0].message}'
 
     # Because, at the point where the cache was reconstitute,
@@ -113,30 +108,32 @@ def test_local_cache_construction(tmpdir, s3_cloud_cache_data, monkeypatch):
     with open(manifest_path, 'rb') as in_file:
         local_manifest = json.load(in_file)
     fnames = set([pathlib.Path(k).name for k in local_manifest])
-    assert 'ophys_file_1.nwb' in fnames
+    assert 'ecephys_file_1.nwb' in fnames
     assert len(local_manifest) == 9  # 8 metadata files and 1 data file
 
 
 @mock_s3
-def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data, monkeypatch):
+def test_load_out_of_date_manifest(
+    tmpdir,
+    vbn_s3_cloud_cache_data,
+    monkeypatch
+):
     """
-    Test that VisualBehaviorOphysProjectCache can load a
+    Test that VisualBehaviorNeuropixelsProjectCache can load a
     manifest other than the latest and download files
     from that manifest.
     """
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
 
     cache_dir = pathlib.Path(tmpdir) / "test_linkage"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
 
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     cache.load_manifest(v_names[0])
@@ -146,12 +143,12 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data, monkeypatch):
                         lambda path: create_autospec(
                             BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
-    for exp_id in (5111, 5222):
+    for ses_id in (5111, 5112):
         with monkeypatch.context() as ctx:
-            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+            ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
                         lambda path: create_autospec(
-                            BehaviorOphysExperiment, instance=True))
-            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+                            BehaviorEcephysSession, instance=True))
+            cache.get_ecephys_session(ecephys_session_id=ses_id)
 
     v1_dir = cache_dir / f'{project_name}-{versions[0]}/data'
 
@@ -164,23 +161,25 @@ def test_load_out_of_date_manifest(tmpdir, s3_cloud_cache_data, monkeypatch):
         with open(p, 'rb') as in_file:
             data = in_file.read()
         file_contents[p.name] = data
-    expected = {'ophys_file_1.nwb', 'ophys_file_2.nwb',
-                'behavior_file_3.nwb', 'behavior_file_4.nwb'}
+    expected = {'ecephys_file_1.nwb', 'ecephys_file_2.nwb'}
 
     assert file_names == expected
 
     expected = {}
-    expected['ophys_file_1.nwb'] = b'abcde'
-    expected['ophys_file_2.nwb'] = b'fghijk'
-    expected['behavior_file_3.nwb'] = b'12345'
-    expected['behavior_file_4.nwb'] = b'67890'
+    expected['ecephys_file_1.nwb'] = b'abcde'
+    expected['ecephys_file_2.nwb'] = b'fghijk'
 
     assert file_contents == expected
 
 
 @mock_s3
 @pytest.mark.parametrize("delete_cache", [True, False])
-def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
+def test_file_linkage(
+    tmpdir,
+    vbn_s3_cloud_cache_data,
+    delete_cache,
+    monkeypatch
+):
     """
     Test that symlinks are used where appropriate
 
@@ -189,18 +188,17 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
     construct_local_cache() to make sure that the symlinks
     are still properly constructed
     """
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_linkage"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
+
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
 
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
     v_dirs = [cache_dir / f'{project_name}-{i}/data' for i in versions]
@@ -218,12 +216,12 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
                         lambda path: create_autospec(
                             BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
-    for exp_id in (5111, 5222):
+    for sess_id in (5111, 5112):
         with monkeypatch.context() as ctx:
-            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+            ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
                         lambda path: create_autospec(
-                            BehaviorOphysExperiment, instance=True))
-            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+                            BehaviorEcephysSession, instance=True))
+            cache.get_ecephys_session(ecephys_session_id=sess_id)
 
     v1_glob = v_dirs[0].glob('*')
     v1_paths = {}
@@ -237,9 +235,7 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
         assert not local_cache.is_file()
         del cache
 
-        cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                              bucket_name,
-                                                              project_name)
+        cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
         cache.construct_local_manifest()
 
     cache.load_manifest(v_names[-1])
@@ -250,12 +246,12 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
                         lambda path: create_autospec(
                             BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
-    for exp_id in (5444, 5666, 5777):
+    for sess_id in (222, 333):
         with monkeypatch.context() as ctx:
-            ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
+            ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
                         lambda path: create_autospec(
-                            BehaviorOphysExperiment, instance=True))
-            cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
+                            BehaviorEcephysSession, instance=True))
+            cache.get_ecephys_session(ecephys_session_id=sess_id)
 
     v2_glob = v_dirs[-1].glob('*')
     v2_paths = {}
@@ -263,38 +259,32 @@ def test_file_linkage(tmpdir, s3_cloud_cache_data, delete_cache, monkeypatch):
         v2_paths[p.name] = p
 
     # check symlinks
-    for name in ('ophys_file_2.nwb',
-                 'behavior_file_3.nwb',
-                 'behavior_file_4.nwb'):
+    for name in ('ecephys_file_2.nwb',):
 
         assert v2_paths[name].is_symlink()
         assert v2_paths[name].resolve() == v1_paths[name].resolve()
         assert v2_paths[name].absolute() != v1_paths[name].absolute()
 
-    name = 'ophys_file_1.nwb'
+    name = 'ecephys_file_1.nwb'
     assert not v2_paths[name].is_symlink()
     assert not v2_paths[name].absolute() == v1_paths[name].absolute()
 
-    assert 'ophys_file_5.nwb' in v2_paths
-
 
 @mock_s3
-def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
+def test_when_data_updated(tmpdir, vbn_s3_cloud_cache_data, data_update):
     """
     Test that when a cache is instantiated after an update has
     been loaded to the dataset, the correct warning is emitted
     """
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_update"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     del cache
 
@@ -311,11 +301,9 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
     name3 = f'{project_name}_manifest_v{later_version}'
     name2 = f'{project_name}_manifest_v{versions[-1]}'
 
-    cmd = 'VisualBehaviorOphysProjectCache.load_manifest'
+    cmd = 'VisualBehaviorNeuropixelsProjectCache.load_manifest'
     with pytest.warns(OutdatedManifestWarning, match=name3) as warnings:
-        VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                      bucket_name,
-                                                      project_name)
+        VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     checked_msg = False
     for w in warnings.list:
@@ -329,23 +317,21 @@ def test_when_data_updated(tmpdir, s3_cloud_cache_data, data_update):
 
 
 @mock_s3
-def test_load_last(tmpdir, s3_cloud_cache_data, data_update):
+def test_load_last(tmpdir, vbn_s3_cloud_cache_data, data_update):
     """
     Test that, when a cache is instantiated over an old
     cache_dir, it loads the most recently loaded manifest,
     not the most up to date manifest
     """
-    data, versions = s3_cloud_cache_data
+    data, versions = vbn_s3_cloud_cache_data
     cache_dir = pathlib.Path(tmpdir) / "test_update"
-    bucket_name = "vis-behav-test-bucket"
-    project_name = "vis-behav-test-proj"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
     create_bucket(bucket_name,
                   project_name,
                   data['data'],
                   data['metadata'])
-    cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                          bucket_name,
-                                                          project_name)
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     v_names = [f'{project_name}_manifest_v{i}.json' for i in versions]
 
@@ -354,10 +340,8 @@ def test_load_last(tmpdir, s3_cloud_cache_data, data_update):
     assert cache.current_manifest() == v_names[0]
     del cache
 
-    msg = 'VisualBehaviorOphysProjectCache.compare_manifests'
+    msg = 'VisualBehaviorNeuropixelsProjectCache.compare_manifests'
     with pytest.warns(OutdatedManifestWarning, match=msg):
-        cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir,
-                                                              bucket_name,
-                                                              project_name)
+        cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     assert cache.current_manifest() == v_names[0]
