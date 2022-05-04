@@ -131,6 +131,7 @@ def units_table_from_ecephys_session_ids(
         dorsal_ventral_ccf_coordinate -- float64
         ecephys_structure_id -- int64 uniquely identifying the structure
         ecephys_structure_acronym -- a string naming the structure
+        valid_data -- a boolean indicating the validity of the channel
     """
 
     query = """
@@ -168,6 +169,7 @@ def units_table_from_ecephys_session_ids(
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
       ,ecephys_channels.manual_structure_id as ecephys_structure_id
       ,structures.acronym as ecephys_structure_acronym
+      ,ecephys_channels.valid_data as valid_data
     """
 
     query += """
@@ -308,6 +310,7 @@ def channels_table_from_ecephys_session_id_list(
         left_right_ccf_coordinate -- float64
         ecephys_structure_acronym -- string
         unit_count -- int64 number of units on this channel
+        valid_data -- a boolean indicating the validity of the channel
     """
 
     query = """
@@ -323,6 +326,7 @@ def channels_table_from_ecephys_session_id_list(
       ,ecephys_channels.left_right_ccf_coordinate
       ,structures.acronym AS ecephys_structure_acronym
       ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
+      ,ecephys_channels.valid_data as valid_data
     """
 
     query += """
