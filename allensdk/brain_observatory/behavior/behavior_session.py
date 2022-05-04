@@ -521,7 +521,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         -------
         An instantiation of a `BehaviorSession`
         """
-        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
+        nwb_path = str(nwb_path)
+        with pynwb.NWBHDF5IO(nwb_path, 'r', load_namespaces=True) as read_io:
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
