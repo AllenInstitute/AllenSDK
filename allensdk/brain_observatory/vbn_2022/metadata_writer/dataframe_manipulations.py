@@ -242,11 +242,9 @@ def _add_prior_omissions_to_behavior(
         sub_ecephys = ecephys_df.query(f"{mouse_col}=='{mouse_id}'")
 
         ecephys_dates = []
-        ecephys_prior = []
         for date, prior in zip(sub_ecephys.date_of_acquisition,
                                sub_ecephys.prior_exposures_to_omissions):
             ecephys_dates.append(date.to_julian_date())
-            ecephys_prior.append(prior)
         ecephys_dates = np.sort(np.array(ecephys_dates))
 
         beh_id_arr = []
