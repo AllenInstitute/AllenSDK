@@ -198,7 +198,7 @@ class BehaviorStimulusFile(_StimulusFile):
                 f"cl_params: {cl_value}\n"
                 f"params: {param_value}\n")
 
-        return self.data['items']['behavior']['params']['stage']
+        return param_value
 
 
 class ReplayStimulusFile(_StimulusFile):
