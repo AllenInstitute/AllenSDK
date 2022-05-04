@@ -49,10 +49,10 @@ def get_list_of_bad_probe_ids(
 
     query = f"""
     SELECT
-    id as probe_id
+      id as probe_id
     FROM ecephys_probes
-    WHERE
-    {where_clause}
+      WHERE
+      {where_clause}
     """
 
     result = lims_connection.fetchall(query)
@@ -120,52 +120,52 @@ def units_table_from_ecephys_session_ids(
     """
 
     query = """
-    select
-    ecephys_units.id as unit_id
-    ,ecephys_units.ecephys_channel_id
-    ,ecephys_probes.id as ecephys_probe_id
-    ,ecephys_sessions.id as ecephys_session_id
-    ,ecephys_units.snr
-    ,ecephys_units.firing_rate
-    ,ecephys_units.isi_violations
-    ,ecephys_units.presence_ratio
-    ,ecephys_units.amplitude_cutoff
-    ,ecephys_units.isolation_distance
-    ,ecephys_units.l_ratio
-    ,ecephys_units.d_prime
-    ,ecephys_units.nn_hit_rate
-    ,ecephys_units.nn_miss_rate
-    ,ecephys_units.silhouette_score
-    ,ecephys_units.max_drift
-    ,ecephys_units.cumulative_drift
-    ,ecephys_units.duration as waveform_duration
-    ,ecephys_units.halfwidth as waveform_halfwidth
-    ,ecephys_units.\"PT_ratio\" as waveform_PT_ratio
-    ,ecephys_units.repolarization_slope as waveform_repolarization_slope
-    ,ecephys_units.recovery_slope as waveform_recovery_slope
-    ,ecephys_units.amplitude as waveform_amplitude
-    ,ecephys_units.spread as waveform_spread
-    ,ecephys_units.velocity_above as waveform_velocity_above
-    ,ecephys_units.velocity_below as waveform_velocity_below
-    ,ecephys_units.local_index
-    ,ecephys_channels.probe_vertical_position
-    ,ecephys_channels.probe_horizontal_position
-    ,ecephys_channels.anterior_posterior_ccf_coordinate
-    ,ecephys_channels.dorsal_ventral_ccf_coordinate
-    ,ecephys_channels.manual_structure_id as ecephys_structure_id
-    ,structures.acronym as ecephys_structure_acronym
+    SELECT
+      ecephys_units.id as unit_id
+      ,ecephys_units.ecephys_channel_id
+      ,ecephys_probes.id as ecephys_probe_id
+      ,ecephys_sessions.id as ecephys_session_id
+      ,ecephys_units.snr
+      ,ecephys_units.firing_rate
+      ,ecephys_units.isi_violations
+      ,ecephys_units.presence_ratio
+      ,ecephys_units.amplitude_cutoff
+      ,ecephys_units.isolation_distance
+      ,ecephys_units.l_ratio
+      ,ecephys_units.d_prime
+      ,ecephys_units.nn_hit_rate
+      ,ecephys_units.nn_miss_rate
+      ,ecephys_units.silhouette_score
+      ,ecephys_units.max_drift
+      ,ecephys_units.cumulative_drift
+      ,ecephys_units.duration as waveform_duration
+      ,ecephys_units.halfwidth as waveform_halfwidth
+      ,ecephys_units.\"PT_ratio\" as waveform_PT_ratio
+      ,ecephys_units.repolarization_slope as waveform_repolarization_slope
+      ,ecephys_units.recovery_slope as waveform_recovery_slope
+      ,ecephys_units.amplitude as waveform_amplitude
+      ,ecephys_units.spread as waveform_spread
+      ,ecephys_units.velocity_above as waveform_velocity_above
+      ,ecephys_units.velocity_below as waveform_velocity_below
+      ,ecephys_units.local_index
+      ,ecephys_channels.probe_vertical_position
+      ,ecephys_channels.probe_horizontal_position
+      ,ecephys_channels.anterior_posterior_ccf_coordinate
+      ,ecephys_channels.dorsal_ventral_ccf_coordinate
+      ,ecephys_channels.manual_structure_id as ecephys_structure_id
+      ,structures.acronym as ecephys_structure_acronym
     """
 
     query += """
     FROM ecephys_units
     JOIN ecephys_channels
-    ON ecephys_channels.id = ecephys_units.ecephys_channel_id
+      ON ecephys_channels.id = ecephys_units.ecephys_channel_id
     JOIN ecephys_probes
-    ON ecephys_probes.id = ecephys_channels.ecephys_probe_id
+      ON ecephys_probes.id = ecephys_channels.ecephys_probe_id
     JOIN ecephys_sessions
-    ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
+      ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
     LEFT JOIN structures
-    ON structures.id = ecephys_channels.manual_structure_id
+      ON structures.id = ecephys_channels.manual_structure_id
     """
 
     query += f"""
@@ -221,28 +221,28 @@ def probes_table_from_ecephys_session_id_list(
     """
 
     query = """
-    select
-    ecephys_probes.id as ecephys_probe_id
-    ,ecephys_probes.ecephys_session_id
-    ,ecephys_probes.name
-    ,ecephys_probes.global_probe_sampling_rate as sampling_rate
-    ,ecephys_probes.global_probe_lfp_sampling_rate as lfp_sampling_rate
-    ,ecephys_probes.phase
-    ,ecephys_probes.use_lfp_data as has_lfp_data
-    ,count(distinct(ecephys_units.id)) as unit_count
-    ,count(distinct(ecephys_channels.id)) as channel_count
-    ,array_agg(distinct(structures.acronym)) as ecephys_structure_acronyms"""
+    SELECT
+      ecephys_probes.id as ecephys_probe_id
+      ,ecephys_probes.ecephys_session_id
+      ,ecephys_probes.name
+      ,ecephys_probes.global_probe_sampling_rate as sampling_rate
+      ,ecephys_probes.global_probe_lfp_sampling_rate as lfp_sampling_rate
+      ,ecephys_probes.phase
+      ,ecephys_probes.use_lfp_data as has_lfp_data
+      ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
+      ,COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
+      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms"""
 
     query += """
     FROM  ecephys_probes
     JOIN ecephys_sessions
-    ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
+      ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
     LEFT OUTER JOIN ecephys_channels
-    ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
+      ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT OUTER JOIN ecephys_units
-    ON ecephys_units.ecephys_channel_id=ecephys_channels.id
+      ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-    ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id"""
 
     query += f"""
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
@@ -297,30 +297,30 @@ def channels_table_from_ecephys_session_id_list(
     """
 
     query = """
-    select
-    ecephys_channels.id as ecephys_channel_id
-    ,ecephys_channels.ecephys_probe_id
-    ,ecephys_sessions.id as ecephys_session_id
-    ,ecephys_channels.local_index
-    ,ecephys_channels.probe_vertical_position
-    ,ecephys_channels.probe_horizontal_position
-    ,ecephys_channels.anterior_posterior_ccf_coordinate
-    ,ecephys_channels.dorsal_ventral_ccf_coordinate
-    ,ecephys_channels.left_right_ccf_coordinate
-    ,structures.acronym as ecephys_structure_acronym
-    ,count(distinct(ecephys_units.id)) as unit_count
+    SELECT
+       ecephys_channels.id as ecephys_channel_id
+      ,ecephys_channels.ecephys_probe_id
+      ,ecephys_sessions.id AS ecephys_session_id
+      ,ecephys_channels.local_index
+      ,ecephys_channels.probe_vertical_position
+      ,ecephys_channels.probe_horizontal_position
+      ,ecephys_channels.anterior_posterior_ccf_coordinate
+      ,ecephys_channels.dorsal_ventral_ccf_coordinate
+      ,ecephys_channels.left_right_ccf_coordinate
+      ,structures.acronym AS ecephys_structure_acronym
+      ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
     """
 
     query += """
     FROM  ecephys_channels
     JOIN ecephys_probes
-    ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
+      ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     JOIN ecephys_sessions
-    ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
+      ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
     LEFT OUTER JOIN ecephys_units
-    ON ecephys_units.ecephys_channel_id=ecephys_channels.id
+      ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-    ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id"""
 
     query += f"""
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
@@ -331,9 +331,10 @@ def channels_table_from_ecephys_session_id_list(
         """
 
     query += """
-    GROUP BY ecephys_channels.id,
-    ecephys_sessions.id,
-    structures.acronym"""
+    GROUP BY
+      ecephys_channels.id,
+      ecephys_sessions.id,
+      structures.acronym"""
 
     channels_table = lims_connection.select(query)
     return channels_table
@@ -373,34 +374,34 @@ def ecephys_summary_table_from_ecephys_session_id_list(
     """
     query = """
         SELECT
-        ecephys_sessions.id AS ecephys_session_id
-        ,behavior_sessions.id as behavior_session_id
-        ,ecephys_sessions.date_of_acquisition
-        ,equipment.name as equipment_name
-        ,ecephys_sessions.stimulus_name as session_type
-        ,donors.external_donor_name as mouse_id
-        ,donors.full_genotype as genotype
-        ,genders.name AS sex
-        ,projects.code as project_code
-        ,DATE_PART('day',
-          ecephys_sessions.date_of_acquisition - donors.date_of_birth)
-          AS age_in_days
+          ecephys_sessions.id AS ecephys_session_id
+          ,behavior_sessions.id AS behavior_session_id
+          ,ecephys_sessions.date_of_acquisition
+          ,equipment.name AS equipment_name
+          ,ecephys_sessions.stimulus_name AS session_type
+          ,donors.external_donor_name AS mouse_id
+          ,donors.full_genotype AS genotype
+          ,genders.name AS sex
+          ,projects.code AS project_code
+          ,DATE_PART('day',
+            ecephys_sessions.date_of_acquisition - donors.date_of_birth)
+            AS age_in_days
         """
 
     query += f"""
         FROM ecephys_sessions
         JOIN specimens
-        ON specimens.id = ecephys_sessions.specimen_id
+          ON specimens.id = ecephys_sessions.specimen_id
         JOIN donors
-        ON specimens.donor_id = donors.id
+          ON specimens.donor_id = donors.id
         JOIN genders
-        ON genders.id = donors.gender_id
+          ON genders.id = donors.gender_id
         JOIN projects
-        ON projects.id = ecephys_sessions.project_id
+          ON projects.id = ecephys_sessions.project_id
         LEFT OUTER JOIN equipment
-        ON equipment.id = ecephys_sessions.equipment_id
+          ON equipment.id = ecephys_sessions.equipment_id
         LEFT OUTER JOIN behavior_sessions
-        ON behavior_sessions.ecephys_session_id = ecephys_sessions.id
+          ON behavior_sessions.ecephys_session_id = ecephys_sessions.id
         WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     summary_table = lims_connection.select(query)
@@ -443,16 +444,16 @@ def ecephys_counts_per_session_from_ecephys_session_id_list(
 
     query = f"""
     SELECT ecephys_sessions.id as ecephys_session_id,
-    COUNT(DISTINCT(ecephys_units.id)) as unit_count,
-    COUNT(DISTINCT(ecephys_probes.id)) as probe_count,
-    COUNT(DISTINCT(ecephys_channels.id)) as channel_count
+      COUNT(DISTINCT(ecephys_units.id)) AS unit_count,
+      COUNT(DISTINCT(ecephys_probes.id)) AS probe_count,
+      COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
     FROM ecephys_sessions
     LEFT OUTER JOIN ecephys_probes ON
-    ecephys_probes.ecephys_session_id = ecephys_sessions.id
+      ecephys_probes.ecephys_session_id = ecephys_sessions.id
     LEFT OUTER JOIN ecephys_channels ON
-    ecephys_channels.ecephys_probe_id = ecephys_probes.id
+      ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT OUTER JOIN ecephys_units ON
-    ecephys_units.ecephys_channel_id = ecephys_channels.id
+      ecephys_units.ecephys_channel_id = ecephys_channels.id
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
@@ -500,15 +501,16 @@ def ecephys_structure_acronyms_from_ecephys_session_id_list(
         ecephys_structure_acronyms -- a list of strings
     """
     query = f"""
-    SELECT ecephys_sessions.id as ecephys_session_id,
-    array_agg(distinct(structures.acronym)) as ecephys_structure_acronyms
+    SELECT
+      ecephys_sessions.id AS ecephys_session_id
+      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms
     FROM ecephys_sessions
     JOIN ecephys_probes
-    ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
+      ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
     JOIN ecephys_channels
-    ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
+      ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT JOIN structures
-    ON structures.id = ecephys_channels.manual_structure_id
+      ON structures.id = ecephys_channels.manual_structure_id
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
