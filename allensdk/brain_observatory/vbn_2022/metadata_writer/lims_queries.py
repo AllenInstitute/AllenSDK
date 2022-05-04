@@ -757,4 +757,4 @@ def session_tables_from_ecephys_session_id_list(
              'session_type',
              'image_set']]
 
-    return (sessions_table, beh_table)
+    return sessions_table, beh_table
