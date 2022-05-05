@@ -10,7 +10,6 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
     .dataframe_manipulations import (
         _add_session_number,
-        _add_prior_omissions,
         _add_experience_level,
         _patch_date_and_stage_from_pickle_file,
         _add_age_in_days,
@@ -123,80 +122,6 @@ def test_add_session_number():
     expected = pd.DataFrame(data=input_data)
 
     pd.testing.assert_frame_equal(expected, actual)
-
-
-def test_add_prior_omissions_to_behavior():
-    """
-    Test that _add_prior_omissions_to_behavior gets the right
-    relationship between ecephys and behavior sessions
-    """
-
-    behavior_data = []
-    behavior_data.append(
-        {'mouse_id': '1',
-         'behavior_session_id': 0,
-         'session_type': 'silly',
-         'date_of_acquisition': pd.Timestamp(2020, 5, 3)})
-    behavior_data.append(
-        {'mouse_id': '1',
-         'behavior_session_id': 1,
-         'session_type': 'ephys_1',
-         'date_of_acquisition': pd.Timestamp(2020, 7, 14)})
-    behavior_data.append(
-        {'mouse_id': '1',
-         'behavior_session_id': 2,
-         'session_type': 'another_ephys_1',
-         'date_of_acquisition': pd.Timestamp(2020, 8, 12)})
-    behavior_data.append(
-        {'mouse_id': '1',
-         'behavior_session_id': 3,
-         'session_type': None,
-         'date_of_acquisition': pd.Timestamp(2020, 8, 13)})
-    behavior_data.append(
-        {'mouse_id': '1',
-         'behavior_session_id': 4,
-         'session_type': 'behavior',
-         'date_of_acquisition': pd.Timestamp(2020, 11, 12)})
-    behavior_data.append(
-        {'mouse_id': '1',
-         'session_type': 'again_ephys_1',
-         'date_of_acquisition': pd.Timestamp(2020, 11, 14)})
-
-    behavior_data.append(
-        {'mouse_id': '2',
-         'behavior_session_id': 6,
-         'session_type': 'nothing',
-         'date_of_acquisition': pd.Timestamp(2020, 9, 3)})
-    behavior_data.append(
-        {'mouse_id': '2',
-         'behavior_session_id': 7,
-         'session_type': None,
-         'date_of_acquisition': pd.Timestamp(2020, 9, 4)})
-    behavior_data.append(
-        {'mouse_id': '2',
-         'behavior_session_id': 8,
-         'session_type': 'a_different_ephys',
-         'date_of_acquisition': pd.Timestamp(2020, 10, 2)})
-    behavior_data.append(
-        {'mouse_id': '2',
-         'behavior_session_id': 9,
-         'session_type': 'this_ephys_i_guess',
-         'date_of_acquisition': pd.Timestamp(2020, 10, 3)})
-
-    behavior_df = pd.DataFrame(data=behavior_data)
-    behavior_df = _add_prior_omissions(
-                    sessions_df=behavior_df)
-
-    expected_prior_omissions = [
-        0., 0., 1., None, 2., 2., 0., None, 0., 1.]
-
-    for row, expected_val in zip(behavior_data,
-                                 expected_prior_omissions):
-        row['prior_exposures_to_omissions'] = expected_val
-
-    expected = pd.DataFrame(data=behavior_data)
-    pd.testing.assert_frame_equal(behavior_df, expected)
-    assert 'prior_exposures_to_omissions' in behavior_df.columns
 
 
 def test_add_experience_level():

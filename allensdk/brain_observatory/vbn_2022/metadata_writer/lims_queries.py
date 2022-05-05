@@ -746,13 +746,15 @@ def session_tables_from_ecephys_session_id_list(
     sessions_table = _add_session_number(
                             sessions_df=summary_tbl,
                             index_col="ecephys_session_id")
-    sessions_table = _add_prior_omissions(
-                            sessions_df=sessions_table)
     sessions_table = _add_experience_level(
                             sessions_df=sessions_table)
 
-    beh_table = _add_prior_omissions(
-            sessions_df=beh_table)
+    omission_results = _add_prior_omissions(
+                behavior_sessions_df=beh_table,
+                ecephys_sessions_df=sessions_table)
+
+    beh_table = omission_results['behavior']
+    sessions_table = omission_results['ecephys']
 
     beh_table = beh_table[
             ['behavior_session_id',

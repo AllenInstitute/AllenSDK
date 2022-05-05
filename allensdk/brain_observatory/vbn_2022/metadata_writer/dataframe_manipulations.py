@@ -2,6 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
+from typing import Dict
 import pandas as pd
 import numpy as np
 import pathlib
@@ -173,29 +174,156 @@ def _add_session_number(
 
 
 def _add_prior_omissions(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
+        behavior_sessions_df: pd.DataFrame,
+        ecephys_sessions_df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     """
     Add the 'prior_exposures_to_omissions' column assuming that
     only sessions with 'EPHYS' in the session_type included
     omissions in them.
 
-    Return the input dataframe with the 'prior_exposures_to_omissions'
-    column added.
+    Because each mouse's history could be split up between
+    the behavior sessions table and the ecephys sessions table,
+    we need to combine the two data frames into a single history
+    for each mouse, determine what each mouse has seen, and then
+    set the prior_exposures_to_omissions in each dataframe
+    in such a way that the ecephys sessions table knows about
+    what the mouse saw in the behavior sessions table.
+
+    This should be one of the last processing steps, as it
+    depends on session_type being properly set in the
+    dataframes.
+
+    Parameters
+    ----------
+    behavior_sessions_df: pd.DataFrame
+        the table of behavior sessions
+
+    ecephys_sessions_df: pd.DataFrame
+        the table of ecephys sessions (may or may not be
+        a superset of behavior sessions)
+
+    Returns
+    -------
+    updated_tables: Dict[str, pd.DataFrame]
+        {'behavior': behavior_session_df with added column
+         'ecephys': ecephys_sessions_df with added column}
     """
 
-    contains_omissions = pd.Series(False, index=sessions_df.index)
+    if 'behavior_session_id' not in ecephys_sessions_df.columns:
+        raise RuntimeError(
+            "Cannot properly merge behavior_sessions_df and "
+            "ecephys_sessions_df; ecephys_sessions_df does not have "
+            "a behavior_session_id column")
+
+    # get all of the behavior sessions
+    beh_history_lookup = dict()
+    for mouse_id, beh_id, date_acq, session_type in zip(
+                behavior_sessions_df.mouse_id,
+                behavior_sessions_df.behavior_session_id,
+                behavior_sessions_df.date_of_acquisition,
+                behavior_sessions_df.session_type):
+        element = {'mouse_id': mouse_id,
+                   'behavior_session_id': beh_id,
+                   'date_of_acquisition': date_acq,
+                   'ecephys_session_id': None,
+                   'session_type': session_type}
+        beh_history_lookup[beh_id] = element
+
+    # get any ecephys sessions that did not occur in the
+    # behavior sessions table
+    full_history = []
+    for mouse_id, beh_id, ece_id, date_acq, session_type in zip(
+                ecephys_sessions_df.mouse_id,
+                ecephys_sessions_df.behavior_session_id,
+                ecephys_sessions_df.ecephys_session_id,
+                ecephys_sessions_df.date_of_acquisition,
+                ecephys_sessions_df.session_type):
+
+        if not np.isnan(beh_id):
+            int_beh_id = int(beh_id)
+        else:
+            int_beh_id = -999
+
+        if not np.isnan(beh_id) and int_beh_id in beh_history_lookup:
+            element = beh_history_lookup[beh_id]
+
+            # This test *should* give an error; however, there are
+            # sessions in LIMS in which ecephys_sessions has a
+            # date_of_acquisition and behavior_sessions does not.
+            # When we patch the behavior_sessions_table from the pickle
+            # file, we get a different date of acquisition than is
+            # listed in the ecephys_sessions table. Until we know how
+            # our stakeholders want to deal with this problem,
+            # I'm going make this a warning.
+
+            if date_acq != element['date_of_acquisition']:
+                warnings.warn(
+                    "behavior_sessions_df and ecephys_sessions_df "
+                    "disagree on the date of behavior session "
+                    f"{beh_id} (ecephys_session_id {ece_id})\n"
+                    f"behavior says: {element['date_of_acquisition']}\n"
+                    f"ecephys says: {date_acq}")
+            if session_type != element['session_type']:
+                raise RuntimeError(
+                    "behavior_sessions_df and ecephys_session_df "
+                    "disagree on the session type of behavior session "
+                    f"{beh_id} (ecephys_session_id {ece_id})\n"
+                    f"behavior says: {element['session_type']}\n"
+                    f"ecephys says: {session_type}")
+            element['ecephys_session_id'] = ece_id
+        else:
+            element = {'mouse_id': mouse_id,
+                       'behavior_session_id': beh_id,
+                       'ecephys_session_id': ece_id,
+                       'date_of_acquisition': date_acq,
+                       'session_type': session_type}
+            full_history.append(element)
+
+    # create a dataframe containing the full history (behavior and
+    # ecephys sessions) of each mouse
+    for beh_id in beh_history_lookup:
+        full_history.append(beh_history_lookup[beh_id])
+
+    full_history_df = pd.DataFrame(data=full_history)
+
+    # add prior_exposures_to_omissions to the full history data frame
+    contains_omissions = pd.Series(False,
+                                   index=full_history_df.index)
     contains_omissions.loc[
-        (sessions_df.session_type.notnull()) &
-        (sessions_df.session_type.str.lower().str.contains('ephys'))
+        (full_history_df.session_type.notnull()) &
+        (full_history_df.session_type.str.lower().str.contains('ephys'))
     ] = True
 
-    sessions_df[
+    full_history_df[
         'prior_exposures_to_omissions'] = __get_prior_exposure_count(
-                df=sessions_df,
+                df=full_history_df,
                 to=contains_omissions,
                 agg_method='cumsum')
 
-    return sessions_df
+    # merge behavior_sessions_df and ecephys_sessions_df with the
+    # appropriate subsets of the full_history_df
+
+    beh_history_df = full_history_df.loc[
+                    full_history_df.behavior_session_id.notnull(),
+                    ('behavior_session_id',
+                     'prior_exposures_to_omissions')]
+
+    behavior_sessions_df = behavior_sessions_df.join(
+                beh_history_df.set_index('behavior_session_id'),
+                on='behavior_session_id',
+                how='left')
+
+    ece_history_df = full_history_df.loc[
+                        full_history_df.ecephys_session_id.notnull(),
+                        ('ecephys_session_id', 'prior_exposures_to_omissions')]
+
+    ecephys_sessions_df = ecephys_sessions_df.join(
+                ece_history_df.set_index('ecephys_session_id'),
+                on='ecephys_session_id',
+                how='left')
+
+    return {'behavior': behavior_sessions_df,
+            'ecephys': ecephys_sessions_df}
 
 
 def _add_experience_level(
