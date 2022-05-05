@@ -12,8 +12,7 @@ from allensdk.internal.api.queries.mtrain_queries import (
 
 from allensdk.brain_observatory.vbn_2022.\
     metadata_writer.dataframe_manipulations import (
-        _add_prior_omissions_to_behavior,
-        _add_prior_omissions_to_ecephys,
+        _add_prior_omissions,
         _add_session_number,
         _add_age_in_days,
         _patch_date_and_stage_from_pickle_file,
@@ -747,17 +746,13 @@ def session_tables_from_ecephys_session_id_list(
     sessions_table = _add_session_number(
                             sessions_df=summary_tbl,
                             index_col="ecephys_session_id")
-    sessions_table = _add_prior_omissions_to_ecephys(
+    sessions_table = _add_prior_omissions(
                             sessions_df=sessions_table)
     sessions_table = _add_experience_level(
                             sessions_df=sessions_table)
 
-    # there are only omissions in the ecephys sessions,
-    # so behavior.prior_exposures_to_omissions should be zero
-    # except for the sessions with non-null ecephys_sessions
-    beh_table = _add_prior_omissions_to_behavior(
-            behavior_df=beh_table,
-            ecephys_df=sessions_table)
+    beh_table = _add_prior_omissions(
+            sessions_df=beh_table)
 
     beh_table = beh_table[
             ['behavior_session_id',
