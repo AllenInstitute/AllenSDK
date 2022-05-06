@@ -4,8 +4,13 @@ import pathlib
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema)
 
-from allensdk.brain_observatory.vbn_2022.metadata_writer.id_generator import (
-    FileIDGenerator)
+from allensdk.brain_observatory.data_release_utils \
+    .metadata_utils.id_generator import (
+        FileIDGenerator)
+
+from allensdk.brain_observatory.data_release_utils \
+    .metadata_utils.utils import (
+        add_file_paths_to_metadata_table)
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     get_list_of_bad_probe_ids,
@@ -13,10 +18,6 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     probes_table_from_ecephys_session_id_list,
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
-
-from allensdk.brain_observatory.vbn_2022 \
-    .metadata_writer.dataframe_manipulations import (
-        add_file_paths_to_session_table)
 
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
@@ -76,8 +77,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         ecephys_nwb_dir = pathlib.Path(
                                 self.args['ecephys_nwb_dir'])
 
-        session_table = add_file_paths_to_session_table(
-                    session_table=session_table,
+        session_table = add_file_paths_to_metadata_table(
+                    metadata_table=session_table,
                     id_generator=file_id_generator,
                     file_dir=ecephys_nwb_dir,
                     file_prefix=self.args['ecephys_nwb_prefix'],

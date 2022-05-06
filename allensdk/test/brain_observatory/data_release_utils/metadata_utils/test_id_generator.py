@@ -1,7 +1,8 @@
 import pytest
 import pathlib
-from allensdk.brain_observatory.vbn_2022.metadata_writer.id_generator import (
-    FileIDGenerator)
+from allensdk.brain_observatory.data_release_utils \
+    .metadata_utils.id_generator import (
+        FileIDGenerator)
 
 
 def test_not_a_file_error():
