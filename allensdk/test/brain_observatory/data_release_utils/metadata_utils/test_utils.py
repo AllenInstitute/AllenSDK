@@ -28,7 +28,6 @@ def test_add_file_paths_to_metadata_table_on_missing_error(
             on_missing_file='whatever')
 
 
-
 def test_add_file_paths_to_metadata_table_no_file_error(
         some_files_fixture,
         metadata_table_fixture):
@@ -45,7 +44,6 @@ def test_add_file_paths_to_metadata_table_no_file_error(
             file_prefix='silly_file',
             index_col='file_index',
             on_missing_file='error')
-
 
 
 @pytest.mark.parametrize(

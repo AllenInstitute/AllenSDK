@@ -1,8 +1,6 @@
 from typing import Optional, List
 import pandas as pd
-from uuid import UUID
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.core.typing import SupportsStr
 import logging
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query)

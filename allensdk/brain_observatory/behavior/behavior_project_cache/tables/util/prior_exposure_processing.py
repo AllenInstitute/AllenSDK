@@ -1,6 +1,3 @@
-import re
-from typing import Optional
-
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
