@@ -34,7 +34,7 @@ def build_in_list_selector_query(
 
 def _sanitize_uuid_list(uuid_list: List[str]) -> List[str]:
     """
-    Loop over a string, removing any that cannot be cast
+    Loop over a list of strings, removing any that cannot be cast
     into a valid UUID
 
     Parameters
