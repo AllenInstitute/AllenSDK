@@ -119,11 +119,11 @@ def donor_id_list_from_ecephys_session_ids(
     SELECT DISTINCT(donors.id) as donor_id
     FROM donors
     JOIN specimens ON
-    specimens.donor_id = donors.id
+      specimens.donor_id = donors.id
     JOIN ecephys_sessions ON
-    ecephys_sessions.specimen_id = specimens.id
+      ecephys_sessions.specimen_id = specimens.id
     WHERE
-    ecephys_sessions.id in {tuple(session_id_list)}
+      ecephys_sessions.id in {tuple(session_id_list)}
     """
     result = lims_connection.select(query)
     return list(result.donor_id)
@@ -164,23 +164,23 @@ def behavior_sessions_from_ecephys_session_ids(
 
     query = f"""
     SELECT
-    donors.external_donor_name as mouse_id
-    ,behavior.id as behavior_session_id
-    ,behavior.date_of_acquisition as date_of_acquisition
-    ,behavior.ecephys_session_id as ecephys_session_id
-    ,donors.date_of_birth as date_of_birth
-    ,donors.full_genotype as genotype
-    ,genders.name as sex
-    ,equipment.name as equipment_name
+      donors.external_donor_name as mouse_id
+      ,behavior.id as behavior_session_id
+      ,behavior.date_of_acquisition as date_of_acquisition
+      ,behavior.ecephys_session_id as ecephys_session_id
+      ,donors.date_of_birth as date_of_birth
+      ,donors.full_genotype as genotype
+      ,genders.name as sex
+      ,equipment.name as equipment_name
     FROM donors
     JOIN behavior_sessions AS behavior
-    ON behavior.donor_id = donors.id
+      ON behavior.donor_id = donors.id
     JOIN genders
-    ON genders.id = donors.gender_id
+      ON genders.id = donors.gender_id
     JOIN equipment
-    ON equipment.id = behavior.equipment_id
+      ON equipment.id = behavior.equipment_id
     WHERE
-    donors.id in {tuple(donor_id_list)}
+      donors.id in {tuple(donor_id_list)}
     """
     mouse_to_behavior = lims_connection.select(query)
     return mouse_to_behavior
@@ -209,22 +209,20 @@ def stimulus_pickle_paths_from_behavior_session_ids(
 
     query = f"""
     SELECT
-    beh.id as behavior_session_id
-    ,wkf.storage_directory || wkf.filename as pkl_path
+      beh.id as behavior_session_id
+      ,wkf.storage_directory || wkf.filename as pkl_path
     FROM behavior_sessions AS beh
-    JOIN
-    well_known_files AS wkf
-    ON wkf.attachable_id = beh.id
-    JOIN
-    well_known_file_types as wkft
-    ON
-    wkf.well_known_file_type_id = wkft.id
+    JOIN well_known_files AS wkf
+      ON wkf.attachable_id = beh.id
+    JOIN well_known_file_types as wkft
+      ON
+      wkf.well_known_file_type_id = wkft.id
     WHERE
-    wkft.name = 'StimulusPickle'
-    AND
-    wkf.attachable_type = 'BehaviorSession'
-    AND
-    beh.id in {tuple(behavior_session_id_list)}
+        wkft.name = 'StimulusPickle'
+      AND
+        wkf.attachable_type = 'BehaviorSession'
+      AND
+        beh.id in {tuple(behavior_session_id_list)}
     """
 
     beh_to_path = lims_connection.select(query)
