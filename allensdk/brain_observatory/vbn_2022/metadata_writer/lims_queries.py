@@ -361,7 +361,7 @@ def channels_table_from_ecephys_session_id_list(
     return channels_table
 
 
-def ecephys_summary_table_from_ecephys_session_id_list(
+def _ecephys_summary_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int]) -> pd.DataFrame:
     """
@@ -429,7 +429,7 @@ def ecephys_summary_table_from_ecephys_session_id_list(
     return summary_table
 
 
-def ecephys_counts_per_session_from_ecephys_session_id_list(
+def _ecephys_counts_per_session_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
@@ -490,7 +490,7 @@ def ecephys_counts_per_session_from_ecephys_session_id_list(
     return counts_table
 
 
-def ecephys_structure_acronyms_from_ecephys_session_id_list(
+def _ecephys_structure_acronyms_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
@@ -547,7 +547,7 @@ def ecephys_structure_acronyms_from_ecephys_session_id_list(
     return struct_tbl
 
 
-def behavior_session_table_from_ecephys_session_id_list(
+def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int]) -> pd.DataFrame:
@@ -714,16 +714,16 @@ def session_tables_from_ecephys_session_id_list(
         image_set -- str
     """
 
-    beh_table = behavior_session_table_from_ecephys_session_id_list(
+    beh_table = _behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
             mtrain_connection=mtrain_connection,
             ecephys_session_id_list=ecephys_session_id_list)
 
-    summary_tbl = ecephys_summary_table_from_ecephys_session_id_list(
+    summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=ecephys_session_id_list)
 
-    ct_tbl = ecephys_counts_per_session_from_ecephys_session_id_list(
+    ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=ecephys_session_id_list,
                         probe_ids_to_skip=probe_ids_to_skip)
@@ -733,7 +733,7 @@ def session_tables_from_ecephys_session_id_list(
                         on="ecephys_session_id",
                         how='left')
 
-    struct_tbl = ecephys_structure_acronyms_from_ecephys_session_id_list(
+    struct_tbl = _ecephys_structure_acronyms_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=ecephys_session_id_list,
                         probe_ids_to_skip=probe_ids_to_skip)
