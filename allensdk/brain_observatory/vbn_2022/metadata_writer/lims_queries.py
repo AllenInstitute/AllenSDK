@@ -25,9 +25,12 @@ from allensdk.brain_observatory.vbn_2022.\
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
-        get_image_set,
         get_prior_exposures_to_image_set,
         get_prior_exposures_to_session_type)
+
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
+    .util.image_presentation_utils import (
+        get_image_set)
 
 
 def get_list_of_bad_probe_ids(
