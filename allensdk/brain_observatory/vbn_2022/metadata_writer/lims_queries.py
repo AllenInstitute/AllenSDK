@@ -2,10 +2,14 @@ from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 
-from allensdk.internal.api.queries.lims_queries import (
-    behavior_sessions_from_ecephys_session_ids,
-    foraging_id_map_from_behavior_session_id,
+from allensdk.internal.api.queries.utils import (
     _sanitize_uuid_list)
+
+from allensdk.internal.api.queries.behavior_lims_queries import (
+    foraging_id_map_from_behavior_session_id)
+
+from allensdk.internal.api.queries.compound_lims_queries import (
+    behavior_sessions_from_ecephys_session_ids)
 
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)

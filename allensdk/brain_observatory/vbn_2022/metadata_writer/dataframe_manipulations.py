@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache \
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BehaviorStimulusFile)
 
-from allensdk.internal.api.queries.lims_queries import (
+from allensdk.internal.api.queries.behavior_lims_queries import (
     stimulus_pickle_paths_from_behavior_session_ids)
 
 from allensdk.brain_observatory.vbn_2022 \

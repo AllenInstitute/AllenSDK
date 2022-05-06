@@ -13,8 +13,9 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
-from allensdk.internal.api.queries.lims_queries import (
-    build_in_list_selector_query,
+from allensdk.internal.api.queries.utils import (
+    build_in_list_selector_query)
+from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)

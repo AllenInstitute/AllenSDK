@@ -1,9 +1,11 @@
 import pytest
 
-from allensdk.internal.api.queries.lims_queries import (
+from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
-    foraging_id_map_from_behavior_session_id,
     _sanitize_uuid_list)
+
+from allensdk.internal.api.queries.behavior_lims_queries import (
+    foraging_id_map_from_behavior_session_id)
 
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)
