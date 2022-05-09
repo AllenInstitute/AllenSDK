@@ -1,6 +1,8 @@
 from typing import Tuple
 from pathlib import Path
+import tempfile
 import pickle
+import datetime
 from unittest.mock import create_autospec
 
 import pytest
@@ -289,3 +291,85 @@ def test_stimulus_lookup_from_json(
     else:
         with pytest.raises(ValueError, match="has no ReplayStimulusFile"):
             lookup.replay_stimulus_file
+
+
+@pytest.mark.parametrize(
+    "cl_value_in, param_value_in, expected_value, expected_error_msg",
+    [(None, 'junk', 'junk', None),
+     ('silly', None, 'silly', None),
+     ('fun', 'fun', 'fun', None),
+     (None, None, None, 'Could not find stage in pickle file'),
+     ('something', 'else', None, 'Conflicting session_types')])
+def test_behavior_session_type(
+        cl_value_in,
+        param_value_in,
+        expected_value,
+        expected_error_msg,
+        tmp_path_factory,
+        helper_functions):
+
+    this_tmp_dir = tmp_path_factory.mktemp('beh_session_type')
+    this_tmp_path = Path(
+                        tempfile.mkstemp(
+                            dir=this_tmp_dir,
+                            suffix='.pkl')[1])
+
+    stim_dict = {'items':
+                 {'behavior': dict()}}
+    if cl_value_in is not None:
+        stim_dict['items']['behavior']['cl_params'] = {'stage': cl_value_in}
+    if param_value_in is not None:
+        stim_dict['items']['behavior']['params'] = {'stage': param_value_in}
+
+    with open(this_tmp_path, 'wb') as out_file:
+        pickle.dump(stim_dict, out_file)
+
+    stim_file = BehaviorStimulusFile(this_tmp_path)
+
+    if expected_error_msg is None:
+        actual = stim_file.session_type
+        assert actual == expected_value
+    else:
+        with pytest.raises(RuntimeError, match=expected_error_msg):
+            stim_file.session_type
+
+    helper_functions.windows_safe_cleanup_dir(
+                dir_path=Path(this_tmp_dir))
+
+
+def test_behavior_start_time(
+        tmp_path_factory,
+        helper_functions):
+    """
+    Test BehaviorStimulusFile.date_of_acquisition
+    """
+    this_tmp_dir = tmp_path_factory.mktemp('date_of_acq')
+
+    expected = datetime.datetime(1972, 3, 14, 23, 30, 41)
+
+    good_data = {'start_time': expected}
+    this_tmp_path = Path(
+                        tempfile.mkstemp(
+                            dir=this_tmp_dir,
+                            suffix='.pkl')[1])
+
+    with open(this_tmp_path, 'wb') as out_file:
+        pickle.dump(good_data, out_file)
+
+    stim_file = BehaviorStimulusFile(this_tmp_path)
+    assert stim_file.date_of_acquisition == expected
+
+    bad_data = {'nothing': 'at all'}
+    other_tmp_path = Path(
+                        tempfile.mkstemp(
+                            dir=this_tmp_dir,
+                            suffix='.pkl')[1])
+    with open(other_tmp_path, 'wb') as out_file:
+        pickle.dump(bad_data, out_file)
+
+    stim_file = BehaviorStimulusFile(other_tmp_path)
+    with pytest.raises(KeyError, match="No \'start_time\' listed in pickle"):
+        stim_file.date_of_acquisition
+
+    helper_functions.windows_safe_cleanup_dir(
+                dir_path=Path(this_tmp_dir))

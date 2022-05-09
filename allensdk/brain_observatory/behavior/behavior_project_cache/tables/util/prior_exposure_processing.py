@@ -1,9 +1,9 @@
-import re
-from typing import Optional
-
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache \
+    .tables.util.image_presentation_utils import (
+        get_image_set)
 
 
 def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
@@ -40,16 +40,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     --------
     Series with index same as df and values prior exposure counts to image set
     """
-
-    def __get_image_set_name(session_type: Optional[str]):
-        match = re.match(r'.*images_(?P<image_set>\w)', session_type)
-        if match is None:
-            return None
-        return match.group('image_set')
-
-    session_type = df['session_type'][
-        df['session_type'].notnull()]
-    image_set = session_type.apply(__get_image_set_name)
+    image_set = get_image_set(df=df)
     return __get_prior_exposure_count(df=df, to=image_set)
 
 

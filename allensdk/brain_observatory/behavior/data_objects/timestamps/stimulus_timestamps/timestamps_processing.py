@@ -59,7 +59,7 @@ def get_frame_indices(
     each event occured on. Indexes will be chosen to be the
     first index satisfying
 
-    frame_timestamps[event_indices] <= event_timestamps
+    frame_timestamps[event_indices] >= event_timestamps
     event_timestamps < frame_timestamps[event_indices+1]
 
     Parameters
