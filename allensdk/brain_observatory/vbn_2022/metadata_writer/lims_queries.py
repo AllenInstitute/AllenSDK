@@ -14,6 +14,9 @@ from allensdk.internal.api.queries.compound_lims_queries import (
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)
 
+from allensdk.brain_observatory.dataframe_utils import (
+    patch_df_from_other)
+
 from allensdk.brain_observatory.vbn_2022.\
     metadata_writer.dataframe_manipulations import (
         _add_prior_omissions,
@@ -733,6 +736,15 @@ def session_tables_from_ecephys_session_id_list(
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=ecephys_session_id_list)
+
+    # patch date_of_acquisition and session_type from beh_table,
+    # which read them directly from the pickle file
+    summary_tbl = patch_df_from_other(
+                    target_df=summary_tbl,
+                    source_df=beh_table,
+                    index_column='behavior_session_id',
+                    columns_to_patch=['date_of_acquisition',
+                                      'session_type'])
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
