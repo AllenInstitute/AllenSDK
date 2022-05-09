@@ -3,7 +3,8 @@ import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 
 from allensdk.internal.api.queries.utils import (
-    _sanitize_uuid_list)
+    _sanitize_uuid_list,
+    build_in_list_selector_query)
 
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
@@ -198,9 +199,12 @@ def units_table_from_ecephys_session_ids(
     """
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     units_table = lims_connection.select(query)
 
@@ -273,9 +277,13 @@ def probes_table_from_ecephys_session_id_list(
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
+
 
     query += """group by ecephys_probes.id"""
 
@@ -353,9 +361,12 @@ def channels_table_from_ecephys_session_id_list(
     WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY
@@ -485,9 +496,12 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
     """
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY ecephys_sessions.id"""
@@ -542,9 +556,12 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
     """
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY ecephys_sessions.id"""
