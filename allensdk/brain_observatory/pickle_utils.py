@@ -92,10 +92,6 @@ def _sanitize_tuple(
     """
     Sanitize a list read from the pickle file, casting bytes
     into str and returning the sanitized list.
-
-    Note
-    ----
-    Alters raw_data in place
     """
     output = list(raw_data)
     output = _sanitize_list(output)
@@ -105,6 +101,15 @@ def _sanitize_tuple(
 
 def _sanitize_list_or_tuple(
         raw_data: Union[list, tuple]) -> Union[list, tuple]:
+    """
+    Sanitize a list or tuple read from the pickle file,
+    casting bytes into str and returning the sanitized iterable.
+
+    Note
+    ----
+    Alters raw_data in place (if a list)
+    """
+
     if isinstance(raw_data, list):
         return _sanitize_list(raw_data)
     elif isinstance(raw_data, tuple):
