@@ -2,7 +2,6 @@ import pytest
 import copy
 import pathlib
 import pandas as pd
-import pickle
 
 from allensdk.test_utilities.custom_comparators import (
     stimulus_pickle_equivalence)
@@ -141,12 +140,12 @@ def test_sanitize_tuple():
     input_data = (['a', b'b', 'c', 2],
                   'cat',
                   b'dog',
-                  {b'd': 2, 'e': 3, b'f':b'g'})
+                  {b'd': 2, 'e': 3, b'f': b'g'})
 
     expected_data = (['a', 'b', 'c', 2],
-                      'cat',
-                      'dog',
-                      {'d': 2, 'e': 3, 'f':'g'})
+                     'cat',
+                     'dog',
+                     {'d': 2, 'e': 3, 'f': 'g'})
 
     actual = _sanitize_tuple(input_data)
     assert actual == expected_data
@@ -159,12 +158,12 @@ def test_sanitize_list_or_tuple():
     input_data = (['a', b'b', 'c', 2],
                   'cat',
                   b'dog',
-                  {b'd': 2, 'e': 3, b'f':b'g'})
+                  {b'd': 2, 'e': 3, b'f': b'g'})
 
     expected_data = (['a', 'b', 'c', 2],
-                      'cat',
-                      'dog',
-                      {'d': 2, 'e': 3, 'f':'g'})
+                     'cat',
+                     'dog',
+                     {'d': 2, 'e': 3, 'f': 'g'})
 
     actual = _sanitize_list_or_tuple(input_data)
     assert actual == expected_data
@@ -172,12 +171,12 @@ def test_sanitize_list_or_tuple():
     input_data = [['h', b'i', 'j', 2],
                   'frog',
                   b'fly',
-                  {b'k': 2, 'l': 3, b'm':b'n'}]
+                  {b'k': 2, 'l': 3, b'm': b'n'}]
 
     expected_data = [['h', 'i', 'j', 2],
                      'frog',
                      'fly',
-                     {'k': 2, 'l': 3, 'm':'n'}]
+                     {'k': 2, 'l': 3, 'm': 'n'}]
     actual = _sanitize_list_or_tuple(input_data)
     assert actual == expected_data
 

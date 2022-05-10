@@ -3,6 +3,7 @@ import pickle
 import gzip
 import pathlib
 
+
 def load_and_sanitize_pickle(
         pickle_path: Union[str, pathlib.Path]) -> Any:
     """

@@ -6,7 +6,6 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 import datetime
-import pickle
 import copy
 
 from allensdk.internal.api import PostgresQueryMixin

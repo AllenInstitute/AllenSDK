@@ -12,7 +12,7 @@ def smoketest_config_fixture():
     """
     config = {
       "ecephys_session_id_list": [1115077618, 1081429294, 1123100019],
-      "probes_to_skip": [{"session": 1123100019, "probe": "probeC"},]
+      "probes_to_skip": [{"session": 1123100019, "probe": "probeC"}]
     }
     return config
 
