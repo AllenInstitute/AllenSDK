@@ -194,9 +194,11 @@ def units_table_from_ecephys_session_ids(
       ON structures.id = ecephys_channels.manual_structure_id
     """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
-    """
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
@@ -271,10 +273,14 @@ def probes_table_from_ecephys_session_id_list(
     LEFT OUTER JOIN ecephys_units
       ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-      ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id
+    """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
@@ -283,7 +289,6 @@ def probes_table_from_ecephys_session_id_list(
                         operator='AND',
                         valid=False)
         query += f"""{skip_clause}"""
-
 
     query += """group by ecephys_probes.id"""
 
@@ -355,10 +360,14 @@ def channels_table_from_ecephys_session_id_list(
     LEFT OUTER JOIN ecephys_units
       ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-      ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id
+    """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
@@ -426,7 +435,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
             AS age_in_days
         """
 
-    query += f"""
+    query += """
         FROM ecephys_sessions
         JOIN specimens
           ON specimens.id = ecephys_sessions.specimen_id
@@ -440,7 +449,13 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
           ON equipment.id = ecephys_sessions.equipment_id
         LEFT OUTER JOIN behavior_sessions
           ON behavior_sessions.ecephys_session_id = ecephys_sessions.id
-        WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+        """
+
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     summary_table = lims_connection.select(query)
     return summary_table
@@ -480,7 +495,7 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
         channel_count -- int(the number of channels in this session)
     """
 
-    query = f"""
+    query = """
     SELECT ecephys_sessions.id as ecephys_session_id,
       COUNT(DISTINCT(ecephys_units.id)) AS unit_count,
       COUNT(DISTINCT(ecephys_probes.id)) AS probe_count,
@@ -492,8 +507,13 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
       ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT OUTER JOIN ecephys_units ON
       ecephys_units.ecephys_channel_id = ecephys_channels.id
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
+
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
@@ -541,7 +561,7 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
         ecephys_session_id -- int
         ecephys_structure_acronyms -- a list of strings
     """
-    query = f"""
+    query = """
     SELECT
       ecephys_sessions.id AS ecephys_session_id
       ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms
@@ -552,8 +572,13 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
       ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT JOIN structures
       ON structures.id = ecephys_channels.manual_structure_id
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
+
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
