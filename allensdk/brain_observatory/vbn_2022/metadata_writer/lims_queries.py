@@ -671,7 +671,7 @@ def _behavior_session_table_from_ecephys_session_id_list(
     # The date_of_acquisition and session_type stored in the LIMS
     # behavior_sessions table is untrustworthy. We will set those
     # columns to None here so that they all get patched from the
-    # pickles files.
+    # pickle files.
 
     behavior_session_df.date_of_acquisition = None
     behavior_session_df.session_type = None
