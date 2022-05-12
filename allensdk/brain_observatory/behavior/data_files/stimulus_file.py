@@ -12,7 +12,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
 from allensdk.core import DataObject
-from allensdk.brain_observatory.pickle_utils import (
+from allensdk.core.pickle_utils import (
     load_and_sanitize_pickle)
 
 # Query returns path to StimulusPickle file for given behavior session

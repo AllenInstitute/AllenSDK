@@ -6,7 +6,7 @@ import pandas as pd
 from allensdk.test_utilities.custom_comparators import (
     stimulus_pickle_equivalence)
 
-from allensdk.brain_observatory.pickle_utils import (
+from allensdk.core.pickle_utils import (
     _sanitize_list,
     _sanitize_dict,
     _sanitize_tuple,
@@ -214,8 +214,9 @@ def test_local_pickle_equivalence():
     sanitize its contents, we get a result equivalent to pd.read_pickle
     """
 
-    this_dir = pathlib.Path(__file__).parent
-    pkl_path = this_dir / 'behavior' / 'resources' / 'example_stimulus.pkl.gz'
+    this_dir = pathlib.Path(__file__).parent.parent
+    pkl_path = this_dir / 'brain_observatory/behavior/resources'
+    pkl_path = pkl_path / 'example_stimulus.pkl.gz'
 
     pd_data = pd.read_pickle(pkl_path)
     sanitized_data = load_and_sanitize_pickle(

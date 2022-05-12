@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 
-from allensdk.brain_observatory.dataframe_utils import (
+from allensdk.core.dataframe_utils import (
     patch_df_from_other)
 
 

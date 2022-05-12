@@ -15,7 +15,7 @@ from allensdk.internal.api.queries.compound_lims_queries import (
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)
 
-from allensdk.brain_observatory.dataframe_utils import (
+from allensdk.core.dataframe_utils import (
     patch_df_from_other)
 
 from allensdk.brain_observatory.vbn_2022.\
