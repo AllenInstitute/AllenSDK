@@ -83,6 +83,8 @@ def _sanitize_list(
             raw_data[idx] = _sanitize_dict(element)
         elif isinstance(element, bytes):
             raw_data[idx] = element.decode('utf-8')
+        else:
+            pass
 
     return raw_data
 
