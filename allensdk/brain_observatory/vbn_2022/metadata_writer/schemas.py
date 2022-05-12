@@ -84,7 +84,7 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
         fname_lookup = {'units_path': 'units.csv',
                         'channels_path': 'channels.csv',
                         'probes_path': 'probes.csv',
-                        'ecephys_sessions_path': 'sessions.csv',
+                        'ecephys_sessions_path': 'ecephys_sessions.csv',
                         'behavior_sessions_path': 'behavior_sessions.csv'}
 
         out_dir = pathlib.Path(data['output_dir'])

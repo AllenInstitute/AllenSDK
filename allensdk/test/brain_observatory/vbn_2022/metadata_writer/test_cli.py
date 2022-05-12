@@ -20,7 +20,7 @@ def test_metadata_writer_smoketest(
     """
 
     output_names = ('units.csv', 'probes.csv', 'channels.csv',
-                    'sessions.csv', 'behavior_sessions.csv')
+                    'ecephys_sessions.csv', 'behavior_sessions.csv')
 
     config = copy.deepcopy(smoketest_config_fixture)
 
