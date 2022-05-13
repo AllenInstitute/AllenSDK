@@ -1,5 +1,6 @@
 from typing import List
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 def donor_id_list_from_ecephys_session_ids(
@@ -16,8 +17,10 @@ def donor_id_list_from_ecephys_session_ids(
       specimens.donor_id = donors.id
     JOIN ecephys_sessions ON
       ecephys_sessions.specimen_id = specimens.id
-    WHERE
-      ecephys_sessions.id in {tuple(session_id_list)}
+    {build_in_list_selector_query(
+        col='ecephys_sessions.id',
+        valid_list=session_id_list
+    )}
     """
     result = lims_connection.select(query)
     return list(result.donor_id)

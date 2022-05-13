@@ -3,11 +3,13 @@ import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.api.queries.ecephys_lims_queries import (
     donor_id_list_from_ecephys_session_ids)
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 def behavior_sessions_from_ecephys_session_ids(
         lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int]) -> pd.DataFrame:
+        ecephys_session_id_list: List[int]
+) -> pd.DataFrame:
     """
     Get a DataFrame listing all of the behavior sessions that
     mice from a specified list of ecephys sessions went through
@@ -55,8 +57,11 @@ def behavior_sessions_from_ecephys_session_ids(
       ON genders.id = donors.gender_id
     JOIN equipment
       ON equipment.id = behavior.equipment_id
-    WHERE
-      donors.id in {tuple(donor_id_list)}
+    {build_in_list_selector_query(
+        col='donors.id',
+        valid_list=donor_id_list
+    )}
     """
+
     mouse_to_behavior = lims_connection.select(query)
     return mouse_to_behavior
