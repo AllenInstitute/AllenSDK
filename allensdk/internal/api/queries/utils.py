@@ -4,30 +4,54 @@ from uuid import UUID
 
 
 def build_in_list_selector_query(
-        col,
+        col: str,
         valid_list: Optional[SupportsStr] = None,
-        operator: str = "WHERE") -> str:
+        operator: str = "WHERE",
+        valid: bool = True) -> str:
     """
-    Filter for rows where the value of a column is contained in a list.
+    Filter for rows where the value of a column is contained in a list
+    (or, if valid=False, where the value is not contained in that list).
     If no list is specified in `valid_list`, return an empty string.
 
     NOTE: if string ids are used, then the strings in `valid_list` must
     be enclosed in single quotes, or else the query will throw a column
     does not exist error. E.g. ["'mystringid1'", "'mystringid2'"...]
 
-    :param col: name of column to compare if in a list
-    :type col: str
-    :param valid_list: iterable of values that can be mapped to str
-        (e.g. string, int, float).
-    :type valid_list: list
-    :param operator: SQL operator to start the clause. Default="WHERE".
-        Valid inputs: "AND", "OR", "WHERE" (not case-sensitive).
-    :type operator: str
+    Parameters
+    ----------
+    col: str
+        The name of the column being filtered on
+
+    valid_list: Optional[SupportsStr]
+        The list of values to test column on
+
+    operator: str
+        The SQL operator that starts the clause ("WHERE", "AND" or "OR")
+
+    valid: bool
+        If True, test for "col IN valid_list"; else, test for
+        "col NOT IN valid_list"
+
+    Returns
+    -------
+    session_query: str
+        The clause performing the request filter
     """
+    if operator not in ("AND", "OR", "WHERE"):
+        msg = ("Operator must be 'AND', 'OR', or 'WHERE'; "
+               f"you gave '{operator}'")
+        raise ValueError(msg)
+
     if not valid_list:
         return ""
+
+    if valid:
+        relation = "IN"
+    else:
+        relation = "NOT IN"
+
     session_query = (
-        f"""{operator} {col} IN ({",".join(
+        f"""{operator} {col} {relation} ({",".join(
             sorted(set(map(str, valid_list))))})""")
     return session_query
 

@@ -6,13 +6,14 @@ from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
 import datetime
-import pandas as pd
 import copy
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
 from allensdk.core import DataObject
+from allensdk.core.pickle_utils import (
+    load_and_sanitize_pickle)
 
 # Query returns path to StimulusPickle file for given behavior session
 BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
@@ -82,7 +83,7 @@ class _StimulusFile(DataFile):
     @staticmethod
     def load_data(filepath: Union[str, Path]) -> dict:
         filepath = safe_system_path(file_name=filepath)
-        return pd.read_pickle(filepath)
+        return load_and_sanitize_pickle(pickle_path=filepath)
 
     @property
     def num_frames(self) -> int:

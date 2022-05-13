@@ -293,6 +293,7 @@ def _patch_date_and_stage_from_pickle_file(
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
             new_date = stim_file.date_of_acquisition
             new_session_type = stim_file.session_type
+
             behavior_df.loc[
                 behavior_df.behavior_session_id == beh_id,
                 ('date_of_acquisition', 'session_type')] = (new_date,

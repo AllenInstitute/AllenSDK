@@ -3,7 +3,8 @@ import pandas as pd
 from allensdk.internal.api import PostgresQueryMixin
 
 from allensdk.internal.api.queries.utils import (
-    _sanitize_uuid_list)
+    _sanitize_uuid_list,
+    build_in_list_selector_query)
 
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
@@ -13,6 +14,9 @@ from allensdk.internal.api.queries.compound_lims_queries import (
 
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)
+
+from allensdk.core.dataframe_utils import (
+    patch_df_from_other)
 
 from allensdk.brain_observatory.vbn_2022.\
     metadata_writer.dataframe_manipulations import (
@@ -190,14 +194,19 @@ def units_table_from_ecephys_session_ids(
       ON structures.id = ecephys_channels.manual_structure_id
     """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
-    """
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     units_table = lims_connection.select(query)
 
@@ -264,15 +273,22 @@ def probes_table_from_ecephys_session_id_list(
     LEFT OUTER JOIN ecephys_units
       ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-      ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id
+    """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """group by ecephys_probes.id"""
 
@@ -344,15 +360,22 @@ def channels_table_from_ecephys_session_id_list(
     LEFT OUTER JOIN ecephys_units
       ON ecephys_units.ecephys_channel_id=ecephys_channels.id
     LEFT JOIN structures
-      ON structures.id = ecephys_channels.manual_structure_id"""
+      ON structures.id = ecephys_channels.manual_structure_id
+    """
 
-    query += f"""
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY
@@ -412,7 +435,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
             AS age_in_days
         """
 
-    query += f"""
+    query += """
         FROM ecephys_sessions
         JOIN specimens
           ON specimens.id = ecephys_sessions.specimen_id
@@ -426,7 +449,13 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
           ON equipment.id = ecephys_sessions.equipment_id
         LEFT OUTER JOIN behavior_sessions
           ON behavior_sessions.ecephys_session_id = ecephys_sessions.id
-        WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}"""
+        """
+
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
 
     summary_table = lims_connection.select(query)
     return summary_table
@@ -466,7 +495,7 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
         channel_count -- int(the number of channels in this session)
     """
 
-    query = f"""
+    query = """
     SELECT ecephys_sessions.id as ecephys_session_id,
       COUNT(DISTINCT(ecephys_units.id)) AS unit_count,
       COUNT(DISTINCT(ecephys_probes.id)) AS probe_count,
@@ -478,13 +507,21 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
       ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT OUTER JOIN ecephys_units ON
       ecephys_units.ecephys_channel_id = ecephys_channels.id
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
+
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY ecephys_sessions.id"""
@@ -524,7 +561,7 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
         ecephys_session_id -- int
         ecephys_structure_acronyms -- a list of strings
     """
-    query = f"""
+    query = """
     SELECT
       ecephys_sessions.id AS ecephys_session_id
       ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms
@@ -535,13 +572,21 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
       ON ecephys_channels.ecephys_probe_id = ecephys_probes.id
     LEFT JOIN structures
       ON structures.id = ecephys_channels.manual_structure_id
-    WHERE ecephys_sessions.id IN {tuple(ecephys_session_id_list)}
     """
 
+    query += build_in_list_selector_query(
+            col='ecephys_sessions.id',
+            valid_list=ecephys_session_id_list,
+            operator='WHERE',
+            valid=True)
+
     if probe_ids_to_skip is not None:
-        query += f"""
-        AND ecephys_probes.id NOT IN {tuple(probe_ids_to_skip)}
-        """
+        skip_clause = build_in_list_selector_query(
+                        col='ecephys_probes.id',
+                        valid_list=probe_ids_to_skip,
+                        operator='AND',
+                        valid=False)
+        query += f"""{skip_clause}"""
 
     query += """
     GROUP BY ecephys_sessions.id"""
@@ -622,6 +667,14 @@ def _behavior_session_table_from_ecephys_session_id_list(
                 foraging_to_stage_df.set_index('foraging_id'),
                 on='foraging_id',
                 how='left')
+
+    # The date_of_acquisition and session_type stored in the LIMS
+    # behavior_sessions table is untrustworthy. We will set those
+    # columns to None here so that they all get patched from the
+    # pickle files.
+
+    behavior_session_df.date_of_acquisition = None
+    behavior_session_df.session_type = None
 
     behavior_session_df = _patch_date_and_stage_from_pickle_file(
                              lims_connection=lims_connection,
@@ -725,6 +778,15 @@ def session_tables_from_ecephys_session_id_list(
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=ecephys_session_id_list)
+
+    # patch date_of_acquisition and session_type from beh_table,
+    # which read them directly from the pickle file
+    summary_tbl = patch_df_from_other(
+                    target_df=summary_tbl,
+                    source_df=beh_table,
+                    index_column='behavior_session_id',
+                    columns_to_patch=['date_of_acquisition',
+                                      'session_type'])
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,

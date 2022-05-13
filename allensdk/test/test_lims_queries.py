@@ -15,17 +15,37 @@ from allensdk.test_utilities.custom_comparators import (
 
 
 @pytest.mark.parametrize(
-    "col,valid_list,operator,expected", [
-        ("os.id", [1, 2, 3], "WHERE", "WHERE os.id IN (1,2,3)"),
-        ("id2", ["'a'", "'b'"], "AND", "AND id2 IN ('a','b')"),
-        ("id3", [1.0], "OR", "OR id3 IN (1.0)"),
-        ("id4", None, "WHERE", "")]
+    "col,valid_list,operator,valid,expected", [
+        ("os.id", [1, 2, 3], "WHERE", True, "WHERE os.id IN (1,2,3)"),
+        ("id2", ["'a'", "'b'"], "AND", True, "AND id2 IN ('a','b')"),
+        ("id3", [1.0], "OR", True, "OR id3 IN (1.0)"),
+        ("id4", None, "WHERE", True, ""),
+        ("os.id", [1, 2, 3], "WHERE", False, "WHERE os.id NOT IN (1,2,3)"),
+        ("id2", ["'a'", "'b'"], "AND", False, "AND id2 NOT IN ('a','b')"),
+        ("id3", [1.0], "OR", False, "OR id3 NOT IN (1.0)"),
+        ("id4", None, "WHERE", False, "")]
 )
 def test_build_in_list_selector_query(
-        col, valid_list, operator, expected):
+        col, valid_list, operator, valid, expected):
     assert (expected
             == build_in_list_selector_query(
-                col, valid_list, operator))
+                col=col,
+                valid_list=valid_list,
+                operator=operator,
+                valid=valid))
+
+
+def test_build_in_selector_error():
+    """
+    Test that build_in_list_selector_query raises the
+    expected error for an invalid operator
+    """
+    with pytest.raises(ValueError, match='Operator must be'):
+        build_in_list_selector_query(
+            col='silly',
+            valid_list=[1, 2, 3],
+            operator='above',
+            valid=True)
 
 
 class MockQueryEngine:
