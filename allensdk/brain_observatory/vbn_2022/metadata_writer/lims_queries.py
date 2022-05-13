@@ -416,7 +416,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
         genotype -- tring
         sex -- string
         project_code -- string
-        age_in_days -- int
+        date_of_birth -- pd.Timestamp
 
     """
     query = """
@@ -430,9 +430,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
           ,donors.full_genotype AS genotype
           ,genders.name AS sex
           ,projects.code AS project_code
-          ,DATE_PART('day',
-            ecephys_sessions.date_of_acquisition - donors.date_of_birth)
-            AS age_in_days
+          ,donors.date_of_birth as date_of_birth
         """
 
     query += """
@@ -692,7 +690,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
             df=behavior_session_df)
 
     behavior_session_df = _add_age_in_days(
-        df=behavior_session_df)
+        df=behavior_session_df,
+        index_column="behavior_session_id")
 
     behavior_session_df = _add_session_number(
         sessions_df=behavior_session_df,
@@ -787,6 +786,17 @@ def session_tables_from_ecephys_session_id_list(
                     index_column='behavior_session_id',
                     columns_to_patch=['date_of_acquisition',
                                       'session_type'])
+
+    # since we had to read date_of_acquisition from the pickle file,
+    # we now need to calculate age_in_days
+    summary_tbl = _add_age_in_days(
+                        df=summary_tbl,
+                        index_column="ecephys_session_id")
+
+    summary_tbl.drop(
+            labels=['date_of_birth'],
+            axis='columns',
+            inplace=True)
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
