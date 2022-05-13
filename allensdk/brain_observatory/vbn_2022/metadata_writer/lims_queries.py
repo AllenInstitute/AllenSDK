@@ -112,6 +112,8 @@ def units_table_from_ecephys_session_id_list(
         ecephys_channel_id -- int64 uniquely identifying the channel
         ecephys_probe_id -- int64 uniquely identifying the probe
         ecephys_session_id -- int64 uniquely identifying teh session
+        cluster_id -- int64
+        quality -- str
         snr -- float64
         firing_rate -- float64
         isi_violations -- float64
@@ -150,6 +152,8 @@ def units_table_from_ecephys_session_id_list(
       ,ecephys_units.ecephys_channel_id
       ,ecephys_probes.id as ecephys_probe_id
       ,ecephys_sessions.id as ecephys_session_id
+      ,ecephys_units.cluster_ids as cluster_id
+      ,ecephys_units.quality as quality
       ,ecephys_units.snr
       ,ecephys_units.firing_rate
       ,ecephys_units.isi_violations
