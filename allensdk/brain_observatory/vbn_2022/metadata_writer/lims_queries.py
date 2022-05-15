@@ -242,6 +242,7 @@ def probes_table_from_ecephys_session_id_list(
         ecephys_session_id -- int64
         name -- string like 'probeA', 'probeB', etc.
         sampling_rate -- float64
+        temporal_subsampling_factor -- float64
         lfp_sampling_rate -- float64
         phase -- float64
         has_lfp_data -- bool
@@ -257,6 +258,7 @@ def probes_table_from_ecephys_session_id_list(
       ,ecephys_probes.ecephys_session_id
       ,ecephys_probes.name
       ,ecephys_probes.global_probe_sampling_rate as sampling_rate
+      ,ecephys_probes.temporal_subsampling_factor
       ,ecephys_probes.global_probe_lfp_sampling_rate as lfp_sampling_rate
       ,ecephys_probes.phase
       ,ecephys_probes.use_lfp_data as has_lfp_data
