@@ -59,7 +59,7 @@ def one(x):
         return x
     if xlen != 1:
         raise OneResultExpectedError("Expected length one result, received: "
-                                     f"{x} results from queryr")
+                                     f"{x} results from query")
     if isinstance(x, set):
         return list(x)[0]
     else:
