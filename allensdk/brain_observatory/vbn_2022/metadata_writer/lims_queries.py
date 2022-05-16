@@ -333,6 +333,7 @@ def channels_table_from_ecephys_session_id_list(
         dorsal_ventral_ccf_coordinate -- float64
         left_right_ccf_coordinate -- float64
         ecephys_structure_acronym -- string
+        ecephys_structure_id -- int64
         unit_count -- int64 number of units on this channel
         valid_data -- a boolean indicating the validity of the channel
     """
@@ -349,6 +350,7 @@ def channels_table_from_ecephys_session_id_list(
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
       ,ecephys_channels.left_right_ccf_coordinate
       ,structures.acronym AS ecephys_structure_acronym
+      ,structures.id AS ecephys_structure_id
       ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
       ,ecephys_channels.valid_data as valid_data
     """
@@ -383,7 +385,8 @@ def channels_table_from_ecephys_session_id_list(
     GROUP BY
       ecephys_channels.id,
       ecephys_sessions.id,
-      structures.acronym"""
+      structures.acronym,
+      structures.id"""
 
     channels_table = lims_connection.select(query)
     return channels_table

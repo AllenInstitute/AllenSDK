@@ -71,6 +71,12 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        channels_table.drop(
+                    labels=['ecephys_structure_id'],
+                    axis='columns',
+                    inplace=True)
+
         channels_table.to_csv(self.args['channels_path'], index=False)
 
         (session_table,
