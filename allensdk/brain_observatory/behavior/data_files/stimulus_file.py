@@ -201,6 +201,18 @@ class BehaviorStimulusFile(_StimulusFile):
 
         return param_value
 
+    @property
+    def session_duration(self) -> float:
+        """
+        Gets session duration in seconds
+
+        Returns
+        -------
+        session duration in seconds
+        """
+        delta = self.data['stop_time'] - self.data['start_time']
+        return delta.total_seconds()
+
 
 class ReplayStimulusFile(_StimulusFile):
 

@@ -20,14 +20,15 @@ from allensdk.internal.api.queries.mtrain_queries import (
 from allensdk.core.dataframe_utils import (
     patch_df_from_other)
 
-from allensdk.brain_observatory.vbn_2022.\
+from allensdk.brain_observatory.vbn_2022. \
     metadata_writer.dataframe_manipulations import (
         _add_prior_omissions,
         _add_session_number,
         _add_age_in_days,
         _patch_date_and_stage_from_pickle_file,
         _add_experience_level,
-        _add_images_from_behavior)
+        _add_images_from_behavior,
+        remove_aborted_sessions)
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
@@ -610,7 +611,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
-        exclude_sessions_after_death_date: bool = True
+        exclude_sessions_after_death_date: bool = True,
+        exclude_aborted_sessions: bool = True
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -630,6 +632,11 @@ def _behavior_session_table_from_ecephys_session_id_list(
     exclude_sessions_after_death_date
         Whether to exclude sessions that fall after death date
         in order to filter out these mistakenly entered sessions
+
+    exclude_aborted_sessions
+        Whether to exclude aborted sessions. The way that we determine if a
+        session is aborted is by comparing the session duration to an
+        expected duration
 
     Returns
     -------
@@ -707,6 +714,12 @@ def _behavior_session_table_from_ecephys_session_id_list(
                 mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
                 on='mouse_id')['death_on']
         ]
+
+    if exclude_aborted_sessions:
+        behavior_session_df = remove_aborted_sessions(
+            lims_connection=lims_connection,
+            behavior_df=behavior_session_df
+        )
 
     behavior_session_df['image_set'] = get_image_set(
             df=behavior_session_df)
