@@ -2,7 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Dict
+from typing import Dict, List
 import pandas as pd
 import numpy as np
 import json
@@ -286,7 +286,7 @@ def _patch_date_and_stage_from_pickle_file(
     if len(invalid_beh) > 0:
         pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
                             lims_connection=lims_connection,
-                            behavior_session_id_list=invalid_beh)
+                            behavior_session_id_list=invalid_beh.tolist())
 
         for beh_id, pkl_path in zip(pickle_path_df.behavior_session_id,
                                     pickle_path_df.pkl_path):
@@ -365,3 +365,80 @@ def _add_images_from_behavior(
             on='ecephys_session_id',
             how='left')
     return ecephys_table
+
+
+def remove_aborted_sessions(
+        lims_connection: PostgresQueryMixin,
+        behavior_df: pd.DataFrame,
+        expected_training_duration: int = 15 * 60,
+        expected_duration: int = 60 * 60
+) -> pd.DataFrame:
+    """
+    Removes aborted sessions
+
+    Parameters
+    ----------
+    lims_connection
+    behavior_df
+    expected_training_duration: Expected duration for a TRAINING_0* session
+        in seconds
+    expected_duration: Expected duration for all non-TRAINING_0* sessions
+        in seconds
+
+    Returns
+    -------
+    behavior_df: behavior df with aborted sessions filtered out
+    """
+    durations = _get_session_duration_from_behavior_session_ids(
+        lims_connection=lims_connection,
+        behavior_session_id_list=(
+            behavior_df['behavior_session_id'].unique().tolist())
+    )
+    durations = behavior_df['behavior_session_id'].map(durations)
+
+    behavior_df = behavior_df[
+        (
+            (behavior_df['session_type'].str.match('TRAINING_0.*')) &
+            (durations > expected_training_duration)
+        ) |
+        (
+            ~(behavior_df['session_type'].str.match('TRAINING_0.*')) &
+            (durations > expected_duration)
+        )
+    ]
+    return behavior_df
+
+
+def _get_session_duration_from_behavior_session_ids(
+        lims_connection: PostgresQueryMixin,
+        behavior_session_id_list: List[int]
+) -> pd.Series:
+    """
+    Gets duration in seconds for each session in `behavior_session_id_list`
+
+    Parameters
+    ----------
+    lims_connection
+    behavior_session_id_list
+
+    Returns
+    -------
+    pd.Series
+        index: behavior_session_id
+        values: duration in seconds
+    """
+    pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
+        lims_connection=lims_connection,
+        behavior_session_id_list=behavior_session_id_list)
+    durations = []
+    for row in pickle_path_df.itertuples(index=False):
+        durations.append({
+            'behavior_session_id': row.behavior_session_id,
+            'duration': (BehaviorStimulusFile(filepath=row.pkl_path)
+                         .session_duration)
+        })
+    durations = pd.Series(
+        [x['duration'] for x in durations],
+        index=pd.Int64Index([x['behavior_session_id'] for x in durations],
+                            name='behavior_session_id'))
+    return durations
