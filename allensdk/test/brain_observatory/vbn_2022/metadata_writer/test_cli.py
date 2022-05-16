@@ -1,6 +1,8 @@
 import pytest
 import pathlib
 import copy
+import json
+import pandas as pd
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
     .metadata_writer import VBN2022MetadataWriterClass
@@ -45,8 +47,19 @@ def test_metadata_writer_smoketest(
     writer = VBN2022MetadataWriterClass(args=[], input_data=config)
     writer.run()
 
+    # load a dict mapping the name of a metadata.csv
+    # to the list of columns it is supposed to contain
+    this_dir = pathlib.Path(__file__).parent
+    resource_dir = this_dir / 'resources'
+    with open(resource_dir / 'column_lookup.json', 'rb') as in_file:
+        column_lookup = json.load(in_file)
+
     for file_path in expected_paths:
         assert file_path.exists()
+        df = pd.read_csv(file_path)
+        expected_columns = set(column_lookup[file_path.name])
+        actual_columns = set(df.columns)
+        assert expected_columns == actual_columns
 
     helper_functions.windows_safe_cleanup_dir(
         dir_path=output_dir)
