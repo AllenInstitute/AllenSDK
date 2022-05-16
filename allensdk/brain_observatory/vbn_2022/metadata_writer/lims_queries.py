@@ -83,7 +83,7 @@ def get_list_of_bad_probe_ids(
     return bad_probe_id_list
 
 
-def units_table_from_ecephys_session_ids(
+def units_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:

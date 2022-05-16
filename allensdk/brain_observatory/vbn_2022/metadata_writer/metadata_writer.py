@@ -14,7 +14,7 @@ from allensdk.brain_observatory.data_release_utils \
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     get_list_of_bad_probe_ids,
-    units_table_from_ecephys_session_ids,
+    units_table_from_ecephys_session_id_list,
     probes_table_from_ecephys_session_id_list,
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
@@ -49,7 +49,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
 
         session_id_list = self.args['ecephys_session_id_list']
 
-        units_table = units_table_from_ecephys_session_ids(
+        units_table = units_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
