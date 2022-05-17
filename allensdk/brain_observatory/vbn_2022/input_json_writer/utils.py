@@ -23,7 +23,8 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     _ecephys_summary_table_from_ecephys_session_id_list,
     probes_table_from_ecephys_session_id_list,
     channels_table_from_ecephys_session_id_list,
-    units_table_from_ecephys_session_id_list)
+    units_table_from_ecephys_session_id_list,
+    get_list_of_bad_probe_ids)
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.\
     dataframe_manipulations import (
@@ -59,16 +60,22 @@ class NwbConfigErrorLog(object):
 
 def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[int]]) -> List[dict]:
+        probes_to_skip: Optional[List[dict]]) -> List[dict]:
 
     error_log = NwbConfigErrorLog()
 
     lims_connection = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
+    if probes_to_skip is not None:
+        probe_ids_to_skip = get_list_of_bad_probe_ids(
+                lims_connection=lims_connection,
+                probes_to_skip=probes_to_skip)
+    else:
+        probe_ids_to_skip=None
+
     session_list = session_input_from_ecephys_session_id_list(
             ecephys_session_id_list=ecephys_session_id_list,
-            probes_to_skip=probes_to_skip,
             lims_connection=lims_connection,
             error_log=error_log)
 
@@ -77,7 +84,7 @@ def vbn_nwb_config_from_ecephys_session_id_list(
 
         probe_list = probe_input_from_ecephys_session_id(
                         ecephys_session_id=session_id,
-                        probes_to_skip=probes_to_skip,
+                        probe_ids_to_skip=probe_ids_to_skip,
                         lims_connection=lims_connection,
                         error_log=error_log)
 
@@ -85,7 +92,7 @@ def vbn_nwb_config_from_ecephys_session_id_list(
 
         channel_input = channel_input_from_ecephys_session_id(
                             ecephys_session_id=session_id,
-                            probes_to_skip=probes_to_skip,
+                            probe_ids_to_skip=probe_ids_to_skip,
                             lims_connection=lims_connection,
                             error_log=error_log)
 
@@ -110,7 +117,7 @@ def vbn_nwb_config_from_ecephys_session_id_list(
 
         unit_input = unit_input_from_ecephys_session_id(
                         ecephys_session_id=session_id,
-                        probes_to_skip=probes_to_skip,
+                        probe_ids_to_skip=probe_ids_to_skip,
                         lims_connection=lims_connection,
                         error_log=error_log)
 
@@ -130,7 +137,6 @@ def vbn_nwb_config_from_ecephys_session_id_list(
 
 def session_input_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> List[dict]:
     """
@@ -289,14 +295,14 @@ def session_input_from_ecephys_session_id_list(
 
 def probe_input_from_ecephys_session_id(
         ecephys_session_id: int,
-        probes_to_skip: Optional[List[int]],
+        probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> List[dict]:
 
     probes_table = probes_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
                         ecephys_session_id_list=[ecephys_session_id, ],
-                        probe_ids_to_skip=probes_to_skip)
+                        probe_ids_to_skip=probe_ids_to_skip)
 
     probes_table = probes_table.set_index('ecephys_probe_id')
 
@@ -354,7 +360,7 @@ def probe_input_from_ecephys_session_id(
 
 def channel_input_from_ecephys_session_id(
         ecephys_session_id: int,
-        probes_to_skip: Optional[List[int]],
+        probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
@@ -363,7 +369,7 @@ def channel_input_from_ecephys_session_id(
 
     raw_channels_table = channels_table_from_ecephys_session_id_list(
                                 ecephys_session_id_list=[ecephys_session_id, ],
-                                probe_ids_to_skip=probes_to_skip,
+                                probe_ids_to_skip=probe_ids_to_skip,
                                 lims_connection=lims_connection)
 
     raw_channels_table.rename(
@@ -400,7 +406,7 @@ def channel_input_from_ecephys_session_id(
 
 def unit_input_from_ecephys_session_id(
         ecephys_session_id: int,
-        probes_to_skip: Optional[List[int]],
+        probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
@@ -408,7 +414,7 @@ def unit_input_from_ecephys_session_id(
     """
     raw_unit_table = units_table_from_ecephys_session_id_list(
                         ecephys_session_id_list=[ecephys_session_id, ],
-                        probe_ids_to_skip=probes_to_skip,
+                        probe_ids_to_skip=probe_ids_to_skip,
                         lims_connection=lims_connection)
 
     raw_unit_table.rename(
