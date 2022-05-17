@@ -89,15 +89,24 @@ def vbn_nwb_config_from_ecephys_session_id_list(
                             lims_connection=lims_connection,
                             error_log=error_log)
 
-        for probe in session['probes']:
+        bad_probe_list = []
+        for idx, probe in enumerate(session['probes']):
             probe_id = probe['id']
             if probe_id in channel_input:
                 channels = channel_input[probe_id]
                 probe['channels'] = channels
             else:
-                msg = f"could not find channels for probe {probe_id}"
+                bad_probe_list.append(idx)
+                msg = (f"could not find channels for probe {probe_id}; "
+                       "not listing in the input.json")
                 error_log.log(ecephys_session_id=session_id,
                               msg=msg)
+
+        # remove probes that have no channels
+        bad_probe_list.reverse()
+        for idx in bad_probe_list:
+            this_probe = session['probes'].pop(idx)
+            assert 'channels' not in this_probe
 
         unit_input = unit_input_from_ecephys_session_id(
                         ecephys_session_id=session_id,
