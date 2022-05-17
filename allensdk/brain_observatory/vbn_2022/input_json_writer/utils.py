@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 
 import pandas as pd
 
@@ -35,29 +35,99 @@ from allensdk.core.auth_config import (
 from allensdk.internal.api import db_connection_creator
 
 
-def session_input_from_ecephys_session_id_list(
+class NwbConfigErrorLog(object):
+
+    def __init__(self):
+        self._messages = dict()
+
+    def log(self, ecephys_session_id: Union[int, str], msg: str):
+        ecephys_session_id = int(ecephys_session_id)
+        if ecephys_session_id not in self._messages:
+            self._messages[ecephys_session_id] = []
+        self._messages[ecephys_session_id].append(msg)
+
+    def write(self) -> str:
+        k_list = list(self._messages.keys())
+        k_list.sort()
+        msg = ""
+        for k in k_list:
+            msg += f"ecephys_session: {k}\n"
+            for m in self._messages[k]:
+                msg += f"    {m}\n"
+        return msg
+
+
+def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
         probes_to_skip: Optional[List[int]]) -> List[dict]:
-    """
-    Take list of session IDs; return a list of dicts, each dict
-    representing the input json needed for a session
-    """
+
+    error_log = NwbConfigErrorLog()
 
     lims_connection = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
-    # get lookup tables mapping ecephys_session_id to the
-    # ecephys_analysis_run_ids for the optotagging and
-    # stimulus table files
-    optotagging_run_lookup = _analysis_run_from_session_id(
-            lims_connection=lims_connection,
+    session_list = session_input_from_ecephys_session_id_list(
             ecephys_session_id_list=ecephys_session_id_list,
-            strategy_class='EcephysOptotaggingTableStrategy')
+            probes_to_skip=probes_to_skip,
+            lims_connection=lims_connection,
+            error_log=error_log)
 
-    stim_table_run_lookup = _analysis_run_from_session_id(
-            lims_connection=lims_connection,
-            ecephys_session_id_list=ecephys_session_id_list,
-            strategy_class='VbnCreateStimTableStrategy')
+    for session in session_list:
+        session_id = session['ecephys_session_id']
+
+        probe_list = probe_input_from_ecephys_session_id(
+                        ecephys_session_id=session_id,
+                        probes_to_skip=probes_to_skip,
+                        lims_connection=lims_connection,
+                        error_log=error_log)
+
+        session['probes'] = probe_list
+
+        channel_input = channel_input_from_ecephys_session_id(
+                            ecephys_session_id=session_id,
+                            probes_to_skip=probes_to_skip,
+                            lims_connection=lims_connection,
+                            error_log=error_log)
+
+        for probe in session['probes']:
+            probe_id = probe['id']
+            if probe_id in channel_input:
+                channels = channel_input[probe_id]
+                probe['channels'] = channels
+            else:
+                msg = f"could not find channels for probe {probe_id}"
+                error_log.log(ecephys_session_id=session_id,
+                              msg=msg)
+
+        unit_input = unit_input_from_ecephys_session_id(
+                        ecephys_session_id=session_id,
+                        probes_to_skip=probes_to_skip,
+                        lims_connection=lims_connection,
+                        error_log=error_log)
+
+        for probe in session['probes']:
+            probe_id = probe['id']
+            if probe_id in unit_input:
+                units = unit_input[probe_id]
+                probe['units'] = units
+            else:
+                msg = f"could not find units for probe {probe_id}"
+                error_log.log(ecephys_session_id=session_id,
+                              msg=msg)
+
+    print(error_log.write())
+    return session_list
+
+
+def session_input_from_ecephys_session_id_list(
+        ecephys_session_id_list: List[int],
+        probes_to_skip: Optional[List[int]],
+        lims_connection: PostgresQueryMixin,
+        error_log: NwbConfigErrorLog) -> List[dict]:
+    """
+    Take list of session IDs; return a list of dicts, each dict
+    representing the input json needed for a session
+    """
 
     session_table = _ecephys_summary_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
@@ -96,7 +166,18 @@ def session_input_from_ecephys_session_id_list(
 
     session_table = session_table.to_dict(orient='index')
 
-    result = []
+    # get lookup tables mapping ecephys_session_id to the
+    # ecephys_analysis_run_ids for the optotagging and
+    # stimulus table files
+    optotagging_run_lookup = _analysis_run_from_session_id(
+            lims_connection=lims_connection,
+            ecephys_session_id_list=ecephys_session_id_list,
+            strategy_class='EcephysOptotaggingTableStrategy')
+
+    stim_table_run_lookup = _analysis_run_from_session_id(
+            lims_connection=lims_connection,
+            ecephys_session_id_list=ecephys_session_id_list,
+            strategy_class='VbnCreateStimTableStrategy')
 
     # well known files that are linked to the ecephys sesssion
     # (as opposed to an ecephys analysis run)
@@ -115,9 +196,16 @@ def session_input_from_ecephys_session_id_list(
     wkf_types_to_query_session = [f"'{el[1]}'"
                                   for el in input_from_wkf_session]
 
+    result = []
     for session_id in ecephys_session_id_list:
-        data = session_table[int(session_id)]
-        data['ecephys_session_id'] = int(session_id)
+        session_id = int(session_id)
+        if session_id not in session_table:
+            error_log.log(ecephys_session_id=session_id,
+                          msg="No session data was found at all; skipping")
+            continue
+
+        data = session_table[session_id]
+        data['ecephys_session_id'] = session_id
 
         wkf_path_lookup = wkf_path_from_attachable(
                             lims_connection=lims_connection,
@@ -126,7 +214,13 @@ def session_input_from_ecephys_session_id_list(
                             attachable_id=session_id)
 
         for key_pair in input_from_wkf_session:
-            data[key_pair[0]] = wkf_path_lookup.get(key_pair[1], None)
+            this_path = wkf_path_lookup.get(key_pair[1], None)
+            if this_path is None:
+                msg = (f"Could not find {key_pair[1]} "
+                       f"for ecephys_session {session_id}")
+                error_log.log(ecephys_session_id=session_id,
+                              msg=msg)
+            data[key_pair[0]] = this_path
 
         # get stimulus_table
         stim_path_lookup = wkf_path_from_attachable(
@@ -170,13 +264,6 @@ def session_input_from_ecephys_session_id_list(
         else:
             data['reporter_line'] = []
 
-        probe_list = probe_input_from_ecephys_session_id(
-                        ecephys_session_id=session_id,
-                        probes_to_skip=probes_to_skip,
-                        lims_connection=lims_connection)
-
-        data['probes'] = probe_list
-
         eye_geometry = eye_tracking_geometry_from_equipment_id(
                 equipment_id=data.pop('equipment_id'),
                 date_of_acquisition=data['date_of_acquisition'],
@@ -194,11 +281,8 @@ def session_input_from_ecephys_session_id_list(
 def probe_input_from_ecephys_session_id(
         ecephys_session_id: int,
         probes_to_skip: Optional[List[int]],
-        lims_connection: Optional[PostgresQueryMixin] = None) -> List[dict]:
-
-    if lims_connection is None:
-        lims_connection = db_connection_creator(
-                fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        lims_connection: PostgresQueryMixin,
+        error_log: NwbConfigErrorLog) -> List[dict]:
 
     probes_table = probes_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
@@ -253,27 +337,8 @@ def probe_input_from_ecephys_session_id(
     _add_spike_times_path(
         data=results,
         ecephys_session_id=ecephys_session_id,
-        lims_connection=lims_connection)
-
-    channel_input = channel_input_from_ecephys_session_id(
-                        ecephys_session_id=ecephys_session_id,
-                        probes_to_skip=probes_to_skip,
-                        lims_connection=lims_connection)
-
-    for probe in results:
-        probe_id = probe['id']
-        channels = channel_input[probe_id]
-        probe['channels'] = channels
-
-    unit_input = unit_input_from_ecephys_session_id(
-                        ecephys_session_id=ecephys_session_id,
-                        probes_to_skip=probes_to_skip,
-                        lims_connection=lims_connection)
-
-    for probe in results:
-        probe_id = probe['id']
-        units = unit_input[probe_id]
-        probe['units'] = units
+        lims_connection=lims_connection,
+        error_log=error_log)
 
     return results
 
@@ -281,7 +346,8 @@ def probe_input_from_ecephys_session_id(
 def channel_input_from_ecephys_session_id(
         ecephys_session_id: int,
         probes_to_skip: Optional[List[int]],
-        lims_connection: PostgresQueryMixin) -> Dict[int, list]:
+        lims_connection: PostgresQueryMixin,
+        error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
     Returns a dict mapping probe_id to the list of channel specifications
     """
@@ -326,7 +392,8 @@ def channel_input_from_ecephys_session_id(
 def unit_input_from_ecephys_session_id(
         ecephys_session_id: int,
         probes_to_skip: Optional[List[int]],
-        lims_connection: PostgresQueryMixin) -> Dict[int, list]:
+        lims_connection: PostgresQueryMixin,
+        error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
     Returns a dict mapping probe_id to the list of unit specifications
     """
@@ -346,6 +413,12 @@ def unit_input_from_ecephys_session_id(
                  'waveform_recovery_slope': 'recovery_slope',
                  'waveform_spread': 'spread'},
         inplace=True)
+
+    if len(raw_unit_table) == 0:
+        msg = f"could not find units for session {ecephys_session_id}"
+        error_log.log(ecephys_session_id=ecephys_session_id,
+                      msg=msg)
+        return dict()
 
     raw_unit_table.drop(
         labels=['ecephys_session_id',
@@ -550,7 +623,8 @@ def _analysis_run_from_session_id(
 def _add_spike_times_path(
         data: List[dict],
         ecephys_session_id: int,
-        lims_connection: PostgresQueryMixin) -> List[dict]:
+        lims_connection: PostgresQueryMixin,
+        error_log: NwbConfigErrorLog) -> List[dict]:
     """
     Add the 'spike_times_path' entry to a list of probe specifications.
 
@@ -611,14 +685,22 @@ def _add_spike_times_path(
 
     for this_probe in data:
         probe_id = this_probe['id']
-        timestamp_lookup = wkf_path_from_attachable(
+        if probe_id in probe_run_lookup:
+            timestamp_lookup = wkf_path_from_attachable(
                             lims_connection=lims_connection,
                             wkf_type_name=[
                                 "'EcephysAlignedEventTimestamps'", ],
                             attachable_type='EcephysAnalysisRunProbe',
                             attachable_id=probe_run_lookup[probe_id])
 
-        this_probe['spike_times_path'] = \
-            timestamp_lookup['EcephysAlignedEventTimestamps']
+            this_probe['spike_times_path'] = \
+                timestamp_lookup['EcephysAlignedEventTimestamps']
+        else:
+            msg = ("could not find EcephysAlignedEventTimestamps for "
+                   f"probe {probe_id}")
+            error_log.log(ecephys_session_id=ecephys_session_id,
+                          msg=msg)
+
+            this_probe['spike_times_path'] = None
 
     return data
