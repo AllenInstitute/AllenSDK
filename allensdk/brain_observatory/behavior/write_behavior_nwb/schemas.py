@@ -13,9 +13,6 @@ class BaseBehaviorSessionDataSchema(RaisingSchema):
                               description=("Unique identifier for the "
                                            "behavior session to write into "
                                            "NWB format"))
-    foraging_id = String(required=True,
-                         description=("The foraging_id for the behavior "
-                                      "session"))
     driver_line = List(String,
                        required=True,
                        cli_as_single_argument=True,
@@ -48,6 +45,10 @@ class BehaviorSessionData(BaseBehaviorSessionDataSchema):
     stimulus_name = String(required=True,
                            description=("Name of stimulus presented during "
                                         "behavior session"))
+
+    foraging_id = String(required=True,
+                         description=("The foraging_id for the behavior "
+                                      "session"))
 
     @mm.pre_load
     def set_stimulus_name(self, data, **kwargs):
