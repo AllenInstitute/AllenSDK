@@ -1,6 +1,8 @@
 from typing import List, Optional, Dict, Union
 
 import pandas as pd
+import numpy as np
+import numbers
 
 from allensdk.internal.api.queries.wkf_lims_queries import (
     wkf_path_from_attachable)
@@ -288,6 +290,10 @@ def session_input_from_ecephys_session_id_list(
 
         data['eye_tracking_rig_geometry'] = eye_geometry
 
+        for k in ('date_of_acquisition',
+                  'date_of_birth'):
+            data[k] = str(data[k])
+
         result.append(data)
 
     return result
@@ -347,7 +353,7 @@ def probe_input_from_ecephys_session_id(
         for key_pair in input_from_wkf_probe:
             data[key_pair[0]] = wkf_path_lookup.get(key_pair[1], None)
 
-        results.append(data)
+        results.append(_nan_to_none(data))
 
     _add_spike_times_path(
         data=results,
@@ -400,7 +406,7 @@ def channel_input_from_ecephys_session_id(
         if probe_id not in output_dict:
             output_dict[probe_id] = []
         this_channel['id'] = channel_id
-        output_dict[probe_id].append(this_channel)
+        output_dict[probe_id].append(_nan_to_none(this_channel))
     return output_dict
 
 
@@ -456,7 +462,7 @@ def unit_input_from_ecephys_session_id(
         probe_id = this_unit.pop('ecephys_probe_id')
         if probe_id not in output_dict:
             output_dict[probe_id] = []
-        output_dict[probe_id].append(this_unit)
+        output_dict[probe_id].append(_nan_to_none(this_unit))
     return output_dict
 
 
@@ -719,3 +725,12 @@ def _add_spike_times_path(
             this_probe['spike_times_path'] = None
 
     return data
+
+
+def _nan_to_none(input_dict: dict) -> dict:
+    for k in input_dict:
+        val = input_dict[k]
+        if isinstance(val, numbers.Number):
+            if np.isnan(val):
+                input_dict[k] = None
+    return input_dict
