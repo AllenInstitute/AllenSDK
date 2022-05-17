@@ -77,8 +77,9 @@ class TestPresentations:
         ts.to_nwb(nwbfile=self._nwbfile)
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
+    @pytest.mark.parametrize('roundtrip, add_is_change',
+                             ([True, False], [True, False]))
+    def test_read_write_nwb(self, roundtrip, add_is_change,
                             data_object_roundtrip_fixture):
         self._table_from_json.to_nwb(nwbfile=self._nwbfile)
 
@@ -86,11 +87,11 @@ class TestPresentations:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self._nwbfile,
                 data_object_cls=Presentations,
-                add_is_change=False
+                add_is_change=add_is_change
             )
         else:
             obt = Presentations.from_nwb(nwbfile=self._nwbfile,
-                                         add_is_change=False)
+                                         add_is_change=add_is_change)
 
         assert obt == self._table_from_json
 
