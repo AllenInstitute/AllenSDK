@@ -1,7 +1,12 @@
 from typing import List, Optional, Dict
 
+import pandas as pd
+
 from allensdk.internal.api.queries.wkf_lims_queries import (
     wkf_path_from_attachable)
+
+from allensdk.internal.api.queries.equipment_lims_queries import (
+    experiment_configs_from_equipment_id_and_type)
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk import OneResultExpectedError
@@ -171,6 +176,15 @@ def session_input_from_ecephys_session_id_list(
                         lims_connection=lims_connection)
 
         data['probes'] = probe_list
+
+        eye_geometry = eye_tracking_geometry_from_equipment_id(
+                equipment_id=data.pop('equipment_id'),
+                date_of_acquisition=data['date_of_acquisition'],
+                lims_connection=lims_connection)
+
+        eye_geometry['equipment'] = data['rig_name']
+
+        data['eye_tracking_rig_geometry'] = eye_geometry
 
         result.append(data)
 
@@ -356,6 +370,111 @@ def unit_input_from_ecephys_session_id(
             output_dict[probe_id] = []
         output_dict[probe_id].append(this_unit)
     return output_dict
+
+
+def eye_tracking_geometry_from_equipment_id(
+        equipment_id: int,
+        date_of_acquisition: pd.Timestamp,
+        lims_connection: PostgresQueryMixin) -> dict:
+
+    """
+    Return eye_tracking_rig_geometry given a specified
+    equipment_id and date_of_acquisition
+
+    Parameters
+    ----------
+    equipment_id: int
+
+    date_of_acqisition: pd.Timestamp
+
+    lims_connection: PostgresQueryMixin
+
+    Returns
+    --------
+    eye_geometry: dict
+        The eye_tracking_geometry dict to be written to
+        the input.json
+    """
+    raw_eye_geometry = _raw_eye_tracking_geometry_from_equipment_id(
+            equipment_id=equipment_id,
+            date_of_acquisition=date_of_acquisition,
+            lims_connection=lims_connection)
+
+    eye_geometry = dict()
+    eye_geometry['led_position'] = [
+            raw_eye_geometry['led position']['center_x_mm'],
+            raw_eye_geometry['led position']['center_y_mm'],
+            raw_eye_geometry['led position']['center_z_mm']]
+
+    eye_geometry['monitor_position_mm'] = [
+            raw_eye_geometry['screen position']['center_x_mm'],
+            raw_eye_geometry['screen position']['center_y_mm'],
+            raw_eye_geometry['screen position']['center_z_mm']]
+
+    eye_geometry['monitor_rotation_deg'] = [
+            raw_eye_geometry['screen position']['rotation_x_deg'],
+            raw_eye_geometry['screen position']['rotation_y_deg'],
+            raw_eye_geometry['screen position']['rotation_z_deg']]
+
+    eye_geometry['camera_position_mm'] = [
+            raw_eye_geometry['eye camera position']['center_x_mm'],
+            raw_eye_geometry['eye camera position']['center_y_mm'],
+            raw_eye_geometry['eye camera position']['center_z_mm']]
+
+    eye_geometry['camera_rotation_deg'] = [
+            raw_eye_geometry['eye camera position']['rotation_x_deg'],
+            raw_eye_geometry['eye camera position']['rotation_y_deg'],
+            raw_eye_geometry['eye camera position']['rotation_z_deg']]
+
+    return eye_geometry
+
+
+def _raw_eye_tracking_geometry_from_equipment_id(
+        equipment_id: int,
+        date_of_acquisition: pd.Timestamp,
+        lims_connection: PostgresQueryMixin) -> dict:
+    """
+    Return eye_tracking_rig_geometry given a specified
+    equipment_id and date_of_acquisition
+
+    Parameters
+    ----------
+    equipment_id: int
+
+    date_of_acquisition: pd.Timestamp
+
+    lims_connection: PostgresQueryMixin
+
+    Returns
+    -------
+    config: dict
+        A dict listing the configuration of the
+        eye tracking rig geometry
+
+    Notes
+    -----
+    Will return the configuration with the latest
+    active_date that is before date_of_acquisition.
+    """
+    config = dict()
+    for name in ('led position', 'behavior camera position',
+                 'eye camera position', 'screen position'):
+        this_df = experiment_configs_from_equipment_id_and_type(
+                        equipment_id=equipment_id,
+                        config_type=name,
+                        lims_connection=lims_connection)
+        this_df = this_df.loc[this_df.active_date <= date_of_acquisition]
+        this_df = this_df.iloc[this_df.active_date.idxmax()]
+        this_config = dict()
+        this_config['center_x_mm'] = this_df.center_x_mm
+        this_config['center_y_mm'] = this_df.center_y_mm
+        this_config['center_z_mm'] = this_df.center_z_mm
+        this_config['rotation_x_deg'] = this_df.rotation_x_deg
+        this_config['rotation_y_deg'] = this_df.rotation_y_deg
+        this_config['rotation_z_deg'] = this_df.rotation_z_deg
+        config[name] = this_config
+
+    return config
 
 
 def _analysis_run_from_session_id(

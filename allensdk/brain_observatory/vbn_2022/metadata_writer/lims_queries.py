@@ -426,6 +426,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
         sex -- string
         project_code -- string
         date_of_birth -- pd.Timestamp
+        equipment_id -- int
 
     """
     query = """
@@ -440,6 +441,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
           ,genders.name AS sex
           ,projects.code AS project_code
           ,donors.date_of_birth as date_of_birth
+          ,ecephys_sessions.equipment_id
         """
 
     query += """
@@ -803,7 +805,7 @@ def session_tables_from_ecephys_session_id_list(
                         index_column="ecephys_session_id")
 
     summary_tbl.drop(
-            labels=['date_of_birth'],
+            labels=['date_of_birth', 'equipment_id'],
             axis='columns',
             inplace=True)
 
