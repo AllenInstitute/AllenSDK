@@ -51,7 +51,7 @@ class VBN2022InputJsonWriterSchema(argschema.ArgSchema):
                          '{nwb_prefix}_{session_id}.nwb'))
 
     @post_load
-    def create_json_path_lookup(self, data, **kwargs):
+    def create_path_lookup(self, data, **kwargs):
         """
         Construct lookups mapping ecephys_session_id to
         the input_json_path and the nwb_file_path
