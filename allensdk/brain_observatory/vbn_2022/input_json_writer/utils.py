@@ -74,7 +74,7 @@ def vbn_nwb_config_from_ecephys_session_id_list(
                 lims_connection=lims_connection,
                 probes_to_skip=probes_to_skip)
     else:
-        probe_ids_to_skip=None
+        probe_ids_to_skip = None
 
     session_list = session_input_from_ecephys_session_id_list(
             ecephys_session_id_list=ecephys_session_id_list,
