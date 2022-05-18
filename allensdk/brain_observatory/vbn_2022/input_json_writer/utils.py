@@ -39,17 +39,48 @@ from allensdk.internal.api import db_connection_creator
 
 
 class NwbConfigErrorLog(object):
+    """
+    This is a class meant to keep track of all of the non-fatal
+    data irregularities encountered during input json generation
+    for the VBN NWB writer.
+    """
 
     def __init__(self):
         self._messages = dict()
 
-    def log(self, ecephys_session_id: Union[int, str], msg: str):
+    def log(self,
+            ecephys_session_id: Union[int, str],
+            msg: str) -> None:
+        """
+        Log an irregularity associated with a specifiec
+        ecephys session
+
+        Parameters
+        ----------
+        ecephys_session_id: Union[int, str]
+            Will get cast to int before actual logging
+
+        msg: str
+            The specific message that you want attached to
+            that ecephys_session_id
+        """
         ecephys_session_id = int(ecephys_session_id)
         if ecephys_session_id not in self._messages:
             self._messages[ecephys_session_id] = []
         self._messages[ecephys_session_id].append(msg)
 
     def write(self) -> str:
+        """
+        Returns a string summarizing all of the logged
+        message. The string will look like
+
+        ecephys_session: 1111
+            first message associated with ecephys_session 1111
+            second message assocated with ecephys_session 1111
+        ecephys_session: 2222
+            first message associated with ecephys_session 2222
+            ...
+        """
         k_list = list(self._messages.keys())
         k_list.sort()
         msg = ""
@@ -62,13 +93,44 @@ class NwbConfigErrorLog(object):
 
 def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[dict]]) -> List[dict]:
+        probes_to_skip: Optional[List[dict]]) -> dict:
+    """
+    Return a list of dicts. Each dict the specification for
+    an NWB writer job, suitable for serialization with
+    json.dumps
+
+    Parameters
+    ----------
+    ecephys_session_id_list: List[int]
+        The ecephys_session_ids for which you want to create
+        NWB writer specifications
+
+    probes_to_skip: List[dict]
+        A list of dicts, each specifying a probe to ignore
+        when generating the NWB writer specifications.
+        Each dict should look like
+            {
+             "session": 12345   # an ecephys_session_id
+             "probe": "probeB"  # the probe's name
+            }
+
+    Returns
+    -------
+    A dict
+        {
+         "specfications": the list of dicts representing
+                          the NWB writer specifications
+         "log": a string with a summary of all non-fatal
+                irregularities encountered in the data
+        }
+    """
 
     error_log = NwbConfigErrorLog()
 
     lims_connection = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
 
+    # convert probes_to_skip into a list of ecephys_probe_ids
     if probes_to_skip is not None:
         probe_ids_to_skip = get_list_of_bad_probe_ids(
                 lims_connection=lims_connection,
@@ -76,11 +138,16 @@ def vbn_nwb_config_from_ecephys_session_id_list(
     else:
         probe_ids_to_skip = None
 
+    # get a list of basic session configuresions (i.e. the
+    # data for each session excluding the lists of probes,
+    # channels, and units)
     session_list = session_input_from_ecephys_session_id_list(
             ecephys_session_id_list=ecephys_session_id_list,
             lims_connection=lims_connection,
             error_log=error_log)
 
+    # iterate over each session, adding the probes, channels,
+    # and units as appropriate
     for session in session_list:
         session_id = session['ecephys_session_id']
 
@@ -98,7 +165,11 @@ def vbn_nwb_config_from_ecephys_session_id_list(
                             lims_connection=lims_connection,
                             error_log=error_log)
 
+        # bad_probe_list keeps track of any probes that did not have
+        # channels attached to it; these probes will be excluded
+        # from the final configuration, and a message will be logged
         bad_probe_list = []
+
         for idx, probe in enumerate(session['probes']):
             probe_id = probe['id']
             if probe_id in channel_input:
@@ -111,7 +182,6 @@ def vbn_nwb_config_from_ecephys_session_id_list(
                 error_log.log(ecephys_session_id=session_id,
                               msg=msg)
 
-        # remove probes that have no channels
         bad_probe_list.reverse()
         for idx in bad_probe_list:
             this_probe = session['probes'].pop(idx)
@@ -142,22 +212,32 @@ def session_input_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> List[dict]:
     """
-    Take list of session IDs; return a list of dicts, each dict
-    representing the input json needed for a session
+    Return a list of dicts, each dict representing the configuration
+    data necessary for writing an NWB file for a session, excluding
+    the lists of probes, channels, and units associated with that
+    session.
+
+    Parameters
+    ----------
+    ecephys_session_id_list: List[int]
+        List of ecephys_session_ids for which we are generating
+        the configurations
+
+    lims_connection: PostgresQueryMixin
+
+    error_log: NwbConfigErrorLog
+        An object for keeping track of all of the non-fatal
+        irregularities encountered in the data.
+
+    Returns
+    -------
+    result: List[dict]
+        Each dict represents a single session's configuration
     """
 
     session_table = _ecephys_summary_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
             ecephys_session_id_list=ecephys_session_id_list)
-
-    session_table.rename(
-            columns={'equipment_name': 'rig_name',
-                     'mouse_id': 'external_specimen_name',
-                     'genotype': 'full_genotype'},
-            inplace=True)
-
-    session_table.external_specimen_name = \
-        session_table.external_specimen_name.astype(int)
 
     session_table = _add_age_in_days(
                 df=session_table,
@@ -166,12 +246,16 @@ def session_input_from_ecephys_session_id_list(
     session_table.age_in_days = session_table.age_in_days.apply(
                          lambda x: f'P{int(x):d}')
 
+    # apply naming conventions from the NWB writer's schema
     session_table.rename(
             columns={'equipment_name': 'rig_name',
                      'mouse_id': 'external_specimen_name',
                      'genotype': 'full_genotype',
                      'age_in_days': 'age'},
             inplace=True)
+
+    session_table.external_specimen_name = \
+        session_table.external_specimen_name.astype(int)
 
     session_table.drop(
         labels=['session_type', 'project_code'],
@@ -196,8 +280,11 @@ def session_input_from_ecephys_session_id_list(
             ecephys_session_id_list=ecephys_session_id_list,
             strategy_class='VbnCreateStimTableStrategy')
 
-    # well known files that are linked to the ecephys sesssion
-    # (as opposed to an ecephys analysis run)
+    # A list of tuples associating fields in the final specification
+    # returned by this method with the names of files in the
+    # well_known_file_types table on LIMS. The zeroth element in each
+    # tuple is the field in the returned specification; the first
+    # element is the associated well_known_file_types.name
     input_from_wkf_session = [
             ('behavior_stimulus_file', 'StimulusPickle'),
             ('mapping_stimulus_file', 'MappingPickle'),
@@ -210,12 +297,14 @@ def session_input_from_ecephys_session_id_list(
             ('eye_tracking_filepath', 'EyeTracking Ellipses'),
             ('sync_file', 'EcephysRigSync')]
 
+    # cast to a SQL-safe string
     wkf_types_to_query_session = [f"'{el[1]}'"
                                   for el in input_from_wkf_session]
 
     result = []
     for session_id in ecephys_session_id_list:
         session_id = int(session_id)
+
         if session_id not in session_table:
             error_log.log(ecephys_session_id=session_id,
                           msg="No session data was found at all; skipping")
@@ -224,6 +313,8 @@ def session_input_from_ecephys_session_id_list(
         data = session_table[session_id]
         data['ecephys_session_id'] = session_id
 
+        # lookup all of the well known files we need for this
+        # specification
         wkf_path_lookup = wkf_path_from_attachable(
                             lims_connection=lims_connection,
                             wkf_type_name=wkf_types_to_query_session,
@@ -264,7 +355,10 @@ def session_input_from_ecephys_session_id_list(
                         allow_none=True).value
 
         if driver_line is not None:
-            data['driver_line'] = driver_line
+            if isinstance(driver_line, list):
+                data['driver_line'] = driver_line
+            else:
+                data['driver_line'] = [driver_line, ]
         else:
             data['driver_line'] = []
 
@@ -304,6 +398,34 @@ def probe_input_from_ecephys_session_id(
         probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> List[dict]:
+    """
+    Get the list of probe specifications, excluding the lists
+    of channels and units, for a given ecephys_session_id
+
+    Parameters
+    ----------
+    ecephys_session_id: int
+
+    probe_ids_to_skip: Optional[List[int]]:
+        List of probes not to return because we already know they
+        are "bad" in some way.
+
+    lims_connection: PostgresQueryMixin
+
+    error_log: NwbConfigErrorLog
+        object to store all of the non-fatal irregularities
+        encountered in the data
+
+    Returns
+    -------
+    probe_list: List[dict]
+        Each dict represents the specifications of a probe
+        that needs to be written to the input.json.
+
+        These dicts will not include the channels or
+        units data. Those are added at a later step in
+        processing.
+    """
 
     probes_table = probes_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
@@ -324,6 +446,11 @@ def probe_input_from_ecephys_session_id(
 
     probes_table = probes_table.to_dict(orient='index')
 
+    # A list of tuples associating fields in the final specification
+    # returned by this method with the names of files in the
+    # well_known_file_types table on LIMS. The zeroth element in each
+    # tuple is the field in the returned specification; the first
+    # element is the associated well_known_file_types.name
     input_from_wkf_probe = [
         ('inverse_whitening_matrix_path', 'EcephysSortedWhiteningMatInv'),
         ('mean_waveforms_path', 'EcephysSortedMeanWaveforms'),
@@ -335,7 +462,7 @@ def probe_input_from_ecephys_session_id(
     wkf_to_query = [f"'{el[1]}'"
                     for el in input_from_wkf_probe]
 
-    results = []
+    probe_list = []
     probe_id_list = list(probes_table.keys())
     probe_id_list.sort()
 
@@ -353,15 +480,15 @@ def probe_input_from_ecephys_session_id(
         for key_pair in input_from_wkf_probe:
             data[key_pair[0]] = wkf_path_lookup.get(key_pair[1], None)
 
-        results.append(_nan_to_none(data))
+        probe_list.append(_nan_to_none(data))
 
-    _add_spike_times_path(
-        data=results,
-        ecephys_session_id=ecephys_session_id,
-        lims_connection=lims_connection,
-        error_log=error_log)
+    probe_list = _add_spike_times_path(
+                    probe_list=probe_list,
+                    ecephys_session_id=ecephys_session_id,
+                    lims_connection=lims_connection,
+                    error_log=error_log)
 
-    return results
+    return probe_list
 
 
 def channel_input_from_ecephys_session_id(
@@ -370,7 +497,29 @@ def channel_input_from_ecephys_session_id(
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
-    Returns a dict mapping probe_id to the list of channel specifications
+    Get a dict mapping probe_id to the list of channel
+    specifications for a given ecephys_session_id
+
+    Parameters
+    ----------
+    ecephys_session_id: int
+
+    probe_ids_to_skip: Optional[List[int]]:
+        List of probes not to return because we already know they
+        are "bad" in some way.
+
+    lims_connection: PostgresQueryMixin
+
+    error_log: NwbConfigErrorLog
+        object to store all of the non-fatal irregularities
+        encountered in the data
+
+    Returns
+    -------
+    probe_id_to_channels: Dict[int, List[dict]]
+        A dict mapping probe_id to a list of dicts, each
+        of which represents the specifications of a channel
+        that needs to be written to the input.json.
     """
 
     raw_channels_table = channels_table_from_ecephys_session_id_list(
@@ -399,15 +548,15 @@ def channel_input_from_ecephys_session_id(
                               'valid_data']]
     raw_channels_table = raw_channels_table.set_index('id')
     raw_channels_table = raw_channels_table.to_dict(orient='index')
-    output_dict = dict()
+    probe_id_to_channels = dict()
     for channel_id in raw_channels_table.keys():
         this_channel = raw_channels_table[channel_id]
         probe_id = this_channel['probe_id']
-        if probe_id not in output_dict:
-            output_dict[probe_id] = []
+        if probe_id not in probe_id_to_channels:
+            probe_id_to_channels[probe_id] = []
         this_channel['id'] = channel_id
-        output_dict[probe_id].append(_nan_to_none(this_channel))
-    return output_dict
+        probe_id_to_channels[probe_id].append(_nan_to_none(this_channel))
+    return probe_id_to_channels
 
 
 def unit_input_from_ecephys_session_id(
@@ -416,7 +565,29 @@ def unit_input_from_ecephys_session_id(
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> Dict[int, list]:
     """
-    Returns a dict mapping probe_id to the list of unit specifications
+    Get a dict mapping probe_id to the list of unit
+    specifications for a given ecephys_session_id
+
+    Parameters
+    ----------
+    ecephys_session_id: int
+
+    probe_ids_to_skip: Optional[List[int]]:
+        List of probes not to return because we already know they
+        are "bad" in some way.
+
+    lims_connection: PostgresQueryMixin
+
+    error_log: NwbConfigErrorLog
+        object to store all of the non-fatal irregularities
+        encountered in the data
+
+    Returns
+    -------
+    probe_id_to_units: Dict[int, List[dict]]
+        A dict mapping probe_id to a list of dicts, each
+        of which represents the specifications of a unit
+        that needs to be written to the input.json.
     """
     raw_unit_table = units_table_from_ecephys_session_id_list(
                         ecephys_session_id_list=[ecephys_session_id, ],
@@ -455,15 +626,15 @@ def unit_input_from_ecephys_session_id(
 
     raw_unit_table = raw_unit_table.set_index('id')
     raw_unit_table = raw_unit_table.to_dict(orient='index')
-    output_dict = dict()
+    probe_id_to_units = dict()
     for unit_id in raw_unit_table.keys():
         this_unit = raw_unit_table[unit_id]
         this_unit['id'] = unit_id
         probe_id = this_unit.pop('ecephys_probe_id')
-        if probe_id not in output_dict:
-            output_dict[probe_id] = []
-        output_dict[probe_id].append(_nan_to_none(this_unit))
-    return output_dict
+        if probe_id not in probe_id_to_units:
+            probe_id_to_units[probe_id] = []
+        probe_id_to_units[probe_id].append(_nan_to_none(this_unit))
+    return probe_id_to_units
 
 
 def eye_tracking_geometry_from_equipment_id(
@@ -488,6 +659,17 @@ def eye_tracking_geometry_from_equipment_id(
     eye_geometry: dict
         The eye_tracking_geometry dict to be written to
         the input.json
+
+        This dict conforms to the eye_traking_rig_geometry
+        schema specified in the NWB writer schema (except
+        that it will not list 'equipment'; that must be
+        added later)
+
+    Notes
+    -----
+    They eye tracking geometry that is specified is the latest
+    (as determined by LIMS' active_date column) that occured
+    before date_of_acquisition.
     """
     raw_eye_geometry = _raw_eye_tracking_geometry_from_equipment_id(
             equipment_id=equipment_id,
@@ -544,6 +726,20 @@ def _raw_eye_tracking_geometry_from_equipment_id(
     config: dict
         A dict listing the configuration of the
         eye tracking rig geometry
+
+        This dict will contain entries for
+        'led position'
+        'behavior camera position'
+        'eye camera position'
+        'screen position'
+
+        Each of these keys maps to a dict containing
+        'center_x_mm'
+        'center_y_mm'
+        'center_z_mm'
+        'rotation_x_deg'
+        'rotation_y_deg'
+        'rotation_z_deg'
 
     Notes
     -----
@@ -642,7 +838,7 @@ def _analysis_run_from_session_id(
 
 
 def _add_spike_times_path(
-        data: List[dict],
+        probe_list: List[dict],
         ecephys_session_id: int,
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog) -> List[dict]:
@@ -651,7 +847,7 @@ def _add_spike_times_path(
 
     Parameters
     ----------
-    data: List[dict]
+    probe_list: List[dict]
         The list of probe specifications to be modified
 
     ecephys_session_id:int
@@ -660,15 +856,15 @@ def _add_spike_times_path(
 
     Returns
     -------
-    data: List[dict]
+    probe_list: List[dict]
         Same as input with 'spike_times_path' added.
 
     Notes
     -----
-    Will alter data in place
+    Will alter probe_list in place
     """
 
-    probe_id_list = [this_probe['id'] for this_probe in data]
+    probe_id_list = [this_probe['id'] for this_probe in probe_list]
 
     timestamp_run_lookup = _analysis_run_from_session_id(
                         lims_connection=lims_connection,
@@ -704,7 +900,7 @@ def _add_spike_times_path(
                           query_result.ecephys_analysis_run_probe_id):
         probe_run_lookup[int(p_id)] = int(r_id)
 
-    for this_probe in data:
+    for this_probe in probe_list:
         probe_id = this_probe['id']
         if probe_id in probe_run_lookup:
             timestamp_lookup = wkf_path_from_attachable(
@@ -724,10 +920,19 @@ def _add_spike_times_path(
 
             this_probe['spike_times_path'] = None
 
-    return data
+    return probe_list
 
 
 def _nan_to_none(input_dict: dict) -> dict:
+    """
+    Scan through a dict transforming any NaNs into
+    Nones (argschema does not like NaNs appearing in
+    float fields). Return the same dict after alteration.
+
+    Note
+    ----
+    Alters the dict in place.
+    """
     for k in input_dict:
         val = input_dict[k]
         if isinstance(val, numbers.Number):
