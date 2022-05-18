@@ -136,6 +136,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             {c: 'int64' for c in table.select_dtypes(include='int')})
         table = table.sort_values(by=["start_time"])
 
+        table = table.reset_index(drop=True)
+        table.index = table.index.astype('int64')
+
         if add_is_change:
             table['is_change'] = is_change_event(stimulus_presentations=table)
         return Presentations(presentations=table, column_list=column_list)
