@@ -38,7 +38,7 @@ def wkf_path_from_attachable(
     for a single type
     """
 
-    query="""
+    query = """
     SELECT
       wkft.name as type_name
       ,wkf.storage_directory || wkf.filename as filepath
@@ -58,13 +58,13 @@ def wkf_path_from_attachable(
 
     query += build_in_list_selector_query(
                 col="wkf.attachable_type",
-                valid_list=[f"'{attachable_type}'",],
+                valid_list=[f"'{attachable_type}'", ],
                 operator="AND",
                 valid=True)
 
     query += build_in_list_selector_query(
                 col="wkf.attachable_id",
-                valid_list=[f"'{attachable_id}'",],
+                valid_list=[f"'{attachable_id}'", ],
                 operator="AND",
                 valid=True)
 
@@ -83,4 +83,3 @@ def wkf_path_from_attachable(
         wkf_path_lookup[type_name] = filepath
 
     return wkf_path_lookup
-    
