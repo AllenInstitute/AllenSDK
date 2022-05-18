@@ -40,6 +40,14 @@ class VBNBehaviorSession(BehaviorSession):
     that implies.
     """
 
+    @staticmethod
+    def _get_monitor_delay():
+        # In a private communication in March 2022,
+        # Corbett Bennett said that we should use 20 milliseconds
+        # as the monitor_delay for the NP.0 and NP.1 rigs
+        # used to collect the ecephys sessions for VBN
+        return 0.02
+
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: Optional[Any] = None,
@@ -212,7 +220,7 @@ class VBNBehaviorSession(BehaviorSession):
                     empty_on_fail=False)
 
 
-class BehaviorEcephysSession(BehaviorSession):
+class BehaviorEcephysSession(VBNBehaviorSession):
     """
     Represents a session with behavior + ecephys
     """
