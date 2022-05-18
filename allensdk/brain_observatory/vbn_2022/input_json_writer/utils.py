@@ -133,8 +133,8 @@ def vbn_nwb_config_from_ecephys_session_id_list(
                 error_log.log(ecephys_session_id=session_id,
                               msg=msg)
 
-    print(error_log.write())
-    return session_list
+    return {'sessions': session_list,
+            'log': error_log.write()}
 
 
 def session_input_from_ecephys_session_id_list(
