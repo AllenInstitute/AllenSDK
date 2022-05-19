@@ -1,4 +1,5 @@
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP, \
+    MTRAIN_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 
 
@@ -14,3 +15,6 @@ class LimsTest:
             if 'requires_bamboo' in marks:
                 self.dbconn = db_connection_creator(
                     fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+                self.mtrainconn = db_connection_creator(
+                    fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP
+                )

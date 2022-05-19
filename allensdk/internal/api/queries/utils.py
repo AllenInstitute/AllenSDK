@@ -5,17 +5,13 @@ from uuid import UUID
 
 def build_in_list_selector_query(
         col: str,
-        valid_list: Optional[SupportsStr] = None,
+        valid_list: Optional[List[SupportsStr]] = None,
         operator: str = "WHERE",
         valid: bool = True) -> str:
     """
     Filter for rows where the value of a column is contained in a list
     (or, if valid=False, where the value is not contained in that list).
     If no list is specified in `valid_list`, return an empty string.
-
-    NOTE: if string ids are used, then the strings in `valid_list` must
-    be enclosed in single quotes, or else the query will throw a column
-    does not exist error. E.g. ["'mystringid1'", "'mystringid2'"...]
 
     Parameters
     ----------
@@ -44,6 +40,10 @@ def build_in_list_selector_query(
 
     if not valid_list:
         return ""
+
+    if type(valid_list[0]) is str:
+        valid_list = _convert_list_of_string_to_sql_safe_string(
+            strings=valid_list)
 
     if valid:
         relation = "IN"
@@ -87,3 +87,30 @@ def _sanitize_uuid_list(uuid_list: List[str]) -> List[str]:
         except ValueError:
             pass
     return sanitized_list
+
+
+def _convert_list_of_string_to_sql_safe_string(
+        strings: List[str]
+) -> List[str]:
+    """
+    Given list of string ["A", "B"]
+    converts to ["'A'", "'B'"]
+    Parameters
+    ----------
+    strings: list of strings to convert
+
+    Returns
+    -------
+    List of sql-safe strings
+    """
+    if len(strings) == 0:
+        return strings
+    if len(strings[0]) == 0:
+        return strings
+
+    # If the first element doesn't start with single quote, assume none of the
+    # elements in the list do
+    if strings[0][0] != "'":
+        # Add single quotes to each element
+        strings = [f"'{x}'" for x in strings]
+    return strings

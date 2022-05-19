@@ -1,5 +1,6 @@
 from typing import Optional, List
 import pandas as pd
+
 from allensdk.internal.api import PostgresQueryMixin
 import logging
 from allensdk.internal.api.queries.utils import (
@@ -81,8 +82,10 @@ def stimulus_pickle_paths_from_behavior_session_ids(
         wkft.name = 'StimulusPickle'
       AND
         wkf.attachable_type = 'BehaviorSession'
-      AND
-        beh.id in {tuple(behavior_session_id_list)}
+        {build_in_list_selector_query(
+        operator='AND',
+        col='beh.id',
+        valid_list=behavior_session_id_list)}
     """
 
     beh_to_path = lims_connection.select(query)
