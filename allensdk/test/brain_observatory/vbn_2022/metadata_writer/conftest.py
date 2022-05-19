@@ -57,6 +57,19 @@ def patching_pickle_file_fixture(
                     'date_of_acquisition': this_date,
                     'session_type': this_stage}
 
+    this_date = datetime.datetime(year=1974, month=7, day=22)
+    this_stage = 'third_stage'
+    pkl_data = {'start_time': this_date,
+                'items':
+                {'behavior':
+                 {'params': {'stage': this_stage}}}}
+    pkl_path = pathlib.Path(
+                    tempfile.mkstemp(dir=tmp_dir, suffix='.pkl')[1])
+    pd.to_pickle(pkl_data, pkl_path)
+    output[2134] = {'pkl_path': pkl_path,
+                    'date_of_acquisition': this_date,
+                    'session_type': this_stage}
+
     yield output
 
     helper_functions.windows_safe_cleanup_dir(

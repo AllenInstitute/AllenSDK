@@ -150,12 +150,27 @@ def test_add_experience_level():
     assert 'experience_level' in actual.columns
 
 
+@pytest.mark.parametrize(
+        "flag_columns, ids_to_fix",
+        [(['date_of_acquisition', 'foraging_id', 'session_type'],
+          (1123, 5813, 2134)),
+         (['foraging_id', 'session_type'],
+          (2134, 5813)),
+         (['foraging_id', ], (2134, ))])
 def test_patch_date_and_stage_from_pickle_file(
-        patching_pickle_file_fixture):
+        patching_pickle_file_fixture,
+        flag_columns,
+        ids_to_fix):
     """
     Test that _patch_date_and_stage_from_pickle_file
     correctly patches sessions that are missing
     date_of_acquisition or session_type
+
+    flag_columns is passed along to
+    _patch_date_and_stage_from_pickle_file
+
+    ids_to_fix denotes the behavior_session_id of the sessions
+    we expect to be patched
     """
 
     input_data = []
@@ -177,6 +192,13 @@ def test_patch_date_and_stage_from_pickle_file(
         {'behavior_session_id': 5813,
          'date_of_acquisition': datetime.datetime(1982, 11, 13),
          'session_type': None,
+         'foraging_id': 3333,
+         'silly': 'baz'})
+
+    input_data.append(
+        {'behavior_session_id': 2134,
+         'date_of_acquisition': datetime.datetime(1982, 11, 13),
+         'session_type': 4444,
          'foraging_id': None,
          'silly': 'baz'})
 
@@ -208,10 +230,13 @@ def test_patch_date_and_stage_from_pickle_file(
 
     actual = _patch_date_and_stage_from_pickle_file(
                     lims_connection=DummyLimsConnection,
-                    behavior_df=input_df)
+                    behavior_df=input_df,
+                    flag_columns=flag_columns)
 
     expected_data = copy.deepcopy(input_data)
-    for idx, bid in enumerate((1123, 5813)):
+    for idx, bid in enumerate((1123, 5813, 2134)):
+        if bid not in ids_to_fix:
+            continue
         this_d = patching_pickle_file_fixture[bid]['date_of_acquisition']
         this_s = patching_pickle_file_fixture[bid]['session_type']
         expected_data[idx+1]['date_of_acquisition'] = this_d

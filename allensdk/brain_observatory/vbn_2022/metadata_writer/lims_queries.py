@@ -702,7 +702,10 @@ def _behavior_session_table_from_ecephys_session_id_list(
 
     behavior_session_df = _patch_date_and_stage_from_pickle_file(
                              lims_connection=lims_connection,
-                             behavior_df=behavior_session_df)
+                             behavior_df=behavior_session_df,
+                             flag_columns=['date_of_acquisition',
+                                           'foraging_id',
+                                           'session_type'])
 
     if exclude_sessions_after_death_date:
         # filter out any sessions which were mistakenly entered that fall
