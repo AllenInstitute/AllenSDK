@@ -14,7 +14,7 @@ from allensdk.brain_observatory.data_release_utils \
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     get_list_of_bad_probe_ids,
-    units_table_from_ecephys_session_ids,
+    units_table_from_ecephys_session_id_list,
     probes_table_from_ecephys_session_id_list,
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
@@ -49,22 +49,71 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
 
         session_id_list = self.args['ecephys_session_id_list']
 
-        units_table = units_table_from_ecephys_session_ids(
+        units_table = units_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        units_table = units_table[
+            ["unit_id",
+             "ecephys_channel_id",
+             "ecephys_probe_id",
+             "ecephys_session_id",
+             "amplitude_cutoff",
+             "anterior_posterior_ccf_coordinate",
+             "cumulative_drift",
+             "d_prime",
+             "dorsal_ventral_ccf_coordinate",
+             "ecephys_structure_acronym",
+             "ecephys_structure_id",
+             "firing_rate",
+             "isi_violations",
+             "isolation_distance",
+             "l_ratio",
+             "local_index",
+             "max_drift",
+             "nn_hit_rate",
+             "nn_miss_rate",
+             "presence_ratio",
+             "probe_horizontal_position",
+             "probe_vertical_position",
+             "silhouette_score",
+             "snr",
+             "valid_data",
+             "waveform_amplitude",
+             "waveform_duration",
+             "waveform_halfwidth",
+             "waveform_pt_ratio",
+             "waveform_recovery_slope",
+             "waveform_repolarization_slope",
+             "waveform_spread",
+             "waveform_velocity_above",
+             "waveform_velocity_below"]]
+
         units_table.to_csv(self.args['units_path'], index=False)
 
         probes_table = probes_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        probes_table.drop(
+            labels=['temporal_subsampling_factor'],
+            axis='columns',
+            inplace=True)
+
         probes_table.to_csv(self.args['probes_path'], index=False)
 
         channels_table = channels_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        channels_table.drop(
+                    labels=['ecephys_structure_id'],
+                    axis='columns',
+                    inplace=True)
+
         channels_table.to_csv(self.args['channels_path'], index=False)
 
         (session_table,

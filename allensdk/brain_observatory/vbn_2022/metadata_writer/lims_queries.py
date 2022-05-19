@@ -83,7 +83,7 @@ def get_list_of_bad_probe_ids(
     return bad_probe_id_list
 
 
-def units_table_from_ecephys_session_ids(
+def units_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
@@ -112,6 +112,8 @@ def units_table_from_ecephys_session_ids(
         ecephys_channel_id -- int64 uniquely identifying the channel
         ecephys_probe_id -- int64 uniquely identifying the probe
         ecephys_session_id -- int64 uniquely identifying teh session
+        cluster_id -- int64
+        quality -- str
         snr -- float64
         firing_rate -- float64
         isi_violations -- float64
@@ -150,6 +152,8 @@ def units_table_from_ecephys_session_ids(
       ,ecephys_units.ecephys_channel_id
       ,ecephys_probes.id as ecephys_probe_id
       ,ecephys_sessions.id as ecephys_session_id
+      ,ecephys_units.cluster_ids as cluster_id
+      ,ecephys_units.quality as quality
       ,ecephys_units.snr
       ,ecephys_units.firing_rate
       ,ecephys_units.isi_violations
@@ -242,6 +246,7 @@ def probes_table_from_ecephys_session_id_list(
         ecephys_session_id -- int64
         name -- string like 'probeA', 'probeB', etc.
         sampling_rate -- float64
+        temporal_subsampling_factor -- float64
         lfp_sampling_rate -- float64
         phase -- float64
         has_lfp_data -- bool
@@ -257,6 +262,7 @@ def probes_table_from_ecephys_session_id_list(
       ,ecephys_probes.ecephys_session_id
       ,ecephys_probes.name
       ,ecephys_probes.global_probe_sampling_rate as sampling_rate
+      ,ecephys_probes.temporal_subsampling_factor
       ,ecephys_probes.global_probe_lfp_sampling_rate as lfp_sampling_rate
       ,ecephys_probes.phase
       ,ecephys_probes.use_lfp_data as has_lfp_data
@@ -331,6 +337,7 @@ def channels_table_from_ecephys_session_id_list(
         dorsal_ventral_ccf_coordinate -- float64
         left_right_ccf_coordinate -- float64
         ecephys_structure_acronym -- string
+        ecephys_structure_id -- int64
         unit_count -- int64 number of units on this channel
         valid_data -- a boolean indicating the validity of the channel
     """
@@ -347,6 +354,7 @@ def channels_table_from_ecephys_session_id_list(
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
       ,ecephys_channels.left_right_ccf_coordinate
       ,structures.acronym AS ecephys_structure_acronym
+      ,structures.id AS ecephys_structure_id
       ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
       ,ecephys_channels.valid_data as valid_data
     """
@@ -381,7 +389,8 @@ def channels_table_from_ecephys_session_id_list(
     GROUP BY
       ecephys_channels.id,
       ecephys_sessions.id,
-      structures.acronym"""
+      structures.acronym,
+      structures.id"""
 
     channels_table = lims_connection.select(query)
     return channels_table
@@ -416,7 +425,8 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
         genotype -- tring
         sex -- string
         project_code -- string
-        age_in_days -- int
+        date_of_birth -- pd.Timestamp
+        equipment_id -- int
 
     """
     query = """
@@ -430,9 +440,8 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
           ,donors.full_genotype AS genotype
           ,genders.name AS sex
           ,projects.code AS project_code
-          ,DATE_PART('day',
-            ecephys_sessions.date_of_acquisition - donors.date_of_birth)
-            AS age_in_days
+          ,donors.date_of_birth as date_of_birth
+          ,ecephys_sessions.equipment_id
         """
 
     query += """
@@ -692,7 +701,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
             df=behavior_session_df)
 
     behavior_session_df = _add_age_in_days(
-        df=behavior_session_df)
+        df=behavior_session_df,
+        index_column="behavior_session_id")
 
     behavior_session_df = _add_session_number(
         sessions_df=behavior_session_df,
@@ -787,6 +797,17 @@ def session_tables_from_ecephys_session_id_list(
                     index_column='behavior_session_id',
                     columns_to_patch=['date_of_acquisition',
                                       'session_type'])
+
+    # since we had to read date_of_acquisition from the pickle file,
+    # we now need to calculate age_in_days
+    summary_tbl = _add_age_in_days(
+                        df=summary_tbl,
+                        index_column="ecephys_session_id")
+
+    summary_tbl.drop(
+            labels=['date_of_birth', 'equipment_id'],
+            axis='columns',
+            inplace=True)
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
                         lims_connection=lims_connection,

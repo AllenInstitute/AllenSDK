@@ -51,10 +51,6 @@ class _VBNSessionDataSchema(BaseBehaviorSessionDataSchema,
         required=True,
         description='ecephys session id'
     )
-    monitor_delay = argschema.fields.Float(
-        required=True,
-        description='monitor delay'
-    )
 
 
 class VBNInputSchema(ArgSchema):

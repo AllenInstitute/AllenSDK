@@ -24,7 +24,24 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin) -> "ReporterLine":
+                  lims_db: PostgresQueryMixin,
+                  allow_none: bool = False) -> "ReporterLine":
+        """
+        Parameters
+        ----------
+        behavior_session_id: int
+
+        lims_db: PostgresQueryMixin
+
+        allow_none: bool
+            if True, allow None as a valid result
+
+        Returns
+        -------
+        An instance of ReporterLine with the value resulting
+        from a query to the LIMS database
+        """
+
         query = f"""
             SELECT g.name AS reporter_line
             FROM behavior_sessions bs
@@ -37,6 +54,9 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         """
         result = lims_db.fetchall(query)
         if result is None or len(result) < 1:
+            if allow_none:
+                return cls(reporter_line=None)
+
             raise OneOrMoreResultExpectedError(
                 f"Expected one or more, but received: '{result}' "
                 f"from query:\n'{query}'")

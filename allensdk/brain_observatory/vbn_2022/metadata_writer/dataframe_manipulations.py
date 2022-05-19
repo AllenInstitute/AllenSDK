@@ -302,24 +302,39 @@ def _patch_date_and_stage_from_pickle_file(
     return behavior_df
 
 
-def _add_age_in_days(df: pd.DataFrame) -> pd.DataFrame:
+def _add_age_in_days(
+        df: pd.DataFrame,
+        index_column: str) -> pd.DataFrame:
     """
     Add an 'age_in_days' column to a dataframe by subtracting
     'date_of_birth' from 'date_of_acquisition'. Return the
     dataframe with the new column added.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+
+    index_column: str
+        The column to use as an index when adding age_in_days
+        (usually "behavior_session_id" or "ecephys_session_id")
+
+    Returns
+    -------
+    df: pd.DataFrame
+        Same as input, but with age_in_days added
     """
     age_in_days = []
     for beh_id, acq, birth in zip(
-                df.behavior_session_id,
-                df.date_of_acquisition,
-                df.date_of_birth):
+                df[index_column],
+                df['date_of_acquisition'],
+                df['date_of_birth']):
         age = (acq-birth).days
-        age_in_days.append({'behavior_session_id': beh_id,
+        age_in_days.append({index_column: beh_id,
                             'age_in_days': age})
     age_in_days = pd.DataFrame(data=age_in_days)
     df = df.join(
-            age_in_days.set_index('behavior_session_id'),
-            on='behavior_session_id',
+            age_in_days.set_index(index_column),
+            on=index_column,
             how='left')
     return df
 

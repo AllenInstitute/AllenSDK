@@ -1,3 +1,4 @@
+import pytest
 import pandas as pd
 import datetime
 import copy
@@ -216,7 +217,8 @@ def test_patch_date_and_stage_from_pickle_file(
     pd.testing.assert_frame_equal(actual, expected)
 
 
-def test_add_age_in_days():
+@pytest.mark.parametrize('index_column', ['behavior_session_id', 'other_id'])
+def test_add_age_in_days(index_column):
     """
     Test that _add_age_in_days adds the expected column to a dataframe
     """
@@ -224,19 +226,20 @@ def test_add_age_in_days():
     input_data = []
 
     input_data.append(
-       {'behavior_session_id': 1,
+       {index_column: 1,
         'date_of_acquisition': datetime.datetime(2020, 7, 8, 12),
         'date_of_birth': datetime.datetime(2020, 7, 6, 14)})
     expected_age.append(1)
 
     input_data.append(
-       {'behavior_session_id': 2,
+       {index_column: 2,
         'date_of_acquisition': datetime.datetime(2020, 7, 9, 15),
         'date_of_birth': datetime.datetime(2020, 7, 6, 14)})
     expected_age.append(3)
 
     input_df = pd.DataFrame(data=input_data)
-    actual = _add_age_in_days(df=input_df)
+    actual = _add_age_in_days(df=input_df,
+                              index_column=index_column)
 
     for session, age in zip(input_data, expected_age):
         session['age_in_days'] = age
