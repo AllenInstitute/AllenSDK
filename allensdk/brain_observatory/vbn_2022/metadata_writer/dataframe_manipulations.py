@@ -2,7 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Dict, List
+from typing import Optional, Dict, List
 import pandas as pd
 import numpy as np
 import json
@@ -253,7 +253,8 @@ def _add_experience_level(
 def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
         behavior_df: pd.DataFrame,
-        flag_columns: List[str]) -> pd.DataFrame:
+        flag_columns: List[str],
+        columns_to_patch: Optional[List[str]] = None) -> pd.DataFrame:
     """
     Fill in missing date_of_acquisition and session_type
     directly from the stimulus pickle file
@@ -269,6 +270,11 @@ def _patch_date_and_stage_from_pickle_file(
         List of the column names which, if NULL, mark
         a row for patching from the pickle file
 
+    columns_to_patch: Optional[List[str]]
+        List of columns to patch from the pickle file.
+        Currently only supports 'date_of_acquisition' and
+        'session_type'. If None, patch both.
+
     Returns
     -------
     behavior_df: pd.DataFrame
@@ -282,6 +288,16 @@ def _patch_date_and_stage_from_pickle_file(
     Raises ValueError if one of the columns specified in
     flag_columns is not in the dataframe
     """
+
+    if columns_to_patch is None:
+        columns_to_patch = ['date_of_acquisition', 'session_type']
+    for col in columns_to_patch:
+        msg = ""
+        if col not in ('date_of_acquisition', 'session_type'):
+            msg += ("can only patch 'date_of_acquisition' "
+                    "and 'session_type'; you asked for '{col}'\n")
+        if len(msg) > 0:
+            raise ValueError(msg)
 
     # assemble a list that is n_rows long that is
     # True whereever the dataframe needs to be patched
@@ -307,10 +323,16 @@ def _patch_date_and_stage_from_pickle_file(
             new_date = stim_file.date_of_acquisition
             new_session_type = stim_file.session_type
 
+            new_vals = {'date_of_acquisition': new_date,
+                        'session_type': new_session_type}
+
+            new_row = [new_vals[c] for c in columns_to_patch]
+            if len(new_row) == 1:
+                new_row = new_row[0]
+
             behavior_df.loc[
                 behavior_df.behavior_session_id == beh_id,
-                ('date_of_acquisition', 'session_type')] = (new_date,
-                                                            new_session_type)
+                columns_to_patch] = new_row
 
     return behavior_df
 

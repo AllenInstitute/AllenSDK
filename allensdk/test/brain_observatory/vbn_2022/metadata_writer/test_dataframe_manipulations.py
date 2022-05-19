@@ -151,16 +151,41 @@ def test_add_experience_level():
 
 
 @pytest.mark.parametrize(
-        "flag_columns, ids_to_fix",
+        "flag_columns, ids_to_fix, cols_to_fix",
         [(['date_of_acquisition', 'foraging_id', 'session_type'],
-          (1123, 5813, 2134)),
+          (1123, 5813, 2134),
+          ['date_of_acquisition', ]),
+         (['date_of_acquisition', 'foraging_id', 'session_type'],
+          (1123, 5813, 2134),
+          ['date_of_acquisition', 'session_type']),
+         (['date_of_acquisition', 'foraging_id', 'session_type'],
+          (1123, 5813, 2134),
+          ['session_type']),
+         (['date_of_acquisition', 'foraging_id', 'session_type'],
+          (1123, 5813, 2134),
+          None),
          (['foraging_id', 'session_type'],
-          (2134, 5813)),
-         (['foraging_id', ], (2134, ))])
+          (2134, 5813),
+          None),
+         (['foraging_id', 'session_type'],
+          (2134, 5813),
+          ['date_of_acquisition', 'session_type']),
+         (['foraging_id', 'session_type'],
+          (2134, 5813),
+          ['date_of_acquisition', ]),
+         (['foraging_id', 'session_type'],
+          (2134, 5813),
+          ['session_type', ]),
+         (['foraging_id', ], (2134, ), None),
+         (['foraging_id', ], (2134, ),
+          ['date_of_acquisition', 'session_type']),
+         (['foraging_id', ], (2134, ), ['date_of_acquisition', ]),
+         (['foraging_id', ], (2134, ), ['session_type', ])])
 def test_patch_date_and_stage_from_pickle_file(
         patching_pickle_file_fixture,
         flag_columns,
-        ids_to_fix):
+        ids_to_fix,
+        cols_to_fix):
     """
     Test that _patch_date_and_stage_from_pickle_file
     correctly patches sessions that are missing
@@ -171,6 +196,8 @@ def test_patch_date_and_stage_from_pickle_file(
 
     ids_to_fix denotes the behavior_session_id of the sessions
     we expect to be patched
+
+    cols_to_fix denotes the columns we want patched
     """
 
     input_data = []
@@ -231,19 +258,38 @@ def test_patch_date_and_stage_from_pickle_file(
     actual = _patch_date_and_stage_from_pickle_file(
                     lims_connection=DummyLimsConnection,
                     behavior_df=input_df,
-                    flag_columns=flag_columns)
+                    flag_columns=flag_columns,
+                    columns_to_patch=cols_to_fix)
+
+    if cols_to_fix is None:
+        cols_to_fix = ['date_of_acquisition', 'session_type']
 
     expected_data = copy.deepcopy(input_data)
     for idx, bid in enumerate((1123, 5813, 2134)):
         if bid not in ids_to_fix:
             continue
-        this_d = patching_pickle_file_fixture[bid]['date_of_acquisition']
-        this_s = patching_pickle_file_fixture[bid]['session_type']
-        expected_data[idx+1]['date_of_acquisition'] = this_d
-        expected_data[idx+1]['session_type'] = this_s
+        for col in cols_to_fix:
+            this_s = patching_pickle_file_fixture[bid][col]
+            expected_data[idx+1][col] = this_s
 
     expected = pd.DataFrame(data=expected_data)
-    pd.testing.assert_frame_equal(actual, expected)
+    pd.testing.assert_frame_equal(actual,
+                                  expected)
+
+
+
+def test_patch_date_and_stage_from_pickle_file_error():
+    """
+    Make sure that an error gets raised when you give
+    _patch_date_and_stage_from_pickle_file an unexpected
+    column to patch
+    """
+    with pytest.raises(ValueError, match="can only patch"):
+        _patch_date_and_stage_from_pickle_file(
+            lims_connection=None,
+            behavior_df=None,
+            flag_columns=['date_of_acquisition', ],
+            columns_to_patch=['date_of_acquisition', 'flavor'])
 
 
 @pytest.mark.parametrize('index_column', ['behavior_session_id', 'other_id'])
