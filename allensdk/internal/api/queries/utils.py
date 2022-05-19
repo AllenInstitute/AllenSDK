@@ -103,9 +103,9 @@ def _convert_list_of_string_to_sql_safe_string(
     -------
     List of sql-safe strings
     """
-    if not strings:
+    if len(strings) == 0:
         return strings
-    if not strings[0]:
+    if len(strings[0]) == 0:
         return strings
 
     # If the first element doesn't start with single quote, assume none of the
