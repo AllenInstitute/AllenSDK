@@ -281,8 +281,6 @@ def _patch_date_and_stage_from_pickle_file(
                     behavior_df.session_type.isna()))
     ].behavior_session_id.values
 
-    assert len(invalid_beh) == len(np.unique(invalid_beh))
-
     if len(invalid_beh) > 0:
         pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
                             lims_connection=lims_connection,
