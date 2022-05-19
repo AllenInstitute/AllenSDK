@@ -277,7 +277,6 @@ def test_patch_date_and_stage_from_pickle_file(
                                   expected)
 
 
-
 def test_patch_date_and_stage_from_pickle_file_error():
     """
     Make sure that an error gets raised when you give
