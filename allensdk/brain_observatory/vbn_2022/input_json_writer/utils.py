@@ -30,7 +30,8 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.\
     dataframe_manipulations import (
-        _add_age_in_days)
+        _add_age_in_days,
+        _patch_date_and_stage_from_pickle_file)
 
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP)
@@ -238,6 +239,19 @@ def session_input_from_ecephys_session_id_list(
     session_table = _ecephys_summary_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
             ecephys_session_id_list=ecephys_session_id_list)
+
+    # get date_of_acquisition from the pickle file by nulling out the
+    # dates of acqusition from any sessions with behavior_session_ids,
+    # then filling the values back in from the pickle file.
+    session_table.loc[
+        np.logical_not(session_table.behavior_session_id.isna()),
+        'date_of_acquisition'] = None
+
+    session_table = _patch_date_and_stage_from_pickle_file(
+                            lims_connection=lims_connection,
+                            behavior_df=session_table,
+                            flag_columns=['date_of_acquisition'],
+                            columns_to_patch=['date_of_acquisition'])
 
     session_table = _add_age_in_days(
                 df=session_table,
