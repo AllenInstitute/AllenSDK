@@ -265,12 +265,13 @@ def test_patch_date_and_stage_from_pickle_file(
         cols_to_fix = ['date_of_acquisition', 'session_type']
 
     expected_data = copy.deepcopy(input_data)
-    for idx, bid in enumerate((1123, 5813, 2134)):
+    for element in expected_data:
+        bid = element['behavior_session_id']
         if bid not in ids_to_fix:
             continue
         for col in cols_to_fix:
             this_s = patching_pickle_file_fixture[bid][col]
-            expected_data[idx+1][col] = this_s
+            element[col] = this_s
 
     expected = pd.DataFrame(data=expected_data)
     pd.testing.assert_frame_equal(actual,
