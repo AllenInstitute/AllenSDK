@@ -253,6 +253,11 @@ def session_input_from_ecephys_session_id_list(
                             flag_columns=['date_of_acquisition'],
                             columns_to_patch=['date_of_acquisition'])
 
+    # clip fractions of a second off the date of acquisition
+    # (DateTime data object will fail deserialization if you do not)
+    session_table.date_of_acquisition = \
+        session_table.date_of_acquisition.dt.floor('S')
+
     session_table = _add_age_in_days(
                 df=session_table,
                 index_column='ecephys_session_id')
