@@ -71,7 +71,7 @@
     "ecephys_session_id",
     "ecephys_structure_acronym",
     "left_right_ccf_coordinate",
-    "local_index",
+    "probe_channel_number",
     "probe_horizontal_position",
     "probe_vertical_position",
     "unit_count",
