@@ -2,7 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Dict, List
+from typing import Optional, Dict, List
 import pandas as pd
 import numpy as np
 import json
@@ -252,7 +252,9 @@ def _add_experience_level(
 
 def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
-        behavior_df: pd.DataFrame) -> pd.DataFrame:
+        behavior_df: pd.DataFrame,
+        flag_columns: List[str],
+        columns_to_patch: Optional[List[str]] = None) -> pd.DataFrame:
     """
     Fill in missing date_of_acquisition and session_type
     directly from the stimulus pickle file
@@ -264,6 +266,15 @@ def _patch_date_and_stage_from_pickle_file(
     behavior_df: pd.DataFrame
         The dataframe to be patched
 
+    flag_columns: Lis[str]
+        List of the column names which, if NULL, mark
+        a row for patching from the pickle file
+
+    columns_to_patch: Optional[List[str]]
+        List of columns to patch from the pickle file.
+        Currently only supports 'date_of_acquisition' and
+        'session_type'. If None, patch both.
+
     Returns
     -------
     behavior_df: pd.DataFrame
@@ -271,17 +282,35 @@ def _patch_date_and_stage_from_pickle_file(
         date_of_acquisition or foraging_id will have their
         date_of_acquisition and session_type overwritten with
         values from the stimulus pickle file.
+
+    Note
+    ----
+    Raises ValueError if one of the columns specified in
+    flag_columns is not in the dataframe
     """
 
-    invalid_beh = behavior_df[
-            np.logical_or(
-                behavior_df.date_of_acquisition.isna(),
-                np.logical_or(
-                    behavior_df.foraging_id.isna(),
-                    behavior_df.session_type.isna()))
-    ].behavior_session_id.values
+    if columns_to_patch is None:
+        columns_to_patch = ['date_of_acquisition', 'session_type']
+    for col in columns_to_patch:
+        msg = ""
+        if col not in ('date_of_acquisition', 'session_type'):
+            msg += ("can only patch 'date_of_acquisition' "
+                    "and 'session_type'; you asked for '{col}'\n")
+        if len(msg) > 0:
+            raise ValueError(msg)
 
-    assert len(invalid_beh) == len(np.unique(invalid_beh))
+    # assemble a list that is n_rows long that is
+    # True whereever the dataframe needs to be patched
+    invalid_rows = np.zeros(len(behavior_df), dtype=bool)
+    for col_name in flag_columns:
+        if col_name not in behavior_df.columns:
+            raise ValueError("dataframe does not contain column "
+                             "{col_name}")
+        invalid_rows[behavior_df[col_name].isna()] = True
+
+    invalid_beh = behavior_df.iloc[
+            invalid_rows
+    ].behavior_session_id.values
 
     if len(invalid_beh) > 0:
         pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
@@ -294,10 +323,16 @@ def _patch_date_and_stage_from_pickle_file(
             new_date = stim_file.date_of_acquisition
             new_session_type = stim_file.session_type
 
+            new_vals = {'date_of_acquisition': new_date,
+                        'session_type': new_session_type}
+
+            new_row = [new_vals[c] for c in columns_to_patch]
+            if len(new_row) == 1:
+                new_row = new_row[0]
+
             behavior_df.loc[
                 behavior_df.behavior_session_id == beh_id,
-                ('date_of_acquisition', 'session_type')] = (new_date,
-                                                            new_session_type)
+                columns_to_patch] = new_row
 
     return behavior_df
 
