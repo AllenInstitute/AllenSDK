@@ -556,7 +556,7 @@ def channel_input_from_ecephys_session_id(
     raw_channels_table = raw_channels_table[[
                               'id',
                               'probe_id',
-                              'local_index',
+                              'probe_channel_number',
                               'manual_structure_id',
                               'manual_structure_acronym',
                               'anterior_posterior_ccf_coordinate',

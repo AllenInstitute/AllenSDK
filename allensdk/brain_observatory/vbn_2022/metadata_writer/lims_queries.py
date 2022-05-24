@@ -333,7 +333,7 @@ def channels_table_from_ecephys_session_id_list(
         ecephys_channel_id -- int64
         ecephys_probe_id -- int64
         ecephys_session_id -- int64
-        local_index -- int64
+        probe_channel_number -- int64
         probe_vertical_position -- float64
         probe_horizontal_position -- float64
         anterior_posterior_ccf_coordinate -- float64
@@ -350,7 +350,7 @@ def channels_table_from_ecephys_session_id_list(
        ecephys_channels.id as ecephys_channel_id
       ,ecephys_channels.ecephys_probe_id
       ,ecephys_sessions.id AS ecephys_session_id
-      ,ecephys_channels.local_index
+      ,ecephys_channels.local_index as probe_channel_number
       ,ecephys_channels.probe_vertical_position
       ,ecephys_channels.probe_horizontal_position
       ,ecephys_channels.anterior_posterior_ccf_coordinate

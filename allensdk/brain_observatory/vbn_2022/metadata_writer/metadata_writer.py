@@ -114,10 +114,6 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     axis='columns',
                     inplace=True)
 
-        channels_table.rename(
-            columns={'local_index': 'probe_channel_number'},
-            inplace=True)
-
         channels_table.to_csv(self.args['channels_path'], index=False)
 
         (session_table,

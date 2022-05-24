@@ -84,7 +84,7 @@ def test_probe_channels_strip_subregion(
     """Tests that subregion is stripped from manual structure acronym"""
     c = Channel(
         id=1,
-        local_index=1,
+        probe_channel_number=1,
         probe_vertical_position=1,
         probe_horizontal_position=1,
         probe_id=1,

@@ -284,7 +284,8 @@ def test_add_probe_to_nwbfile(
     (None,
 
      {"probe_vertical_position", "probe_horizontal_position",
-      "probe_id", "local_index", "valid_data", "x", "y", "z", "group",
+      "probe_id", "probe_channel_number", "valid_data",
+      "x", "y", "z", "group",
       "group_name", "imp", "location", "filtering"}),
 
     ([("test_column_a", "description_a"),
@@ -301,12 +302,12 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
     assert set(nwbfile.electrodes.colnames) == expected_columns
 
 
-@pytest.mark.parametrize(("channels, local_index_whitelist, "
+@pytest.mark.parametrize(("channels, channel_number_whitelist, "
                           "expected_electrode_table"), [
                              ([{"id": 1,
                                 "probe_id": 1234,
                                 "valid_data": True,
-                                "local_index": 23,
+                                "probe_channel_number": 23,
                                 "probe_vertical_position": 10,
                                 "probe_horizontal_position": 10,
                                 "anterior_posterior_ccf_coordinate": 15.0,
@@ -319,7 +320,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                                {"id": 2,
                                 "probe_id": 1234,
                                 "valid_data": True,
-                                "local_index": 15,
+                                "probe_channel_number": 15,
                                 "probe_vertical_position": 20,
                                 "probe_horizontal_position": 20,
                                 "anterior_posterior_ccf_coordinate": 25.0,
@@ -335,7 +336,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                                   "id": [2, 1],
                                   "probe_id": [1234, 1234],
                                   "valid_data": [True, True],
-                                  "local_index": [15, 23],
+                                  "probe_channel_number": [15, 23],
                                   "probe_vertical_position": [20, 10],
                                   "probe_horizontal_position": [20, 10],
                                   "x": [25.0, 15.0],
@@ -349,7 +350,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                               }).set_index("id"))
 
                          ])
-def test_add_ecephys_electrodes(nwbfile, channels, local_index_whitelist,
+def test_add_ecephys_electrodes(nwbfile, channels, channel_number_whitelist,
                                 expected_electrode_table):
     mock_device = pynwb.device.Device(name="mock_device")
     mock_electrode_group = pynwb.ecephys.ElectrodeGroup(name="mock_group",
@@ -361,7 +362,7 @@ def test_add_ecephys_electrodes(nwbfile, channels, local_index_whitelist,
         nwbfile,
         channels,
         mock_electrode_group,
-        local_index_whitelist)
+        channel_number_whitelist)
 
     obt_electrode_table = \
         nwbfile.electrodes.to_dataframe().drop(columns=["group", "group_name"])
@@ -591,7 +592,7 @@ def probe_data():
             {
                 "id": 0,
                 "probe_id": 12,
-                "local_index": 1,
+                "probe_channel_number": 1,
                 "probe_vertical_position": 21,
                 "probe_horizontal_position": 33,
                 "valid_data": True,
@@ -605,7 +606,7 @@ def probe_data():
             {
                 "id": 1,
                 "probe_id": 12,
-                "local_index": 2,
+                "probe_channel_number": 2,
                 "probe_vertical_position": 21,
                 "probe_horizontal_position": 32,
                 "valid_data": True,
@@ -619,7 +620,7 @@ def probe_data():
             {
                 "id": 2,
                 "probe_id": 12,
-                "local_index": 3,
+                "probe_channel_number": 3,
                 "probe_vertical_position": 21,
                 "probe_horizontal_position": 31,
                 "valid_data": True,
@@ -725,7 +726,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         obt_electrodes_df = obt_f.electrodes.to_dataframe()
 
         obt_electrodes = obt_electrodes_df.loc[
-                         :, ["local_index", "probe_horizontal_position",
+                         :, ["probe_channel_number",
+                             "probe_horizontal_position",
                              "probe_id", "probe_vertical_position",
                              "valid_data", "x", "y", "z", "location", "imp",
                              "filtering"]
@@ -1077,7 +1079,7 @@ def test_filter_and_sort_spikes(
        "channels": [{"id": 1,
                      "probe_id": 1234,
                      "valid_data": True,
-                     "local_index": 0,
+                     "probe_channel_number": 0,
                      "probe_vertical_position": 10,
                      "probe_horizontal_position": 10,
                      "anterior_posterior_ccf_coordinate": 15.0,
@@ -1089,7 +1091,7 @@ def test_filter_and_sort_spikes(
                     {"id": 2,
                      "probe_id": 1234,
                      "valid_data": True,
-                     "local_index": 1,
+                     "probe_channel_number": 1,
                      "probe_vertical_position": 20,
                      "probe_horizontal_position": 20,
                      "anterior_posterior_ccf_coordinate": 25.0,

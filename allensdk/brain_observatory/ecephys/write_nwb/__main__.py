@@ -289,7 +289,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
 
     add_ecephys_electrodes(nwbfile, probe["channels"],
                            probe_nwb_electrode_group,
-                           local_index_whitelist=lfp_channels)
+                           channel_number_whitelist=lfp_channels)
 
     electrode_table_region = nwbfile.create_electrode_table_region(
         region=np.arange(len(nwbfile.electrodes)).tolist(),  # use raw inds

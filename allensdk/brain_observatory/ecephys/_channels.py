@@ -30,7 +30,7 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
             id=channel['id'],
             probe_id=channel['probe_id'],
             valid_data=channel['valid_data'],
-            local_index=channel['local_index'],
+            probe_channel_number=channel['probe_channel_number'],
             probe_vertical_position=channel['probe_vertical_position'],
             probe_horizontal_position=channel['probe_horizontal_position'],
             manual_structure_acronym=channel['manual_structure_acronym'],
@@ -91,11 +91,28 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
             if probe_id is not None:
                 if row['probe_id'] != probe_id:
                     continue
+
+            has_local_index = ('local_index' in row.keys())
+            has_channel_number = ('probe_channel_number' in row.keys())
+            if has_local_index and has_channel_number:
+                raise RuntimeError("Unclear how to read channel; "
+                                   "has both 'local_index' and "
+                                   "'probe_channel_number'")
+            elif has_local_index:
+                idx_col = 'local_index'
+            elif has_channel_number:
+                idx_col = 'probe_channel_number'
+            else:
+                raise RuntimeError("Unclear how to read channel; "
+                                   "has neither 'local_index' nor "
+                                   "'probe_channel_number'.\n"
+                                   f"Columns are {row.keys()}")
+
             manual_structure_acronym = \
                 np.nan if row['location'] in ['None', ''] else row['location']
             channels.append(Channel(
                 id=channel_id,
-                local_index=row['local_index'],
+                probe_channel_number=row[idx_col],
                 probe_horizontal_position=row['probe_horizontal_position'],
                 probe_vertical_position=row['probe_vertical_position'],
                 probe_id=row['probe_id'],
