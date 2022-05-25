@@ -13,7 +13,8 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
 from allensdk.core import DataObject
 from allensdk.core.pickle_utils import (
-    load_and_sanitize_pickle)
+    load_and_sanitize_pickle,
+    _sanitize_pickle_data)
 
 # Query returns path to StimulusPickle file for given behavior session
 BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
@@ -57,6 +58,7 @@ class _StimulusFile(DataFile):
         raise NotImplementedError()
 
     def __init__(self, filepath: Union[str, Path]):
+        self._sanitized_data = None
         super().__init__(filepath=filepath)
 
     @classmethod
@@ -83,14 +85,39 @@ class _StimulusFile(DataFile):
     @staticmethod
     def load_data(filepath: Union[str, Path]) -> dict:
         filepath = safe_system_path(file_name=filepath)
-        return load_and_sanitize_pickle(pickle_path=filepath)
+
+        if pickle_path.name.endswith('gz'):
+            open_method = gzip.open
+        elif pickle_path.name.endswith('pkl'):
+            open_method = open
+
+        with open_method(pickle_path, 'rb') as in_file:
+            return pickle.load(in_file, encoding='bytes')
+
+    def _get_sanitized_data(self):
+        """
+        Save a copy of data with bytes converted to strings in the dict
+        """
+        self._sanitized_data = _sanitize_pickle(
+                copy.deepcopy(self._data))
+
+    @property
+    def data(self) -> Any:  # pragma: no cover
+        """
+        To support backwards compatibility, this will return a copy
+        of self._data that has been sanitized so that bytes are converted
+        to string in the dict.
+        """
+        if self._sanitized_data is None:
+            self._get_sanitized_data()
+        return self._sanitized_data
 
     @property
     def num_frames(self) -> int:
         """
         Return the number of frames associated with this StimulusFile
         """
-        return len(self.data['intervalsms']) + 1
+        return len(self._data[b'intervalsms']) + 1
 
 
 class BehaviorStimulusFile(_StimulusFile):
@@ -111,39 +138,12 @@ class BehaviorStimulusFile(_StimulusFile):
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)
 
-    def _validate_frame_data(self):
-        """
-        Make sure that self.data['intervalsms'] does not exist and that
-        self.data['items']['behavior']['intervalsms'] does exist.
-        """
-        msg = ""
-        if "intervalsms" in self.data:
-            msg += "self.data['intervalsms'] present; did not expect that\n"
-        if "items" not in self.data:
-            msg += "self.data['items'] not present\n"
-        else:
-            if "behavior" not in self.data["items"]:
-                msg += "self.data['items']['behavior'] not present\n"
-            else:
-                if "intervalsms" not in self.data["items"]["behavior"]:
-                    msg += ("self.data['items']['behavior']['intervalsms'] "
-                            "not present\n")
-
-        if len(msg) > 0:
-            full_msg = f"When getting num_frames from {type(self)}\n"
-            full_msg += msg
-            full_msg += f"\nfilepath: {self.filepath}"
-            raise RuntimeError(full_msg)
-
-        return None
-
     @property
     def num_frames(self) -> int:
         """
         Return the number of frames associated with this StimulusFile
         """
-        self._validate_frame_data()
-        return len(self.data['items']['behavior']['intervalsms']) + 1
+        return len(self._data[b'items'][b'behavior'][b'intervalsms']) + 1
 
     @property
     def date_of_acquisition(self) -> datetime.datetime:
@@ -152,13 +152,12 @@ class BehaviorStimulusFile(_StimulusFile):
 
         This will be read from self.data['start_time']
         """
-        assert isinstance(self.data, dict)
-        if 'start_time' not in self.data:
+        if b'start_time' not in self._data:
             raise KeyError(
                 "No 'start_time' listed in pickle file "
                 f"{self.filepath}")
 
-        return copy.deepcopy(self.data['start_time'])
+        return copy.deepcopy(self._data[b'start_time'])
 
     @property
     def session_type(self) -> str:
@@ -173,24 +172,24 @@ class BehaviorStimulusFile(_StimulusFile):
         if both are present and they disagree, raise an exception
         """
         param_value = None
-        if 'params' in self.data['items']['behavior']:
-            if 'stage' in self.data['items']['behavior']['params']:
-                param_value = self.data['items']['behavior']['params']['stage']
+        if b'params' in self._data[b'items'][b'behavior']:
+            if b'stage' in self._data[b'items'][b'behavior'][b'params']:
+                param_value = self._data[b'items'][b'behavior'][b'params'][b'stage']
 
         cl_value = None
-        if 'cl_params' in self.data['items']['behavior']:
-            if 'stage' in self.data['items']['behavior']['cl_params']:
-                cl_value = self.data['items']['behavior']['cl_params']['stage']
+        if b'cl_params' in self._data[b'items'][b'behavior']:
+            if b'stage' in self._data[b'items'][b'behavior'][b'cl_params']:
+                cl_value = self._data[b'items'][b'behavior'][b'cl_params'][b'stage']
 
         if cl_value is None and param_value is None:
             raise RuntimeError("Could not find stage in pickle file "
                                f"{self.filepath}")
 
         if param_value is None:
-            return cl_value
+            desired_value = cl_value
 
         if cl_value is None:
-            return param_value
+            desired_value = param_value
 
         if cl_value != param_value:
             raise RuntimeError(
@@ -199,7 +198,10 @@ class BehaviorStimulusFile(_StimulusFile):
                 f"cl_params: {cl_value}\n"
                 f"params: {param_value}\n")
 
-        return param_value
+        desired_value = param_value
+        if isinstance(desired_value, bytes):
+            desired_value = desired_value.decode('utf-8')
+        return desired_value
 
     @property
     def session_duration(self) -> float:
@@ -210,7 +212,7 @@ class BehaviorStimulusFile(_StimulusFile):
         -------
         session duration in seconds
         """
-        delta = self.data['stop_time'] - self.data['start_time']
+        delta = self._data[b'stop_time'] - self._data[b'start_time']
         return delta.total_seconds()
 
 
