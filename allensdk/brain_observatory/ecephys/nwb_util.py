@@ -103,10 +103,11 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate,
     return nwbfile, probe_nwb_device, probe_nwb_electrode_group
 
 
-def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
-                           channels: List[dict],
-                           electrode_group: EcephysElectrodeGroup,
-                           local_index_whitelist: Optional[np.ndarray] = None):
+def add_ecephys_electrodes(
+       nwbfile: pynwb.NWBFile,
+       channels: List[dict],
+       electrode_group: EcephysElectrodeGroup,
+       channel_number_whitelist: Optional[np.ndarray] = None):
     """Add electrode information to an ecephys nwbfile electrode table.
 
     Parameters
@@ -139,7 +140,7 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
 
     electrode_group : EcephysElectrodeGroup
         The pynwb electrode group that electrodes should be associated with
-    local_index_whitelist : Optional[np.ndarray], optional
+    channel_number_whitelist : Optional[np.ndarray], optional
         If provided, only add electrodes (a.k.a. channels) specified by the
         whitelist (and in order specified), by default None
     """
@@ -147,9 +148,9 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
 
     channel_table = pd.DataFrame(channels)
 
-    if local_index_whitelist is not None:
-        channel_table.set_index("local_index", inplace=True)
-        channel_table = channel_table.loc[local_index_whitelist, :]
+    if channel_number_whitelist is not None:
+        channel_table.set_index("probe_channel_number", inplace=True)
+        channel_table = channel_table.loc[channel_number_whitelist, :]
         channel_table.reset_index(inplace=True)
 
     for _, row in channel_table.iterrows():
@@ -164,7 +165,7 @@ def add_ecephys_electrodes(nwbfile: pynwb.NWBFile,
             z=(np.nan if z is None else z),
             probe_vertical_position=row["probe_vertical_position"],
             probe_horizontal_position=row["probe_horizontal_position"],
-            local_index=row["local_index"],
+            probe_channel_number=row["probe_channel_number"],
             valid_data=row["valid_data"],
             probe_id=row["probe_id"],
             group=electrode_group,
@@ -194,7 +195,8 @@ def _add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
         ("probe_horizontal_position",
          "Width-wise position of electrode/channel on device (microns)"),
         ("probe_id", "The unique id of this electrode's/channel's device"),
-        ("local_index", "The local index of electrode/channel on device"),
+        ("probe_channel_number",
+         "The local index of electrode/channel on device"),
         ("valid_data", "Whether data from this electrode/channel is usable")
     ]
 

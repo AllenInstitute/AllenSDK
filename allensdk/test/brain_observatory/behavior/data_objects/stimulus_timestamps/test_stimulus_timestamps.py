@@ -262,7 +262,7 @@ class TestStimulusTimestampsFromMultipleStimulusBlocks:
     @classmethod
     def setup_class(cls):
         with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                  'ecephys_session_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
         input_data = input_data['session_data']

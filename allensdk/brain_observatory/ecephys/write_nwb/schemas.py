@@ -35,7 +35,7 @@ class Channel(RaisingSchema):
     id = Int(required=True)
     probe_id = Int(required=True)
     valid_data = Boolean(required=True)
-    local_index = Int(required=True)
+    probe_channel_number = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
     manual_structure_id = Int(required=True, allow_none=True)

@@ -11,7 +11,7 @@ class TestOptotaggingTable:
     @classmethod
     def setup_class(cls):
         with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                  'ecephys_session_1111216934_input.json') \
                 as f:
             input_data = json.load(f)
         cls._table_from_json = OptotaggingTable.from_json(

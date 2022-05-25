@@ -11,7 +11,7 @@ class Channel(DataObject):
             id: int,
             probe_id: int,
             valid_data: bool,
-            local_index: int,
+            probe_channel_number: int,
             probe_vertical_position: int,
             probe_horizontal_position: int,
             manual_structure_acronym: str = '',
@@ -36,7 +36,7 @@ class Channel(DataObject):
         self._id = id
         self._probe_id = probe_id
         self._valid_data = valid_data
-        self._local_index = local_index
+        self._probe_channel_number = probe_channel_number
         self._probe_vertical_position = probe_vertical_position
         self._probe_horizontal_position = probe_horizontal_position
         self._manual_structure_acronym = manual_structure_acronym
@@ -61,8 +61,8 @@ class Channel(DataObject):
         return self._valid_data
 
     @property
-    def local_index(self) -> int:
-        return self._local_index
+    def probe_channel_number(self) -> int:
+        return self._probe_channel_number
 
     @property
     def probe_vertical_position(self) -> int:
