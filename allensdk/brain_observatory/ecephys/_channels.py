@@ -92,6 +92,10 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
                 if row['probe_id'] != probe_id:
                     continue
 
+            # this block of code is necessary to maintain
+            # backwards compatibility with Visual Coding Neuropixels
+            # NWB files, which used 'local_index' to mean what we
+            # now mean by 'probe_channel_number'
             has_local_index = ('local_index' in row.keys())
             has_channel_number = ('probe_channel_number' in row.keys())
             if has_local_index and has_channel_number:
