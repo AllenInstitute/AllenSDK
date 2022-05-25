@@ -56,7 +56,7 @@ class TestPresentations:
     @classmethod
     def setup_class(cls):
         with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                  'ecephys_session_1111216934_input.json') \
                 as f:
             cls.input_data = json.load(f)['session_data']
         cls._table_from_json = Presentations.from_path(
@@ -177,7 +177,7 @@ class TestTemplates:
     @classmethod
     def setup_class(cls):
         with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'BEHAVIOR_ECEPHYS_WRITE_NWB_QUEUE_1111216934_input.json') \
+                  'ecephys_session_1111216934_input.json') \
                 as f:
             cls.input_data = json.load(f)['session_data']
         sf = BehaviorStimulusFile.from_json(
