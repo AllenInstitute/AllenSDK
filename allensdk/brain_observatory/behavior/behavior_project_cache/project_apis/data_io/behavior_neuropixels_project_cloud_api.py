@@ -12,7 +12,7 @@ from allensdk.brain_observatory.ecephys.behavior_ecephys_session \
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
 
-    MANIFEST_COMPATIBILITY = ["0.1.0", "1.0.0"]
+    MANIFEST_COMPATIBILITY = ["0.1.0", "10.0.0"]
 
     def _load_manifest_tables(self):
 
