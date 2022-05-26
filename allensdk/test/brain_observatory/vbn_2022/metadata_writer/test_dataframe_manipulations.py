@@ -10,8 +10,11 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         _add_experience_level,
         _patch_date_and_stage_from_pickle_file,
         _add_age_in_days,
-        _add_images_from_behavior, remove_aborted_sessions,
-        _get_session_duration_from_behavior_session_ids)
+        _add_images_from_behavior,
+        remove_aborted_sessions,
+        _get_session_duration_from_behavior_session_ids,
+        remove_pretest_sessions)
+
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
@@ -321,6 +324,30 @@ def test_add_age_in_days(index_column):
     expected = pd.DataFrame(data=input_data)
     assert 'age_in_days' in actual.columns
     pd.testing.assert_frame_equal(actual, expected)
+
+
+def test_remove_pretest_sessions():
+    """
+    Test that remove_pretest_sessions only removes
+    sessions whose session_types starts with 'pretest_'
+    """
+
+    raw_data = [
+        {'id': 0, 'session_type': 'A', 'col': 'foo'},
+        {'id': 1, 'session_type': 'pretest_B', 'col': 'bar'},
+        {'id': 2, 'session_type': 'C_pretest', 'col': 'baz'},
+        {'id': 3, 'session_type': 'D', 'col': 'pretest'}]
+
+    input_df = pd.DataFrame(data=raw_data)
+    actual = remove_pretest_sessions(
+                behavior_session_df=input_df)
+
+    expected = pd.DataFrame(data=[raw_data[0],
+                                  raw_data[2],
+                                  raw_data[3]])
+    expected = expected.set_index('id')
+    actual = actual.set_index('id')
+    pd.testing.assert_frame_equal(expected, actual)
 
 
 class TestDataframeManipulations(LimsTest):

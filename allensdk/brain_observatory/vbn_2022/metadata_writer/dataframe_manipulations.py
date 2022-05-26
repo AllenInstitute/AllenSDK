@@ -459,6 +459,18 @@ def remove_aborted_sessions(
     return behavior_df
 
 
+def remove_pretest_sessions(
+        behavior_session_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove any sessions whose session_type begins with 'pretest_'.
+    Return the input dataframe with the removed rows.
+    """
+    new_df = behavior_session_df[
+              np.logical_not(
+                  behavior_session_df.session_type.str.startswith('pretest_'))]
+    return new_df
+
+
 def _get_session_duration_from_behavior_session_ids(
         lims_connection: PostgresQueryMixin,
         behavior_session_id_list: List[int]
