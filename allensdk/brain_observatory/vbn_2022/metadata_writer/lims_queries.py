@@ -715,7 +715,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
             behavior_session_df.merge(get_death_date_for_mouse_ids(
                 lims_connections=lims_connection,
                 mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
-                on='mouse_id')['death_on']
+                on='mouse_id',
+                how='left')['death_on']
         ]
 
     if exclude_aborted_sessions:
