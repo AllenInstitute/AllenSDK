@@ -607,6 +607,37 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
     return struct_tbl
 
 
+def _filter_on_death_date(
+        behavior_session_df: pd.DataFrame,
+        lims_connection: PostgresQueryMixin) -> pd.DataFrame:
+    """
+    Given a pandas dataframe of behavior sessions, remove those
+    that were recorded after the mouse's death date.
+
+    Parameters
+    ----------
+    behavior_session_df: pd.DataFrame
+
+    lims_connection: PostgresQueryMixin
+
+    Returns
+    -------
+    behavior_session_df: pd.DataFrame
+        The same as input, but with the sessions that occurred
+        after the mouse's death date dropped.
+    """
+
+    behavior_session_df = behavior_session_df[
+            behavior_session_df['date_of_acquisition'] <=
+            behavior_session_df.merge(get_death_date_for_mouse_ids(
+                lims_connections=lims_connection,
+                mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
+                on='mouse_id',
+                how='left')['death_on']
+        ]
+    return behavior_session_df
+
+
 def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
@@ -710,14 +741,9 @@ def _behavior_session_table_from_ecephys_session_id_list(
     if exclude_sessions_after_death_date:
         # filter out any sessions which were mistakenly entered that fall
         # after mouse death date
-        behavior_session_df = behavior_session_df[
-            behavior_session_df['date_of_acquisition'] <=
-            behavior_session_df.merge(get_death_date_for_mouse_ids(
-                lims_connections=lims_connection,
-                mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
-                on='mouse_id',
-                how='left')['death_on']
-        ]
+        behavior_session_df = _filter_on_death_date(
+                behavior_session_df=behavior_session_df,
+                lims_connection=lims_connection)
 
     if exclude_aborted_sessions:
         behavior_session_df = remove_aborted_sessions(
