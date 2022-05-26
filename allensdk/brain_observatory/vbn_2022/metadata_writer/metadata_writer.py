@@ -1,5 +1,6 @@
 import argschema
 import pathlib
+import time
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema)
@@ -30,6 +31,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
     default_schema = VBN2022MetadataWriterInputSchema
 
     def run(self):
+        t0 = time.time()
 
         file_id_generator = FileIDGenerator()
 
@@ -91,6 +93,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
              "waveform_velocity_below"]]
 
         units_table.to_csv(self.args['units_path'], index=False)
+        self.logger.info(f"Wrote {self.args['units_path']} after "
+                         f"{time.time()-t0:.2e} seconds")
 
         probes_table = probes_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
@@ -103,6 +107,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             inplace=True)
 
         probes_table.to_csv(self.args['probes_path'], index=False)
+        self.logger.info(f"Wrote {self.args['probes_path']} after "
+                         f"{time.time()-t0:.2e} seconds")
 
         channels_table = channels_table_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
@@ -115,13 +121,16 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     inplace=True)
 
         channels_table.to_csv(self.args['channels_path'], index=False)
+        self.logger.info(f"Wrote {self.args['channels_path']} after "
+                         f"{time.time()-t0:.2e} seconds")
 
         (session_table,
          behavior_session_table) = session_tables_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     mtrain_connection=mtrain_connection,
                     ecephys_session_id_list=session_id_list,
-                    probe_ids_to_skip=probe_ids_to_skip)
+                    probe_ids_to_skip=probe_ids_to_skip,
+                    logger=self.logger)
 
         ecephys_nwb_dir = pathlib.Path(
                                 self.args['ecephys_nwb_dir'])
@@ -139,3 +148,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         behavior_session_table.to_csv(
                              self.args['behavior_sessions_path'],
                              index=False)
+
+        self.logger.info(f"Wrote {self.args['ecephys_sessions_path']}\n"
+                         f"and {self.args['behavior_sessions_path']}\n"
+                         f"after {time.time()-t0:.2e} seconds")

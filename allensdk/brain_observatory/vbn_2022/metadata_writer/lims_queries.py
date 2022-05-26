@@ -1,5 +1,6 @@
 from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
+import logging
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
 from allensdk.internal.api import PostgresQueryMixin
@@ -653,7 +654,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
         mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         exclude_sessions_after_death_date: bool = True,
-        exclude_aborted_sessions: bool = True
+        exclude_aborted_sessions: bool = True,
+        logger: Optional[logging.Logger] = None
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -678,6 +680,11 @@ def _behavior_session_table_from_ecephys_session_id_list(
         Whether to exclude aborted sessions. The way that we determine if a
         session is aborted is by comparing the session duration to an
         expected duration
+
+    logger: Optional[logging.Logger]
+        Really just passed through to track progress when patching
+        columns from the pickle file, since that is the most
+        expensive process.
 
     Returns
     -------
@@ -741,12 +748,17 @@ def _behavior_session_table_from_ecephys_session_id_list(
     behavior_session_df.date_of_acquisition = None
     behavior_session_df.session_type = None
 
+    if logger is not None:
+        logger.info("Patching date_of_acquisition and session_type "
+                    "from pickle file")
+
     behavior_session_df = _patch_date_and_stage_from_pickle_file(
                              lims_connection=lims_connection,
                              behavior_df=behavior_session_df,
                              flag_columns=['date_of_acquisition',
                                            'foraging_id',
-                                           'session_type'])
+                                           'session_type'],
+                             logger=logger)
 
     behavior_session_df = remove_pretest_sessions(
             behavior_session_df=behavior_session_df)
@@ -790,7 +802,8 @@ def session_tables_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]
+        probe_ids_to_skip: Optional[List[int]],
+        logger: Optional[logging.Logger] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform the database query to generate the ecephys_session_table
@@ -807,6 +820,11 @@ def session_tables_from_ecephys_session_id_list(
 
     probe_ids_to_skip: Optional[List[int]]
         The IDs of probes not being released
+
+    logger: Optional[logging.Logger]
+        Really just passed through to track progress
+        while patching columns from the pickle file,
+        since that is the most expensive process.
 
     Returns
     -------
@@ -858,7 +876,8 @@ def session_tables_from_ecephys_session_id_list(
     beh_table = _behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
             mtrain_connection=mtrain_connection,
-            ecephys_session_id_list=ecephys_session_id_list)
+            ecephys_session_id_list=ecephys_session_id_list,
+            logger=logger)
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                         lims_connection=lims_connection,
