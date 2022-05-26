@@ -627,14 +627,23 @@ def _filter_on_death_date(
         after the mouse's death date dropped.
     """
 
-    behavior_session_df = behavior_session_df[
-            behavior_session_df['date_of_acquisition'] <=
-            behavior_session_df.merge(get_death_date_for_mouse_ids(
+    behavior_session_df = behavior_session_df.merge(
+            get_death_date_for_mouse_ids(
                 lims_connections=lims_connection,
                 mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
-                on='mouse_id',
-                how='left')['death_on']
+            on='mouse_id',
+            how='left')
+
+    behavior_session_df = behavior_session_df[
+            behavior_session_df['date_of_acquisition'] <=
+            behavior_session_df['death_on']
         ]
+
+    behavior_session_df.drop(
+        labels=['death_on'],
+        axis='columns',
+        inplace=True)
+
     return behavior_session_df
 
 
