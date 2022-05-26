@@ -1,4 +1,5 @@
 import argschema
+from argschema.schemas import DefaultSchema
 import pathlib
 from marshmallow import post_load
 from marshmallow.validate import OneOf
@@ -81,3 +82,49 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
                 f"{msg}"
                 "Run with clobber=True if you want to overwrite")
         return data
+
+
+class PipelineMetadataSchema(DefaultSchema):
+
+    name = argschema.fields.Str(
+            required=True,
+            allow_none=False,
+            description=(
+                "Name of the pipeline component (e.g. 'AllenSDK')"))
+
+    version = argschema.fields.Str(
+            required=True,
+            allow_none=False,
+            description=(
+                "Semantic version of the pipeline component"))
+
+    comment = argschema.fields.Str(
+            required=False,
+            default="",
+            description=(
+                "Optional comment about this piece of software"))
+
+
+class VBN2022MetadataWriterOutputSchema(argschema.ArgSchema):
+
+    metadata_files = argschema.fields.List(
+            argschema.fields.InputFile,
+            description=(
+                "Paths to the metadata .csv files "
+                "written by this modules"))
+
+    data_pipeline_metadata = argschema.fields.Nested(
+            PipelineMetadataSchema,
+            many=True,
+            description=(
+                "Metadata about the pipeline used "
+                "to create this data release"))
+
+    project_name = argschema.fields.Str(
+            required=True,
+            default=None,
+            allow_none=False,
+            description=(
+                "The project name to be passed along "
+                "to the data_release_tool when uploading "
+                "this dataset"))
