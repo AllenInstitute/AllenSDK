@@ -3,6 +3,7 @@ import pathlib
 import copy
 import json
 import pandas as pd
+import tempfile
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
     .metadata_writer import VBN2022MetadataWriterClass
@@ -28,6 +29,9 @@ def test_metadata_writer_smoketest(
 
     output_dir = tmp_path_factory.mktemp('vbn_metadata_smoketest')
     output_dir = pathlib.Path(output_dir)
+    output_json_path = pathlib.Path(
+                           tempfile.mkstemp(dir=output_dir,
+                                            suffix='.json')[1])
     config['output_dir'] = str(output_dir.resolve().absolute())
 
     expected_paths = []
@@ -43,6 +47,7 @@ def test_metadata_writer_smoketest(
     config['ecephys_nwb_dir'] = this_dir
     config['clobber'] = False
     config['on_missing_file'] = on_missing_file
+    config['output_json'] = str(output_json_path.resolve().absolute())
 
     writer = VBN2022MetadataWriterClass(args=[], input_data=config)
     writer.run()
