@@ -170,19 +170,18 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             df=behavior_session_table,
             output_path=self.args['behavior_sessions_path'])
 
-        output_data = dict()
-        output_data['metadata_files'] = self.files_written
-
         pipeline_metadata = []
         sdk_metadata = {"name": "AllenSDK",
                         "version": str(allensdk.__version__),
                         "comment": ""}
         pipeline_metadata.append(sdk_metadata)
 
-        output_data["data_pipeline_metadata"] = pipeline_metadata
-
-        output_data["project_name"] = "visual-behavior-neuropixels"
-        output_data["log_level"] = "INFO"
+        output_data = {
+            'metadata_files': self.files_written,
+            'data_pipeline_metadata': pipeline_metadata,
+            'project_name': 'visual-behavior-neuropixels',
+            'log_level': 'INFO'
+        }
 
         self.output(output_data, indent=2)
 
