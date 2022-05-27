@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 import json
 import warnings
+import logging
+import time
 
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -254,7 +256,8 @@ def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
         behavior_df: pd.DataFrame,
         flag_columns: List[str],
-        columns_to_patch: Optional[List[str]] = None) -> pd.DataFrame:
+        columns_to_patch: Optional[List[str]] = None,
+        logger: Optional[logging.Logger] = None) -> pd.DataFrame:
     """
     Fill in missing date_of_acquisition and session_type
     directly from the stimulus pickle file
@@ -274,6 +277,8 @@ def _patch_date_and_stage_from_pickle_file(
         List of columns to patch from the pickle file.
         Currently only supports 'date_of_acquisition' and
         'session_type'. If None, patch both.
+
+    logger: Optional[logging.Logger]
 
     Returns
     -------
@@ -317,8 +322,13 @@ def _patch_date_and_stage_from_pickle_file(
                             lims_connection=lims_connection,
                             behavior_session_id_list=invalid_beh.tolist())
 
-        for beh_id, pkl_path in zip(pickle_path_df.behavior_session_id,
-                                    pickle_path_df.pkl_path):
+        n_to_patch = len(pickle_path_df)
+        t0 = time.time()
+        n_to_log = max(1, n_to_patch//10)
+
+        for beh_ct, (beh_id, pkl_path) in enumerate(
+                        zip(pickle_path_df.behavior_session_id,
+                            pickle_path_df.pkl_path)):
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
             new_date = stim_file.date_of_acquisition
             new_session_type = stim_file.session_type
@@ -333,6 +343,18 @@ def _patch_date_and_stage_from_pickle_file(
             behavior_df.loc[
                 behavior_df.behavior_session_id == beh_id,
                 columns_to_patch] = new_row
+
+            if (beh_ct + 1) % n_to_log == 0 and logger is not None:
+                duration = time.time()-t0
+                per = duration/(beh_ct+1)
+                pred = n_to_patch*per
+                remaining = pred-duration
+                logger.info(f"Patched {beh_ct+1} of {n_to_patch} "
+                            f"in {duration:.2e} seconds; "
+                            f"predict {remaining:.2e} seconds more")
+
+    if logger is not None:
+        logger.info("Done patching from pickle file")
 
     return behavior_df
 
@@ -457,6 +479,18 @@ def remove_aborted_sessions(
         )
     ]
     return behavior_df
+
+
+def remove_pretest_sessions(
+        behavior_session_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove any sessions whose session_type begins with 'pretest_'.
+    Return the input dataframe with the removed rows.
+    """
+    new_df = behavior_session_df[
+              np.logical_not(
+                  behavior_session_df.session_type.str.startswith('pretest_'))]
+    return new_df
 
 
 def _get_session_duration_from_behavior_session_ids(
