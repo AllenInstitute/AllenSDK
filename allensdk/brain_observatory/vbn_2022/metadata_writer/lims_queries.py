@@ -627,6 +627,17 @@ def _filter_on_death_date(
     behavior_session_df: pd.DataFrame
         The same as input, but with the sessions that occurred
         after the mouse's death date dropped.
+
+    Notes
+    -----
+    This function is necessary because of a user error.
+    Sessions were loaded into LIMS with the wrong donor_id,
+    causing there to be sessions associated with some mice
+    that occur after those mice's recorded death dates. Our
+    assumption is that the error is with the donor_id rather
+    than the death date, so we can correct it by filtering
+    out any sessions that occur on mice that are supposed
+    to be dead.
     """
 
     behavior_session_df = behavior_session_df.merge(
