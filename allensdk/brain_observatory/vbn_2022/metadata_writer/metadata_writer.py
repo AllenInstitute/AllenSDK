@@ -7,7 +7,7 @@ import allensdk
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema,
-    VBN2022MetadataWriterOutputSchema)
+    DataReleaseToolsInputSchema)
 
 from allensdk.brain_observatory.data_release_utils \
     .metadata_utils.id_generator import (
@@ -33,7 +33,7 @@ from allensdk.internal.api import db_connection_creator
 
 class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
     default_schema = VBN2022MetadataWriterInputSchema
-    default_output_schema = VBN2022MetadataWriterOutputSchema
+    default_output_schema = DataReleaseToolsInputSchema
 
     def write_df(
             self,

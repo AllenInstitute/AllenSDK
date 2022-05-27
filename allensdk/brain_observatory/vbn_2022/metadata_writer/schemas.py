@@ -105,7 +105,14 @@ class PipelineMetadataSchema(DefaultSchema):
                 "Optional comment about this piece of software"))
 
 
-class VBN2022MetadataWriterOutputSchema(argschema.ArgSchema):
+class DataReleaseToolsInputSchema(argschema.ArgSchema):
+    """
+    This schema will be used as the output schema for
+    data_release.metadata_writer modules. It is actually
+    a subset of the input schema for the
+    informatics_data_release_tools (the output of the metadata
+    writers is meant to be the input of the data_release_tool)
+    """
 
     metadata_files = argschema.fields.List(
             argschema.fields.InputFile,
