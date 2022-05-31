@@ -47,6 +47,18 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
           "{ecephys_nwb_dir}/{ecephys_nwb_prefix}_{ecephys_session_id}.nwb")
     )
 
+    supplemental_columns = argschema.fields.List(
+            argschema.fields.Dict,
+            default=None,
+            allow_none=True,
+            description=(
+                "List of dicts definining any supplemental columns "
+                "that need to be added to the ecephys_sessions.csv "
+                "table. Each dict should represent a row in a dataframe "
+                "that will get merged on ecephys_session_id with "
+                "the ecephys_sessions table (row must therefore contain "
+                "ecephys_session_id)"))
+
     on_missing_file = argschema.fields.Str(
             default='error',
             required=False,
