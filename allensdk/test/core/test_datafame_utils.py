@@ -174,3 +174,27 @@ def test_patch_with_duplicates(
                 columns_to_patch=['b', 'd'])
 
     pd.testing.assert_frame_equal(actual, expected_df)
+
+
+def test_patch_new_column(
+        target_df_fixture,
+        source_df_fixture):
+    """
+    Test case where we use patch_df_from_other in the case where we are
+    adding a column to target_df
+    """
+    expected_data = [
+        {'a': 1, 'b': 3.4, 'c': 'apple', 'd': None, 'e': 'frog'},
+        {'a': 9, 'b': 4.5, 'c': 'banana', 'd': 4.6, 'e': None},
+        {'a': 12, 'b': 7.8, 'c': 'pineapple', 'd': 'purple', 'e': 'dog'},
+        {'a': 17, 'b': None, 'c': 'papaya', 'd': 11, 'e': 'cat'}
+    ]
+    expected_df = pd.DataFrame(data=expected_data)
+
+    actual = patch_df_from_other(
+                source_df=source_df_fixture.copy(deep=True),
+                target_df=target_df_fixture,
+                index_column='a',
+                columns_to_patch=['e'])
+
+    pd.testing.assert_frame_equal(actual, expected_df)
