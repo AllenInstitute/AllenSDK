@@ -11,15 +11,20 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize(
-        'on_missing_file', ['skip', 'warn'])
+        'on_missing_file, with_supplement',
+        [('skip', False), ('warn', False), ('warn', True)])
 def test_metadata_writer_smoketest(
         smoketest_config_fixture,
         tmp_path_factory,
         helper_functions,
-        on_missing_file):
+        on_missing_file,
+        with_supplement):
     """
     smoke test for VBN 2022 metadata writer. Requires LIMS
     and mtrain connections.
+
+    If with_supplement is True, add supplemental columns
+    to the ecephys_sessions.csv file and test for their existence
     """
 
     output_names = ('units.csv', 'probes.csv', 'channels.csv',
@@ -33,6 +38,20 @@ def test_metadata_writer_smoketest(
                            tempfile.mkstemp(dir=output_dir,
                                             suffix='.json')[1])
     config['output_dir'] = str(output_dir.resolve().absolute())
+
+    if with_supplement:
+        # add suplemental columns to configuration
+        supplement = [{'ecephys_session_id': 1115077618,
+                       'supplementA': 'cat',
+                       'supplementB': 5},
+                      {'ecephys_session_id': 1081429294,
+                       'supplementA': 'frog',
+                       'supplementB': 6},
+                      {'ecephys_session_id': 11111,
+                       'supplementA': None,
+                       'supplementB': None}]
+
+        config['supplemental_columns'] = supplement
 
     expected_paths = []
     for name in output_names:
@@ -63,8 +82,25 @@ def test_metadata_writer_smoketest(
         assert file_path.exists()
         df = pd.read_csv(file_path)
         expected_columns = set(column_lookup[file_path.name])
+        if with_supplement and file_path.name == 'ecephys_sessions.csv':
+            expected_columns.add('supplementA')
+            expected_columns.add('supplementB')
+
         actual_columns = set(df.columns)
         assert expected_columns == actual_columns
+
+    if with_supplement:
+        df = pd.read_csv(output_dir / 'ecephys_sessions.csv')
+        # make sure that no extra rows were added when adding
+        # the supplemental columns
+        assert len(df) == 2
+
+        for expected in supplement[:2]:
+            this_row = df.loc[
+                df.ecephys_session_id == expected['ecephys_session_id']]
+            assert len(this_row) == 1
+            assert this_row.supplementA.values[0] == expected['supplementA']
+            assert this_row.supplementB.values[0] == expected['supplementB']
 
     helper_functions.windows_safe_cleanup_dir(
         dir_path=output_dir)
