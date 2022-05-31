@@ -56,7 +56,9 @@ def test_filter_on_death_date():
         {'mouse_id': 456,
          'death_on': datetime.datetime(2020, 3, 2)},
         {'mouse_id': 789,
-         'death_on': datetime.datetime(2020, 7, 14)}]
+         'death_on': datetime.datetime(2020, 7, 14)},
+        {'mouse_id': 1011,
+         'death_on': None}]
 
     death_df = pd.DataFrame(data=death_dates)
 
@@ -85,7 +87,10 @@ def test_filter_on_death_date():
          'date_of_acquisition': datetime.datetime(2020, 2, 2)},
         {'mouse_id': 123,
          'session_id': 5,
-         'date_of_acquisition': datetime.datetime(2020, 4, 7)}]
+         'date_of_acquisition': datetime.datetime(2020, 4, 7)},
+        {'mouse_id': 1011,
+         'session_id': 6,
+         'date_of_acqusition': datetime.datetime(2021, 11, 11)}]
 
     session_df = pd.DataFrame(data=session_data)
 
@@ -97,7 +102,8 @@ def test_filter_on_death_date():
             data=[session_data[1],
                   session_data[2],
                   session_data[4],
-                  session_data[5]])
+                  session_data[5],
+                  session_data[6]])
 
     expected = expected.set_index("session_id")
     actual = actual.set_index("session_id")

@@ -1,5 +1,6 @@
 from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
+import numpy as np
 import logging
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
@@ -648,8 +649,10 @@ def _filter_on_death_date(
             how='left')
 
     behavior_session_df = behavior_session_df[
-            behavior_session_df['date_of_acquisition'] <=
-            behavior_session_df['death_on']
+            np.logical_or(
+                behavior_session_df['date_of_acquisition'] <=
+                behavior_session_df['death_on'],
+                behavior_session_df['death_on'].isna())
         ]
 
     behavior_session_df.drop(
