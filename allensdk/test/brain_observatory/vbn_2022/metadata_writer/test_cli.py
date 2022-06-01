@@ -23,7 +23,7 @@ def test_metadata_writer_smoketest(
     smoke test for VBN 2022 metadata writer. Requires LIMS
     and mtrain connections.
 
-    If with_supplement is True, add supplemental columns
+    If with_supplement is True, add supplemental data
     to the ecephys_sessions.csv file and test for their existence
     """
 
@@ -51,7 +51,7 @@ def test_metadata_writer_smoketest(
                        'supplementA': None,
                        'supplementB': None}]
 
-        config['supplemental_columns'] = supplement
+        config['supplemental_data'] = supplement
 
     expected_paths = []
     for name in output_names:
@@ -92,7 +92,7 @@ def test_metadata_writer_smoketest(
     if with_supplement:
         df = pd.read_csv(output_dir / 'ecephys_sessions.csv')
         # make sure that no extra rows were added when adding
-        # the supplemental columns
+        # the supplemental data
         assert len(df) == 2
 
         for expected in supplement[:2]:

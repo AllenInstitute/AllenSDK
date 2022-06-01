@@ -47,7 +47,7 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
           "{ecephys_nwb_dir}/{ecephys_nwb_prefix}_{ecephys_session_id}.nwb")
     )
 
-    supplemental_columns = argschema.fields.List(
+    supplemental_data = argschema.fields.List(
             argschema.fields.Dict,
             default=None,
             allow_none=True,

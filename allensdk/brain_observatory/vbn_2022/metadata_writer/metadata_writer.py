@@ -167,10 +167,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
 
         # add supplemental columns to the ecephys_sessions
         # column
-        if self.args['supplemental_columns'] is not None:
-            self.logger.info("Adding supplemental columns")
+        if self.args['supplemental_data'] is not None:
+            self.logger.info("Adding supplemental data")
             supplemental_df = pd.DataFrame(
-                    data=self.args['supplemental_columns'])
+                    data=self.args['supplemental_data'])
 
             columns_to_patch = []
             for column_name in supplemental_df.columns:
