@@ -402,6 +402,52 @@ def channels_table_from_ecephys_session_id_list(
     return channels_table
 
 
+def _merge_ecephys_id_and_failed(
+        lims_connection: PostgresQueryMixin,
+        ecephys_session_id_list: List[int],
+        failed_ecephys_session_id_list: List[int]) -> List[int]:
+    """
+    Take a list of passed ecephys_session_ids and a list of
+    failed ecephys_session_ids and return return the union of
+    the two lists, ignoring any failed sessions which correspond
+    to a donor_id that is not represented in the passed list.
+
+    Parameters
+    ----------
+    lims_connection: PostgresQueryMixin
+
+    ecephys_session_id_list: List[int]
+        The passed sessions
+
+    failed_ecephys_session_id_list: List[int]
+        The failed sessions
+
+    Returns
+    -------
+    merged_ecephys_session_id_list: List[int]
+    """
+
+    passed_donor_lookup = donor_id_lookup_from_ecephys_session_ids(
+        lims_connection=lims_connection,
+        session_id_list=ecephys_session_id_list)
+
+    passed_donor_ids = set(passed_donor_lookup.donor_id.values)
+
+    failed_donor_lookup = donor_id_lookup_from_ecephys_session_ids(
+        lims_connection=lims_connection,
+        session_id_list=failed_ecephys_session_id_list)
+    to_keep = []
+    for session_id, donor_id in zip(
+            failed_donor_lookup.ecephys_session_id,
+            failed_donor_lookup.donor_id):
+        if donor_id in passed_donor_ids:
+            to_keep.append(int(session_id))
+
+    result = list(set(ecephys_session_id_list + to_keep))
+    result.sort()
+    return result
+
+
 def _ecephys_summary_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int]) -> pd.DataFrame:
