@@ -16,6 +16,17 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
             description=("List of ecephys_sessions.id values "
                          "of sessions to be released"))
 
+    failed_ecephys_session_id_list = argschema.fields.List(
+            argschema.fields.Int,
+            required=False,
+            default=None,
+            allow_none=True,
+            description=("List of ecephys_sessions.id values "
+                         "associated with this release that were "
+                         "failed. These are required to "
+                         "self-consistently construct the history of "
+                         "each mouse passing through the apparatus."))
+
     probes_to_skip = argschema.fields.List(
             argschema.fields.Nested(ProbeToSkip),
             required=False,

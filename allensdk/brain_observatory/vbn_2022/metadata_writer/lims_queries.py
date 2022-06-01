@@ -10,6 +10,9 @@ from allensdk.internal.api.queries.utils import (
     _sanitize_uuid_list,
     build_in_list_selector_query)
 
+from allensdk.internal.api.queries.ecephys_lims_queries import (
+    donor_id_lookup_from_ecephys_session_ids)
+
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
 
@@ -450,7 +453,8 @@ def _merge_ecephys_id_and_failed(
 
 def _ecephys_summary_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int]) -> pd.DataFrame:
+        ecephys_session_id_list: List[int],
+        failed_ecephys_session_id_list: Optional[List[int]]) -> pd.DataFrame:
     """
     Perform the database query that will return the session summary table.
 
@@ -461,6 +465,14 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
     ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
+
+    failed_ecephys_session_id_list: Optional[List[int]]
+        A list of ecephys_sessions that are ultimately failed
+        and should not be included in the release. The purpose
+        of this list is so that these sessions can be accounted
+        for in the various dataframe manipulations that calculate
+        a mouse's history passing through the apparatus (i.e. if
+        the day 1 session is failed but the day 2 session is not)
 
     Returns
     -------
@@ -480,7 +492,26 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
         date_of_birth -- pd.Timestamp
         equipment_id -- int
 
+
+    Note
+    -----
+    The returned dataframe will contain data for all sessions (passed and
+    failed) involving the mice from the passed sessions. This is so that
+    we can reconstruct each mouse's history passing through the apparatus,
+    even if an early session in that mouse's history is marked as "failed."
+
+    Subsequent processing steps will need to trim out sessions marked as
+    "failed" from the dataframe.
     """
+
+    if failed_ecephys_session_id_list is not None:
+        query_id_list = _merge_ecephys_id_and_failed(
+                lims_connection=lims_connection,
+                ecephys_session_id_list=ecephys_session_id_list,
+                failed_ecephys_session_id_list=failed_ecephys_session_id_list)
+    else:
+        query_id_list = ecephys_session_id_list
+
     query = """
         SELECT
           ecephys_sessions.id AS ecephys_session_id
@@ -514,7 +545,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
 
     query += build_in_list_selector_query(
             col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
+            valid_list=query_id_list,
             operator='WHERE',
             valid=True)
 
@@ -862,6 +893,7 @@ def session_tables_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
+        failed_ecephys_session_id_list: Optional[List[int]],
         probe_ids_to_skip: Optional[List[int]],
         logger: Optional[logging.Logger] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -877,6 +909,14 @@ def session_tables_from_ecephys_session_id_list(
     ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
         ecephys sessions for which to construct the units table
+
+    failed_ecephys_session_id_list: Optional[List[int]]
+        A list of ecephys_sessions that are ultimately failed
+        and should not be included in the release. The purpose
+        of this list is so that these sessions can be accounted
+        for in the various dataframe manipulations that calculate
+        a mouse's history passing through the apparatus (i.e. if
+        the day 1 session is failed but the day 2 session is not)
 
     probe_ids_to_skip: Optional[List[int]]
         The IDs of probes not being released
@@ -940,8 +980,9 @@ def session_tables_from_ecephys_session_id_list(
             logger=logger)
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
-                        lims_connection=lims_connection,
-                        ecephys_session_id_list=ecephys_session_id_list)
+                lims_connection=lims_connection,
+                ecephys_session_id_list=ecephys_session_id_list,
+                failed_ecephys_session_id_list=failed_ecephys_session_id_list)
 
     # patch date_of_acquisition and session_type from beh_table,
     # which read them directly from the pickle file
@@ -1015,5 +1056,11 @@ def session_tables_from_ecephys_session_id_list(
              'date_of_acquisition',
              'session_type',
              'image_set']]
+
+    # pare back down to only passed sessions
+    if failed_ecephys_session_id_list is not None:
+        sessions_table = sessions_table[
+                [eid in set(ecephys_session_id_list)
+                 for eid in sessions_table.ecephys_session_id]]
 
     return sessions_table, beh_table
