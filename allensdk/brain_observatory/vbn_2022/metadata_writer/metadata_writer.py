@@ -5,6 +5,9 @@ import pandas as pd
 
 import allensdk
 
+from allensdk.core.dataframe_utils import (
+    patch_df_from_other)
+
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema,
     DataReleaseToolsInputSchema)
@@ -143,7 +146,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             df=channels_table,
             output_path=self.args['channels_path'])
 
-        (session_table,
+        (ecephys_session_table,
          behavior_session_table) = session_tables_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     mtrain_connection=mtrain_connection,
@@ -154,16 +157,35 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         ecephys_nwb_dir = pathlib.Path(
                                 self.args['ecephys_nwb_dir'])
 
-        session_table = add_file_paths_to_metadata_table(
-                    metadata_table=session_table,
+        ecephys_session_table = add_file_paths_to_metadata_table(
+                    metadata_table=ecephys_session_table,
                     id_generator=file_id_generator,
                     file_dir=ecephys_nwb_dir,
                     file_prefix=self.args['ecephys_nwb_prefix'],
                     index_col='ecephys_session_id',
                     on_missing_file=self.args['on_missing_file'])
 
+        # add supplemental columns to the ecephys_sessions
+        # column
+        if self.args['supplemental_data'] is not None:
+            self.logger.info("Adding supplemental data")
+            supplemental_df = pd.DataFrame(
+                    data=self.args['supplemental_data'])
+
+            columns_to_patch = []
+            for column_name in supplemental_df.columns:
+                if column_name == 'ecephys_session_id':
+                    continue
+                columns_to_patch.append(column_name)
+
+            ecephys_session_table = patch_df_from_other(
+                    target_df=ecephys_session_table,
+                    source_df=supplemental_df,
+                    columns_to_patch=columns_to_patch,
+                    index_column='ecephys_session_id')
+
         self.write_df(
-            df=session_table,
+            df=ecephys_session_table,
             output_path=self.args['ecephys_sessions_path'])
 
         self.write_df(

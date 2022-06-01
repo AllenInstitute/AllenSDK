@@ -11,8 +11,8 @@ def smoketest_config_fixture():
     config parameters for on-prem metadata writer smoketest
     """
     config = {
-      "ecephys_session_id_list": [1115077618, 1081429294, 1123100019],
-      "probes_to_skip": [{"session": 1123100019, "probe": "probeC"}]
+      "ecephys_session_id_list": [1115077618, 1081429294],
+      "probes_to_skip": [{"session": 1115077618, "probe": "probeC"}]
     }
     return config
 
