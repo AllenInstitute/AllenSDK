@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
@@ -9,6 +10,9 @@ from allensdk.internal.api.queries.behavior_lims_queries import (
 
 from allensdk.internal.api.queries.mtrain_queries import (
     session_stage_from_foraging_id)
+
+from allensdk.internal.api.queries.ecephys_lims_queries import (
+    donor_id_list_from_ecephys_session_ids)
 
 from allensdk.test_utilities.custom_comparators import (
     WhitespaceStrippedString)
@@ -123,3 +127,32 @@ def test_sanitize_uuid_list():
 
     assert sanitized == ['12345678123456781234567812345678',
                          'abcdefab-1234-abcd-0123-0123456789ab']
+
+
+def test_donor_id_list_from_ecephys_session_ids():
+    """
+    Test that donor_id_list_from_ecephys_session_ids returns
+    a sorted list of donor_ids
+
+    (assumes that donor_lookup_from_ecephys_session_ids
+    works properly)
+    """
+
+    class DummyConnection(object):
+
+        def select(self, query=None):
+            data = [{'ecephys_session_id': 1, 'donor_id': 2},
+                    {'ecephys_session_id': 3, 'donor_id': 2},
+                    {'ecephys_session_id': 4, 'donor_id': 0},
+                    {'ecephys_session_id': 5, 'donor_id': 7},
+                    {'ecephys_session_id': 6, 'donor_id': 2}]
+
+            return pd.DataFrame(data=data)
+
+    expected = [0, 2, 7]
+
+    actual = donor_id_list_from_ecephys_session_ids(
+            lims_connection=DummyConnection(),
+            session_id_list=[9, 9, 9])
+
+    assert actual == expected
