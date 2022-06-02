@@ -238,7 +238,8 @@ def session_input_from_ecephys_session_id_list(
 
     session_table = _ecephys_summary_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
-            ecephys_session_id_list=ecephys_session_id_list)
+            ecephys_session_id_list=ecephys_session_id_list,
+            failed_ecephys_session_id_list=None)
 
     # get date_of_acquisition from the pickle file by nulling out the
     # dates of acqusition from any sessions with behavior_session_ids,

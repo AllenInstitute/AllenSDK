@@ -1,17 +1,23 @@
 from typing import List
+import pandas as pd
+import numpy as np
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
-def donor_id_list_from_ecephys_session_ids(
+def donor_id_lookup_from_ecephys_session_ids(
         lims_connection: PostgresQueryMixin,
-        session_id_list: List[int]) -> List[int]:
+        session_id_list: List[int]) -> pd.DataFrame:
     """
-    Get the list of donor IDs associated with a list
-    of ecephys_session_ids
+    Return a dataframe with columns
+    ecephys_session_id
+    donor_id
+    from a specified list of ecephys_session_ids
     """
     query = f"""
-    SELECT DISTINCT(donors.id) as donor_id
+    SELECT
+      donors.id as donor_id
+      ,ecephys_sessions.id as ecephys_session_id
     FROM donors
     JOIN specimens ON
       specimens.donor_id = donors.id
@@ -23,4 +29,18 @@ def donor_id_list_from_ecephys_session_ids(
     )}
     """
     result = lims_connection.select(query)
-    return list(result.donor_id)
+    return result
+
+
+def donor_id_list_from_ecephys_session_ids(
+        lims_connection: PostgresQueryMixin,
+        session_id_list: List[int]) -> List[int]:
+    """
+    Get the list of donor IDs associated with a list
+    of ecephys_session_ids
+    """
+    lookup = donor_id_lookup_from_ecephys_session_ids(
+                lims_connection=lims_connection,
+                session_id_list=session_id_list)
+
+    return list(np.unique(lookup.donor_id))

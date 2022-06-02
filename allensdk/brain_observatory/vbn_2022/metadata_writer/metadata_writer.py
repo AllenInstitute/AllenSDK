@@ -146,11 +146,15 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             df=channels_table,
             output_path=self.args['channels_path'])
 
+        failed_session_list = self.args[
+            'failed_ecephys_session_id_list']
+
         (ecephys_session_table,
          behavior_session_table) = session_tables_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
                     mtrain_connection=mtrain_connection,
                     ecephys_session_id_list=session_id_list,
+                    failed_ecephys_session_id_list=failed_session_list,
                     probe_ids_to_skip=probe_ids_to_skip,
                     logger=self.logger)
 

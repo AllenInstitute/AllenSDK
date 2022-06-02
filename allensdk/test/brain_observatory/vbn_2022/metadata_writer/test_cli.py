@@ -104,3 +104,53 @@ def test_metadata_writer_smoketest(
 
     helper_functions.windows_safe_cleanup_dir(
         dir_path=output_dir)
+
+
+@pytest.mark.requires_bamboo
+def test_with_failed_sessions(
+        smoketest_with_failed_sessions_config_fixture,
+        tmp_path_factory,
+        helper_functions):
+    """
+    Test that metadata writer CLI can handle
+    failed_ecephys_session_id_list
+    """
+    output_dir = pathlib.Path(tmp_path_factory.mktemp('failed_session_test'))
+    output_json_path = output_dir / 'output.json'
+
+    config = copy.deepcopy(smoketest_with_failed_sessions_config_fixture)
+    config['clobber'] = False
+    config['output_dir'] = str(output_dir.resolve().absolute())
+    config['on_missing_file'] = 'warn'
+    config['ecephys_nwb_prefix'] = 'not_here'
+    config['ecephys_nwb_dir'] = str(output_dir.resolve().absolute())
+    config['output_json'] = str(output_json_path.resolve().absolute())
+
+    writer = VBN2022MetadataWriterClass(args=[], input_data=config)
+    writer.run()
+
+    for fname in ('behavior_sessions.csv',
+                  'ecephys_sessions.csv',
+                  'channels.csv',
+                  'units.csv',
+                  'probes.csv'):
+        file_path = output_dir / fname
+        assert file_path.is_file()
+
+    ecephys_sessions_df = pd.read_csv(output_dir / 'ecephys_sessions.csv')
+
+    assert len(ecephys_sessions_df) == 1
+
+    for bad_session_id in config['failed_ecephys_session_id_list']:
+        assert (bad_session_id not in
+                ecephys_sessions_df.ecephys_session_id.values)
+
+    for good_session_id in config['ecephys_session_id_list']:
+        assert (good_session_id in
+                ecephys_sessions_df.ecephys_session_id.values)
+
+    # make sure this session was recorded with session_number = 2
+    assert ecephys_sessions_df.session_number.values[0] == 2
+
+    helper_functions.windows_safe_cleanup_dir(
+            dir_path=output_dir)

@@ -210,7 +210,16 @@ class BehaviorStimulusFile(_StimulusFile):
         -------
         session duration in seconds
         """
-        delta = self.data['stop_time'] - self.data['start_time']
+        start_time = self.data['start_time']
+        stop_time = self.data['stop_time']
+
+        if not isinstance(start_time, datetime.datetime):
+            start_time = datetime.datetime.fromtimestamp(start_time)
+        if not isinstance(stop_time, datetime.datetime):
+            stop_time = datetime.datetime.fromtimestamp(stop_time)
+
+        delta = stop_time - start_time
+
         return delta.total_seconds()
 
 
