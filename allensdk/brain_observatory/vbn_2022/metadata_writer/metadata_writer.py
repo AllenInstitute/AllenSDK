@@ -88,8 +88,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
              "cumulative_drift",
              "d_prime",
              "dorsal_ventral_ccf_coordinate",
-             "ecephys_structure_acronym",
-             "ecephys_structure_id",
+             "structure_acronym",
+             "structure_id",
              "firing_rate",
              "isi_violations",
              "isolation_distance",
@@ -138,7 +138,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     probe_ids_to_skip=probe_ids_to_skip)
 
         channels_table.drop(
-                    labels=['ecephys_structure_id'],
+                    labels=['structure_id'],
                     axis='columns',
                     inplace=True)
 

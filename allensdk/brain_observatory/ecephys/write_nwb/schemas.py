@@ -28,8 +28,8 @@ class Channel(RaisingSchema):
         if data.get("filtering") is None:
             data["filtering"] = ("AP band: 500 Hz high-pass; "
                                  "LFP band: 1000 Hz low-pass")
-        if data.get("manual_structure_acronym") is None:
-            data["manual_structure_acronym"] = ""
+        if data.get("structure_acronym") is None:
+            data["structure_acronym"] = ""
         return data
 
     id = Int(required=True)
@@ -38,8 +38,8 @@ class Channel(RaisingSchema):
     probe_channel_number = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True)
+    structure_id = Int(required=True, allow_none=True)
+    structure_acronym = String(required=True)
     anterior_posterior_ccf_coordinate = Float(allow_none=True)
     dorsal_ventral_ccf_coordinate = Float(allow_none=True)
     left_right_ccf_coordinate = Float(allow_none=True)

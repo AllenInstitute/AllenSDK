@@ -116,7 +116,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
 
             if filter_out_of_brain_units:
                 channels = channels[
-                    ~(channels['manual_structure_acronym'].isna())]
+                    ~(channels['structure_acronym'].isna())]
 
             # noinspection PyTypeChecker
             channel_ids = set(channels.index.values.tolist())

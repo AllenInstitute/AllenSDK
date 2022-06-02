@@ -460,7 +460,7 @@ def probe_input_from_ecephys_session_id(
                 'has_lfp_data',
                 'unit_count',
                 'channel_count',
-                'ecephys_structure_acronyms'],
+                'structure_acronyms'],
         axis='columns',
         inplace=True)
 
@@ -549,17 +549,15 @@ def channel_input_from_ecephys_session_id(
 
     raw_channels_table.rename(
             columns={'ecephys_channel_id': 'id',
-                     'ecephys_probe_id': 'probe_id',
-                     'ecephys_structure_acronym': 'manual_structure_acronym',
-                     'ecephys_structure_id': 'manual_structure_id'},
+                     'ecephys_probe_id': 'probe_id'},
             inplace=True)
 
     raw_channels_table = raw_channels_table[[
                               'id',
                               'probe_id',
                               'probe_channel_number',
-                              'manual_structure_id',
-                              'manual_structure_acronym',
+                              'structure_id',
+                              'structure_acronym',
                               'anterior_posterior_ccf_coordinate',
                               'dorsal_ventral_ccf_coordinate',
                               'left_right_ccf_coordinate',
@@ -638,8 +636,8 @@ def unit_input_from_ecephys_session_id(
                 'probe_horizontal_position',
                 'anterior_posterior_ccf_coordinate',
                 'dorsal_ventral_ccf_coordinate',
-                'ecephys_structure_id',
-                'ecephys_structure_acronym',
+                'structure_id',
+                'structure_acronym',
                 'valid_data'],
         axis='columns',
         inplace=True)

@@ -313,7 +313,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                                 "anterior_posterior_ccf_coordinate": 15.0,
                                 "dorsal_ventral_ccf_coordinate": 20.0,
                                 "left_right_ccf_coordinate": 25.0,
-                                "manual_structure_acronym": "CA1",
+                                "structure_acronym": "CA1",
                                 "impedence": np.nan,
                                 "filtering": "AP band: 500 Hz high-pass; LFP "
                                              "band: 1000 Hz low-pass"},
@@ -326,7 +326,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
                                 "anterior_posterior_ccf_coordinate": 25.0,
                                 "dorsal_ventral_ccf_coordinate": 30.0,
                                 "left_right_ccf_coordinate": 35.0,
-                                "manual_structure_acronym": "CA3",
+                                "structure_acronym": "CA3",
                                 "impedence": 42.0,
                                 "filtering": "custom"}],
 
@@ -599,7 +599,7 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 5.0,
                 "dorsal_ventral_ccf_coordinate": 10.0,
                 "left_right_ccf_coordinate": 15.0,
-                "manual_structure_acronym": "CA1",
+                "structure_acronym": "CA1",
                 "impedence": np.nan,
                 "filtering": "Unknown"
             },
@@ -613,7 +613,7 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 10.0,
                 "dorsal_ventral_ccf_coordinate": 15.0,
                 "left_right_ccf_coordinate": 20.0,
-                "manual_structure_acronym": "CA2",
+                "structure_acronym": "CA2",
                 "impedence": np.nan,
                 "filtering": "Unknown"
             },
@@ -627,7 +627,7 @@ def probe_data():
                 "anterior_posterior_ccf_coordinate": 15.0,
                 "dorsal_ventral_ccf_coordinate": 20.0,
                 "left_right_ccf_coordinate": 25.0,
-                "manual_structure_acronym": "CA3",
+                "structure_acronym": "CA3",
                 "impedence": np.nan,
                 "filtering": "Unknown"
             }
@@ -711,7 +711,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
     exp_electrodes.rename(columns={"anterior_posterior_ccf_coordinate": "x",
                                    "dorsal_ventral_ccf_coordinate": "y",
                                    "left_right_ccf_coordinate": "z",
-                                   "manual_structure_acronym": "location"},
+                                   "structure_acronym": "location"},
                           inplace=True)
 
     with pynwb.NWBHDF5IO(output_path, "r") as obt_io:
@@ -1085,7 +1085,7 @@ def test_filter_and_sort_spikes(
                      "anterior_posterior_ccf_coordinate": 15.0,
                      "dorsal_ventral_ccf_coordinate": 20.0,
                      "left_right_ccf_coordinate": 25.0,
-                     "manual_structure_acronym": "CA1",
+                     "structure_acronym": "CA1",
                      "impedence": np.nan,
                      "filtering": "Unknown"},
                     {"id": 2,
@@ -1097,7 +1097,7 @@ def test_filter_and_sort_spikes(
                      "anterior_posterior_ccf_coordinate": 25.0,
                      "dorsal_ventral_ccf_coordinate": 30.0,
                      "left_right_ccf_coordinate": 35.0,
-                     "manual_structure_acronym": "CA3",
+                     "structure_acronym": "CA3",
                      "impedence": np.nan,
                      "filtering": "Unknown"}],
 

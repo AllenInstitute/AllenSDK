@@ -150,8 +150,8 @@ def units_table_from_ecephys_session_id_list(
         probe_horizontal_position -- float64
         anterior_posterior_ccf_coordinate -- float64
         dorsal_ventral_ccf_coordinate -- float64
-        ecephys_structure_id -- int64 uniquely identifying the structure
-        ecephys_structure_acronym -- a string naming the structure
+        structure_id -- int64 uniquely identifying the structure
+        structure_acronym -- a string naming the structure
         valid_data -- a boolean indicating the validity of the channel
     """
 
@@ -190,8 +190,8 @@ def units_table_from_ecephys_session_id_list(
       ,ecephys_channels.probe_horizontal_position
       ,ecephys_channels.anterior_posterior_ccf_coordinate
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
-      ,ecephys_channels.manual_structure_id as ecephys_structure_id
-      ,structures.acronym as ecephys_structure_acronym
+      ,ecephys_channels.manual_structure_id as structure_id
+      ,structures.acronym as structure_acronym
       ,ecephys_channels.valid_data as valid_data
     """
 
@@ -261,8 +261,8 @@ def probes_table_from_ecephys_session_id_list(
         has_lfp_data -- bool
         unit_count -- int64 number of units on this probe
         channel_count -- int64 number of channels on this probe
-        ecephys_structure_acronyms -- a list of strings identifing all
-                                      structures incident to this probe
+        structure_acronyms -- a list of strings identifing all
+                              structures incident to this probe
     """
 
     query = """
@@ -277,7 +277,7 @@ def probes_table_from_ecephys_session_id_list(
       ,ecephys_probes.use_lfp_data as has_lfp_data
       ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
       ,COUNT(DISTINCT(ecephys_channels.id)) AS channel_count
-      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms"""
+      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS structure_acronyms"""
 
     query += """
     FROM  ecephys_probes
@@ -345,8 +345,8 @@ def channels_table_from_ecephys_session_id_list(
         anterior_posterior_ccf_coordinate -- float64
         dorsal_ventral_ccf_coordinate -- float64
         left_right_ccf_coordinate -- float64
-        ecephys_structure_acronym -- string
-        ecephys_structure_id -- int64
+        structure_acronym -- string
+        structure_id -- int64
         unit_count -- int64 number of units on this channel
         valid_data -- a boolean indicating the validity of the channel
     """
@@ -362,8 +362,8 @@ def channels_table_from_ecephys_session_id_list(
       ,ecephys_channels.anterior_posterior_ccf_coordinate
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
       ,ecephys_channels.left_right_ccf_coordinate
-      ,structures.acronym AS ecephys_structure_acronym
-      ,structures.id AS ecephys_structure_id
+      ,structures.acronym AS structure_acronym
+      ,structures.id AS structure_id
       ,COUNT(DISTINCT(ecephys_units.id)) AS unit_count
       ,ecephys_channels.valid_data as valid_data
     """
@@ -651,12 +651,12 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
         Columns in this dataframe will be
         =================================
         ecephys_session_id -- int
-        ecephys_structure_acronyms -- a list of strings
+        structure_acronyms -- a list of strings
     """
     query = """
     SELECT
       ecephys_sessions.id AS ecephys_session_id
-      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS ecephys_structure_acronyms
+      ,ARRAY_AGG(DISTINCT(structures.acronym)) AS structure_acronyms
     FROM ecephys_sessions
     JOIN ecephys_probes
       ON ecephys_probes.ecephys_session_id = ecephys_sessions.id
@@ -946,7 +946,7 @@ def session_tables_from_ecephys_session_id_list(
         unit_count -- int64
         probe_count -- int64
         channel_count -- int64
-        ecephys_structure_acronyms -- list of strings
+        structure_acronyms -- list of strings
         image_set -- str
         prior_exposures_to_image_set -- float64
         session_number -- int64
