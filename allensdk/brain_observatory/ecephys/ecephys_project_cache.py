@@ -216,15 +216,6 @@ class EcephysProjectCache(Cache):
 
         units = one_file_call_caching(path, self.fetch_api.get_units, write_csv, read_csv, num_tries=self.fetch_tries)
         units = units.rename(columns={
-            'PT_ratio': 'waveform_PT_ratio',
-            'amplitude': 'waveform_amplitude',
-            'duration': 'waveform_duration',
-            'halfwidth': 'waveform_halfwidth',
-            'recovery_slope': 'waveform_recovery_slope',
-            'repolarization_slope': 'waveform_repolarization_slope',
-            'spread': 'waveform_spread',
-            'velocity_above': 'waveform_velocity_above',
-            'velocity_below': 'waveform_velocity_below',
             'l_ratio': 'L_ratio',
         })
 
