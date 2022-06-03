@@ -28,7 +28,7 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     session_tables_from_ecephys_session_id_list)
 
 from allensdk.brain_observatory.vbn_2022.\
-    metadata_writer.dataframe_manipulations import(
+    metadata_writer.dataframe_manipulations import (
         sanitize_structure_acronyms)
 
 from allensdk.core.auth_config import (
