@@ -614,14 +614,7 @@ def unit_input_from_ecephys_session_id(
 
     raw_unit_table.rename(
         columns={'unit_id': 'id',
-                 'waveform_pt_ratio': 'PT_ratio',
-                 'waveform_amplitude': 'amplitude',
-                 'ecephys_channel_id': 'peak_channel_id',
-                 'waveform_velocity_above': 'velocity_above',
-                 'waveform_velocity_below': 'velocity_below',
-                 'waveform_repolarization_slope': 'repolarization_slope',
-                 'waveform_recovery_slope': 'recovery_slope',
-                 'waveform_spread': 'spread'},
+                 'ecephys_channel_id': 'peak_channel_id'},
         inplace=True)
 
     if len(raw_unit_table) == 0:

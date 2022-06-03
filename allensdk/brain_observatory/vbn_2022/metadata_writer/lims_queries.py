@@ -138,13 +138,13 @@ def units_table_from_ecephys_session_id_list(
         cumulative_drift -- float64
         waveform_duration -- float64
         waveform_halfwidth -- float64
-        waveform_pt_ratio -- float64
-        waveform_repolarization_slope -- float64
-        waveform_recovery_slope -- float64
-        waveform_amplitude -- float64
-        waveform_spread -- float64
-        waveform_velocity_above -- float64
-        waveform_velocity_below -- float64
+        PT_ratio -- float64
+        repolarization_slope -- float64
+        recovery_slope -- float64
+        amplitude -- float64
+        spread -- float64
+        velocity_above -- float64
+        velocity_below -- float64
         local_index -- int64
         probe_vertical_position -- float64
         probe_horizontal_position -- float64
@@ -178,13 +178,13 @@ def units_table_from_ecephys_session_id_list(
       ,ecephys_units.cumulative_drift
       ,ecephys_units.duration as waveform_duration
       ,ecephys_units.halfwidth as waveform_halfwidth
-      ,ecephys_units.\"PT_ratio\" as waveform_PT_ratio
-      ,ecephys_units.repolarization_slope as waveform_repolarization_slope
-      ,ecephys_units.recovery_slope as waveform_recovery_slope
-      ,ecephys_units.amplitude as waveform_amplitude
-      ,ecephys_units.spread as waveform_spread
-      ,ecephys_units.velocity_above as waveform_velocity_above
-      ,ecephys_units.velocity_below as waveform_velocity_below
+      ,ecephys_units.\"PT_ratio\" as "PT_ratio"
+      ,ecephys_units.repolarization_slope as repolarization_slope
+      ,ecephys_units.recovery_slope as recovery_slope
+      ,ecephys_units.amplitude as amplitude
+      ,ecephys_units.spread as spread
+      ,ecephys_units.velocity_above as velocity_above
+      ,ecephys_units.velocity_below as velocity_below
       ,ecephys_units.local_index
       ,ecephys_channels.probe_vertical_position
       ,ecephys_channels.probe_horizontal_position
