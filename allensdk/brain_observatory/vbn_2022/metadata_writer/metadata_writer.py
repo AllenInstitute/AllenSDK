@@ -104,15 +104,15 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
              "silhouette_score",
              "snr",
              "valid_data",
-             "amplitude",
-             "duration",
-             "halfwidth",
-             "PT_ratio",
-             "recovery_slope",
-             "repolarization_slope",
-             "spread",
-             "velocity_above",
-             "velocity_below"]]
+             "waveform_amplitude",
+             "waveform_duration",
+             "waveform_halfwidth",
+             "waveform_pt_ratio",
+             "waveform_recovery_slope",
+             "waveform_repolarization_slope",
+             "waveform_spread",
+             "waveform_velocity_above",
+             "waveform_velocity_below"]]
 
         self.write_df(
             df=units_table,

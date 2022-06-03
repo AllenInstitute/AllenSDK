@@ -32,8 +32,8 @@ class Unit(DataObject):
             max_drift: Optional[float] = None,
             cumulative_drift: Optional[float] = None,
             silhouette_score: Optional[float] = None,
-            duration: Optional[float] = None,
-            halfwidth: Optional[float] = None,
+            waveform_duration: Optional[float] = None,
+            waveform_halfwidth: Optional[float] = None,
             PT_ratio: Optional[float] = None,
             repolarization_slope: Optional[float] = None,
             recovery_slope: Optional[float] = None,
@@ -68,8 +68,8 @@ class Unit(DataObject):
         self._max_drift = max_drift
         self._cumulative_drift = cumulative_drift
         self._silhouette_score = silhouette_score
-        self._duration = duration
-        self._halfwidth = halfwidth
+        self._waveform_duration = waveform_duration
+        self._waveform_halfwidth = waveform_halfwidth
         self._PT_ratio = PT_ratio
         self._repolarization_slope = repolarization_slope
         self._recovery_slope = recovery_slope
@@ -172,8 +172,8 @@ class Unit(DataObject):
         return self._silhouette_score
 
     @property
-    def duration(self) -> Optional[float]:
-        return self._duration
+    def waveform_duration(self) -> Optional[float]:
+        return self._waveform_duration
 
     @property
     def PT_ratio(self) -> Optional[float]:

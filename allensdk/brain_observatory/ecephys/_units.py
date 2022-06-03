@@ -94,7 +94,6 @@ class Units(DataObject, JsonReadableInterface, NwbReadableInterface):
 
         units = units.to_dict(orient='records')
 
-        print(f'unpacking unit\n{units[0]}')
         units = [Unit(**unit, filter_and_sort_spikes=False) for unit in units]
         return Units(units=units)
 
