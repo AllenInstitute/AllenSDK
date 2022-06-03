@@ -27,6 +27,10 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
 
+from allensdk.brain_observatory.vbn_2022.\
+    metadata_writer.dataframe_manipulations import(
+        sanitize_structure_acronyms)
+
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
     MTRAIN_DB_CREDENTIAL_MAP)
@@ -78,6 +82,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
+        units_table = sanitize_structure_acronyms(
+                df=units_table,
+                col_name='structure_acronym')
+
         units_table = units_table[
             ["unit_id",
              "ecephys_channel_id",
@@ -123,6 +131,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
+        probes_table = sanitize_structure_acronyms(
+                df=probes_table,
+                col_name='structure_acronyms')
+
         probes_table.drop(
             labels=['temporal_subsampling_factor'],
             axis='columns',
@@ -136,6 +148,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        channels_table = sanitize_structure_acronyms(
+                df=channels_table,
+                col_name='structure_acronym')
 
         channels_table.drop(
                     labels=['structure_id'],
