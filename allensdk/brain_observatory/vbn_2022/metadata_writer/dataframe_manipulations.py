@@ -2,7 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 import pandas as pd
 import numpy as np
 import json
@@ -526,3 +526,64 @@ def _get_session_duration_from_behavior_session_ids(
         index=pd.Int64Index([x['behavior_session_id'] for x in durations],
                             name='behavior_session_id'))
     return durations
+
+
+def _sanitize_structure_acronym(
+        acronym: Union[str, list]) -> Union[str, list]:
+    """
+    Sanitize a structure acronym or a list of structure acronyms
+    by removing the substructure (e.g. DG-mo becomes DG).
+
+    If acronym is a list, every element in the list will be sanitized
+    and a list of unique acronyms will be returned. **Element order will
+    not be preserved**.
+    """
+
+    if isinstance(acronym, str):
+        return acronym.split('-')[0]
+    elif isinstance(acronym, list):
+        new_acronym = set()
+        for el in acronym:
+            new_acronym.add(el.split('-')[0])
+        new_acronym = list(new_acronym)
+        new_acronym.sort()
+        return new_acronym
+    else:
+        raise RuntimeError(
+            "acronym must be a list or a str; you gave "
+            f"{acronym} which is a {type(acronym)}")
+
+
+def sanitize_structure_acronyms(
+        df: pd.DataFrame,
+        col_name: str) -> pd.DataFrame:
+    """
+    Take the structure_acronym(s) column of a dataframe
+    and remove the substructure (i.e. convert DG-mo to DG).
+
+    Return the altered dataframe.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+
+    col_name: str
+        The name of the structure_acronym column.
+        Note: if the column is a list of strings (as in the
+        probes.csv table) every element in the list will be
+        sanitized.
+
+    Return
+    ------
+    df: pd.DataFrame
+        Same as input with the amended column
+
+    Note
+    ----
+    Alters df in place
+    """
+    new_col = [
+        _sanitize_structure_acronym(acronym)
+        for acronym in df[col_name]]
+    df[col_name] = new_col
+    return df

@@ -13,7 +13,9 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         _add_images_from_behavior,
         remove_aborted_sessions,
         _get_session_duration_from_behavior_session_ids,
-        remove_pretest_sessions)
+        remove_pretest_sessions,
+        _sanitize_structure_acronym,
+        sanitize_structure_acronyms)
 
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -348,6 +350,53 @@ def test_remove_pretest_sessions():
     expected = expected.set_index('id')
     actual = actual.set_index('id')
     pd.testing.assert_frame_equal(expected, actual)
+
+
+def test_sanitize_single_acronym():
+    """
+    Test that _sanitize_structure_acronym behaves properly
+    """
+
+    assert _sanitize_structure_acronym('abcde-fg-hi') == 'abcde'
+
+    data = ['DG-mo', 'DG-pd', 'LS-ab', 'LT-x', 'AB-cd',
+            'WX-yz', 'AB-ef']
+    expected = ['AB', 'DG', 'LS', 'LT', 'WX']
+    assert _sanitize_structure_acronym(data) == expected
+
+    # pass in a tuple; check that it fails since that is not
+    # a str or a list
+    with pytest.raises(RuntimeError, match="list or a str"):
+        _sanitize_structure_acronym(('a', 'b', 'c'))
+
+
+@pytest.mark.parametrize(
+    "input_data, output_data, col_name",
+    [([{'a': 1, 'b': 'DG-mo'}, {'a': 2, 'b': 'LS-x'}],
+      [{'a': 1, 'b': 'DG'}, {'a': 2, 'b': 'LS'}],
+      'b'),
+     ([{'a': 1, 'b': ['DG-mo', 'AB-x', 'DG-pb']},
+       {'a': 2, 'b': 'DG-s'}],
+      [{'a': 1, 'b': ['AB', 'DG']},
+       {'a': 2, 'b': 'DG'}],
+      'b')])
+def test_sanitize_structure_acronyms(
+        input_data,
+        output_data,
+        col_name):
+    """
+    Test method that sanitizes the structure acronym
+    columns in a dataframe
+    """
+
+    input_df = pd.DataFrame(data=input_data)
+    expected_df = pd.DataFrame(data=output_data)
+
+    actual_df = sanitize_structure_acronyms(
+            df=input_df,
+            col_name=col_name)
+
+    pd.testing.assert_frame_equal(expected_df, actual_df)
 
 
 class TestDataframeManipulations(LimsTest):
