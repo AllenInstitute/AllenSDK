@@ -24,7 +24,7 @@ class ImagingPlane(DataObject, LimsReadableInterface,
                  targeted_structure: str,
                  excitation_lambda: float,
                  indicator: Optional[str]):
-        super().__init__(name='imaging_plane', value=self)
+        super().__init__(name='imaging_plane', value=None)
         self._ophys_frame_rate = ophys_frame_rate
         self._targeted_structure = targeted_structure
         self._excitation_lambda = excitation_lambda

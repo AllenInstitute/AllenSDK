@@ -1,3 +1,4 @@
+import gc
 from functools import partial
 from typing import Optional, List, Union
 from pathlib import Path
@@ -558,6 +559,8 @@ class VisualBehaviorOphysProjectCache(object):
         TODO: Using `fixed` will raise a NotImplementedError since there
         is no real cache.
         """
+        return self.fetch_api.get_behavior_ophys_experiment(
+            ophys_experiment_id=ophys_experiment_id)
         if fixed:
             raise NotImplementedError
         fetch_session = partial(self.fetch_api.get_behavior_ophys_experiment,

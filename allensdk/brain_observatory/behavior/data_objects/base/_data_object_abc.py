@@ -25,6 +25,8 @@ class DataObject(abc.ABC):
             Optional set which will exclude these properties from comparison
             checks to another DataObject
         """
+        if value is self:
+            raise RuntimeError('value is self')
         self._name = name
         self._value = value
 
@@ -63,7 +65,7 @@ class DataObject(abc.ABC):
 
             >>> class A(DataObject):
             ...     def __init__(self, b: B):
-            ...         super().__init__(name='a', value=self)
+            ...         super().__init__(name='a', value=None)
             ...         self._b = b
             ...     @property
             ...     def prop1(self):

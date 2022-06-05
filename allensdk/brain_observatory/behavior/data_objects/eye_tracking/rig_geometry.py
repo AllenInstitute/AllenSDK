@@ -69,7 +69,7 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
                  camera_position_mm: Coordinates,
                  camera_rotation_deg: Coordinates,
                  led_position: Coordinates):
-        super().__init__(name='rig_geometry', value=self)
+        super().__init__(name='rig_geometry', value=None)
         self._monitor_position_mm = monitor_position_mm
         self._monitor_rotation_deg = monitor_rotation_deg
         self._camera_position_mm = camera_position_mm

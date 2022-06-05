@@ -10,7 +10,7 @@ from allensdk.internal.api import PostgresQueryMixin
 class FieldOfViewShape(DataObject, LimsReadableInterface,
                        NwbReadableInterface, JsonReadableInterface):
     def __init__(self, height: int, width: int):
-        super().__init__(name='field_of_view_shape', value=self)
+        super().__init__(name='field_of_view_shape', value=None)
 
         self._height = height
         self._width = width
