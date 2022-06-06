@@ -594,8 +594,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                                    f"that are not in {traces.name}")
 
             # validate traces contain expected timepoints
-            num_trace_timepoints = len(traces.value.iloc[0]
-                                       [trace_col_map[traces.name]])
+            num_trace_timepoints = traces.value.shape[1]
             num_ophys_timestamps = ophys_timestamps.value.shape[0]
             if num_trace_timepoints != num_ophys_timestamps:
                 raise RuntimeError(f'{traces.name} contains '
