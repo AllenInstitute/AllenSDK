@@ -550,47 +550,13 @@ class VisualBehaviorOphysProjectCache(object):
 
         return sessions.table if as_df else sessions
 
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int,
-                                      fixed: bool = False):
-        """
-        Note -- This method mocks the behavior of a cache. Future
-        development will include an NWB reader to read from
-        a true local cache (once nwb files are created).
-        TODO: Using `fixed` will raise a NotImplementedError since there
-        is no real cache.
-        """
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int):
         return self.fetch_api.get_behavior_ophys_experiment(
             ophys_experiment_id=ophys_experiment_id)
-        if fixed:
-            raise NotImplementedError
-        fetch_session = partial(self.fetch_api.get_behavior_ophys_experiment,
-                                ophys_experiment_id)
-        return call_caching(
-            fetch_session,
-            lambda x: x,  # not writing anything
-            lazy=False,  # can't actually read from file cache
-            read=fetch_session
-        )
 
-    def get_behavior_session(self, behavior_session_id: int,
-                             fixed: bool = False):
-        """
-        Note -- This method mocks the behavior of a cache. Future
-        development will include an NWB reader to read from
-        a true local cache (once nwb files are created).
-        TODO: Using `fixed` will raise a NotImplementedError since there
-        is no real cache.
-        """
-        if fixed:
-            raise NotImplementedError
-
-        fetch_session = partial(self.fetch_api.get_behavior_session,
-                                behavior_session_id)
-        return call_caching(
-            fetch_session,
-            lambda x: x,  # not writing anything
-            lazy=False,  # can't actually read from file cache
-            read=fetch_session
+    def get_behavior_session(self, behavior_session_id: int):
+        return self.fetch_api.get_behavior_session(
+            behavior_session_id=behavior_session_id
         )
 
 
