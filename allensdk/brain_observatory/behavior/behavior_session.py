@@ -1,7 +1,6 @@
 import datetime
 from typing import Any, List, Dict, Optional
 
-import h5py
 import pynwb
 import pandas as pd
 import numpy as np

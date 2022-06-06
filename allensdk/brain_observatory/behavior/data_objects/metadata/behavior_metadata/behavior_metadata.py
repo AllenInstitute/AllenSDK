@@ -203,7 +203,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             cls,
             behavior_session_id: BehaviorSessionId,
             lims_db: PostgresQueryMixin
-        ) -> "BehaviorMetadata":
+    ) -> "BehaviorMetadata":
         subject_metadata = SubjectMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
         equipment = Equipment.from_lims(
@@ -220,9 +220,10 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         behavior_session_uuid = BehaviorSessionUUID.from_stimulus_file(
             stimulus_file=stimulus_file)\
-            .validate(behavior_session_id=behavior_session_id.value,
-                                       foraging_id=foraging_id.value,
-                                       stimulus_file=stimulus_file)
+            .validate(
+                behavior_session_id=behavior_session_id.value,
+                foraging_id=foraging_id.value,
+                stimulus_file=stimulus_file)
 
         return cls(
             subject_metadata=subject_metadata,
@@ -305,8 +306,9 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._subject_metadata.to_nwb(nwbfile=nwbfile)
         self._equipment.to_nwb(nwbfile=nwbfile)
-        extension = load_pynwb_extension(BehaviorMetadataSchema,
-                                                'ndx-aibs-behavior-ophys')
+        extension = load_pynwb_extension(
+            BehaviorMetadataSchema,
+            'ndx-aibs-behavior-ophys')
         nwb_metadata = extension(
             name='metadata',
             behavior_session_id=self.behavior_session_id,

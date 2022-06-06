@@ -1,5 +1,3 @@
-import gc
-from functools import partial
 from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
@@ -15,7 +13,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
     BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
-    one_file_call_caching, call_caching
+    one_file_call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable
