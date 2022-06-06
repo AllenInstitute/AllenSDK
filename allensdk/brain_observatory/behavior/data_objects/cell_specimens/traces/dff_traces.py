@@ -71,7 +71,7 @@ class DFFTraces(DataObject, RoisMixin,
         # We want rois x timepoints, hence the transpose
         dff_traces = dff_nwb.data[:].T
 
-        df = pd.DataFrame(dff_traces,
+        df = pd.DataFrame({'dff': dff_traces.tolist()},
                           index=pd.Index(data=dff_nwb.rois.table.id[:],
                                          name='cell_roi_id'))
         return DFFTraces(traces=df)
@@ -85,4 +85,4 @@ class DFFTraces(DataObject, RoisMixin,
         """Returns the number of frames in the movie"""
         if self.value.empty:
             raise RuntimeError('Cannot determine number of frames')
-        return self.value.shape[1]
+        return len(self.value.iloc[0]['dff'])

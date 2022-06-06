@@ -40,9 +40,9 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
             'corrected_fluorescence'].roi_response_series['traces']
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
-        f_traces = corr_fluorescence_nwb.data[:].T
-        roi_ids = corr_fluorescence_nwb.rois.table.id[:]
-        df = pd.DataFrame(f_traces,
+        f_traces = corr_fluorescence_nwb.data[:].T.copy()
+        roi_ids = corr_fluorescence_nwb.rois.table.id[:].copy()
+        df = pd.DataFrame({'corrected_fluorescence': f_traces.tolist()},
                           index=pd.Index(
                               data=roi_ids,
                               name='cell_roi_id'))

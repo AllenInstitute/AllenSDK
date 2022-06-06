@@ -25,8 +25,8 @@ class DataObject(abc.ABC):
             Optional set which will exclude these properties from comparison
             checks to another DataObject
         """
-        if type(value) is DataObject:
-            raise RuntimeError('value is data object')
+        if value is self:
+            raise RuntimeError('value is self')
         self._name = name
         self._value = value
 
