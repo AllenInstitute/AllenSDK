@@ -18,7 +18,7 @@ class TestDataObject:
 
         class A(DataObject):
             def __init__(self, b: B):
-                super().__init__(name='a', value=self)
+                super().__init__(name='a', value=None, is_value_self=True)
                 self._b = b
 
             @property
@@ -38,7 +38,7 @@ class TestDataObject:
 
         class B(DataObject):
             def __init__(self, c: C):
-                super().__init__(name='b', value=self)
+                super().__init__(name='b', value=None, is_value_self=True)
                 self._c = c
 
             @property
@@ -51,7 +51,7 @@ class TestDataObject:
 
         class A(DataObject):
             def __init__(self, b: B):
-                super().__init__(name='a', value=self)
+                super().__init__(name='a', value=None, is_value_self=True)
                 self._b = b
 
             @property
