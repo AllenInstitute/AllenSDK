@@ -529,7 +529,8 @@ def _get_session_duration_from_behavior_session_ids(
 
 
 def _sanitize_structure_acronym(
-        acronym: Union[str, list]) -> Union[str, list]:
+        acronym: Optional[Union[str, list]]
+) -> Optional[Union[str, list]]:
     """
     Sanitize a structure acronym or a list of structure acronyms
     by removing the substructure (e.g. DG-mo becomes DG).
@@ -537,20 +538,33 @@ def _sanitize_structure_acronym(
     If acronym is a list, every element in the list will be sanitized
     and a list of unique acronyms will be returned. **Element order will
     not be preserved**.
+
+    If acronym is None, return None. If None occurs in a list of
+    sturture acronyms, it will be omitted
     """
 
     if isinstance(acronym, str):
         return acronym.split('-')[0]
     elif isinstance(acronym, list):
         new_acronym = set()
+
         for el in acronym:
-            new_acronym.add(el.split('-')[0])
+            if isinstance(el, str):
+                new_el = el.split('-')[0]
+                new_acronym.add(new_el)
+            elif el is not None:
+                raise RuntimeError(
+                    "Do not know how to parse structure acronym "
+                    f"{el} of type {type(el)}")
+
         new_acronym = list(new_acronym)
         new_acronym.sort()
         return new_acronym
+    elif acronym is None:
+        return None
     else:
         raise RuntimeError(
-            "acronym must be a list or a str; you gave "
+            "acronym must be a list or a str or None; you gave "
             f"{acronym} which is a {type(acronym)}")
 
 

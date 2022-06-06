@@ -358,22 +358,39 @@ def test_sanitize_single_acronym():
     """
 
     assert _sanitize_structure_acronym('abcde-fg-hi') == 'abcde'
+    assert _sanitize_structure_acronym(None) is None
 
     data = ['DG-mo', 'DG-pd', 'LS-ab', 'LT-x', 'AB-cd',
             'WX-yz', 'AB-ef']
     expected = ['AB', 'DG', 'LS', 'LT', 'WX']
     assert _sanitize_structure_acronym(data) == expected
 
+    data = [None, 'DG-mo', 'DG-pd', 'LS-ab', 'LT-x', 'AB-cd',
+            'WX-yz', None, 'AB-ef']
+    expected = ['AB', 'DG', 'LS', 'LT', 'WX']
+    assert _sanitize_structure_acronym(data) == expected
+
+    assert _sanitize_structure_acronym([None]) == []
+
     # pass in a tuple; check that it fails since that is not
     # a str or a list
     with pytest.raises(RuntimeError, match="list or a str"):
         _sanitize_structure_acronym(('a', 'b', 'c'))
 
+    with pytest.raises(RuntimeError, match="Do not know how to parse"):
+        _sanitize_structure_acronym(['abc', 2.3])
+
 
 @pytest.mark.parametrize(
     "input_data, output_data, col_name",
-    [([{'a': 1, 'b': 'DG-mo'}, {'a': 2, 'b': 'LS-x'}],
-      [{'a': 1, 'b': 'DG'}, {'a': 2, 'b': 'LS'}],
+    [([{'a': 1, 'b': 'DG-mo'},
+       {'a': 2, 'b': 'LS-x'},
+       {'a': 3, 'b': None},
+       {'a': 4, 'b': [None, ]}],
+      [{'a': 1, 'b': 'DG'},
+       {'a': 2, 'b': 'LS'},
+       {'a': 3, 'b': None},
+       {'a': 4, 'b': []}],
       'b'),
      ([{'a': 1, 'b': ['DG-mo', 'AB-x', 'DG-pb']},
        {'a': 2, 'b': 'DG-s'}],
