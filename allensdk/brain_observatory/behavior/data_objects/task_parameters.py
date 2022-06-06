@@ -45,7 +45,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
                  stimulus_distribution: StimulusDistribution,
                  task_type: TaskType,
                  n_stimulus_frames: int):
-        super().__init__(name='task_parameters', value=None, is_value_self=True)
+        super().__init__(name='task_parameters', value=None,
+                         is_value_self=True)
         self._blank_duration_sec = blank_duration_sec
         self._stimulus_duration_sec = stimulus_duration_sec
         self._omitted_flash_fraction = omitted_flash_fraction
