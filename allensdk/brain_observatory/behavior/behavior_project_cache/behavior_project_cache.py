@@ -4,6 +4,8 @@ import pandas as pd
 import logging
 
 from allensdk.api.warehouse_cache.cache import Cache
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .experiments_table import \
     ExperimentsTable
@@ -17,6 +19,8 @@ from allensdk.api.warehouse_cache.caching_utilities import \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 from allensdk.core.authentication import DbCredentials
 
 
@@ -548,11 +552,36 @@ class VisualBehaviorOphysProjectCache(object):
 
         return sessions.table if as_df else sessions
 
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int):
+    def get_behavior_ophys_experiment(
+            self, ophys_experiment_id: int
+    ) -> BehaviorOphysExperiment:
+        """
+        Gets `BehaviorOphysExperiment` for `ophys_experiment_id`
+        Parameters
+        ----------
+        ophys_experiment_id: ophys experiment id
+
+        Returns
+        -------
+        BehaviorOphysExperiment
+        """
         return self.fetch_api.get_behavior_ophys_experiment(
             ophys_experiment_id=ophys_experiment_id)
 
-    def get_behavior_session(self, behavior_session_id: int):
+    def get_behavior_session(
+            self,
+            behavior_session_id: int
+    ) -> BehaviorSession:
+        """
+        Gets `BehaviorSession` for `behavior_session_id`
+        Parameters
+        ----------
+        behavior_session_id: behavior session id
+
+        Returns
+        -------
+        BehaviorSession
+        """
         return self.fetch_api.get_behavior_session(
             behavior_session_id=behavior_session_id
         )
