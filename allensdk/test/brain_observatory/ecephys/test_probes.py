@@ -1,7 +1,6 @@
 import datetime
 import json
 
-import numpy as np
 import pytest
 from pynwb import NWBFile
 
@@ -77,7 +76,7 @@ class TestProbes:
         assert expected_n_units == obtained_n_units
 
 
-@pytest.mark.parametrize('structure_acronym', ('LGd-sh', 'LGd', np.nan))
+@pytest.mark.parametrize('structure_acronym', ('LGd-sh', 'LGd', None))
 @pytest.mark.parametrize('strip_structure_subregion', (True, False))
 def test_probe_channels_strip_subregion(
         structure_acronym, strip_structure_subregion):
@@ -100,4 +99,4 @@ def test_probe_channels_strip_subregion(
                 else 'LGd'
         assert c.structure_acronym == expected
     else:
-        assert np.isnan(c.structure_acronym)
+        c.structure_acronym is None

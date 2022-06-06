@@ -2,6 +2,8 @@ from typing import Optional
 import numpy as np
 
 from allensdk.core import DataObject
+from allensdk.brain_observatory.ecephys.utils import (
+    strip_substructure_acronym)
 
 
 class Channel(DataObject):
@@ -75,9 +77,8 @@ class Channel(DataObject):
     @property
     def structure_acronym(self) -> str:
         acronym = self._structure_acronym
-        if type(self._structure_acronym) is str and \
-                self._strip_structure_subregion:
-            acronym = self._structure_acronym.split('-')[0]
+        if self._strip_structure_subregion:
+            acronym = strip_substructure_acronym(self._structure_acronym)
         return acronym
 
     @property

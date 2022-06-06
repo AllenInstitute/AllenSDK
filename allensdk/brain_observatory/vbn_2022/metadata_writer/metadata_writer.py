@@ -29,7 +29,7 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
 
 from allensdk.brain_observatory.vbn_2022.\
     metadata_writer.dataframe_manipulations import (
-        sanitize_structure_acronyms)
+        strip_substructure_acronym_df)
 
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
@@ -82,7 +82,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
-        units_table = sanitize_structure_acronyms(
+        units_table = strip_substructure_acronym_df(
                 df=units_table,
                 col_name='structure_acronym')
 
@@ -131,7 +131,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
-        probes_table = sanitize_structure_acronyms(
+        probes_table = strip_substructure_acronym_df(
                 df=probes_table,
                 col_name='structure_acronyms')
 
@@ -149,7 +149,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
-        channels_table = sanitize_structure_acronyms(
+        channels_table = strip_substructure_acronym_df(
                 df=channels_table,
                 col_name='structure_acronym')
 

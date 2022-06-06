@@ -14,8 +14,7 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         remove_aborted_sessions,
         _get_session_duration_from_behavior_session_ids,
         remove_pretest_sessions,
-        _sanitize_structure_acronym,
-        sanitize_structure_acronyms)
+        strip_substructure_acronym_df)
 
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -352,35 +351,6 @@ def test_remove_pretest_sessions():
     pd.testing.assert_frame_equal(expected, actual)
 
 
-def test_sanitize_single_acronym():
-    """
-    Test that _sanitize_structure_acronym behaves properly
-    """
-
-    assert _sanitize_structure_acronym('abcde-fg-hi') == 'abcde'
-    assert _sanitize_structure_acronym(None) is None
-
-    data = ['DG-mo', 'DG-pd', 'LS-ab', 'LT-x', 'AB-cd',
-            'WX-yz', 'AB-ef']
-    expected = ['AB', 'DG', 'LS', 'LT', 'WX']
-    assert _sanitize_structure_acronym(data) == expected
-
-    data = [None, 'DG-mo', 'DG-pd', 'LS-ab', 'LT-x', 'AB-cd',
-            'WX-yz', None, 'AB-ef']
-    expected = ['AB', 'DG', 'LS', 'LT', 'WX']
-    assert _sanitize_structure_acronym(data) == expected
-
-    assert _sanitize_structure_acronym([None]) == []
-
-    # pass in a tuple; check that it fails since that is not
-    # a str or a list
-    with pytest.raises(RuntimeError, match="list or a str"):
-        _sanitize_structure_acronym(('a', 'b', 'c'))
-
-    with pytest.raises(RuntimeError, match="Do not know how to parse"):
-        _sanitize_structure_acronym(['abc', 2.3])
-
-
 @pytest.mark.parametrize(
     "input_data, output_data, col_name",
     [([{'a': 1, 'b': 'DG-mo'},
@@ -397,19 +367,19 @@ def test_sanitize_single_acronym():
       [{'a': 1, 'b': ['AB', 'DG']},
        {'a': 2, 'b': 'DG'}],
       'b')])
-def test_sanitize_structure_acronyms(
+def test_strip_substructure_acronym_df(
         input_data,
         output_data,
         col_name):
     """
-    Test method that sanitizes the structure acronym
+    Test method that strips the substructure acronym
     columns in a dataframe
     """
 
     input_df = pd.DataFrame(data=input_data)
     expected_df = pd.DataFrame(data=output_data)
 
-    actual_df = sanitize_structure_acronyms(
+    actual_df = strip_substructure_acronym_df(
             df=input_df,
             col_name=col_name)
 

@@ -2,7 +2,7 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List
 import pandas as pd
 import numpy as np
 import json
@@ -21,6 +21,9 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
 
 from allensdk.internal.api.queries.behavior_lims_queries import (
     stimulus_pickle_paths_from_behavior_session_ids)
+
+from allensdk.brain_observatory.ecephys.utils import (
+    strip_substructure_acronym)
 
 
 def _add_session_number(
@@ -528,47 +531,7 @@ def _get_session_duration_from_behavior_session_ids(
     return durations
 
 
-def _sanitize_structure_acronym(
-        acronym: Optional[Union[str, list]]
-) -> Optional[Union[str, list]]:
-    """
-    Sanitize a structure acronym or a list of structure acronyms
-    by removing the substructure (e.g. DG-mo becomes DG).
-
-    If acronym is a list, every element in the list will be sanitized
-    and a list of unique acronyms will be returned. **Element order will
-    not be preserved**.
-
-    If acronym is None, return None. If None occurs in a list of
-    sturture acronyms, it will be omitted
-    """
-
-    if isinstance(acronym, str):
-        return acronym.split('-')[0]
-    elif isinstance(acronym, list):
-        new_acronym = set()
-
-        for el in acronym:
-            if isinstance(el, str):
-                new_el = el.split('-')[0]
-                new_acronym.add(new_el)
-            elif el is not None:
-                raise RuntimeError(
-                    "Do not know how to parse structure acronym "
-                    f"{el} of type {type(el)}")
-
-        new_acronym = list(new_acronym)
-        new_acronym.sort()
-        return new_acronym
-    elif acronym is None:
-        return None
-    else:
-        raise RuntimeError(
-            "acronym must be a list or a str or None; you gave "
-            f"{acronym} which is a {type(acronym)}")
-
-
-def sanitize_structure_acronyms(
+def strip_substructure_acronym_df(
         df: pd.DataFrame,
         col_name: str) -> pd.DataFrame:
     """
@@ -597,7 +560,7 @@ def sanitize_structure_acronyms(
     Alters df in place
     """
     new_col = [
-        _sanitize_structure_acronym(acronym)
+        strip_substructure_acronym(acronym)
         for acronym in df[col_name]]
     df[col_name] = new_col
     return df
