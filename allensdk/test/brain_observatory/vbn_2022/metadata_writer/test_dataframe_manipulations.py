@@ -2,6 +2,7 @@ import pytest
 import mock
 import pandas as pd
 import datetime
+import numpy as np
 import copy
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
@@ -356,13 +357,15 @@ def test_remove_pretest_sessions():
     [([{'a': 1, 'b': 'DG-mo'},
        {'a': 2, 'b': 'LS-x'},
        {'a': 3, 'b': None},
-       {'a': 4, 'b': [None, ]}],
+       {'a': 4, 'b': [None, ]},
+       {'a': 5, 'b': np.NaN}],
       [{'a': 1, 'b': 'DG'},
        {'a': 2, 'b': 'LS'},
        {'a': 3, 'b': None},
-       {'a': 4, 'b': []}],
+       {'a': 4, 'b': []},
+       {'a': 5, 'b': None}],
       'b'),
-     ([{'a': 1, 'b': ['DG-mo', 'AB-x', 'DG-pb']},
+     ([{'a': 1, 'b': ['DG-mo', 'AB-x', 'DG-pb', np.NaN]},
        {'a': 2, 'b': 'DG-s'}],
       [{'a': 1, 'b': ['AB', 'DG']},
        {'a': 2, 'b': 'DG'}],

@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
@@ -113,7 +112,7 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
                                    f"Columns are {row.keys()}")
 
             structure_acronym = \
-                np.nan if row['location'] in ['None', ''] else row['location']
+                None if row['location'] in ['None', ''] else row['location']
             channels.append(Channel(
                 id=channel_id,
                 probe_channel_number=row[idx_col],
