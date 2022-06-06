@@ -12,7 +12,7 @@ from allensdk.internal.api import PostgresQueryMixin
 class ImagingPlaneGroup(DataObject, LimsReadableInterface,
                         JsonReadableInterface, NwbReadableInterface):
     def __init__(self, plane_group: int, plane_group_count: int):
-        super().__init__(name='plane_group', value=None)
+        super().__init__(name='plane_group', value=None, is_value_self=True)
         self._plane_group = plane_group
         self._plane_group_count = plane_group_count
 

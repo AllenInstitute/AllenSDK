@@ -23,7 +23,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
               NwbReadableInterface, NwbWritableInterface):
     def __init__(self, presentations: Presentations,
                  templates: Templates):
-        super().__init__(name='stimuli', value=None)
+        super().__init__(name='stimuli', value=None, is_value_self=True)
         self._presentations = presentations
         self._templates = templates
 
