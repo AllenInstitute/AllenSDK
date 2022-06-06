@@ -25,8 +25,6 @@ class DataObject(abc.ABC):
             Optional set which will exclude these properties from comparison
             checks to another DataObject
         """
-        if value is self:
-            raise RuntimeError('value is self')
         self._name = name
         self._value = value
 
@@ -39,7 +37,12 @@ class DataObject(abc.ABC):
 
     @property
     def value(self) -> Any:
-        return self._value
+        if self._value is None:
+            # Indicates that the value is the object itself
+            value = self
+        else:
+            value = self._value
+        return value
 
     def to_dict(self) -> dict:
         """
