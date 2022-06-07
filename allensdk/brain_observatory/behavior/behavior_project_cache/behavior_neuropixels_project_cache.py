@@ -71,16 +71,16 @@ class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
         return sessions_table
 
     def get_behavior_session_table(self):
-        return self.fetch_api.get_behavior_session_table(),
+        return self.fetch_api.get_behavior_session_table()
 
     def get_probe_table(self):
-        self.fetch_api.get_probe_table(),
+        return self.fetch_api.get_probe_table()
 
     def get_channel_table(self):
-        return self.fetch_api.get_channel_table(),
+        return self.fetch_api.get_channel_table()
 
     def get_unit_table(self):
-        return self.fetch_api.get_unit_table(),
+        return self.fetch_api.get_unit_table()
 
     def get_ecephys_session(self, ecephys_session_id: int):
         return self.fetch_api.get_ecephys_session(ecephys_session_id)
