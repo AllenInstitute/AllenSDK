@@ -22,7 +22,7 @@ from ...behavior.data_objects.stimuli.presentations import Presentations
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
 
-# TODO: If ecephys write_nwb is revisited, need to re-add `manual_structure_id`
+# TODO: If ecephys write_nwb is revisited, need to re-add `structure_id`
 # column and add the structure ids to the nwbfile for the
 # add_ecephys_electrodes() function.
 

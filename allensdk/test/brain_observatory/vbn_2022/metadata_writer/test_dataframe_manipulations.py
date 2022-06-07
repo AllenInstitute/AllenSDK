@@ -2,6 +2,7 @@ import pytest
 import mock
 import pandas as pd
 import datetime
+import numpy as np
 import copy
 
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
@@ -13,7 +14,8 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         _add_images_from_behavior,
         remove_aborted_sessions,
         _get_session_duration_from_behavior_session_ids,
-        remove_pretest_sessions)
+        remove_pretest_sessions,
+        strip_substructure_acronym_df)
 
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -348,6 +350,43 @@ def test_remove_pretest_sessions():
     expected = expected.set_index('id')
     actual = actual.set_index('id')
     pd.testing.assert_frame_equal(expected, actual)
+
+
+@pytest.mark.parametrize(
+    "input_data, output_data, col_name",
+    [([{'a': 1, 'b': 'DG-mo'},
+       {'a': 2, 'b': 'LS-x'},
+       {'a': 3, 'b': None},
+       {'a': 4, 'b': [None, ]},
+       {'a': 5, 'b': np.NaN}],
+      [{'a': 1, 'b': 'DG'},
+       {'a': 2, 'b': 'LS'},
+       {'a': 3, 'b': None},
+       {'a': 4, 'b': []},
+       {'a': 5, 'b': None}],
+      'b'),
+     ([{'a': 1, 'b': ['DG-mo', 'AB-x', 'DG-pb', np.NaN]},
+       {'a': 2, 'b': 'DG-s'}],
+      [{'a': 1, 'b': ['AB', 'DG']},
+       {'a': 2, 'b': 'DG'}],
+      'b')])
+def test_strip_substructure_acronym_df(
+        input_data,
+        output_data,
+        col_name):
+    """
+    Test method that strips the substructure acronym
+    columns in a dataframe
+    """
+
+    input_df = pd.DataFrame(data=input_data)
+    expected_df = pd.DataFrame(data=output_data)
+
+    actual_df = strip_substructure_acronym_df(
+            df=input_df,
+            col_name=col_name)
+
+    pd.testing.assert_frame_equal(expected_df, actual_df)
 
 
 class TestDataframeManipulations(LimsTest):

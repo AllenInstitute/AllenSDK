@@ -125,9 +125,9 @@ def add_ecephys_electrodes(
                          on device (microns)
             probe_horizontal_position: Width-wise position of electrode/channel
                          on device (microns)
-            manual_structure_id: The LIMS id associated with an anatomical
+            structure_id: The LIMS id associated with an anatomical
                          structure
-            manual_structure_acronym: Acronym associated with an anatomical
+            structure_acronym: Acronym associated with an anatomical
                          structure
             anterior_posterior_ccf_coordinate
             dorsal_ventral_ccf_coordinate
@@ -169,7 +169,7 @@ def add_ecephys_electrodes(
             valid_data=row["valid_data"],
             probe_id=row["probe_id"],
             group=electrode_group,
-            location=row["manual_structure_acronym"],
+            location=row["structure_acronym"],
             imp=row.get("impedence", row.get("impedance")),
             filtering=row["filtering"]
         )

@@ -27,6 +27,10 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     channels_table_from_ecephys_session_id_list,
     session_tables_from_ecephys_session_id_list)
 
+from allensdk.brain_observatory.vbn_2022.\
+    metadata_writer.dataframe_manipulations import (
+        strip_substructure_acronym_df)
+
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
     MTRAIN_DB_CREDENTIAL_MAP)
@@ -78,6 +82,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
+        units_table = strip_substructure_acronym_df(
+                df=units_table,
+                col_name='structure_acronym')
+
         units_table = units_table[
             ["unit_id",
              "ecephys_channel_id",
@@ -88,8 +96,8 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
              "cumulative_drift",
              "d_prime",
              "dorsal_ventral_ccf_coordinate",
-             "ecephys_structure_acronym",
-             "ecephys_structure_id",
+             "structure_acronym",
+             "structure_id",
              "firing_rate",
              "isi_violations",
              "isolation_distance",
@@ -104,15 +112,15 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
              "silhouette_score",
              "snr",
              "valid_data",
-             "waveform_amplitude",
+             "amplitude",
              "waveform_duration",
              "waveform_halfwidth",
-             "waveform_pt_ratio",
-             "waveform_recovery_slope",
-             "waveform_repolarization_slope",
-             "waveform_spread",
-             "waveform_velocity_above",
-             "waveform_velocity_below"]]
+             "PT_ratio",
+             "recovery_slope",
+             "repolarization_slope",
+             "spread",
+             "velocity_above",
+             "velocity_below"]]
 
         self.write_df(
             df=units_table,
@@ -122,6 +130,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     lims_connection=lims_connection,
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+
+        probes_table = strip_substructure_acronym_df(
+                df=probes_table,
+                col_name='structure_acronyms')
 
         probes_table.drop(
             labels=['temporal_subsampling_factor'],
@@ -137,8 +149,12 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     probe_ids_to_skip=probe_ids_to_skip)
 
+        channels_table = strip_substructure_acronym_df(
+                df=channels_table,
+                col_name='structure_acronym')
+
         channels_table.drop(
-                    labels=['ecephys_structure_id'],
+                    labels=['structure_id'],
                     axis='columns',
                     inplace=True)
 

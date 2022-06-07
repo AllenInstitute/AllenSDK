@@ -1,6 +1,7 @@
 import logging
-
+from typing import Optional, Union
 import numpy as np
+import numbers
 import pandas as pd
 
 
@@ -65,3 +66,46 @@ def clobbering_merge(to_df, from_df, **kwargs):
 
     to_df = to_df.drop(columns=list(overlapping))
     return pd.merge(to_df, from_df, **kwargs)
+
+
+def strip_substructure_acronym(
+        acronym: Optional[Union[str, list, float]]
+) -> Optional[Union[str, list]]:
+    """
+    Sanitize a structure acronym or a list of structure acronyms
+    by removing the substructure (e.g. DG-mo becomes DG).
+
+    If acronym is a list, every element in the list will be sanitized
+    and a list of unique acronyms will be returned. **Element order will
+    not be preserved**.
+
+    If acronym is None, return None. If None occurs in a list of
+    sturture acronyms, it will be omitted
+
+    Note: if acronym is NaN, it will get converted to None;
+    any other float will provoke an error.
+    """
+
+    if isinstance(acronym, numbers.Number):
+        if np.isnan(acronym):
+            acronym = None
+
+    if isinstance(acronym, str):
+        return acronym.split('-')[0]
+    elif isinstance(acronym, list):
+        new_acronym = set()
+
+        for el in acronym:
+            new_el = strip_substructure_acronym(el)
+            if new_el is not None:
+                new_acronym.add(new_el)
+        new_acronym = list(new_acronym)
+        new_acronym.sort()
+        return new_acronym
+
+    elif acronym is None:
+        return None
+    else:
+        raise RuntimeError(
+            "acronym must be a list or a str or None; you gave "
+            f"{acronym} which is a {type(acronym)}")

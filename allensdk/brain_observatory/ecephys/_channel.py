@@ -2,6 +2,8 @@ from typing import Optional
 import numpy as np
 
 from allensdk.core import DataObject
+from allensdk.brain_observatory.ecephys.utils import (
+    strip_substructure_acronym)
 
 
 class Channel(DataObject):
@@ -14,7 +16,7 @@ class Channel(DataObject):
             probe_channel_number: int,
             probe_vertical_position: int,
             probe_horizontal_position: int,
-            manual_structure_acronym: str = '',
+            structure_acronym: str = '',
             anterior_posterior_ccf_coordinate: Optional[float] = None,
             dorsal_ventral_ccf_coordinate: Optional[float] = None,
             left_right_ccf_coordinate: Optional[float] = None,
@@ -39,7 +41,7 @@ class Channel(DataObject):
         self._probe_channel_number = probe_channel_number
         self._probe_vertical_position = probe_vertical_position
         self._probe_horizontal_position = probe_horizontal_position
-        self._manual_structure_acronym = manual_structure_acronym
+        self._structure_acronym = structure_acronym
         self._anterior_posterior_ccf_coordinate = \
             anterior_posterior_ccf_coordinate
         self._dorsal_ventral_ccf_coordinate = dorsal_ventral_ccf_coordinate
@@ -73,11 +75,10 @@ class Channel(DataObject):
         return self._probe_horizontal_position
 
     @property
-    def manual_structure_acronym(self) -> str:
-        acronym = self._manual_structure_acronym
-        if type(self._manual_structure_acronym) is str and \
-                self._strip_structure_subregion:
-            acronym = self._manual_structure_acronym.split('-')[0]
+    def structure_acronym(self) -> str:
+        acronym = self._structure_acronym
+        if self._strip_structure_subregion:
+            acronym = strip_substructure_acronym(self._structure_acronym)
         return acronym
 
     @property

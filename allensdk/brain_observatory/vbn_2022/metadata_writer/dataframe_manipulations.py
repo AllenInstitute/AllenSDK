@@ -22,6 +22,9 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
 from allensdk.internal.api.queries.behavior_lims_queries import (
     stimulus_pickle_paths_from_behavior_session_ids)
 
+from allensdk.brain_observatory.ecephys.utils import (
+    strip_substructure_acronym)
+
 
 def _add_session_number(
         sessions_df: pd.DataFrame,
@@ -526,3 +529,38 @@ def _get_session_duration_from_behavior_session_ids(
         index=pd.Int64Index([x['behavior_session_id'] for x in durations],
                             name='behavior_session_id'))
     return durations
+
+
+def strip_substructure_acronym_df(
+        df: pd.DataFrame,
+        col_name: str) -> pd.DataFrame:
+    """
+    Take the structure_acronym(s) column of a dataframe
+    and remove the substructure (i.e. convert DG-mo to DG).
+
+    Return the altered dataframe.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+
+    col_name: str
+        The name of the structure_acronym column.
+        Note: if the column is a list of strings (as in the
+        probes.csv table) every element in the list will be
+        sanitized.
+
+    Return
+    ------
+    df: pd.DataFrame
+        Same as input with the amended column
+
+    Note
+    ----
+    Alters df in place
+    """
+    new_col = [
+        strip_substructure_acronym(acronym)
+        for acronym in df[col_name]]
+    df[col_name] = new_col
+    return df

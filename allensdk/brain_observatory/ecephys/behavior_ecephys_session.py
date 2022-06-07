@@ -267,7 +267,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         -------
         A dataframe with columns
             - id: probe id
-            - description: probe name
+            - name: probe name
             - location: probe location
             - lfp_sampling_rate: LFP sampling rate
             - has_lfp_data: Whether this probe has LFP data

@@ -177,7 +177,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
     def to_dict(self) -> dict:
         return {
             'id': self._id,
-            'description': self._name,
+            'name': self._name,
             'location': self._location,
             'sampling_rate': self._sampling_rate,
             'lfp_sampling_rate':

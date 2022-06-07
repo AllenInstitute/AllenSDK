@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
@@ -33,7 +32,7 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
             probe_channel_number=channel['probe_channel_number'],
             probe_vertical_position=channel['probe_vertical_position'],
             probe_horizontal_position=channel['probe_horizontal_position'],
-            manual_structure_acronym=channel['manual_structure_acronym'],
+            structure_acronym=channel['structure_acronym'],
             anterior_posterior_ccf_coordinate=(
                 channel['anterior_posterior_ccf_coordinate']),
             dorsal_ventral_ccf_coordinate=(
@@ -112,8 +111,8 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
                                    "'probe_channel_number'.\n"
                                    f"Columns are {row.keys()}")
 
-            manual_structure_acronym = \
-                np.nan if row['location'] in ['None', ''] else row['location']
+            structure_acronym = \
+                None if row['location'] in ['None', ''] else row['location']
             channels.append(Channel(
                 id=channel_id,
                 probe_channel_number=row[idx_col],
@@ -121,7 +120,7 @@ class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
                 probe_vertical_position=row['probe_vertical_position'],
                 probe_id=row['probe_id'],
                 valid_data=row['valid_data'],
-                manual_structure_acronym=manual_structure_acronym,
+                structure_acronym=structure_acronym,
                 anterior_posterior_ccf_coordinate=row['x'],
                 dorsal_ventral_ccf_coordinate=row['y'],
                 left_right_ccf_coordinate=row['z']
