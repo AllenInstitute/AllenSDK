@@ -45,7 +45,8 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
                  full_genotype: FullGenotype,
                  driver_line: DriverLine,
                  mouse_id: MouseId):
-        super().__init__(name='subject_metadata', value=self)
+        super().__init__(name='subject_metadata', value=None,
+                         is_value_self=True)
         self._sex = sex
         self._age = age
         self._reporter_line = reporter_line

@@ -1,5 +1,6 @@
 import datetime
 from typing import Any, List, Dict, Optional
+
 import pynwb
 import pandas as pd
 import numpy as np
@@ -62,7 +63,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         metadata: BehaviorMetadata,
         date_of_acquisition: DateOfAcquisition
     ):
-        super().__init__(name='behavior_session', value=self)
+        super().__init__(name='behavior_session', value=None,
+                         is_value_self=True)
 
         self._behavior_session_id = behavior_session_id
         self._licks = licks

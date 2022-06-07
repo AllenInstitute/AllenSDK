@@ -70,7 +70,8 @@ class CellSpecimenMeta(DataObject, LimsReadableInterface,
                        JsonReadableInterface, NwbReadableInterface):
     """Cell specimen metadata"""
     def __init__(self, imaging_plane: ImagingPlane, emission_lambda=520.0):
-        super().__init__(name='cell_specimen_meta', value=self)
+        super().__init__(name='cell_specimen_meta', value=None,
+                         is_value_self=True)
         self._emission_lambda = emission_lambda
         self._imaging_plane = imaging_plane
 
@@ -157,7 +158,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             Whether to exclude invalid rois
 
         """
-        super().__init__(name='cell_specimen_table', value=self)
+        super().__init__(name='cell_specimen_table', value=None,
+                         is_value_self=True)
 
         # Validate ophys timestamps, traces
         ophys_timestamps = ophys_timestamps.validate(

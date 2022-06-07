@@ -19,7 +19,7 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, max_projection: Image, avg_projection: Image):
-        super().__init__(name='projections', value=self)
+        super().__init__(name='projections', value=None, is_value_self=True)
         self._max_projection = max_projection
         self._avg_projection = avg_projection
 

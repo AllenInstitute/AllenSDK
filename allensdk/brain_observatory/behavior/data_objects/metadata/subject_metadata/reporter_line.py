@@ -89,7 +89,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     def parse_indicator(self, warn=False) -> Optional[str]:
         """Parses indicator from reporter"""
-        reporter_line = self.value
+        reporter_line = self._value
         reporter_substring_indicator_map = {
             'GCaMP6f': 'GCaMP6f',
             'GC6f': 'GCaMP6f',

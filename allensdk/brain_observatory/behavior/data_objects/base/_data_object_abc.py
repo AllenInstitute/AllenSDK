@@ -15,7 +15,8 @@ class DataObject(abc.ABC):
     """
 
     def __init__(self, name: str, value: Any,
-                 exclude_from_equals: Optional[Set[str]] = None):
+                 exclude_from_equals: Optional[Set[str]] = None,
+                 is_value_self: bool = False):
         """
         :param name
             Name
@@ -24,9 +25,19 @@ class DataObject(abc.ABC):
         :param exclude_from_equals
             Optional set which will exclude these properties from comparison
             checks to another DataObject
+        :param is_value_self
+            Indicates that the `value` is `self`. Useful for representing
+            complex objects with multiple properties rather than a simple
+            array or dataframe
         """
+        if value is self:
+            raise ValueError('Passing value of self is not supported')
+        if is_value_self and value is not None:
+            raise ValueError('If passing is_value_self=True, then value '
+                             'should be None')
         self._name = name
         self._value = value
+        self._is_value_self = is_value_self
 
         efe = exclude_from_equals if exclude_from_equals else set()
         self._exclude_from_equals = efe
@@ -37,7 +48,11 @@ class DataObject(abc.ABC):
 
     @property
     def value(self) -> Any:
-        return self._value
+        if self._is_value_self:
+            value = self
+        else:
+            value = self._value
+        return value
 
     def to_dict(self) -> dict:
         """
@@ -63,7 +78,8 @@ class DataObject(abc.ABC):
 
             >>> class A(DataObject):
             ...     def __init__(self, b: B):
-            ...         super().__init__(name='a', value=self)
+            ...         super().__init__(name='a', value=None,
+            is_value_self=True)
             ...         self._b = b
             ...     @property
             ...     def prop1(self):
@@ -110,7 +126,8 @@ class DataObject(abc.ABC):
                 for p in path:
                     cur = cur[p]
 
-                if isinstance(value._value, DataObject):
+                if isinstance(value._value, DataObject) or \
+                        value._is_value_self:
                     # it's nested
                     cur[value._name] = dict()
                     for p in properties:

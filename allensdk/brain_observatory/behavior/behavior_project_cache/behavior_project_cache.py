@@ -1,10 +1,11 @@
-from functools import partial
 from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
 import logging
 
 from allensdk.api.warehouse_cache.cache import Cache
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .experiments_table import \
     ExperimentsTable
@@ -14,10 +15,12 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
     BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
-    one_file_call_caching, call_caching
+    one_file_call_caching
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .ophys_sessions_table import \
     BehaviorOphysSessionsTable
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 from allensdk.core.authentication import DbCredentials
 
 
@@ -549,45 +552,38 @@ class VisualBehaviorOphysProjectCache(object):
 
         return sessions.table if as_df else sessions
 
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int,
-                                      fixed: bool = False):
+    def get_behavior_ophys_experiment(
+            self, ophys_experiment_id: int
+    ) -> BehaviorOphysExperiment:
         """
-        Note -- This method mocks the behavior of a cache. Future
-        development will include an NWB reader to read from
-        a true local cache (once nwb files are created).
-        TODO: Using `fixed` will raise a NotImplementedError since there
-        is no real cache.
-        """
-        if fixed:
-            raise NotImplementedError
-        fetch_session = partial(self.fetch_api.get_behavior_ophys_experiment,
-                                ophys_experiment_id)
-        return call_caching(
-            fetch_session,
-            lambda x: x,  # not writing anything
-            lazy=False,  # can't actually read from file cache
-            read=fetch_session
-        )
+        Gets `BehaviorOphysExperiment` for `ophys_experiment_id`
+        Parameters
+        ----------
+        ophys_experiment_id: ophys experiment id
 
-    def get_behavior_session(self, behavior_session_id: int,
-                             fixed: bool = False):
+        Returns
+        -------
+        BehaviorOphysExperiment
         """
-        Note -- This method mocks the behavior of a cache. Future
-        development will include an NWB reader to read from
-        a true local cache (once nwb files are created).
-        TODO: Using `fixed` will raise a NotImplementedError since there
-        is no real cache.
-        """
-        if fixed:
-            raise NotImplementedError
+        return self.fetch_api.get_behavior_ophys_experiment(
+            ophys_experiment_id=ophys_experiment_id)
 
-        fetch_session = partial(self.fetch_api.get_behavior_session,
-                                behavior_session_id)
-        return call_caching(
-            fetch_session,
-            lambda x: x,  # not writing anything
-            lazy=False,  # can't actually read from file cache
-            read=fetch_session
+    def get_behavior_session(
+            self,
+            behavior_session_id: int
+    ) -> BehaviorSession:
+        """
+        Gets `BehaviorSession` for `behavior_session_id`
+        Parameters
+        ----------
+        behavior_session_id: behavior session id
+
+        Returns
+        -------
+        BehaviorSession
+        """
+        return self.fetch_api.get_behavior_session(
+            behavior_session_id=behavior_session_id
         )
 
 
