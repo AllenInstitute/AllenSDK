@@ -31,5 +31,5 @@ def test_strip_substructure_acronym():
     with pytest.raises(RuntimeError, match="list or a str"):
         strip_substructure_acronym(('a', 'b', 'c'))
 
-    with pytest.raises(RuntimeError, match="Do not know how to parse"):
+    with pytest.raises(RuntimeError, match="list or a str"):
         strip_substructure_acronym(['abc', 2.3])

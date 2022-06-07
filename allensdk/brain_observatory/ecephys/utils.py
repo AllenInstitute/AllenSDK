@@ -96,20 +96,9 @@ def strip_substructure_acronym(
         new_acronym = set()
 
         for el in acronym:
-            if isinstance(el, str):
-                new_el = el.split('-')[0]
+            new_el = strip_substructure_acronym(el)
+            if new_el is not None:
                 new_acronym.add(new_el)
-            else:
-
-                if isinstance(el, numbers.Number):
-                    if np.isnan(el):
-                        el = None
-
-                if el is not None:
-                    raise RuntimeError(
-                        "Do not know how to parse structure acronym "
-                        f"{el} of type {type(el)}")
-
         new_acronym = list(new_acronym)
         new_acronym.sort()
         return new_acronym
