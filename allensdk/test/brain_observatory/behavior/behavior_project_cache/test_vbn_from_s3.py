@@ -21,6 +21,39 @@ from allensdk.brain_observatory.\
 
 
 @mock_s3
+def test_vbn_metadata_tables(tmpdir, vbn_s3_cloud_cache_data):
+    """
+    Test that we can load all metadata tables from the VBN cache
+
+    Mostly a smoke test
+    """
+    data, versions = vbn_s3_cloud_cache_data
+    cache_dir = pathlib.Path(tmpdir) / "test_metadata"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
+    create_bucket(bucket_name,
+                  project_name,
+                  data['data'],
+                  data['metadata'])
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
+
+    cache.get_probe_table()
+    cache.get_channel_table()
+    cache.get_unit_table()
+    cache.get_behavior_session_table()
+
+    # make sure we are filtering ecephys sessions according
+    # to abnormality correctly
+    ecephys = cache.get_ecephys_session_table()
+    assert len(ecephys) == 1
+    assert ecephys.index[0] == 222
+
+    abnormal = cache.get_ecephys_session_table(
+                    filter_abnormalities=False)
+    assert len(abnormal) == 3
+
+
+@mock_s3
 def test_manifest_methods(tmpdir, vbn_s3_cloud_cache_data):
 
     data, versions = vbn_s3_cloud_cache_data

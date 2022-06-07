@@ -257,9 +257,12 @@ def vbn_s3_cloud_cache_data():
     data['ecephys_file_3.nwb'] = {'file_id': 3, 'data': b'fxxhijk'}
 
     e_session = [
-        {'ecephys_session_id': 222, 'file_id': 1},
-        {'ecephys_session_id': 333, 'file_id': 2},
-        {'ecephys_session_id': 444, 'file_id': 3},
+        {'ecephys_session_id': 222, 'file_id': 1,
+         'abnormal_histology': None, 'abnormal_activity': None},
+        {'ecephys_session_id': 333, 'file_id': 2,
+         'abnormal_histology': ['l', 'r'], 'abnormal_activity': None},
+        {'ecephys_session_id': 444, 'file_id': 3,
+         'abnormal_histology': None, 'abnormal_activity': [8, 9]},
     ]
 
     e_session = pd.DataFrame(e_session)
