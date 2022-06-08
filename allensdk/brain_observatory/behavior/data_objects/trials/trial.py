@@ -1,8 +1,9 @@
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 import numpy as np
 
 from allensdk import one
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
@@ -10,16 +11,31 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 
 
 class Trial:
-    def __init__(self, trial: dict, start: float, end: float,
-                 behavior_stimulus_file: BehaviorStimulusFile,
-                 index: int,
-                 stimulus_timestamps: StimulusTimestamps,
-                 licks: Licks, rewards: Rewards, stimuli: dict):
+    def __init__(
+            self,
+            trial: dict,
+            start: float,
+            end: float,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            index: int,
+            stimulus_timestamps: StimulusTimestamps,
+            licks: Licks,
+            rewards: Rewards,
+            stimuli: dict,
+            sync_file: Optional[SyncFile] = None):
+        """
+        sync_file is an argument that will be used by
+        sub-classes that have a more subtle way of handling
+        monitor delay.
+        """
+
         self._trial = trial
         self._start = start
         self._end = self._calculate_trial_end(
             trial_end=end, behavior_stimulus_file=behavior_stimulus_file)
         self._index = index
+        self._stimulus_timestamps = stimulus_timestamps
+        self._sync_file = sync_file
         self._data = self._match_to_sync_timestamps(
             raw_stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -42,7 +58,6 @@ class Trial:
 
         # need to separate out the monitor_delay from the
         # un-corrected timestamps
-        monitor_delay = raw_stimulus_timestamps.monitor_delay
         stimulus_timestamps = raw_stimulus_timestamps.subtract_monitor_delay()
 
         event_dict = {
@@ -104,8 +119,6 @@ class Trial:
             tr_data['hit'],
             tr_data['false_alarm'],
             tr_data["aborted"],
-            timestamps,
-            monitor_delay
         ))
         tr_data.update(self._get_trial_image_names(stimuli))
 
@@ -200,8 +213,8 @@ class Trial:
             "correct_reject": correct_reject,
         }
 
-    @staticmethod
     def _get_trial_timing(
+            self,
             event_dict: dict,
             licks: List[float],
             go: bool,
@@ -209,9 +222,7 @@ class Trial:
             auto_rewarded: bool,
             hit: bool,
             false_alarm: bool,
-            aborted: bool,
-            timestamps: np.ndarray,
-            monitor_delay: float) -> Dict[str, Any]:
+            aborted: bool) -> Dict[str, Any]:
         """
         Extract a dictionary of trial timing data.
         See trial_data_from_log for a description of the trial types.
@@ -237,11 +248,6 @@ class Trial:
             True if "false_alarm" trial, False otherwise
         aborted: bool
             True if "aborted" trial, False otherwise
-        timestamps: np.ndarray[1d]
-            Array of ground truth timestamps for the session.
-        monitor_delay: float
-            The monitor delay to be added to timestamps when computing
-            the trial's change_time
 
         Returns
         =======
@@ -317,14 +323,22 @@ class Trial:
         if go or auto_rewarded:
             change_frame = event_dict.get(('stimulus_changed', ''))['frame']
             change_frame += 1
-            change_time = timestamps[change_frame] + monitor_delay
         elif catch:
             change_frame = event_dict.get(('sham_change', ''))['frame']
             change_frame += 1
-            change_time = timestamps[change_frame] + monitor_delay
         else:
-            change_time = float("nan")
             change_frame = float("nan")
+
+        result = {
+            "start_time": start_time,
+            "stop_time": stop_time,
+            "trial_length": stop_time - start_time,
+            "response_time": response_time,
+            "change_frame": change_frame
+        }
+
+        result = self.add_change_time(result)
+        change_time = result["change_time"]
 
         if not (go or catch or auto_rewarded):
             response_latency = None
@@ -333,15 +347,43 @@ class Trial:
         else:
             response_latency = float("inf")
 
-        return {
-            "start_time": start_time,
-            "stop_time": stop_time,
-            "trial_length": stop_time - start_time,
-            "response_time": response_time,
-            "change_frame": change_frame,
-            "change_time": change_time,
-            "response_latency": response_latency,
-        }
+        result["response_latency"] = response_latency
+
+        return result
+
+    def add_change_time(self, trial_dict: dict) -> dict:
+        """
+        Add change_time to a dict representing a single trial.
+
+        This implementation will just take change_frame and
+        select the value of self._stimulus_timestamps corresponding
+        to that frame.
+
+        Parameters
+        ----------
+        trial_dict:
+            dict containing all trial parameters except
+            change_time
+
+        Returns
+        -------
+        trial_dict:
+            Same as input, except change_time field has been
+            added
+
+        Note
+        ----
+        Modified trial_dict in-place, in addition to returning it
+        """
+        change_frame = trial_dict['change_frame']
+        if np.isnan(change_frame):
+            change_time = np.NaN
+        else:
+            change_frame = int(change_frame)
+            change_time = self._stimulus_timestamps.value[change_frame]
+
+        trial_dict['change_time'] = change_time
+        return trial_dict
 
     def _get_trial_image_names(self, stimuli) -> Dict[str, str]:
         """

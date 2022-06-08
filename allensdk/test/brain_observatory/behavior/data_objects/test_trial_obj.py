@@ -1,6 +1,8 @@
 import pytest
 import numpy as np
 import pandas as pd
+from allensdk.brain_observatory.behavior.data_objects import (
+    StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
     Trial)
 
@@ -128,10 +130,18 @@ def test_resolve_initial_image(behavior_stimuli_data_fixture, start_frame,
 )
 def test_get_trial_timing_exclusivity_assertions(
         go, catch, auto_rewarded, hit, false_alarm, aborted, errortext):
+
+    # we just want to test a method of Trial, specifically test
+    # errors that will be raised before any processing happens,
+    # so we can define a child class with an empty __init__
+    class DummyTrial(Trial):
+        def __init__(self):
+            pass
+
     with pytest.raises(AssertionError) as e:
-        Trial._get_trial_timing(
+        DummyTrial()._get_trial_timing(
             None, None, go, catch, auto_rewarded, hit, false_alarm,
-            aborted, np.array([]), 0.0)
+            aborted)
     assert errortext in str(e.value)
 
 
@@ -185,7 +195,19 @@ def test_get_trial_timing():
     timestamps[18346] = 311.77086
     monitor_delay = 0.01
 
-    result = Trial._get_trial_timing(
+    # need a mock Trial class that just populates
+    # self._stimulus_timestamps
+    stimulus_timestamps = StimulusTimestamps(
+        timestamps=timestamps,
+        monitor_delay=monitor_delay)
+
+    class DummyTrial(Trial):
+        def __init__(self, timestamps):
+            self._stimulus_timestamps = timestamps
+
+    this_trial = DummyTrial(timestamps=stimulus_timestamps)
+
+    result = this_trial._get_trial_timing(
         event_dict,
         licks,
         go=False,
@@ -193,9 +215,7 @@ def test_get_trial_timing():
         auto_rewarded=True,
         hit=False,
         false_alarm=False,
-        aborted=False,
-        timestamps=timestamps,
-        monitor_delay=monitor_delay
+        aborted=False
     )
 
     expected_result = {
