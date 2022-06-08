@@ -1,10 +1,11 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile, SyncFile)
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -20,6 +21,14 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
 
 class TrialTable(DataObject, StimulusFileReadableInterface,
                  NwbReadableInterface, NwbWritableInterface):
+
+    @classmethod
+    def trial_class(cls):
+        """
+        Return the class to be used to represent a single Trial
+        """
+        return Trial
+
     def __init__(self, trials: pd.DataFrame):
         super().__init__(name='trials', value=trials)
 
@@ -64,7 +73,8 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
     def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
-                           rewards: Rewards
+                           rewards: Rewards,
+                           sync_file: Optional[SyncFile] = None
                            ) -> "TrialTable":
         bsf = stimulus_file.data
 
@@ -77,12 +87,16 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         for idx, trial in enumerate(trial_log):
             trial_start, trial_end = trial_bounds[idx]
-            t = Trial(trial=trial, start=trial_start, end=trial_end,
+            t = cls.trial_class()(
+                      trial=trial,
+                      start=trial_start,
+                      end=trial_end,
                       behavior_stimulus_file=stimulus_file,
                       index=idx,
                       stimulus_timestamps=stimulus_timestamps,
                       licks=licks, rewards=rewards,
-                      stimuli=stimuli
+                      stimuli=stimuli,
+                      sync_file=sync_file
                       )
             all_trial_data[idx] = t.data
 
