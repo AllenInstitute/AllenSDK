@@ -71,7 +71,7 @@ class DFFTraces(DataObject, RoisMixin,
         # We want rois x timepoints, hence the transpose
         dff_traces = dff_nwb.data[:].T
 
-        df = pd.DataFrame({'dff': dff_traces.tolist()},
+        df = pd.DataFrame({'dff': [x for x in dff_traces]},
                           index=pd.Index(data=dff_nwb.rois.table.id[:],
                                          name='cell_roi_id'))
         return DFFTraces(traces=df)
