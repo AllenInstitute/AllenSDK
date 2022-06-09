@@ -326,8 +326,7 @@ class Trial:
             "change_frame": change_frame
         }
 
-        result = self.add_change_time(result)
-        change_time = result["change_time"]
+        result, change_time = self.add_change_time(result)
 
         if not (go or catch or auto_rewarded):
             response_latency = None
@@ -394,7 +393,7 @@ class Trial:
 
         return change_frame
 
-    def add_change_time(self, trial_dict: dict) -> dict:
+    def add_change_time(self, trial_dict: dict) -> Tuple[dict, float]:
         """
         Add change_time to a dict representing a single trial.
 
@@ -414,6 +413,12 @@ class Trial:
             Same as input, except change_time field has been
             added
 
+        change_time: float
+            The change time value that was added
+            (this is returned separately so that child classes have the
+            option of naming the column something different than
+            'change_time')
+
         Note
         ----
         Modified trial_dict in-place, in addition to returning it
@@ -426,7 +431,7 @@ class Trial:
             change_time = self._stimulus_timestamps.value[change_frame]
 
         trial_dict['change_time'] = change_time
-        return trial_dict
+        return trial_dict, change_time
 
     def _get_trial_image_names(self, stimuli) -> Dict[str, str]:
         """
