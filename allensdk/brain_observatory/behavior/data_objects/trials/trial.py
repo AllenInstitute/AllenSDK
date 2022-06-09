@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple, Optional, Union
 
 import numpy as np
 
@@ -312,22 +312,11 @@ class Trial:
 
         response_time = _get_response_time(licks, aborted)
 
-        # In the code below, change_frame is incremented by one
-        # relative to its naive value in the pickle file. This
-        # is because the visual stimulus does not actually
-        # change until the start of the following frame.
-        #
-        # This behavior was confirmed with the MPE team
-        # over email in mid October 2021
-
-        if go or auto_rewarded:
-            change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-            change_frame += 1
-        elif catch:
-            change_frame = event_dict.get(('sham_change', ''))['frame']
-            change_frame += 1
-        else:
-            change_frame = float("nan")
+        change_frame = self.calculate_change_frame(
+                event_dict=event_dict,
+                go=go,
+                catch=catch,
+                auto_rewarded=auto_rewarded)
 
         result = {
             "start_time": start_time,
@@ -350,6 +339,60 @@ class Trial:
         result["response_latency"] = response_latency
 
         return result
+
+    def calculate_change_frame(
+            self,
+            event_dict: dict,
+            go: bool,
+            catch: bool,
+            auto_rewarded: bool) -> Union[int, float]:
+
+        """
+        Calculate the frame index of a stimulus change
+        associated with a specific event.
+
+        Parameters
+        ----------
+        event_dict: dict
+            Dictionary of trial events in the well-known `pkl` file
+        go: bool
+            True if "go" trial, False otherwise. Mutually exclusive with
+            `catch`.
+        catch: bool
+            True if "catch" trial, False otherwise. Mutually exclusive
+            with `go.`
+        auto_rewarded: bool
+            True if "auto_rewarded" trial, False otherwise.
+
+        Returns
+        -------
+        change_frame: Union[int, float]
+            Index of the change frame; NaN if there is no change
+
+        Notes
+        -----
+        This is its own method so that child classes of Trial
+        can implement different logic as needed.
+        """
+
+        # In the code below, change_frame is incremented by one
+        # relative to its naive value in the pickle file. This
+        # is because the visual stimulus does not actually
+        # change until the start of the following frame.
+        #
+        # This behavior was confirmed with the MPE team
+        # over email in mid October 2021
+
+        if go or auto_rewarded:
+            change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+            change_frame += 1
+        elif catch:
+            change_frame = event_dict.get(('sham_change', ''))['frame']
+            change_frame += 1
+        else:
+            change_frame = float("nan")
+
+        return change_frame
 
     def add_change_time(self, trial_dict: dict) -> dict:
         """
