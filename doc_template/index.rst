@@ -64,7 +64,7 @@ image change detection task.
      - March 2021
    * - Active
      - Extracellular electrophysiology
-     - Visual Behavior - Neuropixels
+     - :doc:`Visual Behavior - Neuropixels <visual_behavior_neuropixels>`
      - Coming soon...
  
 Experiment and stimulus data are provided in `Neurodata Without Borders <https://www.nwb.org/>`_ (NWB) files. 
