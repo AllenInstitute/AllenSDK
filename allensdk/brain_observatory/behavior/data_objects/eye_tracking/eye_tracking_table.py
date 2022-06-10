@@ -220,12 +220,18 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             sync_line_label_keys=Dataset.EYE_TRACKING_KEYS,
             trim_after_spike=False)
 
+        # mvr experiment fix, see notes in process_eye_tracking_data()
+        eye_json = list(sync_path.parent.glob("*_Eye*.json"))
+        mvr_experiment = False
+        mvr_experiment = True if eye_json else mvr_experiment
+
         try:
             eye_tracking_data = process_eye_tracking_data(
                                              data_file.data,
                                              frame_times,
                                              z_threshold,
-                                             dilation_frames)
+                                             dilation_frames,
+                                             mvr_experiment)
         except EyeTrackingError as err:
             msg = f"\nin sync_file: {sync_file.filepath}\n"
             msg += f"{str(err)}\n"

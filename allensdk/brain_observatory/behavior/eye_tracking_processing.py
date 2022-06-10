@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import logging
 
 from scipy import ndimage, stats
 
@@ -158,7 +159,8 @@ def determine_likely_blinks(eye_areas: pd.Series,
 def process_eye_tracking_data(eye_data: pd.DataFrame,
                               frame_times: pd.Series,
                               z_threshold: float = 3.0,
-                              dilation_frames: int = 2) -> pd.DataFrame:
+                              dilation_frames: int = 2,
+                              mvr_experiment = False) -> pd.DataFrame:
     """Processes and refines raw eye tracking data by adding additional
     computed feature columns.
 
@@ -175,6 +177,9 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     dilation_frames : int, optional
         Determines the number of additional adjacent frames to mark as
         'likely_blink', by default 2.
+    mvr_experiment: bool,
+        If eye json is found, this is an MVR file and metadataframe should be
+        removed
 
     Returns
     -------
@@ -192,6 +197,35 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
 
     n_sync = len(frame_times)
     n_eye_frames = len(eye_data.index)
+
+    # Hack to deal with metadata frames in behavior
+    # videos on experiments with MVR. This is a temp fix, and 
+    # not fully vetted for all possible cases. Future work may use 
+    # "lost_frames" in eye_data json
+    # see: https://github.com/AllenInstitute/mindscope_qc/issues/48
+    # see: https://github.com/AllenInstitute/mindscope_qc/issues/40
+    # 1. checks for eye json (to confirm this is MVR session)
+    # 2. removes 1st row from EyeTrackingFile (metadata frame)
+    # 3. Naively truncates to match arrays (this obviates the truncation
+    # below, which can be possibly removed when this code is cleaned by tech)
+    if mvr_experiment:
+        eye_data = eye_data[1:].reset_index(drop=True)
+
+        logging.warning("mvr experiment found, removed 1st frame from"
+                        " eye_data")
+        n_sync, n_eye_frames = len(frame_times), len(eye_data.index)
+
+        if n_sync != n_eye_frames:
+            logging.warning(f"sync_frames ({n_sync}) & eye_data"
+                            f"({n_eye_frames}) size mismatch, truncating to"
+                            f" shortest of those arrays")
+            # find the shortest array length of frame_times/EyeTrackingFile and
+            #  truncate to the that value
+            min_frames = min(n_sync,n_eye_frames)
+            frame_times = frame_times[:min_frames]
+            eye_data = eye_data[:min_frames].reset_index(drop=True)
+
+            n_sync, n_eye_frames = len(frame_times), len(eye_data.index)
 
     # If n_sync exceeds n_eye_frames by <= 15,
     # just trim the excess sync pulses from the end
