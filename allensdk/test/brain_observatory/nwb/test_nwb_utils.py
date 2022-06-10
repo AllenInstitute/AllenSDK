@@ -1,8 +1,8 @@
-import json
 import tempfile
 from pathlib import Path
 
 import pytest
+import copy
 
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
@@ -38,29 +38,25 @@ def test_get_stimulus_name_column_exceptions(input_cols,
         assert expected_value in str(error.value)
 
 
-class TestNwbWriter:
-    @classmethod
-    def setup_class(cls):
-        with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'ecephys_session_1111216934_input.json') \
-                as f:
-            input_data = json.load(f)
-        cls.session_data = input_data['session_data']
+@pytest.mark.requires_bamboo
+def test_nwb_writer(
+        behavior_ecephys_session_config_fixture):
 
-    @pytest.mark.requires_bamboo
-    def test_nwb_writer(self):
-        with tempfile.NamedTemporaryFile() as f:
-            nwb_writer = NWBWriter(
-                nwb_filepath=f.name,
-                session_data=self.session_data,
-                serializer=BehaviorSession
-            )
-            nwb_writer.write_nwb(
-                read_stimulus_presentations_table_from_file=True,
-                sync_file_permissive=True,
-                running_speed_load_from_multiple_stimulus_files=True,
-                include_experiment_description=False,
-                stimulus_presentations_stimulus_column_name='stimulus_name',
-                add_is_change_to_stimulus_presentations_table=False
-            )
-            assert Path(f.name).exists()
+    session_data = copy.deepcopy(
+        behavior_ecephys_session_config_fixture)
+
+    with tempfile.NamedTemporaryFile() as f:
+        nwb_writer = NWBWriter(
+            nwb_filepath=f.name,
+            session_data=session_data,
+            serializer=BehaviorSession
+        )
+        nwb_writer.write_nwb(
+            read_stimulus_presentations_table_from_file=True,
+            sync_file_permissive=True,
+            running_speed_load_from_multiple_stimulus_files=True,
+            include_experiment_description=False,
+            stimulus_presentations_stimulus_column_name='stimulus_name',
+            add_is_change_to_stimulus_presentations_table=False
+        )
+        assert Path(f.name).exists()

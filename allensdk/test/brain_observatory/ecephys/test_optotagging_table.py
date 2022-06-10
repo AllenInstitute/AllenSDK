@@ -1,5 +1,4 @@
 import datetime
-import json
 
 import pytest
 from pynwb import NWBFile
@@ -7,36 +6,41 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 
 
-class TestOptotaggingTable:
-    @classmethod
-    def setup_class(cls):
-        with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'ecephys_session_1111216934_input.json') \
-                as f:
-            input_data = json.load(f)
-        cls._table_from_json = OptotaggingTable.from_json(
-            dict_repr=input_data['session_data'])
+@pytest.fixture(scope='module')
+def optotagging_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return an OptotaggingTable
+    """
+    obj = OptotaggingTable.from_json(
+        dict_repr=behavior_ecephys_session_config_fixture)
+    return obj
 
-    def setup_method(self, method):
-        self._nwbfile = NWBFile(
-            session_description='foo',
-            identifier='foo',
-            session_id='foo',
-            session_start_time=datetime.datetime.now(),
-            institution="Allen Institute"
-        )
 
-    @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
-        self._table_from_json.to_nwb(nwbfile=self._nwbfile)
+def create_nwb_file():
+    nwbfile = NWBFile(
+        session_description='foo',
+        identifier='foo',
+        session_id='foo',
+        session_start_time=datetime.datetime.now(),
+        institution="Allen Institute"
+    )
+    return nwbfile
 
-        if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self._nwbfile,
-                data_object_cls=OptotaggingTable)
-        else:
-            obt = OptotaggingTable.from_nwb(nwbfile=self._nwbfile)
 
-        assert obt == self._table_from_json
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_read_write_nwb(roundtrip,
+                        data_object_roundtrip_fixture,
+                        optotagging_fixture):
+    nwbfile = create_nwb_file()
+    optotagging_fixture.to_nwb(nwbfile=nwbfile)
+
+    if roundtrip:
+        obt = data_object_roundtrip_fixture(
+            nwbfile=nwbfile,
+            data_object_cls=OptotaggingTable)
+    else:
+        obt = OptotaggingTable.from_nwb(nwbfile=nwbfile)
+
+    assert obt == optotagging_fixture
