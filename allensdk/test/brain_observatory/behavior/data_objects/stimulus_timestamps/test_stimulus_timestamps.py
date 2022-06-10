@@ -1,4 +1,3 @@
-import datetime
 from pathlib import Path
 
 import pytest
@@ -7,8 +6,6 @@ from unittest.mock import create_autospec
 import numpy as np
 
 from itertools import product
-
-from pynwb import NWBFile
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
@@ -257,17 +254,6 @@ def test_stimulus_timestamps_nwb_roundtrip(
                        raw_stimulus_timestamps_data+monitor_delay)
 
 
-def create_nwb_file():
-    nwbfile = NWBFile(
-        session_description='foo',
-        identifier='foo',
-        session_id='foo',
-        session_start_time=datetime.datetime.now(),
-        institution="Allen Institute"
-    )
-    return nwbfile
-
-
 @pytest.fixture(scope='module')
 def stimulus_timestamps_fixture(
         behavior_ecephys_session_config_fixture):
@@ -293,9 +279,10 @@ def stimulus_timestamps_fixture(
 def test_read_write_nwb(
         roundtrip,
         data_object_roundtrip_fixture,
-        stimulus_timestamps_fixture):
+        stimulus_timestamps_fixture,
+        helper_functions):
 
-    nwbfile = create_nwb_file()
+    nwbfile = helper_functions.create_blank_nwb_file()
 
     stimulus_timestamps_fixture.to_nwb(nwbfile=nwbfile)
 

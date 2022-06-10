@@ -4,7 +4,6 @@ from pathlib import Path
 import pandas as pd
 import pynwb
 import pytest
-from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -62,18 +61,6 @@ def presentations_fixture(
     return obj
 
 
-def create_nwb_file():
-
-    nwbfile = NWBFile(
-        session_description='foo',
-        identifier='foo',
-        session_id='foo',
-        session_start_time=datetime.now(),
-        institution="Allen Institute"
-    )
-    return nwbfile
-
-
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('roundtrip, add_is_change',
                          ([True, False], [True, False]))
@@ -82,9 +69,10 @@ def test_read_write_nwb(
         add_is_change,
         data_object_roundtrip_fixture,
         presentations_fixture,
-        behavior_ecephys_session_config_fixture):
+        behavior_ecephys_session_config_fixture,
+        helper_functions):
 
-    nwbfile = create_nwb_file()
+    nwbfile = helper_functions.create_blank_nwb_file()
 
     # Need to write stimulus timestamps first
     bsf = BehaviorStimulusFile.from_json(
@@ -206,11 +194,12 @@ def test_read_write_nwb_no_image_index(
         roundtrip,
         data_object_roundtrip_fixture,
         stimulus_templates_fixture,
-        presentations_fixture):
+        presentations_fixture,
+        helper_functions):
     """This presentations table has no image_index.
     Make sure the roundtrip doesn't break"""
 
-    nwbfile = create_nwb_file()
+    nwbfile = helper_functions.create_blank_nwb_file()
 
     stimulus_templates_fixture.to_nwb(
         nwbfile=nwbfile,

@@ -30,7 +30,7 @@ def ecephys_session_id_fixture(
 def create_nwb_file(
         ecephys_session_id):
     """
-    Return an NWB file
+    Return an NWB file with a specified ID
     """
     nwbfile = NWBFile(
         session_description='foo',

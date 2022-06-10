@@ -1,9 +1,25 @@
 import pytest
 import pathlib
 import platform
+import datetime
+from pynwb import NWBFile
 
 
 class HelperFunctions(object):
+
+    @staticmethod
+    def create_blank_nwb_file():
+        """
+        Create and return an empty NWB file
+        """
+        nwbfile = NWBFile(
+            session_description='foo',
+            identifier='foo',
+            session_id='foo',
+            session_start_time=datetime.datetime.now(),
+            institution="Allen Institute"
+        )
+        return nwbfile
 
     @staticmethod
     def windows_safe_cleanup(file_path: pathlib.Path):

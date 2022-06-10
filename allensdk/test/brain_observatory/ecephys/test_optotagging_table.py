@@ -1,7 +1,4 @@
-import datetime
-
 import pytest
-from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 
@@ -17,23 +14,13 @@ def optotagging_fixture(
     return obj
 
 
-def create_nwb_file():
-    nwbfile = NWBFile(
-        session_description='foo',
-        identifier='foo',
-        session_id='foo',
-        session_start_time=datetime.datetime.now(),
-        institution="Allen Institute"
-    )
-    return nwbfile
-
-
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_read_write_nwb(roundtrip,
                         data_object_roundtrip_fixture,
-                        optotagging_fixture):
-    nwbfile = create_nwb_file()
+                        optotagging_fixture,
+                        helper_functions):
+    nwbfile = helper_functions.create_blank_nwb_file()
     optotagging_fixture.to_nwb(nwbfile=nwbfile)
 
     if roundtrip:
