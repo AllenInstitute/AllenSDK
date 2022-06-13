@@ -2,13 +2,11 @@ from typing import Optional, List
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.age import \
@@ -128,7 +126,7 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             driver_line=self.driver_line,
             genotype=self.full_genotype,
             subject_id=str(self.mouse_id),
-            reporter_line=self.reporter_line,
+            reporter_line=str(self.reporter_line),
             sex=self.sex,
             species='Mus musculus')
         nwbfile.subject = nwb_subject

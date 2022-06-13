@@ -4,15 +4,15 @@ from typing import Optional, List
 
 import imageio
 from pynwb import NWBFile
+from pynwb.image import IndexSeries
 
-from allensdk.brain_observatory import nwb
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.core import DataObject
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
@@ -35,7 +35,7 @@ class Templates(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             limit_to_images: Optional[List] = None) -> "Templates":
         """Get stimulus templates (movies, scenes) for behavior session."""
 
@@ -128,12 +128,31 @@ class Templates(DataObject, StimulusFileReadableInterface,
 
         nwbfile.add_stimulus_template(visual_stimulus_image_series)
 
-        # Add index for this template to NWB in-memory object:
+        if 'image_index' in stimulus_presentations.value:
+            nwbfile = self._add_image_index_to_nwb(
+                nwbfile=nwbfile, presentations=stimulus_presentations)
+
+        return nwbfile
+
+    def _add_image_index_to_nwb(
+            self, nwbfile: NWBFile, presentations: Presentations):
+        """Adds the image index and start_time for all stimulus templates
+        to NWB"""
+        stimulus_templates = self.value
+        presentations = presentations.value
+
         nwb_template = nwbfile.stimulus_template[
             stimulus_templates.image_set_name]
-        stimulus_index = stimulus_presentations.value[
-            stimulus_presentations.value[
-                'image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
+        stimulus_name = 'image_set' \
+            if 'image_set' in presentations else 'stimulus_name'
+        stimulus_index = presentations[
+            presentations[stimulus_name] == nwb_template.name]
 
+        image_index = IndexSeries(
+            name=nwb_template.name,
+            data=stimulus_index['image_index'].values,
+            unit='None',
+            indexed_timeseries=nwb_template,
+            timestamps=stimulus_index['start_time'].values)
+        nwbfile.add_stimulus(image_index)
         return nwbfile

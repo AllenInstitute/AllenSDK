@@ -5,16 +5,40 @@ import pynwb
 import pandas as pd
 import numpy as np
 import pytz
+import pathlib
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
+from allensdk.brain_observatory import sync_utilities
+
+from allensdk.brain_observatory.behavior.data_files import \
+    BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
+
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileLookup,
+    stimulus_lookup_from_json)
+
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
+    EyeTrackingFile
+from allensdk.brain_observatory.behavior.\
+    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
+    .eye_tracking_table import EyeTrackingTable
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
+    .rig_geometry import \
+    RigGeometry as EyeTrackingRigGeometry
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
+    import \
+    Presentations
+from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
+    import \
+    Templates
+from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -33,9 +57,9 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition,
-    DataObject
+    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
@@ -61,7 +85,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         task_parameters: TaskParameters,
         trials: TrialTable,
         metadata: BehaviorMetadata,
-        date_of_acquisition: DateOfAcquisition
+        date_of_acquisition: DateOfAcquisition,
+        eye_tracking_table: Optional[EyeTrackingTable] = None,
+        eye_tracking_rig_geometry: Optional[EyeTrackingRigGeometry] = None,
     ):
         super().__init__(name='behavior_session', value=None,
                          is_value_self=True)
@@ -78,18 +104,55 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         self._trials = trials
         self._metadata = metadata
         self._date_of_acquisition = date_of_acquisition
+        self._eye_tracking = eye_tracking_table
+        self._eye_tracking_rig_geometry = eye_tracking_rig_geometry
 
     # ==================== class and utility methods ======================
 
     @classmethod
-    def from_json(cls,
-                  session_data: dict) -> "BehaviorSession":
+    def from_json(
+            cls,
+            session_data: dict,
+            read_stimulus_presentations_table_from_file=False,
+            stimulus_presentation_columns: Optional[List[str]] = None,
+            stimulus_presentation_exclude_columns: Optional[List[str]] = None,
+            skip_eye_tracking=False,
+            eye_tracking_z_threshold: float = 3.0,
+            eye_tracking_dilation_frames: int = 2,
+            eye_tracking_drop_frames: bool = False,
+            sync_file_permissive: bool = False,
+            running_speed_load_from_multiple_stimulus_files: bool = False
+    ) -> "BehaviorSession":
         """
 
         Parameters
         ----------
         session_data
             Dict of input data necessary to construct a session
+        read_stimulus_presentations_table_from_file
+            Whether to read the stimulus table from a file rather than
+            construct it here
+        stimulus_presentation_columns
+            Columns to include in the stimulus presentation table. This also
+            specifies the order of the columns.
+        stimulus_presentation_exclude_columns
+            Optional list of columns to exclude from stimulus presentations
+            table
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+        eye_tracking_z_threshold
+            See `BehaviorSession.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorSession.from_nwb`
+        eye_tracking_drop_frames
+            See `drop_frames` arg in `allensdk.brain_observatory.behavior.
+            data_objects.eye_tracking.eye_tracking_table.EyeTrackingTable.
+            from_data_file`
+        sync_file_permissive
+            See `permissive` arg in `SyncFile` constructor
+        running_speed_load_from_multiple_stimulus_files
+            Whether to load running speed from multiple stimulus files
+            If False, will just load from a single behavior stimulus file
 
         Returns
         -------
@@ -98,31 +161,128 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         """
         if 'monitor_delay' not in session_data:
             monitor_delay = cls._get_monitor_delay()
-            session_data['monitor_delay'] = monitor_delay
+        else:
+            monitor_delay = session_data['monitor_delay']
 
         behavior_session_id = BehaviorSessionId.from_json(
             dict_repr=session_data)
-        stimulus_file = StimulusFile.from_json(dict_repr=session_data)
-        stimulus_timestamps = StimulusTimestamps.from_json(
-            dict_repr=session_data)
-        running_acquisition = RunningAcquisition.from_json(
-            dict_repr=session_data)
-        raw_running_speed = RunningSpeed.from_json(
-            dict_repr=session_data, filtered=False
-        )
-        running_speed = RunningSpeed.from_json(dict_repr=session_data)
+
+        stimulus_file_lookup = stimulus_lookup_from_json(
+                                   dict_repr=session_data)
+
+        if 'sync_file' in session_data:
+            sync_file = SyncFile.from_json(dict_repr=session_data,
+                                           permissive=sync_file_permissive)
+        else:
+            sync_file = None
+
+        if running_speed_load_from_multiple_stimulus_files:
+            running_acquisition = \
+                RunningAcquisition.from_multiple_stimulus_files(
+                    behavior_stimulus_file=(
+                        BehaviorStimulusFile.from_json(
+                            dict_repr=session_data)),
+                    mapping_stimulus_file=MappingStimulusFile.from_json(
+                        dict_repr=session_data),
+                    replay_stimulus_file=ReplayStimulusFile.from_json(
+                        dict_repr=session_data),
+                    sync_file=SyncFile.from_json(dict_repr=session_data)
+
+                )
+            raw_running_speed = \
+                RunningSpeed.from_multiple_stimulus_files(
+                    behavior_stimulus_file=(
+                        BehaviorStimulusFile.from_json(
+                            dict_repr=session_data)),
+                    mapping_stimulus_file=MappingStimulusFile.from_json(
+                        dict_repr=session_data),
+                    replay_stimulus_file=ReplayStimulusFile.from_json(
+                        dict_repr=session_data),
+                    sync_file=SyncFile.from_json(dict_repr=session_data),
+                    filtered=False
+                )
+            running_speed = \
+                RunningSpeed.from_multiple_stimulus_files(
+                    behavior_stimulus_file=(
+                        BehaviorStimulusFile.from_json(
+                            dict_repr=session_data)),
+                    mapping_stimulus_file=MappingStimulusFile.from_json(
+                        dict_repr=session_data),
+                    replay_stimulus_file=ReplayStimulusFile.from_json(
+                        dict_repr=session_data),
+                    sync_file=SyncFile.from_json(dict_repr=session_data),
+                    filtered=True
+                )
+        else:
+            behavior_stimulus_file = \
+              stimulus_file_lookup.behavior_stimulus_file
+
+            running_acquisition = RunningAcquisition.from_stimulus_file(
+                behavior_stimulus_file=behavior_stimulus_file,
+                sync_file=sync_file)
+
+            raw_running_speed = RunningSpeed.from_stimulus_file(
+                behavior_stimulus_file=behavior_stimulus_file,
+                sync_file=sync_file,
+                filtered=False
+            )
+
+            running_speed = RunningSpeed.from_stimulus_file(
+                behavior_stimulus_file=behavior_stimulus_file,
+                sync_file=sync_file
+            )
+
         metadata = BehaviorMetadata.from_json(dict_repr=session_data)
 
-        licks, rewards, stimuli, task_parameters, trials = \
-            cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps
+        (stimulus_timestamps,
+         licks,
+         rewards,
+         stimuli,
+         task_parameters,
+         trials) = cls._read_data_from_stimulus_file(
+                  stimulus_file_lookup=stimulus_file_lookup,
+                  sync_file=sync_file,
+                  monitor_delay=monitor_delay,
+                  include_stimuli=(
+                      not read_stimulus_presentations_table_from_file),
+                  stimulus_presentation_columns=stimulus_presentation_columns)
+
+        if read_stimulus_presentations_table_from_file:
+            stimuli = Stimuli(
+                presentations=Presentations.from_path(
+                    path=session_data['stim_table_file'],
+                    exclude_columns=stimulus_presentation_exclude_columns
+                ),
+                templates=Templates.from_stimulus_file(
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file)
             )
         date_of_acquisition = DateOfAcquisition.from_json(
             dict_repr=session_data)\
             .validate(
-            stimulus_file=stimulus_file,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+
+            eye_tracking_file = EyeTrackingFile.from_json(
+                                    dict_repr=session_data)
+            try:
+                eye_tracking_metadata_file = EyeTrackingMetadataFile.from_json(
+                                    dict_repr=session_data)
+            except KeyError:
+                eye_tracking_metadata_file = None
+
+            eye_tracking_table = cls._read_eye_tracking_table(
+                    eye_tracking_file=eye_tracking_file,
+                    eye_tracking_metadata_file=eye_tracking_metadata_file,
+                    sync_file=sync_file,
+                    z_threshold=eye_tracking_z_threshold,
+                    dilation_frames=eye_tracking_dilation_frames)
+
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
+                dict_repr=session_data)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -136,15 +296,20 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: Optional[PostgresQueryMixin] = None,
-                  stimulus_timestamps: Optional[StimulusTimestamps] = None,
+                  sync_file: Optional[SyncFile] = None,
                   monitor_delay: Optional[float] = None,
-                  date_of_acquisition: Optional[DateOfAcquisition] = None) \
+                  date_of_acquisition: Optional[DateOfAcquisition] = None,
+                  skip_eye_tracking=False,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2) \
             -> "BehaviorSession":
         """
 
@@ -154,9 +319,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             Behavior session id
         lims_db
             Database connection. If not provided will create a new one.
-        stimulus_timestamps
-            Stimulus timestamps. If not provided, will calculate stimulus
-            timestamps from stimulus file.
+        sync_file:
+            If provided, will be used to compute the stimulus timestamps
+            associated with this session. Otherwise, the stimulus timestamps
+            will be computed from the stimulus file.
         monitor_delay
             Monitor delay. If not provided, will use an estimate.
             To provide this value, see for example
@@ -165,6 +331,12 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
+        skip_eye_tracking
+            Used to skip returning eye tracking data
+        eye_tracking_z_threshold
+            See `BehaviorSession.from_nwb`
+        eye_tracking_dilation_frames
+            See `BehaviorSession.from_nwb`
         Returns
         -------
         `BehaviorSession` instance
@@ -177,41 +349,79 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         if monitor_delay is None:
             monitor_delay = cls._get_monitor_delay()
 
+        if sync_file is None:
+            try:
+                sync_file = SyncFile.from_lims(
+                                db=lims_db,
+                                behavior_session_id=behavior_session_id)
+            except OneResultExpectedError:
+                sync_file = None
+
         behavior_session_id = BehaviorSessionId(behavior_session_id)
-        stimulus_file = StimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value)
-        if stimulus_timestamps is None:
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay)
-        running_acquisition = RunningAcquisition.from_lims(
-            lims_db,
-            behavior_session_id.value,
-            monitor_delay=monitor_delay
-        )
-        raw_running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value, filtered=False,
-            stimulus_timestamps=stimulus_timestamps
-        )
-        running_speed = RunningSpeed.from_lims(
-            lims_db, behavior_session_id.value,
-            stimulus_timestamps=stimulus_timestamps
-        )
+
+        stimulus_file_lookup = StimulusFileLookup()
+
+        stimulus_file_lookup.behavior_stimulus_file = (
+                BehaviorStimulusFile.from_lims(
+                    db=lims_db,
+                    behavior_session_id=behavior_session_id.value))
+
+        running_acquisition = RunningAcquisition.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file)
+
+        raw_running_speed = RunningSpeed.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file,
+            filtered=False)
+
+        running_speed = RunningSpeed.from_stimulus_file(
+            behavior_stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            sync_file=sync_file,
+            filtered=True)
+
         behavior_metadata = BehaviorMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db
         )
 
-        licks, rewards, stimuli, task_parameters, trials = \
+        (stimulus_timestamps,
+         licks,
+         rewards,
+         stimuli,
+         task_parameters,
+         trials) = \
             cls._read_data_from_stimulus_file(
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps,
+                stimulus_file_lookup=stimulus_file_lookup,
+                sync_file=sync_file,
+                monitor_delay=monitor_delay
             )
+
         if date_of_acquisition is None:
             date_of_acquisition = DateOfAcquisition.from_lims(
                 behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         date_of_acquisition = date_of_acquisition.validate(
-            stimulus_file=stimulus_file,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
+        if skip_eye_tracking:
+            eye_tracking_table = None
+            eye_tracking_rig_geometry = None
+        else:
+
+            eye_tracking_file = EyeTrackingFile.from_lims(
+                    db=lims_db,
+                    behavior_session_id=behavior_session_id.value)
+
+            eye_tracking_metadata_file = None
+
+            eye_tracking_table = cls._read_eye_tracking_table(
+                eye_tracking_file=eye_tracking_file,
+                eye_tracking_metadata_file=eye_tracking_metadata_file,
+                sync_file=sync_file,
+                z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames)
+
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_lims(
+                behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -225,11 +435,40 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "BehaviorSession":
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            add_is_change_to_stimulus_presentations_table=True,
+            eye_tracking_z_threshold: float = 3.0,
+            eye_tracking_dilation_frames: int = 2
+    ) -> "BehaviorSession":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        add_is_change_to_stimulus_presentations_table: Whether to add a column
+            denoting whether the stimulus presentation represented a change
+            event. May not be needed in case this column is precomputed
+        eye_tracking_z_threshold : float, optional
+            The z-threshold when determining which frames likely contain
+            outliers for eye or pupil areas. Influences which frames
+            are considered 'likely blinks'. By default 3.0
+        eye_tracking_dilation_frames : int, optional
+            Determines the number of adjacent frames that will be marked
+            as 'likely_blink' when performing blink detection for
+            `eye_tracking` data, by default 2
+
+        Returns
+        -------
+
+        """
         behavior_session_id = BehaviorSessionId.from_nwb(nwbfile)
         stimulus_timestamps = StimulusTimestamps.from_nwb(nwbfile)
         running_acquisition = RunningAcquisition.from_nwb(nwbfile)
@@ -238,10 +477,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         metadata = BehaviorMetadata.from_nwb(nwbfile)
         licks = Licks.from_nwb(nwbfile=nwbfile)
         rewards = Rewards.from_nwb(nwbfile=nwbfile)
-        stimuli = Stimuli.from_nwb(nwbfile=nwbfile)
+        stimuli = Stimuli.from_nwb(
+            nwbfile=nwbfile,
+            add_is_change_to_presentations_table=(
+                add_is_change_to_stimulus_presentations_table)
+        )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = TrialTable.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
+        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
+            nwbfile=nwbfile)
+        eye_tracking_table = EyeTrackingTable.from_nwb(
+            nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
+            dilation_frames=eye_tracking_dilation_frames)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -255,7 +503,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli=stimuli,
             task_parameters=task_parameters,
             trials=trials,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
+            eye_tracking_table=eye_tracking_table,
+            eye_tracking_rig_geometry=eye_tracking_rig_geometry
         )
 
     @classmethod
@@ -273,11 +523,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         -------
         An instantiation of a `BehaviorSession`
         """
-        with pynwb.NWBHDF5IO(str(nwb_path), 'r') as read_io:
+        nwb_path = str(nwb_path)
+        with pynwb.NWBHDF5IO(nwb_path, 'r', load_namespaces=True) as read_io:
             nwbfile = read_io.read()
             return cls.from_nwb(nwbfile=nwbfile, **kwargs)
 
-    def to_nwb(self, add_metadata=True) -> NWBFile:
+    def to_nwb(
+            self,
+            add_metadata=True,
+            include_experiment_description=True,
+            stimulus_presentations_stimulus_column_name: str = 'image_set'
+    ) -> NWBFile:
         """
 
         Parameters
@@ -285,7 +541,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_metadata
             Set this to False to prevent adding metadata to the nwb
             instance.
+        include_experiment_description: Whether to include a description of the
+            experiment in the nwbfile
+        stimulus_presentations_stimulus_column_name: Name of the column
+            denoting the stimulus name in the presentations table
         """
+        if include_experiment_description:
+            experiment_description = get_expt_description(
+                session_type=self._get_session_type())
+        else:
+            experiment_description = None
+
         nwbfile = NWBFile(
             session_description=self._get_session_type(),
             identifier=self._get_identifier(),
@@ -293,9 +559,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             file_create_date=pytz.utc.localize(datetime.datetime.now()),
             institution="Allen Institute for Brain Science",
             keywords=self._get_keywords(),
-            experiment_description=get_expt_description(
-                session_type=self._get_session_type())
-        )
+            experiment_description=experiment_description)
 
         self._stimulus_timestamps.to_nwb(nwbfile=nwbfile)
         self._running_acquisition.to_nwb(nwbfile=nwbfile)
@@ -307,9 +571,16 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         self._licks.to_nwb(nwbfile=nwbfile)
         self._rewards.to_nwb(nwbfile=nwbfile)
-        self._stimuli.to_nwb(nwbfile=nwbfile)
+        self._stimuli.to_nwb(
+            nwbfile=nwbfile,
+            presentations_stimulus_column_name=(
+                stimulus_presentations_stimulus_column_name))
         self._task_parameters.to_nwb(nwbfile=nwbfile)
         self._trials.to_nwb(nwbfile=nwbfile)
+        if self._eye_tracking is not None:
+            self._eye_tracking.to_nwb(nwbfile=nwbfile)
+        if self._eye_tracking_rig_geometry is not None:
+            self._eye_tracking_rig_geometry.to_nwb(nwbfile=nwbfile)
 
         return nwbfile
 
@@ -542,6 +813,66 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         :rtype: int
         """
         return self._behavior_session_id.value
+
+    @property
+    def eye_tracking(self) -> Optional[pd.DataFrame]:
+        """A dataframe containing ellipse fit parameters for the eye, pupil
+        and corneal reflection (cr). Fits are derived from tracking points
+        from a DeepLabCut model applied to video frames of a subject's
+        right eye. Raw tracking points and raw video frames are not exposed
+        by the SDK.
+
+        Notes:
+        - All columns starting with 'pupil_' represent ellipse fit parameters
+          relating to the pupil.
+        - All columns starting with 'eye_' represent ellipse fit parameters
+          relating to the eyelid.
+        - All columns starting with 'cr_' represent ellipse fit parameters
+          relating to the corneal reflection, which is caused by an infrared
+          LED positioned near the eye tracking camera.
+        - All positions are in units of pixels.
+        - All areas are in units of pixels^2
+        - All values are in the coordinate space of the eye tracking camera,
+          NOT the coordinate space of the stimulus display (i.e. this is not
+          gaze location), with (0, 0) being the upper-left corner of the
+          eye-tracking image.
+        - The 'likely_blink' column is True for any row (frame) where the pupil
+          fit failed OR eye fit failed OR an outlier fit was identified on the
+          pupil or eye fit.
+        - The pupil_area, cr_area, eye_area columns are set to NaN wherever
+          'likely_blink' == True.
+        - The pupil_area_raw, cr_area_raw, eye_area_raw columns contains all
+          pupil fit values (including where 'likely_blink' == True).
+        - All ellipse fits are derived from tracking points that were output by
+          a DeepLabCut model that was trained on hand-annotated data from a
+          subset of imaging sessions on optical physiology rigs.
+        - Raw DeepLabCut tracking points are not publicly available.
+
+        :rtype: pandas.DataFrame
+        """
+        return self._eye_tracking.value \
+            if self._eye_tracking is not None \
+            else None
+
+    @property
+    def eye_tracking_rig_geometry(self) -> dict:
+        """the eye tracking equipment geometry associated with a
+        given behavior session.
+
+        Returns
+        -------
+        dict
+            dictionary with the following keys:
+                camera_eye_position_mm (array of float)
+                camera_rotation_deg (array of float)
+                equipment (string)
+                led_position (array of float)
+                monitor_position_mm (array of float)
+                monitor_rotation_deg (array of float)
+        """
+        if self._eye_tracking_rig_geometry is None:
+            return dict()
+        return self._eye_tracking_rig_geometry.to_dict()['rig_geometry']
 
     @property
     def licks(self) -> pd.DataFrame:
@@ -881,28 +1212,212 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return self._get_metadata(behavior_metadata=self._metadata)
 
     @classmethod
-    def _read_data_from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
-            stimulus_timestamps: StimulusTimestamps):
-        """Helper method to read data from stimulus file"""
-        licks = Licks.from_stimulus_file(
-            stimulus_file=stimulus_file,
+    def _read_licks(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> Licks:
+        """
+        Construct the Licks data object for this session
+
+        Note: monitor_delay is a part of the call signature so that
+        it can be used in sub-class implementations of this method.
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                        sync_file=sync_file,
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        monitor_delay=0.0)
+
+        return Licks.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps)
-        rewards = Rewards.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
-        stimuli = Stimuli.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
-        task_parameters = TaskParameters.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        trials = TrialTable.from_stimulus_file(
-            stimulus_file=stimulus_file,
+
+    @classmethod
+    def _read_rewards(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile]) -> Rewards:
+        """
+        Construct the Rewards data object for this session
+        """
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                        sync_file=sync_file,
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        monitor_delay=0.0)
+
+        return Rewards.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps.subtract_monitor_delay())
+
+    @classmethod
+    def _read_stimuli(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            stimulus_presentation_columns: Optional[List[str]] = None
+    ) -> Stimuli:
+        """
+        Construct the Stimuli data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                sync_file=sync_file,
+                stimulus_file_lookup=stimulus_file_lookup,
+                monitor_delay=monitor_delay)
+
+        return Stimuli.from_stimulus_file(
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+                    stimulus_timestamps=stimulus_timestamps,
+                    presentation_columns=stimulus_presentation_columns)
+
+    @classmethod
+    def _read_trials(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            licks: Licks,
+            rewards: Rewards) -> TrialTable:
+        """
+        Construct the Trials data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                sync_file=sync_file,
+                stimulus_file_lookup=stimulus_file_lookup,
+                monitor_delay=monitor_delay)
+
+        return TrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
+            licks=licks,
+            rewards=rewards)
+
+    @classmethod
+    def _read_behavior_stimulus_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps from the SyncFile.
+        If a SyncFile is not available, use the
+        behavior_stimulus_file
+        """
+        if sync_file is not None:
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                    sync_file=sync_file,
+                    monitor_delay=monitor_delay)
+        else:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+                    monitor_delay=monitor_delay)
+
+        return stimulus_timestamps
+
+    @classmethod
+    def _read_session_timestamps(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float) -> StimulusTimestamps:
+        """
+        Assemble the StimulusTimestamps (with monitor delay) that will
+        be associated with this session
+        """
+        return cls._read_behavior_stimulus_timestamps(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file,
+            monitor_delay=monitor_delay)
+
+    @classmethod
+    def _read_data_from_stimulus_file(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            include_stimuli=True,
+            stimulus_presentation_columns: Optional[List[str]] = None
+    ):
+        """Helper method to read data from stimulus file"""
+
+        licks = cls._read_licks(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file,
+            monitor_delay=monitor_delay)
+
+        rewards = cls._read_rewards(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file)
+
+        session_stimulus_timestamps = cls._read_session_timestamps(
+                        stimulus_file_lookup=stimulus_file_lookup,
+                        sync_file=sync_file,
+                        monitor_delay=monitor_delay)
+
+        if include_stimuli:
+            stimuli = cls._read_stimuli(
+                stimulus_file_lookup=stimulus_file_lookup,
+                sync_file=sync_file,
+                monitor_delay=monitor_delay,
+                stimulus_presentation_columns=stimulus_presentation_columns)
+        else:
+            stimuli = None
+
+        trials = cls._read_trials(
+            stimulus_file_lookup=stimulus_file_lookup,
+            sync_file=sync_file,
+            monitor_delay=monitor_delay,
             licks=licks,
             rewards=rewards
         )
-        return licks, rewards, stimuli, task_parameters, trials
+
+        task_parameters = TaskParameters.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file)
+
+        return (session_stimulus_timestamps.subtract_monitor_delay(),
+                licks,
+                rewards,
+                stimuli,
+                task_parameters,
+                trials)
+
+    @classmethod
+    def _read_eye_tracking_table(
+            cls,
+            eye_tracking_file: EyeTrackingFile,
+            eye_tracking_metadata_file: EyeTrackingMetadataFile,
+            sync_file: SyncFile,
+            z_threshold: float,
+            dilation_frames: int) -> EyeTrackingTable:
+
+        # this is possible if instantiating from_lims
+        if sync_file is None:
+            msg = ("sync_file is None for this session; "
+                   "do not know how to create an eye tracking "
+                   "table without a sync_file")
+            raise RuntimeError(msg)
+
+        sync_path = pathlib.Path(sync_file.filepath)
+
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_path,
+            sync_line_label_keys=SyncDataset.EYE_TRACKING_KEYS,
+            drop_frames=None,
+            trim_after_spike=False)
+
+        stimulus_timestamps = StimulusTimestamps(
+                timestamps=frame_times.to_numpy(),
+                monitor_delay=0.0)
+
+        return EyeTrackingTable.from_data_file(
+                    data_file=eye_tracking_file,
+                    stimulus_timestamps=stimulus_timestamps,
+                    z_threshold=z_threshold,
+                    dilation_frames=dilation_frames,
+                    empty_on_fail=True)
 
     def _get_metadata(self, behavior_metadata: BehaviorMetadata) -> dict:
         """Returns dict of metadata"""
@@ -923,7 +1438,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         }
 
     def _get_identifier(self) -> str:
-        return str(self._behavior_session_id)
+        return str(self._behavior_session_id.value)
 
     def _get_session_type(self) -> str:
         return self._metadata.session_type

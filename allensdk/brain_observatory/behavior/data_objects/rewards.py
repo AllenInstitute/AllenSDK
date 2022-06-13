@@ -1,16 +1,17 @@
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 from pynwb import NWBFile, TimeSeries, ProcessingModule
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import \
     NwbWritableInterface
 
 
@@ -21,11 +22,19 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile,
+            cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps) -> "Rewards":
         """Get reward data from pkl file, based on timestamps
         (not sync file).
         """
+
+        if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+            msg = ("Instantiating rewards with monitor_delay = "
+                   f"{stimulus_timestamps.monitor_delay: .2e}; "
+                   "monitor_delay should be zero for Rewards "
+                   "data object")
+            raise RuntimeError(msg)
+
         data = stimulus_file.data
 
         trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])

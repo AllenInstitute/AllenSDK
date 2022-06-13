@@ -7,7 +7,7 @@ import pandas as pd
 
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
     cell_specimens import CellSpecimens, CellSpecimenMeta, EventsParams
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\

@@ -2,8 +2,7 @@ import abc
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
+from allensdk.core import DataObject
 
 
 class JsonReadableInterface(abc.ABC):
@@ -43,7 +42,11 @@ class NwbReadableInterface(abc.ABC):
     """Marks a data object as readable from NWB"""
     @classmethod
     @abc.abstractmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "DataObject":  # pragma: no cover
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            **kwargs
+    ) -> "DataObject":  # pragma: no cover
         """Populate a DataObject from a pyNWB file object.
 
         Parameters
@@ -66,36 +69,6 @@ class DataFileReadableInterface(abc.ABC):
     @abc.abstractmethod
     def from_data_file(cls, *args) -> "DataObject":
         """Populate a DataObject from the data file
-
-        Returns
-        -------
-        DataObject:
-            An instantiated DataObject which has `name` and `value` properties
-        """
-        raise NotImplementedError()
-
-
-class StimulusFileReadableInterface(abc.ABC):
-    """Marks a data object as readable from stimulus file"""
-    @classmethod
-    @abc.abstractmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile) -> "DataObject":
-        """Populate a DataObject from the stimulus file
-
-        Returns
-        -------
-        DataObject:
-            An instantiated DataObject which has `name` and `value` properties
-        """
-        raise NotImplementedError()
-
-
-class SyncFileReadableInterface(abc.ABC):
-    """Marks a data object as readable from sync file"""
-    @classmethod
-    @abc.abstractmethod
-    def from_sync_file(cls, *args) -> "DataObject":
-        """Populate a DataObject from the sync file
 
         Returns
         -------

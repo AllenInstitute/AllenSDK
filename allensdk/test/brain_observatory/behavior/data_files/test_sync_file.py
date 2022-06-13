@@ -9,7 +9,7 @@ import pytest
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files.sync_file import (
-    SYNC_FILE_QUERY_TEMPLATE
+    _get_sync_file_query_template
 )
 
 
@@ -26,7 +26,7 @@ def sync_file_fixture(request, tmp_path) -> Tuple[Path, dict]:
     return (sync_path, sync_data)
 
 
-def mock_get_sync_data(sync_path):
+def mock_get_sync_data(sync_path, permissive):
     with h5py.File(sync_path, "r") as f:
         data = f["data"][:]
     return data
@@ -87,8 +87,8 @@ def test_sync_file_from_lims(
         stimfile_cached = SyncFile.from_lims(mock_db_conn, ophys_experiment_id)
         np.allclose(stimfile_cached.data, sync_data)
 
-    query = SYNC_FILE_QUERY_TEMPLATE.format(
-        ophys_experiment_id=ophys_experiment_id
+    query = _get_sync_file_query_template(
+        behavior_session_id=ophys_experiment_id
     )
 
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)

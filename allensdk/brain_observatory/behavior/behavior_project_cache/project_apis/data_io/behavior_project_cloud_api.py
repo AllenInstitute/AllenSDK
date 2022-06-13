@@ -1,41 +1,15 @@
 import pandas as pd
-from typing import Iterable, Union, List, Optional
-from pathlib import Path
-import logging
+from typing import Iterable, List
 import ast
-import semver
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
-from allensdk.api.cloud_cache.cloud_cache import (
-    S3CloudCache, LocalCache, StaticLocalCache)
 
-
-# [min inclusive, max exclusive)
-MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
-
-
-class BehaviorCloudCacheVersionException(Exception):
-    pass
-
-
-def version_check(manifest_version: str,
-                  data_pipeline_version: str,
-                  cmin: str = MANIFEST_COMPATIBILITY[0],
-                  cmax: str = MANIFEST_COMPATIBILITY[1]):
-    mver_parsed = semver.VersionInfo.parse(manifest_version)
-    cmin_parsed = semver.VersionInfo.parse(cmin)
-    cmax_parsed = semver.VersionInfo.parse(cmax)
-    if (mver_parsed < cmin_parsed) | (mver_parsed >= cmax_parsed):
-        estr = (f"the manifest has manifest_version {manifest_version} but "
-                "this version of AllenSDK is compatible only with manifest "
-                f"versions {cmin} <= X < {cmax}. \n"
-                "Consider using a version of AllenSDK closer to the version "
-                f"used to release the data: {data_pipeline_version}")
-        raise BehaviorCloudCacheVersionException(estr)
+from allensdk.brain_observatory.behavior.behavior_project_cache.\
+    project_apis.data_io.project_cloud_api_base import ProjectCloudApiBase  # noqa: E501
 
 
 def literal_col_eval(df: pd.DataFrame,
@@ -54,60 +28,17 @@ def literal_col_eval(df: pd.DataFrame,
     return df
 
 
-class BehaviorProjectCloudApi(BehaviorProjectBase):
-    """API for downloading data released on S3 and returning tables.
+class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
-    Parameters
-    ----------
-    cache: S3CloudCache
-        an instantiated S3CloudCache object, which has already run
-        `self.load_manifest()` which populates the columns:
-          - metadata_file_names
-          - file_id_column
-    skip_version_check: bool
-        whether to skip the version checking of pipeline SDK version
-        vs. running SDK version, which may raise Exceptions. (default=False)
-    local: bool
-        Whether to operate in local mode, where no data will be downloaded
-        and instead will be loaded from local
-    """
-    def __init__(
-        self,
-        cache: Union[S3CloudCache, LocalCache, StaticLocalCache],
-        skip_version_check: bool = False,
-        local: bool = False
-    ):
+    MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
-        self.cache = cache
-        self.skip_version_check = skip_version_check
-        self._local = local
-        self.load_manifest()
-
-    def load_manifest(self, manifest_name: Optional[str] = None):
-        """
-        Load the specified manifest file into the CloudCache
-
-        Parameters
-        ----------
-        manifest_name: Optional[str]
-            Name of manifest file to load. If None, load latest
-            (default: None)
-        """
-        if manifest_name is None:
-            self.cache.load_last_manifest()
-        else:
-            self.cache.load_manifest(manifest_name)
+    def _load_manifest_tables(self):
 
         expected_metadata = set(["behavior_session_table",
                                  "ophys_session_table",
                                  "ophys_experiment_table",
                                  "ophys_cells_table"])
 
-        if self.cache._manifest.metadata_file_names is None:
-            raise RuntimeError("S3CloudCache object has no metadata "
-                               "file names. BehaviorProjectCloudApi "
-                               "expects a S3CloudCache passed which "
-                               "has already run load_manifest()")
         cache_metadata = set(self.cache._manifest.metadata_file_names)
 
         if cache_metadata != expected_metadata:
@@ -115,94 +46,10 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
                                f"metadata file names: {expected_metadata} "
                                f"but it has {cache_metadata}")
 
-        if not self.skip_version_check:
-            data_sdk_version = [i for i in self.cache._manifest._data_pipeline
-                                if i['name'] == "AllenSDK"][0]["version"]
-            version_check(self.cache._manifest.version, data_sdk_version)
-
-        #    version_check(self.cache._manifest._data_pipeline)
-        self.logger = logging.getLogger("BehaviorProjectCloudApi")
         self._get_ophys_session_table()
         self._get_behavior_session_table()
         self._get_ophys_experiment_table()
         self._get_ophys_cells_table()
-
-    @staticmethod
-    def from_s3_cache(cache_dir: Union[str, Path],
-                      bucket_name: str,
-                      project_name: str,
-                      ui_class_name: str) -> "BehaviorProjectCloudApi":
-        """instantiates this object with a connection to an s3 bucket and/or
-        a local cache related to that bucket.
-
-        Parameters
-        ----------
-        cache_dir: str or pathlib.Path
-            Path to the directory where data will be stored on the local system
-
-        bucket_name: str
-            for example, if bucket URI is 's3://mybucket' this value should be
-            'mybucket'
-
-        project_name: str
-            the name of the project this cache is supposed to access. This
-            project name is the first part of the prefix of the release data
-            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
-
-        ui_class_name: str
-            Name of user interface class (used to populate error messages)
-
-        Returns
-        -------
-        BehaviorProjectCloudApi instance
-
-        """
-        cache = S3CloudCache(cache_dir,
-                             bucket_name,
-                             project_name,
-                             ui_class_name=ui_class_name)
-        return BehaviorProjectCloudApi(cache)
-
-    @staticmethod
-    def from_local_cache(
-        cache_dir: Union[str, Path],
-        project_name: str,
-        ui_class_name: str,
-        use_static_cache: bool = False
-    ) -> "BehaviorProjectCloudApi":
-        """instantiates this object with a local cache.
-
-        Parameters
-        ----------
-        cache_dir: str or pathlib.Path
-            Path to the directory where data will be stored on the local system
-
-        project_name: str
-            the name of the project this cache is supposed to access. This
-            project name is the first part of the prefix of the release data
-            objects. I.e. s3://<bucket_name>/<project_name>/<object tree>
-
-        ui_class_name: str
-            Name of user interface class (used to populate error messages)
-
-        Returns
-        -------
-        BehaviorProjectCloudApi instance
-
-        """
-        if use_static_cache:
-            cache = StaticLocalCache(
-                cache_dir,
-                project_name,
-                ui_class_name=ui_class_name
-            )
-        else:
-            cache = LocalCache(
-                cache_dir,
-                project_name,
-                ui_class_name=ui_class_name
-            )
-        return BehaviorProjectCloudApi(cache, local=True)
 
     def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
@@ -365,38 +212,3 @@ class BehaviorProjectCloudApi(BehaviorProjectBase):
         :returns: iterable yielding a tiff file as bytes
         """
         raise NotImplementedError()
-
-    def _get_metadata_path(self, fname: str):
-        if self._local:
-            path = self._get_local_path(fname=fname)
-        else:
-            path = self.cache.download_metadata(fname=fname)
-        return path
-
-    def _get_data_path(self, file_id: str):
-        if self._local:
-            data_path = self._get_local_path(file_id=file_id)
-        else:
-            data_path = self.cache.download_data(file_id=file_id)
-        return data_path
-
-    def _get_local_path(self, fname: Optional[str] = None, file_id:
-                        Optional[str] = None):
-        if fname is None and file_id is None:
-            raise ValueError('Must pass either fname or file_id')
-
-        if fname is not None and file_id is not None:
-            raise ValueError('Must pass only one of fname or file_id')
-
-        if fname is not None:
-            path = self.cache.metadata_path(fname=fname)
-        else:
-            path = self.cache.data_path(file_id=file_id)
-
-        exists = path['exists']
-        local_path = path['local_path']
-        if not exists:
-            raise FileNotFoundError(f'You started a cache without a '
-                                    f'connection to s3 and {local_path} is '
-                                    'not already on your system')
-        return local_path

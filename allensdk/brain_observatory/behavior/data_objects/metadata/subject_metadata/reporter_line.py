@@ -3,9 +3,8 @@ from typing import Optional, List, Union
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
@@ -25,7 +24,24 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin) -> "ReporterLine":
+                  lims_db: PostgresQueryMixin,
+                  allow_none: bool = False) -> "ReporterLine":
+        """
+        Parameters
+        ----------
+        behavior_session_id: int
+
+        lims_db: PostgresQueryMixin
+
+        allow_none: bool
+            if True, allow None as a valid result
+
+        Returns
+        -------
+        An instance of ReporterLine with the value resulting
+        from a query to the LIMS database
+        """
+
         query = f"""
             SELECT g.name AS reporter_line
             FROM behavior_sessions bs
@@ -38,6 +54,9 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         """
         result = lims_db.fetchall(query)
         if result is None or len(result) < 1:
+            if allow_none:
+                return cls(reporter_line=None)
+
             raise OneOrMoreResultExpectedError(
                 f"Expected one or more, but received: '{result}' "
                 f"from query:\n'{query}'")
@@ -46,7 +65,11 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ReporterLine":
-        return cls(reporter_line=nwbfile.subject.reporter_line)
+        if nwbfile.subject.reporter_line == "None":
+            reporter_line = None
+        else:
+            reporter_line = nwbfile.subject.reporter_line
+        return cls(reporter_line=reporter_line)
 
     @staticmethod
     def parse(reporter_line: Union[Optional[List[str]], str],

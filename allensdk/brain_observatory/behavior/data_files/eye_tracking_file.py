@@ -7,7 +7,7 @@ from allensdk.brain_observatory.behavior.eye_tracking_processing import \
     load_eye_tracking_hdf
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.data_files import DataFile
+from allensdk.internal.core import DataFile
 
 
 class EyeTrackingFile(DataFile):
@@ -29,16 +29,17 @@ class EyeTrackingFile(DataFile):
     @classmethod
     def from_lims(
         cls, db: PostgresQueryMixin,
-        ophys_experiment_id: Union[int, str]
+        behavior_session_id: Union[int, str]
     ) -> "EyeTrackingFile":
         query = f"""
                 SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
-                FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf ON wkf.attachable_id = oe.ophys_session_id
+                FROM behavior_sessions bs
+                JOIN ophys_sessions os ON os.id = bs.ophys_session_id
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id = os.id
                 JOIN well_known_file_types wkft ON wkf.well_known_file_type_id = wkft.id
                 WHERE wkf.attachable_type = 'OphysSession'
                     AND wkft.name = 'EyeTracking Ellipses'
-                    AND oe.id = {ophys_experiment_id};
+                    AND bs.id = {behavior_session_id};
                 """  # noqa E501
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)

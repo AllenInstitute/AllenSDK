@@ -1,3 +1,4 @@
+import argschema.fields
 import marshmallow as mm
 import numpy as np
 
@@ -27,18 +28,18 @@ class Channel(RaisingSchema):
         if data.get("filtering") is None:
             data["filtering"] = ("AP band: 500 Hz high-pass; "
                                  "LFP band: 1000 Hz low-pass")
-        if data.get("manual_structure_acronym") is None:
-            data["manual_structure_acronym"] = ""
+        if data.get("structure_acronym") is None:
+            data["structure_acronym"] = ""
         return data
 
     id = Int(required=True)
     probe_id = Int(required=True)
     valid_data = Boolean(required=True)
-    local_index = Int(required=True)
+    probe_channel_number = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True)
+    structure_id = Int(required=True, allow_none=True)
+    structure_acronym = String(required=True)
     anterior_posterior_ccf_coordinate = Float(allow_none=True)
     dorsal_ventral_ccf_coordinate = Float(allow_none=True)
     left_right_ccf_coordinate = Float(allow_none=True)
@@ -147,6 +148,7 @@ class Probe(RaisingSchema):
     )
     amplitude_scale_factor = Float(
         default=0.195e-6,
+        allow_none=True,
         help="""amplitude scale factor converting raw amplitudes to Volts.
                 Default converts from bits -> uV -> V"""
     )
@@ -171,7 +173,34 @@ class SessionMetadata(RaisingSchema):
     donor_id = Int(required=True)
 
 
-class InputSchema(ArgSchema):
+class BaseNeuropixelsSchema(ArgSchema):
+    """Base schema for writing NWB files for projects with
+    behavior + ecephys"""
+    probes = Nested(
+        Probe,
+        many=True,
+        required=True,
+        help="records of the individual probes used for this experiment",
+    )
+    optotagging_table_path = argschema.fields.InputFile(
+        required=False,
+        help="""file at this path contains information about the optogenetic
+                stimulation applied during this experiment"""
+    )
+    running_speed_path = String(
+        required=False,
+        help="""data collected about the running behavior of the experiment's
+                subject""",
+    )
+    eye_tracking_rig_geometry = Dict(
+        required=False,
+        help="""Mapping containing information about session rig geometry used
+                for eye gaze mapping."""
+    )
+
+
+class VCNInputSchema(BaseNeuropixelsSchema):
+    """Input schema for visual coding neuropixels project"""
     class Meta:
         unknown = mm.RAISE
 
@@ -201,17 +230,6 @@ class InputSchema(ArgSchema):
         required=True,
         help="epochs with invalid data"
     )
-    probes = Nested(
-        Probe,
-        many=True,
-        required=True,
-        help="records of the individual probes used for this experiment",
-    )
-    running_speed_path = String(
-        required=True,
-        help="""data collected about the running behavior of the experiment's
-                subject""",
-    )
     session_sync_path = String(
         required=True,
         validate=check_read_access,
@@ -222,17 +240,6 @@ class InputSchema(ArgSchema):
     pool_size = Int(
         default=3,
         help="number of child processes used to write probewise lfp files"
-    )
-    optotagging_table_path = String(
-        required=False,
-        validate=check_read_access,
-        help="""file at this path contains information about the optogenetic
-                stimulation applied during this experiment"""
-    )
-    eye_tracking_rig_geometry = Dict(
-        required=False,
-        help="""Mapping containing information about session rig geometry used
-                for eye gaze mapping."""
     )
     eye_dlc_ellipses_path = String(
         required=False,
@@ -252,6 +259,11 @@ class InputSchema(ArgSchema):
         allow_none=True,
         required=False,
         help="miscellaneous information describing this session""")
+    running_speed_path = String(
+        required=True,
+        help="""data collected about the running behavior of the experiment's
+                subject""",
+    )
 
 
 class ProbeOutputs(RaisingSchema):
