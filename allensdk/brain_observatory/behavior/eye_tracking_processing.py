@@ -160,7 +160,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                               frame_times: pd.Series,
                               z_threshold: float = 3.0,
                               dilation_frames: int = 2,
-                              mvr_experiment = False) -> pd.DataFrame:
+                              mvr_experiment: bool = False) -> pd.DataFrame:
     """Processes and refines raw eye tracking data by adding additional
     computed feature columns.
 
@@ -199,8 +199,8 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     n_eye_frames = len(eye_data.index)
 
     # Hack to deal with metadata frames in behavior
-    # videos on experiments with MVR. This is a temp fix, and 
-    # not fully vetted for all possible cases. Future work may use 
+    # videos on experiments with MVR. This is a temp fix, and
+    # not fully vetted for all possible cases. Future work may use
     # "lost_frames" in eye_data json
     # see: https://github.com/AllenInstitute/mindscope_qc/issues/48
     # see: https://github.com/AllenInstitute/mindscope_qc/issues/40
@@ -221,7 +221,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                             f" shortest of those arrays")
             # find the shortest array length of frame_times/EyeTrackingFile and
             #  truncate to the that value
-            min_frames = min(n_sync,n_eye_frames)
+            min_frames = min(n_sync, n_eye_frames)
             frame_times = frame_times[:min_frames]
             eye_data = eye_data[:min_frames].reset_index(drop=True)
 
