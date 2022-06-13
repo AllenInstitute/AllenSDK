@@ -34,7 +34,9 @@ class Channel(DataObject):
             parsed as "LGd". You might want to strip it if the subregion is
             beyond annotation accuracy.
         """
-        super().__init__(name='channel', value=self)
+        super().__init__(name='channel',
+                         value=None,
+                         is_value_self=True)
         self._id = id
         self._probe_id = probe_id
         self._valid_data = valid_data

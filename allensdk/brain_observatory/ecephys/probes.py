@@ -26,7 +26,9 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         probes: List of Probe
         """
         self._probes = probes
-        super().__init__(name='probes', value=self)
+        super().__init__(name='probes',
+                         value=None,
+                         is_value_self=True)
 
     @property
     def probes(self):

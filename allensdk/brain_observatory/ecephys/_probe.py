@@ -70,7 +70,9 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         self._lfp = lfp
         self._location = location
         self._temporal_subsampling_factor = temporal_subsampling_factor
-        super().__init__(name=name, value=self)
+        super().__init__(name=name,
+                         value=None,
+                         is_value_self=True)
 
     @property
     def id(self) -> int:

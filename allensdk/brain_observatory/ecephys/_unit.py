@@ -44,7 +44,9 @@ class Unit(DataObject):
             snr: Optional[float] = None,
             filter_and_sort_spikes=True
     ):
-        super().__init__(name='unit', value=self)
+        super().__init__(name='unit',
+                         value=None,
+                         is_value_self=True)
         if filter_and_sort_spikes:
             spike_times, spike_amplitudes = _get_filtered_and_sorted_spikes(
                 spike_times=spike_times, spike_amplitudes=spike_amplitudes)
