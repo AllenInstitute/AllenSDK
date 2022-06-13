@@ -20,7 +20,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     BehaviorOphysSessionsTable
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
-from allensdk.core.authentication import DbCredentials
 from allensdk.brain_observatory.behavior.behavior_project_cache \
     .project_cache_base import ProjectCacheBase
 
