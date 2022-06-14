@@ -115,7 +115,7 @@ class VBNTrialTable(TrialTable):
         return ['initial_image_name', 'change_image_name',
                 'stimulus_change', 'change_time_no_display_delay',
                 'go', 'catch', 'lick_times', 'response_time',
-                'response_latency', 'reward_time', 'reward_volume',
+                'reward_time', 'reward_volume',
                 'hit', 'false_alarm', 'miss', 'correct_reject',
                 'aborted', 'auto_rewarded', 'change_frame',
                 'start_time', 'stop_time', 'trial_length']

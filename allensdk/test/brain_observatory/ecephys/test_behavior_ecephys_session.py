@@ -53,3 +53,6 @@ def test_session_consistency(
     np.testing.assert_array_equal(
         delta,
         np.zeros(len(delta), dtype=int))
+
+    # make sure that response_latency is not in the trials table
+    assert 'response_latency' not in trials.columns
