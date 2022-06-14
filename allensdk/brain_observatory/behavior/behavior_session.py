@@ -445,6 +445,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             cls,
             nwbfile: NWBFile,
             add_is_change_to_stimulus_presentations_table=True,
+            skip_eye_tracking: bool = False,
             eye_tracking_z_threshold: float = 3.0,
             eye_tracking_dilation_frames: int = 2
     ) -> "BehaviorSession":
@@ -456,6 +457,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_is_change_to_stimulus_presentations_table: Whether to add a column
             denoting whether the stimulus presentation represented a change
             event. May not be needed in case this column is precomputed
+        skip_eye_tracking: bool
+            If True, do not load eye tracking data
         eye_tracking_z_threshold : float, optional
             The z-threshold when determining which frames likely contain
             outliers for eye or pupil areas. Influences which frames
@@ -485,11 +488,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = TrialTable.from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
-        eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
-            nwbfile=nwbfile)
-        eye_tracking_table = EyeTrackingTable.from_nwb(
-            nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
-            dilation_frames=eye_tracking_dilation_frames)
+        if skip_eye_tracking:
+            eye_tracking_rig_geometry = None
+            eye_tracking_table = None
+        else:
+            eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
+                nwbfile=nwbfile)
+            eye_tracking_table = EyeTrackingTable.from_nwb(
+                nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
+                dilation_frames=eye_tracking_dilation_frames)
 
         return BehaviorSession(
             behavior_session_id=behavior_session_id,
@@ -509,13 +516,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_nwb_path(cls, nwb_path: str, **kwargs) -> "BehaviorSession":
+    def from_nwb_path(
+            cls,
+            nwb_path: str,
+            skip_eye_tracking: bool = False,
+            **kwargs) -> "BehaviorSession":
         """
 
         Parameters
         ----------
         nwb_path
             Path to nwb file
+        skip_eye_tracking
+            if True, do not load eye tracking data
         kwargs
             Kwargs to be passed to `from_nwb`
 
@@ -526,7 +539,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         nwb_path = str(nwb_path)
         with pynwb.NWBHDF5IO(nwb_path, 'r', load_namespaces=True) as read_io:
             nwbfile = read_io.read()
-            return cls.from_nwb(nwbfile=nwbfile, **kwargs)
+            return cls.from_nwb(
+                 nwbfile=nwbfile,
+                 skip_eye_tracking=skip_eye_tracking,
+                 **kwargs)
 
     def to_nwb(
             self,

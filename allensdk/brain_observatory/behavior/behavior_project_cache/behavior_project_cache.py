@@ -311,7 +311,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
     def get_behavior_session(
             self,
-            behavior_session_id: int
+            behavior_session_id: int,
+            skip_eye_tracking: bool = False
     ) -> BehaviorSession:
         """
         Gets `BehaviorSession` for `behavior_session_id`
@@ -319,12 +320,16 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         ----------
         behavior_session_id: behavior session id
 
+        skip_eye_tracking: bool
+            if True, do not load eye tracking data for this session
+
         Returns
         -------
         BehaviorSession
         """
         return self.fetch_api.get_behavior_session(
-            behavior_session_id=behavior_session_id
+            behavior_session_id=behavior_session_id,
+            skip_eye_tracking=skip_eye_tracking
         )
 
 
