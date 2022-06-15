@@ -14,7 +14,8 @@ from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
 from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
+    build_in_list_selector_query,
+    _sanitize_uuid_list)
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
 from allensdk.internal.api.queries.mtrain_queries import (
@@ -406,15 +407,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return table
 
     def get_behavior_session(
-            self, behavior_session_id: int) -> BehaviorSession:
+            self,
+            behavior_session_id: int,
+            skip_eye_tracking: bool = False) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
+        :param skip_eye_tracking: if True, do not load eye tracking data
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
         return BehaviorSession.from_lims(
-            behavior_session_id=behavior_session_id)
+            behavior_session_id=behavior_session_id,
+            skip_eye_tracking=skip_eye_tracking)
 
     def get_ophys_experiment_table(
             self,
@@ -452,6 +457,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 logger=self.logger)
 
         foraging_ids = list(foraging_id_map.foraging_id)
+
+        foraging_ids = _sanitize_uuid_list(foraging_ids)
 
         stimulus_names = session_stage_from_foraging_id(
                             mtrain_engine=self.mtrain_engine,
