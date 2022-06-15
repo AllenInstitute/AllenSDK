@@ -87,7 +87,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Parameters
         ----------
         filter_by_validity
-            Whether to filter out units without quality == "good"
+            Whether to filter out units in channels with valid_data==False
         filter_out_of_brain_units
             Whether to filter out units with missing ecephys_structure_acronym
         amplitude_cutoff_maximum

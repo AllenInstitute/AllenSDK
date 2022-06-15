@@ -377,18 +377,43 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             p.channels.to_dataframe(filter_by_validity=filter_by_validity)
             for p in self._probes.probes])
 
-    def get_units(self, **kwargs) -> pd.DataFrame:
+    def get_units(
+        self,
+        filter_by_validity: bool = False,
+        filter_out_of_brain_units: bool = False,
+        amplitude_cutoff_maximum: Optional[float] = None,
+        presence_ratio_minimum: Optional[float] = None,
+        isi_violations_maximum: Optional[float] = None
+    ) -> pd.DataFrame:
         """
+        Gets a dataframe representing all units detected by all probes
 
         Parameters
         ----------
-        kwargs: kwargs sent to `Probes.get_units_table`
-
+        filter_by_validity
+            Whether to filter out units in channels with valid_data==False
+        filter_out_of_brain_units
+            Whether to filter out units with missing ecephys_structure_acronym
+        amplitude_cutoff_maximum
+            Filter units by this upper bound
+        presence_ratio_minimum
+            Filter units by this lower bound
+        isi_violations_maximum
+            Filter units by this upper bound
         Returns
         -------
-        `pd.DataFrame` of units detected by all probes
+        Dataframe containing all units detected by probes
+        Columns:
+            - properties of `allensdk.ecephys._unit.Unit`
+            except for 'spike_times', 'spike_amplitudes', 'mean_waveforms'
+            which are returned separately
         """
-        return self._probes.get_units_table(**kwargs)
+        return self._probes.get_units_table(
+            filter_by_validity=filter_by_validity,
+            filter_out_of_brain_units=filter_out_of_brain_units,
+            amplitude_cutoff_maximum=amplitude_cutoff_maximum,
+            presence_ratio_minimum=presence_ratio_minimum,
+            isi_violations_maximum=isi_violations_maximum)
 
     @classmethod
     def from_json(
