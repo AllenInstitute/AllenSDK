@@ -85,7 +85,7 @@ def test_local_cache_construction(
 
     with monkeypatch.context() as ctx:
         ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
-                    lambda path: create_autospec(
+                    lambda nwb_path: create_autospec(
                         BehaviorOphysExperiment, instance=True))
         cache.get_behavior_ophys_experiment(ophys_experiment_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -143,13 +143,14 @@ def test_load_out_of_date_manifest(
     for sess_id in (333, 444):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda path: create_autospec(
-                            BehaviorSession, instance=True))
+                        lambda nwb_path, skip_eye_tracking=False:
+                            create_autospec(
+                                BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda nwb_path: create_autospec(
                             BehaviorOphysExperiment, instance=True))
             cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
@@ -218,13 +219,14 @@ def test_file_linkage(
     for sess_id in (333, 444):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda path: create_autospec(
-                            BehaviorSession, instance=True))
+                        lambda nwb_path, skip_eye_tracking=False:
+                            create_autospec(
+                                BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5111, 5222):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda nwb_path: create_autospec(
                             BehaviorOphysExperiment, instance=True))
             cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 
@@ -248,13 +250,14 @@ def test_file_linkage(
     for sess_id in (777, 888):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda path: create_autospec(
-                            BehaviorSession, instance=True))
+                        lambda nwb_path, skip_eye_tracking=False:
+                            create_autospec(
+                                BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
     for exp_id in (5444, 5666, 5777):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorOphysExperiment, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda nwb_path: create_autospec(
                             BehaviorOphysExperiment, instance=True))
             cache.get_behavior_ophys_experiment(ophys_experiment_id=exp_id)
 

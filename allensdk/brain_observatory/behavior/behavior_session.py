@@ -519,7 +519,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def from_nwb_path(
             cls,
             nwb_path: str,
-            skip_eye_tracking: bool = False,
             **kwargs) -> "BehaviorSession":
         """
 
@@ -527,8 +526,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         ----------
         nwb_path
             Path to nwb file
-        skip_eye_tracking
-            if True, do not load eye tracking data
         kwargs
             Kwargs to be passed to `from_nwb`
 
@@ -541,7 +538,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             nwbfile = read_io.read()
             return cls.from_nwb(
                  nwbfile=nwbfile,
-                 skip_eye_tracking=skip_eye_tracking,
                  **kwargs)
 
     def to_nwb(

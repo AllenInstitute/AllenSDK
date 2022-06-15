@@ -150,7 +150,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
 
     # get_behavior_session returns expected value
     # both directly and via experiment table
-    def mock_nwb(nwb_path):
+    def mock_nwb(nwb_path, skip_eye_tracking=False):
         return nwb_path
     monkeypatch.setattr(cloudapi.BehaviorSession, "from_nwb_path", mock_nwb)
     assert api.get_behavior_session(2) == "5"
