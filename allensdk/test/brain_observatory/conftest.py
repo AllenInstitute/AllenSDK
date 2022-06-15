@@ -4,6 +4,9 @@ from datetime import datetime
 import pynwb
 import numpy as np
 
+from allensdk.brain_observatory.vbn_2022.input_json_writer.utils import (
+    vbn_nwb_config_from_ecephys_session_id_list)
+
 
 @pytest.fixture
 def running_speed():
@@ -61,3 +64,16 @@ def data_object_roundtrip_fixture(tmp_path):
         return data_object_instance
 
     return f
+
+
+@pytest.fixture(scope='session')
+def behavior_ecephys_session_config_fixture():
+    """
+    Return a dict representing the session_data needed to create
+    a BehaviorEcephysSession
+    """
+    session_data_list = vbn_nwb_config_from_ecephys_session_id_list(
+        ecephys_session_id_list=[1111216934],
+        probes_to_skip=None)
+
+    return session_data_list['sessions'][0]

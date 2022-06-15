@@ -1,5 +1,4 @@
 import datetime
-import json
 
 import pytest
 from pynwb import NWBFile
@@ -8,38 +7,57 @@ from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
     BehaviorEcephysMetadata
 
 
-class TestBehaviorEcephysMetadata:
-    @classmethod
-    def setup_class(cls):
-        with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'ecephys_session_1111216934_input.json') \
-                as f:
-            input_data = json.load(f)
-        input_data = input_data['session_data']
-        cls._ecephys_session_id = input_data['ecephys_session_id']
-        cls._meta_from_json = BehaviorEcephysMetadata.from_json(
-            dict_repr=input_data)
+@pytest.fixture(scope='module')
+def behavior_ecephys_metadata_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return a BehaviorEcephysMetadata object
+    """
+    obj = BehaviorEcephysMetadata.from_json(
+        dict_repr=behavior_ecephys_session_config_fixture)
+    return obj
 
-    def setup_method(self, method):
-        self._nwbfile = NWBFile(
-            session_description='foo',
-            identifier=str(self._ecephys_session_id),
-            session_id='foo',
-            session_start_time=datetime.datetime.now(),
-            institution="Allen Institute"
-        )
 
-    @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
-        self._meta_from_json.to_nwb(nwbfile=self._nwbfile)
+@pytest.fixture(scope='module')
+def ecephys_session_id_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return an ecephys_session_id object
+    """
+    return behavior_ecephys_session_config_fixture['ecephys_session_id']
 
-        if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self._nwbfile,
-                data_object_cls=BehaviorEcephysMetadata)
-        else:
-            obt = BehaviorEcephysMetadata.from_nwb(nwbfile=self._nwbfile)
 
-        assert obt == self._meta_from_json
+def create_nwb_file(
+        ecephys_session_id):
+    """
+    Return an NWB file with a specified ID
+    """
+    nwbfile = NWBFile(
+        session_description='foo',
+        identifier=str(ecephys_session_id),
+        session_id='foo',
+        session_start_time=datetime.datetime.now(),
+        institution="Allen Institute"
+    )
+    return nwbfile
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_read_write_nwb(
+        roundtrip,
+        data_object_roundtrip_fixture,
+        behavior_ecephys_metadata_fixture,
+        ecephys_session_id_fixture):
+
+    nwbfile = create_nwb_file(ecephys_session_id_fixture)
+    behavior_ecephys_metadata_fixture.to_nwb(nwbfile=nwbfile)
+
+    if roundtrip:
+        obt = data_object_roundtrip_fixture(
+            nwbfile=nwbfile,
+            data_object_cls=BehaviorEcephysMetadata)
+    else:
+        obt = BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile)
+
+    assert obt == behavior_ecephys_metadata_fixture

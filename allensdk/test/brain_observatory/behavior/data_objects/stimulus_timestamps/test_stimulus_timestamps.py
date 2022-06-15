@@ -1,5 +1,3 @@
-import datetime
-import json
 from pathlib import Path
 
 import pytest
@@ -8,8 +6,6 @@ from unittest.mock import create_autospec
 import numpy as np
 
 from itertools import product
-
-from pynwb import NWBFile
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
@@ -258,47 +254,46 @@ def test_stimulus_timestamps_nwb_roundtrip(
                        raw_stimulus_timestamps_data+monitor_delay)
 
 
-class TestStimulusTimestampsFromMultipleStimulusBlocks:
-    @classmethod
-    def setup_class(cls):
-        with open('/allen/aibs/informatics/module_test_data/ecephys/'
-                  'ecephys_session_1111216934_input.json') \
-                as f:
-            input_data = json.load(f)
-        input_data = input_data['session_data']
-        sync_file = SyncFile.from_json(dict_repr=input_data, permissive=True)
-        bsf = BehaviorStimulusFile.from_json(dict_repr=input_data)
-        msf = MappingStimulusFile.from_json(dict_repr=input_data)
-        rsf = ReplayStimulusFile.from_json(dict_repr=input_data)
-        cls._timestamps_from_json = \
-            StimulusTimestamps.from_multiple_stimulus_blocks(
-                sync_file=sync_file,
-                list_of_stims=[bsf, msf, rsf]
-            )
-
-    def setup_method(self, method):
-        self._nwbfile = NWBFile(
-            session_description='foo',
-            identifier='foo',
-            session_id='foo',
-            session_start_time=datetime.datetime.now(),
-            institution="Allen Institute"
+@pytest.fixture(scope='module')
+def stimulus_timestamps_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return a StimulusTimestamps object constituted from
+    multiple stimulus files
+    """
+    input_data = behavior_ecephys_session_config_fixture
+    sync_file = SyncFile.from_json(dict_repr=input_data, permissive=True)
+    bsf = BehaviorStimulusFile.from_json(dict_repr=input_data)
+    msf = MappingStimulusFile.from_json(dict_repr=input_data)
+    rsf = ReplayStimulusFile.from_json(dict_repr=input_data)
+    obj = \
+        StimulusTimestamps.from_multiple_stimulus_blocks(
+            sync_file=sync_file,
+            list_of_stims=[bsf, msf, rsf]
         )
+    return obj
 
-    @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture):
-        self._timestamps_from_json.to_nwb(nwbfile=self._nwbfile)
 
-        if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self._nwbfile,
-                data_object_cls=StimulusTimestamps)
-        else:
-            obt = StimulusTimestamps.from_nwb(nwbfile=self._nwbfile)
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_read_write_nwb(
+        roundtrip,
+        data_object_roundtrip_fixture,
+        stimulus_timestamps_fixture,
+        helper_functions):
 
-        assert obt == self._timestamps_from_json
+    nwbfile = helper_functions.create_blank_nwb_file()
+
+    stimulus_timestamps_fixture.to_nwb(nwbfile=nwbfile)
+
+    if roundtrip:
+        obt = data_object_roundtrip_fixture(
+            nwbfile=nwbfile,
+            data_object_cls=StimulusTimestamps)
+    else:
+        obt = StimulusTimestamps.from_nwb(nwbfile=nwbfile)
+
+    assert obt == stimulus_timestamps_fixture
 
 
 def test_substract_monitor_delay():

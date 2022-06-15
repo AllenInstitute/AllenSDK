@@ -11,9 +11,15 @@ from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
     BehaviorEcephysMetadata
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
+from allensdk.brain_observatory.ecephys.data_objects.trials import (
+    VBNTrialTable)
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.\
+    data_objects.trials.trial_table import (
+        TrialTable)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.behavior_session import (
     StimulusFileLookup)
@@ -218,6 +224,29 @@ class VBNBehaviorSession(BehaviorSession):
                     dilation_frames=dilation_frames,
                     metadata_file=eye_tracking_metadata_file,
                     empty_on_fail=False)
+
+    @classmethod
+    def _read_trials(
+            cls,
+            stimulus_file_lookup: StimulusFileLookup,
+            sync_file: Optional[SyncFile],
+            monitor_delay: float,
+            licks: Licks,
+            rewards: Rewards) -> TrialTable:
+        """
+        Construct the Trials data object for this session
+        """
+
+        stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
+                sync_file=sync_file,
+                stimulus_file_lookup=stimulus_file_lookup,
+                monitor_delay=monitor_delay)
+
+        return VBNTrialTable.from_stimulus_file(
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            licks=licks,
+            rewards=rewards)
 
 
 class BehaviorEcephysSession(VBNBehaviorSession):
