@@ -34,10 +34,6 @@ from allensdk.brain_observatory.behavior.\
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .eye_tracking_table import EyeTrackingTable, get_lost_frames
 
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .stimulus_timestamps.timestamps_processing import (
-        get_frame_indices)
-
 
 class VBNBehaviorSession(BehaviorSession):
     """
@@ -164,12 +160,16 @@ class VBNBehaviorSession(BehaviorSession):
 
         lick_times = lick_times.value[valid]
 
-        # use the version of beh_stim_times with non-zero monitor_delay
-        # because we are interested in which frame the mouse was seeing
-        # when it licked
-        lick_frames = get_frame_indices(
-                        frame_timestamps=beh_stim_times.value,
-                        event_timestamps=lick_times)
+        # The 'frames' in the licks dataframe is just a unitless
+        # measure of time in camstime. It roughly corresponds to
+        # the rising vsync_stim line. To quote Corbett:
+        # "camstim flips this right before rendering the frame so this
+        # is as close as we can get to the time when it reads the nidaq
+        # buffer"
+
+        lick_frames = np.searchsorted(
+            beh_stim_times_no_monitor.value,
+            lick_times)
 
         if len(lick_frames) != len(lick_times):
             msg = (f"{len(lick_frames)} lick frames; "
