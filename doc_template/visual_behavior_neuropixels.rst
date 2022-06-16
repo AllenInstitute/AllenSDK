@@ -13,11 +13,12 @@ data access and subsequent analysis. No knowledge of the NWB file format is requ
 Specific information about how Visual Behavior Optical Physiology data is stored
 in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
 
-To get started, check out these jupyter notebooks to learn how to:
+To get started, check out these jupyter notebooks:
 
 1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_neuropixels_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_data_access.ipynb>`_
-2) `Plot quality metrics for the 'units' identified in these experiments <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.ipynb>`_
-
+2) `Visual Behavior Neuropixels Quickstart <_static/examples/nb/visual_behavior_neuropixels_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quickstart.ipynb>`_
+3) `Plot quality metrics for the 'units' identified in these experiments <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.ipynb>`_
+4) `Aligning behavioral data to task events with the stimulus and trials tables <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.html>`_ `(download .ipynb) <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.ipynb>`_
 
 If you have questions about the dataset that aren’t addressed by the whitepaper
 or any of our tutorials, please reach out by posting at
