@@ -8,8 +8,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.\
 
 class VisualBehaviorNeuropixelsProjectCache(ProjectCacheBase):
 
-    PROJECT_NAME = "visual-behavior-neuropixels-2022"
-    BUCKET_NAME = "sfd-cloudcache-test-bucket"
+    PROJECT_NAME = "visual-behavior-neuropixels"
+    BUCKET_NAME = "visual-behavior-neuropixels-data"
 
     def __init__(
             self,
