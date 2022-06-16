@@ -27,7 +27,7 @@ https://community.brain-map.org/
 Visual Behavior - Neuropixels
 ====================================
 
-**Add link to "explorer page" here; no need to duplicate content***
+`Overview of the dataset <http://portal.brain-map.org/explore/circuits/visual-behavior-neuropixels>`_
 
 DATA FILE CHANGELOG
 -------------------
