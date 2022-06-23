@@ -10,6 +10,8 @@ import pathlib
 from pynwb import NWBFile
 
 from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
+    EyeTrackingVideo
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 
@@ -411,11 +413,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     db=lims_db,
                     behavior_session_id=behavior_session_id.value)
 
+            eye_tracking_video = EyeTrackingVideo.from_lims(
+                db=lims_db, behavior_session_id=behavior_session_id.value)
+
             eye_tracking_metadata_file = None
 
             eye_tracking_table = cls._read_eye_tracking_table(
                 eye_tracking_file=eye_tracking_file,
                 eye_tracking_metadata_file=eye_tracking_metadata_file,
+                eye_tracking_video=eye_tracking_video,
                 sync_file=sync_file,
                 z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)
@@ -1400,10 +1406,13 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_eye_tracking_table(
             cls,
             eye_tracking_file: EyeTrackingFile,
-            eye_tracking_metadata_file: EyeTrackingMetadataFile,
             sync_file: SyncFile,
             z_threshold: float,
-            dilation_frames: int) -> EyeTrackingTable:
+            dilation_frames: int,
+            eye_tracking_metadata_file: Optional[
+                EyeTrackingMetadataFile] = None,
+            eye_tracking_video: Optional[EyeTrackingVideo] = None
+    ) -> EyeTrackingTable:
 
         # this is possible if instantiating from_lims
         if sync_file is None:
@@ -1426,6 +1435,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         return EyeTrackingTable.from_data_file(
                     data_file=eye_tracking_file,
+                    metadata_file=eye_tracking_metadata_file,
+                    video=eye_tracking_video,
                     stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
                     dilation_frames=dilation_frames,

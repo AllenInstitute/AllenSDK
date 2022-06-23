@@ -5,6 +5,9 @@ from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 import pytest
 
+from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
+    LimsTest
+
 
 @pytest.fixture
 def session_data_fixture():
@@ -78,3 +81,14 @@ def test_behavior_session_equivalent_json_lims(session_data_fixture):
                                              skip_eye_tracking=True)
 
     assert sessions_are_equal(json_session, lims_session, reraise=True)
+
+
+class TestBehaviorSession(LimsTest):
+    @pytest.mark.requires_bamboo
+    def test_eye_tracking_loaded_with_metadata_frame(self):
+        # This session uses MVR to record the eye tracking video
+        sess_id = 1154034257
+
+        sess = BehaviorSession.from_lims(behavior_session_id=sess_id,
+                                         lims_db=self.dbconn)
+        assert not sess.eye_tracking.empty
