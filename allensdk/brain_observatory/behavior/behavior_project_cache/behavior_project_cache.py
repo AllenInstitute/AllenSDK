@@ -133,8 +133,9 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             index_column: str = "ophys_session_id",
             as_df=True,
             include_behavior_data=True,
-            passed_only=True) -> \
-            Union[pd.DataFrame, BehaviorOphysSessionsTable]:
+            passed_only=True,
+            n_workers: int = 1
+    ) -> Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -149,6 +150,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         :param as_df: whether to return as df or as BehaviorOphysSessionsTable
         :param include_behavior_data
             Whether to include behavior data
+        :param n_workers
+            Number of parallel processes to use for i.e reading from pkl files
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -167,7 +170,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if include_behavior_data:
             # Merge behavior data in
             behavior_sessions_table = self.get_behavior_session_table(
-                suppress=suppress, as_df=True, include_ophys_data=False)
+                suppress=suppress, as_df=True, include_ophys_data=False,
+                n_workers=n_workers)
             ophys_sessions = behavior_sessions_table.merge(
                 ophys_sessions,
                 left_index=True,
@@ -178,7 +182,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                                               suppress=suppress,
                                               index_column=index_column)
         if passed_only:
-            oet = self.get_ophys_experiment_table(passed_only=True)
+            oet = self.get_ophys_experiment_table(passed_only=True,
+                                                  n_workers=n_workers)
             for i in sessions.table.index:
                 sub_df = oet.query(f"ophys_session_id=={i}")
                 values = list(set(sub_df["ophys_container_id"].values))
@@ -191,7 +196,9 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             self,
             suppress: Optional[List[str]] = None,
             as_df=True,
-            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
+            passed_only=True,
+            n_workers: int = 1
+    ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all ophys_experiment_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -201,6 +208,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         :param passed_only: if True, return only experiments flagged as
                             'passed' and containers flagged as 'published'
                             (default=True)
+        :param n_workers
+            Number of parallel processes to use for i.e reading from pkl files
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -219,7 +228,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
         # Merge behavior data in
         behavior_sessions_table = self.get_behavior_session_table(
-            suppress=suppress, as_df=True, include_ophys_data=False)
+            suppress=suppress, as_df=True, include_ophys_data=False,
+            n_workers=n_workers)
         experiments = behavior_sessions_table.merge(
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
@@ -255,7 +265,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             as_df=True,
             include_ophys_data=True,
             passed_only=True,
-            n_workers=1
+            n_workers: int = 1
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
@@ -289,7 +299,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 suppress=suppress,
                 as_df=False,
                 include_behavior_data=False,
-                passed_only=passed_only)
+                passed_only=passed_only,
+                n_workers=n_workers)
         else:
             ophys_session_table = None
         sessions = SessionsTable(df=sessions, suppress=suppress,

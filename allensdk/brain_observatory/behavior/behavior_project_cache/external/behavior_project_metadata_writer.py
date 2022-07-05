@@ -71,7 +71,9 @@ class BehaviorProjectMetadataWriter:
         self._data_release_date = data_release_date
         self._overwrite_ok = overwrite_ok
         self._n_workers = n_workers
-        self._logger = logging.getLogger(self.__class__.__name__)
+
+        logging.basicConfig(level=logging.INFO)
+        self._logger = logging.getLogger(__name__)
 
         self._release_behavior_only_nwb = self._behavior_project_cache \
             .fetch_api.get_release_files(file_type='BehaviorNwb')
@@ -82,9 +84,13 @@ class BehaviorProjectMetadataWriter:
         """Writes metadata to csv"""
         os.makedirs(self._out_dir, exist_ok=True)
 
+        self._logger.info('Writing behavior sessions table')
         self._write_behavior_sessions()
+        self._logger.info('Writing ophys sessions table')
         self._write_ophys_sessions()
+        self._logger.info('Writing ophys experiments table')
         self._write_ophys_experiments()
+        self._logger.info('Writing ophys cells table')
         self._write_ophys_cells()
 
         self._write_manifest()
@@ -124,7 +130,8 @@ class BehaviorProjectMetadataWriter:
                                   'ophys_session_table'
                               ]):
         ophys_sessions = self._behavior_project_cache. \
-            get_ophys_session_table(suppress=suppress, as_df=True)
+            get_ophys_session_table(suppress=suppress, as_df=True,
+                                    n_workers=self._n_workers)
         self._write_metadata_table(df=ophys_sessions,
                                    filename=output_filename)
 
@@ -134,7 +141,8 @@ class BehaviorProjectMetadataWriter:
                                  ]):
         ophys_experiments = \
                 self._behavior_project_cache.get_ophys_experiment_table(
-                        suppress=suppress, as_df=True)
+                        suppress=suppress, as_df=True,
+                        n_workers=self._n_workers)
 
         # Add release files
         ophys_experiments = ophys_experiments.merge(
@@ -171,8 +179,6 @@ class BehaviorProjectMetadataWriter:
 
         df = df.reset_index()
         df.to_csv(filepath, index=False)
-
-        self._logger.info('Writing successful')
 
     def _write_manifest(self):
         def get_abs_path(filename):
