@@ -44,13 +44,33 @@ class BehaviorProjectMetadataWriter:
     def __init__(self, behavior_project_cache: VisualBehaviorOphysProjectCache,
                  out_dir: str, project_name: str,
                  data_release_date: Union[str, List[str]],
-                 overwrite_ok=False):
+                 overwrite_ok=False,
+                 n_workers=1):
+        """
+
+        Parameters
+        ----------
+        behavior_project_cache
+            Cache object to use for fetching
+        out_dir
+            Where to write tables
+        project_name
+            Project name in LIMS to use for querying data to be released
+        data_release_date
+            Date data is released. Needed to filter results to only released
+                data
+        overwrite_ok
+            Whether to raise an exception if output file alread exists
+        n_workers
+            Number of parallel processes to use for i.e reading pkl files
+        """
 
         self._behavior_project_cache = behavior_project_cache
         self._out_dir = out_dir
         self._project_name = project_name
         self._data_release_date = data_release_date
         self._overwrite_ok = overwrite_ok
+        self._n_workers = n_workers
         self._logger = logging.getLogger(self.__class__.__name__)
 
         self._release_behavior_only_nwb = self._behavior_project_cache \
@@ -74,7 +94,8 @@ class BehaviorProjectMetadataWriter:
                                      'behavior_session_table']):
         behavior_sessions = self._behavior_project_cache. \
             get_behavior_session_table(suppress=suppress,
-                                       as_df=True)
+                                       as_df=True,
+                                       n_workers=self._n_workers)
 
         # Add release files
         behavior_sessions = behavior_sessions \
@@ -203,6 +224,9 @@ def main():
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
                                                'existing output files',
                         dest='overwrite_ok', action='store_true')
+    parser.add_argument('--n_workers', help='Number of processes to use for '
+                                            'i.e reading from pkl files',
+                        default=1, type=int)
     args = parser.parse_args()
 
     bpc = VisualBehaviorOphysProjectCache.from_lims(
@@ -212,7 +236,9 @@ def main():
         out_dir=args.out_dir,
         project_name=args.project_name,
         data_release_date=args.data_release_date,
-        overwrite_ok=args.overwrite_ok)
+        overwrite_ok=args.overwrite_ok,
+        n_workers=args.n_workers
+    )
     bpmw.write_metadata()
 
 

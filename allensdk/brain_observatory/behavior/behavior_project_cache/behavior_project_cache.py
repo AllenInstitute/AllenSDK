@@ -254,7 +254,9 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             suppress: Optional[List[str]] = None,
             as_df=True,
             include_ophys_data=True,
-            passed_only=True) -> Union[pd.DataFrame, SessionsTable]:
+            passed_only=True,
+            n_workers=1
+    ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
         :param suppress: optional list of columns to drop from the resulting
@@ -262,6 +264,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         :param as_df: whether to return as df or as SessionsTable
         :param include_ophys_data
             Whether to include ophys data
+        :param n_workers
+            Number of parallel processes to use for i.e reading from pkl files
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -277,7 +281,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 lambda path: _read_json(path,
                                         index_name='behavior_session_id'))
         else:
-            sessions = self.fetch_api.get_behavior_session_table()
+            sessions = self.fetch_api.get_behavior_session_table(
+                n_workers=n_workers)
 
         if include_ophys_data:
             ophys_session_table = self.get_ophys_session_table(

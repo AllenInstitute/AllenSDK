@@ -1,12 +1,17 @@
+from multiprocessing import Pool
+
 import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
+
+from tqdm import tqdm
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
@@ -14,8 +19,7 @@ from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
 from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query,
-    _sanitize_uuid_list)
+    build_in_list_selector_query)
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
 from allensdk.internal.api.queries.mtrain_queries import (
@@ -441,32 +445,36 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = self._get_ophys_experiment_table()
         return df.set_index("ophys_experiment_id")
 
-    def get_behavior_session_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self, n_workers: int = 1) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
+        Parameters
+        ----------
+        n_workers
+            Number of parallel processes to use for reading from pkl files
+
+        :rtype: pd.DataFrame
+
+        Notes
+        -----
         Can't return age at time of session because there is no field for
         acquisition date for behavior sessions (only in the stimulus pkl file)
-        :rtype: pd.DataFrame
         """
         summary_tbl = self._get_behavior_summary_table()
 
-        foraging_id_map = foraging_id_map_from_behavior_session_id(
-                lims_engine=self.lims_engine,
-                behavior_session_ids=summary_tbl.behavior_session_id.tolist(),
-                logger=self.logger)
-
-        foraging_ids = list(foraging_id_map.foraging_id)
-
-        foraging_ids = _sanitize_uuid_list(foraging_ids)
-
-        stimulus_names = session_stage_from_foraging_id(
-                            mtrain_engine=self.mtrain_engine,
-                            foraging_ids=foraging_ids,
-                            logger=self.logger)
+        with Pool(n_workers) as p:
+            stimulus_names = list(tqdm(
+                p.imap(_get_session_type_from_pkl_file_helper,
+                       zip(
+                            summary_tbl['behavior_session_id'].tolist(),
+                            [self.lims_engine] * summary_tbl.shape[0])
+                       ),
+                total=summary_tbl.shape[0]))
+        stimulus_names = pd.DataFrame(stimulus_names)
 
         return (summary_tbl.merge(stimulus_names,
-                                  on=["foraging_id"], how="left")
+                                  on=["behavior_session_id"], how="left")
                 .set_index("behavior_session_id"))
 
     def get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
@@ -584,3 +592,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :returns: iterable yielding a tiff file as bytes
         """
         raise NotImplementedError()
+
+
+def _get_session_type_from_pkl_file(behavior_session_id, db_conn) -> dict:
+    return {
+        'behavior_session_id': behavior_session_id,
+        'session_type': (
+            BehaviorStimulusFile.from_lims(
+                db=db_conn,
+                behavior_session_id=behavior_session_id).session_type)
+    }
+
+
+def _get_session_type_from_pkl_file_helper(args) -> dict:
+    """
+    Helper function to call `_get_session_type_from_pkl_file` passing in
+    *args. Needed because imap does not support passing in *args
+    """
+    return _get_session_type_from_pkl_file(*args)
