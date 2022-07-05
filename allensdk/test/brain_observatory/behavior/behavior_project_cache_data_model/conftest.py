@@ -674,7 +674,7 @@ def mock_api(ophys_session_table,
         def get_ophys_session_table(self):
             return ophys_session_table
 
-        def get_behavior_session_table(self):
+        def get_behavior_session_table(self, n_workers=1):
             return behavior_session_table
 
         def get_ophys_experiment_table(self):
