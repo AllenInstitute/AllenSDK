@@ -466,7 +466,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                             summary_tbl['behavior_session_id'].tolist(),
                             [self.lims_engine] * summary_tbl.shape[0])
                        ),
-                total=summary_tbl.shape[0]))
+                total=summary_tbl.shape[0],
+                desc='Reading session type from pkl file'))
         stimulus_names = pd.DataFrame(stimulus_names)
 
         return (summary_tbl.merge(stimulus_names,
