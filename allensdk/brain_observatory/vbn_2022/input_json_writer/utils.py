@@ -629,6 +629,7 @@ def unit_input_from_ecephys_session_id(
                 'probe_horizontal_position',
                 'anterior_posterior_ccf_coordinate',
                 'dorsal_ventral_ccf_coordinate',
+                'left_right_ccf_coordinate',
                 'structure_id',
                 'structure_acronym',
                 'valid_data'],
