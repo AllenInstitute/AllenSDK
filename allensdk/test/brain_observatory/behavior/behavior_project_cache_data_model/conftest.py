@@ -671,13 +671,13 @@ def mock_api(ophys_session_table,
 
     class MockApi:
 
-        def get_ophys_session_table(self):
+        def get_ophys_session_table(self, n_workers=1):
             return ophys_session_table
 
-        def get_behavior_session_table(self):
+        def get_behavior_session_table(self, n_workers=1):
             return behavior_session_table
 
-        def get_ophys_experiment_table(self):
+        def get_ophys_experiment_table(self, n_workers=1):
             return ophys_experiments_table
 
         def get_session_data(self, ophys_session_id):
