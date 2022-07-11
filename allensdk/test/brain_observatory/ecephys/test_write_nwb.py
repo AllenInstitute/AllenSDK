@@ -268,19 +268,20 @@ def test_add_probe_to_nwbfile(
 
 
 @pytest.mark.parametrize("columns_to_add", [
-    (None, ),
+    None,
 
-    ([("test_column_a", "description_a"),
-      ("test_column_b", "description_b")], )
+    [("test_column_a", "description_a"),
+     ("test_column_b", "description_b")]
 ])
 def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
 
     write_nwb.add_ecephys_electrode_columns(nwbfile, columns_to_add)
 
     if columns_to_add is None:
-        expected_columns = write_nwb.ELECTRODE_TABLE_DEFAULT_COLUMNS
+        expected_columns = \
+            [x[0] for x in write_nwb.ELECTRODE_TABLE_DEFAULT_COLUMNS]
     else:
-        expected_columns = columns_to_add
+        expected_columns = [x[0] for x in columns_to_add]
 
     for c in expected_columns:
         assert c in nwbfile.electrodes.colnames
