@@ -9,14 +9,15 @@ from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, \
     EcephysElectrodeGroup
 
 ELECTRODE_TABLE_DEFAULT_COLUMNS = [
-        ("probe_vertical_position",
-         "Length-wise position of electrode/channel on device (microns)"),
-        ("probe_horizontal_position",
-         "Width-wise position of electrode/channel on device (microns)"),
-        ("probe_id", "The unique id of this electrode's/channel's device"),
-        ("local_index", "The local index of electrode/channel on device"),
-        ("valid_data", "Whether data from this electrode/channel is usable")
-    ]
+    ("probe_vertical_position",
+     "Length-wise position of electrode/channel on device (microns)"),
+    ("probe_horizontal_position",
+     "Width-wise position of electrode/channel on device (microns)"),
+    ("probe_id", "The unique id of this electrode's/channel's device"),
+    ("probe_channel_number",
+     "The local index of electrode/channel on device"),
+    ("valid_data", "Whether data from this electrode/channel is usable")
+]
 
 
 def add_ragged_data_to_dynamic_table(
