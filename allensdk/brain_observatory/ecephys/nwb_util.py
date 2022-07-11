@@ -8,6 +8,16 @@ from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, \
     EcephysElectrodeGroup
 
+ELECTRODE_TABLE_DEFAULT_COLUMNS = [
+        ("probe_vertical_position",
+         "Length-wise position of electrode/channel on device (microns)"),
+        ("probe_horizontal_position",
+         "Width-wise position of electrode/channel on device (microns)"),
+        ("probe_id", "The unique id of this electrode's/channel's device"),
+        ("local_index", "The local index of electrode/channel on device"),
+        ("valid_data", "Whether data from this electrode/channel is usable")
+    ]
+
 
 def add_ragged_data_to_dynamic_table(
         table, data, column_name, column_description=""
@@ -189,19 +199,8 @@ def _add_ecephys_electrode_columns(nwbfile: pynwb.NWBFile,
         to the nwbfile electrode table, by default None. If None, default
         columns are added.
     """
-    default_columns = [
-        ("probe_vertical_position",
-         "Length-wise position of electrode/channel on device (microns)"),
-        ("probe_horizontal_position",
-         "Width-wise position of electrode/channel on device (microns)"),
-        ("probe_id", "The unique id of this electrode's/channel's device"),
-        ("probe_channel_number",
-         "The local index of electrode/channel on device"),
-        ("valid_data", "Whether data from this electrode/channel is usable")
-    ]
-
     if columns_to_add is None:
-        columns_to_add = default_columns
+        columns_to_add = ELECTRODE_TABLE_DEFAULT_COLUMNS
 
     for col_name, col_description in columns_to_add:
         if (not nwbfile.electrodes) or \
