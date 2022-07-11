@@ -2,9 +2,10 @@
   "units.csv": [
     "amplitude_cutoff",
     "anterior_posterior_ccf_coordinate",
+    "dorsal_ventral_ccf_coordinate",
+    "left_right_ccf_coordinate",
     "cumulative_drift",
     "d_prime",
-    "dorsal_ventral_ccf_coordinate",
     "ecephys_channel_id",
     "ecephys_probe_id",
     "ecephys_session_id",
