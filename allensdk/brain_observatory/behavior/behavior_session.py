@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Dict, Optional
+from typing import Any, List, Dict, Optional, Type
 
 import pynwb
 import pandas as pd
@@ -492,7 +492,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 add_is_change_to_stimulus_presentations_table)
         )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        trials = TrialTable.from_nwb(nwbfile=nwbfile)
+        trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         if skip_eye_tracking:
             eye_tracking_rig_geometry = None
@@ -504,7 +504,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)
 
-        return BehaviorSession(
+        return cls(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
@@ -645,7 +645,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             task calculated over a 25 trial rolling window.
         """
         return calculate_reward_rate_fix_nans(
-                self.trials,
+                self._trials,
                 self.task_parameters['response_window_sec'][0])
 
     def get_rolling_performance_df(self) -> pd.DataFrame:
@@ -685,7 +685,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         """
         return construct_rolling_performance_df(
-                self.trials,
+                self._trials,
                 self.task_parameters['response_window_sec'][0],
                 self.task_parameters["session_type"])
 
@@ -1477,3 +1477,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         # as discussed in
         # https://github.com/AllenInstitute/AllenSDK/issues/1318
         return 0.02115
+
+    @classmethod
+    def _trial_table_class(cls) -> Type[TrialTable]:
+        return TrialTable
