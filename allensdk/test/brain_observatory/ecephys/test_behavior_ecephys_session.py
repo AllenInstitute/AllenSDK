@@ -56,3 +56,13 @@ def test_session_consistency(
 
     # make sure that response_latency is not in the trials table
     assert 'response_latency' not in trials.columns
+
+
+@pytest.mark.requires_bamboo
+def test_getters_sanity(behavior_ecephys_session_fixture):
+    """Sanity check to make sure that the BehaviorEcephysSession
+    can use the BehaviorSession base class getter methods
+    """
+    behavior_ecephys_session_fixture.get_performance_metrics()
+    behavior_ecephys_session_fixture.get_rolling_performance_df()
+    behavior_ecephys_session_fixture.get_reward_rate()

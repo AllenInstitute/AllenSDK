@@ -286,7 +286,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
                 dict_repr=session_data)
 
-        return BehaviorSession(
+        return cls(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
@@ -1307,7 +1307,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return TrialTable.from_stimulus_file(
+        return cls._trial_table_class().from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,

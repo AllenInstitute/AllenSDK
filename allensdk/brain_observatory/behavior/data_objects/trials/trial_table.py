@@ -119,7 +119,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         # Order/Filter columns
         trials = trials[cls.columns_to_output()]
 
-        return TrialTable(trials=trials)
+        return cls(trials=trials)
 
     @staticmethod
     def _get_trial_bounds(trial_log: List) -> List[Tuple[int, int]]:
