@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Type
 
 import numpy as np
 import pandas as pd
@@ -248,6 +248,10 @@ class VBNBehaviorSession(BehaviorSession):
             licks=licks,
             rewards=rewards)
 
+    @classmethod
+    def _trial_table_class(cls) -> Type[VBNTrialTable]:
+        return VBNTrialTable
+
 
 class BehaviorEcephysSession(VBNBehaviorSession):
     """
@@ -264,7 +268,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     def __init__(
             self,
-            behavior_session: BehaviorSession,
+            behavior_session: VBNBehaviorSession,
             metadata: BehaviorEcephysMetadata,
             probes: Probes,
             optotagging_table: OptotaggingTable

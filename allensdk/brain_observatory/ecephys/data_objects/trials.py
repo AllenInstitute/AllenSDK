@@ -119,3 +119,7 @@ class VBNTrialTable(TrialTable):
                 'hit', 'false_alarm', 'miss', 'correct_reject',
                 'aborted', 'auto_rewarded', 'change_frame',
                 'start_time', 'stop_time', 'trial_length']
+
+    @property
+    def change_time(self):
+        return self.value['change_time_no_display_delay']

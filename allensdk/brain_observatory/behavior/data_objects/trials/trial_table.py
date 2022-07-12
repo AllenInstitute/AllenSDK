@@ -67,7 +67,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         if 'lick_events' in trials.columns:
             trials.drop('lick_events', inplace=True, axis=1)
         trials.index = trials.index.rename('trials_id')
-        return TrialTable(trials=trials)
+        return cls(trials=trials)
 
     @classmethod
     def columns_to_output(cls) -> List[str]:
@@ -119,7 +119,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         # Order/Filter columns
         trials = trials[cls.columns_to_output()]
 
-        return TrialTable(trials=trials)
+        return cls(trials=trials)
 
     @staticmethod
     def _get_trial_bounds(trial_log: List) -> List[Tuple[int, int]]:
@@ -167,3 +167,39 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         end_frames = [idx for idx in start_frames[1:] + [-1]]
         return list([(s, e) for s, e in zip(start_frames, end_frames)])
+
+    @property
+    def index(self) -> pd.Index:
+        return self.value.index
+
+    @property
+    def change_time(self) -> pd.Series:
+        return self.value['change_time']
+
+    @property
+    def lick_times(self) -> pd.Series:
+        return self.value['lick_times']
+
+    @property
+    def start_time(self) -> pd.Series:
+        return self.value['start_time']
+
+    @property
+    def aborted(self) -> pd.Series:
+        return self.value['aborted']
+
+    @property
+    def hit(self) -> pd.Series:
+        return self.value['hit']
+
+    @property
+    def miss(self) -> pd.Series:
+        return self.value['miss']
+
+    @property
+    def false_alarm(self) -> pd.Series:
+        return self.value['false_alarm']
+
+    @property
+    def correct_reject(self) -> pd.Series:
+        return self.value['correct_reject']
