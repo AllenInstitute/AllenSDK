@@ -12,7 +12,6 @@ class OphysMixin:
                 ['date_of_acquisition_behavior',
                  'date_of_acquisition_ophys'], axis=1)
 
-            # Prioritize ophys session_type
             self._df['session_type'] = \
                 self._df['session_type_ophys']
             self._df = self._df.drop(

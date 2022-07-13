@@ -45,8 +45,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         if sort_columns:
             presentations = presentations[sorted(presentations.columns)]
         presentations = presentations.reset_index(drop=True)
-        presentations.index = pd.Int64Index(
-            range(presentations.shape[0]), name='stimulus_presentations_id')
+        presentations.index = pd.Index(
+            range(presentations.shape[0]), name='stimulus_presentations_id',
+            dtype='int')
         super().__init__(name='presentations', value=presentations)
 
     def to_nwb(self,

@@ -150,6 +150,7 @@ def units_table_from_ecephys_session_id_list(
         probe_horizontal_position -- float64
         anterior_posterior_ccf_coordinate -- float64
         dorsal_ventral_ccf_coordinate -- float64
+        left_right_ccf_coordinate -- float64
         structure_id -- int64 uniquely identifying the structure
         structure_acronym -- a string naming the structure
         valid_data -- a boolean indicating the validity of the channel
@@ -190,6 +191,7 @@ def units_table_from_ecephys_session_id_list(
       ,ecephys_channels.probe_horizontal_position
       ,ecephys_channels.anterior_posterior_ccf_coordinate
       ,ecephys_channels.dorsal_ventral_ccf_coordinate
+      ,ecephys_channels.left_right_ccf_coordinate
       ,ecephys_channels.manual_structure_id as structure_id
       ,structures.acronym as structure_acronym
       ,ecephys_channels.valid_data as valid_data

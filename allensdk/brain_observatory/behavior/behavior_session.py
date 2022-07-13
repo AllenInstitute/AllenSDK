@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Dict, Optional
+from typing import Any, List, Dict, Optional, Type
 
 import pynwb
 import pandas as pd
@@ -10,6 +10,8 @@ import pathlib
 from pynwb import NWBFile
 
 from allensdk import OneResultExpectedError
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
+    EyeTrackingVideo
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
 
@@ -284,7 +286,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_json(
                 dict_repr=session_data)
 
-        return BehaviorSession(
+        return cls(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
@@ -411,11 +413,15 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     db=lims_db,
                     behavior_session_id=behavior_session_id.value)
 
+            eye_tracking_video = EyeTrackingVideo.from_lims(
+                db=lims_db, behavior_session_id=behavior_session_id.value)
+
             eye_tracking_metadata_file = None
 
             eye_tracking_table = cls._read_eye_tracking_table(
                 eye_tracking_file=eye_tracking_file,
                 eye_tracking_metadata_file=eye_tracking_metadata_file,
+                eye_tracking_video=eye_tracking_video,
                 sync_file=sync_file,
                 z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)
@@ -486,7 +492,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 add_is_change_to_stimulus_presentations_table)
         )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        trials = TrialTable.from_nwb(nwbfile=nwbfile)
+        trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         if skip_eye_tracking:
             eye_tracking_rig_geometry = None
@@ -498,7 +504,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)
 
-        return BehaviorSession(
+        return cls(
             behavior_session_id=behavior_session_id,
             stimulus_timestamps=stimulus_timestamps,
             running_acquisition=running_acquisition,
@@ -639,7 +645,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             task calculated over a 25 trial rolling window.
         """
         return calculate_reward_rate_fix_nans(
-                self.trials,
+                self._trials,
                 self.task_parameters['response_window_sec'][0])
 
     def get_rolling_performance_df(self) -> pd.DataFrame:
@@ -679,7 +685,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         """
         return construct_rolling_performance_df(
-                self.trials,
+                self._trials,
                 self.task_parameters['response_window_sec'][0],
                 self.task_parameters["session_type"])
 
@@ -1301,7 +1307,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return TrialTable.from_stimulus_file(
+        return cls._trial_table_class().from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -1400,10 +1406,13 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_eye_tracking_table(
             cls,
             eye_tracking_file: EyeTrackingFile,
-            eye_tracking_metadata_file: EyeTrackingMetadataFile,
             sync_file: SyncFile,
             z_threshold: float,
-            dilation_frames: int) -> EyeTrackingTable:
+            dilation_frames: int,
+            eye_tracking_metadata_file: Optional[
+                EyeTrackingMetadataFile] = None,
+            eye_tracking_video: Optional[EyeTrackingVideo] = None
+    ) -> EyeTrackingTable:
 
         # this is possible if instantiating from_lims
         if sync_file is None:
@@ -1426,6 +1435,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
 
         return EyeTrackingTable.from_data_file(
                     data_file=eye_tracking_file,
+                    metadata_file=eye_tracking_metadata_file,
+                    video=eye_tracking_video,
                     stimulus_timestamps=stimulus_timestamps,
                     z_threshold=z_threshold,
                     dilation_frames=dilation_frames,
@@ -1466,3 +1477,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         # as discussed in
         # https://github.com/AllenInstitute/AllenSDK/issues/1318
         return 0.02115
+
+    @classmethod
+    def _trial_table_class(cls) -> Type[TrialTable]:
+        return TrialTable

@@ -280,26 +280,26 @@ def test_add_probe_to_nwbfile(
     pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
 
 
-@pytest.mark.parametrize("columns_to_add, expected_columns", [
-    (None,
+@pytest.mark.parametrize("columns_to_add", [
+    None,
 
-     {"probe_vertical_position", "probe_horizontal_position",
-      "probe_id", "probe_channel_number", "valid_data",
-      "x", "y", "z", "group",
-      "group_name", "imp", "location", "filtering"}),
-
-    ([("test_column_a", "description_a"),
-      ("test_column_b", "description_b")],
-
-     {"x", "y", "z", "group", "group_name", "imp", "location", "filtering",
-      "test_column_a", "test_column_b"})
+    [("test_column_a", "description_a"),
+     ("test_column_b", "description_b")]
 ])
-def test_add_ecephys_electrode_columns(nwbfile, columns_to_add,
-                                       expected_columns):
+def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
     allensdk.brain_observatory.ecephys.nwb_util._add_ecephys_electrode_columns(
         nwbfile, columns_to_add)
 
-    assert set(nwbfile.electrodes.colnames) == expected_columns
+    if columns_to_add is None:
+        expected_columns = \
+            [x[0] for x in
+             allensdk.brain_observatory.ecephys.nwb_util.
+             ELECTRODE_TABLE_DEFAULT_COLUMNS]
+    else:
+        expected_columns = [x[0] for x in columns_to_add]
+
+    for c in expected_columns:
+        assert c in nwbfile.electrodes.colnames
 
 
 @pytest.mark.parametrize(("channels, channel_number_whitelist, "

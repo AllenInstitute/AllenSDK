@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
+    EyeTrackingVideo
 from allensdk.brain_observatory.behavior.data_objects import (
     StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
@@ -198,6 +200,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             data_file: EyeTrackingFile,
             stimulus_timestamps: StimulusTimestamps,
             metadata_file: Optional[EyeTrackingMetadataFile] = None,
+            video: Optional[EyeTrackingVideo] = None,
             z_threshold: float = 3.0,
             dilation_frames: int = 2,
             empty_on_fail: bool = False) -> "EyeTrackingTable":
@@ -216,15 +219,25 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             if an EyeTrackingError is raised (usually because
             timestamps and eye tracking video frames do not
             align). If false, the error will get raised.
-        metadata_file: EyeTrackingMetadataFile
+        metadata_file: EyeTrackingMetadataFile. Used for detecting if video is
+            MVR. Either this or video must be given.
+        video: EyeTrackingVideo. Used for detecting if video is MVR.
+            Either this or metadata_file must be given.
         """
         cls._logger.info(f"Getting eye_tracking_data with "
                          f"'z_threshold={z_threshold}', "
                          f"'dilation_frames={dilation_frames}'")
 
+        # TODO currently the only codepath that doesn't pass metadata file or
+        #  video is BehaviorSession.from_json. Once we add metadata file or
+        #  video path to this json file, then we should remove the
+        # `if metadata_file is not None or video is not None else False` clause
+        # to always check if metadata frame is present
         is_metadata_frame_present = (
-            _is_metadata_frame_present(metadata_file=metadata_file)
-            if metadata_file is not None else False)
+            _is_metadata_frame_present(
+                metadata_file=metadata_file,
+                video=video
+            ) if metadata_file is not None or video is not None else False)
 
         try:
             frames, stimulus_timestamps = cls._validate_frame_time_alignment(
@@ -356,15 +369,31 @@ def get_lost_frames(
     return np.array(lost_frames)-1
 
 
-def _is_metadata_frame_present(metadata_file: EyeTrackingMetadataFile) -> bool:
+def _is_metadata_frame_present(
+        metadata_file: Optional[EyeTrackingMetadataFile] = None,
+        video: Optional[EyeTrackingVideo] = None
+) -> bool:
     """Return whether a metadata frame was placed at the front of the eye
     tracking movie. Tries to determine this by using the fact that the MVR
     (multi-video-recorder) software always places a metadata frame at the
     front. Detect MVR by the filetype. MVR outputs mp4 while predecessors
     output a different format.
+
+    First checks the metadata file if given for the video filepath
+    Then checks video file if metadata file not given
+
+    Raises
+    ------
+    ValueError if neither metadata_file or video is given
     """
-    video_file_name = \
-        metadata_file.data['RecordingReport']['VideoOutputFileName'].lower()
+    if metadata_file is not None:
+        video_file_name = \
+            metadata_file.data['RecordingReport']['VideoOutputFileName']\
+            .lower()
+    elif video is not None:
+        video_file_name = video.filepath.lower()
+    else:
+        raise ValueError('Either metadata_file or video must be given')
     video_file_name = Path(video_file_name)
 
     return video_file_name.suffix == '.mp4' or \

@@ -33,7 +33,38 @@ class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
     def from_lims(cls, ophys_experiment_id: int,
                   lims_db: PostgresQueryMixin) -> "Projections":
         def _get_filepaths():
+            """
+            Note
+            ----
+            Legacy motion correction/segmentation stores images as well known
+            files attached to the segmentation run while the newer suite2p
+            pipeline produces them during motion correction and attached
+            to the ophys_experiment. In the code below, we first check
+            for the well known  files attached to the experiment and then,
+            to support older datasets, we check for them on the segmentation
+            run if not all data products are found.
+            """
             query = """
+                    SELECT
+                        wkf.storage_directory || wkf.filename AS filepath,
+                        wkft.name as wkfn
+                    FROM ophys_experiments oe
+                    JOIN well_known_files wkf ON wkf.attachable_id = oe.id
+                    JOIN well_known_file_types wkft
+                    ON wkft.id = wkf.well_known_file_type_id
+                    WHERE wkf.attachable_type = 'OphysExperiment'
+                    AND wkft.name IN ('OphysMaxIntImage',
+                                      'OphysAverageIntensityProjectionImage')
+                    AND oe.id = {};
+                    """.format(ophys_experiment_id)
+            res = lims_db.select(query=query)
+            # Check if the projections are attached to motion correction/the
+            # ophys_experiment. If not, this is an older experiment and
+            # need to load the projections from the segmentation.
+            if 'OphysMaxIntImage' not in res['wkfn'].to_list() \
+               or 'OphysAverageIntensityProjectionImage' \
+               not in res['wkfn'].to_list():
+                query = """
                     SELECT
                         wkf.storage_directory || wkf.filename AS filepath,
                         wkft.name as wkfn
@@ -49,7 +80,7 @@ class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
                         'OphysAverageIntensityProjectionImage')
                     AND oe.id = {};
                     """.format(ophys_experiment_id)
-            res = lims_db.select(query=query)
+                res = lims_db.select(query=query)
             res['filepath'] = res['filepath'].apply(safe_system_path)
             return res
 
