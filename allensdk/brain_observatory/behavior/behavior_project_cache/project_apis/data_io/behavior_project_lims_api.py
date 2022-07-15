@@ -180,7 +180,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 ON oec.visual_behavior_experiment_container_id = vbc.id
             JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
-            {where_clause} 
+            {where_clause}
             GROUP BY os.id
             -- -- end getting all ophys_container_ids -- --
         """
@@ -354,7 +354,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN ophys_cell_segmentation_runs AS ocsr
                 ON ocsr.id=cr.ophys_cell_segmentation_run_id
             JOIN ophys_experiments AS oe ON oe.id=cr.ophys_experiment_id
-            JOIN ophys_experiments_visual_behavior_experiment_containers oec 
+            JOIN ophys_experiments_visual_behavior_experiment_containers oec
                 ON oec.ophys_experiment_id = oe.id
             JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
