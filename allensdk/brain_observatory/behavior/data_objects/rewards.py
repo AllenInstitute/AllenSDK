@@ -38,7 +38,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         data = stimulus_file.data
 
         trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])
-        rewards_dict = {"volume": [], "timestamps": [], "autorewarded": []}
+        rewards_dict = {"volume": [], "timestamps": [], "auto_rewarded": []}
         for idx, trial in trial_df.iterrows():
             rewards = trial["rewards"]
             # as i write this there can only ever be one reward per trial
@@ -47,7 +47,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
                 rewards_dict["timestamps"].append(
                     stimulus_timestamps.value[rewards[0][2]])
                 auto_rwrd = trial["trial_params"]["auto_reward"]
-                rewards_dict["autorewarded"].append(auto_rwrd)
+                rewards_dict["auto_rewarded"].append(auto_rwrd)
 
         df = pd.DataFrame(rewards_dict)
         return cls(rewards=df)
@@ -67,7 +67,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
         df = pd.DataFrame({
                 'volume': volume,
                 'timestamps': time,
-                'autorewarded': autorewarded})
+                'auto_rewarded': autorewarded})
         return cls(rewards=df)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
@@ -87,7 +87,7 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
 
         autorewarded_ts = TimeSeries(
             name='autorewarded',
-            data=self.value['autorewarded'].values,
+            data=self.value['auto_rewarded'].values,
             timestamps=reward_volume_ts.timestamps,
             unit='mL'
         )

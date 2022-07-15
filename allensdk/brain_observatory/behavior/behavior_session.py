@@ -937,7 +937,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     0.007 if earned reward, 0.005 if auto reward.
                 timestamps: (float)
                     time in seconds
-                autorewarded: (bool)
+                auto_rewarded: (bool)
                     True if free reward was delivered for that trial.
                     Occurs during the first 5 trials of a session and
                     throughout as needed

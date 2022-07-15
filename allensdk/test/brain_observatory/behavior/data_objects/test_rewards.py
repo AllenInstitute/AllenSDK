@@ -89,7 +89,7 @@ class TestFromBehaviorStimulusFile(LimsTest):
 
         expected_dict = {'volume': [0.001, 0.002],
                          'timestamps': [0.04, 0.1],
-                         'autorewarded': [True, False]}
+                         'auto_rewarded': [True, False]}
         expected_df = pd.DataFrame(expected_dict)
         expected_df = expected_df
         assert expected_df.equals(rewards.value)
