@@ -64,7 +64,3 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         self._df = add_experience_level_to_experiment_table(self._df)
         self._df = add_passive_flag_to_ophys_experiment_table(self._df)
         self._df = add_image_set_to_experiment_table(self._df)
-
-        if self._passed_only:
-            self._df = self._df.query("experiment_workflow_state=='passed'")
-            self._df = self._df.query("container_workflow_state=='published'")

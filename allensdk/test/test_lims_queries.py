@@ -3,7 +3,7 @@ import pandas as pd
 
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
-    _sanitize_uuid_list)
+    _sanitize_uuid_list, build_where_clause)
 
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
@@ -50,6 +50,19 @@ def test_build_in_selector_error():
             valid_list=[1, 2, 3],
             operator='above',
             valid=True)
+
+
+@pytest.mark.parametrize('clauses, expected', [
+    (['foo=b', 'baz=a'], 'WHERE foo=b AND baz=a'),
+    (['WHERE foo=b and baz=c'], 'WHERE foo=b and baz=c'),
+    (['foo=b', 'baz=a', 'bar=c'], 'WHERE foo=b AND baz=a AND bar=c'),
+    (['WHERE foo=b', 'baz=a'], 'WHERE foo=b AND baz=a'),
+    (['where foo=b', 'baz=a'], 'where foo=b AND baz=a'),
+    ([], ''),
+    (['foo=b'], 'WHERE foo=b')
+])
+def test_build_where_clause(clauses, expected):
+    assert build_where_clause(clauses=clauses) == expected
 
 
 class MockQueryEngine:
