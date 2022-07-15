@@ -83,10 +83,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self._passed_only = passed_only
         self.logger = logging.getLogger("BehaviorProjectLimsApi")
 
-    @property
-    def passed_only(self) -> bool:
-        return self._passed_only
-
     @classmethod
     def default(
             cls,
