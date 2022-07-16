@@ -6,66 +6,6 @@ import os
 from allensdk.test_utilities.custom_comparators import safe_df_comparison
 
 
-@pytest.mark.skip()
-@pytest.mark.parametrize("TempdirBehaviorCache, expected_ophys_session_table",
-                         [(True, True),
-                          (True, False),
-                          (False, True),
-                          (False, False)], indirect=True)
-def test_get_ophys_session_table(TempdirBehaviorCache,
-                                 expected_ophys_session_table):
-    cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_session_table()
-    if cache.cache:
-        path = cache.manifest.path_info.get("ophys_sessions").get("spec")
-        assert os.path.exists(path)
-
-    safe_df_comparison(expected_ophys_session_table['df'],
-                       obtained)
-
-
-@pytest.mark.skip()
-@pytest.mark.parametrize("TempdirBehaviorCache, "
-                         "expected_behavior_session_table",
-                         [(True, True),
-                          (True, False),
-                          (False, True),
-                          (False, False)], indirect=True)
-def test_get_behavior_table(TempdirBehaviorCache,
-                            expected_behavior_session_table,
-                            container_state_lookup,
-                            experiment_state_lookup,
-                            ophys_experiment_to_container_map):
-    cache = TempdirBehaviorCache
-    obtained = cache.get_behavior_session_table(
-                    passed_only=expected_behavior_session_table['passed_only'])
-    expected = expected_behavior_session_table['df']
-    if cache.cache:
-        path = cache.manifest.path_info.get("behavior_sessions").get("spec")
-        assert os.path.exists(path)
-
-    safe_df_comparison(expected, obtained)
-
-
-@pytest.mark.skip()
-@pytest.mark.parametrize("TempdirBehaviorCache, "
-                         "expected_experiments_table",
-                         [(True, True),
-                          (True, False),
-                          (False, True),
-                          (False, False)], indirect=True)
-def test_get_experiments_table(TempdirBehaviorCache,
-                               expected_experiments_table):
-    cache = TempdirBehaviorCache
-    obtained = cache.get_ophys_experiment_table(
-                     passed_only=expected_experiments_table['passed_only'])
-    if cache.cache:
-        path = cache.manifest.path_info.get("ophys_experiments").get("spec")
-        assert os.path.exists(path)
-
-    safe_df_comparison(expected_experiments_table['df'], obtained)
-
-
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
 def test_session_table_reads_from_cache(TempdirBehaviorCache,
                                         caplog):

@@ -485,15 +485,22 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         summary_tbl = self._get_behavior_summary_table()
 
-        with Pool(n_workers) as p:
-            stimulus_names = list(tqdm(
-                p.imap(_get_session_type_from_pkl_file_helper,
-                       zip(
-                            summary_tbl['behavior_session_id'].tolist(),
-                            [self.lims_engine] * summary_tbl.shape[0])
-                       ),
-                total=summary_tbl.shape[0],
-                desc='Reading session type from pkl file'))
+        if n_workers > 1:
+            with Pool(n_workers) as p:
+                stimulus_names = list(tqdm(
+                    p.imap(_get_session_type_from_pkl_file_helper,
+                           zip(
+                                summary_tbl['behavior_session_id'].tolist(),
+                                [self.lims_engine] * summary_tbl.shape[0])
+                           ),
+                    total=summary_tbl.shape[0],
+                    desc='Reading session type from pkl file'))
+        else:
+            stimulus_names = [
+                _get_session_type_from_pkl_file(
+                    behavior_session_id=behavior_session_id,
+                    db_conn=self.lims_engine)
+                for behavior_session_id in summary_tbl['behavior_session_id']]
         stimulus_names = pd.DataFrame(stimulus_names)
 
         return (summary_tbl.merge(stimulus_names,
