@@ -1,9 +1,6 @@
 import pytest
 import pandas as pd
 import logging
-import os
-
-from allensdk.test_utilities.custom_comparators import safe_df_comparison
 
 
 @pytest.mark.parametrize("TempdirBehaviorCache", [True], indirect=True)
