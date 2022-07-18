@@ -288,7 +288,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line, mouse_id
+                        reporter_line, driver_line
 
         :rtype: pd.DataFrame
         """
@@ -387,7 +387,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                         ophys_experiment_id, project_code, session_name,
                         date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
-                        reporter_line, driver_line, mouse_id
+                        reporter_line, driver_line
 
         :rtype: pd.DataFrame
         """
