@@ -1014,6 +1014,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 image_index: (int)
                     image index (0-7) for a given session,
                     corresponding to each image name
+                image_set: (string)
+                    image set for this behavior session
+                index: (int)
+                    an index assigned to each stimulus presentation
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
