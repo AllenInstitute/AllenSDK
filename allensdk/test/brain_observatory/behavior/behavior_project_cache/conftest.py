@@ -42,8 +42,12 @@ def vbo_s3_cloud_cache_data():
                                    'data': b'67890'}
 
     o_session = [{'ophys_session_id': 111,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 1},
                  {'ophys_session_id': 222,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
@@ -55,9 +59,13 @@ def vbo_s3_cloud_cache_data():
 
     b_session = [{'behavior_session_id': 333,
                   'file_id': 3,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'species': 'mouse'},
                  {'behavior_session_id': 444,
                   'file_id': 4,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'species': 'mouse'}]
     b_session = pd.DataFrame(b_session)
     buff = io.StringIO()
@@ -67,8 +75,12 @@ def vbo_s3_cloud_cache_data():
     metadata['behavior_session_table'] = bytes(buff.read(), 'utf-8')
 
     o_session = [{'ophys_experiment_id': 5111,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 1},
                  {'ophys_experiment_id': 5222,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
@@ -113,8 +125,12 @@ def vbo_s3_cloud_cache_data():
                                 'data': b'98765'}
 
     o_session = [{'ophys_session_id': 222,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 1},
                  {'ophys_session_id': 333,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 2}]
 
     o_session = pd.DataFrame(o_session)
@@ -126,9 +142,13 @@ def vbo_s3_cloud_cache_data():
 
     b_session = [{'behavior_session_id': 777,
                   'file_id': 3,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'species': 'mouse'},
                  {'behavior_session_id': 888,
                   'file_id': 4,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'species': 'mouse'}]
     b_session = pd.DataFrame(b_session)
     buff = io.StringIO()
@@ -138,10 +158,16 @@ def vbo_s3_cloud_cache_data():
     metadata['behavior_session_table'] = bytes(buff.read(), 'utf-8')
 
     o_session = [{'ophys_experiment_id': 5444,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 1},
                  {'ophys_experiment_id': 5666,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 2},
                  {'ophys_experiment_id': 5777,
+                  'mouse_id': '1',
+                  'date_of_acquisition': '2021-01-01',
                   'file_id': 5}]
 
     o_session = pd.DataFrame(o_session)
