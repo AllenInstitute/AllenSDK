@@ -1014,10 +1014,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 image_index: (int)
                     image index (0-7) for a given session,
                     corresponding to each image name
-                image_set: (string)
-                    image set for this behavior session
-                index: (int)
-                    an index assigned to each stimulus presentation
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
@@ -1028,7 +1024,9 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stop_time: (float)
                     image presentation end time in seconds
         """
-        return self._stimuli.presentations.value
+        table = self._stimuli.presentations.value
+        table = table.drop(columns=['image_set', 'index'], errors='ignore')
+        return table
 
     @property
     def stimulus_templates(self) -> pd.DataFrame:
