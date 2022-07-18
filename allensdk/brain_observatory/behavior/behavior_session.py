@@ -1150,7 +1150,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 miss: (bool)
                     Behavior response type. On a go trial, mouse either
                     does not lick at all, or licks after reward window
-                stimulus_change: (bool)
+                is_change: (bool)
                     True if an image change occurs during the trial
                     (if the trial was both a 'go' trial and the trial
                     was not aborted)
