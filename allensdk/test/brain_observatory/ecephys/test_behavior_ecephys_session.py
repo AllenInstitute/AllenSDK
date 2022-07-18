@@ -48,7 +48,7 @@ def test_session_consistency(
     stim = behavior_ecephys_session_fixture.stimulus_presentations
     trials = behavior_ecephys_session_fixture.trials
     stim_frames = stim[stim.is_change & stim.active].start_frame
-    trials_frames = trials[trials.stimulus_change].change_frame
+    trials_frames = trials[trials.is_change].change_frame
     delta = stim_frames.values-trials_frames.values
     np.testing.assert_array_equal(
         delta,

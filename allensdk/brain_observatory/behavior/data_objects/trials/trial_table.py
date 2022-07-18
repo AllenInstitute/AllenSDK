@@ -30,6 +30,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         return Trial
 
     def __init__(self, trials: pd.DataFrame):
+        trials = trials.rename(columns={'stimulus_change': 'is_change'})
         super().__init__(name='trials', value=trials)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
