@@ -224,6 +224,7 @@ class TestLimsCloudConsistency:
         elif fname == 'ophys_cells_table':
             return cls.test_dir / 'ophys_cells_table.csv'
 
+    @pytest.mark.requires_bamboo
     def test_behavior_session_table(self):
         with patch('allensdk.brain_observatory.'
                    'behavior.behavior_project_cache.'
@@ -238,6 +239,7 @@ class TestLimsCloudConsistency:
         from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
+    @pytest.mark.requires_bamboo
     def test_ophys_session_table(self):
         with patch('allensdk.brain_observatory.'
                    'behavior.behavior_project_cache.'
@@ -251,6 +253,7 @@ class TestLimsCloudConsistency:
         from_s3 = self.cloud_cache.get_ophys_session_table()
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
+    @pytest.mark.requires_bamboo
     def test_ophys_experiments_table(self):
         with patch('allensdk.brain_observatory.'
                    'behavior.behavior_project_cache.'
