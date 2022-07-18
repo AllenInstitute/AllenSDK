@@ -77,7 +77,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.licks) == 2421 and set(data_set.licks.columns) \
         == set(['timestamps', 'frame'])
     assert len(data_set.rewards) == 85 and set(data_set.rewards.columns) == \
-        set(['timestamps', 'volume', 'autorewarded'])
+        set(['timestamps', 'volume', 'auto_rewarded'])
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
         set(data_set.corrected_fluorescence_traces.columns) == \
         set(['cell_roi_id', 'corrected_fluorescence'])
