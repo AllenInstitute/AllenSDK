@@ -359,7 +359,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         if self.data_release_date is not None:
             where_clause.append(self._get_ophys_experiment_release_filter())
         where_clause.append("cr.valid_roi = True")
-        where_clause.append("ocsr.current=True")
+        where_clause.append("ocsr.current = True")
 
         if self._passed_only:
             where_clause += _get_passed_ophys_experiment_clauses()
