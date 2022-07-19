@@ -1009,23 +1009,24 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 duration: (float)
                     duration of an image presentation (flash)
                     in seconds (stop_time - start_time). NaN if omitted
+                start_frame: (int)
+                    image presentation start frame
                 end_frame: (float)
                     image presentation end frame
+                start_time: (float)
+                    image presentation start time in seconds
+                end_time: (float)
+                    image presentation end time in seconds
                 image_index: (int)
                     image index (0-7) for a given session,
                     corresponding to each image name
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
-                start_frame: (int)
-                    image presentation start frame
-                start_time: (float)
-                    image presentation start time in seconds
-                stop_time: (float)
-                    image presentation end time in seconds
         """
         table = self._stimuli.presentations.value
         table = table.drop(columns=['image_set', 'index'], errors='ignore')
+        table = table.rename(columns={'stop_time': 'end_time'})
         return table
 
     @property
