@@ -169,7 +169,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             -- -- begin getting imaging_plane_count -- --
             SELECT
-                os.id, 
+                os.id,
                 COUNT(DISTINCT(pg.group_order)) AS imaging_plane_group_count
             FROM ophys_sessions os
             JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
