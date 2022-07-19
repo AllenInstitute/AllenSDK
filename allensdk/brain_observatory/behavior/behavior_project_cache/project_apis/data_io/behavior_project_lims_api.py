@@ -156,6 +156,31 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return query
 
+    def _build_imaging_plane_count_from_session_query(self) -> str:
+        """Sub-query to get imaging_plane_count associated
+        with an ophys session id."""
+        where_clause = []
+        if self.data_release_date is not None:
+            where_clause.append(self._get_ophys_experiment_release_filter())
+        if self._passed_only:
+            where_clause.append("oe.workflow_state = 'passed'")
+        where_clause = build_where_clause(clauses=where_clause)
+
+        query = f"""
+            -- -- begin getting imaging_plane_count -- --
+            SELECT
+                os.id, 
+                COUNT(DISTINCT(pg.group_order)) AS imaging_plane_group_count
+            FROM ophys_sessions os
+            JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
+            JOIN  ophys_imaging_plane_groups pg
+                ON pg.id = oe.ophys_imaging_plane_group_id
+            {where_clause}
+            GROUP BY os.id
+            -- -- end getting imaging_plane_count -- --
+        """
+        return query
+
     def _build_container_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_container_ids associated
         with a single ophys_session_id."""
@@ -299,6 +324,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
                     ophys_container_id,
+                pg.group_order AS imaging_plane_group,
                 pr.code as project_code,
                 vbc.workflow_state as container_workflow_state,
                 oe.workflow_state as experiment_workflow_state,
@@ -312,6 +338,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
             JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            LEFT JOIN  ophys_imaging_plane_groups pg
+                ON pg.id = oe.ophys_imaging_plane_group_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
             JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
             LEFT OUTER JOIN projects pr ON pr.id = os.project_id
@@ -395,6 +423,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
+                imaging_plane_group_count.imaging_plane_group_count,
                 exp_ids.experiment_ids as ophys_experiment_id,
                 cntr_ids.container_ids as ophys_container_id,
                 pr.code as project_code,
@@ -410,6 +439,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN (
                 {self._build_container_from_session_query()}
             ) cntr_ids ON os.id = cntr_ids.id
+            LEFT JOIN (
+                {self._build_imaging_plane_count_from_session_query()}
+            ) imaging_plane_group_count ON os.id = imaging_plane_group_count.id
         """
 
         if self.data_release_date is not None:

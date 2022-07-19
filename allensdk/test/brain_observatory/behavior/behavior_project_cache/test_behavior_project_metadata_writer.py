@@ -104,3 +104,68 @@ class TestVBO:
                                'ophys_cells_table.csv')
         pd.testing.assert_frame_equal(
             obtained, self.expected_ophys_cells_table)
+
+    @pytest.mark.requires_bamboo
+    def test_imaging_plane_group_only_mesoscope(self):
+        """Tests that imaging plane group only applies to mesoscope"""
+        with patch('allensdk.brain_observatory.'
+                   'behavior.behavior_project_cache.'
+                   'project_apis.data_io.behavior_project_lims_api.'
+                   '_get_session_type_from_pkl_file',
+                   wraps=self._get_session_type):
+            self.project_table_writer._write_ophys_sessions()
+            self.project_table_writer._write_ophys_experiments()
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                        'ophys_session_table.csv')
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                           'ophys_experiment_table.csv')
+        df = ophys_session_tbl.merge(ophys_experiment_tbl,
+                                     on='ophys_session_id')
+
+        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
+                ['imaging_plane_group_count'].isna().all())
+        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
+                ['imaging_plane_group'].isna().all())
+
+    @pytest.mark.requires_bamboo
+    def test_imaging_plane_group_count_consistent(self):
+        """Tests that imaging plane group count in ophys sessions table is
+        consistent with the number of imaging plane groups in experiment
+        table"""
+        with patch('allensdk.brain_observatory.'
+                   'behavior.behavior_project_cache.'
+                   'project_apis.data_io.behavior_project_lims_api.'
+                   '_get_session_type_from_pkl_file',
+                   wraps=self._get_session_type):
+            self.project_table_writer._write_ophys_sessions()
+            self.project_table_writer._write_ophys_experiments()
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                        'ophys_session_table.csv')
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                           'ophys_experiment_table.csv')
+        df = ophys_session_tbl.merge(ophys_experiment_tbl,
+                                     on='ophys_session_id')
+
+        imaging_plane_group_count = (
+            df[~df['imaging_plane_group'].isna()]
+            .groupby('ophys_session_id')['imaging_plane_group'].nunique()
+            .reset_index()
+            .rename(
+                columns={'imaging_plane_group': 'imaging_plane_group_count'})
+        )
+
+        ophys_session_tbl = ophys_session_tbl.merge(
+            imaging_plane_group_count,
+            on='ophys_session_id',
+            suffixes=('_from_lims', '_recalculated'),
+            how='left'
+        )
+        assert (
+            (ophys_session_tbl['imaging_plane_group_count_from_lims']
+             [~ophys_session_tbl['imaging_plane_group_count_from_lims'].isna()]
+             ==
+             ophys_session_tbl['imaging_plane_group_count_recalculated']
+             [~ophys_session_tbl['imaging_plane_group_count_recalculated']
+             .isna()])
+            .all()
+        )
