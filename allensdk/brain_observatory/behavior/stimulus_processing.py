@@ -451,11 +451,6 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
             )
 
             for idx, (epoch_start, epoch_end,) in enumerate(draw_epochs):
-                # visual stimulus doesn't actually change until start of
-                # following frame, so we need to bump the
-                # epoch_start & epoch_end to get the timing right
-                epoch_start += 1
-                epoch_end += 1
 
                 visual_stimuli_data.append({
                     "orientation": orientation,

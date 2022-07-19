@@ -192,7 +192,7 @@ def test_get_trial_timing():
     # timestamps to lookup the timestamp of
     # change_frame
     timestamps = np.zeros(20000, dtype=float)
-    timestamps[18346] = 311.77086
+    timestamps[18345] = 311.77086
     monitor_delay = 0.01
 
     # need a mock Trial class that just populates
@@ -223,7 +223,7 @@ def test_get_trial_timing():
         'stop_time': 315.23590438557534,
         'trial_length': 8.757316460199547,
         'response_time': 312.24876,
-        'change_frame': 18346,
+        'change_frame': 18345,
         'change_time': 311.78086,
         'response_latency': 0.4678999999999769
     }
