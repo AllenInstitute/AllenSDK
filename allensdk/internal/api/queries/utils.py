@@ -56,6 +56,15 @@ def build_in_list_selector_query(
     return session_query
 
 
+def build_where_clause(clauses: List[str]):
+    if not clauses:
+        return ''
+    where_clause = ' AND '.join(clauses)
+    if not where_clause[:5].lower() == 'where':
+        where_clause = f'WHERE {where_clause}'
+    return where_clause
+
+
 def _sanitize_uuid_list(uuid_list: List[str]) -> List[str]:
     """
     Loop over a list of strings, removing any that cannot be cast

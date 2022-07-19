@@ -122,7 +122,8 @@ class ProjectCacheBase(object):
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
                   asynchronous: bool = True,
-                  data_release_date: Optional[Union[str, List[str]]] = None
+                  data_release_date: Optional[Union[str, List[str]]] = None,
+                  passed_only: bool = True
                   ) -> "ProjectCacheBase":
         """
         Construct a ProjectCacheBase with a lims api.
@@ -156,10 +157,13 @@ class ProjectCacheBase(object):
         data_release_date: str or list of str
             Use to filter tables to only include data released on date
             ie 2021-03-25 or ['2021-03-25', '2021-08-12']
+        passed_only
+            Whether to limit to data with `workflow_state` set to 'passed'
+            and 'published'
         Returns
         =======
         ProjectCacheBase
-            ProjectCachBase instance with a LIMS fetch API
+            ProjectCacheBase instance with a LIMS fetch API
         """
         if host and scheme:
             app_kwargs = {"host": host, "scheme": scheme,
@@ -170,7 +174,9 @@ class ProjectCacheBase(object):
             lims_credentials=lims_credentials,
             mtrain_credentials=mtrain_credentials,
             data_release_date=data_release_date,
-            app_kwargs=app_kwargs)
+            app_kwargs=app_kwargs,
+            passed_only=passed_only
+        )
         return cls(fetch_api=fetch_api, manifest=manifest, version=version,
                    cache=cache, fetch_tries=fetch_tries)
 
