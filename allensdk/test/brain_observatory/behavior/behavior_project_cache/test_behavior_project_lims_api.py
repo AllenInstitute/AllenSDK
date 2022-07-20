@@ -1,10 +1,18 @@
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
 import pandas as pd
 import pytest
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache import \
+    VisualBehaviorOphysProjectCache
+from allensdk.brain_observatory.behavior.behavior_project_cache.external \
+    .behavior_project_metadata_writer import \
+    SESSION_SUPPRESS, OPHYS_EXPERIMENTS_SUPPRESS, \
+    OPHYS_EXPERIMENTS_SUPPRESS_FINAL
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    BehaviorProjectLimsApi, BehaviorProjectCloudApi  # noqa: E501
 
 from allensdk.test_utilities.custom_comparators import (
     WhitespaceStrippedString)
@@ -164,3 +172,100 @@ class TestProjectTablesAll:
             .nunique()
         assert obtained.shape[0] > \
                self.release_ophys_cells_table.shape[0]
+
+
+class TestLimsCloudConsistency:
+    """Tests for checking consistency between tables as returned by cloud
+    vs those returned internally by lims"""
+    @classmethod
+    def setup_class(cls):
+        tempdir = tempfile.TemporaryDirectory()
+
+        cls.test_dir = Path(__file__).parent / 'test_data' / 'vbo'
+
+        behavior_sessions_table = pd.read_csv(
+            cls.test_dir / 'behavior_session_table.csv')
+        cls.session_type_map = (
+            behavior_sessions_table
+            .set_index('behavior_session_id')[['session_type']]
+            .to_dict()['session_type'])
+
+        cls.lims_cache = VisualBehaviorOphysProjectCache.from_lims(
+            data_release_date=['2021-03-25', '2021-08-12'])
+        cls.tempdir = tempdir
+
+        with patch.object(
+                BehaviorProjectCloudApi,
+                '_get_metadata_path',
+                wraps=cls._get_project_table_path):
+            cls.cloud_cache = VisualBehaviorOphysProjectCache.from_s3_cache(
+                cache_dir=tempdir.name)
+
+    def teardown_class(self):
+        self.tempdir.cleanup()
+
+    def _get_session_type(self, behavior_session_id, db_conn):
+        """
+        Note: mocking this because getting session type from pkl file is
+        expensive
+        """
+        return {
+            'behavior_session_id': behavior_session_id,
+            'session_type': self.session_type_map[behavior_session_id]}
+
+    @classmethod
+    def _get_project_table_path(cls, fname):
+        if fname == 'behavior_session_table':
+            return cls.test_dir / 'behavior_session_table.csv'
+        elif fname == 'ophys_session_table':
+            return cls.test_dir / 'ophys_session_table.csv'
+        elif fname == 'ophys_experiment_table':
+            return cls.test_dir / 'ophys_experiment_table.csv'
+        elif fname == 'ophys_cells_table':
+            return cls.test_dir / 'ophys_cells_table.csv'
+
+    @pytest.mark.requires_bamboo
+    def test_behavior_session_table(self):
+        with patch('allensdk.brain_observatory.'
+                   'behavior.behavior_project_cache.'
+                   'project_apis.data_io.behavior_project_lims_api.'
+                   '_get_session_type_from_pkl_file',
+                   wraps=self._get_session_type):
+            from_lims = self.lims_cache.get_behavior_session_table()
+
+        from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
+
+        from_s3 = self.cloud_cache.get_behavior_session_table()
+        from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+        pd.testing.assert_frame_equal(from_lims, from_s3)
+
+    @pytest.mark.requires_bamboo
+    def test_ophys_session_table(self):
+        with patch('allensdk.brain_observatory.'
+                   'behavior.behavior_project_cache.'
+                   'project_apis.data_io.behavior_project_lims_api.'
+                   '_get_session_type_from_pkl_file',
+                   wraps=self._get_session_type):
+            from_lims = self.lims_cache.get_ophys_session_table()
+
+        from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
+
+        from_s3 = self.cloud_cache.get_ophys_session_table()
+        pd.testing.assert_frame_equal(from_lims, from_s3)
+
+    @pytest.mark.requires_bamboo
+    def test_ophys_experiments_table(self):
+        with patch('allensdk.brain_observatory.'
+                   'behavior.behavior_project_cache.'
+                   'project_apis.data_io.behavior_project_lims_api.'
+                   '_get_session_type_from_pkl_file',
+                   wraps=self._get_session_type):
+            from_lims = self.lims_cache.get_ophys_experiment_table()
+
+        from_lims = from_lims.drop(
+            columns=list(OPHYS_EXPERIMENTS_SUPPRESS) +
+            list(OPHYS_EXPERIMENTS_SUPPRESS_FINAL), errors='ignore')
+
+        from_s3 = self.cloud_cache.get_ophys_experiment_table()
+        from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+        pd.testing.assert_frame_equal(from_lims, from_s3)

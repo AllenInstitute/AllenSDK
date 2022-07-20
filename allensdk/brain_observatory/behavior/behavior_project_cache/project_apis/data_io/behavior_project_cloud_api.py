@@ -128,7 +128,9 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
     def _get_ophys_session_table(self):
         session_table_path = self._get_metadata_path(
             fname="ophys_session_table")
-        df = literal_col_eval(pd.read_csv(session_table_path))
+        df = literal_col_eval(pd.read_csv(session_table_path,
+                                          dtype={'mouse_id': str}))
+        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -147,7 +149,10 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
     def _get_behavior_session_table(self):
         session_table_path = self._get_metadata_path(
             fname='behavior_session_table')
-        df = literal_col_eval(pd.read_csv(session_table_path))
+        df = literal_col_eval(pd.read_csv(session_table_path,
+                                          dtype={'mouse_id': str}))
+        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
+
         self._behavior_session_table = df.set_index("behavior_session_id")
 
     def get_behavior_session_table(self) -> pd.DataFrame:
@@ -170,7 +175,10 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
     def _get_ophys_experiment_table(self):
         experiment_table_path = self._get_metadata_path(
             fname="ophys_experiment_table")
-        df = literal_col_eval(pd.read_csv(experiment_table_path))
+        df = literal_col_eval(pd.read_csv(experiment_table_path,
+                                          dtype={'mouse_id': str}))
+        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
+
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
