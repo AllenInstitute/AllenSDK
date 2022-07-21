@@ -21,7 +21,7 @@ from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
     process_eye_tracking_data, determine_outliers, determine_likely_blinks, \
-    EyeTrackingError
+    filter_on_blinks, EyeTrackingError
 from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
     import \
     EllipseSeries, EllipseEyeTracking
@@ -188,9 +188,7 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
             dilation_frames=dilation_frames)
 
         eye_tracking_data["likely_blink"] = likely_blinks
-        eye_tracking_data.loc[likely_blinks, "eye_area"] = np.nan
-        eye_tracking_data.loc[likely_blinks, "pupil_area"] = np.nan
-        eye_tracking_data.loc[likely_blinks, "cr_area"] = np.nan
+        filter_on_blinks(eye_tracking_data)
 
         return EyeTrackingTable(eye_tracking=eye_tracking_data)
 

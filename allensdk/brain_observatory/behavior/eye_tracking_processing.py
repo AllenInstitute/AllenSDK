@@ -231,10 +231,6 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     cr_areas_raw = cr_areas.copy()
     eye_areas_raw = eye_areas.copy()
 
-    pupil_areas[likely_blinks] = np.nan
-    cr_areas[likely_blinks] = np.nan
-    eye_areas[likely_blinks] = np.nan
-
     eye_data.insert(0, "timestamps", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)
     eye_data.insert(2, "eye_area", eye_areas)
@@ -244,4 +240,31 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     eye_data.insert(6, "cr_area_raw", cr_areas_raw)
     eye_data.insert(7, "eye_area_raw", eye_areas_raw)
 
+    # Apply blink fliter to additional columns.
+    filter_on_blinks(eye_data)
+
     return eye_data
+
+
+def filter_on_blinks(eye_tracking_data: pd.DataFrame):
+    """Set data is specified columns where likely_blink is true to NaN.
+
+    Modify the DataFrame in place.
+
+    Parameters
+    ----------
+    eye_tracking_data : pandas.DataFrame
+        Data frame containing eye tracking data.
+    """
+    likely_blinks = eye_tracking_data["likely_blink"]
+    eye_tracking_data.loc[likely_blinks, "eye_area"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "pupil_area"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "cr_area"] = np.nan
+
+    eye_tracking_data.loc[likely_blinks, "eye_width"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "eye_height"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "eye_phi"] = np.nan
+
+    eye_tracking_data.loc[likely_blinks, "pupil_width"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "pupil_height"] = np.nan
+    eye_tracking_data.loc[likely_blinks, "pupil_phi"] = np.nan
