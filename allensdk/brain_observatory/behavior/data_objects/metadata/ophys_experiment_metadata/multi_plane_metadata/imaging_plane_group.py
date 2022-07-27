@@ -2,9 +2,8 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -12,7 +11,7 @@ from allensdk.internal.api import PostgresQueryMixin
 class ImagingPlaneGroup(DataObject, LimsReadableInterface,
                         JsonReadableInterface, NwbReadableInterface):
     def __init__(self, plane_group: int, plane_group_count: int):
-        super().__init__(name='plane_group', value=self)
+        super().__init__(name='plane_group', value=None, is_value_self=True)
         self._plane_group = plane_group
         self._plane_group_count = plane_group_count
 

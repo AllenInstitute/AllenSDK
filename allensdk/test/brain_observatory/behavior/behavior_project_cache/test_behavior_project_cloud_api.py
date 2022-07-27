@@ -4,9 +4,14 @@ from pathlib import Path
 from unittest.mock import MagicMock, create_autospec
 
 from allensdk.api.cloud_cache.manifest import Manifest
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import behavior_project_cloud_api as cloudapi  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-        data_io.behavior_project_cloud_api import MANIFEST_COMPATIBILITY
+    data_io import behavior_project_cloud_api as cloudapi
+
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
+    data_io import project_cloud_api_base as cloudapibase
+
+from allensdk.brain_observatory.behavior.behavior_project_cache. \
+    utils import version_check, BehaviorCloudCacheVersionException
 
 
 class MockCache():
@@ -145,7 +150,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
 
     # get_behavior_session returns expected value
     # both directly and via experiment table
-    def mock_nwb(nwb_path):
+    def mock_nwb(nwb_path, skip_eye_tracking=False):
         return nwb_path
     monkeypatch.setattr(cloudapi.BehaviorSession, "from_nwb_path", mock_nwb)
     assert api.get_behavior_session(2) == "5"
@@ -166,13 +171,12 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
 def test_version_check(manifest_version, data_pipeline_version,
                        cmin, cmax, exception):
     if exception:
-        with pytest.raises(cloudapi.BehaviorCloudCacheVersionException,
+        with pytest.raises(BehaviorCloudCacheVersionException,
                            match=f".*{data_pipeline_version}"):
-            cloudapi.version_check(manifest_version, data_pipeline_version,
-                                   cmin, cmax)
+            version_check(manifest_version, data_pipeline_version,
+                          cmin, cmax)
     else:
-        cloudapi.version_check(manifest_version, data_pipeline_version,
-                               cmin, cmax)
+        version_check(manifest_version, data_pipeline_version, cmin, cmax)
 
 
 def test_from_local_cache(monkeypatch):
@@ -190,17 +194,18 @@ def test_from_local_cache(monkeypatch):
             "comment": "This is a test entry. NOT REAL."
         }
     ]
-    mock_manifest.version = MANIFEST_COMPATIBILITY[0]
+    mock_manifest.version = cloudapi. \
+        BehaviorProjectCloudApi.MANIFEST_COMPATIBILITY[0]
 
-    mock_local_cache = create_autospec(cloudapi.LocalCache)
+    mock_local_cache = create_autospec(cloudapibase.LocalCache)
     type(mock_local_cache.return_value)._manifest = mock_manifest
 
-    mock_static_local_cache = create_autospec(cloudapi.StaticLocalCache)
+    mock_static_local_cache = create_autospec(cloudapibase.StaticLocalCache)
     type(mock_static_local_cache.return_value)._manifest = mock_manifest
 
     with monkeypatch.context() as m:
-        m.setattr(cloudapi, "LocalCache", mock_local_cache)
-        m.setattr(cloudapi, "StaticLocalCache", mock_static_local_cache)
+        m.setattr(cloudapibase, "LocalCache", mock_local_cache)
+        m.setattr(cloudapibase, "StaticLocalCache", mock_static_local_cache)
 
         # Test from_local_cache with use_static_cache=False
         try:

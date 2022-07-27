@@ -3,6 +3,9 @@ from typing import List
 import pandas as pd
 import numpy as np
 
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
+    import \
+    TrialTable
 from allensdk.brain_observatory.behavior.dprime import (
     get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
     get_trial_count_corrected_hit_rate,
@@ -132,20 +135,19 @@ def calculate_reward_rate(response_latency=None,
 
 
 def calculate_response_latency_list(
-        trials: pd.DataFrame, response_window_start: float) -> List:
-    """per trial, detemines a response latency
+        trials: TrialTable, response_window_start: float) -> List:
+    """per trial, determines a response latency
 
     Parameters
     ----------
-    trials: pd.DataFrame
-        contains columns "lick_times" and "change_times"
+    trials: TrialTable
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image
 
     Returns
     -------
-    response_latency_list: list
+    response_latency_list: List
         len() = trials.shape[0]
         value is 'inf' if there are no valid licks in the trial
 
@@ -161,27 +163,25 @@ def calculate_response_latency_list(
     (the two instance of monitor delay cancel out in the
     difference).
     """
-    response_latency_list = []
-    for _, t in trials.iterrows():
-        valid_response_licks = \
-                [x for x in t.lick_times
-                 if x - t.change_time > response_window_start]
-        response_latency = (
-                float('inf')
-                if len(valid_response_licks) == 0
-                else valid_response_licks[0] - t.change_time)
-        response_latency_list.append(response_latency)
-    return response_latency_list
+    df = pd.DataFrame({'lick_times': trials.lick_times,
+                       'change_time': trials.change_time})
+    df['valid_response_licks'] = df.apply(
+        lambda trial: [lt for lt in trial['lick_times']
+                       if lt - trial['change_time'] > response_window_start],
+        axis=1)
+    response_latency = df.apply(
+        lambda trial: trial['valid_response_licks'][0] - trial['change_time']
+        if len(trial['valid_response_licks']) > 0 else float('inf'), axis=1)
+    return response_latency.tolist()
 
 
 def calculate_reward_rate_fix_nans(
-        trials: pd.DataFrame, response_window_start: float) -> np.ndarray:
-    """per trial, detemines the reward rate, replacing infs with nans
+        trials: TrialTable, response_window_start: float) -> np.ndarray:
+    """per trial, determines the reward rate, replacing infs with nans
 
     Parameters
     ----------
-    trials: pd.DataFrame
-        contains columns "lick_times", "change_times", and "start_time"
+    trials: TrialTable
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image
@@ -203,7 +203,7 @@ def calculate_reward_rate_fix_nans(
     return reward_rate
 
 
-def construct_rolling_performance_df(trials: pd.DataFrame,
+def construct_rolling_performance_df(trials: TrialTable,
                                      response_window_start,
                                      session_type) -> pd.DataFrame:
     """Return a DataFrame containing trial by trial behavior response
@@ -211,8 +211,7 @@ def construct_rolling_performance_df(trials: pd.DataFrame,
 
     Parameters
     ----------
-    trials: pd.DataFrame
-        contains columns "lick_times", "change_times", and "start_time"
+    trials: TrialTable
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image
@@ -258,7 +257,7 @@ def construct_rolling_performance_df(trials: pd.DataFrame,
     # Indices to build trial metrics dataframe:
     trials_index = trials.index
     not_aborted_index = \
-        trials[np.logical_not(trials.aborted)].index
+        trials.value[np.logical_not(trials.aborted)].index
 
     # Initialize dataframe:
     performance_metrics_df = pd.DataFrame(index=trials_index)

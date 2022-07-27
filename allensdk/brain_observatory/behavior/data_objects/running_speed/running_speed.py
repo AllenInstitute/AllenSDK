@@ -1,32 +1,35 @@
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import NwbReadableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.core.exceptions import DataFrameIndexError
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.behavior.data_objects import (
-    DataObject, StimulusTimestamps
-)
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_files import (
-    StimulusFile
+    BehaviorStimulusFile,
+    ReplayStimulusFile,
+    MappingStimulusFile
 )
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
 
 
-class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
-                   NwbWritableInterface, JsonReadableInterface,
-                   JsonWritableInterface):
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.multi_stim_running_processing import (
+        _get_multi_stim_running_df)
+
+
+class RunningSpeed(DataObject,
+                   NwbReadableInterface,
+                   NwbWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent running speed data.
 
@@ -40,18 +43,29 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
     def __init__(
         self,
         running_speed: pd.DataFrame,
-        stimulus_file: Optional[StimulusFile] = None,
+        stimulus_file: Optional[BehaviorStimulusFile] = None,
+        sync_file: Optional[SyncFile] = None,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         filtered: bool = True
     ):
         super().__init__(name='running_speed', value=running_speed)
+
+        if stimulus_timestamps is not None:
+            if not np.isclose(stimulus_timestamps.monitor_delay, 0.0):
+                raise RuntimeError(
+                    "Running speed timestamps have monitor delay "
+                    f"{stimulus_timestamps.monitor_delay}; there "
+                    "should be no monitor delay applied to the timestamps "
+                    "associated with running speed")
+
         self._stimulus_file = stimulus_file
+        self._sync_file = sync_file
         self._stimulus_timestamps = stimulus_timestamps
         self._filtered = filtered
 
     @staticmethod
     def _get_running_speed_df(
-        stimulus_file: StimulusFile,
+        stimulus_file: BehaviorStimulusFile,
         stimulus_timestamps: StimulusTimestamps,
         filtered: bool = True,
         zscore_threshold: float = 1.0
@@ -72,66 +86,71 @@ class RunningSpeed(DataObject, LimsReadableInterface, NwbReadableInterface,
         return running_speed
 
     @classmethod
-    def from_json(
-        cls,
-        dict_repr: dict,
-        filtered: bool = True,
-        zscore_threshold: float = 10.0
-    ) -> "RunningSpeed":
-        stimulus_file = StimulusFile.from_json(dict_repr)
-        stimulus_timestamps = StimulusTimestamps.from_json(dict_repr)
+    def from_stimulus_file(
+            cls,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            sync_file: Optional[SyncFile] = None,
+            filtered: bool = True,
+            zscore_threshold: float = 10.0) -> "RunningSpeed":
+        """
+        sync_file is used for generating timestamps. If None, timestamps
+        will be generated from the stimulus file.
+        """
+
+        if sync_file is not None:
+            stimulus_timestamps = StimulusTimestamps.from_sync_file(
+                                        sync_file=sync_file,
+                                        monitor_delay=0.0)
+
+        else:
+            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+                                        stimulus_file=behavior_stimulus_file,
+                                        monitor_delay=0.0)
 
         running_speed = cls._get_running_speed_df(
-            stimulus_file, stimulus_timestamps, filtered, zscore_threshold
+            behavior_stimulus_file,
+            stimulus_timestamps,
+            filtered,
+            zscore_threshold
         )
         return cls(
             running_speed=running_speed,
-            stimulus_file=stimulus_file,
+            stimulus_file=behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             filtered=filtered)
 
-    def to_json(self) -> dict:
-        if self._stimulus_file is None or self._stimulus_timestamps is None:
-            raise RuntimeError(
-                "RunningSpeed DataObject lacks information about the "
-                "StimulusFile or StimulusTimestamps. This is likely due to "
-                "instantiating from NWB which prevents to_json() functionality"
-            )
-        output_dict = dict()
-        output_dict.update(self._stimulus_file.to_json())
-        output_dict.update(self._stimulus_timestamps.to_json())
-        return output_dict
-
     @classmethod
-    def from_lims(
-        cls,
-        db: PostgresQueryMixin,
-        behavior_session_id: int,
-        filtered: bool = True,
-        zscore_threshold: float = 10.0,
-        stimulus_timestamps: Optional[StimulusTimestamps] = None,
-        monitor_delay: Optional[float] = None,
-    ) -> "RunningSpeed":
-        stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
-        if stimulus_timestamps is None:
-            if monitor_delay is None:
-                raise RuntimeError("Must specify monitor delay "
-                                   "if you are not specifying "
-                                   "stimulus_timestamps")
-            stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-                stimulus_file=stimulus_file,
-                monitor_delay=monitor_delay
-            )
+    def from_multiple_stimulus_files(
+            cls,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            mapping_stimulus_file: MappingStimulusFile,
+            replay_stimulus_file: ReplayStimulusFile,
+            sync_file: SyncFile,
+            filtered: bool = True,
+            zscore_threshold: float = 10.0) -> "RunningSpeed":
+        """
+        sync_file is used for generating timestamps.
 
-        running_speed = cls._get_running_speed_df(
-            stimulus_file, stimulus_timestamps, filtered, zscore_threshold
-        )
+        Stimulus blocks are assumed to be presented in the order
+        behavior_stimulus_file
+        mapping_stimulus_file
+        replay_stimulus_file
+        """
+
+        df = _get_multi_stim_running_df(
+                sync_path=sync_file.filepath,
+                behavior_stimulus_file=behavior_stimulus_file,
+                mapping_stimulus_file=mapping_stimulus_file,
+                replay_stimulus_file=replay_stimulus_file,
+                use_lowpass_filter=filtered,
+                zscore_threshold=zscore_threshold)['running_speed']
+
         return cls(
-            running_speed=running_speed,
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps,
-            filtered=filtered
-        )
+               running_speed=df,
+               filtered=filtered,
+               sync_file=None,
+               stimulus_file=None,
+               stimulus_timestamps=None)
 
     @classmethod
     def from_nwb(

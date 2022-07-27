@@ -4,15 +4,14 @@ import re
 import numpy as np
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.core import DataObject
+
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     JsonWritableInterface, NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
@@ -188,7 +187,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
                  behavior_session_uuid: BehaviorSessionUUID):
-        super().__init__(name='behavior_metadata', value=self)
+        super().__init__(name='behavior_metadata', value=None,
+                         is_value_self=True)
         self._subject_metadata = subject_metadata
         self._behavior_session_id = behavior_session_id
         self._equipment = equipment
@@ -203,13 +203,13 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             cls,
             behavior_session_id: BehaviorSessionId,
             lims_db: PostgresQueryMixin
-        ) -> "BehaviorMetadata":
+    ) -> "BehaviorMetadata":
         subject_metadata = SubjectMetadata.from_lims(
             behavior_session_id=behavior_session_id, lims_db=lims_db)
         equipment = Equipment.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             db=lims_db, behavior_session_id=behavior_session_id.value)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_file=stimulus_file)
@@ -221,10 +221,10 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         behavior_session_uuid = BehaviorSessionUUID.from_stimulus_file(
             stimulus_file=stimulus_file)\
             .validate(behavior_session_id=behavior_session_id.value,
-                                       foraging_id=foraging_id.value,
-                                       stimulus_file=stimulus_file)
+                      foraging_id=foraging_id.value,
+                      stimulus_file=stimulus_file)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
@@ -239,7 +239,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
         equipment = Equipment.from_json(dict_repr=dict_repr)
 
-        stimulus_file = StimulusFile.from_json(dict_repr=dict_repr)
+        stimulus_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
         stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
             stimulus_file=stimulus_file)
         session_type = SessionType.from_stimulus_file(
@@ -247,7 +247,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         session_uuid = BehaviorSessionUUID.from_stimulus_file(
             stimulus_file=stimulus_file)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
@@ -266,7 +266,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
 
-        return cls(
+        return BehaviorMetadata(
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             equipment=equipment,
@@ -306,7 +306,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         self._subject_metadata.to_nwb(nwbfile=nwbfile)
         self._equipment.to_nwb(nwbfile=nwbfile)
         extension = load_pynwb_extension(BehaviorMetadataSchema,
-                                                'ndx-aibs-behavior-ophys')
+                                         'ndx-aibs-behavior-ophys')
         nwb_metadata = extension(
             name='metadata',
             behavior_session_id=self.behavior_session_id,

@@ -7,6 +7,7 @@ from pathlib import Path
 import pynwb
 import pytest
 
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
     .rig_geometry import \
     RigGeometry, Coordinates
@@ -30,8 +31,10 @@ class TestFromLims(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_lims(self):
+        behavior_session_id = BehaviorSessionId.from_lims(
+            db=self.dbconn, ophys_experiment_id=self.ophys_experiment_id)
         rg = RigGeometry.from_lims(
-            ophys_experiment_id=self.ophys_experiment_id, lims_db=self.dbconn)
+            behavior_session_id=behavior_session_id.value, lims_db=self.dbconn)
         assert rg == self.expected
 
     @pytest.mark.requires_bamboo

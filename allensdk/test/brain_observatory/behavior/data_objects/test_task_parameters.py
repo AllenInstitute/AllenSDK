@@ -5,14 +5,14 @@ import numpy as np
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
 
-class TestFromStimulusFile(LimsTest):
+class TestFromBehaviorStimulusFile(LimsTest):
     @classmethod
     def setup_class(cls):
         cls.behavior_session_id = 994174745
@@ -26,7 +26,7 @@ class TestFromStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         tp = TaskParameters.from_stimulus_file(stimulus_file=stimulus_file)
         assert tp == self.expected

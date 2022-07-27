@@ -4,12 +4,10 @@ from pynwb import NWBFile
 from pynwb.ophys import Fluorescence
 
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     DataFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .rois_mixin import \
@@ -40,12 +38,13 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
             'corrected_fluorescence'].roi_response_series['traces']
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
-        f_traces = corr_fluorescence_nwb.data[:].T
-        df = pd.DataFrame({'corrected_fluorescence': f_traces.tolist()},
+        f_traces = corr_fluorescence_nwb.data[:].T.copy()
+        roi_ids = corr_fluorescence_nwb.rois.table.id[:].copy()
+        df = pd.DataFrame({'corrected_fluorescence': [x for x in f_traces]},
                           index=pd.Index(
-                              data=corr_fluorescence_nwb.rois.table.id[:],
+                              data=roi_ids,
                               name='cell_roi_id'))
-        return cls(traces=df)
+        return CorrectedFluorescenceTraces(traces=df)
 
     @classmethod
     def from_data_file(cls,

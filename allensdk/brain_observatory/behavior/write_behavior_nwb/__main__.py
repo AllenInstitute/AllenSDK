@@ -7,8 +7,8 @@ from pynwb import NWBHDF5IO
 
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
-from allensdk.brain_observatory.behavior.write_behavior_nwb._schemas import (
-    InputSchema, OutputSchema)
+from allensdk.brain_observatory.behavior.write_behavior_nwb.schemas import (
+    BehaviorInputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs)
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
@@ -27,7 +27,16 @@ def write_behavior_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
-        json_session = BehaviorSession.from_json(session_data)
+        json_session = BehaviorSession.from_json(
+            session_data,
+            stimulus_presentation_columns=[
+                    'start_time', 'stop_time',
+                    'duration',
+                    'image_name', 'image_index',
+                    'is_change', 'omitted',
+                    'start_frame', 'end_frame',
+                    'image_set']
+        )
 
         behavior_session_id = session_data['behavior_session_id']
         lims_session = BehaviorSession.from_lims(behavior_session_id)
@@ -62,7 +71,7 @@ def main():
     try:
         parser = argschema.ArgSchemaParser(
             args=args,
-            schema_type=InputSchema,
+            schema_type=BehaviorInputSchema,
             output_schema_type=OutputSchema,
         )
         logging.info('Input successfully parsed')

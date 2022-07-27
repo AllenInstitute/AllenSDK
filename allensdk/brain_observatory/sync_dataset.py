@@ -103,6 +103,7 @@ class Dataset(object):
                          # previous line label for eye tracking
                          # (prior to ~ Oct. 2018)
                          "eyetracking",
+                         "eye_cam_exposing",
                          "eye_tracking")  # An undocumented, but possible eye tracking line label  # NOQA E114
     BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020  # NOQA E127
                                                     # clocks behavior tracking frame # NOQA E127

@@ -1,6 +1,6 @@
 import abc
-from typing import Any, Union
 from pathlib import Path
+from typing import Union, Any
 
 from allensdk.internal.core.lims_utilities import safe_system_path
 
@@ -9,16 +9,23 @@ class DataFile(abc.ABC):
     """An abstract class that prototypes methods for accessing internal
     data files.
 
-    These data files contain information necessary to sucessfully instantiate
+    These data files contain information necessary to successfully instantiate
     one or many `DataObject`(s).
 
     External users should ignore this class (and subclasses) as as they
     will only ever be using `from_nwb()` and `to_nwb()` `DataObject` methods.
+
+    Attributes
+    ----------
+    filepath : str or pathlib.Path
+        Path to file.
     """
 
-    def __init__(self, filepath: Union[str, Path]):  # pragma: no cover
+    def __init__(self,
+                 filepath: Union[str, Path],
+                 **kwargs):  # pragma: no cover
         self._filepath: str = safe_system_path(str(filepath))
-        self._data = self.load_data(filepath=self._filepath)
+        self._data = self.load_data(filepath=self._filepath, **kwargs)
 
     @property
     def data(self) -> Any:  # pragma: no cover
@@ -30,7 +37,8 @@ class DataFile(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls, dict_repr: dict) -> "DataFile":  # pragma: no cover
+    def from_json(cls,
+                  dict_repr: dict) -> "DataFile":  # pragma: no cover
         """Populates a DataFile from a JSON compatible dict (likely parsed by
         argschema)
 
@@ -75,7 +83,8 @@ class DataFile(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def load_data(filepath: Union[str, Path]) -> Any:  # pragma: no cover
+    def load_data(filepath: Union[str, Path],
+                  **kwargs) -> Any:  # pragma: no cover
         """Given a filepath (that is meant to by read by the DataFile type),
         load the contents of the file into a Python type.
         (dict, DataFrame, list, etc...)

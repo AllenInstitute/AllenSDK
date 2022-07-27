@@ -2,10 +2,9 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -24,7 +23,8 @@ class ImagingPlane(DataObject, LimsReadableInterface,
                  targeted_structure: str,
                  excitation_lambda: float,
                  indicator: Optional[str]):
-        super().__init__(name='imaging_plane', value=self)
+        super().__init__(name='imaging_plane', value=None,
+                         is_value_self=True)
         self._ophys_frame_rate = ophys_frame_rate
         self._targeted_structure = targeted_structure
         self._excitation_lambda = excitation_lambda

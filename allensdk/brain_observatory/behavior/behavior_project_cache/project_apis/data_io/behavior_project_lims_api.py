@@ -1,19 +1,25 @@
+from multiprocessing import Pool
+
 import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
+
+from tqdm import tqdm
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
-from allensdk.core.typing import SupportsStr
 from allensdk.core.authentication import DbCredentials
 from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
+from allensdk.internal.api.queries.utils import (
+    build_in_list_selector_query)
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -113,35 +119,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         app_engine = HttpEngine(**_app_kwargs)
         return cls(lims_engine, mtrain_engine, app_engine,
                    data_release_date=data_release_date)
-
-    @staticmethod
-    def _build_in_list_selector_query(
-            col,
-            valid_list: Optional[SupportsStr] = None,
-            operator: str = "WHERE") -> str:
-        """
-        Filter for rows where the value of a column is contained in a list.
-        If no list is specified in `valid_list`, return an empty string.
-
-        NOTE: if string ids are used, then the strings in `valid_list` must
-        be enclosed in single quotes, or else the query will throw a column
-        does not exist error. E.g. ["'mystringid1'", "'mystringid2'"...]
-
-        :param col: name of column to compare if in a list
-        :type col: str
-        :param valid_list: iterable of values that can be mapped to str
-            (e.g. string, int, float).
-        :type valid_list: list
-        :param operator: SQL operator to start the clause. Default="WHERE".
-            Valid inputs: "AND", "OR", "WHERE" (not case-sensitive).
-        :type operator: str
-        """
-        if not valid_list:
-            return ""
-        session_query = (
-            f"""{operator} {col} IN ({",".join(
-                sorted(set(map(str, valid_list))))})""")
-        return session_query
 
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
@@ -243,51 +220,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def _get_foraging_ids_from_behavior_session(
-            self, behavior_session_ids: List[int]) -> List[str]:
-        behav_ids = self._build_in_list_selector_query("id",
-                                                       behavior_session_ids,
-                                                       operator="AND")
-        forag_ids_query = f"""
-            SELECT foraging_id
-            FROM behavior_sessions
-            WHERE foraging_id IS NOT NULL
-            {behav_ids};
-            """
-        self.logger.debug("get_foraging_ids_from_behavior_session query: \n"
-                          f"{forag_ids_query}")
-        foraging_ids = self.lims_engine.fetchall(forag_ids_query)
-
-        self.logger.debug(f"Retrieved {len(foraging_ids)} foraging ids for"
-                          f" behavior stage query. Ids = {foraging_ids}")
-        return foraging_ids
-
-    def _get_behavior_stage_table(
-            self,
-            behavior_session_ids: Optional[List[int]] = None):
-        # Select fewer rows if possible via behavior_session_id
-        if behavior_session_ids:
-            foraging_ids = self._get_foraging_ids_from_behavior_session(
-                behavior_session_ids)
-            foraging_ids = [f"'{fid}'" for fid in foraging_ids]
-        # Otherwise just get the full table from mtrain
-        else:
-            foraging_ids = None
-
-        foraging_ids_query = self._build_in_list_selector_query(
-            "bs.id", foraging_ids)
-
-        query = f"""
-            SELECT
-                stages.name as session_type,
-                bs.id AS foraging_id
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            {foraging_ids_query};
-        """
-        self.logger.debug(f"_get_behavior_stage_table query: \n {query}")
-        return self.mtrain_engine.select(query)
-
     def get_behavior_stage_parameters(self,
                                       foraging_ids: List[str]) -> pd.Series:
         """Gets the stage parameters for each foraging id from mtrain
@@ -302,7 +234,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         ---------
         Series with index of foraging id and values stage parameters
         """
-        foraging_ids_query = self._build_in_list_selector_query(
+        foraging_ids_query = build_in_list_selector_query(
             "bs.id", foraging_ids)
 
         query = f"""
@@ -345,7 +277,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 oe.id as ophys_experiment_id,
                 os.id as ophys_session_id,
-                os.stimulus_name as session_type,
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
                     ophys_container_id,
@@ -475,15 +406,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return table
 
     def get_behavior_session(
-            self, behavior_session_id: int) -> BehaviorSession:
+            self,
+            behavior_session_id: int,
+            skip_eye_tracking: bool = False) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
+        :param skip_eye_tracking: if True, do not load eye tracking data
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
         return BehaviorSession.from_lims(
-            behavior_session_id=behavior_session_id)
+            behavior_session_id=behavior_session_id,
+            skip_eye_tracking=skip_eye_tracking)
 
     def get_ophys_experiment_table(
             self,
@@ -505,19 +440,37 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = self._get_ophys_experiment_table()
         return df.set_index("ophys_experiment_id")
 
-    def get_behavior_session_table(self) -> pd.DataFrame:
+    def get_behavior_session_table(self, n_workers: int = 1) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
 
+        Parameters
+        ----------
+        n_workers
+            Number of parallel processes to use for reading from pkl files
+
+        :rtype: pd.DataFrame
+
+        Notes
+        -----
         Can't return age at time of session because there is no field for
         acquisition date for behavior sessions (only in the stimulus pkl file)
-        :rtype: pd.DataFrame
         """
         summary_tbl = self._get_behavior_summary_table()
-        stimulus_names = self._get_behavior_stage_table(
-            behavior_session_ids=summary_tbl.index.tolist())
+
+        with Pool(n_workers) as p:
+            stimulus_names = list(tqdm(
+                p.imap(_get_session_type_from_pkl_file_helper,
+                       zip(
+                            summary_tbl['behavior_session_id'].tolist(),
+                            [self.lims_engine] * summary_tbl.shape[0])
+                       ),
+                total=summary_tbl.shape[0],
+                desc='Reading session type from pkl file'))
+        stimulus_names = pd.DataFrame(stimulus_names)
+
         return (summary_tbl.merge(stimulus_names,
-                                  on=["foraging_id"], how="left")
+                                  on=["behavior_session_id"], how="left")
                 .set_index("behavior_session_id"))
 
     def get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
@@ -602,19 +555,19 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             release_behavior_only_session_ids + \
             release_behavior_with_ophys_session_ids
 
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "bs.id", release_behavior_session_ids)
 
     def _get_ophys_session_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "bs.id", release_files['behavior_session_id'].tolist())
 
     def _get_ophys_experiment_release_filter(self):
         release_files = self.get_release_files(
             file_type='BehaviorOphysNwb')
-        return self._build_in_list_selector_query(
+        return build_in_list_selector_query(
             "oe.id", release_files.index.tolist())
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
@@ -635,3 +588,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :returns: iterable yielding a tiff file as bytes
         """
         raise NotImplementedError()
+
+
+def _get_session_type_from_pkl_file(behavior_session_id, db_conn) -> dict:
+    return {
+        'behavior_session_id': behavior_session_id,
+        'session_type': (
+            BehaviorStimulusFile.from_lims(
+                db=db_conn,
+                behavior_session_id=behavior_session_id).session_type)
+    }
+
+
+def _get_session_type_from_pkl_file_helper(args) -> dict:
+    """
+    Helper function to call `_get_session_type_from_pkl_file` passing in
+    *args. Needed because imap does not support passing in *args
+    """
+    return _get_session_type_from_pkl_file(*args)

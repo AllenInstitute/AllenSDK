@@ -5,11 +5,11 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
-    Presentations as StimulusPresentations
+    Presentations as StimulusPresentations, Presentations
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
@@ -19,7 +19,7 @@ from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 
 
-class TestFromStimulusFile(LimsTest):
+class TestFromBehaviorStimulusFile(LimsTest):
     @classmethod
     def setup_class(cls):
         cls.behavior_session_id = 994174745
@@ -37,7 +37,7 @@ class TestFromStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file = StimulusFile.from_lims(
+        stimulus_file = BehaviorStimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -48,6 +48,54 @@ class TestFromStimulusFile(LimsTest):
             limit_to_images=['im065'])
         assert stimuli.presentations == self.expected_presentations
         assert stimuli.templates == self.expected_templates
+
+
+@pytest.fixture(scope='module')
+def presentations_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return a Presentations object
+    """
+    obj = Presentations.from_path(
+        path=behavior_ecephys_session_config_fixture['stim_table_file'])
+    return obj
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('roundtrip, add_is_change',
+                         ([True, False], [True, False]))
+def test_read_write_nwb(
+        roundtrip,
+        add_is_change,
+        data_object_roundtrip_fixture,
+        presentations_fixture,
+        behavior_ecephys_session_config_fixture,
+        helper_functions):
+
+    nwbfile = helper_functions.create_blank_nwb_file()
+
+    # Need to write stimulus timestamps first
+    bsf = BehaviorStimulusFile.from_json(
+        dict_repr=behavior_ecephys_session_config_fixture)
+    ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf,
+                                               monitor_delay=0.0)
+    ts.to_nwb(nwbfile=nwbfile)
+
+    presentations_fixture.to_nwb(
+        nwbfile=nwbfile)
+
+    if roundtrip:
+        obt = data_object_roundtrip_fixture(
+            nwbfile=nwbfile,
+            data_object_cls=Presentations,
+            add_is_change=add_is_change
+        )
+    else:
+        obt = Presentations.from_nwb(
+            nwbfile=nwbfile,
+            add_is_change=add_is_change)
+
+    assert obt == presentations_fixture
 
 
 class TestNWB:
@@ -73,7 +121,7 @@ class TestNWB:
         )
 
         # Need to write stimulus timestamps first
-        bsf = StimulusFile(
+        bsf = BehaviorStimulusFile(
             filepath=self.test_data_dir / 'behavior_stimulus_file.pkl')
         ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf,
                                                    monitor_delay=0.0)
@@ -125,3 +173,44 @@ def test_set_omitted_stop_time(stimulus_table, expected_table_data):
         StimulusPresentations._fill_missing_values_for_omitted_flashes(
             df=stimulus_table)
     assert stimulus_table.equals(expected_table)
+
+
+@pytest.fixture(scope='module')
+def stimulus_templates_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return a Templates object
+    """
+
+    sf = BehaviorStimulusFile.from_json(
+        dict_repr=behavior_ecephys_session_config_fixture)
+    obj = Templates.from_stimulus_file(stimulus_file=sf)
+    return obj
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_read_write_nwb_no_image_index(
+        roundtrip,
+        data_object_roundtrip_fixture,
+        stimulus_templates_fixture,
+        presentations_fixture,
+        helper_functions):
+    """This presentations table has no image_index.
+    Make sure the roundtrip doesn't break"""
+
+    nwbfile = helper_functions.create_blank_nwb_file()
+
+    stimulus_templates_fixture.to_nwb(
+        nwbfile=nwbfile,
+        stimulus_presentations=presentations_fixture)
+
+    if roundtrip:
+        obt = data_object_roundtrip_fixture(
+            nwbfile=nwbfile,
+            data_object_cls=Templates
+        )
+    else:
+        obt = Templates.from_nwb(nwbfile=nwbfile)
+
+    assert obt == stimulus_templates_fixture

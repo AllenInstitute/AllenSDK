@@ -152,7 +152,7 @@ def determine_likely_blinks(eye_areas: pd.Series,
                                                 iterations=dilation_frames)
     else:
         likely_blinks = blinks
-    return pd.Series(likely_blinks)
+    return pd.Series(likely_blinks, index=eye_areas.index)
 
 
 def process_eye_tracking_data(eye_data: pd.DataFrame,
@@ -200,7 +200,7 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     # This solution was discussed in
     # https://github.com/AllenInstitute/AllenSDK/issues/1545
 
-    if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
+    if n_eye_frames < n_sync <= n_eye_frames + 15:
         frame_times = frame_times[:n_eye_frames]
         n_sync = len(frame_times)
 

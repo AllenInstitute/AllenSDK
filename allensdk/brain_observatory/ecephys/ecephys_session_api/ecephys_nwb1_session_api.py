@@ -199,7 +199,7 @@ class EcephysNwb1Api(EcephysSessionApi):
         return probes_df
 
     def get_channels(self) -> pd.DataFrame:
-        # TODO: Missing: manual_structure_id
+        # TODO: Missing: structure_id
         processing_grp = self.processing_grp
 
         max_channels = sum(

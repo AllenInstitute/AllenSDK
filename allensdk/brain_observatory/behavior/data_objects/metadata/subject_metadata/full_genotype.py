@@ -3,9 +3,8 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -13,8 +12,11 @@ from allensdk.internal.api import PostgresQueryMixin
 class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
                    NwbReadableInterface):
     """the name of the subject's genotype"""
-    def __init__(self, full_genotype: str):
-        super().__init__(name="full_genotype", value=full_genotype)
+    def __init__(self, full_genotype: Optional[str]):
+
+        # casting full_genotype into a str because there are instances
+        # in LIMS of full_genotype == NULL
+        super().__init__(name="full_genotype", value=str(full_genotype))
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "FullGenotype":

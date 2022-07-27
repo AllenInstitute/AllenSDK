@@ -1,10 +1,11 @@
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    NwbReadableInterface, StimulusFileReadableInterface
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.core import DataObject
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
 
 
 class SessionType(DataObject, StimulusFileReadableInterface,
@@ -16,7 +17,7 @@ class SessionType(DataObject, StimulusFileReadableInterface,
     @classmethod
     def from_stimulus_file(
             cls,
-            stimulus_file: StimulusFile) -> "SessionType":
+            stimulus_file: BehaviorStimulusFile) -> "SessionType":
         try:
             stimulus_name = \
                 stimulus_file.data["items"]["behavior"]["cl_params"]["stage"]

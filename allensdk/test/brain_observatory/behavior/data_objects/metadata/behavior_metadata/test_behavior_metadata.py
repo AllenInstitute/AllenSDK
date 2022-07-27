@@ -8,7 +8,7 @@ import pytest
 import pytz
 from uuid import UUID
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.behavior_metadata import \
@@ -107,6 +107,16 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
     def test_cre_line_bad_full_genotype(self):
         """Test that cre_line is None and no error raised"""
         fg = FullGenotype(full_genotype='foo')
+
+        with pytest.warns(UserWarning) as record:
+            cre_line = fg.parse_cre_line(warn=True)
+        assert cre_line is None
+        assert str(record[0].message) == 'Unable to parse cre_line from ' \
+                                         'full_genotype'
+
+    def test_cre_line_full_genotype_is_none(self):
+        """Test that cre_line is None and no error raised"""
+        fg = FullGenotype(full_genotype=None)
 
         with pytest.warns(UserWarning) as record:
             cre_line = fg.parse_cre_line(warn=True)
@@ -215,7 +225,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         extractor_expt_date = tz.localize(
             test_params['extractor_expt_date']).astimezone(pytz.utc)
 
-        stimulus_file = StimulusFile(filepath=pkl_save_path)
+        stimulus_file = BehaviorStimulusFile(filepath=pkl_save_path)
         obt_date = DateOfAcquisition(
             date_of_acquisition=extractor_expt_date)
 
@@ -252,13 +262,13 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         assert str(record[0].message) == warning_msg
 
 
-class TestStimulusFile:
+class TestBehaviorStimulusFile:
     """Tests properties read from stimulus file"""
     def setup_class(cls):
         dir = Path(__file__).parent.parent.parent.resolve()
         test_data_dir = dir / 'test_data'
         sf_path = test_data_dir / 'stimulus_file.pkl'
-        cls.stimulus_file = StimulusFile.from_json(
+        cls.stimulus_file = BehaviorStimulusFile.from_json(
             dict_repr={'behavior_stimulus_file': str(sf_path)})
 
     def test_session_uuid(self):

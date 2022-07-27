@@ -1,17 +1,18 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject, \
-    StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    StimulusFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile, SyncFile)
+from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
@@ -20,6 +21,14 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
 
 class TrialTable(DataObject, StimulusFileReadableInterface,
                  NwbReadableInterface, NwbWritableInterface):
+
+    @classmethod
+    def trial_class(cls):
+        """
+        Return the class to be used to represent a single Trial
+        """
+        return Trial
+
     def __init__(self, trials: pd.DataFrame):
         super().__init__(name='trials', value=trials)
 
@@ -58,13 +67,27 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         if 'lick_events' in trials.columns:
             trials.drop('lick_events', inplace=True, axis=1)
         trials.index = trials.index.rename('trials_id')
-        return TrialTable(trials=trials)
+        return cls(trials=trials)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: StimulusFile,
+    def columns_to_output(cls) -> List[str]:
+        """
+        Return the list of columns to be output in this table
+        """
+        return ['initial_image_name', 'change_image_name',
+                'stimulus_change', 'change_time',
+                'go', 'catch', 'lick_times', 'response_time',
+                'response_latency', 'reward_time', 'reward_volume',
+                'hit', 'false_alarm', 'miss', 'correct_reject',
+                'aborted', 'auto_rewarded', 'change_frame',
+                'start_time', 'stop_time', 'trial_length']
+
+    @classmethod
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile,
                            stimulus_timestamps: StimulusTimestamps,
                            licks: Licks,
-                           rewards: Rewards
+                           rewards: Rewards,
+                           sync_file: Optional[SyncFile] = None
                            ) -> "TrialTable":
         bsf = stimulus_file.data
 
@@ -77,12 +100,16 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         for idx, trial in enumerate(trial_log):
             trial_start, trial_end = trial_bounds[idx]
-            t = Trial(trial=trial, start=trial_start, end=trial_end,
+            t = cls.trial_class()(
+                      trial=trial,
+                      start=trial_start,
+                      end=trial_end,
                       behavior_stimulus_file=stimulus_file,
                       index=idx,
                       stimulus_timestamps=stimulus_timestamps,
                       licks=licks, rewards=rewards,
-                      stimuli=stimuli
+                      stimuli=stimuli,
+                      sync_file=sync_file
                       )
             all_trial_data[idx] = t.data
 
@@ -90,15 +117,9 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         trials.index = trials.index.rename('trials_id')
 
         # Order/Filter columns
-        trials = trials[['initial_image_name', 'change_image_name',
-                         'stimulus_change', 'change_time',
-                         'go', 'catch', 'lick_times', 'response_time',
-                         'response_latency', 'reward_time', 'reward_volume',
-                         'hit', 'false_alarm', 'miss', 'correct_reject',
-                         'aborted', 'auto_rewarded', 'change_frame',
-                         'start_time', 'stop_time', 'trial_length']]
+        trials = trials[cls.columns_to_output()]
 
-        return TrialTable(trials=trials)
+        return cls(trials=trials)
 
     @staticmethod
     def _get_trial_bounds(trial_log: List) -> List[Tuple[int, int]]:
@@ -146,3 +167,39 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
         end_frames = [idx for idx in start_frames[1:] + [-1]]
         return list([(s, e) for s, e in zip(start_frames, end_frames)])
+
+    @property
+    def index(self) -> pd.Index:
+        return self.value.index
+
+    @property
+    def change_time(self) -> pd.Series:
+        return self.value['change_time']
+
+    @property
+    def lick_times(self) -> pd.Series:
+        return self.value['lick_times']
+
+    @property
+    def start_time(self) -> pd.Series:
+        return self.value['start_time']
+
+    @property
+    def aborted(self) -> pd.Series:
+        return self.value['aborted']
+
+    @property
+    def hit(self) -> pd.Series:
+        return self.value['hit']
+
+    @property
+    def miss(self) -> pd.Series:
+        return self.value['miss']
+
+    @property
+    def false_alarm(self) -> pd.Series:
+        return self.value['false_alarm']
+
+    @property
+    def correct_reject(self) -> pd.Series:
+        return self.value['correct_reject']

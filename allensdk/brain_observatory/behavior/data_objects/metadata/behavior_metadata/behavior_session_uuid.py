@@ -3,11 +3,12 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
-    NwbReadableInterface, StimulusFileReadableInterface
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.core import DataObject
+from allensdk.core import \
+    NwbReadableInterface
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    StimulusFileReadableInterface
 
 
 class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
@@ -19,7 +20,8 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: StimulusFile) -> "BehaviorSessionUUID":
+            cls,
+            stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         id = stimulus_file.data.get('session_uuid')
         if id:
             id = uuid.UUID(id)
@@ -28,12 +30,15 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSessionUUID":
         metadata = nwbfile.lab_meta_data['metadata']
-        id = uuid.UUID(metadata.behavior_session_uuid)
-        return cls(behavior_session_uuid=id)
+        behavior_session_uuid = metadata.behavior_session_uuid
+        behavior_session_uuid = \
+            uuid.UUID(behavior_session_uuid) \
+            if behavior_session_uuid != 'None' else None
+        return cls(behavior_session_uuid=behavior_session_uuid)
 
     def validate(self, behavior_session_id: int,
                  foraging_id: int,
-                 stimulus_file: StimulusFile) -> "BehaviorSessionUUID":
+                 stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         """
         Sanity check to ensure that pkl file data matches up with
         the behavior session that the pkl file has been associated with.

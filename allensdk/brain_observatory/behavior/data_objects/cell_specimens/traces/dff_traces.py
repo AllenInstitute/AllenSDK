@@ -4,12 +4,10 @@ from pynwb import NWBFile
 from pynwb.ophys import DfOverF
 
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     DataFileReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .rois_mixin import \
@@ -71,7 +69,7 @@ class DFFTraces(DataObject, RoisMixin,
         # We want rois x timepoints, hence the transpose
         dff_traces = dff_nwb.data[:].T
 
-        df = pd.DataFrame({'dff': dff_traces.tolist()},
+        df = pd.DataFrame({'dff': [x for x in dff_traces]},
                           index=pd.Index(data=dff_nwb.rois.table.id[:],
                                          name='cell_roi_id'))
         return DFFTraces(traces=df)

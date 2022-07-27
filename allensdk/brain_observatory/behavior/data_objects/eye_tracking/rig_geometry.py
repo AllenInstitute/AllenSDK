@@ -7,12 +7,10 @@ from typing import Optional
 import pynwb
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import DataObject
-from allensdk.brain_observatory.behavior.data_objects.base \
-    .readable_interfaces import \
+from allensdk.core import DataObject
+from allensdk.core import \
     LimsReadableInterface, JsonReadableInterface, NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.base\
-    .writable_interfaces import \
+from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.schemas import \
     OphysEyeTrackingRigMetadataSchema
@@ -69,7 +67,7 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
                  camera_position_mm: Coordinates,
                  camera_rotation_deg: Coordinates,
                  led_position: Coordinates):
-        super().__init__(name='rig_geometry', value=self)
+        super().__init__(name='rig_geometry', value=None, is_value_self=True)
         self._monitor_position_mm = monitor_position_mm
         self._monitor_rotation_deg = monitor_rotation_deg
         self._camera_position_mm = camera_position_mm
@@ -134,7 +132,7 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
             et_mod = \
                 nwbfile.get_processing_module("eye_tracking_rig_metadata")
         except KeyError as e:
-            warnings.warn("This ophys session "
+            warnings.warn("This nwb file with identifier "
                           f"'{int(nwbfile.identifier)}' has no eye "
                           f"tracking rig metadata. (NWB error: {e})")
             return None
@@ -188,22 +186,49 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
         )
 
     @classmethod
-    def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> Optional["RigGeometry"]:
-        query = f'''
-            SELECT oec.*, oect.name as config_type, equipment.name as 
-            equipment_name
-            FROM ophys_sessions os
-            JOIN observatory_experiment_configs oec ON oec.equipment_id = 
-            os.equipment_id
-            JOIN observatory_experiment_config_types oect ON oect.id = 
-            oec.observatory_experiment_config_type_id
-            JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
-            JOIN equipment ON equipment.id = oec.equipment_id
-            WHERE oe.id = {ophys_experiment_id} AND 
-                oec.active_date <= os.date_of_acquisition AND
-                oect.name IN ('eye camera position', 'led position', 'screen position')
-        '''  # noqa E501
+    def from_lims(
+            cls,
+            lims_db: PostgresQueryMixin,
+            behavior_session_id: Optional[int] = None,
+            ophys_experiment_id: Optional[int] = None
+    ) -> Optional["RigGeometry"]:
+        if behavior_session_id is None and ophys_experiment_id is None:
+            raise ValueError('Must provide either behavior_session_id or '
+                             'ophys_experiment_id')
+        if behavior_session_id is not None and ophys_experiment_id is not None:
+            raise ValueError('Supply either ophys_experiment_id or '
+                             'behavior_session_id')
+        if ophys_experiment_id is not None:
+            query = f'''
+                SELECT oec.*, oect.name as config_type, equipment.name as 
+                equipment_name
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                JOIN observatory_experiment_configs oec ON oec.equipment_id = 
+                os.equipment_id
+                JOIN observatory_experiment_config_types oect ON oect.id = 
+                oec.observatory_experiment_config_type_id
+                JOIN equipment ON equipment.id = oec.equipment_id
+                WHERE oe.id = {ophys_experiment_id} AND 
+                    oec.active_date <= os.date_of_acquisition AND
+                    oect.name IN ('eye camera position', 'led position', 'screen position')
+            '''  # noqa E501
+        else:
+            query = f'''
+                SELECT oec.*, oect.name as config_type, equipment.name as 
+                equipment_name
+                FROM behavior_sessions bs
+                JOIN ophys_sessions os ON os.id = bs.ophys_session_id
+                JOIN observatory_experiment_configs oec ON oec.equipment_id = 
+                os.equipment_id
+                JOIN observatory_experiment_config_types oect ON oect.id = 
+                oec.observatory_experiment_config_type_id
+                JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
+                JOIN equipment ON equipment.id = oec.equipment_id
+                WHERE bs.id = {behavior_session_id} AND 
+                    oec.active_date <= os.date_of_acquisition AND
+                    oect.name IN ('eye camera position', 'led position', 'screen position')
+            '''  # noqa E501
         # Get the raw data
         rig_geometry = pd.read_sql(query, lims_db.get_connection())
 
