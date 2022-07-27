@@ -65,7 +65,7 @@ image change detection task.
    * - Active
      - Extracellular electrophysiology
      - :doc:`Visual Behavior - Neuropixels <visual_behavior_neuropixels>`
-     - Coming soon...
+     - July 2022
  
 Experiment and stimulus data are provided in `Neurodata Without Borders <https://www.nwb.org/>`_ (NWB) files. 
 The AllenSDK provides code to:
