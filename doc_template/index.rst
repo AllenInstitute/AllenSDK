@@ -52,20 +52,20 @@ image change detection task.
      - Initial Release
    * - Passive
      - Optical physiology
-     - `Visual Coding - Optical Physiology <https://allensdk.readthedocs.io/en/latest/brain_observatory.html>`_
+     - :doc:`Visual Coding - Optical Physiology <brain_observatory>`
      - June 2016
    * - Passive
      - Extracellular electrophysiology
-     - `Visual Coding - Neuropixels <https://allensdk.readthedocs.io/en/latest/visual_coding_neuropixels.html>`_
+     - :doc:`Visual Coding - Neuropixels <visual_coding_neuropixels>`
      - October 2019
    * - Active
      - Optical physiology
-     - `Visual Behavior - Optical Physiology <https://allensdk.readthedocs.io/en/latest/visual_behavior_optical_physiology.html>`_
+     - :doc:`Visual Behavior - Optical Physiology <visual_behavior_optical_physiology>`
      - March 2021
    * - Active
      - Extracellular electrophysiology
-     - Visual Behavior - Neuropixels
-     - Coming soon...
+     - :doc:`Visual Behavior - Neuropixels <visual_behavior_neuropixels>`
+     - July 2022
  
 Experiment and stimulus data are provided in `Neurodata Without Borders <https://www.nwb.org/>`_ (NWB) files. 
 The AllenSDK provides code to:
