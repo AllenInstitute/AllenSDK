@@ -118,7 +118,7 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's new - 2.16.0
+What's new - 2.13.5
 ----------------------------------------------------------------------
 - Support for visual behavior neuropixels data
 
