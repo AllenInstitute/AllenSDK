@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.16.0] = 2022-07-27
+## [2.13.5] = 2022-07-27
 - Add support for visual behavior neuropixels data
 - 
 ## [2.13.4] = 2022-02-23
