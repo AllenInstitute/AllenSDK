@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.13.6] = 2022-08-04
+- bugfix when accessing stimulus presentations table for vcn data
+- updates vbn notebooks
+- 
 ## [2.13.5] = 2022-07-27
 - Add support for visual behavior neuropixels data
 - 
