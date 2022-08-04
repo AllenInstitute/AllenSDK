@@ -84,6 +84,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         table = table.value
 
         if "color" in table.columns:
+            # .loc breaks on nan values so fill with empty string
+            # This is backwards compatible change for older nwb files
+            # Newer ones encode nan value here with empty string
+            table['color'] = table['color'].fillna('')
+
             # the color column actually contains two parameters. One is
             # coded as rgb triplets and the other as -1 or 1
             if "color_triplet" not in table.columns:
