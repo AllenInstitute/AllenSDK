@@ -2,6 +2,7 @@ import collections
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
+import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
@@ -226,6 +227,26 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         stim_pres_df = cls._postprocess(
             presentations=stim_pres_df,
             fill_omitted_values=fill_omitted_values)
+
+        stim_pres_df['stimulus_block'] = 0
+        stim_pres_df['stimulus_name'] = 'behavior'
+
+        has_fingerprint_stimulus = \
+            'fingerprint' in stimulus_file.data['items']['behavior']['items']
+        if has_fingerprint_stimulus:
+            fingerprint_stimulus = cls._get_fingerprint_stimulus(
+                stimulus_presentations=stim_pres_df,
+                stimulus_file=stimulus_file)
+            stim_pres_df = pd.concat([stim_pres_df, fingerprint_stimulus])
+            spontaneous_stimulus = cls._get_spontaneous_stimulus(
+                stimulus_presentations_table=stim_pres_df)
+            stim_pres_df = pd.concat([stim_pres_df, spontaneous_stimulus])
+            stim_pres_df = stim_pres_df.sort_values('start_frame')
+
+            # reset index to go from 0...end
+            stim_pres_df.index = pd.Index(
+                np.arange(0, stim_pres_df.shape[0]),
+                name='stimulus_presentation_id', dtype='int')
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 
@@ -304,3 +325,137 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             df.loc[omitted, 'start_time'] + omitted_time_duration
         df.loc[omitted, 'duration'] = omitted_time_duration
         return df
+
+    @staticmethod
+    def _get_fingerprint_stimulus(
+            stimulus_presentations: pd.DataFrame,
+            stimulus_file: BehaviorStimulusFile
+    ) -> pd.DataFrame:
+        """The fingerprint stimulus is a movie used to trigger many neurons
+        and is used to improve cell matching. This method adds rows for this
+        stimulus to the stimulus presentations table
+
+        Parameters
+        ----------
+        stimulus_presentations: stimulus presentations dataframe
+
+        Returns
+        ----------
+        stimulus_presentations: stimulus presentations table for
+        fingerprint stimulus
+        """
+        fingerprint_stim = (
+            stimulus_file.data['items']['behavior']['items']['fingerprint']
+            ['static_stimulus'])
+
+        # start time is relative to session start. stop_time here
+        # is assumed to be the last stop time of the last stimulus prior to the
+        # fingerprint stimulus
+        start_time = stimulus_presentations['stop_time'].max() + \
+            fingerprint_stim['start_time']
+
+        n_repeats = fingerprint_stim['runs']
+
+        duration = fingerprint_stim['frame_length']
+        movie_frame_rate = 1 / duration
+        monitor_frame_rate = \
+            stimulus_file.data['items']['behavior']['stim_config']['fps']
+        stimulus_frames_per_movie_frame = monitor_frame_rate / movie_frame_rate
+
+        def get_movie_length() -> int:
+            movie_path = (
+                stimulus_file.data['items']['behavior']['items']['fingerprint']
+                ['static_stimulus']['movie_path'])
+            movie = np.load(movie_path)
+            return movie.shape[0]
+
+        def get_movie_start_frame() -> float:
+            """Get movie start frame relative to the start of the session"""
+
+            # Start time within the block
+            start_time = fingerprint_stim['start_time']
+
+            # This is the start frame within the block,
+            # due to the gray screen that precedes it
+            movie_start_index = \
+                int(start_time * monitor_frame_rate) \
+                - 1  # account for zero indexing
+
+            frame_indices = (
+                stimulus_file.data['items']['behavior']['items']
+                ['fingerprint']['frame_indices'])
+            return frame_indices[movie_start_index]
+
+        movie_length = get_movie_length()
+        start_frame = get_movie_start_frame()
+
+        res = []
+        for repeat in range(n_repeats):
+            for frame in range(movie_length):
+                stop_time = start_time + duration
+                end_frame = start_frame + stimulus_frames_per_movie_frame - 1
+                res.append({
+                    'movie_frame_index': frame,
+                    'start_time': start_time,
+                    'stop_time': stop_time,
+                    'start_frame': start_frame,
+                    'end_frame': end_frame,
+                    'repeat': repeat
+                })
+                start_time = stop_time
+                start_frame = end_frame
+        res = pd.DataFrame(res)
+
+        res['stimulus_block'] = \
+            stimulus_presentations['stimulus_block'].max() \
+            + 2     # + 2 since there is a gap before this stimulus
+        res['stimulus_name'] = 'natural_movie_one'
+        res['duration'] = 1 / movie_frame_rate
+        return res
+
+    @classmethod
+    def _get_spontaneous_stimulus(
+            cls,
+            stimulus_presentations_table
+    ) -> pd.DataFrame:
+        """The spontaneous stimulus is a gray screen shown in between
+        different stimulus blocks"""
+        spontaneous_stimulus_blocks = \
+            np.diff(np.sort(stimulus_presentations_table['stimulus_block']
+                            .unique()))
+        spontaneous_stimulus_blocks = \
+            spontaneous_stimulus_blocks[spontaneous_stimulus_blocks > 1]
+        spontaneous_stimulus_blocks -= 1
+        if (spontaneous_stimulus_blocks > 1).any():
+            raise RuntimeError('There should not be any stimulus block gaps '
+                               'greater than 1')
+        res = []
+        for spontaneous_block in spontaneous_stimulus_blocks:
+            prev_stop_time = \
+                stimulus_presentations_table[
+                    stimulus_presentations_table['stimulus_block'] ==
+                    spontaneous_block - 1]['stop_time'].max()
+            prev_end_frame = \
+                stimulus_presentations_table[
+                    stimulus_presentations_table['stimulus_block'] ==
+                    spontaneous_block - 1]['end_frame'].max()
+            next_start_time = \
+                stimulus_presentations_table[
+                    stimulus_presentations_table['stimulus_block'] ==
+                    spontaneous_block + 1]['start_time'].min()
+            next_start_frame = \
+                stimulus_presentations_table[
+                    stimulus_presentations_table['stimulus_block'] ==
+                    spontaneous_block + 1]['start_frame'].min()
+            res.append({
+                'duration': next_start_time - prev_stop_time,
+                'start_time': prev_stop_time,
+                'stop_time': next_start_time,
+                'start_frame': prev_end_frame,
+                'end_frame': next_start_frame,
+                'stimulus_block': spontaneous_block,
+                'stimulus_name': 'spontaneous'
+            })
+        res = pd.DataFrame(res)
+
+        return res
