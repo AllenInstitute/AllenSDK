@@ -170,10 +170,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
         """
-        stimulus_timestamps = stimulus_timestamps.value
         data = stimulus_file.data
         raw_stim_pres_df = get_stimulus_presentations(
-            data, stimulus_timestamps)
+            data, stimulus_timestamps.value)
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=['index'])
 
         # Fill in nulls for image_name
@@ -236,7 +235,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         if has_fingerprint_stimulus:
             fingerprint_stimulus = cls._get_fingerprint_stimulus(
                 stimulus_presentations=stim_pres_df,
-                stimulus_file=stimulus_file)
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps)
             stim_pres_df = pd.concat([stim_pres_df, fingerprint_stimulus])
             spontaneous_stimulus = cls._get_spontaneous_stimulus(
                 stimulus_presentations_table=stim_pres_df)
@@ -329,7 +329,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
     @staticmethod
     def _get_fingerprint_stimulus(
             stimulus_presentations: pd.DataFrame,
-            stimulus_file: BehaviorStimulusFile
+            stimulus_file: BehaviorStimulusFile,
+            stimulus_timestamps: StimulusTimestamps
     ) -> pd.DataFrame:
         """The fingerprint stimulus is a movie used to trigger many neurons
         and is used to improve cell matching. This method adds rows for this
@@ -382,16 +383,17 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                              [frame + (repeat * movie_length)])
                 start_frame, end_frame = frame_indices[
                     stimulus_frame_indices + movie_start_index]
-                stop_time = start_time + duration
+                start_time, stop_time = \
+                    stimulus_timestamps.value[[start_frame, end_frame + 1]]
                 res.append({
                     'movie_frame_index': frame,
                     'start_time': start_time,
                     'stop_time': stop_time,
                     'start_frame': start_frame,
                     'end_frame': end_frame,
-                    'repeat': repeat
+                    'repeat': repeat,
+                    'duration': stop_time - start_time
                 })
-                start_time = stop_time
         res = pd.DataFrame(res)
 
         res['stimulus_block'] = \
