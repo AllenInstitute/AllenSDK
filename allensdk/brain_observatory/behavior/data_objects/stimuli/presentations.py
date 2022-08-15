@@ -360,40 +360,29 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         movie_frame_rate = 1 / duration
         monitor_frame_rate = \
             stimulus_file.data['items']['behavior']['stim_config']['fps']
-        stimulus_frames_per_movie_frame = monitor_frame_rate / movie_frame_rate
 
-        def get_movie_length() -> int:
-            movie_path = (
-                stimulus_file.data['items']['behavior']['items']['fingerprint']
-                ['static_stimulus']['movie_path'])
-            movie = np.load(movie_path)
-            return movie.shape[0]
+        # spontaneous + fingerprint indices relative to start of session
+        frame_indices = np.array(
+            stimulus_file.data['items']['behavior']['items']
+            ['fingerprint']['frame_indices'])
 
-        def get_movie_start_frame() -> float:
-            """Get movie start frame relative to the start of the session"""
+        movie_length = int(len(fingerprint_stim['sweep_frames']) / n_repeats)
 
-            # Start time within the block
-            start_time = fingerprint_stim['start_time']
-
-            # This is the start frame within the block,
-            # due to the gray screen that precedes it
-            movie_start_index = \
-                int(start_time * monitor_frame_rate) \
-                - 1  # account for zero indexing
-
-            frame_indices = (
-                stimulus_file.data['items']['behavior']['items']
-                ['fingerprint']['frame_indices'])
-            return frame_indices[movie_start_index]
-
-        movie_length = get_movie_length()
-        start_frame = get_movie_start_frame()
+        # Start index within the spontaneous + fingerprint block
+        movie_start_index = int(
+            fingerprint_stim['start_time'] * monitor_frame_rate)
 
         res = []
         for repeat in range(n_repeats):
             for frame in range(movie_length):
+                # 0-indexed frame indices relative to start of fingerprint
+                # movie
+                stimulus_frame_indices = \
+                    np.array(fingerprint_stim['sweep_frames']
+                             [frame + (repeat * movie_length)])
+                start_frame, end_frame = frame_indices[
+                    stimulus_frame_indices + movie_start_index]
                 stop_time = start_time + duration
-                end_frame = start_frame + stimulus_frames_per_movie_frame - 1
                 res.append({
                     'movie_frame_index': frame,
                     'start_time': start_time,
@@ -403,7 +392,6 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                     'repeat': repeat
                 })
                 start_time = stop_time
-                start_frame = end_frame
         res = pd.DataFrame(res)
 
         res['stimulus_block'] = \
