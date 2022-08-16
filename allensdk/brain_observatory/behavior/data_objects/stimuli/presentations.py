@@ -233,20 +233,11 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         has_fingerprint_stimulus = \
             'fingerprint' in stimulus_file.data['items']['behavior']['items']
         if has_fingerprint_stimulus:
-            fingerprint_stimulus = cls._get_fingerprint_stimulus(
+            stim_pres_df = cls._add_fingerprint_stimulus(
                 stimulus_presentations=stim_pres_df,
                 stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps)
-            stim_pres_df = pd.concat([stim_pres_df, fingerprint_stimulus])
-            spontaneous_stimulus = cls._get_spontaneous_stimulus(
-                stimulus_presentations_table=stim_pres_df)
-            stim_pres_df = pd.concat([stim_pres_df, spontaneous_stimulus])
-            stim_pres_df = stim_pres_df.sort_values('start_frame')
-
-            # reset index to go from 0...end
-            stim_pres_df.index = pd.Index(
-                np.arange(0, stim_pres_df.shape[0]),
-                name='stimulus_presentation_id', dtype='int')
+                stimulus_timestamps=stimulus_timestamps
+            )
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 
@@ -449,3 +440,37 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         res = pd.DataFrame(res)
 
         return res
+
+    @classmethod
+    def _add_fingerprint_stimulus(
+            cls,
+            stimulus_presentations: pd.Dataframe,
+            stimulus_file: BehaviorStimulusFile,
+            stimulus_timestamps: StimulusTimestamps
+    ) -> pd.DataFrame:
+        """Adds the fingerprint stimulus and the preceding gray screen to
+        the stimulus presentations table
+
+        Returns
+        -------
+        pd.DataFrame: stimulus presentations with gray screen + fingerprint
+        movie added"""
+        fingerprint_stimulus = cls._get_fingerprint_stimulus(
+            stimulus_presentations=stimulus_presentations,
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps)
+        stimulus_presentations = \
+            pd.concat([stimulus_presentations, fingerprint_stimulus])
+        spontaneous_stimulus = cls._get_spontaneous_stimulus(
+            stimulus_presentations_table=stimulus_presentations)
+        stimulus_presentations = \
+            pd.concat([stimulus_presentations, spontaneous_stimulus])
+        stimulus_presentations = \
+            stimulus_presentations.sort_values('start_frame')
+
+        # reset index to go from 0...end
+        stimulus_presentations.index = pd.Index(
+            np.arange(0, stimulus_presentations.shape[0]),
+            name=stimulus_presentations.index.name,
+            dtype=stimulus_presentations.index.dtype)
+        return stimulus_presentations
