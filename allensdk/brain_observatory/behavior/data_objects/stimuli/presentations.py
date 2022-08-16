@@ -391,7 +391,6 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             stimulus_presentations['stimulus_block'].max() \
             + 2     # + 2 since there is a gap before this stimulus
         res['stimulus_name'] = 'natural_movie_one'
-        res['duration'] = 1 / movie_frame_rate
         return res
 
     @classmethod
