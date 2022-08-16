@@ -397,19 +397,23 @@ class Presentations(DataObject, StimulusFileReadableInterface,
     @classmethod
     def _get_spontaneous_stimulus(
             cls,
-            stimulus_presentations_table
+            stimulus_presentations_table: pd.DataFrame
     ) -> pd.DataFrame:
         """The spontaneous stimulus is a gray screen shown in between
-        different stimulus blocks"""
-        spontaneous_stimulus_blocks = \
-            np.diff(np.sort(stimulus_presentations_table['stimulus_block']
-                            .unique()))
-        spontaneous_stimulus_blocks = \
-            spontaneous_stimulus_blocks[spontaneous_stimulus_blocks > 1]
-        spontaneous_stimulus_blocks -= 1
-        if (spontaneous_stimulus_blocks > 1).any():
-            raise RuntimeError('There should not be any stimulus block gaps '
-                               'greater than 1')
+        different stimulus blocks. This method finds any gaps in the stimulus
+        presentations. These gaps are assumed to be spontaneous stimulus.
+
+        Raises
+        ------
+        RuntimeError if there are any gaps in stimulus blocks > 1
+
+        Returns
+        -------
+        pd.DataFrame: a dataframe with a single row for each spontaneous
+        stimulus shown"""
+        spontaneous_stimulus_blocks = get_spontaneous_block_indices(
+            stimulus_blocks=(
+                stimulus_presentations_table['stimulus_block'].values))
         res = []
         for spontaneous_block in spontaneous_stimulus_blocks:
             prev_stop_time = \
@@ -444,7 +448,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
     @classmethod
     def _add_fingerprint_stimulus(
             cls,
-            stimulus_presentations: pd.Dataframe,
+            stimulus_presentations: pd.DataFrame,
             stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps
     ) -> pd.DataFrame:
@@ -474,3 +478,28 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             name=stimulus_presentations.index.name,
             dtype=stimulus_presentations.index.dtype)
         return stimulus_presentations
+
+
+def get_spontaneous_block_indices(
+        stimulus_blocks: np.ndarray
+) -> np.ndarray:
+    """Gets the indexes where there is a gap in stimulus block
+
+    Parameters
+    ----------
+    stimulus_blocks: Stimulus blocks in the stimulus presentations table
+    """
+    blocks = np.sort(np.unique(stimulus_blocks))
+    block_diffs = np.diff(blocks)
+    if (block_diffs > 2).any():
+        raise RuntimeError(f'There should not be any stimulus block '
+                           f'diffs greater than 2. The stimulus '
+                           f'blocks are {blocks}')
+
+    # i.e. if the current blocks are [0, 2], then block_diffs will
+    # be [2], with a gap (== 2) at index 0, meaning that the spontaneous block
+    # is at index 1
+    block_indices = blocks[
+        np.where(block_diffs == 2)[0]
+    ] + 1
+    return block_indices
