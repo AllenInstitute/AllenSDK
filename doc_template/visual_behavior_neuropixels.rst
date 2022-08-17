@@ -10,8 +10,6 @@ download you choose, we recommend that you load and interact with the data
 using the tools provided in the AllenSDK, which have been designed to simplify
 data access and subsequent analysis. No knowledge of the NWB file format is required.
 
-Specific information about how Visual Behavior Optical Physiology data is stored
-in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
 
 To get started, check out these jupyter notebooks:
 
@@ -20,6 +18,9 @@ To get started, check out these jupyter notebooks:
 3) `Aligning behavioral data to task events with the stimulus and trials tables <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.html>`_ `(download .ipynb) <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.ipynb>`_
 4) `Plot quality metrics for the 'units' identified in these experiments <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.ipynb>`_
 5) `Visual Behavior Neuropixels Quickstart <_static/examples/nb/visual_behavior_neuropixels_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quickstart.ipynb>`_
+
+You may also find `these tutorials <https://github.com/AllenInstitute/swdb_2022/tree/main/DynamicBrain>`_ helpful, 
+which were made for students in the Summer Workshop for the Dynamic Brain.
 
 If you have questions about the dataset that aren’t addressed by the whitepaper
 or any of our tutorials, please reach out by posting at
