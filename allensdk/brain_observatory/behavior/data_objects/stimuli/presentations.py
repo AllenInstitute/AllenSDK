@@ -482,11 +482,17 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 def get_spontaneous_block_indices(
         stimulus_blocks: np.ndarray
 ) -> np.ndarray:
-    """Gets the indexes where there is a gap in stimulus block
+    """Gets the indices where there is a gap in stimulus block. This is
+    where spontaneous blocks are.
+    Example: stimulus blocks are [0, 2, 3]. There is a spontaneous block at 1.
 
     Parameters
     ----------
     stimulus_blocks: Stimulus blocks in the stimulus presentations table
+
+    Returns
+    -------
+    np.array: spontaneous stimulus blocks
     """
     blocks = np.sort(np.unique(stimulus_blocks))
     block_diffs = np.diff(blocks)
