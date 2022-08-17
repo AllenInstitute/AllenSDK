@@ -1,17 +1,13 @@
-from multiprocessing import Pool
-
 import pandas as pd
 from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
 
-from tqdm import tqdm
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
@@ -20,6 +16,9 @@ from allensdk.core.auth_config import (
     MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query, build_where_clause)
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    get_session_type_from_pkl_file, \
+    get_session_types_multiprocessing
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -518,18 +517,14 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         summary_tbl = self._get_behavior_summary_table()
 
         if n_workers > 1:
-            with Pool(n_workers) as p:
-                stimulus_names = list(tqdm(
-                    p.imap(_get_session_type_from_pkl_file_helper,
-                           zip(
-                                summary_tbl['behavior_session_id'].tolist(),
-                                [self.lims_engine] * summary_tbl.shape[0])
-                           ),
-                    total=summary_tbl.shape[0],
-                    desc='Reading session type from pkl file'))
+            stimulus_names = get_session_types_multiprocessing(
+                behavior_session_ids=(
+                    summary_tbl['behavior_session_id'].tolist()),
+                lims_engine=self.lims_engine
+            )
         else:
             stimulus_names = [
-                _get_session_type_from_pkl_file(
+                get_session_type_from_pkl_file(
                     behavior_session_id=behavior_session_id,
                     db_conn=self.lims_engine)
                 for behavior_session_id in summary_tbl['behavior_session_id']]
@@ -654,24 +649,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :returns: iterable yielding a tiff file as bytes
         """
         raise NotImplementedError()
-
-
-def _get_session_type_from_pkl_file(behavior_session_id, db_conn) -> dict:
-    return {
-        'behavior_session_id': behavior_session_id,
-        'session_type': (
-            BehaviorStimulusFile.from_lims(
-                db=db_conn,
-                behavior_session_id=behavior_session_id).session_type)
-    }
-
-
-def _get_session_type_from_pkl_file_helper(args) -> dict:
-    """
-    Helper function to call `_get_session_type_from_pkl_file` passing in
-    *args. Needed because imap does not support passing in *args
-    """
-    return _get_session_type_from_pkl_file(*args)
 
 
 def _get_passed_ophys_experiment_clauses():
