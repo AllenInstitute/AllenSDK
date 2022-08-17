@@ -490,6 +490,11 @@ def get_spontaneous_block_indices(
     ----------
     stimulus_blocks: Stimulus blocks in the stimulus presentations table
 
+    Notes
+    -----
+    This doesn't support a spontaneous block appearing at the beginning or
+    end of a session
+
     Returns
     -------
     np.array: spontaneous stimulus blocks
