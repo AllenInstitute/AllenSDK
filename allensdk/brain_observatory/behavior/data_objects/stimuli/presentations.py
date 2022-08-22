@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
     NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
-    StimulusFileReadableInterface
+    StimulusFileReadableInterface, MalformedStimulusFileError
 from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.stimulus_processing import \
@@ -187,7 +187,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         """
         data = stimulus_file.data
         raw_stim_pres_df = get_stimulus_presentations(
-            data, stimulus_timestamps)
+            data, stimulus_timestamps.value)
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=['index'])
 
         # Fill in nulls for image_name
@@ -406,15 +406,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         # start time is relative to session start. stop_time here
         # is assumed to be the last stop time of the last stimulus prior to the
         # fingerprint stimulus
-        start_time = stimulus_presentations['stop_time'].max() + \
-            fingerprint_stim['start_time']
-
         n_repeats = fingerprint_stim['runs']
 
-        duration = fingerprint_stim['frame_length']
-        movie_frame_rate = 1 / duration
-        monitor_frame_rate = \
-            stimulus_file.data['items']['behavior']['stim_config']['fps']
+        monitor_frame_rate = stimulus_file.monitor_frame_rate
 
         # spontaneous + fingerprint indices relative to start of session
         frame_indices = np.array(
@@ -521,10 +515,14 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         -------
         pd.DataFrame: stimulus presentations with gray screen + fingerprint
         movie added"""
-        fingerprint_stimulus = cls._get_fingerprint_stimulus(
-            stimulus_presentations=stimulus_presentations,
-            stimulus_file=stimulus_file,
-            stimulus_timestamps=stimulus_timestamps)
+        try:
+            fingerprint_stimulus = cls._get_fingerprint_stimulus(
+                stimulus_presentations=stimulus_presentations,
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps)
+        except MalformedStimulusFileError:
+            return stimulus_presentations
+
         stimulus_presentations = \
             pd.concat([stimulus_presentations, fingerprint_stimulus])
         spontaneous_stimulus = cls._get_spontaneous_stimulus(

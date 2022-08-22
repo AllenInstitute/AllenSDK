@@ -6,6 +6,8 @@ from typing import List, Optional, Set, Callable
 from tqdm import tqdm
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    MalformedStimulusFileError
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \
@@ -44,6 +46,7 @@ def get_session_metadata_multiprocessing(
         progress_bar_title='Reading session metadata from pkl file',
         n_workers=n_workers
     )
+    session_metadata = [x for x in session_metadata if x is not None]
 
     return session_metadata
 
@@ -101,14 +104,18 @@ def _multiprocessing_helper(
     return res
 
 
-def _get_session_metadata(*args) -> BehaviorMetadata:
+def _get_session_metadata(*args) -> Optional[BehaviorMetadata]:
     """
     Helper function to get session metadata
     """
     behavior_session_id, db_conn = args[0]
-    return BehaviorMetadata.from_lims(
-        behavior_session_id=BehaviorSessionId(behavior_session_id),
-        lims_db=db_conn)
+    try:
+        meta = BehaviorMetadata.from_lims(
+                behavior_session_id=BehaviorSessionId(behavior_session_id),
+                lims_db=db_conn)
+    except MalformedStimulusFileError:
+        meta = None
+    return meta
 
 
 def _get_image_names(*args) -> Set[str]:
