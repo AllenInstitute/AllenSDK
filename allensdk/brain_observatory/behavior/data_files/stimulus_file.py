@@ -96,10 +96,6 @@ class _StimulusFile(DataFile):
 class BehaviorStimulusFile(_StimulusFile):
     def __init__(self, filepath: Union[str, Path]):
         super().__init__(filepath=filepath)
-        if 'behavior' not in self.data['items']:
-            raise MalformedStimulusFileError(
-                f'Expected to find key "behavior" in "items" dict. '
-                f'Found {self.data["items"].keys()}')
 
     @classmethod
     def file_path_key(cls) -> str:
@@ -252,6 +248,13 @@ class BehaviorStimulusFile(_StimulusFile):
                 'Expected key "stim_config". Found '
                 f'{self.data["items"]["behavior"].keys()}')
         return self.data['items']['behavior']['stim_config']['fps']
+
+    def validate(self) -> "BehaviorStimulusFile":
+        if 'items' not in self.data or 'behavior' not in self.data['items']:
+            raise MalformedStimulusFileError(
+                f'Expected to find key "behavior" in "items" dict. '
+                f'Found {self.data["items"].keys()}')
+        return self
 
 
 class ReplayStimulusFile(_StimulusFile):
