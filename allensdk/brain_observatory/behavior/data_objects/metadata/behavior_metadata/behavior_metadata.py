@@ -220,7 +220,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
 
         stimulus_file = BehaviorStimulusFile.from_lims(
-            db=lims_db, behavior_session_id=behavior_session_id.value)
+            db=lims_db, behavior_session_id=behavior_session_id.value)\
+            .validate()
         date_of_acquisition = DateOfAcquisition.from_stimulus_file(
             stimulus_file=stimulus_file)
 
