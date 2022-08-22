@@ -152,9 +152,9 @@ def remove_invalid_sessions(
     remove_aborted_sessions
         Remove aborted sessions
     expected_training_duration
-        Expected duration for TRAINING_0 session
+        Expected duration for TRAINING_0 session in seconds
     expected_duration
-        Expected duration for all sessions except TRAINING_0
+        Expected duration for all sessions except TRAINING_0 in seconds
 
     Returns
     -------
