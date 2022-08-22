@@ -52,6 +52,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
     def from_stimulus_file(
             cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
+            behavior_session_id: int,
             limit_to_images: Optional[List] = None,
             presentation_columns: Optional[List[str]] = None,
             presentation_fill_omitted_values: bool = True
@@ -62,6 +63,8 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         ----------
         stimulus_file
         stimulus_timestamps
+        behavior_session_id
+            behavior session id in LIMS
         limit_to_images: limit to certain images. Used for testing.
         presentation_columns: The columns and order of columns
             in the final presentations dataframe
@@ -75,6 +78,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         p = Presentations.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
+            behavior_session_id=behavior_session_id,
             limit_to_images=limit_to_images,
             column_list=presentation_columns,
             fill_omitted_values=presentation_fill_omitted_values
