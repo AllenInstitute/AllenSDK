@@ -168,7 +168,8 @@ def remove_invalid_sessions(
     if remove_sessions_after_mouse_death_date:
         behavior_sessions = [
             x for x in behavior_sessions
-            if x.date_of_acquisition <= x.subject_metadata.get_death_date()]
+            if (x.subject_metadata.get_death_date() is None or
+                x.date_of_acquisition <= x.subject_metadata.get_death_date())]
 
     if remove_aborted_sessions:
         training_sessions = \
