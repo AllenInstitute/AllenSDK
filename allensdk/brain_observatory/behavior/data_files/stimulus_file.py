@@ -94,6 +94,12 @@ class _StimulusFile(DataFile):
 
 
 class BehaviorStimulusFile(_StimulusFile):
+    def __init__(self, filepath: Union[str, Path]):
+        super().__init__(filepath=filepath)
+        if 'behavior' not in self.data['items']:
+            raise MalformedStimulusFileError(
+                f'Expected to find key "behavior" in "items" dict. '
+                f'Found {self.data["items"].keys()}')
 
     @classmethod
     def file_path_key(cls) -> str:
@@ -239,6 +245,14 @@ class BehaviorStimulusFile(_StimulusFile):
         # TODO implement return value as class (i.e. Image, Grating)
         return self.data['items']['behavior']['stimuli']
 
+    @property
+    def monitor_frame_rate(self) -> float:
+        if 'stim_config' not in self.data['items']['behavior']:
+            raise MalformedStimulusFileError(
+                'Expected key "stim_config". Found '
+                f'{self.data["items"]["behavior"].keys()}')
+        return self.data['items']['behavior']['stim_config']['fps']
+
 
 class ReplayStimulusFile(_StimulusFile):
 
@@ -344,3 +358,8 @@ def stimulus_lookup_from_json(
         stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
         lookup_table.replay_stimulus_file = stim
     return lookup_table
+
+
+class MalformedStimulusFileError(RuntimeError):
+    """Malformed stimulus file"""
+    pass
