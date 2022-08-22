@@ -10,6 +10,13 @@ from allensdk.brain_observatory.behavior.behavior_project_cache import \
 from allensdk.brain_observatory.behavior.behavior_project_cache.external\
     .behavior_project_metadata_writer import \
     BehaviorProjectMetadataWriter
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
 
 
 class TestVBO:
@@ -43,28 +50,30 @@ class TestVBO:
             behavior_project_cache=bpc,
             out_dir=cls.test_dir.name,
             project_name='',
-            data_release_date=''
+            data_release_date='',
+            overwrite_ok=True
         )
 
     def teardown_class(self):
         self.test_dir.cleanup()
 
-    def _get_session_type(self, behavior_session_id, db_conn):
-        """
-        Note: mocking this because getting session type from pkl file is
-        expensive
-        """
-        return {
-            'behavior_session_id': behavior_session_id,
-            'session_type': self.session_type_map[behavior_session_id]}
+    def _get_behavior_session(self, behavior_session_id, lims_db):
+        return BehaviorMetadata(
+            date_of_acquisition=None,
+            subject_metadata=None,
+            behavior_session_id=BehaviorSessionId(behavior_session_id),
+            equipment=None,
+            stimulus_frame_rate=None,
+            session_type=SessionType(
+                self.session_type_map[behavior_session_id]),
+            behavior_session_uuid=None
+        )
 
     @pytest.mark.requires_bamboo
     def test_get_behavior_sessions_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_behavior_sessions()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'behavior_session_table.csv')
@@ -73,11 +82,9 @@ class TestVBO:
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_sessions_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'ophys_session_table.csv')
@@ -86,11 +93,9 @@ class TestVBO:
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_experiments_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_experiments()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'ophys_experiment_table.csv')
@@ -108,11 +113,9 @@ class TestVBO:
     @pytest.mark.requires_bamboo
     def test_imaging_plane_group_only_mesoscope(self):
         """Tests that imaging plane group only applies to mesoscope"""
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
         ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
@@ -132,11 +135,9 @@ class TestVBO:
         """Tests that imaging plane group count in ophys sessions table is
         consistent with the number of imaging plane groups in experiment
         table"""
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
         ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
