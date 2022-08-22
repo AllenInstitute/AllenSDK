@@ -197,4 +197,7 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         """
         res = lims_db.fetchall(query)
         res = res[0]
+        if res is not None:
+            # convert to datetime.datetime
+            res = res.astype('datetime64[s]').astype(datetime)
         return res
