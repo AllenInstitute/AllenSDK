@@ -24,7 +24,10 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
             stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         id = stimulus_file.data.get('session_uuid')
         if id:
-            id = uuid.UUID(id)
+            try:
+                id = uuid.UUID(id)
+            except ValueError:
+                id = None
         return cls(behavior_session_uuid=id)
 
     @classmethod

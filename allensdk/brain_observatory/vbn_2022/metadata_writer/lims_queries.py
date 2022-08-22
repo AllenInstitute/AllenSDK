@@ -4,7 +4,8 @@ import numpy as np
 import logging
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 from allensdk.internal.api.queries.utils import (
     _sanitize_uuid_list,
@@ -13,14 +14,8 @@ from allensdk.internal.api.queries.utils import (
 from allensdk.internal.api.queries.ecephys_lims_queries import (
     donor_id_lookup_from_ecephys_session_ids)
 
-from allensdk.internal.api.queries.behavior_lims_queries import (
-    foraging_id_map_from_behavior_session_id)
-
 from allensdk.internal.api.queries.compound_lims_queries import (
     behavior_sessions_from_ecephys_session_ids)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
 
 from allensdk.core.dataframe_utils import (
     patch_df_from_other)
@@ -30,11 +25,8 @@ from allensdk.brain_observatory.vbn_2022. \
         _add_prior_omissions,
         _add_session_number,
         _add_age_in_days,
-        _patch_date_and_stage_from_pickle_file,
         _add_experience_level,
-        _add_images_from_behavior,
-        remove_aborted_sessions,
-        remove_pretest_sessions)
+        _add_images_from_behavior)
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
@@ -44,6 +36,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.image_presentation_utils import (
         get_image_set)
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    get_session_metadata_multiprocessing, remove_invalid_sessions
 
 
 def get_list_of_bad_probe_ids(
@@ -806,68 +800,32 @@ def _behavior_session_table_from_ecephys_session_id_list(
     behavior_session_df = behavior_sessions_from_ecephys_session_ids(
                             lims_connection=lims_connection,
                             ecephys_session_id_list=ecephys_session_id_list)
-
-    beh_to_foraging_df = foraging_id_map_from_behavior_session_id(
-        lims_engine=lims_connection,
-        behavior_session_ids=behavior_session_df.behavior_session_id.tolist())
-
-    # add foraging_id
-    behavior_session_df = behavior_session_df.join(
-                    beh_to_foraging_df.set_index('behavior_session_id'),
-                    on='behavior_session_id',
-                    how='left')
-
-    foraging_ids = beh_to_foraging_df.foraging_id.tolist()
-
-    # this is necessary because there are some sessions with the
-    # invalid foraging_id entry 'DoC' in MTRAIN
-    foraging_ids = _sanitize_uuid_list(foraging_ids)
-
-    foraging_to_stage_df = session_stage_from_foraging_id(
-            mtrain_engine=mtrain_connection,
-            foraging_ids=foraging_ids)
-
-    # add session_type
-    behavior_session_df = behavior_session_df.join(
-                foraging_to_stage_df.set_index('foraging_id'),
-                on='foraging_id',
-                how='left')
-
-    # The date_of_acquisition and session_type stored in the LIMS
-    # behavior_sessions table is untrustworthy. We will set those
-    # columns to None here so that they all get patched from the
-    # pickle files.
-
-    behavior_session_df.date_of_acquisition = None
-    behavior_session_df.session_type = None
-
-    if logger is not None:
-        logger.info("Patching date_of_acquisition and session_type "
-                    "from pickle file")
-
-    behavior_session_df = _patch_date_and_stage_from_pickle_file(
-                             lims_connection=lims_connection,
-                             behavior_df=behavior_session_df,
-                             flag_columns=['date_of_acquisition',
-                                           'foraging_id',
-                                           'session_type'],
-                             logger=logger)
-
-    behavior_session_df = remove_pretest_sessions(
-            behavior_session_df=behavior_session_df)
-
-    if exclude_sessions_after_death_date:
-        # filter out any sessions which were mistakenly entered that fall
-        # after mouse death date
-        behavior_session_df = _filter_on_death_date(
-                behavior_session_df=behavior_session_df,
-                lims_connection=lims_connection)
-
-    if exclude_aborted_sessions:
-        behavior_session_df = remove_aborted_sessions(
-            lims_connection=lims_connection,
-            behavior_df=behavior_session_df
+    behavior_sessions = get_session_metadata_multiprocessing(
+        behavior_session_ids=behavior_session_df['behavior_session_id'],
+        lims_engine=db_connection_creator(
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         )
+    )
+    behavior_sessions = remove_invalid_sessions(
+        behavior_sessions=behavior_sessions)
+
+    behavior_session_df = \
+        behavior_session_df[
+            behavior_session_df['behavior_session_id']
+            .isin([x.behavior_session_id for x in behavior_sessions])]
+
+    behavior_session_df['date_of_acquisition'] = \
+        behavior_session_df['behavior_session_id']\
+        .map({
+            x.behavior_session_id: x.date_of_acquisition
+            for x in behavior_sessions
+        })
+    behavior_session_df['session_type'] = \
+        behavior_session_df['behavior_session_id']\
+        .map({
+            x.behavior_session_id: x.session_type
+            for x in behavior_sessions
+        })
 
     behavior_session_df['image_set'] = get_image_set(
             df=behavior_session_df)

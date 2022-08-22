@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 
 from pynwb import NWBFile
@@ -28,7 +29,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     Sex
 from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 
 class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
@@ -42,7 +44,8 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
                  reporter_line: ReporterLine,
                  full_genotype: FullGenotype,
                  driver_line: DriverLine,
-                 mouse_id: MouseId):
+                 mouse_id: MouseId,
+                 death_on: Optional[datetime] = None):
         super().__init__(name='subject_metadata', value=None,
                          is_value_self=True)
         self._sex = sex
@@ -51,17 +54,22 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         self._full_genotype = full_genotype
         self._driver_line = driver_line
         self._mouse_id = mouse_id
+        self._death_on = death_on
 
     @classmethod
-    def from_lims(cls,
-                  behavior_session_id: BehaviorSessionId,
-                  lims_db: PostgresQueryMixin) -> "SubjectMetadata":
+    def from_lims(
+            cls,
+            behavior_session_id: BehaviorSessionId,
+            lims_db: PostgresQueryMixin
+    ) -> "SubjectMetadata":
         sex = Sex.from_lims(behavior_session_id=behavior_session_id.value,
                             lims_db=lims_db)
         age = Age.from_lims(behavior_session_id=behavior_session_id.value,
                             lims_db=lims_db)
         reporter_line = ReporterLine.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db)
+            behavior_session_id=behavior_session_id.value,
+            lims_db=lims_db
+        )
         full_genotype = FullGenotype.from_lims(
             behavior_session_id=behavior_session_id.value, lims_db=lims_db)
         driver_line = DriverLine.from_lims(
@@ -69,14 +77,16 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         mouse_id = MouseId.from_lims(
             behavior_session_id=behavior_session_id.value,
             lims_db=lims_db)
+        death_on = cls._get_death_date_from_lims(
+            mouse_id=mouse_id.value, lims_db=lims_db)
         return cls(
             sex=sex,
             age=age,
             full_genotype=full_genotype,
             driver_line=driver_line,
             mouse_id=mouse_id,
-            reporter_line=reporter_line
-        )
+            reporter_line=reporter_line,
+            death_on=death_on)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "SubjectMetadata":
@@ -86,6 +96,10 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         full_genotype = FullGenotype.from_json(dict_repr=dict_repr)
         driver_line = DriverLine.from_json(dict_repr=dict_repr)
         mouse_id = MouseId.from_json(dict_repr=dict_repr)
+        death_on = cls._get_death_date_from_lims(
+            mouse_id=mouse_id.value,
+            lims_db=db_connection_creator(
+                fallback_credentials=LIMS_DB_CREDENTIAL_MAP))
 
         return cls(
             sex=sex,
@@ -93,7 +107,8 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             full_genotype=full_genotype,
             driver_line=driver_line,
             mouse_id=mouse_id,
-            reporter_line=reporter_line
+            reporter_line=reporter_line,
+            death_on=death_on
         )
 
     def to_json(self) -> dict:
@@ -159,3 +174,26 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
     @property
     def mouse_id(self) -> int:
         return self._mouse_id.value
+
+    def get_death_date(self) -> Optional[datetime]:
+        """
+
+        Notes
+        -----
+        Optional since we don't store this field when reading from NWB
+        """
+        return self._death_on
+
+    @classmethod
+    def _get_death_date_from_lims(
+            cls,
+            mouse_id: int,
+            lims_db: PostgresQueryMixin
+    ):
+        query = f"""
+            SELECT death_on
+            FROM donors
+            WHERE external_donor_name = '{mouse_id}'
+        """
+        res = lims_db.fetchone(query)
+        return res

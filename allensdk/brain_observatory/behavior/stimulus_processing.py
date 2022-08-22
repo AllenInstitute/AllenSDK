@@ -1,10 +1,11 @@
 import pickle
 import warnings
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Tuple, Union, Optional, Set
 
 import numpy as np
 import pandas as pd
 
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import \
     StimulusTemplate, StimulusTemplateFactory
@@ -414,7 +415,10 @@ def unpack_change_log(change):
     )
 
 
-def get_visual_stimuli_df(data, time) -> pd.DataFrame:
+def get_visual_stimuli_df(
+        data,
+        time
+) -> pd.DataFrame:
     """
     This function loads the stimuli and the omitted stimuli into a dataframe.
     These stimuli are loaded from the input data, where the set_log and
@@ -433,8 +437,8 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     stimuli = data['items']['behavior']['stimuli']
     n_frames = len(time)
     visual_stimuli_data = []
-    for stimuli_group_name, stim_dict in stimuli.items():
-        for idx, (attr_name, attr_value, _time, frame,) in \
+    for stim_dict in stimuli.values():
+        for idx, (attr_name, attr_value, _, frame) in \
                 enumerate(stim_dict["set_log"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
@@ -450,7 +454,7 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                 *stimulus_epoch
             )
 
-            for idx, (epoch_start, epoch_end,) in enumerate(draw_epochs):
+            for epoch_start, epoch_end in draw_epochs:
 
                 visual_stimuli_data.append({
                     "orientation": orientation,
@@ -461,7 +465,7 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                     "duration": time[epoch_end] - time[epoch_start],
                     # this will always work because an epoch
                     # will never occur near the end of time
-                    "omitted": False,
+                    "omitted": False
                 })
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
@@ -505,6 +509,19 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     df = pd.concat((visual_stimuli_df, omitted_df),
                    sort=False).sort_values('frame').reset_index()
     return df
+
+
+def get_image_names(
+        behavior_stimulus_file: BehaviorStimulusFile
+) -> Set[str]:
+    """Gets set of image names shown during behavior session"""
+    stimuli = behavior_stimulus_file.stimuli
+    image_names = set()
+    for stim_dict in stimuli.values():
+        for attr_name, attr_value, _, _ in stim_dict["set_log"]:
+            if attr_name.lower() == 'image':
+                image_names.add(attr_value)
+    return image_names
 
 
 def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:

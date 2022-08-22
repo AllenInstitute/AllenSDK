@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, Union
+from typing import Dict, Union, Tuple
 from pathlib import Path
 
 from cachetools import cached, LRUCache
@@ -221,6 +221,23 @@ class BehaviorStimulusFile(_StimulusFile):
         delta = stop_time - start_time
 
         return delta.total_seconds()
+
+    @property
+    def stimuli(self) -> Dict[str, Tuple[str, Union[str, int], int, int]]:
+        """Stimuli shown during session
+
+        Returns
+        -------
+        stimuli:
+            (stimulus type ('Image' or 'Grating'),
+             stimulus descriptor (image_name or orientation of grating in
+                degrees),
+             nonsynced time of display,
+             display frame (frame that stimuli was displayed))
+
+        """
+        # TODO implement return value as class (i.e. Image, Grating)
+        return self.data['items']['behavior']['stimuli']
 
 
 class ReplayStimulusFile(_StimulusFile):
