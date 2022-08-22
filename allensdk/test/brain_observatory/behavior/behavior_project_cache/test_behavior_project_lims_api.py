@@ -13,6 +13,13 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.external \
     OPHYS_EXPERIMENTS_SUPPRESS_FINAL
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
     BehaviorProjectLimsApi, BehaviorProjectCloudApi  # noqa: E501
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
 
 from allensdk.test_utilities.custom_comparators import (
     WhitespaceStrippedString)
@@ -89,24 +96,24 @@ class TestProjectTablesAll:
             passed_only=False
         )
 
-    def _get_session_type(self, behavior_session_id, db_conn):
-        """
-        Note: mocking this because getting session type from pkl file is
-        expensive
-        """
-        return {
-            'behavior_session_id': behavior_session_id,
-            'session_type': 'foo'}
+    def _get_behavior_session(self, behavior_session_id, lims_db):
+        return BehaviorMetadata(
+            date_of_acquisition=None,
+            subject_metadata=None,
+            behavior_session_id=BehaviorSessionId(behavior_session_id),
+            equipment=None,
+            stimulus_frame_rate=None,
+            session_type=SessionType('foo'),
+            behavior_session_uuid=None
+        )
 
     @pytest.mark.requires_bamboo
     def test_all_behavior_sessions(self):
         """Tests that when passed_only=False, that more sessions are returned
         than in the release table"""
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             obtained = self.lims_api.get_behavior_session_table()
 
             # Make sure ids returned are superset of release ids
@@ -122,11 +129,9 @@ class TestProjectTablesAll:
     def test_all_ophys_sessions(self):
         """Tests that when passed_only=False, that more sessions are returned
         than in the release table"""
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             obtained = self.lims_api.get_ophys_session_table()
 
             # Make sure ids returned are superset of release ids
@@ -142,11 +147,9 @@ class TestProjectTablesAll:
     def test_all_ophys_experiments(self):
         """Tests that when passed_only=False, that more experiments are
         returned than in the release table"""
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             obtained = self.lims_api.get_ophys_experiment_table()
 
             # Make sure ids returned are superset of release ids
@@ -204,14 +207,17 @@ class TestLimsCloudConsistency:
     def teardown_class(self):
         self.tempdir.cleanup()
 
-    def _get_session_type(self, behavior_session_id, db_conn):
-        """
-        Note: mocking this because getting session type from pkl file is
-        expensive
-        """
-        return {
-            'behavior_session_id': behavior_session_id,
-            'session_type': self.session_type_map[behavior_session_id]}
+    def _get_behavior_session(self, behavior_session_id, lims_db):
+        return BehaviorMetadata(
+            date_of_acquisition=None,
+            subject_metadata=None,
+            behavior_session_id=BehaviorSessionId(behavior_session_id),
+            equipment=None,
+            stimulus_frame_rate=None,
+            session_type=SessionType(
+                self.session_type_map[behavior_session_id]),
+            behavior_session_uuid=None
+        )
 
     @classmethod
     def _get_project_table_path(cls, fname):
@@ -226,11 +232,9 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_behavior_session_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_behavior_session_table()
 
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
@@ -241,11 +245,9 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_ophys_session_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_ophys_session_table()
 
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
@@ -255,11 +257,9 @@ class TestLimsCloudConsistency:
 
     @pytest.mark.requires_bamboo
     def test_ophys_experiments_table(self):
-        with patch('allensdk.brain_observatory.'
-                   'behavior.behavior_project_cache.'
-                   'project_apis.data_io.behavior_project_lims_api.'
-                   '_get_session_type_from_pkl_file',
-                   wraps=self._get_session_type):
+        with patch.object(
+                BehaviorMetadata,
+                'from_lims', wraps=self._get_behavior_session):
             from_lims = self.lims_cache.get_ophys_experiment_table()
 
         from_lims = from_lims.drop(
