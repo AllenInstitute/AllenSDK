@@ -243,6 +243,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
          task_parameters,
          trials) = cls._read_data_from_stimulus_file(
                   stimulus_file_lookup=stimulus_file_lookup,
+                  behavior_session_id=behavior_session_id.value,
                   sync_file=sync_file,
                   monitor_delay=monitor_delay,
                   include_stimuli=(
@@ -393,6 +394,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
          task_parameters,
          trials) = \
             cls._read_data_from_stimulus_file(
+                behavior_session_id=behavior_session_id.value,
                 stimulus_file_lookup=stimulus_file_lookup,
                 sync_file=sync_file,
                 monitor_delay=monitor_delay
@@ -1271,6 +1273,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_stimuli(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
+            behavior_session_id: int,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             stimulus_presentation_columns: Optional[List[str]] = None
@@ -1285,9 +1288,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 monitor_delay=monitor_delay)
 
         return Stimuli.from_stimulus_file(
-                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
-                    stimulus_timestamps=stimulus_timestamps,
-                    presentation_columns=stimulus_presentation_columns)
+            behavior_session_id=behavior_session_id,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            presentation_columns=stimulus_presentation_columns)
 
     @classmethod
     def _read_trials(
@@ -1353,6 +1357,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_data_from_stimulus_file(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
+            behavior_session_id: int,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             include_stimuli=True,
@@ -1377,6 +1382,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         if include_stimuli:
             stimuli = cls._read_stimuli(
                 stimulus_file_lookup=stimulus_file_lookup,
+                behavior_session_id=behavior_session_id,
                 sync_file=sync_file,
                 monitor_delay=monitor_delay,
                 stimulus_presentation_columns=stimulus_presentation_columns)
