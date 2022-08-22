@@ -195,5 +195,6 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             FROM donors
             WHERE external_donor_name = '{mouse_id}'
         """
-        res = lims_db.fetchone(query)
+        res = lims_db.fetchall(query)
+        res = res[0]
         return res
