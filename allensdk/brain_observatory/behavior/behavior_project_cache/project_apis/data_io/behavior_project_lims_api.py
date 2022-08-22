@@ -533,7 +533,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                     )
                 )
                 for behavior_session_id in summary_tbl['behavior_session_id']]
-        stimulus_names = [x.session_type for x in session_metadata]
+        stimulus_names = [{
+                'session_type': x.session_type,
+                'behavior_session_id': x.behavior_session_id
+            } for x in session_metadata
+        ]
         stimulus_names = pd.DataFrame(stimulus_names)
 
         return (summary_tbl.merge(stimulus_names,
