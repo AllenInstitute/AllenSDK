@@ -7,6 +7,12 @@ import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.mouse_id import \
+    MouseId
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -19,6 +25,11 @@ from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import db_connection_creator
+from allensdk.internal.brain_observatory.mouse import Mouse
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    get_session_metadata_multiprocessing
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
@@ -147,8 +158,10 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: BehaviorStimulusFile,
+            cls,
+            stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
+            behavior_session_id: int,
             limit_to_images: Optional[List] = None,
             column_list: Optional[List[str]] = None,
             fill_omitted_values=True
@@ -159,6 +172,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         :param limit_to_images
             Only return images given by these image names
         :param stimulus_timestamps
+        :param behavior_session_id
+            LIMS id of behavior session
         :param column_list: The columns and order of columns
             in the final dataframe
         :param fill_omitted_values: Whether to fill stop_time and duration
@@ -172,7 +187,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         """
         data = stimulus_file.data
         raw_stim_pres_df = get_stimulus_presentations(
-            data, stimulus_timestamps.value)
+            data, stimulus_timestamps)
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=['index'])
 
         # Fill in nulls for image_name
@@ -230,6 +245,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         stim_pres_df['stimulus_block'] = 0
         stim_pres_df['stimulus_name'] = 'behavior'
 
+        cls._add_is_image_novel(stimulus_presentations=stim_pres_df,
+                                behavior_session_id=behavior_session_id)
+
         has_fingerprint_stimulus = \
             'fingerprint' in stimulus_file.data['items']['behavior']['items']
         if has_fingerprint_stimulus:
@@ -244,6 +262,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
     @classmethod
     def from_path(cls,
                   path: Union[str, Path],
+                  behavior_session_id: int,
                   exclude_columns: Optional[List[str]] = None,
                   columns_to_rename: Optional[Dict[str, str]] = None,
                   sort_columns: bool = True
@@ -254,21 +273,65 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         Parameters
         -----------
         path: Path to load table from
+        behavior_session_id
+            LIMS behavior session id
         exclude_columns: Columns to exclude
         columns_to_rename: Optional d ict mapping
             old column name -> new column name
         sort_columns: Whether to sort the columns by name
+
         Returns
         -------
         Presentations instance
         """
         path = Path(path)
         df = pd.read_csv(path)
+        cls._add_is_image_novel(stimulus_presentations=df,
+                                behavior_session_id=behavior_session_id)
         exclude_columns = exclude_columns if exclude_columns else []
         df = df[[c for c in df if c not in exclude_columns]]
         return Presentations(presentations=df,
                              columns_to_rename=columns_to_rename,
                              sort_columns=sort_columns)
+
+    @classmethod
+    def _get_is_image_novel(
+            cls,
+            image_names: List[str],
+            behavior_session_id: int,
+    ) -> Dict[str, bool]:
+        mouse = Mouse.from_behavior_session_id(
+            behavior_session_id=behavior_session_id)
+        prior_images_shown = mouse.get_images_shown(
+            up_to_behavior_session_id=behavior_session_id)
+
+        image_names = set([
+            x for x in image_names if x != 'omitted' and type(x) is str])
+        is_novel = {
+            f'{image_name}': image_name not in prior_images_shown
+            for image_name in image_names}
+        return is_novel
+
+    @classmethod
+    def _add_is_image_novel(
+            cls,
+            stimulus_presentations: pd.DataFrame,
+            behavior_session_id: int
+    ):
+        """Adds a column 'is_image_novel' to `stimulus_presentations`
+
+        Parameters
+        ----------
+        stimulus_presentations: stimulus presentations table
+        behavior_session_id: LIMS id of behavior session
+
+        """
+        stimulus_presentations['is_image_novel'] = \
+            stimulus_presentations['image_name']\
+            .map(cls._get_is_image_novel(
+                image_names=stimulus_presentations['image_name'].tolist(),
+                behavior_session_id=behavior_session_id
+            ))
 
     @classmethod
     def _postprocess(cls, presentations: pd.DataFrame,

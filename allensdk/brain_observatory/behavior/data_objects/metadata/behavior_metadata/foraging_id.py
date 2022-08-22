@@ -27,5 +27,8 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
                 behavior_sessions.id = {behavior_session_id};
         """
         foraging_id = lims_db.fetchone(query, strict=True)
-        foraging_id = uuid.UUID(foraging_id)
+        try:
+            foraging_id = uuid.UUID(foraging_id)
+        except ValueError:
+            foraging_id = None
         return cls(foraging_id=foraging_id)

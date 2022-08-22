@@ -25,7 +25,7 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin,
-                  allow_none: bool = False) -> "ReporterLine":
+                  allow_none: bool = True) -> "ReporterLine":
         """
         Parameters
         ----------

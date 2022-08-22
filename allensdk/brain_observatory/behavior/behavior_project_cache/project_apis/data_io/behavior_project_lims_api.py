@@ -8,6 +8,9 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.internal.api import db_connection_creator
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
     import (HttpEngine)
@@ -17,8 +20,7 @@ from allensdk.core.auth_config import (
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query, build_where_clause)
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
-    get_session_type_from_pkl_file, \
-    get_session_types_multiprocessing
+    get_session_metadata_multiprocessing
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -517,17 +519,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         summary_tbl = self._get_behavior_summary_table()
 
         if n_workers > 1:
-            stimulus_names = get_session_types_multiprocessing(
+            session_metadata = get_session_metadata_multiprocessing(
                 behavior_session_ids=(
                     summary_tbl['behavior_session_id'].tolist()),
                 lims_engine=self.lims_engine
             )
         else:
-            stimulus_names = [
-                get_session_type_from_pkl_file(
+            session_metadata = [
+                BehaviorMetadata.from_lims(
                     behavior_session_id=behavior_session_id,
-                    db_conn=self.lims_engine)
+                    lims_db=db_connection_creator(
+                        fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+                    )
+                )
                 for behavior_session_id in summary_tbl['behavior_session_id']]
+        stimulus_names = [x.session_type for x in session_metadata]
         stimulus_names = pd.DataFrame(stimulus_names)
 
         return (summary_tbl.merge(stimulus_names,

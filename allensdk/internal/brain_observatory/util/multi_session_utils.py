@@ -1,22 +1,27 @@
 """Utilities for accessing data across multiple sessions"""
 import os
 from multiprocessing import Pool
-from typing import List, Optional
+from typing import List, Optional, Set, Callable
 
 from tqdm import tqdm
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    get_image_names
 from allensdk.internal.api import PostgresQueryMixin
 
 
-def get_session_types_multiprocessing(
+def get_session_metadata_multiprocessing(
         behavior_session_ids: List[int],
         lims_engine: PostgresQueryMixin,
-        n_workers: Optional[int] = None
-) -> List[str]:
-    """Gets session type for `behavior_session_ids` by reading it from the
-    behavior stimulus pkl files. Uses multiprocessing to speed up
-    reading
+        n_workers: Optional[int] = None,
+) -> List[BehaviorMetadata]:
+    """Gets session metadata for `behavior_session_ids`.
+    Uses multiprocessing to speed up reading
 
     Parameters
     ----------
@@ -30,38 +35,140 @@ def get_session_types_multiprocessing(
 
     Returns
     -------
-    List[str]: list of session type
+    List[BehaviorMetadata]: list of `BehaviorMetadata`
     """
+    session_metadata = _multiprocessing_helper(
+        target=_get_session_metadata,
+        behavior_session_ids=behavior_session_ids,
+        lims_engine=lims_engine,
+        progress_bar_title='Reading session metadata from pkl file',
+        n_workers=n_workers
+    )
+
+    return session_metadata
+
+
+def get_images_shown_multiprocessing(
+        behavior_session_ids: List[int],
+        lims_engine: PostgresQueryMixin,
+        n_workers: Optional[int] = None
+) -> Set[str]:
+    """
+
+    Parameters
+    ----------
+    behavior_session_ids
+    lims_engine
+    n_workers
+
+    Returns
+    -------
+    Set[str]: set of image names shown to mouse in behavior_session_ids
+    """
+    image_names = _multiprocessing_helper(
+        target=_get_image_names,
+        behavior_session_ids=behavior_session_ids,
+        lims_engine=lims_engine,
+        progress_bar_title='Reading image_names from pkl file',
+        n_workers=n_workers
+    )
+    res = set()
+    for image_name_set in image_names:
+        for image_name in image_name_set:
+            res.add(image_name)
+    return res
+
+
+def _multiprocessing_helper(
+        target: Callable,
+        progress_bar_title: str,
+        behavior_session_ids: List[int],
+        lims_engine: PostgresQueryMixin,
+        n_workers: Optional[int] = None
+):
     if n_workers is None:
         n_workers = len(os.sched_getaffinity(0))
 
     with Pool(n_workers) as p:
-        stimulus_names = list(tqdm(
-            p.imap(_get_session_type_from_pkl_file,
+        res = list(tqdm(
+            p.imap(target,
                    zip(
                        behavior_session_ids,
                        [lims_engine] * len(behavior_session_ids))
                    ),
             total=len(behavior_session_ids),
-            desc='Reading session type from pkl file'))
-    return stimulus_names
+            desc=progress_bar_title))
+    return res
 
 
-def get_session_type_from_pkl_file(
-        behavior_session_id: int,
-        db_conn: PostgresQueryMixin):
-    return _get_session_type_from_pkl_file(behavior_session_id, db_conn)
-
-
-def _get_session_type_from_pkl_file(*args) -> dict:
+def _get_session_metadata(*args) -> BehaviorMetadata:
     """
-    Helper function to get session type from behavior stimulus file
+    Helper function to get session metadata
     """
     behavior_session_id, db_conn = args[0]
-    return {
-        'behavior_session_id': behavior_session_id,
-        'session_type': (
-            BehaviorStimulusFile.from_lims(
-                db=db_conn,
-                behavior_session_id=behavior_session_id).session_type)
-    }
+    return BehaviorMetadata.from_lims(
+        behavior_session_id=BehaviorSessionId(behavior_session_id),
+        lims_db=db_conn)
+
+
+def _get_image_names(*args) -> Set[str]:
+    """
+    Helper function to get image names from behavior stimulus file
+    """
+    behavior_session_id, db_conn = args[0]
+    behavior_stimulus_file = BehaviorStimulusFile.from_lims(
+        behavior_session_id=behavior_session_id, db=db_conn)
+    image_names = get_image_names(
+        behavior_stimulus_file=behavior_stimulus_file)
+    return image_names
+
+
+def remove_invalid_sessions(
+    behavior_sessions: List[BehaviorMetadata],
+    remove_pretest_sessions: bool = True,
+    remove_sessions_after_mouse_death_date: bool = True,
+    remove_aborted_sessions: bool = True,
+    expected_training_duration: int = 15 * 60,
+    expected_duration: int = 60 * 60
+) -> List[BehaviorMetadata]:
+    """
+    Removes any invalid sessions from `behavior_sessions`
+
+    Parameters
+    ----------
+    behavior_sessions:
+        List of behavior session metadata
+    remove_pretest_sessions
+        Remove any "pretest" session
+    remove_sessions_after_mouse_death_date
+        Remove any sessions mistakenly entered that fall after mouse death date
+    remove_aborted_sessions
+        Remove aborted sessions
+    expected_training_duration
+        Expected duration for TRAINING_0 session
+    expected_duration
+        Expected duration for all sessions except TRAINING_0
+
+    Returns
+    -------
+    List[BehaviorMetadata]:
+        list of behavior sessions with invalid sessions
+        removed
+    """
+    if remove_pretest_sessions:
+        behavior_sessions = [x for x in behavior_sessions if not x.is_pretest]
+
+    if remove_sessions_after_mouse_death_date:
+        behavior_sessions = [
+            x for x in behavior_sessions
+            if x.date_of_acquisition <= x.subject_metadata.get_death_date()]
+
+    if remove_aborted_sessions:
+        training_sessions = \
+            [x for x in behavior_sessions if x.is_training and
+             x.get_session_duration() > expected_training_duration]
+        nontraining_sessions = \
+            [x for x in behavior_sessions if not x.is_training and
+             x.get_session_duration() > expected_duration]
+        behavior_sessions = training_sessions + nontraining_sessions
+    return behavior_sessions

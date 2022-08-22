@@ -45,6 +45,10 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile):
+        return stimulus_file.date_of_acquisition
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
         return cls(date_of_acquisition=nwbfile.session_start_time)
 
