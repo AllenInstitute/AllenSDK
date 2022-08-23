@@ -552,7 +552,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             self,
             add_metadata=True,
             include_experiment_description=True,
-            stimulus_presentations_stimulus_column_name: str = 'image_set'
+            stimulus_presentations_stimulus_column_name: str = 'stimulus_name'
     ) -> NWBFile:
         """
 
