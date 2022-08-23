@@ -88,7 +88,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         return Stimuli(presentations=p, templates=t)
 
     def to_nwb(self, nwbfile: NWBFile,
-               presentations_stimulus_column_name='image_set') -> NWBFile:
+               presentations_stimulus_column_name='stimulus_name') -> NWBFile:
         """
 
         Parameters
