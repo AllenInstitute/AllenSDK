@@ -7,12 +7,6 @@ import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.mouse_id import \
-    MouseId
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.core import \
@@ -25,11 +19,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.mouse import Mouse
-from allensdk.internal.brain_observatory.util.multi_session_utils import \
-    get_session_metadata_multiprocessing
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
@@ -91,7 +81,12 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 if len(types) > 1 and str in types:
                     series.fillna('N/A', inplace=True)
                     cleaned_table[colname] = series.transform(str)
-
+                if series.dtype == 'boolean':
+                    # Fixing an issue in which a bool column contains
+                    # nans, which get coerced to True in pynwb
+                    # Float maintains the nan values, while bool does not
+                    # These will be coerced to boolean when reading
+                    cleaned_table[colname] = series.astype(float)
             interval_description = (f"Presentation times and stimuli details "
                                     f"for '{stim_name}' stimuli. "
                                     f"\n"
@@ -147,6 +142,15 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         table = pd.concat(presentation_dfs, sort=False)
         table = table.astype(
             {c: 'int64' for c in table.select_dtypes(include='int')})
+
+        # coercing bool columns with nans to boolean. "Boolean" dtype
+        # allows null values, while "bool" does not (see comment in to_nwb)
+        table = table.astype({
+            c: 'boolean' for c in table.select_dtypes(include='float')
+            if set(table[c][~table[c].isna()].unique()).issubset({1, 0})
+               # These columns should not be coerced to boolean
+               and not c.endswith('_index')
+        })
         table = table.sort_values(by=["start_time"])
 
         table = table.reset_index(drop=True)
@@ -238,9 +242,6 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 stim_pres_df[stim_pres_df['image_name'].isin(limit_to_images)]
             stim_pres_df.index = pd.Int64Index(
                 range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
-        stim_pres_df = cls._postprocess(
-            presentations=stim_pres_df,
-            fill_omitted_values=fill_omitted_values)
 
         stim_pres_df['stimulus_block'] = 0
         stim_pres_df['stimulus_name'] = 'behavior'
@@ -256,6 +257,11 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 stimulus_file=stimulus_file,
                 stimulus_timestamps=stimulus_timestamps
             )
+        stim_pres_df = cls._postprocess(
+            presentations=stim_pres_df,
+            fill_omitted_values=fill_omitted_values,
+            coerce_bool_to_boolean=True
+        )
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 
@@ -290,6 +296,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                                 behavior_session_id=behavior_session_id)
         exclude_columns = exclude_columns if exclude_columns else []
         df = df[[c for c in df if c not in exclude_columns]]
+        df = cls._postprocess(presentations=df,
+                              fill_omitted_values=False,
+                              coerce_bool_to_boolean=True)
         return Presentations(presentations=df,
                              columns_to_rename=columns_to_rename,
                              sort_columns=sort_columns)
@@ -336,11 +345,11 @@ class Presentations(DataObject, StimulusFileReadableInterface,
     @classmethod
     def _postprocess(cls, presentations: pd.DataFrame,
                      fill_omitted_values=True,
+                     coerce_bool_to_boolean=True,
                      omitted_time_duration: float = 0.25) \
             -> pd.DataFrame:
         """
-        Optionally fill missing values for omitted flashes (no need when
-            reading from NWB since already filled)
+        Applies further processing to `presentations`
 
         Parameters
         ----------
@@ -348,12 +357,19 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             Presentations df
         fill_omitted_values
             Whether to fill stop time and duration for omitted flashes
+        coerce_bool_to_boolean
+            Whether to coerce columns of "Object" dtype that are truly bool
+            to nullable "boolean" dtype
         omitted_time_duration
             Amount of time a stimuli is omitted for in seconds"""
         df = presentations
         if fill_omitted_values:
             cls._fill_missing_values_for_omitted_flashes(
                 df=df, omitted_time_duration=omitted_time_duration)
+        if coerce_bool_to_boolean:
+            df = df.astype({
+                c: 'boolean' for c in df.select_dtypes('O')
+                if set(df[c][~df[c].isna()].unique()).issubset({True, False})})
         return df
 
     @staticmethod
@@ -374,7 +390,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         omitted_time_duration
             Amount of time a stimulus is omitted for in seconds
         """
-        omitted = df['omitted']
+        omitted = df['omitted'].fillna(False)
         df.loc[omitted, 'stop_time'] = \
             df.loc[omitted, 'start_time'] + omitted_time_duration
         df.loc[omitted, 'duration'] = omitted_time_duration
@@ -403,12 +419,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             stimulus_file.data['items']['behavior']['items']['fingerprint']
             ['static_stimulus'])
 
-        # start time is relative to session start. stop_time here
-        # is assumed to be the last stop time of the last stimulus prior to the
-        # fingerprint stimulus
         n_repeats = fingerprint_stim['runs']
-
-        monitor_frame_rate = stimulus_file.monitor_frame_rate
 
         # spontaneous + fingerprint indices relative to start of session
         frame_indices = np.array(
@@ -418,8 +429,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         movie_length = int(len(fingerprint_stim['sweep_frames']) / n_repeats)
 
         # Start index within the spontaneous + fingerprint block
-        movie_start_index = int(
-            fingerprint_stim['start_time'] * monitor_frame_rate)
+        movie_start_index = (fingerprint_stim['frame_list'] == -1).sum()
 
         res = []
         for repeat in range(n_repeats):
