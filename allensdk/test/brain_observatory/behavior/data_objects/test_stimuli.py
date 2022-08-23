@@ -45,7 +45,9 @@ class TestFromBehaviorStimulusFile(LimsTest):
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            limit_to_images=['im065'])
+            limit_to_images=['im065'],
+            behavior_session_id=self.behavior_session_id
+        )
         assert stimuli.presentations == self.expected_presentations
         assert stimuli.templates == self.expected_templates
 
@@ -57,7 +59,10 @@ def presentations_fixture(
     Return a Presentations object
     """
     obj = Presentations.from_path(
-        path=behavior_ecephys_session_config_fixture['stim_table_file'])
+        path=behavior_ecephys_session_config_fixture['stim_table_file'],
+        behavior_session_id=(
+            behavior_ecephys_session_config_fixture['behavior_session_id'])
+    )
     return obj
 
 

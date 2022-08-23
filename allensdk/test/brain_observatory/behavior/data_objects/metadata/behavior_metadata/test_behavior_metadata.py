@@ -79,7 +79,8 @@ class BehaviorMetaTestCase:
             stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
             session_type=SessionType(session_type='Unknown'),
             behavior_session_uuid=BehaviorSessionUUID(
-                behavior_session_uuid=uuid.uuid4())
+                behavior_session_uuid=uuid.uuid4()),
+            date_of_acquisition=None
         )
         return behavior_meta
 
