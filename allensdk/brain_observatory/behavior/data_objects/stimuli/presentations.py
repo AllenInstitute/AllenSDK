@@ -422,7 +422,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         n_repeats = fingerprint_stim['runs']
 
         # spontaneous + fingerprint indices relative to start of session
-        frame_indices = np.array(
+        stimulus_session_frame_indices = np.array(
             stimulus_file.data['items']['behavior']['items']
             ['fingerprint']['frame_indices'])
 
@@ -439,10 +439,21 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 stimulus_frame_indices = \
                     np.array(fingerprint_stim['sweep_frames']
                              [frame + (repeat * movie_length)])
-                start_frame, end_frame = frame_indices[
+                start_frame, end_frame = stimulus_session_frame_indices[
                     stimulus_frame_indices + movie_start_index]
                 start_time, stop_time = \
-                    stimulus_timestamps.value[[start_frame, end_frame + 1]]
+                    stimulus_timestamps.value[[
+                        start_frame,
+                        # Sometimes stimulus timestamps gets truncated too
+                        # early. There should be 2 extra frames after last
+                        # stimulus presentation frame, since if the end
+                        # frame is end_frame, then the end timestamp occurs on
+                        # end_frame+1. The min is being taken to prevent
+                        # index out of bounds. This results in the last
+                        # frame's duration being too short TODO this is
+                        #  probably a bug somewhere in timestamp creation
+                        min(end_frame + 1,
+                            len(stimulus_timestamps.value) - 1)]]
                 res.append({
                     'movie_frame_index': frame,
                     'start_time': start_time,
