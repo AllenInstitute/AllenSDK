@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import pynwb
 import pytest
+from dateutil.tz import tzoffset
 
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
@@ -174,7 +175,8 @@ class TestNWB(TestBOM):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=datetime.datetime.now()
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35,
+                                                 tzinfo=tzoffset(None, -22500))
         )
 
     @pytest.mark.parametrize('meso', [True, False])

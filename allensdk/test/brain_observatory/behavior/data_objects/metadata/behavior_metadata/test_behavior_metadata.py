@@ -8,6 +8,8 @@ import pytest
 import pytz
 from uuid import UUID
 
+from dateutil.tz import tzoffset
+
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -80,7 +82,9 @@ class BehaviorMetaTestCase:
             session_type=SessionType(session_type='Unknown'),
             behavior_session_uuid=BehaviorSessionUUID(
                 behavior_session_uuid=uuid.uuid4()),
-            date_of_acquisition=None
+            date_of_acquisition=DateOfAcquisition(
+                datetime.datetime(2022, 8, 24, 12, 35,
+                                  tzinfo=tzoffset(None, -22500)))
         )
         return behavior_meta
 
