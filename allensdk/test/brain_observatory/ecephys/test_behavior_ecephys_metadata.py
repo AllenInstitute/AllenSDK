@@ -36,7 +36,7 @@ def create_nwb_file(
         session_description='foo',
         identifier=str(ecephys_session_id),
         session_id='foo',
-        session_start_time=datetime.datetime.now(),
+        session_start_time=datetime.datetime(2021, 6, 24, 13, 59, 17, 563000),
         institution="Allen Institute"
     )
     return nwbfile
