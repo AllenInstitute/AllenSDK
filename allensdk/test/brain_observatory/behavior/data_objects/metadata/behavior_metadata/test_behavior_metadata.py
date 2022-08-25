@@ -83,8 +83,7 @@ class BehaviorMetaTestCase:
             behavior_session_uuid=BehaviorSessionUUID(
                 behavior_session_uuid=uuid.uuid4()),
             date_of_acquisition=DateOfAcquisition(
-                datetime.datetime(2022, 8, 24, 12, 35,
-                                  tzinfo=tzoffset(None, -22500)))
+                datetime.datetime(2022, 8, 24, 12, 35))
         )
         return behavior_meta
 
