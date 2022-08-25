@@ -175,8 +175,7 @@ class TestNWB(TestBOM):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=datetime.datetime(2022, 8, 24, 12, 35,
-                                                 tzinfo=tzoffset(None, -22500))
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35)
         )
 
     @pytest.mark.parametrize('meso', [True, False])
