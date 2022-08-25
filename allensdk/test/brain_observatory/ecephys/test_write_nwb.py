@@ -516,12 +516,20 @@ def test_read_stimulus_table(tmpdir_factory, presentations,
     presentations.to_csv(stim_table_path, index=False)
     if column_renames_map is None:
         column_renames_map = write_nwb.STIM_TABLE_RENAMES_MAP
-    obt = Presentations.from_path(
-        path=stim_table_path,
-        exclude_columns=columns_to_drop,
-        columns_to_rename=column_renames_map,
-        sort_columns=False
-    )
+
+    def add_is_image_novel(stimulus_presentations, behavior_session_id):
+        # not testing this for vcn
+        return None
+
+    with patch.object(Presentations, '_add_is_image_novel',
+                      wraps=add_is_image_novel):
+        obt = Presentations.from_path(
+            path=stim_table_path,
+            behavior_session_id=1,
+            exclude_columns=columns_to_drop,
+            columns_to_rename=column_renames_map,
+            sort_columns=False
+        )
 
     pd.testing.assert_frame_equal(obt.value, expected)
 
