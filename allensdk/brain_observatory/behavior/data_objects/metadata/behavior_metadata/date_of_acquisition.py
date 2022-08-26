@@ -23,7 +23,11 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
         doa = dict_repr['date_of_acquisition']
-        doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
+        try:
+            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            # parse the microseconds
+            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S.%f")
         tz = pytz.timezone("America/Los_Angeles")
         doa = tz.localize(doa)
 
@@ -46,8 +50,11 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile):
-        return stimulus_file.date_of_acquisition
+    def from_stimulus_file(
+            cls,
+            stimulus_file: BehaviorStimulusFile
+    ) -> "DateOfAcquisition":
+        return cls(date_of_acquisition=stimulus_file.date_of_acquisition)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
