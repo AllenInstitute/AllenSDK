@@ -1,14 +1,12 @@
 from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
 import numpy as np
-import logging
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 from allensdk.internal.api.queries.utils import (
-    _sanitize_uuid_list,
     build_in_list_selector_query)
 
 from allensdk.internal.api.queries.ecephys_lims_queries import (

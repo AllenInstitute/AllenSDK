@@ -8,8 +8,6 @@ import pytest
 import pytz
 from uuid import UUID
 
-from dateutil.tz import tzoffset
-
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata \

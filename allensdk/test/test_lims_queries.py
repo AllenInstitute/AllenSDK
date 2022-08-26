@@ -105,7 +105,6 @@ def test_foraging_id_map(
                            behavior_session_ids=behavior_session_ids)
 
 
-
 def test_sanitize_uuid_list():
     """
     Test that _sanitize_uuid_list gives the expected result
