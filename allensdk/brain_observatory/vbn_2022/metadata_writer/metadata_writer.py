@@ -64,9 +64,6 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP
             )
 
-        mtrain_connection = db_connection_creator(
-                fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
-
         if self.args['probes_to_skip'] is not None:
             probe_ids_to_skip = get_list_of_bad_probe_ids(
                         lims_connection=lims_connection,
@@ -169,11 +166,9 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
         (ecephys_session_table,
          behavior_session_table) = session_tables_from_ecephys_session_id_list(
                     lims_connection=lims_connection,
-                    mtrain_connection=mtrain_connection,
                     ecephys_session_id_list=session_id_list,
                     failed_ecephys_session_id_list=failed_session_list,
-                    probe_ids_to_skip=probe_ids_to_skip,
-                    logger=self.logger)
+                    probe_ids_to_skip=probe_ids_to_skip)
 
         ecephys_nwb_dir = pathlib.Path(
                                 self.args['ecephys_nwb_dir'])

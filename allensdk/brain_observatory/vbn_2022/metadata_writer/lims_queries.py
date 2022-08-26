@@ -738,11 +738,8 @@ def _filter_on_death_date(
 
 def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
-        exclude_sessions_after_death_date: bool = True,
-        exclude_aborted_sessions: bool = True,
-        logger: Optional[logging.Logger] = None
+        exclude_invalid_sessions: bool = True
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -753,25 +750,15 @@ def _behavior_session_table_from_ecephys_session_id_list(
     ----------
     lims_connection: PostgresQueryMixin
 
-    mtrain_connection: PostgresQueryMixin
-
     ecephys_session_id_list: List[int]
         The list of ecephys_session_ids used to lookup the mice
         we are interested in following
 
-    exclude_sessions_after_death_date
-        Whether to exclude sessions that fall after death date
-        in order to filter out these mistakenly entered sessions
-
-    exclude_aborted_sessions
-        Whether to exclude aborted sessions. The way that we determine if a
-        session is aborted is by comparing the session duration to an
-        expected duration
-
-    logger: Optional[logging.Logger]
-        Really just passed through to track progress when patching
-        columns from the pickle file, since that is the most
-        expensive process.
+    exclude_invalid_sessions
+        Excludes sessions that:
+        - are pretest
+        - fall after mouse death date
+        - were aborted
 
     Returns
     -------
@@ -806,8 +793,9 @@ def _behavior_session_table_from_ecephys_session_id_list(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         )
     )
-    behavior_sessions = remove_invalid_sessions(
-        behavior_sessions=behavior_sessions)
+    if exclude_invalid_sessions:
+        behavior_sessions = remove_invalid_sessions(
+            behavior_sessions=behavior_sessions)
 
     behavior_session_df = \
         behavior_session_df[
@@ -851,11 +839,9 @@ def _behavior_session_table_from_ecephys_session_id_list(
 
 def session_tables_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         failed_ecephys_session_id_list: Optional[List[int]],
-        probe_ids_to_skip: Optional[List[int]],
-        logger: Optional[logging.Logger] = None
+        probe_ids_to_skip: Optional[List[int]]
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform the database query to generate the ecephys_session_table
@@ -863,8 +849,6 @@ def session_tables_from_ecephys_session_id_list(
     Parameters
     ----------
     lims_connection: PostgresQueryMixin
-
-    mtrain_connection: PostgresQueryMixin
 
     ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
@@ -880,11 +864,6 @@ def session_tables_from_ecephys_session_id_list(
 
     probe_ids_to_skip: Optional[List[int]]
         The IDs of probes not being released
-
-    logger: Optional[logging.Logger]
-        Really just passed through to track progress
-        while patching columns from the pickle file,
-        since that is the most expensive process.
 
     Returns
     -------
@@ -935,9 +914,7 @@ def session_tables_from_ecephys_session_id_list(
 
     beh_table = _behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
-            mtrain_connection=mtrain_connection,
-            ecephys_session_id_list=ecephys_session_id_list,
-            logger=logger)
+            ecephys_session_id_list=ecephys_session_id_list)
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                 lims_connection=lims_connection,
