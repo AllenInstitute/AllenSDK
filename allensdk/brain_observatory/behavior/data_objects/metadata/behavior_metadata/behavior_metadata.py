@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Dict, Optional
 import re
@@ -298,8 +299,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         )
 
     @property
-    def date_of_acquisition(self) -> DateOfAcquisition:
-        return self._date_of_acquisition
+    def date_of_acquisition(self) -> datetime.datetime:
+        return self._date_of_acquisition.value
 
     @property
     def equipment(self) -> Equipment:
