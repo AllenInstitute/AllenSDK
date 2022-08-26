@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 import pynwb
 import pytest
-from dateutil.tz import tzoffset
 
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
