@@ -312,6 +312,20 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             image_names: List[str],
             behavior_session_id: int,
     ) -> Dict[str, bool]:
+        """
+        Returns whether each image in `image_names` is novel for the mouse
+
+        Parameters
+        ----------
+        image_names:
+            List of image names
+        behavior_session_id
+            LIMS behavior session id
+
+        Returns
+        -------
+        Dict mapping image name to is_novel
+        """
         mouse = Mouse.from_behavior_session_id(
             behavior_session_id=behavior_session_id)
         prior_images_shown = mouse.get_images_shown(
