@@ -23,15 +23,13 @@ class TestLimsQueries(LimsTest):
         obtained = \
             _behavior_session_table_from_ecephys_session_id_list(
                 lims_connection=self.dbconn,
-                mtrain_connection=self.mtrainconn,
                 ecephys_session_id_list=[ecephys_session_id]
             )
         obtained_include = \
             _behavior_session_table_from_ecephys_session_id_list(
                 lims_connection=self.dbconn,
-                mtrain_connection=self.mtrainconn,
                 ecephys_session_id_list=[ecephys_session_id],
-                exclude_sessions_after_death_date=False
+                exclude_invalid_sessions=False
             )
         death_date = get_death_date_for_mouse_ids(
             lims_connections=self.dbconn,
