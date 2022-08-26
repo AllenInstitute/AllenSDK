@@ -1,6 +1,7 @@
 import pickle
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -13,6 +14,7 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli\
     FingerprintStimulus
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import get_spontaneous_block_indices, Presentations
+from allensdk.internal.brain_observatory.mouse import Mouse
 
 
 @pytest.mark.parametrize('stimulus_blocks, expected', [
@@ -114,3 +116,40 @@ class TestFingerprintStimulus:
             expected_num_spontaneous_rows + \
             expected_num_fingerprint_rows
 
+
+class TestStimulusPresentations:
+    @pytest.mark.parametrize('image_names, expected', [
+        (['A', 'B'], {'A': False, 'B': False}),
+        (['A', 'C'], {'A': False, 'C': True}),
+        (['C', 'omitted', np.nan, None], {'C': True})
+    ])
+    def test_get_is_image_novel(self, image_names, expected):
+        with patch.object(Mouse, attribute='from_behavior_session_id',
+                          wraps=lambda behavior_session_id: Mouse('1')):
+            with patch.object(
+                    Mouse, attribute='get_images_shown',
+                    wraps=lambda up_to_behavior_session_id: {'A', 'B'}):
+                obt = Presentations._get_is_image_novel(
+                    image_names=image_names, behavior_session_id=1)
+                assert obt == expected
+
+    def test_add_is_image_novel(self):
+        stimulus_presentations = pd.DataFrame({
+            'image_name': ['A', 'B', 'C', np.nan]})
+        is_image_novel = {
+            'A': False,
+            'B': False,
+            'C': True
+        }
+        with patch.object(Presentations, attribute='_get_is_image_novel',
+                          wraps=lambda image_names, behavior_session_id:
+                          is_image_novel):
+            Presentations._add_is_image_novel(
+                stimulus_presentations=stimulus_presentations,
+                behavior_session_id=1
+            )
+            assert (stimulus_presentations['is_image_novel'].tolist() ==
+                   list(is_image_novel.values())
+                    # due to last stimulus which is not an image
+                    + [np.nan]
+                    )
