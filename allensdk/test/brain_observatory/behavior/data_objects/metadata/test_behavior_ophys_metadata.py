@@ -155,6 +155,7 @@ class TestJson(TestBOM):
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         self.dict_repr = dict_repr
 
+    @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
     def test_from_json(self, meso):
         if meso:
