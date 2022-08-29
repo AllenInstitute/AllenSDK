@@ -201,5 +201,6 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         if res is not None:
             # convert to datetime.datetime
             res = res.astype('datetime64[s]').astype(datetime)
-        res = pytz.utc.localize(res)
+
+            res = pytz.utc.localize(res)
         return res
