@@ -58,7 +58,7 @@ def get_images_shown(
 ) -> Set[str]:
     """
     Gets images shown to mouse during `behavior_session_ids`
-    
+
     Parameters
     ----------
     behavior_session_ids
