@@ -73,6 +73,7 @@ class _StimulusFile(DataFile):
         return {self.file_path_key(): str(self.filepath)}
 
     @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin,
         behavior_session_id: Union[int, str]
