@@ -314,7 +314,7 @@ def test_add_age_in_days(index_column):
        {index_column: 1,
         'date_of_acquisition': datetime.datetime(2020, 7, 8, 12),
         'date_of_birth': datetime.datetime(2020, 7, 6, 14)})
-    expected_age.append(1)
+    expected_age.append(2)
 
     input_data.append(
        {index_column: 2,
