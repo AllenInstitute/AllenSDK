@@ -73,7 +73,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
         behavior_metadata = super().from_nwb(nwbfile=nwbfile)
         return BehaviorEcephysMetadata(
             ecephys_session_id=int(nwbfile.identifier),
-            date_of_acquisition=behavior_metadata.date_of_acquisition,
+            date_of_acquisition=DateOfAcquisition(
+                behavior_metadata.date_of_acquisition),
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
             equipment=behavior_metadata.equipment,
