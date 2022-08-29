@@ -96,12 +96,12 @@ def credential_injector(credential_map: Dict[str, Any],
         def wrapper(*args, **kwargs):
             for kw, credential in credential_map.items():
                 if kw not in kwargs.keys():
-                    logger.info(f"No explicit value provided for {kw}. "
-                                "Searching credential provider.")
+                    logger.debug(f"No explicit value provided for {kw}. "
+                                 "Searching credential provider.")
                     secret = provider.provide(credential)
                     if secret is not None:
-                        logger.info("Found value in credential provider, "
-                                    f"from '{provider.METHOD}' method.")
+                        logger.debug("Found value in credential provider, "
+                                     f"from '{provider.METHOD}' method.")
                         kwargs.update({kw: provider.provide(credential)})
                     else:
                         logger.warning(
