@@ -90,7 +90,7 @@ class TestFingerprintStimulus:
 
         obt = obt.table[sorted([c for c in obt.table])]
         expected = expected[sorted([c for c in expected])]
-        assert obt.equals(expected)
+        pd.testing.assert_frame_equal(obt, expected)
 
     def test_add_fingerprint_stimulus(self):
         """Checks that fingerprint block and spontaneous block are correctly
