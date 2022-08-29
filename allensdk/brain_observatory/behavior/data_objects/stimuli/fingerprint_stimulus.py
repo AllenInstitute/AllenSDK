@@ -88,11 +88,14 @@ class FingerprintStimulus:
                     'repeat': repeat,
                     'duration': stop_time - start_time
                 })
-        res = pd.DataFrame(res)
+        table = pd.DataFrame(res)
 
-        res['stimulus_block'] = \
+        table['stimulus_block'] = \
             stimulus_presentations['stimulus_block'].max() \
             + 2     # + 2 since there is a gap before this stimulus
-        res['stimulus_name'] = 'natural_movie_one'
+        table['stimulus_name'] = 'natural_movie_one'
 
-        return FingerprintStimulus(table=res)
+        table = table.astype(
+            {c: 'int64' for c in table.select_dtypes(include='int')})
+
+        return FingerprintStimulus(table=table)
