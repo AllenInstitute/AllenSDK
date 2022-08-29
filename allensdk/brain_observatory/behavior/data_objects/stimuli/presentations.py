@@ -84,7 +84,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 if len(types) > 1 and str in types:
                     series.fillna('N/A', inplace=True)
                     cleaned_table[colname] = series.transform(str)
-                if series.dtype == 'boolean':
+                if series.dtype.name == 'boolean':
                     # Fixing an issue in which a bool column contains
                     # nans, which get coerced to True in pynwb
                     # Float maintains the nan values, while bool does not
