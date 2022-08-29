@@ -15,6 +15,7 @@ DbCredentials = namedtuple("DbCredentials",
 
 class CredentialProvider(ABC):
     METHOD = "custom"
+
     @abstractmethod
     def provide(self, credential):
         pass
