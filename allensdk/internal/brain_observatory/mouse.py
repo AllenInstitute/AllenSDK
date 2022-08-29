@@ -9,7 +9,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
-    get_session_metadata_multiprocessing, get_images_shown_multiprocessing, \
+    get_session_metadata_multiprocessing, get_images_shown, \
     remove_invalid_sessions
 
 
@@ -76,7 +76,8 @@ class Mouse:
 
     def get_images_shown(
             self,
-            up_to_behavior_session_id: Optional[int] = None
+            up_to_behavior_session_id: Optional[int] = None,
+            n_workers: Optional[int] = None
     ):
         """Gets all images presented to mouse up to (not including)
         `up_to_behavior_session_id` if provided
@@ -86,6 +87,9 @@ class Mouse:
         up_to_behavior_session_id
             Filters stimulus presentations to all those up to (not including)
             this behavior session, if provided
+        n_workers
+            Number of processes to spawn for reading image names from
+            stimulus files
         """
         lims_db = db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
@@ -104,9 +108,10 @@ class Mouse:
             behavior_sessions = [
                 x for x in behavior_sessions
                 if x.behavior_session_id in prior_behavior_session_ids]
-        images_shown = get_images_shown_multiprocessing(
+        images_shown = get_images_shown(
             behavior_session_ids=(
                 [x.behavior_session_id for x in behavior_sessions]),
-            lims_engine=lims_db
+            lims_engine=lims_db,
+            n_workers=n_workers
         )
         return images_shown

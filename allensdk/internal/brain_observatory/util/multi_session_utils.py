@@ -51,13 +51,14 @@ def get_session_metadata_multiprocessing(
     return session_metadata
 
 
-def get_images_shown_multiprocessing(
+def get_images_shown(
         behavior_session_ids: List[int],
         lims_engine: PostgresQueryMixin,
         n_workers: Optional[int] = None
 ) -> Set[str]:
     """
-
+    Gets images shown to mouse during `behavior_session_ids`
+    
     Parameters
     ----------
     behavior_session_ids
@@ -68,13 +69,19 @@ def get_images_shown_multiprocessing(
     -------
     Set[str]: set of image names shown to mouse in behavior_session_ids
     """
-    image_names = _multiprocessing_helper(
-        target=_get_image_names,
-        behavior_session_ids=behavior_session_ids,
-        lims_engine=lims_engine,
-        progress_bar_title='Reading image_names from pkl file',
-        n_workers=n_workers
-    )
+    if n_workers > 1:
+        # multiprocessing
+        image_names = _multiprocessing_helper(
+            target=_get_image_names,
+            behavior_session_ids=behavior_session_ids,
+            lims_engine=lims_engine,
+            progress_bar_title='Reading image_names from pkl file',
+            n_workers=n_workers
+        )
+    else:
+        # single process
+        image_names = [_get_image_names([behavior_session_id, lims_engine])
+                       for behavior_session_id in behavior_session_ids]
     res = set()
     for image_name_set in image_names:
         for image_name in image_name_set:
