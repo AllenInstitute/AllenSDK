@@ -90,7 +90,7 @@ def _multiprocessing_helper(
         n_workers: Optional[int] = None
 ):
     if n_workers is None:
-        n_workers = len(os.sched_getaffinity(0))
+        n_workers = os.cpu_count()
 
     with Pool(n_workers) as p:
         res = list(tqdm(
