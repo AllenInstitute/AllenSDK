@@ -91,7 +91,8 @@ class TestMouse:
                 with patch.object(BehaviorStimulusFile, attribute='from_lims',
                                   wraps=self.get_behavior_stimulus_file):
                     obt = self.mouse.get_images_shown(
-                        up_to_behavior_session_id=upto_behavior_session_id)
+                        up_to_behavior_session_id=upto_behavior_session_id,
+                        n_workers=1)
                     if upto_behavior_session_id is None:
                         assert obt == set(self.image_names)
                     elif upto_behavior_session_id == 1:
