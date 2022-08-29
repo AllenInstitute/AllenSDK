@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
+import pytz
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
@@ -200,4 +201,5 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         if res is not None:
             # convert to datetime.datetime
             res = res.astype('datetime64[s]').astype(datetime)
+        res = pytz.utc.localize(res)
         return res
