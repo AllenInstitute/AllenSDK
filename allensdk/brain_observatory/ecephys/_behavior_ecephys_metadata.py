@@ -58,7 +58,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
         behavior_metadata = super().from_json(dict_repr=dict_repr)
         return BehaviorEcephysMetadata(
             ecephys_session_id=dict_repr['ecephys_session_id'],
-            date_of_acquisition=behavior_metadata.date_of_acquisition,
+            date_of_acquisition=DateOfAcquisition(
+                behavior_metadata.date_of_acquisition),
             subject_metadata=behavior_metadata.subject_metadata,
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
