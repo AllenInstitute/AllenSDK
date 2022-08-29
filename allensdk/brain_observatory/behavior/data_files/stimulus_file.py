@@ -241,14 +241,6 @@ class BehaviorStimulusFile(_StimulusFile):
         # TODO implement return value as class (i.e. Image, Grating)
         return self.data['items']['behavior']['stimuli']
 
-    @property
-    def monitor_frame_rate(self) -> float:
-        if 'stim_config' not in self.data['items']['behavior']:
-            raise MalformedStimulusFileError(
-                'Expected key "stim_config". Found '
-                f'{self.data["items"]["behavior"].keys()}')
-        return self.data['items']['behavior']['stim_config']['fps']
-
     def validate(self) -> "BehaviorStimulusFile":
         if 'items' not in self.data or 'behavior' not in self.data['items']:
             raise MalformedStimulusFileError(
