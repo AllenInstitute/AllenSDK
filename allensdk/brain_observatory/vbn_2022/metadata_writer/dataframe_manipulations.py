@@ -383,19 +383,10 @@ def _add_age_in_days(
     df: pd.DataFrame
         Same as input, but with age_in_days added
     """
-    age_in_days = []
-    for beh_id, acq, birth in zip(
-                df[index_column],
-                df['date_of_acquisition'],
-                df['date_of_birth']):
-        age = (acq-birth).days
-        age_in_days.append({index_column: beh_id,
-                            'age_in_days': age})
-    age_in_days = pd.DataFrame(data=age_in_days)
-    df = df.join(
-            age_in_days.set_index(index_column),
-            on=index_column,
-            how='left')
+    age_in_days = \
+        df['date_of_acquisition'].dt.date - df['date_of_birth'].dt.date
+    age_in_days = age_in_days.apply(lambda x: x.days)
+    df['age_in_days'] = age_in_days
     return df
 
 
