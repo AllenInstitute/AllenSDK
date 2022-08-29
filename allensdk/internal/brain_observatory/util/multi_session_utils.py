@@ -69,7 +69,7 @@ def get_images_shown(
     -------
     Set[str]: set of image names shown to mouse in behavior_session_ids
     """
-    if n_workers > 1:
+    if n_workers is None or n_workers > 1:
         # multiprocessing
         image_names = _multiprocessing_helper(
             target=_get_image_names,
