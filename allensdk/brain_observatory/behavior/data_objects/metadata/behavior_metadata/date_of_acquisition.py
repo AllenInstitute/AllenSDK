@@ -59,9 +59,6 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
         date_of_acquisition = nwbfile.session_start_time
-        # remove the timezone which nwb adds, since behavior stimulus file
-        # doesn't store timezone
-        date_of_acquisition = date_of_acquisition.replace(tzinfo=None)
         return cls(date_of_acquisition=date_of_acquisition)
 
     def validate(self, stimulus_file: BehaviorStimulusFile,
