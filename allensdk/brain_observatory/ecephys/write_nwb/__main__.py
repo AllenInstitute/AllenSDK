@@ -547,6 +547,7 @@ def write_ecephys_nwb(
     ]
     stimulus_table = Presentations.from_path(
         path=stimulus_table_path,
+        behavior_session_id=session_id,
         exclude_columns=stimulus_columns_to_drop,
         columns_to_rename=STIM_TABLE_RENAMES_MAP,
         sort_columns=False

@@ -79,7 +79,9 @@ class BehaviorMetaTestCase:
             stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
             session_type=SessionType(session_type='Unknown'),
             behavior_session_uuid=BehaviorSessionUUID(
-                behavior_session_uuid=uuid.uuid4())
+                behavior_session_uuid=uuid.uuid4()),
+            date_of_acquisition=DateOfAcquisition(
+                datetime.datetime(2022, 8, 24, 12, 35))
         )
         return behavior_meta
 
@@ -299,7 +301,7 @@ class TestNWB(BehaviorMetaTestCase):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier='afile',
-            session_start_time=datetime.datetime.now()
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35)
         )
 
     @pytest.mark.parametrize('roundtrip', [True, False])

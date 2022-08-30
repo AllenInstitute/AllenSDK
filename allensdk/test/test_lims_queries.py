@@ -8,9 +8,6 @@ from allensdk.internal.api.queries.utils import (
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
 
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
-
 from allensdk.internal.api.queries.ecephys_lims_queries import (
     donor_id_list_from_ecephys_session_ids)
 
@@ -106,22 +103,6 @@ def test_foraging_id_map(
                            lims_engine=MockQueryEngine(),
                            logger=None,
                            behavior_session_ids=behavior_session_ids)
-
-
-def test_session_stage():
-    expected = WhitespaceStrippedString("""
-            SELECT
-                stages.name as session_type,
-                bs.id AS foraging_id
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            ;
-        """)
-    actual = session_stage_from_foraging_id(
-                mtrain_engine=MockQueryEngine(),
-                foraging_ids=None,
-                logger=None)
-    assert expected == actual
 
 
 def test_sanitize_uuid_list():

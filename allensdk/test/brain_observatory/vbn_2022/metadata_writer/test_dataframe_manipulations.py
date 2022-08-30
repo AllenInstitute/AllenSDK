@@ -1,10 +1,16 @@
 import pytest
-import mock
 import pandas as pd
 import datetime
 import numpy as np
 import copy
 
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
     .dataframe_manipulations import (
         _add_session_number,
@@ -12,10 +18,9 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer \
         _patch_date_and_stage_from_pickle_file,
         _add_age_in_days,
         _add_images_from_behavior,
-        remove_aborted_sessions,
-        _get_session_duration_from_behavior_session_ids,
-        remove_pretest_sessions,
         strip_substructure_acronym_df)
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    remove_invalid_sessions
 
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -309,7 +314,7 @@ def test_add_age_in_days(index_column):
        {index_column: 1,
         'date_of_acquisition': datetime.datetime(2020, 7, 8, 12),
         'date_of_birth': datetime.datetime(2020, 7, 6, 14)})
-    expected_age.append(1)
+    expected_age.append(2)
 
     input_data.append(
        {index_column: 2,
@@ -339,17 +344,30 @@ def test_remove_pretest_sessions():
         {'id': 1, 'session_type': 'pretest_B', 'col': 'bar'},
         {'id': 2, 'session_type': 'C_pretest', 'col': 'baz'},
         {'id': 3, 'session_type': 'D', 'col': 'pretest'}]
+    behavior_sessions = [
+        BehaviorMetadata(
+            date_of_acquisition=None,
+            subject_metadata=None,
+            behavior_session_id=None,
+            equipment=None,
+            stimulus_frame_rate=None,
+            session_type=SessionType(x['session_type']),
+            behavior_session_uuid=None,
+            session_duration=None
+        )
+        for x in raw_data]
+    actual = remove_invalid_sessions(
+        behavior_sessions=behavior_sessions,
+        remove_pretest_sessions=True,
+        remove_aborted_sessions=False,
+        remove_sessions_after_mouse_death_date=False)
 
-    input_df = pd.DataFrame(data=raw_data)
-    actual = remove_pretest_sessions(
-                behavior_session_df=input_df)
-
-    expected = pd.DataFrame(data=[raw_data[0],
-                                  raw_data[2],
-                                  raw_data[3]])
-    expected = expected.set_index('id')
-    actual = actual.set_index('id')
-    pd.testing.assert_frame_equal(expected, actual)
+    expected = [
+        behavior_sessions[0],
+        behavior_sessions[2],
+        behavior_sessions[3]
+    ]
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -408,7 +426,7 @@ class TestDataframeManipulations(LimsTest):
                          'TRAINING_0_gratings_autorewards_15min_0uL_reward'
                      }
                 ]
-            )
+            ).set_index('behavior_session_id')
         session_durations = \
             pd.Series({
                 # Too short
@@ -424,29 +442,29 @@ class TestDataframeManipulations(LimsTest):
         cls.session_durations = session_durations
 
     def test_remove_aborted_sessions(self):
-        with mock.patch(
-                'allensdk.brain_observatory.vbn_2022.metadata_writer.'
-                'dataframe_manipulations.'
-                '_get_session_duration_from_behavior_session_ids',
-                return_value=self.session_durations):
-            behavior_sessions_df = remove_aborted_sessions(
-                lims_connection=None,
-                behavior_df=self.behavior_sessions_df
+        behavior_sessions = [
+            BehaviorMetadata(
+                date_of_acquisition=None,
+                subject_metadata=None,
+                behavior_session_id=BehaviorSessionId(x),
+                equipment=None,
+                stimulus_frame_rate=None,
+                session_type=(
+                    SessionType(
+                        self.behavior_sessions_df.loc[x]['session_type'])),
+                behavior_session_uuid=None,
+                session_duration=self.session_durations.loc[x]
             )
-            assert \
-                (behavior_sessions_df['behavior_session_id']
-                 .tolist() == [2, 4])
-
-    @pytest.mark.requires_bamboo
-    def test_get_session_duration_from_behavior_session_ids(
-            self
-    ):
-        behavior_session_id_list = [1030908509, 1046655591]
-        durations = _get_session_duration_from_behavior_session_ids(
-            lims_connection=self.dbconn,
-            behavior_session_id_list=behavior_session_id_list
-        )
-        assert len(durations) == 2 and \
-               durations.index.tolist() == behavior_session_id_list and \
-               durations.index.name == 'behavior_session_id' and \
-               not durations.isna().any()
+            for x in self.behavior_sessions_df.index]
+        actual = remove_invalid_sessions(
+            behavior_sessions=behavior_sessions,
+            remove_pretest_sessions=False,
+            remove_aborted_sessions=True,
+            remove_sessions_after_mouse_death_date=False)
+        expected = [
+            behavior_sessions[1],
+            behavior_sessions[3]
+        ]
+        assert \
+            sorted([x.behavior_session_id for x in actual]) == \
+            sorted([x.behavior_session_id for x in expected])

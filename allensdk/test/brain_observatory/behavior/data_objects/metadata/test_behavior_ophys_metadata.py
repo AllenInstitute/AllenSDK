@@ -155,6 +155,7 @@ class TestJson(TestBOM):
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         self.dict_repr = dict_repr
 
+    @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
     def test_from_json(self, meso):
         if meso:
@@ -174,7 +175,7 @@ class TestNWB(TestBOM):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=datetime.datetime.now()
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35)
         )
 
     @pytest.mark.parametrize('meso', [True, False])

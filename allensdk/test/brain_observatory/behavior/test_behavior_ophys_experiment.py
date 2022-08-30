@@ -265,9 +265,8 @@ def test_stim_v_trials_time(
     """
     exp = behavior_ophys_experiment_fixture
 
-    stim = exp.stimulus_presentations.\
-        query('is_change').\
-        start_time.reset_index(drop=True)
+    stim = exp.stimulus_presentations[exp.stimulus_presentations['is_change']]\
+        .start_time.reset_index(drop=True)
 
     trials = exp.trials.\
         query('not aborted').\

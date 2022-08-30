@@ -31,6 +31,7 @@ class BehaviorSessionId(DataObject, LimsReadableInterface,
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
+    # TODO should be from_ophys_experiment_id
     def from_lims(
         cls, db: PostgresQueryMixin,
         ophys_experiment_id: int
@@ -42,6 +43,20 @@ class BehaviorSessionId(DataObject, LimsReadableInterface,
             JOIN ophys_sessions os ON oe.ophys_session_id = os.id
             JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
             WHERE oe.id = {ophys_experiment_id};
+        """
+        behavior_session_id = db.fetchone(query, strict=True)
+        return cls(behavior_session_id=behavior_session_id)
+
+    @classmethod
+    def from_ecephys_session_id(
+            cls,
+            db: PostgresQueryMixin,
+            ecephys_session_id: int
+    ) -> "BehaviorSessionId":
+        query = f"""
+            SELECT bs.id
+            FROM behavior_sessions bs
+            WHERE bs.ecephys_session_id = {ecephys_session_id};
         """
         behavior_session_id = db.fetchone(query, strict=True)
         return cls(behavior_session_id=behavior_session_id)
