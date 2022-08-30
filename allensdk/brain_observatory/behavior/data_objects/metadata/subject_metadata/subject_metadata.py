@@ -49,6 +49,9 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
                  death_on: Optional[datetime] = None):
         super().__init__(name='subject_metadata', value=None,
                          is_value_self=True)
+        if death_on is not None and death_on.tzinfo is None:
+            # Add UTC tzinfo if not already set
+            death_on = pytz.utc.localize(death_on)
         self._sex = sex
         self._age = age
         self._reporter_line = reporter_line
