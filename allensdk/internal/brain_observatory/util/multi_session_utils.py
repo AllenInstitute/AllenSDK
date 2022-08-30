@@ -156,6 +156,14 @@ def remove_invalid_sessions(
         Remove any "pretest" session
     remove_sessions_after_mouse_death_date
         Remove any sessions mistakenly entered that fall after mouse death date
+        Sessions were loaded into LIMS with the wrong donor_id,
+        causing there to be sessions associated with some mice
+        that occur after those mice's recorded death dates. Our
+        assumption is that the error is with the donor_id rather
+        than the death date, so we can correct it by filtering
+        out any sessions that occur on mice that are supposed
+        to be dead.
+
     remove_aborted_sessions
         Remove aborted sessions
     expected_training_duration

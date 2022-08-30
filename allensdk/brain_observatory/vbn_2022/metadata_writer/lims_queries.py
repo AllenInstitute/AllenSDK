@@ -1,8 +1,6 @@
 from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
-import numpy as np
 
-from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
@@ -679,59 +677,6 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
 
     struct_tbl = lims_connection.select(query)
     return struct_tbl
-
-
-def _filter_on_death_date(
-        behavior_session_df: pd.DataFrame,
-        lims_connection: PostgresQueryMixin) -> pd.DataFrame:
-    """
-    Given a pandas dataframe of behavior sessions, remove those
-    that were recorded after the mouse's death date.
-
-    Parameters
-    ----------
-    behavior_session_df: pd.DataFrame
-
-    lims_connection: PostgresQueryMixin
-
-    Returns
-    -------
-    behavior_session_df: pd.DataFrame
-        The same as input, but with the sessions that occurred
-        after the mouse's death date dropped.
-
-    Notes
-    -----
-    This function is necessary because of a user error.
-    Sessions were loaded into LIMS with the wrong donor_id,
-    causing there to be sessions associated with some mice
-    that occur after those mice's recorded death dates. Our
-    assumption is that the error is with the donor_id rather
-    than the death date, so we can correct it by filtering
-    out any sessions that occur on mice that are supposed
-    to be dead.
-    """
-
-    behavior_session_df = behavior_session_df.merge(
-            get_death_date_for_mouse_ids(
-                lims_connections=lims_connection,
-                mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
-            on='mouse_id',
-            how='left')
-
-    behavior_session_df = behavior_session_df[
-            np.logical_or(
-                behavior_session_df['date_of_acquisition'] <=
-                behavior_session_df['death_on'],
-                behavior_session_df['death_on'].isna())
-        ]
-
-    behavior_session_df.drop(
-        labels=['death_on'],
-        axis='columns',
-        inplace=True)
-
-    return behavior_session_df
 
 
 def _behavior_session_table_from_ecephys_session_id_list(
