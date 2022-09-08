@@ -75,7 +75,7 @@ class StimulusImageFactory:
         mask = self._monitor.get_mask()
         arr = arr.astype(np.float)
         arr *= mask
-        arr[arr == 0] = np.nan
+        arr[mask == 0] = np.nan
         return arr
 
     def _warp(self, arr: np.ndarray) -> np.ndarray:
