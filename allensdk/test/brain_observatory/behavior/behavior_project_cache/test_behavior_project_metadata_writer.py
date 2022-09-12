@@ -77,8 +77,13 @@ class TestVBO:
             self.project_table_writer._write_behavior_sessions()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'behavior_session_table.csv')
+            obtained = obtained.sort_values('behavior_session_id')\
+                .reset_index(drop=True)
+            expected = self.expected_behavior_sessions_table\
+                .sort_values('behavior_session_id')\
+                .reset_index(drop=True)
             pd.testing.assert_frame_equal(
-                obtained, self.expected_behavior_sessions_table)
+                obtained, expected)
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_sessions_table(self):
@@ -88,8 +93,13 @@ class TestVBO:
             self.project_table_writer._write_ophys_sessions()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'ophys_session_table.csv')
+            obtained = obtained.sort_values('behavior_session_id')\
+                .reset_index(drop=True)
+            expected = self.expected_behavior_sessions_table\
+                .sort_values('behavior_session_id')\
+                .reset_index(drop=True)
             pd.testing.assert_frame_equal(
-                obtained, self.expected_ophys_sessions_table)
+                obtained, expected)
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_experiments_table(self):
@@ -99,8 +109,13 @@ class TestVBO:
             self.project_table_writer._write_ophys_experiments()
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'ophys_experiment_table.csv')
+            obtained = obtained.sort_values('behavior_session_id')\
+                .reset_index(drop=True)
+            expected = self.expected_behavior_sessions_table\
+                .sort_values('behavior_session_id')\
+                .reset_index(drop=True)
             pd.testing.assert_frame_equal(
-                obtained, self.expected_ophys_experiments_table)
+                obtained, expected)
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_cells_table(self):
