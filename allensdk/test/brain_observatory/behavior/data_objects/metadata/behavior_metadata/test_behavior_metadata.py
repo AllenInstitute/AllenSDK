@@ -301,7 +301,8 @@ class TestNWB(BehaviorMetaTestCase):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier='afile',
-            session_start_time=datetime.datetime(2022, 8, 24, 12, 35)
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35,
+                                                 tzinfo=pytz.UTC)
         )
 
     @pytest.mark.parametrize('roundtrip', [True, False])

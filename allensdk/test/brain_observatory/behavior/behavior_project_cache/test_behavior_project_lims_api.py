@@ -241,6 +241,10 @@ class TestLimsCloudConsistency:
 
         from_s3 = self.cloud_cache.get_behavior_session_table()
         from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+
+        from_lims = from_lims.sort_index()
+        from_s3 = from_s3.sort_index()
+
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
@@ -253,6 +257,10 @@ class TestLimsCloudConsistency:
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
 
         from_s3 = self.cloud_cache.get_ophys_session_table()
+
+        from_lims = from_lims.sort_index()
+        from_s3 = from_s3.sort_index()
+
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
@@ -268,4 +276,7 @@ class TestLimsCloudConsistency:
 
         from_s3 = self.cloud_cache.get_ophys_experiment_table()
         from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+
+        from_lims = from_lims.sort_index()
+        from_s3 = from_s3.sort_index()
         pd.testing.assert_frame_equal(from_lims, from_s3)
