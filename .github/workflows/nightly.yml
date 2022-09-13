@@ -29,11 +29,12 @@ jobs:
                                 pip install -r test_requirements.txt; \
                                 pip install -e .; \
                                 python -m pytest \
+                                    --log-level=INFO \
                                     --capture=no \
                                     --cov=allensdk \
                                     --cov-config coveragerc \
                                     --cov-report html \
                                     --junitxml=test-reports/test.xml \
                                     --boxed \
-                                    --numprocesses 4 \
+                                    --numprocesses auto \
                                     --durations=0"
