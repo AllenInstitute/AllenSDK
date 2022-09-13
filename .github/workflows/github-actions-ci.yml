@@ -87,7 +87,7 @@ jobs:
                   /bin/bash -c "pip install -r requirements.txt; \
                                 pip install -r test_requirements.txt; \
                                 python -m pytest \
-                                    --log-level=WARNING \
+                                    --log-level=INFO \
                                     --capture=no \
                                     --cov=allensdk \
                                     --cov-config coveragerc \
