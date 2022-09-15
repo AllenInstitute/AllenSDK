@@ -77,7 +77,7 @@ groups:
   neurodata_type_inc: BehaviorMetadata
   doc: Metadata for behavior + ophys experiments
   attributes:
-  - name: experiment_container_id
+  - name: ophys_container_id
     dtype: int
     doc: Container ID for the container that contains this ophys session
   - name: behavior_session_id

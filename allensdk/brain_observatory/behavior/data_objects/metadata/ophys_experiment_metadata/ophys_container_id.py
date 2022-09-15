@@ -6,12 +6,12 @@ from allensdk.core import \
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ExperimentContainerId(DataObject, LimsReadableInterface,
-                            JsonReadableInterface, NwbReadableInterface):
+class OphysContainerId(DataObject, LimsReadableInterface,
+                       JsonReadableInterface, NwbReadableInterface):
     """"experiment container id"""
-    def __init__(self, experiment_container_id: int):
-        super().__init__(name='experiment_container_id',
-                         value=experiment_container_id)
+    def __init__(self, ophys_container_id: int):
+        super().__init__(name='ophys_container_id',
+                         value=ophys_container_id)
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
@@ -22,13 +22,13 @@ class ExperimentContainerId(DataObject, LimsReadableInterface,
                 WHERE ophys_experiment_id = {};
                 """.format(ophys_experiment_id)
         container_id = lims_db.fetchone(query, strict=False)
-        return cls(experiment_container_id=container_id)
+        return cls(ophys_container_id=container_id)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ExperimentContainerId":
-        return cls(experiment_container_id=dict_repr['container_id'])
+        return cls(ophys_container_id=dict_repr['container_id'])
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ExperimentContainerId":
         metadata = nwbfile.lab_meta_data['metadata']
-        return cls(experiment_container_id=metadata.experiment_container_id)
+        return cls(ophys_container_id=metadata.ophys_container_id)

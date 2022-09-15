@@ -12,8 +12,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_ophys_metadata import \
     BehaviorOphysMetadata
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.experiment_container_id import \
-    ExperimentContainerId
+    .ophys_experiment_metadata.ophys_container_id import \
+    OphysContainerId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
@@ -54,8 +54,8 @@ class TestBOM:
         ophys_meta = OphysExperimentMetadata(
             ophys_experiment_id=1234,
             ophys_session_id=OphysSessionId(session_id=999),
-            experiment_container_id=ExperimentContainerId(
-                experiment_container_id=5678),
+            ophys_container_id=OphysContainerId(
+                ophys_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
             imaging_depth=ImagingDepth(imaging_depth=375)
         )
@@ -78,7 +78,7 @@ class TestBOM:
         multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
+            ophys_container_id=ophys_experiment_metadata._ophys_container_id, # noqa E501
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
