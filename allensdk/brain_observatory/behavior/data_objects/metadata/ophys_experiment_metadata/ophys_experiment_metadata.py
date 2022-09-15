@@ -7,8 +7,8 @@ from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.experiment_container_id import \
-    ExperimentContainerId
+    .ophys_experiment_metadata.ophys_container_id import \
+    OphysContainerId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
@@ -30,7 +30,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
     def __init__(self,
                  ophys_experiment_id: int,
                  ophys_session_id: OphysSessionId,
-                 experiment_container_id: ExperimentContainerId,
+                 ophys_container_id: OphysContainerId,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
                  project_code: Optional[ProjectCode] = None):
@@ -38,7 +38,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
                          is_value_self=True)
         self._ophys_experiment_id = ophys_experiment_id
         self._ophys_session_id = ophys_session_id
-        self._experiment_container_id = experiment_container_id
+        self._ophys_container_id = ophys_container_id
         self._field_of_view_shape = field_of_view_shape
         self._imaging_depth = imaging_depth
         self._project_code = project_code
@@ -53,7 +53,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
             lims_db: PostgresQueryMixin) -> "OphysExperimentMetadata":
         ophys_session_id = OphysSessionId.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-        experiment_container_id = ExperimentContainerId.from_lims(
+        ophys_container_id = OphysContainerId.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         field_of_view_shape = FieldOfViewShape.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
@@ -65,7 +65,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
         return cls(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            experiment_container_id=experiment_container_id,
+            ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
             project_code=project_code
@@ -74,7 +74,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "OphysExperimentMetadata":
         ophys_session_id = OphysSessionId.from_json(dict_repr=dict_repr)
-        experiment_container_id = ExperimentContainerId.from_json(
+        ophys_container_id = OphysContainerId.from_json(
             dict_repr=dict_repr)
         ophys_experiment_id = dict_repr['ophys_experiment_id']
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
@@ -83,7 +83,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            experiment_container_id=experiment_container_id,
+            ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth
         )
@@ -92,7 +92,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysExperimentMetadata":
         ophys_experiment_id = int(nwbfile.identifier)
         ophys_session_id = OphysSessionId.from_nwb(nwbfile=nwbfile)
-        experiment_container_id = ExperimentContainerId.from_nwb(
+        ophys_container_id = OphysContainerId.from_nwb(
             nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
@@ -100,15 +100,14 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
-            experiment_container_id=experiment_container_id,
+            ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth
         )
 
-    # TODO rename to ophys_container_id
     @property
-    def experiment_container_id(self) -> int:
-        return self._experiment_container_id.value
+    def ophys_container_id(self) -> int:
+        return self._ophys_container_id.value
 
     @property
     def field_of_view_shape(self) -> FieldOfViewShape:

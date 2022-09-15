@@ -139,7 +139,7 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
         doc='Unique ID for the ophys session',
         required=True
     )
-    experiment_container_id = fields.Int(
+    ophys_container_id = fields.Int(
         doc='Container ID for the container that contains this ophys session',
         required=True,
     )
@@ -174,7 +174,6 @@ class OphysBehaviorMetadataSchema(BehaviorMetadataSchema, OphysMetadataSchema):
     """ This schema contains fields pertaining to ophys+behavior. It is used
     as a template for generating our custom NWB behavior + ophys extension.
     """
-
     neurodata_type = 'OphysBehaviorMetadata'
     neurodata_type_inc = 'BehaviorMetadata'
     neurodata_doc = "Metadata for behavior + ophys experiments"

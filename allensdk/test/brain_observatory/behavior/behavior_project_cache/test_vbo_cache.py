@@ -11,6 +11,9 @@ from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment)
 
 
+@pytest.mark.skip("cannot run until on-site cache reflects "
+                  "experiment_container_id -> ophys_container_id "
+                  "change")
 @pytest.mark.requires_bamboo
 def test_session_from_vbo_cache():
     """
