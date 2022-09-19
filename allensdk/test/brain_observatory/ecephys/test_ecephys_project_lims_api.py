@@ -144,7 +144,7 @@ class MockSelector:
         },
         pd.DataFrame(
             {"id": [5, 6], "a": [1, 3], "b": [2, 4]}, 
-            index=pd.Index(name="iecephys_unit_id", data=[10, 11])
+            index=pd.Index(name="ecephys_unit_id", data=[10, 11])
         )
     ]
 ])
