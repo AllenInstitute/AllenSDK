@@ -18,7 +18,11 @@ statsmodels<=0.13.0
 simpleitk>=2.0.2,<3.0.0
 argschema>=3.0.1,<4.0.0
 glymur==0.8.19
+<<<<<<< HEAD
 xarray
+=======
+xarray==0.19.0
+>>>>>>> e33caf28 (update to xarray v 0.19.0 (required for pandas 0.15.0))
 pynwb
 tables>=3.6.0,<3.7.0
 seaborn<1.0.0
