@@ -300,7 +300,7 @@ def test_get_stimulus_presentations(valid_stimulus_table_api):
         "stimulus_name": ['invalid_presentation',
                           'invalid_presentation', 'a', 'a_movie'],
         "phase": [np.nan, np.nan, 120.0, 180.0]
-    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
+    }, index=pd.Index(name='stimulus_presentation_id', data=[0, 1, 2, 3]))
 
     session = EcephysSession(api=valid_stimulus_table_api)
     obtained = session.stimulus_presentations[["start_time",
@@ -323,7 +323,7 @@ def test_get_stimulus_presentations_no_invalid_times(just_stim_table_api):
         "stop_time": [1/2, 1, 3/2, 2],
         'stimulus_name': ['a', 'a', 'a', 'a_movie'],
 
-    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
+    }, index=pd.Index(name='stimulus_presentation_id', data=[0, 1, 2, 3]))
 
     session = EcephysSession(api=just_stim_table_api)
 
