@@ -427,7 +427,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             'excitation_lambda':
                 self._cell_specimens.meta.imaging_plane.excitation_lambda,
             'ophys_container_id':
-                self._metadata.ophys_metadata.experiment_container_id,
+                self._metadata.ophys_metadata.ophys_container_id,
             'field_of_view_height':
                 self._metadata.ophys_metadata.field_of_view_shape.height,
             'field_of_view_width':

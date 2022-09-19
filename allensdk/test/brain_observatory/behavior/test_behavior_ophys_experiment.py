@@ -112,7 +112,7 @@ def test_visbeh_ophys_data_set():
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
         'mouse_id': 416369,
-        'experiment_container_id': 814796558,
+        'ophys_container_id': 814796558,
         'targeted_structure': 'VISp',
         'reporter_line': 'Ai93(TITL-GCaMP6f)',
         'emission_lambda': 520.0,
