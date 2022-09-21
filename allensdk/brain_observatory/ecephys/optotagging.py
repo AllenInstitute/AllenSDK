@@ -37,6 +37,7 @@ class OptotaggingTable(DataObject, JsonReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "OptotaggingTable":
         table = pd.read_csv(dict_repr['optotagging_table_path'])
+        table.index.name = 'id'
         return OptotaggingTable(table=table)
 
     @classmethod
