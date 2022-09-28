@@ -133,10 +133,6 @@ class InputSchema(ArgSchema):
                                       'used for this experiment')
     output_path = String(required=True, validate=check_write_access_overwrite,
                          description='write outputs to here')
-    skip_eye_tracking = Boolean(
-        required=True, default=False,
-        description="Whether or not to skip processing eye tracking data. "
-                    "If True, no eye tracking data will be written to NWB")
 
 
 class OutputSchema(RaisingSchema):

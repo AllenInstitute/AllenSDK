@@ -100,8 +100,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True,
-                  skip_eye_tracking=False) -> \
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
         Parameters
@@ -117,8 +116,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
@@ -162,7 +159,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             sync_file=sync_file,
             monitor_delay=monitor_delay,
             date_of_acquisition=date_of_acquisition,
-            skip_eye_tracking=skip_eye_tracking,
             eye_tracking_z_threshold=eye_tracking_z_threshold,
             eye_tracking_dilation_frames=eye_tracking_dilation_frames
         )
@@ -275,8 +271,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True,
-                  skip_eye_tracking=False) -> \
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
 
@@ -293,8 +288,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
-        skip_eye_tracking
-            Used to skip returning eye tracking data
 
         """
         def _is_multi_plane_session():

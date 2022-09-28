@@ -15,8 +15,7 @@ from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
 def write_behavior_ophys_nwb(session_data: dict,
-                             nwb_filepath: str,
-                             skip_eye_tracking: bool):
+                             nwb_filepath: str):
 
     nwb_filepath_inprogress = nwb_filepath+'.inprogress'
     nwb_filepath_error = nwb_filepath+'.error'
@@ -30,10 +29,9 @@ def write_behavior_ophys_nwb(session_data: dict,
 
     try:
         json_session = BehaviorOphysExperiment.from_json(
-            session_data=session_data, skip_eye_tracking=skip_eye_tracking)
+            session_data=session_data)
         lims_session = BehaviorOphysExperiment.from_lims(
-            ophys_experiment_id=session_data['ophys_experiment_id'],
-            skip_eye_tracking=skip_eye_tracking)
+            ophys_experiment_id=session_data['ophys_experiment_id'])
 
         logging.info("Comparing a BehaviorOphysExperiment created from JSON "
                      "with a BehaviorOphysExperiment created from LIMS")
@@ -76,10 +74,8 @@ def main():
         raise err
 
     try:
-        skip_eye_tracking = parser.args['skip_eye_tracking']
         output = write_behavior_ophys_nwb(parser.args['session_data'],
-                                          parser.args['output_path'],
-                                          skip_eye_tracking)
+                                          parser.args['output_path'])
         logging.info('File successfully created')
     except Exception as err:
         logging.error('NWB write failure')

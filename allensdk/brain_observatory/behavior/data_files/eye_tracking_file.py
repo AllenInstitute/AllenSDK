@@ -5,7 +5,7 @@ import pandas as pd
 
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
     load_eye_tracking_hdf
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.api import PostgresQueryMixin, OneResultExpectedError
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
 
@@ -41,7 +41,10 @@ class EyeTrackingFile(DataFile):
                     AND wkft.name = 'EyeTracking Ellipses'
                     AND bs.id = {behavior_session_id};
                 """  # noqa E501
-        filepath = db.fetchone(query, strict=True)
+        try:
+            filepath = db.fetchone(query, strict=True)
+        except OneResultExpectedError:
+            return None
         return cls(filepath=filepath)
 
     @staticmethod
