@@ -473,18 +473,15 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     def get_behavior_session(
             self,
-            behavior_session_id: int,
-            skip_eye_tracking: bool = False) -> BehaviorSession:
+            behavior_session_id: int) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
-        :param skip_eye_tracking: if True, do not load eye tracking data
         :type behavior_session_id: int
         :rtype: BehaviorSession
         """
         return BehaviorSession.from_lims(
-            behavior_session_id=behavior_session_id,
-            skip_eye_tracking=skip_eye_tracking)
+            behavior_session_id=behavior_session_id)
 
     def get_ophys_experiment_table(
             self
