@@ -115,7 +115,8 @@ def _extract_attributes(attributes, fields_to_skip=None):
             res.append(NWBAttributeSpec(name=name,
                                         dtype=STYPE_DICT[type(val)],
                                         doc=val.metadata['doc'],
-                                        shape=val.metadata['shape']))
+                                        shape=val.metadata['shape'],
+                                        required=val.required))
         elif type(val) == fields.Nested:
             continue
         else:
