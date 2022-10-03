@@ -33,6 +33,7 @@ class SubjectMetadataSchema(RaisingSchema):
     driver_line = fields.List(
         fields.String,
         doc="Driver line of subject",
+        required=False,
         allow_none=True,
         shape=(None,),
     )
