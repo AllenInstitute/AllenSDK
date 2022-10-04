@@ -143,7 +143,7 @@ def test_load_out_of_date_manifest(
     for sess_id in (333, 444):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda nwb_path, skip_eye_tracking=False:
+                        lambda nwb_path:
                             create_autospec(
                                 BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
@@ -219,7 +219,7 @@ def test_file_linkage(
     for sess_id in (333, 444):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda nwb_path, skip_eye_tracking=False:
+                        lambda nwb_path:
                             create_autospec(
                                 BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)
@@ -250,7 +250,7 @@ def test_file_linkage(
     for sess_id in (777, 888):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorSession, 'from_nwb_path',
-                        lambda nwb_path, skip_eye_tracking=False:
+                        lambda nwb_path:
                             create_autospec(
                                 BehaviorSession, instance=True))
             cache.get_behavior_session(behavior_session_id=sess_id)

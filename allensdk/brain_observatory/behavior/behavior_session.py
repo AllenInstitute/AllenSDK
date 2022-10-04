@@ -1,5 +1,6 @@
 import datetime
 from typing import Any, List, Dict, Optional, Type
+import warnings
 
 import pynwb
 import pandas as pd
@@ -118,7 +119,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             read_stimulus_presentations_table_from_file=False,
             stimulus_presentation_columns: Optional[List[str]] = None,
             stimulus_presentation_exclude_columns: Optional[List[str]] = None,
-            skip_eye_tracking=False,
             eye_tracking_z_threshold: float = 3.0,
             eye_tracking_dilation_frames: int = 2,
             eye_tracking_drop_frames: bool = False,
@@ -140,8 +140,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         stimulus_presentation_exclude_columns
             Optional list of columns to exclude from stimulus presentations
             table
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         eye_tracking_z_threshold
             See `BehaviorSession.from_nwb`
         eye_tracking_dilation_frames
@@ -265,13 +263,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             .validate(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
-        if skip_eye_tracking:
-            eye_tracking_table = None
+
+        try:
+            eye_tracking_file = EyeTrackingFile.from_json(
+                dict_repr=session_data)
+        except KeyError:
+            eye_tracking_file = None
+
+        if eye_tracking_file is None:
+            # Return empty data to match what is returned by from_nwb.
+            eye_tracking_table = EyeTrackingTable(
+                eye_tracking=EyeTrackingTable._get_empty_df())
             eye_tracking_rig_geometry = None
         else:
-
-            eye_tracking_file = EyeTrackingFile.from_json(
-                                    dict_repr=session_data)
             try:
                 eye_tracking_metadata_file = EyeTrackingMetadataFile.from_json(
                                     dict_repr=session_data)
@@ -311,7 +315,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                   sync_file: Optional[SyncFile] = None,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[DateOfAcquisition] = None,
-                  skip_eye_tracking=False,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2) \
             -> "BehaviorSession":
@@ -335,8 +338,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         eye_tracking_z_threshold
             See `BehaviorSession.from_nwb`
         eye_tracking_dilation_frames
@@ -407,15 +408,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition = date_of_acquisition.validate(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
-        if skip_eye_tracking:
-            eye_tracking_table = None
+
+        eye_tracking_file = EyeTrackingFile.from_lims(
+                db=lims_db,
+                behavior_session_id=behavior_session_id.value)
+
+        if eye_tracking_file is None:
+            # Return empty data to match what is returned by from_nwb.
+            eye_tracking_table = EyeTrackingTable(
+                eye_tracking=EyeTrackingTable._get_empty_df())
             eye_tracking_rig_geometry = None
         else:
-
-            eye_tracking_file = EyeTrackingFile.from_lims(
-                    db=lims_db,
-                    behavior_session_id=behavior_session_id.value)
-
             eye_tracking_video = EyeTrackingVideo.from_lims(
                 db=lims_db, behavior_session_id=behavior_session_id.value)
 
@@ -454,7 +457,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             cls,
             nwbfile: NWBFile,
             add_is_change_to_stimulus_presentations_table=True,
-            skip_eye_tracking: bool = False,
             eye_tracking_z_threshold: float = 3.0,
             eye_tracking_dilation_frames: int = 2
     ) -> "BehaviorSession":
@@ -466,8 +468,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_is_change_to_stimulus_presentations_table: Whether to add a column
             denoting whether the stimulus presentation represented a change
             event. May not be needed in case this column is precomputed
-        skip_eye_tracking: bool
-            If True, do not load eye tracking data
         eye_tracking_z_threshold : float, optional
             The z-threshold when determining which frames likely contain
             outliers for eye or pupil areas. Influences which frames
@@ -497,12 +497,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
         trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
-        if skip_eye_tracking:
-            eye_tracking_rig_geometry = None
-            eye_tracking_table = None
-        else:
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action='ignore',
+                                    message='This nwb file with identifier ',
+                                    category=UserWarning)
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
                 nwbfile=nwbfile)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action='ignore',
+                                    message='This nwb file with identifier ',
+                                    category=UserWarning)
             eye_tracking_table = EyeTrackingTable.from_nwb(
                 nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)

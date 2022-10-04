@@ -53,8 +53,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
     def get_behavior_session(
             self,
-            behavior_session_id: int,
-            skip_eye_tracking: bool = False) -> BehaviorSession:
+            behavior_session_id: int) -> BehaviorSession:
         """get a BehaviorSession by specifying behavior_session_id
 
         Parameters
@@ -95,8 +94,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(
-                nwb_path=str(data_path),
-                skip_eye_tracking=skip_eye_tracking)
+                nwb_path=str(data_path))
 
     def get_behavior_ophys_experiment(self, ophys_experiment_id: int
                                       ) -> BehaviorOphysExperiment:

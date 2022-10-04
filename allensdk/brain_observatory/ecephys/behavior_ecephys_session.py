@@ -56,7 +56,6 @@ class VBNBehaviorSession(BehaviorSession):
                   sync_file: Optional[Any] = None,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[Any] = None,
-                  skip_eye_tracking=False,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2) \
             -> "VBNBehaviorSession":
