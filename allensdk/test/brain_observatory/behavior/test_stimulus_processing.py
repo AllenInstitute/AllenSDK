@@ -7,7 +7,7 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates, is_change_event)
+    get_stimulus_templates, is_change_event, compute_trials_id_for_stimulus)
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
@@ -459,3 +459,34 @@ def test_is_change_mult_omission():
     obtained = is_change_event(stimulus_presentations=stimulus_presentations)
     expected = pd.Series([False, False, False, True], name='is_change')
     pd.testing.assert_series_equal(obtained, expected)
+
+
+def test_compute_trials_id_for_stimulus():
+    """Test that a set of trials maps onto a stimulus table as expected.
+    """
+    stimulus_presentations = pd.DataFrame(
+        data={'start_time': [1.1, 2.1, 3, 4, 5, 6, 7, 8],
+              'image_name': ['A', 'B', None, None, 'A', 'A', 'A', 'B'],
+              'stimulus_block': [0, 0, 1, 1, 2, 2, 3, 3]},
+    )
+    trials = pd.DataFrame({
+        'start_time': [1., 2.],
+        'stop_time': [2., 3.]
+    })
+    expected_trials_id = pd.Series(
+        name='trials_id',
+        data=[0, 1, -1, -1, -1, -1, 0, 1],
+        index=stimulus_presentations.index)
+    output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations,
+                                                       trials)
+    assert np.array_equal(output_trials_ids.values,
+                          expected_trials_id.values)
+
+    # Test with explicit active block.
+    stimulus_presentations['active'] = np.array(
+        [True, True, False, False, False, False, False, False])
+    output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations,
+                                                       trials)
+    assert np.array_equal(output_trials_ids.values,
+                          expected_trials_id.values)
+
