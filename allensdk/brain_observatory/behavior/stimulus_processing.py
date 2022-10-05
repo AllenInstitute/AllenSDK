@@ -559,3 +559,83 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     is_change = is_change.fillna(False)
 
     return is_change
+
+
+def compute_trials_id_for_stimulus(
+        stim_pres_table: pd.DataFrame,
+        trials_table: pd.DataFrame) -> pd.Series:
+    """Add an id to allow for merging of the stimulus presentations
+    table with the trials table.
+
+    Parameters
+    ----------
+    stim_pres_table : pandas.DataFrame
+        Pandas stimulus table to create trials_id from.
+    trials_table : pandas.DataFrame
+        Trials table to create id from using trial start times.
+
+    Returns
+    -------
+    trials_ids : pd.Series
+        Unique id to allow merging of the stim table with the trials table.
+        Null values are represented by -1.
+
+    Note
+    ----
+    ``trials_id`` values are copied from active stimulus blocks into
+    passive stimulus/replay blocks that contain the same image ordering and
+    length.
+    """
+    stim_pres_sorted = stim_pres_table.sort_values('start_time')
+    trials_sorted = trials_table.sort_values('start_time')
+    # Create a placeholder for the trials_id.
+    trials_ids = pd.Series(
+        data=np.full(len(stim_pres_sorted), -1, dtype=int),
+        index=stim_pres_sorted.index,
+        name='trials_id')
+    if 'active' in stim_pres_sorted.columns:
+        has_active = True
+        active_sorted = stim_pres_sorted.active
+    else:
+        has_active = False
+        active_sorted = pd.Series(
+            data=np.zeros(len(stim_pres_sorted), dtype=bool),
+            index=stim_pres_sorted.index,
+            name='active')
+
+    # Find stimulus blocks that start within a trial. Copy the trial_id
+    # into our new trials_ids series.
+    for idx, trial in trials_sorted.iterrows():
+        stim_mask = (stim_pres_sorted.start_time > trial.start_time) \
+                    & (stim_pres_sorted.start_time < trial.stop_time)
+        trials_ids[stim_mask] = idx
+        if not has_active:
+            active_sorted[stim_mask] = True
+
+    # The code below finds all stimulus blocks that contain images/trials
+    # and attempts to detect blocks that are identical to copy the associated
+    # trials_ids into those blocks. In the parlance of the data this is
+    # copying the active stimulus block data into the passive stimulus block.
+
+    # Get the block ids for the behavior trial presentations
+    stim_blocks = stim_pres_sorted.stimulus_block
+    stim_image_names = stim_pres_sorted.image_name
+    active_stim_blocks = stim_blocks[active_sorted].unique()
+    # Find passive blocks that show images for potential copying of the active
+    # into a passive stimulus block.
+    passive_stim_blocks = stim_blocks[
+        np.logical_and(~active_sorted, ~stim_image_names.isna())].unique()
+
+    # Copy the trials_id into the passive block if it exists.
+    if len(passive_stim_blocks) > 0:
+        for active_stim_block in active_stim_blocks:
+            active_block_mask = stim_blocks == active_stim_block
+            active_images = stim_image_names[active_block_mask].values
+            for passive_stim_block in passive_stim_blocks:
+                passive_block_mask = stim_blocks == passive_stim_block
+                if np.array_equal(active_images,
+                                  stim_image_names[passive_block_mask].values):
+                    trials_ids.loc[passive_block_mask] = \
+                        trials_ids[active_block_mask].values
+
+    return trials_ids.sort_index()
