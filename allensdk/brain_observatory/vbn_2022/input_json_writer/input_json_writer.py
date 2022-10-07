@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import argschema
 import json
 
@@ -15,7 +17,9 @@ class VBN2022InputJsonWriter(argschema.ArgSchemaParser):
 
         results = vbn_nwb_config_from_ecephys_session_id_list(
             ecephys_session_id_list=self.args['ecephys_session_id_list'],
-            probes_to_skip=self.args['probes_to_skip'])
+            probes_to_skip=self.args['probes_to_skip'],
+            nwb_output_dir=Path(self.args['nwb_output_dir'])
+        )
 
         session_specs = results['sessions']
         msg = results['log']

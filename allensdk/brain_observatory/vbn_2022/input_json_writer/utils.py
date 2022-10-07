@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Optional, Dict, Union
 
 import pandas as pd
@@ -94,7 +95,9 @@ class NwbConfigErrorLog(object):
 
 def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[dict]]) -> dict:
+        probes_to_skip: Optional[List[dict]],
+        nwb_output_dir: Path
+) -> dict:
     """
     Return a list of dicts. Each dict the specification for
     an NWB writer job, suitable for serialization with
@@ -114,6 +117,9 @@ def vbn_nwb_config_from_ecephys_session_id_list(
              "session": 12345   # an ecephys_session_id
              "probe": "probeB"  # the probe's name
             }
+
+    nwb_output_dir: Path
+        Root path to write nwbs
 
     Returns
     -------
@@ -153,10 +159,12 @@ def vbn_nwb_config_from_ecephys_session_id_list(
         session_id = session['ecephys_session_id']
 
         probe_list = probe_input_from_ecephys_session_id(
-                        ecephys_session_id=session_id,
-                        probe_ids_to_skip=probe_ids_to_skip,
-                        lims_connection=lims_connection,
-                        error_log=error_log)
+            ecephys_session_id=session_id,
+            probe_ids_to_skip=probe_ids_to_skip,
+            lims_connection=lims_connection,
+            error_log=error_log,
+            nwb_out_dir=nwb_output_dir
+        )
 
         session['probes'] = probe_list
 
@@ -413,11 +421,82 @@ def session_input_from_ecephys_session_id_list(
     return result
 
 
+def _get_probe_analysis_run_from_probe_id(
+        lims_connection: PostgresQueryMixin,
+        probe_id: int
+):
+    query = f'''
+    SELECT earp.id
+    FROM ecephys_analysis_run_probes earp
+    JOIN well_known_files wkf ON wkf.attachable_id = earp.id
+    JOIN well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+    WHERE earp.ecephys_probe_id = {probe_id} and 
+        wkft.name = 'EcephysSubsampledChannelStates'
+    '''
+    res = lims_connection.select_one(query)
+    if not res:
+        raise OneResultExpectedError(
+            f'Expected to find one analysis probe run for probe '
+            f'{probe_id}')
+    return res['id']
+
+
+def _get_probe_lfp_meta(
+        lims_connection: PostgresQueryMixin,
+        probe_id: int,
+        lfp_out_dir: Path
+):
+    """Gets filepaths for files needed to build LFP data
+
+    Parameters
+    ----------
+    lims_connection
+    probe_id
+    lfp_out_dir: Where to write LFP NWB to
+
+    """
+    probe_well_known_files = [
+        'EcephysSortedLfpContinuous',
+        'EcephysSortedLfpTimestamps'
+    ]
+    analysis_run_probe_well_known_files = [
+        'EcephysSubsampledChannelStates'
+    ]
+    probe_analysis_run_id = _get_probe_analysis_run_from_probe_id(
+        lims_connection=lims_connection,
+        probe_id=probe_id
+    )
+    probe_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=probe_well_known_files,
+        attachable_type='EcephysProbe',
+        attachable_id=probe_id)
+    probe_analysis_run_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=analysis_run_probe_well_known_files,
+        attachable_type='EcephysAnalysisRunProbe',
+        attachable_id=probe_analysis_run_id)
+
+    lfp = {
+        'input_data_path':
+            probe_well_known_files.get('EcephysSortedLfpContinuous'),
+        'input_timestamps_path':
+            probe_well_known_files.get('EcephysSortedLfpTimestamps'),
+        'input_channels_path':
+            probe_analysis_run_well_known_files.get(
+                'EcephysSubsampledChannelStates'),
+        'output_path': str(lfp_out_dir / 'lfp.nwb')
+    }
+    return lfp
+
+
 def probe_input_from_ecephys_session_id(
         ecephys_session_id: int,
         probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
-        error_log: NwbConfigErrorLog) -> List[dict]:
+        error_log: NwbConfigErrorLog,
+        nwb_out_dir: Path
+) -> List[dict]:
     """
     Get the list of probe specifications, excluding the lists
     of channels and units, for a given ecephys_session_id
@@ -435,6 +514,9 @@ def probe_input_from_ecephys_session_id(
     error_log: NwbConfigErrorLog
         object to store all of the non-fatal irregularities
         encountered in the data
+
+    nwb_out_dir
+        Root path to write NWB files
 
     Returns
     -------
@@ -457,7 +539,6 @@ def probe_input_from_ecephys_session_id(
     probes_table.drop(
         labels=['ecephys_session_id',
                 'phase',
-                'has_lfp_data',
                 'unit_count',
                 'channel_count',
                 'structure_acronyms'],
@@ -488,8 +569,8 @@ def probe_input_from_ecephys_session_id(
 
     for probe_id in probe_id_list:
         data = probes_table[probe_id]
+        has_lfp = data.pop('has_lfp_data')
         data['csd_path'] = None
-        data['lfp'] = None
         data['id'] = probe_id
 
         wkf_path_lookup = wkf_path_from_attachable(
@@ -500,6 +581,16 @@ def probe_input_from_ecephys_session_id(
         for key_pair in input_from_wkf_probe:
             data[key_pair[0]] = wkf_path_lookup.get(key_pair[1], None)
 
+        if has_lfp:
+            lfp_meta = _get_probe_lfp_meta(
+                lims_connection=lims_connection,
+                probe_id=probe_id,
+                lfp_out_dir=nwb_out_dir / f'{ecephys_session_id}' /
+                f'probe_{data["name"]}'
+            )
+            data['lfp'] = lfp_meta
+        else:
+            data['lfp'] = None
         probe_list.append(_nan_to_none(data))
 
     probe_list = _add_spike_times_path(
