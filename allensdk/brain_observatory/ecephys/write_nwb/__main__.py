@@ -20,9 +20,10 @@ from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
+from allensdk.brain_observatory.ecephys.write_nwb.schemas import \
+    VCNInputSchema, OutputSchema
 from allensdk.config.manifest import Manifest
 
-from .schemas import VCNInputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_timestamps,
     add_invalid_times,
