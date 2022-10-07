@@ -16,6 +16,7 @@ from hdmf.backends.hdf5.h5_utils import H5DataIO
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
     Presentations
+from allensdk.brain_observatory.ecephys.lfp import LFP
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
@@ -271,9 +272,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     if session_metadata is not None:
         nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
-    if probe.get("temporal_subsampling_factor", None) is not None:
-        probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / \
-            probe["temporal_subsampling_factor"]
+    lfp = LFP.from_json(probe_meta=probe)
 
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = \
         add_probe_to_nwbfile(
@@ -281,16 +280,13 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
             probe_id=probe["id"],
             name=probe["name"],
             sampling_rate=probe["sampling_rate"],
-            lfp_sampling_rate=probe["lfp_sampling_rate"],
+            lfp_sampling_rate=lfp.sampling_rate,
             has_lfp_data=probe["lfp"] is not None
         )
 
-    lfp_channels = np.load(probe['lfp']['input_channels_path'],
-                           allow_pickle=False)
-
     add_ecephys_electrodes(nwbfile, probe["channels"],
                            probe_nwb_electrode_group,
-                           channel_number_whitelist=lfp_channels)
+                           channel_number_whitelist=lfp.channels)
 
     electrode_table_region = nwbfile.create_electrode_table_region(
         region=np.arange(len(nwbfile.electrodes)).tolist(),  # use raw inds
@@ -298,21 +294,12 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
         description=f"lfp channels on probe {probe['id']}"
     )
 
-    lfp_data, lfp_timestamps = ContinuousFile(
-        data_path=probe['lfp']['input_data_path'],
-        timestamps_path=probe['lfp']['input_timestamps_path'],
-        total_num_channels=len(nwbfile.electrodes)
-    ).load(memmap=False)
+    lfp_nwb = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
 
-    lfp_data = lfp_data.astype(np.float32)
-    lfp_data = lfp_data * probe["amplitude_scale_factor"]
-
-    lfp = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
-
-    nwbfile.add_acquisition(lfp.create_electrical_series(
+    nwbfile.add_acquisition(lfp_nwb.create_electrical_series(
         name=f"probe_{probe['id']}_lfp_data",
-        data=H5DataIO(data=lfp_data, compression='gzip', compression_opts=9),
-        timestamps=H5DataIO(data=lfp_timestamps,
+        data=H5DataIO(data=lfp.data, compression='gzip', compression_opts=9),
+        timestamps=H5DataIO(data=lfp.timestamps,
                             compression='gzip',
                             compression_opts=9),
         electrodes=electrode_table_region

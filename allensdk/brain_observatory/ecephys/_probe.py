@@ -7,31 +7,11 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._units import Units
+from allensdk.brain_observatory.ecephys.lfp import LFP
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
 from allensdk.core import DataObject, JsonReadableInterface, \
     NwbWritableInterface, NwbReadableInterface
-
-
-class _Lfp:
-    def __init__(self, data: np.ndarray, sampling_rate: float = 2500.0):
-        """
-
-        Parameters
-        ----------
-        data: LFP data
-        sampling_rate: sampling rate of LFP data
-        """
-        self._data = data
-        self._sampling_rate = sampling_rate
-
-    @property
-    def data(self) -> np.ndarray:
-        return self._data
-
-    @property
-    def sampling_rate(self) -> float:
-        return self._sampling_rate
 
 
 class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
@@ -44,7 +24,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             channels: Channels,
             units: Units,
             sampling_rate: float = 30000.0,
-            lfp: Optional[_Lfp] = None,
+            lfp: Optional[LFP] = None,
             location: str = 'See electrode locations',
             temporal_subsampling_factor: Optional[float] = 2.0
     ):
@@ -95,7 +75,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         return self._sampling_rate
 
     @property
-    def lfp(self) -> Optional[_Lfp]:
+    def lfp(self) -> Optional[LFP]:
         return self._lfp
 
     @property
@@ -115,14 +95,16 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
 
     @classmethod
     def from_json(cls, probe: dict) -> "Probe":
-        if probe['lfp'] is not None:
-            lfp = _Lfp(data=probe['lfp'],
-                       sampling_rate=probe['lfp_sampling_rate'])
-        else:
-            lfp = None
-
         channels = Channels.from_json(channels=probe['channels'])
         units = Units.from_json(probe=probe)
+
+        if probe['lfp'] is not None:
+            lfp = LFP.from_json(
+                probe_meta=probe,
+                num_probe_channels=len(channels.value)
+            )
+        else:
+            lfp = None
 
         return Probe(
             id=probe['id'],
