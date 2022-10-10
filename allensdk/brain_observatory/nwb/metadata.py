@@ -2,7 +2,8 @@ import os
 
 from marshmallow import fields
 import pynwb
-from pynwb.spec import NWBNamespaceBuilder, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec
+from pynwb.spec import \
+    NWBNamespaceBuilder, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec
 
 from allensdk.brain_observatory.behavior.schemas import STYPE_DICT, TYPE_DICT
 
@@ -16,7 +17,8 @@ def extract_from_schema(schema):
     # Extract fields from Schema:
     docval_list = [{'name': 'name', 'type': str, 'doc': 'name'}]
 
-    attributes = _extract_attributes(attributes=schema().fields, fields_to_skip=fields_to_skip)
+    attributes = _extract_attributes(attributes=schema().fields,
+                                     fields_to_skip=fields_to_skip)
     datasets = []
     nwbfields_list = []
 
@@ -50,9 +52,9 @@ def load_pynwb_extension(schema, prefix: str):
     return pynwb.get_class(neurodata_type, prefix)
 
 
-def create_pynwb_extension_from_schemas(schema_list, prefix: str, save_dir: str):
+def create_pynwb_extension_from_schemas(schema_list, prefix: str,
+                                        save_dir: str):
     # Initializations:
-    outdir = os.path.abspath(os.path.dirname(__file__))
     ext_source = f'{prefix}.extension.yaml'
     ns_path = f'{prefix}.namespace.yaml'
 
@@ -71,7 +73,8 @@ def create_pynwb_extension_from_schemas(schema_list, prefix: str, save_dir: str)
     # Loops through and create NWB custom group specs for schemas found in:
     # allensdk.brain_observatory.behavior.schemas
     for schema in schema_list:
-        docval_list, attributes, nwbfields_list, datasets = extract_from_schema(schema)
+        docval_list, attributes, nwbfields_list, datasets = \
+            extract_from_schema(schema)
 
         # Build the spec:
         ext_group_spec = NWBGroupSpec(
@@ -94,7 +97,8 @@ def _extract_dataset(val):
     if 'values' not in val.schema.fields:
         raise ValueError('A dataset must contain an attribute called "values"')
     values = val.schema.fields['values']
-    attributes = _extract_attributes(attributes=val.schema.fields, fields_to_skip=['values'])
+    attributes = _extract_attributes(attributes=val.schema.fields,
+                                     fields_to_skip=['values'])
 
     return NWBDatasetSpec(
         name=val.name,
