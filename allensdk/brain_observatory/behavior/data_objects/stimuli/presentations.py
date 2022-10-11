@@ -19,7 +19,8 @@ from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
 from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.stimulus_processing import \
-    get_stimulus_presentations, get_stimulus_metadata, is_change_event
+    get_stimulus_presentations, get_stimulus_metadata, is_change_event, \
+    get_flashes_since_change
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
 from allensdk.internal.brain_observatory.mouse import Mouse
@@ -161,6 +162,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
         if add_is_change:
             table['is_change'] = is_change_event(stimulus_presentations=table)
+            table['flashes_since_change'] = \
+                get_flashes_since_change(stimulus_presentations=table)
         return Presentations(presentations=table, column_list=column_list)
 
     @classmethod
@@ -235,6 +238,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                              f" {len(stim_pres_df)}.")
 
         stim_pres_df['is_change'] = is_change_event(
+            stimulus_presentations=stim_pres_df)
+        stim_pres_df['flashes_since_change'] = get_flashes_since_change(
             stimulus_presentations=stim_pres_df)
 
         # Sort columns then drop columns which contain only all NaN values

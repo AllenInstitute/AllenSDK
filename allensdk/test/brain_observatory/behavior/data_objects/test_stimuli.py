@@ -114,6 +114,7 @@ class TestNWB:
         templates = \
             pd.read_pickle(str(cls.test_data_dir / 'templates.pkl'))
         presentations = presentations.drop('is_change', axis=1)
+        presentations = presentations.drop('flashes_since_change', axis=1)
         p = StimulusPresentations(presentations=presentations)
         t = Templates(templates=templates)
         cls.stimuli = Stimuli(presentations=p, templates=t)
@@ -144,8 +145,12 @@ class TestNWB:
         else:
             obt = Stimuli.from_nwb(nwbfile=self.nwbfile)
 
-        # is_change different due to limit_to_images
+        # is_change different due to limit_to_images. flashes_since_change
+        # also relies on this column so we ommit that.
         obt.presentations.value.drop('is_change', axis=1, inplace=True)
+        obt.presentations.value.drop('flashes_since_change',
+                                     axis=1,
+                                     inplace=True)
 
         assert obt == self.stimuli
 
