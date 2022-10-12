@@ -1,10 +1,17 @@
 import logging
-from typing import Optional
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
+import pynwb
+from hdmf.backends.hdf5 import H5DataIO
 from pynwb import NWBFile
 
+from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
+    BehaviorEcephysMetadata
 from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._units import Units
 from allensdk.brain_observatory.ecephys.lfp import LFP
@@ -132,15 +139,31 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             units=units
         )
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        logging.info(f'found probe {self._id} with name {self._name}')
+    def to_nwb(
+            self,
+            nwbfile: NWBFile,
+            lfp_output_path: Optional[Union[str, Path]] = None
+    ) -> NWBFile:
+        nwbfile = self._add_probe_to_nwb(nwbfile=nwbfile)
 
-        if self._temporal_subsampling_factor is not None and \
-                self._lfp is not None:
-            lfp_sampling_rate = self._lfp.sampling_rate / \
-                                self._temporal_subsampling_factor
-        else:
-            lfp_sampling_rate = np.nan
+        if self._lfp is not None:
+            if lfp_output_path is None:
+                raise ValueError(
+                    'Need output path to save LFP data to separate NWB file')
+            self._write_lfp_to_nwb(
+                output_path=lfp_output_path,
+                session_id=nwbfile.session_id,
+                session_metadata=BehaviorEcephysMetadata.from_nwb(
+                    nwbfile=nwbfile),
+                session_start_time=nwbfile.session_start_time
+            )
+        return nwbfile
+
+    def _add_probe_to_nwb(
+            self, nwbfile: NWBFile,
+            add_only_lfp_channels: bool = False
+    ):
+        logging.info(f'found probe {self._id} with name {self._name}')
 
         nwbfile, probe_nwb_device, probe_nwb_electrode_group = \
             add_probe_to_nwbfile(
@@ -148,14 +171,70 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
                 probe_id=self._id,
                 name=self._name,
                 sampling_rate=self._sampling_rate,
-                lfp_sampling_rate=lfp_sampling_rate,
+                lfp_sampling_rate=(
+                    self._lfp.sampling_rate if self._lfp is not None
+                    else np.nan),
                 has_lfp_data=self._lfp is not None
             )
 
         channels = [c.to_dict()['channel'] for c in self._channels.value]
+
+        if self._lfp is not None and add_only_lfp_channels:
+            channels = [c for i, c in enumerate(channels)
+                        if i in self._lfp.channels]
         add_ecephys_electrodes(nwbfile,
                                channels,
                                probe_nwb_electrode_group)
+        return nwbfile
+
+    def _write_lfp_to_nwb(
+            self,
+            output_path: Union[Path, str],
+            session_id: str,
+            session_start_time: datetime,
+            session_metadata: BehaviorEcephysMetadata
+    ):
+        logging.info(f'writing lfp file for probe {self._id}')
+
+        output_path = Path(output_path)
+
+        nwbfile = pynwb.NWBFile(
+            session_description='LFP data and associated info for one probe',
+            identifier=f"{self._id}",
+            session_id=f"{session_id}",
+            session_start_time=session_start_time,
+            institution="Allen Institute for Brain Science"
+        )
+        nwbfile = session_metadata.to_nwb(nwbfile=nwbfile)
+
+        nwbfile = self._add_probe_to_nwb(
+            nwbfile=nwbfile,
+            add_only_lfp_channels=True
+        )
+        lfp_nwb = pynwb.ecephys.LFP(name=f"probe_{self._id}_lfp")
+
+        electrode_table_region = nwbfile.create_electrode_table_region(
+            region=np.arange(len(nwbfile.electrodes)).tolist(),
+            name='electrodes',
+            description=f"lfp channels on probe {self._id}"
+        )
+
+        nwbfile.add_acquisition(lfp_nwb.create_electrical_series(
+            name=f"probe_{self._id}_lfp_data",
+            data=self._lfp.data,
+            timestamps=self._lfp.timestamps,
+            electrodes=electrode_table_region
+        ))
+        nwbfile.add_acquisition(lfp_nwb)
+
+        # TODO CSD data
+
+        os.makedirs(output_path.parent, exist_ok=True)
+
+        with pynwb.NWBHDF5IO(output_path, 'w') as f:
+            logging.info(f"writing lfp file to {output_path}")
+            f.write(nwbfile, cache_spec=True)
+
         return nwbfile
 
     def to_dict(self) -> dict:

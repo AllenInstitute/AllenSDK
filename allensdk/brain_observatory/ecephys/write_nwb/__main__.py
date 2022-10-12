@@ -257,7 +257,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     """ Writes LFP data (and associated channel information) for one
     probe to a standalone nwb file
     """
-
+    # TODO use Probe class
     logging.getLogger('').setLevel(log_level)
     logging.info(f"writing lfp file for probe {probe['id']}")
 
@@ -305,7 +305,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
         electrodes=electrode_table_region
     ))
 
-    nwbfile.add_acquisition(lfp)
+    nwbfile.add_acquisition(lfp_nwb)
 
     if ("csd_path" in probe.keys()):
         csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])

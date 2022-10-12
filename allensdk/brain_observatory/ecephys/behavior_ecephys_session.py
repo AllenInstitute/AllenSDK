@@ -1,4 +1,5 @@
-from typing import Optional, List, Dict, Any, Type
+from pathlib import Path
+from typing import Optional, List, Dict, Any, Type, Union
 
 import numpy as np
 import pandas as pd
@@ -465,14 +466,29 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data)
         )
 
-    def to_nwb(self) -> NWBFile:
+    def to_nwb(
+            self,
+            lfp_output_path: Optional[Union[str, Path]] = None
+    ) -> NWBFile:
+        """
+        Adds behavior ecephys session to NWBFile instance
+
+        Parameters
+        ----------
+        lfp_output_path:
+            The path to save probe LFP data to NWB file, if LFP data exists
+
+        Returns
+        -------
+        `NWBFile` instance
+        """
         nwbfile = super().to_nwb(
             add_metadata=False,
             include_experiment_description=False,
             stimulus_presentations_stimulus_column_name='stimulus_name')
 
         self._metadata.to_nwb(nwbfile=nwbfile)
-        self._probes.to_nwb(nwbfile=nwbfile)
+        self._probes.to_nwb(nwbfile=nwbfile, lfp_output_path=lfp_output_path)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
         return nwbfile
 

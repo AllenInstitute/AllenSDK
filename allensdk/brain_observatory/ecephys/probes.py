@@ -1,5 +1,6 @@
 import logging
-from typing import List, Dict, Any, Optional
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -187,9 +188,29 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+    def to_nwb(
+            self,
+            nwbfile: NWBFile,
+            lfp_output_path: Optional[Union[str, Path]] = None
+    ) -> NWBFile:
+        """
+        Adds probes to NWBFile instance
+
+        Parameters
+        ----------
+        nwbfile
+        lfp_output_path:
+            The path to save probe LFP data to NWB file, if LFP data exists
+
+        Returns
+        -------
+        `NWBFile` instance
+        """
         for probe in self.probes:
-            probe.to_nwb(nwbfile=nwbfile)
+            probe.to_nwb(
+                nwbfile=nwbfile,
+                lfp_output_path=lfp_output_path
+            )
 
         nwbfile.units = pynwb.misc.Units.from_dataframe(
             self.get_units_table(

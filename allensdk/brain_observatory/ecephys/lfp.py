@@ -1,15 +1,16 @@
 from typing import Optional
 
 import numpy as np
-from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
     ContinuousFile
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbWritableInterface
+from allensdk.core import DataObject, JsonReadableInterface
 
 
-class LFP(DataObject, JsonReadableInterface, NwbWritableInterface):
+class LFP(DataObject, JsonReadableInterface):
+    """
+    Probe LFP
+    """
     def __init__(
             self,
             data: np.ndarray,
@@ -70,11 +71,13 @@ class LFP(DataObject, JsonReadableInterface, NwbWritableInterface):
 
         Returns
         -------
-
+        `LFP` instance
         """
         lfp_meta = probe_meta['lfp']
         lfp_channels = np.load(lfp_meta['input_channels_path'],
                                allow_pickle=False)
+
+        # TODO 2nd dimension in lfp_data doesn't match number of lfp_channels
 
         lfp_data, lfp_timestamps = ContinuousFile(
             data_path=lfp_meta['input_data_path'],
@@ -91,12 +94,9 @@ class LFP(DataObject, JsonReadableInterface, NwbWritableInterface):
                 probe_meta['lfp_sampling_rate'] /
                 probe_meta['temporal_subsampling_factor'])
 
-        return LFP(
+        return cls(
             data=lfp_data,
             timestamps=lfp_timestamps,
             channels=lfp_channels,
             sampling_rate=sampling_rate
         )
-
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
-        pass
