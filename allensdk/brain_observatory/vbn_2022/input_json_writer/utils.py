@@ -456,8 +456,8 @@ def _get_probe_lfp_meta(
 
     """
     probe_well_known_files = [
-        'EcephysSortedLfpContinuous',
-        'EcephysSortedLfpTimestamps'
+        'EcephysSubsampledLfpContinuous',
+        'EcephysSubsampledLfpTimestamps'
     ]
     analysis_run_probe_well_known_files = [
         'EcephysSubsampledChannelStates'
