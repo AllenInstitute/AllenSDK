@@ -191,7 +191,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
     def to_nwb(
             self,
             nwbfile: NWBFile,
-            lfp_output_path: Optional[Union[str, Path]] = None
+            probe_lfp_nwb_filepath_map: Dict[str, Optional[str]]
     ) -> NWBFile:
         """
         Adds probes to NWBFile instance
@@ -199,8 +199,8 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Parameters
         ----------
         nwbfile
-        lfp_output_path:
-            The path to save probe LFP data to NWB file, if LFP data exists
+        probe_lfp_nwb_filepath_map
+            Maps probe name to lfp nwb file output path
 
         Returns
         -------
@@ -209,7 +209,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         for probe in self.probes:
             probe.to_nwb(
                 nwbfile=nwbfile,
-                lfp_output_path=lfp_output_path
+                lfp_nwb_output_path=probe_lfp_nwb_filepath_map[probe.name]
             )
 
         nwbfile.units = pynwb.misc.Units.from_dataframe(
