@@ -1,6 +1,7 @@
 from typing import Optional
 
 import numpy as np
+from xarray import DataArray
 
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
     ContinuousFile
@@ -31,7 +32,7 @@ class LFP(DataObject, JsonReadableInterface):
         sampling_rate
             LFP sampling rate
         """
-        super().__init__(name='lfp', value=None)
+        super().__init__(name='lfp', value=None, is_value_self=True)
         self._data = data
         self._timestamps = timestamps
         self._channels = channels
@@ -56,8 +57,7 @@ class LFP(DataObject, JsonReadableInterface):
     @classmethod
     def from_json(
             cls,
-            probe_meta: dict,
-            num_probe_channels: Optional[int] = None
+            probe_meta: dict
     ) -> "LFP":
         """
 
@@ -65,9 +65,6 @@ class LFP(DataObject, JsonReadableInterface):
         ----------
         probe_meta:
             Probe metadata as a dict
-        num_probe_channels:
-            Number of channels on this probe. Assumes LFP was recorded on all
-            channels if None
 
         Returns
         -------
@@ -82,9 +79,7 @@ class LFP(DataObject, JsonReadableInterface):
         lfp_data, lfp_timestamps = ContinuousFile(
             data_path=lfp_meta['input_data_path'],
             timestamps_path=lfp_meta['input_timestamps_path'],
-            total_num_channels=(
-                num_probe_channels if num_probe_channels is not None
-                else len(lfp_channels))
+            total_num_channels=len(lfp_channels)
         ).load(memmap=False)
 
         lfp_data = lfp_data.astype(np.float32)
@@ -99,4 +94,12 @@ class LFP(DataObject, JsonReadableInterface):
             timestamps=lfp_timestamps,
             channels=lfp_channels,
             sampling_rate=sampling_rate
+        )
+
+    def to_dataarray(self) -> DataArray:
+        return DataArray(
+            name="LFP",
+            data=self._data,
+            dims=['time', 'channel'],
+            coords=[self._timestamps, self._channels]
         )

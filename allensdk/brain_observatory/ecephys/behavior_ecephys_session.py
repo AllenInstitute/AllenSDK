@@ -365,6 +365,9 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         """
         return self._probes.spike_amplitudes
 
+    def get_probes_obj(self) -> Probes:
+        return self._probes
+
     def get_channels(self, filter_by_validity: bool = True) -> pd.DataFrame:
         """
 
@@ -468,15 +471,15 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     def to_nwb(
             self,
-            lfp_output_path: Optional[Union[str, Path]] = None
+            probe_lfp_nwb_filepath_map: Dict[str, Optional[str]]
     ) -> NWBFile:
         """
         Adds behavior ecephys session to NWBFile instance
 
         Parameters
         ----------
-        lfp_output_path:
-            The path to save probe LFP data to NWB file, if LFP data exists
+        probe_lfp_nwb_filepath_map:
+            Maps probe name to lfp nwb file output path
 
         Returns
         -------
@@ -488,7 +491,9 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             stimulus_presentations_stimulus_column_name='stimulus_name')
 
         self._metadata.to_nwb(nwbfile=nwbfile)
-        self._probes.to_nwb(nwbfile=nwbfile, lfp_output_path=lfp_output_path)
+        self._probes.to_nwb(
+            nwbfile=nwbfile,
+            probe_lfp_nwb_filepath_map=probe_lfp_nwb_filepath_map)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
         return nwbfile
 
