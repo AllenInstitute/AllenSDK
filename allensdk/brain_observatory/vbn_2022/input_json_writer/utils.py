@@ -455,22 +455,15 @@ def _get_probe_lfp_meta(
     lfp_out_dir: Where to write LFP NWB to
 
     """
-    probe_well_known_files = [
-        'EcephysSubsampledLfpContinuous',
-        'EcephysSubsampledLfpTimestamps'
-    ]
     analysis_run_probe_well_known_files = [
+        'EcephysSubsampledLfpContinuous',
+        'EcephysSubsampledLfpTimestamps',
         'EcephysSubsampledChannelStates'
     ]
     probe_analysis_run_id = _get_probe_analysis_run_from_probe_id(
         lims_connection=lims_connection,
         probe_id=probe_id
     )
-    probe_well_known_files = wkf_path_from_attachable(
-        lims_connection=lims_connection,
-        wkf_type_name=probe_well_known_files,
-        attachable_type='EcephysProbe',
-        attachable_id=probe_id)
     probe_analysis_run_well_known_files = wkf_path_from_attachable(
         lims_connection=lims_connection,
         wkf_type_name=analysis_run_probe_well_known_files,
@@ -479,9 +472,11 @@ def _get_probe_lfp_meta(
 
     lfp = {
         'input_data_path':
-            probe_well_known_files.get('EcephysSortedLfpContinuous'),
+            probe_analysis_run_well_known_files.get(
+                'EcephysSubsampledLfpContinuous'),
         'input_timestamps_path':
-            probe_well_known_files.get('EcephysSortedLfpTimestamps'),
+            probe_analysis_run_well_known_files.get(
+                'EcephysSubsampledLfpTimestamps'),
         'input_channels_path':
             probe_analysis_run_well_known_files.get(
                 'EcephysSubsampledChannelStates'),
