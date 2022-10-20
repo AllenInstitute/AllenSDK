@@ -13,6 +13,7 @@ def add_file_paths_to_metadata_table(
         file_dir: pathlib.Path,
         file_prefix: str,
         index_col: str,
+        session_id_col: str,
         on_missing_file: str) -> pd.DataFrame:
     """
     Add file_id and file_path columns to session dataframe.
@@ -34,6 +35,9 @@ def add_file_paths_to_metadata_table(
 
     index_col: str
         Column in metadata_table used to index files
+
+    session_id_col
+        Column in metadata_table denoting session id
 
     on_missing_file: str
         Specifies how to handle missing files
@@ -62,8 +66,12 @@ def add_file_paths_to_metadata_table(
     file_suffix = 'nwb'
     new_data = []
     missing_files = []
-    for file_index in metadata_table[index_col].values:
-        file_path = file_dir / f'{file_prefix}_{file_index}.{file_suffix}'
+    metadata_table = metadata_table.set_index(index_col)
+
+    for row in metadata_table.itertuples():
+        session_id = getattr(row, session_id_col, row.Index)
+        file_path = file_dir / f'{session_id}' /  \
+            f'{file_prefix}_{row.Index}.{file_suffix}'
         if not file_path.exists():
             file_id = id_generator.dummy_value
             missing_files.append(file_path.resolve().absolute())
@@ -73,7 +81,7 @@ def add_file_paths_to_metadata_table(
         new_data.append(
             {'file_id': file_id,
              'file_path': str_path,
-             index_col: file_index})
+             index_col: row.Index})
 
     if len(missing_files) > 0:
         msg = "The following files do not exist:"

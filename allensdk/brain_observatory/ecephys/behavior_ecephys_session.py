@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Type, Union
+from typing import Optional, List, Dict, Any, Type, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -501,6 +501,8 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def from_nwb(
             cls,
             nwbfile: NWBFile,
+            probe_lfp_data_path_map: Optional[
+                Dict[str, Union[str, Callable[[], str]]]] = None,
             **kwargs
     ) -> "BehaviorEcephysSession":
         """
@@ -508,6 +510,13 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         Parameters
         ----------
         nwbfile
+        probe_lfp_data_path_map
+            Maps the probe name to the path to the LFP nwb file, or a callable
+             that returns the nwb path. The LFP nwb file is loaded separately
+             from the main session nwb file in order to load the LFP data
+             on the fly rather than with the main
+            session NWB file. This is to speed up download of the NWB
+            for users who don't wish to load the LFP data (it is large).
         kwargs: kwargs sent to `BehaviorSession.from_nwb`
 
         Returns

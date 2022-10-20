@@ -480,7 +480,7 @@ def _get_probe_lfp_meta(
         'input_channels_path':
             probe_analysis_run_well_known_files.get(
                 'EcephysSubsampledChannelStates'),
-        'output_path': str(lfp_out_dir / 'lfp.nwb')
+        'output_path': str(lfp_out_dir / f'lfp_probe_{probe_id}.nwb')
     }
     return lfp
 
@@ -580,8 +580,7 @@ def probe_input_from_ecephys_session_id(
             lfp_meta = _get_probe_lfp_meta(
                 lims_connection=lims_connection,
                 probe_id=probe_id,
-                lfp_out_dir=nwb_out_dir / f'{ecephys_session_id}' /
-                f'probe_{data["name"]}'
+                lfp_out_dir=nwb_out_dir / f'{ecephys_session_id}'
             )
             data['lfp'] = lfp_meta
         else:

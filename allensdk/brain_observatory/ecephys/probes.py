@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -180,7 +180,24 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         return probes
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Probes":
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            probe_lfp_data_path_map: Optional[
+                Dict[str, Union[str, Callable[[], str]]]] = None,
+    ) -> "Probes":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        probe_lfp_data_path_map
+            See description in `BehaviorEcephysSession.from_nwb`
+
+        Returns
+        -------
+        `NWBFile` with probes added
+        """
         probes = [
             Probe.from_nwb(
                 nwbfile=nwbfile,
