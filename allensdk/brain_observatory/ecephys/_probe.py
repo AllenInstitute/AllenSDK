@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -142,10 +142,27 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         )
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "Probe":
-        if 'probe_name' not in kwargs:
-            raise ValueError('Must pass probe_name')
-        probe = nwbfile.electrode_groups[kwargs['probe_name']]
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            probe_name: str,
+            lfp_nwb_path: Optional[str] = None,
+    ) -> "Probe":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        probe_name
+            Probe name
+        lfp_nwb_path
+            Path to load LFP NWB file, if LFP data exists
+
+        Returns
+        -------
+        `NWBFile` with probe data added
+        """
+        probe = nwbfile.electrode_groups[probe_name]
         channels = Channels.from_nwb(nwbfile=nwbfile, probe_id=probe.probe_id)
         units = Units.from_nwb(nwbfile=nwbfile, probe_id=probe.probe_id)
         return Probe(
@@ -155,7 +172,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             sampling_rate=probe.device.sampling_rate,
             channels=channels,
             units=units,
-            lfp_nwb_path=kwargs.get('lfp_nwb_path')
+            lfp_nwb_path=lfp_nwb_path
         )
 
     def to_nwb(
@@ -178,7 +195,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         nwbfile = self._add_probe_to_nwb(nwbfile=nwbfile)
 
         if self._lfp is not None:
-            lfp_nwbfile = self._write_lfp_to_nwb(
+            self._write_lfp_to_nwb(
                 output_path=lfp_nwb_output_path,
                 session_id=nwbfile.session_id,
                 session_metadata=BehaviorEcephysMetadata.from_nwb(
