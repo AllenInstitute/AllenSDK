@@ -201,7 +201,9 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         probes = [
             Probe.from_nwb(
                 nwbfile=nwbfile,
-                probe_name=probe_name)
+                probe_name=probe_name,
+                lfp_nwb_path=probe_lfp_data_path_map[probe_name]
+            )
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)
 

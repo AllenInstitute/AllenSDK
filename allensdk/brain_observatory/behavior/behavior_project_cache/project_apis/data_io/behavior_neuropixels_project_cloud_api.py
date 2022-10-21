@@ -101,9 +101,18 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         session_file_id = str(int(session_meta[self.cache.file_id_column]))
         session_data_path = self._get_data_path(file_id=session_file_id)
 
+        def make_lazy_load_filepath_function(file_id):
+            """Due to late binding closure. See:
+            https://docs.python-guide.org/writing/gotchas/
+            #late-binding-closures"""
+            def f():
+                return self._get_data_path(file_id=file_id)
+
+            return f
+
         if not probes_meta.empty:
             probe_lfp_data_path_map = {
-                p.name: lambda: self._get_data_path(
+                p.name: make_lazy_load_filepath_function(
                     file_id=str(int(getattr(p, self.cache.file_id_column)))
                 ) for p in probes_meta.itertuples(index=False)}
         else:

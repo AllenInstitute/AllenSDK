@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Optional, List, Dict, Any, Type, Union, Callable
 
 import numpy as np
@@ -422,6 +421,22 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             presence_ratio_minimum=presence_ratio_minimum,
             isi_violations_maximum=isi_violations_maximum)
 
+    def get_lfp(
+        self,
+        probe_id: int
+    ):
+        """
+        Get LFP data for a single probe given by `probe_id`
+        """
+        probe = [p for p in self._probes if p.id == probe_id]
+        if len(probe) == 0:
+            raise ValueError(f'Could not find probe with id {probe_id}')
+        if len(probe) > 1:
+            raise RuntimeError(f'Multiple probes found with probe_id '
+                               f'{probe_id}')
+        probe = probe[0]
+        return probe.lfp
+
     @classmethod
     def from_json(
             cls,
@@ -530,7 +545,9 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         )
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
-            probes=Probes.from_nwb(nwbfile=nwbfile),
+            probes=Probes.from_nwb(
+                nwbfile=nwbfile,
+                probe_lfp_data_path_map=probe_lfp_data_path_map),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
             metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile)
         )

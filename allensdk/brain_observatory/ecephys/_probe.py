@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -32,7 +32,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             units: Units,
             sampling_rate: float = 30000.0,
             lfp: Optional[LFP] = None,
-            lfp_nwb_path: Optional[str] = None,
+            lfp_nwb_path: Optional[Union[str, Callable[[], str]]] = None,
             location: str = 'See electrode locations',
             temporal_subsampling_factor: Optional[float] = 2.0
     ):
@@ -53,7 +53,9 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         lfp:
             probe LFP
         lfp_nwb_path
-            Path to the LFP NWB file to load this data on the fly
+            Can be one of the following:
+                Path to the LFP NWB file
+                Callable that returns path to the LFP NWB file
         location:
             probe location
         temporal_subsampling_factor:
@@ -204,9 +206,6 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             )
         return nwbfile
 
-    def get_lfp_nwbfile(self) -> Optional[NWBFile]:
-        return self._lfp_nwbfile
-
     def _add_probe_to_nwb(
             self, nwbfile: NWBFile,
             add_only_lfp_channels: bool = False
@@ -288,10 +287,12 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         return nwbfile
 
     def _read_lfp_from_nwb(self) -> LFP:
-        #TODO read from cloud provider also
-
-        with pynwb.NWBHDF5IO(
-                self._lfp_nwb_path, 'r', load_namespaces=True) as f:
+        if isinstance(self._lfp_nwb_path, Callable):
+            logging.info('Fetching LFP NWB file')
+            path = self._lfp_nwb_path()
+        else:
+            path = self._lfp_nwb_path
+        with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
             nwbfile = f.read()
             probe = nwbfile.electrode_groups[self._name]
             lfp = nwbfile.get_acquisition(f'probe_{self._id}_lfp')
