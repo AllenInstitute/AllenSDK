@@ -71,7 +71,7 @@ def rf_mask():
 
     def make(nr, nc, slices):
         mask = np.zeros((nr, nc))
-        mask[slices] = 1
+        mask[slices[0][0]:slices[0][-1], slices[1][0]:slices[1][-1]] = 1
         return mask
   
     return make
@@ -268,14 +268,15 @@ def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
     ntr = 2000
     nr = 20
     nc = 20
-    slices = [slice(9, 11), slice(9, 11)]
+    slices = [range(9, 12), range(9, 12)]
 
     mask = rf_mask(nr, nc, slices)
     lsn = locally_sparse_noise(ntr, nr, nc)
     events = rf_events(mask, lsn)
 
     obt = chi.chi_square_binary(events, lsn)
-    assert( obt[0][slices].sum() == 0 )
+    assert( obt[0][slices[0][0]:slices[0][-1],
+            slices[1][0]:slices[1][-1]].sum() == 0 )
     assert( obt.sum() > 0 )
 
 
@@ -285,7 +286,7 @@ def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
     ntr = 2000
     nr = 20
     nc = 20
-    slices = [slice(9, 11), slice(9, 11)]
+    slices = [range(9, 12), range(9, 12)]
 
     mask = rf_mask(nr, nc, slices)
     lsn = locally_sparse_noise(ntr, nr, nc)
