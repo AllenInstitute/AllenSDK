@@ -11,18 +11,23 @@ from pathlib import Path
 
 from typing import Optional
 
-from ._schemas import InputParameters, OutputParameters
-from ._current_source_density import (
-    accumulate_lfp_data,
-    compute_csd,
-    extract_trial_windows
-)
-from ._filter_utils import filter_lfp_channels, select_good_channels
-from ._interpolation_utils import (
-    interp_channel_locs,
-    make_actual_channel_locations,
-    make_interp_channel_locations
-)
+from allensdk.brain_observatory.ecephys.current_source_density._schemas \
+    import \
+    InputParameters, OutputParameters
+from allensdk.brain_observatory.ecephys.current_source_density.\
+    _current_source_density import (
+        accumulate_lfp_data,
+        compute_csd,
+        extract_trial_windows
+    )
+from allensdk.brain_observatory.ecephys.current_source_density._filter_utils \
+    import filter_lfp_channels, select_good_channels
+from allensdk.brain_observatory.ecephys.current_source_density\
+    ._interpolation_utils import (
+        interp_channel_locs,
+        make_actual_channel_locations,
+        make_interp_channel_locations
+    )
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import (
     ContinuousFile
 )
@@ -74,6 +79,13 @@ def get_inputs_from_lims(args) -> dict:
 def run_csd(args: dict) -> dict:
 
     stimulus_table = pd.read_csv(args['stimulus']['stimulus_table_path'])
+
+    # backwards compatibility
+    stimulus_table['stimulus_name'] = stimulus_table['stimulus_name'].apply(
+        lambda x: args['stimulus']['key'] if x == 'flashes' else x)
+    if args['start_field'] not in stimulus_table:
+        stimulus_table = stimulus_table.rename(
+            columns={'Start': args['start_field']})
 
     probewise_outputs = []
     for probe_idx, probe in enumerate(args['probes']):
