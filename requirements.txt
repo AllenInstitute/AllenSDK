@@ -1,4 +1,4 @@
-psycopg2-binary>=2.7,<3.0.0
+psycopg2-binary
 hdmf>=2.5.8
 h5py
 matplotlib>=1.4.3,<3.4.3
@@ -18,7 +18,7 @@ statsmodels<=0.13.0
 simpleitk>=2.0.2,<3.0.0
 argschema>=3.0.1,<4.0.0
 glymur==0.8.19
-xarray<0.16.0
+xarray
 pynwb
 tables>=3.6.0,<3.7.0
 seaborn<1.0.0

@@ -215,7 +215,8 @@ def test_add_stimulus_presentations_color(
                    "level": [10., 9., 8., 7.],
                    "condition": ["a", "a", "b", "c"],
                    "stimulus_name": ["w", "x", "y", "z"],
-                   "duration": [0.5, 0.5, 0.5, 0.5]})),
+                   "duration": [0.5, 0.5, 0.5, 0.5]},
+                  index=pd.Index(name="id", data=[0, 1, 2, 3]))),
 
     (pd.DataFrame({"start_time": [0., 1., 2., 3.],
                    "stop_time": [0.5, 1.5, 2.5, 3.5],
@@ -239,6 +240,7 @@ def test_add_optotagging_table_to_nwbfile(
 
     if expected is None:
         expected = opto_table.value
+        expected.index.name = 'id'
 
     pd.testing.assert_frame_equal(obtained, expected, check_like=True)
 
@@ -1243,7 +1245,8 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                       "eye_height": [6.] * 5,
                       "eye_width": [6.] * 5,
                       "eye_phi": [3.] * 5},
-                     index=[3., 4., 5., 6., 7.]),
+                     index=pd.Index(name="Time (s)",
+                                    data=[3., 4., 5., 6., 7.])),
         # expected_gaze_data
         pd.DataFrame({"raw_eye_area": [3., 5., 7., 9., 11.],
                       "raw_pupil_area": [2., 4., 6., 8., 10.],
@@ -1281,7 +1284,8 @@ def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                                                                       np.nan,
                                                                       8.,
                                                                       10.]},
-                     index=[3., 4., 5., 6., 7.])
+                     index=pd.Index(name="Time (s)",
+                                    data=[3., 4., 5., 6., 7.]))
     ),
 ])
 def test_add_eye_tracking_data_to_nwbfile(nwbfile,
