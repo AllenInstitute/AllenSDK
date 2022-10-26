@@ -93,6 +93,8 @@ class ProbeOutputParameters(DefaultSchema):
     name = String(required=True, help='Identifier for this probe.')
     csd_path = String(required=True,
                       help='Path to current source density file.')
+    clean_channels = List(Int, required=True,
+                          help='List of channels used in CSD calculation')
 
 
 class OutputSchema(DefaultSchema):
