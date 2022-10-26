@@ -171,6 +171,7 @@ def run_csd(args: dict) -> dict:
         probewise_outputs.append({
             'name': probe['name'],
             'csd_path': probe['csd_output_path'],
+            'clean_channels': clean_channels.tolist()
         })
 
     return {
