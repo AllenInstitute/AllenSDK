@@ -68,9 +68,9 @@ class Tile(object):
         row = self.bounds['row']
         col = self.bounds['column']
 
-        return [slice(row['start'], row['end']), 
-                slice(col['start'], col['end']), 
-                self.channel]
+        return slice(row['start'], row['end']), \
+            slice(col['start'], col['end']), \
+            self.channel
 
 
     def get_missing_path(self):
