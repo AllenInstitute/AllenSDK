@@ -3,7 +3,7 @@ import pandas as pd
 from pynwb import NWBFile
 from pynwb.ophys import Fluorescence
 
-from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
+from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file import NeuropilCorrectedFile
 from allensdk.core import DataObject
 from allensdk.core import \
     DataFileReadableInterface, NwbReadableInterface
@@ -48,9 +48,9 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
 
     @classmethod
     def from_data_file(cls,
-                       demix_file: DemixFile) \
+                       neuropil_corrected_file: NeuropilCorrectedFile) \
             -> "CorrectedFluorescenceTraces":
-        corrected_fluorescence_traces = demix_file.data
+        corrected_fluorescence_traces = neuropil_corrected_file.corrected_fluorescence
         return cls(traces=corrected_fluorescence_traces)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
