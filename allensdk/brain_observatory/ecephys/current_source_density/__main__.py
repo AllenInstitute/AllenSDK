@@ -11,6 +11,8 @@ from pathlib import Path
 
 from typing import Optional
 
+from scipy.spatial import QhullError
+
 from allensdk.brain_observatory.ecephys.current_source_density._schemas \
     import \
     InputParameters, OutputParameters
@@ -159,7 +161,7 @@ def run_csd(args: dict) -> dict:
                 actual_locs=clean_actual_locs,
                 interp_locs=interp_locs
             )
-        except ValueError as e:
+        except (ValueError, QhullError) as e:
             logging.error(e)
             probewise_outputs.append({
                 'name': probe['name'],
