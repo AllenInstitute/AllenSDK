@@ -153,11 +153,20 @@ def run_csd(args: dict) -> dict:
             0,
             accumulated_lfp_data.shape[1]
         )
-        interp_lfp, spacing = interp_channel_locs(
-            lfp=filt_lfp,
-            actual_locs=clean_actual_locs,
-            interp_locs=interp_locs
-        )
+        try:
+            interp_lfp, spacing = interp_channel_locs(
+                lfp=filt_lfp,
+                actual_locs=clean_actual_locs,
+                interp_locs=interp_locs
+            )
+        except ValueError as e:
+            logging.error(e)
+            probewise_outputs.append({
+                'name': probe['name'],
+                'csd_path': None,
+                'clean_channels': clean_channels.tolist()
+            })
+            continue
 
         logging.info('Averaging LFPs over trials')
         trial_mean_lfp = np.nanmean(interp_lfp, axis=0)
@@ -213,7 +222,8 @@ def write_csd_to_h5(path: Path, csd: np.ndarray, relative_window,
 def main():
 
     logging.basicConfig(format=('%(asctime)s:%(funcName)s'
-                                ':%(levelname)s:%(message)s'))
+                                ':%(levelname)s:%(message)s'),
+                        level=logging.INFO)
     parser = optional_lims_inputs(sys.argv, InputParameters,
                                   OutputParameters, get_inputs_from_lims)
     output = run_csd(parser.args)
