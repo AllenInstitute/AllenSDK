@@ -83,6 +83,7 @@ class TestJson:
                                                   'behavior_stimulus_file.pkl')
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         dict_repr['demix_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr['neuropil_corrected_file'] = str(test_data_dir / 'neuropil_corrected_file.h5')
         dict_repr['events_file'] = str(test_data_dir / 'events.h5')
 
         cls.dict_repr = dict_repr
