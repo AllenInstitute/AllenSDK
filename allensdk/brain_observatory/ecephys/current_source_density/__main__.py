@@ -11,7 +11,7 @@ from pathlib import Path
 
 from typing import Optional
 
-from scipy.spatial import QhullError
+from scipy.spatial.qhull import QhullError
 
 from allensdk.brain_observatory.ecephys.current_source_density._schemas \
     import \
