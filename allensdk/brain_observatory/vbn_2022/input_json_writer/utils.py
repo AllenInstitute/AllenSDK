@@ -423,15 +423,16 @@ def session_input_from_ecephys_session_id_list(
 
 def _get_probe_analysis_run_from_probe_id(
         lims_connection: PostgresQueryMixin,
-        probe_id: int
+        probe_id: int,
+        lims_strategy: str
 ):
     query = f'''
     SELECT earp.id
     FROM ecephys_analysis_run_probes earp
-    JOIN well_known_files wkf ON wkf.attachable_id = earp.id
-    JOIN well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+    JOIN ecephys_analysis_runs ear on ear.id = earp.ecephys_analysis_run_id
     WHERE earp.ecephys_probe_id = {probe_id} and 
-        wkft.name = 'EcephysSubsampledChannelStates'
+        job_strategy_class = '{lims_strategy}' and 
+        ear.current
     '''
     res = lims_connection.select_one(query)
     if not res:
@@ -455,32 +456,48 @@ def _get_probe_lfp_meta(
     lfp_out_dir: Where to write LFP NWB to
 
     """
-    analysis_run_probe_well_known_files = [
+    lfp_subsampling_run_well_known_files = [
         'EcephysSubsampledLfpContinuous',
         'EcephysSubsampledLfpTimestamps',
         'EcephysSubsampledChannelStates'
     ]
-    probe_analysis_run_id = _get_probe_analysis_run_from_probe_id(
+    current_source_density_well_known_files = [
+        'EcephysCurrentSourceDensity'
+    ]
+    probe_lfp_subsampling_run_id = _get_probe_analysis_run_from_probe_id(
         lims_connection=lims_connection,
-        probe_id=probe_id
+        probe_id=probe_id,
+        lims_strategy='EcephysLfpSubsamplingStrategy'
     )
-    probe_analysis_run_well_known_files = wkf_path_from_attachable(
+    probe_current_source_density_run_id = _get_probe_analysis_run_from_probe_id(
         lims_connection=lims_connection,
-        wkf_type_name=analysis_run_probe_well_known_files,
+        probe_id=probe_id,
+        lims_strategy='EcephysCurrentSourceDensityStrategy'
+    )
+    probe_lfp_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=lfp_subsampling_run_well_known_files,
         attachable_type='EcephysAnalysisRunProbe',
-        attachable_id=probe_analysis_run_id)
+        attachable_id=probe_lfp_subsampling_run_id)
+    probe_csd_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=current_source_density_well_known_files,
+        attachable_type='EcephysAnalysisRunProbe',
+        attachable_id=probe_current_source_density_run_id)
 
     lfp = {
         'input_data_path':
-            probe_analysis_run_well_known_files.get(
+            probe_lfp_well_known_files.get(
                 'EcephysSubsampledLfpContinuous'),
         'input_timestamps_path':
-            probe_analysis_run_well_known_files.get(
+            probe_lfp_well_known_files.get(
                 'EcephysSubsampledLfpTimestamps'),
         'input_channels_path':
-            probe_analysis_run_well_known_files.get(
+            probe_lfp_well_known_files.get(
                 'EcephysSubsampledChannelStates'),
-        'output_path': str(lfp_out_dir / f'lfp_probe_{probe_id}.nwb')
+        'output_path': str(lfp_out_dir / f'lfp_probe_{probe_id}.nwb'),
+        'csd_path': probe_csd_well_known_files.get(
+            'EcephysCurrentSourceDensity')
     }
     return lfp
 
@@ -565,7 +582,6 @@ def probe_input_from_ecephys_session_id(
     for probe_id in probe_id_list:
         data = probes_table[probe_id]
         has_lfp = data.pop('has_lfp_data')
-        data['csd_path'] = None
         data['id'] = probe_id
 
         wkf_path_lookup = wkf_path_from_attachable(
@@ -582,6 +598,7 @@ def probe_input_from_ecephys_session_id(
                 probe_id=probe_id,
                 lfp_out_dir=nwb_out_dir / f'{ecephys_session_id}'
             )
+            data['csd_path'] = lfp_meta.pop('csd_path')
             data['lfp'] = lfp_meta
         else:
             data['lfp'] = None
