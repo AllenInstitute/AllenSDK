@@ -203,7 +203,8 @@ def remove_lfp_offset(lfp, sampling_frequency, cutoff_frequency, filter_order):
     return lfp_filtered
 
 
-def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384, channel_limit=380):
+def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384, 
+                    channel_limit=380, max_out_of_brain_channels=50):
     """
     Subtract mean of channels out of brain to remove noise
 
@@ -229,7 +230,9 @@ def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384, cha
     surface_channel = channel_limit if surface_channel >= channel_max else surface_channel
 
     channel_selection = np.where(channel_numbers > surface_channel)[0]
-
+    if len(channel_selection)>max_out_of_brain_channels:
+        channel_selection = channel_selection[:max_out_of_brain_channels]
+    
     median_signal_out_of_brain = np.median(lfp[:, channel_selection], 1)
 
     for ch in range(lfp.shape[1]):
