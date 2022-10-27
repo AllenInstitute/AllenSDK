@@ -6,7 +6,7 @@ from pynwb import NWBFile, ProcessingModule
 from pynwb.ophys import OpticalChannel, ImageSegmentation
 
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
+from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file import NeuropilCorrectedFile
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
 from allensdk.brain_observatory.behavior.data_files.event_detection_file \
     import \
@@ -278,11 +278,11 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 dff_file=dff_file)
 
         def _get_corrected_fluorescence_traces():
-            demix_file = DemixFile.from_lims(
+            neuropil_corrected_file = NeuropilCorrectedFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id,
                 db=lims_db)
             return CorrectedFluorescenceTraces.from_data_file(
-                demix_file=demix_file)
+                neuropil_corrected_file=neuropil_corrected_file)
 
         def _get_events():
             events_file = EventDetectionFile.from_lims(
@@ -331,9 +331,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
                 dff_file=dff_file)
 
         def _get_corrected_fluorescence_traces():
-            demix_file = DemixFile.from_json(dict_repr=dict_repr)
+            neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
             return CorrectedFluorescenceTraces.from_data_file(
-                demix_file=demix_file)
+                neuropil_corrected_file=neuropil_corrected_file)
 
         meta = CellSpecimenMeta.from_json(dict_repr=dict_repr,
                                           ophys_timestamps=ophys_timestamps)
