@@ -252,7 +252,19 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
 
         stim_pres_df['stimulus_block'] = 0
-        stim_pres_df['stimulus_name'] = 'behavior'
+        # Match the Ecephys VBN stimulus name convention.
+        try:
+            stim_pres_df['stimulus_name'] = Path(
+                stimulus_file.stimuli['images']['image_set']).\
+                stem.split('.')[0]
+        except KeyError:
+            # if we can't find the images key in the stimuli, check for the
+            # name ``grating`` as the stimulus. If not add generic
+            # ``behavior``.
+            if 'grating' in stimulus_file.stimuli.keys():
+                stim_pres_df['stimulus_name'] = 'grating'
+            else:
+                stim_pres_df['stimulus_name'] = 'behavior'
 
         stim_pres_df = fix_omitted_end_frame(stim_pres_df)
 
