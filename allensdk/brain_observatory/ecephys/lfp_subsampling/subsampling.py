@@ -217,6 +217,10 @@ def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384,
         Surface channel (relative to original probe)
     channel_numbers : numpy.ndarray
         Channel numbers in 'lfp' array (relative to original probe)
+    max_out_of_brain_channels: int
+        Max number of channels to take above the surface channel
+        for re-referencing
+
 
     Returns:
 
