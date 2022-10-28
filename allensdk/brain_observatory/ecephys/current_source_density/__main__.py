@@ -128,7 +128,7 @@ def run_csd(args: dict) -> dict:
 
         lfp_referenced = remove_lfp_noise(
             lfp=lfp_raw,
-            surface_channel=args['surface_channel'],
+            surface_channel=probe['surface_channel'],
             channel_numbers=lfp_channels,
             max_out_of_brain_channels=args['max_out_of_brain_channels']
         )
