@@ -115,6 +115,20 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         return lfp
 
     @property
+    def current_source_density(self) -> Optional[DataArray]:
+        if self._current_source_density is None:
+            if self._probe_nwb_path is None:
+                raise RuntimeError(f'Path to NWB file containing CSD data '
+                                   f'for probe {self._id} not set')
+            csd = self._read_csd_data_from_nwb()
+            self._current_source_density = csd
+
+        csd = self._current_source_density.to_dataarray() if \
+            self._current_source_density is not None else \
+            self._current_source_density
+        return csd
+
+    @property
     def location(self) -> str:
         return self._location
 
@@ -374,6 +388,32 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             channels=electrodes.index.values,
             sampling_rate=probe.lfp_sampling_rate
         )
+
+    def _read_csd_data_from_nwb(self) -> CurrentSourceDensity:
+        if isinstance(self._probe_nwb_path, Callable):
+            logging.info('Fetching LFP NWB file')
+            path = self._probe_nwb_path()
+        else:
+            path = self._probe_nwb_path
+        with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
+            nwbfile = f.read()
+            csd_mod = nwbfile.get_processing_module(
+                "current_source_density")
+            nwb_csd = csd_mod["ecephys_csd"]
+            csd_data = nwb_csd.time_series.data[:]
+
+            # csd data stored as (timepoints x channels) but we
+            # want (channels x timepoints)
+            csd_data = csd_data.T
+
+            channel_locations = np.stack([
+                nwb_csd.virtual_electrode_x_positions,
+                nwb_csd.virtual_electrode_y_positions], axis=1).astype('int')
+            return CurrentSourceDensity(
+                data=csd_data,
+                timestamps=nwb_csd.time_series.timestamps[:],
+                interpolated_channel_locations=channel_locations
+            )
 
     def to_dict(self) -> dict:
         return {

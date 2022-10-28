@@ -428,14 +428,18 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         """
         Get LFP data for a single probe given by `probe_id`
         """
-        probe = [p for p in self._probes if p.id == probe_id]
-        if len(probe) == 0:
-            raise ValueError(f'Could not find probe with id {probe_id}')
-        if len(probe) > 1:
-            raise RuntimeError(f'Multiple probes found with probe_id '
-                               f'{probe_id}')
-        probe = probe[0]
+        probe = self._get_probe(probe_id=probe_id)
         return probe.lfp
+
+    def get_current_source_density(
+        self,
+        probe_id: int
+    ):
+        """
+        Get current source density data for a single probe given by `probe_id`
+        """
+        probe = self._get_probe(probe_id=probe_id)
+        return probe.current_source_density
 
     @classmethod
     def from_json(
@@ -555,3 +559,14 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     def _get_identifier(self) -> str:
         return str(self._metadata.ecephys_session_id)
+
+    def _get_probe(self, probe_id: int):
+        """Gets a probe given by `probe_id`"""
+        probe = [p for p in self._probes if p.id == probe_id]
+        if len(probe) == 0:
+            raise ValueError(f'Could not find probe with id {probe_id}')
+        if len(probe) > 1:
+            raise RuntimeError(f'Multiple probes found with probe_id '
+                               f'{probe_id}')
+        probe = probe[0]
+        return probe
