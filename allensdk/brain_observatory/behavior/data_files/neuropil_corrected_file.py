@@ -22,7 +22,7 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
 
 class NeuropilCorrectedFile(DataFile):
     """A DataFile which contains methods for accessing and loading
-    neuropil traces, neuropil corrected traces.
+    neuropil corrected traces, r values, and RMSE.
     """
 
     def __init__(self, filepath: Union[str, Path]):
