@@ -204,7 +204,7 @@ def remove_lfp_offset(lfp, sampling_frequency, cutoff_frequency, filter_order):
 
 
 def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384, 
-                    channel_limit=380, max_out_of_brain_channels=50):
+                     channel_limit=380, max_out_of_brain_channels=50):
     """
     Subtract mean of channels out of brain to remove noise
 

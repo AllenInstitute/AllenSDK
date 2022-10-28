@@ -126,7 +126,10 @@ def run_csd(args: dict) -> dict:
         else:
             lfp_channels = np.arange(0, probe['total_channels'])
 
-        lfp_referenced = remove_lfp_noise(lfp_raw, probe['surface_channel'], lfp_channels)
+        lfp_referenced = remove_lfp_noise(
+            lfp=lfp_raw,
+            surface_channel=['surface_channel'],
+            channel_numbers=lfp_channels)
 
         logging.info('Accumulating LFP data')
         accumulated_lfp_data = accumulate_lfp_data(
