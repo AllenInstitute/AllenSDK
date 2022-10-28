@@ -67,7 +67,5 @@ class NeuropilCorrectedFile(DataFile):
             return pd.DataFrame(
                 {
                     'corrected_fluorescence': list(traces),
-                    'r': r_values,
-                    'RMSE': rmse_values
                 },
                 index=idx)

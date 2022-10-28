@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="12" skipped="1" tests="15" time="1.527" timestamp="2022-10-27T10:29:31.324905" hostname="BioWS"><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestLims" name="test_from_lims" time="0.000"><skipped type="pytest.skip" message="this test depends on the resources only available to Bamboo agents, but are still fast.  If they are slow, mark with nightly">/home/mike/workspace/AllenSDK/allensdk/test/brain_observatory/behavior/data_objects/test_cell_specimens.py:53: this test depends on the resources only available to Bamboo agents, but are still fast.  If they are slow, mark with nightly</skipped></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_from_json" time="0.007"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941e1a520&gt;
+
+    def test_from_json(self):
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_roi_data_same_order_as_cell_specimen_table[dff_traces]" time="0.004"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941e1ad30&gt;, data = 'dff_traces'
+
+    @pytest.mark.parametrize('data',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces',
+                              'events'))
+    def test_roi_data_same_order_as_cell_specimen_table(self, data):
+        """tests that roi data are in same order as cell specimen table"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_roi_data_same_order_as_cell_specimen_table[corrected_fluorescence_traces]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941e1a430&gt;, data = 'corrected_fluorescence_traces'
+
+    @pytest.mark.parametrize('data',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces',
+                              'events'))
+    def test_roi_data_same_order_as_cell_specimen_table(self, data):
+        """tests that roi data are in same order as cell specimen table"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_roi_data_same_order_as_cell_specimen_table[events]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941e1adc0&gt;, data = 'events'
+
+    @pytest.mark.parametrize('data',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces',
+                              'events'))
+    def test_roi_data_same_order_as_cell_specimen_table(self, data):
+        """tests that roi data are in same order as cell specimen table"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_trace_rois_different_than_cell_specimen_table[dff_traces-True]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941cd5670&gt;, trace_type = 'dff_traces', extra_in_trace = True
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_trace_rois_different_than_cell_specimen_table[dff_traces-False]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941cd5dc0&gt;, trace_type = 'dff_traces', extra_in_trace = False
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_trace_rois_different_than_cell_specimen_table[corrected_fluorescence_traces-True]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941cd5a60&gt;, trace_type = 'corrected_fluorescence_traces', extra_in_trace = True
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestJson" name="test_trace_rois_different_than_cell_specimen_table[corrected_fluorescence_traces-False]" time="0.003"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestJson object at 0x7f8941cd51f0&gt;, trace_type = 'corrected_fluorescence_traces', extra_in_trace = False
+
+    @pytest.mark.parametrize('extra_in_trace', (True, False))
+    @pytest.mark.parametrize('trace_type',
+                             ('dff_traces',
+                              'corrected_fluorescence_traces'))
+    def test_trace_rois_different_than_cell_specimen_table(self, trace_type,
+                                                           extra_in_trace):
+        """check that an exception is raised if there is a mismatch in rois
+        between cell specimen table and traces"""
+&gt;       csp = CellSpecimens.from_json(
+            dict_repr=self.dict_repr,
+            ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestNWB" name="test_read_write_nwb[True-True]" time="1.281"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestNWB object at 0x7f8941cd5490&gt;, roundtrip = True
+data_object_roundtrip_fixture = &lt;function data_object_roundtrip_fixture.&lt;locals&gt;.f at 0x7f89421a63a0&gt;, exclude_invalid_rois = True
+
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture,
+                            exclude_invalid_rois):
+&gt;       cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            exclude_invalid_rois=exclude_invalid_rois,
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestNWB" name="test_read_write_nwb[True-False]" time="0.009"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestNWB object at 0x7f8941cd53a0&gt;, roundtrip = True
+data_object_roundtrip_fixture = &lt;function data_object_roundtrip_fixture.&lt;locals&gt;.f at 0x7f8941a32ca0&gt;, exclude_invalid_rois = False
+
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture,
+                            exclude_invalid_rois):
+&gt;       cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            exclude_invalid_rois=exclude_invalid_rois,
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestNWB" name="test_read_write_nwb[False-True]" time="0.009"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestNWB object at 0x7f8941cd5b80&gt;, roundtrip = False
+data_object_roundtrip_fixture = &lt;function data_object_roundtrip_fixture.&lt;locals&gt;.f at 0x7f8941a004c0&gt;, exclude_invalid_rois = True
+
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture,
+                            exclude_invalid_rois):
+&gt;       cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            exclude_invalid_rois=exclude_invalid_rois,
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestNWB" name="test_read_write_nwb[False-False]" time="0.010"><failure message="AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'">self = &lt;test_cell_specimens.TestNWB object at 0x7f8941cd5160&gt;, roundtrip = False
+data_object_roundtrip_fixture = &lt;function data_object_roundtrip_fixture.&lt;locals&gt;.f at 0x7f8941a009d0&gt;, exclude_invalid_rois = False
+
+    @pytest.mark.parametrize('exclude_invalid_rois', [True, False])
+    @pytest.mark.parametrize('roundtrip', [True, False])
+    def test_read_write_nwb(self, roundtrip,
+                            data_object_roundtrip_fixture,
+                            exclude_invalid_rois):
+&gt;       cell_specimens = CellSpecimens.from_json(
+            dict_repr=self.dict_repr, ophys_timestamps=self.ophys_timestamps,
+            segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
+            exclude_invalid_rois=exclude_invalid_rois,
+            events_params=EventsParams(
+                           filter_scale_seconds=2.0/31.0,
+                           filter_n_time_steps=20))
+
+test_cell_specimens.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:349: in from_json
+    corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _get_corrected_fluorescence_traces():
+        neuropil_corrected_file = NeuropilCorrectedFile.from_json(dict_repr=dict_repr)
+        return CorrectedFluorescenceTraces.from_data_file(
+&gt;           neuropil_corrected_file=NeuropilCorrectedFile.load_data(neuropil_corrected_file.value))
+E       AttributeError: 'NeuropilCorrectedFile' object has no attribute 'value'
+
+../../../../brain_observatory/behavior/data_objects/cell_specimens/cell_specimens.py:336: AttributeError</failure></testcase><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestFilterAndReorder" name="test_missing_rois[True]" time="0.002" /><testcase classname="allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens.TestFilterAndReorder" name="test_missing_rois[False]" time="0.003" /></testsuite></testsuites>

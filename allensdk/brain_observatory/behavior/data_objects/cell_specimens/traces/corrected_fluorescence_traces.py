@@ -50,7 +50,7 @@ class CorrectedFluorescenceTraces(DataObject, RoisMixin,
     def from_data_file(cls,
                        neuropil_corrected_file: NeuropilCorrectedFile) \
             -> "CorrectedFluorescenceTraces":
-        corrected_fluorescence_traces = neuropil_corrected_file.corrected_fluorescence
+        corrected_fluorescence_traces = neuropil_corrected_file.data
         return cls(traces=corrected_fluorescence_traces)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:

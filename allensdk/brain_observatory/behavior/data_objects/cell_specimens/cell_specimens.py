@@ -148,6 +148,8 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         meta
         dff_traces
         corrected_fluorescence_traces
+        r
+        RMSE
         events
         ophys_timestamps
         segmentation_mask_image_spacing
