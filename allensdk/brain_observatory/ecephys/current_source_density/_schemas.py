@@ -83,6 +83,13 @@ class InputParameters(ArgSchema):
     noisy_channel_threshold = Float(default=1500.0,
                                     help='Threshold for removing noisy '
                                          'channels from analysis')
+    max_out_of_brain_channels = Int(
+        default=50,
+        help='Rereferencing can sometimes fail for experiments with shallow '
+             'probe insertions as the uppermost channels are in air and not '
+             'agar. This places a limit on the number of channels to use for '
+             're-referencing.'
+    )
     start_field = String(
         default='Start',
         help='Column from which to extract start times.'
