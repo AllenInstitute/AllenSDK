@@ -165,14 +165,25 @@ def run_csd(args: dict) -> dict:
             0,
             accumulated_lfp_data.shape[1]
         )
+        if len(clean_channels) == 0:
+            logging.error(f'There are no clean channels. Skipping probe '
+                          f'{probe["name"]}')
+            probewise_outputs.append({
+                'name': probe['name'],
+                'csd_path': None,
+                'clean_channels': clean_channels.tolist()
+            })
+            continue
         try:
             interp_lfp, spacing = interp_channel_locs(
                 lfp=filt_lfp,
                 actual_locs=clean_actual_locs,
                 interp_locs=interp_locs
             )
-        except (ValueError, QhullError) as e:
-            logging.error(e)
+        except QhullError:
+            logging.error(f'There are only {len(clean_channels)} '
+                          f'clean channels, which is not enough for '
+                          f'interpolation. Skipping probe {probe["name"]}')
             probewise_outputs.append({
                 'name': probe['name'],
                 'csd_path': None,
