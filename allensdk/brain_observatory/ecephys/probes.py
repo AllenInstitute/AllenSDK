@@ -183,7 +183,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
     def from_nwb(
             cls,
             nwbfile: NWBFile,
-            probe_lfp_data_path_map: Optional[
+            probe_data_path_map: Optional[
                 Dict[str, Union[str, Callable[[], str]]]] = None,
     ) -> "Probes":
         """
@@ -191,7 +191,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Parameters
         ----------
         nwbfile
-        probe_lfp_data_path_map
+        probe_data_path_map
             See description in `BehaviorEcephysSession.from_nwb`
 
         Returns
@@ -202,7 +202,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
             Probe.from_nwb(
                 nwbfile=nwbfile,
                 probe_name=probe_name,
-                lfp_nwb_path=probe_lfp_data_path_map[probe_name]
+                probe_nwb_path=probe_data_path_map[probe_name]
             )
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)

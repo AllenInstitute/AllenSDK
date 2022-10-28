@@ -35,7 +35,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             units: Units,
             sampling_rate: float = 30000.0,
             lfp: Optional[LFP] = None,
-            lfp_nwb_path: Optional[Union[str, Callable[[], str]]] = None,
+            probe_nwb_path: Optional[Union[str, Callable[[], str]]] = None,
             current_source_density: Optional[CurrentSourceDensity] = None,
             location: str = 'See electrode locations',
             temporal_subsampling_factor: Optional[float] = 2.0
@@ -56,10 +56,11 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             probe sampling rate
         lfp:
             probe LFP
-        lfp_nwb_path
+        probe_nwb_path
+            The file at this path should contain LFP, CSD data for this probe
             Can be one of the following:
-                Path to the LFP NWB file
-                Callable that returns path to the LFP NWB file
+                Path to the probe NWB file
+                Callable that returns path to the probe NWB file
         current_source_density
             probe current source density
         location:
@@ -73,7 +74,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         self._units = units
         self._sampling_rate = sampling_rate
         self._lfp = lfp
-        self._lfp_nwb_path = lfp_nwb_path
+        self._probe_nwb_path = probe_nwb_path
         self._current_source_density = current_source_density
         self._location = location
         self._temporal_subsampling_factor = temporal_subsampling_factor
@@ -104,7 +105,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
     @property
     def lfp(self) -> Optional[DataArray]:
         if self._lfp is None:
-            if self._lfp_nwb_path is None:
+            if self._probe_nwb_path is None:
                 raise RuntimeError(f'Path to NWB file containing LFP data '
                                    f'for probe {self._id} not set')
             lfp = self._read_lfp_from_nwb()
@@ -160,7 +161,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             cls,
             nwbfile: NWBFile,
             probe_name: str,
-            lfp_nwb_path: Optional[str] = None,
+            probe_nwb_path: Optional[str] = None,
     ) -> "Probe":
         """
 
@@ -169,8 +170,9 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         nwbfile
         probe_name
             Probe name
-        lfp_nwb_path
-            Path to load LFP NWB file, if LFP data exists
+        probe_nwb_path
+            Path to load probe NWB file, which should contain LFP and CSD data,
+            if LFP data exists
 
         Returns
         -------
@@ -186,7 +188,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             sampling_rate=probe.device.sampling_rate,
             channels=channels,
             units=units,
-            lfp_nwb_path=lfp_nwb_path
+            probe_nwb_path=probe_nwb_path
         )
 
     def to_nwb(
@@ -350,11 +352,11 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         return nwbfile
 
     def _read_lfp_from_nwb(self) -> LFP:
-        if isinstance(self._lfp_nwb_path, Callable):
+        if isinstance(self._probe_nwb_path, Callable):
             logging.info('Fetching LFP NWB file')
-            path = self._lfp_nwb_path()
+            path = self._probe_nwb_path()
         else:
-            path = self._lfp_nwb_path
+            path = self._probe_nwb_path
         with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
             nwbfile = f.read()
             probe = nwbfile.electrode_groups[self._name]

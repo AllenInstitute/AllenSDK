@@ -516,7 +516,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def from_nwb(
             cls,
             nwbfile: NWBFile,
-            probe_lfp_data_path_map: Optional[
+            probe_data_path_map: Optional[
                 Dict[str, Union[str, Callable[[], str]]]] = None,
             **kwargs
     ) -> "BehaviorEcephysSession":
@@ -525,11 +525,12 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         Parameters
         ----------
         nwbfile
-        probe_lfp_data_path_map
-            Maps the probe name to the path to the LFP nwb file, or a callable
-             that returns the nwb path. The LFP nwb file is loaded separately
-             from the main session nwb file in order to load the LFP data
-             on the fly rather than with the main
+        probe_data_path_map
+            Maps the probe name to the path to the probe nwb file, or a
+            callable that returns the nwb path. This file should contain
+            LFP and CSD data. The nwb file is loaded
+            separately from the main session nwb file in order to load the LFP
+            data on the fly rather than with the main
             session NWB file. This is to speed up download of the NWB
             for users who don't wish to load the LFP data (it is large).
         kwargs: kwargs sent to `BehaviorSession.from_nwb`
@@ -547,7 +548,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             behavior_session=behavior_session,
             probes=Probes.from_nwb(
                 nwbfile=nwbfile,
-                probe_lfp_data_path_map=probe_lfp_data_path_map),
+                probe_data_path_map=probe_data_path_map),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
             metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile)
         )

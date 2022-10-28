@@ -111,15 +111,15 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             return f
 
         if not probes_meta.empty:
-            probe_lfp_data_path_map = {
+            probe_data_path_map = {
                 p.name: make_lazy_load_filepath_function(
                     file_id=str(int(getattr(p, self.cache.file_id_column)))
                 ) for p in probes_meta.itertuples(index=False)}
         else:
-            probe_lfp_data_path_map = None
+            probe_data_path_map = None
         return BehaviorEcephysSession.from_nwb_path(
             str(session_data_path),
-            probe_lfp_data_path_map=probe_lfp_data_path_map)
+            probe_data_path_map=probe_data_path_map)
 
     def _get_ecephys_session_table(self):
         session_table_path = self._get_metadata_path(
