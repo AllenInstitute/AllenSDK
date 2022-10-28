@@ -13,8 +13,11 @@ from xarray import DataArray
 from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
     BehaviorEcephysMetadata
 from allensdk.brain_observatory.ecephys._channels import Channels
+from allensdk.brain_observatory.ecephys._current_source_density import \
+    CurrentSourceDensity
 from allensdk.brain_observatory.ecephys._units import Units
 from allensdk.brain_observatory.ecephys.lfp import LFP
+from allensdk.brain_observatory.ecephys.nwb import EcephysCSD
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
 from allensdk.core import DataObject, JsonReadableInterface, \
@@ -33,6 +36,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             sampling_rate: float = 30000.0,
             lfp: Optional[LFP] = None,
             lfp_nwb_path: Optional[Union[str, Callable[[], str]]] = None,
+            current_source_density: Optional[CurrentSourceDensity] = None,
             location: str = 'See electrode locations',
             temporal_subsampling_factor: Optional[float] = 2.0
     ):
@@ -56,6 +60,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             Can be one of the following:
                 Path to the LFP NWB file
                 Callable that returns path to the LFP NWB file
+        current_source_density
+            probe current source density
         location:
             probe location
         temporal_subsampling_factor:
@@ -68,6 +74,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         self._sampling_rate = sampling_rate
         self._lfp = lfp
         self._lfp_nwb_path = lfp_nwb_path
+        self._current_source_density = current_source_density
         self._location = location
         self._temporal_subsampling_factor = temporal_subsampling_factor
         super().__init__(name=name,
@@ -130,8 +137,12 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             lfp = LFP.from_json(
                 probe_meta=probe
             )
+            csd = CurrentSourceDensity.from_json(
+                probe_meta=probe
+            )
         else:
             lfp = None
+            csd = None
 
         return Probe(
             id=probe['id'],
@@ -140,6 +151,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             units=units,
             sampling_rate=probe['sampling_rate'],
             lfp=lfp,
+            current_source_density=csd,
             temporal_subsampling_factor=probe['temporal_subsampling_factor']
         )
 
@@ -276,13 +288,64 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         ))
         nwbfile.add_acquisition(lfp_nwb)
 
-        # TODO CSD data
+        nwbfile = self._add_csd_to_nwb(nwbfile=nwbfile)
 
         os.makedirs(Path(output_path).parent, exist_ok=True)
 
         with pynwb.NWBHDF5IO(output_path, 'w') as f:
             logging.info(f"writing lfp file to {output_path}")
             f.write(nwbfile, cache_spec=True)
+
+        return nwbfile
+
+    def _add_csd_to_nwb(
+            self,
+            nwbfile: NWBFile,
+            csd_unit: str = 'V/cm^2',
+            position_unit: str = "um"
+    ):
+        """
+
+        Parameters
+        ----------
+        nwbfile:
+            NWBFile containing LFP data
+        csd_unit:
+            Units of CSD data, by default "V/cm^2"
+        position_unit:
+            Units of virtual channel locations, by default "um" (micrometer)
+
+        Returns
+        -------
+        `NWBFile` with csd added
+        """
+        csd = self._current_source_density
+
+        csd_mod = pynwb.ProcessingModule("current_source_density",
+                                         "Precalculated current source "
+                                         "density")
+        nwbfile.add_processing_module(csd_mod)
+
+        csd_ts = pynwb.base.TimeSeries(
+            name="current_source_density",
+            data=csd.data.T,
+            # TimeSeries should have data in (time x channels) format
+            timestamps=csd.timestamps.T,
+            unit=csd_unit
+        )
+
+        x_locs, y_locs = np.split(csd.channel_locations.astype(np.uint64),
+                                  2,
+                                  axis=1)
+
+        csd = EcephysCSD(name="ecephys_csd",
+                         time_series=csd_ts,
+                         virtual_electrode_x_positions=x_locs.flatten(),
+                         virtual_electrode_x_positions__unit=position_unit,
+                         virtual_electrode_y_positions=y_locs.flatten(),
+                         virtual_electrode_y_positions__unit=position_unit)
+
+        csd_mod.add_data_interface(csd)
 
         return nwbfile
 
