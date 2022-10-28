@@ -16,6 +16,9 @@ from hdmf.backends.hdf5.h5_utils import H5DataIO
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
     Presentations
+from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
+    BehaviorEcephysMetadata
+from allensdk.brain_observatory.ecephys._probe import Probe
 from allensdk.brain_observatory.ecephys.lfp import LFP
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
@@ -253,128 +256,24 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
 
 
 def write_probe_lfp_file(session_id, session_metadata, session_start_time,
-                         log_level, probe):
+                         log_level, probe_meta):
     """ Writes LFP data (and associated channel information) for one
     probe to a standalone nwb file
     """
-    # TODO use Probe class
     logging.getLogger('').setLevel(log_level)
-    logging.info(f"writing lfp file for probe {probe['id']}")
+    logging.info(f"writing lfp file for probe {probe_meta['id']}")
 
-    nwbfile = pynwb.NWBFile(
-        session_description='LFP data and associated info for one probe',
-        identifier=f"{probe['id']}",
-        session_id=f"{session_id}",
+    probe = Probe.from_json(probe=probe_meta)
+    probe.write_lfp_to_nwb(
+        output_path=probe_meta['lfp']['output_path'],
+        session_id=session_id,
         session_start_time=session_start_time,
-        institution="Allen Institute for Brain Science"
+        session_metadata=BehaviorEcephysMetadata.from_json(
+            dict_repr=session_metadata)
     )
-
-    if session_metadata is not None:
-        nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
-
-    lfp = LFP.from_json(probe_meta=probe)
-
-    nwbfile, probe_nwb_device, probe_nwb_electrode_group = \
-        add_probe_to_nwbfile(
-            nwbfile,
-            probe_id=probe["id"],
-            name=probe["name"],
-            sampling_rate=probe["sampling_rate"],
-            lfp_sampling_rate=lfp.sampling_rate,
-            has_lfp_data=probe["lfp"] is not None
-        )
-
-    add_ecephys_electrodes(nwbfile, probe["channels"],
-                           probe_nwb_electrode_group,
-                           channel_number_whitelist=lfp.channels)
-
-    electrode_table_region = nwbfile.create_electrode_table_region(
-        region=np.arange(len(nwbfile.electrodes)).tolist(),  # use raw inds
-        name='electrodes',
-        description=f"lfp channels on probe {probe['id']}"
-    )
-
-    lfp_nwb = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
-
-    nwbfile.add_acquisition(lfp_nwb.create_electrical_series(
-        name=f"probe_{probe['id']}_lfp_data",
-        data=H5DataIO(data=lfp.data, compression='gzip', compression_opts=9),
-        timestamps=H5DataIO(data=lfp.timestamps,
-                            compression='gzip',
-                            compression_opts=9),
-        electrodes=electrode_table_region
-    ))
-
-    nwbfile.add_acquisition(lfp_nwb)
-
-    if ("csd_path" in probe.keys()):
-        csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
-        nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
-
-    with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
-        logging.info(f"writing lfp file to {probe['lfp']['output_path']}")
-        lfp_writer.write(nwbfile, cache_spec=True)
-    return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
-
-
-def read_csd_data_from_h5(csd_path):
-    with h5py.File(csd_path, "r") as csd_file:
-        return (csd_file["current_source_density"][:],
-                csd_file["timestamps"][:],
-                csd_file["csd_locations"][:])
-
-
-def add_csd_to_nwbfile(nwbfile: pynwb.NWBFile, csd: np.ndarray,
-                       times: np.ndarray, csd_virt_channel_locs: np.ndarray,
-                       csd_unit="V/cm^2", position_unit="um") -> pynwb.NWBFile:
-    """Add current source density (CSD) data to an nwbfile
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        nwbfile to add CSD data to
-    csd : np.ndarray
-        CSD data in the form of: (channels x timepoints)
-    times : np.ndarray
-        Timestamps for CSD data (timepoints)
-    csd_virt_channel_locs : np.ndarray
-        Location of interpolated channels
-    csd_unit : str, optional
-        Units of CSD data, by default "V/cm^2"
-    position_unit : str, optional
-        Units of virtual channel locations, by default "um" (micrometer)
-
-    Returns
-    -------
-    pynwb.NWBFiles
-        nwbfile which has had CSD data added
-    """
-
-    csd_mod = pynwb.ProcessingModule("current_source_density",
-                                     "Precalculated current source density")
-    nwbfile.add_processing_module(csd_mod)
-
-    csd_ts = pynwb.base.TimeSeries(
-        name="current_source_density",
-        data=csd.T,  # TimeSeries should have data in (time x channels) format
-        timestamps=times,
-        unit=csd_unit
-    )
-
-    x_locs, y_locs = np.split(csd_virt_channel_locs.astype(np.uint64),
-                              2,
-                              axis=1)
-
-    csd = EcephysCSD(name="ecephys_csd",
-                     time_series=csd_ts,
-                     virtual_electrode_x_positions=x_locs.flatten(),
-                     virtual_electrode_x_positions__unit=position_unit,
-                     virtual_electrode_y_positions=y_locs.flatten(),
-                     virtual_electrode_y_positions__unit=position_unit)
-
-    csd_mod.add_data_interface(csd)
-
-    return nwbfile
+    return {
+        "id": probe_meta["id"],
+        "nwb_path": probe_meta["lfp"]["output_path"]}
 
 
 def write_probewise_lfp_files(probes, session_id, session_metadata,

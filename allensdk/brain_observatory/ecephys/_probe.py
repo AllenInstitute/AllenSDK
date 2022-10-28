@@ -225,7 +225,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         nwbfile = self._add_probe_to_nwb(nwbfile=nwbfile)
 
         if self._lfp is not None:
-            self._write_lfp_to_nwb(
+            self.write_lfp_to_nwb(
                 output_path=lfp_nwb_output_path,
                 session_id=nwbfile.session_id,
                 session_metadata=BehaviorEcephysMetadata.from_nwb(
@@ -266,7 +266,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             channel_number_whitelist=channel_number_whitelist)
         return nwbfile
 
-    def _write_lfp_to_nwb(
+    def write_lfp_to_nwb(
             self,
             output_path: str,
             session_id: str,
@@ -304,7 +304,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         ))
         nwbfile.add_acquisition(lfp_nwb)
 
-        nwbfile = self._add_csd_to_nwb(nwbfile=nwbfile)
+        if self._current_source_density is not None:
+            nwbfile = self._add_csd_to_nwb(nwbfile=nwbfile)
 
         os.makedirs(Path(output_path).parent, exist_ok=True)
 
