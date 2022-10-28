@@ -20,7 +20,7 @@ from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event, \
-    get_flashes_since_change
+    get_flashes_since_change, fix_omitted_end_frame
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
 from allensdk.internal.brain_observatory.mouse import Mouse
@@ -253,6 +253,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
         stim_pres_df['stimulus_block'] = 0
         stim_pres_df['stimulus_name'] = 'behavior'
+
+        stim_pres_df = fix_omitted_end_frame(stim_pres_df)
 
         cls._add_is_image_novel(stimulus_presentations=stim_pres_df,
                                 behavior_session_id=behavior_session_id)

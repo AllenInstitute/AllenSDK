@@ -673,3 +673,36 @@ def compute_trials_id_for_stimulus(
                         trials_ids[active_block_mask].values
 
     return trials_ids.sort_index()
+
+
+def fix_omitted_end_frame(stim_pres_table: pd.DataFrame) -> pd.DataFrame:
+    """Fill NaN ``end_frame`` values for omitted frames.
+
+    Additionally, change type of ``end_frame`` to int.
+
+    Parameters
+    ----------
+    stim_pres_table : `pandas.DataFrame`
+        Input stimulus table to fix/fill omitted ``end_frame`` values.
+
+    Returns
+    -------
+    output : `pandas.DataFrame`
+        Copy of input DataFrame with filled omitted, ``end_frame`` values and
+        fixed typing.
+    """
+    median_stim_frame_duration = np.nanmedian(
+        stim_pres_table["end_frame"] - stim_pres_table["start_frame"]
+    )
+    omitted_end_frames = (
+        stim_pres_table[stim_pres_table['omitted']]['start_frame']
+        + median_stim_frame_duration
+    )
+    stim_pres_table.loc[stim_pres_table['omitted'], 'end_frame'] = \
+        omitted_end_frames
+
+    stim_dtypes = stim_pres_table.dtypes.to_dict()
+    stim_dtypes['start_frame'] = int
+    stim_dtypes['end_frame'] = int
+
+    return stim_pres_table.astype(stim_dtypes)
