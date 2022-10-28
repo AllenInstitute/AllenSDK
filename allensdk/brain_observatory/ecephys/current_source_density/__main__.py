@@ -37,6 +37,9 @@ from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
 )
 
+from allensdk.brain_observatory.ecephys.lfp_subsampling.subsampling \
+    import remove_lfp_noise
+
 
 def get_inputs_from_lims(args) -> dict:
 
@@ -123,10 +126,12 @@ def run_csd(args: dict) -> dict:
         else:
             lfp_channels = np.arange(0, probe['total_channels'])
 
+        lfp_referenced = remove_lfp_noise(lfp_raw, probe['surface_channel'], lfp_channels)
+
         logging.info('Accumulating LFP data')
         accumulated_lfp_data = accumulate_lfp_data(
             timestamps=timestamps,
-            lfp_raw=lfp_raw,
+            lfp_raw=lfp_referenced,
             lfp_channels=lfp_channels,
             trial_windows=trial_windows,
             volts_per_bit=args['volts_per_bit']
