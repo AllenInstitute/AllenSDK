@@ -490,7 +490,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     def to_nwb(
             self,
-            probe_lfp_nwb_filepath_map: Dict[str, Optional[str]]
+            probe_lfp_nwb_filepath_map: Optional[Dict[str, str]] = None
     ) -> NWBFile:
         """
         Adds behavior ecephys session to NWBFile instance

@@ -210,7 +210,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
     def to_nwb(
             self,
             nwbfile: NWBFile,
-            probe_lfp_nwb_filepath_map: Dict[str, Optional[str]]
+            probe_lfp_nwb_filepath_map: Optional[Dict[str, str]] = None
     ) -> NWBFile:
         """
         Adds probes to NWBFile instance
