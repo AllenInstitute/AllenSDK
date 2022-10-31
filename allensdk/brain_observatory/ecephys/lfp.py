@@ -55,7 +55,8 @@ class LFP(DataObject, JsonReadableInterface):
     @classmethod
     def from_json(
             cls,
-            probe_meta: dict
+            probe_meta: dict,
+            amplitude_scale_factor: float = 0.195e-6
     ) -> "LFP":
         """
 
@@ -63,6 +64,9 @@ class LFP(DataObject, JsonReadableInterface):
         ----------
         probe_meta:
             Probe metadata as a dict
+        amplitude_scale_factor
+            amplitude scale factor converting raw amplitudes to Volts.
+                Default converts from bits -> uV -> V
 
         Returns
         -------
@@ -72,8 +76,6 @@ class LFP(DataObject, JsonReadableInterface):
         lfp_channels = np.load(lfp_meta['input_channels_path'],
                                allow_pickle=False)
 
-        # TODO 2nd dimension in lfp_data doesn't match number of lfp_channels
-
         lfp_data, lfp_timestamps = ContinuousFile(
             data_path=lfp_meta['input_data_path'],
             timestamps_path=lfp_meta['input_timestamps_path'],
@@ -81,7 +83,8 @@ class LFP(DataObject, JsonReadableInterface):
         ).load(memmap=False)
 
         lfp_data = lfp_data.astype(np.float32)
-        lfp_data = lfp_data * probe_meta["amplitude_scale_factor"]
+        lfp_data = lfp_data * probe_meta.get("amplitude_scale_factor",
+                                             amplitude_scale_factor)
 
         sampling_rate = (
                 probe_meta['lfp_sampling_rate'] /
