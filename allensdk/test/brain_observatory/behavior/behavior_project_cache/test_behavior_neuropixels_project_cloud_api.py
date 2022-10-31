@@ -202,19 +202,22 @@ def test_probe_data_path_map(mock_cache, monkeypatch, has_lfp_data):
     def mock_from_nwb_path(nwb_path, probe_data_path_map):
         return probe_data_path_map
 
+    ecephys_session_id = 10
     with patch.object(BehaviorEcephysSession, 'from_nwb_path',
                       wraps=mock_from_nwb_path):
-        probe_data_path_map = api.get_ecephys_session(10)
+        probe_data_path_map = api.get_ecephys_session(ecephys_session_id)
 
     probe_meta = api.get_probe_table()
+    probe_meta = probe_meta.loc[
+        probe_meta['ecephys_session_id'] == ecephys_session_id]
 
     if has_lfp_data:
-        obtained_probe_nwb_path = probe_data_path_map['probeA']()
-        expected_probe_nwb_path = str(probe_meta.loc[
-            (probe_meta['ecephys_session_id'] == 10) &
-            (probe_meta['name'] == 'probeA')
-        ].iloc[0]['file_id'])
-        assert obtained_probe_nwb_path == expected_probe_nwb_path
+        for probe_name in probe_meta['name'].unique():
+            obtained_probe_nwb_path = probe_data_path_map[probe_name]()
+            expected_probe_nwb_path = str(probe_meta.loc[
+                (probe_meta['name'] == probe_name)
+            ].iloc[0]['file_id'])
+            assert obtained_probe_nwb_path == expected_probe_nwb_path
     else:
         assert probe_data_path_map is None
 
