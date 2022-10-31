@@ -19,3 +19,11 @@ class VBN2022BehaviorOnlyWriterSchema(argschema.ArgSchema):
     nwb_output_dir = argschema.fields.OutputDir(
             required=True,
             description=("Directory to write the Behavior only NWBs to."))
+
+    lims_user = argschema.fields.String(
+            required=True,
+            description=("Username for LIMS2"))
+
+    lims_password = argschema.fields.String(
+            required=True,
+            description=("Password for LIMS2 login."))
