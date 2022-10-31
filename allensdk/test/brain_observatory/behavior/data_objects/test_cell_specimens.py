@@ -90,6 +90,7 @@ class TestJson:
             test_data_dir / "behavior_stimulus_file.pkl"
         )
         dict_repr["dff_file"] = str(test_data_dir / "demix_file.h5")
+        dict_repr["demix_file"] = str(test_data_dir / "demix_file.h5")
         dict_repr["neuropil_corrected_file"] = str(
             test_data_dir / "neuropil_corrected_file.h5"
         )
@@ -125,7 +126,13 @@ class TestJson:
         assert csp.meta == self.expected_meta
 
     @pytest.mark.parametrize(
-        "data", ("dff_traces", "corrected_fluorescence_traces", "events")
+        "data",
+        (
+            "dff_traces",
+            "demixed_traces",
+            "corrected_fluorescence_traces",
+            "events",
+        ),
     )
     def test_roi_data_same_order_as_cell_specimen_table(self, data):
         """tests that roi data are in same order as cell specimen table"""
@@ -160,7 +167,8 @@ class TestJson:
 
     @pytest.mark.parametrize("extra_in_trace", (True, False))
     @pytest.mark.parametrize(
-        "trace_type", ("dff_traces", "corrected_fluorescence_traces")
+        "trace_type",
+        ("dff_traces", "demixed_traces", "corrected_fluorescence_traces"),
     )
     def test_trace_rois_different_than_cell_specimen_table(
         self, trace_type, extra_in_trace
@@ -193,11 +201,21 @@ class TestJson:
         if trace_type == "dff_traces":
             trace_args = {
                 "dff_traces": private_trace_attr,
-                "corrected_fluorescence_traces": csp._corrected_fluorescence_traces,
+                "demixed_traces": csp._demixed_traces,
+                "corrected_fluorescence_traces":
+                    csp._corrected_fluorescence_traces,
+            }
+        elif trace_type == "demixed_traces":
+            trace_args = {
+                "dff_traces": csp._dff_traces,
+                "demixed_traces": private_trace_attr,
+                "corrected_fluorescence_traces":
+                    csp._corrected_fluorescence_traces,
             }
         else:
             trace_args = {
                 "dff_traces": csp._dff_traces,
+                "demixed_traces": csp._demixed_traces,
                 "corrected_fluorescence_traces": private_trace_attr,
             }
         with pytest.raises(RuntimeError):
