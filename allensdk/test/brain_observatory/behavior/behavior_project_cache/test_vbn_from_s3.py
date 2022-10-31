@@ -115,7 +115,7 @@ def test_local_cache_construction(
 
     with monkeypatch.context() as ctx:
         ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                    lambda path: create_autospec(
+                    lambda path, probe_data_path_map: create_autospec(
                         BehaviorEcephysSession, instance=True))
         cache.get_ecephys_session(ecephys_session_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -179,7 +179,7 @@ def test_load_out_of_date_manifest(
     for ses_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=ses_id)
 
@@ -252,7 +252,7 @@ def test_file_linkage(
     for sess_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 
@@ -282,7 +282,7 @@ def test_file_linkage(
     for sess_id in (222, 333):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 

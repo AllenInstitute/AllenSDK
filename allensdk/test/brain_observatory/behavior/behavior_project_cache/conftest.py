@@ -237,8 +237,20 @@ def vbn_s3_cloud_cache_data():
     metadata['behavior_sessions'] = bytes(buff.read(), 'utf-8')
 
     probes = [
-        {'ecephys_probe_id': 5111, 'ecephys_session_id': 5111},
-        {'ecephys_probe_id': 5222, 'ecephys_session_id_id': 5112}
+        {
+            'ecephys_probe_id': 5111,
+            'ecephys_session_id': 5111,
+            'has_lfp_data': True,
+            'name': 'probeA',
+            'file_id': 1024123123
+        },
+        {
+            'ecephys_probe_id': 5222,
+            'ecephys_session_id_id': 5112,
+            'has_lfp_data': True,
+            'name': 'probeA',
+            'file_id': 1024123124
+        }
     ]
 
     probes = pd.DataFrame(probes)
@@ -316,8 +328,20 @@ def vbn_s3_cloud_cache_data():
     metadata['behavior_sessions'] = bytes(buff.read(), 'utf-8')
 
     probes = [
-        {'ecephys_probe_id': 5411, 'ecephys_session_id': 222},
-        {'ecephys_probe_id': 5422, 'ecephys_session_id_id': 222}
+        {
+            'ecephys_probe_id': 5111,
+            'ecephys_session_id': 222,
+            'has_lfp_data': True,
+            'name': 'probeA',
+            'file_id': 1024123123
+        },
+        {
+            'ecephys_probe_id': 5222,
+            'ecephys_session_id_id': 222,
+            'has_lfp_data': True,
+            'name': 'probeB',
+            'file_id': 1024123124
+        }
     ]
 
     probes = pd.DataFrame(probes)
