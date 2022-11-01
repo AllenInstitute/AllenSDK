@@ -4,6 +4,7 @@ from typing import Dict, Optional
 import re
 import numpy as np
 from pynwb import NWBFile
+import warnings
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -89,7 +90,8 @@ def get_expt_description(session_type: str) -> str:
         if len(match) > 1:
             emsg += f"{list(match.keys())}"
         emsg += f"the regex pattern templates are {list(description_dict)}"
-        raise RuntimeError(emsg)
+        warnings.warn(emsg + "\nReturning None")
+        return None
 
     return match.popitem()[1]
 
