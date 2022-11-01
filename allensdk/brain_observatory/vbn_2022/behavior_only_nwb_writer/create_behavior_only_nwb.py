@@ -43,14 +43,21 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                 datetime.strptime(
                     behavior_session_table.loc[bs_id, 'date_of_acquisition'],
                     "%Y-%m-%d %H:%M:%S.%f"))
-            session = BehaviorSession.from_lims(
-                behavior_session_id=bs_id,
-                lims_db=db_conn,
-                date_of_acquisition=daq)
-            print('Session age', session._metadata._subject_metadata._age._value)
-            session._metadata._subject_metadata._age._value = \
-                behavior_session_table.loc[bs_id, 'age_in_days']
-            print('Session age', session._metadata._subject_metadata._age._value)
+            try:
+                session = BehaviorSession.from_lims(
+                    behavior_session_id=bs_id,
+                    lims_db=db_conn,
+                    date_of_acquisition=daq)
+                session._metadata._subject_metadata._age._value = \
+                    behavior_session_table.loc[bs_id, 'age_in_days']
+            except:
+                self.logger.info(
+                    f"\tFailure loading session {bs_id}. Continuing...")
             file_path = output_path / f'{bs_id}.nwb'
-            with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
-                nwb_writer.write(session.to_nwb())
+            try:
+                with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
+                    nwb_writer.write(session.to_nwb())
+            except:
+                self.logger.info(
+                    f"\tFailure writing nwb for session {bs_id}. "
+                    "Continuing...")
