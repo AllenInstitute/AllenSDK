@@ -38,6 +38,8 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                                   password=self.args['lims_password'])
         db_conn = db_connection_creator(lims2cred)
 
+        passed = 0
+        failed = 0
         for bs_id in behavior_session_ids:
             daq = DateOfAcquisition(
                 datetime.strptime(
@@ -53,11 +55,16 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
             except:
                 self.logger.info(
                     f"\tFailure loading session {bs_id}. Continuing...")
+                failed += 1
             file_path = output_path / f'{bs_id}.nwb'
             try:
                 with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
                     nwb_writer.write(session.to_nwb())
+                passed += 1
             except:
                 self.logger.info(
                     f"\tFailure writing nwb for session {bs_id}. "
                     "Continuing...")
+                failed += 1
+        self.logger.info(f"Completed processing. Successful on {passed} "
+                         f"session. Failed on {failed} session.")
