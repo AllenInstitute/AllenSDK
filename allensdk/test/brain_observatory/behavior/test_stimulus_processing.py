@@ -489,4 +489,3 @@ def test_compute_trials_id_for_stimulus():
                                                        trials)
     assert np.array_equal(output_trials_ids.values,
                           expected_trials_id.values)
-

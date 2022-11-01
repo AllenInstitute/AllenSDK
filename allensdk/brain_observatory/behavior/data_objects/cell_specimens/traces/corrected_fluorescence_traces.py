@@ -34,17 +34,27 @@ class CorrectedFluorescenceTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "CorrectedFluorescenceTraces":
-        corr_fluorescence_nwb = (
+        corr_fluorescence_traces_nwb = (
             nwbfile.processing["ophys"]
             .data_interfaces["corrected_fluorescence"]
-            .roi_response_series["traces"]
         )
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
-        f_traces = corr_fluorescence_nwb.data[:].T.copy()
-        roi_ids = corr_fluorescence_nwb.rois.table.id[:].copy()
+        f_traces = corr_fluorescence_traces_nwb.roi_response_series["traces"]\
+            .data[:].T.copy()
+        roi_ids = corr_fluorescence_traces_nwb.roi_response_series["traces"]\
+            .rois.table.id[:].copy()
+        r_values = corr_fluorescence_traces_nwb.roi_response_series["r"]\
+            .data[:].copy()
+        rmse = corr_fluorescence_traces_nwb.roi_response_series["RMSE"]\
+            .data[:].copy()
+
         df = pd.DataFrame(
-            {"corrected_fluorescence": [x for x in f_traces]},
+            {
+                "corrected_fluorescence": [x for x in f_traces],
+                "r": r_values,
+                "RMSE": rmse,
+            },
             index=pd.Index(data=roi_ids, name="cell_roi_id"),
         )
         return CorrectedFluorescenceTraces(traces=df)
@@ -54,13 +64,14 @@ class CorrectedFluorescenceTraces(
         cls, neuropil_corrected_file: NeuropilCorrectedFile
     ) -> "CorrectedFluorescenceTraces":
         corrected_fluorescence_traces = (
-            neuropil_corrected_file.data.corrected_fluorescence.to_frame()
+            neuropil_corrected_file.data
         )
         return cls(traces=corrected_fluorescence_traces)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         corrected_fluorescence_traces = self.value["corrected_fluorescence"]
-
+        rmse = self.value["RMSE"].values
+        r_values = self.value["r"].values
         # Convert from Series of lists to numpy array
         # of shape ROIs x timepoints
         traces = np.stack([x for x in corrected_fluorescence_traces])
@@ -89,4 +100,21 @@ class CorrectedFluorescenceTraces(
             rois=roi_table_region,
             timestamps=ophys_timestamps,
         )
+
+        f_interface.create_roi_response_series(
+            name="r",
+            data=r_values,
+            unit="NA",
+            rois=roi_table_region,
+            timestamps=ophys_timestamps,
+        )
+
+        f_interface.create_roi_response_series(
+            name="RMSE",
+            data=rmse,
+            unit="NA",
+            rois=roi_table_region,
+            timestamps=ophys_timestamps,
+        )
+
         return nwbfile
