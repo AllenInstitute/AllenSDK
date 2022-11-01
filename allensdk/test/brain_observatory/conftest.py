@@ -76,8 +76,7 @@ def behavior_ecephys_session_config_fixture():
     """
     session_data_list = vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list=[1111216934],
-        probes_to_skip=None,
-        nwb_output_dir=Path()
+        probes_to_skip=None
     )
 
     return session_data_list['sessions'][0]

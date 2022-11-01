@@ -96,7 +96,7 @@ class Lfp(RaisingSchema):
     input_data_path = String(required=True, validate=check_read_access)
     input_timestamps_path = String(required=True, validate=check_read_access)
     input_channels_path = String(required=True, validate=check_read_access)
-    output_path = String(required=True)
+    output_path = String(required=False)
 
 
 class Probe(RaisingSchema):

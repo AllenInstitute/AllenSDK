@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union, Callable
+from typing import Optional, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -207,32 +207,31 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
 
     def to_nwb(
             self,
-            nwbfile: NWBFile,
-            lfp_nwb_output_path: Optional[str]
-    ) -> NWBFile:
+            nwbfile: NWBFile
+    ) -> Tuple[NWBFile, Optional[NWBFile]]:
         """
 
         Parameters
         ----------
         nwbfile
-        lfp_nwb_output_path:
-            Where to write LFP NWB file, if LFP data exists
 
         Returns
         -------
-        `NWBFile` instance
+        (session `NWBFile` instance,
+        probe `NWBFile` instance if LFP data exists else None)
         """
         nwbfile = self._add_probe_to_nwb(nwbfile=nwbfile)
 
         if self._lfp is not None:
-            self.write_lfp_to_nwb(
-                output_path=lfp_nwb_output_path,
+            probe_nwbfile = self.add_lfp_to_nwb(
                 session_id=nwbfile.session_id,
                 session_metadata=BehaviorEcephysMetadata.from_nwb(
                     nwbfile=nwbfile),
                 session_start_time=nwbfile.session_start_time
             )
-        return nwbfile
+        else:
+            probe_nwbfile = None
+        return nwbfile, probe_nwbfile
 
     def _add_probe_to_nwb(
             self, nwbfile: NWBFile,
@@ -266,9 +265,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             channel_number_whitelist=channel_number_whitelist)
         return nwbfile
 
-    def write_lfp_to_nwb(
+    def add_lfp_to_nwb(
             self,
-            output_path: str,
             session_id: str,
             session_start_time: datetime,
             session_metadata: BehaviorEcephysMetadata
@@ -306,12 +304,6 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
 
         if self._current_source_density is not None:
             nwbfile = self._add_csd_to_nwb(nwbfile=nwbfile)
-
-        os.makedirs(Path(output_path).parent, exist_ok=True)
-
-        with pynwb.NWBHDF5IO(output_path, 'w') as f:
-            logging.info(f"writing lfp file to {output_path}")
-            f.write(nwbfile, cache_spec=True)
 
         return nwbfile
 

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Union, Callable
+from typing import List, Dict, Any, Optional, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -209,8 +209,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
 
     def to_nwb(
             self,
-            nwbfile: NWBFile,
-            probe_lfp_nwb_filepath_map: Optional[Dict[str, str]] = None
+            nwbfile: NWBFile
     ) -> NWBFile:
         """
         Adds probes to NWBFile instance
@@ -218,8 +217,6 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Parameters
         ----------
         nwbfile
-        probe_lfp_nwb_filepath_map
-            Maps probe name to lfp nwb file output path
 
         Returns
         -------
@@ -227,8 +224,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         """
         for probe in self.probes:
             probe.to_nwb(
-                nwbfile=nwbfile,
-                lfp_nwb_output_path=probe_lfp_nwb_filepath_map[probe.name]
+                nwbfile=nwbfile
             )
 
         nwbfile.units = pynwb.misc.Units.from_dataframe(

@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Type, Union, Callable
+from typing import Optional, List, Dict, Any, Type, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -488,17 +488,10 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data)
         )
 
-    def to_nwb(
-            self,
-            probe_lfp_nwb_filepath_map: Optional[Dict[str, str]] = None
-    ) -> NWBFile:
+    def to_nwb(self) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
         """
-        Adds behavior ecephys session to NWBFile instance
+        Adds behavior ecephys session to NWBFile instance.
 
-        Parameters
-        ----------
-        probe_lfp_nwb_filepath_map:
-            Maps probe name to lfp nwb file output path
 
         Returns
         -------
@@ -511,8 +504,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
         self._metadata.to_nwb(nwbfile=nwbfile)
         self._probes.to_nwb(
-            nwbfile=nwbfile,
-            probe_lfp_nwb_filepath_map=probe_lfp_nwb_filepath_map)
+            nwbfile=nwbfile)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
         return nwbfile
 

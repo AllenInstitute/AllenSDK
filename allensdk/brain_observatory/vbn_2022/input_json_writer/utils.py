@@ -95,8 +95,7 @@ class NwbConfigErrorLog(object):
 
 def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[dict]],
-        nwb_output_dir: Path
+        probes_to_skip: Optional[List[dict]]
 ) -> dict:
     """
     Return a list of dicts. Each dict the specification for
@@ -117,9 +116,6 @@ def vbn_nwb_config_from_ecephys_session_id_list(
              "session": 12345   # an ecephys_session_id
              "probe": "probeB"  # the probe's name
             }
-
-    nwb_output_dir: Path
-        Root path to write nwbs
 
     Returns
     -------
@@ -162,8 +158,7 @@ def vbn_nwb_config_from_ecephys_session_id_list(
             ecephys_session_id=session_id,
             probe_ids_to_skip=probe_ids_to_skip,
             lims_connection=lims_connection,
-            error_log=error_log,
-            nwb_out_dir=nwb_output_dir
+            error_log=error_log
         )
 
         session['probes'] = probe_list
@@ -444,8 +439,7 @@ def _get_probe_analysis_run_from_probe_id(
 
 def _get_probe_lfp_meta(
         lims_connection: PostgresQueryMixin,
-        probe_id: int,
-        lfp_out_dir: Path
+        probe_id: int
 ):
     """Gets filepaths for files needed to build LFP data
 
@@ -453,7 +447,6 @@ def _get_probe_lfp_meta(
     ----------
     lims_connection
     probe_id
-    lfp_out_dir: Where to write LFP NWB to
 
     """
     lfp_subsampling_run_well_known_files = [
@@ -495,7 +488,6 @@ def _get_probe_lfp_meta(
         'input_channels_path':
             probe_lfp_well_known_files.get(
                 'EcephysSubsampledChannelStates'),
-        'output_path': str(lfp_out_dir / f'lfp_probe_{probe_id}.nwb'),
         'csd_path': probe_csd_well_known_files.get(
             'EcephysCurrentSourceDensity')
     }
@@ -507,7 +499,6 @@ def probe_input_from_ecephys_session_id(
         probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
         error_log: NwbConfigErrorLog,
-        nwb_out_dir: Path
 ) -> List[dict]:
     """
     Get the list of probe specifications, excluding the lists
@@ -526,9 +517,6 @@ def probe_input_from_ecephys_session_id(
     error_log: NwbConfigErrorLog
         object to store all of the non-fatal irregularities
         encountered in the data
-
-    nwb_out_dir
-        Root path to write NWB files
 
     Returns
     -------
@@ -595,8 +583,7 @@ def probe_input_from_ecephys_session_id(
         if has_lfp:
             lfp_meta = _get_probe_lfp_meta(
                 lims_connection=lims_connection,
-                probe_id=probe_id,
-                lfp_out_dir=nwb_out_dir / f'{ecephys_session_id}'
+                probe_id=probe_id
             )
             data['csd_path'] = lfp_meta.pop('csd_path')
             data['lfp'] = lfp_meta
