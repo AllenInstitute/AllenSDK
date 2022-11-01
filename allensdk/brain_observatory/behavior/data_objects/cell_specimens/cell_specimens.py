@@ -335,11 +335,11 @@ class CellSpecimens(
             return DFFTraces.from_data_file(dff_file=dff_file)
 
         def _get_demixed_traces():
-            demixed_traces_file = DemixFile.from_lims(
+            demix_file = DemixFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id, db=lims_db
             )
             return DemixedTraces.from_data_file(
-                demixed_traces_file=demixed_traces_file
+                demix_file=demix_file
             )
 
         def _get_corrected_fluorescence_traces():
