@@ -9,6 +9,9 @@ import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file \
     import NeuropilCorrectedFile
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
+from allensdk.brain_observatory.behavior.data_files.neuropil_file import (
+    NeuropilFile,
+)
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
 from allensdk.brain_observatory.behavior.data_files.event_detection_file \
     import EventDetectionFile
@@ -25,6 +28,8 @@ from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
     .corrected_fluorescence_traces import CorrectedFluorescenceTraces
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
     .demixed_traces import DemixedTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .neuropil_traces import NeuropilTraces
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
     .dff_traces import DFFTraces
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -141,6 +146,7 @@ class CellSpecimens(
         meta: CellSpecimenMeta,
         dff_traces: DFFTraces,
         demixed_traces: DemixedTraces,
+        neuropil_traces: NeuropilTraces,
         corrected_fluorescence_traces: CorrectedFluorescenceTraces,
         events: Events,
         ophys_timestamps: OphysTimestamps,
@@ -170,6 +176,7 @@ class CellSpecimens(
         meta
         dff_traces
         demixed_traces
+        neuropil_traces
         corrected_fluorescence_traces
         events
         ophys_timestamps
@@ -191,6 +198,7 @@ class CellSpecimens(
             ophys_timestamps=ophys_timestamps,
             dff_traces=dff_traces,
             demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             cell_roi_ids=cell_specimen_table["cell_roi_id"].values,
         )
@@ -205,6 +213,9 @@ class CellSpecimens(
             roi_ids=cell_specimen_table["cell_roi_id"].values
         )
         demixed_traces.filter_and_reorder(
+            roi_ids=cell_specimen_table["cell_roi_id"].values
+        )
+        neuropil_traces.filter_and_reorder(
             roi_ids=cell_specimen_table["cell_roi_id"].values
         )
         corrected_fluorescence_traces.filter_and_reorder(
@@ -224,6 +235,7 @@ class CellSpecimens(
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
         self._demixed_traces = demixed_traces
+        self._neuropil_traces = neuropil_traces
         self._corrected_fluorescence_traces = corrected_fluorescence_traces
         self._events = events
         self._segmentation_mask_image = self._get_segmentation_mask_image(
@@ -253,6 +265,13 @@ class CellSpecimens(
     def demixed_traces(self) -> pd.DataFrame:
         df = self.table[["cell_roi_id"]].join(
             self._demixed_traces.value, on="cell_roi_id"
+        )
+        return df
+
+    @property
+    def neuropil_traces(self) -> pd.DataFrame:
+        df = self.table[["cell_roi_id"]].join(
+            self._neuropil_traces.value, on="cell_roi_id"
         )
         return df
 
@@ -342,6 +361,14 @@ class CellSpecimens(
                 demix_file=demix_file
             )
 
+        def _get_neuropil_traces():
+            neuropil_file = NeuropilFile.from_lims(
+                ophys_experiment_id=ophys_experiment_id, db=lims_db
+            )
+            return NeuropilTraces.from_data_file(
+                neuropil_file=neuropil_file
+            )
+
         def _get_corrected_fluorescence_traces():
             neuropil_corrected_file = NeuropilCorrectedFile.from_lims(
                 ophys_experiment_id=ophys_experiment_id, db=lims_db
@@ -370,6 +397,7 @@ class CellSpecimens(
 
         dff_traces = _get_dff_traces()
         demixed_traces = _get_demixed_traces()
+        neuropil_traces = _get_neuropil_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
 
@@ -378,6 +406,7 @@ class CellSpecimens(
             meta=meta,
             dff_traces=dff_traces,
             demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
@@ -412,6 +441,14 @@ class CellSpecimens(
                 demix_file=demix_file
             )
 
+        def _get_neuropil_traces():
+            neuropil_file = NeuropilFile.from_json(
+                dict_repr=dict_repr
+            )
+            return NeuropilTraces.from_data_file(
+                neuropil_file=neuropil_file
+            )
+
         def _get_corrected_fluorescence_traces():
             neuropil_corrected_file = NeuropilCorrectedFile.from_json(
                 dict_repr=dict_repr
@@ -434,6 +471,7 @@ class CellSpecimens(
 
         dff_traces = _get_dff_traces()
         demixed_traces = _get_demixed_traces()
+        neuropil_traces = _get_neuropil_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
         return CellSpecimens(
@@ -441,6 +479,7 @@ class CellSpecimens(
             meta=meta,
             dff_traces=dff_traces,
             demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
@@ -488,6 +527,7 @@ class CellSpecimens(
         meta = CellSpecimenMeta.from_nwb(nwbfile=nwbfile)
         dff_traces = DFFTraces.from_nwb(nwbfile=nwbfile)
         demixed_traces = DemixedTraces.from_nwb(nwbfile=nwbfile)
+        neuropil_traces = NeuropilTraces.from_nwb(nwbfile=nwbfile)
         corrected_fluorescence_traces = CorrectedFluorescenceTraces.from_nwb(
             nwbfile=nwbfile
         )
@@ -508,6 +548,7 @@ class CellSpecimens(
             meta=meta,
             dff_traces=dff_traces,
             demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
             corrected_fluorescence_traces=corrected_fluorescence_traces,
             events=events,
             ophys_timestamps=ophys_timestamps,
@@ -623,13 +664,16 @@ class CellSpecimens(
         # 3. Add demixed traces
         self._demixed_traces.to_nwb(nwbfile=nwbfile)
 
-        # 4. Add Corrected fluorescence traces
+        # 4. Add neuropil traces
+        self._neuropil_traces.to_nwb(nwbfile=nwbfile)
+
+        # 5. Add Corrected fluorescence traces
         self._corrected_fluorescence_traces.to_nwb(nwbfile=nwbfile)
 
-        # 5. Add events
+        # 6. Add events
         self._events.to_nwb(nwbfile=nwbfile)
 
-        # 6. Add segmentation mask image
+        # 7. Add segmentation mask image
         add_image_to_nwb(
             nwbfile=nwbfile,
             image_data=self._segmentation_mask_image,
@@ -702,6 +746,7 @@ class CellSpecimens(
         ophys_timestamps: OphysTimestamps,
         dff_traces: DFFTraces,
         demixed_traces: DemixedTraces,
+        neuropil_traces: NeuropilTraces,
         corrected_fluorescence_traces: CorrectedFluorescenceTraces,
         cell_roi_ids: np.ndarray,
     ):
@@ -709,11 +754,13 @@ class CellSpecimens(
         trace_col_map = {
             "dff_traces": "dff",
             "demixed_traces": "demixed_trace",
+            "neuropil_traces": "neuropil_trace",
             "corrected_fluorescence_traces": "corrected_fluorescence",
         }
         for traces in (
             dff_traces,
             demixed_traces,
+            neuropil_traces,
             corrected_fluorescence_traces,
         ):
             # validate traces contain expected roi ids

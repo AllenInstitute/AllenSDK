@@ -18,6 +18,7 @@ class NwbInputJson:
             test_data_dir / "neuropil_corrected_file.h5"
         )
         dict_repr["demix_file"] = str(test_data_dir / "demix_file.h5")
+        dict_repr["neuropil_file"] = str(test_data_dir / "demix_file.h5")
         dict_repr["events_file"] = str(test_data_dir / "events.h5")
 
         self._dict_repr = dict_repr

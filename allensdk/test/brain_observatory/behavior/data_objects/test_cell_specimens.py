@@ -91,6 +91,7 @@ class TestJson:
         )
         dict_repr["dff_file"] = str(test_data_dir / "demix_file.h5")
         dict_repr["demix_file"] = str(test_data_dir / "demix_file.h5")
+        dict_repr["neuropil_file"] = str(test_data_dir / "demix_file.h5")
         dict_repr["neuropil_corrected_file"] = str(
             test_data_dir / "neuropil_corrected_file.h5"
         )
@@ -130,6 +131,7 @@ class TestJson:
         (
             "dff_traces",
             "demixed_traces",
+            "neuropil_traces",
             "corrected_fluorescence_traces",
             "events",
         ),
@@ -168,7 +170,12 @@ class TestJson:
     @pytest.mark.parametrize("extra_in_trace", (True, False))
     @pytest.mark.parametrize(
         "trace_type",
-        ("dff_traces", "demixed_traces", "corrected_fluorescence_traces"),
+        (
+            "dff_traces",
+            "demixed_traces",
+            "neuropil_traces",
+            "corrected_fluorescence_traces",
+        ),
     )
     def test_trace_rois_different_than_cell_specimen_table(
         self, trace_type, extra_in_trace
@@ -202,6 +209,7 @@ class TestJson:
             trace_args = {
                 "dff_traces": private_trace_attr,
                 "demixed_traces": csp._demixed_traces,
+                "neuropil_traces": csp._neuropil_traces,
                 "corrected_fluorescence_traces":
                     csp._corrected_fluorescence_traces,
             }
@@ -209,6 +217,15 @@ class TestJson:
             trace_args = {
                 "dff_traces": csp._dff_traces,
                 "demixed_traces": private_trace_attr,
+                "neuropil_traces": csp._neuropil_traces,
+                "corrected_fluorescence_traces":
+                    csp._corrected_fluorescence_traces,
+            }
+        elif trace_type == "neuropil_traces":
+            trace_args = {
+                "dff_traces": csp._dff_traces,
+                "demixed_traces": csp._demixed_traces,
+                "neuropil_traces": private_trace_attr,
                 "corrected_fluorescence_traces":
                     csp._corrected_fluorescence_traces,
             }
@@ -216,6 +233,7 @@ class TestJson:
             trace_args = {
                 "dff_traces": csp._dff_traces,
                 "demixed_traces": csp._demixed_traces,
+                "neuropil_traces": csp._neuropil_traces,
                 "corrected_fluorescence_traces": private_trace_attr,
             }
         with pytest.raises(RuntimeError):
