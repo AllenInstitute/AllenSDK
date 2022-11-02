@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from unittest.mock import MagicMock, create_autospec
+from unittest.mock import MagicMock, create_autospec, patch
 
 from allensdk.api.cloud_cache.manifest import Manifest
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
@@ -12,6 +12,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.\
     utils import version_check, BehaviorCloudCacheVersionException
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
+    BehaviorEcephysSession
 
 
 class MockCache():
@@ -73,61 +75,55 @@ class MockCache():
 
 
 @pytest.fixture
-def mock_cache(request, tmpdir):
-    bst = request.param.get("behavior_sessions")
-    est = request.param.get("ecephys_sessions")
-    pt = request.param.get("probes")
-    ct = request.param.get("channels")
-    ut = request.param.get("units")
+def mock_cache(tmpdir):
+    c = {
+            "behavior_sessions": pd.DataFrame({
+                "behavior_session_id": [1, 2, 3, 4],
+                "ecephys_session_id": [10, 11, 12, 13],
+                "mouse_id": [4, 4, 2, 1]}),
+            "ecephys_sessions": pd.DataFrame({
+                "ecephys_session_id": [10, 11, 12, 13],
+                "behavior_session_id": [1, 2, 3, 4],
+                "file_id": [10, 11, 12, 13]}),
+            "probes": pd.DataFrame({
+                "ecephys_probe_id": [4, 5, 6, 7],
+                "name": ["probeA", "probeB", "probeA", "probeB"],
+                "ecephys_session_id": [10, 10, 11, 11],
+                "has_lfp_data": [True] * 4,
+                "file_id": [0, 1, 2, 3]
+            }),
+            "channels": pd.DataFrame({
+                "ecephys_channel_id": [14, 15, 16],
+                "ecephys_probe_id": [4, 4, 4],
+                "ecephys_session_id": [10, 10, 10]}),
+            "units": pd.DataFrame({
+                "unit_id": [204, 205, 206],
+                "ecephys_channel_id": [14, 15, 16],
+                "ecephys_probe_id": [4, 4, 4],
+                "ecephys_session_id": [10, 10, 10]}),
+    }
 
     # round-trip the tables through csv to pick up
     # pandas mods to lists
     fname = tmpdir / "my.csv"
-    bst.to_csv(fname, index=False)
+    c['behavior_sessions'].to_csv(fname, index=False)
     bst = pd.read_csv(fname)
 
-    est.to_csv(fname, index=False)
+    c['ecephys_sessions'].to_csv(fname, index=False)
     est = pd.read_csv(fname)
 
-    pt.to_csv(fname, index=False)
+    c['probes'].to_csv(fname, index=False)
     pt = pd.read_csv(fname)
 
-    ct.to_csv(fname, index=False)
+    c['channels'].to_csv(fname, index=False)
     ct = pd.read_csv(fname)
 
-    ut.to_csv(fname, index=False)
+    c['units'].to_csv(fname, index=False)
     ut = pd.read_csv(fname)
 
-    yield (MockCache(bst, est, pt, ct, ut, tmpdir), request.param)
+    yield (MockCache(bst, est, pt, ct, ut, tmpdir), c)
 
 
-@pytest.mark.parametrize(
-        "mock_cache",
-        [
-            {
-                "behavior_sessions": pd.DataFrame({
-                    "behavior_session_id": [1, 2, 3, 4],
-                    "ecephys_session_id": [10, 11, 12, 13],
-                    "mouse_id": [4, 4, 2, 1]}),
-                "ecephys_sessions": pd.DataFrame({
-                    "ecephys_session_id": [10, 11, 12, 13],
-                    "behavior_session_id": [1, 2, 3, 4],
-                    "file_id": [10, 11, 12, 13]}),
-                "probes": pd.DataFrame({
-                    "ecephys_probe_id": [4, 5, 6, 7],
-                    "ecephys_session_id": [10, 10, 11, 11]}),
-                "channels": pd.DataFrame({
-                    "ecephys_channel_id": [14, 15, 16],
-                    "ecephys_probe_id": [4, 4, 4],
-                    "ecephys_session_id": [10, 10, 10]}),
-                "units": pd.DataFrame({
-                    "unit_id": [204, 205, 206],
-                    "ecephys_channel_id": [14, 15, 16],
-                    "ecephys_probe_id": [4, 4, 4],
-                    "ecephys_session_id": [10, 10, 10]}),
-            }
-        ],
-        indirect=["mock_cache"])
 @pytest.mark.parametrize("local", [True, False])
 def test_VisualBehaviorNeuropixelsProjectCloudApi(
     mock_cache,
@@ -181,12 +177,49 @@ def test_VisualBehaviorNeuropixelsProjectCloudApi(
     ut = ut.reset_index()
     pd.testing.assert_frame_equal(ut, expected["units"])
 
-    def mock_nwb(nwb_path):
+    def mock_nwb(nwb_path, probe_data_path_map):
         return nwb_path
 
     monkeypatch.setattr(cloudapi.BehaviorEcephysSession,
                         "from_nwb_path", mock_nwb)
     assert api.get_ecephys_session(12) == "12"
+
+
+@pytest.mark.parametrize('has_lfp_data', [True, False])
+def test_probe_data_path_map(mock_cache, monkeypatch, has_lfp_data):
+    """tests that probe_data_path_map is set correctly"""
+    mocked_cache, _ = mock_cache
+
+    probe_meta = pd.read_csv(mocked_cache.probe_table_path)
+    probe_meta['has_lfp_data'] = has_lfp_data
+    probe_meta.to_csv(mocked_cache.probe_table_path, index=False)
+
+    api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(
+        mocked_cache,
+        skip_version_check=True,
+        local=False)
+
+    def mock_from_nwb_path(nwb_path, probe_data_path_map):
+        return probe_data_path_map
+
+    ecephys_session_id = 10
+    with patch.object(BehaviorEcephysSession, 'from_nwb_path',
+                      wraps=mock_from_nwb_path):
+        probe_data_path_map = api.get_ecephys_session(ecephys_session_id)
+
+    probe_meta = api.get_probe_table()
+    probe_meta = probe_meta.loc[
+        probe_meta['ecephys_session_id'] == ecephys_session_id]
+
+    if has_lfp_data:
+        for probe_name in probe_meta['name'].unique():
+            obtained_probe_nwb_path = probe_data_path_map[probe_name]()
+            expected_probe_nwb_path = str(probe_meta.loc[
+                (probe_meta['name'] == probe_name)
+            ].iloc[0]['file_id'])
+            assert obtained_probe_nwb_path == expected_probe_nwb_path
+    else:
+        assert probe_data_path_map is None
 
 
 @pytest.mark.parametrize(

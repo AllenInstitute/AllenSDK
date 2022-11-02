@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Type
+from typing import Optional, List, Dict, Any, Type, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -364,6 +364,9 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         """
         return self._probes.spike_amplitudes
 
+    def get_probes_obj(self) -> Probes:
+        return self._probes
+
     def get_channels(self, filter_by_validity: bool = True) -> pd.DataFrame:
         """
 
@@ -418,6 +421,26 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             presence_ratio_minimum=presence_ratio_minimum,
             isi_violations_maximum=isi_violations_maximum)
 
+    def get_lfp(
+        self,
+        probe_id: int
+    ):
+        """
+        Get LFP data for a single probe given by `probe_id`
+        """
+        probe = self._get_probe(probe_id=probe_id)
+        return probe.lfp
+
+    def get_current_source_density(
+        self,
+        probe_id: int
+    ):
+        """
+        Get current source density data for a single probe given by `probe_id`
+        """
+        probe = self._get_probe(probe_id=probe_id)
+        return probe.current_source_density
+
     @classmethod
     def from_json(
             cls,
@@ -465,21 +488,34 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data)
         )
 
-    def to_nwb(self) -> NWBFile:
+    def to_nwb(self) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
+        """
+        Adds behavior ecephys session to NWBFile instance.
+
+
+        Returns
+        -------
+        (session `NWBFile` instance,
+         mapping from probe name to optional probe `NWBFile` instance. C
+         Contains LFP and CSD data if it exists)
+        """
         nwbfile = super().to_nwb(
             add_metadata=False,
             include_experiment_description=False,
             stimulus_presentations_stimulus_column_name='stimulus_name')
 
         self._metadata.to_nwb(nwbfile=nwbfile)
-        self._probes.to_nwb(nwbfile=nwbfile)
+        _, probe_nwbfile_map = self._probes.to_nwb(
+            nwbfile=nwbfile)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
-        return nwbfile
+        return nwbfile, probe_nwbfile_map
 
     @classmethod
     def from_nwb(
             cls,
             nwbfile: NWBFile,
+            probe_data_path_map: Optional[
+                Dict[str, Union[str, Callable[[], str]]]] = None,
             **kwargs
     ) -> "BehaviorEcephysSession":
         """
@@ -487,6 +523,14 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         Parameters
         ----------
         nwbfile
+        probe_data_path_map
+            Maps the probe name to the path to the probe nwb file, or a
+            callable that returns the nwb path. This file should contain
+            LFP and CSD data. The nwb file is loaded
+            separately from the main session nwb file in order to load the LFP
+            data on the fly rather than with the main
+            session NWB file. This is to speed up download of the NWB
+            for users who don't wish to load the LFP data (it is large).
         kwargs: kwargs sent to `BehaviorSession.from_nwb`
 
         Returns
@@ -500,10 +544,23 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         )
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
-            probes=Probes.from_nwb(nwbfile=nwbfile),
+            probes=Probes.from_nwb(
+                nwbfile=nwbfile,
+                probe_data_path_map=probe_data_path_map),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
             metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile)
         )
 
     def _get_identifier(self) -> str:
         return str(self._metadata.ecephys_session_id)
+
+    def _get_probe(self, probe_id: int):
+        """Gets a probe given by `probe_id`"""
+        probe = [p for p in self._probes if p.id == probe_id]
+        if len(probe) == 0:
+            raise ValueError(f'Could not find probe with id {probe_id}')
+        if len(probe) > 1:
+            raise RuntimeError(f'Multiple probes found with probe_id '
+                               f'{probe_id}')
+        probe = probe[0]
+        return probe

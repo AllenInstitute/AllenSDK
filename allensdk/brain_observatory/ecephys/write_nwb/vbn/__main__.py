@@ -6,7 +6,8 @@ import argschema
 import marshmallow
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
-from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
+from allensdk.brain_observatory.ecephys.write_nwb.nwb_writer import \
+    BehaviorEcephysNwbWriter
 from allensdk.brain_observatory.ecephys.write_nwb.vbn._schemas import \
     VBNInputSchema, OutputSchema
 
@@ -25,8 +26,8 @@ def main():
         logging.error(err)
         raise err
 
-    nwb_writer = NWBWriter(
-        nwb_filepath=parser.args['output_path'],
+    nwb_writer = BehaviorEcephysNwbWriter(
+        session_nwb_filepath=parser.args['output_path'],
         session_data=parser.args['session_data'],
         serializer=BehaviorEcephysSession
     )

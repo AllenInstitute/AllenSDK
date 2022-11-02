@@ -86,18 +86,40 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         BehaviorEcephysSession
 
         """
-        row = self._ecephys_session_table.query(
+        session_meta = self._ecephys_session_table.query(
                 f"index=={ecephys_session_id}")
-        if row.shape[0] != 1:
+        probes_meta = self._probe_table[
+            (self._probe_table['ecephys_session_id'] == ecephys_session_id) &
+            (self._probe_table['has_lfp_data'])
+        ]
+        if session_meta.shape[0] != 1:
             raise RuntimeError("The behavior_ecephys_session_table should "
                                "have 1 and only 1 entry for a given "
                                f"ecephys_session_id. For "
                                f"{ecephys_session_id} "
-                               f" there are {row.shape[0]} entries.")
-        file_id = str(int(row[self.cache.file_id_column]))
-        data_path = self._get_data_path(file_id=file_id)
+                               f" there are {session_meta.shape[0]} entries.")
+        session_file_id = str(int(session_meta[self.cache.file_id_column]))
+        session_data_path = self._get_data_path(file_id=session_file_id)
+
+        def make_lazy_load_filepath_function(file_id):
+            """Due to late binding closure. See:
+            https://docs.python-guide.org/writing/gotchas/
+            #late-binding-closures"""
+            def f():
+                return self._get_data_path(file_id=file_id)
+
+            return f
+
+        if not probes_meta.empty:
+            probe_data_path_map = {
+                p.name: make_lazy_load_filepath_function(
+                    file_id=str(int(getattr(p, self.cache.file_id_column)))
+                ) for p in probes_meta.itertuples(index=False)}
+        else:
+            probe_data_path_map = None
         return BehaviorEcephysSession.from_nwb_path(
-            str(data_path))
+            str(session_data_path),
+            probe_data_path_map=probe_data_path_map)
 
     def _get_ecephys_session_table(self):
         session_table_path = self._get_metadata_path(
