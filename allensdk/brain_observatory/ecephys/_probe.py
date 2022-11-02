@@ -14,7 +14,7 @@ from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._current_source_density import \
     CurrentSourceDensity
 from allensdk.brain_observatory.ecephys._units import Units
-from allensdk.brain_observatory.ecephys.lfp import LFP
+from allensdk.brain_observatory.ecephys._lfp import LFP
 from allensdk.brain_observatory.ecephys.nwb import EcephysCSD
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
