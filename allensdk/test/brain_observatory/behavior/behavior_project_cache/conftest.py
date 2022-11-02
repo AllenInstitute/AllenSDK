@@ -213,8 +213,8 @@ def vbn_s3_cloud_cache_data():
 
     data['ecephys_file_1.nwb'] = {'file_id': 1, 'data': b'abcde'}
     data['ecephys_file_2.nwb'] = {'file_id': 2, 'data': b'fghijk'}
-    data['probe_5111_lfp.nwb'] = {'file_id': 1024123123, 'data': b'fxxhijk'}
-    data['probe_5222_lfp.nwb'] = {'file_id': 1024123124, 'data': b'fxxhijk'}
+    data['probe_5111_lfp.nwb'] = {'file_id': 1024123123, 'data': b'0x230213'}
+    data['probe_5222_lfp.nwb'] = {'file_id': 1024123124, 'data': b'980934'}
 
     e_session = [{'ecephys_session_id': 5111,
                   'file_id': 1},
@@ -295,8 +295,8 @@ def vbn_s3_cloud_cache_data():
     data['ecephys_file_1.nwb'] = {'file_id': 1, 'data': b'lmnopqrs'}
     data['ecephys_file_2.nwb'] = {'file_id': 2, 'data': b'fghijk'}
     data['ecephys_file_3.nwb'] = {'file_id': 3, 'data': b'fxxhijk'}
-    data['probe_5111_lfp.nwb'] = {'file_id': 1024123123, 'data': b'fxxhijk'}
-    data['probe_5222_lfp.nwb'] = {'file_id': 1024123124, 'data': b'fxxhijk'}
+    data['probe_5411_lfp.nwb'] = {'file_id': 1024123125, 'data': b'9890'}
+    data['probe_5422_lfp.nwb'] = {'file_id': 1024123126, 'data': b'ksdiiondiw'}
 
     e_session = [
         {'ecephys_session_id': 222, 'file_id': 1,
@@ -333,18 +333,18 @@ def vbn_s3_cloud_cache_data():
 
     probes = [
         {
-            'ecephys_probe_id': 5111,
+            'ecephys_probe_id': 5411,
             'ecephys_session_id': 222,
             'has_lfp_data': True,
             'name': 'probeA',
-            'file_id': 1024123123
+            'file_id': 1024123125
         },
         {
-            'ecephys_probe_id': 5222,
+            'ecephys_probe_id': 5422,
             'ecephys_session_id': 222,
             'has_lfp_data': True,
             'name': 'probeB',
-            'file_id': 1024123124
+            'file_id': 1024123126
         }
     ]
 

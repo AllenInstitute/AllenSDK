@@ -97,11 +97,11 @@ def add_file_paths_to_metadata_table(
                 new_df.set_index(index_col),
                 on=index_col,
                 how='left')
-    metadata_table = metadata_table.reset_index()
-
     if on_missing_file == 'skip' and len(missing_files) > 0:
         metadata_table = metadata_table.drop(
             metadata_table.loc[
                 metadata_table.file_id == id_generator.dummy_value].index)
+
+    metadata_table = metadata_table.reset_index()
 
     return metadata_table

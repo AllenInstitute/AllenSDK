@@ -25,7 +25,9 @@ def test_add_file_paths_to_metadata_table_on_missing_error(
             file_dir=some_files_fixture[0].parent,
             file_prefix='silly_file',
             index_col='file_index',
-            on_missing_file='whatever')
+            on_missing_file='whatever',
+            session_id_col='session_id'
+        )
 
 
 def test_add_file_paths_to_metadata_table_no_file_error(
@@ -43,7 +45,9 @@ def test_add_file_paths_to_metadata_table_no_file_error(
             file_dir=some_files_fixture[0].parent,
             file_prefix='silly_file',
             index_col='file_index',
-            on_missing_file='error')
+            on_missing_file='error',
+            session_id_col='session_id'
+        )
 
 
 @pytest.mark.parametrize(
@@ -56,7 +60,7 @@ def test_add_file_paths_to_metadata_table(
     Test that add_file_paths_to_metadata_table behaves as expected
     when not raising an error
     """
-    file_dir = some_files_fixture[0].parent
+    file_dir = some_files_fixture[0].parent.parent
     expected = metadata_table_fixture.copy(deep=True)
 
     id_generator = FileIDGenerator()
@@ -64,12 +68,14 @@ def test_add_file_paths_to_metadata_table(
     with pytest.warns(UserWarning,
                       match='The following files do not exist'):
         result = add_file_paths_to_metadata_table(
-                    metadata_table=metadata_table_fixture,
-                    id_generator=id_generator,
-                    file_dir=file_dir,
-                    file_prefix='silly_file',
-                    index_col='file_index',
-                    on_missing_file=on_missing_file)
+            metadata_table=metadata_table_fixture,
+            id_generator=id_generator,
+            file_dir=file_dir,
+            file_prefix='silly_file',
+            index_col='file_index',
+            on_missing_file=on_missing_file,
+            session_id_col='session_id'
+        )
 
     # because we have not yet added file_id and file_path
     # to expected
@@ -84,7 +90,7 @@ def test_add_file_paths_to_metadata_table(
     expected['file_path'] = 'nothing'
 
     for file_idx in expected.file_index:
-        file_path = file_dir / f'silly_file_{file_idx}.nwb'
+        file_path = file_dir / f'{file_idx}' / f'silly_file_{file_idx}.nwb'
         str_path = str(file_path.resolve().absolute())
         expected.loc[expected.file_index == file_idx, 'file_path'] = str_path
         if file_path.exists():

@@ -274,7 +274,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             session_start_time=session_start_time,
             institution="Allen Institute for Brain Science"
         )
-        nwbfile = session_metadata.to_nwb(nwbfile=nwbfile)
+        session_metadata.to_nwb(nwbfile=nwbfile)
 
         nwbfile = self._add_probe_to_nwb(
             nwbfile=nwbfile,
