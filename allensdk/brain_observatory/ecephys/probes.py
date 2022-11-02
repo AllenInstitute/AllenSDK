@@ -184,7 +184,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
             cls,
             nwbfile: NWBFile,
             probe_data_path_map: Optional[
-                Dict[str, Union[str, Callable[[], str]]]] = None,
+                Dict[str, Union[str, Callable[[], str]]]] = None
     ) -> "Probes":
         """
 
@@ -198,11 +198,13 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         -------
         `NWBFile` with probes added
         """
+        if probe_data_path_map is None:
+            probe_data_path_map = dict()
         probes = [
             Probe.from_nwb(
                 nwbfile=nwbfile,
                 probe_name=probe_name,
-                probe_nwb_path=probe_data_path_map[probe_name]
+                probe_nwb_path=probe_data_path_map.get(probe_name)
             )
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)
@@ -210,7 +212,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
     def to_nwb(
             self,
             nwbfile: NWBFile
-    ) -> NWBFile:
+    ) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
         """
         Adds probes to NWBFile instance
 
@@ -220,12 +222,16 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
 
         Returns
         -------
-        `NWBFile` instance
+        (session `NWBFile` instance,
+         mapping from probe name to optional probe `NWBFile` instance. C
+         Contains LFP and CSD data if it exists)
         """
+        probe_nwbfile_map = dict()
         for probe in self.probes:
-            probe.to_nwb(
+            _, probe_nwbfile = probe.to_nwb(
                 nwbfile=nwbfile
             )
+            probe_nwbfile_map[probe.name] = probe_nwbfile
 
         nwbfile.units = pynwb.misc.Units.from_dataframe(
             self.get_units_table(
@@ -255,7 +261,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
                                "samples)",
         )
 
-        return nwbfile
+        return nwbfile, probe_nwbfile_map
 
     def __iter__(self):
         for p in self.probes:

@@ -44,11 +44,12 @@ class BehaviorEcephysNwbWriter(NWBWriter):
         with NWBHDF5IO(self.nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(session_nwbfile)
 
-        for probe in session.probes:
-            _, probe_nwbfile = probe.to_nwb(nwbfile=session_nwbfile)
+        for probe_name, probe_nwbfile in probe_nwbfile_map.items():
+            probe_id = [p.id for p in session.probes
+                        if p.name == probe_name][0]
             if probe_nwbfile is not None:
                 probe_nwb_path = Path(self._nwb_filepath).parent / \
-                    f'lfp_probe_{probe.id}.nwb'
+                    f'lfp_probe_{probe_id}.nwb'
                 with NWBHDF5IO(probe_nwb_path, 'w') as nwb_file_writer:
                     nwb_file_writer.write(probe_nwbfile)
         return session_nwbfile

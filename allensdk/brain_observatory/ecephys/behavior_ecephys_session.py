@@ -495,7 +495,9 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
         Returns
         -------
-        `NWBFile` instance
+        (session `NWBFile` instance,
+         mapping from probe name to optional probe `NWBFile` instance. C
+         Contains LFP and CSD data if it exists)
         """
         nwbfile = super().to_nwb(
             add_metadata=False,
@@ -503,10 +505,10 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             stimulus_presentations_stimulus_column_name='stimulus_name')
 
         self._metadata.to_nwb(nwbfile=nwbfile)
-        self._probes.to_nwb(
+        _, probe_nwbfile_map = self._probes.to_nwb(
             nwbfile=nwbfile)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
-        return nwbfile
+        return nwbfile, probe_nwbfile_map
 
     @classmethod
     def from_nwb(
