@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any, Type, Union, Callable, Tuple
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile
+from xarray import DataArray
 
 from allensdk.brain_observatory import sync_utilities
 from allensdk.brain_observatory.behavior.behavior_session import \
@@ -424,7 +425,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def get_lfp(
         self,
         probe_id: int
-    ):
+    ) -> Optional[DataArray]:
         """
         Get LFP data for a single probe given by `probe_id`
         """
@@ -434,7 +435,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def get_current_source_density(
         self,
         probe_id: int
-    ):
+    ) -> Optional[DataArray]:
         """
         Get current source density data for a single probe given by `probe_id`
         """
