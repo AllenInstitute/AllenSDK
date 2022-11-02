@@ -184,6 +184,12 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     ecephys_session_id_list=session_id_list,
                     failed_ecephys_session_id_list=failed_session_list,
                     probe_ids_to_skip=probe_ids_to_skip)
+<<<<<<< HEAD
+=======
+
+        ecephys_nwb_dir = pathlib.Path(
+                                self.args['ecephys_nwb_dir'])
+>>>>>>> 0f4ac934ef97011ad3ea56eda63cf8448c4d8eaa
 
         ecephys_session_table = add_file_paths_to_metadata_table(
                     metadata_table=ecephys_session_table,

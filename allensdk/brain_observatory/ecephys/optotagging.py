@@ -15,7 +15,7 @@ class OptotaggingTable(DataObject, JsonReadableInterface,
         # pre-processed optotagging_table may use.
         table = \
             table.rename(columns={"name": "stimulus_name"})
-
+        table.index = table.index.rename('id')
         super().__init__(name='optotaggging_table', value=table)
 
     @property

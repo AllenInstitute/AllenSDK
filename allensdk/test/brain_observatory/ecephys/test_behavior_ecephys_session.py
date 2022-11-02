@@ -82,7 +82,7 @@ def test_read_write_session_with_probe_nwb(
         data_object_cls=BehaviorEcephysSession,
         probe_data_path_map=probe_data_path_map
     )
-    
+
     # Load the LFP data into memory
     for probe in obt._probes:
         obt.get_lfp(probe_id=probe.id)

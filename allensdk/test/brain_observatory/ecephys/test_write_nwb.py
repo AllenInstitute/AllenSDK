@@ -151,7 +151,8 @@ def test_add_metadata(nwbfile, roundtripper, metadata, expected_metadata):
         'movie_specific_column': [np.nan, np.nan, np.nan, 1.0, np.nan],
         'start_time': [1., 2., 4., 5., 6.],
         'stimulus_name': ['gabors', 'gabors', 'random', 'movie', 'gabors'],
-        'stop_time': [2., 4., 5., 6., 8.]
+        'stop_time': [2., 4., 5., 6., 8.],
+        'color': [np.nan] + ['[1.0, 1.0, 1.0]'] * 4
     }, index=pd.Index(name='stimulus_presentations_id',
                       data=[0, 1, 2, 3, 4]))),
 ])
@@ -163,6 +164,9 @@ def test_add_stimulus_presentations(nwbfile, presentations, roundtripper):
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
 
+    if 'color' in presentations.value:
+        presentations.value['color_triplet'] = [''] + ['[1.0, 1.0, 1.0]'] * 4
+        presentations.value['color'] = ''
     pd.testing.assert_frame_equal(
         presentations.value,
         obtained_stimulus_table,

@@ -74,7 +74,7 @@ def extract_trial_windows(
 
     if num_trials is not None:
         trials = trials.iloc[:num_trials, :]
-    trials = trials.to_dict('record')
+    trials = trials.to_dict('records')
 
     relative_times = np.arange(-pre_stimulus_time,
                                post_stimulus_time,

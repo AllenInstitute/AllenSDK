@@ -468,8 +468,13 @@ def test_empty_presentationwise_spike_times(spike_times_api):
             session.stimulus_presentations.index.values,
             session.units.index.values)
 
+<<<<<<< HEAD
     assert (isinstance(obtained, pd.DataFrame))
     assert (obtained.empty)
+=======
+    assert isinstance(obtained, pd.DataFrame)
+    assert obtained.empty
+>>>>>>> 0f4ac934ef97011ad3ea56eda63cf8448c4d8eaa
 
 
 def test_conditionwise_spike_statistics(spike_times_api):
@@ -503,6 +508,7 @@ def test_empty_conditionwise_spike_statistics(spike_times_api):
         stimulus_presentation_ids=session.stimulus_presentations.index.values,
         unit_ids=session.units.index.values
     )
+<<<<<<< HEAD
     assert (len(obtained) == 12)
 
     # check all spike_counts are 0
@@ -515,6 +521,13 @@ def test_empty_conditionwise_spike_statistics(spike_times_api):
     assert (np.all(np.isnan(obtained['spike_std'])))
 
     assert (np.all(np.isnan(obtained['spike_sem'])))
+=======
+    assert len(obtained) == 12
+    assert not np.any(obtained['spike_count'])  # check all spike_counts are 0
+    assert not np.any(obtained['spike_mean'])  # spike_means are 0
+    assert np.all(np.isnan(obtained['spike_std']))  # std/sem is undefined
+    assert np.all(np.isnan(obtained['spike_sem']))
+>>>>>>> 0f4ac934ef97011ad3ea56eda63cf8448c4d8eaa
 
 
 def test_get_stimulus_parameter_values(just_stim_table_api):

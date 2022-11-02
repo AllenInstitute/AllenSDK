@@ -33,7 +33,8 @@ class SubjectMetadataSchema(RaisingSchema):
     driver_line = fields.List(
         fields.String,
         doc="Driver line of subject",
-        required=True,
+        required=False,
+        allow_none=True,
         shape=(None,),
     )
     # 'full_genotype' will be stored in pynwb Subject 'genotype' attr

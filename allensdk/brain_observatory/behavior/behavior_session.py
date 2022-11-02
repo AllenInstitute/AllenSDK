@@ -64,6 +64,8 @@ from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    compute_trials_id_for_stimulus
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
@@ -1031,10 +1033,20 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
+<<<<<<< HEAD
+=======
+                trials_id: (int)
+                    Id to match to the table Index of the trials table.
+>>>>>>> 0f4ac934ef97011ad3ea56eda63cf8448c4d8eaa
         """
         table = self._stimuli.presentations.value
         table = table.drop(columns=['image_set', 'index'], errors='ignore')
         table = table.rename(columns={'stop_time': 'end_time'})
+<<<<<<< HEAD
+=======
+        table['trials_id'] = compute_trials_id_for_stimulus(table,
+                                                            self.trials)
+>>>>>>> 0f4ac934ef97011ad3ea56eda63cf8448c4d8eaa
         return table
 
     @property
