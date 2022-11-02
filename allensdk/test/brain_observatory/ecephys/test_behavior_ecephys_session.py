@@ -1,3 +1,6 @@
+from pathlib import Path
+
+import pynwb
 import pytest
 import numpy as np
 import copy
@@ -13,17 +16,38 @@ def behavior_ecephys_session_fixture(
     Return a BehaviorEcephysSession for testing
     """
     config = copy.deepcopy(behavior_ecephys_session_config_fixture)
-    config['probes'] = config['probes'][:3]
+
+    # Don't load LFP here to speed up the tests
+    for probe in config['probes']:
+        probe['lfp'] = None
     return BehaviorEcephysSession.from_json(
-        session_data=config)
+        session_data=config,
+        skip_probes=['probeB', 'probeC', 'probeD', 'probeE', 'probeF']
+    )
+
+
+@pytest.fixture(scope='module')
+def behavior_ecephys_session_with_lfp_fixture(
+        behavior_ecephys_session_config_fixture):
+    """
+    Return a BehaviorEcephysSession for testing
+    """
+    config = copy.deepcopy(behavior_ecephys_session_config_fixture)
+
+    return BehaviorEcephysSession.from_json(
+        session_data=config,
+        skip_probes=['probeB', 'probeC', 'probeD', 'probeE', 'probeF']
+    )
 
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_read_write_nwb(roundtrip,
-                        data_object_roundtrip_fixture,
-                        behavior_ecephys_session_fixture):
-    nwbfile = behavior_ecephys_session_fixture.to_nwb()
+def test_read_write_session_nwb(
+        roundtrip,
+        data_object_roundtrip_fixture,
+        behavior_ecephys_session_fixture):
+    """Tests roundtrip of the session data"""
+    nwbfile, _ = behavior_ecephys_session_fixture.to_nwb()
 
     if roundtrip:
         obt = data_object_roundtrip_fixture(
@@ -33,6 +57,37 @@ def test_read_write_nwb(roundtrip,
         obt = BehaviorEcephysSession.from_nwb(nwbfile=nwbfile)
 
     assert obt == behavior_ecephys_session_fixture
+
+
+@pytest.mark.requires_bamboo
+def test_read_write_session_with_probe_nwb(
+        data_object_roundtrip_fixture,
+        behavior_ecephys_session_with_lfp_fixture,
+        tmpdir
+):
+    """Tests roundtrip of a session with separate probe nwb files that store
+    LFP and CSD data"""
+    nwbfile, probe_nwbfile_map = \
+        behavior_ecephys_session_with_lfp_fixture.to_nwb()
+
+    probe_data_path_map = dict()
+    for probe_name, probe_nwbfile in probe_nwbfile_map.items():
+        path = Path(tmpdir) / f'probe_{probe_name}_lfp.nwb'
+        with pynwb.NWBHDF5IO(path, 'w') as write_io:
+            write_io.write(probe_nwbfile)
+        probe_data_path_map[probe_name] = path
+
+    obt = data_object_roundtrip_fixture(
+        nwbfile=nwbfile,
+        data_object_cls=BehaviorEcephysSession,
+        probe_data_path_map=probe_data_path_map
+    )
+    
+    # Load the LFP data into memory
+    for probe in obt._probes:
+        obt.get_lfp(probe_id=probe.id)
+
+    assert obt == behavior_ecephys_session_with_lfp_fixture
 
 
 @pytest.mark.requires_bamboo
