@@ -104,26 +104,22 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
     def lfp(self) -> Optional[DataArray]:
         if self._lfp is None:
             if self._probe_nwb_path is None:
-                raise RuntimeError(f'Path to NWB file containing LFP data '
-                                   f'for probe {self._id} not set')
+                return None
             lfp = self._read_lfp_from_nwb()
             self._lfp = lfp
 
-        lfp = self._lfp.to_dataarray() if self._lfp is not None else self._lfp
+        lfp = self._lfp.to_dataarray()
         return lfp
 
     @property
     def current_source_density(self) -> Optional[DataArray]:
         if self._current_source_density is None:
             if self._probe_nwb_path is None:
-                raise RuntimeError(f'Path to NWB file containing CSD data '
-                                   f'for probe {self._id} not set')
+                return None
             csd = self._read_csd_data_from_nwb()
             self._current_source_density = csd
 
-        csd = self._current_source_density.to_dataarray() if \
-            self._current_source_density is not None else \
-            self._current_source_density
+        csd = self._current_source_density.to_dataarray()
         return csd
 
     @property
