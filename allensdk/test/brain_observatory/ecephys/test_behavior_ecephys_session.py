@@ -86,6 +86,7 @@ def test_read_write_session_with_probe_nwb(
     # Load the LFP data into memory
     for probe in obt._probes:
         obt.get_lfp(probe_id=probe.id)
+        assert probe.lfp is not None
 
     assert obt == behavior_ecephys_session_with_lfp_fixture
 
