@@ -5,7 +5,6 @@ from typing import Union
 
 from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.ecephys._probe import Probe
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
 from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
