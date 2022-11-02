@@ -50,13 +50,16 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                     behavior_session_id=bs_id,
                     lims_db=db_conn,
                     date_of_acquisition=daq)
+                # Edit the value for age using the info in the
+                # behavior sessions table. This is due to LIMS
+                # containing unreliable info for DAQ and AGE.
                 session._metadata._subject_metadata._age._value = \
                     behavior_session_table.loc[bs_id, 'age_in_days']
             except:
                 self.logger.info(
                     f"\tFailure loading session {bs_id}. Continuing...")
                 failed += 1
-            file_path = output_path / f'{bs_id}.nwb'
+            file_path = output_path / f'behavior_session_{bs_id}.nwb'
             try:
                 with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
                     nwb_writer.write(session.to_nwb())
