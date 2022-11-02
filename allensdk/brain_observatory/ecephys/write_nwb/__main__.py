@@ -256,13 +256,15 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     logging.info(f"writing lfp file for probe {probe_meta['id']}")
 
     probe = Probe.from_json(probe=probe_meta)
-    probe.add_lfp_to_nwb(
-        output_path=probe_meta['lfp']['output_path'],
+    nwbfile = probe.add_lfp_to_nwb(
         session_id=session_id,
         session_start_time=session_start_time,
         session_metadata=BehaviorEcephysMetadata.from_json(
             dict_repr=session_metadata)
     )
+    with pynwb.NWBHDF5IO(probe_meta['lfp']['output_path'], 'w') as lfp_writer:
+        logging.info(f"writing lfp file to {probe_meta['lfp']['output_path']}")
+        lfp_writer.write(nwbfile, cache_spec=True)
     return {
         "id": probe_meta["id"],
         "nwb_path": probe_meta["lfp"]["output_path"]}
