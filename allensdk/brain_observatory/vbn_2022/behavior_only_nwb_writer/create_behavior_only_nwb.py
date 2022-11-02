@@ -18,7 +18,9 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
     default_schema = VBN2022BehaviorOnlyWriterSchema
 
     def run(self):
-
+        """Write behavior only NWB files for input behavior_session_ids from
+        using already produced behavior session metadata.
+        """
         behavior_session_ids = self.args['behavior_session_id_list']
         output_path = Path(self.args['nwb_output_dir'])
         behavior_session_table = pd.read_csv(
@@ -41,6 +43,8 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
         passed = 0
         failed = 0
         for bs_id in behavior_session_ids:
+            # Date of acquisition is unreliable from LIMS, hence we pull it
+            # from the already produced metadata.
             daq = DateOfAcquisition(
                 datetime.strptime(
                     behavior_session_table.loc[bs_id, 'date_of_acquisition'],
