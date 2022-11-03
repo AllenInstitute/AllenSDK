@@ -153,7 +153,7 @@ class NWBWriter:
 
         try:
             nwbfile = self._write_nwb(
-                session_data=json_session, **kwargs)
+                session=json_session, **kwargs)
             self._compare_sessions(nwbfile=nwbfile, json_session=json_session,
                                    **kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
