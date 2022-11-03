@@ -222,8 +222,14 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         Returns
         -------
         (session `NWBFile` instance,
-         mapping from probe name to optional probe `NWBFile` instance. C
+         mapping from probe name to optional probe `NWBFile` instance.
          Contains LFP and CSD data if it exists)
+
+         Notes
+         ------
+         We return a map from probe name to nwb file separately, since the LFP
+         data is large, and we want this written separately from the session
+         nwb file
         """
         probe_nwbfile_map = dict()
         for probe in self.probes:
