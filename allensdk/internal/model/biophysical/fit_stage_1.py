@@ -1,18 +1,20 @@
-import os
-import sys
-import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
-from . import check_fi_shift
-import pandas as pd
-import numpy as np
-from collections import Counter
-import subprocess
-
-from allensdk.ephys.ephys_extractor \
-    import EphysSweepFeatureExtractor, EphysSweepSetFeatureExtractor
-import allensdk.core.json_utilities as ju
-from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.internal.model.biophysical.optimize as optimize
 import logging
+import os
+import subprocess
+import sys
+from collections import Counter
+
+import numpy as np
+import pandas as pd
+
+import allensdk.core.json_utilities as ju
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
+import allensdk.internal.model.biophysical.optimize as optimize
+from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.ephys.ephys_extractor import (EphysSweepFeatureExtractor,
+                                            EphysSweepSetFeatureExtractor)
+
+from . import check_fi_shift
 
 SEEDS = [1234, 1001, 4321, 1024, 2048]
 FIT_BASE_DIR = os.path.join(os.path.dirname(__file__), "fits")

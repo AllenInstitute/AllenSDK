@@ -4,9 +4,8 @@ import numpy as np
 import pytest
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .ophys_timestamps import \
-    OphysTimestamps, OphysTimestampsMultiplane
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import (
+    OphysTimestamps, OphysTimestampsMultiplane)
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 

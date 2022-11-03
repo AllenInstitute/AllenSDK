@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from pynwb import NWBFile
@@ -6,17 +6,14 @@ from pynwb import NWBFile
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.data_files import (
     BehaviorStimulusFile, SyncFile)
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 
 
 class TrialTable(DataObject, StimulusFileReadableInterface,

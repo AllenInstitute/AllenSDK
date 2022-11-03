@@ -1,14 +1,11 @@
+from cachetools import LRUCache, cached
+from cachetools.keys import hashkey
 from pynwb import NWBFile
 
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
-
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           JsonWritableInterface, LimsReadableInterface,
+                           NwbReadableInterface)
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.core import DataObject
 
 
 def from_lims_cache_key(cls, db, ophys_experiment_id: int):

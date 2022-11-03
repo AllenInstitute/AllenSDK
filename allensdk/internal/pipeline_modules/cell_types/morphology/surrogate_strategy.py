@@ -1,7 +1,9 @@
 #!/usr/bin/python
 import sys
+
 import psycopg2
 import psycopg2.extras
+
 sys.path.append("/home/keithg/allen/allensd")
 import allensdk.core.json_utilities as json
 

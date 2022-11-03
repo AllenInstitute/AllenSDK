@@ -1,6 +1,7 @@
-from typing import Union
-import pathlib
 import json
+import pathlib
+from typing import Union
+
 from allensdk.internal.core import DataFile
 
 

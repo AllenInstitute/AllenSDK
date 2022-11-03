@@ -1,5 +1,5 @@
 from argschema import ArgSchema
-from argschema.fields import Nested, String, Float, Dict, Int, List, LogLevel
+from argschema.fields import Dict, Float, Int, List, LogLevel, Nested, String
 from argschema.schemas import DefaultSchema
 from marshmallow import RAISE
 

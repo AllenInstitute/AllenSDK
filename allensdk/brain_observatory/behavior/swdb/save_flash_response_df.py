@@ -1,17 +1,18 @@
-import sys
+import itertools
 import os
+import sys
+
 import numpy as np
 import pandas as pd
-import itertools
 
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
     BehaviorOphysExperiment
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi)
+from allensdk.brain_observatory.behavior.session_apis.data_io import \
+    BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.swdb import \
     behavior_project_cache as bpc
-from allensdk.brain_observatory.behavior.swdb.analysis_tools import \
-    get_trace_around_timepoint, get_mean_in_window
+from allensdk.brain_observatory.behavior.swdb.analysis_tools import (
+    get_mean_in_window, get_trace_around_timepoint)
 
 '''
     This script computes the flash_response_df for a BehaviorOphysExperiment

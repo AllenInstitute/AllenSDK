@@ -1,14 +1,14 @@
-import functools
-import os
 import asyncio
+import functools
+import logging
+import os
 import time
 import warnings
-import logging
-from typing import Optional, Iterable, Callable, AsyncIterator, Awaitable
+from typing import AsyncIterator, Awaitable, Callable, Iterable, Optional
 
-import requests
 import aiohttp
 import nest_asyncio
+import requests
 from tqdm.auto import tqdm
 
 DEFAULT_TIMEOUT = 20 * 60  # seconds

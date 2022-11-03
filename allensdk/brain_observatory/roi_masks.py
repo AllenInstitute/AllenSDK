@@ -33,11 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
-import math
-import scipy.ndimage.morphology as morphology
 import logging
+import math
+
 import h5py
+import numpy as np
+import scipy.ndimage.morphology as morphology
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0

@@ -1,19 +1,20 @@
-import os
-import sys
-import subprocess
-import numpy as np
-import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
-from .passive_fitting import preprocess as passive_prep
-import allensdk.core.json_utilities as ju
-from allensdk.model.biophys_sim.config import Config
-from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit
-from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit2
-from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit_elec
-from pkg_resources import resource_filename #@UnresolvedImport
 import logging
 import logging.config as lc
+import os
+import subprocess
+import sys
 
+import numpy as np
+from pkg_resources import resource_filename  # @UnresolvedImport
+
+import allensdk.core.json_utilities as ju
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
+from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.internal.model.biophysical.passive_fitting import (
+    neuron_passive_fit, neuron_passive_fit2, neuron_passive_fit_elec)
+from allensdk.model.biophys_sim.config import Config
+
+from .passive_fitting import preprocess as passive_prep
 
 _run_passive_fit_log = logging.getLogger('allensdk.internal.model.biophysical.run_passive_fit')
 

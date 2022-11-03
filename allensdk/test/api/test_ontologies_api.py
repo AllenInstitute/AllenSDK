@@ -33,11 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.api.queries.ontologies_api import OntologiesApi
 import pandas as pd
-from numpy import allclose
 import pytest
 from mock import patch
+from numpy import allclose
+
+from allensdk.api.queries.ontologies_api import OntologiesApi
 
 
 @pytest.fixture

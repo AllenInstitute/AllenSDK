@@ -1,16 +1,18 @@
-from mpi4py import MPI # needed for NEURON parallel execution
-import os
-from allensdk.internal.model.biophysical.deap_utils import Utils
-from . import neuron_parallel
+import argparse
 import logging
 import logging.config as lc
-import argparse
+import os
 import random
+
 import numpy as np
 from deap import algorithms, base, creator, tools
-from allensdk.model.biophys_sim.config import Config
-from pkg_resources import resource_filename #@UnresolvedImport
+from mpi4py import MPI  # needed for NEURON parallel execution
+from pkg_resources import resource_filename  # @UnresolvedImport
 
+from allensdk.internal.model.biophysical.deap_utils import Utils
+from allensdk.model.biophys_sim.config import Config
+
+from . import neuron_parallel
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 DEFAULT_NGEN = 500

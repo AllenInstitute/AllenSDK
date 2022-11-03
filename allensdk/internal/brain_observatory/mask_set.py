@@ -1,6 +1,8 @@
 import itertools
-import numpy as np
 import logging
+
+import numpy as np
+
 
 class MaskSet( object ):
     def __init__(self, masks):

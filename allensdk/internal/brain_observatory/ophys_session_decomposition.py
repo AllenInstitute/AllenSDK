@@ -1,5 +1,5 @@
-import numpy as np
 import h5py
+import numpy as np
 
 
 def open_view_on_binary(file_like, dtype=np.uint8, mode="r", offset=0,

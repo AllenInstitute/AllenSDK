@@ -1,13 +1,10 @@
-import pytest
 import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.id_generator import (
-        FileIDGenerator)
-
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.utils import (
-        add_file_paths_to_metadata_table)
+from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import \
+    FileIDGenerator
+from allensdk.brain_observatory.data_release_utils.metadata_utils.utils import \
+    add_file_paths_to_metadata_table
 
 
 def test_add_file_paths_to_metadata_table_on_missing_error(

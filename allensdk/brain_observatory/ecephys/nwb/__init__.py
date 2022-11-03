@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pynwb
 
-
 file_dir = Path(__file__).parent
 namespace_path = (file_dir / "ndx-aibs-ecephys.namespace.yaml").resolve()
 pynwb.load_namespaces(str(namespace_path))

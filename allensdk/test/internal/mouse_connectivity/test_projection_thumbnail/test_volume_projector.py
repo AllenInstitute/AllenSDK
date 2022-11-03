@@ -1,8 +1,9 @@
-import pytest
 import numpy as np
+import pytest
 import SimpleITK as sitk
 
-from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_projector import VolumeProjector
+from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_projector import \
+    VolumeProjector
 
 
 @pytest.fixture

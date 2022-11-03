@@ -3,9 +3,10 @@
 
 # To Do: This will be done by the strategy and later removed from here.
 
-import psycopg2
 import json
 import sys
+
+import psycopg2
 from psycopg2.extras import RealDictCursor
 
 

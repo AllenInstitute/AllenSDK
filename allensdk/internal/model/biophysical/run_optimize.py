@@ -1,17 +1,21 @@
+import logging
+import logging.config as lc
 import os
 import shutil
 import subprocess
-import logging
-import logging.config as lc
-import allensdk.core.json_utilities as ju
-from allensdk.core.nwb_data_set import NwbDataSet
+
 from pkg_resources import resource_filename  # @UnresolvedImport
-from allensdk.internal.api.queries.optimize_config_reader import OptimizeConfigReader
-from allensdk.model.biophys_sim.config import Config
-from allensdk.internal.model.biophysical.make_deap_fit_json import Report
-from allensdk.internal.api.queries.biophysical_module_api import BiophysicalModuleApi
-import allensdk.model.biophysical as hoc_location
 from six.moves import reduce
+
+import allensdk.core.json_utilities as ju
+import allensdk.model.biophysical as hoc_location
+from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.internal.api.queries.biophysical_module_api import \
+    BiophysicalModuleApi
+from allensdk.internal.api.queries.optimize_config_reader import \
+    OptimizeConfigReader
+from allensdk.internal.model.biophysical.make_deap_fit_json import Report
+from allensdk.model.biophys_sim.config import Config
 
 
 class RunOptimize(object):
@@ -89,6 +93,7 @@ class RunOptimize(object):
         Other necessary files are also written.
         '''
         import json
+
         from allensdk.api.api import Api
 
         bma = BiophysicalModuleApi(api_url)
@@ -118,9 +123,9 @@ class RunOptimize(object):
 
 
     def start_specimen(self):
-        import allensdk.internal.model.biophysical.run_passive_fit as run_passive_fit
         import allensdk.internal.model.biophysical.fit_stage_1 as fit_stage_1
         import allensdk.internal.model.biophysical.fit_stage_2 as fit_stage_2
+        import allensdk.internal.model.biophysical.run_passive_fit as run_passive_fit
 
         self.load_manifest()
         

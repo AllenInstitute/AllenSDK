@@ -1,36 +1,34 @@
+import logging
 import os
+import platform
 from datetime import datetime, timezone
 from pathlib import Path
-import logging
-import platform
 from unittest.mock import patch
 
-import pytest
-import pynwb
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pynwb
+import pytest
 import xarray as xr
+from pynwb import NWBHDF5IO, NWBFile
 
-from pynwb import NWBFile, NWBHDF5IO
-
-from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
-    Presentations
-from allensdk.brain_observatory.ecephys._unit import Unit, \
-    _get_filtered_and_sorted_spikes
-from allensdk.brain_observatory.ecephys._units import Units
 import allensdk.brain_observatory.ecephys.nwb_util
 import allensdk.brain_observatory.ecephys.utils
-from allensdk.brain_observatory.ecephys.current_source_density.__main__ \
-    import write_csd_to_h5
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
-from allensdk.brain_observatory.ecephys.ecephys_session_api \
-    import EcephysNwbSessionApi
+from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
+    Presentations
+from allensdk.brain_observatory.ecephys._unit import (
+    Unit, _get_filtered_and_sorted_spikes)
+from allensdk.brain_observatory.ecephys._units import Units
+from allensdk.brain_observatory.ecephys.current_source_density.__main__ import \
+    write_csd_to_h5
+from allensdk.brain_observatory.ecephys.ecephys_session_api import \
+    EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing \
-    import create_preload_eye_tracking_df
 from allensdk.brain_observatory.nwb import setup_table_for_invalid_times
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import \
+    create_preload_eye_tracking_df
 
 
 @pytest.fixture

@@ -1,6 +1,4 @@
-from allensdk.core import DataObject
-from allensdk.core import \
-    LimsReadableInterface
+from allensdk.core import DataObject, LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 

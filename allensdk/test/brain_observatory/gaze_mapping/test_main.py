@@ -1,11 +1,10 @@
 from pathlib import Path
-import pytest
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import allensdk.brain_observatory.gaze_mapping.__main__ as main
-
 from allensdk.brain_observatory import sync_utilities as su
 from allensdk.brain_observatory.sync_dataset import Dataset
 

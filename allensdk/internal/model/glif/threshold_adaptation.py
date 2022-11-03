@@ -1,13 +1,17 @@
-import numpy as np
 import copy
+import logging
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
-import logging
+
 THRESH_PCT_MULTIBLIP = 0.05
 
-from allensdk.model.glif.glif_neuron_methods import spike_component_of_threshold_exact
 from allensdk.internal.model.glif.find_spikes import find_spikes_ssq_list
+from allensdk.model.glif.glif_neuron_methods import \
+    spike_component_of_threshold_exact
+
 
 def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, dv_cutoff, thresh_frac,
                                                      MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):

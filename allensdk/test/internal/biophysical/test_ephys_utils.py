@@ -1,6 +1,7 @@
-import pytest
 import numpy as np
+import pytest
 from mock import Mock
+
 import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 
 

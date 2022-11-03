@@ -1,10 +1,11 @@
 from unittest import mock
 
-import pytest
-import numpy as np
 import h5py
+import numpy as np
+import pytest
 
-from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import EcephysSyncDataset
+from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import \
+    EcephysSyncDataset
 
 
 @pytest.mark.parametrize('expected', [1, None])

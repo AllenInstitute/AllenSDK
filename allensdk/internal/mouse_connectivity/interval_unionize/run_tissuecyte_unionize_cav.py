@@ -1,14 +1,16 @@
 from __future__ import division
+
 import logging
+
+import data_utilities as du
+import numpy as np
+from run_tissuecyte_unionize_classic import (get_ancestor_id_map,
+                                             get_volume_scale)
 from six import iteritems
 
-import numpy as np
-
 from allensdk.core.simple_tree import SimpleTree
-
-from run_tissuecyte_unionize_classic import get_ancestor_id_map, get_volume_scale
-from allensdk.internal.mouse_connectivity.interval_unionize.cav_unionizer import CavUnionizer
-import data_utilities as du
+from allensdk.internal.mouse_connectivity.interval_unionize.cav_unionizer import \
+    CavUnionizer
 
 
 def run(input_data):

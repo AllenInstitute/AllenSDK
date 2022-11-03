@@ -33,19 +33,22 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import argparse
+import logging
+import multiprocessing as mp
+import os
+import time
+from functools import partial
+from shutil import copy
+
+import argschema as ags
+import numpy
+
+import allensdk.ephys.extract_cell_features as extract_cell_features
+from allensdk.core.nwb_data_set import NwbDataSet
+
 from ..biophys_sim.config import Config
 from .utils import create_utils
-from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.ephys.extract_cell_features as extract_cell_features
-from shutil import copy
-import numpy
-import logging
-import time
-import os
-import multiprocessing as mp
-from functools import partial
-import argschema as ags
-import argparse
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 

@@ -1,15 +1,15 @@
 import logging
 import os
+from collections import defaultdict
+
 import h5py
 import nwb.nwb as nwb
 import nwb.nwbco as nwbco
 import resource_file
-from collections import defaultdict
 from six import iteritems
 
-from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
-
+from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 # changes

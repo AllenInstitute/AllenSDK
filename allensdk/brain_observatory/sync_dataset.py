@@ -15,13 +15,13 @@ h5py   http://www.h5py.org/
 
 """
 import collections
-from typing import Union, Sequence, Optional
+import logging
+import warnings
+from typing import Optional, Sequence, Union
 
 import h5py as h5
 import numpy as np
 
-import warnings
-import logging
 logger = logging.getLogger(__name__)
 
 dset_version = 1.04

@@ -1,9 +1,10 @@
 from unittest import mock
 
-import pytest
 import numpy as np
+import pytest
 
-from allensdk.brain_observatory.ecephys.align_timestamps import channel_states as cs
+from allensdk.brain_observatory.ecephys.align_timestamps import \
+    channel_states as cs
 
 
 @pytest.mark.parametrize(

@@ -1,14 +1,13 @@
-import multiprocessing as mp
 import logging
+import multiprocessing as mp
 
-from six import iteritems
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
+from six import iteritems
 
 from .subimage import run_subimage
 from .utilities import image_utilities as iu
 from .utilities.downsampling_utilities import block_average, window_average
-
 
 #==============================================================================
 

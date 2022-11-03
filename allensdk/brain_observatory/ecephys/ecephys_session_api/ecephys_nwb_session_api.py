@@ -1,23 +1,23 @@
-from typing import Dict, Union, List, Optional, Callable
-import re
 import ast
+import re
+from typing import Callable, Dict, List, Optional, Union
 
-import pandas as pd
 import numpy as np
-import xarray as xr
+import pandas as pd
 import pynwb
+import xarray as xr
 
-from .ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.nwb.nwb_api import NwbApi
-import \
-    allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB
+import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB
 # namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.brain_observatory.nwb import check_nwbfile_version
+from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+
+from ...behavior.data_objects.stimuli.presentations import Presentations
 from .._channels import Channels
 from ..optotagging import OptotaggingTable
 from ..probes import Probes
-from ...behavior.data_objects.stimuli.presentations import Presentations
+from .ecephys_session_api import EcephysSessionApi
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 

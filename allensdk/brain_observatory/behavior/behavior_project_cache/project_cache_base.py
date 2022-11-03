@@ -1,12 +1,10 @@
-from typing import Optional, Union, List
-from pathlib import Path
 import logging
+from pathlib import Path
+from typing import List, Optional, Union
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io import ProjectCloudApiBase
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (
+    BehaviorProjectLimsApi, ProjectCloudApiBase)
 from allensdk.core.authentication import DbCredentials
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io import BehaviorProjectLimsApi
 
 
 class ProjectCacheBase(object):

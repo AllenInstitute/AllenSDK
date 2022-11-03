@@ -4,14 +4,10 @@ from pynwb import NWBFile
 from pynwb.ophys import Fluorescence
 
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import \
     RoisMixin
+from allensdk.core import (DataFileReadableInterface, DataObject,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class CorrectedFluorescenceTraces(DataObject, RoisMixin,

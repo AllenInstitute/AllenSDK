@@ -1,6 +1,7 @@
-from typing import Optional, List
-from allensdk.core.typing import SupportsStr
+from typing import List, Optional
 from uuid import UUID
+
+from allensdk.core.typing import SupportsStr
 
 
 def build_in_list_selector_query(

@@ -1,5 +1,5 @@
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP, \
-    MTRAIN_DB_CREDENTIAL_MAP
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.internal.api import db_connection_creator
 
 

@@ -1,9 +1,9 @@
 import logging
 
-from allensdk.core.simple_tree import SimpleTree
-
-from allensdk.internal.mouse_connectivity.interval_unionize.tissuecyte_unionizer import TissuecyteUnionizer
 import allensdk.internal.mouse_connectivity.interval_unionize.data_utilities as du
+from allensdk.core.simple_tree import SimpleTree
+from allensdk.internal.mouse_connectivity.interval_unionize.tissuecyte_unionizer import \
+    TissuecyteUnionizer
 
 
 def get_ancestor_id_map(structures):

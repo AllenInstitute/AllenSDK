@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimulus_templates import \
+    StimulusImage
 from allensdk.brain_observatory.behavior.stimulus_processing import (
-    get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
-    get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates, is_change_event)
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_templates import StimulusImage
+    _get_draw_epochs, _get_stimulus_epoch, get_gratings_metadata,
+    get_stimulus_metadata, get_stimulus_presentations, get_stimulus_templates,
+    get_visual_stimuli_df, is_change_event)
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
 
 

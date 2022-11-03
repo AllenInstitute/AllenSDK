@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
 import pandas as pd
+
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 
 
 class BehaviorProjectBase(ABC):

@@ -1,10 +1,12 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.stimulus_analysis.static_gratings import (
+    StaticGratings, fit_sf_tuning, get_sfdi)
+
 from .conftest import MockSessionApi
-from allensdk.brain_observatory.ecephys.stimulus_analysis.static_gratings import StaticGratings, get_sfdi, fit_sf_tuning
 
 
 class MockSGSessionApi(MockSessionApi):

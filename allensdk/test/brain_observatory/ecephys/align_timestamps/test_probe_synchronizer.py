@@ -1,12 +1,10 @@
 from unittest import mock
 
-import pytest
 import numpy as np
+import pytest
 
-
-from allensdk.brain_observatory.ecephys.align_timestamps.probe_synchronizer import (
-    ProbeSynchronizer,
-)
+from allensdk.brain_observatory.ecephys.align_timestamps.probe_synchronizer import \
+    ProbeSynchronizer
 
 
 def get_test_barcodes():

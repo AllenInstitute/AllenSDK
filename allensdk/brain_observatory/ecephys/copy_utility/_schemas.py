@@ -1,9 +1,9 @@
 import hashlib
-from argschema import ArgSchema
-from argschema.fields import (
-    LogLevel, String, Int, Nested, Boolean, List, InputFile)
-from argschema.schemas import DefaultSchema
 
+from argschema import ArgSchema
+from argschema.fields import (Boolean, InputFile, Int, List, LogLevel, Nested,
+                              String)
+from argschema.schemas import DefaultSchema
 
 available_hashers = {
     'sha3_256': hashlib.sha3_256,

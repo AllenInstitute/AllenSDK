@@ -33,11 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import itertools as it
+
+import pytest
+from mock import MagicMock, patch
+
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
-import pytest
-from mock import patch, MagicMock
-import itertools as it
 
 
 @pytest.fixture

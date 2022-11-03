@@ -2,29 +2,25 @@ import logging
 import warnings
 from pathlib import Path
 from typing import Optional, Tuple
+
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
-from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
-    EyeTrackingVideo
-from allensdk.brain_observatory.behavior.data_objects import (
-    StimulusTimestamps)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
-from allensdk.brain_observatory.behavior.\
-    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    NwbReadableInterface, DataFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.eye_tracking_processing import \
-    process_eye_tracking_data, determine_outliers, determine_likely_blinks, \
-    EyeTrackingError
-from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking \
-    import \
-    EllipseSeries, EllipseEyeTracking
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
+    EyeTrackingVideo
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.eye_tracking_processing import (
+    EyeTrackingError, determine_likely_blinks, determine_outliers,
+    process_eye_tracking_data)
+from allensdk.brain_observatory.nwb.eye_tracking.ndx_ellipse_eye_tracking import (
+    EllipseEyeTracking, EllipseSeries)
+from allensdk.core import (DataFileReadableInterface, DataObject,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class EyeTrackingTable(DataObject, DataFileReadableInterface,

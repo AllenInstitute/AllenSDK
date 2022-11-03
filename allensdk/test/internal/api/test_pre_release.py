@@ -1,9 +1,13 @@
-from allensdk.internal.api.queries.pre_release import BrainObservatoryApiPreRelease
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
-from six import integer_types
-import pytest
 import os
+
 import numpy as np
+import pytest
+from six import integer_types
+
+from allensdk.core.brain_observatory_cache import BrainObservatoryCache
+from allensdk.internal.api.queries.pre_release import \
+    BrainObservatoryApiPreRelease
+
 
 @pytest.fixture(scope='function')
 def tmpdir(tmpdir_factory):

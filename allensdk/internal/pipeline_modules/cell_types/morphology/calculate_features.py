@@ -1,9 +1,9 @@
 import sys
 
-import neuron_morphology.swc as swc
 import neuron_morphology.features.feature_extractor as feature_extractor
-from allensdk.internal.core.lims_pipeline_module import PipelineModule
+import neuron_morphology.swc as swc
 
+from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 ########################################################################
 

@@ -1,15 +1,13 @@
-import pytest
-import pandas as pd
 import io
+
+import pandas as pd
+import pytest
 import semver
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-        data_io.behavior_project_cloud_api \
-        import BehaviorProjectCloudApi
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-        data_io.behavior_neuropixels_project_cloud_api \
-        import VisualBehaviorNeuropixelsProjectCloudApi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_neuropixels_project_cloud_api import \
+    VisualBehaviorNeuropixelsProjectCloudApi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_project_cloud_api import \
+    BehaviorProjectCloudApi
 
 
 @pytest.fixture

@@ -35,13 +35,13 @@
 #
 import os
 import warnings
-import mock
-import pytest
-import numpy as np
-import nrrd
-import pandas as pd
-import SimpleITK as sitk
 
+import mock
+import nrrd
+import numpy as np
+import pandas as pd
+import pytest
+import SimpleITK as sitk
 
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.core.structure_tree import StructureTree

@@ -1,6 +1,8 @@
 from argschema.fields import String
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import (RaisingSchema,
+                                                            check_read_access,
+                                                            check_write_access)
 
 
 class RunningSpeedPathsSchema(RaisingSchema):

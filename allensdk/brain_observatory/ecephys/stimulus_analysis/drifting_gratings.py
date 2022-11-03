@@ -1,20 +1,20 @@
-import numpy as np
-import pandas as pd
-from six import string_types
-import scipy.ndimage as ndi
-import scipy.stats as st
-from scipy.signal import welch
-from scipy.optimize import curve_fit
-from scipy.fftpack import fft
-from scipy import signal
 import logging
+import warnings
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy.ndimage as ndi
+import scipy.stats as st
+from scipy import signal
+from scipy.fftpack import fft
+from scipy.optimize import curve_fit
+from scipy.signal import welch
+from six import string_types
 
-from .stimulus_analysis import StimulusAnalysis, osi, dsi, deg2rad
 from ...circle_plots import FanPlotter
+from .stimulus_analysis import StimulusAnalysis, deg2rad, dsi, osi
 
-import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 

@@ -33,9 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .utilities import smooth
 import numpy as np
 import scipy.stats as sps
+
+from .utilities import smooth
+
 
 def detect_events(data, cell_index, stimulus, debug_plots=False):
 

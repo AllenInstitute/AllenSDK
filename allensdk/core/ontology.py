@@ -34,9 +34,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from collections import defaultdict
-from six import string_types
+
 import numpy as np
 import pandas as pd
+from six import string_types
 
 from allensdk.deprecated import class_deprecated
 

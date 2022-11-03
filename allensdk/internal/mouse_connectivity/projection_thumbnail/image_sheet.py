@@ -1,5 +1,5 @@
-import functools
 import copy as cp
+import functools
 import logging
 
 import numpy as np

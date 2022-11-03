@@ -1,33 +1,25 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.age import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.age import \
     Age
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.driver_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.driver_line import \
     DriverLine
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.full_genotype import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.full_genotype import \
     FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.mouse_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.mouse_id import \
     MouseId
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.reporter_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
     ReporterLine
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.sex import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.sex import \
     Sex
 from allensdk.brain_observatory.behavior.schemas import SubjectMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           JsonWritableInterface, LimsReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

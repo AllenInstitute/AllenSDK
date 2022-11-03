@@ -1,15 +1,15 @@
 from __future__ import division
+
 import logging
 import os
 import sys
 
-from six import iteritems
 import numpy as np
 import SimpleITK as sitk
+from six import iteritems
 from skimage.draw import polygon
 
 from allensdk.config.manifest import Manifest
-
 
 if sys.version_info[0] > 2:
     failed_import = (ImportError, ModuleNotFoundError)

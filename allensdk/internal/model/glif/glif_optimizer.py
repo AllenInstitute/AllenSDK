@@ -1,15 +1,10 @@
+import json
 import logging
+import time
+from uuid import uuid4
 
 import numpy as np
-
-import time
-
-from scipy.optimize import fminbound, fmin
-from scipy.optimize import minimize
-
-import json
-
-from uuid import uuid4
+from scipy.optimize import fmin, fminbound, minimize
 
 import allensdk.internal.model.glif.error_functions as error_functions
 

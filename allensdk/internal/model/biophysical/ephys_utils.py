@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_sweep_v_i_t_from_set(data_set, sweep_number):
     sweep_data = data_set.get_sweep(sweep_number)
     i = sweep_data["stimulus"] # in A

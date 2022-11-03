@@ -1,5 +1,6 @@
-from neuron import h
 import logging
+
+from neuron import h
 
 _neuron_parallel_log = logging.getLogger('allensdk.model.biophysical.neuron_parallel')
 

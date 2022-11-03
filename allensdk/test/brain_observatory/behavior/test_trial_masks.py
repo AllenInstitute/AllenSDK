@@ -1,7 +1,8 @@
-import pytest
-from allensdk.brain_observatory.behavior import trial_masks as masks
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
+from allensdk.brain_observatory.behavior import trial_masks as masks
 
 
 @pytest.mark.parametrize(

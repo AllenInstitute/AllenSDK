@@ -1,11 +1,14 @@
-import subprocess as sp
-import numpy as np
 import logging
-import sys, os
-from collections import deque
-import scipy.misc
-import traceback
+import os
 import signal
+import subprocess as sp
+import sys
+import traceback
+from collections import deque
+
+import numpy as np
+import scipy.misc
+
 
 class FrameInputStream( object ):
     def __init__(self, movie_path, num_frames=None, block_size=1, cache_frames=False, process_frame_cb=None):

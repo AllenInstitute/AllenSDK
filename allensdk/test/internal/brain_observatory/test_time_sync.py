@@ -1,14 +1,15 @@
-import pytest
-import numpy as np
 import json
 import os
+
 import h5py
-from pkg_resources import resource_filename
+import numpy as np
+import pytest
 from mock import patch
+from pkg_resources import resource_filename
+
+from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.internal.brain_observatory import time_sync as ts
 from allensdk.internal.pipeline_modules import run_ophys_time_sync
-from allensdk.brain_observatory.sync_dataset import Dataset
-
 
 ASSUMED_DELAY = 0.0351
 

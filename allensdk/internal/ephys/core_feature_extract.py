@@ -1,19 +1,21 @@
-import sys, os, shutil
-import logging
-from collections import defaultdict
-import numpy as np
 import json
+import logging
+import os
+import shutil
+import sys
+from collections import defaultdict
+
+import numpy as np
 from six import iteritems
 
+import allensdk.internal.ephys.plot_qc_figures as plot_qc_figures
 from allensdk.config.manifest import Manifest
 from allensdk.core.json_utilities import json_handler
-
 from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.ephys.extract_cell_features import extract_cell_features, extract_sweep_features
-from allensdk.ephys.ephys_features import FeatureError
 from allensdk.ephys.ephys_extractor import reset_long_squares_start
-import allensdk.internal.ephys.plot_qc_figures as plot_qc_figures
-
+from allensdk.ephys.ephys_features import FeatureError
+from allensdk.ephys.extract_cell_features import (extract_cell_features,
+                                                  extract_sweep_features)
 
 TEST_PULSE_DURATION_SEC = 0.4
 

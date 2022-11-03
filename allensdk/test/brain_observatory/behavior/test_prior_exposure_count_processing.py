@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util \
-    .prior_exposure_processing import \
-    get_prior_exposures_to_session_type, get_prior_exposures_to_image_set, \
-    get_prior_exposures_to_omissions
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (
+    get_prior_exposures_to_image_set, get_prior_exposures_to_omissions,
+    get_prior_exposures_to_session_type)
 
 
 def test_prior_exposure_to_session_type():

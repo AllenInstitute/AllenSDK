@@ -1,9 +1,12 @@
-import pytest
-import numpy as np
 import os
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
+
 import numpy as np
+import pytest
 from pkg_resources import resource_filename  # @UnresolvedImport
+
+from allensdk.core.brain_observatory_nwb_data_set import (
+    BrainObservatoryNwbDataSet, si)
+
 NWB_FLAVORS = []
 
 if 'TEST_NWB_FILES' in os.environ:

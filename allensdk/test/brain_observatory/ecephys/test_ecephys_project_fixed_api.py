@@ -1,6 +1,7 @@
 import pytest
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectFixedApi, MissingDataError
+from allensdk.brain_observatory.ecephys.ecephys_project_api import (
+    EcephysProjectFixedApi, MissingDataError)
 
 
 def test_get_sessions():

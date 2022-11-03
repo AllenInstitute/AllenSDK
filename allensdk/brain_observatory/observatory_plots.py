@@ -33,21 +33,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.collections import PatchCollection
-import matplotlib.lines as mlines
-import matplotlib.patches as mpatches
-import scipy.interpolate as si
-from scipy.stats import gaussian_kde
-import matplotlib.colorbar as cbar
-from mpl_toolkits.axes_grid1 import ImageGrid
-
-import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
 
+import matplotlib.colorbar as cbar
+import matplotlib.colors as mcolors
+import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import numpy as np
+import scipy.interpolate as si
+from matplotlib.collections import PatchCollection
+from matplotlib.colors import LinearSegmentedColormap
+from mpl_toolkits.axes_grid1 import ImageGrid
+from scipy.stats import gaussian_kde
+
+import allensdk.brain_observatory.circle_plots as cplots
 
 SI_RANGE = [ 0, 1.5 ]
 P_VALUE_MAX = 0.05

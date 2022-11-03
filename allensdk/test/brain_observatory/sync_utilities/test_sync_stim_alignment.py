@@ -3,15 +3,13 @@
 # of these tests is to detect if the behavior of the utilities
 # in ecephys_etl_pipelines ever changes out from under us
 
-import pytest
 import numpy as np
+import pytest
 
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory.sync_stim_aligner import (
-    _choose_line,
-    _get_rising_times,
-    _get_falling_times,
-    _get_line_starts_and_ends)
+    _choose_line, _get_falling_times, _get_line_starts_and_ends,
+    _get_rising_times)
 
 
 def test_choose_line(

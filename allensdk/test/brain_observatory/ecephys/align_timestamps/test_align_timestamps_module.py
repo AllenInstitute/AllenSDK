@@ -2,9 +2,8 @@ import json
 import os
 import subprocess as sp
 
-import pytest
 import numpy as np
-
+import pytest
 
 DATA_DIR = os.environ.get(
     "ECEPHYS_PIPELINE_DATA",

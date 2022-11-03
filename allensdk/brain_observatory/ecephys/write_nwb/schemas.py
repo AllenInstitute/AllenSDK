@@ -1,24 +1,13 @@
 import argschema.fields
 import marshmallow as mm
 import numpy as np
-
 from argschema import ArgSchema
-from argschema.fields import (
-    LogLevel,
-    Dict,
-    String,
-    Int,
-    DateTime,
-    Nested,
-    Boolean,
-    Float,
-)
+from argschema.fields import (Boolean, DateTime, Dict, Float, Int, LogLevel,
+                              Nested, String)
 
-from allensdk.brain_observatory.argschema_utilities import (
-    check_read_access,
-    check_write_access,
-    RaisingSchema,
-)
+from allensdk.brain_observatory.argschema_utilities import (RaisingSchema,
+                                                            check_read_access,
+                                                            check_write_access)
 
 
 class Channel(RaisingSchema):

@@ -1,14 +1,13 @@
+import copy
+
 import pytest
 
-import copy
-from allensdk.brain_observatory.behavior.\
-    data_objects.eye_tracking.eye_tracking_table import EyeTrackingTable
-from allensdk.brain_observatory.behavior.\
-    data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.\
-    data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import \
+    EyeTrackingTable
+from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 
 
 @pytest.mark.requires_bamboo

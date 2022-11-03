@@ -1,14 +1,11 @@
 import os
 
 from allensdk.brain_observatory.behavior.schemas import (
-    BehaviorMetadataSchema,
-    OphysBehaviorMetadataSchema,
-    BehaviorTaskParametersSchema,
-    SubjectMetadataSchema, OphysEyeTrackingRigMetadataSchema
-)
-from allensdk.brain_observatory.nwb.metadata import (
+    BehaviorMetadataSchema, BehaviorTaskParametersSchema,
+    OphysBehaviorMetadataSchema, OphysEyeTrackingRigMetadataSchema,
+    SubjectMetadataSchema)
+from allensdk.brain_observatory.nwb.metadata import \
     create_pynwb_extension_from_schemas
-)
 
 if __name__ == "__main__":
 

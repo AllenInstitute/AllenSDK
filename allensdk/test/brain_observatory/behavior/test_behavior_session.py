@@ -1,10 +1,8 @@
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-
-from allensdk.brain_observatory.session_api_utils import sessions_are_equal
-
 import pytest
 
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 

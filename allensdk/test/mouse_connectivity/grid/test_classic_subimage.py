@@ -1,10 +1,8 @@
-import pytest
 import mock
-
 import numpy as np
+import pytest
 
 from allensdk.mouse_connectivity.grid.subimage import ClassicSubImage
-
 
 #==============================================================================
 #==============================================================================

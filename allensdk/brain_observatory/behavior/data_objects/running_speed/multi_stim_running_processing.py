@@ -1,20 +1,15 @@
-from typing import Tuple, Dict
+from typing import Dict, Tuple
+
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile,
-    MappingStimulusFile,
-    ReplayStimulusFile,
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile,
     _StimulusFile)
-
-from allensdk.brain_observatory.sync_stim_aligner import (
-    get_stim_timestamps_from_stimulus_blocks)
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.running_processing import (
-        get_running_df
-    )
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import \
+    get_running_df
+from allensdk.brain_observatory.sync_stim_aligner import \
+    get_stim_timestamps_from_stimulus_blocks
 
 
 def _extract_dx_info(

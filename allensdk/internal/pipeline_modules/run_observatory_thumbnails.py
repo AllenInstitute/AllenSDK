@@ -1,33 +1,35 @@
 import matplotlib
+
 matplotlib.use('agg')
 
-import os, shutil
-import allensdk.core.json_utilities as ju
-import shutil
-import numpy as np
 import argparse
+import functools
+import logging
+import multiprocessing
+import os
+import shutil
+import traceback
+from contextlib import contextmanager
+
+import numpy as np
 import scipy.misc
 from scipy.stats import gaussian_kde
 
-import multiprocessing
-import functools
-import traceback
-import logging
-
-from allensdk.brain_observatory.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.static_gratings import StaticGratings
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.natural_movie import NaturalMovie
-from allensdk.brain_observatory import observatory_plots as oplots
-from allensdk.core.brain_observatory_nwb_data_set import (BrainObservatoryNwbDataSet,
-                                                          MissingStimulusException,
-                                                          NoEyeTrackingException)
-from allensdk.config.manifest import Manifest
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
-import allensdk.internal.core.lims_utilities as lu
 import allensdk.brain_observatory.stimulus_info as si
-from contextlib import contextmanager
+import allensdk.core.json_utilities as ju
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.brain_observatory import observatory_plots as oplots
+from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_movie import NaturalMovie
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.config.manifest import Manifest
+from allensdk.core.brain_observatory_nwb_data_set import (
+    BrainObservatoryNwbDataSet, MissingStimulusException,
+    NoEyeTrackingException)
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
 
 LARGE_HEIGHT = 500
 SMALL_HEIGHT = 150

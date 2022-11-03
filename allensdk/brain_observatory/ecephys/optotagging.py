@@ -3,8 +3,8 @@ import pynwb
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.nwb import setup_table_for_epochs
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbWritableInterface, NwbReadableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class OptotaggingTable(DataObject, JsonReadableInterface,

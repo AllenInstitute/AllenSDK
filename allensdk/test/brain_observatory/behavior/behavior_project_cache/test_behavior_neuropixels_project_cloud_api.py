@@ -1,17 +1,16 @@
-import pytest
-import pandas as pd
 from pathlib import Path
 from unittest.mock import MagicMock, create_autospec
 
+import pandas as pd
+import pytest
+
 from allensdk.api.cloud_cache.manifest import Manifest
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-    data_io import behavior_neuropixels_project_cloud_api as cloudapi  # noqa: E501
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-    data_io import project_cloud_api_base as cloudapibase  # noqa: E501
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    utils import version_check, BehaviorCloudCacheVersionException
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    behavior_neuropixels_project_cloud_api as cloudapi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    project_cloud_api_base as cloudapibase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.utils import (
+    BehaviorCloudCacheVersionException, version_check)
 
 
 class MockCache():

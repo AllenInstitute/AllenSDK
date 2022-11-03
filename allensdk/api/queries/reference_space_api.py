@@ -33,13 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_api import RmaApi
-from allensdk.api.warehouse_cache.cache import cacheable, Cache
-from allensdk.core.obj_utilities import read_obj
-import allensdk.core.sitk_utilities as sitk_utilities
-import numpy as np
 import nrrd
+import numpy as np
 import six
+
+import allensdk.core.sitk_utilities as sitk_utilities
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+from allensdk.core.obj_utilities import read_obj
+
+from .rma_api import RmaApi
 
 
 class ReferenceSpaceApi(RmaApi):

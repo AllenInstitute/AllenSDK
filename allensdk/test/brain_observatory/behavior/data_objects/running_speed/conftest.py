@@ -1,18 +1,15 @@
-import pytest
-import numpy as np
+import json
 import pathlib
 import tempfile
-import pandas as pd
-import h5py
-import json
 
-from allensdk.brain_observatory.behavior.data_files.sync_file import (
-    SyncFile)
+import h5py
+import numpy as np
+import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile,
-    ReplayStimulusFile,
-    MappingStimulusFile)
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile)
+from allensdk.brain_observatory.behavior.data_files.sync_file import SyncFile
 
 
 @pytest.fixture

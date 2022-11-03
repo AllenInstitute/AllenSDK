@@ -1,17 +1,16 @@
-from six import string_types
+import logging
+import warnings
+from functools import partial
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from functools import partial
-import logging
+from six import string_types
 
-import matplotlib.pyplot as plt
-
-from .stimulus_analysis import StimulusAnalysis
-from .stimulus_analysis import osi, deg2rad
 from ...circle_plots import FanPlotter
+from .stimulus_analysis import StimulusAnalysis, deg2rad, osi
 
-import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 

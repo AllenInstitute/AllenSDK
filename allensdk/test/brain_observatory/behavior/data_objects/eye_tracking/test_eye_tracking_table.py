@@ -6,26 +6,21 @@ import numpy as np
 import pandas as pd
 import pynwb
 import pytest
-from allensdk.brain_observatory.behavior.data_files\
-    .eye_tracking_metadata_file import \
-    EyeTrackingMetadataFile
 
-from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory import sync_utilities
-
-from allensdk.brain_observatory.behavior.data_files import \
-    SyncFile
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import \
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_objects import (
+    BehaviorSessionId, StimulusTimestamps)
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import \
     EyeTrackingTable
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
-from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing \
-    import \
+from allensdk.test.brain_observatory.behavior.test_eye_tracking_processing import \
     create_refined_eye_tracking_df
 
 

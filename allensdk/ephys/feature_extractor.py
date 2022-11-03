@@ -33,11 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import sys
+import logging
 import math
+import sys
+
 import numpy as np
 import scipy.signal as signal
-import logging
 
 # Design notes:
 # to generate an average feature file, all sweeps must have all features

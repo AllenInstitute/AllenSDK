@@ -1,23 +1,22 @@
+import json
+import pathlib
 from unittest.mock import create_autospec
 
+import boto3
 import pytest
+import semver
+from moto import mock_s3
 
+from allensdk.api.cloud_cache.cloud_cache import (MissingLocalManifestWarning,
+                                                  OutdatedManifestWarning)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
     BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_project_cache.behavior_project_cache import \
+    VisualBehaviorOphysProjectCache
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
-from .utils import create_bucket, load_dataset
-import boto3
-from moto import mock_s3
-import pathlib
-import json
-import semver
 
-from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
-from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
-from allensdk.brain_observatory.\
-    behavior.behavior_project_cache.behavior_project_cache \
-    import VisualBehaviorOphysProjectCache
+from .utils import create_bucket, load_dataset
 
 
 @mock_s3

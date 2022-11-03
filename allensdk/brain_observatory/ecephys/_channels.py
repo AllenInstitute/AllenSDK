@@ -5,8 +5,8 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys._channel import Channel
 from allensdk.brain_observatory.ecephys.utils import clobbering_merge
-from allensdk.core import DataObject, NwbReadableInterface, \
-    JsonReadableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface)
 
 
 class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):

@@ -1,12 +1,11 @@
-from typing import Union, Optional
-from pathlib import Path
 import logging
+from pathlib import Path
+from typing import Optional, Union
 
-from allensdk.api.cloud_cache.cloud_cache import (
-    S3CloudCache, LocalCache, StaticLocalCache)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .utils import version_check
+from allensdk.api.cloud_cache.cloud_cache import (LocalCache, S3CloudCache,
+                                                  StaticLocalCache)
+from allensdk.brain_observatory.behavior.behavior_project_cache.utils import \
+    version_check
 
 
 class ProjectCloudApiBase(object):

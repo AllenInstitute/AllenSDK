@@ -1,6 +1,5 @@
-from allensdk.brain_observatory.\
-    vbn_2022.metadata_writer.metadata_writer import (
-        VBN2022MetadataWriterClass)
+from allensdk.brain_observatory.vbn_2022.metadata_writer.metadata_writer import \
+    VBN2022MetadataWriterClass
 
 
 def main():

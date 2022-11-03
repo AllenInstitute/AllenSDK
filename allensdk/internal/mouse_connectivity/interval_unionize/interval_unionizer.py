@@ -1,12 +1,12 @@
 from __future__ import division
-import logging
-import functools
-from collections import defaultdict
+
 import copy as cp
+import functools
+import logging
+from collections import defaultdict
 
 import numpy as np
 from six import iteritems
-
 
 
 class IntervalUnionizer(object):

@@ -1,9 +1,8 @@
-import pytest
 import numpy as np
+import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import (
-        description_dict, get_task_parameters, get_expt_description)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (
+    description_dict, get_expt_description, get_task_parameters)
 
 
 @pytest.mark.parametrize("data, expected",

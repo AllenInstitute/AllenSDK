@@ -1,6 +1,7 @@
-import pytest
-import numpy as np
 import copy
+
+import numpy as np
+import pytest
 
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession

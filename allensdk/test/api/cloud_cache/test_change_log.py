@@ -1,7 +1,10 @@
 import pathlib
+
 from moto import mock_s3
-from .utils import create_bucket
+
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
+
+from .utils import create_bucket
 
 
 @mock_s3

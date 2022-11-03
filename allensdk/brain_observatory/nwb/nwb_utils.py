@@ -6,14 +6,14 @@ import logging
 import os
 from typing import Tuple, Union
 
-from pynwb import NWBFile, ProcessingModule, NWBHDF5IO
+from pynwb import NWBHDF5IO, NWBFile, ProcessingModule
 from pynwb.base import Images
 from pynwb.image import GrayscaleImage
 
-from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
+from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbReadableInterface, NwbWritableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 def get_column_name(table_cols: list,

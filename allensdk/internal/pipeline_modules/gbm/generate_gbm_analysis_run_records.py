@@ -3,9 +3,10 @@
 
 # To Do: This will be done by the strategy and later removed from here.
 
-import psycopg2
 import json
 import sys
+
+import psycopg2
 
 
 def main(analysis_records_json_location, db_host, db_port, db_name, db_user, db_passwd):

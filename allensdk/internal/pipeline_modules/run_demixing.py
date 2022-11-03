@@ -1,20 +1,21 @@
 import matplotlib
+
 matplotlib.use('agg')
-import matplotlib.pyplot as plt
-
-import allensdk.internal.core.lims_utilities as lu
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
-
-import argparse, os, logging, shutil
-import h5py
-import numpy as np
+import argparse
+import logging
+import os
 import shutil
 
-import allensdk.brain_observatory.demixer as demixer
-from allensdk.config.manifest import Manifest
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
 
+import allensdk.brain_observatory.demixer as demixer
 import allensdk.core.json_utilities as ju
-import logging
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.config.manifest import Manifest
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
 
 EXCLUDE_LABELS = ["union", "duplicate", "motion_border",
                   "decrosstalk_ghost",

@@ -33,10 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.api.queries.glif_api import GlifApi
+import os
+
 import numpy as np
 import pytest
-import os
+
+from allensdk.api.queries.glif_api import GlifApi
 
 
 @pytest.fixture

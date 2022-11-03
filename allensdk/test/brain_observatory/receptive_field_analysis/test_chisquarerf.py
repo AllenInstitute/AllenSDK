@@ -36,10 +36,9 @@
 
 import os
 
-import pytest
-
-import scipy.stats as stats
 import numpy as np
+import pytest
+import scipy.stats as stats
 
 from allensdk.brain_observatory.receptive_field_analysis import \
     chisquarerf as chi

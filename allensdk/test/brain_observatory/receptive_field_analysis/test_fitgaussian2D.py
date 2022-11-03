@@ -36,13 +36,12 @@
 
 import itertools as it
 
-import pytest
 import mock
-
+import numpy as np
+import pytest
+import skimage
 from scipy.stats import multivariate_normal
 from skimage.transform import rotate
-import skimage
-import numpy as np
 
 import allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D as gauss
 

@@ -1,14 +1,12 @@
-import pytest
 import os
-import tempfile
 import pathlib
+import tempfile
+
 import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.\
-    multi_stimulus_running_speed.multi_stimulus_running_speed import (
-        MultiStimulusRunningSpeed
-    )
-
+from allensdk.brain_observatory.multi_stimulus_running_speed.multi_stimulus_running_speed import \
+    MultiStimulusRunningSpeed
 
 DATA_DIR = os.environ.get(
     "ECEPHYS_PIPELINE_DATA",

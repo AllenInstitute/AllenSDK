@@ -1,25 +1,20 @@
 from typing import Optional
+
 import numpy as np
 import pandas as pd
 from hdmf.backends.hdf5 import H5DataIO
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files.event_detection_file \
-    import \
+from allensdk.brain_observatory.behavior.data_files.event_detection_file import \
     EventDetectionFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import \
     RoisMixin
 from allensdk.brain_observatory.behavior.event_detection import \
     filter_events_array
-from allensdk.brain_observatory.behavior.write_nwb.extensions\
-    .event_detection.ndx_ophys_events import \
+from allensdk.brain_observatory.behavior.write_nwb.extensions.event_detection.ndx_ophys_events import \
     OphysEventDetection
+from allensdk.core import (DataFileReadableInterface, DataObject,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class Events(DataObject, RoisMixin, DataFileReadableInterface,

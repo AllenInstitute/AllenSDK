@@ -34,7 +34,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import logging
-from pprint import pprint, pformat
+from pprint import pformat, pprint
+
 from allensdk.config.model.description import Description
 from allensdk.config.model.description_parser import DescriptionParser
 

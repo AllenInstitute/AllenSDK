@@ -1,7 +1,8 @@
-import pytest
 import pandas as pd
+import pytest
+
 from allensdk.brain_observatory.behavior import criteria
-from allensdk.core.exceptions import DataFrameKeyError, DataFrameIndexError
+from allensdk.core.exceptions import DataFrameIndexError, DataFrameKeyError
 
 
 @pytest.mark.parametrize(

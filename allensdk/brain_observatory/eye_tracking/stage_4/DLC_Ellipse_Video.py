@@ -1,21 +1,21 @@
 import time
-t0 = time.time()
-import os
 
-from matplotlib.patches import Ellipse
-import matplotlib.pyplot as plt
-from moviepy.video.io.bindings import mplfig_to_npimage
-from moviepy.editor import *
-import numpy as np
-import collections
-import pandas as pd
-import sys
-import re
+t0 = time.time()
 import argparse
+import collections
 import logging
+import os
+import re
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from ellipses import LSqEllipse
 from google.cloud import storage
-
+from matplotlib.patches import Ellipse
+from moviepy.editor import *
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

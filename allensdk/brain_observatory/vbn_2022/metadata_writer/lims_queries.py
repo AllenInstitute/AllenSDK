@@ -1,49 +1,31 @@
-from typing import List, Tuple, Dict, Any, Optional
-import pandas as pd
-import numpy as np
 import logging
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.image_presentation_utils import \
+    get_image_set
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (
+    get_prior_exposures_to_image_set, get_prior_exposures_to_session_type)
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import (
+    _add_age_in_days, _add_experience_level, _add_images_from_behavior,
+    _add_prior_omissions, _add_session_number,
+    _patch_date_and_stage_from_pickle_file, remove_aborted_sessions,
+    remove_pretest_sessions)
+from allensdk.core.dataframe_utils import patch_df_from_other
 from allensdk.internal.api import PostgresQueryMixin
-
-from allensdk.internal.api.queries.utils import (
-    _sanitize_uuid_list,
-    build_in_list_selector_query)
-
-from allensdk.internal.api.queries.ecephys_lims_queries import (
-    donor_id_lookup_from_ecephys_session_ids)
-
-from allensdk.internal.api.queries.behavior_lims_queries import (
-    foraging_id_map_from_behavior_session_id)
-
-from allensdk.internal.api.queries.compound_lims_queries import (
-    behavior_sessions_from_ecephys_session_ids)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
-
-from allensdk.core.dataframe_utils import (
-    patch_df_from_other)
-
-from allensdk.brain_observatory.vbn_2022. \
-    metadata_writer.dataframe_manipulations import (
-        _add_prior_omissions,
-        _add_session_number,
-        _add_age_in_days,
-        _patch_date_and_stage_from_pickle_file,
-        _add_experience_level,
-        _add_images_from_behavior,
-        remove_aborted_sessions,
-        remove_pretest_sessions)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.prior_exposure_processing import (
-        get_prior_exposures_to_image_set,
-        get_prior_exposures_to_session_type)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.image_presentation_utils import (
-        get_image_set)
+from allensdk.internal.api.queries.behavior_lims_queries import \
+    foraging_id_map_from_behavior_session_id
+from allensdk.internal.api.queries.compound_lims_queries import \
+    behavior_sessions_from_ecephys_session_ids
+from allensdk.internal.api.queries.ecephys_lims_queries import \
+    donor_id_lookup_from_ecephys_session_ids
+from allensdk.internal.api.queries.mtrain_queries import \
+    session_stage_from_foraging_id
+from allensdk.internal.api.queries.utils import (_sanitize_uuid_list,
+                                                 build_in_list_selector_query)
 
 
 def get_list_of_bad_probe_ids(

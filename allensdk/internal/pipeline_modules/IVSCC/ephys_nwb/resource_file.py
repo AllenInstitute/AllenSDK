@@ -1,6 +1,8 @@
-import sys
 import string
+import sys
+
 from six import iteritems
+
 
 class ResourceFile(object):
     def __init__(self):

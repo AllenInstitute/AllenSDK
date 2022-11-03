@@ -1,18 +1,16 @@
-import logging
-import subprocess as sp
-import shutil
-import warnings
 import copy as cp
+import logging
+import shutil
+import subprocess as sp
+import warnings
 from pathlib import Path
 
 import argschema
 
 from allensdk.config.manifest import Manifest
-from ._schemas import (
-    SessionUploadInputSchema,
-    SessionUploadOutputSchema,
-    available_hashers
-)
+
+from ._schemas import (SessionUploadInputSchema, SessionUploadOutputSchema,
+                       available_hashers)
 
 
 def hash_file(path, hasher_cls, blocks_per_chunk=128):

@@ -1,12 +1,10 @@
 import os
 
 import mock
-import requests
 import pytest
+import requests
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import (
-    http_engine
-)
+from allensdk.brain_observatory.ecephys.ecephys_project_api import http_engine
 
 
 class MockResponse:

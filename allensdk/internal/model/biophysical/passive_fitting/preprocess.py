@@ -1,7 +1,9 @@
-import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 import logging
+
 import numpy as np
 import pandas as pd
+
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 
 _passive_fit_log = logging.getLogger(
     'allensdk.model.biophysical.passive_fitting.preprocess')

@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Union, Any
+from typing import Any, Union
 
 from allensdk.internal.api import PostgresQueryMixin
-
 from allensdk.internal.core import DataFile
 
 

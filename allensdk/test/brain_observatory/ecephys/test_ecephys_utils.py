@@ -1,7 +1,7 @@
-import pytest
 import numpy as np
-from allensdk.brain_observatory.ecephys.utils import (
-    strip_substructure_acronym)
+import pytest
+
+from allensdk.brain_observatory.ecephys.utils import strip_substructure_acronym
 
 
 def test_strip_substructure_acronym():

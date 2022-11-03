@@ -1,8 +1,8 @@
+import copy
 import tempfile
 from pathlib import Path
 
 import pytest
-import copy
 
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession

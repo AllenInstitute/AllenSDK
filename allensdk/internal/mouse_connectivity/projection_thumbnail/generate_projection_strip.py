@@ -1,15 +1,15 @@
 import functools
 import logging
-from six.moves import xrange
 
 import numpy as np
 import SimpleITK as sitk
 from scipy.ndimage.interpolation import zoom
+from six.moves import xrange
 
+from . import visualization_utilities as vis
 from .image_sheet import ImageSheet
 from .projection_functions import max_projection
 from .volume_projector import VolumeProjector
-from . import visualization_utilities as vis
 
 
 def max_cb(max_sheet, depth_sheet, volume, axis, *a, **k):

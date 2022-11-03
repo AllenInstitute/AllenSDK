@@ -1,13 +1,11 @@
 import functools
-from pathlib import Path
-import warnings
-import os
 import logging
-
-from typing import overload, Callable, Any, Union, Optional, TypeVar
+import os
+import warnings
+from pathlib import Path
+from typing import Any, Callable, Optional, TypeVar, Union, overload
 
 from allensdk.config.manifest import Manifest
-
 
 P = TypeVar("P")
 Q = TypeVar("Q")

@@ -2,16 +2,14 @@ import inspect
 import logging
 import warnings
 from collections import Callable
-
 from itertools import zip_longest
-from typing import Any, Dict, List, Optional, Set, Iterable
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.comparison_utils import compare_fields
 from allensdk.core import DataObject
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

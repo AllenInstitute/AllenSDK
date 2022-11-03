@@ -1,7 +1,6 @@
-import pytest
-
 import numpy as np
 import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.gaze_mapping import _gaze_mapper as gm
 

@@ -1,15 +1,14 @@
 import os
 
 import mock
-import pytest
 import nrrd
 import numpy as np
 import pandas as pd
+import pytest
 
 from allensdk.core import json_utilities
-
-from allensdk.internal.core.mouse_connectivity_cache_prerelease \
-        import MouseConnectivityCachePrerelease
+from allensdk.internal.core.mouse_connectivity_cache_prerelease import \
+    MouseConnectivityCachePrerelease
 
 
 @pytest.fixture(scope='function')

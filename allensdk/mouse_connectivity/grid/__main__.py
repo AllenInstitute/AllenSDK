@@ -8,6 +8,7 @@ import requests
 
 from allensdk.brain_observatory.argschema_utilities import \
     write_or_print_outputs
+
 from . import cases
 from ._schemas import InputParameters, OutputParameters
 from .image_series_gridder import ImageSeriesGridder

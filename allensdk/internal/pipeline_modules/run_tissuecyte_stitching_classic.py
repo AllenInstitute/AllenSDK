@@ -1,25 +1,25 @@
-import sys
 import argparse
 import logging
 import os
-
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+import sys
 from xml.dom import minidom
+from xml.etree.ElementTree import Comment, Element, SubElement, tostring
 
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
 from six import iteritems
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
-from allensdk.internal.mouse_connectivity.tissuecyte_stitching.stitcher import Stitcher
-from allensdk.internal.mouse_connectivity.tissuecyte_stitching.tile import Tile
 import allensdk.core.json_utilities as ju
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
+from allensdk.internal.mouse_connectivity.tissuecyte_stitching.stitcher import \
+    Stitcher
+from allensdk.internal.mouse_connectivity.tissuecyte_stitching.tile import Tile
 
 # TODO this ought to be installed with the actual python build? 
 # need to consult with sysadmins/refactor jp2 project build
 sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
 import jpeg_twok
-
 
 logging.getLogger().setLevel(logging.INFO)
 logging.captureWarnings(True)

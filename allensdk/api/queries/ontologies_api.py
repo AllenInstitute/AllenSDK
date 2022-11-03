@@ -33,10 +33,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable
-
 from allensdk.core.structure_tree import StructureTree
+
+from .rma_template import RmaTemplate
 
 
 class OntologiesApi(RmaTemplate):

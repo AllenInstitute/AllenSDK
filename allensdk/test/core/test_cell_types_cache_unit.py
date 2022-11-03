@@ -33,18 +33,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import allensdk.core.cell_types_cache as CTC
-from allensdk.core.cell_types_cache import ReporterStatus as RS
-import pytest
-from pandas.core.frame import DataFrame
-from allensdk.config import enable_console_log
-from mock import MagicMock, patch, call, mock_open
-from six.moves import builtins
 import itertools as it
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
-import pandas as pd
 import os
+
+import pandas as pd
+import pandas.io.json as pj
+import pytest
+from mock import MagicMock, call, mock_open, patch
+from pandas.core.frame import DataFrame
+from six.moves import builtins
+
+import allensdk.core.cell_types_cache as CTC
+import allensdk.core.json_utilities as ju
+from allensdk.config import enable_console_log
+from allensdk.core.cell_types_cache import ReporterStatus as RS
 
 _MOCK_PATH = '/path/to/xyz.txt'
 

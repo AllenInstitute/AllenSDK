@@ -1,8 +1,8 @@
-import logging
 import argparse
-import subprocess
-import os
 import errno
+import logging
+import os
+import subprocess
 
 import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import Manifest

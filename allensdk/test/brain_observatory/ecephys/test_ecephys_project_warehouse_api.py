@@ -1,6 +1,8 @@
 import pytest
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import ecephys_project_warehouse_api as epwa
+from allensdk.brain_observatory.ecephys.ecephys_project_api import \
+    ecephys_project_warehouse_api as epwa
+
 
 @pytest.mark.skipif(True, reason="broken test")
 @pytest.mark.parametrize(

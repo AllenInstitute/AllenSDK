@@ -1,12 +1,12 @@
+import json
 from pathlib import Path
 from typing import Tuple
-import json
 
 import pandas as pd
 import pytest
 
-from allensdk.api.cloud_cache.utils import file_hash_from_path
 from allensdk.api.cloud_cache.cloud_cache import StaticLocalCache
+from allensdk.api.cloud_cache.utils import file_hash_from_path
 
 
 @pytest.fixture

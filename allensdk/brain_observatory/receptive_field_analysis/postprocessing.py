@@ -33,12 +33,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .fit_parameters import get_gaussian_fit_single_channel, compute_distance, compute_overlap
-from .chisquarerf import chi_square_binary, get_peak_significance, pvalue_to_NLL
-from .utilities import upsample_image_to_degrees
 import collections
-import numpy as np
 import sys
+
+import numpy as np
+
+from .chisquarerf import (chi_square_binary, get_peak_significance,
+                          pvalue_to_NLL)
+from .fit_parameters import (compute_distance, compute_overlap,
+                             get_gaussian_fit_single_channel)
+from .utilities import upsample_image_to_degrees
+
 
 def get_gaussian_fit(rf):
 

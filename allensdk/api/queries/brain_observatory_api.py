@@ -37,16 +37,16 @@
 import logging
 
 import pandas as pd
+from dateutil.parser import parse as parse_date
 from six import string_types
 
-from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+from allensdk.config.manifest import Manifest
 
-from .rma_template import RmaTemplate
-from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from .rma_pager import pageable
+from .rma_template import RmaTemplate
 
-from dateutil.parser import parse as parse_date
 
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')

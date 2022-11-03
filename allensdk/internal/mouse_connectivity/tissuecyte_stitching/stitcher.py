@@ -1,10 +1,9 @@
 import logging
 import operator as op
 from collections import defaultdict
-from six.moves import reduce
 
 import numpy as np
-
+from six.moves import reduce
 
 
 class Stitcher(object):

@@ -1,6 +1,7 @@
-import SimpleITK as sitk
-import numpy as np
 from typing import NamedTuple
+
+import numpy as np
+import SimpleITK as sitk
 
 
 class Image(NamedTuple):

@@ -33,12 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
-import pytest
-from mock import patch, Mock
 import itertools as it
+import os
+
 import numpy as np
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
+import pytest
+from mock import Mock, patch
+
+from allensdk.api.queries.mouse_connectivity_api import \
+    MouseConnectivityApi as MCA
 
 MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'

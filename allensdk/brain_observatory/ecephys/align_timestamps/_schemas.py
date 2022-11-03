@@ -1,6 +1,6 @@
 from argschema import ArgSchema
+from argschema.fields import Dict, Float, Int, List, Nested, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, String, Float, Dict, Int, List
 
 
 class ProbeMappable(DefaultSchema):

@@ -1,6 +1,8 @@
-import pytest
 import numpy as np
+import pytest
+
 from allensdk.internal.brain_observatory import eye_calibration
+
 
 def cr_params():
     x, y = np.meshgrid(np.array([300, 320, 340]),

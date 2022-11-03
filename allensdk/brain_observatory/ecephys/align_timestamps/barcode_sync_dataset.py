@@ -2,10 +2,10 @@ import warnings
 
 import numpy as np
 
+from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import \
+    EcephysSyncDataset
+
 from . import barcode
-from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (
-    EcephysSyncDataset,
-)
 
 
 class BarcodeSyncDataset(EcephysSyncDataset):

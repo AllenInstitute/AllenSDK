@@ -1,10 +1,12 @@
 import logging
+import logging.config as lc
 import os
+import shutil
 import sys
 import traceback
-import logging.config as lc
-import shutil
-from pkg_resources import resource_filename #@UnresolvedImport
+
+from pkg_resources import resource_filename  # @UnresolvedImport
+
 from allensdk.model.biophysical.run_simulate import RunSimulate
 
 
@@ -26,8 +28,11 @@ class RunSimulateLims(RunSimulate):
         Other necessary files are also written.
         '''
         import json
-        from allensdk.internal.api.queries.biophysical_module_api import BiophysicalModuleApi
-        from allensdk.internal.api.queries.biophysical_module_reader import BiophysicalModuleReader
+
+        from allensdk.internal.api.queries.biophysical_module_api import \
+            BiophysicalModuleApi
+        from allensdk.internal.api.queries.biophysical_module_reader import \
+            BiophysicalModuleReader
 
         bma = BiophysicalModuleApi(api_url)
         data = bma.get_neuronal_model_runs(neuronal_model_run_id)
@@ -48,7 +53,8 @@ class RunSimulateLims(RunSimulate):
         ----
         Other necessary files are also written.
         '''
-        from allensdk.internal.api.queries.biophysical_module_reader import BiophysicalModuleReader
+        from allensdk.internal.api.queries.biophysical_module_reader import \
+            BiophysicalModuleReader
 
         self.lims_json = lims_data_path
 

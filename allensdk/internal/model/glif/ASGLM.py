@@ -1,9 +1,12 @@
-import numpy as np
 import itertools
-import allensdk.internal.model.GLM as GLM
 import logging
-import statsmodels.api as sm
+
 import matplotlib.pyplot as plt
+import numpy as np
+import statsmodels.api as sm
+
+import allensdk.internal.model.GLM as GLM
+
 
 def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, resting_potential, 
                    SHORT_RUN=False, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False):

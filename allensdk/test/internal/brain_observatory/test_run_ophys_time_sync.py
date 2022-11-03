@@ -3,18 +3,17 @@ ophys experiment. For tests of the logic used by this executable, see
 test_time_sync
 """
 
-import os
 import json
+import os
 from typing import NamedTuple
 
-import pytest
-import numpy as np
 import h5py
+import numpy as np
+import pytest
 
 import allensdk
 from allensdk.internal.pipeline_modules.run_ophys_time_sync import (
-    TimeSyncOutputs, TimeSyncWriter, check_stimulus_delay, run_ophys_time_sync
-)
+    TimeSyncOutputs, TimeSyncWriter, check_stimulus_delay, run_ophys_time_sync)
 
 
 @pytest.fixture

@@ -1,16 +1,16 @@
-import sys
+import itertools
 import os
+import sys
+from importlib import reload
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-import itertools
 
 from allensdk.brain_observatory.behavior.swdb import \
     behavior_project_cache as bpc
-from importlib import reload
-
-from allensdk.brain_observatory.behavior.swdb.analysis_tools import \
-    get_trace_around_timepoint, get_mean_in_window
+from allensdk.brain_observatory.behavior.swdb.analysis_tools import (
+    get_mean_in_window, get_trace_around_timepoint)
 
 reload(bpc)
 

@@ -1,7 +1,7 @@
-from typing import Union, Any
-import pickle
 import gzip
 import pathlib
+import pickle
+from typing import Any, Union
 
 
 def load_and_sanitize_pickle(

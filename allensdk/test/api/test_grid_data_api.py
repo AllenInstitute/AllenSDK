@@ -35,6 +35,7 @@
 #
 import pytest
 from mock import MagicMock, patch
+
 from allensdk.api.queries.grid_data_api import GridDataApi
 
 

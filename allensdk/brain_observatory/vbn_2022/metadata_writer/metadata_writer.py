@@ -1,40 +1,26 @@
-import argschema
 import pathlib
 import time
+
+import argschema
 import pandas as pd
 
 import allensdk
-
-from allensdk.core.dataframe_utils import (
-    patch_df_from_other)
-
-from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
-    VBN2022MetadataWriterInputSchema,
-    DataReleaseToolsInputSchema)
-
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.id_generator import (
-        FileIDGenerator)
-
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.utils import (
-        add_file_paths_to_metadata_table)
-
+from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import \
+    FileIDGenerator
+from allensdk.brain_observatory.data_release_utils.metadata_utils.utils import \
+    add_file_paths_to_metadata_table
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import \
+    strip_substructure_acronym_df
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
-    get_list_of_bad_probe_ids,
-    units_table_from_ecephys_session_id_list,
+    channels_table_from_ecephys_session_id_list, get_list_of_bad_probe_ids,
     probes_table_from_ecephys_session_id_list,
-    channels_table_from_ecephys_session_id_list,
-    session_tables_from_ecephys_session_id_list)
-
-from allensdk.brain_observatory.vbn_2022.\
-    metadata_writer.dataframe_manipulations import (
-        strip_substructure_acronym_df)
-
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP,
-    MTRAIN_DB_CREDENTIAL_MAP)
-
+    session_tables_from_ecephys_session_id_list,
+    units_table_from_ecephys_session_id_list)
+from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
+    DataReleaseToolsInputSchema, VBN2022MetadataWriterInputSchema)
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
+from allensdk.core.dataframe_utils import patch_df_from_other
 from allensdk.internal.api import db_connection_creator
 
 

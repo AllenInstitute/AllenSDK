@@ -33,14 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from scipy.ndimage.filters import gaussian_filter
-import numpy as np
-import scipy.interpolate as spinterp
-from .tools import dict_generator
-from allensdk.api.warehouse_cache.cache import memoize
 import os
 import warnings
+
+import numpy as np
+import scipy.interpolate as spinterp
+from scipy.ndimage.filters import gaussian_filter
 from skimage.measure import block_reduce
+
+from allensdk.api.warehouse_cache.cache import memoize
+
+from .tools import dict_generator
+
 
 def upsample_image_to_degrees(img):
 

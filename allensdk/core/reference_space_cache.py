@@ -33,15 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.warehouse_cache.cache import Cache
-from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
+from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
+from allensdk.api.warehouse_cache.cache import Cache
+from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.deprecated import deprecated
 
 from .ontology import Ontology
-from .structure_tree import StructureTree
 from .reference_space import ReferenceSpace
+from .structure_tree import StructureTree
 
 
 class ReferenceSpaceCache(Cache):

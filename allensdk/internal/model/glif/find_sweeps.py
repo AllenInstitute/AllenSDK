@@ -1,10 +1,13 @@
-import json, sys, os
-import logging
 import argparse
+import json
+import logging
+import os
+import sys
+
 from six import iteritems
 from six.moves import xrange
-import allensdk.core.json_utilities as ju
 
+import allensdk.core.json_utilities as ju
 
 SHORT_SQUARE = 'Short Square'
 SHORT_SQUARE_60 = 'Short Square - Hold -60mv'

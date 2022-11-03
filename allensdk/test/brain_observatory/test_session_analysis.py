@@ -33,13 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-from mock import patch
-from allensdk.core.brain_observatory_nwb_data_set import \
-    BrainObservatoryNwbDataSet
-from allensdk.brain_observatory.session_analysis import SessionAnalysis
 import os
 
+import pytest
+from mock import patch
+
+from allensdk.brain_observatory.session_analysis import SessionAnalysis
+from allensdk.core.brain_observatory_nwb_data_set import \
+    BrainObservatoryNwbDataSet
 
 _orig_get_stimulus_table = BrainObservatoryNwbDataSet.get_stimulus_table
 

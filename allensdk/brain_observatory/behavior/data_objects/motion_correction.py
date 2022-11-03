@@ -1,14 +1,10 @@
 import pandas as pd
 from pynwb import NWBFile, TimeSeries
 
-from allensdk.brain_observatory.behavior.data_files\
-    .rigid_motion_transform_file import \
+from allensdk.brain_observatory.behavior.data_files.rigid_motion_transform_file import \
     RigidMotionTransformFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
+from allensdk.core import (DataFileReadableInterface, DataObject,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class MotionCorrection(DataObject, DataFileReadableInterface,

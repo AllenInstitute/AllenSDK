@@ -1,7 +1,8 @@
 import numpy as np
-from allensdk.ephys.feature_extractor import EphysFeatureExtractor
+
 import allensdk.ephys.ephys_extractor as efex
 import allensdk.ephys.ephys_features as ft
+from allensdk.ephys.feature_extractor import EphysFeatureExtractor
 
 ALIGN_CUT_WINDOW = np.array([ 0.002, 0.015 ])
 

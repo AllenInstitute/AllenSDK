@@ -1,5 +1,6 @@
-import h5py
 import math
+
+import h5py
 
 
 class LabNotebookReader(object):

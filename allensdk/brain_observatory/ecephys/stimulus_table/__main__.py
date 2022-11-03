@@ -2,18 +2,14 @@ import functools
 
 import numpy as np
 
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
-from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (
-    EcephysSyncDataset,
-)
-from allensdk.brain_observatory.ecephys.file_io.stim_file import (
-    CamStimOnePickleStimFile,
-)
-from . import ephys_pre_spikes
-from . import naming_utilities
-from . import output_validation
+from allensdk.brain_observatory.argschema_utilities import (
+    ArgSchemaParserPlus, write_or_print_outputs)
+from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import \
+    EcephysSyncDataset
+from allensdk.brain_observatory.ecephys.file_io.stim_file import \
+    CamStimOnePickleStimFile
+
+from . import ephys_pre_spikes, naming_utilities, output_validation
 from ._schemas import InputParameters, OutputSchema
 
 

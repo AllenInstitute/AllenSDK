@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import allensdk.brain_observatory.dff as dff
+from functools import partial
+
 import numpy as np
 import pytest
-from functools import partial
 from matplotlib.pyplot import Figure
-from mock import patch, MagicMock
+from mock import MagicMock, patch
+
+import allensdk.brain_observatory.dff as dff
 
 
 def test_movingmode_fast():

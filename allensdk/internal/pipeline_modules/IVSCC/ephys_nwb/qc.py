@@ -1,20 +1,21 @@
 #!/usr/bin/python
+import argparse
+import copy
+import json
 import logging
-import sys
 import math
 import os
 import re
-import copy
-import json
-import numpy as np
-import argparse
+import sys
+
 import h5py
+import numpy as np
 from six import iteritems
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
-    
+
 def main(jin):
     # load QC criteria and sweep table from input json file
     try:

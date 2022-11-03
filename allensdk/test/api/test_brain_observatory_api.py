@@ -33,18 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
-import pytest
-from mock import patch, MagicMock, call
-from collections import Counter
 import datetime
-from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
-                                                        find_container_tags,
-                                                        find_specimen_cre_line,
-                                                        find_specimen_reporter_line,
-                                                        find_experiment_acquisition_age)
-from . import SafeJsonMsg
+import os
+from collections import Counter
 
+import pytest
+from mock import MagicMock, call, patch
+
+from allensdk.api.queries.brain_observatory_api import (
+    BrainObservatoryApi, find_container_tags, find_experiment_acquisition_age,
+    find_specimen_cre_line, find_specimen_reporter_line)
+
+from . import SafeJsonMsg
 
 _rows_per_message = 2000
 _msg = [{'whatever': True}] * _rows_per_message

@@ -36,6 +36,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+
 import allensdk.brain_observatory.roi_masks as roi_masks
 
 

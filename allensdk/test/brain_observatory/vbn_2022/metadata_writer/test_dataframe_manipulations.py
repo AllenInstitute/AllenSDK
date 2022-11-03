@@ -1,22 +1,16 @@
-import pytest
-import mock
-import pandas as pd
-import datetime
-import numpy as np
 import copy
+import datetime
 
-from allensdk.brain_observatory.vbn_2022.metadata_writer \
-    .dataframe_manipulations import (
-        _add_session_number,
-        _add_experience_level,
-        _patch_date_and_stage_from_pickle_file,
-        _add_age_in_days,
-        _add_images_from_behavior,
-        remove_aborted_sessions,
-        _get_session_duration_from_behavior_session_ids,
-        remove_pretest_sessions,
-        strip_substructure_acronym_df)
+import mock
+import numpy as np
+import pandas as pd
+import pytest
 
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import (
+    _add_age_in_days, _add_experience_level, _add_images_from_behavior,
+    _add_session_number, _get_session_duration_from_behavior_session_ids,
+    _patch_date_and_stage_from_pickle_file, remove_aborted_sessions,
+    remove_pretest_sessions, strip_substructure_acronym_df)
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 

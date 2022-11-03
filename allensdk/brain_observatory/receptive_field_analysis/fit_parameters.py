@@ -33,12 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .fitgaussian2D import fitgaussian2D, GaussianFitError, gaussian2D
-import numpy as np
-import pandas as pd
 import collections
 import sys
 import warnings
+
+import numpy as np
+import pandas as pd
+
+from .fitgaussian2D import GaussianFitError, fitgaussian2D, gaussian2D
+
 
 def add_to_fit_parameters_dict_single(fit_parameters_dict, p):
 

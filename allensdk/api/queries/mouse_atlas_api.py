@@ -34,13 +34,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from allensdk.core import sitk_utilities
 from allensdk.api.warehouse_cache.cache import Cache, cacheable
+from allensdk.core import sitk_utilities
 
-from .reference_space_api import ReferenceSpaceApi
 from .grid_data_api import GridDataApi
+from .reference_space_api import ReferenceSpaceApi
 from .rma_pager import pageable
-
 
 
 class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):

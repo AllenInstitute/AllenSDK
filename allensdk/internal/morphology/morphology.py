@@ -15,9 +15,11 @@
 
 import copy
 import math
+
 import numpy as np
-from allensdk.internal.morphology.node import Node
+
 from allensdk.internal.morphology.compartment import Compartment
+from allensdk.internal.morphology.node import Node
 
 
 class Morphology( object ):

@@ -1,11 +1,11 @@
 import argschema.fields
-from argschema import ArgSchema
-from argschema.fields import (LogLevel, String, Int, Nested, List)
 import marshmallow as mm
 import pandas as pd
+from argschema import ArgSchema
+from argschema.fields import Int, List, LogLevel, Nested, String
 
 from allensdk.brain_observatory.argschema_utilities import (
-    check_write_access_overwrite, RaisingSchema)
+    RaisingSchema, check_write_access_overwrite)
 
 
 class BaseBehaviorSessionDataSchema(RaisingSchema):

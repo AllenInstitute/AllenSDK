@@ -1,27 +1,25 @@
-from typing import Optional, List, Union
 from pathlib import Path
+from typing import List, Optional, Union
+
 import pandas as pd
 
 from allensdk.api.warehouse_cache.cache import Cache
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-    BehaviorOphysExperiment
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .experiments_table import \
-    ExperimentsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .sessions_table import \
-    SessionsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
-    BehaviorProjectLimsApi, BehaviorProjectCloudApi)
 from allensdk.api.warehouse_cache.caching_utilities import \
     one_file_call_caching
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .ophys_sessions_table import \
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
+    BehaviorProjectCloudApi, BehaviorProjectLimsApi)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_cache_base import \
+    ProjectCacheBase
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.experiments_table import \
+    ExperimentsTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_sessions_table import \
     BehaviorOphysSessionsTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.sessions_table import \
+    SessionsTable
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .project_cache_base import ProjectCacheBase
 
 
 class VBOLimsCache(Cache):

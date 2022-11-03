@@ -33,17 +33,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
-from allensdk.brain_observatory.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.static_gratings import StaticGratings
-from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-from allensdk.brain_observatory.r_neuropil import estimate_contamination_ratios
-import allensdk.brain_observatory.stimulus_info as stim_info
+import os
+
 import numpy as np
 import pandas as pd
 import pytest
-import os
+
+import allensdk.brain_observatory.stimulus_info as stim_info
+from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.r_neuropil import estimate_contamination_ratios
+from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 
 
 @pytest.fixture

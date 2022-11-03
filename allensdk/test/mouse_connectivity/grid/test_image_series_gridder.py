@@ -1,11 +1,11 @@
-import pytest
 import mock
+import numpy as np
+import pytest
+import SimpleITK as sitk
 from six.moves import range
 
-import numpy as np
-import SimpleITK as sitk
-
-from allensdk.mouse_connectivity.grid.image_series_gridder import ImageSeriesGridder
+from allensdk.mouse_connectivity.grid.image_series_gridder import \
+    ImageSeriesGridder
 
 
 def small_gridder():

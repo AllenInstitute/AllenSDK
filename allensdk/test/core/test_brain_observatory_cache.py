@@ -33,14 +33,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-import os
-import numpy as np
-from mock import call, patch, mock_open, MagicMock
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
-from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json
+import os
+
+import numpy as np
+import pytest
+from mock import MagicMock, call, mock_open, patch
+
 import allensdk.brain_observatory.stimulus_info as si
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.test_utilities.regression_fixture import get_list_of_path_dict
 
 try:

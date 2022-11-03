@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def measure_vm(seg):
     vals = np.copy(seg)
     if len(vals) < 1:

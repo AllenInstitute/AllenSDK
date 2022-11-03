@@ -1,28 +1,24 @@
 import json
 from datetime import datetime
 from pathlib import Path
-import numpy as np
-import pynwb
-import pandas as pd
 
+import numpy as np
+import pandas as pd
+import pynwb
 import pytest
 
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.\
-    cell_specimens import CellSpecimens, CellSpecimenMeta, EventsParams
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.cell_specimens import (
+    CellSpecimenMeta, CellSpecimens, EventsParams)
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import \
     RoisMixin
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_plane import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import \
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import \
     OphysTimestamps
+from allensdk.core import DataObject
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata\
-    .test_behavior_ophys_metadata import \
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.test_behavior_ophys_metadata import \
     TestBOM
 
 

@@ -1,25 +1,18 @@
-from typing import Tuple
-from pathlib import Path
-import tempfile
-import pickle
 import datetime
+import pickle
+import tempfile
+from pathlib import Path
+from typing import Tuple
 from unittest.mock import create_autospec
 
 import pytest
 
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile,
-    ReplayStimulusFile,
-    MappingStimulusFile)
-
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile)
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    StimulusFileLookup,
+    BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE, StimulusFileLookup,
     stimulus_lookup_from_json)
-
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE
-)
+from allensdk.internal.api import PostgresQueryMixin
 
 
 @pytest.fixture

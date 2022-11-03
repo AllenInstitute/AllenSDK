@@ -1,10 +1,10 @@
-import pandas as pd
 import pathlib
 import warnings
 
-from allensdk.brain_observatory.data_release_utils \
-    .metadata_utils.id_generator import (
-        FileIDGenerator)
+import pandas as pd
+
+from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import \
+    FileIDGenerator
 
 
 def add_file_paths_to_metadata_table(

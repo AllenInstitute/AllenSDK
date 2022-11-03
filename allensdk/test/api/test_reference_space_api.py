@@ -33,11 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
-import pytest
-from mock import patch, MagicMock
 import itertools as it
+import os
+
 import numpy as np
+import pytest
+from mock import MagicMock, patch
+
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi as RSA
 
 

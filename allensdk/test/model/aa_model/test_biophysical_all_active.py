@@ -33,15 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 import os
+import subprocess
+
 import numpy
-from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical.utils import Utils, AllActiveUtils
+import pytest
+
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 from allensdk.core.dat_utilities import DatUtilities
 from allensdk.ephys import ephys_features
-import subprocess
+from allensdk.model.biophys_sim.config import Config
+from allensdk.model.biophysical.utils import AllActiveUtils, Utils
+
 
 @pytest.mark.requires_neuron
 def test_biophysical_aa():

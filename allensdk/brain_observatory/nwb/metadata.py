@@ -1,8 +1,9 @@
 import os
 
-from marshmallow import fields
 import pynwb
-from pynwb.spec import NWBNamespaceBuilder, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec
+from marshmallow import fields
+from pynwb.spec import (NWBAttributeSpec, NWBDatasetSpec, NWBGroupSpec,
+                        NWBNamespaceBuilder)
 
 from allensdk.brain_observatory.behavior.schemas import STYPE_DICT, TYPE_DICT
 

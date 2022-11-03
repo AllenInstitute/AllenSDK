@@ -1,7 +1,7 @@
 import pytest
 
-from allensdk.internal.brain_observatory.roi_filter_utils import (
-        get_indices_by_distance)
+from allensdk.internal.brain_observatory.roi_filter_utils import \
+    get_indices_by_distance
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,12 @@
 import logging
-import numpy as np
-import h5py
+import os
 
+import h5py
 #import matplotlib
 #matplotlib.use('agg')
 import matplotlib.pyplot as plt
-import os
+import numpy as np
+
 
 def background_trace(trace, save_dir, data_set=None):
 

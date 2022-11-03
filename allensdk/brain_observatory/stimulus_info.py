@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import six
+import itertools
+
 import numpy as np
 import scipy.ndimage.interpolation as spndi
+import six
 from PIL import Image
+
 from allensdk.api.warehouse_cache.cache import memoize
-import itertools
 
 # some handles for stimulus types
 DRIFTING_GRATINGS = 'drifting_gratings'

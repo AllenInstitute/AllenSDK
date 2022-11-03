@@ -1,10 +1,13 @@
+import json
+from io import IOBase
+
+import pytest
+from mock import MagicMock, mock_open, patch
+from six import StringIO
+
 from allensdk.internal.api.queries.biophysical_module_reader import \
     BiophysicalModuleReader
-import pytest
-from mock import patch, mock_open, MagicMock
-from six import StringIO
-from io import IOBase
-import json
+
 try:
     import __builtin__ as builtins
 except:

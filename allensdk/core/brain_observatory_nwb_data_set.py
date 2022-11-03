@@ -34,29 +34,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import functools
-import dateutil
-import re
-import os
-import six
 import itertools
 import logging
+import os
+import re
+
+import dateutil
+import h5py
+import numpy as np
+import pandas as pd
+import six
 from pkg_resources import parse_version
 
-import h5py
-import pandas as pd
-import numpy as np
-
 import allensdk.brain_observatory.roi_masks as roi
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import allensdk.brain_observatory.stimulus_info as si
-
-from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
-                                                                     NoEyeTrackingException)
 from allensdk.api.warehouse_cache.cache import memoize
-from allensdk.core import h5_utilities 
-
-from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template
-from allensdk.brain_observatory.brain_observatory_exceptions import EpochSeparationException
+from allensdk.brain_observatory.brain_observatory_exceptions import (
+    EpochSeparationException, MissingStimulusException, NoEyeTrackingException)
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.stimulus_info import \
+    mask_stimulus_template as si_mask_stimulus_template
+from allensdk.core import h5_utilities
 
 _STIMULUS_PRESENTATION_PATH = 'stimulus/presentation'
 _STIMULUS_PRESENTATION_PATTERNS = ('{}', '{}_stimulus',)

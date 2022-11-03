@@ -33,20 +33,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
 import os
+import warnings
+
+import pandas as pd
 from six import string_types
 
-from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.cell_types_api import CellTypesApi
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
+from allensdk.config.manifest_builder import ManifestBuilder
 
 from . import json_utilities as json_utilities
+from . import swc
 from .nwb_data_set import NwbDataSet
-from . import  swc
-
-import logging
-import warnings
-import pandas as pd
 
 
 class CellTypesCache(Cache):

@@ -1,12 +1,12 @@
 ########################################################################
 # library code
-import math
 import argparse
+import math
 import sys
-import numpy as np
-from scipy.spatial.distance import euclidean
-import skimage.draw
 
+import numpy as np
+import skimage.draw
+from scipy.spatial.distance import euclidean
 
 
 def calculate_centroid(x, y):

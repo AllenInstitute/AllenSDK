@@ -1,14 +1,16 @@
 import pytest
-from mock import patch, mock_open, Mock, MagicMock
+from mock import MagicMock, Mock, mock_open, patch
+
 try:
     import __builtin__ as builtins
 except:
     import builtins
-from allensdk.model.biophysical.utils import Utils
+
+from allensdk.internal.model.biophysical.run_simulate_lims import \
+    RunSimulateLims
 from allensdk.model.biophys_sim.config import Config
-from allensdk.internal.model.biophysical.run_simulate_lims \
-    import RunSimulateLims
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+from allensdk.model.biophysical.utils import Utils
 
 MANIFEST_JSON = '''
 {

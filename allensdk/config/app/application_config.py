@@ -33,13 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.core.json_utilities import JsonComments
 import argparse
-import os
 import io
 import logging
 import logging.config as lc
+import os
+
 from pkg_resources import resource_filename  # @UnresolvedImport
+
+from allensdk.core.json_utilities import JsonComments
 
 try:
     from configparser import ConfigParser  # @UnresolvedImport

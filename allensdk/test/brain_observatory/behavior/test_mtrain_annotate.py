@@ -1,5 +1,5 @@
-import pytest
 import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior.mtrain import annotate_change_detect
 

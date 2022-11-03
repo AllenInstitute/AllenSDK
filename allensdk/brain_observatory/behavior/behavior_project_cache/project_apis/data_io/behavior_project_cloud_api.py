@@ -1,15 +1,16 @@
-import pandas as pd
-from typing import Iterable, List
 import ast
+from typing import Iterable, List
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io.project_cloud_api_base import ProjectCloudApiBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import \
+    BehaviorProjectBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import \
+    ProjectCloudApiBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 
 
 def literal_col_eval(df: pd.DataFrame,

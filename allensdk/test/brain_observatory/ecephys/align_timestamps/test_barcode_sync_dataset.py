@@ -1,11 +1,10 @@
 from unittest import mock
 
-import pytest
 import numpy as np
+import pytest
 
-from allensdk.brain_observatory.ecephys.align_timestamps.barcode_sync_dataset import (
-    BarcodeSyncDataset,
-)
+from allensdk.brain_observatory.ecephys.align_timestamps.barcode_sync_dataset import \
+    BarcodeSyncDataset
 
 
 @pytest.mark.parametrize(

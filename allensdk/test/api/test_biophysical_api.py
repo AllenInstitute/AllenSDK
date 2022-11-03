@@ -1,9 +1,10 @@
-import os
 import json
+import os
 
 import numpy as np
 import pytest
 from mock import patch
+
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 

@@ -1,6 +1,7 @@
 import sys
 from subprocess import call
-from pkg_resources import resource_filename #@UnresolvedImport
+
+from pkg_resources import resource_filename  # @UnresolvedImport
 
 the_script = resource_filename(__name__, 'run_optimize.sh')
 

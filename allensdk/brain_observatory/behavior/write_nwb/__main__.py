@@ -1,16 +1,17 @@
-import os
 import logging
+import os
 import sys
+
 import argschema
 import marshmallow
 from pynwb import NWBHDF5IO
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.brain_observatory.behavior.write_nwb._schemas import (
     InputSchema, OutputSchema)
-from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs)
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 

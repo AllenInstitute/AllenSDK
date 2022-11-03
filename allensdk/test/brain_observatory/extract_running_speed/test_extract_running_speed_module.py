@@ -1,10 +1,11 @@
-import os
-from pathlib import Path
 import json
+import os
 import subprocess as sp
+from pathlib import Path
 
-import pytest
 import pandas as pd
+import pytest
+
 
 @pytest.fixture
 def use_temp_dir(tmpdir_factory):

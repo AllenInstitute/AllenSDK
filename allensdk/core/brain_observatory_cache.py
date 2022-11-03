@@ -34,30 +34,29 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
-import six
-import numpy as np
-import pandas as pd
-
 from pathlib import Path
 
-from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
-from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
-from allensdk.config.manifest_builder import ManifestBuilder
-from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+import numpy as np
+import pandas as pd
+import six
+
 import allensdk.brain_observatory.stimulus_info as stim_info
-
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.natural_movie import NaturalMovie
-from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_movie import NaturalMovie
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.nwb import (create_eye_gaze_mapping_dataframe,
+                                            read_eye_gaze_mappings)
+from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.config.manifest_builder import ManifestBuilder
 
-from allensdk.brain_observatory.nwb import (read_eye_gaze_mappings,
-                                            create_eye_gaze_mapping_dataframe)
-
+from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 # NOTE: This is a really ugly hack to get around the fact that warehouse does
 # not have Ophys session ids associated with experiment ids.
-from .ophys_experiment_session_id_mapping import ophys_experiment_session_id_map
+from .ophys_experiment_session_id_mapping import \
+    ophys_experiment_session_id_map
 
 ANALYSIS_CLASS_DICT = {stim_info.LOCALLY_SPARSE_NOISE: LocallySparseNoise,
                        stim_info.LOCALLY_SPARSE_NOISE_4DEG: LocallySparseNoise,

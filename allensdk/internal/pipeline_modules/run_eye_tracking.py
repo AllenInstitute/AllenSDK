@@ -1,15 +1,19 @@
 import matplotlib
+
 matplotlib.use('agg')
 
 import logging
-import numpy as np
-import os, sys
+import os
+import sys
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
-from allensdk.internal.brain_observatory.run_itracker import (run_itracker, 
-                                                              compute_bounding_box, 
-                                                              DEFAULT_THRESHOLD_FACTOR,
-                                                              get_experiment_info)
+import numpy as np
+
+from allensdk.internal.brain_observatory.run_itracker import (
+    DEFAULT_THRESHOLD_FACTOR, compute_bounding_box, get_experiment_info,
+    run_itracker)
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
+
 
 def debug(experiment_id, num_frames=None, threshold_factor=None, local=False):
     OUTPUT_DIR = "/data/informatics/CAM/eye_tracking/"

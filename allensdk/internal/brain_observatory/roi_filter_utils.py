@@ -1,11 +1,13 @@
-import os
 import json
 import logging
+import os
+
+import numpy as np
+import pandas as pd
 import scipy.ndimage.measurements as measurements
 from scipy.spatial import cKDTree
+
 from allensdk.brain_observatory.roi_masks import create_roi_mask
-import pandas as pd
-import numpy as np
 
 CRITERIA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              "resources",

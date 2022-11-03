@@ -1,6 +1,8 @@
-from allensdk.core.nwb_data_set import NwbDataSet
-from scipy import signal
 import numpy as np
+from scipy import signal
+
+from allensdk.core.nwb_data_set import NwbDataSet
+
 
 def load_sweep(file_name, sweep_number, desired_dt=None, cut=0, bessel=False):
     '''load a data sweep and do specified data processing.

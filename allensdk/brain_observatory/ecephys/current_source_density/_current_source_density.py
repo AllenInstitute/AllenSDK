@@ -1,9 +1,8 @@
 import logging
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
-from typing import Callable, List, Optional, Tuple
 
 from ._interpolation_utils import regular_grid_extractor_factory
 

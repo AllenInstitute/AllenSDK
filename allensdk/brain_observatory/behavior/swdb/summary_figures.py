@@ -1,14 +1,16 @@
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_context('notebook', font_scale=1.5, rc={'lines.markeredgewidth': 2})
 sns.set_style('white')
 sns.set_palette('deep');
 
-from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
+from allensdk.brain_observatory.behavior.swdb import \
+    behavior_project_cache as bpc
 from allensdk.brain_observatory.behavior.swdb import utilities as ut
 
 
@@ -535,7 +537,8 @@ if __name__ == '__main__':
     #     'analysis_files_metadata_path':r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\analysis_files_metadata.json',
     # }
 
-    from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
+    from allensdk.brain_observatory.behavior.swdb import \
+        behavior_project_cache as bpc
 
     cache = bpc.BehaviorProjectCache(cache_json)
     manifest = cache.manifest

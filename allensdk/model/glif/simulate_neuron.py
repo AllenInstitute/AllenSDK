@@ -33,14 +33,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import logging
-import time
 import argparse
+import logging
 import os
+import time
+
 import numpy as np
+
 import allensdk.core.json_utilities as json_utilities
-from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.api.queries.glif_api import GlifApi
+from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV

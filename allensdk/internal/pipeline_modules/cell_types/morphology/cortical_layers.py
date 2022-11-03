@@ -1,13 +1,15 @@
 #!/usr/bin/python
 import json
 import math
+import sys
+
 import cv2
 import numpy as np
-import sys
 import psycopg2
 import psycopg2.extras
-import allensdk.core.json_utilities as json
 from neuron_morphology import swc
+
+import allensdk.core.json_utilities as json
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 #from surrogate_strategy import prep_json

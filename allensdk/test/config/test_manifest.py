@@ -33,10 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 import os
-from allensdk.config.manifest_builder import ManifestBuilder
+
+import pytest
+
 from allensdk.config.manifest import Manifest
+from allensdk.config.manifest_builder import ManifestBuilder
 
 
 @pytest.fixture

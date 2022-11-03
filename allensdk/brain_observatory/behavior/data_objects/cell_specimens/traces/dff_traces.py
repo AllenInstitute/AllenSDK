@@ -1,20 +1,15 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pynwb import NWBFile
 from pynwb.ophys import DfOverF
 
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import \
     RoisMixin
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import \
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import \
     OphysTimestamps
+from allensdk.core import (DataFileReadableInterface, DataObject,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class DFFTraces(DataObject, RoisMixin,

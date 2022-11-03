@@ -7,13 +7,13 @@ import pytest
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
-    Presentations as StimulusPresentations, Presentations
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
+    Presentations
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
+    Presentations as StimulusPresentations
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
-from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.stimuli.templates import \
     Templates
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest

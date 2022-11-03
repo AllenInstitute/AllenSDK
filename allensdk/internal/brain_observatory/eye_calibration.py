@@ -1,5 +1,6 @@
-import numpy as np
 import logging
+
+import numpy as np
 
 MONITOR_POSITION_OLD = np.array([17.0, 0.0, 0.0])
 MONITOR_POSITION_NEW = np.array([11.86, 8.62, 3.16])

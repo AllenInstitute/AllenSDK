@@ -1,6 +1,6 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 import allensdk.brain_observatory.ecephys.ecephys_project_api.rma_engine as rma_engine
 

@@ -1,7 +1,10 @@
-import platform
-import pytest
 import pathlib
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
+import platform
+
+import pytest
+
+from allensdk.api.cloud_cache.file_attributes import \
+    CacheFileAttributes  # noqa: E501
 
 
 def test_cache_file_attributes():

@@ -33,22 +33,26 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-from mock import MagicMock, call, patch, mock_open
-from allensdk.api.queries.rma_pager import RmaPager, pageable
-from allensdk.api.queries.rma_api import RmaApi
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
-import pandas as pd
-from six.moves import builtins
 import os
+
+import pandas as pd
+import pandas.io.json as pj
+import pytest
 import simplejson as json
+from mock import MagicMock, call, mock_open, patch
+from six.moves import builtins
+
+import allensdk.core.json_utilities as ju
+from allensdk.api.queries.rma_api import RmaApi
+from allensdk.api.queries.rma_pager import RmaPager, pageable
 from allensdk.api.queries.rma_template import RmaTemplate
-from allensdk.api.warehouse_cache.cache import cacheable, Cache
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+
 try:
     import StringIO
 except:
     import io as StringIO
+
 from . import SafeJsonMsg
 
 

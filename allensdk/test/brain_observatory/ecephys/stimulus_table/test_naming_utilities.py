@@ -1,8 +1,9 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities as nu
+from allensdk.brain_observatory.ecephys.stimulus_table import \
+    naming_utilities as nu
 
 
 @pytest.mark.parametrize(

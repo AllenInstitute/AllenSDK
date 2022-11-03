@@ -1,7 +1,8 @@
+import json
+import logging
 import os
 import sys
-import logging
-import json
+
 from pkg_resources import resource_filename  # @UnresolvedImport
 
 if 'TEST_SESSION_ANALYSIS_REGRESSION_DATA' in os.environ:

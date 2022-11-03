@@ -1,14 +1,12 @@
 import sys
 
-import pytest
 import mock
-
 import numpy as np
+import pytest
 
 sys.modules['jpeg_twok'] = mock.Mock()
-from allensdk.mouse_connectivity.grid.subimage.base_subimage import SubImage, \
-    SegmentationSubImage, IntensitySubImage, PolygonSubImage
-
+from allensdk.mouse_connectivity.grid.subimage.base_subimage import (
+    IntensitySubImage, PolygonSubImage, SegmentationSubImage, SubImage)
 
 #==============================================================================
 #==============================================================================

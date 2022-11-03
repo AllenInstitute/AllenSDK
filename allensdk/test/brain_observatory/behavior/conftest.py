@@ -1,15 +1,14 @@
+import datetime
 import os
 import sys
 
 import pytest
-
-import datetime
 import pytz
 from pynwb import NWBFile
 
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
 from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
 
 
 def get_resources_dir():

@@ -1,9 +1,11 @@
 import os
+
 import h5py
 import pandas as pd
-from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
-from allensdk.brain_observatory.behavior.swdb import utilities as ut
 
+from allensdk.brain_observatory.behavior.swdb import \
+    behavior_project_cache as bpc
+from allensdk.brain_observatory.behavior.swdb import utilities as ut
 
 cache_json = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
               'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',

@@ -35,11 +35,10 @@
 #
 
 import numpy as np
-
 import pytest
 from mock import MagicMock, mock_open, patch
 
-from allensdk.core.obj_utilities import read_obj, parse_obj
+from allensdk.core.obj_utilities import parse_obj, read_obj
 
 
 @pytest.fixture

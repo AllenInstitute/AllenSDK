@@ -1,9 +1,8 @@
 import pytest
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
-
-from allensdk.test_utilities.custom_comparators import (
-    WhitespaceStrippedString)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    BehaviorProjectLimsApi  # noqa: E501
+from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 
 class MockQueryEngine:

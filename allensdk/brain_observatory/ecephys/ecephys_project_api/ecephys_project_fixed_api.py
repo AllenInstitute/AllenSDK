@@ -1,4 +1,5 @@
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import \
+    EcephysProjectApi
 
 
 class MissingDataError(ValueError):

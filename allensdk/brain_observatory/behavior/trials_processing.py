@@ -1,15 +1,14 @@
 from typing import List
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
     TrialTable
 from allensdk.brain_observatory.behavior.dprime import (
-    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
-    get_trial_count_corrected_hit_rate,
-    get_hit_rate, get_false_alarm_rate)
+    get_false_alarm_rate, get_hit_rate, get_rolling_dprime,
+    get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate)
 
 EDF_COLUMNS = ['index', 'lick_times', 'auto_rewarded', 'cumulative_volume',
                'cumulative_reward_number', 'reward_volume', 'reward_times',

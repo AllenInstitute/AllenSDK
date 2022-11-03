@@ -1,5 +1,5 @@
-import re
 import json
+import re
 from pathlib import Path
 
 from allensdk.api.cloud_cache.cloud_cache import CloudCacheBase

@@ -1,20 +1,21 @@
-import pandas as pd
-import requests
-import os
-import sys
 import itertools
 import json
+import os
+import sys
 import uuid
 
-from . import PostgresQueryMixin, db_connection_creator
+import pandas as pd
+import requests
+
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
 from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
-from allensdk.core.auth_config import MTRAIN_DB_CREDENTIAL_MAP, \
-    LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import credential_injector
-from allensdk.brain_observatory.behavior.data_objects \
-    import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata.\
-    behavior_metadata.behavior_metadata import BehaviorMetadata
+
+from . import PostgresQueryMixin, db_connection_creator
 
 
 class MtrainApi:

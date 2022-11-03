@@ -1,18 +1,16 @@
-import pytest
-import pandas as pd
-from pynwb import NWBHDF5IO, NWBFile
-import tempfile
-import pathlib
-import pytz
 import datetime
+import pathlib
+import tempfile
 
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.running_speed import (
-        RunningSpeed)
+import pandas as pd
+import pytest
+import pytz
+from pynwb import NWBHDF5IO, NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.running_acquisition import (
-        RunningAcquisition)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_acquisition import \
+    RunningAcquisition
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_speed import \
+    RunningSpeed
 
 
 @pytest.mark.parametrize('filtered', [True, False])

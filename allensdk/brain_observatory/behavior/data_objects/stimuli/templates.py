@@ -1,30 +1,24 @@
 import os
-import numpy as np
-from typing import Optional, List
+from typing import List, Optional
 
 import imageio
+import numpy as np
 from pynwb import NWBFile
 from pynwb.image import IndexSeries
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
     Presentations
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimulus_templates import (
+    StimulusTemplate, StimulusTemplateFactory)
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_templates
-from allensdk.brain_observatory.behavior.data_objects.stimuli \
-    .stimulus_templates import \
-    StimulusTemplate, StimulusTemplateFactory
-from allensdk.brain_observatory.behavior.write_nwb.extensions\
-    .stimulus_template.ndx_stimulus_template import \
+from allensdk.brain_observatory.behavior.write_nwb.extensions.stimulus_template.ndx_stimulus_template import \
     StimulusTemplateExtension
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 

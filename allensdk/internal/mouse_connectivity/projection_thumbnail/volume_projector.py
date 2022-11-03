@@ -1,8 +1,8 @@
 import logging
 
+import numpy as np
 import SimpleITK as sitk
 from six.moves import xrange
-import numpy as np
 
 from . import volume_utilities as vol
 

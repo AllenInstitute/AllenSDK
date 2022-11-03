@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from mock import patch, MagicMock
-from pkg_resources import resource_filename  # @UnresolvedImport
-import numpy as np
-from allensdk.core.nwb_data_set import NwbDataSet
-import pytest
 import os
+
+import numpy as np
+import pytest
+from mock import MagicMock, patch
+from pkg_resources import resource_filename  # @UnresolvedImport
+
+from allensdk.core.nwb_data_set import NwbDataSet
 
 NWB_FLAVORS = []
 

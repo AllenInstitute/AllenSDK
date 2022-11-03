@@ -1,12 +1,16 @@
-import json, os
-import sys
+import json
+import os
 import subprocess
+import sys
 
 import run_observatory_thumbnails as robsth
-import allensdk.internal.core.lims_utilities as lu
-from allensdk.internal.core.lims_pipeline_module import run_module, PipelineModule
+
 import allensdk.core.json_utilities as ju
+import allensdk.internal.core.lims_utilities as lu
 from allensdk.config.manifest import Manifest
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
+
 
 def get_container_info(container_id):
     res = lu.query("""

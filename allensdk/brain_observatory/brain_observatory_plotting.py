@@ -33,12 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
+import os
+
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
-import os
-import logging
+from matplotlib.ticker import MaxNLocator
 
 
 def plot_drifting_grating_traces(dg, save_dir):

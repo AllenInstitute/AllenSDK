@@ -33,17 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from __future__ import division, print_function, absolute_import
-from collections import defaultdict
-import operator as op
-import functools
-import os
-import csv
+from __future__ import absolute_import, division, print_function
 
-from scipy.ndimage.interpolation import zoom
-import numpy as np
+import csv
+import functools
+import operator as op
+import os
+from collections import defaultdict
+
 import nrrd
+import numpy as np
 import pandas as pd
+from scipy.ndimage.interpolation import zoom
 
 from allensdk.core.structure_tree import StructureTree
 

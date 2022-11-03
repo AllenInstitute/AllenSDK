@@ -1,11 +1,11 @@
-import os
-from typing import Optional, Dict, Any
 import logging
-from functools import wraps
+import os
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from allensdk.core.auth_config import CREDENTIAL_KEYS
+from functools import wraps
+from typing import Any, Dict, Optional
 
+from allensdk.core.auth_config import CREDENTIAL_KEYS
 
 logger = logging.getLogger(__name__)
 

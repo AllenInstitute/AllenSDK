@@ -1,13 +1,11 @@
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io.project_cloud_api_base import ProjectCloudApiBase  # noqa: E501
-
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session \
-    import BehaviorEcephysSession
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import \
+    ProjectCloudApiBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
+    BehaviorEcephysSession
 
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):

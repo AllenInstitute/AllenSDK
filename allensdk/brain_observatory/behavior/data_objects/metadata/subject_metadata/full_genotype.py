@@ -3,9 +3,8 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

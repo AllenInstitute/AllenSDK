@@ -1,6 +1,7 @@
-from marshmallow import Schema, fields
-from datetime import datetime, date
+from datetime import date, datetime
+
 import numpy as np
+from marshmallow import Schema, fields
 
 
 def annotate_change_detect(trials):

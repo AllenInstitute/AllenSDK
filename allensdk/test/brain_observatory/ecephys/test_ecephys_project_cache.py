@@ -1,21 +1,20 @@
-import os
 import collections
+import os
 from datetime import datetime
 
-import pytest
-import pandas as pd
 import numpy as np
-import SimpleITK as sitk
+import pandas as pd
 import pynwb
+import pytest
+import SimpleITK as sitk
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 import allensdk.brain_observatory.ecephys.nwb_util
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import \
+    DEFAULT_TIMEOUT as HTTP_ENGINE_DEFAULT_TIMEOUT
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
+    AsyncHttpEngine, HttpEngine, write_bytes_from_coroutine, write_from_stream)
 from allensdk.core.authentication import DbCredentials
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
-    import (
-        write_from_stream, write_bytes_from_coroutine, AsyncHttpEngine,
-        HttpEngine, DEFAULT_TIMEOUT as HTTP_ENGINE_DEFAULT_TIMEOUT
-    )
 
 mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
                                       host='mock_host', port='mock_port',

@@ -33,10 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import allensdk.core.json_utilities as ju
-import pytest
-from mock import patch, MagicMock, call
 import numpy as np
+import pytest
+from mock import MagicMock, call, patch
+
+import allensdk.core.json_utilities as ju
 
 
 @pytest.fixture

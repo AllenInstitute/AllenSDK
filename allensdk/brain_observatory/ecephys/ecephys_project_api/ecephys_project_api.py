@@ -1,8 +1,7 @@
-from typing import Optional, TypeVar, Iterable
+from typing import Iterable, Optional, TypeVar
 
 import numpy as np
 import pandas as pd
-
 
 # TODO: This should be a generic over the type of the values, but there is not 
 # good support currently for numpy and pandas type annotations 

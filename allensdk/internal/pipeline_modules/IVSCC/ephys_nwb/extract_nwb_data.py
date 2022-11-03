@@ -1,24 +1,22 @@
 import logging
 
+import h5py
 import numpy as np
 from six import iteritems
-import h5py
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.core.nwb_data_set import NwbDataSet
-
+from allensdk.internal.core.lims_pipeline_module import PipelineModule
 # manual keys are values that can be passed in through input.json.
 # these values are used if the particular value cannot be computed.
 # a better name might be 'DEFAULT_VALUE_KEYS'
-from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.lab_notebook_reader \
-    import \
+from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.lab_notebook_reader import \
     create_lab_notebook_reader
-from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.qc_support import \
-    measure_blowout, measure_seal, find_stim_start, measure_vm, \
-    get_last_vm_epoch, find_stim_interval, find_stim_amplitude_and_duration, \
-    measure_electrode_0, get_last_vm_noise_epoch, get_stability_vm_epoch, \
-    get_first_vm_noise_epoch, measure_input_resistance, \
-    measure_initial_access_resistance
+from allensdk.internal.pipeline_modules.IVSCC.ephys_nwb.qc_support import (
+    find_stim_amplitude_and_duration, find_stim_interval, find_stim_start,
+    get_first_vm_noise_epoch, get_last_vm_epoch, get_last_vm_noise_epoch,
+    get_stability_vm_epoch, measure_blowout, measure_electrode_0,
+    measure_initial_access_resistance, measure_input_resistance, measure_seal,
+    measure_vm)
 
 MANUAL_KEYS = ['manual_seal_gohm', 'manual_initial_access_resistance_mohm',
                'manual_initial_input_mohm']

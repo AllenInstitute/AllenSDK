@@ -1,19 +1,20 @@
+import functools
 import logging
 import os
-import functools
-import six
 
-import SimpleITK as sitk
-from scipy.misc import imread, imsave
 import numpy as np
 import pandas as pd
+import SimpleITK as sitk
+import six
+from scipy.misc import imread, imsave
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
-
-from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_utilities import sitk_get_diagonal_length
-from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import run, apply_colormap
-from allensdk.internal.mouse_connectivity.projection_thumbnail.visualization_utilities import convert_discrete_colormap
-
+from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import (
+    apply_colormap, run)
+from allensdk.internal.mouse_connectivity.projection_thumbnail.visualization_utilities import \
+    convert_discrete_colormap
+from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_utilities import \
+    sitk_get_diagonal_length
 
 PERMUTATION = [2, 1, 0]
 FLIP = [True, False, False]

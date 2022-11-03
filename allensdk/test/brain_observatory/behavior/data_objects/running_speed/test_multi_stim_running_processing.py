@@ -1,25 +1,18 @@
-import pytest
-from itertools import product
 import copy
-import numpy as np
-import tempfile
 import pathlib
-import pandas as pd
+import tempfile
+from itertools import product
 
-from allensdk.brain_observatory.behavior.\
-    data_objects.running_speed.running_processing import (
-        get_running_df)
+import numpy as np
+import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile,
-    ReplayStimulusFile,
-    MappingStimulusFile)
-
-from allensdk.brain_observatory.behavior.\
-    data_objects.running_speed.multi_stim_running_processing import (
-        _extract_dx_info,
-        _merge_dx_data,
-        multi_stim_running_df_from_raw_data)
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.multi_stim_running_processing import (
+    _extract_dx_info, _merge_dx_data, multi_stim_running_df_from_raw_data)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import \
+    get_running_df
 
 
 @pytest.mark.parametrize(

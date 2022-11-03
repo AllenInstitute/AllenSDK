@@ -1,14 +1,13 @@
-import pytest
 import pathlib
 
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .behavior_project_cache import (
-        VisualBehaviorOphysProjectCache)
+import pytest
 
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_project_cache.behavior_project_cache import \
+    VisualBehaviorOphysProjectCache
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 
 
 @pytest.mark.requires_bamboo

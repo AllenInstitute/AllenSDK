@@ -7,18 +7,16 @@ import pynwb
 import pytest
 
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile,
-    SyncFile)
+    BehaviorStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
     calculate_monitor_delay
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import TrialTable
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
+    TrialTable
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest

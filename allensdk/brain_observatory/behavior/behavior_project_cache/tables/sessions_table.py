@@ -1,26 +1,20 @@
 import re
-from typing import Optional, List
+from typing import List, Optional
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .ophys_sessions_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    BehaviorProjectLimsApi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_sessions_table import \
     BehaviorOphysSessionsTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.prior_exposure_processing import \
-    get_prior_exposures_to_session_type, get_prior_exposures_to_image_set, \
-    get_prior_exposures_to_omissions
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .project_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import \
     ProjectTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
-
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.full_genotype import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (
+    get_prior_exposures_to_image_set, get_prior_exposures_to_omissions,
+    get_prior_exposures_to_session_type)
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.full_genotype import \
     FullGenotype
-
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.reporter_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
     ReporterLine
 
 

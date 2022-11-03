@@ -1,20 +1,16 @@
+from itertools import product
 from pathlib import Path
-
-import pytest
 from unittest.mock import create_autospec
 
 import numpy as np
+import pytest
 
-from itertools import product
-
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
-)
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .stimulus_timestamps.timestamps_processing import (
-        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.timestamps.stimulus_timestamps.timestamps_processing import (
+    get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+from allensdk.internal.api import PostgresQueryMixin
 
 
 @pytest.mark.parametrize("dict_repr, has_pkl, has_sync", [

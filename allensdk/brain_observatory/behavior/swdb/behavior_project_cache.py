@@ -1,20 +1,20 @@
-import os
-import pandas as pd
-import numpy as np
 import json
+import os
 import re
 
+import numpy as np
+import pandas as pd
+
 from allensdk import one
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
-from allensdk.brain_observatory.behavior.session_apis.data_io import (
-    BehaviorOphysNwbApi)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
     BehaviorOphysExperiment
-from allensdk.core.lazy_property import LazyProperty
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import \
+    BehaviorMetadata
+from allensdk.brain_observatory.behavior.session_apis.data_io import \
+    BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.trials_processing import \
     calculate_reward_rate
+from allensdk.core.lazy_property import LazyProperty
 from allensdk.deprecated import deprecated
 
 csv_io = {

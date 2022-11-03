@@ -1,8 +1,9 @@
-from typing import Dict
-import pandas as pd
-import numpy as np
-import h5py
 import collections
+from typing import Dict
+
+import h5py
+import numpy as np
+import pandas as pd
 
 from .ecephys_session_api import EcephysSessionApi
 

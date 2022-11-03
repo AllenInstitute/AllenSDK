@@ -1,12 +1,11 @@
 import json
-from typing import Dict, Union
 from pathlib import Path
+from typing import Dict, Union
 
 import h5py
-from cachetools import cached, LRUCache
-from cachetools.keys import hashkey
-
 import pandas as pd
+from cachetools import LRUCache, cached
+from cachetools.keys import hashkey
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core import DataFile

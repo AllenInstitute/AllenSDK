@@ -1,25 +1,24 @@
+import logging
 from multiprocessing import Pool
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import pandas as pd
-from typing import Optional, List, Dict, Any, Iterable, Union
-import logging
-
 from tqdm import tqdm
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
+    BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import \
+    BehaviorProjectBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.internal.api import db_connection_creator
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
-    import (HttpEngine)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import \
+    HttpEngine
+from allensdk.core.auth_config import (LIMS_DB_CREDENTIAL_MAP,
+                                       MTRAIN_DB_CREDENTIAL_MAP)
 from allensdk.core.authentication import DbCredentials
-from allensdk.core.auth_config import (
-    MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
+from allensdk.internal.api import db_connection_creator
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):

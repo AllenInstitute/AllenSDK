@@ -1,11 +1,13 @@
-import pytest
+import hashlib
+import io
 import json
 import pathlib
-import hashlib
-import pandas as pd
-import io
+
 import boto3
+import pandas as pd
+import pytest
 from moto import mock_s3
+
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
 

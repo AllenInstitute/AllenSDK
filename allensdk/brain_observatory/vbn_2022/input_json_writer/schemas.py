@@ -1,9 +1,9 @@
-import argschema
 import pathlib
+
+import argschema
 from marshmallow import post_load
 
-from allensdk.brain_observatory.vbn_2022.utils.schemas import (
-    ProbeToSkip)
+from allensdk.brain_observatory.vbn_2022.utils.schemas import ProbeToSkip
 
 
 class VBN2022InputJsonWriterSchema(argschema.ArgSchema):

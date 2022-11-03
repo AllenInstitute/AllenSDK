@@ -33,9 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-from allensdk.deprecated import deprecated, class_deprecated
 import warnings
+
+import pytest
+
+from allensdk.deprecated import class_deprecated, deprecated
 
 
 @pytest.fixture

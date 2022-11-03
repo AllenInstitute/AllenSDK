@@ -1,9 +1,9 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 from skimage import draw
-from allensdk.internal.brain_observatory import roi_filter
-from allensdk.internal.brain_observatory import roi_filter_utils
+
+from allensdk.internal.brain_observatory import roi_filter, roi_filter_utils
 from allensdk.internal.pipeline_modules import run_roi_filter
 
 OVERLAP_THRESHOLD = 0.9

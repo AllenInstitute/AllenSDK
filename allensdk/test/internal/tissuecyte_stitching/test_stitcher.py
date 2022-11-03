@@ -1,8 +1,8 @@
 import operator as op
 
-import pytest
 import mock
 import numpy as np
+import pytest
 
 import allensdk.internal.mouse_connectivity.tissuecyte_stitching.stitcher as stitcher
 

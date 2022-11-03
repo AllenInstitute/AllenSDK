@@ -34,18 +34,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
-
-import pandas as pd
-import pandas.io.json as pj
-import numpy as np
 import time
 
+import numpy as np
+import pandas as pd
+import pandas.io.json as pj
 import pytest
 from mock import MagicMock, mock_open, patch
 
-from allensdk.api.warehouse_cache.cache import Cache, memoize, get_default_manifest_file
-from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
+from allensdk.api.queries.rma_api import RmaApi
+from allensdk.api.warehouse_cache.cache import (Cache,
+                                                get_default_manifest_file,
+                                                memoize)
 from allensdk.config.manifest import ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 

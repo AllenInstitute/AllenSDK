@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import csv
 import copy
+import csv
 import math
+
 from allensdk.internal.morphology.morphology import *
 from allensdk.internal.morphology.node import Node
+
 
 ########################################################################
 def read_swc(file_name):

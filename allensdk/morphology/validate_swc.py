@@ -34,7 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import argparse
+
 import allensdk.core.swc as swc
+
 try:
     xrange
 except:

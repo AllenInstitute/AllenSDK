@@ -15,6 +15,7 @@
 
 from allensdk.api.queries.rma_template import RmaTemplate
 
+
 class BiophysicalModuleApi(RmaTemplate):
     ''''''
     

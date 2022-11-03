@@ -1,15 +1,15 @@
 import os
 
-import nrrd
 import mock
-import pytest
+import nrrd
 import numpy as np
+import pytest
 from numpy.testing import assert_raises
 
 from allensdk.core import json_utilities
+from allensdk.internal.api.queries.mouse_connectivity_api_prerelease import (
+    MouseConnectivityApiPrerelease, _experiment_dict)
 
-from allensdk.internal.api.queries.mouse_connectivity_api_prerelease \
-        import MouseConnectivityApiPrerelease, _experiment_dict
 
 @pytest.fixture
 def storage_dirs(fn_temp_dir):

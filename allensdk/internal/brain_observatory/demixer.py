@@ -1,11 +1,13 @@
-import scipy.sparse as sparse
-import scipy.linalg as linalg
-import numpy as np
-import os
-import matplotlib.pyplot as plt
-import allensdk.internal.brain_observatory.mask_set as mask_set
 import logging
+import os
+
 import matplotlib.colors as colors
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.linalg as linalg
+import scipy.sparse as sparse
+
+import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.config.manifest import Manifest
 from allensdk.deprecated import deprecated
 

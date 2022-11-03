@@ -33,12 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import matplotlib.pyplot as plt
-from matplotlib import ticker
-import numpy as np
 import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import ticker
 
 DEFAULT_CMAP = 'magma'
 

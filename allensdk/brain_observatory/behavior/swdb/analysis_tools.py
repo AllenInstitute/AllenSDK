@@ -1,8 +1,10 @@
-import sys
+import bisect
 import os
+import sys
+
 import numpy as np
 import pandas as pd
-import bisect
+
 
 def get_nearest_frame(timepoint, timestamps):
     '''

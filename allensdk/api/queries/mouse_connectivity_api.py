@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .reference_space_api import ReferenceSpaceApi
-from .grid_data_api import GridDataApi
-from allensdk.api.warehouse_cache.cache import cacheable, Cache
-import numpy as np
 import nrrd
+import numpy as np
 import six
+
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+
+from .grid_data_api import GridDataApi
+from .reference_space_api import ReferenceSpaceApi
 
 
 class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):

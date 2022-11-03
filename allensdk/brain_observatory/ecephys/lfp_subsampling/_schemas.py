@@ -34,8 +34,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from argschema import ArgSchema
+from argschema.fields import Boolean, Float, Int, Nested, NumpyArray, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, String, Boolean, Float, Int, NumpyArray
 
 
 class ProbeInputParameters(DefaultSchema):

@@ -1,6 +1,7 @@
 import logging
-from six.moves import xrange
+
 import numpy as np
+from six.moves import xrange
 
 # TODO: license
 # TODO: document

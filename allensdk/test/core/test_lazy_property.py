@@ -1,5 +1,6 @@
-import pytest
 import copy as cp
+
+import pytest
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 

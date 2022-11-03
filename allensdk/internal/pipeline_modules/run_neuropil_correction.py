@@ -1,20 +1,24 @@
 #!/usr/bin/python
 import matplotlib
-matplotlib.use('agg')
-import matplotlib.pyplot as plt
-import logging
-import numpy as np
-from allensdk.brain_observatory.r_neuropil import estimate_contamination_ratios
-import allensdk.internal.core.lims_utilities as lu
-import h5py
-import json
-import copy
-import os
-import sys
-import argparse
-import shutil
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
+matplotlib.use('agg')
+import argparse
+import copy
+import json
+import logging
+import os
+import shutil
+import sys
+
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.brain_observatory.r_neuropil import estimate_contamination_ratios
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
+
 
 def debug(experiment_id, local=False):
     OUTPUT_DIRECTORY = "/data/informatics/CAM/neuropil"

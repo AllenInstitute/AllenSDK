@@ -34,11 +34,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #test AllenSDK svg api for download and show
-from allensdk.api.queries.svg_api import SvgApi
-import pytest
 import json
-from mock import MagicMock
 import os
+
+import pytest
+from mock import MagicMock
+
+from allensdk.api.queries.svg_api import SvgApi
+
 
 @pytest.fixture
 def svg():

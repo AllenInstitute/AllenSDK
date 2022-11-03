@@ -1,14 +1,11 @@
-from unittest.mock import create_autospec, PropertyMock
+from unittest.mock import PropertyMock, create_autospec
 
 import numpy as np
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .stimulus_timestamps.timestamps_processing import (
-        get_behavior_stimulus_timestamps,
-        get_ophys_stimulus_timestamps,
-        get_frame_indices)
-
+from allensdk.brain_observatory.behavior.data_objects.timestamps.stimulus_timestamps.timestamps_processing import (
+    get_behavior_stimulus_timestamps, get_frame_indices,
+    get_ophys_stimulus_timestamps)
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 
 

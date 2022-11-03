@@ -1,12 +1,11 @@
-import pytest
 import pathlib
 import tempfile
+
 import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile,
-    MappingStimulusFile,
-    ReplayStimulusFile)
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile)
 
 
 @pytest.fixture

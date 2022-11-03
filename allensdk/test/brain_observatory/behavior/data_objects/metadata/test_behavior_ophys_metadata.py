@@ -1,42 +1,31 @@
 import datetime
 import json
 from pathlib import Path
+
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import \
     Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_ophys_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import \
     BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.experiment_container_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.field_of_view_shape import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_depth import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .imaging_plane_group import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import \
     ImagingPlaneGroup
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .multi_plane_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import \
     MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_experiment_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import \
     OphysExperimentMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_session_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.test_behavior_metadata import \
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import \
     TestBehaviorMetadata
 
 

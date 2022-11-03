@@ -1,50 +1,39 @@
 """Module for writing NWB files for the VCN project"""
 import logging
-import sys
-from typing import Any, Dict, List, Tuple
-from pathlib import Path, PurePath
 import multiprocessing as mp
+import sys
 from functools import partial
+from pathlib import Path, PurePath
+from typing import Any, Dict, List, Tuple
 
 import h5py
+import numpy as np
+import pandas as pd
 import pynwb
 import requests
-import pandas as pd
-import numpy as np
 from hdmf.backends.hdf5.h5_utils import H5DataIO
 
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
+import allensdk.brain_observatory.sync_utilities as su
+from allensdk.brain_observatory.argschema_utilities import optional_lims_inputs
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
     Presentations
-from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
-    add_ecephys_electrodes
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
+    ContinuousFile
+from allensdk.brain_observatory.ecephys.nwb import (
+    EcephysCSD, EcephysEyeTrackingRigMetadata, EcephysSpecimen)
+from allensdk.brain_observatory.ecephys.nwb_util import (
+    add_ecephys_electrodes, add_probe_to_nwbfile)
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
+from allensdk.brain_observatory.nwb import (
+    add_eye_gaze_mapping_data_to_nwbfile,
+    add_eye_tracking_ellipse_fit_data_to_nwbfile, add_invalid_times,
+    add_stimulus_timestamps, eye_tracking_data_is_valid,
+    read_eye_dlc_tracking_ellipses, read_eye_gaze_mappings)
+from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.config.manifest import Manifest
 
-from .schemas import VCNInputSchema, OutputSchema
-from allensdk.brain_observatory.nwb import (
-    add_stimulus_timestamps,
-    add_invalid_times,
-    read_eye_dlc_tracking_ellipses,
-    read_eye_gaze_mappings,
-    add_eye_tracking_ellipse_fit_data_to_nwbfile,
-    add_eye_gaze_mapping_data_to_nwbfile,
-    eye_tracking_data_is_valid
-)
-from allensdk.brain_observatory.argschema_utilities import (
-    optional_lims_inputs
-)
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import (
-    ContinuousFile
-)
-from allensdk.brain_observatory.ecephys.nwb import (
-    EcephysSpecimen,
-    EcephysEyeTrackingRigMetadata,
-    EcephysCSD)
-from allensdk.brain_observatory.sync_dataset import Dataset
-import allensdk.brain_observatory.sync_utilities as su
-
+from .schemas import OutputSchema, VCNInputSchema
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
 

@@ -1,12 +1,15 @@
 import argparse
-import os
-import sys
-import subprocess
 import logging
+import os
+import subprocess
+import sys
+
 import numpy as np
+
 import allensdk.core.json_utilities as json_utilities
-from .fit_stage_1 import SEEDS, FIT_BASE_DIR, MPIEXEC
 import allensdk.internal.model.biophysical.optimize as optimize
+
+from .fit_stage_1 import FIT_BASE_DIR, MPIEXEC, SEEDS
 
 FIT_TYPES = {"f6": "f9", "f12": "f13"}
 DEFAULT_NUM_PROCESSES = 240

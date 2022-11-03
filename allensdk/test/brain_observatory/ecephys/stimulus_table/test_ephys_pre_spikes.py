@@ -1,6 +1,6 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 import allensdk.brain_observatory.ecephys.stimulus_table.ephys_pre_spikes as ephys_pre_spikes
 

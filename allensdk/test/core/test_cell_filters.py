@@ -33,18 +33,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-import os
 import json
-import pandas as pd
+import os
 from zipfile import ZipFile
-from mock import patch, mock_open, MagicMock
-from test_brain_observatory_cache import CACHE_MANIFEST
-from allensdk.core.brain_observatory_cache \
-    import BrainObservatoryCache
-from allensdk.api.queries.brain_observatory_api \
-    import BrainObservatoryApi
 
+import pandas as pd
+import pytest
+from mock import MagicMock, mock_open, patch
+from test_brain_observatory_cache import CACHE_MANIFEST
+
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport

@@ -1,13 +1,14 @@
+import logging
+import warnings
+
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage as ndi
 from scipy.optimize import curve_fit, leastsq
-import logging
-import matplotlib.pyplot as plt
 
 from ...chisquare_categorical import chisq_from_stim_table
 from .stimulus_analysis import StimulusAnalysis
 
-import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 

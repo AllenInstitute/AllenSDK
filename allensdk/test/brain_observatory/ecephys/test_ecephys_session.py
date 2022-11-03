@@ -1,13 +1,14 @@
-import pytest
-import pandas as pd
-import numpy as np
-import xarray as xr
 import types
 
+import numpy as np
+import pandas as pd
+import pytest
+import xarray as xr
+
+from allensdk.brain_observatory.ecephys.ecephys_session import (
+    EcephysSession, build_spike_histogram, nan_intervals)
 from allensdk.brain_observatory.ecephys.ecephys_session_api import \
     EcephysSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import \
-    EcephysSession, nan_intervals, build_spike_histogram
 
 
 @pytest.fixture

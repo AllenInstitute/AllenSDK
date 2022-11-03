@@ -1,9 +1,9 @@
-import pickle
 import operator as op
 import os
+import pickle
 
-import pytest
 import numpy as np
+import pytest
 
 from allensdk.brain_observatory.ecephys.file_io import stim_file as stim_file
 

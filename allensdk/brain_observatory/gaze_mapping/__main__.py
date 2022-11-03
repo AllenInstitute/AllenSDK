@@ -7,27 +7,17 @@ import numpy as np
 import pandas as pd
 from argschema import ArgSchemaParser
 
-
 import allensdk
-from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs
-)
-from allensdk.brain_observatory.gaze_mapping._schemas import (
-    InputSchema,
-    OutputSchema
-)
-from allensdk.brain_observatory.gaze_mapping._gaze_mapper import (
-    compute_circular_areas,
-    compute_elliptical_areas,
-    GazeMapper
-)
-from allensdk.brain_observatory.gaze_mapping._filter_utils import (
-    post_process_areas,
-    post_process_cr,
-)
-
-from allensdk.brain_observatory.sync_dataset import Dataset
 import allensdk.brain_observatory.sync_utilities as su
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
+from allensdk.brain_observatory.gaze_mapping._filter_utils import (
+    post_process_areas, post_process_cr)
+from allensdk.brain_observatory.gaze_mapping._gaze_mapper import (
+    GazeMapper, compute_circular_areas, compute_elliptical_areas)
+from allensdk.brain_observatory.gaze_mapping._schemas import (InputSchema,
+                                                              OutputSchema)
+from allensdk.brain_observatory.sync_dataset import Dataset
 
 
 def load_ellipse_fit_params(input_file: Path) -> Dict[str, pd.DataFrame]:

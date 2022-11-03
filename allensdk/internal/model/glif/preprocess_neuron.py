@@ -1,23 +1,30 @@
-import argparse, logging
+import argparse
 import itertools
-from scipy.optimize import fmin
-import numpy as np
+import logging
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import fmin
+
 import allensdk.core.json_utilities as ju
-import allensdk.internal.model.glif.find_sweeps as fs
-from allensdk.internal.model.data_access import load_sweeps
-from allensdk.internal.model.glif.MLIN import MLIN
-from allensdk.internal.model.glif.ASGLM import ASGLM_pairwise
-from allensdk.internal.model.glif.rc import least_squares_RCEl_calc_tested
-from allensdk.internal.model.glif.threshold_adaptation import calc_spike_component_of_threshold_from_multiblip
-from allensdk.internal.model.glif.spike_cutting import calc_spike_cut_and_v_reset_via_expvar_residuals
-from allensdk.internal.model.glif.find_spikes import find_spikes_list, find_spikes_ssq_list
-from allensdk.internal.model.glif.threshold_adaptation import fit_avoltage_bvoltage_th, fit_avoltage_bvoltage
 import allensdk.ephys.ephys_extractor as efex
 import allensdk.ephys.ephys_features as ft
-from allensdk.model.glif.glif_neuron_methods import spike_component_of_threshold_exact
-import matplotlib.pyplot as plt
+import allensdk.internal.model.glif.find_sweeps as fs
 import allensdk.internal.model.glif.plotting as plotting
+from allensdk.internal.model.data_access import load_sweeps
+from allensdk.internal.model.glif.ASGLM import ASGLM_pairwise
+from allensdk.internal.model.glif.find_spikes import (find_spikes_list,
+                                                      find_spikes_ssq_list)
+from allensdk.internal.model.glif.MLIN import MLIN
+from allensdk.internal.model.glif.rc import least_squares_RCEl_calc_tested
+from allensdk.internal.model.glif.spike_cutting import \
+    calc_spike_cut_and_v_reset_via_expvar_residuals
+from allensdk.internal.model.glif.threshold_adaptation import (
+    calc_spike_component_of_threshold_from_multiblip, fit_avoltage_bvoltage,
+    fit_avoltage_bvoltage_th)
+from allensdk.model.glif.glif_neuron_methods import \
+    spike_component_of_threshold_exact
 
 RESTING_POTENTIAL = 'slow_vm_mv'
 DEFAULT_DT = 5e-05

@@ -7,8 +7,9 @@ Created on Wed Jun  5 15:52:22 2019
 """
 # TODO: Fix header
 
-import numpy as np
 import warnings
+
+import numpy as np
 
 
 def chisq_from_stim_table(stim_table,

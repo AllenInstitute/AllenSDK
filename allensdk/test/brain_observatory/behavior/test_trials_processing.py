@@ -1,10 +1,9 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior import trials_processing
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
     TrialTable
 
 _test_response_latency_0 = np.array(

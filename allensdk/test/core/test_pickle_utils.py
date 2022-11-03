@@ -1,18 +1,15 @@
-import pytest
 import copy
 import pathlib
+
 import pandas as pd
+import pytest
 
-from allensdk.test_utilities.custom_comparators import (
-    stimulus_pickle_equivalence)
-
-from allensdk.core.pickle_utils import (
-    _sanitize_list,
-    _sanitize_dict,
-    _sanitize_tuple,
-    _sanitize_list_or_tuple,
-    _sanitize_pickle_data,
-    load_and_sanitize_pickle)
+from allensdk.core.pickle_utils import (_sanitize_dict, _sanitize_list,
+                                        _sanitize_list_or_tuple,
+                                        _sanitize_pickle_data, _sanitize_tuple,
+                                        load_and_sanitize_pickle)
+from allensdk.test_utilities.custom_comparators import \
+    stimulus_pickle_equivalence
 
 
 @pytest.fixture

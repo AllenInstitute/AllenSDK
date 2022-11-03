@@ -1,23 +1,25 @@
-from typing import List, Tuple, Dict, Optional, Union
-from abc import ABC, abstractmethod
-from pathlib import Path
+import json
 import os
 import pathlib
-import pandas as pd
+import re
+import warnings
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
 import boto3
+import pandas as pd
 import semver
 import tqdm
-import re
-import json
-import warnings
 from botocore import UNSIGNED
 from botocore.client import Config
-from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.api.cloud_cache.manifest import Manifest
+
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes
-from allensdk.api.cloud_cache.utils import file_hash_from_path
-from allensdk.api.cloud_cache.utils import bucket_name_from_url
-from allensdk.api.cloud_cache.utils import relative_path_from_url
+from allensdk.api.cloud_cache.manifest import Manifest
+from allensdk.api.cloud_cache.utils import (bucket_name_from_url,
+                                            file_hash_from_path,
+                                            relative_path_from_url)
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class OutdatedManifestWarning(UserWarning):

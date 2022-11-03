@@ -1,13 +1,13 @@
 import numpy as np
 
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
+from allensdk.brain_observatory.argschema_utilities import (
+    ArgSchemaParserPlus, write_or_print_outputs)
+
 from ._schemas import InputParameters, OutputParameters
 from .barcode_sync_dataset import BarcodeSyncDataset
-from .channel_states import extract_barcodes_from_states, \
-    extract_splits_from_states, \
-    extract_splits_from_barcode_times
+from .channel_states import (extract_barcodes_from_states,
+                             extract_splits_from_barcode_times,
+                             extract_splits_from_states)
 from .probe_synchronizer import ProbeSynchronizer
 
 

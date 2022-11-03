@@ -1,4 +1,6 @@
+import datetime
 import logging
+import uuid
 import warnings
 from pathlib import Path
 from typing import Iterable, Optional
@@ -7,26 +9,21 @@ import h5py
 import marshmallow
 import numpy as np
 import pandas as pd
-import datetime
-import uuid
-import SimpleITK as sitk
 import pynwb
-from pynwb.base import TimeSeries, Images
-from pynwb import ProcessingModule, NWBFile
+import SimpleITK as sitk
+from pynwb import NWBFile, ProcessingModule
+from pynwb.base import Images, TimeSeries
 from pynwb.image import GrayscaleImage
-from pynwb.ophys import (
-    DfOverF, ImageSegmentation, OpticalChannel, Fluorescence)
+from pynwb.ophys import (DfOverF, Fluorescence, ImageSegmentation,
+                         OpticalChannel)
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.behavior.image_api import Image
-from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 from allensdk.brain_observatory.behavior.schemas import (
+    BehaviorMetadataSchema, BehaviorTaskParametersSchema,
     CompleteOphysBehaviorMetadataSchema, NwbOphysMetadataSchema,
-    BehaviorMetadataSchema, OphysBehaviorMetadataSchema,
-    BehaviorTaskParametersSchema, SubjectMetadataSchema
-)
+    OphysBehaviorMetadataSchema, SubjectMetadataSchema)
 from allensdk.brain_observatory.nwb.metadata import load_pynwb_extension
-
 
 log = logging.getLogger("allensdk.brain_observatory.nwb")
 

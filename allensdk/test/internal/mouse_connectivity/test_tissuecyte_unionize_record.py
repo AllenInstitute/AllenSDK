@@ -1,16 +1,16 @@
 from __future__ import division
 
+import mock
 import numpy as np
 import pytest
-import mock
 from six import iteritems
 from six.moves import xrange
 
-from allensdk.internal.mouse_connectivity.interval_unionize\
-    .tissuecyte_unionize_record import TissuecyteBaseUnionize, \
-    TissuecyteInjectionUnionize,TissuecyteProjectionUnionize
-    
-  
+from allensdk.internal.mouse_connectivity.interval_unionize.tissuecyte_unionize_record import (
+    TissuecyteBaseUnionize, TissuecyteInjectionUnionize,
+    TissuecyteProjectionUnionize)
+
+
 @pytest.fixture(scope='function')  
 def data_arrays():
 

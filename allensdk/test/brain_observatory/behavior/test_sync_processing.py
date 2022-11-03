@@ -1,6 +1,8 @@
 import os
-import pytest
+
 import numpy as np
+import pytest
+
 import allensdk.brain_observatory.behavior.sync as sync
 from allensdk.brain_observatory.sync_dataset import Dataset
 

@@ -1,16 +1,14 @@
 import json
-import pandas as pd
-
 from datetime import datetime
 from pathlib import Path
 
+import pandas as pd
 import pynwb
 import pytest
 
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .rig_geometry import \
-    RigGeometry, Coordinates
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.rig_geometry import (
+    Coordinates, RigGeometry)
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 

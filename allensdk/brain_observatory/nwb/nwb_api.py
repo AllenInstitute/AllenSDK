@@ -4,11 +4,10 @@ import pandas as pd
 import pynwb
 import SimpleITK as sitk
 
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
     Presentations
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 namespace_path = Path(__file__).parent / \
                  'ndx-aibs-behavior-ophys.namespace.yaml'

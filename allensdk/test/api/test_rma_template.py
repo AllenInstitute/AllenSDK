@@ -35,9 +35,9 @@
 #
 import pytest
 from mock import MagicMock, patch
+
 import allensdk.core.json_utilities as ju
 from allensdk.api.queries.rma_template import RmaTemplate
-
 
 _msg = {'msg': [{'whatever': True}]}
 

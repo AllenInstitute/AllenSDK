@@ -1,8 +1,8 @@
 import pytest
-from allensdk.internal.ephys.core_feature_extract import ( find_stim_start, 
-                                                           filter_sweeps,
-                                                           find_coarse_long_square_amp_delta,
-                                                           nan_get )
+
+from allensdk.internal.ephys.core_feature_extract import (
+    filter_sweeps, find_coarse_long_square_amp_delta, find_stim_start, nan_get)
+
 
 def test_find_stim_start():
     a = [0,0,0,1,1,1,0,0,0]

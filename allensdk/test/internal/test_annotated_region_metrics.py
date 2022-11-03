@@ -1,6 +1,8 @@
-import pytest
 import numpy as np
+import pytest
+
 from allensdk.internal.brain_observatory import annotated_region_metrics
+
 
 @pytest.fixture
 def mask():

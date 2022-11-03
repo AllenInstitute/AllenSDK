@@ -4,8 +4,8 @@ If criteria are met, return true. Otherwise, return false.
 """
 
 import logging
-from allensdk.core.exceptions import DataFrameKeyError, DataFrameIndexError
 
+from allensdk.core.exceptions import DataFrameIndexError, DataFrameKeyError
 
 logger = logging.getLogger(__name__)
 

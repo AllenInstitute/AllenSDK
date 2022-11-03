@@ -1,11 +1,10 @@
-import pytest
-
-
-import SimpleITK as sitk
-import numpy as np
 import matplotlib as mpl
+import numpy as np
+import pytest
+import SimpleITK as sitk
 
-from allensdk.internal.mouse_connectivity.projection_thumbnail import visualization_utilities as vis
+from allensdk.internal.mouse_connectivity.projection_thumbnail import \
+    visualization_utilities as vis
 
 
 @pytest.fixture

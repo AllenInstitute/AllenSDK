@@ -34,11 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from ._data_object_base.data_object import DataObject   # noqa F401
-from ._data_object_base.readable_interfaces import (    # noqa F401
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface,
-    DataFileReadableInterface
-)
-from ._data_object_base.writable_interfaces import (    # noqa F401
-    JsonWritableInterface, NwbWritableInterface
-)
+from ._data_object_base.data_object import DataObject  # noqa F401
+from ._data_object_base.readable_interfaces import (  # noqa F401
+    DataFileReadableInterface, JsonReadableInterface, LimsReadableInterface,
+    NwbReadableInterface)
+from ._data_object_base.writable_interfaces import (  # noqa F401
+    JsonWritableInterface, NwbWritableInterface)

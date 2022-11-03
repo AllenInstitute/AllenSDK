@@ -33,14 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from __future__ import division, print_function, absolute_import
-import re
-import operator as op
-from six import iteritems, string_types
+from __future__ import absolute_import, division, print_function
+
 import functools
+import operator as op
+import re
 
 import numpy as np
 import pandas as pd
+from six import iteritems, string_types
 
 from .simple_tree import SimpleTree
 

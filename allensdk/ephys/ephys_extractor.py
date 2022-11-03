@@ -33,14 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
-from pandas import DataFrame
-import warnings
 import logging
+import warnings
 from collections import Counter
 
-from . import ephys_features as ft
+import numpy as np
 import six
+from pandas import DataFrame
+
+from . import ephys_features as ft
 
 # Constants for stimulus-specific analysis
 RAMPS_START = 1.02

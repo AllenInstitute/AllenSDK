@@ -33,10 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
+
 import h5py
 import numpy as np
 from scipy.sparse import csr_matrix
-import logging
 
 
 class Hdf5Util(object):

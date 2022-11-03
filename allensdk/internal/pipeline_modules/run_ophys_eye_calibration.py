@@ -1,11 +1,12 @@
 import os
+
+import h5py
+import numpy as np
+
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.internal.brain_observatory import eye_calibration, itracker_utils
 from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
                                                          run_module)
-from allensdk.internal.brain_observatory import (eye_calibration,
-                                                 itracker_utils)
-import allensdk.internal.core.lims_utilities as lu
-import numpy as np
-import h5py
 
 EYE_RADIUS = 0.1682
 CM_PER_PIXEL = 10.2/10000

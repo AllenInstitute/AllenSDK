@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-from allensdk.api.queries.glif_api import GlifApi
-import allensdk.core.json_utilities as json_utilities
-from allensdk.model.glif.glif_neuron import GlifNeuron
-from allensdk.core.nwb_data_set import NwbDataSet
 import os
+
+import pytest
+
+import allensdk.core.json_utilities as json_utilities
+from allensdk.api.queries.glif_api import GlifApi
+from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.model.glif.glif_neuron import GlifNeuron
 
 
 @pytest.fixture

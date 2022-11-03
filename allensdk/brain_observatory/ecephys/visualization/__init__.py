@@ -1,6 +1,6 @@
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def plot_mean_waveforms(mean_waveforms, unit_ids, peak_channels): # pragma: no cover

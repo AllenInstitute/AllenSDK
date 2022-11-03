@@ -1,29 +1,20 @@
 
 from typing import Optional
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.core import NwbReadableInterface
-from allensdk.core import NwbWritableInterface
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile,
-    ReplayStimulusFile,
-    MappingStimulusFile
-)
-from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
-    get_running_df
-)
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.multi_stim_running_processing import (
-        _get_multi_stim_running_df)
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile, SyncFile)
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.running_speed.multi_stim_running_processing import \
+    _get_multi_stim_running_df
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import \
+    get_running_df  # noqa: E501
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 
 
 class RunningAcquisition(DataObject,

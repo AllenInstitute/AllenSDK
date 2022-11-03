@@ -1,5 +1,5 @@
-from abc import abstractmethod, ABC
-from typing import Optional, Iterable
+from abc import ABC, abstractmethod
+from typing import Iterable, Optional
 
 import pandas as pd
 

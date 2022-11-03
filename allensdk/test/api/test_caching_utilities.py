@@ -1,9 +1,9 @@
-from functools import partial
-import re
 import os
+import re
+from functools import partial
 
-import pytest
 import pandas as pd
+import pytest
 
 from allensdk.api.warehouse_cache import caching_utilities as cu
 

@@ -33,9 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
 import logging
+
+import numpy as np
 import six
+
 from . import ephys_extractor as efex
 from . import ephys_features as ft
 

@@ -2,28 +2,23 @@
 # the VBN 2022 metadata dataframes as they are directly queried
 # from LIMS.
 
-from typing import Optional, Dict, List
-import pandas as pd
-import numpy as np
 import json
-import warnings
 import logging
 import time
+import warnings
+from typing import Dict, List, Optional
 
+import numpy as np
+import pandas as pd
+
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import \
+    __get_prior_exposure_count
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    BehaviorStimulusFile
+from allensdk.brain_observatory.ecephys.utils import strip_substructure_acronym
 from allensdk.internal.api import PostgresQueryMixin
-
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .tables.util.prior_exposure_processing import (
-        __get_prior_exposure_count)
-
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile)
-
-from allensdk.internal.api.queries.behavior_lims_queries import (
-    stimulus_pickle_paths_from_behavior_session_ids)
-
-from allensdk.brain_observatory.ecephys.utils import (
-    strip_substructure_acronym)
+from allensdk.internal.api.queries.behavior_lims_queries import \
+    stimulus_pickle_paths_from_behavior_session_ids
 
 
 def _add_session_number(

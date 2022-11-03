@@ -1,10 +1,9 @@
-import pytest
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.behavior.data_objects import (
-    StimulusTimestamps)
-from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
-    Trial)
+import pytest
+
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
 
 
 @pytest.mark.parametrize("behavior_stimuli_data_fixture, trial, expected",

@@ -1,21 +1,24 @@
-import pytest
-import sys
-from mock import patch, mock_open, Mock, MagicMock
-from allensdk.model.biophysical.utils import Utils
-from allensdk.model.biophys_sim.config import Config
 import os
-import mock
 import shutil
+import sys
+
+import mock
+import pytest
+from mock import MagicMock, Mock, mock_open, patch
+
+from allensdk.model.biophys_sim.config import Config
+from allensdk.model.biophysical.utils import Utils
+
 try:
     import __builtin__ as builtins
 except:
     import builtins
-from allensdk.model.biophysical import runner
-from allensdk.internal.model.biophysical.run_optimize \
-    import RunOptimize
-from allensdk.internal.api.queries.optimize_config_reader \
-    import OptimizeConfigReader
+
+from allensdk.internal.api.queries.optimize_config_reader import \
+    OptimizeConfigReader
+from allensdk.internal.model.biophysical.run_optimize import RunOptimize
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+from allensdk.model.biophysical import runner
 
 real_import = __import__
 

@@ -1,29 +1,23 @@
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.core import \
-    LimsReadableInterface, NwbReadableInterface, JsonReadableInterface
-from allensdk.brain_observatory.behavior.data_files.sync_file import \
-    SyncFileReadableInterface
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile,
-    MappingStimulusFile,
-    ReplayStimulusFile,
-    SyncFile
-)
-from allensdk.core import NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .stimulus_timestamps.timestamps_processing import (
-        get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+from allensdk.brain_observatory.behavior.data_files.sync_file import \
+    SyncFileReadableInterface
+from allensdk.brain_observatory.behavior.data_objects.timestamps.stimulus_timestamps.timestamps_processing import (
+    get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+from allensdk.brain_observatory.sync_stim_aligner import \
+    get_stim_timestamps_from_stimulus_blocks
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface,
+                           NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.sync_stim_aligner import (
-    get_stim_timestamps_from_stimulus_blocks)
 
 
 class StimulusTimestamps(DataObject,

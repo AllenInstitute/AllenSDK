@@ -1,20 +1,17 @@
 import warnings
+from typing import Optional
 
 import numpy as np
 import pandas as pd
-from typing import Optional
-
 import pynwb
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    LimsReadableInterface, JsonReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
 from allensdk.brain_observatory.behavior.schemas import \
     OphysEyeTrackingRigMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface,
+                           NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

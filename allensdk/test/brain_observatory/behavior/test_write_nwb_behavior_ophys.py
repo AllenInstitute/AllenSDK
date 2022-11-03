@@ -1,8 +1,7 @@
-import mock
 from pathlib import Path
 
+import mock
 import pytest
-
 
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import \
     write_behavior_ophys_nwb  # noqa: E501

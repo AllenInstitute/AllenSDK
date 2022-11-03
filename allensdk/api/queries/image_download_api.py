@@ -33,9 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_template import RmaTemplate
-from allensdk.api.warehouse_cache.cache import cacheable
 from six import string_types
+
+from allensdk.api.warehouse_cache.cache import cacheable
+
+from .rma_template import RmaTemplate
 
 
 class ImageDownloadApi(RmaTemplate):

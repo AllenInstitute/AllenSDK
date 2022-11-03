@@ -14,13 +14,14 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-import logging
-import allensdk.internal.core.lims_utilities as lims_utilities
-from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.config.manifest import Manifest
 import json
+import logging
+import os
 import traceback
+
+import allensdk.internal.core.lims_utilities as lims_utilities
+from allensdk.config.manifest import Manifest
+from allensdk.config.manifest_builder import ManifestBuilder
 
 
 class OptimizeConfigReader(object):

@@ -1,12 +1,12 @@
 from __future__ import division
 
+import mock
 import numpy as np
 import pytest
-import mock
 from six import iteritems
 
-from allensdk.internal.mouse_connectivity.interval_unionize.interval_unionizer \
-    import IntervalUnionizer
+from allensdk.internal.mouse_connectivity.interval_unionize.interval_unionizer import \
+    IntervalUnionizer
 
 
 @pytest.fixture(scope='function')

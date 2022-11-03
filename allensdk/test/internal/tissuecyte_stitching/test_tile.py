@@ -1,9 +1,8 @@
-import pytest
 import mock
 import numpy as np
+import pytest
 
 from allensdk.internal.mouse_connectivity.tissuecyte_stitching.tile import Tile
-
 
 
 @pytest.fixture(scope='function')

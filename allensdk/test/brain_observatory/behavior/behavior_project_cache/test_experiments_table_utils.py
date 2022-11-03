@@ -1,11 +1,11 @@
 import copy
+
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    tables.util.experiments_table_utils import (
-        add_experience_level_to_experiment_table,
-        add_passive_flag_to_ophys_experiment_table,
-        add_image_set_to_experiment_table)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.experiments_table_utils import (
+    add_experience_level_to_experiment_table,
+    add_image_set_to_experiment_table,
+    add_passive_flag_to_ophys_experiment_table)
 
 
 def test_add_experience_level():

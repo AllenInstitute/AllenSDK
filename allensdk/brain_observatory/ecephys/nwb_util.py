@@ -5,8 +5,8 @@ import pandas as pd
 import pynwb
 
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, \
-    EcephysElectrodeGroup
+from allensdk.brain_observatory.ecephys.nwb import (EcephysElectrodeGroup,
+                                                    EcephysProbe)
 
 ELECTRODE_TABLE_DEFAULT_COLUMNS = [
     ("probe_vertical_position",

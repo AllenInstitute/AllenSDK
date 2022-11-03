@@ -1,8 +1,7 @@
-import subprocess as sp
 import os
+import subprocess as sp
 
 import pytest
-
 
 EXAMPLE_DIR = os.path.join(
     os.path.dirname(__file__),

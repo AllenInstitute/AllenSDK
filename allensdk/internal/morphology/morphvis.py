@@ -1,5 +1,6 @@
-from PIL import Image, ImageDraw
 import numpy as np
+from PIL import Image, ImageDraw
+
 
 class MorphologyColors(object):
     def __init__(self):

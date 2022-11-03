@@ -6,10 +6,11 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._unit import Unit
-from allensdk.brain_observatory.ecephys.utils import load_and_squeeze_npy, \
-    scale_amplitudes, group_1d_by_unit
-from allensdk.core import DataObject, NwbReadableInterface, \
-    JsonReadableInterface
+from allensdk.brain_observatory.ecephys.utils import (group_1d_by_unit,
+                                                      load_and_squeeze_npy,
+                                                      scale_amplitudes)
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface)
 
 
 class Units(DataObject, JsonReadableInterface, NwbReadableInterface):

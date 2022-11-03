@@ -1,7 +1,7 @@
 from pathlib import Path
 
-import pytest
 import pandas as pd
+import pytest
 import xarray as xr
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession

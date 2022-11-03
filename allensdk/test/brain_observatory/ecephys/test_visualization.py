@@ -1,5 +1,7 @@
-import allensdk.brain_observatory.ecephys.visualization.__init__ as vis
 import pandas as pd
+
+import allensdk.brain_observatory.ecephys.visualization.__init__ as vis
+
 
 def test_raster_plot():
     spike_times = pd.DataFrame({

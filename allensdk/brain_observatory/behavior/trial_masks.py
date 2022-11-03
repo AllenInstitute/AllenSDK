@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def trial_types(trials, trial_types):
     """ only include trials of certain trial types
 

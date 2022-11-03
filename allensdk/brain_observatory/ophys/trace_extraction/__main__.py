@@ -1,17 +1,17 @@
-import logging
-import sys
-import marshmallow
 import argparse
+import logging
 import os
 import sys
 
+import argschema
+import h5py
+import marshmallow
 import numpy as np
 import requests
-import h5py
-import argschema
 
-from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 from allensdk.brain_observatory import roi_masks
+from allensdk.brain_observatory.argschema_utilities import \
+    write_or_print_outputs
 
 from ._schemas import InputSchema, OutputSchema
 

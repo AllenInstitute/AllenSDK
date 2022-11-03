@@ -2,13 +2,15 @@
 
 import logging
 import sys
+
 import argschema
 import marshmallow
+
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
+from allensdk.brain_observatory.ecephys.write_nwb.vbn._schemas import (
+    OutputSchema, VBNInputSchema)
 from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
-from allensdk.brain_observatory.ecephys.write_nwb.vbn._schemas import \
-    VBNInputSchema, OutputSchema
 
 
 def main():

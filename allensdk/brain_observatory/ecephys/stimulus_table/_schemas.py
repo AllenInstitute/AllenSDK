@@ -1,9 +1,8 @@
 import sys
 
 from argschema import ArgSchema
+from argschema.fields import Bool, Dict, Float, List, Nested, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, String, Float, Dict, List, Bool
-
 
 default_stimulus_renames = {
     "": "spontaneous",

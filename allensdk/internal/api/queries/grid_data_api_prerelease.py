@@ -1,14 +1,14 @@
 import os
+
 import six
 
-from allensdk.config.manifest import Manifest
-from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.grid_data_api import GridDataApi
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+from allensdk.config.manifest import Manifest
 from allensdk.core import json_utilities
 
-from ..api_prerelease import ApiPrerelease
 from ...core import lims_utilities as lu
-
+from ..api_prerelease import ApiPrerelease
 
 _STORAGE_DIRECTORY_QUERY = '''
 select     iser.id,

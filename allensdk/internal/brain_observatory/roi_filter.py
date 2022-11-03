@@ -1,17 +1,20 @@
 import itertools
-from six.moves import cPickle
 import logging
-from allensdk.internal.brain_observatory import roi_filter_utils
+
+from six.moves import cPickle
+
 import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.brain_observatory.roi_masks import create_roi_mask_array
+from allensdk.internal.brain_observatory import roi_filter_utils
 
 try:
     from sklearn.model_selection import cross_val_score
 except ImportError:
     from sklearn.cross_validation import cross_val_score
-from sklearn import __version__ as sklearn_version
+
 import numpy as np
 import pandas as pd
+from sklearn import __version__ as sklearn_version
 
 
 class ROIClassifier(object):

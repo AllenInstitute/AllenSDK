@@ -1,38 +1,32 @@
-from typing import Optional, List, Dict, Any, Type
+from typing import Any, Dict, List, Optional, Type
 
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.behavior.behavior_session import \
-    BehaviorSession
-from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
-    BehaviorEcephysMetadata
-from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
-from allensdk.brain_observatory.ecephys.probes import Probes
-from allensdk.brain_observatory.ecephys.data_objects.trials import (
-    VBNTrialTable)
-
-from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.\
-    data_objects.trials.trial_table import (
-        TrialTable)
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.behavior_session import (
-    StimulusFileLookup)
-from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import (
-    Stimuli)
+    BehaviorSession, StimulusFileLookup)
+from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
-from allensdk.brain_observatory.behavior.\
-    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
-
-
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import EyeTrackingTable, get_lost_frames
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import (
+    EyeTrackingTable, get_lost_frames)
+from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
+    Stimuli
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
+    TrialTable
+from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
+    BehaviorEcephysMetadata
+from allensdk.brain_observatory.ecephys.data_objects.trials import \
+    VBNTrialTable
+from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
+from allensdk.brain_observatory.ecephys.probes import Probes
 
 
 class VBNBehaviorSession(BehaviorSession):

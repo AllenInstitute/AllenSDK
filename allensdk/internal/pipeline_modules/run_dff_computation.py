@@ -1,9 +1,11 @@
-import os
 import argparse
-import h5py
 import logging
-from allensdk.brain_observatory.dff import calculate_dff
+import os
+
+import h5py
+
 import allensdk.core.json_utilities as ju
+from allensdk.brain_observatory.dff import calculate_dff
 
 
 def parse_input(data):

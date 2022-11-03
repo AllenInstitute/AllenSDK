@@ -1,8 +1,9 @@
 import os
 import sys
+
 sys.path.append('/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/pbstools')
-from pbstools import PythonJob 
 import behavior_project_cache as bpc
+from pbstools import PythonJob
 
 python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/save_trial_response_df.py"
 

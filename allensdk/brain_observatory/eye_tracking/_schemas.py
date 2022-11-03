@@ -1,9 +1,12 @@
 from argschema import ArgSchema, ArgSchemaParser
+from argschema.fields import (Boolean, DateTime, Dict, Float, Int, List,
+                              LogLevel, Nested, String)
 from argschema.schemas import DefaultSchema
-from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float, List, Dict
 from marshmallow import RAISE, ValidationError
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access_overwrite, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import (
+    RaisingSchema, check_read_access, check_write_access_overwrite)
+
 
 class InputSchema(ArgSchema):
     class Meta:

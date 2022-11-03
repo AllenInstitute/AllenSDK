@@ -1,8 +1,8 @@
 from __future__ import division
 
+import numpy as np
 import SimpleITK as sitk
 from six.moves import xrange
-import numpy as np
 
 
 def convert_axis(axis):

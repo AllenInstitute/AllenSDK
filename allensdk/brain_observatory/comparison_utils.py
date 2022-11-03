@@ -2,9 +2,9 @@ import datetime
 import math
 from typing import Any, Optional, Set
 
-import SimpleITK as sitk
 import numpy as np
 import pandas as pd
+import SimpleITK as sitk
 import xarray as xr
 from pandas.testing import assert_frame_equal
 

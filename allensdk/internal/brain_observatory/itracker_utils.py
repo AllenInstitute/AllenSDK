@@ -1,8 +1,9 @@
-import numpy as np
-from scipy.signal import correlate2d
-from scipy.signal import fftconvolve
-from scipy.ndimage.filters import sobel
 import logging
+
+import numpy as np
+from scipy.ndimage.filters import sobel
+from scipy.signal import correlate2d, fftconvolve
+
 
 def default_ray(n):
 

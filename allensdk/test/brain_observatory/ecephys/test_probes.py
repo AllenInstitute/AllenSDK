@@ -1,5 +1,6 @@
-import pytest
 import copy
+
+import pytest
 
 from allensdk.brain_observatory.ecephys._channel import Channel
 from allensdk.brain_observatory.ecephys.probes import Probes

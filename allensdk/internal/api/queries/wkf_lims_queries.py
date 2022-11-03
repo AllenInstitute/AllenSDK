@@ -1,8 +1,8 @@
-from typing import List, Dict
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
+from typing import Dict, List
+
 from allensdk import OneResultExpectedError
+from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 def wkf_path_from_attachable(

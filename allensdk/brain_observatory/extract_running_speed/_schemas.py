@@ -1,6 +1,6 @@
 from argschema import ArgSchema
+from argschema.fields import Boolean, Float, Nested, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, String, Float, Boolean
 
 
 class InputParameters(ArgSchema):

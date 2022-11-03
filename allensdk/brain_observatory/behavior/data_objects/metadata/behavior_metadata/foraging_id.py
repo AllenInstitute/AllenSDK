@@ -1,8 +1,7 @@
 import uuid
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

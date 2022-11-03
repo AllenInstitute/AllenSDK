@@ -1,14 +1,13 @@
 from pathlib import Path
 
-import pytest
-
 import numpy as np
 import pandas as pd
+import pytest
 
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
-    load_eye_tracking_hdf, determine_outliers, compute_circular_area,
-    compute_elliptical_area, determine_likely_blinks,
-    process_eye_tracking_data, EyeTrackingError)
+    EyeTrackingError, compute_circular_area, compute_elliptical_area,
+    determine_likely_blinks, determine_outliers, load_eye_tracking_hdf,
+    process_eye_tracking_data)
 
 
 def create_preload_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:

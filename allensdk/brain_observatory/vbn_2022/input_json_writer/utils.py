@@ -1,42 +1,28 @@
-from typing import List, Optional, Dict, Union
-
-import pandas as pd
-import numpy as np
 import numbers
+from typing import Dict, List, Optional, Union
 
-from allensdk.internal.api.queries.wkf_lims_queries import (
-    wkf_path_from_attachable)
+import numpy as np
+import pandas as pd
 
-from allensdk.internal.api.queries.equipment_lims_queries import (
-    experiment_configs_from_equipment_id_and_type)
-
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk import OneResultExpectedError
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    metadata.subject_metadata.reporter_line import ReporterLine
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    metadata.subject_metadata.driver_line import DriverLine
-
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.driver_line import \
+    DriverLine
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
+    ReporterLine
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import (
+    _add_age_in_days, _patch_date_and_stage_from_pickle_file)
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     _ecephys_summary_table_from_ecephys_session_id_list,
+    channels_table_from_ecephys_session_id_list, get_list_of_bad_probe_ids,
     probes_table_from_ecephys_session_id_list,
-    channels_table_from_ecephys_session_id_list,
-    units_table_from_ecephys_session_id_list,
-    get_list_of_bad_probe_ids)
-
-from allensdk.brain_observatory.vbn_2022.metadata_writer.\
-    dataframe_manipulations import (
-        _add_age_in_days,
-        _patch_date_and_stage_from_pickle_file)
-
-from allensdk.core.auth_config import (
-    LIMS_DB_CREDENTIAL_MAP)
-
-from allensdk.internal.api import db_connection_creator
+    units_table_from_ecephys_session_id_list)
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
+from allensdk.internal.api.queries.equipment_lims_queries import \
+    experiment_configs_from_equipment_id_and_type
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
+from allensdk.internal.api.queries.wkf_lims_queries import \
+    wkf_path_from_attachable
 
 
 class NwbConfigErrorLog(object):

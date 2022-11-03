@@ -1,8 +1,8 @@
 import functools
 
 import h5py
-import pytest
 import numpy as np
+import pytest
 
 import allensdk.core.h5_utilities as h5_utilities
 

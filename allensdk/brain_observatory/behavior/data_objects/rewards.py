@@ -1,18 +1,15 @@
 from typing import Optional
 
-import pandas as pd
 import numpy as np
-from pynwb import NWBFile, TimeSeries, ProcessingModule
+import pandas as pd
+from pynwb import NWBFile, ProcessingModule, TimeSeries
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 
 
 class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,

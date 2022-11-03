@@ -1,7 +1,7 @@
 import warnings
 
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-        BehaviorOphysExperiment as BOE
+    BehaviorOphysExperiment as BOE
 
 # alias as BOE prevents someone becoming comfortable with
 # import BehaviorOphysExperiment from this to-be-deprecated module

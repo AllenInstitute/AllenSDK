@@ -1,12 +1,17 @@
-import pytest
-import json
 import hashlib
+import json
 import pathlib
+
+import pytest
 from moto import mock_s3
+
+from allensdk.api.cloud_cache.cloud_cache import (LocalCache,
+                                                  MissingLocalManifestWarning,
+                                                  S3CloudCache)
+from allensdk.api.cloud_cache.file_attributes import \
+    CacheFileAttributes  # noqa: E501
+
 from .utils import create_bucket
-from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
-from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 @mock_s3

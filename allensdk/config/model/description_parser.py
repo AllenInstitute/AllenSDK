@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import logging
+
 from allensdk.config.model.description import Description
 
 
@@ -91,8 +92,10 @@ class DescriptionParser(object):
             Appropriate subclass.
         '''
         # Circular imports
-        from allensdk.config.model.formats.json_description_parser import JsonDescriptionParser
-        from allensdk.config.model.formats.pycfg_description_parser import PycfgDescriptionParser
+        from allensdk.config.model.formats.json_description_parser import \
+            JsonDescriptionParser
+        from allensdk.config.model.formats.pycfg_description_parser import \
+            PycfgDescriptionParser
 
         parser = None
 

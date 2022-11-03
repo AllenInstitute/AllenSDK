@@ -35,19 +35,19 @@
 #
 
 import io
-from six.moves import builtins
-import zipfile
 import os
+import zipfile
 
 import numpy as np
 import pytest
-from mock import MagicMock, patch, mock_open
-from requests.exceptions import HTTPError
 import requests
+from mock import MagicMock, mock_open, patch
+from requests.exceptions import HTTPError
+from six.moves import builtins
 
 import allensdk.core.json_utilities as ju
-from allensdk.api.api import Api, stream_file_over_http, stream_zip_directory_over_http
-
+from allensdk.api.api import (Api, stream_file_over_http,
+                              stream_zip_directory_over_http)
 
 _msg = {'whatever': True}
 

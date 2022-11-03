@@ -1,14 +1,13 @@
 import re
 from unittest import mock
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
+from allensdk.brain_observatory.ecephys.ecephys_project_api import \
+    ecephys_project_lims_api as epla
 from allensdk.core.authentication import DbCredentials
-from allensdk.brain_observatory.ecephys.ecephys_project_api import (
-    ecephys_project_lims_api as epla,
-)
 
 mock_lims_credentials = DbCredentials(dbname='mock_lims', user='mock_user',
                                       host='mock_host', port='mock_port',

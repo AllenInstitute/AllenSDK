@@ -1,14 +1,14 @@
 from __future__ import division
+
+import functools
 import logging
 import sys
-import functools
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 from six import iteritems
 
 from allensdk.mouse_connectivity.grid.utilities import image_utilities as iu
-
 
 #==============================================================================
 

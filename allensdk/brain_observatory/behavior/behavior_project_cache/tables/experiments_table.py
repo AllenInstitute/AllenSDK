@@ -1,18 +1,15 @@
-from typing import Optional, List
+from typing import List, Optional
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .ophys_mixin import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_mixin import \
     OphysMixin
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .project_table import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import \
     ProjectTable
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .util.experiments_table_utils import (
-        add_experience_level_to_experiment_table,
-        add_passive_flag_to_ophys_experiment_table,
-        add_image_set_to_experiment_table)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.experiments_table_utils import (
+    add_experience_level_to_experiment_table,
+    add_image_set_to_experiment_table,
+    add_passive_flag_to_ophys_experiment_table)
 
 
 class ExperimentsTable(ProjectTable, OphysMixin):

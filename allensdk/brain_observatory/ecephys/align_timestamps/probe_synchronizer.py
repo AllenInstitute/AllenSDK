@@ -1,6 +1,6 @@
-from . import barcode
-
 import numpy as np
+
+from . import barcode
 
 
 class ProbeSynchronizer(object):

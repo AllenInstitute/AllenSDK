@@ -1,21 +1,15 @@
-import pytest
 import pandas as pd
+import pytest
 
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query,
-    _sanitize_uuid_list)
-
-from allensdk.internal.api.queries.behavior_lims_queries import (
-    foraging_id_map_from_behavior_session_id)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
-
-from allensdk.internal.api.queries.ecephys_lims_queries import (
-    donor_id_list_from_ecephys_session_ids)
-
-from allensdk.test_utilities.custom_comparators import (
-    WhitespaceStrippedString)
+from allensdk.internal.api.queries.behavior_lims_queries import \
+    foraging_id_map_from_behavior_session_id
+from allensdk.internal.api.queries.ecephys_lims_queries import \
+    donor_id_list_from_ecephys_session_ids
+from allensdk.internal.api.queries.mtrain_queries import \
+    session_stage_from_foraging_id
+from allensdk.internal.api.queries.utils import (_sanitize_uuid_list,
+                                                 build_in_list_selector_query)
+from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
 
 
 @pytest.mark.parametrize(

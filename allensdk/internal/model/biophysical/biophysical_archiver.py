@@ -1,9 +1,10 @@
-from allensdk.api.queries.biophysical_api import \
-    BiophysicalApi
+import os
+import shutil
+import sys
+
+from allensdk.api.queries.biophysical_api import BiophysicalApi
 from allensdk.api.queries.cell_types_api import CellTypesApi
 from allensdk.api.queries.rma_api import RmaApi
-import os, sys, shutil
-
 
 #bp = BiophysicalApi('http://api.brain-map.org')
 #bp.cache_stimulus = True # change to False to not download the large stimulus NWB file

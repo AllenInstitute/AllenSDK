@@ -1,5 +1,6 @@
-import mock
 from pathlib import Path
+
+import mock
 import pytest
 
 from allensdk.brain_observatory.behavior.write_behavior_nwb.__main__ import \

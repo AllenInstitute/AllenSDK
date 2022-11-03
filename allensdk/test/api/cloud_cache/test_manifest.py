@@ -1,9 +1,12 @@
-import pytest
 import json
 import pathlib
-from allensdk.internal.core.lims_utilities import safe_system_path
+
+import pytest
+
+from allensdk.api.cloud_cache.file_attributes import \
+    CacheFileAttributes  # noqa: E501
 from allensdk.api.cloud_cache.manifest import Manifest
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 @pytest.fixture

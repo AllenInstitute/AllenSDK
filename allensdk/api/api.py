@@ -34,16 +34,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from contextlib import closing
+import errno
+import io
 import logging
 import os
-import errno
 import warnings
-import io
 import zipfile
+from contextlib import closing
 
-import requests
 import pandas as pd
+import requests
 from requests_toolbelt import exceptions
 from requests_toolbelt.downloadutils import stream
 

@@ -2,8 +2,8 @@ from __future__ import division
 
 import logging
 
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
 
 
 def sitk_get_image_parameters(volume):

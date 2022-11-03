@@ -34,11 +34,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import copy
-import warnings
 import functools
+import warnings
+
 from numpy import VisibleDeprecationWarning
 
-    
+
 def deprecated(message=None):
 
     if message is None:

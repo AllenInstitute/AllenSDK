@@ -1,18 +1,18 @@
-import numpy as np
-import sys
+import ast
+import json
+import logging
 import os
 import subprocess as sp
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+from fit_ellipse import FitEllipse, fit_ellipse
+from itracker_utils import (generate_rays, initial_cr_point,
+                            initial_pupil_point, sobel_grad)
 from PIL import Image, ImageDraw
 from scipy.misc import imsave
 from scipy.signal import medfilt2d
-import ast
-import json
-
-from fit_ellipse import fit_ellipse, FitEllipse
-from itracker_utils import generate_rays, initial_pupil_point, initial_cr_point, sobel_grad
-import logging
-
-import matplotlib.pyplot as plt
 
 # import cv2
 

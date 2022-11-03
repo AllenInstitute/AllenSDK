@@ -33,8 +33,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import allensdk.brain_observatory.circle_plots as cplots
 import numpy as np
+
+import allensdk.brain_observatory.circle_plots as cplots
+
 
 def test_polar_to_xy():
     d = cplots.polar_to_xy([0], 0.0)

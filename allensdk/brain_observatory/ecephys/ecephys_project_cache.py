@@ -1,28 +1,26 @@
+import ast
 from functools import partial
 from pathlib import Path
-from typing import Any, List, Optional, Union, Callable
-import ast
+from typing import Any, Callable, List, Optional, Union
 
-import pandas as pd
-import SimpleITK as sitk
 import numpy as np
+import pandas as pd
 import pynwb
+import SimpleITK as sitk
 
 from allensdk.api.warehouse_cache.cache import Cache
-from allensdk.core.authentication import DbCredentials
-from allensdk.brain_observatory.ecephys.ecephys_project_api import (
-    EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi,
-    EcephysProjectFixedApi
-)
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
-    write_bytes_from_coroutine, write_from_stream
-)
-from allensdk.brain_observatory.ecephys.ecephys_session_api import (
-    EcephysNwbSessionApi
-)
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.api.warehouse_cache.caching_utilities import \
+    one_file_call_caching
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
-from allensdk.api.warehouse_cache.caching_utilities import one_file_call_caching
+from allensdk.brain_observatory.ecephys.ecephys_project_api import (
+    EcephysProjectApi, EcephysProjectFixedApi, EcephysProjectLimsApi,
+    EcephysProjectWarehouseApi)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
+    write_bytes_from_coroutine, write_from_stream)
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_session_api import \
+    EcephysNwbSessionApi
+from allensdk.core.authentication import DbCredentials
 
 
 class EcephysProjectCache(Cache):

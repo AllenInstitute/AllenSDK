@@ -1,6 +1,9 @@
 #!/usr/bin/python
-import os, sys
+import os
+import sys
+
 from six.moves import xrange
+
 import allensdk.internal.core.swc as swc
 
 

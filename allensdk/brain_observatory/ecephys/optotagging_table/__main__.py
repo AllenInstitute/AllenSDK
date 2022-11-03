@@ -1,11 +1,10 @@
 import pandas as pd
 
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
-from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (
-    EcephysSyncDataset,
-)
+from allensdk.brain_observatory.argschema_utilities import (
+    ArgSchemaParserPlus, write_or_print_outputs)
+from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import \
+    EcephysSyncDataset
+
 from ._schemas import InputParameters, OutputParameters
 
 

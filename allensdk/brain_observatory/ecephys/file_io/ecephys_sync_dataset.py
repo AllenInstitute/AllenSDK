@@ -1,12 +1,12 @@
 import functools
-from collections import defaultdict
 import logging
 import warnings
+from collections import defaultdict
 
 import numpy as np
 
-from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory.ecephys import stimulus_sync
+from allensdk.brain_observatory.sync_dataset import Dataset
 
 
 class EcephysSyncDataset(Dataset):

@@ -35,13 +35,16 @@
 #
 import logging
 import os
-from ..biophys_sim.neuron.hoc_utils import HocUtils
-from allensdk.core.nwb_data_set import NwbDataSet
 from fractions import gcd
-from skimage.measure import block_reduce
-import scipy.interpolate
+
 import numpy as np
-from pkg_resources import resource_filename #@UnresolvedImport
+import scipy.interpolate
+from pkg_resources import resource_filename  # @UnresolvedImport
+from skimage.measure import block_reduce
+
+from allensdk.core.nwb_data_set import NwbDataSet
+
+from ..biophys_sim.neuron.hoc_utils import HocUtils
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"

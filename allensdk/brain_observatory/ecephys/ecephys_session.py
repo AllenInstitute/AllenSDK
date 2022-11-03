@@ -1,22 +1,19 @@
 import warnings
-from collections.abc import Collection
 from collections import defaultdict
+from collections.abc import Collection
 from typing import Optional
 
-import xarray as xr
 import numpy as np
 import pandas as pd
 import scipy.stats
+import xarray as xr
 
-from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import (
-        EcephysSessionApi,
-        EcephysNwbSessionApi,
-        EcephysNwb1Api)
+    EcephysNwb1Api, EcephysNwbSessionApi, EcephysSessionApi)
 from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
 from allensdk.brain_observatory.ecephys.stimulus_table._schemas import (
-    default_stimulus_renames,
-    default_column_renames)
+    default_column_renames, default_stimulus_renames)
+from allensdk.core.lazy_property import LazyPropertyMixin
 
 # stimulus_presentation column names not describing a parameter of a stimulus
 NON_STIMULUS_PARAMETERS = tuple([

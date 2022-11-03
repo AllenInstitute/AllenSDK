@@ -2,10 +2,9 @@ from __future__ import division
 
 import logging
 
-
 import matplotlib as mpl
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
 
 
 def convert_discrete_colormap(data, cm_name='custom', color_names=None):

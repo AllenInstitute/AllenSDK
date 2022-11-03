@@ -1,7 +1,8 @@
 import pytest
 
-from allensdk.core.authentication import (
-    EnvCredentialProvider, credential_injector, set_credential_provider)
+from allensdk.core.authentication import (EnvCredentialProvider,
+                                          credential_injector,
+                                          set_credential_provider)
 
 
 @pytest.mark.parametrize(

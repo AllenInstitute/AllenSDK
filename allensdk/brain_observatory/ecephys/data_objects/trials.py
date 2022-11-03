@@ -1,12 +1,10 @@
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import numpy as np
 
-from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
-    Trial)
-from allensdk.brain_observatory.behavior.data_objects.\
-    trials.trial_table import (
-        TrialTable)
+from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
+    TrialTable
 
 
 class VBNTrial(Trial):

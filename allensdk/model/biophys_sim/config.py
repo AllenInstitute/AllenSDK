@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import re
 import logging
+import re
+
 from pkg_resources import resource_filename  # @UnresolvedImport
+
 from allensdk.config.app.application_config import ApplicationConfig
-from allensdk.config.model.description_parser import DescriptionParser
 from allensdk.config.model.description import Description
+from allensdk.config.model.description_parser import DescriptionParser
 
 
 class Config(ApplicationConfig):

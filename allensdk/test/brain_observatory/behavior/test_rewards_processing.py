@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 

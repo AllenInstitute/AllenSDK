@@ -33,25 +33,26 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
-from .static_gratings import StaticGratings
-from .locally_sparse_noise import LocallySparseNoise
-from .natural_scenes import NaturalScenes
-from .drifting_gratings import DriftingGratings
-from .natural_movie import NaturalMovie
-import six
-from allensdk.core.brain_observatory_nwb_data_set \
-    import BrainObservatoryNwbDataSet
-from . import stimulus_info
-from allensdk.brain_observatory.brain_observatory_exceptions \
-    import BrainObservatoryAnalysisException
-from . import brain_observatory_plotting as cp
 import argparse
 import logging
 import os
 
+import numpy as np
+import six
+
+from allensdk.brain_observatory.brain_observatory_exceptions import \
+    BrainObservatoryAnalysisException
+from allensdk.core.brain_observatory_nwb_data_set import \
+    BrainObservatoryNwbDataSet
 from allensdk.deprecated import deprecated
 
+from . import brain_observatory_plotting as cp
+from . import stimulus_info
+from .drifting_gratings import DriftingGratings
+from .locally_sparse_noise import LocallySparseNoise
+from .natural_movie import NaturalMovie
+from .natural_scenes import NaturalScenes
+from .static_gratings import StaticGratings
 
 
 def multi_dataframe_merge(dfs):

@@ -38,7 +38,6 @@ import scipy.interpolate as si
 import scipy.ndimage.filters as filt
 import scipy.stats as stats
 
-
 ON_LUMINANCE = 255
 OFF_LUMINANCE = 0
 

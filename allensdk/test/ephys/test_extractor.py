@@ -34,13 +34,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import mock
-
-import pytest
-import numpy as np
-from allensdk.ephys.ephys_extractor import EphysSweepSetFeatureExtractor, input_resistance
-import allensdk.ephys.ephys_extractor as ephys_extractor
 import os
+
+import mock
+import numpy as np
+import pytest
+
+import allensdk.ephys.ephys_extractor as ephys_extractor
+from allensdk.ephys.ephys_extractor import (EphysSweepSetFeatureExtractor,
+                                            input_resistance)
+
 path = os.path.dirname(__file__)
 
 

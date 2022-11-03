@@ -1,16 +1,15 @@
-import os
 import hashlib
-from pathlib import Path
-import sys
+import os
 import shutil
-
-import pytest
+import sys
+from pathlib import Path
 
 import argschema
+import pytest
 
 import allensdk.brain_observatory.ecephys.copy_utility.__main__ as cu
 from allensdk.brain_observatory.ecephys.copy_utility._schemas import (
-        SessionUploadInputSchema, SessionUploadOutputSchema)
+    SessionUploadInputSchema, SessionUploadOutputSchema)
 
 
 @pytest.mark.parametrize("already_exists", [True, False])

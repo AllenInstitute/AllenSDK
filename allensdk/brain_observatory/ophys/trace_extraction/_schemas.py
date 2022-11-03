@@ -1,6 +1,6 @@
 from argschema import ArgSchema
-from argschema.fields import LogLevel, String, Nested, Boolean, Float, List, \
-    Integer
+from argschema.fields import (Boolean, Float, Integer, List, LogLevel, Nested,
+                              String)
 from marshmallow import RAISE
 
 from allensdk.brain_observatory.argschema_utilities import RaisingSchema

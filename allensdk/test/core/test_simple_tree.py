@@ -33,8 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 import mock
+import pytest
 from numpy import allclose
 
 from allensdk.core.simple_tree import SimpleTree

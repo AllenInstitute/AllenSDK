@@ -33,16 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
 import warnings
-import scipy.stats as st
-import scipy
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import logging
-from .findlevel import findlevel
-from .brain_observatory_exceptions import BrainObservatoryAnalysisException
+import scipy
+import scipy.stats as st
+
 from . import observatory_plots as oplots
-import matplotlib.pyplot as plt
+from .brain_observatory_exceptions import BrainObservatoryAnalysisException
+from .findlevel import findlevel
 
 
 class StimulusAnalysis(object):

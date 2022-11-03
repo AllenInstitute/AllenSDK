@@ -34,15 +34,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import numpy as np
 import sys
+
+import numpy as np
+
 if sys.version_info < (3, 3):
     from collections import Iterable
 else:
     from collections.abc import Iterable
+
+import datetime
 import json
 import uuid
-import datetime
+
 import dateutil
 
 

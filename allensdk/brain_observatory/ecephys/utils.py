@@ -1,7 +1,8 @@
 import logging
-from typing import Optional, Union
-import numpy as np
 import numbers
+from typing import Optional, Union
+
+import numpy as np
 import pandas as pd
 
 

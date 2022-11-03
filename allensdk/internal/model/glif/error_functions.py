@@ -1,13 +1,12 @@
 import logging
-import sys
 import os
-
-from scipy.stats import norm
+import sys
 
 import numpy as np
+from scipy.stats import norm
 
-from allensdk.internal.model.glif.glif_optimizer_neuron import GlifNeuronException
-from allensdk.internal.model.glif.glif_optimizer_neuron import GlifBadInitializationException
+from allensdk.internal.model.glif.glif_optimizer_neuron import (
+    GlifBadInitializationException, GlifNeuronException)
 from allensdk.model.glif.glif_neuron import GlifBadResetException
 
 # TODO: clean up

@@ -1,14 +1,14 @@
-from typing import Optional, Iterable, NamedTuple
+from typing import Iterable, NamedTuple, Optional
 
 import pandas as pd
 
-from .ecephys_project_api import EcephysProjectApi, ArrayLike
-from .http_engine import HttpEngine, AsyncHttpEngine
-from .utilities import postgres_macros, build_and_execute
-
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.core.authentication import credential_injector, DbCredentials
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.internal.api import PostgresQueryMixin
+
+from .ecephys_project_api import ArrayLike, EcephysProjectApi
+from .http_engine import AsyncHttpEngine, HttpEngine
+from .utilities import build_and_execute, postgres_macros
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):

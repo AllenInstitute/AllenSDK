@@ -1,5 +1,6 @@
-import pytest
 import copy
+
+import pytest
 
 
 @pytest.fixture

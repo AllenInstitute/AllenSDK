@@ -1,10 +1,13 @@
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.ecephys.current_source_density import _current_source_density as csd
-from allensdk.brain_observatory.ecephys.current_source_density import _interpolation_utils as interp_utils
-from allensdk.brain_observatory.ecephys.current_source_density import _filter_utils as filt_utils
+from allensdk.brain_observatory.ecephys.current_source_density import \
+    _current_source_density as csd
+from allensdk.brain_observatory.ecephys.current_source_density import \
+    _filter_utils as filt_utils
+from allensdk.brain_observatory.ecephys.current_source_density import \
+    _interpolation_utils as interp_utils
 
 
 @pytest.fixture

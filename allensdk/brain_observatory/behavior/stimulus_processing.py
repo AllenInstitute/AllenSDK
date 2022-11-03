@@ -1,15 +1,14 @@
 import pickle
 import warnings
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_templates import \
-    StimulusTemplate, StimulusTemplateFactory
-from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
-    convert_filepath_caseinsensitive, get_image_set_name
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimulus_templates import (
+    StimulusTemplate, StimulusTemplateFactory)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import (
+    convert_filepath_caseinsensitive, get_image_set_name)
 
 
 def load_pickle(pstream):

@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -9,8 +9,8 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.ecephys._probe import Probe
 from allensdk.brain_observatory.ecephys.nwb_util import \
     add_ragged_data_to_dynamic_table
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbReadableInterface, NwbWritableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,

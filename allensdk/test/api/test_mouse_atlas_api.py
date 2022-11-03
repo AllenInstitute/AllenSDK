@@ -34,11 +34,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from mock import MagicMock, patch
 import pytest
+from mock import MagicMock, patch
 
 from allensdk.api.queries.mouse_atlas_api import MouseAtlasApi as MAA
-
 
 
 @pytest.fixture

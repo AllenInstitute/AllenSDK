@@ -34,16 +34,18 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import matplotlib
+
 matplotlib.use('agg')
-import matplotlib.pyplot as plt # noqa: #402
-from allensdk.api.queries.glif_api import GlifApi  # noqa: #402
+import logging  # noqa: #402
+import os  # noqa: #402
+import shutil  # noqa: #402
+
+import matplotlib.pyplot as plt  # noqa: #402
+
 import allensdk.core.json_utilities as json_utilities  # noqa: #402
+from allensdk.api.queries.glif_api import GlifApi  # noqa: #402
 from allensdk.model.glif.glif_neuron import GlifNeuron  # noqa: #402
 from allensdk.model.glif.simulate_neuron import simulate_neuron  # noqa: #402
-import os         # noqa: #402
-import shutil     # noqa: #402
-import logging    # noqa: #402
-
 
 # NEURONAL_MODEL_ID = 491547163 # level 1 LIF
 NEURONAL_MODEL_ID = 491547171  # level 5 GLIF

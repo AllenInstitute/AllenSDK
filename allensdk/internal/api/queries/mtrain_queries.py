@@ -1,9 +1,10 @@
-from typing import Optional, List
-import pandas as pd
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
 import logging
+from typing import List, Optional
+
+import pandas as pd
+
+from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 def session_stage_from_foraging_id(

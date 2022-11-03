@@ -33,12 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import warnings
 import logging
+import warnings
+from functools import partial
+
 import numpy as np
 import scipy.signal as signal
 from scipy.optimize import curve_fit
-from functools import partial
+
 
 def detect_putative_spikes(v, t, start=None, end=None, filter=10., dv_cutoff=20.):
     """Perform initial detection of spikes and return their indexes.

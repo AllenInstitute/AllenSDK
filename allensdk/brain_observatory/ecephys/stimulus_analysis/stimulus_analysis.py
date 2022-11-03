@@ -1,17 +1,17 @@
-from six import string_types
+import warnings
+
 import numpy as np
 import pandas as pd
-import scipy.stats as st
 import scipy.ndimage as ndi
-
-from scipy.optimize import curve_fit
+import scipy.stats as st
 from scipy.ndimage import gaussian_filter
+from scipy.optimize import curve_fit
+from six import string_types
 
-from ..ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.ecephys_session_api import \
     EcephysNwbSessionApi
 
-import warnings
+from ..ecephys_session import EcephysSession
 
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
 

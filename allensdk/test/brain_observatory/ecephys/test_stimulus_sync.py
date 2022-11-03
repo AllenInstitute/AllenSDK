@@ -1,7 +1,7 @@
 from functools import partial
 
-import pytest
 import numpy as np
+import pytest
 
 from allensdk.brain_observatory.ecephys import stimulus_sync
 

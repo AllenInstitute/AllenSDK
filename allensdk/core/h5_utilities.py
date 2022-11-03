@@ -35,9 +35,9 @@
 #
 
 import functools
-import six
 
 import h5py
+import six
 
 
 def decode_bytes(bytes_dataset, encoding='UTF-8'):

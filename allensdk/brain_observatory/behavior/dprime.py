@@ -1,9 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.stats import norm
 
 from allensdk import one
-
 
 SLIDING_WINDOW = 100
 

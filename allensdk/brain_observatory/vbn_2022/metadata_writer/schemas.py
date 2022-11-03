@@ -1,11 +1,11 @@
+import pathlib
+
 import argschema
 from argschema.schemas import DefaultSchema
-import pathlib
 from marshmallow import post_load
 from marshmallow.validate import OneOf
 
-from allensdk.brain_observatory.vbn_2022.utils.schemas import (
-    ProbeToSkip)
+from allensdk.brain_observatory.vbn_2022.utils.schemas import ProbeToSkip
 
 
 class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):

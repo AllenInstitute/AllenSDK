@@ -1,13 +1,15 @@
 import logging
-import allensdk.internal.core.lims_utilities as lu
-from allensdk.internal.core.lims_pipeline_module import (
-        PipelineModule, run_module)
-from allensdk.internal.brain_observatory import roi_filter, roi_filter_utils
-from allensdk.brain_observatory.roi_masks import (RIGHT_SHIFT, LEFT_SHIFT,
-                                                  DOWN_SHIFT, UP_SHIFT)
-import pandas as pd
 import os
+
 import h5py
+import pandas as pd
+
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.brain_observatory.roi_masks import (DOWN_SHIFT, LEFT_SHIFT,
+                                                  RIGHT_SHIFT, UP_SHIFT)
+from allensdk.internal.brain_observatory import roi_filter, roi_filter_utils
+from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
+                                                         run_module)
 
 DEPRECATED_MOTION_HEADER = ["index", "x", "y", "a", "b", "c", "d", "e", "f"]
 MAX_SHIFT = 30

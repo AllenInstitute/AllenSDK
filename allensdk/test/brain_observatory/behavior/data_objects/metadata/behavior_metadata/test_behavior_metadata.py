@@ -2,52 +2,39 @@ import datetime
 import pickle
 import uuid
 from pathlib import Path
+from uuid import UUID
 
 import pynwb
 import pytest
 import pytz
-from uuid import UUID
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.behavior_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import \
     BehaviorMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.behavior_session_uuid import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.date_of_acquisition import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.equipment import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import \
     Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.session_type import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.session_type import \
     SessionType
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.stimulus_frame_rate import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.age import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.age import \
     Age
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.driver_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.driver_line import \
     DriverLine
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.full_genotype import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.full_genotype import \
     FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.mouse_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.mouse_id import \
     MouseId
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.reporter_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
     ReporterLine
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.sex import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.sex import \
     Sex
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .subject_metadata.subject_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.subject_metadata import \
     SubjectMetadata
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest

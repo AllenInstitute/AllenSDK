@@ -1,8 +1,9 @@
 import os
+
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib as mpl
 
 '''
     This file contains a set of functions that are useful in analyzing visual behavior data

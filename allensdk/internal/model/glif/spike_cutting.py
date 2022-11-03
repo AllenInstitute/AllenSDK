@@ -1,10 +1,13 @@
+import logging
+
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 from scipy.optimize import curve_fit, fmin
-from allensdk.internal.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WINDOW
-import logging
 
-import matplotlib.pyplot as plt 
+from allensdk.internal.model.glif.find_spikes import (ALIGN_CUT_WINDOW,
+                                                      align_and_cut_spikes)
+
 
 def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list, 
                                                     all_voltage_list, dt, El_reference, deltaV, 

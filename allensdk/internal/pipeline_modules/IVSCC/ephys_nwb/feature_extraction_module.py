@@ -1,20 +1,19 @@
 #!/usr/bin/python
-import sys, logging
-import os
-import json
-import shutil
 import argparse
 import copy
-import numpy as np
+import json
+import logging
+import os
 import shutil
+import sys
 
-from allensdk.config.manifest import Manifest
+import numpy as np
 
-import allensdk.internal.core.lims_utilities as lims_utilities
 import allensdk.core.json_utilities as json_utilities
-
-from allensdk.internal.ephys.core_feature_extract import *
+import allensdk.internal.core.lims_utilities as lims_utilities
+from allensdk.config.manifest import Manifest
 from allensdk.ephys.ephys_features import FeatureError
+from allensdk.internal.ephys.core_feature_extract import *
 
 
 def parse_args():

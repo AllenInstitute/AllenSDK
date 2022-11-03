@@ -1,12 +1,13 @@
 from __future__ import division
+
 import itertools as it
-from six.moves import xrange
 import logging
 
+import numpy as np
+from scipy.ndimage.filters import convolve
+from six.moves import xrange
 from skimage.measure import block_reduce
 from skimage.util import view_as_windows
-from scipy.ndimage.filters import convolve
-import numpy as np
 
 
 def downsample_average(volume, current_spacing, target_spacing):

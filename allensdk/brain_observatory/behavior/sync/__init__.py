@@ -3,10 +3,11 @@ Created on Sunday July 15 2018
 
 @author: marinag
 """
-from typing import Dict, Optional, List, Union
-from allensdk.brain_observatory.sync_dataset import \
-    Dataset as SyncDataset
+from typing import Dict, List, Optional, Union
+
 import numpy as np
+
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 
 
 def get_raw_stimulus_frames(

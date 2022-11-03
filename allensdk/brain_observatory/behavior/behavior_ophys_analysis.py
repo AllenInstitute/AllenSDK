@@ -1,10 +1,11 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
-from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-        BehaviorOphysExperiment
+    BehaviorOphysExperiment
+from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
+
 
 def plot_trace(timestamps, trace, ax=None, xlabel='time (seconds)', ylabel='fluorescence', title='roi'):
     if ax is None:

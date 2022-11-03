@@ -1,38 +1,29 @@
+import re
 import uuid
 from typing import Dict, Optional
-import re
+
 import numpy as np
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_session_uuid import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import \
     Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.foraging_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.foraging_id import \
     ForagingId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.session_type import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.session_type import \
     SessionType
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.stimulus_frame_rate import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.subject_metadata import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.subject_metadata import \
     SubjectMetadata
 from allensdk.brain_observatory.behavior.schemas import BehaviorMetadataSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           JsonWritableInterface, LimsReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 description_dict = {

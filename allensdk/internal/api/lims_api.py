@@ -1,10 +1,11 @@
-import pandas as pd
 from typing import Optional
 
+import pandas as pd
+
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.authentication import DbCredentials, credential_injector
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.core.authentication import credential_injector, DbCredentials
 
 
 class LimsApi():

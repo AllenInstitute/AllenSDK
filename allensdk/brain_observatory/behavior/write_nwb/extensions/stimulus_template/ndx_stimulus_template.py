@@ -1,5 +1,6 @@
 import os
-from pynwb import load_namespaces, get_class
+
+from pynwb import get_class, load_namespaces
 
 # Set path of the namespace.yaml file to the expected install location
 ndx_stimulus_template_specpath = os.path.join(

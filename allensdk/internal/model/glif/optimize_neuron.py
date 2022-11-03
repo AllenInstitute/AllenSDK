@@ -1,16 +1,17 @@
-import argparse, sys, logging
+import argparse
+import logging
+import sys
 
 import allensdk.core.json_utilities as ju
 import allensdk.internal.model.glif.find_sweeps as fs
-
-from allensdk.internal.model.glif.glif_optimizer_neuron import GlifOptimizerNeuron
-from allensdk.internal.model.glif.glif_experiment import GlifExperiment
-from allensdk.internal.model.glif.glif_optimizer import GlifOptimizer
-
+import allensdk.internal.model.glif.preprocess_neuron as pn
 from allensdk.internal.model.data_access import load_sweeps
 from allensdk.internal.model.glif.find_spikes import find_spikes_list
-import allensdk.core.json_utilities as ju
-import allensdk.internal.model.glif.preprocess_neuron as pn
+from allensdk.internal.model.glif.glif_experiment import GlifExperiment
+from allensdk.internal.model.glif.glif_optimizer import GlifOptimizer
+from allensdk.internal.model.glif.glif_optimizer_neuron import \
+    GlifOptimizerNeuron
+
 
 def get_optimize_sweep_numbers(sweep_index): 
     #TODO: why is this here--why are sweep indicies being fed to a find_noise_sweeps sweeps and specifying

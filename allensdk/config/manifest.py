@@ -33,13 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
-import sys
-import re
-import logging
 import errno
-import pandas as pd
+import logging
+import os
+import re
+import sys
 from pathlib import Path
+
+import pandas as pd
 
 
 class ManifestVersionError(Exception): 

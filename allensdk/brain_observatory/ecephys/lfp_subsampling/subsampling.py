@@ -36,7 +36,7 @@
 import logging
 
 import numpy as np
-from scipy.signal import decimate, butter, filtfilt
+from scipy.signal import butter, decimate, filtfilt
 
 logger = logging.getLogger(__name__)
 

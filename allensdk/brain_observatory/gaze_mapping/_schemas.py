@@ -1,11 +1,9 @@
 from argschema import ArgSchema
-from argschema.fields import Float, LogLevel, String, Boolean, Nested
+from argschema.fields import Boolean, Float, LogLevel, Nested, String
 
-from allensdk.brain_observatory.argschema_utilities import (
-    InputFile,
-    OutputFile,
-    RaisingSchema
-)
+from allensdk.brain_observatory.argschema_utilities import (InputFile,
+                                                            OutputFile,
+                                                            RaisingSchema)
 
 
 class InputSchema(ArgSchema):

@@ -1,7 +1,8 @@
-import pytest
-from allensdk.brain_observatory.behavior import session_metrics as metrics
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
+from allensdk.brain_observatory.behavior import session_metrics as metrics
 
 
 @pytest.mark.parametrize(

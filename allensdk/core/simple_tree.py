@@ -36,6 +36,7 @@
 import functools
 import operator as op
 from collections import defaultdict
+
 from six import iteritems
 
 from allensdk.deprecated import deprecated

@@ -1,8 +1,10 @@
-from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
-from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
 import logging
 
 import numpy as np
+
+from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
+from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+
 
 class Utils(HocUtils):
     _log = logging.getLogger(__name__)

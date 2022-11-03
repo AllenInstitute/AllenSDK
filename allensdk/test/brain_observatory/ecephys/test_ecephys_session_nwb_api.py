@@ -1,7 +1,7 @@
 # most of the tests for this functionality are actually in test_write_nwb
 
-import pytest
 import pandas as pd
+import pytest
 
 import allensdk.brain_observatory.ecephys.utils
 

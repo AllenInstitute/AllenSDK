@@ -33,12 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
+
 import pytest
-from mock import patch, mock_open, Mock
+from mock import Mock, mock_open, patch
 from simplejson.scanner import JSONDecodeError
+
 import allensdk.core.json_utilities as ju
 from allensdk.core.json_utilities import JsonComments
-import logging
+
 try:
     import __builtin__ as builtins  # @UnresolvedImport
 except:

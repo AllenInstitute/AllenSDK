@@ -1,8 +1,10 @@
 from typing import List
+
 import pandas as pd
+
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.api.queries.ecephys_lims_queries import (
-    donor_id_list_from_ecephys_session_ids)
+from allensdk.internal.api.queries.ecephys_lims_queries import \
+    donor_id_list_from_ecephys_session_ids
 from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 

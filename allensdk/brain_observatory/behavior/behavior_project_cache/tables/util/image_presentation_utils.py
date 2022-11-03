@@ -1,6 +1,7 @@
-from typing import Optional
-import pandas as pd
 import re
+from typing import Optional
+
+import pandas as pd
 
 
 def get_image_set(df: pd.DataFrame) -> pd.Series:

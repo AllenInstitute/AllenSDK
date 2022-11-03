@@ -1,19 +1,17 @@
 import abc
-from typing import Dict, Union
+import copy
+import datetime
 from pathlib import Path
+from typing import Dict, Union
 
-from cachetools import cached, LRUCache
+from cachetools import LRUCache, cached
 from cachetools.keys import hashkey
 
-import datetime
-import copy
-
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.internal.core import DataFile
 from allensdk.core import DataObject
-from allensdk.core.pickle_utils import (
-    load_and_sanitize_pickle)
+from allensdk.core.pickle_utils import load_and_sanitize_pickle
+from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.core import DataFile
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 # Query returns path to StimulusPickle file for given behavior session
 BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """

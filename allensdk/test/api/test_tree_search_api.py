@@ -34,10 +34,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ####test AllenSDK tree search api for Specimen and Structure
-from allensdk.api.queries.tree_search_api import TreeSearchApi
-import pytest
 import json
+
+import pytest
 from mock import MagicMock
+
+from allensdk.api.queries.tree_search_api import TreeSearchApi
+
 
 @pytest.fixture
 def tree_search():

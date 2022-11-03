@@ -1,8 +1,8 @@
 import logging
 
-from .count_subimage import CountSubImage
 from .cav_subimage import CavSubImage
 from .classic_subimage import ClassicSubImage
+from .count_subimage import CountSubImage
 
 
 def run_subimage(input_data):

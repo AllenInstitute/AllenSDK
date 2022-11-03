@@ -33,10 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
+
 import numpy as np
 import scipy.sparse as sparse
 from scipy.linalg import solve_banded
-import logging
 
 
 def get_diagonals_from_sparse(mat):

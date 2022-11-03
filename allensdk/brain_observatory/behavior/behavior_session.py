@@ -1,71 +1,55 @@
 import datetime
-from typing import Any, List, Dict, Optional, Type
-
-import pynwb
-import pandas as pd
-import numpy as np
-import pytz
 import pathlib
+from typing import Any, Dict, List, Optional, Type
 
+import numpy as np
+import pandas as pd
+import pynwb
+import pytz
 from pynwb import NWBFile
 
 from allensdk import OneResultExpectedError
-from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
-    EyeTrackingVideo
-from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory import sync_utilities
-
-from allensdk.brain_observatory.behavior.data_files import \
-    BehaviorStimulusFile, SyncFile, MappingStimulusFile, ReplayStimulusFile
-
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    StimulusFileLookup,
-    stimulus_lookup_from_json)
-
+from allensdk.brain_observatory.behavior.data_files import (
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
     EyeTrackingFile
-from allensdk.brain_observatory.behavior.\
-    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import EyeTrackingTable
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking\
-    .rig_geometry import \
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_video import \
+    EyeTrackingVideo
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileLookup, stimulus_lookup_from_json)
+from allensdk.brain_observatory.behavior.data_objects import (
+    BehaviorSessionId, RunningAcquisition, RunningSpeed, StimulusTimestamps)
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import \
+    EyeTrackingTable
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.rig_geometry import \
     RigGeometry as EyeTrackingRigGeometry
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
-    Presentations
-from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
-    import \
-    Templates
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata, get_expt_description
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (
+    BehaviorMetadata, get_expt_description)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import \
     DateOfAcquisition
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import \
+    Presentations
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
+from allensdk.brain_observatory.behavior.data_objects.stimuli.templates import \
+    Templates
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.trials.trial_table import \
     TrialTable
 from allensdk.brain_observatory.behavior.trials_processing import (
-    construct_rolling_performance_df, calculate_reward_rate_fix_nans)
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects import (
-    BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
-)
-
+    calculate_reward_rate_fix_nans, construct_rolling_performance_df)
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface,
+                           NwbWritableInterface)
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 
 class BehaviorSession(DataObject, LimsReadableInterface,

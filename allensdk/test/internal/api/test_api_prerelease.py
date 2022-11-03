@@ -1,8 +1,8 @@
 import os
 
 import nrrd
-import pytest
 import numpy as np
+import pytest
 
 from allensdk.internal.api.api_prerelease import ApiPrerelease
 

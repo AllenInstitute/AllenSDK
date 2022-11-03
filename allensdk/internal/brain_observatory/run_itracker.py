@@ -1,16 +1,17 @@
 import argparse
-import allensdk.internal.core.lims_utilities as lu
+import ast
 import glob
 import logging
-from allensdk.config.manifest import Manifest
-from allensdk.internal.brain_observatory.itracker import iTracker
-from allensdk.internal.brain_observatory.frame_stream import \
-    FfmpegInputStream, \
-    FfmpegOutputStream
-import h5py
-import ast
 import sys
+
+import h5py
 import numpy as np
+
+import allensdk.internal.core.lims_utilities as lu
+from allensdk.config.manifest import Manifest
+from allensdk.internal.brain_observatory.frame_stream import (
+    FfmpegInputStream, FfmpegOutputStream)
+from allensdk.internal.brain_observatory.itracker import iTracker
 
 DEFAULT_THRESHOLD_FACTOR = 1.6
 

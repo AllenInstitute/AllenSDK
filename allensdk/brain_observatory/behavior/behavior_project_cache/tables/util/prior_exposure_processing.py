@@ -1,9 +1,9 @@
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .tables.util.image_presentation_utils import (
-        get_image_set)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
+    BehaviorProjectLimsApi  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.image_presentation_utils import \
+    get_image_set
 
 
 def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:

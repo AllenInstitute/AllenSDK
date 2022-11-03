@@ -1,7 +1,8 @@
-import pytest
 import itertools
-import numpy as np
 import logging
+
+import numpy as np
+import pytest
 
 import allensdk.brain_observatory.ecephys.lfp_subsampling.subsampling as subsampling
 

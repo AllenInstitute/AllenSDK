@@ -1,8 +1,7 @@
-import pytest
 import pandas as pd
+import pytest
 
-from allensdk.core.dataframe_utils import (
-    patch_df_from_other)
+from allensdk.core.dataframe_utils import patch_df_from_other
 
 
 @pytest.fixture

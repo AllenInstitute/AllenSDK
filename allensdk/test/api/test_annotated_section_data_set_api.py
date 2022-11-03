@@ -33,10 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.api.queries.annotated_section_data_sets_api import \
-    AnnotatedSectionDataSetsApi
 import pytest
 from mock import MagicMock
+
+from allensdk.api.queries.annotated_section_data_sets_api import \
+    AnnotatedSectionDataSetsApi
 
 
 @pytest.fixture

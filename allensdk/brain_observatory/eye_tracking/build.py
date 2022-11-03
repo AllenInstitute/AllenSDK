@@ -1,9 +1,8 @@
 import argparse
-import os
-import subprocess
 import contextlib
+import os
 import shutil
-
+import subprocess
 
 CURR_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCKERFILE_STAGE_1 = os.path.join(CURR_FILE_DIR, 'stage_1', 'Dockerfile')

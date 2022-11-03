@@ -1,12 +1,13 @@
-import pytest
-import pathlib
 import copy
 import json
-import pandas as pd
+import pathlib
 import tempfile
 
-from allensdk.brain_observatory.vbn_2022.metadata_writer \
-    .metadata_writer import VBN2022MetadataWriterClass
+import pandas as pd
+import pytest
+
+from allensdk.brain_observatory.vbn_2022.metadata_writer.metadata_writer import \
+    VBN2022MetadataWriterClass
 
 
 @pytest.mark.requires_bamboo

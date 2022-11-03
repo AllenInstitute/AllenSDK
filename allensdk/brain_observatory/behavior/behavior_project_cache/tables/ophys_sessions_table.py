@@ -1,13 +1,12 @@
 import logging
-from typing import Optional, List
+from typing import List, Optional
 
 import pandas as pd
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .ophys_mixin import \
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_mixin import \
     OphysMixin
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
-    .project_table import ProjectTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import \
+    ProjectTable
 
 
 class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):

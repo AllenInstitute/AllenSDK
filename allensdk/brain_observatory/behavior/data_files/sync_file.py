@@ -1,16 +1,16 @@
 import abc
 import json
-from typing import Dict, Union
 from pathlib import Path
+from typing import Dict, Union
 
-from cachetools import cached, LRUCache
+from cachetools import LRUCache, cached
 from cachetools.keys import hashkey
 
-from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.internal.core import DataFile
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.core import DataObject
+from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.core import DataFile
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 def _get_sync_file_query_template(behavior_session_id: int):

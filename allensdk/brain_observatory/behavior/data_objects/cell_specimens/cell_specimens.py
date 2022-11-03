@@ -3,40 +3,31 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 from pynwb import NWBFile, ProcessingModule
-from pynwb.ophys import OpticalChannel, ImageSegmentation
+from pynwb.ophys import ImageSegmentation, OpticalChannel
 
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
 from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
-from allensdk.brain_observatory.behavior.data_files.event_detection_file \
-    import \
+from allensdk.brain_observatory.behavior.data_files.event_detection_file import \
     EventDetectionFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events import \
     Events
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
-    .corrected_fluorescence_traces import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.corrected_fluorescence_traces import \
     CorrectedFluorescenceTraces
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
-    .dff_traces import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces.dff_traces import \
     DFFTraces
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .ophys_experiment_metadata.field_of_view_shape import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .ophys_experiment_metadata.imaging_plane import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_plane import \
     ImagingPlane
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .ophys_timestamps import \
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import \
     OphysTimestamps
 from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.nwb import CELL_SPECIMEN_COL_DESCRIPTIONS
 from allensdk.brain_observatory.nwb.nwb_utils import add_image_to_nwb
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface,
+                           NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

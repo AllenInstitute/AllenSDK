@@ -1,20 +1,17 @@
 from enum import Enum
-import numpy as np
 from typing import List
 
+import numpy as np
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
 from allensdk.brain_observatory.behavior.schemas import \
     BehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 
 
 class BehaviorStimulusType(Enum):

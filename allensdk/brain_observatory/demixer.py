@@ -33,15 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from typing import Tuple, Optional
-import os
 import logging
+import os
+from typing import Optional, Tuple
 
-import numpy as np
-import scipy.sparse as sparse
-import scipy.linalg as linalg
-import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.linalg as linalg
+import scipy.sparse as sparse
 
 import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.config.manifest import Manifest

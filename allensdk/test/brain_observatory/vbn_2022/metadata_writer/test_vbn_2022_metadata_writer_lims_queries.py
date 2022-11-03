@@ -1,12 +1,12 @@
+import datetime
+
 import pandas as pd
 import pytest
-import datetime
 
 from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     _behavior_session_table_from_ecephys_session_id_list,
-    _filter_on_death_date,
-    _merge_ecephys_id_and_failed)
+    _filter_on_death_date, _merge_ecephys_id_and_failed)
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
 

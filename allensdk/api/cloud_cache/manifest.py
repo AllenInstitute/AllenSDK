@@ -1,9 +1,10 @@
-from typing import Dict, List, Any
 import json
 import pathlib
-from typing import Union
+from typing import Any, Dict, List, Union
+
+from allensdk.api.cloud_cache.file_attributes import \
+    CacheFileAttributes  # noqa: E501
 from allensdk.api.cloud_cache.utils import relative_path_from_url  # noqa: E501
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
 class Manifest(object):

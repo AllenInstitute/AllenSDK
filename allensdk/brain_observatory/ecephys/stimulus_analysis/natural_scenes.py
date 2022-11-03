@@ -1,10 +1,10 @@
-import numpy as np
-import pandas as pd
 import logging
 import warnings
 
-from .stimulus_analysis import StimulusAnalysis
+import numpy as np
+import pandas as pd
 
+from .stimulus_analysis import StimulusAnalysis
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 

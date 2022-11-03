@@ -37,6 +37,7 @@
 For more details on how to use these methods, see :doc:`glif_models`.
 """
 import functools
+
 import numpy as np
 
 

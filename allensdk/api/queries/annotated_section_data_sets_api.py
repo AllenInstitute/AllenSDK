@@ -33,8 +33,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_api import RmaApi
 from allensdk.api.warehouse_cache.cache import cacheable
+
+from .rma_api import RmaApi
 
 
 class AnnotatedSectionDataSetsApi(RmaApi):

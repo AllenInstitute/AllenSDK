@@ -1,13 +1,13 @@
-from typing import Dict, Union
 from pathlib import Path
+from typing import Dict, Union
 
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.eye_tracking_processing import \
     load_eye_tracking_hdf
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class EyeTrackingFile(DataFile):

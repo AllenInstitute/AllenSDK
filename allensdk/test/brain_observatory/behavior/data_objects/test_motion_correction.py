@@ -7,26 +7,19 @@ import pandas as pd
 import pynwb
 import pytest
 
-from allensdk.brain_observatory.behavior.data_files\
-    .rigid_motion_transform_file import \
+from allensdk.brain_observatory.behavior.data_files.rigid_motion_transform_file import \
     RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .cell_specimens import (
-        CellSpecimens,
-        EventsParams)
-from allensdk.brain_observatory.behavior.data_objects.motion_correction \
-    import \
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.cell_specimens import (
+    CellSpecimens, EventsParams)
+from allensdk.brain_observatory.behavior.data_objects.motion_correction import \
     MotionCorrection
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .ophys_timestamps import \
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import \
     OphysTimestamps
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
-from allensdk.test.brain_observatory.behavior.data_objects.metadata\
-    .test_behavior_ophys_metadata import \
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.test_behavior_ophys_metadata import \
     TestBOM
-from allensdk.test.brain_observatory.behavior.data_objects.nwb_input_json \
-    import \
+from allensdk.test.brain_observatory.behavior.data_objects.nwb_input_json import \
     NwbInputJson
 
 

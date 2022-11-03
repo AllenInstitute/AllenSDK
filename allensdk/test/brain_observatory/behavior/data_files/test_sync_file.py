@@ -1,16 +1,15 @@
-from typing import Tuple
 from pathlib import Path
-import h5py
+from typing import Tuple
 from unittest.mock import create_autospec
-import numpy as np
 
+import h5py
+import numpy as np
 import pytest
 
-from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_files.sync_file import (
+from allensdk.brain_observatory.behavior.data_files.sync_file import \
     _get_sync_file_query_template
-)
+from allensdk.internal.api import PostgresQueryMixin
 
 
 @pytest.fixture

@@ -1,10 +1,10 @@
 from typing import Optional
 
+import pandas as pd
 import psycopg2
 import psycopg2.extras
-import pandas as pd
 
-from allensdk import one, OneResultExpectedError
+from allensdk import OneResultExpectedError, one
 from allensdk.core.authentication import DbCredentials, credential_injector
 
 

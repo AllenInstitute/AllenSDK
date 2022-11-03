@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings \
-    import DriftingGratings, modulation_index, c50, f1_f0
+from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import (
+    DriftingGratings, c50, f1_f0, modulation_index)
+
+from .conftest import MockSessionApi
 
 pd.set_option('display.max_columns', None)
 

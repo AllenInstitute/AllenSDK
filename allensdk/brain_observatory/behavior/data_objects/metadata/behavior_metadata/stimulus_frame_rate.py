@@ -1,16 +1,13 @@
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.timestamps\
-    .stimulus_timestamps.stimulus_timestamps import \
+from allensdk.brain_observatory.behavior.data_objects.timestamps.stimulus_timestamps.stimulus_timestamps import \
     StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
     calc_frame_rate
+from allensdk.core import DataObject, NwbReadableInterface
 
 
 class StimulusFrameRate(DataObject, StimulusFileReadableInterface,

@@ -34,20 +34,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import logging
-import allensdk.brain_observatory.stimulus_info as stimulus_info
+
 import h5py
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-from .receptive_field_analysis.receptive_field import \
-    compute_receptive_field_with_postprocessing
-from .receptive_field_analysis.visualization import plot_receptive_field_data
+
+import allensdk.brain_observatory.stimulus_info as stimulus_info
 
 from . import circle_plots as cplots
 from . import observatory_plots as oplots
 from .brain_observatory_exceptions import MissingStimulusException
-from .stimulus_analysis import StimulusAnalysis
+from .receptive_field_analysis.receptive_field import \
+    compute_receptive_field_with_postprocessing
 from .receptive_field_analysis.tools import dict_generator, read_h5_group
+from .receptive_field_analysis.visualization import plot_receptive_field_data
+from .stimulus_analysis import StimulusAnalysis
 
 
 class LocallySparseNoise(StimulusAnalysis):

@@ -1,29 +1,23 @@
-import os
 import copy
-import numpy as np
-import pytest
-import pandas as pd
+import os
 import tempfile
 
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    import VisualBehaviorOphysProjectCache
+import numpy as np
+import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    tables.util.experiments_table_utils import (
-        add_experience_level_to_experiment_table,
-        add_passive_flag_to_ophys_experiment_table,
-        add_image_set_to_experiment_table)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.prior_exposure_processing import \
-    get_prior_exposures_to_session_type, \
-    get_prior_exposures_to_image_set, \
-    get_prior_exposures_to_omissions
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.full_genotype import \
+from allensdk.brain_observatory.behavior.behavior_project_cache import \
+    VisualBehaviorOphysProjectCache
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.experiments_table_utils import (
+    add_experience_level_to_experiment_table,
+    add_image_set_to_experiment_table,
+    add_passive_flag_to_ophys_experiment_table)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (
+    get_prior_exposures_to_image_set, get_prior_exposures_to_omissions,
+    get_prior_exposures_to_session_type)
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.full_genotype import \
     FullGenotype
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.reporter_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
     ReporterLine
 
 

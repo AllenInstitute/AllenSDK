@@ -33,11 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import numpy as np
-import simplejson as json
+import logging
 import math
 import re
-import logging
+
+import numpy as np
+import simplejson as json
 
 ju_logger = logging.getLogger(__name__)
 

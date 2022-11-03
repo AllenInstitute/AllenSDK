@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def are_two_lists_of_arrays_the_same(data1, data2):   
     '''returns False if to lists of arrays are different.
     otherwise the function returns True.

@@ -1,5 +1,5 @@
-from pynwb.spec import (NWBAttributeSpec, NWBDatasetSpec,
-                        NWBGroupSpec, NWBNamespaceBuilder)
+from pynwb.spec import (NWBAttributeSpec, NWBDatasetSpec, NWBGroupSpec,
+                        NWBNamespaceBuilder)
 
 # This is the script used to generate the AIBS ecephys NWB extension .yaml
 # files. It can be run by installing pynwb and executing

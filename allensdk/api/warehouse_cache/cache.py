@@ -33,19 +33,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.config.manifest import Manifest, ManifestVersionError
-from allensdk.config.manifest_builder import ManifestBuilder
-import allensdk.core.json_utilities as ju
-from allensdk.deprecated import deprecated
+import csv
+import functools
+import logging
+import os
+from functools import _make_key, wraps
 
 import pandas as pd
 import pandas.io.json as pj
 
-import functools
-from functools import wraps, _make_key
-import os
-import logging
-import csv
+import allensdk.core.json_utilities as ju
+from allensdk.config.manifest import Manifest, ManifestVersionError
+from allensdk.config.manifest_builder import ManifestBuilder
+from allensdk.deprecated import deprecated
 
 
 def memoize(f):

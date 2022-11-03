@@ -1,11 +1,14 @@
 """Run annotated region metrics calculations"""
 import logging
 import os
+
 import h5py
-from allensdk.internal.core.lims_utilities import get_input_json
-from allensdk.internal.brain_observatory.annotated_region_metrics import get_metrics
+
+from allensdk.internal.brain_observatory.annotated_region_metrics import \
+    get_metrics
 from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
                                                          run_module)
+from allensdk.internal.core.lims_utilities import get_input_json
 
 SDK_PATH = "/data/informatics/CAM/isi_metrics/allensdk"
 SCRIPT_PATH = ("/data/informatics/CAM/isi_metrics/allensdk/allensdk/internal"

@@ -34,13 +34,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import pytest
-import numpy as np
-import SimpleITK as sitk
 import nrrd
+import numpy as np
+import pytest
+import SimpleITK as sitk
 
 from allensdk.core import sitk_utilities as su
-
 
 
 @pytest.fixture(params=[1, 2, 3, 4])

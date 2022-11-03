@@ -1,7 +1,7 @@
+import logging
 import os
 import platform
 import re
-import logging
 
 from allensdk.core.json_utilities import read_url_get
 

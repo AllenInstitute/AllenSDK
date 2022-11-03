@@ -1,13 +1,14 @@
 #!/usr/bin/python
 import os
-import h5py
-import sys
 import shutil
-import traceback
 import subprocess
+import sys
+import traceback
+
+import h5py
+import nwb
 from six import iteritems
 
-import nwb
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 # development/debugging code

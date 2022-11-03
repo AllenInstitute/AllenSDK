@@ -1,5 +1,7 @@
 import numpy as np
+
 from allensdk.brain_observatory.behavior import trial_masks as masks
+
 
 def response_bias(trials, detect_col, trial_types=("go", "catch")):
     """

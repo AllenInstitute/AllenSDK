@@ -1,16 +1,14 @@
 import os
-import stat
 import platform
+import stat
 from pathlib import Path
 
 import pytest
-from allensdk.brain_observatory.argschema_utilities import (
-    InputFile,
-    OutputFile,
-    RaisingSchema,
-    check_write_access,
-    check_write_access_overwrite)
 from marshmallow import Schema, ValidationError
+
+from allensdk.brain_observatory.argschema_utilities import (
+    InputFile, OutputFile, RaisingSchema, check_write_access,
+    check_write_access_overwrite)
 
 READ_ONLY = stat.S_IREAD | stat.S_IRGRP | stat.S_IROTH
 READ_WRITE = READ_ONLY | stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH

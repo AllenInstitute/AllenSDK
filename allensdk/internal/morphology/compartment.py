@@ -15,6 +15,7 @@
 
 import allensdk.internal.morphology.node as node
 
+
 class Compartment(object):
     def __init__(self, node1, node2):
         if not isinstance(node1, node.Node) or not isinstance(node2, node.Node):

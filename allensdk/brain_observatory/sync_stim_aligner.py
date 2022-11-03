@@ -1,14 +1,16 @@
 # Here we will define a class for aligning the timesteps in a sync
 # file with the frames listed in a stimulus pickle file.
 
-from typing import Tuple, Union, List, Dict, Any
-import numpy as np
 import logging
 import pathlib
+from typing import Any, Dict, List, Tuple, Union
+
+import numpy as np
+
 from allensdk.brain_observatory import sync_dataset
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
+    _StimulusFile
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    _StimulusFile)
 
 
 def _choose_line(

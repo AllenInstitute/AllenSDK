@@ -1,5 +1,6 @@
 from typing import Callable, Iterable
 
+
 class LazyProperty(object):
 
     def __init__(self, api_method: Callable, wrappers: Iterable = tuple(),

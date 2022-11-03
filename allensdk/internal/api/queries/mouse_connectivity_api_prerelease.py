@@ -1,10 +1,9 @@
-from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.grid_data_api import GridDataApi
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
 
-from .grid_data_api_prerelease import GridDataApiPrerelease
 from ...core import lims_utilities as lu
-
+from .grid_data_api_prerelease import GridDataApiPrerelease
 
 _STRUCTURE_TREE_ROOT_ID = 997
 _STRUCTURE_TREE_ROOT_NAME = "root"

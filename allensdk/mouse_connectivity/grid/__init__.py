@@ -1,7 +1,6 @@
 
-from .writers import classic_writer, count_writer, cav_writer
-from .subimage import CavSubImage, CountSubImage, ClassicSubImage
-
+from .subimage import CavSubImage, ClassicSubImage, CountSubImage
+from .writers import cav_writer, classic_writer, count_writer
 
 cases = {
     'classic': {

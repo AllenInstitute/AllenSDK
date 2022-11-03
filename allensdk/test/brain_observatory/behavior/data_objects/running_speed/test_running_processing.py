@@ -1,12 +1,11 @@
 import numpy as np
 import pytest
 
-from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
-    get_running_df, calc_deriv, deg_to_dist, _shift, _identify_wraps,
-    _unwrap_voltage_signal, _angular_change, _zscore_threshold_1d,
-    _clip_speed_wraps)
-
 import allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing as rp  # noqa: E501
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
+    _angular_change, _clip_speed_wraps, _identify_wraps, _shift,
+    _unwrap_voltage_signal, _zscore_threshold_1d, calc_deriv, deg_to_dist,
+    get_running_df)
 
 
 @pytest.fixture

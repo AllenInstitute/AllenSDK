@@ -1,15 +1,14 @@
 import collections
-import sys
 import os
+import sys
 
-import pytest
 import mock
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.ecephys.stimulus_table.__main__ import (
-    build_stimulus_table,
-)
+from allensdk.brain_observatory.ecephys.stimulus_table.__main__ import \
+    build_stimulus_table
 
 
 def build_psuedofixture(name, data):

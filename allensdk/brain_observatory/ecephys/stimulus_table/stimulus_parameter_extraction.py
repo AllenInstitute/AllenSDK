@@ -1,6 +1,5 @@
-import re
 import ast
-
+import re
 
 REPR_PARAMS_RE = re.compile(r"([a-z0-9]+=[^=]+)[,\)]", re.IGNORECASE)
 REPR_CLASS_RE = re.compile(r"^(?P<class_name>[a-z0-9]+)\(.*\)$", re.IGNORECASE)

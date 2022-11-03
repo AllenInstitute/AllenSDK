@@ -33,8 +33,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import simplejson as json
 import logging
+
+import simplejson as json
+
 from ...deprecated import deprecated
 from .rma_template import RmaTemplate
 

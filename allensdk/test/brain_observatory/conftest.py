@@ -1,11 +1,12 @@
-import pytest
 import os
 from datetime import datetime
-import pynwb
-import numpy as np
 
-from allensdk.brain_observatory.vbn_2022.input_json_writer.utils import (
-    vbn_nwb_config_from_ecephys_session_id_list)
+import numpy as np
+import pynwb
+import pytest
+
+from allensdk.brain_observatory.vbn_2022.input_json_writer.utils import \
+    vbn_nwb_config_from_ecephys_session_id_list
 
 
 @pytest.fixture

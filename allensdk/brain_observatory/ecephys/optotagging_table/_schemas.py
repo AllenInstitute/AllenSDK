@@ -1,7 +1,6 @@
-from argschema import ArgSchema, ArgSchemaParser 
+from argschema import ArgSchema, ArgSchemaParser
+from argschema.fields import Dict, Float, InputDir, Int, Nested, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, InputDir, String, Float, Dict, Int
-
 
 known_conditions = {
     "0": {

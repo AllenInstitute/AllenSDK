@@ -1,10 +1,9 @@
 import json
-import tempfile
 import pathlib
+import tempfile
 
-from allensdk.brain_observatory.behavior.\
-    data_files.eye_tracking_metadata_file import (
-        EyeTrackingMetadataFile)
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
 
 
 def test_eye_tracking_metadata_file(

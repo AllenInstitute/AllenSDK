@@ -33,21 +33,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 import os
+
 import matplotlib.image as mpimg
 import numpy as np
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
-import allensdk.brain_observatory.observatory_plots as oplots
-from allensdk.brain_observatory.static_gratings import StaticGratings
-from allensdk.brain_observatory.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.natural_movie import NaturalMovie
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-import allensdk.brain_observatory.stimulus_info as stiminfo
-import allensdk.core.json_utilities as ju
+import pytest
 from pkg_resources import resource_filename  # @UnresolvedImport
 
+import allensdk.brain_observatory.observatory_plots as oplots
+import allensdk.brain_observatory.stimulus_info as stiminfo
+import allensdk.core.json_utilities as ju
+from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_movie import NaturalMovie
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.core.brain_observatory_nwb_data_set import \
+    BrainObservatoryNwbDataSet
 
 data_file = os.environ.get('TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA', 'skip')
 if data_file == 'default':

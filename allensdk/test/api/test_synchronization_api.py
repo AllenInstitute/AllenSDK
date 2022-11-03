@@ -35,6 +35,7 @@
 #
 import pytest
 from mock import MagicMock
+
 from allensdk.api.queries.synchronization_api import SynchronizationApi
 
 

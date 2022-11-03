@@ -33,11 +33,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import argparse
 import logging
 import os
-import argparse
-import matplotlib.pyplot as plt
+
 import h5py
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage.filters import median_filter
 

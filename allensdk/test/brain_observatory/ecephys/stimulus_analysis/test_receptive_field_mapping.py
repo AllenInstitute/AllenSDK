@@ -1,13 +1,13 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import (
+    ReceptiveFieldMapping, fit_2d_gaussian, threshold_rf)
 
 from .conftest import MockSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import \
-    ReceptiveFieldMapping, \
-    fit_2d_gaussian, \
-    threshold_rf
+
 
 class MockRFMSessionApi(MockSessionApi):
     def get_stimulus_presentations(self):

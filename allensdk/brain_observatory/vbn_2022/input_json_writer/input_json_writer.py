@@ -1,11 +1,11 @@
-import argschema
 import json
 
-from allensdk.brain_observatory.vbn_2022.input_json_writer.schemas import (
-    VBN2022InputJsonWriterSchema)
+import argschema
 
-from allensdk.brain_observatory.vbn_2022.input_json_writer.utils import (
-    vbn_nwb_config_from_ecephys_session_id_list)
+from allensdk.brain_observatory.vbn_2022.input_json_writer.schemas import \
+    VBN2022InputJsonWriterSchema
+from allensdk.brain_observatory.vbn_2022.input_json_writer.utils import \
+    vbn_nwb_config_from_ecephys_session_id_list
 
 
 class VBN2022InputJsonWriter(argschema.ArgSchemaParser):

@@ -1,13 +1,13 @@
-import re
-import json
 import ast
+import json
+import re
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from .rma_engine import RmaEngine, AsyncRmaEngine
 from .ecephys_project_api import EcephysProjectApi
-from .utilities import rma_macros, build_and_execute
+from .rma_engine import AsyncRmaEngine, RmaEngine
+from .utilities import build_and_execute, rma_macros
 
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):

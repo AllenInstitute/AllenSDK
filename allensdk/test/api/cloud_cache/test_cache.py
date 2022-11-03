@@ -1,15 +1,19 @@
-import pytest
-import json
 import hashlib
-import pathlib
-import pandas as pd
 import io
+import json
+import pathlib
+
 import boto3
+import pandas as pd
+import pytest
 from moto import mock_s3
-from .utils import create_bucket
-from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
+
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
-from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
+from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
+from allensdk.api.cloud_cache.file_attributes import \
+    CacheFileAttributes  # noqa: E501
+
+from .utils import create_bucket
 
 
 @mock_s3

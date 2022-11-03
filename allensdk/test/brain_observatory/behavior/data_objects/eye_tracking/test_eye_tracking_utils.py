@@ -1,15 +1,14 @@
-import pytest
-import tempfile
 import json
 import pathlib
+import tempfile
+
 import numpy as np
+import pytest
 
-from allensdk.brain_observatory.behavior.data_files.\
-    eye_tracking_metadata_file import EyeTrackingMetadataFile
-
-from allensdk.brain_observatory.behavior.\
-    data_objects.eye_tracking.eye_tracking_table import (
-        get_lost_frames)
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import \
+    EyeTrackingMetadataFile
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import \
+    get_lost_frames
 
 
 @pytest.mark.parametrize(

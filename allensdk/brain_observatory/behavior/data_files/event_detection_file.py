@@ -1,17 +1,16 @@
 import json
-import numpy as np
-from typing import Dict, Union, Tuple
 from pathlib import Path
+from typing import Dict, Tuple, Union
 
 import h5py
-from cachetools import cached, LRUCache
+import numpy as np
+import pandas as pd
+from cachetools import LRUCache, cached
 from cachetools.keys import hashkey
 
-import pandas as pd
-
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.core import DataFile
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 def from_json_cache_key(cls, dict_repr: dict):

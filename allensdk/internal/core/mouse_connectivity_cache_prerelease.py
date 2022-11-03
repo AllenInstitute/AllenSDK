@@ -1,12 +1,13 @@
 import os
+
 import pandas as pd
 
 from allensdk.config.manifest import Manifest
 from allensdk.core import json_utilities
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 
-from ..api.queries.mouse_connectivity_api_prerelease \
-        import MouseConnectivityApiPrerelease
+from ..api.queries.mouse_connectivity_api_prerelease import \
+    MouseConnectivityApiPrerelease
 
 
 class MouseConnectivityCachePrerelease(MouseConnectivityCache):

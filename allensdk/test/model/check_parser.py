@@ -1,5 +1,6 @@
 from allensdk.model.biophysical.runner import sim_parser
 
+
 def get_parsed_args(schema):
     print(vars(schema))
 

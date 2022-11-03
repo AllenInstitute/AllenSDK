@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
+from allensdk.brain_observatory.argschema_utilities import (
+    ArgSchemaParserPlus, write_or_print_outputs)
 from allensdk.brain_observatory.sync_dataset import Dataset
+
 from ._schemas import InputParameters, OutputParameters
 
 DEGREES_TO_RADIANS = np.pi / 180.0

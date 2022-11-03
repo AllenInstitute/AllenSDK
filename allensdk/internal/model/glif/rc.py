@@ -1,9 +1,10 @@
-import numpy as np
 import logging
 
-from allensdk.internal.model.glif.find_spikes import find_spikes_list
+import numpy as np
 
 from allensdk.ephys.extract_cell_features import get_stim_characteristics
+from allensdk.internal.model.glif.find_spikes import find_spikes_list
+
 
 def least_squares_RCEl_calc_tested(voltage_list, current_list, dt):
     '''Calculate resistance, capacitance and resting potential by performing 

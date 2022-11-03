@@ -1,7 +1,7 @@
-import pytest
-import numpy as np
-
 from functools import partial
+
+import numpy as np
+import pytest
 
 from allensdk.brain_observatory import sync_utilities as su
 from allensdk.brain_observatory.sync_dataset import Dataset

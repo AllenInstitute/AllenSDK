@@ -1,9 +1,10 @@
 
 
-import pytest
 import mock
+import pytest
 
-from allensdk.internal.mouse_connectivity.interval_unionize.unionize_record import Unionize
+from allensdk.internal.mouse_connectivity.interval_unionize.unionize_record import \
+    Unionize
 
 
 @pytest.mark.parametrize('method', ['__init__', 'calculate', 'propagate', 'output'])

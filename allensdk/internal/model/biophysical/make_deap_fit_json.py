@@ -1,11 +1,15 @@
+import json
+import logging
 import os.path
+
 import numpy as np
-import json, logging
-from allensdk.core.nwb_data_set import NwbDataSet
+
 import allensdk.core.json_utilities as ju
-from allensdk.model.biophys_sim.config import Config
+from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.internal.model.biophysical import ephys_utils
 from allensdk.internal.model.biophysical.deap_utils import Utils
+from allensdk.model.biophys_sim.config import Config
+
 
 class Report:
     _log = logging.getLogger('allensdk.model.biophysical.make_deap_fit_json')

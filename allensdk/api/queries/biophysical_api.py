@@ -33,11 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import os
+from collections import OrderedDict
+
+import simplejson as json
+
 from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable
-import os
-import simplejson as json
-from collections import OrderedDict
 from allensdk.config.manifest import Manifest
 
 

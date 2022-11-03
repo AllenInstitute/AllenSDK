@@ -33,17 +33,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .stimulus_analysis import StimulusAnalysis
-import scipy.stats as st
-import pandas as pd
-import numpy as np
-import h5py
-from math import sqrt
 import logging
-from . import observatory_plots as oplots
-from . import circle_plots as cplots
-from .brain_observatory_exceptions import MissingStimulusException
+from math import sqrt
+
+import h5py
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy.stats as st
+
+from . import circle_plots as cplots
+from . import observatory_plots as oplots
+from .brain_observatory_exceptions import MissingStimulusException
+from .stimulus_analysis import StimulusAnalysis
 
 
 class DriftingGratings(StimulusAnalysis):

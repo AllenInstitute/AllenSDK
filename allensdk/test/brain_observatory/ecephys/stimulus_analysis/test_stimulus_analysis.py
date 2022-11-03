@@ -1,14 +1,16 @@
-import pytest
-import pandas as pd
-import numpy as np
-import xarray as xr
 import warnings
 
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.stimulus_analysis import StimulusAnalysis, \
-    running_modulation, lifetime_sparseness, fano_factor, overall_firing_rate, get_fr, osi, dsi
+import numpy as np
+import pandas as pd
+import pytest
+import xarray as xr
 
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_session_api import \
+    EcephysSessionApi
+from allensdk.brain_observatory.ecephys.stimulus_analysis.stimulus_analysis import (
+    StimulusAnalysis, dsi, fano_factor, get_fr, lifetime_sparseness, osi,
+    overall_firing_rate, running_modulation)
 
 pd.set_option('display.max_columns', None)
 

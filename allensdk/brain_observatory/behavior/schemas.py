@@ -1,6 +1,5 @@
-from marshmallow import Schema, fields, RAISE
 import numpy as np
-
+from marshmallow import RAISE, Schema, fields
 
 STYPE_DICT = {fields.Float: 'float', fields.Int: 'int',
               fields.String: 'text', fields.List: 'text',

@@ -35,11 +35,11 @@
 #
 import os
 
-import pytest
 import mock
-import numpy as np
 import nrrd
+import numpy as np
 import pandas as pd
+import pytest
 
 from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from allensdk.core.structure_tree import StructureTree

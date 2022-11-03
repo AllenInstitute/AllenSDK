@@ -1,18 +1,15 @@
-import pytest
 from unittest.mock import create_autospec
 
 import pandas as pd
+import pytest
 
-from allensdk.core.exceptions import DataFrameIndexError
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
-    get_running_df
-)
 from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
+    BehaviorStimulusFile, SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import (
-    RunningSpeed, StimulusTimestamps
-)
+    RunningSpeed, StimulusTimestamps)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import \
+    get_running_df  # noqa: E501
+from allensdk.core.exceptions import DataFrameIndexError
 
 
 class DummyTimestamps(object):

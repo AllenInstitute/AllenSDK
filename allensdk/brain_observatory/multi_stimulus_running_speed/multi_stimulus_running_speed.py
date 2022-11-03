@@ -5,23 +5,18 @@ multiple stimulus blocks (behavior, mapping, replay) were presented
 to the mouse and need to be registered to the sync file.
 """
 
-import pandas as pd
-import argschema
 import json
 
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    BehaviorStimulusFile,
-    MappingStimulusFile,
-    ReplayStimulusFile)
+import argschema
+import pandas as pd
 
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    BehaviorStimulusFile, MappingStimulusFile, ReplayStimulusFile)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.multi_stim_running_processing import \
+    multi_stim_running_df_from_raw_data
 from allensdk.brain_observatory.multi_stimulus_running_speed._schemas import (
     MultiStimulusRunningSpeedInputParameters,
-    MultiStimulusRunningSpeedOutputParameters
-)
-
-from allensdk.brain_observatory.behavior.data_objects.\
-    running_speed.multi_stim_running_processing import (
-        multi_stim_running_df_from_raw_data)
+    MultiStimulusRunningSpeedOutputParameters)
 
 
 class MultiStimulusRunningSpeed(argschema.ArgSchemaParser):

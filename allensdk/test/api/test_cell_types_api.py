@@ -1,6 +1,10 @@
-import pytest, os
-from mock import patch, mock_open, MagicMock
+import os
+
+import pytest
+from mock import MagicMock, mock_open, patch
+
 from allensdk.api.queries.cell_types_api import CellTypesApi
+
 
 @pytest.fixture
 def mock_cells_api():

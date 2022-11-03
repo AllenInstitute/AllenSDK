@@ -33,25 +33,26 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
+import functools
+import operator as op
+import os
+import re
+import warnings
+
+import nrrd
+import numpy as np
+import pandas as pd
+import SimpleITK as sitk
+from six.moves import reduce
+
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
+from allensdk.config.manifest import Manifest
+from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.deprecated import deprecated
 
 from . import json_utilities
 from .reference_space_cache import ReferenceSpaceCache
-
-import nrrd
-import re
-import os
-import SimpleITK as sitk
-import pandas as pd
-import numpy as np
-from allensdk.config.manifest import Manifest
-import warnings
-import operator as op
-import functools
-from six.moves import reduce
 
 
 class MouseConnectivityCache(ReferenceSpaceCache):

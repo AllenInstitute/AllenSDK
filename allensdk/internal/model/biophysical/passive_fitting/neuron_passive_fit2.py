@@ -1,8 +1,9 @@
-import numpy as np
 import os
-import allensdk.internal.model.biophysical.passive_fitting.neuron_utils as neuron_utils
+
+import numpy as np
 
 import allensdk.core.json_utilities as json_utilities
+import allensdk.internal.model.biophysical.passive_fitting.neuron_utils as neuron_utils
 from allensdk.model.biophys_sim.config import Config
 
 # Load the morphology

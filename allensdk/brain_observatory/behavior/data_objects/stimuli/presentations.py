@@ -1,23 +1,20 @@
 import collections
 from pathlib import Path
-from typing import Optional, List, Dict, Union
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
     StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.stimulus_processing import \
-    get_stimulus_presentations, get_stimulus_metadata, is_change_event
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.stimulus_processing import (
+    get_stimulus_metadata, get_stimulus_presentations, is_change_event)
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
+from allensdk.core import (DataObject, NwbReadableInterface,
+                           NwbWritableInterface)
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,

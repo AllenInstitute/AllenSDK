@@ -1,13 +1,13 @@
 from argschema import ArgSchema
+from argschema.fields import Float, Int, List, Nested, String
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, String, Float, List, Int
 
-from .drifting_gratings import DriftingGratings
-from .static_gratings import StaticGratings
-from .natural_scenes import NaturalScenes
 from .dot_motion import DotMotion
+from .drifting_gratings import DriftingGratings
 from .flashes import Flashes
+from .natural_scenes import NaturalScenes
 from .receptive_field_mapping import ReceptiveFieldMapping
+from .static_gratings import StaticGratings
 
 
 class DriftingGratings(DefaultSchema):

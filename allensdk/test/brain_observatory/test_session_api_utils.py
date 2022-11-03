@@ -1,11 +1,11 @@
 import warnings
 from inspect import Parameter
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.session_api_utils import is_equal, ParamsMixin
+from allensdk.brain_observatory.session_api_utils import ParamsMixin, is_equal
 
 
 class ParamsMixinTestHarness(ParamsMixin):

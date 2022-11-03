@@ -1,7 +1,8 @@
 import logging
+
 import numpy as np
-from six.moves import xrange
 import scipy.interpolate as spi
+from six.moves import xrange
 
 import allensdk.model.glif.glif_neuron as glif_neuron
 

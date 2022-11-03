@@ -33,17 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import copy
 import logging
 
 import numpy as np
-import simplejson as json 
+import simplejson as json
+
 import allensdk.core.json_utilities as ju
-import copy
 
 try:
-    from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+    from glif_neuron_methods import METHOD_LIBRARY, GlifNeuronMethod
 except:
-    from .glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+    from .glif_neuron_methods import METHOD_LIBRARY, GlifNeuronMethod
 
 class GlifBadResetException( Exception ):
     """ Exception raised when voltage is still above threshold after a reset rule is applied. """

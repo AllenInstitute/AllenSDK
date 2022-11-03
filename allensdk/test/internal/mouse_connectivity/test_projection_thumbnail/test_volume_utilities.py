@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 import SimpleITK as sitk
 
 import allensdk.internal.mouse_connectivity.projection_thumbnail.volume_utilities as vol

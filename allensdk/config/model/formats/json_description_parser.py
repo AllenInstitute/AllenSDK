@@ -35,8 +35,9 @@
 #
 import logging
 from json import dump, dumps
-from allensdk.config.model.description_parser import DescriptionParser
+
 from allensdk.config.model.description import Description
+from allensdk.config.model.description_parser import DescriptionParser
 from allensdk.core.json_utilities import JsonComments
 
 

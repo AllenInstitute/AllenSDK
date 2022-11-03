@@ -1,12 +1,12 @@
-import pytest
 import json
 import pathlib
 
-from allensdk.brain_observatory.vbn_2022.input_json_writer \
-    .input_json_writer import VBN2022InputJsonWriter
+import pytest
 
-from allensdk.brain_observatory.ecephys.write_nwb.vbn._schemas import (
-    VBNInputSchema)
+from allensdk.brain_observatory.ecephys.write_nwb.vbn._schemas import \
+    VBNInputSchema
+from allensdk.brain_observatory.vbn_2022.input_json_writer.input_json_writer import \
+    VBN2022InputJsonWriter
 
 
 @pytest.mark.requires_bamboo

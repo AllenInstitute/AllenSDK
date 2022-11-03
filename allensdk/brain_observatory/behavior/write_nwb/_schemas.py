@@ -1,11 +1,10 @@
 from argschema import ArgSchema, InputFile
-from argschema.fields import LogLevel, String, Int, Nested, \
-    Boolean, \
-    Float, List, Dict
+from argschema.fields import (Boolean, Dict, Float, Int, List, LogLevel,
+                              Nested, String)
 from marshmallow import RAISE
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, \
-    check_write_access_overwrite, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import (
+    RaisingSchema, check_read_access, check_write_access_overwrite)
 
 
 class CellSpecimenTable(RaisingSchema):

@@ -7,10 +7,10 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._units import Units
-from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
-    add_ecephys_electrodes
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbWritableInterface, NwbReadableInterface
+from allensdk.brain_observatory.ecephys.nwb_util import (
+    add_ecephys_electrodes, add_probe_to_nwbfile)
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 
 
 class _Lfp:

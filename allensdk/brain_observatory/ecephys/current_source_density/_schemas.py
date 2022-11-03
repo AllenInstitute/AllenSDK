@@ -1,6 +1,6 @@
 import numpy as np
 from argschema import ArgSchema
-from argschema.fields import Nested, String, Float, Int, List, Bool
+from argschema.fields import Bool, Float, Int, List, Nested, String
 from argschema.schemas import DefaultSchema
 
 

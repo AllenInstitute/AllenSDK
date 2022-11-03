@@ -1,17 +1,14 @@
-import pytest
 from unittest.mock import create_autospec
 
 import pandas as pd
+import pytest
 
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
-    get_running_df
-)
-from allensdk.brain_observatory.behavior.data_objects import (
-    RunningAcquisition, StimulusTimestamps
-)
 from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
+    BehaviorStimulusFile, SyncFile)
+from allensdk.brain_observatory.behavior.data_objects import (
+    RunningAcquisition, StimulusTimestamps)
+from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import \
+    get_running_df  # noqa: E501
 
 
 def test_nonzero_monitor_delay_acq():

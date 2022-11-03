@@ -1,9 +1,10 @@
-import pytest
-import allensdk.internal.pipeline_modules.gbm.generate_gbm_heatmap as heatmap
-import pandas as pd
 import os
-import numpy as np
 
+import numpy as np
+import pandas as pd
+import pytest
+
+import allensdk.internal.pipeline_modules.gbm.generate_gbm_heatmap as heatmap
 
 TEST_DIR = os.path.dirname(__file__)
 TEST_GENE_FILE = os.path.join(TEST_DIR, "test.genes.results")

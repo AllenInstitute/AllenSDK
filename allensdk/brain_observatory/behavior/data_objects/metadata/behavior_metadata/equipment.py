@@ -2,11 +2,9 @@ from enum import Enum
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           JsonWritableInterface, LimsReadableInterface,
+                           NwbReadableInterface, NwbWritableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

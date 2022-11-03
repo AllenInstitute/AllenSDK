@@ -15,11 +15,12 @@
 
 
 import json
-import os
 import logging
+import os
+
 import allensdk.internal.core.lims_utilities as lims_utilities
-from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.config.manifest import Manifest
+from allensdk.config.manifest_builder import ManifestBuilder
 
 
 class BiophysicalModuleReader(object):

@@ -1,6 +1,8 @@
 from typing import List
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.api.queries.utils import build_in_list_selector_query
 

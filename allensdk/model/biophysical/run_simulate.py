@@ -33,15 +33,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from . import runner as single_cell
 import logging
+import logging.config as lc
 import os
+import subprocess
 import sys
 import traceback
-import subprocess
-import logging.config as lc
-from ..biophys_sim.config import Config
+
 from pkg_resources import resource_filename  # @UnresolvedImport
+
+from ..biophys_sim.config import Config
+from . import runner as single_cell
 
 
 class RunSimulate(object):
@@ -67,8 +69,8 @@ class RunSimulate(object):
         subprocess.call(['nrnivmodl', './modfiles'])
 
     def simulate(self):
-        from allensdk.internal.api.queries.biophysical_module_reader \
-            import BiophysicalModuleReader
+        from allensdk.internal.api.queries.biophysical_module_reader import \
+            BiophysicalModuleReader
 
         self.load_manifest()
 

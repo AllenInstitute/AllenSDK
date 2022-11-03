@@ -33,13 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .eventdetection import detect_events
-from statsmodels.sandbox.stats.multicomp import multipletests
-import numpy as np
-from .utilities import get_A, get_A_blur, get_shuffle_matrix, get_components, \
-    dict_generator
-from .postprocessing import run_postprocessing
 import h5py
+import numpy as np
+from statsmodels.sandbox.stats.multicomp import multipletests
+
+from .eventdetection import detect_events
+from .postprocessing import run_postprocessing
+from .utilities import (dict_generator, get_A, get_A_blur, get_components,
+                        get_shuffle_matrix)
 
 
 def events_to_pvalues_no_fdr_correction(data, event_vector, A,

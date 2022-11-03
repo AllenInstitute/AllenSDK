@@ -2,11 +2,10 @@ from typing import List
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.internal.api import PostgresQueryMixin, \
-    OneOrMoreResultExpectedError
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface)
+from allensdk.internal.api import (OneOrMoreResultExpectedError,
+                                   PostgresQueryMixin)
 
 
 class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,

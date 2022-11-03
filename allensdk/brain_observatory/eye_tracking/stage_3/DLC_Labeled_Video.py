@@ -1,22 +1,24 @@
 import time
+
 t0 = time.time()
-import tensorflow as tf
 import os
+
+import tensorflow as tf
+
 os.environ["DLClight"]="True"
-import deeplabcut
-
-from matplotlib.patches import Ellipse
-import matplotlib.pyplot as plt
-from moviepy.video.io.bindings import mplfig_to_npimage
-from moviepy.editor import *
-import numpy as np
-import collections
-import pandas as pd
-import sys
-import re
 import argparse
+import collections
 import logging
+import re
+import sys
 
+import deeplabcut
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.patches import Ellipse
+from moviepy.editor import *
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -37,6 +39,7 @@ bucket_data_blobname = video_file_path[:-4] + 'DeepCut_resnet50_universal_eye_tr
 output_data_file = '/workdir/{}'.format(bucket_data_blobname)
 
 from google.cloud import storage
+
 client = storage.Client()
 src_bucket = client.get_bucket('brain-observatory-eye-videos')
 tgt_bucket = client.get_bucket('dlc-labeled-videos')

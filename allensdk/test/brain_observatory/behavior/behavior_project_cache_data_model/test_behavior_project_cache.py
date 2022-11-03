@@ -1,7 +1,8 @@
-import pytest
-import pandas as pd
 import logging
 import os
+
+import pandas as pd
+import pytest
 
 from allensdk.test_utilities.custom_comparators import safe_df_comparison
 

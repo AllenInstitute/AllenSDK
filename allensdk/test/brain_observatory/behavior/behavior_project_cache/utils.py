@@ -1,7 +1,8 @@
-from typing import Union
-import boto3
-import json
 import hashlib
+import json
+from typing import Union
+
+import boto3
 
 
 def load_dataset(data_blobs: dict,

@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
+
 import numpy as np
 import pynwb
 import pytest

@@ -16,6 +16,7 @@
 import json
 import math
 
+
 def euclidean_distance(node1, node2):
     dx = node1.x - node2.x
     dy = node1.y - node2.y

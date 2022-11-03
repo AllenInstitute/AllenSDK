@@ -1,9 +1,9 @@
-from typing import Optional, Union
-from pathlib import Path
-import warnings
+import hashlib
 import re
 import urllib.parse as url_parse
-import hashlib
+import warnings
+from pathlib import Path
+from typing import Optional, Union
 
 
 def bucket_name_from_url(url: str) -> Optional[str]:

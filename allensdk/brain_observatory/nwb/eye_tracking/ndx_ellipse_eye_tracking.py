@@ -1,5 +1,7 @@
 import os
-from pynwb import load_namespaces, get_class
+
+from pynwb import get_class, load_namespaces
+
 # import ndx_events
 
 # Set path of the namespace.yaml file to the expected install location

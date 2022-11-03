@@ -1,9 +1,9 @@
-import pytest
 import numpy as np
+import pytest
+
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.brain_observatory.sync_stim_aligner import (
-    _get_start_frames,
-    get_stim_timestamps_from_stimulus_blocks)
+    _get_start_frames, get_stim_timestamps_from_stimulus_blocks)
 
 
 class DummyStim(object):

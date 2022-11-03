@@ -1,15 +1,15 @@
 import os
 
-import nrrd
 import mock
-import pytest
+import nrrd
 import numpy as np
+import pytest
 from numpy.testing import assert_raises
 
 from allensdk.config.manifest import Manifest
+from allensdk.internal.api.queries.grid_data_api_prerelease import (
+    GridDataApiPrerelease, _get_grid_storage_directories)
 
-from allensdk.internal.api.queries.grid_data_api_prerelease \
-        import GridDataApiPrerelease, _get_grid_storage_directories
 
 @pytest.fixture
 def storage_dirs(fn_temp_dir):

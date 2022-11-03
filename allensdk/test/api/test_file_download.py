@@ -33,15 +33,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import pandas as pd
+import pandas.io.json as pj
 import pytest
 from mock import Mock, patch
-from allensdk.api.warehouse_cache.cache import cacheable, Cache
-from allensdk.config.manifest import Manifest
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
-import pandas as pd
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
 
+import allensdk.core.json_utilities as ju
+from allensdk.api.queries.mouse_connectivity_api import \
+    MouseConnectivityApi as MCA
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
+from allensdk.config.manifest import Manifest
 
 try:
     import StringIO

@@ -1,11 +1,14 @@
-import numpy as np
-import pytest
-import pandas as pd
 import datetime
+
+import numpy as np
+import pandas as pd
+import pytest
 import pytz
 
-from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate, get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate, get_dprime
-
+from allensdk.brain_observatory.behavior.dprime import (
+    get_dprime, get_false_alarm_rate, get_hit_rate, get_rolling_dprime,
+    get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate)
 
 NaN = float('nan')
 
@@ -55,6 +58,7 @@ def mock_trials_fixture():
     return trials
 
 from collections import defaultdict
+
 
 @pytest.fixture
 def mock_rolling_dprime_fixture(mock_trials_fixture):

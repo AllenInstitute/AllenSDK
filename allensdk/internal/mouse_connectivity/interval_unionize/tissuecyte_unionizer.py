@@ -1,14 +1,15 @@
 from __future__ import division
+
 import logging
 
 import numpy as np
 from six import iteritems
 
 from .interval_unionizer import IntervalUnionizer
-from .tissuecyte_unionize_record import TissuecyteInjectionUnionize, \
-    TissuecyteProjectionUnionize
+from .tissuecyte_unionize_record import (TissuecyteInjectionUnionize,
+                                         TissuecyteProjectionUnionize)
 
-  
+
 class TissuecyteUnionizer(IntervalUnionizer):
     '''A specialization of the IntervalUnionizer set up for unionizing 
     Tissuecyte-derived projection data.

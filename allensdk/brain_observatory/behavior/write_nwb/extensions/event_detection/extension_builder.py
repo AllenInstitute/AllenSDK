@@ -1,7 +1,7 @@
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, \
-    NWBDatasetSpec
+from pynwb.spec import (NWBDatasetSpec, NWBGroupSpec, NWBNamespaceBuilder,
+                        export_spec)
 
 NAMESPACE = 'ndx-aibs-ophys-event-detection'
 

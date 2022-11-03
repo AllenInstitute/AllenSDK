@@ -1,10 +1,10 @@
-import pytest
 import mock
-
-import SimpleITK as sitk
 import numpy as np
+import pytest
+import SimpleITK as sitk
 
 from allensdk.mouse_connectivity.grid.utilities import image_utilities as iu
+
 
 @pytest.fixture(scope='function')
 def dfmfld():

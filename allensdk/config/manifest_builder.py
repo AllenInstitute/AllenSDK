@@ -33,11 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import allensdk.core.json_utilities as ju
 import logging
-from allensdk.config.manifest import Manifest
+
 import pandas as pd
 import six
+
+import allensdk.core.json_utilities as ju
+from allensdk.config.manifest import Manifest
 
 
 class ManifestBuilder(object):

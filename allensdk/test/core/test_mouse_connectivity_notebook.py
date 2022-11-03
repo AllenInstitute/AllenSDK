@@ -33,9 +33,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-
 import os
+
+import pytest
 
 
 @pytest.mark.nightly
@@ -180,9 +180,10 @@ def test_notebook(tmpdir_factory):
 
     # In[9]:
 
-    import numpy as np
-    import matplotlib.pyplot as plt
     import warnings
+
+    import matplotlib.pyplot as plt
+    import numpy as np
     warnings.filterwarnings('ignore')
 
     visp_experiment_ids = [ e['id'] for e in visp_experiments ]

@@ -1,7 +1,8 @@
-import pytest
+import datetime
 import pathlib
 import platform
-import datetime
+
+import pytest
 from pynwb import NWBFile
 
 

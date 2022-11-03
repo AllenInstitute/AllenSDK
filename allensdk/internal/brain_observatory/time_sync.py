@@ -1,11 +1,13 @@
-from collections import deque
-from typing import Optional, Callable, Any
-
-import numpy as np
-import h5py
-from allensdk.brain_observatory.sync_dataset import Dataset
-import pandas as pd
 import logging
+from collections import deque
+from typing import Any, Callable, Optional
+
+import h5py
+import numpy as np
+import pandas as pd
+
+from allensdk.brain_observatory.sync_dataset import Dataset
+
 try:
     import cv2
 except ImportError:

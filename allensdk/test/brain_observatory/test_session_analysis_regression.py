@@ -1,22 +1,22 @@
+import json
 import logging
+import os
 import sys
 
-import pytest
-import os
-import json
-from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 import pandas as pd
+import pytest
+from pkg_resources import resource_filename  # @UnresolvedImport
 
+import allensdk.brain_observatory.stimulus_info as si
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.natural_movie import NaturalMovie
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.session_analysis import SessionAnalysis
+from allensdk.brain_observatory.static_gratings import StaticGratings
 from allensdk.core.brain_observatory_nwb_data_set import \
     BrainObservatoryNwbDataSet as BODS
-import allensdk.brain_observatory.stimulus_info as si
 
 logging.basicConfig(level=logging.DEBUG)
 

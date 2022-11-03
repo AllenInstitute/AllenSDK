@@ -1,9 +1,10 @@
-import pytest
+import json
 import pathlib
 import tempfile
+
 import h5py
-import json
 import numpy as np
+import pytest
 
 
 @pytest.fixture

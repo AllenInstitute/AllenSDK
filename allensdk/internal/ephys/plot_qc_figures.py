@@ -2,29 +2,29 @@ import matplotlib
 
 matplotlib.use('agg')
 
-import logging
-
-import allensdk.internal.core.lims_utilities as lims_utilities
-import allensdk.core.json_utilities as json_utilities
-
-from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.ephys.ephys_features as ft
-from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics, get_stim_characteristics
-
-import sys
 import argparse
-import os
+import datetime
 import json
+import logging
+import os
+import sys
+
 import h5py
+import matplotlib.pyplot as plt
 import numpy as np
+import scipy.misc
+import scipy.signal as sg
+from scipy.optimize import curve_fit
 from six import iteritems
 
-from scipy.optimize import curve_fit
-import scipy.signal as sg
-import scipy.misc
+import allensdk.core.json_utilities as json_utilities
+import allensdk.ephys.ephys_features as ft
+import allensdk.internal.core.lims_utilities as lims_utilities
+from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.ephys.extract_cell_features import (
+    get_ramp_stim_characteristics, get_square_stim_characteristics,
+    get_stim_characteristics)
 
-import datetime
-import matplotlib.pyplot as plt
 #import seaborn as sns
 
 AXIS_Y_RANGE = [ -110, 60 ]

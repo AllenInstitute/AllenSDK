@@ -1,9 +1,10 @@
-import scipy.signal as signal
-from scipy.stats import zscore
+import warnings
+from typing import Iterable, Optional, Union
+
 import numpy as np
 import pandas as pd
-import warnings
-from typing import Iterable, Union, Optional
+import scipy.signal as signal
+from scipy.stats import zscore
 
 
 def calc_deriv(x, time):

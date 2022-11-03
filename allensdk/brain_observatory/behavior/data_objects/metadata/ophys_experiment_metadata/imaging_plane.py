@@ -2,18 +2,15 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.reporter_line import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.reporter_line import \
     ReporterLine
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .ophys_timestamps import OphysTimestamps
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import \
+    OphysTimestamps
 from allensdk.brain_observatory.behavior.data_objects.timestamps.util import \
     calc_frame_rate
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

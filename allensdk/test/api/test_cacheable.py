@@ -33,20 +33,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
-from mock import MagicMock, patch, mock_open
-from allensdk.api.warehouse_cache.cache import Cache, cacheable
-from allensdk.api.queries.rma_api import RmaApi
 import pandas as pd
+import pytest
+from mock import MagicMock, mock_open, patch
 from six.moves import builtins
+
+from allensdk.api.queries.rma_api import RmaApi
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.config.manifest import Manifest
 
 try:
     import StringIO
 except:
     import io as StringIO
-import os
 
+import os
 
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)

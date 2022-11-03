@@ -41,17 +41,16 @@ try:
 except:
     from past.builtins import xrange
 
+import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import matplotlib.transforms as mxfms
 import numpy as np
 import pandas as pd
-from matplotlib.colors import LinearSegmentedColormap
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.collections import PatchCollection, LineCollection
-import matplotlib.transforms as mxfms
-import matplotlib.colors as mcolors
 import skimage.transform
+from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.colors import LinearSegmentedColormap
 from six import iteritems
-
 
 DEFAULT_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[.7,0,.7,0.0],[.7,0,0,1]])
 DEFAULT_MEAN_RESP_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,0.5,0.0],[0.0,0.0,0.5,1]])

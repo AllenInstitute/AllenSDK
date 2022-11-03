@@ -37,15 +37,14 @@ import logging
 
 import numpy as np
 
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
+from allensdk.brain_observatory.argschema_utilities import (
+    ArgSchemaParserPlus, write_or_print_outputs)
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
     ContinuousFile
+
 from ._schemas import InputParameters, OutputParameters
-from .subsampling import select_channels, subsample_timestamps, \
-    subsample_lfp, \
-    remove_lfp_offset, remove_lfp_noise
+from .subsampling import (remove_lfp_noise, remove_lfp_offset, select_channels,
+                          subsample_lfp, subsample_timestamps)
 
 logger = logging.getLogger(__name__)
 

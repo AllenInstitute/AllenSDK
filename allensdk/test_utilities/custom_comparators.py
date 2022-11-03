@@ -1,8 +1,9 @@
-import re
-from typing import Union, Any, Iterable
 import difflib
-import numpy as np
 import numbers
+import re
+from typing import Any, Iterable, Union
+
+import numpy as np
 import pandas as pd
 
 

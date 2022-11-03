@@ -9,6 +9,8 @@ from argschema import ArgSchemaParser
 
 from allensdk.brain_observatory.argschema_utilities import \
     write_or_print_outputs
+
+from ..ecephys_session import EcephysSession
 from .dot_motion import DotMotion
 from .drifting_gratings import DriftingGratings
 from .flashes import Flashes
@@ -16,7 +18,6 @@ from .natural_movies import NaturalMovies
 from .natural_scenes import NaturalScenes
 from .receptive_field_mapping import ReceptiveFieldMapping
 from .static_gratings import StaticGratings
-from ..ecephys_session import EcephysSession
 
 try:
     from mpi4py import MPI

@@ -1,9 +1,9 @@
 from typing import Optional
+
 import numpy as np
 
+from allensdk.brain_observatory.ecephys.utils import strip_substructure_acronym
 from allensdk.core import DataObject
-from allensdk.brain_observatory.ecephys.utils import (
-    strip_substructure_acronym)
 
 
 class Channel(DataObject):

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def plot_running_speed(
     timestamps, values, 
     start_index=0, stop_index=None, step=1,

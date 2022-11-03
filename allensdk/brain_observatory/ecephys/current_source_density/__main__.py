@@ -1,44 +1,30 @@
-import numpy as np
-import requests
 import logging
-import sys
-
 import os
-import pandas as pd
-import h5py
-
+import sys
 from pathlib import Path
-
 from typing import Optional
 
+import h5py
+import numpy as np
+import pandas as pd
+import requests
 from scipy.spatial.qhull import QhullError
 
-from allensdk.brain_observatory.ecephys.current_source_density._schemas \
-    import \
-    InputParameters, OutputParameters
-from allensdk.brain_observatory.ecephys.current_source_density.\
-    _current_source_density import (
-        accumulate_lfp_data,
-        compute_csd,
-        extract_trial_windows
-    )
-from allensdk.brain_observatory.ecephys.current_source_density._filter_utils \
-    import filter_lfp_channels, select_good_channels
-from allensdk.brain_observatory.ecephys.current_source_density\
-    ._interpolation_utils import (
-        interp_channel_locs,
-        make_actual_channel_locations,
-        make_interp_channel_locations
-    )
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import (
-    ContinuousFile
-)
 from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs, optional_lims_inputs
-)
-
-from allensdk.brain_observatory.ecephys.lfp_subsampling.subsampling \
-    import remove_lfp_noise
+    optional_lims_inputs, write_or_print_outputs)
+from allensdk.brain_observatory.ecephys.current_source_density._current_source_density import (
+    accumulate_lfp_data, compute_csd, extract_trial_windows)
+from allensdk.brain_observatory.ecephys.current_source_density._filter_utils import (
+    filter_lfp_channels, select_good_channels)
+from allensdk.brain_observatory.ecephys.current_source_density._interpolation_utils import (
+    interp_channel_locs, make_actual_channel_locations,
+    make_interp_channel_locations)
+from allensdk.brain_observatory.ecephys.current_source_density._schemas import (
+    InputParameters, OutputParameters)
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import \
+    ContinuousFile
+from allensdk.brain_observatory.ecephys.lfp_subsampling.subsampling import \
+    remove_lfp_noise
 
 
 def get_inputs_from_lims(args) -> dict:

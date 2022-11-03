@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Union, Any
+from typing import Any, Union
 
 from allensdk.internal.core.lims_utilities import safe_system_path
 

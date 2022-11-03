@@ -33,11 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_api import RmaApi
-from allensdk.api.warehouse_cache.cache import cacheable
+from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.config.manifest import Manifest
-from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.deprecated import deprecated
+
+from .rma_api import RmaApi
 
 
 class CellTypesApi(RmaApi):

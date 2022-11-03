@@ -2,25 +2,18 @@ from typing import Optional
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.experiment_container_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.experiment_container_id import \
     ExperimentContainerId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.field_of_view_shape import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import \
     FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_depth import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_session_id import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.project_code import \
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.project_code import \
     ProjectCode
+from allensdk.core import (DataObject, JsonReadableInterface,
+                           LimsReadableInterface, NwbReadableInterface)
 from allensdk.internal.api import PostgresQueryMixin
 
 

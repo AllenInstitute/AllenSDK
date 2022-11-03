@@ -33,15 +33,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import scipy.stats as st
+import logging
+
+import h5py
 import numpy as np
 import pandas as pd
-from .stimulus_analysis import StimulusAnalysis
-import logging
-import h5py
-from . import observatory_plots as oplots
+import scipy.stats as st
+
 from . import circle_plots as cplots
+from . import observatory_plots as oplots
 from .brain_observatory_exceptions import MissingStimulusException
+from .stimulus_analysis import StimulusAnalysis
 
 
 class NaturalScenes(StimulusAnalysis):

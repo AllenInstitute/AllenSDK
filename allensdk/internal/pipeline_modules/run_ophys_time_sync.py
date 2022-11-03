@@ -1,18 +1,18 @@
-import logging
 import argparse
-import os
 import datetime
 import json
+import logging
+import os
 from typing import NamedTuple, Optional
 
-import numpy as np
 import h5py
+import numpy as np
 
 import allensdk
-from allensdk.internal.core.lims_pipeline_module import PipelineModule
-from allensdk.internal.brain_observatory import time_sync as ts
 from allensdk.brain_observatory.argschema_utilities import \
     check_write_access_overwrite
+from allensdk.internal.brain_observatory import time_sync as ts
+from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 
 class TimeSyncOutputs(NamedTuple):
