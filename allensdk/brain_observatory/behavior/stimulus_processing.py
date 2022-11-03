@@ -561,6 +561,40 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     return is_change
 
 
+def get_flashes_since_change(
+        stimulus_presentations: pd.DataFrame) -> pd.Series:
+    """ Calculate the number of times an images is flashed between changes.
+
+    Parameters
+    ----------
+    stimulus_presentations : pandas.DataFrame
+        Table of presented stimuli with ``is_change`` column already
+        calculated.
+
+    Returns
+    -------
+    flashes_since_change : pandas.Series
+        Number of times the same image is flashed between image changes.
+    """
+    flashes_since_change = pd.Series(data=np.zeros(len(stimulus_presentations),
+                                                   dtype=float),
+                                     index=stimulus_presentations.index,
+                                     name='flashes_since_change')
+    for idx, (pd_index, row) in enumerate(stimulus_presentations.iterrows()):
+        omitted = row['omitted']
+        if pd.isna(row['omitted']):
+            omitted = False
+        if row['image_name'] == 'omitted' or omitted:
+            flashes_since_change.iloc[idx] = flashes_since_change.iloc[idx - 1]
+        else:
+            if row['is_change'] or idx == 0:
+                flashes_since_change.iloc[idx] = 0
+            else:
+                flashes_since_change.iloc[idx] = \
+                    flashes_since_change.iloc[idx - 1] + 1
+    return flashes_since_change
+
+
 def compute_trials_id_for_stimulus(
         stim_pres_table: pd.DataFrame,
         trials_table: pd.DataFrame) -> pd.Series:
