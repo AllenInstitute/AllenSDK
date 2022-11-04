@@ -14,7 +14,7 @@ class HelperFunctions(object):
         """
         nwbfile = NWBFile(
             session_description='foo',
-            identifier='foo',
+            identifier='1',
             session_id='foo',
             session_start_time=datetime.datetime.now(),
             institution="Allen Institute"

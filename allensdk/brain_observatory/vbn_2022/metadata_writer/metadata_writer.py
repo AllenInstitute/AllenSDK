@@ -137,6 +137,22 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             axis='columns',
             inplace=True)
 
+        ecephys_nwb_dir = pathlib.Path(
+                                self.args['ecephys_nwb_dir'])
+
+        probes_without_lfp = probes_table[~probes_table['has_lfp_data']]
+        probes_with_lfp = probes_table[probes_table['has_lfp_data']]
+
+        probes_with_lfp = add_file_paths_to_metadata_table(
+                    metadata_table=probes_with_lfp,
+                    id_generator=file_id_generator,
+                    file_dir=ecephys_nwb_dir,
+                    file_prefix='lfp_probe',
+                    index_col='ecephys_probe_id',
+                    session_id_col='ecephys_session_id',
+                    on_missing_file=self.args['on_missing_file'])
+        probes_table = pd.concat([probes_with_lfp, probes_without_lfp])
+
         self.write_df(
             df=probes_table,
             output_path=self.args['probes_path'])
@@ -178,6 +194,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     file_dir=ecephys_nwb_dir,
                     file_prefix=self.args['ecephys_nwb_prefix'],
                     index_col='ecephys_session_id',
+                    session_id_col='ecephys_session_id',
                     on_missing_file=self.args['on_missing_file'])
 
         # add supplemental columns to the ecephys_sessions

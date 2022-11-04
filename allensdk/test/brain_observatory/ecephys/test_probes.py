@@ -31,6 +31,10 @@ def probes_fixture(
     Return a Probes object
     """
     probes = Probe().load(probes_config_fixture, many=True)
+
+    # Don't test lfp here
+    for probe in probes:
+        probe['lfp'] = None
     obj = Probes.from_json(probes=probes)
     return obj
 

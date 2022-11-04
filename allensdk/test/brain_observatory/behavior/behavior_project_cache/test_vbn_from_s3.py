@@ -54,6 +54,36 @@ def test_vbn_metadata_tables(tmpdir, vbn_s3_cloud_cache_data):
 
 
 @mock_s3
+def test_probe_nwb_file(monkeypatch, tmpdir, vbn_s3_cloud_cache_data):
+    """Tests that the probe nwb file is downloaded"""
+    data, versions = vbn_s3_cloud_cache_data
+    cache_dir = pathlib.Path(tmpdir) / "test_metadata"
+    bucket_name = VisualBehaviorNeuropixelsProjectCache.BUCKET_NAME
+    project_name = VisualBehaviorNeuropixelsProjectCache.PROJECT_NAME
+    create_bucket(bucket_name,
+                  project_name,
+                  data['data'],
+                  data['metadata'])
+    cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
+
+    probe_meta_table = cache.get_probe_table()
+    for probe_meta in probe_meta_table.itertuples():
+        with monkeypatch.context() as ctx:
+            ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
+                        lambda path, probe_data_path_map: probe_data_path_map)
+            probe_data_path_map = \
+                cache.get_ecephys_session(
+                    ecephys_session_id=probe_meta.ecephys_session_id)
+
+        probe_id = probe_meta.Index
+        probe_nwb = probe_data_path_map[probe_meta.name]()
+        expected_path = (cache_dir / f'{project_name}-0.{len(data)}.0' /
+                         'data' / f'probe_{probe_id}_lfp.nwb')
+        assert probe_nwb == expected_path
+        assert expected_path.is_file()
+
+
+@mock_s3
 def test_manifest_methods(tmpdir, vbn_s3_cloud_cache_data):
 
     data, versions = vbn_s3_cloud_cache_data
@@ -115,7 +145,7 @@ def test_local_cache_construction(
 
     with monkeypatch.context() as ctx:
         ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                    lambda path: create_autospec(
+                    lambda path, probe_data_path_map: create_autospec(
                         BehaviorEcephysSession, instance=True))
         cache.get_ecephys_session(ecephys_session_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -179,7 +209,7 @@ def test_load_out_of_date_manifest(
     for ses_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=ses_id)
 
@@ -252,7 +282,7 @@ def test_file_linkage(
     for sess_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 
@@ -282,7 +312,7 @@ def test_file_linkage(
     for sess_id in (222, 333):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path: create_autospec(
+                        lambda path, probe_data_path_map: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 
