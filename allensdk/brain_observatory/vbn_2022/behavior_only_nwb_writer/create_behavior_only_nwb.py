@@ -45,10 +45,18 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
         for bs_id in behavior_session_ids:
             # Date of acquisition is unreliable from LIMS, hence we pull it
             # from the already produced metadata.
-            daq = DateOfAcquisition(
-                datetime.strptime(
-                    behavior_session_table.loc[bs_id, 'date_of_acquisition'],
-                    "%Y-%m-%d %H:%M:%S.%f"))
+            try:
+                daq = DateOfAcquisition(
+                    datetime.strptime(
+                        behavior_session_table.loc[bs_id,
+                        'date_of_acquisition'],
+                        "%Y-%m-%d %H:%M:%S.%f"))
+            except ValueError:
+                daq = DateOfAcquisition(
+                    datetime.strptime(
+                        behavior_session_table.loc[bs_id,
+                        'date_of_acquisition'],
+                        "%Y-%m-%d %H:%M:%S"))
             try:
                 session = BehaviorSession.from_lims(
                     behavior_session_id=bs_id,
