@@ -122,7 +122,9 @@ class NWBWriter:
         self._nwb_filepath_error = nwb_filepath + '.error'
 
         logging.basicConfig(
-            format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+            format='%(asctime)s - %(process)s - %(levelname)s - %(message)s',
+            level=logging.INFO
+        )
 
         # Clean out files from previous runs:
         for filename in [self.nwb_filepath_inprogress,

@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 from pathlib import Path
 from typing import Union
@@ -40,15 +41,23 @@ class BehaviorEcephysNwbWriter(NWBWriter):
 
         os.makedirs(Path(self.nwb_filepath_inprogress).parent, exist_ok=True)
 
+        logging.info(f'Writing session NWB file to '
+                     f'{self.nwb_filepath_inprogress}')
         with NWBHDF5IO(self.nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(session_nwbfile)
+        logging.info(f'Wrote session NWB file to '
+                     f'{self.nwb_filepath_inprogress}')
 
         for probe_name, probe_nwbfile in probe_nwbfile_map.items():
-            probe_id = [p.id for p in session.probes
+            probe_id = [p.id for p in session.get_probes_obj()
                         if p.name == probe_name][0]
             if probe_nwbfile is not None:
                 probe_nwb_path = Path(self._nwb_filepath).parent / \
                     f'lfp_probe_{probe_id}.nwb'
+                logging.info(f'Writing probe NWB file to '
+                             f'{probe_nwb_path}')
                 with NWBHDF5IO(probe_nwb_path, 'w') as nwb_file_writer:
                     nwb_file_writer.write(probe_nwbfile)
+                logging.info(f'Wrote probe NWB file to '
+                             f'{probe_nwb_path}')
         return session_nwbfile

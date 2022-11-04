@@ -224,6 +224,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
                 session_start_time=nwbfile.session_start_time
             )
         else:
+            logging.info(f'No LFP data found for probe {self._id}')
             probe_nwbfile = None
         return nwbfile, probe_nwbfile
 
