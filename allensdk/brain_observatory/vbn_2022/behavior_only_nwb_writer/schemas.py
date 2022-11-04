@@ -27,3 +27,7 @@ class VBN2022BehaviorOnlyWriterSchema(argschema.ArgSchema):
     lims_password = argschema.fields.String(
             required=True,
             description=("Password for LIMS2 login."))
+
+    clobber = argschema.fields.Boolean(
+            default=False,
+            description=("Overwrite existing output if it exists."))

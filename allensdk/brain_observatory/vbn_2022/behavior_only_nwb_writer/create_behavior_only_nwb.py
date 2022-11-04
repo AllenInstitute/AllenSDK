@@ -43,6 +43,9 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
         passed = 0
         failed = 0
         for bs_id in behavior_session_ids:
+            file_path = output_path / f'behavior_session_{bs_id}.nwb'
+            if not self.args['clobber'] and file_path.exists():
+                continue
             # Date of acquisition is unreliable from LIMS, hence we pull it
             # from the already produced metadata.
             try:
@@ -57,6 +60,7 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                         behavior_session_table.loc[bs_id,
                         'date_of_acquisition'],
                         "%Y-%m-%d %H:%M:%S"))
+
             try:
                 session = BehaviorSession.from_lims(
                     behavior_session_id=bs_id,
@@ -71,7 +75,6 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                 self.logger.info(
                     f"\tFailure loading session {bs_id}. Continuing...")
                 failed += 1
-            file_path = output_path / f'behavior_session_{bs_id}.nwb'
             try:
                 with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
                     nwb_writer.write(session.to_nwb())
