@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.\
@@ -25,10 +26,12 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
     def get_behavior_session(
             self, behavior_session_id: int) -> BehaviorSession:
         """
-        Since we are not releasing behavior-only NWB files
-        with the VBN June 2022 release, the behavior sesion data
-        is obtained from the behavior_ecephys_session NWB file
-        based on the associated behavior_ecephys_session_id
+        Retrieve behavior session data from either the released behavior
+        only nwb or the behavior side of the released ecephys data.
+
+        Checks first if the session is behavior only and if so returns the
+        behavior sessions. Failing this, we check if the the behavior session
+        has an associated ecephys session and return that if it exists.
 
         Parameters
         ----------
@@ -38,12 +41,6 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         Returns
         -------
         BehaviorSession
-
-        Notes
-        -----
-        behavior session does not include file_id.
-        The file id is accessed via ecephys_session_id key
-        from the ecephys_session_table
         """
         row = self._behavior_session_table.query(
                 f"behavior_session_id=={behavior_session_id}")
@@ -53,16 +50,22 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
                                "behavior_session_id. For "
                                f"{behavior_session_id} "
                                f" there are {row.shape[0]} entries.")
-        row = row.squeeze()
-        ecephys_session_id = int(row.ecephys_session_id)
 
-        row = self._ecephys_session_table.query(f"index=={ecephys_session_id}")
+        row = row.squeeze()
+        ecephys_session_id = row.ecephys_session_id
+        # If a file_id for the behavior session is not set, attempt to load
+        # an associated ecephys session.
+        if row[self.cache.file_id_column] < 0 \
+           or np.isnan(row[self.cache.file_id_column]):
+            row = self._ecephys_session_table.query(
+                f"index=={ecephys_session_id}")
 
         if len(row) == 0:
-            raise RuntimeError(f"ecephys_session: {ecephys_session_id} "
+            raise RuntimeError(f"behavior_session: {behavior_session_id} "
                                f"corresponding to "
-                               f"behavior_session: {behavior_session_id} "
-                               f"does not exist in the ecephys_session_table ")
+                               f"ecephys_session: {ecephys_session_id}"
+                               f"does not exist in the behavior_session  "
+                               "or ecephys_session tables.")
 
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)

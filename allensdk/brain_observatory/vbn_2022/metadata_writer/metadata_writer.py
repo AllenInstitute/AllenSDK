@@ -141,8 +141,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                                 self.args['ecephys_nwb_dir'])
 
         probes_without_lfp = probes_table[~probes_table['has_lfp_data']]
-        probes_with_lfp = probes_table[probes_table['has_lfp_data']]
+        # Fill file_id with dummy value to preserve typing.
+        probes_without_lfp['file_id'] = file_id_generator.dummy_value
 
+        probes_with_lfp = probes_table[probes_table['has_lfp_data']]
         probes_with_lfp = add_file_paths_to_metadata_table(
                     metadata_table=probes_with_lfp,
                     id_generator=file_id_generator,
@@ -187,6 +189,10 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
 
         ecephys_nwb_dir = pathlib.Path(
                                 self.args['ecephys_nwb_dir'])
+        if self.args['behavior_nwb_dir'] is None:
+            behavior_nwb_dir = ecephys_nwb_dir
+        else:
+            behavior_nwb_dir = pathlib.Path(self.args['behavior_nwb_dir'])
 
         ecephys_session_table = add_file_paths_to_metadata_table(
                     metadata_table=ecephys_session_table,
@@ -196,6 +202,34 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                     index_col='ecephys_session_id',
                     session_id_col='ecephys_session_id',
                     on_missing_file=self.args['on_missing_file'])
+
+        ecephys_session_ids = ecephys_session_table['ecephys_session_id']
+        behavior_ecephys_session_ids = behavior_session_table[
+            'ecephys_session_id']
+        ecephys_session_mask = behavior_ecephys_session_ids.isin(
+            ecephys_session_ids)
+
+        behavior_only_table = behavior_session_table[
+            ~ecephys_session_mask]
+        behavior_w_ecephy_table = behavior_session_table[
+            ecephys_session_mask]
+        # Fill in null values for file ID to preserve typing of the id
+        # column.
+        behavior_w_ecephy_table['file_id'] = file_id_generator.dummy_value
+        # Compute a file_id and add the file path to the table for behavior
+        # sessions with no corresponding ecephys session. For behavior
+        # sessions with ecephys data, we leave the file_id and file_path as
+        # Null values, loading their behavior data from the ecephys session.
+        behavior_only_table = add_file_paths_to_metadata_table(
+                    metadata_table=behavior_only_table,
+                    id_generator=file_id_generator,
+                    file_dir=behavior_nwb_dir,
+                    file_prefix=self.args['behavior_nwb_prefix'],
+                    index_col='behavior_session_id',
+                    session_id_col='behavior_session_id',
+                    on_missing_file=self.args['on_missing_file'])
+        behavior_session_table = pd.concat([behavior_only_table,
+                                            behavior_w_ecephy_table])
 
         # add supplemental columns to the ecephys_sessions
         # column

@@ -228,10 +228,12 @@ def vbn_s3_cloud_cache_data():
 
     b_session = [{'behavior_session_id': 333,
                   'ecephys_session_id': 5111,
-                  'species': 'mouse'},
+                  'species': 'mouse',
+                  'file_id': -999},
                  {'behavior_session_id': 444,
                   'ecephys_session_id': 5112,
-                  'species': 'mouse'}]
+                  'species': 'mouse',
+                  'file_id': -999}]
     b_session = pd.DataFrame(b_session)
     buff = io.StringIO()
     b_session.to_csv(buff, index=False)
@@ -315,13 +317,16 @@ def vbn_s3_cloud_cache_data():
 
     b_session = [{'behavior_session_id': 777,
                   'ecephys_session_id': 222,
-                  'species': 'mouse'},
+                  'species': 'mouse',
+                  'file_id': -999},
                  {'behavior_session_id': 888,
                   'ecephys_session_id': 333,
-                  'species': 'mouse'},
+                  'species': 'mouse',
+                  'file_id': -999},
                  {'behavior_session_id': 999,
                   'ecephys_session_id': 444,
-                  'species': 'mouse'}
+                  'species': 'mouse',
+                  'file_id': -999}
                  ]
 
     b_session = pd.DataFrame(b_session)

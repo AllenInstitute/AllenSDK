@@ -48,6 +48,13 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
             allow_none=False,
             description=("The directory where ecephys_nwb sessions are "
                          "to be found"))
+    behavior_nwb_dir = argschema.fields.InputDir(
+            required=False,
+            default=None,
+            allow_none=True,
+            description=("The directory where behavior_nwb sessions are "
+                         "to be found. Default to the value of ecephys_nwb "
+                         "if not set/set to None."))
 
     ecephys_nwb_prefix = argschema.fields.Str(
         required=False,
@@ -56,6 +63,14 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
           "Ecephys session NWB files will be looked for "
           "in the form "
           "{ecephys_nwb_dir}/{ecephys_nwb_prefix}_{ecephys_session_id}.nwb")
+    )
+    behavior_nwb_prefix = argschema.fields.Str(
+        required=False,
+        default='behavior_session',
+        description=(
+          "Behavior session NWB files will be looked for "
+          "in the form "
+          "{behavior_nwb_dir}/{behavior_nwb_prefix}_{behavior_session_id}.nwb")
     )
 
     supplemental_data = argschema.fields.List(
