@@ -63,5 +63,7 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DriverLine":
+        if nwbfile.subject.driver_line is None:
+            return cls(driver_line=None)
         driver_line = sorted(list(nwbfile.subject.driver_line))
         return cls(driver_line=driver_line)
