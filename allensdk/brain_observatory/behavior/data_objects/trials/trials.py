@@ -19,8 +19,8 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
 
 
-class TrialTable(DataObject, StimulusFileReadableInterface,
-                 NwbReadableInterface, NwbWritableInterface):
+class Trials(DataObject, StimulusFileReadableInterface,
+             NwbReadableInterface, NwbWritableInterface):
 
     @classmethod
     def trial_class(cls):
@@ -31,7 +31,13 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
 
     def __init__(self, trials: pd.DataFrame):
         trials = trials.rename(columns={'stimulus_change': 'is_change'})
-        super().__init__(name='trials', value=trials)
+        super().__init__(name='trials', value=None, is_value_self=True)
+
+        self._trials = trials
+
+    @property
+    def data(self) -> pd.DataFrame:
+        return self._trials
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         trials = self.value
@@ -63,7 +69,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
         return nwbfile
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "TrialTable":
+    def from_nwb(cls, nwbfile: NWBFile) -> "Trials":
         trials = nwbfile.trials.to_dataframe()
         if 'lick_events' in trials.columns:
             trials.drop('lick_events', inplace=True, axis=1)
@@ -89,7 +95,7 @@ class TrialTable(DataObject, StimulusFileReadableInterface,
                            licks: Licks,
                            rewards: Rewards,
                            sync_file: Optional[SyncFile] = None
-                           ) -> "TrialTable":
+                           ) -> "Trials":
         bsf = stimulus_file.data
 
         stimuli = bsf["items"]["behavior"]["stimuli"]

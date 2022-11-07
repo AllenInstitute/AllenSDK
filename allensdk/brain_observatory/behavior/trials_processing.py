@@ -5,7 +5,7 @@ import numpy as np
 
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     import \
-    TrialTable
+    Trials
 from allensdk.brain_observatory.behavior.dprime import (
     get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
     get_trial_count_corrected_hit_rate,
@@ -135,12 +135,12 @@ def calculate_reward_rate(response_latency=None,
 
 
 def calculate_response_latency_list(
-        trials: TrialTable, response_window_start: float) -> List:
+        trials: Trials, response_window_start: float) -> List:
     """per trial, determines a response latency
 
     Parameters
     ----------
-    trials: TrialTable
+    trials: Trials
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image
@@ -176,12 +176,12 @@ def calculate_response_latency_list(
 
 
 def calculate_reward_rate_fix_nans(
-        trials: TrialTable, response_window_start: float) -> np.ndarray:
+        trials: Trials, response_window_start: float) -> np.ndarray:
     """per trial, determines the reward rate, replacing infs with nans
 
     Parameters
     ----------
-    trials: TrialTable
+    trials: Trials
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image
@@ -203,7 +203,7 @@ def calculate_reward_rate_fix_nans(
     return reward_rate
 
 
-def construct_rolling_performance_df(trials: TrialTable,
+def construct_rolling_performance_df(trials: Trials,
                                      response_window_start,
                                      session_type) -> pd.DataFrame:
     """Return a DataFrame containing trial by trial behavior response
@@ -211,7 +211,7 @@ def construct_rolling_performance_df(trials: TrialTable,
 
     Parameters
     ----------
-    trials: TrialTable
+    trials: Trials
     response_window_start: float
         [seconds] relative to the non-display-lag-compensated presentation
         of the change-image

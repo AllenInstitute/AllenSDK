@@ -5,7 +5,7 @@ import numpy as np
 from allensdk.brain_observatory.behavior import trials_processing
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
     import \
-    TrialTable
+    Trials
 
 _test_response_latency_0 = np.array(
     [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
@@ -353,7 +353,7 @@ def trial_data_and_expectation_2():
 def test_calculate_response_latency_list(
         trials, response_window_start, expected):
     latencies = trials_processing.calculate_response_latency_list(
-            TrialTable(trials), response_window_start)
+            Trials(trials), response_window_start)
     np.testing.assert_allclose(latencies, expected)
 
 
@@ -393,7 +393,7 @@ def test_construct_rolling_performance_df(trials_example, session_type):
     rolling_dprime values with all zeros
     """
     df = trials_processing.construct_rolling_performance_df(
-            TrialTable(trials_example), 0.15, session_type)
+            Trials(trials_example), 0.15, session_type)
     if session_type.endswith("passive"):
         assert np.all(df["rolling_dprime"].values == 0.0)
     else:

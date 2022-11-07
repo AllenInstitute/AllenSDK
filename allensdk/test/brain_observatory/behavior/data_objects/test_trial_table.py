@@ -18,7 +18,7 @@ from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
     calculate_monitor_delay
 from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import TrialTable
+    import Trials
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -40,14 +40,14 @@ class TestFromBehaviorStimulusFile(LimsTest):
         # The tests expect stimulus_timestamps to be instantiated
         # from a stimulus file.
         expected = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.expected = TrialTable(trials=expected)
+        cls.expected = Trials(trials=expected)
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
         stimulus_file, stimulus_timestamps, licks, rewards = \
             self._get_trial_table_data()
 
-        trials = TrialTable.from_stimulus_file(
+        trials = Trials.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -61,7 +61,7 @@ class TestFromBehaviorStimulusFile(LimsTest):
         stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         stimulus_file, stimulus_timestamps, licks, rewards = \
             self._get_trial_table_data(stimulus_file=stimulus_file)
-        TrialTable.from_stimulus_file(
+        Trials.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -110,7 +110,7 @@ class TestMonitorDelay:
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
         self.sync_file = SyncFile(filepath=str(test_data_dir / 'sync.h5'))
-        self.trials = TrialTable(trials=trials)
+        self.trials = Trials(trials=trials)
 
     @pytest.mark.parametrize('equipment_name', ('CAMP2.1', 'MESO.2'))
     def test_monitor_delay(self, monkeypatch, equipment_name):
@@ -165,7 +165,7 @@ class TestNWB:
         test_data_dir = dir / 'test_data'
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.trials = TrialTable(trials=trials)
+        cls.trials = Trials(trials=trials)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -182,7 +182,7 @@ class TestNWB:
         if roundtrip:
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
-                data_object_cls=TrialTable)
+                data_object_cls=Trials)
         else:
             obt = self.trials.from_nwb(nwbfile=self.nwbfile)
 

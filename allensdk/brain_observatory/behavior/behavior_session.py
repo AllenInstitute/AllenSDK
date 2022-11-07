@@ -55,9 +55,8 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
-    TrialTable
+from allensdk.brain_observatory.behavior.data_objects.trials.trials \
+    import Trials
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.core import DataObject
@@ -88,7 +87,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         rewards: Rewards,
         stimuli: Stimuli,
         task_parameters: TaskParameters,
-        trials: TrialTable,
+        trials: Trials,
         metadata: BehaviorMetadata,
         date_of_acquisition: DateOfAcquisition,
         eye_tracking_table: Optional[EyeTrackingTable] = None,
@@ -497,7 +496,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 add_is_change_to_stimulus_presentations_table)
         )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
+        trials = cls._trials_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
 
         with warnings.catch_warnings():
@@ -1199,7 +1198,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     name of image that is changed to at the change time,
                     on go trials
         """
-        return self._trials.value
+        return self._trials.data
 
     @property
     def metadata(self) -> Dict[str, Any]:
@@ -1312,7 +1311,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             licks: Licks,
-            rewards: Rewards) -> TrialTable:
+            rewards: Rewards) -> Trials:
         """
         Construct the Trials data object for this session
         """
@@ -1322,7 +1321,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return cls._trial_table_class().from_stimulus_file(
+        return cls._trials_class().from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -1496,5 +1495,5 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return 0.02115
 
     @classmethod
-    def _trial_table_class(cls) -> Type[TrialTable]:
-        return TrialTable
+    def _trials_class(cls) -> Type[Trials]:
+        return Trials

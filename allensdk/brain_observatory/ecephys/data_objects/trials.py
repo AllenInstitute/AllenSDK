@@ -6,7 +6,7 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
     Trial)
 from allensdk.brain_observatory.behavior.data_objects.\
     trials.trial_table import (
-        TrialTable)
+    Trials)
 
 
 class VBNTrial(Trial):
@@ -98,7 +98,7 @@ class VBNTrial(Trial):
         return trial_dict, change_time
 
 
-class VBNTrialTable(TrialTable):
+class VBNTrials(Trials):
 
     @classmethod
     def trial_class(cls):
