@@ -595,9 +595,59 @@ class BehaviorOphysExperiment(BehaviorSession):
                     (assigned before cell matching)
                 corrected_fluorescence: (list of float)
                     fluorescence values (arbitrary units)
-
+                RMSE: (float)
+                    error values (arbitrary units)
+                r:
+                    r values (arbitrary units)
         """
         return self._cell_specimens.corrected_fluorescence_traces
+
+    @property
+    def demixed_traces(self) -> pd.DataFrame:
+        """Demixed traces are traces that are demixed from overlapping ROIs.
+        Sampling rate can be found in metadata ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                demixed_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
+        return self._cell_specimens.demixed_traces
+
+    @property
+    def neuropil_traces(self) -> pd.DataFrame:
+        """neuropil traces are the fluorescent signal measured from the
+        neuropil_mask. Sampling rate can be found in metadata
+        ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                neuropil_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
+        return self._cell_specimens.demixed_traces
 
     @property
     def motion_correction(self) -> pd.DataFrame:
