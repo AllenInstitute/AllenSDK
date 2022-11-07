@@ -628,7 +628,7 @@ class BehaviorOphysExperiment(BehaviorSession):
     @property
     def neuropil_traces(self) -> pd.DataFrame:
         """neuropil traces are the fluorescent signal measured from the
-        neuropil_mask. Sampling rate can be found in metadata
+        neuropil_masks. Sampling rate can be found in metadata
         ‘ophys_frame_rate’
 
         Returns

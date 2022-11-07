@@ -23,6 +23,11 @@ class NeuropilTraces(
     NwbReadableInterface,
     NwbWritableInterface,
 ):
+    """A data container to load, access, and store the
+    neuropil_traces dataframe. Neuropil traces are the fluorescent signal
+    measured from the neuropil_masks.
+    """
+
     def __init__(self, traces: pd.DataFrame):
         """
         Parameters

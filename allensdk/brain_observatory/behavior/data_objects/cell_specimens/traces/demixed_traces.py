@@ -21,6 +21,11 @@ class DemixedTraces(
     NwbReadableInterface,
     NwbWritableInterface,
 ):
+    """A data container to load, access, and store the
+    demixed_traces dataframe. Demixed traces are traces that are demixed from
+    overlapping ROIs.
+    """
+
     def __init__(self, traces: pd.DataFrame):
         """
         Parameters

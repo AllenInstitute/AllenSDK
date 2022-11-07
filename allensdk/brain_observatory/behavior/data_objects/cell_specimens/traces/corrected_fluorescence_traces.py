@@ -19,6 +19,11 @@ class CorrectedFluorescenceTraces(
     NwbReadableInterface,
     NwbWritableInterface,
 ):
+    """A data container to load, access, and store the
+    corrected_fluorescence_traces dataframe. Corrected fluorescence traces
+    are neuropil corrected and demixed.
+    """
+
     def __init__(self, traces: pd.DataFrame):
         """
 
@@ -27,8 +32,12 @@ class CorrectedFluorescenceTraces(
         traces
             index cell_roi_id
             columns:
-            - corrected_fluorescence
-                list of float
+                corrected_fluorescence: (list of float)
+                    fluorescence values (arbitrary units)
+                RMSE: (float)
+                    error values (arbitrary units)
+                r:
+                    r values (arbitrary units)
         """
         super().__init__(name="corrected_fluorescence_traces", value=traces)
 
