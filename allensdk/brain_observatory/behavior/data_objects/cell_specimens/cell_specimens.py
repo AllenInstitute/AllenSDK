@@ -184,7 +184,6 @@ class CellSpecimens(
             Spacing to pass to sitk when constructing segmentation mask image
         exclude_invalid_rois
             Whether to exclude invalid rois
-
         """
         super().__init__(
             name="cell_specimen_table", value=None, is_value_self=True
@@ -256,6 +255,26 @@ class CellSpecimens(
 
     @property
     def dff_traces(self) -> pd.DataFrame:
+        """traces of change in fluoescence / fluorescence
+
+        Returns
+        -------
+        pd.DataFrame
+            dataframe of traces of dff
+            (change in fluorescence / fluorescence)
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    assigned after cell matching
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi,
+                    assigned before cell matching
+                dff: (list of float)
+                    fluorescence fractional values relative to baseline
+                    (arbitrary units)
+
+        """
         df = self.table[["cell_roi_id"]].join(
             self._dff_traces.value, on="cell_roi_id"
         )
@@ -263,6 +282,25 @@ class CellSpecimens(
 
     @property
     def demixed_traces(self) -> pd.DataFrame:
+        """Demixed traces are traces that are demixed from overlapping ROIs.
+        Sampling rate can be found in metadata ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                demixed_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
         df = self.table[["cell_roi_id"]].join(
             self._demixed_traces.value, on="cell_roi_id"
         )
@@ -270,6 +308,26 @@ class CellSpecimens(
 
     @property
     def neuropil_traces(self) -> pd.DataFrame:
+        """neuropil traces are the fluorescent signal measured from the
+        neuropil_masks. Sampling rate can be found in metadata
+        ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                neuropil_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
         df = self.table[["cell_roi_id"]].join(
             self._neuropil_traces.value, on="cell_roi_id"
         )
@@ -277,6 +335,30 @@ class CellSpecimens(
 
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
+        """Corrected fluorescence traces which are neuropil corrected
+        and demixed. Sampling rate can be found in metadata
+        ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                corrected_fluorescence: (list of float)
+                    fluorescence values (arbitrary units)
+                RMSE: (float)
+                    error values (arbitrary units)
+                r:
+                    r values (arbitrary units)
+        """
         df = self.table[["cell_roi_id"]].join(
             self._corrected_fluorescence_traces.value, on="cell_roi_id"
         )
