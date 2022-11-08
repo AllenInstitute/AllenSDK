@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+from unittest.mock import patch, create_autospec
 
 import pandas as pd
 import pynwb
@@ -17,8 +18,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
     calculate_monitor_delay
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import Trials
+from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
+    TaskParameters
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import \
+    Trials
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
@@ -40,11 +43,12 @@ class TestFromBehaviorStimulusFile(LimsTest):
         # The tests expect stimulus_timestamps to be instantiated
         # from a stimulus file.
         expected = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.expected = Trials(trials=expected)
+        cls.expected = Trials(trials=expected, response_window_start=0)
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
-        stimulus_file, stimulus_timestamps, licks, rewards = \
+        stimulus_file, stimulus_timestamps, licks, rewards, \
+            response_window_start = \
             self._get_trial_table_data()
 
         trials = Trials.from_stimulus_file(
@@ -53,13 +57,17 @@ class TestFromBehaviorStimulusFile(LimsTest):
             licks=licks,
             rewards=rewards
         )
+        trials._response_window_start = response_window_start
+        self.expected._response_window_start = response_window_start
+
         assert trials == self.expected
 
     def test_from_stimulus_file2(self):
         dir = Path(__file__).parent.parent.resolve()
         stimulus_filepath = dir / 'resources' / 'example_stimulus.pkl.gz'
         stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
-        stimulus_file, stimulus_timestamps, licks, rewards = \
+        stimulus_file, stimulus_timestamps, licks, rewards, \
+            response_window_start = \
             self._get_trial_table_data(stimulus_file=stimulus_file)
         Trials.from_stimulus_file(
             stimulus_file=stimulus_file,
@@ -89,7 +97,13 @@ class TestFromBehaviorStimulusFile(LimsTest):
         rewards = Rewards.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps_no_delay)
-        return stimulus_file, stimulus_timestamps, licks, rewards
+
+        response_window_start = TaskParameters.from_stimulus_file(
+            stimulus_file=stimulus_file
+        ).response_window_sec[0]
+
+        return stimulus_file, stimulus_timestamps, licks, rewards, \
+            response_window_start
 
 
 class TestMonitorDelay:
@@ -110,7 +124,7 @@ class TestMonitorDelay:
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
         self.sync_file = SyncFile(filepath=str(test_data_dir / 'sync.h5'))
-        self.trials = Trials(trials=trials)
+        self.trials = Trials(trials=trials, response_window_start=0)
 
     @pytest.mark.parametrize('equipment_name', ('CAMP2.1', 'MESO.2'))
     def test_monitor_delay(self, monkeypatch, equipment_name):
@@ -165,7 +179,7 @@ class TestNWB:
         test_data_dir = dir / 'test_data'
 
         trials = pd.read_pickle(str(test_data_dir / 'trials.pkl'))
-        cls.trials = Trials(trials=trials)
+        cls.trials = Trials(trials=trials, response_window_start=0)
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(
@@ -174,16 +188,29 @@ class TestNWB:
             session_start_time=datetime.now()
         )
 
+    @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture):
         self.trials.to_nwb(nwbfile=self.nwbfile)
 
-        if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self.nwbfile,
-                data_object_cls=Trials)
-        else:
-            obt = self.trials.from_nwb(nwbfile=self.nwbfile)
+        with patch.object(TaskParameters, 'from_nwb',
+                          lambda nwbfile: create_autospec(
+                              TaskParameters, instance=True)):
+            if roundtrip:
+                obt = data_object_roundtrip_fixture(
+                    nwbfile=self.nwbfile,
+                    data_object_cls=Trials)
+            else:
+                obt = self.trials.from_nwb(nwbfile=self.nwbfile)
+
+        test = TestFromBehaviorStimulusFile()
+        test.setup_class()
+        test.setup_method(self.test_read_write_nwb)
+        _, _, _, _, \
+            response_window_start = \
+            test._get_trial_table_data()
+        obt._response_window_start = response_window_start
+        self.trials._response_window_start = response_window_start
 
         assert obt == self.trials

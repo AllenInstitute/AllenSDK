@@ -34,7 +34,7 @@ def mock_trials_fixture():
     trials['trial_length'] = 8.5
     trials['reward_times'] = trials.apply(lambda r: [r['change_time']+0.2] if r['change']*r['detect'] else [],axis=1)
     trials['reward_volume'] = 0.005 * trials['reward_times'].map(len)
-    trials['response_latency'] = trials.apply(lambda r: 0.2 if r['detect'] else np.inf,axis=1)
+    trials['response_latency'] = trials.apply(lambda r: 0.2 if r['detect'] else np.nan,axis=1)
     trials['blank_duration_range'] = [[0.5, 0.5] for row in trials.iterrows()]
 
     metadata = {}
