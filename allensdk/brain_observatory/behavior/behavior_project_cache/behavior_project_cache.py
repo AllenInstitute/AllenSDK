@@ -170,8 +170,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if include_behavior_data:
             # Merge behavior data in
             behavior_sessions_table = self.get_behavior_session_table(
-                suppress=suppress, as_df=True, include_ophys_data=False,
-                n_workers=n_workers)
+                suppress=suppress,
+                as_df=True,
+                include_ophys_data=False,
+                n_workers=n_workers,
+                include_trial_metrics=False
+            )
             ophys_sessions = behavior_sessions_table.merge(
                 ophys_sessions,
                 left_index=True,
@@ -217,7 +221,9 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         # Merge behavior data in
         behavior_sessions_table = self.get_behavior_session_table(
             suppress=suppress, as_df=True, include_ophys_data=False,
-            n_workers=n_workers)
+            n_workers=n_workers,
+            include_trial_metrics=False
+        )
         experiments = behavior_sessions_table.merge(
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
@@ -251,7 +257,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             suppress: Optional[List[str]] = None,
             as_df=True,
             include_ophys_data=True,
-            n_workers: int = 1
+            n_workers: int = 1,
+            include_trial_metrics: bool = False
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
@@ -262,6 +269,10 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             Whether to include ophys data
         :param n_workers
             Number of parallel processes to use for i.e reading from pkl files
+        :param include_trial_metrics
+            Whether to include trial metrics. Set to False to skip. Is
+            expensive to calculate these metrics since the data must be read
+            from the pkl file for each session
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -288,9 +299,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 n_workers=n_workers)
         else:
             ophys_session_table = None
-        sessions = SessionsTable(df=sessions, suppress=suppress,
-                                 fetch_api=self.fetch_api,
-                                 ophys_session_table=ophys_session_table)
+        sessions = SessionsTable(
+            df=sessions,
+            suppress=suppress,
+            fetch_api=self.fetch_api,
+            ophys_session_table=ophys_session_table,
+            include_trial_metrics=include_trial_metrics)
 
         return sessions.table if as_df else sessions
 

@@ -5,8 +5,7 @@ import numpy as np
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
     Trial)
 from allensdk.brain_observatory.behavior.data_objects.\
-    trials.trial_table import (
-    Trials)
+    trials.trials import Trials
 
 
 class VBNTrial(Trial):
