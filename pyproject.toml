@@ -1,0 +1,33 @@
+## Build System Configurations
+# 
+# https://setuptools.pypa.io/en/latest/setuptools.html#building-and-distributing-packages-with-setuptools
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+## Pyright Configurations
+# 
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+[tool.pyright]
+reportGeneralTypeIssues = false
+typeCheckingMode = "basic"
+
+
+## Black Configurations
+# 
+# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#what-on-earth-is-a-pyproject-toml-file
+[tool.black]
+line-length = 99
+include = '\.pyi?$'
+
+
+## isort Configurations
+#
+# https://pycqa.github.io/isort/docs/configuration/config_files.html
+[tool.isort]
+# required for compatibility with black:
+line_length = 99
+profile = "black"
+src_paths = ["src", "test"]
+known_first_party = ["gcsutils"]
+
