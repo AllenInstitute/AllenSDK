@@ -1,24 +1,16 @@
-import os
 import datetime
+import os
 import uuid
+
+import numpy as np
 import pytest
 import pytz
-import numpy as np
-
 from pynwb import NWBHDF5IO
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-    BehaviorOphysExperiment
-
-from allensdk.brain_observatory.behavior.data_objects import \
-    BehaviorSessionId
-
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.foraging_id import \
-    ForagingId
-
-from allensdk.brain_observatory.session_api_utils import (
-    sessions_are_equal)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import BehaviorOphysExperiment  # NOQA
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.foraging_id import ForagingId  # NOQA
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator

@@ -2,26 +2,13 @@ from typing import Union
 
 from pynwb import NWBFile
 
-from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .multi_plane_metadata import \
-    MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_experiment_metadata import \
-    OphysExperimentMetadata
-from allensdk.brain_observatory.behavior.schemas import \
-    OphysBehaviorMetadataSchema
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import BehaviorMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
+from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetadataSchema  # NOQA
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.core import DataObject, JsonReadableInterface, LimsReadableInterface, NwbReadableInterface, NwbWritableInterface  # NOQA
 from allensdk.internal.api import PostgresQueryMixin
 
 

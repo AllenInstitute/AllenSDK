@@ -1,47 +1,24 @@
 import datetime
 import json
 from pathlib import Path
+
 import pynwb
 import pytest
 import pytz
 
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_ophys_metadata import \
-    BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_container_id import \
-    OphysContainerId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.field_of_view_shape import \
-    FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_depth import \
-    ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.target_imaging_depth import \
-    TargetImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .imaging_plane_group import \
-    ImagingPlaneGroup
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .multi_plane_metadata import \
-    MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_experiment_metadata import \
-    OphysExperimentMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_session_id import \
-    OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import Equipment  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import BehaviorOphysMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import FieldOfViewShape  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import ImagingDepth  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import ImagingPlaneGroup  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import OphysContainerId  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import OphysSessionId  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.target_imaging_depth import TargetImagingDepth  # NOQA
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.test_behavior_metadata import \
-    TestBehaviorMetadata
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import TestBehaviorMetadata  # NOQA
 
 
 class TestBOM:
@@ -82,10 +59,10 @@ class TestBOM:
         multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            ophys_container_id=ophys_experiment_metadata._ophys_container_id, # noqa E501
+            ophys_container_id=ophys_experiment_metadata._ophys_container_id,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
-            target_imaging_depth=ophys_experiment_metadata._target_imaging_depth,
+            target_imaging_depth=ophys_experiment_metadata._target_imaging_depth,  # noqa E501
             project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
