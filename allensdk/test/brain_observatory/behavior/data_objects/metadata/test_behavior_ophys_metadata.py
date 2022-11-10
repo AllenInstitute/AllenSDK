@@ -21,6 +21,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.target_imaging_depth import \
+    TargetImagingDepth
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.multi_plane_metadata\
     .imaging_plane_group import \
     ImagingPlaneGroup
@@ -57,7 +60,8 @@ class TestBOM:
             ophys_container_id=OphysContainerId(
                 ophys_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
-            imaging_depth=ImagingDepth(imaging_depth=375)
+            imaging_depth=ImagingDepth(imaging_depth=375),
+            target_imaging_depth=TargetImagingDepth(target_imaging_depth=375)
         )
 
         behavior_metadata = TestBehaviorMetadata()
@@ -81,6 +85,7 @@ class TestBOM:
             ophys_container_id=ophys_experiment_metadata._ophys_container_id, # noqa E501
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
+            target_imaging_depth=ophys_experiment_metadata._target_imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
@@ -117,6 +122,7 @@ class TestInternal(TestBOM):
             assert isinstance(bom.ophys_metadata,
                               MultiplaneMetadata)
             assert bom.ophys_metadata.imaging_depth == 150
+            assert bom.ophys_metadata.target_imaging_depth == 150
             assert bom.behavior_metadata.session_type == 'OPHYS_1_images_A'
             assert bom.behavior_metadata.subject_metadata.reporter_line == \
                    'Ai148(TIT2L-GC6f-ICL-tTA2)'
@@ -130,6 +136,7 @@ class TestInternal(TestBOM):
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
             assert bom.ophys_metadata.imaging_depth == 175
+            assert bom.ophys_metadata.target_imaging_depth == 175
             assert bom.behavior_metadata.session_type == 'OPHYS_4_images_A'
             assert bom.behavior_metadata.subject_metadata.reporter_line == \
                    'Ai93(TITL-GCaMP6f)'

@@ -426,6 +426,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             'field_of_view_width':
                 self._metadata.ophys_metadata.field_of_view_shape.width,
             'imaging_depth': self._metadata.ophys_metadata.imaging_depth,
+            'target_imaging_depth': self._metadata.ophys_metadata.target_imaging_depth,
             'imaging_plane_group':
                 self._metadata.ophys_metadata.imaging_plane_group
                 if isinstance(self._metadata.ophys_metadata,

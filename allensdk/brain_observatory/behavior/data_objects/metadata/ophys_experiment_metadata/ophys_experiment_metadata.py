@@ -16,6 +16,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.imaging_depth import \
     ImagingDepth
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.target_imaging_depth import \
+    TargetImagingDepth
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.ophys_session_id import \
     OphysSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -33,6 +36,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
                  ophys_container_id: OphysContainerId,
                  field_of_view_shape: FieldOfViewShape,
                  imaging_depth: ImagingDepth,
+                 target_imaging_depth: TargetImagingDepth,
                  project_code: Optional[ProjectCode] = None):
         super().__init__(name='ophys_experiment_metadata', value=None,
                          is_value_self=True)
@@ -41,6 +45,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
         self._ophys_container_id = ophys_container_id
         self._field_of_view_shape = field_of_view_shape
         self._imaging_depth = imaging_depth
+        self._target_imaging_depth = target_imaging_depth
         self._project_code = project_code
 
         # project_code needs to be excluded from comparison
@@ -59,6 +64,8 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         imaging_depth = ImagingDepth.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        target_imaging_depth = TargetImagingDepth.from_lims(
+            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         project_code = ProjectCode.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
@@ -68,6 +75,7 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
             ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
             imaging_depth=imaging_depth,
+            target_imaging_depth=target_imaging_depth,
             project_code=project_code
         )
 
@@ -79,13 +87,15 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
         ophys_experiment_id = dict_repr['ophys_experiment_id']
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
+        target_imaging_depth = TargetImagingDepth.from_json(dict_repr=dict_repr)
 
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
-            imaging_depth=imaging_depth
+            imaging_depth=imaging_depth,
+            target_imaging_depth=target_imaging_depth
         )
 
     @classmethod
@@ -96,13 +106,15 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
             nwbfile=nwbfile)
         field_of_view_shape = FieldOfViewShape.from_nwb(nwbfile=nwbfile)
         imaging_depth = ImagingDepth.from_nwb(nwbfile=nwbfile)
+        target_imaging_depth = TargetImagingDepth.from_nwb(nwbfile=nwbfile)
 
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,
             ophys_container_id=ophys_container_id,
             field_of_view_shape=field_of_view_shape,
-            imaging_depth=imaging_depth
+            imaging_depth=imaging_depth,
+            target_imaging_depth=target_imaging_depth
         )
 
     @property
@@ -116,6 +128,10 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
     @property
     def imaging_depth(self) -> int:
         return self._imaging_depth.value
+
+    @property
+    def target_imaging_depth(self) -> int:
+        return self._target_imaging_depth.value
 
     @property
     def ophys_experiment_id(self) -> int:

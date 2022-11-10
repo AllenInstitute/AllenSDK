@@ -111,6 +111,7 @@ def test_visbeh_ophys_data_set():
             datetime.datetime(2018, 11, 30, 23, 28, 37)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
+        'target_imaging_depth': 375,
         'mouse_id': 416369,
         'ophys_container_id': 814796558,
         'targeted_structure': 'VISp',
