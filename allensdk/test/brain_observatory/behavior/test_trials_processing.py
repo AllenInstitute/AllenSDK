@@ -1,10 +1,9 @@
-from unittest.mock import patch, PropertyMock, create_autospec
+from unittest.mock import patch, PropertyMock
 
 import pytest
 import pandas as pd
 import numpy as np
 
-import allensdk.brain_observatory.behavior.data_objects.trials.trials
 from allensdk.brain_observatory.behavior.data_objects.trials.trials \
     import Trials
 

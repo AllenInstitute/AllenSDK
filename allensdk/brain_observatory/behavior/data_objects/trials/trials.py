@@ -73,17 +73,17 @@ class Trials(DataObject, StimulusFileReadableInterface,
     def catch_trial_count(self) -> int:
         """Number of 'catch' trials"""
         return self._trials['catch'].sum()
-    
+
     @property
     def hit_trial_count(self) -> int:
         """Number of trials with a hit behavior response"""
         return self._trials['hit'].sum()
-    
+
     @property
     def miss_trial_count(self) -> int:
         """Number of trials with a hit behavior response"""
         return self._trials['miss'].sum()
-    
+
     @property
     def false_alarm_trial_count(self) -> int:
         """Number of trials where the mouse had a false alarm
@@ -411,7 +411,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
             axis=1)
         response_latency = df.apply(
             lambda trial: trial['valid_response_licks'][0] -
-                          trial['change_time']
+            trial['change_time']
             if len(trial['valid_response_licks']) > 0 else float('inf'),
             axis=1)
         return response_latency.tolist()
@@ -453,7 +453,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
 
             # get the time elapsed over the trials
             time_elapsed = df_roll.starttime.iloc[-1] - \
-                           df_roll.starttime.iloc[0]
+                df_roll.starttime.iloc[0]
 
             # calculate the reward rate, rewards/min
             reward_rate_on_this_lap = correct / time_elapsed * 60

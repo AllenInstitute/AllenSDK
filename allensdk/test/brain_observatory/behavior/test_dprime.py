@@ -3,8 +3,16 @@ import pytest
 import pandas as pd
 import datetime
 import pytz
+from collections import defaultdict
 
-from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate, get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate, get_dprime
+
+from allensdk.brain_observatory.behavior.dprime import \
+    get_hit_rate, \
+    get_false_alarm_rate, \
+    get_rolling_dprime, \
+    get_trial_count_corrected_false_alarm_rate, \
+    get_trial_count_corrected_hit_rate, \
+    get_dprime
 
 
 NaN = float('nan')
@@ -32,16 +40,20 @@ def mock_trials_fixture():
     trials['auto_rewarded'] = False
     trials['lick_frames'] = [[] for row in trials.iterrows()]
     trials['trial_length'] = 8.5
-    trials['reward_times'] = trials.apply(lambda r: [r['change_time']+0.2] if r['change']*r['detect'] else [],axis=1)
+    trials['reward_times'] = trials.apply(
+        lambda r: [r['change_time']+0.2] if r['change']*r['detect'] else [],
+        axis=1)
     trials['reward_volume'] = 0.005 * trials['reward_times'].map(len)
-    trials['response_latency'] = trials.apply(lambda r: 0.2 if r['detect'] else np.nan,axis=1)
+    trials['response_latency'] = trials.apply(
+        lambda r: 0.2 if r['detect'] else np.nan, axis=1)
     trials['blank_duration_range'] = [[0.5, 0.5] for row in trials.iterrows()]
 
     metadata = {}
     metadata['mouse_id'] = 'M999999'
     metadata['user_id'] = 'johnd'
 
-    metadata['startdatetime'] = datetime.datetime(2017, 7, 19, 10, 35, 8, 369000, tzinfo=pytz.utc)
+    metadata['startdatetime'] = datetime.datetime(
+        2017, 7, 19, 10, 35, 8, 369000, tzinfo=pytz.utc)
     metadata['dayofweek'] = metadata['startdatetime'].weekday()
     metadata['startdatetime'] = metadata['startdatetime']
 
@@ -54,24 +66,24 @@ def mock_trials_fixture():
         trials[k] = v
     return trials
 
-from collections import defaultdict
 
 @pytest.fixture
 def mock_rolling_dprime_fixture(mock_trials_fixture):
 
     data_dict = defaultdict(list)
-    for ri, row in mock_trials_fixture[['trial_type', 'response', 'change_time']].iterrows():
+    for ri, row in mock_trials_fixture[['trial_type', 'response',
+                                        'change_time']].iterrows():
         assert not pd.isnull(row['change_time'])
-        if row['trial_type'] == 'go' and row['response'] == True:
+        if row['trial_type'] == 'go' and row['response'] is True:
             hit = True
             miss = false_alarm = correct_reject = False
-        elif row['trial_type'] == 'go' and row['response'] == False:
+        elif row['trial_type'] == 'go' and row['response'] is False:
             miss = True
             hit = false_alarm = correct_reject = False
-        elif row['trial_type'] == 'catch' and row['response'] == True:
+        elif row['trial_type'] == 'catch' and row['response'] is True:
             false_alarm = True
             miss = hit = correct_reject = False
-        elif row['trial_type'] == 'catch' and row['response'] == False:
+        elif row['trial_type'] == 'catch' and row['response'] is False:
             correct_reject = True
             hit = false_alarm = miss = False
         else:
@@ -82,9 +94,8 @@ def mock_rolling_dprime_fixture(mock_trials_fixture):
         data_dict['correct_reject'].append(correct_reject)
         data_dict['aborted'].append(False)
 
-
-
     return pd.DataFrame(data_dict)
+
 
 def test_get_hit_rate():
 
@@ -93,7 +104,8 @@ def test_get_hit_rate():
         [1, 0, 0, 0, 1, 0],
         [0, 0, 1, 1, 0, 0])
 
-    result = get_hit_rate(hit=hit, miss=miss, aborted=aborted, sliding_window=3)
+    result = get_hit_rate(hit=hit, miss=miss, aborted=aborted,
+                          sliding_window=3)
     np.testing.assert_allclose(result, [0, .5, 1/3, 2/3])
 
 
@@ -104,7 +116,10 @@ def test_get_false_alarm_rate(mock_trials_fixture):
         [1, 0, 0, 0, 1, 0],
         [0, 0, 1, 1, 0, 0])
 
-    result = get_false_alarm_rate(false_alarm=false_alarm, correct_reject=correct_reject, aborted=aborted, sliding_window=3)
+    result = get_false_alarm_rate(false_alarm=false_alarm,
+                                  correct_reject=correct_reject,
+                                  aborted=aborted,
+                                  sliding_window=3)
     np.testing.assert_allclose(result, [0, .5, 1/3, 2/3])
 
 
@@ -118,9 +133,14 @@ def test_rolling_dprime_unit():
         [0, 0, 0, 0, 0, 0])
 
     hr = get_hit_rate(hit=hit, miss=miss, aborted=aborted, sliding_window=3)
-    far = get_false_alarm_rate(false_alarm=false_alarm, correct_reject=correct_reject, aborted=aborted, sliding_window=3)
+    far = get_false_alarm_rate(
+        false_alarm=false_alarm,
+        correct_reject=correct_reject,
+        aborted=aborted,
+        sliding_window=3)
     result = get_rolling_dprime(hr, far)
-    np.testing.assert_allclose(result, [NaN, NaN, NaN, 2.326348, 4.652696, 4.652696])
+    np.testing.assert_allclose(result,
+                               [NaN, NaN, NaN, 2.326348, 4.652696, 4.652696])
 
 
 def test_rolling_dprime_integration_legacy(mock_rolling_dprime_fixture):
@@ -132,8 +152,12 @@ def test_rolling_dprime_integration_legacy(mock_rolling_dprime_fixture):
     correct_reject = mock_rolling_dprime_fixture.correct_reject
     aborted = mock_rolling_dprime_fixture.aborted
 
-    hr = get_hit_rate(hit=hit, miss=miss, aborted=aborted, sliding_window=sliding_window)
-    cr = get_false_alarm_rate(false_alarm=false_alarm, correct_reject=correct_reject, aborted=aborted, sliding_window=sliding_window)
+    hr = get_hit_rate(hit=hit, miss=miss, aborted=aborted,
+                      sliding_window=sliding_window)
+    cr = get_false_alarm_rate(false_alarm=false_alarm,
+                              correct_reject=correct_reject,
+                              aborted=aborted,
+                              sliding_window=sliding_window)
     dprime = get_rolling_dprime(hr, cr)
 
     assert dprime[2] == 4.6526957480816815
@@ -148,8 +172,14 @@ def test_rolling_dprime_integration(mock_rolling_dprime_fixture):
     correct_reject = mock_rolling_dprime_fixture.correct_reject
     aborted = mock_rolling_dprime_fixture.aborted
 
-    hr = get_trial_count_corrected_hit_rate(hit=hit, miss=miss, aborted=aborted, sliding_window=sliding_window)
-    cr = get_trial_count_corrected_false_alarm_rate(false_alarm=false_alarm, correct_reject=correct_reject, aborted=aborted, sliding_window=sliding_window)
+    hr = get_trial_count_corrected_hit_rate(hit=hit, miss=miss,
+                                            aborted=aborted,
+                                            sliding_window=sliding_window)
+    cr = get_trial_count_corrected_false_alarm_rate(
+        false_alarm=false_alarm,
+        correct_reject=correct_reject,
+        aborted=aborted,
+        sliding_window=sliding_window)
     dprime = get_rolling_dprime(hr, cr)
 
     assert dprime[2] == 0.6744897501960817
@@ -172,4 +202,3 @@ def test_dprime(hr, far, dprime):
         assert val > 0
     else:
         pass
-

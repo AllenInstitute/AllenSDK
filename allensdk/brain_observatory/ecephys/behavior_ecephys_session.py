@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Type, Union, Callable, Tuple
+from typing import Optional, List, Dict, Any, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -19,8 +19,7 @@ from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.\
-    data_objects.trials.trial_table import (
-    Trials)
+    data_objects.trials.trials import Trials
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.behavior_session import (
     StimulusFileLookup)
