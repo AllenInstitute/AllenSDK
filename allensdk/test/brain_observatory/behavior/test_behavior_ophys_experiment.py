@@ -211,6 +211,8 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods(
         'behavior_session_id',
         'cell_specimen_table',
         'corrected_fluorescence_traces',
+        'demixed_traces',
+        'neuropil_traces',
         'dff_traces',
         'events',
         'eye_tracking',

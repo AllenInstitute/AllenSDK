@@ -20,9 +20,9 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
 
-class DemixFile(DataFile):
+class NeuropilFile(DataFile):
     """A DataFile which contains methods for accessing and loading
-    demixed traces.
+    neuropil traces.
     """
 
     def __init__(self, filepath: Union[str, Path]):
@@ -30,26 +30,26 @@ class DemixFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls, dict_repr: dict) -> "DemixFile":
-        filepath = dict_repr["demix_file"]
+    def from_json(cls, dict_repr: dict) -> "NeuropilFile":
+        filepath = dict_repr["neuropil_file"]
         return cls(filepath=filepath)
 
     def to_json(self) -> Dict[str, str]:
-        return {"demix_file": str(self.filepath)}
+        return {"neuropil_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(
         cls, db: PostgresQueryMixin, ophys_experiment_id: Union[int, str]
-    ) -> "DemixFile":
+    ) -> "NeuropilFile":
         query = """
-                SELECT wkf.storage_directory || wkf.filename AS demix_file
+                SELECT wkf.storage_directory || wkf.filename AS neuropil_file
                 FROM ophys_experiments oe
                 JOIN well_known_files wkf ON wkf.attachable_id = oe.id
                 JOIN well_known_file_types wkft
                 ON wkft.id = wkf.well_known_file_type_id
                 WHERE wkf.attachable_type = 'OphysExperiment'
-                AND wkft.name = 'DemixedTracesFile'
+                AND wkft.name = 'OphysNeuropilTraces'
                 AND oe.id = {};
                 """.format(
             ophys_experiment_id
@@ -63,4 +63,4 @@ class DemixFile(DataFile):
             traces = in_file["data"][()]
             roi_id = in_file["roi_names"][()]
             idx = pd.Index(roi_id, name="cell_roi_id").astype("int64")
-            return pd.DataFrame({"demixed_trace": list(traces)}, index=idx)
+            return pd.DataFrame({"neuropil_trace": list(traces)}, index=idx)
