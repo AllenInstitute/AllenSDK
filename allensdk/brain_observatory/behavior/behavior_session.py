@@ -55,11 +55,8 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
-    TrialTable
-from allensdk.brain_observatory.behavior.trials_processing import (
-    construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.brain_observatory.behavior.data_objects.trials.trials \
+    import Trials
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
@@ -88,7 +85,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         rewards: Rewards,
         stimuli: Stimuli,
         task_parameters: TaskParameters,
-        trials: TrialTable,
+        trials: Trials,
         metadata: BehaviorMetadata,
         date_of_acquisition: DateOfAcquisition,
         eye_tracking_table: Optional[EyeTrackingTable] = None,
@@ -497,7 +494,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 add_is_change_to_stimulus_presentations_table)
         )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
+        trials = cls._trials_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
 
         with warnings.catch_warnings():
@@ -654,9 +651,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             The reward rate (rewards/minute) of the subject for the
             task calculated over a 25 trial rolling window.
         """
-        return calculate_reward_rate_fix_nans(
-                self._trials,
-                self.task_parameters['response_window_sec'][0])
+        return self._trials.calculate_reward_rate()
 
     def get_rolling_performance_df(self) -> pd.DataFrame:
         """Return a DataFrame containing trial by trial behavior response
@@ -694,10 +689,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     rolling false_alarm _rate.
 
         """
-        return construct_rolling_performance_df(
-                self._trials,
-                self.task_parameters['response_window_sec'][0],
-                self.task_parameters["session_type"])
+        return self._trials.rolling_performance
 
     def get_performance_metrics(
             self,
@@ -782,26 +774,26 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     The peak of the rolling d_prime, excluding epochs
                     when the rolling reward rate was below 2 rewards/minute
         """
-        performance_metrics = {}
-        performance_metrics['trial_count'] = len(self.trials)
-        performance_metrics['go_trial_count'] = self.trials.go.sum()
-        performance_metrics['catch_trial_count'] = self.trials.catch.sum()
-        performance_metrics['hit_trial_count'] = self.trials.hit.sum()
-        performance_metrics['miss_trial_count'] = self.trials.miss.sum()
-        performance_metrics['false_alarm_trial_count'] = \
-            self.trials.false_alarm.sum()
-        performance_metrics['correct_reject_trial_count'] = \
-            self.trials.correct_reject.sum()
-        performance_metrics['auto_reward_count'] = \
-            self.trials.auto_rewarded.sum()
+        performance_metrics = {
+            'trial_count': self._trials.trial_count,
+            'go_trial_count': self._trials.go_trial_count,
+            'catch_trial_count': self._trials.catch_trial_count,
+            'hit_trial_count': self._trials.hit_trial_count,
+            'miss_trial_count': self._trials.miss_trial_count,
+            'false_alarm_trial_count':
+                self._trials.false_alarm_trial_count,
+            'correct_reject_trial_count':
+                self._trials.correct_reject_trial_count,
+            'auto_reward_count': self.trials.auto_rewarded.sum(),
+            'earned_reward_count': self.trials.hit.sum(),
+            'total_reward_count': len(self.rewards),
+            'total_reward_volume': self.rewards.volume.sum()
+        }
         # Although 'earned_reward_count' will currently have the same value as
         # 'hit_trial_count', in the future there may be variants of the
         # task where rewards are withheld. In that case the
         # 'earned_reward_count' will be smaller than (and different from)
         # the 'hit_trial_count'.
-        performance_metrics['earned_reward_count'] = self.trials.hit.sum()
-        performance_metrics['total_reward_count'] = len(self.rewards)
-        performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
         rpdf = self.get_rolling_performance_df()
         engaged_trial_mask = (
@@ -809,7 +801,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 engaged_trial_reward_rate_threshold)
         performance_metrics['maximum_reward_rate'] = \
             np.nanmax(rpdf['reward_rate'].values)
-        performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
+        performance_metrics['engaged_trial_count'] = \
+            self._trials.get_engaged_trial_count(
+                engaged_trial_reward_rate_threshold=(
+                    engaged_trial_reward_rate_threshold))
         performance_metrics['mean_hit_rate'] = \
             rpdf['hit_rate'].mean()
         performance_metrics['mean_hit_rate_uncorrected'] = \
@@ -1199,7 +1194,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     name of image that is changed to at the change time,
                     on go trials
         """
-        return self._trials.value
+        return self._trials.data
 
     @property
     def metadata(self) -> Dict[str, Any]:
@@ -1312,7 +1307,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             licks: Licks,
-            rewards: Rewards) -> TrialTable:
+            rewards: Rewards) -> Trials:
         """
         Construct the Trials data object for this session
         """
@@ -1322,7 +1317,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return cls._trial_table_class().from_stimulus_file(
+        return cls._trials_class().from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -1496,5 +1491,5 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return 0.02115
 
     @classmethod
-    def _trial_table_class(cls) -> Type[TrialTable]:
-        return TrialTable
+    def _trials_class(cls) -> Type[Trials]:
+        return Trials

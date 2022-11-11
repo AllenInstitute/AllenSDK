@@ -95,13 +95,19 @@ class BehaviorProjectMetadataWriter:
 
         self._write_manifest()
 
-    def _write_behavior_sessions(self, suppress=SESSION_SUPPRESS,
-                                 output_filename=OUTPUT_METADATA_FILENAMES[
-                                     'behavior_session_table']):
+    def _write_behavior_sessions(
+            self,
+            suppress=SESSION_SUPPRESS,
+            output_filename=OUTPUT_METADATA_FILENAMES[
+                'behavior_session_table'],
+            include_trial_metrics: bool = True
+    ):
         behavior_sessions = self._behavior_project_cache. \
-            get_behavior_session_table(suppress=suppress,
-                                       as_df=True,
-                                       n_workers=self._n_workers)
+            get_behavior_session_table(
+                suppress=suppress,
+                as_df=True,
+                n_workers=self._n_workers,
+                include_trial_metrics=include_trial_metrics)
 
         # Add release files
         behavior_sessions = behavior_sessions \

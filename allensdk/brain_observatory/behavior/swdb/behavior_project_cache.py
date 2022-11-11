@@ -13,7 +13,7 @@ from allensdk.brain_observatory.behavior.session_apis.data_io import (
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
     BehaviorOphysExperiment
 from allensdk.core.lazy_property import LazyProperty
-from allensdk.brain_observatory.behavior.trials_processing import \
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import \
     calculate_reward_rate
 from allensdk.deprecated import deprecated
 

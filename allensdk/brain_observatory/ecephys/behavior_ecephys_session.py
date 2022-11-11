@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Type, Union, Callable, Tuple
+from typing import Optional, List, Dict, Any, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -13,14 +13,13 @@ from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
 from allensdk.brain_observatory.ecephys.data_objects.trials import (
-    VBNTrialTable)
+    VBNTrials)
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.\
-    data_objects.trials.trial_table import (
-        TrialTable)
+    data_objects.trials.trials import Trials
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.behavior_session import (
     StimulusFileLookup)
@@ -232,7 +231,7 @@ class VBNBehaviorSession(BehaviorSession):
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             licks: Licks,
-            rewards: Rewards) -> TrialTable:
+            rewards: Rewards) -> Trials:
         """
         Construct the Trials data object for this session
         """
@@ -242,15 +241,11 @@ class VBNBehaviorSession(BehaviorSession):
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return VBNTrialTable.from_stimulus_file(
+        return VBNTrials.from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
             rewards=rewards)
-
-    @classmethod
-    def _trial_table_class(cls) -> Type[VBNTrialTable]:
-        return VBNTrialTable
 
 
 class BehaviorEcephysSession(VBNBehaviorSession):

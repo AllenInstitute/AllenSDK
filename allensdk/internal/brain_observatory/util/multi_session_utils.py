@@ -39,7 +39,7 @@ def get_session_metadata_multiprocessing(
     -------
     List[BehaviorMetadata]: list of `BehaviorMetadata`
     """
-    session_metadata = _multiprocessing_helper(
+    session_metadata = multiprocessing_helper(
         target=_get_session_metadata,
         behavior_session_ids=behavior_session_ids,
         lims_engine=lims_engine,
@@ -71,7 +71,7 @@ def get_images_shown(
     """
     if n_workers is None or n_workers > 1:
         # multiprocessing
-        image_names = _multiprocessing_helper(
+        image_names = multiprocessing_helper(
             target=_get_image_names,
             behavior_session_ids=behavior_session_ids,
             lims_engine=lims_engine,
@@ -89,7 +89,7 @@ def get_images_shown(
     return res
 
 
-def _multiprocessing_helper(
+def multiprocessing_helper(
         target: Callable,
         progress_bar_title: str,
         behavior_session_ids: List[int],

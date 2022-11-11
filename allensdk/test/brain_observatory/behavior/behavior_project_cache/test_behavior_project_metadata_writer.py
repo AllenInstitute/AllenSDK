@@ -74,7 +74,8 @@ class TestVBO:
         with patch.object(
             BehaviorMetadata, 'from_lims',
                 wraps=self._get_behavior_session):
-            self.project_table_writer._write_behavior_sessions()
+            self.project_table_writer._write_behavior_sessions(
+                include_trial_metrics=False)
             obtained = pd.read_csv(Path(self.test_dir.name) /
                                    'behavior_session_table.csv')
             obtained = obtained.sort_values('behavior_session_id')\

@@ -29,6 +29,10 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
     if ignore_keys is None:
         ignore_keys = set()
 
+    if isinstance(x1, pd.Index):
+        x1 = x1.values
+        x2 = x2.values
+
     if isinstance(x1, pd.DataFrame):
         try:
             assert_frame_equal(x1, x2, check_like=True)
@@ -36,6 +40,8 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
             print(e)
             print(err_msg)
             raise
+    elif isinstance(x1, pd.Series):
+        pd.testing.assert_series_equal(x1, x2)
     elif isinstance(x1, np.ndarray):
         np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
     elif isinstance(x1, xr.DataArray):
