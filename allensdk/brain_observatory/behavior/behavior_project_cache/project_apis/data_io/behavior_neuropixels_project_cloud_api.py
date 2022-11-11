@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io.project_cloud_api_base import ProjectCloudApiBase  # noqa: E501
-
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import ( # noqa
+    ProjectCloudApiBase,
+)
 from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
-
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session \
-    import BehaviorEcephysSession
+    BehaviorSession,
+)
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
+    BehaviorEcephysSession,
+)
 
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
@@ -24,7 +24,8 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         self._get_channel_table()
 
     def get_behavior_session(
-            self, behavior_session_id: int) -> BehaviorSession:
+        self, behavior_session_id: int
+    ) -> BehaviorSession:
         """
         Retrieve behavior session data from either the released behavior
         only nwb or the behavior side of the released ecephys data.
@@ -43,29 +44,36 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         BehaviorSession
         """
         row = self._behavior_session_table.query(
-                f"behavior_session_id=={behavior_session_id}")
+            f"behavior_session_id=={behavior_session_id}"
+        )
         if row.shape[0] != 1:
-            raise RuntimeError("The behavior_session_table should have "
-                               "1 and only 1 entry for a given "
-                               "behavior_session_id. For "
-                               f"{behavior_session_id} "
-                               f" there are {row.shape[0]} entries.")
+            raise RuntimeError(
+                "The behavior_session_table should have "
+                "1 and only 1 entry for a given "
+                "behavior_session_id. For "
+                f"{behavior_session_id} "
+                f" there are {row.shape[0]} entries."
+            )
 
         row = row.squeeze()
         ecephys_session_id = row.ecephys_session_id
         # If a file_id for the behavior session is not set, attempt to load
         # an associated ecephys session.
-        if row[self.cache.file_id_column] < 0 \
-           or np.isnan(row[self.cache.file_id_column]):
+        if row[self.cache.file_id_column] < 0 or np.isnan(
+            row[self.cache.file_id_column]
+        ):
             row = self._ecephys_session_table.query(
-                f"index=={ecephys_session_id}")
+                f"index=={ecephys_session_id}"
+            )
 
         if len(row) == 0:
-            raise RuntimeError(f"behavior_session: {behavior_session_id} "
-                               f"corresponding to "
-                               f"ecephys_session: {ecephys_session_id}"
-                               f"does not exist in the behavior_session  "
-                               "or ecephys_session tables.")
+            raise RuntimeError(
+                f"behavior_session: {behavior_session_id} "
+                f"corresponding to "
+                f"ecephys_session: {ecephys_session_id}"
+                f"does not exist in the behavior_session  "
+                "or ecephys_session tables."
+            )
 
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
@@ -73,8 +81,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         return BehaviorSession.from_nwb_path(str(data_path))
 
     def get_ecephys_session(
-        self,
-        ecephys_session_id: int
+        self, ecephys_session_id: int
     ) -> BehaviorEcephysSession:
 
         """get a BehaviorEcephysSession by specifying ecephys_session_id
@@ -90,17 +97,20 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
 
         """
         session_meta = self._ecephys_session_table.query(
-                f"index=={ecephys_session_id}")
+            f"index=={ecephys_session_id}"
+        )
         probes_meta = self._probe_table[
-            (self._probe_table['ecephys_session_id'] == ecephys_session_id) &
-            (self._probe_table['has_lfp_data'])
+            (self._probe_table["ecephys_session_id"] == ecephys_session_id)
+            & (self._probe_table["has_lfp_data"])
         ]
         if session_meta.shape[0] != 1:
-            raise RuntimeError("The behavior_ecephys_session_table should "
-                               "have 1 and only 1 entry for a given "
-                               f"ecephys_session_id. For "
-                               f"{ecephys_session_id} "
-                               f" there are {session_meta.shape[0]} entries.")
+            raise RuntimeError(
+                "The behavior_ecephys_session_table should "
+                "have 1 and only 1 entry for a given "
+                f"ecephys_session_id. For "
+                f"{ecephys_session_id} "
+                f" there are {session_meta.shape[0]} entries."
+            )
         session_file_id = str(int(session_meta[self.cache.file_id_column]))
         session_data_path = self._get_data_path(file_id=session_file_id)
 
@@ -108,6 +118,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             """Due to late binding closure. See:
             https://docs.python-guide.org/writing/gotchas/
             #late-binding-closures"""
+
             def f():
                 return self._get_data_path(file_id=file_id)
 
@@ -117,16 +128,17 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             probe_data_path_map = {
                 p.name: make_lazy_load_filepath_function(
                     file_id=str(int(getattr(p, self.cache.file_id_column)))
-                ) for p in probes_meta.itertuples(index=False)}
+                )
+                for p in probes_meta.itertuples(index=False)
+            }
         else:
             probe_data_path_map = None
         return BehaviorEcephysSession.from_nwb_path(
-            str(session_data_path),
-            probe_data_path_map=probe_data_path_map)
+            str(session_data_path), probe_data_path_map=probe_data_path_map
+        )
 
     def _get_ecephys_session_table(self):
-        session_table_path = self._get_metadata_path(
-            fname="ecephys_sessions")
+        session_table_path = self._get_metadata_path(fname="ecephys_sessions")
         df = pd.read_csv(session_table_path)
         self._ecephys_session_table = df.set_index("ecephys_session_id")
 
@@ -138,8 +150,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         return self._ecephys_session_table
 
     def _get_behavior_session_table(self):
-        session_table_path = self._get_metadata_path(
-            fname='behavior_sessions')
+        session_table_path = self._get_metadata_path(fname="behavior_sessions")
         df = pd.read_csv(session_table_path)
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -147,8 +158,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         return self._behavior_session_table
 
     def _get_probe_table(self):
-        probe_table_path = self._get_metadata_path(
-            fname="probes")
+        probe_table_path = self._get_metadata_path(fname="probes")
         df = pd.read_csv(probe_table_path)
         self._probe_table = df.set_index("ecephys_probe_id")
 
@@ -156,8 +166,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         return self._probe_table
 
     def _get_unit_table(self):
-        unit_table_path = self._get_metadata_path(
-            fname="units")
+        unit_table_path = self._get_metadata_path(fname="units")
         df = pd.read_csv(unit_table_path)
         self._unit_table = df.set_index("unit_id")
 
@@ -165,8 +174,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         return self._unit_table
 
     def _get_channel_table(self):
-        channel_table_path = self._get_metadata_path(
-            fname="channels")
+        channel_table_path = self._get_metadata_path(fname="channels")
         df = pd.read_csv(channel_table_path)
         self._channel_table = df.set_index("ecephys_channel_id")
 
