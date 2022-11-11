@@ -121,4 +121,4 @@ class VBNTrials(Trials):
 
     @property
     def change_time(self):
-        return self.value['change_time_no_display_delay']
+        return self.data['change_time_no_display_delay']
