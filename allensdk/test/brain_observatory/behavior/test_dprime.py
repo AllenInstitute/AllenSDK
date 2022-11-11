@@ -74,16 +74,16 @@ def mock_rolling_dprime_fixture(mock_trials_fixture):
     for ri, row in mock_trials_fixture[['trial_type', 'response',
                                         'change_time']].iterrows():
         assert not pd.isnull(row['change_time'])
-        if row['trial_type'] == 'go' and row['response'] is True:
+        if row['trial_type'] == 'go' and row['response']:
             hit = True
             miss = false_alarm = correct_reject = False
-        elif row['trial_type'] == 'go' and row['response'] is False:
+        elif row['trial_type'] == 'go' and not row['response']:
             miss = True
             hit = false_alarm = correct_reject = False
-        elif row['trial_type'] == 'catch' and row['response'] is True:
+        elif row['trial_type'] == 'catch' and row['response']:
             false_alarm = True
             miss = hit = correct_reject = False
-        elif row['trial_type'] == 'catch' and row['response'] is False:
+        elif row['trial_type'] == 'catch' and not row['response']:
             correct_reject = True
             hit = false_alarm = miss = False
         else:
