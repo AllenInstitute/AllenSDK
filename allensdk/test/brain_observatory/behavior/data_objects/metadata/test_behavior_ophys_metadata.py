@@ -63,7 +63,8 @@ class TestBOM:
             ophys_container_id=ophys_experiment_metadata._ophys_container_id,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
-            average_container_depth=ophys_experiment_metadata._average_container_depth,  # noqa E501
+            average_container_depth=ophys_experiment_metadata.
+            _average_container_depth,
             project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
