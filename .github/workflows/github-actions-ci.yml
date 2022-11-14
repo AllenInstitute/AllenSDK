@@ -22,49 +22,49 @@ env:
   MTRAIN_PASSWORD: password
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: actions/checkout@v2
-      - name: flake8 linting
-        run: |
-          pip install flake8
-          export PATH="/home/runner/.local/bin:${PATH}"
-          git fetch origin master
-          # `|| true` to force exit code 0 even if no files found
-          CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master allensdk | grep -e ".*.py$" || true)
-          echo "List of changed files:"
-          echo ${CHANGED_PYFILES}
-          flake8 ${CHANGED_PYFILES} --count
+#   lint:
+#     name: Lint
+#     runs-on: "ubuntu-latest"
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: flake8 linting
+#         run: |
+#           pip install flake8
+#           export PATH="/home/runner/.local/bin:${PATH}"
+#           git fetch origin master
+#           # `|| true` to force exit code 0 even if no files found
+#           CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master allensdk | grep -e ".*.py$" || true)
+#           echo "List of changed files:"
+#           echo ${CHANGED_PYFILES}
+#           flake8 ${CHANGED_PYFILES} --count
 
-  allensdk:
-    name: ${{ matrix.python-version }}, ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.6", "3.7", "3.8"]
-      fail-fast: false
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          activate-environment: test-env
-      - name: Install
-        run: |
-          conda activate test-env
-          pip install codecov
-          pip install -r test_requirements.txt
-          pip install .
-      - name: Test
-        run: |
-          py.test --cov=allensdk -n 4
+#   allensdk:
+#     name: ${{ matrix.python-version }}, ${{ matrix.os }}
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       matrix:
+#         os: ["macos-latest", "windows-latest", "ubuntu-latest"]
+#         python-version: ["3.6", "3.7", "3.8"]
+#       fail-fast: false
+#     defaults:
+#       run:
+#         shell: bash -l {0}
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: conda-incubator/setup-miniconda@v2
+#         with:
+#           auto-update-conda: true
+#           python-version: ${{ matrix.python-version }}
+#           activate-environment: test-env
+#       - name: Install
+#         run: |
+#           conda activate test-env
+#           pip install codecov
+#           pip install -r test_requirements.txt
+#           pip install .
+#       - name: Test
+#         run: |
+#           py.test --cov=allensdk -n 4
 
   onprem:
     name: python ${{ matrix.image }} on-prem test
