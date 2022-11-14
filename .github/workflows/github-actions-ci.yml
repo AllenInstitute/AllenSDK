@@ -73,7 +73,7 @@ jobs:
       matrix:
         image: ["allensdk_local_py37:latest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: run test in docker
         run: |
           docker run \
