@@ -148,7 +148,7 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
              'targeted for two-photon acquisition'),
         required=True,
     )
-    target_imaging_depth = fields.Int(
+    average_container_depth = fields.Int(
         doc=(
             "Average Depth (microns) below the cortical surface "
             "across experiments of a container."

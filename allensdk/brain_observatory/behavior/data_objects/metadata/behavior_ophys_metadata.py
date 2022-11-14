@@ -145,7 +145,7 @@ class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
             session_type=behavior_meta.session_type,
             equipment_name=behavior_meta.equipment.value,
             imaging_depth=ophys_meta.imaging_depth,
-            target_imaging_depth=ophys_meta.target_imaging_depth,
+            average_container_depth=ophys_meta.average_container_depth,
             behavior_session_uuid=str(behavior_meta.behavior_session_uuid),
             behavior_session_id=behavior_meta.behavior_session_id
         )
