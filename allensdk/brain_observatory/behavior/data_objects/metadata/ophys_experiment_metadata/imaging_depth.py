@@ -8,6 +8,10 @@ from allensdk.internal.api import PostgresQueryMixin
 
 class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface,
                    JsonReadableInterface):
+    """Data object loads and stores the imaging_depth (microns) for an
+    experiments. This is the calculated difference between measured
+    z-depths of the surface and imaging_depth.
+    """
     def __init__(self, imaging_depth: int):
         super().__init__(name='imaging_depth', value=imaging_depth)
 
@@ -15,10 +19,10 @@ class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface,
     def from_lims(cls, ophys_experiment_id: int,
                   lims_db: PostgresQueryMixin) -> "ImagingDepth":
         query = """
-                SELECT id.depth
+                SELECT imd.depth
                 FROM ophys_experiments oe
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-                LEFT JOIN imaging_depths id ON id.id = oe.imaging_depth_id
+                LEFT JOIN imaging_depths imd ON imd.id = oe.imaging_depth_id
                 WHERE oe.id = {};
                 """.format(ophys_experiment_id)
         imaging_depth = lims_db.fetchone(query, strict=True)
