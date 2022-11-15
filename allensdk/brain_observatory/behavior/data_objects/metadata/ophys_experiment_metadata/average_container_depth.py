@@ -48,7 +48,9 @@ class AverageContainerDepth(
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "AverageContainerDepth":
-        return cls(average_container_depth=dict_repr["targeted_imaging_depth"])
+        # TODO remove all of the from_json loading and validation step
+        # ticket 2607
+        return cls(average_container_depth=dict_repr["targeted_depth"])
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "AverageContainerDepth":

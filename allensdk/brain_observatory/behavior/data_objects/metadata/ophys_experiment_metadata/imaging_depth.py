@@ -30,6 +30,8 @@ class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ImagingDepth":
+        # TODO remove all of the from_json loading and validation step
+        # ticket 2607
         return cls(imaging_depth=dict_repr['targeted_depth'])
 
     @classmethod
