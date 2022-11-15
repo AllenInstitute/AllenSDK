@@ -1,3 +1,0 @@
-pg8000
-deap
-scikit-learn>=0.16.0

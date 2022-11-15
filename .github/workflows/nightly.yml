@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '05 6 * * *'
 
+
 jobs:
   onprem:
     name: python ${{ matrix.image }} on-prem test
@@ -10,7 +11,7 @@ jobs:
     strategy:
       matrix:
         image: ["allensdk_local_py37:latest"]
-        branch: ["master", "rc/2.16.1"]
+        branch: ["master", "rc/**"]
     steps:
       - uses: actions/checkout@v2
         with:
