@@ -1124,7 +1124,15 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new "nonapplicable"
         # value that pandas does not recognize as null ...
         stimulus_presentations.replace("", nonapplicable, inplace=True)
-        stimulus_presentations = stimulus_presentations.astype("object").fillna(nonapplicable)
+        
+        # pandas does not automatically convert boolean cols for fillna
+        boolean_colnames = stimulus_presentations.dtypes[stimulus_presentations.dtypes=="boolean"].index
+        col_type_map = {colname: "object" for colname in boolean_colnames}
+        stimulus_presentations = stimulus_presentations.astype(col_type_map).fillna(nonapplicable)
+
+        # Values in 'spatial_frequency' is expected to be str 
+        stimulus_presentations.spatial_frequency = \
+            stimulus_presentations.spatial_frequency.astype(str)
 
         stimulus_presentations['duration'] = \
             stimulus_presentations['stop_time'] - \
@@ -1241,7 +1249,7 @@ class EcephysSession(LazyPropertyMixin):
 
         channel_id_lut = defaultdict(lambda: -1)
         for cid, row in self.channels.iterrows():
-            channel_id_lut[(row["local_index"], row["probe_id"])] = cid
+            channel_id_lut[(row["probe_channel_number"], row["probe_id"])] = cid
 
         probe_id_lut = {
             uid: row['probe_id'] for uid, row in self._units.iterrows()
