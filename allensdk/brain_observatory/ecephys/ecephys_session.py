@@ -1124,7 +1124,7 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new "nonapplicable"
         # value that pandas does not recognize as null ...
         stimulus_presentations.replace("", nonapplicable, inplace=True)
-        stimulus_presentations.fillna(nonapplicable, inplace=True)
+        stimulus_presentations = stimulus_presentations.astype("object").fillna(nonapplicable)
 
         stimulus_presentations['duration'] = \
             stimulus_presentations['stop_time'] - \
