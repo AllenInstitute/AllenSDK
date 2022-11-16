@@ -1,22 +1,24 @@
 import warnings
-from collections.abc import Collection
 from collections import defaultdict
+from collections.abc import Collection
 from typing import Optional
 
-import xarray as xr
 import numpy as np
 import pandas as pd
 import scipy.stats
+import xarray as xr
 
-from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import (
-        EcephysSessionApi,
-        EcephysNwbSessionApi,
-        EcephysNwb1Api)
+    EcephysNwb1Api,
+    EcephysNwbSessionApi,
+    EcephysSessionApi,
+)
 from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
 from allensdk.brain_observatory.ecephys.stimulus_table._schemas import (
+    default_column_renames,
     default_stimulus_renames,
-    default_column_renames)
+)
+from allensdk.core.lazy_property import LazyPropertyMixin
 
 # stimulus_presentation column names not describing a parameter of a stimulus
 NON_STIMULUS_PARAMETERS = tuple([
@@ -356,16 +358,17 @@ class EcephysSession(LazyPropertyMixin):
         Returns
         -------
         xr.DataArray :
-            dimensions are channel (id) and time (seconds, relative to stimulus
-            onset). Values are current source density assessed on that
-            channel at that time (V/m^2)
+            dimensions are channel (id) and time (seconds, relative to
+            stimulus onset). Values are current source density assessed
+            on that channel at that time (V/m^2)
 
         """
 
         return self.api.get_current_source_density(probe_id)
 
     def get_lfp(self, probe_id, mask_invalid_intervals=True):
-        ''' Load an xarray DataArray with LFP data from channels on a single probe
+        ''' Load an xarray DataArray with LFP data from channels on a
+         single probe
 
         Parameters
         ----------
@@ -979,8 +982,8 @@ class EcephysSession(LazyPropertyMixin):
             self,
             stimulus_name,
             drop_nulls=True):
-        """ For each stimulus parameter, report the unique values taken on by that
-        parameter while a named stimulus was presented.
+        """ For each stimulus parameter, report the unique values taken
+        on by that parameter while a named stimulus was presented.
 
         Parameters
         ----------
@@ -1004,8 +1007,8 @@ class EcephysSession(LazyPropertyMixin):
             self,
             stimulus_presentation_ids=None,
             drop_nulls=True):
-        ''' For each stimulus parameter, report the unique values taken on by that
-        parameter throughout the course of the  session.
+        ''' For each stimulus parameter, report the unique values taken
+        on by that parameter throughout the course of the session.
 
         Parameters
         ----------
@@ -1124,13 +1127,15 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new "nonapplicable"
         # value that pandas does not recognize as null ...
         stimulus_presentations.replace("", nonapplicable, inplace=True)
-        
-        # pandas does not automatically convert boolean cols for fillna
-        boolean_colnames = stimulus_presentations.dtypes[stimulus_presentations.dtypes=="boolean"].index
-        col_type_map = {colname: "object" for colname in boolean_colnames}
-        stimulus_presentations = stimulus_presentations.astype(col_type_map).fillna(nonapplicable)
 
-        # Values in 'spatial_frequency' is expected to be str 
+        # pandas does not automatically convert boolean cols for fillna
+        boolean_colnames = stimulus_presentations.dtypes[
+            stimulus_presentations.dtypes == "boolean"].index
+        col_type_map = {colname: "object" for colname in boolean_colnames}
+        stimulus_presentations = stimulus_presentations.astype(
+            col_type_map).fillna(nonapplicable)
+
+        # Values in 'spatial_frequency' is expected to be str
         stimulus_presentations.spatial_frequency = \
             stimulus_presentations.spatial_frequency.astype(str)
 
@@ -1249,7 +1254,10 @@ class EcephysSession(LazyPropertyMixin):
 
         channel_id_lut = defaultdict(lambda: -1)
         for cid, row in self.channels.iterrows():
-            channel_id_lut[(row["probe_channel_number"], row["probe_id"])] = cid
+            channel_id_lut[(
+                row["probe_channel_number"],
+                row["probe_id"],
+                )] = cid
 
         probe_id_lut = {
             uid: row['probe_id'] for uid, row in self._units.iterrows()
@@ -1446,7 +1454,8 @@ def is_distinct_from(left, right):
 
 
 def array_intervals(array):
-    """ find interval bounds (bounding consecutive identical values) in an array
+    """ find interval bounds (bounding consecutive identical values)
+    in an array
 
     Parameters
     -----------
