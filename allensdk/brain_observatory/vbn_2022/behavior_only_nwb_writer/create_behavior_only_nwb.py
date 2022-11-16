@@ -61,28 +61,18 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                         'date_of_acquisition'],
                         "%Y-%m-%d %H:%M:%S"))
 
-            try:
-                session = BehaviorSession.from_lims(
-                    behavior_session_id=bs_id,
-                    lims_db=db_conn,
-                    date_of_acquisition=daq)
-                # Edit the value for age using the info in the
-                # behavior sessions table. This is due to LIMS
-                # containing unreliable info for DAQ and AGE.
-                session._metadata._subject_metadata._age._value = \
-                    behavior_session_table.loc[bs_id, 'age_in_days']
-            except:
-                self.logger.info(
-                    f"\tFailure loading session {bs_id}. Continuing...")
-                failed += 1
-            try:
-                with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
-                    nwb_writer.write(session.to_nwb())
-                passed += 1
-            except:
-                self.logger.info(
-                    f"\tFailure writing nwb for session {bs_id}. "
-                    "Continuing...")
-                failed += 1
+            session = BehaviorSession.from_lims(
+                behavior_session_id=bs_id,
+                lims_db=db_conn,
+                date_of_acquisition=daq)
+            # Edit the value for age using the info in the
+            # behavior sessions table. This is due to LIMS
+            # containing unreliable info for DAQ and AGE.
+            session._metadata._subject_metadata._age._value = \
+                behavior_session_table.loc[bs_id, 'age_in_days']
+
+            with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
+                nwb_writer.write(session.to_nwb())
+
         self.logger.info(f"Completed processing. Successful on {passed} "
                          f"session. Failed on {failed} session.")
