@@ -119,6 +119,9 @@ groups:
   - name: imaging_depth
     dtype: int
     doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: average_container_depth
+    dtype: int
+    doc: Average imaging_depth (microns) across experiments in a container
 - neurodata_type_def: OphysEyeTrackingRigMetadata
   neurodata_type_inc: NWBDataInterface
   doc: Metadata for ophys experiment rig
