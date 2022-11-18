@@ -198,12 +198,12 @@ def map_column_names(table, name_map=None, ignore_case=True):
 
 
 def eval_str(val):
+    """Evaluates str(numeric) and str(list)
+    """
+
     if isinstance(val, str):
-        try:
+        if val.replace('.', '').isdigit():
             val = eval(val)
-            if isinstance(val, list):
-                val = tuple(val)
-        except: # noqa E722
-            pass
+        elif val[0] == "[" and val[-1] == "]":
+            val = tuple(eval(val))
     return val
-#

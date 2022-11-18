@@ -1039,7 +1039,6 @@ class EcephysSession(LazyPropertyMixin):
 
             non_null = np.array(uniques[uniques != "null"])
             non_null = non_null
-            # non_null = np.sort(non_null)
 
             if not drop_nulls and "null" in uniques:
                 non_null = np.concatenate([non_null, ["null"]])
