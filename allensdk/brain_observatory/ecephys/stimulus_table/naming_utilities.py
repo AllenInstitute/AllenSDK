@@ -195,4 +195,14 @@ def map_column_names(table, name_map=None, ignore_case=True):
     output = table.rename(columns=name_map)
 
     return output
+
+def eval_str(val):
+    if isinstance(val, str):
+        try:
+            val = eval(val)
+            if isinstance(val, list):
+                val = tuple(val)
+        except:
+            pass
+    return val
 #

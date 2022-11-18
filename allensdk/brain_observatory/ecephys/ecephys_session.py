@@ -1039,7 +1039,7 @@ class EcephysSession(LazyPropertyMixin):
 
             non_null = np.array(uniques[uniques != "null"])
             non_null = non_null
-            non_null = np.sort(non_null)
+            # non_null = np.sort(non_null)
 
             if not drop_nulls and "null" in uniques:
                 non_null = np.concatenate([non_null, ["null"]])
@@ -1135,9 +1135,13 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations = stimulus_presentations.astype(
             col_type_map).fillna(nonapplicable)
 
-        # Values in 'spatial_frequency' is expected to be str
-        stimulus_presentations.spatial_frequency = \
-            stimulus_presentations.spatial_frequency.astype(str)
+        # eval str(numeric) and str(lists), convert lists to tuple for
+        # dict key compatibility
+        exclude_columns = ['stimulus_name']
+        for colname in stimulus_presentations.columns:
+            if colname not in exclude_columns:
+                stimulus_presentations[colname] = \
+                    stimulus_presentations[colname].apply(naming_utilities.eval_str) 
 
         stimulus_presentations['duration'] = \
             stimulus_presentations['stop_time'] - \
