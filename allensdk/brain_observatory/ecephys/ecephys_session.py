@@ -1141,7 +1141,8 @@ class EcephysSession(LazyPropertyMixin):
         for colname in stimulus_presentations.columns:
             if colname not in exclude_columns:
                 stimulus_presentations[colname] = \
-                    stimulus_presentations[colname].apply(naming_utilities.eval_str) 
+                    stimulus_presentations[colname].apply(
+                        naming_utilities.eval_str)
 
         stimulus_presentations['duration'] = \
             stimulus_presentations['stop_time'] - \
