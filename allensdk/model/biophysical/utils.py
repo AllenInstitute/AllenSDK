@@ -37,7 +37,7 @@ import logging
 import os
 from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
-from fractions import gcd
+from math import gcd
 from skimage.measure import block_reduce
 import scipy.interpolate
 import numpy as np

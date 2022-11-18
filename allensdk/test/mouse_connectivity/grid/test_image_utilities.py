@@ -117,7 +117,7 @@ def test_rasterize_polygons():
     points_list = [ [ (4, 4), (6, 4), (6, 6), (4, 6) ] ]
     
     exp = np.zeros((10, 10))
-    exp[4:6, 4:6] = 1
+    exp[4:7, 4:7] = 1
     
     obt = iu.rasterize_polygons(shape, scale, points_list)
     assert( np.allclose(obt, exp) )

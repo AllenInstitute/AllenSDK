@@ -26,6 +26,12 @@ def prepend_find_packages(*roots):
         
     return packages
 
+# Enviroment variable needed to properly install pytables on Windows
+# for miniconda installs. See:
+# https://github.com/PyTables/PyTables/issues/933#issuecomment-1072128725
+if os.environ.get('CONDA_DLL_SEARCH_MODIFICATION_ENABLE', '0') == '0':
+    os.environ['CONDA_DLL_SEARCH_MODIFICATION_ENABLE'] = '1'
+
 required = parse_requirements_file('requirements.txt')
 
 if os.environ.get('ALLENSDK_INTERNAL_REQUIREMENTS', 'false') == 'true':
@@ -55,8 +61,8 @@ setup(
         'License :: Other/Proprietary License', # Allen Institute Software License
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.6', 
         'Programming Language :: Python :: 3.7', 
-        'Programming Language :: Python :: 3.8', 
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering :: Bio-Informatics'
         ])

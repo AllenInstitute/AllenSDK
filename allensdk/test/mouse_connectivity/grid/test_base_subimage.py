@@ -214,7 +214,7 @@ def test_get_polygons(polygon_params):
     si = PolygonSubImage(**polygon_params)
 
     arr = np.zeros([1875, 2500])
-    arr[500:1000, 500:1000] = 1
+    arr[500:1001, 500:1001] = 1
 
     with mock.patch(
         'allensdk.mouse_connectivity.grid.subimage.base_subimage.PolygonSubImage.required_polys', 
