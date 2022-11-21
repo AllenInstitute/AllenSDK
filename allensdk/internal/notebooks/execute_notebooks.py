@@ -17,6 +17,12 @@ parser.add_argument(
     required=True,
     help='Path to notebooks to execute'
 )
+parser.add_argument(
+    '--skip_notebooks',
+    nargs='+',
+    help='List of notebook names to skip',
+    default=[]
+)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO)
@@ -33,9 +39,12 @@ class NotebookRunner:
         notebooks_dir
             Path to notebooks
         """
-        self._notebook_paths = [
+        notebook_paths = [
             Path(args.notebooks_dir) / x for x in os.listdir(notebooks_dir)
             if Path(x).suffix == '.ipynb']
+        self._notebook_paths = [
+            x for x in notebook_paths
+            if x not in args.skip_notebooks]
 
     def run(self):
         """Runs each notebook, overwriting it with updated output,

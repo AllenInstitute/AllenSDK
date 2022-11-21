@@ -18,4 +18,5 @@ jobs:
       - name: Run notebooks
         run: |
           python -m allensdk.internal.notebooks.execute_notebooks \
-            --notebooks_dir doc_template/examples_root/examples/nb
+            --notebooks_dir doc_template/examples_root/examples/nb \
+            --skip_notebooks behavior_ophys_session.ipynb
