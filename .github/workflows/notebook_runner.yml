@@ -20,3 +20,8 @@ jobs:
           python -m allensdk.internal.notebooks.execute_notebooks \
             --notebooks_dir doc_template/examples_root/examples/nb \
             --skip_notebooks behavior_ophys_session.ipynb
+      - name: Commit and push updated notebooks
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update notebooks
+          file_pattern: '*.ipynb'
