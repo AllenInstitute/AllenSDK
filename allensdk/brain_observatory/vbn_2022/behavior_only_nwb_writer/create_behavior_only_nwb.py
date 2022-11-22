@@ -78,8 +78,9 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                     loaded_session = BehaviorSession.from_nwb_path(file_path)
                     if loaded_session.behavior_session_id == bs_id:
                         completed_file = False
+                    else:
+                        self.logger.info(f"Failed {bs_id} (id wrong), rerunning...")
                 except AttributeError:
+                    self.logger.info(f"Failed {bs_id} (missing meta), rerunning...")
                     continue
-
-        self.logger.info(f"Completed processing. Successful on {passed} "
-                         f"session. Failed on {failed} session.")
+        self.logger.info('complete!') 
