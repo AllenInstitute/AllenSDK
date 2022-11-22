@@ -40,39 +40,46 @@ class VBN2022BehaviorOnlyWriter(argschema.ArgSchemaParser):
                                   password=self.args['lims_password'])
         db_conn = db_connection_creator(lims2cred)
 
-        passed = 0
-        failed = 0
         for bs_id in behavior_session_ids:
-            file_path = output_path / f'behavior_session_{bs_id}.nwb'
-            if not self.args['clobber'] and file_path.exists():
-                continue
-            # Date of acquisition is unreliable from LIMS, hence we pull it
-            # from the already produced metadata.
-            try:
-                daq = DateOfAcquisition(
-                    datetime.strptime(
-                        behavior_session_table.loc[bs_id,
-                        'date_of_acquisition'],
-                        "%Y-%m-%d %H:%M:%S.%f"))
-            except ValueError:
-                daq = DateOfAcquisition(
-                    datetime.strptime(
-                        behavior_session_table.loc[bs_id,
-                        'date_of_acquisition'],
-                        "%Y-%m-%d %H:%M:%S"))
+            completed_file = True
+            while completed_file:
+                file_path = output_path / f'behavior_session_{bs_id}.nwb'
+                if not self.args['clobber'] and file_path.exists():
+                    continue
+                # Date of acquisition is unreliable from LIMS, hence we pull it
+                # from the already produced metadata.
+                try:
+                    daq = DateOfAcquisition(
+                        datetime.strptime(
+                            behavior_session_table.loc[bs_id,
+                            'date_of_acquisition'],
+                            "%Y-%m-%d %H:%M:%S.%f"))
+                except ValueError:
+                    daq = DateOfAcquisition(
+                        datetime.strptime(
+                            behavior_session_table.loc[bs_id,
+                            'date_of_acquisition'],
+                            "%Y-%m-%d %H:%M:%S"))
 
-            session = BehaviorSession.from_lims(
-                behavior_session_id=bs_id,
-                lims_db=db_conn,
-                date_of_acquisition=daq)
-            # Edit the value for age using the info in the
-            # behavior sessions table. This is due to LIMS
-            # containing unreliable info for DAQ and AGE.
-            session._metadata._subject_metadata._age._value = \
-                behavior_session_table.loc[bs_id, 'age_in_days']
+                session = BehaviorSession.from_lims(
+                    behavior_session_id=bs_id,
+                    lims_db=db_conn,
+                    date_of_acquisition=daq)
+                # Edit the value for age using the info in the
+                # behavior sessions table. This is due to LIMS
+                # containing unreliable info for DAQ and AGE.
+                session._metadata._subject_metadata._age._value = \
+                    behavior_session_table.loc[bs_id, 'age_in_days']
 
-            with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
-                nwb_writer.write(session.to_nwb())
+                with pynwb.NWBHDF5IO(file_path, 'w') as nwb_writer:
+                    nwb_writer.write(session.to_nwb())
+
+                try:
+                    loaded_session = BehaviorSession.from_nwb_path(file_path)
+                    if loaded_session.behavior_session_id == bs_id:
+                        completed_file = False
+                except AttributeError:
+                    continue
 
         self.logger.info(f"Completed processing. Successful on {passed} "
                          f"session. Failed on {failed} session.")
