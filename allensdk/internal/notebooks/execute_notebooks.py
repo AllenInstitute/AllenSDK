@@ -55,7 +55,9 @@ class NotebookRunner:
         notebooks_dir
             Path to notebooks
         """
-        notebook_paths = glob.glob(os.path.join(notebooks_dir, '*.ipynb'))
+        notebook_paths = [
+            Path(x) for x in glob.glob(os.path.join(notebooks_dir, "*.ipynb"))
+        ]
         self._notebook_paths = [
             x for x in notebook_paths
             if x not in args.skip_notebooks]
@@ -86,7 +88,7 @@ class NotebookRunner:
                                 'resources_dir': str(Path(__file__).parent /
                                                      'resources')
                             },
-                            **NOTEBOOK_ARGS.get(Path(notebook_path).name, {})
+                            **NOTEBOOK_ARGS.get(notebook_path.name, {})
                         },
                         kernel_name='python3'
                     )
