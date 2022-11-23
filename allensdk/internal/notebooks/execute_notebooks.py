@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import shutil
@@ -54,9 +55,7 @@ class NotebookRunner:
         notebooks_dir
             Path to notebooks
         """
-        notebook_paths = [
-            Path(args.notebooks_dir) / x for x in os.listdir(notebooks_dir)
-            if Path(x).suffix == '.ipynb']
+        notebook_paths = glob.glob(os.path.join(notebooks_dir, '*.ipynb'))
         self._notebook_paths = [
             x for x in notebook_paths
             if x not in args.skip_notebooks]
