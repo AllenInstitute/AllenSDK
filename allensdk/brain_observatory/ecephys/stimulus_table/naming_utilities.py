@@ -195,15 +195,3 @@ def map_column_names(table, name_map=None, ignore_case=True):
     output = table.rename(columns=name_map)
 
     return output
-
-
-def eval_str(val):
-    """Evaluates str(numeric) and str(list)
-    """
-
-    if isinstance(val, str):
-        if val.replace('.', '').isdigit():
-            val = eval(val)
-        elif val[0] == "[" and val[-1] == "]":
-            val = tuple(eval(val))
-    return val

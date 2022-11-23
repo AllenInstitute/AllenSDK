@@ -8,6 +8,7 @@ import pandas as pd
 import scipy.stats
 import xarray as xr
 
+from allensdk.brain_observatory.behavior.swdb.utilities import literal_col_eval, df_list_to_tuple
 from allensdk.brain_observatory.ecephys.ecephys_session_api import (
     EcephysNwb1Api,
     EcephysNwbSessionApi,
