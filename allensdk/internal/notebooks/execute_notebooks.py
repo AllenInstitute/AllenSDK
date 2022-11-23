@@ -86,7 +86,7 @@ class NotebookRunner:
                                 'resources_dir': str(Path(__file__).parent /
                                                      'resources')
                             },
-                            **NOTEBOOK_ARGS.get(notebook_path.name, {})
+                            **NOTEBOOK_ARGS.get(Path(notebook_path).name, {})
                         },
                         kernel_name='python3'
                     )
