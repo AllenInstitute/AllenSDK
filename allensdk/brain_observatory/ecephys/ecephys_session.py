@@ -8,7 +8,7 @@ import pandas as pd
 import scipy.stats
 import xarray as xr
 
-from allensdk.brain_observatory.behavior.swdb.utilities import literal_col_eval, df_list_to_tuple
+from allensdk.core.utilities import literal_col_eval, df_list_to_tuple
 from allensdk.brain_observatory.ecephys.ecephys_session_api import (
     EcephysNwb1Api,
     EcephysNwbSessionApi,
@@ -1135,19 +1135,21 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations = stimulus_presentations.astype(
             col_type_map).fillna(nonapplicable)
 
-        # eval str(numeric) and str(lists), convert lists to tuple for
-        # dict key compatibility
-        exclude_columns = ['stimulus_name']
-        for colname in stimulus_presentations.columns:
-            if colname not in exclude_columns:
-                stimulus_presentations[colname] = \
-                    stimulus_presentations[colname].apply(
-                        naming_utilities.eval_str)
-
-        stimulus_presentations['duration'] = \
-            stimulus_presentations['stop_time'] - \
-            stimulus_presentations['start_time']
-
+        # eval str(numeric) and str(lists)
+        # convert lists to tuple for hashability
+        # Rationale: pd dataframe reads values as str from nwb files
+        # where they are expected to be float
+        col_list = ["phase, size, spatial_frequency"]
+        stimulus_presentations = literal_col_eval(
+            stimulus_presentations,
+            columns=col_list)
+        stimulus_presentations = df_list_to_tuple(
+            stimulus_presentations,
+            columns=col_list)
+        stimulus_presentations["duration"] = (
+            stimulus_presentations["stop_time"]
+            - stimulus_presentations["start_time"]
+        )
         # TODO: database these
         stimulus_conditions = {}
         presentation_conditions = []

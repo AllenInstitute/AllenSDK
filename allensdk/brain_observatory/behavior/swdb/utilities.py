@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib as mpl
-from typing import List
-import ast
 
 '''
     This file contains a set of functions that are useful in analyzing visual behavior data
@@ -19,11 +17,9 @@ def save_figure(fig, figsize, save_dir, folder, filename, formats=['.png']):
         fig: a figure object
         figsize: tuple of desired figure size
         save_dir: string, the directory to save the figure
-        folder: string, the sub-folder to save the figure in. if the
-        folder does not exist, it will be created
+        folder: string, the sub-folder to save the figure in. if the folder does not exist, it will be created
         filename: string, the desired name of the saved figure
-        formats: a list of file formats as strings to save the figure
-        as, ex: ['.png','.pdf']
+        formats: a list of file formats as strings to save the figure as, ex: ['.png','.pdf']
     '''
     fig_dir = os.path.join(save_dir, folder)
     if not os.path.exists(fig_dir):
@@ -31,10 +27,7 @@ def save_figure(fig, figsize, save_dir, folder, filename, formats=['.png']):
     mpl.rcParams['pdf.fonttype'] = 42
     fig.set_size_inches(figsize)
     for f in formats:
-        fig.savefig(
-            os.path.join(fig_dir, fig_title + f),
-            transparent=True,
-            orientation='landscape')
+        fig.savefig(os.path.join(fig_dir, fig_title + f), transparent=True, orientation='landscape')
 
 
 def get_dff_matrix(session):
@@ -53,15 +46,11 @@ def get_dff_matrix(session):
 
 def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
     '''
-        Computes an analysis on a selection of responses (either flashes
-        or trials). Computes mean_response, sem_response, the pref_stim,
-        fraction_active_responses.
+        Computes an analysis on a selection of responses (either flashes or trials). Computes mean_response, sem_response, the pref_stim, fraction_active_responses.
 
         INPUTS
         response_df: the dataframe to group
-        conditions: the conditions to group by, the first entry should be
-        'cell_specimen_id', the second could be 'image_name' or
-        'change_image_name'
+        conditions: the conditions to group by, the first entry should be 'cell_specimen_id', the second could be 'image_name' or 'change_image_name'
 
         OUTPUTS:
         mdf: a dataframe with the following columns:
@@ -69,22 +58,15 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
             sem_response: the sem of the mean_response
             mean_trace: the average dff trace for each condition
             sem_trace: the sem of the mean_trace
-            mean_responses: the list of mean_responses for each element
-                of each group
-            pref_stim: if conditions includes image_name or
-                change_image_name, sets a boolean column for whether
-                that was the cell's preferred stimulus
-            fraction_significant_responses: the fraction of
-                individual image presentations or trials that were
-                significant (p_value > 0.05)
+            mean_responses: the list of mean_responses for each element of each group
+            pref_stim: if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
+            fraction_significant_responses: the fraction of individual image presentations or trials that were significant (p_value > 0.05)
     '''
 
     # Group by conditions
     rdf = response_df.copy()
     mdf = rdf.groupby(conditions).apply(get_mean_sem_trace)
-    mdf = mdf[
-        ['mean_response', 'sem_response', 'mean_trace', 
-            'sem_trace', 'mean_responses']]
+    mdf = mdf[['mean_response', 'sem_response', 'mean_trace', 'sem_trace', 'mean_responses']]
     mdf = mdf.reset_index()
 
     # Add preferred stimulus if we can
@@ -109,8 +91,7 @@ def get_mean_sem_trace(group):
         group: a pandas groupby object
         
         OUTPUT:
-        a pandas series with the mean_response, sem_response,
-        mean_trace, sem_trace, and mean_responses computed for the group. 
+        a pandas series with the mean_response, sem_response, mean_trace, sem_trace, and mean_responses computed for the group. 
     '''
     mean_response = np.mean(group['mean_response'])
     mean_responses = group['mean_response'].values
@@ -124,18 +105,13 @@ def get_mean_sem_trace(group):
 
 def annotate_mean_df_with_pref_stim(mean_df):
     '''
-        Computes the preferred stimulus for each cell/trial or
-        cell/flash combination. Preferred image is computed by seeing
-        which image evoked the largest average mean_response across
-        all images. 
+        Computes the preferred stimulus for each cell/trial or cell/flash combination. Preferred image is computed by seeing which image evoked the largest average mean_response across all images. 
 
         INPUTS:
         mean_df: the mean_df to be annotated
 
         OUTPUTS:
-        mean_df with a new column appended 'pref_stim' which is a
-        boolean TRUE/FALSE for whether that image was that cell's
-        preferred image.
+        mean_df with a new column appended 'pref_stim' which is a boolean TRUE/FALSE for whether that image was that cell's preferred image.
        
         ASSERTS:
         Each cell has one unique preferred stimulus 
@@ -155,13 +131,10 @@ def annotate_mean_df_with_pref_stim(mean_df):
     for cell in mdf['cell_specimen_id'].unique():
         mc = mdf[(mdf['cell_specimen_id'] == cell)]
         mc = mc[mc[image_name] != 'omitted']
-        temp = mc[
-            (mc.mean_response == np.max(mc.mean_response.values))
-            ][image_name].values
+        temp = mc[(mc.mean_response == np.max(mc.mean_response.values))][image_name].values
         if len(temp) > 0:  # need this test if the mean_response was nan
             pref_image = temp[0]
-            # PROBLEM, this is slow, and sets on slice,
-            # better to use mdf.at[test, 'pref_stim']
+            # PROBLEM, this is slow, and sets on slice, better to use mdf.at[test, 'pref_stim']
             row = mdf[(mdf['cell_specimen_id'] == cell) & (mdf[image_name] == pref_image)].index
             mdf.loc[row, 'pref_stim'] = True
 
@@ -382,41 +355,11 @@ def get_active_cell_indices(dff_traces):
 
 
 def compute_lifetime_sparseness(image_responses):
-    # image responses should be an array of the trial averaged responses
-    # to each image
-    # sparseness = 1-(sum of trial averaged responses to images / N)squared /
-    # (sum of (squared mean responses / n)) / (1-(1/N))
+    # image responses should be an array of the trial averaged responses to each image
+    # sparseness = 1-(sum of trial averaged responses to images / N)squared / (sum of (squared mean responses / n)) / (1-(1/N))
     # N = number of images
     # after Vinje & Gallant, 2000; Froudarakis et al., 2014
     N = float(len(image_responses))
-    ls = ((1 - (1 / N) * ((np.power(image_responses.sum(axis=0), 2)) /
-     (np.power(image_responses, 2).sum(axis=0)))) / (
+    ls = ((1 - (1 / N) * ((np.power(image_responses.sum(axis=0), 2)) / (np.power(image_responses, 2).sum(axis=0)))) / (
         1 - (1 / N)))
     return ls
-
-def literal_col_eval(df: pd.DataFrame,
-                     columns: List[str]) -> pd.DataFrame:
-    ''' Eval string entries of specified columns 
-    '''
-
-    for column in columns:
-        if column in df.columns:
-            df.loc[df[column].notnull(), column] = \
-                df[column][df[column].notnull()].apply(
-                    lambda x: ast.literal_eval(x) if isinstance(x, str) else x
-                )
-    return df
-
-
-def df_list_to_tuple(df: pd.DataFrame,
-                     columns: List[str]) -> pd.DataFrame:
-    ''' convert list to tuple 
-    '''
-
-    for column in columns:
-        if column in df.columns:
-            df.loc[df[column].notnull(), column] = \
-                df[column][df[column].notnull()].apply(
-                    lambda x: tuple(x) if isinstance(x, list) else x
-                )
-    return df
