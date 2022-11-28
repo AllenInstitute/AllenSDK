@@ -1,31 +1,21 @@
 import pandas as pd
-from typing import Iterable, List
-import ast
+from typing import Iterable
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import (  # noqa: E501
+    BehaviorProjectBase,
+)
 from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+    BehaviorSession,
+)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
+    BehaviorOphysExperiment,
+)
+from allensdk.core.utilities import literal_col_eval
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
+    ProjectCloudApiBase,
+)
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.\
-    project_apis.data_io.project_cloud_api_base import ProjectCloudApiBase  # noqa: E501
-
-
-def literal_col_eval(df: pd.DataFrame,
-                     columns: List[str] = ["ophys_experiment_id",
-                                           "ophys_container_id",
-                                           "driver_line"]) -> pd.DataFrame:
-    def converter(x):
-        if isinstance(x, str):
-            x = ast.literal_eval(x)
-        return x
-
-    for column in columns:
-        if column in df.columns:
-            df.loc[df[column].notnull(), column] = \
-                df[column][df[column].notnull()].apply(converter)
-    return df
+COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
@@ -34,17 +24,23 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
     def _load_manifest_tables(self):
 
-        expected_metadata = set(["behavior_session_table",
-                                 "ophys_session_table",
-                                 "ophys_experiment_table",
-                                 "ophys_cells_table"])
+        expected_metadata = set(
+            [
+                "behavior_session_table",
+                "ophys_session_table",
+                "ophys_experiment_table",
+                "ophys_cells_table",
+            ]
+        )
 
         cache_metadata = set(self.cache._manifest.metadata_file_names)
 
         if cache_metadata != expected_metadata:
-            raise RuntimeError("expected S3CloudCache object to have "
-                               f"metadata file names: {expected_metadata} "
-                               f"but it has {cache_metadata}")
+            raise RuntimeError(
+                "expected S3CloudCache object to have "
+                f"metadata file names: {expected_metadata} "
+                f"but it has {cache_metadata}"
+            )
 
         self._get_ophys_session_table()
         self._get_behavior_session_table()
@@ -52,8 +48,8 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         self._get_ophys_cells_table()
 
     def get_behavior_session(
-            self,
-            behavior_session_id: int) -> BehaviorSession:
+        self, behavior_session_id: int
+    ) -> BehaviorSession:
         """get a BehaviorSession by specifying behavior_session_id
 
         Parameters
@@ -79,13 +75,16 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
         """
         row = self._behavior_session_table.query(
-                f"behavior_session_id=={behavior_session_id}")
+            f"behavior_session_id=={behavior_session_id}"
+        )
         if row.shape[0] != 1:
-            raise RuntimeError("The behavior_session_table should have "
-                               "1 and only 1 entry for a given "
-                               "behavior_session_id. For "
-                               f"{behavior_session_id} "
-                               f" there are {row.shape[0]} entries.")
+            raise RuntimeError(
+                "The behavior_session_table should have "
+                "1 and only 1 entry for a given "
+                "behavior_session_id. For "
+                f"{behavior_session_id} "
+                f" there are {row.shape[0]} entries."
+            )
         row = row.squeeze()
         has_file_id = not pd.isna(row[self.cache.file_id_column])
         if not has_file_id:
@@ -93,11 +92,11 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
             row = self._ophys_experiment_table.query(f"index=={oeid}")
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
-        return BehaviorSession.from_nwb_path(
-                nwb_path=str(data_path))
+        return BehaviorSession.from_nwb_path(nwb_path=str(data_path))
 
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int
-                                      ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(
+        self, ophys_experiment_id: int
+    ) -> BehaviorOphysExperiment:
         """get a BehaviorOphysExperiment by specifying ophys_experiment_id
 
         Parameters
@@ -111,24 +110,29 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
         """
         row = self._ophys_experiment_table.query(
-                f"index=={ophys_experiment_id}")
+            f"index=={ophys_experiment_id}"
+        )
         if row.shape[0] != 1:
-            raise RuntimeError("The behavior_ophys_experiment_table should "
-                               "have 1 and only 1 entry for a given "
-                               f"ophys_experiment_id. For "
-                               f"{ophys_experiment_id} "
-                               f" there are {row.shape[0]} entries.")
+            raise RuntimeError(
+                "The behavior_ophys_experiment_table should "
+                "have 1 and only 1 entry for a given "
+                f"ophys_experiment_id. For "
+                f"{ophys_experiment_id} "
+                f" there are {row.shape[0]} entries."
+            )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
-        return BehaviorOphysExperiment.from_nwb_path(
-            str(data_path))
+        return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
     def _get_ophys_session_table(self):
         session_table_path = self._get_metadata_path(
-            fname="ophys_session_table")
-        df = literal_col_eval(pd.read_csv(session_table_path,
-                                          dtype={'mouse_id': str}))
-        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
+            fname="ophys_session_table"
+        )
+        df = literal_col_eval(
+            pd.read_csv(session_table_path, dtype={"mouse_id": str}),
+            columns=COL_EVAL_LIST,
+        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -146,10 +150,13 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
     def _get_behavior_session_table(self):
         session_table_path = self._get_metadata_path(
-            fname='behavior_session_table')
-        df = literal_col_eval(pd.read_csv(session_table_path,
-                                          dtype={'mouse_id': str}))
-        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
+            fname="behavior_session_table"
+        )
+        df = literal_col_eval(
+            pd.read_csv(session_table_path, dtype={"mouse_id": str}),
+            columns=COL_EVAL_LIST,
+        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -172,20 +179,27 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
 
     def _get_ophys_experiment_table(self):
         experiment_table_path = self._get_metadata_path(
-            fname="ophys_experiment_table")
-        df = literal_col_eval(pd.read_csv(experiment_table_path,
-                                          dtype={'mouse_id': str}))
-        df['date_of_acquisition'] = pd.to_datetime(df['date_of_acquisition'])
+            fname="ophys_experiment_table"
+        )
+        df = literal_col_eval(
+            pd.read_csv(experiment_table_path, dtype={"mouse_id": str}),
+            columns=COL_EVAL_LIST,
+        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
 
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
         ophys_cells_table_path = self._get_metadata_path(
-            fname="ophys_cells_table")
-        df = literal_col_eval(pd.read_csv(ophys_cells_table_path))
+            fname="ophys_cells_table"
+        )
+        df = literal_col_eval(
+            pd.read_csv(ophys_cells_table_path), columns=COL_EVAL_LIST
+        )
         # NaN's for invalid cells force this to float, push to int
-        df['cell_specimen_id'] = pd.array(df['cell_specimen_id'],
-                                          dtype="Int64")
+        df["cell_specimen_id"] = pd.array(
+            df["cell_specimen_id"], dtype="Int64"
+        )
         self._ophys_cells_table = df.set_index("cell_roi_id")
 
     def get_ophys_cells_table(self):
@@ -205,7 +219,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         return self._ophys_experiment_table
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """ Download a template for the natural movie stimulus. This is the
+        """Download a template for the natural movie stimulus. This is the
         actual movie that was shown during the recording session.
         :param number: identifier for this scene
         :type number: int
