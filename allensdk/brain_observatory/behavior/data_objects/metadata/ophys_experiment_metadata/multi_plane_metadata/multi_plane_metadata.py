@@ -52,21 +52,6 @@ class MultiplaneMetadata(OphysExperimentMetadata):
         )
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "MultiplaneMetadata":
-        ophys_experiment_metadata = super().from_json(dict_repr=dict_repr)
-        imaging_plane_group = ImagingPlaneGroup.from_json(dict_repr=dict_repr)
-        return cls(
-            ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
-            ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            ophys_container_id=ophys_experiment_metadata._ophys_container_id,
-            field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
-            imaging_depth=ophys_experiment_metadata._imaging_depth,
-            targeted_imaging_depth=ophys_experiment_metadata._targeted_imaging_depth,  # noqa E501
-            project_code=ophys_experiment_metadata._project_code,
-            imaging_plane_group=imaging_plane_group
-        )
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "MultiplaneMetadata":
         ophys_experiment_metadata = super().from_nwb(nwbfile=nwbfile)
         imaging_plane_group = ImagingPlaneGroup.from_nwb(nwbfile=nwbfile)

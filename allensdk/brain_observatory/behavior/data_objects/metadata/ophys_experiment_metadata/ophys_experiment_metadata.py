@@ -8,12 +8,12 @@ from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import OphysSessionId  # NOQA
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.project_code import ProjectCode  # NOQA
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import TargetedImagingDepth  # NOQA
-from allensdk.core import DataObject, JsonReadableInterface, LimsReadableInterface, NwbReadableInterface  # NOQA
+from allensdk.core import DataObject, LimsReadableInterface, NwbReadableInterface  # NOQA
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class OphysExperimentMetadata(DataObject, LimsReadableInterface,
-                              JsonReadableInterface, NwbReadableInterface):
+                              NwbReadableInterface):
     """Container class for ophys experiment metadata"""
     def __init__(self,
                  ophys_experiment_id: int,
@@ -62,27 +62,6 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
             imaging_depth=imaging_depth,
             targeted_imaging_depth=targeted_imaging_depth,
             project_code=project_code
-        )
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "OphysExperimentMetadata":
-        ophys_session_id = OphysSessionId.from_json(dict_repr=dict_repr)
-        ophys_container_id = OphysContainerId.from_json(
-            dict_repr=dict_repr)
-        ophys_experiment_id = dict_repr['ophys_experiment_id']
-        field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
-        imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
-        targeted_imaging_depth = TargetedImagingDepth.from_json(
-            dict_repr=dict_repr
-        )
-
-        return OphysExperimentMetadata(
-            ophys_experiment_id=ophys_experiment_id,
-            ophys_session_id=ophys_session_id,
-            ophys_container_id=ophys_container_id,
-            field_of_view_shape=field_of_view_shape,
-            imaging_depth=imaging_depth,
-            targeted_imaging_depth=targeted_imaging_depth
         )
 
     @classmethod

@@ -2,9 +2,7 @@ from matplotlib import image as mpimg
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
+from allensdk.core import NwbReadableInterface, LimsReadableInterface
 from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
@@ -14,7 +12,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
+class Projections(DataObject, LimsReadableInterface,
                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, max_projection: Image, avg_projection: Image):
         super().__init__(name='projections', value=None, is_value_self=True)
@@ -127,20 +125,6 @@ class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
                          image_name='average_image')
 
         return nwbfile
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "Projections":
-        max_projection_filepath = dict_repr['max_projection_file']
-        avg_projection_filepath = \
-            dict_repr['average_intensity_projection_image_file']
-        pixel_size = dict_repr['surface_2p_pixel_size_um']
-
-        max_projection = cls._from_filepath(filepath=max_projection_filepath,
-                                            pixel_size=pixel_size)
-        avg_projection = cls._from_filepath(filepath=avg_projection_filepath,
-                                            pixel_size=pixel_size)
-        return Projections(max_projection=max_projection,
-                           avg_projection=avg_projection)
 
     @staticmethod
     def _from_filepath(filepath: str, pixel_size: float) -> Image:

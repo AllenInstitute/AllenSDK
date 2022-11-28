@@ -17,12 +17,6 @@ class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
         super().__init__(name="age_in_days", value=age)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "Age":
-        age = dict_repr["age"]
-        age = cls._age_code_to_days(age=age)
-        return cls(age=age)
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "Age":
         query = f"""

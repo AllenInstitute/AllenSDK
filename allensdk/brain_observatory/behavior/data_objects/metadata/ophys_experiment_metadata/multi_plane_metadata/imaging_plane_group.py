@@ -63,13 +63,6 @@ class ImagingPlaneGroup(DataObject, LimsReadableInterface,
                    plane_group_count=plane_group_count)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "ImagingPlaneGroup":
-        plane_group = dict_repr['imaging_plane_group']
-        plane_group_count = dict_repr['plane_group_count']
-        return cls(plane_group=plane_group,
-                   plane_group_count=plane_group_count)
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ImagingPlaneGroup":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(plane_group=metadata.imaging_plane_group,

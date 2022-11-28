@@ -14,10 +14,6 @@ class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
     def __init__(self, sex: str):
         super().__init__(name="sex", value=sex)
 
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "Sex":
-        return cls(sex=dict_repr["sex"])
-
     def to_json(self) -> dict:
         return {"sex": self.value}
 

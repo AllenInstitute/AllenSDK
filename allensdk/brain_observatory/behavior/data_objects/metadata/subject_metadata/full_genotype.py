@@ -19,10 +19,6 @@ class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
         super().__init__(name="full_genotype", value=str(full_genotype))
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "FullGenotype":
-        return cls(full_genotype=dict_repr['full_genotype'])
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "FullGenotype":
         query = f"""

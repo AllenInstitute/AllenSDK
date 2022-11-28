@@ -21,22 +21,6 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
-        doa = dict_repr['date_of_acquisition']
-        try:
-            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            # parse the microseconds
-            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S.%f")
-        tz = pytz.timezone("America/Los_Angeles")
-        doa = tz.localize(doa)
-
-        # NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
-        doa = doa.astimezone(pytz.utc)
-
-        return cls(date_of_acquisition=doa)
-
-    @classmethod
     def from_lims(
             cls, behavior_session_id: int,
             lims_db: PostgresQueryMixin) -> "DateOfAcquisition":

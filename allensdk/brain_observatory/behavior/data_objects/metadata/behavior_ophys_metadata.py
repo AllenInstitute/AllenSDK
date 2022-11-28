@@ -8,12 +8,12 @@ from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetadataSchema  # NOQA
 from allensdk.brain_observatory.nwb import load_pynwb_extension
-from allensdk.core import DataObject, JsonReadableInterface, LimsReadableInterface, NwbReadableInterface, NwbWritableInterface  # NOQA
+from allensdk.core import DataObject, LimsReadableInterface, NwbReadableInterface, NwbWritableInterface  # NOQA
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
-                            JsonReadableInterface, NwbReadableInterface,
+                            NwbReadableInterface,
                             NwbWritableInterface):
     def __init__(self, behavior_metadata: BehaviorMetadata,
                  ophys_metadata: Union[OphysExperimentMetadata,
@@ -59,34 +59,6 @@ class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
         else:
             ophys_metadata = OphysExperimentMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
-
-        return cls(behavior_metadata=behavior_metadata,
-                   ophys_metadata=ophys_metadata)
-
-    @classmethod
-    def from_json(cls, dict_repr: dict,
-                  is_multiplane=False) -> "BehaviorOphysMetadata":
-        """
-
-        Parameters
-        ----------
-        dict_repr
-        is_multiplane
-            Whether to fetch metadata for an experiment that is part of a
-            container containing multiple imaging planes
-
-        Returns
-        -------
-
-        """
-        behavior_metadata = BehaviorMetadata.from_json(dict_repr=dict_repr)
-
-        if is_multiplane:
-            ophys_metadata = MultiplaneMetadata.from_json(
-                dict_repr=dict_repr)
-        else:
-            ophys_metadata = OphysExperimentMetadata.from_json(
-                dict_repr=dict_repr)
 
         return cls(behavior_metadata=behavior_metadata,
                    ophys_metadata=ophys_metadata)

@@ -1,13 +1,12 @@
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class FieldOfViewShape(DataObject, LimsReadableInterface,
-                       NwbReadableInterface, JsonReadableInterface):
+                       NwbReadableInterface):
     def __init__(self, height: int, width: int):
         super().__init__(name='field_of_view_shape', value=None,
                          is_value_self=True)
@@ -41,8 +40,3 @@ class FieldOfViewShape(DataObject, LimsReadableInterface,
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(height=metadata.field_of_view_height,
                    width=metadata.field_of_view_width)
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "FieldOfViewShape":
-        return cls(height=dict_repr['movie_height'],
-                   width=dict_repr['movie_width'])

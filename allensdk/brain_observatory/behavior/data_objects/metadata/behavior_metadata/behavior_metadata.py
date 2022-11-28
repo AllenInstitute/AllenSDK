@@ -12,11 +12,8 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.core import DataObject
 
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
-    LimsReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import NwbReadableInterface, LimsReadableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
@@ -179,9 +176,7 @@ def get_task_parameters(data: Dict) -> Dict:
 
 
 class BehaviorMetadata(DataObject, LimsReadableInterface,
-                       JsonReadableInterface,
                        NwbReadableInterface,
-                       JsonWritableInterface,
                        NwbWritableInterface):
     """Container class for behavior metadata"""
     def __init__(self,
@@ -251,33 +246,6 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         )
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "BehaviorMetadata":
-        subject_metadata = SubjectMetadata.from_json(dict_repr=dict_repr)
-        behavior_session_id = BehaviorSessionId.from_json(dict_repr=dict_repr)
-        equipment = Equipment.from_json(dict_repr=dict_repr)
-
-        stimulus_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
-        date_of_acquisition = DateOfAcquisition.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        stimulus_frame_rate = StimulusFrameRate.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        session_type = SessionType.from_stimulus_file(
-            stimulus_file=stimulus_file)
-        session_uuid = BehaviorSessionUUID.from_stimulus_file(
-            stimulus_file=stimulus_file)
-
-        return BehaviorMetadata(
-            date_of_acquisition=date_of_acquisition,
-            subject_metadata=subject_metadata,
-            behavior_session_id=behavior_session_id,
-            equipment=equipment,
-            stimulus_frame_rate=stimulus_frame_rate,
-            session_type=session_type,
-            behavior_session_uuid=session_uuid,
-            session_duration=stimulus_file.session_duration
-        )
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorMetadata":
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
         subject_metadata = SubjectMetadata.from_nwb(nwbfile=nwbfile)
@@ -333,9 +301,6 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
     @property
     def is_training(self):
         return self.session_type.lower().startswith('training_0')
-
-    def to_json(self) -> dict:
-        pass
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._subject_metadata.to_nwb(nwbfile=nwbfile)

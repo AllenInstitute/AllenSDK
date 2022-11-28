@@ -9,7 +9,7 @@ from pynwb import NWBFile
 
 from allensdk.core import DataObject
 from allensdk.core import \
-    LimsReadableInterface, JsonReadableInterface, NwbReadableInterface
+    LimsReadableInterface, NwbReadableInterface
 from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.schemas import \
@@ -59,7 +59,7 @@ class Coordinates:
         return f'[{self._x}, {self._y}, {self._z}]'
 
 
-class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
+class RigGeometry(DataObject, LimsReadableInterface,
                   NwbReadableInterface, NwbWritableInterface):
     def __init__(self, equipment: str,
                  monitor_position_mm: Coordinates,
@@ -171,18 +171,6 @@ class RigGeometry(DataObject, LimsReadableInterface, JsonReadableInterface,
             led_position=Coordinates(*led_position),
             monitor_rotation_deg=Coordinates(*monitor_rotation),
             camera_rotation_deg=Coordinates(*camera_rotation)
-        )
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "RigGeometry":
-        rg = dict_repr['eye_tracking_rig_geometry']
-        return RigGeometry(
-            equipment=rg['equipment'],
-            monitor_position_mm=Coordinates(*rg['monitor_position_mm']),
-            monitor_rotation_deg=Coordinates(*rg['monitor_rotation_deg']),
-            camera_position_mm=Coordinates(*rg['camera_position_mm']),
-            camera_rotation_deg=Coordinates(*rg['camera_rotation_deg']),
-            led_position=Coordinates(*rg['led_position'])
         )
 
     @classmethod

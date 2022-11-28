@@ -16,11 +16,7 @@ from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
 from allensdk.brain_observatory.behavior.data_files.event_detection_file \
     import EventDetectionFile
 from allensdk.core import DataObject
-from allensdk.core import (
-    JsonReadableInterface,
-    LimsReadableInterface,
-    NwbReadableInterface,
-)
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens.events \
     import Events
@@ -73,7 +69,6 @@ class EventsParams:
 class CellSpecimenMeta(
     DataObject,
     LimsReadableInterface,
-    JsonReadableInterface,
     NwbReadableInterface,
 ):
     """Cell specimen metadata"""
@@ -108,15 +103,6 @@ class CellSpecimenMeta(
         return cls(imaging_plane=imaging_plane_meta)
 
     @classmethod
-    def from_json(
-        cls, dict_repr: dict, ophys_timestamps: OphysTimestamps
-    ) -> "CellSpecimenMeta":
-        imaging_plane_meta = ImagingPlane.from_json(
-            dict_repr=dict_repr, ophys_timestamps=ophys_timestamps
-        )
-        return cls(imaging_plane=imaging_plane_meta)
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "CellSpecimenMeta":
         ophys_module = nwbfile.processing["ophys"]
         image_seg = ophys_module.data_interfaces["image_segmentation"]
@@ -136,7 +122,6 @@ class CellSpecimenMeta(
 class CellSpecimens(
     DataObject,
     LimsReadableInterface,
-    JsonReadableInterface,
     NwbReadableInterface,
     NwbWritableInterface,
 ):
@@ -483,79 +468,6 @@ class CellSpecimens(
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
 
-        return CellSpecimens(
-            cell_specimen_table=cell_specimen_table,
-            meta=meta,
-            dff_traces=dff_traces,
-            demixed_traces=demixed_traces,
-            neuropil_traces=neuropil_traces,
-            corrected_fluorescence_traces=corrected_fluorescence_traces,
-            events=events,
-            ophys_timestamps=ophys_timestamps,
-            segmentation_mask_image_spacing=segmentation_mask_image_spacing,
-            exclude_invalid_rois=exclude_invalid_rois,
-        )
-
-    @classmethod
-    def from_json(
-        cls,
-        dict_repr: dict,
-        ophys_timestamps: OphysTimestamps,
-        segmentation_mask_image_spacing: Tuple,
-        events_params: EventsParams,
-        exclude_invalid_rois=True,
-    ) -> "CellSpecimens":
-        cell_specimen_table = dict_repr["cell_specimen_table_dict"]
-        fov_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
-        cell_specimen_table = cls._postprocess(
-            cell_specimen_table=cell_specimen_table, fov_shape=fov_shape
-        )
-
-        def _get_dff_traces():
-            dff_file = DFFFile.from_json(dict_repr=dict_repr)
-            return DFFTraces.from_data_file(dff_file=dff_file)
-
-        def _get_demixed_traces():
-            demix_file = DemixFile.from_json(
-                dict_repr=dict_repr
-            )
-            return DemixedTraces.from_data_file(
-                demix_file=demix_file
-            )
-
-        def _get_neuropil_traces():
-            neuropil_file = NeuropilFile.from_json(
-                dict_repr=dict_repr
-            )
-            return NeuropilTraces.from_data_file(
-                neuropil_file=neuropil_file
-            )
-
-        def _get_corrected_fluorescence_traces():
-            neuropil_corrected_file = NeuropilCorrectedFile.from_json(
-                dict_repr=dict_repr
-            )
-            return CorrectedFluorescenceTraces.from_data_file(
-                neuropil_corrected_file=neuropil_corrected_file
-            )
-
-        meta = CellSpecimenMeta.from_json(
-            dict_repr=dict_repr, ophys_timestamps=ophys_timestamps
-        )
-
-        def _get_events():
-            events_file = EventDetectionFile.from_json(dict_repr=dict_repr)
-            return cls._get_events(
-                events_file=events_file,
-                events_params=events_params,
-                frame_rate_hz=meta.imaging_plane.ophys_frame_rate,
-            )
-
-        dff_traces = _get_dff_traces()
-        demixed_traces = _get_demixed_traces()
-        neuropil_traces = _get_neuropil_traces()
-        corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
-        events = _get_events()
         return CellSpecimens(
             cell_specimen_table=cell_specimen_table,
             meta=meta,

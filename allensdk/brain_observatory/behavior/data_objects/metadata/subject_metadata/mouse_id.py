@@ -13,12 +13,6 @@ class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
         super().__init__(name="mouse_id", value=mouse_id)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "MouseId":
-        mouse_id = dict_repr['external_specimen_name']
-        mouse_id = int(mouse_id)
-        return cls(mouse_id=mouse_id)
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "MouseId":
         # TODO: Should this even be included?

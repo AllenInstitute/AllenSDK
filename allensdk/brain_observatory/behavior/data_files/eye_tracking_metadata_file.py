@@ -27,14 +27,3 @@ class EyeTrackingMetadataFile(DataFile):
         raise NotImplementedError(
                 "from_lims not yet supported for EyeTrackingMetadataFile")
 
-    @classmethod
-    def to_json(cls):
-        raise NotImplementedError(
-                "from_json not yet supported for EyeTrackingMetadataFile")
-
-    @classmethod
-    def from_json(
-            cls,
-            dict_repr: dict) -> "EyeTrackingMetadataFile":
-        filepath = dict_repr[cls.file_path_key()]
-        return cls(filepath=filepath)

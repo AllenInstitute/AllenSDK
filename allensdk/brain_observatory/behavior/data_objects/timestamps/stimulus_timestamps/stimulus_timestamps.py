@@ -4,8 +4,7 @@ import numpy as np
 from pynwb import NWBFile, ProcessingModule
 from pynwb.base import TimeSeries
 
-from allensdk.core import \
-    LimsReadableInterface, NwbReadableInterface, JsonReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.brain_observatory.behavior.data_files.sync_file import \
     SyncFileReadableInterface
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
@@ -31,8 +30,7 @@ class StimulusTimestamps(DataObject,
                          SyncFileReadableInterface,
                          NwbReadableInterface,
                          LimsReadableInterface,
-                         NwbWritableInterface,
-                         JsonReadableInterface):
+                         NwbWritableInterface):
     """A DataObject which contains properties and methods to load, process,
     and represent visual behavior stimulus timestamp data.
 
@@ -120,37 +118,6 @@ class StimulusTimestamps(DataObject,
             monitor_delay=monitor_delay,
             sync_file=sync_file
         )
-
-    @classmethod
-    def from_json(
-            cls,
-            dict_repr: dict,
-            monitor_delay=0.0
-    ) -> "StimulusTimestamps":
-        """
-        Reads timestamps from stimulus file or sync file.
-        Note that `from_multiple_stimulus_blocks` method of constructing
-        timestamps is not supported using `from_json`
-
-        Parameters
-        ----------
-        dict_repr
-        monitor_delay: Monitor delay to apply to the timestamps
-
-        Returns
-        -------
-        StimulusTimestamps
-        """
-        if 'sync_file' in dict_repr:
-            sync_file = SyncFile.from_json(dict_repr=dict_repr)
-            return cls.from_sync_file(
-                        sync_file=sync_file,
-                        monitor_delay=monitor_delay)
-        else:
-            stim_file = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
-            return cls.from_stimulus_file(
-                        stimulus_file=stim_file,
-                        monitor_delay=monitor_delay)
 
     @classmethod
     def from_multiple_stimulus_blocks(

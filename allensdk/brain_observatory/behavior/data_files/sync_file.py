@@ -31,10 +31,6 @@ def _get_sync_file_query_template(behavior_session_id: int):
     return SYNC_FILE_QUERY_TEMPLATE
 
 
-def from_json_cache_key(cls, dict_repr: dict, permissive: bool = False):
-    return hashkey(json.dumps(dict_repr))
-
-
 def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id)
 
@@ -62,17 +58,6 @@ class SyncFile(DataFile):
     @property
     def permissive(self) -> bool:  # pragma: no cover
         return self._permissive
-
-    @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls,
-                  dict_repr: dict,
-                  permissive: bool = False) -> "SyncFile":
-        filepath = dict_repr["sync_file"]
-        return cls(filepath=filepath, permissive=permissive)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"sync_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

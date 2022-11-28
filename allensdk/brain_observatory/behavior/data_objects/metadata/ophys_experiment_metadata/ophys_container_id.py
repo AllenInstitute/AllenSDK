@@ -15,7 +15,7 @@ class OphysContainerId(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "ExperimentContainerId":
+                  lims_db: PostgresQueryMixin) -> "OphysContainerId":
         query = """
                 SELECT visual_behavior_experiment_container_id
                 FROM ophys_experiments_visual_behavior_experiment_containers
@@ -25,10 +25,6 @@ class OphysContainerId(DataObject, LimsReadableInterface,
         return cls(ophys_container_id=container_id)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "ExperimentContainerId":
-        return cls(ophys_container_id=dict_repr['container_id'])
-
-    @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "ExperimentContainerId":
+    def from_nwb(cls, nwbfile: NWBFile) -> "OphysContainerId":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(ophys_container_id=metadata.ophys_container_id)

@@ -16,10 +16,6 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         super().__init__(name="driver_line", value=driver_line)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "DriverLine":
-        return cls(driver_line=dict_repr['driver_line'])
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin,
                   allow_none: bool = True) -> "DriverLine":

@@ -6,10 +6,8 @@ from pynwb import NWBFile
 
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.age import \
     Age
@@ -35,8 +33,7 @@ from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 
 class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
-                      NwbWritableInterface, JsonReadableInterface,
-                      JsonWritableInterface):
+                      NwbWritableInterface):
     """Subject metadata"""
 
     def __init__(self,
@@ -91,32 +88,6 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             mouse_id=mouse_id,
             reporter_line=reporter_line,
             death_on=death_on)
-
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "SubjectMetadata":
-        sex = Sex.from_json(dict_repr=dict_repr)
-        age = Age.from_json(dict_repr=dict_repr)
-        reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
-        full_genotype = FullGenotype.from_json(dict_repr=dict_repr)
-        driver_line = DriverLine.from_json(dict_repr=dict_repr)
-        mouse_id = MouseId.from_json(dict_repr=dict_repr)
-        death_on = cls._get_death_date_from_lims(
-            mouse_id=mouse_id.value,
-            lims_db=db_connection_creator(
-                fallback_credentials=LIMS_DB_CREDENTIAL_MAP))
-
-        return cls(
-            sex=sex,
-            age=age,
-            full_genotype=full_genotype,
-            driver_line=driver_line,
-            mouse_id=mouse_id,
-            reporter_line=reporter_line,
-            death_on=death_on
-        )
-
-    def to_json(self) -> dict:
-        pass
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "SubjectMetadata":

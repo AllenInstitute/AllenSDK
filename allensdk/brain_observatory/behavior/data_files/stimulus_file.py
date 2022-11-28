@@ -31,10 +31,6 @@ BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
 """
 
 
-def from_json_cache_key(cls, stimulus_file_path: str):
-    return hashkey(stimulus_file_path, cls.file_path_key())
-
-
 def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id, cls.file_path_key())
 
@@ -59,18 +55,6 @@ class _StimulusFile(DataFile):
     def __init__(self, filepath: Union[str, Path]):
         super().__init__(filepath=filepath)
 
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "_StimulusFile":
-        filepath = dict_repr[cls.file_path_key()]
-        return cls._from_json(stimulus_file_path=filepath)
-
-    @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def _from_json(cls, stimulus_file_path: str) -> "_StimulusFile":
-        return cls(filepath=stimulus_file_path)
-
-    def to_json(self) -> Dict[str, str]:
-        return {self.file_path_key(): str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
@@ -333,26 +317,6 @@ class StimulusFileLookup(object):
                              f"value of type {type(value)}; type should "
                              "be MappingStimulusFile")
         self._values['mapping'] = value
-
-
-def stimulus_lookup_from_json(
-        dict_repr: dict) -> StimulusFileLookup:
-    """
-    Load a lookup table of the stimulus files associated with a
-    BehaviorSession from the dict representation of that session's
-    session_data
-    """
-    lookup_table = StimulusFileLookup()
-    if BehaviorStimulusFile.file_path_key() in dict_repr:
-        stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
-        lookup_table.behavior_stimulus_file = stim
-    if MappingStimulusFile.file_path_key() in dict_repr:
-        stim = MappingStimulusFile.from_json(dict_repr=dict_repr)
-        lookup_table.mapping_stimulus_file = stim
-    if ReplayStimulusFile.file_path_key() in dict_repr:
-        stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
-        lookup_table.replay_stimulus_file = stim
-    return lookup_table
 
 
 class MalformedStimulusFileError(RuntimeError):

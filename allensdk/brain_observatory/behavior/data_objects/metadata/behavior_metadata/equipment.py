@@ -22,10 +22,6 @@ class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
     def __init__(self, equipment_name: str):
         super().__init__(name="equipment_name", value=equipment_name)
 
-    @classmethod
-    def from_json(cls, dict_repr: dict) -> "Equipment":
-        return cls(equipment_name=dict_repr["rig_name"])
-
     def to_json(self) -> dict:
         return {"eqipment_name": self.value}
 

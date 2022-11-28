@@ -17,12 +17,6 @@ class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
         super().__init__(name="reporter_line", value=reporter_line)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "ReporterLine":
-        reporter_line = dict_repr['reporter_line']
-        reporter_line = cls.parse(reporter_line=reporter_line, warn=True)
-        return cls(reporter_line=reporter_line)
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin,
                   allow_none: bool = True) -> "ReporterLine":

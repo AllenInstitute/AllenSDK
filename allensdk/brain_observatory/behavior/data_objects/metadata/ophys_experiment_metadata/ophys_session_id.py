@@ -25,10 +25,6 @@ class OphysSessionId(DataObject, LimsReadableInterface,
         return cls(session_id=session_id)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "OphysSessionId":
-        return cls(session_id=dict_repr['ophys_session_id'])
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OphysSessionId":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(session_id=metadata.ophys_session_id)

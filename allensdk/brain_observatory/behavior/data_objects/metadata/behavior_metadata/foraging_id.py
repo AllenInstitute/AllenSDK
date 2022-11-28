@@ -12,10 +12,6 @@ class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
         super().__init__(name="foraging_id", value=foraging_id)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "ForagingId":
-        pass
-
-    @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "ForagingId":
         query = f"""

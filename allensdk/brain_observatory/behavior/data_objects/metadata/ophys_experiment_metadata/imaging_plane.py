@@ -49,19 +49,6 @@ class ImagingPlane(DataObject, LimsReadableInterface,
                    indicator=indicator)
 
     @classmethod
-    def from_json(cls, dict_repr: dict,
-                  ophys_timestamps: OphysTimestamps,
-                  excitation_lambda=910.0) -> "ImagingPlane":
-        targeted_structure = dict_repr['targeted_structure']
-        ophys_fame_rate = calc_frame_rate(timestamps=ophys_timestamps.value)
-        reporter_line = ReporterLine.from_json(dict_repr=dict_repr)
-        indicator = reporter_line.parse_indicator(warn=True)
-        return cls(targeted_structure=targeted_structure,
-                   ophys_frame_rate=ophys_fame_rate,
-                   excitation_lambda=excitation_lambda,
-                   indicator=indicator)
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ImagingPlane":
         ophys_module = nwbfile.processing['ophys']
         image_seg = ophys_module.data_interfaces['image_segmentation']

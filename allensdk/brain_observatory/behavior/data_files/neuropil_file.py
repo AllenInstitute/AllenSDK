@@ -12,10 +12,6 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core import DataFile
 
 
-def from_json_cache_key(cls, dict_repr: dict):
-    return hashkey(json.dumps(dict_repr))
-
-
 def from_lims_cache_key(cls, db, ophys_experiment_id: int):
     return hashkey(ophys_experiment_id)
 
@@ -27,15 +23,6 @@ class NeuropilFile(DataFile):
 
     def __init__(self, filepath: Union[str, Path]):
         super().__init__(filepath=filepath)
-
-    @classmethod
-    @cached(cache=LRUCache(maxsize=10), key=from_json_cache_key)
-    def from_json(cls, dict_repr: dict) -> "NeuropilFile":
-        filepath = dict_repr["neuropil_file"]
-        return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"neuropil_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

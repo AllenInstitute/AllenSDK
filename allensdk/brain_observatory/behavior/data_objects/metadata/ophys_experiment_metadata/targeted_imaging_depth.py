@@ -47,12 +47,6 @@ class TargetedImagingDepth(
         return cls(targeted_imaging_depth=targeted_imaging_depth)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "TargetedImagingDepth":
-        # TODO remove all of the from_json loading and validation step
-        # ticket 2607
-        return cls(targeted_imaging_depth=dict_repr["targeted_depth"])
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "TargetedImagingDepth":
         metadata = nwbfile.lab_meta_data["metadata"]
         return cls(targeted_imaging_depth=metadata.targeted_imaging_depth)

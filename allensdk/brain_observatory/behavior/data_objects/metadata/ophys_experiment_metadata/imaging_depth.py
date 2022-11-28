@@ -29,12 +29,6 @@ class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface,
         return cls(imaging_depth=imaging_depth)
 
     @classmethod
-    def from_json(cls, dict_repr: dict) -> "ImagingDepth":
-        # TODO remove all of the from_json loading and validation step
-        # ticket 2607
-        return cls(imaging_depth=dict_repr['targeted_depth'])
-
-    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ImagingDepth":
         metadata = nwbfile.lab_meta_data['metadata']
         return cls(imaging_depth=metadata.imaging_depth)
