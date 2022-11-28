@@ -1,6 +1,5 @@
-from marshmallow import Schema, fields, RAISE
 import numpy as np
-
+from marshmallow import RAISE, Schema, fields
 
 STYPE_DICT = {fields.Float: 'float', fields.Int: 'int',
               fields.String: 'text', fields.List: 'text',
@@ -147,6 +146,14 @@ class OphysMetadataSchema(NwbOphysMetadataSchema):
     imaging_depth = fields.Int(
         doc=('Depth (microns) below the cortical surface '
              'targeted for two-photon acquisition'),
+        required=True,
+    )
+    targeted_imaging_depth = fields.Int(
+        doc=(
+            "Average Depth (microns) below the cortical surface "
+            "across experiments of a container."
+            "targeted for two-photon acquisition"
+        ),
         required=True,
     )
     field_of_view_width = fields.Int(

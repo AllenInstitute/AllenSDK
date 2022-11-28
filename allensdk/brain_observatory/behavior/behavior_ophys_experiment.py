@@ -2,44 +2,22 @@ import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession  # NOQA
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_files\
-    .rigid_motion_transform_file import \
-    RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects import \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
-    .cell_specimens import \
-    CellSpecimens, EventsParams
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisitionOphys, DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_ophys_metadata import \
-    BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group \
-    import \
-    ImagingPlaneGroup
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata \
-    import \
-    MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.motion_correction \
-    import \
-    MotionCorrection
-from allensdk.brain_observatory.behavior.data_objects.projections import \
-    Projections
-from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
-    calculate_monitor_delay
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .ophys_timestamps import \
-    OphysTimestamps, OphysTimestampsMultiplane
+from allensdk.brain_observatory.behavior.data_files.rigid_motion_transform_file import RigidMotionTransformFile  # NOQA
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.cell_specimens import CellSpecimens, EventsParams  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import DateOfAcquisition, DateOfAcquisitionOphys  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import BehaviorOphysMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import ImagingPlaneGroup  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.motion_correction import MotionCorrection  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.projections import Projections  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import calculate_monitor_delay  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import OphysTimestamps, OphysTimestampsMultiplane  # NOQA
+from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.internal.api import db_connection_creator
 
 
@@ -426,6 +404,8 @@ class BehaviorOphysExperiment(BehaviorSession):
             'field_of_view_width':
                 self._metadata.ophys_metadata.field_of_view_shape.width,
             'imaging_depth': self._metadata.ophys_metadata.imaging_depth,
+            'targeted_imaging_depth':
+                self._metadata.ophys_metadata.targeted_imaging_depth,
             'imaging_plane_group':
                 self._metadata.ophys_metadata.imaging_plane_group
                 if isinstance(self._metadata.ophys_metadata,

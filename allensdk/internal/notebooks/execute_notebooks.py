@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import shutil
@@ -28,6 +29,21 @@ args = parser.parse_args()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(name='Notebook runner')
 
+NOTEBOOK_ARGS = {
+    'brain_observatory_analysis.ipynb': {
+        'RUN_LOCALLY_SPARSE_NOISE': False
+    },
+    'ecephys_data_access.ipynb': {
+        'DOWNLOAD_COMPLETE_DATASET': False
+    },
+    'visual_behavior_neuropixels_data_access.ipynb': {
+        'DOWNLOAD_COMPLETE_DATASET': False
+    },
+    'visual_behavior_ophys_data_access.ipynb': {
+        'DOWNLOAD_COMPLETE_DATASET': False
+    }
+}
+
 
 class NotebookRunner:
     """Notebook runner"""
@@ -40,8 +56,8 @@ class NotebookRunner:
             Path to notebooks
         """
         notebook_paths = [
-            Path(args.notebooks_dir) / x for x in os.listdir(notebooks_dir)
-            if Path(x).suffix == '.ipynb']
+            Path(x) for x in glob.glob(os.path.join(notebooks_dir, "*.ipynb"))
+        ]
         self._notebook_paths = [
             x for x in notebook_paths
             if x not in args.skip_notebooks]
@@ -67,9 +83,12 @@ class NotebookRunner:
                         # Note: notebook must have a variable with this name
                         # and the cell must have tag 'parameters'
                         parameters={
-                            'output_dir': tmp_dir,
-                            'resources_dir': str(Path(__file__).parent /
-                                                 'resources')
+                            **{
+                                'output_dir': tmp_dir,
+                                'resources_dir': str(Path(__file__).parent /
+                                                     'resources')
+                            },
+                            **NOTEBOOK_ARGS.get(notebook_path.name, {})
                         },
                         kernel_name='python3'
                     )
