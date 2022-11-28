@@ -1,0 +1,22 @@
+name: Notebooks
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  run_notebooks:
+    name: Notebook runner
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install -r dev_requirements.txt
+          pip install .
+          ipython kernel install --name "python3" --user
+      - name: Run notebooks
+        run: |
+          python -m allensdk.internal.notebooks.execute_notebooks \
+            --notebooks_dir doc_template/examples_root/examples/nb \
+            --skip_notebooks behavior_ophys_session.ipynb
