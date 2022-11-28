@@ -144,7 +144,7 @@ class NWBWriter:
 
         Parameters
         ----------
-        kwargs: kwargs sent to `from_json`, `from_nwb`, `to_nwb`
+        kwargs: kwargs sent to `from_nwb`, `to_nwb`
 
         """
         from_json_kwargs = {
@@ -174,7 +174,7 @@ class NWBWriter:
         Parameters
         ----------
         session_data
-        kwargs: kwargs to pass to `from_json` and `to_nwb`
+        kwargs: kwargs to pass to `to_nwb`
 
         Returns
         -------
@@ -189,10 +189,3 @@ class NWBWriter:
             nwb_file_writer.write(nwbfile)
         return nwbfile
 
-    def _compare_sessions(self, nwbfile: NWBFile, json_session: DataObject,
-                          **kwargs):
-        kwargs = {
-            k: v for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.from_nwb).parameters}
-        nwb_session = self._serializer.from_nwb(nwbfile, **kwargs)
-        assert sessions_are_equal(json_session, nwb_session, reraise=True)

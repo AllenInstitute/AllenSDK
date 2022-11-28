@@ -27,33 +27,6 @@ def write_behavior_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
-        json_session = BehaviorSession.from_json(
-            session_data,
-            stimulus_presentation_columns=[
-                    'start_time', 'stop_time',
-                    'duration',
-                    'image_name', 'image_index',
-                    'is_change', 'omitted',
-                    'start_frame', 'end_frame',
-                    'image_set']
-        )
-
-        behavior_session_id = session_data['behavior_session_id']
-        lims_session = BehaviorSession.from_lims(behavior_session_id)
-
-        logging.info("Comparing a BehaviorSession created from JSON "
-                     "with a BehaviorSession created from LIMS")
-        assert sessions_are_equal(json_session, lims_session, reraise=True)
-
-        nwbfile = lims_session.to_nwb()
-        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
-            nwb_file_writer.write(nwbfile)
-
-        logging.info("Comparing a BehaviorSession created from JSON "
-                     "with a BehaviorSession created from NWB")
-        nwb_session = BehaviorSession.from_nwb_path(nwb_filepath_inprogress)
-        assert sessions_are_equal(json_session, nwb_session, reraise=True)
-
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
