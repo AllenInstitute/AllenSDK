@@ -1,10 +1,13 @@
 GETTING STARTED
 ---------------
 
-First, `install or update the AllenSDK <https://allensdk.readthedocs.io/en/latest/install.html>`_, 
-our Python based toolkit for accessing and working with Allen Institute datasets.
+Prerequisites
+^^^^^^^^^
+* `install or update the AllenSDK <https://allensdk.readthedocs.io/en/latest/install.html>`_,
+    our Python based toolkit for accessing and working with Allen Institute datasets.
+* `Pandas <https://pandas.pydata.org/docs/user_guide/index.html>`_ familiarity
 
-Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloaded using the AllenSDK, 
+Data is provided in in `NWB <https://www.nwb.org/>`_ format and can be downloaded using the AllenSDK,
 or accessed directly via an S3 bucket (instructions provided in notebook #1 below). Regardless of which method of file 
 download you choose, we recommend that you load and interact with the data 
 using the tools provided in the AllenSDK, which have been designed to simplify 
