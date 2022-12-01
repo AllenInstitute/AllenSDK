@@ -7,12 +7,12 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
 from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+    LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class DateOfAcquisition(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, NwbReadableInterface):
+                        NwbReadableInterface):
     """timestamp for when experiment was started in UTC"""
     def __init__(self, date_of_acquisition: datetime):
         if date_of_acquisition.tzinfo is None:

@@ -3,10 +3,8 @@ from enum import Enum
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface, \
+    NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -15,15 +13,11 @@ class EquipmentType(Enum):
     OTHER = 'OTHER'
 
 
-class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
-                NwbReadableInterface, JsonWritableInterface,
-                NwbWritableInterface):
+class Equipment(DataObject, LimsReadableInterface,
+                NwbReadableInterface, NwbWritableInterface):
     """the name of the experimental rig."""
     def __init__(self, equipment_name: str):
         super().__init__(name="equipment_name", value=equipment_name)
-
-    def to_json(self) -> dict:
-        return {"eqipment_name": self.value}
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,

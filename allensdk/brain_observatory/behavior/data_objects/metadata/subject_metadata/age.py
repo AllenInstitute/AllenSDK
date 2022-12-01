@@ -5,12 +5,11 @@ from typing import Optional
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
+class Age(DataObject, LimsReadableInterface,
           NwbReadableInterface):
     """Age of animal (in days)"""
     def __init__(self, age: int):

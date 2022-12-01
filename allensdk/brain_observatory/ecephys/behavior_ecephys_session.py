@@ -437,53 +437,6 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         probe = self._get_probe(probe_id=probe_id)
         return probe.current_source_density
 
-    @classmethod
-    def from_json(
-            cls,
-            session_data: dict,
-            stimulus_presentation_exclude_columns: Optional[List[str]] = None,
-            running_speed_load_from_multiple_stimulus_files: bool = True,
-            skip_probes: Optional[List[str]] = None
-    ) -> "BehaviorEcephysSession":
-        """
-
-        Parameters
-        ----------
-        session_data: Dict of input data necessary to construct a session
-        stimulus_presentation_exclude_columns:  Optional list of columns to
-            exclude from stimulus presentations table
-        running_speed_load_from_multiple_stimulus_files:
-            Whether to load running speed from multiple stimulus files
-            If False, will just load from a single behavior stimulus file
-        skip_probes: Names of probes to exclude (due to known bad data
-            for example)
-
-        Returns
-        -------
-        Instantiated `BehaviorEcephysSession`
-        """
-
-        behavior_session = cls.behavior_data_class().from_json(
-            session_data=session_data,
-            read_stimulus_presentations_table_from_file=True,
-            stimulus_presentation_exclude_columns=(
-                stimulus_presentation_exclude_columns),
-            sync_file_permissive=True,
-            eye_tracking_drop_frames=True,
-            running_speed_load_from_multiple_stimulus_files=(
-                running_speed_load_from_multiple_stimulus_files)
-        )
-        probes = Probes.from_json(probes=session_data['probes'],
-                                  skip_probes=skip_probes)
-        optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
-
-        return BehaviorEcephysSession(
-            behavior_session=behavior_session,
-            probes=probes,
-            optotagging_table=optotagging_table,
-            metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data)
-        )
-
     def to_nwb(self) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
         """
         Adds behavior ecephys session to NWBFile instance.

@@ -2,10 +2,10 @@ import h5py
 import numpy as np
 from xarray import DataArray
 
-from allensdk.core import JsonReadableInterface, DataObject
+from allensdk.core import DataObject
 
 
-class CurrentSourceDensity(DataObject, JsonReadableInterface):
+class CurrentSourceDensity(DataObject):
     """Current Source Density"""
     def __init__(
             self,
@@ -47,15 +47,6 @@ class CurrentSourceDensity(DataObject, JsonReadableInterface):
         """Array of interpolated channel indices for CSD. N channels x 2
         (x, y coord)"""
         return self._interpolated_channel_locations
-
-    @classmethod
-    def from_json(cls, probe_meta: dict) -> "CurrentSourceDensity":
-        with h5py.File(probe_meta['csd_path'], "r") as csd_file:
-            return CurrentSourceDensity(
-                data=csd_file["current_source_density"][:],
-                timestamps=csd_file["timestamps"][:],
-                interpolated_channel_locations=csd_file["csd_locations"][:]
-            )
 
     def to_dataarray(self) -> DataArray:
         x_locs = self.channel_locations[:, 0]

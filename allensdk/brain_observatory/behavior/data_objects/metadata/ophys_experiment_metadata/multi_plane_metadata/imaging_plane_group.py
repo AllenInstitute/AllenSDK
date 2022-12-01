@@ -3,13 +3,12 @@ from typing import Optional
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class ImagingPlaneGroup(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, NwbReadableInterface):
+                        NwbReadableInterface):
     def __init__(self, plane_group: int, plane_group_count: int):
         super().__init__(name='plane_group', value=None, is_value_self=True)
         self._plane_group = plane_group

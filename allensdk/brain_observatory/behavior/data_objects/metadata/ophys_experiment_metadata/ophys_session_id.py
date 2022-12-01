@@ -1,13 +1,12 @@
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class OphysSessionId(DataObject, LimsReadableInterface,
-                     JsonReadableInterface, NwbReadableInterface):
+                     NwbReadableInterface):
     """"Ophys session id"""
     def __init__(self, session_id: int):
         super().__init__(name='session_id',

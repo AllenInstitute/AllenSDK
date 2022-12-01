@@ -1,13 +1,11 @@
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface,
-                   JsonReadableInterface):
+class ImagingDepth(DataObject, LimsReadableInterface, NwbReadableInterface):
     """Data object loads and stores the imaging_depth (microns) for an
     experiments. This is the calculated difference between measured
     z-depths of the surface and imaging_depth.

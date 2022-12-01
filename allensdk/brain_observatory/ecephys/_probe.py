@@ -18,11 +18,11 @@ from allensdk.brain_observatory.ecephys._lfp import LFP
 from allensdk.brain_observatory.ecephys.nwb import EcephysCSD
 from allensdk.brain_observatory.ecephys.nwb_util import add_probe_to_nwbfile, \
     add_ecephys_electrodes
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbWritableInterface, NwbReadableInterface
+from allensdk.core import DataObject, NwbWritableInterface, \
+    NwbReadableInterface
 
 
-class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
+class Probe(DataObject, NwbWritableInterface,
             NwbReadableInterface):
     """A single probe"""
     def __init__(
@@ -136,33 +136,6 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
                 [unit.to_dict()['unit'] for unit in self.units.value])
         df = df.fillna(np.nan)
         return df
-
-    @classmethod
-    def from_json(cls, probe: dict) -> "Probe":
-        channels = Channels.from_json(channels=probe['channels'])
-        units = Units.from_json(probe=probe)
-
-        if probe['lfp'] is not None:
-            lfp = LFP.from_json(
-                probe_meta=probe
-            )
-            csd = CurrentSourceDensity.from_json(
-                probe_meta=probe
-            )
-        else:
-            lfp = None
-            csd = None
-
-        return Probe(
-            id=probe['id'],
-            name=probe['name'],
-            channels=channels,
-            units=units,
-            sampling_rate=probe['sampling_rate'],
-            lfp=lfp,
-            current_source_density=csd,
-            temporal_subsampling_factor=probe['temporal_subsampling_factor']
-        )
 
     @classmethod
     def from_nwb(

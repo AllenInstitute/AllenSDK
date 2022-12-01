@@ -4,12 +4,11 @@ from typing import Optional
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class FullGenotype(DataObject, LimsReadableInterface, JsonReadableInterface,
+class FullGenotype(DataObject, LimsReadableInterface,
                    NwbReadableInterface):
     """the name of the subject's genotype"""
     def __init__(self, full_genotype: Optional[str]):

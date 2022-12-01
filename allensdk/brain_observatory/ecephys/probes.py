@@ -9,12 +9,11 @@ from pynwb import NWBFile
 from allensdk.brain_observatory.ecephys._probe import Probe
 from allensdk.brain_observatory.ecephys.nwb_util import \
     add_ragged_data_to_dynamic_table
-from allensdk.core import DataObject, JsonReadableInterface, \
+from allensdk.core import DataObject, \
     NwbReadableInterface, NwbWritableInterface
 
 
-class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
-             NwbWritableInterface):
+class Probes(DataObject, NwbReadableInterface, NwbWritableInterface):
     """Probes"""
 
     def __init__(self,
@@ -140,37 +139,6 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
             (isi_violations_maximum or np.inf)]
 
         return units_table
-
-    @classmethod
-    def from_json(
-            cls,
-            probes: List[Dict[str, Any]],
-            skip_probes: Optional[List[str]] = None
-    ) -> "Probes":
-        """
-
-        Parameters
-        ----------
-        probes
-        skip_probes: Names of probes to exclude (due to known bad data
-            for example)
-        Returns
-        -------
-        `Probes` instance
-        """
-        skip_probes = skip_probes if skip_probes is not None else []
-        invalid_skip_probes = set(skip_probes).difference(
-            [p['name'] for p in probes])
-        if invalid_skip_probes:
-            raise ValueError(
-                f'You passed invalid probes to skip: {invalid_skip_probes} '
-                f'are not valid probe names')
-        for probe in skip_probes:
-            logging.info(f'Skipping {probe}')
-        probes = [p for p in probes if p['name'] not in skip_probes]
-        probes = sorted(probes, key=lambda probe: probe['name'])
-        probes = [Probe.from_json(probe=probe) for probe in probes]
-        return Probes(probes=probes)
 
     def to_dataframe(self):
         probes = [probe.to_dict() for probe in self.probes]

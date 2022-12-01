@@ -4,13 +4,12 @@ from typing import Optional, List, Union
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class ReporterLine(DataObject, LimsReadableInterface, JsonReadableInterface,
+class ReporterLine(DataObject, LimsReadableInterface,
                    NwbReadableInterface):
     """the genotype name(s) of the reporter line(s)"""
     def __init__(self, reporter_line: Optional[str]):

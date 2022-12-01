@@ -2,11 +2,11 @@ from pynwb import NWBFile
 
 from allensdk.core import DataObject
 from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+    LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class MouseId(DataObject, LimsReadableInterface, JsonReadableInterface,
+class MouseId(DataObject, LimsReadableInterface,
               NwbReadableInterface):
     """the LabTracks ID"""
     def __init__(self, mouse_id: int):

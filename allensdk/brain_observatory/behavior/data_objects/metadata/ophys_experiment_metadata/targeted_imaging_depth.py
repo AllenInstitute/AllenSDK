@@ -1,14 +1,13 @@
 from pynwb import NWBFile
 
-from allensdk.core import DataObject, JsonReadableInterface, LimsReadableInterface, NwbReadableInterface  # NOQA
+from allensdk.core import DataObject, LimsReadableInterface, NwbReadableInterface  # NOQA
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class TargetedImagingDepth(
     DataObject,
     LimsReadableInterface,
-    NwbReadableInterface,
-    JsonReadableInterface,
+    NwbReadableInterface
 ):
     """Data object loads and stores the average `imaging_depth`s
     (microns) across experiments in the container that an experiment is

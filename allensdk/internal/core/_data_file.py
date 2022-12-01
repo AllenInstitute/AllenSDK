@@ -37,36 +37,6 @@ class DataFile(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls,
-                  dict_repr: dict) -> "DataFile":  # pragma: no cover
-        """Populates a DataFile from a JSON compatible dict (likely parsed by
-        argschema)
-
-        Returns
-        -------
-        DataFile:
-            An instantiated DataFile which has `data` and `filepath` properties
-        """
-        # Example:
-        # filepath = dict_repr["my_data_file_path"]
-        # return cls.instantiate(filepath=filepath)
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def to_json(self) -> dict:  # pragma: no cover
-        """Given an already populated DataFile, return the dict that
-        when used with the `from_json()` classmethod would produce the same
-        DataFile
-
-        Returns
-        -------
-        dict:
-            The JSON (in dict form) that would produce the DataFile.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
     def from_lims(cls) -> "DataFile":  # pragma: no cover
         """Populate a DataFile from an internal database (likely LIMS)
 

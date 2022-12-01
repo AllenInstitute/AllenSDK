@@ -14,8 +14,8 @@ from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
-from allensdk.core import DataObject, JsonReadableInterface, \
-    NwbReadableInterface, NwbWritableInterface
+from allensdk.core import DataObject, NwbReadableInterface, \
+    NwbWritableInterface
 
 
 def get_column_name(table_cols: list,
@@ -101,7 +101,6 @@ class NWBWriter:
                  nwb_filepath: str,
                  session_data: dict,
                  serializer: Union[
-                     JsonReadableInterface,
                      NwbReadableInterface,
                      NwbWritableInterface]):
         """
@@ -112,8 +111,7 @@ class NWBWriter:
         session_data: dict representation of data to instantiate `serializer`
             and write nwb
         serializer: The class to use to read `session_data` and write nwb.
-            Must implement `JsonReadableInterface`, `NwbReadableInterface`,
-            `NwbWritableInterface`
+            Must implement `NwbReadableInterface`, `NwbWritableInterface`
         """
         self._serializer = serializer
         self._session_data = session_data
@@ -147,16 +145,16 @@ class NWBWriter:
         kwargs: kwargs sent to `from_nwb`, `to_nwb`
 
         """
-        from_json_kwargs = {
+        from_lims_kwargs = {
             k: v for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.from_json).parameters}
-        json_session = self._serializer.from_json(
-            session_data=self._session_data, **from_json_kwargs)
+            if k in inspect.signature(self._serializer.from_lims).parameters}
+        lims_session = self._serializer.from_lims(
+            session_data=self._session_data, **from_lims_kwargs)
 
         try:
             nwbfile = self._write_nwb(
-                session=json_session, **kwargs)
-            self._compare_sessions(nwbfile=nwbfile, json_session=json_session,
+                session=lims_session, **kwargs)
+            self._compare_sessions(nwbfile=nwbfile, lims_session=lims_session,
                                    **kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:
@@ -189,3 +187,10 @@ class NWBWriter:
             nwb_file_writer.write(nwbfile)
         return nwbfile
 
+    def _compare_sessions(self, nwbfile: NWBFile, lims_session: DataObject,
+                          **kwargs):
+        kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_nwb).parameters}
+        nwb_session = self._serializer.from_nwb(nwbfile, **kwargs)
+        assert sessions_are_equal(lims_session, nwb_session, reraise=True)

@@ -2,12 +2,12 @@ from pynwb import NWBFile
 
 from allensdk.core import DataObject
 from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+    LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
 class OphysContainerId(DataObject, LimsReadableInterface,
-                       JsonReadableInterface, NwbReadableInterface):
+                       NwbReadableInterface):
     """"experiment container id"""
     def __init__(self, ophys_container_id: int):
         super().__init__(name='ophys_container_id',

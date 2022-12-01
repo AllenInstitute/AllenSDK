@@ -1,12 +1,11 @@
 import uuid
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface
+from allensdk.core import LimsReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class ForagingId(DataObject, LimsReadableInterface, JsonReadableInterface):
+class ForagingId(DataObject, LimsReadableInterface):
     """Foraging id"""
     def __init__(self, foraging_id: uuid.UUID):
         super().__init__(name="foraging_id", value=foraging_id)

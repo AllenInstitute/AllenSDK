@@ -5,7 +5,7 @@ from pynwb import NWBFile
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.core import \
-    JsonReadableInterface, NwbReadableInterface, \
+    NwbReadableInterface, \
     LimsReadableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.reporter_line import \
@@ -18,7 +18,7 @@ from allensdk.internal.api import PostgresQueryMixin
 
 
 class ImagingPlane(DataObject, LimsReadableInterface,
-                   JsonReadableInterface, NwbReadableInterface):
+                   NwbReadableInterface):
     def __init__(self, ophys_frame_rate: float,
                  targeted_structure: str,
                  excitation_lambda: float,

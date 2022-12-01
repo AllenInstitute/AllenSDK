@@ -3,10 +3,7 @@ from pynwb import NWBFile
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.core import DataObject
 
@@ -16,9 +13,7 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
 
 
 class BehaviorSessionId(DataObject, LimsReadableInterface,
-                        JsonReadableInterface,
-                        NwbReadableInterface,
-                        JsonWritableInterface):
+                        NwbReadableInterface):
     def __init__(self, behavior_session_id: int):
         super().__init__(name="behavior_session_id", value=behavior_session_id)
 

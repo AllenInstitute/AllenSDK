@@ -3,13 +3,12 @@ from typing import List, Optional
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin, \
     OneOrMoreResultExpectedError
 
 
-class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
+class DriverLine(DataObject, LimsReadableInterface,
                  NwbReadableInterface):
     """the genotype name(s) of the driver line(s)"""
     def __init__(self, driver_line: Optional[List[str]]):
