@@ -28,6 +28,11 @@ def write_behavior_ophys_nwb(session_data: dict,
             os.remove(filename)
 
     try:
+        lims_session = BehaviorOphysExperiment.from_lims(
+            ophys_experiment_id=session_data['ophys_experiment_id'])
+        nwbfile = lims_session.to_nwb()
+        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:

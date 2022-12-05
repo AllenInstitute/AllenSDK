@@ -27,6 +27,11 @@ def write_behavior_nwb(session_data, nwb_filepath):
             os.remove(filename)
 
     try:
+        behavior_session_id = session_data['behavior_session_id']
+        lims_session = BehaviorSession.from_lims(behavior_session_id)
+        nwbfile = lims_session.to_nwb()
+        with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
