@@ -70,20 +70,15 @@ class TestJson:
 
         cls.dict_repr = dict_repr
 
-    def test_from_json(self):
-        projections = Projections.from_json(dict_repr=self.dict_repr)
-
-        assert projections.max_projection == self.expected_max
-        assert projections.avg_projection == self.expected_avg
-
-
 class TestNWB:
     @classmethod
     def setup_class(cls):
         tj = TestJson()
         tj.setup_class()
-        cls.projections = Projections.from_json(
-            dict_repr=tj.dict_repr)
+        cls.projections = Projections(
+            max_projection=tj.expected_max,
+            avg_projection=tj.expected_avg
+        )
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(

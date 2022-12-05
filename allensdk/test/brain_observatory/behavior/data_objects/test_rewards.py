@@ -80,8 +80,7 @@ class TestFromBehaviorStimulusFile(LimsTest):
             return tmp_path
 
         stimulus_filepath = _create_dummy_stimulus_file()
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        stimulus_file = BehaviorStimulusFile(stimulus_filepath)
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
         rewards = Rewards.from_stimulus_file(stimulus_file=stimulus_file,

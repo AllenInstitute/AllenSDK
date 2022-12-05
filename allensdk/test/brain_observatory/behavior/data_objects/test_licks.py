@@ -66,8 +66,7 @@ class TestFromBehaviorStimulusFile:
         """
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136], tmpdir=tmpdir)
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
@@ -93,8 +92,7 @@ class TestFromBehaviorStimulusFile:
 
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[], tmpdir=tmpdir)
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
@@ -122,8 +120,7 @@ class TestFromBehaviorStimulusFile:
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136, 200],  # len(timestamps) == 200,
             tmpdir=tmpdir)
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
         licks = Licks.from_stimulus_file(stimulus_file=stimulus_file,
@@ -145,8 +142,7 @@ class TestFromBehaviorStimulusFile:
         stimulus_filepath = self._create_test_stimulus_file(
             lick_events=[12, 15, 90, 136, 201],  # len(timestamps) == 200,
             tmpdir=tmpdir)
-        stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(stimulus_filepath)})
+        stimulus_file = BehaviorStimulusFile(filepath=stimulus_filepath)
         timestamps = StimulusTimestamps(timestamps=np.arange(0, 2.0, 0.01),
                                         monitor_delay=0.0)
 

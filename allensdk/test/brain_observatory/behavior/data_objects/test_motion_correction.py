@@ -10,10 +10,6 @@ import pytest
 from allensdk.brain_observatory.behavior.data_files\
     .rigid_motion_transform_file import \
     RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .cell_specimens import (
-        CellSpecimens,
-        EventsParams)
 from allensdk.brain_observatory.behavior.data_objects.motion_correction \
     import \
     MotionCorrection
@@ -25,9 +21,8 @@ from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
 from allensdk.test.brain_observatory.behavior.data_objects.metadata\
     .test_behavior_ophys_metadata import \
     TestBOM
-from allensdk.test.brain_observatory.behavior.data_objects.nwb_input_json \
-    import \
-    NwbInputJson
+from allensdk.test.brain_observatory.behavior.data_objects.test_cell_specimens\
+    import TestJson
 
 
 class TestFromDataFile(LimsTest):
@@ -46,22 +41,6 @@ class TestFromDataFile(LimsTest):
         assert len(mc.value.columns) == 2
         for c in expected_cols:
             assert c in mc.value.columns
-
-
-class TestJson:
-    @classmethod
-    def setup_class(cls):
-        dir = Path(__file__).parent.resolve()
-        test_data_dir = dir / 'test_data'
-        with open(test_data_dir / 'test_input.json') as f:
-            dict_repr = json.load(f)
-        dict_repr = dict_repr['session_data']
-        dict_repr['rigid_motion_transform_file'] = \
-            str(test_data_dir / 'rigid_motion_transform_file.csv')
-        cls.dict_repr = dict_repr
-        expected = pd.DataFrame({'x': [2, 3, 2], 'y': [-3, -4, -4]})
-        cls.expected = MotionCorrection(motion_correction=expected)
-
 
 class TestNWB:
     @classmethod
@@ -84,16 +63,11 @@ class TestNWB:
             bom.to_nwb(nwbfile=self.nwbfile)
 
             # write cell specimen
-            ij = NwbInputJson()
+            tjson = TestJson()
+            tjson.setup_class()
             ophys_timestamps = OphysTimestamps(
                 timestamps=np.array([.1, .2, .3]))
-            csp = CellSpecimens.from_json(
-                dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
-                segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
-                events_params=EventsParams(
-                               filter_scale_seconds=2.0/31.0,
-                               filter_n_time_steps=20))
-            csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
+            tjson.csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
 
         # need to write cell specimen, since it is a dependency
         _write_cell_specimen()
