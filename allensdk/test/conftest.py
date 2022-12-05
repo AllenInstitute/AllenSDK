@@ -3,7 +3,10 @@ import pathlib
 import platform
 import datetime
 from pynwb import NWBFile
-
+from cachetools import cached, LRUCache
+from allensdk.internal.core.lims_utilities import safe_system_path
+from pathlib import Path
+from typing import Union, Any
 
 class HelperFunctions(object):
 
@@ -73,6 +76,12 @@ class HelperFunctions(object):
                     this_path.rmdir()
                 except Exception:
                     raise
+
+    @staticmethod
+    def load_data(data_object, filepath: Union[str, Path], **kwargs):
+        filepath: str = safe_system_path(str(filepath))
+        return data_object.load_data(filepath, **kwargs)
+        #TODO: verify kwargs
 
 
 @pytest.fixture(scope='session')

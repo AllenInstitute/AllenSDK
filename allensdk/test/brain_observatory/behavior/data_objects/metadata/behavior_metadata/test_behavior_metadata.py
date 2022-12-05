@@ -270,8 +270,7 @@ class TestBehaviorStimulusFile:
         dir = Path(__file__).parent.parent.parent.resolve()
         test_data_dir = dir / 'test_data'
         sf_path = test_data_dir / 'stimulus_file.pkl'
-        cls.stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={'behavior_stimulus_file': str(sf_path)})
+        cls.stimulus_file = BehaviorStimulusFile(filepath=sf_path)
 
     def test_session_uuid(self):
         uuid = BehaviorSessionUUID.from_stimulus_file(
@@ -283,17 +282,6 @@ class TestBehaviorStimulusFile:
         rate = StimulusFrameRate.from_stimulus_file(
             stimulus_file=self.stimulus_file)
         assert 62.0 == rate.value
-
-
-def test_date_of_acquisition_utc():
-    """Tests that when read from json (in Pacific time), that
-    date of acquisition is converted to utc"""
-    expected = DateOfAcquisition(
-        date_of_acquisition=datetime.datetime(2019, 9, 26, 16,
-                                              tzinfo=pytz.UTC))
-    actual = DateOfAcquisition.from_json(
-        dict_repr={'date_of_acquisition': '2019-09-26 09:00:00'})
-    assert expected == actual
 
 
 class TestNWB(BehaviorMetaTestCase):

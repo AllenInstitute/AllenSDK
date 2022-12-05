@@ -14,8 +14,7 @@ from allensdk.brain_observatory.behavior.data_files import (
     MappingStimulusFile)
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    StimulusFileLookup,
-    stimulus_lookup_from_json)
+    StimulusFileLookup)
 
 from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
     BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE
@@ -33,24 +32,6 @@ def stimulus_file_fixture(request, tmp_path) -> Tuple[Path, dict]:
         pickle.dump(stim_pkl_data, f)
 
     return (stim_pkl_path, stim_pkl_data)
-
-
-@pytest.mark.parametrize("stimulus_file_fixture", [
-    ({"pkl_data": {"a": 42, "b": 7}}),
-    ({"pkl_data": {"slightly_more_complex": [1, 2, 3, 4]}})
-], indirect=["stimulus_file_fixture"])
-def test_stimulus_file_from_json(stimulus_file_fixture):
-    stim_pkl_path, stim_pkl_data = stimulus_file_fixture
-
-    # Basic test case
-    input_json_dict = {"behavior_stimulus_file": str(stim_pkl_path)}
-    stimulus_file = BehaviorStimulusFile.from_json(input_json_dict)
-    assert stimulus_file.data == stim_pkl_data
-
-    # Now test caching by deleting the stimulus_file
-    stim_pkl_path.unlink()
-    stimulus_file_cached = BehaviorStimulusFile.from_json(input_json_dict)
-    assert stimulus_file_cached.data == stim_pkl_data
 
 
 @pytest.mark.parametrize("stimulus_file_fixture, behavior_session_id", [
@@ -84,43 +65,6 @@ def test_stimulus_file_from_lims(stimulus_file_fixture, behavior_session_id):
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
 
 
-@pytest.mark.parametrize("stimulus_file_fixture", [
-    ({"filename": "test_stim_file_1.pkl"}),
-    ({"filename": "mock_stim_pkl_2.pkl"})
-], indirect=["stimulus_file_fixture"])
-def test_stimulus_file_to_json(stimulus_file_fixture):
-    stim_pkl_path, stim_pkl_data = stimulus_file_fixture
-
-    stimulus_file = BehaviorStimulusFile(filepath=stim_pkl_path)
-    obt_json = stimulus_file.to_json()
-    assert obt_json == {"behavior_stimulus_file": str(stim_pkl_path)}
-
-
-@pytest.mark.parametrize(
-        "stimulus_class_name", ["replay", "mapping"]
-)
-def test_replay_mapping_round_trip(
-        general_pkl_fixture,
-        stimulus_class_name):
-    """
-    Test the round tripping of ReplayStimulusFile and MappingStimulusFile
-    """
-    if stimulus_class_name == "replay":
-        json_key = "replay_stimulus_file"
-        stimulus_class = ReplayStimulusFile
-    else:
-        json_key = "mapping_stimulus_file"
-        stimulus_class = MappingStimulusFile
-
-    str_path = str(general_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {json_key: str_path}
-    stim = stimulus_class.from_json(dict_repr=dict_repr)
-
-    new_dict_repr = stim.to_json()
-    new_stim = stimulus_class.from_json(dict_repr=new_dict_repr)
-    assert new_stim.data == stim.data
-
-
 def test_behavior_num_frames(
         behavior_pkl_fixture):
     """
@@ -128,8 +72,7 @@ def test_behavior_num_frames(
     expected result
     """
     str_path = str(behavior_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"behavior_stimulus_file": str_path}
-    beh_stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
+    beh_stim = BehaviorStimulusFile(filepath=str_path)
     assert beh_stim.num_frames == behavior_pkl_fixture['expected_frames']
 
 
@@ -140,8 +83,7 @@ def test_replay_num_frames(
     expected result
     """
     str_path = str(general_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"replay_stimulus_file": str_path}
-    rep_stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
+    rep_stim = ReplayStimulusFile(filepath=str_path)
     assert rep_stim.num_frames == general_pkl_fixture['expected_frames']
 
 
@@ -152,8 +94,7 @@ def test_mapping_num_frames(
     expected result
     """
     str_path = str(general_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"mapping_stimulus_file": str_path}
-    map_stim = MappingStimulusFile.from_json(dict_repr=dict_repr)
+    map_stim = MappingStimulusFile(filepath=str_path)
     assert map_stim.num_frames == general_pkl_fixture['expected_frames']
 
 
@@ -164,8 +105,7 @@ def test_malformed_behavior_pkl(
     is mal-formed
     """
     str_path = str(general_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {"behavior_stimulus_file": str_path}
-    stim = BehaviorStimulusFile.from_json(dict_repr=dict_repr)
+    stim = BehaviorStimulusFile(filepath=str_path)
     with pytest.raises(RuntimeError,
                        match="When getting num_frames from"):
         _ = stim.num_frames
@@ -238,59 +178,6 @@ def test_stimulus_file_lookup_errors(
     else:
         with pytest.raises(ValueError, match="should be MappingStimulusFile"):
             lookup.mapping_stimulus_file = src
-
-
-@pytest.mark.parametrize(
-    "to_use",
-    [('behavior',),
-     ('mapping',),
-     ('replay',),
-     ('behavior', 'replay'),
-     ('behavior', 'mapping'),
-     ('mapping', 'replay'),
-     ('behavior', 'mapping', 'replay')])
-def test_stimulus_lookup_from_json(
-        behavior_stim_fixture,
-        mapping_stim_fixture,
-        replay_stim_fixture,
-        general_pkl_fixture,
-        behavior_pkl_fixture,
-        to_use):
-    """
-    Smoke test for stimulus_lookup_from_json
-    """
-
-    dict_repr = dict()
-    if 'behavior' in to_use:
-        dict_repr['behavior_stimulus_file'] = behavior_pkl_fixture['path']
-    if 'mapping' in to_use:
-        dict_repr['mapping_stimulus_file'] = general_pkl_fixture['path']
-    if 'replay' in to_use:
-        dict_repr['replay_stimulus_file'] = general_pkl_fixture['path']
-
-    lookup = stimulus_lookup_from_json(dict_repr=dict_repr)
-    assert isinstance(lookup, StimulusFileLookup)
-
-    if 'behavior' in to_use:
-        assert isinstance(lookup.behavior_stimulus_file, BehaviorStimulusFile)
-        assert lookup.behavior_stimulus_file.data == behavior_stim_fixture.data
-    else:
-        with pytest.raises(ValueError, match="has no BehaviorStimulusFile"):
-            lookup.behavior_stimulus_file
-
-    if 'mapping' in to_use:
-        assert isinstance(lookup.mapping_stimulus_file, MappingStimulusFile)
-        assert lookup.mapping_stimulus_file.data == mapping_stim_fixture.data
-    else:
-        with pytest.raises(ValueError, match="has no MappingStimulusFile"):
-            lookup.mapping_stimulus_file
-
-    if 'replay' in to_use:
-        assert isinstance(lookup.replay_stimulus_file, ReplayStimulusFile)
-        assert lookup.replay_stimulus_file.data == replay_stim_fixture.data
-    else:
-        with pytest.raises(ValueError, match="has no ReplayStimulusFile"):
-            lookup.replay_stimulus_file
 
 
 @pytest.mark.parametrize(

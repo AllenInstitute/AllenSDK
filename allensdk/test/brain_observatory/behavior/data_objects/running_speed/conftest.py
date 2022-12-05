@@ -210,9 +210,7 @@ def behavior_pkl_fixture(
 
 @pytest.fixture(scope='session')
 def behavior_stim_file_fixture(behavior_pkl_fixture):
-    yield BehaviorStimulusFile.from_json(
-        dict_repr={'behavior_stimulus_file':
-                   behavior_pkl_fixture['path_to_pkl']})
+    yield BehaviorStimulusFile(filepath=behavior_pkl_fixture['path_to_pkl'])
 
 
 @pytest.fixture(scope='session')
@@ -279,9 +277,7 @@ def mapping_pkl_fixture(
 
 @pytest.fixture(scope='session')
 def mapping_stim_file_fixture(mapping_pkl_fixture):
-    yield MappingStimulusFile.from_json(
-         dict_repr={'mapping_stimulus_file':
-                    mapping_pkl_fixture['path_to_pkl']})
+    yield MappingStimulusFile(filepath=mapping_pkl_fixture['path_to_pkl'])
 
 
 @pytest.fixture(scope='session')
@@ -348,9 +344,7 @@ def replay_pkl_fixture(
 
 @pytest.fixture(scope='session')
 def replay_stim_file_fixture(replay_pkl_fixture):
-    yield ReplayStimulusFile.from_json(
-        dict_repr={'replay_stimulus_file':
-                   replay_pkl_fixture['path_to_pkl']})
+    yield ReplayStimulusFile(filepath=replay_pkl_fixture['path_to_pkl'])
 
 
 @pytest.fixture(scope='session')
@@ -427,6 +421,4 @@ def sync_path_fixture(
 
 @pytest.fixture(scope='session')
 def sync_file_fixture(sync_path_fixture):
-    return SyncFile.from_json(
-        dict_repr={'sync_file':
-                   str(sync_path_fixture.resolve().absolute())})
+    return SyncFile(filepath=str(sync_path_fixture.resolve().absolute()))

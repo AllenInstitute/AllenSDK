@@ -59,15 +59,8 @@ class TestJson:
         dict_repr['rigid_motion_transform_file'] = \
             str(test_data_dir / 'rigid_motion_transform_file.csv')
         cls.dict_repr = dict_repr
-        cls.motion_correction_file = \
-            RigidMotionTransformFile.from_json(dict_repr=dict_repr)
         expected = pd.DataFrame({'x': [2, 3, 2], 'y': [-3, -4, -4]})
         cls.expected = MotionCorrection(motion_correction=expected)
-
-    def test_from_json(self):
-        mc = MotionCorrection.from_data_file(
-            rigid_motion_transform_file=self.motion_correction_file)
-        assert mc == self.expected
 
 
 class TestNWB:

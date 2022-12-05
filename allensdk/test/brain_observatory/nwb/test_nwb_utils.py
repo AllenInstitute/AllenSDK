@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from allensdk.brain_observatory.nwb import nwb_utils
 from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
-
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 
 @pytest.mark.parametrize("input_cols, possible_names, expected_intersection", [
     (['duration', 'end_frame', 'image_index', 'image_name'],
@@ -51,12 +51,9 @@ def test_nwb_writer(
             session_data=session_data,
             serializer=BehaviorSession
         )
+        behavior_session_id = 823847007
         nwb_writer.write_nwb(
-            read_stimulus_presentations_table_from_file=True,
-            sync_file_permissive=True,
-            running_speed_load_from_multiple_stimulus_files=True,
-            include_experiment_description=False,
-            stimulus_presentations_stimulus_column_name='stimulus_name',
-            add_is_change_to_stimulus_presentations_table=False
+            behavior_session_id=BehaviorSessionId(
+                behavior_session_id=behavior_session_id),
         )
         assert Path(f.name).exists()

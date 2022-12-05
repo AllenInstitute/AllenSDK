@@ -79,13 +79,13 @@ def test_stimulus_timestamps_from_json(
             ".get_ophys_stimulus_timestamps",
             mock_get_ophys_stimulus_timestamps
         )
-        mock_stimulus_file_instance = mock_stimulus_file.from_json(dict_repr)
+        mock_stimulus_file_instance = mock_stimulus_file(filepath=dict_repr['behavior_stimulus_file'])
         ts_from_stim = StimulusTimestamps.from_stimulus_file(
             stimulus_file=mock_stimulus_file_instance,
             monitor_delay=0.0)
 
         if has_pkl and has_sync:
-            mock_sync_file_instance = mock_sync_file.from_json(dict_repr)
+            mock_sync_file_instance = mock_sync_file(filepath=dict_repr['sync_file'])
             ts_from_sync = StimulusTimestamps.from_sync_file(
                 sync_file=mock_sync_file_instance,
                 monitor_delay=0.0)
@@ -108,8 +108,8 @@ def stimulus_file_fixture():
     test_data_dir = dir / 'test_data'
     sf_path = test_data_dir / 'stimulus_file.pkl'
 
-    return BehaviorStimulusFile.from_json(
-        dict_repr={'behavior_stimulus_file': str(sf_path)})
+    return BehaviorStimulusFile(
+        filepath=sf_path)
 
 
 def test_stimulus_timestamps_from_json2(stimulus_file_fixture):
@@ -262,10 +262,10 @@ def stimulus_timestamps_fixture(
     multiple stimulus files
     """
     input_data = behavior_ecephys_session_config_fixture
-    sync_file = SyncFile.from_json(dict_repr=input_data, permissive=True)
-    bsf = BehaviorStimulusFile.from_json(dict_repr=input_data)
-    msf = MappingStimulusFile.from_json(dict_repr=input_data)
-    rsf = ReplayStimulusFile.from_json(dict_repr=input_data)
+    sync_file = SyncFile(filepath=input_data['sync_file'], permissive=True)
+    bsf = BehaviorStimulusFile(filepath=input_data['behavior_stimulus_file'])
+    msf = MappingStimulusFile(filepath=input_data['mapping_stimulus_file'])
+    rsf = ReplayStimulusFile(filepath=input_data['replay_stimulus_file'])
     obj = \
         StimulusTimestamps.from_multiple_stimulus_blocks(
             sync_file=sync_file,

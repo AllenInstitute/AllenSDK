@@ -7,7 +7,7 @@ from allensdk.internal.api import PostgresQueryMixin
 
 
 class Sex(DataObject, LimsReadableInterface,
-          NwbReadableInterface, JsonWritableInterface):
+          NwbReadableInterface):
     """sex of the animal (M/F)"""
     def __init__(self, sex: str):
         super().__init__(name="sex", value=sex)

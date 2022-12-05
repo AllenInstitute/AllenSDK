@@ -111,21 +111,6 @@ class TestJson:
             timestamps=np.array([0.1, 0.2, 0.3])
         )
 
-    def test_from_json(self):
-        csp = CellSpecimens.from_json(
-            dict_repr=self.dict_repr,
-            ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
-            events_params=EventsParams(
-                filter_scale_seconds=2.0 / 31.0, filter_n_time_steps=20
-            ),
-        )
-        assert not csp.table.empty
-        assert not csp.events.empty
-        assert not csp.dff_traces.empty
-        assert not csp.corrected_fluorescence_traces.empty
-        assert csp.meta == self.expected_meta
-
     @pytest.mark.parametrize(
         "data",
         (

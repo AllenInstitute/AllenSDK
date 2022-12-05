@@ -128,34 +128,6 @@ class TestInternal(TestBOM):
             assert bom.behavior_metadata.subject_metadata.sex == 'M'
 
 
-class TestJson(TestBOM):
-    @classmethod
-    def setup_method(self, method):
-        dir = Path(__file__).parent.resolve()
-        test_data_dir = dir.parent / 'test_data'
-        with open(test_data_dir / 'test_input.json') as f:
-            dict_repr = json.load(f)
-        dict_repr = dict_repr['session_data']
-        dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
-        dict_repr['behavior_stimulus_file'] = str(test_data_dir /
-                                                  'behavior_stimulus_file.pkl')
-        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
-        self.dict_repr = dict_repr
-
-    @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('meso', [True, False])
-    def test_from_json(self, meso):
-        if meso:
-            self.dict_repr['rig_name'] = 'MESO.1'
-        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr,
-                                              is_multiplane=meso)
-
-        if meso:
-            assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
-        else:
-            assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
-
-
 class TestNWB(TestBOM):
     def setup_method(self, method):
         self.meta = self._get_meta()

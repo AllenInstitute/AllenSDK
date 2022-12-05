@@ -191,17 +191,14 @@ def test_multi_stim_running_df_from_raw_data(
     use_lowpass = True
     zscore = 10.0
 
-    b_stim = BehaviorStimulusFile.from_json(
-                dict_repr={'behavior_stimulus_file':
-                           behavior_pkl_fixture['path_to_pkl']})
+    b_stim = BehaviorStimulusFile(
+        filepath=behavior_pkl_fixture['path_to_pkl'])
 
-    r_stim = ReplayStimulusFile.from_json(
-                dict_repr={'replay_stimulus_file':
-                           replay_pkl_fixture['path_to_pkl']})
+    r_stim = ReplayStimulusFile(
+        filepath=replay_pkl_fixture['path_to_pkl'])
 
-    m_stim = MappingStimulusFile.from_json(
-                dict_repr={'mapping_stimulus_file':
-                           mapping_pkl_fixture['path_to_pkl']})
+    m_stim = MappingStimulusFile(
+        filepath=mapping_pkl_fixture['path_to_pkl'])
 
     (velocities_df,
      raw_df) = multi_stim_running_df_from_raw_data(

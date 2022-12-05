@@ -61,9 +61,8 @@ def behavior_stim_fixture(
     """
     A BehaviorStimulusFile
     """
-    return BehaviorStimulusFile.from_json(
-        dict_repr={"behavior_stimulus_file":
-                   behavior_pkl_fixture["path"]})
+    return BehaviorStimulusFile(
+        filepath=behavior_pkl_fixture["path"])
 
 
 @pytest.fixture
@@ -72,9 +71,8 @@ def replay_stim_fixture(
     """
     A ReplayStimulusFile
     """
-    return ReplayStimulusFile.from_json(
-        dict_repr={"replay_stimulus_file":
-                   general_pkl_fixture["path"]})
+    return ReplayStimulusFile(
+        filepath=general_pkl_fixture["path"])
 
 
 @pytest.fixture
@@ -83,6 +81,5 @@ def mapping_stim_fixture(
     """
     A MappingStimulusFile
     """
-    return MappingStimulusFile.from_json(
-        dict_repr={"mapping_stimulus_file":
-                   general_pkl_fixture["path"]})
+    return MappingStimulusFile(
+        filepath=general_pkl_fixture["path"])

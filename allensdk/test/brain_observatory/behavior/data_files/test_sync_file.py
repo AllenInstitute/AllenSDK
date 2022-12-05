@@ -32,30 +32,6 @@ def mock_get_sync_data(sync_path, permissive):
     return data
 
 
-@pytest.mark.parametrize("sync_file_fixture", [
-    ({"sync_data": [2, 3, 4, 5]}),
-], indirect=["sync_file_fixture"])
-def test_sync_file_from_json(monkeypatch, sync_file_fixture):
-    sync_path, sync_data = sync_file_fixture
-
-    with monkeypatch.context() as m:
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_files"
-            ".sync_file.get_sync_data",
-            mock_get_sync_data
-        )
-
-        # Basic test case
-        input_json_dict = {"sync_file": str(sync_path)}
-        sync_file = SyncFile.from_json(input_json_dict)
-        assert np.allclose(sync_file.data, sync_data)
-
-        # Now test caching by deleting the sync_file
-        sync_path.unlink()
-        sync_file_cached = SyncFile.from_json(input_json_dict)
-        assert np.allclose(sync_file_cached.data, sync_data)
-
-
 @pytest.mark.parametrize("sync_file_fixture, ophys_experiment_id", [
     ({"sync_data": [2, 3, 4, 5]}, 12),
     ({"sync_data": [2, 3, 4, 5]}, 8)
@@ -92,21 +68,3 @@ def test_sync_file_from_lims(
     )
 
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
-
-
-@pytest.mark.parametrize("sync_file_fixture", [
-    ({"filename": "test_sync_file_1.h5"}),
-    ({"filename": "mock_sync_file_2.h5"})
-], indirect=["sync_file_fixture"])
-def test_sync_file_to_json(monkeypatch, sync_file_fixture):
-    sync_path, sync_data = sync_file_fixture
-
-    with monkeypatch.context() as m:
-        m.setattr(
-            "allensdk.brain_observatory.behavior.data_files"
-            ".sync_file.get_sync_data",
-            mock_get_sync_data
-        )
-        sync_file = SyncFile(filepath=sync_path)
-        obt_json = sync_file.to_json()
-        assert obt_json == {"sync_file": str(sync_path)}
