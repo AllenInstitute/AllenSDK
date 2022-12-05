@@ -25,9 +25,16 @@ class TestFromLims(LimsTest):
 
         with open(test_data_dir / 'eye_tracking_rig_geometry.json') as f:
             x = json.load(f)
-            x = x['rig_geometry']
-            x = {'eye_tracking_rig_geometry': x}
-            cls.expected = RigGeometry.from_json(dict_repr=x)
+            rg = x['rig_geometry']
+            cls.expected = RigGeometry(
+                equipment=rg['equipment'],
+                monitor_position_mm=Coordinates(*rg['monitor_position_mm']),
+                monitor_rotation_deg=Coordinates(*rg['monitor_rotation_deg']),
+                camera_position_mm=Coordinates(*rg['camera_position_mm']),
+                camera_rotation_deg=Coordinates(*rg['camera_rotation_deg']),
+                led_position=Coordinates(*rg['led_position'])
+             )
+
 
     @pytest.mark.requires_bamboo
     def test_from_lims(self):
@@ -104,9 +111,15 @@ class TestNWB:
 
         with open(cls.test_data_dir / 'eye_tracking_rig_geometry.json') as f:
             x = json.load(f)
-            x = x['rig_geometry']
-            x = {'eye_tracking_rig_geometry': x}
-            cls.rig_geometry = RigGeometry.from_json(dict_repr=x)
+            rg = x['rig_geometry']
+            cls.rig_geometry = RigGeometry(
+                equipment=rg['equipment'],
+                monitor_position_mm=Coordinates(*rg['monitor_position_mm']),
+                monitor_rotation_deg=Coordinates(*rg['monitor_rotation_deg']),
+                camera_position_mm=Coordinates(*rg['camera_position_mm']),
+                camera_rotation_deg=Coordinates(*rg['camera_rotation_deg']),
+                led_position=Coordinates(*rg['led_position'])
+             )
 
     def setup_method(self, method):
         self.nwbfile = pynwb.NWBFile(

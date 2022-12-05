@@ -8,6 +8,26 @@ import pandas as pd
 import pytest
 
 from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file \
+    import NeuropilCorrectedFile
+from allensdk.brain_observatory.behavior.data_files.demix_file import DemixFile
+from allensdk.brain_observatory.behavior.data_files.neuropil_file import (
+    NeuropilFile,
+)
+from allensdk.brain_observatory.behavior.data_files.dff_file import DFFFile
+from allensdk.brain_observatory.behavior.data_files.event_detection_file \
+    import EventDetectionFile
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces \
+    .dff_traces import \
+    DFFTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .corrected_fluorescence_traces import CorrectedFluorescenceTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .demixed_traces import DemixedTraces
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.traces\
+    .neuropil_traces import NeuropilTraces
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .ophys_experiment_metadata.field_of_view_shape import FieldOfViewShape
 from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
     .cell_specimens import (
         CellSpecimens,
@@ -110,6 +130,63 @@ class TestJson:
         cls.ophys_timestamps = OphysTimestamps(
             timestamps=np.array([0.1, 0.2, 0.3])
         )
+        cell_specimen_table = CellSpecimens._postprocess(
+            cell_specimen_table=dict_repr['cell_specimen_table_dict'],
+            fov_shape=FieldOfViewShape(
+                height=dict_repr['movie_height'], width=dict_repr['movie_width']
+                )
+            )
+
+        def _get_dff_traces():
+            dff_file = DFFFile(filepath=dict_repr['dff_file'])
+            return DFFTraces.from_data_file(
+                dff_file=dff_file)
+
+        def _get_demixed_traces():
+            demix_file = DemixFile(filepath=dict_repr['demix_file'])
+            return DemixedTraces.from_data_file(
+                demix_file=demix_file
+            )
+
+        def _get_neuropil_traces():
+            neuropil_file = NeuropilFile(filepath=dict_repr['neuropil_file'])
+            return NeuropilTraces.from_data_file(
+                neuropil_file=neuropil_file
+            )
+
+        def _get_corrected_fluorescence_traces():
+            neuropil_corrected_file = NeuropilCorrectedFile(
+                filepath=dict_repr['neuropil_corrected_file'])
+            return CorrectedFluorescenceTraces.from_data_file(
+                neuropil_corrected_file=neuropil_corrected_file
+            )
+        
+        def _get_events():
+            events_file = EventDetectionFile(
+                filepath=dict_repr['events_file']),
+            return CellSpecimens._get_events(
+                events_file=events_file[0],
+                events_params=EventsParams(
+                    filter_scale_seconds=2.0/31.0,
+                    filter_n_time_steps=20),
+                    frame_rate_hz=cls.expected_meta.\
+                        imaging_plane.ophys_frame_rate,
+            )
+        dff_traces = _get_dff_traces()
+        demixed_traces = _get_demixed_traces()
+        neuropil_traces = _get_neuropil_traces()
+        corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+        events = _get_events()
+        cls.csp = CellSpecimens(
+            cell_specimen_table=cell_specimen_table, meta=cls.expected_meta,
+            dff_traces=dff_traces,
+            demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
+            events=events,
+            ophys_timestamps=cls.ophys_timestamps,
+            segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
+            )
 
     @pytest.mark.parametrize(
         "data",
@@ -123,16 +200,8 @@ class TestJson:
     )
     def test_roi_data_same_order_as_cell_specimen_table(self, data):
         """tests that roi data are in same order as cell specimen table"""
-        csp = CellSpecimens.from_json(
-            dict_repr=self.dict_repr,
-            ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
-            events_params=EventsParams(
-                filter_scale_seconds=2.0 / 31.0, filter_n_time_steps=20
-            ),
-        )
-        private_attr = getattr(csp, f"_{data}")
-        public_attr = getattr(csp, data)
+        private_attr = getattr(self.csp, f"_{data}")
+        public_attr = getattr(self.csp, data)
 
         # Events stores cell_roi_id as column whereas traces is index
         data_cell_roi_ids = getattr(
@@ -140,7 +209,7 @@ class TestJson:
         ).values
 
         current_order = np.where(
-            data_cell_roi_ids == csp._cell_specimen_table["cell_roi_id"]
+            data_cell_roi_ids == self.csp._cell_specimen_table["cell_roi_id"]
         )[0]
 
         # make sure same order
@@ -150,7 +219,7 @@ class TestJson:
         private_attr._value = private_attr._value.iloc[[1, 0]]
 
         # make sure same order
-        np.testing.assert_array_equal(public_attr.index, csp.table.index)
+        np.testing.assert_array_equal(public_attr.index, self.csp.table.index)
 
     @pytest.mark.parametrize("extra_in_trace", (True, False))
     @pytest.mark.parametrize(
@@ -167,25 +236,17 @@ class TestJson:
     ):
         """check that an exception is raised if there is a mismatch in rois
         between cell specimen table and traces"""
-        csp = CellSpecimens.from_json(
-            dict_repr=self.dict_repr,
-            ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
-            events_params=EventsParams(
-                filter_scale_seconds=2.0 / 31.0, filter_n_time_steps=20
-            ),
-        )
-        private_trace_attr = getattr(csp, f"_{trace_type}")
+        private_trace_attr = getattr(self.csp, f"_{trace_type}")
 
         if extra_in_trace:
             # Drop an roi from cell specimen table that is in trace
             trace_rois = private_trace_attr.value.index
-            csp._cell_specimen_table = csp._cell_specimen_table[
-                csp._cell_specimen_table["cell_roi_id"] != trace_rois[0]
+            self.csp._cell_specimen_table = self.csp._cell_specimen_table[
+                self.csp._cell_specimen_table["cell_roi_id"] != trace_rois[0]
             ]
         else:
             # Drop an roi from trace that is in cell specimen table
-            csp_rois = csp._cell_specimen_table["cell_roi_id"]
+            csp_rois = self.csp._cell_specimen_table["cell_roi_id"]
             private_trace_attr._value = private_trace_attr._value[
                 private_trace_attr._value.index != csp_rois.iloc[0]
             ]
@@ -193,40 +254,40 @@ class TestJson:
         if trace_type == "dff_traces":
             trace_args = {
                 "dff_traces": private_trace_attr,
-                "demixed_traces": csp._demixed_traces,
-                "neuropil_traces": csp._neuropil_traces,
+                "demixed_traces": self.csp._demixed_traces,
+                "neuropil_traces": self.csp._neuropil_traces,
                 "corrected_fluorescence_traces":
-                    csp._corrected_fluorescence_traces,
+                    self.csp._corrected_fluorescence_traces,
             }
         elif trace_type == "demixed_traces":
             trace_args = {
-                "dff_traces": csp._dff_traces,
+                "dff_traces": self.csp._dff_traces,
                 "demixed_traces": private_trace_attr,
-                "neuropil_traces": csp._neuropil_traces,
+                "neuropil_traces": self.csp._neuropil_traces,
                 "corrected_fluorescence_traces":
-                    csp._corrected_fluorescence_traces,
+                    self.csp._corrected_fluorescence_traces,
             }
         elif trace_type == "neuropil_traces":
             trace_args = {
-                "dff_traces": csp._dff_traces,
-                "demixed_traces": csp._demixed_traces,
+                "dff_traces": self.csp._dff_traces,
+                "demixed_traces": self.csp._demixed_traces,
                 "neuropil_traces": private_trace_attr,
                 "corrected_fluorescence_traces":
-                    csp._corrected_fluorescence_traces,
+                    self.csp._corrected_fluorescence_traces,
             }
         else:
             trace_args = {
-                "dff_traces": csp._dff_traces,
-                "demixed_traces": csp._demixed_traces,
-                "neuropil_traces": csp._neuropil_traces,
+                "dff_traces": self.csp._dff_traces,
+                "demixed_traces": self.csp._demixed_traces,
+                "neuropil_traces": self.csp._neuropil_traces,
                 "corrected_fluorescence_traces": private_trace_attr,
             }
         with pytest.raises(RuntimeError):
             # construct it again using trace/table combo with different rois
             CellSpecimens(
-                cell_specimen_table=csp._cell_specimen_table,
-                meta=csp._meta,
-                events=csp._events,
+                cell_specimen_table=self.csp._cell_specimen_table,
+                meta=self.csp._meta,
+                events=self.csp._events,
                 ophys_timestamps=self.ophys_timestamps,
                 segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
                 exclude_invalid_rois=False,
@@ -250,8 +311,7 @@ class TestNWB:
 
         tj = TestJson()
         tj.setup_class()
-        self.dict_repr = tj.dict_repr
-
+        self.csp = tj.csp
         # Write metadata, since csp requires other metdata
         tbom = TestBOM()
         tbom.setup_class()
@@ -263,21 +323,10 @@ class TestNWB:
     def test_read_write_nwb(
         self, roundtrip, data_object_roundtrip_fixture, exclude_invalid_rois
     ):
-        cell_specimens = CellSpecimens.from_json(
-            dict_repr=self.dict_repr,
-            ophys_timestamps=self.ophys_timestamps,
-            segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
-            exclude_invalid_rois=exclude_invalid_rois,
-            events_params=EventsParams(
-                filter_scale_seconds=2.0 / 31.0, filter_n_time_steps=20
-            ),
-        )
+        cell_specimen_table = self.csp._cell_specimen_table
+        valid_roi_id = cell_specimen_table[cell_specimen_table["valid_roi"]]["cell_roi_id"]
 
-        csp = cell_specimens._cell_specimen_table
-
-        valid_roi_id = csp[csp["valid_roi"]]["cell_roi_id"]
-
-        cell_specimens.to_nwb(
+        self.csp.to_nwb(
             nwbfile=self.nwbfile, ophys_timestamps=self.ophys_timestamps
         )
 
@@ -292,7 +341,7 @@ class TestNWB:
                 ),
             )
         else:
-            obt = cell_specimens.from_nwb(
+            obt = self.csp.from_nwb(
                 nwbfile=self.nwbfile,
                 exclude_invalid_rois=exclude_invalid_rois,
                 segmentation_mask_image_spacing=(0.78125e-3, 0.78125e-3),
@@ -302,15 +351,15 @@ class TestNWB:
             )
 
         if exclude_invalid_rois:
-            cell_specimens._cell_specimen_table = (
-                cell_specimens._cell_specimen_table[
-                    cell_specimens._cell_specimen_table["cell_roi_id"].isin(
+            self.csp._cell_specimen_table = (
+                self.csp._cell_specimen_table[
+                    self.csp._cell_specimen_table["cell_roi_id"].isin(
                         valid_roi_id
                     )
                 ]
             )
 
-        assert obt == cell_specimens
+        assert obt == self.csp
 
 
 class TestFilterAndReorder:

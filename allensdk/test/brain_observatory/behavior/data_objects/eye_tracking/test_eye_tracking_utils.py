@@ -42,11 +42,8 @@ def test_get_lost_frames(
     with open(json_path, 'w') as output_file:
         output_file.write(json.dumps(metadata))
 
-    dict_repr = {'raw_eye_tracking_video_meta_data':
-                 str(json_path.resolve().absolute())}
-
-    metadata = EyeTrackingMetadataFile.from_json(
-                    dict_repr=dict_repr)
+    metadata = EyeTrackingMetadataFile(
+        filepath=str(json_path.resolve().absolute()))
 
     actual = get_lost_frames(eye_tracking_metadata=metadata)
     np.testing.assert_array_equal(actual, np.array(expected_array))
