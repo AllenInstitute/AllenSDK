@@ -8,16 +8,66 @@ from allensdk.brain_observatory.ecephys._channels import Channels
 from allensdk.brain_observatory.ecephys._unit import Unit
 from allensdk.brain_observatory.ecephys.utils import load_and_squeeze_npy, \
     scale_amplitudes, group_1d_by_unit
-from allensdk.core import DataObject, NwbReadableInterface
+from allensdk.core import DataObject, NwbReadableInterface, \
+    JsonReadableInterface
 
 
-class Units(DataObject, NwbReadableInterface):
+class Units(DataObject, JsonReadableInterface, NwbReadableInterface):
     """
     A collection of units
     """
 
     def __init__(self, units: List[Unit]):
         super().__init__(name='units', value=units)
+
+    @classmethod
+    def from_json(
+            cls,
+            probe: dict,
+            amplitude_scale_factor=0.195e-6
+    ) -> "Units":
+        """
+
+        Parameters
+        ----------
+        probe
+        amplitude_scale_factor: amplitude scale factor converting raw
+        amplitudes to Volts. Default converts from bits -> uV -> V
+
+        Returns
+        -------
+
+        """
+        local_to_global_unit_map = {
+            unit['cluster_id']: unit['id'] for unit in probe['units']}
+        spike_times = _read_spike_times_to_dictionary(
+            probe['spike_times_path'],
+            probe['spike_clusters_file'],
+            local_to_global_unit_map
+        )
+        mean_waveforms = _read_waveforms_to_dictionary(
+            probe['mean_waveforms_path'],
+            local_to_global_unit_map
+        )
+        spike_amplitudes = _read_spike_amplitudes_to_dictionary(
+            probe["spike_amplitudes_path"],
+            probe["spike_clusters_file"],
+            probe["templates_path"],
+            probe["spike_templates_path"],
+            probe["inverse_whitening_matrix_path"],
+            local_to_global_unit_map=local_to_global_unit_map,
+            scale_factor=probe.get('amplitude_scale_factor',
+                                   amplitude_scale_factor)
+        )
+        units = [
+            Unit(**unit,
+                 spike_times=spike_times[unit['id']],
+                 spike_amplitudes=spike_amplitudes[unit['id']],
+                 mean_waveforms=mean_waveforms[unit['id']])
+            for unit in probe['units']
+        ]
+        units = Units(units=units)
+        return units
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile,

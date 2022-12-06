@@ -3,11 +3,12 @@ import pynwb
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.nwb import setup_table_for_epochs
-from allensdk.core import DataObject, \
+from allensdk.core import DataObject, JsonReadableInterface, \
     NwbWritableInterface, NwbReadableInterface
 
 
-class OptotaggingTable(DataObject, NwbWritableInterface, NwbReadableInterface):
+class OptotaggingTable(DataObject, JsonReadableInterface,
+                       NwbWritableInterface, NwbReadableInterface):
     """Optotagging table - optotagging stimulation"""
     def __init__(self, table: pd.DataFrame):
         # "name" is a pynwb reserved column name that older versions of the
@@ -32,6 +33,12 @@ class OptotaggingTable(DataObject, NwbWritableInterface, NwbReadableInterface):
             - duration: duration of stimulation
         """
         return self._value
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "OptotaggingTable":
+        table = pd.read_csv(dict_repr['optotagging_table_path'])
+        table.index.name = 'id'
+        return OptotaggingTable(table=table)
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "OptotaggingTable":

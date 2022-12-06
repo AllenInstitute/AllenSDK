@@ -5,14 +5,42 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.ecephys._channel import Channel
 from allensdk.brain_observatory.ecephys.utils import clobbering_merge
-from allensdk.core import DataObject, NwbReadableInterface
+from allensdk.core import DataObject, NwbReadableInterface, \
+    JsonReadableInterface
 
 
-class Channels(DataObject, NwbReadableInterface):
+class Channels(DataObject, NwbReadableInterface, JsonReadableInterface):
     """A set of channels"""
 
     def __init__(self, channels: List[Channel]):
         super().__init__(name='channels', value=channels)
+
+    @classmethod
+    def from_json(
+            cls,
+            channels: dict
+    ) -> "Channels":
+        for channel in channels:
+            if 'impedence' in channel:
+                # Correct misspelling
+                channel['impedance'] = channel.pop('impedence')
+
+        channels = [Channel(
+            id=channel['id'],
+            probe_id=channel['probe_id'],
+            valid_data=channel['valid_data'],
+            probe_channel_number=channel['probe_channel_number'],
+            probe_vertical_position=channel['probe_vertical_position'],
+            probe_horizontal_position=channel['probe_horizontal_position'],
+            structure_acronym=channel['structure_acronym'],
+            anterior_posterior_ccf_coordinate=(
+                channel['anterior_posterior_ccf_coordinate']),
+            dorsal_ventral_ccf_coordinate=(
+                channel['dorsal_ventral_ccf_coordinate']),
+            left_right_ccf_coordinate=channel['left_right_ccf_coordinate']
+        )
+                    for channel in channels]
+        return Channels(channels=channels)
 
     def to_dataframe(self, external_channel_columns=None,
                      filter_by_validity=True) -> pd.DataFrame:

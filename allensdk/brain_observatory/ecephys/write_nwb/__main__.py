@@ -255,7 +255,7 @@ def write_probe_lfp_file(session_id, session_metadata, session_start_time,
     logging.getLogger('').setLevel(log_level)
     logging.info(f"writing lfp file for probe {probe_meta['id']}")
 
-    probe = Probe(filepath=probe_meta['probe'])
+    probe = Probe.from_json(probe=probe_meta)
     nwbfile = probe.add_lfp_to_nwb(
         session_id=session_id,
         session_start_time=session_start_time,

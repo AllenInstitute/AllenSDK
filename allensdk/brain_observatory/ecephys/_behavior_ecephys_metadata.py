@@ -22,10 +22,11 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.subject_metadata import \
     SubjectMetadata
-from allensdk.core import NwbReadableInterface
+from allensdk.core import JsonReadableInterface, NwbReadableInterface
 
 
-class BehaviorEcephysMetadata(BehaviorMetadata, NwbReadableInterface):
+class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
+                              NwbReadableInterface):
     def __init__(
             self,
             ecephys_session_id: int,
@@ -51,6 +52,21 @@ class BehaviorEcephysMetadata(BehaviorMetadata, NwbReadableInterface):
     @property
     def ecephys_session_id(self) -> int:
         return self._ecephys_session_id
+
+    @classmethod
+    def from_json(cls, dict_repr: dict) -> "BehaviorEcephysMetadata":
+        behavior_metadata = super().from_json(dict_repr=dict_repr)
+        return BehaviorEcephysMetadata(
+            ecephys_session_id=dict_repr['ecephys_session_id'],
+            date_of_acquisition=DateOfAcquisition(
+                behavior_metadata.date_of_acquisition),
+            subject_metadata=behavior_metadata.subject_metadata,
+            behavior_session_id=behavior_metadata._behavior_session_id,
+            behavior_session_uuid=behavior_metadata._behavior_session_uuid,
+            equipment=behavior_metadata.equipment,
+            session_type=behavior_metadata._session_type,
+            stimulus_frame_rate=behavior_metadata._stimulus_frame_rate
+        )
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorEcephysMetadata":

@@ -9,7 +9,7 @@ from pynwb import NWBHDF5IO, NWBFile
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
 from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
-from allensdk.core import NwbReadableInterface, \
+from allensdk.core import JsonReadableInterface, NwbReadableInterface, \
     NwbWritableInterface
 
 
@@ -21,6 +21,7 @@ class BehaviorEcephysNwbWriter(NWBWriter):
             session_nwb_filepath: str,
             session_data: dict,
             serializer: Union[
+                JsonReadableInterface,
                 NwbReadableInterface,
                 NwbWritableInterface]):
         super().__init__(
