@@ -28,25 +28,11 @@ def write_behavior_ophys_nwb(session_data: dict,
             os.remove(filename)
 
     try:
-        json_session = BehaviorOphysExperiment.from_json(
-            session_data=session_data)
         lims_session = BehaviorOphysExperiment.from_lims(
             ophys_experiment_id=session_data['ophys_experiment_id'])
-
-        logging.info("Comparing a BehaviorOphysExperiment created from JSON "
-                     "with a BehaviorOphysExperiment created from LIMS")
-        assert sessions_are_equal(json_session, lims_session, reraise=True,
-                                  ignore_keys={'metadata': {'project_code'}})
-
-        nwbfile = json_session.to_nwb()
+        nwbfile = lims_session.to_nwb()
         with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
-
-        logging.info("Comparing a BehaviorOphysExperiment created from JSON "
-                     "with a BehaviorOphysExperiment created from NWB")
-        nwb_session = BehaviorOphysExperiment.from_nwb(nwbfile=nwbfile)
-        assert sessions_are_equal(json_session, nwb_session, reraise=True)
-
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
