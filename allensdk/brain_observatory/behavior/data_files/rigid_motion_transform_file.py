@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 from cachetools import cached, LRUCache

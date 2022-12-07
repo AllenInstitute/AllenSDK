@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 import h5py

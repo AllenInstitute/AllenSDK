@@ -10,8 +10,6 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningAcquisition, StimulusTimestamps
 )
-from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
 
 
 def test_nonzero_monitor_delay_acq():
@@ -109,6 +107,7 @@ def test_running_acquisition_from_json(
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     pd.testing.assert_frame_equal(obt.value, expected_running_acq_df)
+
 
 # Fixtures:
 # nwbfile:

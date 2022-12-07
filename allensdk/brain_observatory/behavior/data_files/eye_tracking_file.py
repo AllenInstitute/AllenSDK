@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 import pandas as pd
