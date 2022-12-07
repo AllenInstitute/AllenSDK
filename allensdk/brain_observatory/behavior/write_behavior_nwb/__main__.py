@@ -11,7 +11,6 @@ from allensdk.brain_observatory.behavior.write_behavior_nwb.schemas import (
     BehaviorInputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs)
-from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
 def write_behavior_nwb(session_data, nwb_filepath):
