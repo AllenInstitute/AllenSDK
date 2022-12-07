@@ -71,9 +71,6 @@ class SyncFile(DataFile):
         filepath = dict_repr["sync_file"]
         return cls(filepath=filepath, permissive=permissive)
 
-    def to_json(self) -> Dict[str, str]:
-        return {"sync_file": str(self.filepath)}
-
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(

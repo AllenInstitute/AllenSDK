@@ -23,9 +23,6 @@ class EyeTrackingFile(DataFile):
         filepath = dict_repr["eye_tracking_filepath"]
         return cls(filepath=filepath)
 
-    def to_json(self) -> Dict[str, str]:
-        return {"eye_tracking_filepath": str(self.filepath)}
-
     @classmethod
     def from_lims(
         cls, db: PostgresQueryMixin,

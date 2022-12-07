@@ -26,9 +26,6 @@ class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
     def from_json(cls, dict_repr: dict) -> "Equipment":
         return cls(equipment_name=dict_repr["rig_name"])
 
-    def to_json(self) -> dict:
-        return {"eqipment_name": self.value}
-
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "Equipment":
