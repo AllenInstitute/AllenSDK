@@ -6,7 +6,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import OphysContainerId  # NOQA
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import OphysSessionId  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.project_code import ProjectCode  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_project_code import OphysProjectCode  # NOQA
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import TargetedImagingDepth  # NOQA
 from allensdk.internal.api import PostgresQueryMixin
 
@@ -20,7 +20,7 @@ class MultiplaneMetadata(OphysExperimentMetadata):
                  imaging_depth: ImagingDepth,
                  targeted_imaging_depth: TargetedImagingDepth,
                  imaging_plane_group: ImagingPlaneGroup,
-                 project_code: ProjectCode):
+                 project_code: OphysProjectCode = OphysProjectCode()):
         super().__init__(
             ophys_experiment_id=ophys_experiment_id,
             ophys_session_id=ophys_session_id,

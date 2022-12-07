@@ -1,4 +1,5 @@
 from typing import Union
+import warnings
 
 from pynwb import NWBFile
 
@@ -59,6 +60,13 @@ class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
         else:
             ophys_metadata = OphysExperimentMetadata.from_lims(
                 ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+
+        if ophys_metadata.project_code != behavior_metadata.project_code:
+            raise warnings.warn(
+                'project_code for Ophys experiment table does not match '
+                'project_code from behavior_session table for '
+                'ophys_experiment_id={ophys_experiment_id} with '
+                f'behavior_session_id={behavior_session_id}.')
 
         return cls(behavior_metadata=behavior_metadata,
                    ophys_metadata=ophys_metadata)
@@ -147,7 +155,8 @@ class BehaviorOphysMetadata(DataObject, LimsReadableInterface,
             imaging_depth=ophys_meta.imaging_depth,
             targeted_imaging_depth=ophys_meta.targeted_imaging_depth,
             behavior_session_uuid=str(behavior_meta.behavior_session_uuid),
-            behavior_session_id=behavior_meta.behavior_session_id
+            behavior_session_id=behavior_meta.behavior_session_id,
+            project_code=ophys_meta.project_code,
         )
         nwbfile.add_lab_meta_data(nwb_metadata)
 

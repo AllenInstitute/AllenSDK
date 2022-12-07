@@ -58,6 +58,8 @@ class TestVBO:
         self.test_dir.cleanup()
 
     def _get_behavior_session(self, behavior_session_id, lims_db):
+        if isinstance(behavior_session_id, BehaviorSessionId):
+            behavior_session_id = behavior_session_id.value
         return BehaviorMetadata(
             date_of_acquisition=None,
             subject_metadata=None,

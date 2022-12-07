@@ -33,9 +33,12 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
     multiprocessing_helper
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
+    .ophys_mixin import \
+    OphysMixin
 
 
-class SessionsTable(ProjectTable):
+class SessionsTable(ProjectTable, OphysMixin):
     """Class for storing and manipulating project-level data
     at the session level"""
 
@@ -65,7 +68,8 @@ class SessionsTable(ProjectTable):
         self._fetch_api = fetch_api
         self._ophys_session_table = ophys_session_table
         self._include_trial_metrics = include_trial_metrics
-        super().__init__(df=df, suppress=suppress)
+        ProjectTable.__init__(self, df=df, suppress=suppress)
+        OphysMixin.__init__(self)
 
     def postprocess_additional(self):
         # Add subject metadata
