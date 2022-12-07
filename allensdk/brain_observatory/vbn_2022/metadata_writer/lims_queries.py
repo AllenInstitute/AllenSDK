@@ -542,6 +542,13 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
             valid=True)
 
     summary_table = lims_connection.select(query)
+
+    # date_of_acquisition stored in local time in DB. Convert to UTC
+    summary_table['date_of_acquisition'] = \
+        summary_table['date_of_acquisition'].dt\
+        .tz_localize('America/Los_Angeles').dt\
+        .tz_convert('UTC')
+
     return summary_table
 
 
@@ -682,7 +689,8 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
 def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
-        exclude_invalid_sessions: bool = True
+        exclude_invalid_sessions: bool = True,
+        n_workers: Optional[int] = None
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -702,6 +710,9 @@ def _behavior_session_table_from_ecephys_session_id_list(
         - are pretest
         - fall after mouse death date
         - were aborted
+
+    n_workers
+        Number of workers for reading from pkl file
 
     Returns
     -------
@@ -734,7 +745,8 @@ def _behavior_session_table_from_ecephys_session_id_list(
         behavior_session_ids=behavior_session_df['behavior_session_id'],
         lims_engine=db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
+        ),
+        n_workers=n_workers
     )
     if exclude_invalid_sessions:
         behavior_sessions = remove_invalid_sessions(
@@ -784,7 +796,8 @@ def session_tables_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         failed_ecephys_session_id_list: Optional[List[int]],
-        probe_ids_to_skip: Optional[List[int]]
+        probe_ids_to_skip: Optional[List[int]],
+        n_workers: Optional[int] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform the database query to generate the ecephys_session_table
@@ -807,6 +820,9 @@ def session_tables_from_ecephys_session_id_list(
 
     probe_ids_to_skip: Optional[List[int]]
         The IDs of probes not being released
+
+    n_workers
+        Number of workers for reading from pkl file
 
     Returns
     -------
@@ -857,7 +873,9 @@ def session_tables_from_ecephys_session_id_list(
 
     beh_table = _behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
-            ecephys_session_id_list=ecephys_session_id_list)
+            ecephys_session_id_list=ecephys_session_id_list,
+            n_workers=n_workers
+    )
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                 lims_connection=lims_connection,

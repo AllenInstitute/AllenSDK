@@ -118,6 +118,15 @@ class VBN2022MetadataWriterInputSchema(argschema.ArgSchema):
         ),
     )
 
+    n_workers = argschema.fields.Int(
+        default=8,
+        allow_none=True,
+        description='Number of workers for reading from pkl file. '
+                    'Default=8 due to issues with making too many '
+                    'requests to the database. Increase if too slow, decrease '
+                    'if the database rejects the connection'
+    )
+
     @post_load
     def validate_paths(self, data, **kwargs):
         fname_lookup = {
