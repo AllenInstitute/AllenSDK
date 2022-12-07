@@ -8,8 +8,7 @@ from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata \
     .subject_metadata.age import \
     Age
@@ -36,7 +35,7 @@ from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
                       NwbWritableInterface, JsonReadableInterface,
-                      JsonWritableInterface):
+                      ):
     """Subject metadata"""
 
     def __init__(self,

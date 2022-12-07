@@ -40,5 +40,5 @@ from ._data_object_base.readable_interfaces import (    # noqa F401
     DataFileReadableInterface
 )
 from ._data_object_base.writable_interfaces import (    # noqa F401
-    JsonWritableInterface, NwbWritableInterface
+    NwbWritableInterface
 )

@@ -16,7 +16,7 @@ from allensdk.core import \
     JsonReadableInterface, NwbReadableInterface, \
     LimsReadableInterface
 from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
@@ -181,7 +181,6 @@ def get_task_parameters(data: Dict) -> Dict:
 class BehaviorMetadata(DataObject, LimsReadableInterface,
                        JsonReadableInterface,
                        NwbReadableInterface,
-                       JsonWritableInterface,
                        NwbWritableInterface):
     """Container class for behavior metadata"""
     def __init__(self,
