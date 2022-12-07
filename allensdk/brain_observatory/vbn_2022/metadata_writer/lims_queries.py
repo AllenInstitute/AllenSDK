@@ -543,7 +543,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
 
     summary_table = lims_connection.select(query)
 
-    # date_of_acquisition stored in local time in DB. Convert to UTC
+    # Add UTC tz
     summary_table['date_of_acquisition'] = \
         summary_table['date_of_acquisition'].dt.tz_localize('UTC')
 
