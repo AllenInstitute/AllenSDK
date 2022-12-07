@@ -26,9 +26,6 @@ class BehaviorSessionId(DataObject, LimsReadableInterface,
     def from_json(cls, dict_repr: dict) -> "BehaviorSessionId":
         return cls(behavior_session_id=dict_repr["behavior_session_id"])
 
-    def to_json(self) -> dict:
-        return {"behavior_session_id": self.value}
-
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     # TODO should be from_ophys_experiment_id

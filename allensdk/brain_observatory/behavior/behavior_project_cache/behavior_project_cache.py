@@ -343,23 +343,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         )
 
 
-def _write_json(path, df):
-    """Wrapper to change the arguments for saving a pandas json
-    dataframe so that it conforms to expectations of the internal
-    cache methods. Can't use partial with the native `to_json` method
-    because the dataframe is not yet created at the time we need to
-    pass in the save method.
-    Saves a dataframe in json format to `path`, in split orientation
-    to save space on disk.
-    Converts dates to seconds from epoch.
-    NOTE: Date serialization is a big pain. Make sure if columns
-    are being added, the _read_json is updated to properly deserialize
-    them back to the expected format by adding them to `convert_dates`.
-    In the future we could schematize this data using marshmallow
-    or something similar."""
-    df.to_json(path, orient="split", date_unit="s", date_format="epoch")
-
-
 def _read_json(path, index_name: Optional[str] = None):
     """Reads a dataframe file written to the cache by _write_json."""
     df = pd.read_json(path, date_unit="s", orient="split",

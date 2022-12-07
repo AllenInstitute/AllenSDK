@@ -36,9 +36,6 @@ class EventDetectionFile(DataFile):
         filepath = dict_repr["events_file"]
         return cls(filepath=filepath)
 
-    def to_json(self) -> Dict[str, str]:
-        return {"events_file": str(self.filepath)}
-
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(

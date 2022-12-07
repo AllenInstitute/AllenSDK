@@ -115,9 +115,6 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
             death_on=death_on
         )
 
-    def to_json(self) -> dict:
-        pass
-
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "SubjectMetadata":
         mouse_id = MouseId.from_nwb(nwbfile=nwbfile)

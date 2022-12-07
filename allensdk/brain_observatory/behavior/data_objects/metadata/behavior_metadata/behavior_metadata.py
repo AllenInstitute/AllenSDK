@@ -334,9 +334,6 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
     def is_training(self):
         return self.session_type.lower().startswith('training_0')
 
-    def to_json(self) -> dict:
-        pass
-
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._subject_metadata.to_nwb(nwbfile=nwbfile)
         self._equipment.to_nwb(nwbfile=nwbfile)

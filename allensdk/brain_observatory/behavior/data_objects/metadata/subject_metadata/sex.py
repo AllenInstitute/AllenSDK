@@ -18,9 +18,6 @@ class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
     def from_json(cls, dict_repr: dict) -> "Sex":
         return cls(sex=dict_repr["sex"])
 
-    def to_json(self) -> dict:
-        return {"sex": self.value}
-
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "Sex":
