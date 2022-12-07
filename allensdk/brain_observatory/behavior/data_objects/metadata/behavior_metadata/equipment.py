@@ -5,8 +5,7 @@ from pynwb import NWBFile
 from allensdk.core import DataObject
 from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface, NwbWritableInterface
+from allensdk.core import NwbWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -16,8 +15,7 @@ class EquipmentType(Enum):
 
 
 class Equipment(DataObject, JsonReadableInterface, LimsReadableInterface,
-                NwbReadableInterface, JsonWritableInterface,
-                NwbWritableInterface):
+                NwbReadableInterface, NwbWritableInterface):
     """the name of the experimental rig."""
     def __init__(self, equipment_name: str):
         super().__init__(name="equipment_name", value=equipment_name)
