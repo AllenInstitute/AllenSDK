@@ -545,9 +545,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
 
     # date_of_acquisition stored in local time in DB. Convert to UTC
     summary_table['date_of_acquisition'] = \
-        summary_table['date_of_acquisition'].dt\
-        .tz_localize('America/Los_Angeles').dt\
-        .tz_convert('UTC')
+        summary_table['date_of_acquisition'].dt.tz_localize('UTC')
 
     return summary_table
 
