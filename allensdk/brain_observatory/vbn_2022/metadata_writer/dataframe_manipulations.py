@@ -10,6 +10,9 @@ import warnings
 import logging
 import time
 
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
 from allensdk.internal.api import PostgresQueryMixin
 
 from allensdk.brain_observatory.behavior.behavior_project_cache \
@@ -333,7 +336,8 @@ def _patch_date_and_stage_from_pickle_file(
                         zip(pickle_path_df.behavior_session_id,
                             pickle_path_df.pkl_path)):
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
-            new_date = stim_file.date_of_acquisition
+            new_date = DateOfAcquisition.from_stimulus_file(
+                stimulus_file=stim_file).value
             new_session_type = stim_file.session_type
 
             new_vals = {'date_of_acquisition': new_date,
