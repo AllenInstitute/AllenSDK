@@ -8,8 +8,6 @@ from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
-from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningSpeed, StimulusTimestamps
 )
@@ -195,6 +193,7 @@ def test_running_speed_from_json(
 
     assert obt._filtered == filtered
     pd.testing.assert_frame_equal(obt.value, expected_running_df)
+
 
 # Fixtures:
 # nwbfile:
