@@ -151,7 +151,7 @@ class NWBWriter:
             k: v for k, v in kwargs.items()
             if k in inspect.signature(self._serializer.from_lims).parameters}
         lims_session = self._serializer.from_lims(
-            session_data=self._session_data, **from_lims_kwargs)
+            behavior_session_id=self._session_data['behavior_session_id'], **from_lims_kwargs)
 
         try:
             nwbfile = self._write_nwb(
