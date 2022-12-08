@@ -1,4 +1,5 @@
 import warnings
+from dateutil import parser as datetime_parser
 from datetime import datetime
 
 import pytz
@@ -23,16 +24,16 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
         doa = dict_repr['date_of_acquisition']
-        try:
-            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            # parse the microseconds
-            doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S.%f")
-        tz = pytz.timezone("America/Los_Angeles")
-        doa = tz.localize(doa)
+        doa = datetime_parser.parse(doa)
 
-        # NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
-        doa = doa.astimezone(pytz.utc)
+        if doa.tzinfo is None:
+            # Assume it is local time
+            tz = pytz.timezone("America/Los_Angeles")
+            doa = tz.localize(doa)
+
+            # NOTE: LIMS writes to JSON in local time. Needs to be
+            # converted to UTC
+            doa = doa.astimezone(pytz.utc)
 
         return cls(date_of_acquisition=doa)
 
