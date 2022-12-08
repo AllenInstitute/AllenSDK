@@ -180,6 +180,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             ecephys_session_id_list=session_id_list,
             failed_ecephys_session_id_list=failed_session_list,
             probe_ids_to_skip=probe_ids_to_skip,
+            n_workers=self.args["n_workers"]
         )
 
         ecephys_nwb_dir = pathlib.Path(self.args["ecephys_nwb_dir"])

@@ -72,7 +72,7 @@ def test_visbeh_ophys_data_set():
         set(['timestamps', 'volume', 'auto_rewarded'])
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
         set(data_set.corrected_fluorescence_traces.columns) == \
-        set(['cell_roi_id', 'corrected_fluorescence'])
+        set(['cell_roi_id', 'corrected_fluorescence', 'RMSE', 'r'])
 
     monitor_delay = data_set._stimulus_timestamps.monitor_delay
 
@@ -100,7 +100,7 @@ def test_visbeh_ophys_data_set():
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
         'date_of_acquisition': pytz.utc.localize(
-            datetime.datetime(2018, 11, 30, 23, 28, 37)),
+            datetime.datetime(2018, 11, 30, 15, 58, 50, 325000)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
         'targeted_imaging_depth': 375,

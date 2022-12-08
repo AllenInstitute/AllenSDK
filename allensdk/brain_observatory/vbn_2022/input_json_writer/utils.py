@@ -854,7 +854,8 @@ def _raw_eye_tracking_geometry_from_equipment_id(
                         equipment_id=equipment_id,
                         config_type=name,
                         lims_connection=lims_connection)
-        this_df = this_df.loc[this_df.active_date <= date_of_acquisition]
+        this_df = this_df.loc[
+            this_df.active_date.dt.date <= date_of_acquisition]
         this_df = this_df.iloc[this_df.active_date.idxmax()]
         this_config = dict()
         this_config['center_x_mm'] = this_df.center_x_mm

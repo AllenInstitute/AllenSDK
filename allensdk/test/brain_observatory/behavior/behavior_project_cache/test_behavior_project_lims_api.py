@@ -231,6 +231,7 @@ class TestLimsCloudConsistency:
             return cls.test_dir / 'ophys_cells_table.csv'
 
     @pytest.mark.requires_bamboo
+    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_behavior_session_table(self):
         with patch.object(
                 BehaviorMetadata,
@@ -248,6 +249,7 @@ class TestLimsCloudConsistency:
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
+    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_ophys_session_table(self):
         with patch.object(
                 BehaviorMetadata,
@@ -264,6 +266,7 @@ class TestLimsCloudConsistency:
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
+    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_ophys_experiments_table(self):
         with patch.object(
                 BehaviorMetadata,
