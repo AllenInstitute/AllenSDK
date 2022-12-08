@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.6", "3.7", "3.8"]
+        python-version: ["3.7", "3.8", "3.9"]
       fail-fast: false
     defaults:
       run:
@@ -71,7 +71,7 @@ jobs:
     runs-on: ["self-hosted"]
     strategy:
       matrix:
-        image: ["allensdk_local_py37:latest"]
+        image: ["allensdk_local_py38:latest"]
     steps:
       - uses: actions/checkout@v2
       - name: run test in docker
