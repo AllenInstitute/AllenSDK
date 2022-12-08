@@ -41,6 +41,9 @@ NOTEBOOK_ARGS = {
     },
     'visual_behavior_ophys_data_access.ipynb': {
         'DOWNLOAD_COMPLETE_DATASET': False
+    },
+    'ecephys_session.ipynb': {
+        'DOWNLOAD_LFP': False
     }
 }
 
