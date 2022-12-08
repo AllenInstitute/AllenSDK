@@ -20,7 +20,12 @@ class TestSegmentation(object):
 def create_mask_plane(img_shape, dot_positions, radius=15):
     img = np.zeros(img_shape, dtype=np.uint8)
     for r, c in dot_positions:
-        img[draw.circle(r, c, radius, shape=img_shape)] = 1
+        if getattr(draw, 'circle', None) is not None:
+            # older version of skimage
+            img[draw.circle(r, c, radius, shape=img_shape)] = 1
+        else:
+            # draw.circle deprecated in favor of draw.disk
+            img[draw.disk((r, c), radius, shape=img_shape)] = 1
     return img
 
 
