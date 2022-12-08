@@ -6,7 +6,12 @@ on:
 jobs:
   run_notebooks:
     name: Notebook runner
-    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.8"]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Install
