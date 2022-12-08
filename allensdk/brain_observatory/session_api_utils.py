@@ -1,10 +1,9 @@
 import inspect
 import logging
 import warnings
-from collections import Callable
 
 from itertools import zip_longest
-from typing import Any, Dict, List, Optional, Set, Iterable
+from typing import Any, Callable, Dict, List, Optional, Set, Iterable
 
 import numpy as np
 import pandas as pd
