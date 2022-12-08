@@ -11,6 +11,7 @@ from allensdk.brain_observatory.behavior.write_nwb._schemas import (
     InputSchema, OutputSchema)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs)
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 
 def write_behavior_ophys_nwb(session_data: dict,
@@ -32,6 +33,11 @@ def write_behavior_ophys_nwb(session_data: dict,
         nwbfile = lims_session.to_nwb()
         with NWBHDF5IO(nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
+        logging.info("Comparing a BehaviorSession created from LIMS "
+                     "with a BehaviorSession created from NWB")
+        nwb_session = BehaviorOphysExperiment.from_nwb_path(
+            nwb_filepath_inprogress)
+        assert sessions_are_equal(lims_session, nwb_session, reraise=True)
         os.rename(nwb_filepath_inprogress, nwb_filepath)
         return {'output_path': nwb_filepath}
     except Exception as e:
