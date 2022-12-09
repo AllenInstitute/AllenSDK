@@ -42,7 +42,7 @@ class NeuropilTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "NeuropilTraces":
-        #TODO Remove try/except once VBO released.
+        # TODO Remove try/except once VBO released.
         try:
             neuropil_traces_nwb = (
                 nwbfile.processing["ophys"]
@@ -60,7 +60,6 @@ class NeuropilTraces(
             return NeuropilTraces(traces=df)
         except KeyError:
             return None
-
 
     @classmethod
     def from_data_file(cls, neuropil_file: NeuropilFile) -> "NeuropilTraces":

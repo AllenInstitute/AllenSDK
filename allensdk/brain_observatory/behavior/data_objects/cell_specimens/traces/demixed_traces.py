@@ -40,7 +40,7 @@ class DemixedTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DemixedTraces":
-        #TODO Remove try/except once VBO released.
+        # TODO Remove try/except once VBO released.
         try:
             demixed_traces_nwb = (
                 nwbfile.processing["ophys"]
