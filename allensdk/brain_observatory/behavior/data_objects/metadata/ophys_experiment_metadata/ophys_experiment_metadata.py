@@ -107,6 +107,9 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
 
     @property
     def ophys_container_id(self) -> int:
+        # TODO: Remove upon updated VBO release.
+        if self._ophys_container_id is None:
+            return None
         return self._ophys_container_id.value
 
     @property
@@ -115,10 +118,16 @@ class OphysExperimentMetadata(DataObject, LimsReadableInterface,
 
     @property
     def imaging_depth(self) -> int:
+        # TODO: Remove upon updated VBO release.
+        if self._ophys_container_id is None:
+            return None
         return self._imaging_depth.value
 
     @property
     def targeted_imaging_depth(self) -> int:
+        # TODO: Remove upon updated VBO release.
+        if self._targeted_imaging_depth is None:
+            return None
         return self._targeted_imaging_depth.value
 
     @property

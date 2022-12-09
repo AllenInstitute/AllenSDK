@@ -63,16 +63,19 @@ class DFFTraces(DataObject, RoisMixin,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DFFTraces":
-        dff_nwb = nwbfile.processing[
-            'ophys'].data_interfaces['dff'].roi_response_series['traces']
-        # dff traces stored as timepoints x rois in NWB
-        # We want rois x timepoints, hence the transpose
-        dff_traces = dff_nwb.data[:].T
+        try:
+            dff_nwb = nwbfile.processing[
+                'ophys'].data_interfaces['dff'].roi_response_series['traces']
+            # dff traces stored as timepoints x rois in NWB
+            # We want rois x timepoints, hence the transpose
+            dff_traces = dff_nwb.data[:].T
 
-        df = pd.DataFrame({'dff': [x for x in dff_traces]},
-                          index=pd.Index(data=dff_nwb.rois.table.id[:],
-                                         name='cell_roi_id'))
-        return DFFTraces(traces=df)
+            df = pd.DataFrame({'dff': [x for x in dff_traces]},
+                              index=pd.Index(data=dff_nwb.rois.table.id[:],
+                                             name='cell_roi_id'))
+            return DFFTraces(traces=df)
+        except KeyError:
+            return None
 
     @classmethod
     def from_data_file(cls, dff_file: DFFFile) -> "DFFTraces":

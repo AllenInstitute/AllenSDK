@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -144,13 +144,13 @@ class CellSpecimens(
         self,
         cell_specimen_table: pd.DataFrame,
         meta: CellSpecimenMeta,
-        dff_traces: DFFTraces,
-        demixed_traces: DemixedTraces,
-        neuropil_traces: NeuropilTraces,
-        corrected_fluorescence_traces: CorrectedFluorescenceTraces,
         events: Events,
         ophys_timestamps: OphysTimestamps,
         segmentation_mask_image_spacing: Tuple,
+        corrected_fluorescence_traces: CorrectedFluorescenceTraces,
+        dff_traces: Optional[DFFTraces] = None,
+        demixed_traces: Optional[DemixedTraces] = None,
+        neuropil_traces: Optional[NeuropilTraces] = None,
         exclude_invalid_rois=True,
     ):
         """
@@ -208,15 +208,18 @@ class CellSpecimens(
             ]
 
         # Filter/reorder rois according to cell_specimen_table
-        dff_traces.filter_and_reorder(
-            roi_ids=cell_specimen_table["cell_roi_id"].values
-        )
-        demixed_traces.filter_and_reorder(
-            roi_ids=cell_specimen_table["cell_roi_id"].values
-        )
-        neuropil_traces.filter_and_reorder(
-            roi_ids=cell_specimen_table["cell_roi_id"].values
-        )
+        if dff_traces is not None:
+            dff_traces.filter_and_reorder(
+                roi_ids=cell_specimen_table["cell_roi_id"].values
+            )
+        if demixed_traces is not None:
+            demixed_traces.filter_and_reorder(
+                roi_ids=cell_specimen_table["cell_roi_id"].values
+            )
+        if neuropil_traces is not None:
+            neuropil_traces.filter_and_reorder(
+                roi_ids=cell_specimen_table["cell_roi_id"].values
+            )
         corrected_fluorescence_traces.filter_and_reorder(
             roi_ids=cell_specimen_table["cell_roi_id"].values
         )
@@ -275,6 +278,8 @@ class CellSpecimens(
                     (arbitrary units)
 
         """
+        if self._dff_traces is None:
+            return None
         df = self.table[["cell_roi_id"]].join(
             self._dff_traces.value, on="cell_roi_id"
         )
@@ -301,6 +306,8 @@ class CellSpecimens(
                 demixed_trace: (list of float)
                     fluorescence values (arbitrary units)
         """
+        if self._demixed_traces is None:
+            return None
         df = self.table[["cell_roi_id"]].join(
             self._demixed_traces.value, on="cell_roi_id"
         )
@@ -328,6 +335,8 @@ class CellSpecimens(
                 neuropil_trace: (list of float)
                     fluorescence values (arbitrary units)
         """
+        if self._neuropil_traces is None:
+            return None
         df = self.table[["cell_roi_id"]].join(
             self._neuropil_traces.value, on="cell_roi_id"
         )
@@ -845,6 +854,8 @@ class CellSpecimens(
             neuropil_traces,
             corrected_fluorescence_traces,
         ):
+            if traces is None:
+                continue
             # validate traces contain expected roi ids
             if not np.in1d(traces.value.index, cell_roi_ids).all():
                 raise RuntimeError(

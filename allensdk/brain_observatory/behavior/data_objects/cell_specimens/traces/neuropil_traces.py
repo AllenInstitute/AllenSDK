@@ -42,20 +42,25 @@ class NeuropilTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "NeuropilTraces":
-        neuropil_traces_nwb = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["neuropil_trace"]
-            .roi_response_series["traces"]
-        )
-        # f traces stored as timepoints x rois in NWB
-        # We want rois x timepoints, hence the transpose
-        f_traces = neuropil_traces_nwb.data[:].T.copy()
-        roi_ids = neuropil_traces_nwb.rois.table.id[:].copy()
-        df = pd.DataFrame(
-            {"neuropil_trace": [x for x in f_traces]},
-            index=pd.Index(data=roi_ids, name="cell_roi_id"),
-        )
-        return NeuropilTraces(traces=df)
+        #TODO Remove try/except once VBO released.
+        try:
+            neuropil_traces_nwb = (
+                nwbfile.processing["ophys"]
+                .data_interfaces["neuropil_trace"]
+                .roi_response_series["traces"]
+            )
+            # f traces stored as timepoints x rois in NWB
+            # We want rois x timepoints, hence the transpose
+            f_traces = neuropil_traces_nwb.data[:].T.copy()
+            roi_ids = neuropil_traces_nwb.rois.table.id[:].copy()
+            df = pd.DataFrame(
+                {"neuropil_trace": [x for x in f_traces]},
+                index=pd.Index(data=roi_ids, name="cell_roi_id"),
+            )
+            return NeuropilTraces(traces=df)
+        except KeyError:
+            return None
+
 
     @classmethod
     def from_data_file(cls, neuropil_file: NeuropilFile) -> "NeuropilTraces":

@@ -30,5 +30,8 @@ class OphysContainerId(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ExperimentContainerId":
-        metadata = nwbfile.lab_meta_data['metadata']
-        return cls(ophys_container_id=metadata.ophys_container_id)
+        try:
+            metadata = nwbfile.lab_meta_data['metadata']
+            return cls(ophys_container_id=metadata.ophys_container_id)
+        except AttributeError:
+            return None

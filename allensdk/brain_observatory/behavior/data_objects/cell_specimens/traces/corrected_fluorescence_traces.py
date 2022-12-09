@@ -53,17 +53,21 @@ class CorrectedFluorescenceTraces(
             .data[:].T.copy()
         roi_ids = corr_fluorescence_traces_nwb.roi_response_series["traces"]\
             .rois.table.id[:].copy()
-        r_values = corr_fluorescence_traces_nwb.roi_response_series["r"]\
-            .data[:].copy()
-        rmse = corr_fluorescence_traces_nwb.roi_response_series["RMSE"]\
-            .data[:].copy()
-
-        df = pd.DataFrame(
-            {
+        #TODO: Remove try/except once VBO released.
+        try:
+            r_values = corr_fluorescence_traces_nwb.roi_response_series["r"]\
+                .data[:].copy()
+            rmse = corr_fluorescence_traces_nwb.roi_response_series["RMSE"]\
+                .data[:].copy()
+            data_dict = {
                 "corrected_fluorescence": [x for x in f_traces],
                 "r": r_values,
                 "RMSE": rmse,
-            },
+            } 
+        except KeyError:
+            data_dict = {"corrected_fluorescence": [x for x in f_traces]}
+        df = pd.DataFrame(
+            data=data_dict,
             index=pd.Index(data=roi_ids, name="cell_roi_id"),
         )
         return CorrectedFluorescenceTraces(traces=df)

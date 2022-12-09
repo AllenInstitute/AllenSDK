@@ -40,20 +40,24 @@ class DemixedTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DemixedTraces":
-        demixed_traces_nwb = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["demixed_trace"]
-            .roi_response_series["traces"]
-        )
-        # f traces stored as timepoints x rois in NWB
-        # We want rois x timepoints, hence the transpose
-        f_traces = demixed_traces_nwb.data[:].T.copy()
-        roi_ids = demixed_traces_nwb.rois.table.id[:].copy()
-        df = pd.DataFrame(
-            {"demixed_trace": [x for x in f_traces]},
-            index=pd.Index(data=roi_ids, name="cell_roi_id"),
-        )
-        return DemixedTraces(traces=df)
+        #TODO Remove try/except once VBO released.
+        try:
+            demixed_traces_nwb = (
+                nwbfile.processing["ophys"]
+                .data_interfaces["demixed_trace"]
+                .roi_response_series["traces"]
+            )
+            # f traces stored as timepoints x rois in NWB
+            # We want rois x timepoints, hence the transpose
+            f_traces = demixed_traces_nwb.data[:].T.copy()
+            roi_ids = demixed_traces_nwb.rois.table.id[:].copy()
+            df = pd.DataFrame(
+                {"demixed_trace": [x for x in f_traces]},
+                index=pd.Index(data=roi_ids, name="cell_roi_id"),
+            )
+            return DemixedTraces(traces=df)
+        except KeyError:
+            return None
 
     @classmethod
     def from_data_file(cls, demix_file: DemixFile) -> "DemixedTraces":

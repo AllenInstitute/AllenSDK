@@ -54,5 +54,8 @@ class TargetedImagingDepth(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "TargetedImagingDepth":
-        metadata = nwbfile.lab_meta_data["metadata"]
-        return cls(targeted_imaging_depth=metadata.targeted_imaging_depth)
+        try:
+            metadata = nwbfile.lab_meta_data["metadata"]
+            return cls(targeted_imaging_depth=metadata.targeted_imaging_depth)
+        except AttributeError:
+            return None
