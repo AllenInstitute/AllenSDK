@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.14.0] = 2022-12-12
+- Support for updated vbn release containing probe, lfp and behavior only data.
+- Updates to Ophys data in anticipation of a forthcoming updated data release
+- Various notebook updates
+- Python 3.9 support
+- Various bug fixes and quality of life improvements.
+
 ## [2.13.6] = 2022-08-04
 - bugfix when accessing stimulus presentations table for vcn data
 - updates vbn notebooks
