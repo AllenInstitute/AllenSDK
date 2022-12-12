@@ -109,9 +109,7 @@ class NotebookRunner:
             msg = f'{len(errors)} notebooks failed. Errors in: {errors}'
             logging.error(msg)
 
-            # TODO uncomment once notebooks run successfully
-            #  https://github.com/AllenInstitute/AllenSDK/issues/2611
-            # raise RuntimeError(msg)
+            raise RuntimeError(msg)
         return errors
 
     @staticmethod
