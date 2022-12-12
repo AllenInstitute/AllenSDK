@@ -195,4 +195,3 @@ def map_column_names(table, name_map=None, ignore_case=True):
     output = table.rename(columns=name_map)
 
     return output
-#

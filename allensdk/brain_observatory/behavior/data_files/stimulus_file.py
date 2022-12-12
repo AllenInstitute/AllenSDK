@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, Union
+from typing import Dict, Union, Tuple
 from pathlib import Path
 
 from cachetools import cached, LRUCache
@@ -94,6 +94,8 @@ class _StimulusFile(DataFile):
 
 
 class BehaviorStimulusFile(_StimulusFile):
+    def __init__(self, filepath: Union[str, Path]):
+        super().__init__(filepath=filepath)
 
     @classmethod
     def file_path_key(cls) -> str:
@@ -222,6 +224,30 @@ class BehaviorStimulusFile(_StimulusFile):
 
         return delta.total_seconds()
 
+    @property
+    def stimuli(self) -> Dict[str, Tuple[str, Union[str, int], int, int]]:
+        """Stimuli shown during session
+
+        Returns
+        -------
+        stimuli:
+            (stimulus type ('Image' or 'Grating'),
+             stimulus descriptor (image_name or orientation of grating in
+                degrees),
+             nonsynced time of display,
+             display frame (frame that stimuli was displayed))
+
+        """
+        # TODO implement return value as class (i.e. Image, Grating)
+        return self.data['items']['behavior']['stimuli']
+
+    def validate(self) -> "BehaviorStimulusFile":
+        if 'items' not in self.data or 'behavior' not in self.data['items']:
+            raise MalformedStimulusFileError(
+                f'Expected to find key "behavior" in "items" dict. '
+                f'Found {self.data["items"].keys()}')
+        return self
+
 
 class ReplayStimulusFile(_StimulusFile):
 
@@ -327,3 +353,8 @@ def stimulus_lookup_from_json(
         stim = ReplayStimulusFile.from_json(dict_repr=dict_repr)
         lookup_table.replay_stimulus_file = stim
     return lookup_table
+
+
+class MalformedStimulusFileError(RuntimeError):
+    """Malformed stimulus file"""
+    pass

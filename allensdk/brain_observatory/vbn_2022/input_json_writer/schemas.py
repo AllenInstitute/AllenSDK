@@ -84,7 +84,7 @@ class VBN2022InputJsonWriterSchema(argschema.ArgSchema):
                                    f"{nwb_name} more than once")
 
             unq_nwb.add(nwb_name)
-            nwb_path = nwb_dir_path / nwb_name
+            nwb_path = nwb_dir_path / f'{ecephys_id}' / nwb_name
             nwb_lookup[ecephys_id] = nwb_path
 
         data['json_path_lookup'] = json_lookup

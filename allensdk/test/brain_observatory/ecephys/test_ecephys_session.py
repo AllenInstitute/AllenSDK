@@ -66,7 +66,7 @@ def raw_mean_waveforms():
 @pytest.fixture
 def raw_channels():
     return pd.DataFrame({
-        'local_index': [0, 1, 2],
+        'probe_channel_number': [0, 1, 2],
         'probe_horizontal_position': [5, 10, 15],
         'probe_id': [0, 0, 0],
         'probe_vertical_position': [10, 22, 33],
@@ -79,7 +79,7 @@ def raw_units():
     return pd.DataFrame({
         'firing_rate': np.linspace(1, 3, 3),
         'isi_violations': [40, 0.5, 0.1],
-        'local_index': [0, 0, 1],
+        'probe_channel_number': [0, 0, 1],
         'peak_channel_id': [2, 1, 0],
         'quality': ['good', 'good', 'noise'],
         'snr': [0.1, 1.4, 10.0],

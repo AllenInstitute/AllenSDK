@@ -4,6 +4,10 @@ import datetime
 import pathlib
 import tempfile
 
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+
 
 @pytest.fixture
 def smoketest_config_fixture():
@@ -44,7 +48,8 @@ def patching_pickle_file_fixture(
     tmp_dir = tmp_path_factory.mktemp('patching_pickles')
 
     output = dict()
-    this_date = datetime.datetime(year=2020, month=6, day=7)
+    this_date = DateOfAcquisition(
+        datetime.datetime(year=2020, month=6, day=7)).value
     this_stage = 'first_stage'
     pkl_data = {'start_time': this_date,
                 'items':
@@ -57,7 +62,8 @@ def patching_pickle_file_fixture(
                     'date_of_acquisition': this_date,
                     'session_type': this_stage}
 
-    this_date = datetime.datetime(year=1998, month=3, day=14)
+    this_date = DateOfAcquisition(
+        datetime.datetime(year=1998, month=3, day=14)).value
     this_stage = 'second_stage'
     pkl_data = {'start_time': this_date,
                 'items':
@@ -70,7 +76,8 @@ def patching_pickle_file_fixture(
                     'date_of_acquisition': this_date,
                     'session_type': this_stage}
 
-    this_date = datetime.datetime(year=1974, month=7, day=22)
+    this_date = DateOfAcquisition(
+        datetime.datetime(year=1974, month=7, day=22)).value
     this_stage = 'third_stage'
     pkl_data = {'start_time': this_date,
                 'items':

@@ -4,12 +4,14 @@
 import inspect
 import logging
 import os
-from typing import Tuple, Union
+from typing import Union
 
 from pynwb import NWBFile, ProcessingModule, NWBHDF5IO
 from pynwb.base import Images
 from pynwb.image import GrayscaleImage
 
+from allensdk.brain_observatory.behavior.behavior_session import \
+    BehaviorSession
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.core import DataObject, JsonReadableInterface, \
@@ -120,7 +122,9 @@ class NWBWriter:
         self._nwb_filepath_error = nwb_filepath + '.error'
 
         logging.basicConfig(
-            format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+            format='%(asctime)s - %(process)s - %(levelname)s - %(message)s',
+            level=logging.INFO
+        )
 
         # Clean out files from previous runs:
         for filename in [self.nwb_filepath_inprogress,
@@ -143,9 +147,15 @@ class NWBWriter:
         kwargs: kwargs sent to `from_json`, `from_nwb`, `to_nwb`
 
         """
+        from_json_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_json).parameters}
+        json_session = self._serializer.from_json(
+            session_data=self._session_data, **from_json_kwargs)
+
         try:
-            json_session, nwbfile = self._write_nwb(
-                session_data=self._session_data, **kwargs)
+            nwbfile = self._write_nwb(
+                session=json_session, **kwargs)
             self._compare_sessions(nwbfile=nwbfile, json_session=json_session,
                                    **kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
@@ -157,8 +167,8 @@ class NWBWriter:
 
     def _write_nwb(
             self,
-            session_data: dict,
-            **kwargs) -> Tuple[DataObject, NWBFile]:
+            session: BehaviorSession,
+            **kwargs) -> NWBFile:
         """
 
         Parameters
@@ -170,19 +180,14 @@ class NWBWriter:
         -------
 
         """
-        from_json_kwargs = {
-            k: v for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.from_json).parameters}
         to_nwb_kwargs = {
             k: v for k, v in kwargs.items()
             if k in inspect.signature(self._serializer.to_nwb).parameters}
-        json_session = self._serializer.from_json(
-            session_data=session_data, **from_json_kwargs)
-        nwbfile = json_session.to_nwb(**to_nwb_kwargs)
+        nwbfile = session.to_nwb(**to_nwb_kwargs)
 
         with NWBHDF5IO(self.nwb_filepath_inprogress, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
-        return json_session, nwbfile
+        return nwbfile
 
     def _compare_sessions(self, nwbfile: NWBFile, json_session: DataObject,
                           **kwargs):

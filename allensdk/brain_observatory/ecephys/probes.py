@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union, Callable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -179,17 +179,64 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
         return probes
 
     @classmethod
-    def from_nwb(cls, nwbfile: NWBFile) -> "Probes":
+    def from_nwb(
+            cls,
+            nwbfile: NWBFile,
+            probe_data_path_map: Optional[
+                Dict[str, Union[str, Callable[[], str]]]] = None
+    ) -> "Probes":
+        """
+
+        Parameters
+        ----------
+        nwbfile
+        probe_data_path_map
+            See description in `BehaviorEcephysSession.from_nwb`
+
+        Returns
+        -------
+        `NWBFile` with probes added
+        """
+        if probe_data_path_map is None:
+            probe_data_path_map = dict()
         probes = [
             Probe.from_nwb(
                 nwbfile=nwbfile,
-                probe_name=probe_name)
+                probe_name=probe_name,
+                probe_nwb_path=probe_data_path_map.get(probe_name)
+            )
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+    def to_nwb(
+            self,
+            nwbfile: NWBFile
+    ) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
+        """
+        Adds probes to NWBFile instance
+
+        Parameters
+        ----------
+        nwbfile
+
+        Returns
+        -------
+        (session `NWBFile` instance,
+         mapping from probe name to optional probe `NWBFile` instance.
+         Contains LFP and CSD data if it exists)
+
+         Notes
+         ------
+         We return a map from probe name to nwb file separately, since the LFP
+         data is large, and we want this written separately from the session
+         nwb file
+        """
+        probe_nwbfile_map = dict()
         for probe in self.probes:
-            probe.to_nwb(nwbfile=nwbfile)
+            _, probe_nwbfile = probe.to_nwb(
+                nwbfile=nwbfile
+            )
+            probe_nwbfile_map[probe.name] = probe_nwbfile
 
         nwbfile.units = pynwb.misc.Units.from_dataframe(
             self.get_units_table(
@@ -219,7 +266,7 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
                                "samples)",
         )
 
-        return nwbfile
+        return nwbfile, probe_nwbfile_map
 
     def __iter__(self):
         for p in self.probes:

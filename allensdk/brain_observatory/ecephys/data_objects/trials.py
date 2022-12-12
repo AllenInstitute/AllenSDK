@@ -5,8 +5,7 @@ import numpy as np
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import (
     Trial)
 from allensdk.brain_observatory.behavior.data_objects.\
-    trials.trial_table import (
-        TrialTable)
+    trials.trials import Trials
 
 
 class VBNTrial(Trial):
@@ -98,7 +97,7 @@ class VBNTrial(Trial):
         return trial_dict, change_time
 
 
-class VBNTrialTable(TrialTable):
+class VBNTrials(Trials):
 
     @classmethod
     def trial_class(cls):
@@ -122,4 +121,4 @@ class VBNTrialTable(TrialTable):
 
     @property
     def change_time(self):
-        return self.value['change_time_no_display_delay']
+        return self.data['change_time_no_display_delay']

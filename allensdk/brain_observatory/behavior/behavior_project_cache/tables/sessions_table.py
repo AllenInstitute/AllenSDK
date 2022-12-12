@@ -1,5 +1,5 @@
 import re
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import pandas as pd
 
@@ -15,6 +15,10 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     ProjectTable
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
 
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.licks import Licks
+
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.full_genotype import \
     FullGenotype
@@ -22,6 +26,13 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.reporter_line import \
     ReporterLine
+from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import \
+    Trials
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import db_connection_creator
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    multiprocessing_helper
 
 
 class SessionsTable(ProjectTable):
@@ -32,7 +43,9 @@ class SessionsTable(ProjectTable):
             self, df: pd.DataFrame,
             fetch_api: BehaviorProjectLimsApi,
             suppress: Optional[List[str]] = None,
-            ophys_session_table: Optional[BehaviorOphysSessionsTable] = None):
+            ophys_session_table: Optional[BehaviorOphysSessionsTable] = None,
+            include_trial_metrics: bool = False
+    ):
         """
         Parameters
         ----------
@@ -44,12 +57,18 @@ class SessionsTable(ProjectTable):
             columns to drop from table
         ophys_session_table
             BehaviorOphysSessionsTable, to optionally merge in ophys data
+        include_trial_metrics
+            Whether to include trial metrics. Set to False to skip. Is
+            expensive to calculate these metrics since the data must be read
+            from the pkl file for each session
         """
         self._fetch_api = fetch_api
         self._ophys_session_table = ophys_session_table
+        self._include_trial_metrics = include_trial_metrics
         super().__init__(df=df, suppress=suppress)
 
     def postprocess_additional(self):
+        # Add subject metadata
         self._df['reporter_line'] = self._df['reporter_line'].apply(
             ReporterLine.parse)
         self._df['cre_line'] = self._df['full_genotype'].apply(
@@ -57,8 +76,10 @@ class SessionsTable(ProjectTable):
         self._df['indicator'] = self._df['reporter_line'].apply(
             lambda x: ReporterLine(x).parse_indicator())
 
+        # add session number
         self.__add_session_number()
 
+        # add prior exposure
         self._df['prior_exposures_to_session_type'] = \
             get_prior_exposures_to_session_type(df=self._df)
         self._df['prior_exposures_to_image_set'] = \
@@ -67,6 +88,23 @@ class SessionsTable(ProjectTable):
             get_prior_exposures_to_omissions(df=self._df,
                                              fetch_api=self._fetch_api)
 
+        if self._include_trial_metrics:
+            # add trial metrics
+            trial_metrics = multiprocessing_helper(
+                target=self._get_trial_metrics_helper,
+                behavior_session_ids=self._df.index.tolist(),
+                lims_engine=db_connection_creator(
+                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP),
+                progress_bar_title='Getting trial metrics for each session'
+            )
+            trial_metrics = pd.DataFrame(trial_metrics).set_index(
+                'behavior_session_id')
+            self._df = self._df.merge(
+                trial_metrics,
+                left_index=True,
+                right_index=True)
+
+        # Add data from ophys session
         if self._ophys_session_table is not None:
             # Merge in ophys data
             self._df = self._df.reset_index() \
@@ -81,14 +119,6 @@ class SessionsTable(ProjectTable):
                 self._df['date_of_acquisition_behavior']
             self._df = self._df.drop(['date_of_acquisition_behavior',
                                       'date_of_acquisition_ophys'], axis=1)
-
-            # Session_type appears 2 times in dataframe. Select
-            # session_type_behavior and delete the duplicates
-            self._df['session_type'] = \
-                self._df['session_type_behavior']
-            self._df = self._df.drop(
-                ['session_type_behavior',
-                 'session_type_ophys'], axis=1)
 
     def __add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""
@@ -106,3 +136,43 @@ class SessionsTable(ProjectTable):
 
         self._df.loc[session_type.index, 'session_number'] = \
             session_type.apply(parse_session_number)
+
+    @staticmethod
+    def _get_trial_metrics_helper(*args) -> Dict:
+        """Gets trial metrics for a single session.
+        Meant to be called by a multiprocessing worker"""
+        behavior_session_id, db_conn = args[0]
+
+        stimulus_file = BehaviorStimulusFile.from_lims(
+            behavior_session_id=behavior_session_id,
+            db=db_conn
+        )
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            monitor_delay=0.0
+        )
+
+        trials = Trials.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            licks=Licks.from_stimulus_file(
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps
+            ),
+            rewards=Rewards.from_stimulus_file(
+                stimulus_file=stimulus_file,
+                stimulus_timestamps=stimulus_timestamps
+            )
+        )
+
+        return {
+            'behavior_session_id': behavior_session_id,
+            'trial_count': trials.trial_count,
+            'go_trial_count': trials.go_trial_count,
+            'catch_trial_count': trials.catch_trial_count,
+            'hit_trial_count': trials.hit_trial_count,
+            'miss_trial_count': trials.miss_trial_count,
+            'false_alarm_trial_count': trials.false_alarm_trial_count,
+            'correct_reject_trial_count': trials.correct_reject_trial_count,
+            'engaged_trial_count': trials.get_engaged_trial_count()
+        }

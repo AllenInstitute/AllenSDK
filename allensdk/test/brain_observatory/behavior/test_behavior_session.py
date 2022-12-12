@@ -4,9 +4,36 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 
 import pytest
+import pathlib
+from pynwb import NWBHDF5IO
 
 from allensdk.test.brain_observatory.behavior.data_objects.lims_util import \
     LimsTest
+
+
+@pytest.mark.requires_bamboo
+def test_nwb_end_to_end_session(
+        tmpdir_factory,
+        helper_functions):
+    session_id = 870987812
+    tmpdir = tmpdir_factory.mktemp('session_nwb_end_to_end')
+    tmpdir = pathlib.Path(tmpdir)
+    nwb_path = tmpdir / f'session_{session_id}.nwb'
+    session = BehaviorSession.from_lims(
+            behavior_session_id=session_id)
+    nwb_file = session.to_nwb()
+    with NWBHDF5IO(nwb_path, 'w') as nwb_file_writer:
+        nwb_file_writer.write(nwb_file)
+
+    roundtrip = BehaviorSession.from_nwb_path(
+            nwb_path=str(nwb_path.resolve().absolute()))
+
+    assert sessions_are_equal(
+            session,
+            roundtrip,
+            reraise=True)
+
+    helper_functions.windows_safe_cleanup_dir(tmpdir)
 
 
 @pytest.fixture
@@ -73,12 +100,10 @@ def test_behavior_session_list_data_attributes_and_methods(monkeypatch):
 @pytest.mark.nightly
 def test_behavior_session_equivalent_json_lims(session_data_fixture):
 
-    json_session = BehaviorSession.from_json(session_data_fixture,
-                                             skip_eye_tracking=True)
+    json_session = BehaviorSession.from_json(session_data_fixture)
 
     behavior_session_id = session_data_fixture['behavior_session_id']
-    lims_session = BehaviorSession.from_lims(behavior_session_id,
-                                             skip_eye_tracking=True)
+    lims_session = BehaviorSession.from_lims(behavior_session_id)
 
     assert sessions_are_equal(json_session, lims_session, reraise=True)
 

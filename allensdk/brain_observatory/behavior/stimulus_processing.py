@@ -1,10 +1,11 @@
 import pickle
 import warnings
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Tuple, Union, Optional, Set
 
 import numpy as np
 import pandas as pd
 
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import \
     StimulusTemplate, StimulusTemplateFactory
@@ -414,7 +415,10 @@ def unpack_change_log(change):
     )
 
 
-def get_visual_stimuli_df(data, time) -> pd.DataFrame:
+def get_visual_stimuli_df(
+        data,
+        time
+) -> pd.DataFrame:
     """
     This function loads the stimuli and the omitted stimuli into a dataframe.
     These stimuli are loaded from the input data, where the set_log and
@@ -433,8 +437,8 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     stimuli = data['items']['behavior']['stimuli']
     n_frames = len(time)
     visual_stimuli_data = []
-    for stimuli_group_name, stim_dict in stimuli.items():
-        for idx, (attr_name, attr_value, _time, frame,) in \
+    for stim_dict in stimuli.values():
+        for idx, (attr_name, attr_value, _, frame) in \
                 enumerate(stim_dict["set_log"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
@@ -450,12 +454,7 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                 *stimulus_epoch
             )
 
-            for idx, (epoch_start, epoch_end,) in enumerate(draw_epochs):
-                # visual stimulus doesn't actually change until start of
-                # following frame, so we need to bump the
-                # epoch_start & epoch_end to get the timing right
-                epoch_start += 1
-                epoch_end += 1
+            for epoch_start, epoch_end in draw_epochs:
 
                 visual_stimuli_data.append({
                     "orientation": orientation,
@@ -466,7 +465,7 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                     "duration": time[epoch_end] - time[epoch_start],
                     # this will always work because an epoch
                     # will never occur near the end of time
-                    "omitted": False,
+                    "omitted": False
                 })
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
@@ -512,6 +511,19 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     return df
 
 
+def get_image_names(
+        behavior_stimulus_file: BehaviorStimulusFile
+) -> Set[str]:
+    """Gets set of image names shown during behavior session"""
+    stimuli = behavior_stimulus_file.stimuli
+    image_names = set()
+    for stim_dict in stimuli.values():
+        for attr_name, attr_value, _, _ in stim_dict["set_log"]:
+            if attr_name.lower() == 'image':
+                image_names.add(attr_value)
+    return image_names
+
+
 def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     """
     Returns whether a stimulus is a change stimulus
@@ -547,3 +559,150 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     is_change = is_change.fillna(False)
 
     return is_change
+
+
+def get_flashes_since_change(
+        stimulus_presentations: pd.DataFrame) -> pd.Series:
+    """ Calculate the number of times an images is flashed between changes.
+
+    Parameters
+    ----------
+    stimulus_presentations : pandas.DataFrame
+        Table of presented stimuli with ``is_change`` column already
+        calculated.
+
+    Returns
+    -------
+    flashes_since_change : pandas.Series
+        Number of times the same image is flashed between image changes.
+    """
+    flashes_since_change = pd.Series(data=np.zeros(len(stimulus_presentations),
+                                                   dtype=float),
+                                     index=stimulus_presentations.index,
+                                     name='flashes_since_change')
+    for idx, (pd_index, row) in enumerate(stimulus_presentations.iterrows()):
+        omitted = row['omitted']
+        if pd.isna(row['omitted']):
+            omitted = False
+        if row['image_name'] == 'omitted' or omitted:
+            flashes_since_change.iloc[idx] = flashes_since_change.iloc[idx - 1]
+        else:
+            if row['is_change'] or idx == 0:
+                flashes_since_change.iloc[idx] = 0
+            else:
+                flashes_since_change.iloc[idx] = \
+                    flashes_since_change.iloc[idx - 1] + 1
+    return flashes_since_change
+
+
+def compute_trials_id_for_stimulus(
+        stim_pres_table: pd.DataFrame,
+        trials_table: pd.DataFrame) -> pd.Series:
+    """Add an id to allow for merging of the stimulus presentations
+    table with the trials table.
+
+    Parameters
+    ----------
+    stim_pres_table : pandas.DataFrame
+        Pandas stimulus table to create trials_id from.
+    trials_table : pandas.DataFrame
+        Trials table to create id from using trial start times.
+
+    Returns
+    -------
+    trials_ids : pd.Series
+        Unique id to allow merging of the stim table with the trials table.
+        Null values are represented by -1.
+
+    Note
+    ----
+    ``trials_id`` values are copied from active stimulus blocks into
+    passive stimulus/replay blocks that contain the same image ordering and
+    length.
+    """
+    stim_pres_sorted = stim_pres_table.sort_values('start_time')
+    trials_sorted = trials_table.sort_values('start_time')
+    # Create a placeholder for the trials_id.
+    trials_ids = pd.Series(
+        data=np.full(len(stim_pres_sorted), -1, dtype=int),
+        index=stim_pres_sorted.index,
+        name='trials_id')
+    if 'active' in stim_pres_sorted.columns:
+        has_active = True
+        active_sorted = stim_pres_sorted.active
+    else:
+        has_active = False
+        active_sorted = pd.Series(
+            data=np.zeros(len(stim_pres_sorted), dtype=bool),
+            index=stim_pres_sorted.index,
+            name='active')
+
+    # Find stimulus blocks that start within a trial. Copy the trial_id
+    # into our new trials_ids series.
+    for idx, trial in trials_sorted.iterrows():
+        stim_mask = (stim_pres_sorted.start_time > trial.start_time) \
+                    & (stim_pres_sorted.start_time < trial.stop_time)
+        trials_ids[stim_mask] = idx
+        if not has_active:
+            active_sorted[stim_mask] = True
+
+    # The code below finds all stimulus blocks that contain images/trials
+    # and attempts to detect blocks that are identical to copy the associated
+    # trials_ids into those blocks. In the parlance of the data this is
+    # copying the active stimulus block data into the passive stimulus block.
+
+    # Get the block ids for the behavior trial presentations
+    stim_blocks = stim_pres_sorted.stimulus_block
+    stim_image_names = stim_pres_sorted.image_name
+    active_stim_blocks = stim_blocks[active_sorted].unique()
+    # Find passive blocks that show images for potential copying of the active
+    # into a passive stimulus block.
+    passive_stim_blocks = stim_blocks[
+        np.logical_and(~active_sorted, ~stim_image_names.isna())].unique()
+
+    # Copy the trials_id into the passive block if it exists.
+    if len(passive_stim_blocks) > 0:
+        for active_stim_block in active_stim_blocks:
+            active_block_mask = stim_blocks == active_stim_block
+            active_images = stim_image_names[active_block_mask].values
+            for passive_stim_block in passive_stim_blocks:
+                passive_block_mask = stim_blocks == passive_stim_block
+                if np.array_equal(active_images,
+                                  stim_image_names[passive_block_mask].values):
+                    trials_ids.loc[passive_block_mask] = \
+                        trials_ids[active_block_mask].values
+
+    return trials_ids.sort_index()
+
+
+def fix_omitted_end_frame(stim_pres_table: pd.DataFrame) -> pd.DataFrame:
+    """Fill NaN ``end_frame`` values for omitted frames.
+
+    Additionally, change type of ``end_frame`` to int.
+
+    Parameters
+    ----------
+    stim_pres_table : `pandas.DataFrame`
+        Input stimulus table to fix/fill omitted ``end_frame`` values.
+
+    Returns
+    -------
+    output : `pandas.DataFrame`
+        Copy of input DataFrame with filled omitted, ``end_frame`` values and
+        fixed typing.
+    """
+    median_stim_frame_duration = np.nanmedian(
+        stim_pres_table["end_frame"] - stim_pres_table["start_frame"]
+    )
+    omitted_end_frames = (
+        stim_pres_table[stim_pres_table['omitted']]['start_frame']
+        + median_stim_frame_duration
+    )
+    stim_pres_table.loc[stim_pres_table['omitted'], 'end_frame'] = \
+        omitted_end_frames
+
+    stim_dtypes = stim_pres_table.dtypes.to_dict()
+    stim_dtypes['start_frame'] = int
+    stim_dtypes['end_frame'] = int
+
+    return stim_pres_table.astype(stim_dtypes)

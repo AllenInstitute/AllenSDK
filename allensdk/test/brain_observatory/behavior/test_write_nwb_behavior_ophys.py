@@ -32,7 +32,6 @@ def test_write_behavior_ophys_nwb_no_file():
         write_behavior_ophys_nwb(
             session_data=None,
             nwb_filepath='',
-            skip_eye_tracking=True
         )
 
 
@@ -74,7 +73,6 @@ def test_write_behavior_ophys_nwb_with_file(tmpdir):
             write_behavior_ophys_nwb(
                 session_data=None,
                 nwb_filepath=str(fake_nwb_fp),
-                skip_eye_tracking=True
             )
 
             # Check that the new .error file exists, and that we

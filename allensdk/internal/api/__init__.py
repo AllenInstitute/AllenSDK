@@ -69,7 +69,7 @@ class PostgresQueryMixin(object):
         )
 
     def select_one(self, query):
-        data = self.select(query).to_dict('record')
+        data = self.select(query).to_dict('records')
         if len(data) == 1:
             return data[0]
         return {}

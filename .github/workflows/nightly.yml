@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '05 6 * * *'
 
+
 jobs:
   onprem:
     name: python ${{ matrix.image }} on-prem test
@@ -10,7 +11,7 @@ jobs:
     strategy:
       matrix:
         image: ["allensdk_local_py37:latest"]
-        branch: ["master", "rc/2.16.1"]
+        branch: ["master", "rc/**"]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -29,11 +30,12 @@ jobs:
                                 pip install -r test_requirements.txt; \
                                 pip install -e .; \
                                 python -m pytest \
+                                    --log-level=INFO \
                                     --capture=no \
                                     --cov=allensdk \
                                     --cov-config coveragerc \
                                     --cov-report html \
                                     --junitxml=test-reports/test.xml \
                                     --boxed \
-                                    --numprocesses 4 \
+                                    --numprocesses auto \
                                     --durations=0"

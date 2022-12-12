@@ -94,7 +94,8 @@ class NwbConfigErrorLog(object):
 
 def vbn_nwb_config_from_ecephys_session_id_list(
         ecephys_session_id_list: List[int],
-        probes_to_skip: Optional[List[dict]]) -> dict:
+        probes_to_skip: Optional[List[dict]]
+) -> dict:
     """
     Return a list of dicts. Each dict the specification for
     an NWB writer job, suitable for serialization with
@@ -153,10 +154,11 @@ def vbn_nwb_config_from_ecephys_session_id_list(
         session_id = session['ecephys_session_id']
 
         probe_list = probe_input_from_ecephys_session_id(
-                        ecephys_session_id=session_id,
-                        probe_ids_to_skip=probe_ids_to_skip,
-                        lims_connection=lims_connection,
-                        error_log=error_log)
+            ecephys_session_id=session_id,
+            probe_ids_to_skip=probe_ids_to_skip,
+            lims_connection=lims_connection,
+            error_log=error_log
+        )
 
         session['probes'] = probe_list
 
@@ -413,11 +415,91 @@ def session_input_from_ecephys_session_id_list(
     return result
 
 
+def _get_probe_analysis_run_from_probe_id(
+        lims_connection: PostgresQueryMixin,
+        probe_id: int,
+        lims_strategy: str
+):
+    query = f'''
+    SELECT earp.id
+    FROM ecephys_analysis_run_probes earp
+    JOIN ecephys_analysis_runs ear on ear.id = earp.ecephys_analysis_run_id
+    WHERE earp.ecephys_probe_id = {probe_id} and
+        job_strategy_class = '{lims_strategy}' and
+        ear.current
+    '''
+    res = lims_connection.select_one(query)
+    if not res:
+        raise OneResultExpectedError(
+            f'Expected to find one analysis probe run for probe '
+            f'{probe_id}')
+    return res['id']
+
+
+def _get_probe_lfp_meta(
+        lims_connection: PostgresQueryMixin,
+        probe_id: int
+):
+    """Gets filepaths for files needed to build LFP data
+
+    Parameters
+    ----------
+    lims_connection
+    probe_id
+
+    """
+    lfp_subsampling_run_well_known_files = [
+        'EcephysSubsampledLfpContinuous',
+        'EcephysSubsampledLfpTimestamps',
+        'EcephysSubsampledChannelStates'
+    ]
+    current_source_density_well_known_files = [
+        'EcephysCurrentSourceDensity'
+    ]
+    probe_lfp_subsampling_run_id = _get_probe_analysis_run_from_probe_id(
+        lims_connection=lims_connection,
+        probe_id=probe_id,
+        lims_strategy='EcephysLfpSubsamplingStrategy'
+    )
+    probe_current_source_density_run_id = \
+        _get_probe_analysis_run_from_probe_id(
+            lims_connection=lims_connection,
+            probe_id=probe_id,
+            lims_strategy='EcephysCurrentSourceDensityStrategy'
+        )
+    probe_lfp_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=lfp_subsampling_run_well_known_files,
+        attachable_type='EcephysAnalysisRunProbe',
+        attachable_id=probe_lfp_subsampling_run_id)
+    probe_csd_well_known_files = wkf_path_from_attachable(
+        lims_connection=lims_connection,
+        wkf_type_name=current_source_density_well_known_files,
+        attachable_type='EcephysAnalysisRunProbe',
+        attachable_id=probe_current_source_density_run_id)
+
+    lfp = {
+        'input_data_path':
+            probe_lfp_well_known_files.get(
+                'EcephysSubsampledLfpContinuous'),
+        'input_timestamps_path':
+            probe_lfp_well_known_files.get(
+                'EcephysSubsampledLfpTimestamps'),
+        'input_channels_path':
+            probe_lfp_well_known_files.get(
+                'EcephysSubsampledChannelStates'),
+        'csd_path': probe_csd_well_known_files.get(
+            'EcephysCurrentSourceDensity')
+    }
+    return lfp
+
+
 def probe_input_from_ecephys_session_id(
         ecephys_session_id: int,
         probe_ids_to_skip: Optional[List[int]],
         lims_connection: PostgresQueryMixin,
-        error_log: NwbConfigErrorLog) -> List[dict]:
+        error_log: NwbConfigErrorLog,
+) -> List[dict]:
     """
     Get the list of probe specifications, excluding the lists
     of channels and units, for a given ecephys_session_id
@@ -457,7 +539,6 @@ def probe_input_from_ecephys_session_id(
     probes_table.drop(
         labels=['ecephys_session_id',
                 'phase',
-                'has_lfp_data',
                 'unit_count',
                 'channel_count',
                 'structure_acronyms'],
@@ -488,8 +569,7 @@ def probe_input_from_ecephys_session_id(
 
     for probe_id in probe_id_list:
         data = probes_table[probe_id]
-        data['csd_path'] = None
-        data['lfp'] = None
+        has_lfp = data.pop('has_lfp_data')
         data['id'] = probe_id
 
         wkf_path_lookup = wkf_path_from_attachable(
@@ -500,6 +580,15 @@ def probe_input_from_ecephys_session_id(
         for key_pair in input_from_wkf_probe:
             data[key_pair[0]] = wkf_path_lookup.get(key_pair[1], None)
 
+        if has_lfp:
+            lfp_meta = _get_probe_lfp_meta(
+                lims_connection=lims_connection,
+                probe_id=probe_id
+            )
+            data['csd_path'] = lfp_meta.pop('csd_path')
+            data['lfp'] = lfp_meta
+        else:
+            data['lfp'] = None
         probe_list.append(_nan_to_none(data))
 
     probe_list = _add_spike_times_path(
@@ -765,7 +854,8 @@ def _raw_eye_tracking_geometry_from_equipment_id(
                         equipment_id=equipment_id,
                         config_type=name,
                         lims_connection=lims_connection)
-        this_df = this_df.loc[this_df.active_date <= date_of_acquisition]
+        this_df = this_df.loc[
+            this_df.active_date.dt.date <= date_of_acquisition]
         this_df = this_df.iloc[this_df.active_date.idxmax()]
         this_config = dict()
         this_config['center_x_mm'] = this_df.center_x_mm

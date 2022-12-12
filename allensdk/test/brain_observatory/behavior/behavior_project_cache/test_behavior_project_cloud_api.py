@@ -95,13 +95,19 @@ def mock_cache(request, tmpdir):
             {
                 "behavior_session_table": pd.DataFrame({
                     "behavior_session_id": [1, 2, 3, 4],
+                    "mouse_id": ['1'] * 4,
+                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 4),
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]],
                     "file_id": [4, 5, 6, None]}),
                 "ophys_session_table": pd.DataFrame({
                     "ophys_session_id": [10, 11, 12, 13],
+                    "mouse_id": ['1'] * 4,
+                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 4),
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]]}),
                 "ophys_experiment_table": pd.DataFrame({
                     "ophys_experiment_id": [4, 5, 6, 7, 8, 9],
+                    "mouse_id": ['1'] * 6,
+                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 6),
                     "file_id": [4, 5, 6, 7, 8, 9]}),
                 "ophys_cells_table": pd.DataFrame({
                     "cell_roi_id": [4, 5, 6],
@@ -150,7 +156,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
 
     # get_behavior_session returns expected value
     # both directly and via experiment table
-    def mock_nwb(nwb_path, skip_eye_tracking=False):
+    def mock_nwb(nwb_path):
         return nwb_path
     monkeypatch.setattr(cloudapi.BehaviorSession, "from_nwb_path", mock_nwb)
     assert api.get_behavior_session(2) == "5"

@@ -374,20 +374,10 @@ class Trial:
         can implement different logic as needed.
         """
 
-        # In the code below, change_frame is incremented by one
-        # relative to its naive value in the pickle file. This
-        # is because the visual stimulus does not actually
-        # change until the start of the following frame.
-        #
-        # This behavior was confirmed with the MPE team
-        # over email in mid October 2021
-
         if go or auto_rewarded:
             change_frame = event_dict.get(('stimulus_changed', ''))['frame']
-            change_frame += 1
         elif catch:
             change_frame = event_dict.get(('sham_change', ''))['frame']
-            change_frame += 1
         else:
             change_frame = float("nan")
 

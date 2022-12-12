@@ -1,11 +1,11 @@
+from unittest.mock import patch, PropertyMock
+
 import pytest
 import pandas as pd
 import numpy as np
 
-from allensdk.brain_observatory.behavior import trials_processing
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
-    TrialTable
+from allensdk.brain_observatory.behavior.data_objects.trials.trials \
+    import Trials
 
 _test_response_latency_0 = np.array(
     [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
@@ -75,8 +75,8 @@ _test_starttime_0 = np.array(
      550.44972206, 553.46895029, 556.4714981, 559.47403694, 562.47658507])
 
 expected_result_0 = np.array([
-    np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf,
-    np.inf, np.inf, 0.85743611, 0.82215855, 0.79754855, 0.77420232,
+    np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
+    np.nan, np.nan, 0.85743611, 0.82215855, 0.79754855, 0.77420232,
     0.74532604, 0.72504419, 0.73828876, 0.73168092, 0.73168145,
     0.73844044, 0.745635, 0.75997116, 0.73889553, 0.7457893, 0.73212764,
     0.72533739, 0., 0., 0., 0., 0., 0., 0., 0.83147215, 0.76759434,
@@ -104,8 +104,8 @@ expected_result_0 = np.array([
 ])
 
 expected_result_1 = np.array(
-    [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf,
-     np.inf, np.inf, 1.811146, 1.944290, 1.898119, 1.811146, 1.733465,
+    [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
+     np.nan, np.nan, 1.811146, 1.944290, 1.898119, 1.811146, 1.733465,
      1.771897, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
      0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
      0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
@@ -156,10 +156,18 @@ expected_result_1 = np.array(
     ),
 ])
 def test_calculate_reward_rate(kwargs, expected):
-    assert np.allclose(
-        trials_processing.calculate_reward_rate(**kwargs),
-        expected,
-    ), "calculated reward rate should match expected reward rate :("
+    with patch.object(Trials, '_calculate_response_latency_list',
+                      wraps=lambda: kwargs['response_latency']):
+        with patch.object(Trials, 'start_time',
+                          new_callable=PropertyMock) as mock_start_time:
+            mock_start_time.return_value = pd.Series(kwargs['starttime'])
+            trials = Trials(trials=pd.DataFrame(), response_window_start=0)
+            reward_rate = trials.calculate_reward_rate(
+                trial_window=kwargs['trial_window'],
+                initial_trials=kwargs['initial_trials']
+            )
+    assert np.allclose(reward_rate, expected, equal_nan=True), \
+        "calculated reward rate should match expected reward rate :("
 
 
 def trial_data_and_expectation_0():
@@ -352,8 +360,8 @@ def trial_data_and_expectation_2():
             ])
 def test_calculate_response_latency_list(
         trials, response_window_start, expected):
-    latencies = trials_processing.calculate_response_latency_list(
-            TrialTable(trials), response_window_start)
+    trials = Trials(trials=trials, response_window_start=response_window_start)
+    latencies = trials._calculate_response_latency_list()
     np.testing.assert_allclose(latencies, expected)
 
 
@@ -386,15 +394,17 @@ def trials_example():
     return pd.DataFrame(trials_dict)
 
 
-@pytest.mark.parametrize("session_type", ["OPHYS_5_images_B_passive",
-                                          "OPHYS_5_images_B"])
-def test_construct_rolling_performance_df(trials_example, session_type):
+@pytest.mark.parametrize('is_passive', [True, False])
+def test_construct_rolling_performance_df(trials_example, is_passive):
     """tests that ending a session_type with "passive" replaces
     rolling_dprime values with all zeros
     """
-    df = trials_processing.construct_rolling_performance_df(
-            TrialTable(trials_example), 0.15, session_type)
-    if session_type.endswith("passive"):
+    # Mouse not rewarded if passive
+    trials_example['reward_volume'] = 0 if is_passive else [0, .25, 0, 0]
+
+    trials = Trials(trials=trials_example, response_window_start=0.15)
+    df = trials.rolling_performance
+    if is_passive:
         assert np.all(df["rolling_dprime"].values == 0.0)
     else:
         assert not np.all(df["rolling_dprime"].values == 0.0)

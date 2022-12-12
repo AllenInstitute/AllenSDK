@@ -42,6 +42,8 @@
     "date_of_acquisition",
     "ecephys_session_id",
     "equipment_name",
+    "file_id",
+    "file_path",
     "genotype",
     "image_set",
     "mouse_id",
@@ -62,7 +64,9 @@
     "name",
     "phase",
     "sampling_rate",
-    "unit_count"
+    "unit_count",
+    "file_id",
+    "file_path"
   ],
   "channels.csv": [
     "anterior_posterior_ccf_coordinate",

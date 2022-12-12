@@ -72,7 +72,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             fetch_tries: int = 2,
             manifest: Optional[Union[str, Path]] = None,
             version: Optional[str] = None,
-            cache: bool = True):
+            cache: bool = True
+    ):
         """ Entrypoint for accessing visual behavior data. Supports
         access to summaries of session data and provides tools for
         downloading detailed session data (such as dff traces).
@@ -133,7 +134,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             index_column: str = "ophys_session_id",
             as_df=True,
             include_behavior_data=True,
-            passed_only=True,
             n_workers: int = 1
     ) -> Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
@@ -170,8 +170,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if include_behavior_data:
             # Merge behavior data in
             behavior_sessions_table = self.get_behavior_session_table(
-                suppress=suppress, as_df=True, include_ophys_data=False,
-                n_workers=n_workers)
+                suppress=suppress,
+                as_df=True,
+                include_ophys_data=False,
+                n_workers=n_workers,
+                include_trial_metrics=False
+            )
             ophys_sessions = behavior_sessions_table.merge(
                 ophys_sessions,
                 left_index=True,
@@ -181,14 +185,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         sessions = BehaviorOphysSessionsTable(df=ophys_sessions,
                                               suppress=suppress,
                                               index_column=index_column)
-        if passed_only:
-            oet = self.get_ophys_experiment_table(passed_only=True,
-                                                  n_workers=n_workers)
-            for i in sessions.table.index:
-                sub_df = oet.query(f"ophys_session_id=={i}")
-                values = list(set(sub_df["ophys_container_id"].values))
-                values.sort()
-                sessions.table.at[i, "ophys_container_id"] = values
 
         return sessions.table if as_df else sessions
 
@@ -196,7 +192,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             self,
             suppress: Optional[List[str]] = None,
             as_df=True,
-            passed_only=True,
             n_workers: int = 1
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
@@ -205,9 +200,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             dataframe.
         :type suppress: list of str
         :param as_df: whether to return as df or as SessionsTable
-        :param passed_only: if True, return only experiments flagged as
-                            'passed' and containers flagged as 'published'
-                            (default=True)
         :param n_workers
             Number of parallel processes to use for i.e reading from pkl files
         :rtype: pd.DataFrame
@@ -229,13 +221,14 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         # Merge behavior data in
         behavior_sessions_table = self.get_behavior_session_table(
             suppress=suppress, as_df=True, include_ophys_data=False,
-            n_workers=n_workers)
+            n_workers=n_workers,
+            include_trial_metrics=False
+        )
         experiments = behavior_sessions_table.merge(
             experiments, left_index=True, right_on='behavior_session_id',
             suffixes=('_behavior', '_ophys'))
         experiments = ExperimentsTable(df=experiments,
-                                       suppress=suppress,
-                                       passed_only=passed_only)
+                                       suppress=suppress)
         return experiments.table if as_df else experiments
 
     def get_ophys_cells_table(self) -> pd.DataFrame:
@@ -264,8 +257,8 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             suppress: Optional[List[str]] = None,
             as_df=True,
             include_ophys_data=True,
-            passed_only=True,
-            n_workers: int = 1
+            n_workers: int = 1,
+            include_trial_metrics: bool = False
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all behavior_session_ids in the database.
@@ -276,6 +269,10 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             Whether to include ophys data
         :param n_workers
             Number of parallel processes to use for i.e reading from pkl files
+        :param include_trial_metrics
+            Whether to include trial metrics. Set to False to skip. Is
+            expensive to calculate these metrics since the data must be read
+            from the pkl file for each session
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
@@ -299,13 +296,15 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 suppress=suppress,
                 as_df=False,
                 include_behavior_data=False,
-                passed_only=passed_only,
                 n_workers=n_workers)
         else:
             ophys_session_table = None
-        sessions = SessionsTable(df=sessions, suppress=suppress,
-                                 fetch_api=self.fetch_api,
-                                 ophys_session_table=ophys_session_table)
+        sessions = SessionsTable(
+            df=sessions,
+            suppress=suppress,
+            fetch_api=self.fetch_api,
+            ophys_session_table=ophys_session_table,
+            include_trial_metrics=include_trial_metrics)
 
         return sessions.table if as_df else sessions
 
@@ -327,8 +326,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
     def get_behavior_session(
             self,
-            behavior_session_id: int,
-            skip_eye_tracking: bool = False
+            behavior_session_id: int
     ) -> BehaviorSession:
         """
         Gets `BehaviorSession` for `behavior_session_id`
@@ -336,16 +334,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         ----------
         behavior_session_id: behavior session id
 
-        skip_eye_tracking: bool
-            if True, do not load eye tracking data for this session
-
         Returns
         -------
         BehaviorSession
         """
         return self.fetch_api.get_behavior_session(
-            behavior_session_id=behavior_session_id,
-            skip_eye_tracking=skip_eye_tracking
+            behavior_session_id=behavior_session_id
         )
 
 

@@ -10,6 +10,9 @@ import warnings
 import logging
 import time
 
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
 from allensdk.internal.api import PostgresQueryMixin
 
 from allensdk.brain_observatory.behavior.behavior_project_cache \
@@ -333,7 +336,8 @@ def _patch_date_and_stage_from_pickle_file(
                         zip(pickle_path_df.behavior_session_id,
                             pickle_path_df.pkl_path)):
             stim_file = BehaviorStimulusFile(filepath=pkl_path)
-            new_date = stim_file.date_of_acquisition
+            new_date = DateOfAcquisition.from_stimulus_file(
+                stimulus_file=stim_file).value
             new_session_type = stim_file.session_type
 
             new_vals = {'date_of_acquisition': new_date,
@@ -383,19 +387,10 @@ def _add_age_in_days(
     df: pd.DataFrame
         Same as input, but with age_in_days added
     """
-    age_in_days = []
-    for beh_id, acq, birth in zip(
-                df[index_column],
-                df['date_of_acquisition'],
-                df['date_of_birth']):
-        age = (acq-birth).days
-        age_in_days.append({index_column: beh_id,
-                            'age_in_days': age})
-    age_in_days = pd.DataFrame(data=age_in_days)
-    df = df.join(
-            age_in_days.set_index(index_column),
-            on=index_column,
-            how='left')
+    age_in_days = \
+        df['date_of_acquisition'].dt.date - df['date_of_birth'].dt.date
+    age_in_days = age_in_days.apply(lambda x: x.days)
+    df['age_in_days'] = age_in_days
     return df
 
 
@@ -440,95 +435,6 @@ def _add_images_from_behavior(
             on='ecephys_session_id',
             how='left')
     return ecephys_table
-
-
-def remove_aborted_sessions(
-        lims_connection: PostgresQueryMixin,
-        behavior_df: pd.DataFrame,
-        expected_training_duration: int = 15 * 60,
-        expected_duration: int = 60 * 60
-) -> pd.DataFrame:
-    """
-    Removes aborted sessions
-
-    Parameters
-    ----------
-    lims_connection
-    behavior_df
-    expected_training_duration: Expected duration for a TRAINING_0* session
-        in seconds
-    expected_duration: Expected duration for all non-TRAINING_0* sessions
-        in seconds
-
-    Returns
-    -------
-    behavior_df: behavior df with aborted sessions filtered out
-    """
-    durations = _get_session_duration_from_behavior_session_ids(
-        lims_connection=lims_connection,
-        behavior_session_id_list=(
-            behavior_df['behavior_session_id'].unique().tolist())
-    )
-    durations = behavior_df['behavior_session_id'].map(durations)
-
-    behavior_df = behavior_df[
-        (
-            (behavior_df['session_type'].str.match('TRAINING_0.*')) &
-            (durations > expected_training_duration)
-        ) |
-        (
-            ~(behavior_df['session_type'].str.match('TRAINING_0.*')) &
-            (durations > expected_duration)
-        )
-    ]
-    return behavior_df
-
-
-def remove_pretest_sessions(
-        behavior_session_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Remove any sessions whose session_type begins with 'pretest_'.
-    Return the input dataframe with the removed rows.
-    """
-    new_df = behavior_session_df[
-              np.logical_not(
-                  behavior_session_df.session_type.str.startswith('pretest_'))]
-    return new_df
-
-
-def _get_session_duration_from_behavior_session_ids(
-        lims_connection: PostgresQueryMixin,
-        behavior_session_id_list: List[int]
-) -> pd.Series:
-    """
-    Gets duration in seconds for each session in `behavior_session_id_list`
-
-    Parameters
-    ----------
-    lims_connection
-    behavior_session_id_list
-
-    Returns
-    -------
-    pd.Series
-        index: behavior_session_id
-        values: duration in seconds
-    """
-    pickle_path_df = stimulus_pickle_paths_from_behavior_session_ids(
-        lims_connection=lims_connection,
-        behavior_session_id_list=behavior_session_id_list)
-    durations = []
-    for row in pickle_path_df.itertuples(index=False):
-        durations.append({
-            'behavior_session_id': row.behavior_session_id,
-            'duration': (BehaviorStimulusFile(filepath=row.pkl_path)
-                         .session_duration)
-        })
-    durations = pd.Series(
-        [x['duration'] for x in durations],
-        index=pd.Int64Index([x['behavior_session_id'] for x in durations],
-                            name='behavior_session_id'))
-    return durations
 
 
 def strip_substructure_acronym_df(

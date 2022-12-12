@@ -1,26 +1,17 @@
 from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
-import numpy as np
-import logging
 
-from allensdk.api.queries.donors_queries import get_death_date_for_mouse_ids
-from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 
 from allensdk.internal.api.queries.utils import (
-    _sanitize_uuid_list,
     build_in_list_selector_query)
 
 from allensdk.internal.api.queries.ecephys_lims_queries import (
     donor_id_lookup_from_ecephys_session_ids)
 
-from allensdk.internal.api.queries.behavior_lims_queries import (
-    foraging_id_map_from_behavior_session_id)
-
 from allensdk.internal.api.queries.compound_lims_queries import (
     behavior_sessions_from_ecephys_session_ids)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
 
 from allensdk.core.dataframe_utils import (
     patch_df_from_other)
@@ -30,11 +21,8 @@ from allensdk.brain_observatory.vbn_2022. \
         _add_prior_omissions,
         _add_session_number,
         _add_age_in_days,
-        _patch_date_and_stage_from_pickle_file,
         _add_experience_level,
-        _add_images_from_behavior,
-        remove_aborted_sessions,
-        remove_pretest_sessions)
+        _add_images_from_behavior)
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import (
@@ -44,6 +32,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.image_presentation_utils import (
         get_image_set)
+from allensdk.internal.brain_observatory.util.multi_session_utils import \
+    get_session_metadata_multiprocessing, remove_invalid_sessions
 
 
 def get_list_of_bad_probe_ids(
@@ -552,6 +542,11 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
             valid=True)
 
     summary_table = lims_connection.select(query)
+
+    # Add UTC tz
+    summary_table['date_of_acquisition'] = \
+        summary_table['date_of_acquisition'].dt.tz_localize('UTC')
+
     return summary_table
 
 
@@ -689,66 +684,11 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
     return struct_tbl
 
 
-def _filter_on_death_date(
-        behavior_session_df: pd.DataFrame,
-        lims_connection: PostgresQueryMixin) -> pd.DataFrame:
-    """
-    Given a pandas dataframe of behavior sessions, remove those
-    that were recorded after the mouse's death date.
-
-    Parameters
-    ----------
-    behavior_session_df: pd.DataFrame
-
-    lims_connection: PostgresQueryMixin
-
-    Returns
-    -------
-    behavior_session_df: pd.DataFrame
-        The same as input, but with the sessions that occurred
-        after the mouse's death date dropped.
-
-    Notes
-    -----
-    This function is necessary because of a user error.
-    Sessions were loaded into LIMS with the wrong donor_id,
-    causing there to be sessions associated with some mice
-    that occur after those mice's recorded death dates. Our
-    assumption is that the error is with the donor_id rather
-    than the death date, so we can correct it by filtering
-    out any sessions that occur on mice that are supposed
-    to be dead.
-    """
-
-    behavior_session_df = behavior_session_df.merge(
-            get_death_date_for_mouse_ids(
-                lims_connections=lims_connection,
-                mouse_ids_list=behavior_session_df['mouse_id'].tolist()),
-            on='mouse_id',
-            how='left')
-
-    behavior_session_df = behavior_session_df[
-            np.logical_or(
-                behavior_session_df['date_of_acquisition'] <=
-                behavior_session_df['death_on'],
-                behavior_session_df['death_on'].isna())
-        ]
-
-    behavior_session_df.drop(
-        labels=['death_on'],
-        axis='columns',
-        inplace=True)
-
-    return behavior_session_df
-
-
 def _behavior_session_table_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
-        exclude_sessions_after_death_date: bool = True,
-        exclude_aborted_sessions: bool = True,
-        logger: Optional[logging.Logger] = None
+        exclude_invalid_sessions: bool = True,
+        n_workers: Optional[int] = None
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -759,25 +699,18 @@ def _behavior_session_table_from_ecephys_session_id_list(
     ----------
     lims_connection: PostgresQueryMixin
 
-    mtrain_connection: PostgresQueryMixin
-
     ecephys_session_id_list: List[int]
         The list of ecephys_session_ids used to lookup the mice
         we are interested in following
 
-    exclude_sessions_after_death_date
-        Whether to exclude sessions that fall after death date
-        in order to filter out these mistakenly entered sessions
+    exclude_invalid_sessions
+        Excludes sessions that:
+        - are pretest
+        - fall after mouse death date
+        - were aborted
 
-    exclude_aborted_sessions
-        Whether to exclude aborted sessions. The way that we determine if a
-        session is aborted is by comparing the session duration to an
-        expected duration
-
-    logger: Optional[logging.Logger]
-        Really just passed through to track progress when patching
-        columns from the pickle file, since that is the most
-        expensive process.
+    n_workers
+        Number of workers for reading from pkl file
 
     Returns
     -------
@@ -806,68 +739,34 @@ def _behavior_session_table_from_ecephys_session_id_list(
     behavior_session_df = behavior_sessions_from_ecephys_session_ids(
                             lims_connection=lims_connection,
                             ecephys_session_id_list=ecephys_session_id_list)
+    behavior_sessions = get_session_metadata_multiprocessing(
+        behavior_session_ids=behavior_session_df['behavior_session_id'],
+        lims_engine=db_connection_creator(
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+        ),
+        n_workers=n_workers
+    )
+    if exclude_invalid_sessions:
+        behavior_sessions = remove_invalid_sessions(
+            behavior_sessions=behavior_sessions)
 
-    beh_to_foraging_df = foraging_id_map_from_behavior_session_id(
-        lims_engine=lims_connection,
-        behavior_session_ids=behavior_session_df.behavior_session_id.tolist())
+    behavior_session_df = \
+        behavior_session_df[
+            behavior_session_df['behavior_session_id']
+            .isin([x.behavior_session_id for x in behavior_sessions])]
 
-    # add foraging_id
-    behavior_session_df = behavior_session_df.join(
-                    beh_to_foraging_df.set_index('behavior_session_id'),
-                    on='behavior_session_id',
-                    how='left')
-
-    foraging_ids = beh_to_foraging_df.foraging_id.tolist()
-
-    # this is necessary because there are some sessions with the
-    # invalid foraging_id entry 'DoC' in MTRAIN
-    foraging_ids = _sanitize_uuid_list(foraging_ids)
-
-    foraging_to_stage_df = session_stage_from_foraging_id(
-            mtrain_engine=mtrain_connection,
-            foraging_ids=foraging_ids)
-
-    # add session_type
-    behavior_session_df = behavior_session_df.join(
-                foraging_to_stage_df.set_index('foraging_id'),
-                on='foraging_id',
-                how='left')
-
-    # The date_of_acquisition and session_type stored in the LIMS
-    # behavior_sessions table is untrustworthy. We will set those
-    # columns to None here so that they all get patched from the
-    # pickle files.
-
-    behavior_session_df.date_of_acquisition = None
-    behavior_session_df.session_type = None
-
-    if logger is not None:
-        logger.info("Patching date_of_acquisition and session_type "
-                    "from pickle file")
-
-    behavior_session_df = _patch_date_and_stage_from_pickle_file(
-                             lims_connection=lims_connection,
-                             behavior_df=behavior_session_df,
-                             flag_columns=['date_of_acquisition',
-                                           'foraging_id',
-                                           'session_type'],
-                             logger=logger)
-
-    behavior_session_df = remove_pretest_sessions(
-            behavior_session_df=behavior_session_df)
-
-    if exclude_sessions_after_death_date:
-        # filter out any sessions which were mistakenly entered that fall
-        # after mouse death date
-        behavior_session_df = _filter_on_death_date(
-                behavior_session_df=behavior_session_df,
-                lims_connection=lims_connection)
-
-    if exclude_aborted_sessions:
-        behavior_session_df = remove_aborted_sessions(
-            lims_connection=lims_connection,
-            behavior_df=behavior_session_df
-        )
+    behavior_session_df['date_of_acquisition'] = \
+        behavior_session_df['behavior_session_id']\
+        .map({
+            x.behavior_session_id: x.date_of_acquisition
+            for x in behavior_sessions
+        })
+    behavior_session_df['session_type'] = \
+        behavior_session_df['behavior_session_id']\
+        .map({
+            x.behavior_session_id: x.session_type
+            for x in behavior_sessions
+        })
 
     behavior_session_df['image_set'] = get_image_set(
             df=behavior_session_df)
@@ -893,11 +792,10 @@ def _behavior_session_table_from_ecephys_session_id_list(
 
 def session_tables_from_ecephys_session_id_list(
         lims_connection: PostgresQueryMixin,
-        mtrain_connection: PostgresQueryMixin,
         ecephys_session_id_list: List[int],
         failed_ecephys_session_id_list: Optional[List[int]],
         probe_ids_to_skip: Optional[List[int]],
-        logger: Optional[logging.Logger] = None
+        n_workers: Optional[int] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform the database query to generate the ecephys_session_table
@@ -905,8 +803,6 @@ def session_tables_from_ecephys_session_id_list(
     Parameters
     ----------
     lims_connection: PostgresQueryMixin
-
-    mtrain_connection: PostgresQueryMixin
 
     ecephys_session_id_list: List[int]
         The list of ecephys_sessions.id values of the
@@ -923,10 +819,8 @@ def session_tables_from_ecephys_session_id_list(
     probe_ids_to_skip: Optional[List[int]]
         The IDs of probes not being released
 
-    logger: Optional[logging.Logger]
-        Really just passed through to track progress
-        while patching columns from the pickle file,
-        since that is the most expensive process.
+    n_workers
+        Number of workers for reading from pkl file
 
     Returns
     -------
@@ -977,9 +871,9 @@ def session_tables_from_ecephys_session_id_list(
 
     beh_table = _behavior_session_table_from_ecephys_session_id_list(
             lims_connection=lims_connection,
-            mtrain_connection=mtrain_connection,
             ecephys_session_id_list=ecephys_session_id_list,
-            logger=logger)
+            n_workers=n_workers
+    )
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
                 lims_connection=lims_connection,

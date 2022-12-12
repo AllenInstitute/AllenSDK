@@ -45,7 +45,9 @@ class TestFromBehaviorStimulusFile(LimsTest):
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
-            limit_to_images=['im065'])
+            limit_to_images=['im065'],
+            behavior_session_id=self.behavior_session_id
+        )
         assert stimuli.presentations == self.expected_presentations
         assert stimuli.templates == self.expected_templates
 
@@ -57,7 +59,10 @@ def presentations_fixture(
     Return a Presentations object
     """
     obj = Presentations.from_path(
-        path=behavior_ecephys_session_config_fixture['stim_table_file'])
+        path=behavior_ecephys_session_config_fixture['stim_table_file'],
+        behavior_session_id=(
+            behavior_ecephys_session_config_fixture['behavior_session_id'])
+    )
     return obj
 
 
@@ -109,6 +114,7 @@ class TestNWB:
         templates = \
             pd.read_pickle(str(cls.test_data_dir / 'templates.pkl'))
         presentations = presentations.drop('is_change', axis=1)
+        presentations = presentations.drop('flashes_since_change', axis=1)
         p = StimulusPresentations(presentations=presentations)
         t = Templates(templates=templates)
         cls.stimuli = Stimuli(presentations=p, templates=t)
@@ -139,8 +145,12 @@ class TestNWB:
         else:
             obt = Stimuli.from_nwb(nwbfile=self.nwbfile)
 
-        # is_change different due to limit_to_images
+        # is_change different due to limit_to_images. flashes_since_change
+        # also relies on this column so we ommit that.
         obt.presentations.value.drop('is_change', axis=1, inplace=True)
+        obt.presentations.value.drop('flashes_since_change',
+                                     axis=1,
+                                     inplace=True)
 
         assert obt == self.stimuli
 

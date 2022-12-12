@@ -8,6 +8,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -27,6 +30,7 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
     def __init__(
             self,
             ecephys_session_id: int,
+            date_of_acquisition: DateOfAcquisition,
             subject_metadata: SubjectMetadata,
             behavior_session_id: BehaviorSessionId,
             behavior_session_uuid: BehaviorSessionUUID,
@@ -35,6 +39,7 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
             stimulus_frame_rate: StimulusFrameRate
     ):
         super().__init__(
+            date_of_acquisition=date_of_acquisition,
             subject_metadata=subject_metadata,
             behavior_session_id=behavior_session_id,
             behavior_session_uuid=behavior_session_uuid,
@@ -53,6 +58,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
         behavior_metadata = super().from_json(dict_repr=dict_repr)
         return BehaviorEcephysMetadata(
             ecephys_session_id=dict_repr['ecephys_session_id'],
+            date_of_acquisition=DateOfAcquisition(
+                behavior_metadata.date_of_acquisition),
             subject_metadata=behavior_metadata.subject_metadata,
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
@@ -66,6 +73,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
         behavior_metadata = super().from_nwb(nwbfile=nwbfile)
         return BehaviorEcephysMetadata(
             ecephys_session_id=int(nwbfile.identifier),
+            date_of_acquisition=DateOfAcquisition(
+                behavior_metadata.date_of_acquisition),
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
             equipment=behavior_metadata.equipment,

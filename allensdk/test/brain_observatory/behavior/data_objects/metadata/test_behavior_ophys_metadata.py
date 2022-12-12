@@ -1,43 +1,24 @@
 import datetime
 import json
 from pathlib import Path
+
 import pynwb
 import pytest
+import pytz
 
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_ophys_metadata import \
-    BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.experiment_container_id import \
-    ExperimentContainerId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.field_of_view_shape import \
-    FieldOfViewShape
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.imaging_depth import \
-    ImagingDepth
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .imaging_plane_group import \
-    ImagingPlaneGroup
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata\
-    .multi_plane_metadata import \
-    MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_experiment_metadata import \
-    OphysExperimentMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.ophys_session_id import \
-    OphysSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import Equipment  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import BehaviorOphysMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import FieldOfViewShape  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import ImagingDepth  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import ImagingPlaneGroup  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import OphysContainerId  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import OphysSessionId  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import TargetedImagingDepth  # NOQA
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.test_behavior_metadata import \
-    TestBehaviorMetadata
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import TestBehaviorMetadata  # NOQA
 
 
 class TestBOM:
@@ -53,10 +34,12 @@ class TestBOM:
         ophys_meta = OphysExperimentMetadata(
             ophys_experiment_id=1234,
             ophys_session_id=OphysSessionId(session_id=999),
-            experiment_container_id=ExperimentContainerId(
-                experiment_container_id=5678),
+            ophys_container_id=OphysContainerId(
+                ophys_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
-            imaging_depth=ImagingDepth(imaging_depth=375)
+            imaging_depth=ImagingDepth(imaging_depth=375),
+            targeted_imaging_depth=TargetedImagingDepth(
+                targeted_imaging_depth=375)
         )
 
         behavior_metadata = TestBehaviorMetadata()
@@ -77,9 +60,11 @@ class TestBOM:
         multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
-            experiment_container_id=ophys_experiment_metadata._experiment_container_id, # noqa E501
+            ophys_container_id=ophys_experiment_metadata._ophys_container_id,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
+            targeted_imaging_depth=ophys_experiment_metadata.
+            _targeted_imaging_depth,
             project_code=ophys_experiment_metadata._project_code,
             imaging_plane_group=imaging_plane_group
         )
@@ -116,6 +101,7 @@ class TestInternal(TestBOM):
             assert isinstance(bom.ophys_metadata,
                               MultiplaneMetadata)
             assert bom.ophys_metadata.imaging_depth == 150
+            assert bom.ophys_metadata.targeted_imaging_depth == 150
             assert bom.behavior_metadata.session_type == 'OPHYS_1_images_A'
             assert bom.behavior_metadata.subject_metadata.reporter_line == \
                    'Ai148(TIT2L-GC6f-ICL-tTA2)'
@@ -129,6 +115,7 @@ class TestInternal(TestBOM):
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
             assert bom.ophys_metadata.imaging_depth == 175
+            assert bom.ophys_metadata.targeted_imaging_depth == 175
             assert bom.behavior_metadata.session_type == 'OPHYS_4_images_A'
             assert bom.behavior_metadata.subject_metadata.reporter_line == \
                    'Ai93(TITL-GCaMP6f)'
@@ -155,6 +142,7 @@ class TestJson(TestBOM):
         dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
         self.dict_repr = dict_repr
 
+    @pytest.mark.requires_bamboo
     @pytest.mark.parametrize('meso', [True, False])
     def test_from_json(self, meso):
         if meso:
@@ -174,7 +162,8 @@ class TestNWB(TestBOM):
         self.nwbfile = pynwb.NWBFile(
             session_description='asession',
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=datetime.datetime.now()
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35,
+                                                 tzinfo=pytz.UTC)
         )
 
     @pytest.mark.parametrize('meso', [True, False])

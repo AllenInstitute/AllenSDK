@@ -23,8 +23,17 @@ class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface,
             cls,
             stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         id = stimulus_file.data.get('session_uuid')
+        if id is None:
+            try:
+                id = (stimulus_file.data['items']['behavior']['params']
+                      ['foraging_id']['value'])
+            except KeyError:
+                id = None
         if id:
-            id = uuid.UUID(id)
+            try:
+                id = uuid.UUID(id)
+            except ValueError:
+                id = None
         return cls(behavior_session_uuid=id)
 
     @classmethod

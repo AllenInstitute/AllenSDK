@@ -1,4 +1,5 @@
 import warnings
+from dateutil import parser as datetime_parser
 from datetime import datetime
 
 import pytz
@@ -15,17 +16,24 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                         JsonReadableInterface, NwbReadableInterface):
     """timestamp for when experiment was started in UTC"""
     def __init__(self, date_of_acquisition: datetime):
+        if date_of_acquisition.tzinfo is None:
+            # Add UTC tzinfo if not already set
+            date_of_acquisition = pytz.utc.localize(date_of_acquisition)
         super().__init__(name="date_of_acquisition", value=date_of_acquisition)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
         doa = dict_repr['date_of_acquisition']
-        doa = datetime.strptime(doa, "%Y-%m-%d %H:%M:%S")
-        tz = pytz.timezone("America/Los_Angeles")
-        doa = tz.localize(doa)
+        doa = datetime_parser.parse(doa)
 
-        # NOTE: LIMS writes to JSON in local time. Needs to be converted to UTC
-        doa = doa.astimezone(pytz.utc)
+        if doa.tzinfo is None:
+            # Assume it is local time
+            tz = pytz.timezone("America/Los_Angeles")
+            doa = tz.localize(doa)
+
+            # NOTE: LIMS writes to JSON in local time. Needs to be
+            # converted to UTC
+            doa = doa.astimezone(pytz.utc)
 
         return cls(date_of_acquisition=doa)
 
@@ -40,13 +48,19 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                 """.format(behavior_session_id)
 
         experiment_date = lims_db.fetchone(query, strict=True)
-        experiment_date = cls._postprocess_lims_datetime(
-            datetime=experiment_date)
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
+    def from_stimulus_file(
+            cls,
+            stimulus_file: BehaviorStimulusFile
+    ) -> "DateOfAcquisition":
+        return cls(date_of_acquisition=stimulus_file.date_of_acquisition)
+
+    @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DateOfAcquisition":
-        return cls(date_of_acquisition=nwbfile.session_start_time)
+        date_of_acquisition = nwbfile.session_start_time
+        return cls(date_of_acquisition=date_of_acquisition)
 
     def validate(self, stimulus_file: BehaviorStimulusFile,
                  behavior_session_id: int) -> "DateOfAcquisition":
@@ -86,14 +100,6 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
                 )
         return self
 
-    @staticmethod
-    def _postprocess_lims_datetime(datetime: datetime):
-        """Applies postprocessing to datetime read from LIMS"""
-        # add utc tz
-        datetime = pytz.utc.localize(datetime)
-
-        return datetime
-
 
 class DateOfAcquisitionOphys(DateOfAcquisition):
     """Ophys experiments read date of acquisition from the ophys_sessions
@@ -110,6 +116,4 @@ class DateOfAcquisitionOphys(DateOfAcquisition):
             WHERE oe.id = {ophys_experiment_id};
         """
         doa = lims_db.fetchone(query=query)
-        doa = cls._postprocess_lims_datetime(
-            datetime=doa)
         return DateOfAcquisitionOphys(date_of_acquisition=doa)

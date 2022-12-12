@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pynwb import NWBFile
 
@@ -12,7 +12,7 @@ from allensdk.internal.api import PostgresQueryMixin, \
 class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
                  NwbReadableInterface):
     """the genotype name(s) of the driver line(s)"""
-    def __init__(self, driver_line: List[str]):
+    def __init__(self, driver_line: Optional[List[str]]):
         super().__init__(name="driver_line", value=driver_line)
 
     @classmethod
@@ -22,7 +22,7 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin,
-                  allow_none: bool = False) -> "DriverLine":
+                  allow_none: bool = True) -> "DriverLine":
         """
         Parameters
         ----------
@@ -63,5 +63,7 @@ class DriverLine(DataObject, LimsReadableInterface, JsonReadableInterface,
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "DriverLine":
+        if nwbfile.subject.driver_line is None:
+            return cls(driver_line=None)
         driver_line = sorted(list(nwbfile.subject.driver_line))
         return cls(driver_line=driver_line)

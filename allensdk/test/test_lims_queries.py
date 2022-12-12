@@ -3,13 +3,10 @@ import pandas as pd
 
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
-    _sanitize_uuid_list)
+    _sanitize_uuid_list, build_where_clause)
 
 from allensdk.internal.api.queries.behavior_lims_queries import (
     foraging_id_map_from_behavior_session_id)
-
-from allensdk.internal.api.queries.mtrain_queries import (
-    session_stage_from_foraging_id)
 
 from allensdk.internal.api.queries.ecephys_lims_queries import (
     donor_id_list_from_ecephys_session_ids)
@@ -50,6 +47,19 @@ def test_build_in_selector_error():
             valid_list=[1, 2, 3],
             operator='above',
             valid=True)
+
+
+@pytest.mark.parametrize('clauses, expected', [
+    (['foo=b', 'baz=a'], 'WHERE foo=b AND baz=a'),
+    (['WHERE foo=b and baz=c'], 'WHERE foo=b and baz=c'),
+    (['foo=b', 'baz=a', 'bar=c'], 'WHERE foo=b AND baz=a AND bar=c'),
+    (['WHERE foo=b', 'baz=a'], 'WHERE foo=b AND baz=a'),
+    (['where foo=b', 'baz=a'], 'where foo=b AND baz=a'),
+    ([], ''),
+    (['foo=b'], 'WHERE foo=b')
+])
+def test_build_where_clause(clauses, expected):
+    assert build_where_clause(clauses=clauses) == expected
 
 
 class MockQueryEngine:
@@ -93,22 +103,6 @@ def test_foraging_id_map(
                            lims_engine=MockQueryEngine(),
                            logger=None,
                            behavior_session_ids=behavior_session_ids)
-
-
-def test_session_stage():
-    expected = WhitespaceStrippedString("""
-            SELECT
-                stages.name as session_type,
-                bs.id AS foraging_id
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            ;
-        """)
-    actual = session_stage_from_foraging_id(
-                mtrain_engine=MockQueryEngine(),
-                foraging_ids=None,
-                logger=None)
-    assert expected == actual
 
 
 def test_sanitize_uuid_list():

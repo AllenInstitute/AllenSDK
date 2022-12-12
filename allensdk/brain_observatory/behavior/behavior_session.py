@@ -1,5 +1,6 @@
 import datetime
 from typing import Any, List, Dict, Optional, Type
+import warnings
 
 import pynwb
 import pandas as pd
@@ -54,15 +55,14 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import \
     Stimuli
 from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
     TaskParameters
-from allensdk.brain_observatory.behavior.data_objects.trials.trial_table \
-    import \
-    TrialTable
-from allensdk.brain_observatory.behavior.trials_processing import (
-    construct_rolling_performance_df, calculate_reward_rate_fix_nans)
+from allensdk.brain_observatory.behavior.data_objects.trials.trials \
+    import Trials
 from allensdk.core import DataObject
 from allensdk.brain_observatory.behavior.data_objects import (
     BehaviorSessionId, StimulusTimestamps, RunningSpeed, RunningAcquisition
 )
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    compute_trials_id_for_stimulus
 
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator, PostgresQueryMixin
@@ -85,7 +85,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         rewards: Rewards,
         stimuli: Stimuli,
         task_parameters: TaskParameters,
-        trials: TrialTable,
+        trials: Trials,
         metadata: BehaviorMetadata,
         date_of_acquisition: DateOfAcquisition,
         eye_tracking_table: Optional[EyeTrackingTable] = None,
@@ -118,7 +118,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             read_stimulus_presentations_table_from_file=False,
             stimulus_presentation_columns: Optional[List[str]] = None,
             stimulus_presentation_exclude_columns: Optional[List[str]] = None,
-            skip_eye_tracking=False,
             eye_tracking_z_threshold: float = 3.0,
             eye_tracking_dilation_frames: int = 2,
             eye_tracking_drop_frames: bool = False,
@@ -140,8 +139,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         stimulus_presentation_exclude_columns
             Optional list of columns to exclude from stimulus presentations
             table
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         eye_tracking_z_threshold
             See `BehaviorSession.from_nwb`
         eye_tracking_dilation_frames
@@ -243,6 +240,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
          task_parameters,
          trials) = cls._read_data_from_stimulus_file(
                   stimulus_file_lookup=stimulus_file_lookup,
+                  behavior_session_id=behavior_session_id.value,
                   sync_file=sync_file,
                   monitor_delay=monitor_delay,
                   include_stimuli=(
@@ -253,6 +251,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             stimuli = Stimuli(
                 presentations=Presentations.from_path(
                     path=session_data['stim_table_file'],
+                    behavior_session_id=session_data['behavior_session_id'],
                     exclude_columns=stimulus_presentation_exclude_columns
                 ),
                 templates=Templates.from_stimulus_file(
@@ -263,13 +262,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             .validate(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
-        if skip_eye_tracking:
-            eye_tracking_table = None
+
+        try:
+            eye_tracking_file = EyeTrackingFile.from_json(
+                dict_repr=session_data)
+        except KeyError:
+            eye_tracking_file = None
+
+        if eye_tracking_file is None:
+            # Return empty data to match what is returned by from_nwb.
+            eye_tracking_table = EyeTrackingTable(
+                eye_tracking=EyeTrackingTable._get_empty_df())
             eye_tracking_rig_geometry = None
         else:
-
-            eye_tracking_file = EyeTrackingFile.from_json(
-                                    dict_repr=session_data)
             try:
                 eye_tracking_metadata_file = EyeTrackingMetadataFile.from_json(
                                     dict_repr=session_data)
@@ -309,7 +314,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                   sync_file: Optional[SyncFile] = None,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[DateOfAcquisition] = None,
-                  skip_eye_tracking=False,
                   eye_tracking_z_threshold: float = 3.0,
                   eye_tracking_dilation_frames: int = 2) \
             -> "BehaviorSession":
@@ -333,8 +337,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition
             Date of acquisition. If not provided, will read from
             behavior_sessions table.
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         eye_tracking_z_threshold
             See `BehaviorSession.from_nwb`
         eye_tracking_dilation_frames
@@ -393,6 +395,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
          task_parameters,
          trials) = \
             cls._read_data_from_stimulus_file(
+                behavior_session_id=behavior_session_id.value,
                 stimulus_file_lookup=stimulus_file_lookup,
                 sync_file=sync_file,
                 monitor_delay=monitor_delay
@@ -404,15 +407,17 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         date_of_acquisition = date_of_acquisition.validate(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             behavior_session_id=behavior_session_id.value)
-        if skip_eye_tracking:
-            eye_tracking_table = None
+
+        eye_tracking_file = EyeTrackingFile.from_lims(
+                db=lims_db,
+                behavior_session_id=behavior_session_id.value)
+
+        if eye_tracking_file is None:
+            # Return empty data to match what is returned by from_nwb.
+            eye_tracking_table = EyeTrackingTable(
+                eye_tracking=EyeTrackingTable._get_empty_df())
             eye_tracking_rig_geometry = None
         else:
-
-            eye_tracking_file = EyeTrackingFile.from_lims(
-                    db=lims_db,
-                    behavior_session_id=behavior_session_id.value)
-
             eye_tracking_video = EyeTrackingVideo.from_lims(
                 db=lims_db, behavior_session_id=behavior_session_id.value)
 
@@ -451,7 +456,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             cls,
             nwbfile: NWBFile,
             add_is_change_to_stimulus_presentations_table=True,
-            skip_eye_tracking: bool = False,
             eye_tracking_z_threshold: float = 3.0,
             eye_tracking_dilation_frames: int = 2
     ) -> "BehaviorSession":
@@ -463,8 +467,6 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         add_is_change_to_stimulus_presentations_table: Whether to add a column
             denoting whether the stimulus presentation represented a change
             event. May not be needed in case this column is precomputed
-        skip_eye_tracking: bool
-            If True, do not load eye tracking data
         eye_tracking_z_threshold : float, optional
             The z-threshold when determining which frames likely contain
             outliers for eye or pupil areas. Influences which frames
@@ -492,14 +494,19 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 add_is_change_to_stimulus_presentations_table)
         )
         task_parameters = TaskParameters.from_nwb(nwbfile=nwbfile)
-        trials = cls._trial_table_class().from_nwb(nwbfile=nwbfile)
+        trials = cls._trials_class().from_nwb(nwbfile=nwbfile)
         date_of_acquisition = DateOfAcquisition.from_nwb(nwbfile=nwbfile)
-        if skip_eye_tracking:
-            eye_tracking_rig_geometry = None
-            eye_tracking_table = None
-        else:
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action='ignore',
+                                    message='This nwb file with identifier ',
+                                    category=UserWarning)
             eye_tracking_rig_geometry = EyeTrackingRigGeometry.from_nwb(
                 nwbfile=nwbfile)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action='ignore',
+                                    message='This nwb file with identifier ',
+                                    category=UserWarning)
             eye_tracking_table = EyeTrackingTable.from_nwb(
                 nwbfile=nwbfile, z_threshold=eye_tracking_z_threshold,
                 dilation_frames=eye_tracking_dilation_frames)
@@ -550,7 +557,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             self,
             add_metadata=True,
             include_experiment_description=True,
-            stimulus_presentations_stimulus_column_name: str = 'image_set'
+            stimulus_presentations_stimulus_column_name: str = 'stimulus_name'
     ) -> NWBFile:
         """
 
@@ -644,9 +651,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             The reward rate (rewards/minute) of the subject for the
             task calculated over a 25 trial rolling window.
         """
-        return calculate_reward_rate_fix_nans(
-                self._trials,
-                self.task_parameters['response_window_sec'][0])
+        return self._trials.calculate_reward_rate()
 
     def get_rolling_performance_df(self) -> pd.DataFrame:
         """Return a DataFrame containing trial by trial behavior response
@@ -684,10 +689,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     rolling false_alarm _rate.
 
         """
-        return construct_rolling_performance_df(
-                self._trials,
-                self.task_parameters['response_window_sec'][0],
-                self.task_parameters["session_type"])
+        return self._trials.rolling_performance
 
     def get_performance_metrics(
             self,
@@ -772,26 +774,26 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     The peak of the rolling d_prime, excluding epochs
                     when the rolling reward rate was below 2 rewards/minute
         """
-        performance_metrics = {}
-        performance_metrics['trial_count'] = len(self.trials)
-        performance_metrics['go_trial_count'] = self.trials.go.sum()
-        performance_metrics['catch_trial_count'] = self.trials.catch.sum()
-        performance_metrics['hit_trial_count'] = self.trials.hit.sum()
-        performance_metrics['miss_trial_count'] = self.trials.miss.sum()
-        performance_metrics['false_alarm_trial_count'] = \
-            self.trials.false_alarm.sum()
-        performance_metrics['correct_reject_trial_count'] = \
-            self.trials.correct_reject.sum()
-        performance_metrics['auto_reward_count'] = \
-            self.trials.auto_rewarded.sum()
+        performance_metrics = {
+            'trial_count': self._trials.trial_count,
+            'go_trial_count': self._trials.go_trial_count,
+            'catch_trial_count': self._trials.catch_trial_count,
+            'hit_trial_count': self._trials.hit_trial_count,
+            'miss_trial_count': self._trials.miss_trial_count,
+            'false_alarm_trial_count':
+                self._trials.false_alarm_trial_count,
+            'correct_reject_trial_count':
+                self._trials.correct_reject_trial_count,
+            'auto_reward_count': self.trials.auto_rewarded.sum(),
+            'earned_reward_count': self.trials.hit.sum(),
+            'total_reward_count': len(self.rewards),
+            'total_reward_volume': self.rewards.volume.sum()
+        }
         # Although 'earned_reward_count' will currently have the same value as
         # 'hit_trial_count', in the future there may be variants of the
         # task where rewards are withheld. In that case the
         # 'earned_reward_count' will be smaller than (and different from)
         # the 'hit_trial_count'.
-        performance_metrics['earned_reward_count'] = self.trials.hit.sum()
-        performance_metrics['total_reward_count'] = len(self.rewards)
-        performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
         rpdf = self.get_rolling_performance_df()
         engaged_trial_mask = (
@@ -799,7 +801,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 engaged_trial_reward_rate_threshold)
         performance_metrics['maximum_reward_rate'] = \
             np.nanmax(rpdf['reward_rate'].values)
-        performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
+        performance_metrics['engaged_trial_count'] = \
+            self._trials.get_engaged_trial_count(
+                engaged_trial_reward_rate_threshold=(
+                    engaged_trial_reward_rate_threshold))
         performance_metrics['mean_hit_rate'] = \
             rpdf['hit_rate'].mean()
         performance_metrics['mean_hit_rate_uncorrected'] = \
@@ -857,8 +862,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         - The 'likely_blink' column is True for any row (frame) where the pupil
           fit failed OR eye fit failed OR an outlier fit was identified on the
           pupil or eye fit.
-        - The pupil_area, cr_area, eye_area columns are set to NaN wherever
-          'likely_blink' == True.
+        - The pupil_area, cr_area, eye_area, and pupil/eye_width, height, phi
+          columns are set to NaN wherever 'likely_blink' == True.
         - The pupil_area_raw, cr_area_raw, eye_area_raw columns contains all
           pupil fit values (including where 'likely_blink' == True).
         - All ellipse fits are derived from tracking points that were output by
@@ -1009,26 +1014,30 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 duration: (float)
                     duration of an image presentation (flash)
                     in seconds (stop_time - start_time). NaN if omitted
+                start_frame: (int)
+                    image presentation start frame
                 end_frame: (float)
                     image presentation end frame
+                start_time: (float)
+                    image presentation start time in seconds
+                end_time: (float)
+                    image presentation end time in seconds
                 image_index: (int)
                     image index (0-7) for a given session,
                     corresponding to each image name
-                image_set: (string)
-                    image set for this behavior session
-                index: (int)
-                    an index assigned to each stimulus presentation
                 omitted: (bool)
                     True if no image was shown for this stimulus
                     presentation
-                start_frame: (int)
-                    image presentation start frame
-                start_time: (float)
-                    image presentation start time in seconds
-                stop_time: (float)
-                    image presentation end time in seconds
+                trials_id: (int)
+                    Id to match to the table Index of the trials table.
         """
-        return self._stimuli.presentations.value
+        table = self._stimuli.presentations.value
+        table = table.drop(columns=['image_set', 'index'], errors='ignore')
+        table = table.rename(columns={'stop_time': 'end_time'})
+        if 'stimulus_blocks' in table.columns:
+            table['trials_id'] = compute_trials_id_for_stimulus(table,
+                                                                self.trials)
+        return table
 
     @property
     def stimulus_templates(self) -> pd.DataFrame:
@@ -1150,7 +1159,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 miss: (bool)
                     Behavior response type. On a go trial, mouse either
                     does not lick at all, or licks after reward window
-                stimulus_change: (bool)
+                is_change: (bool)
                     True if an image change occurs during the trial
                     (if the trial was both a 'go' trial and the trial
                     was not aborted)
@@ -1186,7 +1195,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     name of image that is changed to at the change time,
                     on go trials
         """
-        return self._trials.value
+        return self._trials.data
 
     @property
     def metadata(self) -> Dict[str, Any]:
@@ -1272,6 +1281,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_stimuli(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
+            behavior_session_id: int,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             stimulus_presentation_columns: Optional[List[str]] = None
@@ -1286,9 +1296,10 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 monitor_delay=monitor_delay)
 
         return Stimuli.from_stimulus_file(
-                    stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
-                    stimulus_timestamps=stimulus_timestamps,
-                    presentation_columns=stimulus_presentation_columns)
+            behavior_session_id=behavior_session_id,
+            stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
+            stimulus_timestamps=stimulus_timestamps,
+            presentation_columns=stimulus_presentation_columns)
 
     @classmethod
     def _read_trials(
@@ -1297,7 +1308,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             licks: Licks,
-            rewards: Rewards) -> TrialTable:
+            rewards: Rewards) -> Trials:
         """
         Construct the Trials data object for this session
         """
@@ -1307,7 +1318,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                 stimulus_file_lookup=stimulus_file_lookup,
                 monitor_delay=monitor_delay)
 
-        return cls._trial_table_class().from_stimulus_file(
+        return cls._trials_class().from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
@@ -1354,6 +1365,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
     def _read_data_from_stimulus_file(
             cls,
             stimulus_file_lookup: StimulusFileLookup,
+            behavior_session_id: int,
             sync_file: Optional[SyncFile],
             monitor_delay: float,
             include_stimuli=True,
@@ -1378,6 +1390,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         if include_stimuli:
             stimuli = cls._read_stimuli(
                 stimulus_file_lookup=stimulus_file_lookup,
+                behavior_session_id=behavior_session_id,
                 sync_file=sync_file,
                 monitor_delay=monitor_delay,
                 stimulus_presentation_columns=stimulus_presentation_columns)
@@ -1479,5 +1492,5 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         return 0.02115
 
     @classmethod
-    def _trial_table_class(cls) -> Type[TrialTable]:
-        return TrialTable
+    def _trials_class(cls) -> Type[Trials]:
+        return Trials

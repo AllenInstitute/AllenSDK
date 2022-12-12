@@ -2,44 +2,22 @@ import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession  # NOQA
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_files\
-    .rigid_motion_transform_file import \
-    RigidMotionTransformFile
-from allensdk.brain_observatory.behavior.data_objects import \
-    BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens \
-    .cell_specimens import \
-    CellSpecimens, EventsParams
-from allensdk.brain_observatory.behavior.data_objects.metadata \
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisitionOphys, DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_ophys_metadata import \
-    BehaviorOphysMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group \
-    import \
-    ImagingPlaneGroup
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata \
-    import \
-    MultiplaneMetadata
-from allensdk.brain_observatory.behavior.data_objects.motion_correction \
-    import \
-    MotionCorrection
-from allensdk.brain_observatory.behavior.data_objects.projections import \
-    Projections
-from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
-    calculate_monitor_delay
-from allensdk.brain_observatory.behavior.data_objects.timestamps \
-    .ophys_timestamps import \
-    OphysTimestamps, OphysTimestampsMultiplane
+from allensdk.brain_observatory.behavior.data_files.rigid_motion_transform_file import RigidMotionTransformFile  # NOQA
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.cell_specimens import CellSpecimens, EventsParams  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import DateOfAcquisition, DateOfAcquisitionOphys  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import BehaviorOphysMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import ImagingPlaneGroup  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.motion_correction import MotionCorrection  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.projections import Projections  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import calculate_monitor_delay  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.timestamps.ophys_timestamps import OphysTimestamps, OphysTimestampsMultiplane  # NOQA
+from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.internal.api import db_connection_creator
 
 
@@ -100,8 +78,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True,
-                  skip_eye_tracking=False) -> \
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
         Parameters
@@ -117,8 +94,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
-        skip_eye_tracking
-            Used to skip returning eye tracking data
         """
         def _is_multi_plane_session():
             imaging_plane_group_meta = ImagingPlaneGroup.from_lims(
@@ -162,7 +137,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             sync_file=sync_file,
             monitor_delay=monitor_delay,
             date_of_acquisition=date_of_acquisition,
-            skip_eye_tracking=skip_eye_tracking,
             eye_tracking_z_threshold=eye_tracking_z_threshold,
             eye_tracking_dilation_frames=eye_tracking_dilation_frames
         )
@@ -275,8 +249,7 @@ class BehaviorOphysExperiment(BehaviorSession):
                   eye_tracking_dilation_frames: int = 2,
                   events_filter_scale_seconds: float = 2.0/31.0,
                   events_filter_n_time_steps: int = 20,
-                  exclude_invalid_rois=True,
-                  skip_eye_tracking=False) -> \
+                  exclude_invalid_rois=True) -> \
             "BehaviorOphysExperiment":
         """
 
@@ -293,8 +266,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois
             Whether to exclude invalid rois
-        skip_eye_tracking
-            Used to skip returning eye tracking data
 
         """
         def _is_multi_plane_session():
@@ -426,13 +397,15 @@ class BehaviorOphysExperiment(BehaviorSession):
             'emission_lambda': self._cell_specimens.meta.emission_lambda,
             'excitation_lambda':
                 self._cell_specimens.meta.imaging_plane.excitation_lambda,
-            'experiment_container_id':
-                self._metadata.ophys_metadata.experiment_container_id,
+            'ophys_container_id':
+                self._metadata.ophys_metadata.ophys_container_id,
             'field_of_view_height':
                 self._metadata.ophys_metadata.field_of_view_shape.height,
             'field_of_view_width':
                 self._metadata.ophys_metadata.field_of_view_shape.width,
             'imaging_depth': self._metadata.ophys_metadata.imaging_depth,
+            'targeted_imaging_depth':
+                self._metadata.ophys_metadata.targeted_imaging_depth,
             'imaging_plane_group':
                 self._metadata.ophys_metadata.imaging_plane_group
                 if isinstance(self._metadata.ophys_metadata,
@@ -602,9 +575,59 @@ class BehaviorOphysExperiment(BehaviorSession):
                     (assigned before cell matching)
                 corrected_fluorescence: (list of float)
                     fluorescence values (arbitrary units)
-
+                RMSE: (float)
+                    error values (arbitrary units)
+                r:
+                    r values (arbitrary units)
         """
         return self._cell_specimens.corrected_fluorescence_traces
+
+    @property
+    def demixed_traces(self) -> pd.DataFrame:
+        """Demixed traces are traces that are demixed from overlapping ROIs.
+        Sampling rate can be found in metadata ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                demixed_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
+        return self._cell_specimens.demixed_traces
+
+    @property
+    def neuropil_traces(self) -> pd.DataFrame:
+        """neuropil traces are the fluorescent signal measured from the
+        neuropil_masks. Sampling rate can be found in metadata
+        ‘ophys_frame_rate’
+
+        Returns
+        -------
+        pd.DataFrame
+            Dataframe that contains the corrected fluorescence traces
+            for all valid cells.
+
+            dataframe columns:
+                cell_specimen_id [index]: (int)
+                    unified id of segmented cell across experiments
+                    (assigned after cell matching)
+                cell_roi_id: (int)
+                    experiment specific id of segmented roi
+                    (assigned before cell matching)
+                neuropil_trace: (list of float)
+                    fluorescence values (arbitrary units)
+        """
+        return self._cell_specimens.demixed_traces
 
     @property
     def motion_correction(self) -> pd.DataFrame:

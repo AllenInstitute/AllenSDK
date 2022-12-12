@@ -1,24 +1,16 @@
-import os
 import datetime
+import os
 import uuid
+
+import numpy as np
 import pytest
 import pytz
-import numpy as np
-
 from pynwb import NWBHDF5IO
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
-    BehaviorOphysExperiment
-
-from allensdk.brain_observatory.behavior.data_objects import \
-    BehaviorSessionId
-
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.foraging_id import \
-    ForagingId
-
-from allensdk.brain_observatory.session_api_utils import (
-    sessions_are_equal)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import BehaviorOphysExperiment  # NOQA
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.foraging_id import ForagingId  # NOQA
+from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.brain_observatory.stimulus_info import MONITOR_DIMENSIONS
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
@@ -80,7 +72,7 @@ def test_visbeh_ophys_data_set():
         set(['timestamps', 'volume', 'auto_rewarded'])
     assert len(data_set.corrected_fluorescence_traces) == 258 and \
         set(data_set.corrected_fluorescence_traces.columns) == \
-        set(['cell_roi_id', 'corrected_fluorescence'])
+        set(['cell_roi_id', 'corrected_fluorescence', 'RMSE', 'r'])
 
     monitor_delay = data_set._stimulus_timestamps.monitor_delay
 
@@ -108,11 +100,12 @@ def test_visbeh_ophys_data_set():
         'behavior_session_uuid': uuid.UUID(
             '69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
         'date_of_acquisition': pytz.utc.localize(
-            datetime.datetime(2018, 11, 30, 23, 28, 37)),
+            datetime.datetime(2018, 11, 30, 15, 58, 50, 325000)),
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
+        'targeted_imaging_depth': 375,
         'mouse_id': 416369,
-        'experiment_container_id': 814796558,
+        'ophys_container_id': 814796558,
         'targeted_structure': 'VISp',
         'reporter_line': 'Ai93(TITL-GCaMP6f)',
         'emission_lambda': 520.0,
@@ -211,6 +204,8 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods(
         'behavior_session_id',
         'cell_specimen_table',
         'corrected_fluorescence_traces',
+        'demixed_traces',
+        'neuropil_traces',
         'dff_traces',
         'events',
         'eye_tracking',
@@ -265,9 +260,8 @@ def test_stim_v_trials_time(
     """
     exp = behavior_ophys_experiment_fixture
 
-    stim = exp.stimulus_presentations.\
-        query('is_change').\
-        start_time.reset_index(drop=True)
+    stim = exp.stimulus_presentations[exp.stimulus_presentations['is_change']]\
+        .start_time.reset_index(drop=True)
 
     trials = exp.trials.\
         query('not aborted').\

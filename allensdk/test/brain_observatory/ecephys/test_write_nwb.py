@@ -3,13 +3,61 @@ from datetime import datetime, timezone
 from pathlib import Path
 import logging
 import platform
-from unittest.mock import patch
+from unittest.mock import patch, create_autospec
 
 import pytest
 import pynwb
 import pandas as pd
 import numpy as np
 import xarray as xr
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.sex import \
+    Sex
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.full_genotype import \
+    FullGenotype
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.age import \
+    Age
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.mouse_id import \
+    MouseId
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.driver_line import \
+    DriverLine
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.reporter_line import \
+    ReporterLine
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.stimulus_frame_rate import \
+    StimulusFrameRate
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.session_type import \
+    SessionType
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.equipment import \
+    Equipment
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.behavior_session_uuid import \
+    BehaviorSessionUUID
+
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .subject_metadata.subject_metadata import \
+    SubjectMetadata
 
 from pynwb import NWBFile, NWBHDF5IO
 
@@ -17,6 +65,8 @@ from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     import \
     Presentations
+from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
+    BehaviorEcephysMetadata
 from allensdk.brain_observatory.ecephys._unit import Unit, \
     _get_filtered_and_sorted_spikes
 from allensdk.brain_observatory.ecephys._units import Units
@@ -320,7 +370,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
                                 "dorsal_ventral_ccf_coordinate": 20.0,
                                 "left_right_ccf_coordinate": 25.0,
                                 "structure_acronym": "CA1",
-                                "impedence": np.nan,
+                                "impedance": np.nan,
                                 "filtering": "AP band: 500 Hz high-pass; LFP "
                                              "band: 1000 Hz low-pass"},
                                {"id": 2,
@@ -333,7 +383,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
                                 "dorsal_ventral_ccf_coordinate": 30.0,
                                 "left_right_ccf_coordinate": 35.0,
                                 "structure_acronym": "CA3",
-                                "impedence": 42.0,
+                                "impedance": 42.0,
                                 "filtering": "custom"}],
 
                               [15, 23],
@@ -349,7 +399,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
                                   "y": [30.0, 20.0],
                                   "z": [35.0, 25.0],
                                   "location": ["CA3", "CA1"],
-                                  "imp": [42.0, np.nan],
+                                  "impedance": [42.0, np.nan],
                                   "filtering": ["custom",
                                                 "AP band: 500 Hz high-pass; "
                                                 "LFP band: 1000 Hz low-pass"]
@@ -373,6 +423,7 @@ def test_add_ecephys_electrodes(nwbfile, channels, channel_number_whitelist,
     obt_electrode_table = \
         nwbfile.electrodes.to_dataframe().drop(columns=["group", "group_name"])
 
+    expected_electrode_table.rename(columns={'impedance': 'imp'}, inplace=True)
     pd.testing.assert_frame_equal(obt_electrode_table,
                                   expected_electrode_table,
                                   check_like=True)
@@ -516,12 +567,20 @@ def test_read_stimulus_table(tmpdir_factory, presentations,
     presentations.to_csv(stim_table_path, index=False)
     if column_renames_map is None:
         column_renames_map = write_nwb.STIM_TABLE_RENAMES_MAP
-    obt = Presentations.from_path(
-        path=stim_table_path,
-        exclude_columns=columns_to_drop,
-        columns_to_rename=column_renames_map,
-        sort_columns=False
-    )
+
+    def add_is_image_novel(stimulus_presentations, behavior_session_id):
+        # not testing this for vcn
+        return None
+
+    with patch.object(Presentations, '_add_is_image_novel',
+                      wraps=add_is_image_novel):
+        obt = Presentations.from_path(
+            path=stim_table_path,
+            behavior_session_id=1,
+            exclude_columns=columns_to_drop,
+            columns_to_rename=column_renames_map,
+            sort_columns=False
+        )
 
     pd.testing.assert_frame_equal(obt.value, expected)
 
@@ -607,7 +666,8 @@ def probe_data():
                 "left_right_ccf_coordinate": 15.0,
                 "structure_acronym": "CA1",
                 "impedence": np.nan,
-                "filtering": "Unknown"
+                "filtering": "AP band: 500 Hz high-pass; "
+                             "LFP band: 1000 Hz low-pass"
             },
             {
                 "id": 1,
@@ -621,7 +681,8 @@ def probe_data():
                 "left_right_ccf_coordinate": 20.0,
                 "structure_acronym": "CA2",
                 "impedence": np.nan,
-                "filtering": "Unknown"
+                "filtering": "AP band: 500 Hz high-pass; "
+                             "LFP band: 1000 Hz low-pass"
             },
             {
                 "id": 2,
@@ -635,7 +696,8 @@ def probe_data():
                 "left_right_ccf_coordinate": 25.0,
                 "structure_acronym": "CA3",
                 "impedence": np.nan,
-                "filtering": "Unknown"
+                "filtering": "AP band: 500 Hz high-pass; "
+                             "LFP band: 1000 Hz low-pass"
             }
         ],
         "lfp": {
@@ -691,6 +753,27 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         "donor_id": 42
     }
 
+    def dummy_meta_from_json(dict_repr):
+        return BehaviorEcephysMetadata(
+            ecephys_session_id=1,
+            behavior_session_id=BehaviorSessionId(1),
+            behavior_session_uuid=BehaviorSessionUUID(None),
+            date_of_acquisition=DateOfAcquisition(
+                date_of_acquisition=datetime.now()),
+            equipment=Equipment('foo'),
+            session_type=SessionType('foo'),
+            stimulus_frame_rate=StimulusFrameRate(1.0),
+            subject_metadata=SubjectMetadata(
+                sex=Sex(dict_repr['sex']),
+                age=Age(1),
+                reporter_line=ReporterLine('foo'),
+                driver_line=DriverLine(['foo']),
+                full_genotype=FullGenotype(dict_repr['full_genotype']),
+                mouse_id=MouseId(dict_repr['donor_id'])
+
+            )
+        )
+
     probe_data.update({"lfp": test_lfp_paths})
     probe_data.update({"csd_path": input_csd_path})
 
@@ -705,15 +788,18 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
 
-    write_nwb.write_probe_lfp_file(
-        4242,
-        test_session_metadata,
-        datetime.now(),
-        logging.INFO, probe_data)
+    with patch.object(Units, 'from_json', wraps=lambda probe: None):
+        with patch.object(BehaviorEcephysMetadata, 'from_json',
+                          wraps=dummy_meta_from_json):
+            write_nwb.write_probe_lfp_file(
+                4242,
+                test_session_metadata,
+                datetime.now(),
+                logging.INFO, probe_data)
 
     exp_electrodes = \
         pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
-    exp_electrodes = exp_electrodes.rename(columns={'impedence': 'imp'})
+    exp_electrodes = exp_electrodes.rename(columns={'impedance': 'imp'})
     exp_electrodes.rename(columns={"anterior_posterior_ccf_coordinate": "x",
                                    "dorsal_ventral_ccf_coordinate": "y",
                                    "left_right_ccf_coordinate": "z",
@@ -833,12 +919,16 @@ def test_write_probe_lfp_file_roundtrip(
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
 
-    write_nwb.write_probe_lfp_file(
-        4242,
-        None,
-        datetime.now(),
-        logging.INFO,
-        probe_data)
+    with patch.object(Units, 'from_json', wraps=lambda probe: None):
+        with patch.object(BehaviorEcephysMetadata, 'from_json',
+                          wraps=lambda dict_repr: create_autospec(
+                              BehaviorEcephysMetadata, instance=True)):
+            write_nwb.write_probe_lfp_file(
+                4242,
+                None,
+                datetime.now(),
+                logging.INFO,
+                probe_data)
 
     obt = EcephysNwbSessionApi(
         path=None,
@@ -1078,7 +1168,7 @@ def test_filter_and_sort_spikes(
        "sampling_rate": 29999.9655245905,
        "lfp_sampling_rate": np.nan,
        "temporal_subsampling_factor": 2.0,
-       "lfp": {},
+       "lfp": None,
        "spike_times_path": "/dummy_path",
        "spike_clusters_files": "/dummy_path",
        "mean_waveforms_path": "/dummy_path",
