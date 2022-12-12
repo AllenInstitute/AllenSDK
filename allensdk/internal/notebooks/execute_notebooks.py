@@ -63,7 +63,7 @@ class NotebookRunner:
         ]
         self._notebook_paths = [
             x for x in notebook_paths
-            if x not in args.skip_notebooks]
+            if x.name not in args.skip_notebooks]
 
     def run(self):
         """Runs each notebook, overwriting it with updated output,
