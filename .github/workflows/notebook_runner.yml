@@ -22,6 +22,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r dev_requirements.txt
+          pip install -r notebook_requirements.txt
           pip install .
           ipython kernel install --name "python3" --user
       - name: Run notebooks
