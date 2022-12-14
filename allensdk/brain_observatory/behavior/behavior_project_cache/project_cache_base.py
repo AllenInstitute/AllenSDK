@@ -241,6 +241,7 @@ class ProjectCacheBase(object):
         if not isinstance(self.fetch_api, self.cloud_api_class()):
             self._cache_not_implemented('load_latest_manifest')
         self.fetch_api.cache.load_latest_manifest()
+        self.load_manifest(self.current_manifest())
 
     def latest_downloaded_manifest_file(self) -> str:
         """
