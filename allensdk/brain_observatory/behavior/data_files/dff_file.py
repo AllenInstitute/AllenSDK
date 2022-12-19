@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 import h5py
@@ -34,9 +34,6 @@ class DFFFile(DataFile):
     def from_json(cls, dict_repr: dict) -> "DFFFile":
         filepath = dict_repr["dff_file"]
         return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"dff_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

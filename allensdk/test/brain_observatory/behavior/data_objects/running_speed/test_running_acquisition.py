@@ -10,8 +10,6 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningAcquisition, StimulusTimestamps
 )
-from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
 
 
 def test_nonzero_monitor_delay_acq():
@@ -109,86 +107,6 @@ def test_running_acquisition_from_json(
     assert obt._stimulus_timestamps == mock_stimulus_timestamps_instance
 
     pd.testing.assert_frame_equal(obt.value, expected_running_acq_df)
-
-
-@pytest.mark.skip('to_json not supported yet')
-@pytest.mark.parametrize(
-    "stimulus_file, stimulus_file_to_json_ret, "
-    "stimulus_timestamps, stimulus_timestamps_to_json_ret, raises, expected",
-    [
-        # Test to_json with both stimulus_file and sync_file
-        (
-            # stimulus_file
-            create_autospec(BehaviorStimulusFile, instance=True),
-            # stimulus_file_to_json_ret
-            {"behavior_stimulus_file": "stim.pkl"},
-            # stimulus_timestamps
-            create_autospec(StimulusTimestamps, instance=True),
-            # stimulus_timestamps_to_json_ret
-            {"sync_file": "sync.h5"},
-            # raises
-            False,
-            # expected
-            {"behavior_stimulus_file": "stim.pkl", "sync_file": "sync.h5"}
-        ),
-        # Test to_json without stimulus_file
-        (
-            # stimulus_file
-            None,
-            # stimulus_file_to_json_ret
-            None,
-            # stimulus_timestamps
-            create_autospec(StimulusTimestamps, instance=True),
-            # stimulus_timestamps_to_json_ret
-            {"sync_file": "sync.h5"},
-            # raises
-            "RunningAcquisition DataObject lacks information about",
-            # expected
-            None
-        ),
-        # Test to_json without stimulus_timestamps
-        (
-            # stimulus_file
-            create_autospec(BehaviorStimulusFile, instance=True),
-            # stimulus_file_to_json_ret
-            {"behavior_stimulus_file": "stim.pkl"},
-            # stimulus_timestamps_to_json_ret
-            None,
-            # sync_file_to_json_ret
-            None,
-            # raises
-            "RunningAcquisition DataObject lacks information about",
-            # expected
-            None
-        ),
-    ]
-)
-def test_running_acquisition_to_json(
-    stimulus_file, stimulus_file_to_json_ret,
-    stimulus_timestamps, stimulus_timestamps_to_json_ret, raises, expected
-):
-    if stimulus_file is not None:
-        stimulus_file.to_json.return_value = stimulus_file_to_json_ret
-    if stimulus_timestamps is not None:
-        stimulus_timestamps._sync_file = create_autospec(SyncFile,
-                                                         instance=True)
-        stimulus_timestamps._monitor_delay = 0.0
-        stimulus_timestamps._sync_file.to_json.return_value = (
-            stimulus_timestamps_to_json_ret
-        )
-
-    running_acq = RunningAcquisition(
-        running_acquisition=None,
-        stimulus_file=stimulus_file,
-        stimulus_timestamps=stimulus_timestamps
-    )
-
-    if raises:
-        with pytest.raises(RuntimeError, match=raises):
-            _ = running_acq.to_json()
-    else:
-        obt = running_acq.to_json()
-        assert obt == expected
 
 
 # Fixtures:

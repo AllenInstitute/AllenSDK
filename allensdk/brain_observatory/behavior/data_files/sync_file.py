@@ -1,6 +1,6 @@
 import abc
 import json
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 from cachetools import cached, LRUCache
@@ -70,9 +70,6 @@ class SyncFile(DataFile):
                   permissive: bool = False) -> "SyncFile":
         filepath = dict_repr["sync_file"]
         return cls(filepath=filepath, permissive=permissive)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"sync_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

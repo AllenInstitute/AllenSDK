@@ -5,8 +5,6 @@ from cachetools.keys import hashkey
 
 from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
-from allensdk.core import \
-    JsonWritableInterface
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.core import DataObject
 
@@ -18,16 +16,13 @@ def from_lims_cache_key(cls, db, ophys_experiment_id: int):
 class BehaviorSessionId(DataObject, LimsReadableInterface,
                         JsonReadableInterface,
                         NwbReadableInterface,
-                        JsonWritableInterface):
+                        ):
     def __init__(self, behavior_session_id: int):
         super().__init__(name="behavior_session_id", value=behavior_session_id)
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "BehaviorSessionId":
         return cls(behavior_session_id=dict_repr["behavior_session_id"])
-
-    def to_json(self) -> dict:
-        return {"behavior_session_id": self.value}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

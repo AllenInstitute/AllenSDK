@@ -8,8 +8,6 @@ from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.running_speed.running_processing import (  # noqa: E501
     get_running_df
 )
-from allensdk.brain_observatory.behavior.data_files import (
-    SyncFile)
 from allensdk.brain_observatory.behavior.data_objects import (
     RunningSpeed, StimulusTimestamps
 )
@@ -195,92 +193,6 @@ def test_running_speed_from_json(
 
     assert obt._filtered == filtered
     pd.testing.assert_frame_equal(obt.value, expected_running_df)
-
-
-@pytest.mark.skip('to_json not supported yet')
-@pytest.mark.parametrize(
-    "stimulus_file, stimulus_file_to_json_ret, "
-    "stimulus_timestamps, "
-    "sync_file, sync_file_to_json_ret, raises, expected",
-    [
-        # Test to_json with both stimulus_file and sync_file
-        (
-            # stimulus_file
-            create_autospec(BehaviorStimulusFile, instance=True),
-            # stimulus_file_to_json_ret
-            {"behavior_stimulus_file": "stim.pkl"},
-            # stimulus_timestamps
-            create_autospec(StimulusTimestamps, instance=True),
-            # sync_file
-            create_autospec(SyncFile, instance=True),
-            # sync_file_to_json_ret
-            {"sync_file": "sync.h5"},
-            # raises
-            False,
-            # expected
-            {"behavior_stimulus_file": "stim.pkl", "sync_file": "sync.h5"}
-        ),
-        # Test to_json without stimulus_file
-        (
-            # stimulus_file
-            None,
-            # stimulus_file_to_json_ret
-            None,
-            # stimulus_timestamps
-            create_autospec(StimulusTimestamps, instance=True),
-            # sync_file
-            create_autospec(SyncFile, instance=True),
-            # sync_file_to_json_ret
-            {"sync_file": "sync.h5"},
-            # raises
-            "RunningSpeed DataObject lacks information about",
-            # expected
-            None
-        ),
-        # Test to_json without stimulus_timestamps
-        (
-            # stimulus_file
-            create_autospec(BehaviorStimulusFile, instance=True),
-            # stimulus_file_to_json_ret
-            {"behavior_stimulus_file": "stim.pkl"},
-            # stimulus_timestamps
-            None,
-            # sync_file
-            None,
-            # sync_file_to_json_ret
-            None,
-            # raises
-            "RunningSpeed DataObject lacks information about",
-            # expected
-            None
-        ),
-    ]
-)
-def test_running_speed_to_json(
-    stimulus_file, stimulus_file_to_json_ret,
-    stimulus_timestamps, sync_file,
-    sync_file_to_json_ret, raises, expected
-):
-    if stimulus_file is not None:
-        stimulus_file.to_json.return_value = stimulus_file_to_json_ret
-    if sync_file is not None:
-        sync_file.to_json.return_value = sync_file_to_json_ret
-    if stimulus_timestamps is not None:
-        stimulus_timestamps._monitor_delay = 0.0
-
-    running_speed = RunningSpeed(
-        running_speed=None,
-        stimulus_file=stimulus_file,
-        stimulus_timestamps=stimulus_timestamps,
-        sync_file=sync_file
-    )
-
-    if raises:
-        with pytest.raises(RuntimeError, match=raises):
-            _ = running_speed.to_json()
-    else:
-        obt = running_speed.to_json()
-        assert obt == expected
 
 
 # Fixtures:

@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 import h5py
@@ -33,9 +33,6 @@ class NeuropilFile(DataFile):
     def from_json(cls, dict_repr: dict) -> "NeuropilFile":
         filepath = dict_repr["neuropil_file"]
         return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"neuropil_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
