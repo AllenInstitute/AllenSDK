@@ -59,6 +59,8 @@ from allensdk.brain_observatory.nwb import (read_eye_gaze_mappings,
 # not have Ophys session ids associated with experiment ids.
 from .ophys_experiment_session_id_mapping import ophys_experiment_session_id_map
 
+from ..api.cloud_cache.cloud_cache import S3CloudCache
+
 ANALYSIS_CLASS_DICT = {stim_info.LOCALLY_SPARSE_NOISE: LocallySparseNoise,
                        stim_info.LOCALLY_SPARSE_NOISE_4DEG: LocallySparseNoise,
                        stim_info.LOCALLY_SPARSE_NOISE_8DEG: LocallySparseNoise,
@@ -550,6 +552,32 @@ class BrainObservatoryCache(Cache):
         self.api.save_ophys_experiment_event_data(ophys_experiment_id, file_name, strategy='lazy')
 
         return np.load(file_name, allow_pickle=False)["ev"]
+
+    def get_eye_tracking(self, ophys_experiment_id) -> np.ndarray:
+        """
+        Download the eye tracking data for an ophys_experiment if it hasn't
+        already been downloaded and return it.
+
+        Parameters
+        ----------
+        ophys_experiment_id
+
+        Returns
+        -------
+        `numpy.ndarray`
+            Contents of array unknown. Assumed to be [n_frames, 5] where
+            the meaning of the values in each column are unknown.
+            Ask Saskia De Vries saskiad@alleninstitute.org
+        """
+        cloud_cache = S3CloudCache(
+            cache_dir=Path(self.manifest_path).parent / 's3_cache',
+            bucket_name='visual-coding-ophys-data',
+            project_name='visual-coding-ophys'
+        )
+        file_path = self.api.save_ophys_experiment_eye_tracking_data(
+            ophys_experiment_id=ophys_experiment_id,
+            cloud_cache=cloud_cache)
+        return np.load(file_path, allow_pickle=False)
 
     def get_ophys_pupil_data(self,
                              ophys_experiment_id: int,
