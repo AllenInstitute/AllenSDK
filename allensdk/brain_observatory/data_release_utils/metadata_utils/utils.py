@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pandas as pd
 import pathlib
 import warnings
@@ -11,10 +13,13 @@ def add_file_paths_to_metadata_table(
         metadata_table: pd.DataFrame,
         id_generator: FileIDGenerator,
         file_dir: pathlib.Path,
-        file_prefix: str,
+        file_prefix: Optional[str],
         index_col: str,
-        session_id_col: str,
-        on_missing_file: str) -> pd.DataFrame:
+        data_dir_col: Optional[str],
+        on_missing_file: str,
+        file_suffix: str = 'nwb',
+        file_stem: Optional[str] = None
+) -> pd.DataFrame:
     """
     Add file_id and file_path columns to session dataframe.
 
@@ -36,14 +41,26 @@ def add_file_paths_to_metadata_table(
     index_col: str
         Column in metadata_table used to index files
 
-    session_id_col
-        Column in metadata_table denoting session id
+    data_dir_col
+        Column in metadata_table denoting directory structure of data
+        For example if data is stored under each session_id
+            <session_id> / file_a
+            <session_id> / file_b
+            ...
+        then give the name of the session_id col here
+
+        If None, data is assumed to be stored flat
 
     on_missing_file: str
         Specifies how to handle missing files
             'error' -> raise an exception
             'warning' -> assign dummy file_id and warn
             'skip' -> drop that row from the table and warn
+    
+    file_suffix
+
+    file_stem
+        Explicit file stem. Overrides dynamic naming of files
 
     Returns
     -------
@@ -54,7 +71,7 @@ def add_file_paths_to_metadata_table(
     Notes
     -----
     Files are assumed to be named like
-    {file_dir}/{file_prefix}_{metadata_table.index_col}.nwb
+    {file_dir}/{file_prefix}_{metadata_table.index_col}.{file_suffix}
     """
 
     if on_missing_file not in ('error', 'warn', 'skip'):
@@ -63,15 +80,26 @@ def add_file_paths_to_metadata_table(
                f"{on_missing_file}")
         raise ValueError(msg)
 
-    file_suffix = 'nwb'
     new_data = []
     missing_files = []
     metadata_table = metadata_table.set_index(index_col)
 
     for row in metadata_table.itertuples():
-        session_id = getattr(row, session_id_col, row.Index)
-        file_path = file_dir / f'{session_id}' /  \
-            f'{file_prefix}_{row.Index}.{file_suffix}'
+        data_dir = getattr(row, data_dir_col, row.Index)
+
+        if file_stem is None:
+            file_stem = \
+                f'{file_prefix}_{row.Index}' if file_prefix is not None else \
+                f'{row.Index}'
+
+        if data_dir is None:
+            # If session_id_col is not given, assume files stored flat
+            file_path = file_dir / f'{file_stem}.{file_suffix}'
+        else:
+            # assume files stored under session_id for each session_id
+            file_path = file_dir / f'{data_dir}' / \
+                        f'{file_stem}.{file_suffix}'
+
         if not file_path.exists():
             file_id = id_generator.dummy_value
             missing_files.append(file_path.resolve().absolute())

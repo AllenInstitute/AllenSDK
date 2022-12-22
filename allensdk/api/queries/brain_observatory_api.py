@@ -35,11 +35,11 @@
 #
 
 import logging
+from pathlib import Path
 
 import pandas as pd
 from six import string_types
 
-from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 
 from .rma_template import RmaTemplate
@@ -47,6 +47,9 @@ from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from .rma_pager import pageable
 
 from dateutil.parser import parse as parse_date
+
+from ..cloud_cache.cloud_cache import S3CloudCache
+
 
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
@@ -426,6 +429,41 @@ class BrainObservatoryApi(RmaTemplate):
             "Downloading ophys_experiment %d events file. This can take some time." % ophys_experiment_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+    def save_ophys_experiment_eye_tracking_data(
+            self,
+            ophys_experiment_id,
+            cloud_cache: S3CloudCache
+    ) -> Path:
+        """
+        Downloads eye tracking data for `ophys_experiment_id` using
+            `S3CloudCache`
+        S3 used instead of warehouse due to no experience on current team
+        using warehouse
+
+        Parameters
+        ----------
+        ophys_experiment_id
+        cloud_cache
+            instantiated `S3CloudCache`
+
+        Returns
+        -------
+        local path to eye tracking data
+
+        Raises
+        -------
+        `ValueError` if no eye tracking data exists for `ophys_experiment_id`
+        """
+        cloud_cache.load_latest_manifest()
+        meta = cloud_cache.get_metadata(fname='metadata')
+        meta = meta.set_index('ophys_experiment_id')
+        if ophys_experiment_id not in meta.index:
+            raise ValueError(f'No eye tracking data for ophys experiment id '
+                             f'{ophys_experiment_id}')
+        file_id = meta.loc[ophys_experiment_id]['file_id']
+        file_path = cloud_cache.download_data(file_id=str(file_id))
+        return file_path
 
     @cacheable(strategy='create',
                pathfinder=Cache.pathfinder(file_name_position=3,
