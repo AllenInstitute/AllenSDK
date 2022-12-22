@@ -88,17 +88,19 @@ def add_file_paths_to_metadata_table(
         data_dir = getattr(row, data_dir_col, row.Index)
 
         if file_stem is None:
-            file_stem = \
+            file_stem_ = \
                 f'{file_prefix}_{row.Index}' if file_prefix is not None else \
                 f'{row.Index}'
+        else:
+            file_stem_ = file_stem
 
         if data_dir is None:
             # If session_id_col is not given, assume files stored flat
-            file_path = file_dir / f'{file_stem}.{file_suffix}'
+            file_path = file_dir / f'{file_stem_}.{file_suffix}'
         else:
-            # assume files stored under session_id for each session_id
+            # assume files stored under data_dir
             file_path = file_dir / f'{data_dir}' / \
-                        f'{file_stem}.{file_suffix}'
+                        f'{file_stem_}.{file_suffix}'
 
         if not file_path.exists():
             file_id = id_generator.dummy_value
