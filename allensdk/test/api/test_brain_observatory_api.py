@@ -34,8 +34,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 import pytest
-from mock import patch, MagicMock, call
+from mock import patch, call
 from collections import Counter
 import datetime
 from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
@@ -44,7 +49,7 @@ from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
                                                         find_specimen_reporter_line,
                                                         find_experiment_acquisition_age)
 from . import SafeJsonMsg
-
+from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
 _rows_per_message = 2000
 _msg = [{'whatever': True}] * _rows_per_message
@@ -437,6 +442,52 @@ def test_save_ophys_experiment_event_data(mock_json_msg_query,
     mock_retrieve_file_over_http.assert_called_with(
         bo_api.api_url +  '/url/path/to/file',
         '/path/to/filename')
+
+
+@pytest.mark.parametrize('ophys_experiment_id', [1, 2])
+def test_save_ophys_experiment_eye_tracking_data(bo_api, ophys_experiment_id):
+    """tests that save_ophys_experiment_eye_tracking_data returns path to
+    data"""
+    expected = np.array([1, 2, 3])
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        def get_dummy_metadata(fname):
+            return pd.DataFrame({'ophys_experiment_id': [1], 'file_id': 1})
+
+        def get_dummy_data(file_id):
+            np.save(str(Path(tmp_dir) / 'file.npy'), expected)
+            return Path(tmp_dir) / 'file.npy'
+
+        def dummy_cloud_cache_init(cache_dir, bucket_name, project_name):
+            pass
+
+        with patch.object(S3CloudCache, '__init__',
+                          wraps=dummy_cloud_cache_init):
+            with patch.object(S3CloudCache, 'load_latest_manifest',
+                              wraps=lambda: None):
+                with patch.object(S3CloudCache, 'get_metadata',
+                                  wraps=get_dummy_metadata):
+                    with patch.object(S3CloudCache, 'download_data',
+                                      wraps=get_dummy_data):
+                        cloud_cache = S3CloudCache(
+                            cache_dir='',
+                            bucket_name='',
+                            project_name=''
+                        )
+                        if ophys_experiment_id == 2:
+                            with pytest.raises(ValueError):
+                                    bo_api.save_ophys_experiment_eye_tracking_data( # noqa E501
+                                        ophys_experiment_id=ophys_experiment_id,    # noqa E501
+                                        cloud_cache=cloud_cache
+                                    )
+                        else:
+                            file_path = \
+                                bo_api.save_ophys_experiment_eye_tracking_data(
+                                    ophys_experiment_id=ophys_experiment_id,
+                                    cloud_cache=cloud_cache
+                                )
+                            actual = np.load(str(file_path))
+                            np.testing.assert_array_equal(actual, expected)
 
 
 @patch.object(BrainObservatoryApi, "retrieve_file_over_http")

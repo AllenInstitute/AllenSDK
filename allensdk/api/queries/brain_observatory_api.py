@@ -430,8 +430,8 @@ class BrainObservatoryApi(RmaTemplate):
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
+    @staticmethod
     def save_ophys_experiment_eye_tracking_data(
-            self,
             ophys_experiment_id,
             cloud_cache: S3CloudCache
     ) -> Path:
