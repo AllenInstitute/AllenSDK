@@ -64,7 +64,6 @@ def _write_metadata():
     metadata_table = pd.DataFrame({'ophys_experiment_id': exp_ids})
     file_id_generator = FileIDGenerator()
 
-    # The data release tool assumes that
     metadata_table = add_file_paths_to_metadata_table(
         metadata_table=metadata_table,
         id_generator=file_id_generator,
