@@ -26,7 +26,7 @@ def test_add_file_paths_to_metadata_table_on_missing_error(
             file_prefix='silly_file',
             index_col='file_index',
             on_missing_file='whatever',
-            session_id_col='session_id'
+            data_dir_col='session_id'
         )
 
 
@@ -46,7 +46,7 @@ def test_add_file_paths_to_metadata_table_no_file_error(
             file_prefix='silly_file',
             index_col='file_index',
             on_missing_file='error',
-            session_id_col='session_id'
+            data_dir_col='session_id'
         )
 
 
@@ -74,7 +74,7 @@ def test_add_file_paths_to_metadata_table(
             file_prefix='silly_file',
             index_col='file_index',
             on_missing_file=on_missing_file,
-            session_id_col='session_id'
+            data_dir_col='session_id'
         )
 
     # because we have not yet added file_id and file_path
