@@ -500,7 +500,7 @@ class BrainObservatoryApi(RmaTemplate):
         Downloads eye tracking data for `ophys_experiment_id` using
             `S3CloudCache`
         S3 used instead of warehouse since the current team has stopped
-        using warehouse in favor of S3. 
+        using warehouse in favor of S3.
 
         Parameters
         ----------
