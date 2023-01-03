@@ -95,7 +95,7 @@ def add_file_paths_to_metadata_table(
             file_stem_ = file_stem
 
         if data_dir is None:
-            # If session_id_col is not given, assume files stored flat
+            # If `data_dir` is not given, assume files stored flat
             file_path = file_dir / f'{file_stem_}.{file_suffix}'
         else:
             # assume files stored under data_dir
