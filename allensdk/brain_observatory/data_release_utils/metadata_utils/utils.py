@@ -56,7 +56,7 @@ def add_file_paths_to_metadata_table(
             'error' -> raise an exception
             'warning' -> assign dummy file_id and warn
             'skip' -> drop that row from the table and warn
-    
+
     file_suffix
 
     file_stem
