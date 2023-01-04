@@ -145,7 +145,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             file_dir=ecephys_nwb_dir,
             file_prefix="lfp_probe",
             index_col="ecephys_probe_id",
-            session_id_col="ecephys_session_id",
+            data_dir_col="ecephys_session_id",
             on_missing_file=self.args["on_missing_file"],
         )
         probes_table = pd.concat([probes_with_lfp, probes_without_lfp])
@@ -195,7 +195,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             file_dir=ecephys_nwb_dir,
             file_prefix=self.args["ecephys_nwb_prefix"],
             index_col="ecephys_session_id",
-            session_id_col="ecephys_session_id",
+            data_dir_col="ecephys_session_id",
             on_missing_file=self.args["on_missing_file"],
         )
 
@@ -222,7 +222,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             file_dir=behavior_nwb_dir,
             file_prefix=self.args["behavior_nwb_prefix"],
             index_col="behavior_session_id",
-            session_id_col="behavior_session_id",
+            data_dir_col="behavior_session_id",
             on_missing_file=self.args["on_missing_file"],
         )
         behavior_session_table = pd.concat(

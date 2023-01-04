@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 from cachetools import cached, LRUCache
@@ -33,9 +33,6 @@ class RigidMotionTransformFile(DataFile):
     def from_json(cls, dict_repr: dict) -> "RigidMotionTransformFile":
         filepath = dict_repr["rigid_motion_transform_file"]
         return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"rigid_motion_transform_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

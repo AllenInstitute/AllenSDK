@@ -8,8 +8,6 @@ from allensdk.internal.core import DataFile
 
 class EyeTrackingVideo(DataFile):
     """Eye tracking video"""
-    def to_json(self) -> dict:
-        raise NotImplementedError
 
     @classmethod
     def from_lims(

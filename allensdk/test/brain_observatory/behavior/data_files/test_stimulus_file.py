@@ -84,43 +84,6 @@ def test_stimulus_file_from_lims(stimulus_file_fixture, behavior_session_id):
     mock_db_conn.fetchone.assert_called_once_with(query, strict=True)
 
 
-@pytest.mark.parametrize("stimulus_file_fixture", [
-    ({"filename": "test_stim_file_1.pkl"}),
-    ({"filename": "mock_stim_pkl_2.pkl"})
-], indirect=["stimulus_file_fixture"])
-def test_stimulus_file_to_json(stimulus_file_fixture):
-    stim_pkl_path, stim_pkl_data = stimulus_file_fixture
-
-    stimulus_file = BehaviorStimulusFile(filepath=stim_pkl_path)
-    obt_json = stimulus_file.to_json()
-    assert obt_json == {"behavior_stimulus_file": str(stim_pkl_path)}
-
-
-@pytest.mark.parametrize(
-        "stimulus_class_name", ["replay", "mapping"]
-)
-def test_replay_mapping_round_trip(
-        general_pkl_fixture,
-        stimulus_class_name):
-    """
-    Test the round tripping of ReplayStimulusFile and MappingStimulusFile
-    """
-    if stimulus_class_name == "replay":
-        json_key = "replay_stimulus_file"
-        stimulus_class = ReplayStimulusFile
-    else:
-        json_key = "mapping_stimulus_file"
-        stimulus_class = MappingStimulusFile
-
-    str_path = str(general_pkl_fixture['path'].resolve().absolute())
-    dict_repr = {json_key: str_path}
-    stim = stimulus_class.from_json(dict_repr=dict_repr)
-
-    new_dict_repr = stim.to_json()
-    new_stim = stimulus_class.from_json(dict_repr=new_dict_repr)
-    assert new_stim.data == stim.data
-
-
 def test_behavior_num_frames(
         behavior_pkl_fixture):
     """

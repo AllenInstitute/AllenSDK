@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Union
 from pathlib import Path
 
 import pandas as pd
@@ -22,9 +22,6 @@ class EyeTrackingFile(DataFile):
     def from_json(cls, dict_repr: dict) -> "EyeTrackingFile":
         filepath = dict_repr["eye_tracking_filepath"]
         return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"eye_tracking_filepath": str(self.filepath)}
 
     @classmethod
     def from_lims(
