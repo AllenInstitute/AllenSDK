@@ -27,6 +27,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.foraging_id import \
     ForagingId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.project_code import \
+    ProjectCode
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.session_type import \
     SessionType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -191,6 +194,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
                  stimulus_frame_rate: StimulusFrameRate,
                  session_type: SessionType,
                  behavior_session_uuid: BehaviorSessionUUID,
+                 project_code: ProjectCode = ProjectCode(),
                  session_duration: Optional[float] = None
                  ):
         super().__init__(name='behavior_metadata', value=None,
@@ -202,6 +206,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         self._stimulus_frame_rate = stimulus_frame_rate
         self._session_type = session_type
         self._behavior_session_uuid = behavior_session_uuid
+        self._project_code = project_code
         self._session_duration = session_duration
 
         self._exclude_from_equals = set()
@@ -238,6 +243,10 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
                       foraging_id=foraging_id.value,
                       stimulus_file=stimulus_file)
 
+        project_code = ProjectCode.from_lims(
+            behavior_session_id=behavior_session_id.value,
+            lims_db=lims_db)
+
         return BehaviorMetadata(
             date_of_acquisition=date_of_acquisition,
             subject_metadata=subject_metadata,
@@ -246,6 +255,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             behavior_session_uuid=behavior_session_uuid,
+            project_code=project_code,
             session_duration=stimulus_file.session_duration
         )
 
@@ -273,7 +283,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
             behavior_session_uuid=session_uuid,
-            session_duration=stimulus_file.session_duration
+            session_duration=stimulus_file.session_duration,
+            project_code=ProjectCode(),
         )
 
     @classmethod
@@ -286,6 +297,7 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         stimulus_frame_rate = StimulusFrameRate.from_nwb(nwbfile=nwbfile)
         session_type = SessionType.from_nwb(nwbfile=nwbfile)
         session_uuid = BehaviorSessionUUID.from_nwb(nwbfile=nwbfile)
+        project_code = ProjectCode.from_nwb(nwbfile=nwbfile)
 
         return BehaviorMetadata(
             date_of_acquisition=date_of_acquisition,
@@ -294,7 +306,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             equipment=equipment,
             stimulus_frame_rate=stimulus_frame_rate,
             session_type=session_type,
-            behavior_session_uuid=session_uuid
+            behavior_session_uuid=session_uuid,
+            project_code=project_code,
         )
 
     @property
@@ -322,6 +335,10 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
         return self._behavior_session_id.value
 
     @property
+    def project_code(self) -> str:
+        return self._project_code.value
+
+    @property
     def subject_metadata(self):
         return self._subject_metadata
 
@@ -344,7 +361,8 @@ class BehaviorMetadata(DataObject, LimsReadableInterface,
             behavior_session_uuid=str(self.behavior_session_uuid),
             stimulus_frame_rate=self.stimulus_frame_rate,
             session_type=self.session_type,
-            equipment_name=self.equipment.value
+            equipment_name=self.equipment.value,
+            project_code=self.project_code
         )
         nwbfile.add_lab_meta_data(nwb_metadata)
 

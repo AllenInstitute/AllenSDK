@@ -1225,6 +1225,8 @@ class BehaviorSession(DataObject, LimsReadableInterface,
                     full genotype of transgenic mouse
                 mouse_id: (int)
                     unique identifier for a mouse
+                project_code: (string)
+                    String of project session is associated with.
                 reporter_line: (string)
                     reporter line for a transgenic mouse
                 session_type: (string)
@@ -1469,6 +1471,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
             'behavior_session_uuid': behavior_metadata.behavior_session_uuid,
             'driver_line': behavior_metadata.subject_metadata.driver_line,
             'mouse_id': behavior_metadata.subject_metadata.mouse_id,
+            'project_code': behavior_metadata.project_code,
             'full_genotype': behavior_metadata.subject_metadata.full_genotype,
             'behavior_session_id': behavior_metadata.behavior_session_id
         }

@@ -26,6 +26,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.session_type import \
     SessionType
 from allensdk.brain_observatory.behavior.data_objects.metadata \
+    .behavior_metadata.project_code import \
+    ProjectCode
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
 from allensdk.brain_observatory.behavior.data_objects.metadata \
@@ -81,7 +84,8 @@ class BehaviorMetaTestCase:
             behavior_session_uuid=BehaviorSessionUUID(
                 behavior_session_uuid=uuid.uuid4()),
             date_of_acquisition=DateOfAcquisition(
-                datetime.datetime(2022, 8, 24, 12, 35))
+                datetime.datetime(2022, 8, 24, 12, 35)),
+            project_code=ProjectCode('1234')
         )
         return behavior_meta
 

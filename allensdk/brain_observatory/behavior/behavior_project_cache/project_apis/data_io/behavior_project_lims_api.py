@@ -21,6 +21,7 @@ from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query, build_where_clause)
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
     get_session_metadata_multiprocessing
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -236,6 +237,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             SELECT
                 bs.id AS behavior_session_id,
+                pr.code as project_code,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
                 d.id as donor_id,
@@ -257,6 +259,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 {self._build_line_from_donor_query("driver")}
             ) driver on driver.donor_id = d.id
             LEFT OUTER JOIN equipment ON equipment.id = bs.equipment_id
+            LEFT OUTER JOIN projects pr ON pr.id = bs.project_id
         """
 
         if self.data_release_date is not None:
@@ -416,7 +419,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
-        Return columns: ophys_session_id, behavior_session_id,
+        Return columns: ophys_session_id, behavior_session_id, project_code,
                         ophys_experiment_id, project_code, session_name,
                         date_of_acquisition,
                         specimen_id, full_genotype, sex, age_in_days,
@@ -428,10 +431,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
+                pr.code as project_code,
                 imaging_plane_group_count.imaging_plane_group_count,
                 exp_ids.experiment_ids as ophys_experiment_id,
                 cntr_ids.container_ids as ophys_container_id,
-                pr.code as project_code,
                 os.name as session_name,
                 os.date_of_acquisition,
                 os.specimen_id
@@ -528,7 +531,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         else:
             session_metadata = [
                 BehaviorMetadata.from_lims(
-                    behavior_session_id=behavior_session_id,
+                    behavior_session_id=BehaviorSessionId(behavior_session_id),
                     lims_db=db_connection_creator(
                         fallback_credentials=LIMS_DB_CREDENTIAL_MAP
                     )
