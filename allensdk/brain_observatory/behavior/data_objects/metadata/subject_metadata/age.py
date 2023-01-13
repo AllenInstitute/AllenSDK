@@ -1,18 +1,24 @@
+from datetime import datetime
 import re
 import warnings
 from typing import Optional
 
+import pytz
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
 from allensdk.core import \
     JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.date_of_acquisition import \
+    DateOfAcquisition
+from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 
 
 class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
           NwbReadableInterface):
-    """Age of animal (in days)"""
+    """Age (in days) of animal at the time the behavior session was taken."""
     def __init__(self, age: int):
         super().__init__(name="age_in_days", value=age)
 
@@ -25,16 +31,33 @@ class Age(DataObject, JsonReadableInterface, LimsReadableInterface,
     @classmethod
     def from_lims(cls, behavior_session_id: int,
                   lims_db: PostgresQueryMixin) -> "Age":
+        # TODO PSB-17: Need to likewise grab the daq from the stimulus
+        # file for now as the data for daq in LIMS needs to be
+        # updated.
+        date_of_acquisition = DateOfAcquisition.from_stimulus_file(
+            BehaviorStimulusFile.from_lims(
+                db=lims_db,
+                behavior_session_id=behavior_session_id).validate()
+        ).value
+
         query = f"""
-            SELECT a.name AS age
+            SELECT d.date_of_birth AS date_of_birth
             FROM behavior_sessions bs
             JOIN donors d ON d.id = bs.donor_id
-            JOIN ages a ON a.id = d.age_id
             WHERE bs.id = {behavior_session_id};
         """
-        age = lims_db.fetchone(query, strict=True)
-        age = cls._age_code_to_days(age=age)
+        date_of_birth = cls._check_timezone(
+            lims_db.fetchone(query, strict=True))
+
+        age = (date_of_acquisition - date_of_birth).days
         return cls(age=age)
+
+    @classmethod
+    def _check_timezone(cls, input_date: datetime) -> datetime:
+        if input_date.tzinfo is None:
+            # Add UTC tzinfo if not already set
+            input_date = pytz.utc.localize(input_date)
+        return input_date
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Age":

@@ -129,41 +129,31 @@ class TestInternal(TestBOM):
             assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
             assert bom.ophys_metadata.imaging_depth == 150
             assert bom.ophys_metadata.targeted_imaging_depth == 150
-            assert bom.behavior_metadata.session_type == "OPHYS_1_images_A"
-            assert (
-                bom.behavior_metadata.subject_metadata.reporter_line
-                == "Ai148(TIT2L-GC6f-ICL-tTA2)"
-            )
-            assert bom.behavior_metadata.subject_metadata.driver_line == [
-                "Sst-IRES-Cre"
-            ]
-            assert bom.behavior_metadata.subject_metadata.mouse_id == "457841"
-            assert (
-                bom.behavior_metadata.subject_metadata.full_genotype
-                == "Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt"
-            )
-            assert bom.behavior_metadata.subject_metadata.age_in_days == 233
-            assert bom.behavior_metadata.subject_metadata.sex == "F"
+
+            assert bom.behavior_metadata.session_type == 'OPHYS_1_images_A'
+            assert bom.behavior_metadata.subject_metadata.reporter_line == \
+                   'Ai148(TIT2L-GC6f-ICL-tTA2)'
+            assert bom.behavior_metadata.subject_metadata.driver_line == \
+                   ['Sst-IRES-Cre']
+            assert bom.behavior_metadata.subject_metadata.mouse_id == '457841'
+            assert bom.behavior_metadata.subject_metadata.full_genotype == \
+                   'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
+            assert bom.behavior_metadata.subject_metadata.age_in_days == 206
+            assert bom.behavior_metadata.subject_metadata.sex == 'F'
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
             assert bom.ophys_metadata.imaging_depth == 175
             assert bom.ophys_metadata.targeted_imaging_depth == 175
-            assert bom.behavior_metadata.session_type == "OPHYS_4_images_A"
-            assert (
-                bom.behavior_metadata.subject_metadata.reporter_line
-                == "Ai93(TITL-GCaMP6f)"
-            )
-            assert bom.behavior_metadata.subject_metadata.driver_line == [
-                "Camk2a-tTA",
-                "Slc17a7-IRES2-Cre",
-            ]
-            assert bom.behavior_metadata.subject_metadata.mouse_id == "491060"
-            assert (
-                bom.behavior_metadata.subject_metadata.full_genotype
-                == "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt"
-            )
-            assert bom.behavior_metadata.subject_metadata.age_in_days == 130
-            assert bom.behavior_metadata.subject_metadata.sex == "M"
+            assert bom.behavior_metadata.session_type == 'OPHYS_4_images_A'
+            assert bom.behavior_metadata.subject_metadata.reporter_line == \
+                   'Ai93(TITL-GCaMP6f)'
+            assert bom.behavior_metadata.subject_metadata.driver_line == \
+                   ['Camk2a-tTA', 'Slc17a7-IRES2-Cre']
+            assert bom.behavior_metadata.subject_metadata.mouse_id == '491060'
+            assert bom.behavior_metadata.subject_metadata.full_genotype == \
+                   'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt'
+            assert bom.behavior_metadata.subject_metadata.age_in_days == 120
+            assert bom.behavior_metadata.subject_metadata.sex == 'M'
 
 
 class TestJson(TestBOM):
