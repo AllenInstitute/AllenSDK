@@ -1,46 +1,46 @@
+from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (  # noqa: E501
+    BehaviorMetadata,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_session_uuid import (  # noqa: E501
+    BehaviorSessionUUID,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import (  # noqa: E501
+    DateOfAcquisition,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import (  # noqa: E501
+    Equipment,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import (  # noqa: E501
+    ProjectCode,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.session_type import (  # noqa: E501
+    SessionType,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.stimulus_frame_rate import (  # noqa: E501
+    StimulusFrameRate,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.subject_metadata import (  # noqa: E501
+    SubjectMetadata,
+)
+from allensdk.core import JsonReadableInterface, NwbReadableInterface
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_session_uuid import \
-    BehaviorSessionUUID
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.date_of_acquisition import \
-    DateOfAcquisition
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.equipment import \
-    Equipment
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.session_type import \
-    SessionType
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.project_code import \
-    ProjectCode
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.stimulus_frame_rate import \
-    StimulusFrameRate
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .subject_metadata.subject_metadata import \
-    SubjectMetadata
-from allensdk.core import JsonReadableInterface, NwbReadableInterface
 
-
-class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
-                              NwbReadableInterface):
+class BehaviorEcephysMetadata(
+    BehaviorMetadata, JsonReadableInterface, NwbReadableInterface
+):
     def __init__(
-            self,
-            ecephys_session_id: int,
-            date_of_acquisition: DateOfAcquisition,
-            subject_metadata: SubjectMetadata,
-            behavior_session_id: BehaviorSessionId,
-            behavior_session_uuid: BehaviorSessionUUID,
-            equipment: Equipment,
-            session_type: SessionType,
-            stimulus_frame_rate: StimulusFrameRate,
-            project_code: ProjectCode = ProjectCode(),
+        self,
+        ecephys_session_id: int,
+        date_of_acquisition: DateOfAcquisition,
+        subject_metadata: SubjectMetadata,
+        behavior_session_id: BehaviorSessionId,
+        behavior_session_uuid: BehaviorSessionUUID,
+        equipment: Equipment,
+        session_type: SessionType,
+        stimulus_frame_rate: StimulusFrameRate,
+        project_code: ProjectCode = ProjectCode(),
     ):
         super().__init__(
             date_of_acquisition=date_of_acquisition,
@@ -62,16 +62,17 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
     def from_json(cls, dict_repr: dict) -> "BehaviorEcephysMetadata":
         behavior_metadata = super().from_json(dict_repr=dict_repr)
         return BehaviorEcephysMetadata(
-            ecephys_session_id=dict_repr['ecephys_session_id'],
+            ecephys_session_id=dict_repr["ecephys_session_id"],
             date_of_acquisition=DateOfAcquisition(
-                behavior_metadata.date_of_acquisition),
+                behavior_metadata.date_of_acquisition
+            ),
             subject_metadata=behavior_metadata.subject_metadata,
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
             equipment=behavior_metadata.equipment,
             session_type=behavior_metadata._session_type,
             project_code=behavior_metadata._project_code,
-            stimulus_frame_rate=behavior_metadata._stimulus_frame_rate
+            stimulus_frame_rate=behavior_metadata._stimulus_frame_rate,
         )
 
     @classmethod
@@ -80,7 +81,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
         return BehaviorEcephysMetadata(
             ecephys_session_id=int(nwbfile.identifier),
             date_of_acquisition=DateOfAcquisition(
-                behavior_metadata.date_of_acquisition),
+                behavior_metadata.date_of_acquisition
+            ),
             behavior_session_id=behavior_metadata._behavior_session_id,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
             equipment=behavior_metadata.equipment,

@@ -7,42 +7,42 @@ import pytest
 import pytz
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import (  # noqa: E501
     Equipment,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import (  # noqa: E501
     BehaviorOphysMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import (  # noqa: E501
     FieldOfViewShape,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import (  # noqa: E501
     ImagingDepth,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import (  # noqa: E501
     ImagingPlaneGroup,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import (  # noqa: E501
     MultiplaneMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import (  # noqa: E501
     OphysContainerId,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import (  # noqa: E501
     OphysExperimentMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_project_code import (  # noqa: E501
     OphysProjectCode,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import (  # noqa: E501
     OphysSessionId,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import (  # noqa: E501
     TargetedImagingDepth,
-)  # NOQA
+)
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import (  # noqa: E501
     TestBehaviorMetadata,
-)  # NOQA
+)
 
 
 class TestBOM:

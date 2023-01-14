@@ -1,5 +1,6 @@
-from allensdk.brain_observatory.behavior.data_objects.metadata.\
-    behavior_metadata.project_code import ProjectCode
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import (  # noqa: E501
+    ProjectCode,
+)
 from allensdk.internal.api import PostgresQueryMixin
 
 
@@ -11,8 +12,9 @@ class OphysProjectCode(ProjectCode):
     """
 
     @classmethod
-    def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "OphysProjectCode":
+    def from_lims(
+        cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin
+    ) -> "OphysProjectCode":
         query = f"""
             SELECT ps.code AS project_code
             FROM ophys_sessions os

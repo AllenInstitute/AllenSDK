@@ -1,11 +1,12 @@
-from pynwb import NWBFile
 from typing import Optional
 
-from allensdk.core import DataObject
-from allensdk.core import \
-    LimsReadableInterface
+from allensdk.core import (
+    DataObject,
+    LimsReadableInterface,
+    NwbReadableInterface,
+)
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.core import NwbReadableInterface
+from pynwb import NWBFile
 
 
 class ProjectCode(DataObject, LimsReadableInterface, NwbReadableInterface):
@@ -17,12 +18,13 @@ class ProjectCode(DataObject, LimsReadableInterface, NwbReadableInterface):
 
     def __init__(self, project_code: Optional[str] = None):
         if project_code is None:
-            project_code = 'Not Available'
-        super().__init__(name='project_code', value=project_code)
+            project_code = "Not Available"
+        super().__init__(name="project_code", value=project_code)
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin) -> "ProjectCode":
+    def from_lims(
+        cls, behavior_session_id: int, lims_db: PostgresQueryMixin
+    ) -> "ProjectCode":
         query = f"""
             SELECT ps.code AS project_code
             FROM behavior_sessions bs
@@ -35,7 +37,7 @@ class ProjectCode(DataObject, LimsReadableInterface, NwbReadableInterface):
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ProjectCode":
         try:
-            metadata = nwbfile.lab_meta_data['metadata']
+            metadata = nwbfile.lab_meta_data["metadata"]
             return cls(project_code=metadata.project_code)
         except AttributeError:
             # Return values for NWBs without the project code set/available.
