@@ -431,7 +431,7 @@ def test_add_ecephys_electrode_columns(nwbfile, columns_to_add):
     if columns_to_add is None:
         expected_columns = [
             x[0]
-            for x in allensdk.brain_observatory.ecephys.nwb_util.ELECTRODE_TABLE_DEFAULT_COLUMNS
+            for x in allensdk.brain_observatory.ecephys.nwb_util.ELECTRODE_TABLE_DEFAULT_COLUMNS  # noqa: E501
         ]
     else:
         expected_columns = [x[0] for x in columns_to_add]
@@ -539,7 +539,7 @@ def test_dict_to_indexed_array(dc, order, exp_idx, exp_data):
 
 
 def test_add_ragged_data_to_dynamic_table(units_table, spike_times):
-    allensdk.brain_observatory.ecephys.nwb_util.add_ragged_data_to_dynamic_table(
+    allensdk.brain_observatory.ecephys.nwb_util.add_ragged_data_to_dynamic_table(  # noqa: E501
         table=units_table, data=spike_times, column_name="spike_times"
     )
 
@@ -742,7 +742,7 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
 
     local_to_global_unit_map = {ii: -ii for ii in spike_units}
 
-    obtained = allensdk.brain_observatory.ecephys._units._read_spike_times_to_dictionary(
+    obtained = allensdk.brain_observatory.ecephys._units._read_spike_times_to_dictionary(  # noqa: E501
         spike_times_path, spike_units_path, local_to_global_unit_map
     )
     for ii in range(15):
@@ -764,7 +764,7 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
     mean_waveforms = np.random.rand(nunits, nsamples, nchannels)
     np.save(waveforms_path, mean_waveforms, allow_pickle=False)
 
-    obtained = allensdk.brain_observatory.ecephys._units._read_waveforms_to_dictionary(
+    obtained = allensdk.brain_observatory.ecephys._units._read_waveforms_to_dictionary(  # noqa: E501
         waveforms_path, local_to_global_unit_map
     )
     for ii in range(nunits):

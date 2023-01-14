@@ -837,7 +837,7 @@ class BehaviorSession(
             "hit_trial_count": self._trials.hit_trial_count,
             "miss_trial_count": self._trials.miss_trial_count,
             "false_alarm_trial_count": self._trials.false_alarm_trial_count,
-            "correct_reject_trial_count": self._trials.correct_reject_trial_count,
+            "correct_reject_trial_count": self._trials.correct_reject_trial_count,  # noqa: E501
             "auto_reward_count": self.trials.auto_rewarded.sum(),
             "earned_reward_count": self.trials.hit.sum(),
             "total_reward_count": len(self.rewards),
