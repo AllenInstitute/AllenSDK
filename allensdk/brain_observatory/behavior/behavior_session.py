@@ -1034,7 +1034,7 @@ class BehaviorSession(DataObject, LimsReadableInterface,
         table = self._stimuli.presentations.value
         table = table.drop(columns=['image_set', 'index'], errors='ignore')
         table = table.rename(columns={'stop_time': 'end_time'})
-        if 'stimulus_blocks' in table.columns:
+        if 'stimulus_block' in table.columns:
             table['trials_id'] = compute_trials_id_for_stimulus(table,
                                                                 self.trials)
         return table
