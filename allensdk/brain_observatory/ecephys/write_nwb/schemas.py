@@ -1,33 +1,80 @@
 import argschema.fields
 import marshmallow as mm
 import numpy as np
-
-from argschema import ArgSchema
-from argschema.fields import (
-    LogLevel,
-    Dict,
-    String,
-    Int,
-    DateTime,
-    Nested,
-    Boolean,
-    Float,
-)
-
 from allensdk.brain_observatory.argschema_utilities import (
+    RaisingSchema,
     check_read_access,
     check_write_access,
-    RaisingSchema,
 )
+from argschema import ArgSchema
+from argschema.fields import (
+    Boolean,
+    DateTime,
+    Dict,
+    Float,
+    Int,
+    List,
+    LogLevel,
+    Nested,
+    String,
+)
+
+
+class BaseBehaviorSessionDataSchema(RaisingSchema):
+    behavior_session_id = Int(
+        required=True,
+        description=(
+            "Unique identifier for the "
+            "behavior session to write into "
+            "NWB format"
+        ),
+    )
+    driver_line = List(
+        String,
+        required=True,
+        cli_as_single_argument=True,
+        description="Genetic driver line(s) of subject",
+    )
+    reporter_line = List(
+        String,
+        required=True,
+        cli_as_single_argument=True,
+        description="Genetic reporter line(s) of subject",
+    )
+    full_genotype = String(
+        required=True, description="Full genotype of subject"
+    )
+    rig_name = String(
+        required=True,
+        description=(
+            "Name of experimental rig used for " "the behavior session"
+        ),
+    )
+    date_of_acquisition = String(
+        required=True,
+        description=(
+            "Date of acquisition of " "behavior session, in string " "format"
+        ),
+    )
+    external_specimen_name = Int(
+        required=True, description="LabTracks ID of the subject"
+    )
+    behavior_stimulus_file = argschema.fields.InputFile(
+        required=True,
+        description=("Path of behavior_stimulus " "camstim *.pkl file"),
+    )
+    date_of_birth = String(required=True, description="Subject date of birth")
+    sex = String(required=True, description="Subject sex")
+    age = String(required=True, description="Subject age")
 
 
 class Channel(RaisingSchema):
-
     @mm.pre_load
     def set_field_defaults(self, data, **kwargs):
         if data.get("filtering") is None:
-            data["filtering"] = ("AP band: 500 Hz high-pass; "
-                                 "LFP band: 1000 Hz low-pass")
+            data["filtering"] = (
+                "AP band: 500 Hz high-pass; " "LFP band: 1000 Hz low-pass"
+            )
         if data.get("structure_acronym") is None:
             data["structure_acronym"] = ""
         return data
@@ -108,49 +155,54 @@ class Probe(RaisingSchema):
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
     lfp = Nested(Lfp, many=False, required=False, allow_none=True)
-    csd_path = String(required=False,
-                      validate=check_read_access,
-                      allow_none=True,
-                      help="""path to h5 file containing calculated current
-                              source density""")
+    csd_path = String(
+        required=False,
+        validate=check_read_access,
+        allow_none=True,
+        help="""path to h5 file containing calculated current
+                              source density""",
+    )
     sampling_rate = Float(
         default=30000.0,
         help="""sampling rate (Hz, master clock) at which raw data were
-                acquired on this probe""")
+                acquired on this probe""",
+    )
     lfp_sampling_rate = Float(
         default=2500.0,
         allow_none=True,
-        help="""sampling rate of LFP data on this probe""")
+        help="""sampling rate of LFP data on this probe""",
+    )
     temporal_subsampling_factor = Float(
         default=2.0,
         allow_none=True,
         help="""subsampling factor applied to lfp data for
-                this probe (across time)""")
+                this probe (across time)""",
+    )
     spike_amplitudes_path = String(
         validate=check_read_access,
         help="""path to npy file containing scale factor applied to the
-                kilosort template used to extract each spike"""
+                kilosort template used to extract each spike""",
     )
     spike_templates_path = String(
         validate=check_read_access,
-        help="""path to file associating each spike with a kilosort template"""
+        help="""path to file associating each spike with a kilosort template""",  # noqa: E501
     )
     templates_path = String(
         validate=check_read_access,
         help="""path to file containing an (nTemplates)x(nSamples)x(nUnits)
-                array of kilosort templates"""
+                array of kilosort templates""",
     )
     inverse_whitening_matrix_path = String(
         validate=check_read_access,
         help="""Kilosort templates are whitened. In order to use them for
                 scaling spike amplitudes to volts, we need to remove
-                the whitening"""
+                the whitening""",
     )
     amplitude_scale_factor = Float(
         default=0.195e-6,
         allow_none=True,
         help="""amplitude scale factor converting raw amplitudes to Volts.
-                Default converts from bits -> uV -> V"""
+                Default converts from bits -> uV -> V""",
     )
 
 
@@ -176,6 +228,7 @@ class SessionMetadata(RaisingSchema):
 class BaseNeuropixelsSchema(ArgSchema):
     """Base schema for writing NWB files for projects with
     behavior + ecephys"""
+
     probes = Nested(
         Probe,
         many=True,
@@ -185,7 +238,7 @@ class BaseNeuropixelsSchema(ArgSchema):
     optotagging_table_path = argschema.fields.InputFile(
         required=False,
         help="""file at this path contains information about the optogenetic
-                stimulation applied during this experiment"""
+                stimulation applied during this experiment""",
     )
     running_speed_path = String(
         required=False,
@@ -195,12 +248,13 @@ class BaseNeuropixelsSchema(ArgSchema):
     eye_tracking_rig_geometry = Dict(
         required=False,
         help="""Mapping containing information about session rig geometry used
-                for eye gaze mapping."""
+                for eye gaze mapping.""",
     )
 
 
 class VCNInputSchema(BaseNeuropixelsSchema):
     """Input schema for visual coding neuropixels project"""
+
     class Meta:
         unknown = mm.RAISE
 
@@ -225,40 +279,38 @@ class VCNInputSchema(BaseNeuropixelsSchema):
         help="path to stimulus table file",
     )
     invalid_epochs = Nested(
-        InvalidEpoch,
-        many=True,
-        required=True,
-        help="epochs with invalid data"
+        InvalidEpoch, many=True, required=True, help="epochs with invalid data"
     )
     session_sync_path = String(
         required=True,
         validate=check_read_access,
         help="""Path to an h5 experiment session sync file (*.sync). This file
                 relates events from different acquisition modalities to one
-                another in time."""
+                another in time.""",
     )
     pool_size = Int(
         default=3,
-        help="number of child processes used to write probewise lfp files"
+        help="number of child processes used to write probewise lfp files",
     )
     eye_dlc_ellipses_path = String(
         required=False,
         validate=check_read_access,
         help="""h5 filepath containing raw ellipse fits produced by Deep Lab
                 Cuts of subject eye, pupil, and corneal reflections during
-                experiment"""
+                experiment""",
     )
     eye_gaze_mapping_path = String(
         required=False,
         allow_none=True,
         help="""h5 filepath containing eye gaze behavior of the
-                experiment's subject"""
+                experiment's subject""",
     )
     session_metadata = Nested(
         SessionMetadata,
         allow_none=True,
         required=False,
-        help="miscellaneous information describing this session""")
+        help="miscellaneous information describing this session" "",
+    )
     running_speed_path = String(
         required=True,
         help="""data collected about the running behavior of the experiment's
@@ -272,5 +324,5 @@ class ProbeOutputs(RaisingSchema):
 
 
 class OutputSchema(RaisingSchema):
-    nwb_path = String(required=True, description='path to output file')
+    nwb_path = String(required=True, description="path to output file")
     probe_outputs = Nested(ProbeOutputs, required=True, many=True)

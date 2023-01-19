@@ -1,15 +1,19 @@
 import numpy as np
 import pandas as pd
+from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file import (  # noqa: E501
+    NeuropilCorrectedFile,
+)
+from allensdk.brain_observatory.behavior.data_objects.cell_specimens.rois_mixin import (  # noqa: E501
+    RoisMixin,
+)
+from allensdk.core import (
+    DataFileReadableInterface,
+    DataObject,
+    NwbReadableInterface,
+    NwbWritableInterface,
+)
 from pynwb import NWBFile
 from pynwb.ophys import Fluorescence
-
-from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file \
-    import NeuropilCorrectedFile
-from allensdk.core import DataObject
-from allensdk.core import DataFileReadableInterface, NwbReadableInterface
-from allensdk.core import NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.cell_specimens\
-    .rois_mixin import RoisMixin
 
 
 class CorrectedFluorescenceTraces(
@@ -43,22 +47,33 @@ class CorrectedFluorescenceTraces(
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "CorrectedFluorescenceTraces":
-        corr_fluorescence_traces_nwb = (
-            nwbfile.processing["ophys"]
-            .data_interfaces["corrected_fluorescence"]
-        )
+        corr_fluorescence_traces_nwb = nwbfile.processing[
+            "ophys"
+        ].data_interfaces["corrected_fluorescence"]
         # f traces stored as timepoints x rois in NWB
         # We want rois x timepoints, hence the transpose
-        f_traces = corr_fluorescence_traces_nwb.roi_response_series["traces"]\
-            .data[:].T.copy()
-        roi_ids = corr_fluorescence_traces_nwb.roi_response_series["traces"]\
-            .rois.table.id[:].copy()
+        f_traces = (
+            corr_fluorescence_traces_nwb.roi_response_series["traces"]
+            .data[:]
+            .T.copy()
+        )
+        roi_ids = (
+            corr_fluorescence_traces_nwb.roi_response_series["traces"]
+            .rois.table.id[:]
+            .copy()
+        )
         # TODO: Remove try/except once VBO released.
         try:
-            r_values = corr_fluorescence_traces_nwb.roi_response_series["r"]\
-                .data[:].copy()
-            rmse = corr_fluorescence_traces_nwb.roi_response_series["RMSE"]\
-                .data[:].copy()
+            r_values = (
+                corr_fluorescence_traces_nwb.roi_response_series["r"]
+                .data[:]
+                .copy()
+            )
+            rmse = (
+                corr_fluorescence_traces_nwb.roi_response_series["RMSE"]
+                .data[:]
+                .copy()
+            )
             data_dict = {
                 "corrected_fluorescence": [x for x in f_traces],
                 "r": r_values,
@@ -76,9 +91,7 @@ class CorrectedFluorescenceTraces(
     def from_data_file(
         cls, neuropil_corrected_file: NeuropilCorrectedFile
     ) -> "CorrectedFluorescenceTraces":
-        corrected_fluorescence_traces = (
-            neuropil_corrected_file.data
-        )
+        corrected_fluorescence_traces = neuropil_corrected_file.data
         return cls(traces=corrected_fluorescence_traces)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
@@ -114,12 +127,15 @@ class CorrectedFluorescenceTraces(
             timestamps=ophys_timestamps,
         )
 
+        # For the r and RMSE values we use the response series to store
+        # the values as a convenience. The timestamps are thus superfluous
+        # and we fill them with a dummy array of the same length of r/RMSE.
         f_interface.create_roi_response_series(
             name="r",
             data=r_values,
             unit="NA",
             rois=roi_table_region,
-            timestamps=ophys_timestamps,
+            timestamps=np.arange(len(r_values)),
         )
 
         f_interface.create_roi_response_series(
@@ -127,7 +143,7 @@ class CorrectedFluorescenceTraces(
             data=rmse,
             unit="NA",
             rois=roi_table_region,
-            timestamps=ophys_timestamps,
+            timestamps=np.arange(len(rmse)),
         )
 
         return nwbfile

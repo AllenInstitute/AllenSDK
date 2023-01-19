@@ -1,7 +1,13 @@
-from pynwb import NWBFile
+from typing import List, Optional
 
-from allensdk.core import DataObject, JsonReadableInterface, LimsReadableInterface, NwbReadableInterface  # NOQA
+from allensdk.core import (
+    DataObject,
+    JsonReadableInterface,
+    LimsReadableInterface,
+    NwbReadableInterface,
+)
 from allensdk.internal.api import PostgresQueryMixin
+from pynwb import NWBFile
 
 
 class TargetedImagingDepth(
@@ -14,6 +20,7 @@ class TargetedImagingDepth(
     (microns) across experiments in the container that an experiment is
     associated with.
     """
+
     def __init__(self, targeted_imaging_depth: int):
         super().__init__(
             name="targeted_imaging_depth", value=targeted_imaging_depth
@@ -21,8 +28,24 @@ class TargetedImagingDepth(
 
     @classmethod
     def from_lims(
-        cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin
+        cls,
+        ophys_experiment_id: int,
+        lims_db: PostgresQueryMixin,
+        ophys_experiment_ids: Optional[List[int]] = None,
     ) -> "TargetedImagingDepth":
+        """Load targeted imaging depth.
+
+        Parameters
+        ----------
+        ophys_experiment_id : int
+            Id of experiment to calculate targeted depth for.
+        lims_db : PostgresQueryMixin
+            Connection to the LIMS2 database.
+        ophys_experiment_ids : list of int
+            Subset of experiments in the container of ``ophys_experiment_id``
+            to calculate the target_imaging_depth. List should contain
+            the value of ``ophys_experiment_id``.
+        """
         query_container_id = """
             SELECT visual_behavior_experiment_container_id
             FROM ophys_experiments_visual_behavior_experiment_containers
@@ -34,7 +57,7 @@ class TargetedImagingDepth(
         container_id = lims_db.fetchone(query_container_id, strict=True)
 
         query_depths = """
-            SELECT AVG(imd.depth)
+            SELECT oe.id as ophys_experiment_id, imd.depth as depth
             FROM ophys_experiments_visual_behavior_experiment_containers ec
             JOIN ophys_experiments oe ON oe.id = ec.ophys_experiment_id
             LEFT JOIN imaging_depths imd ON imd.id = oe.imaging_depth_id
@@ -42,8 +65,18 @@ class TargetedImagingDepth(
         """.format(
             container_id
         )
+        depths = lims_db.select(query_depths).set_index("ophys_experiment_id")
+        if ophys_experiment_ids is not None:
+            if ophys_experiment_id not in ophys_experiment_ids:
+                raise ValueError(
+                    "List of ophys_exeperiment_ids does not contain id of "
+                    "this experiment. Exiting. \n"
+                    f"\tophys_experiment_id={ophys_experiment_id}\n"
+                    f"\tophys_experiment_id list={ophys_experiment_ids}\n"
+                )
+            depths = depths.loc[ophys_experiment_ids]
 
-        targeted_imaging_depth = int(lims_db.fetchone(query_depths))
+        targeted_imaging_depth = int(depths["depth"].mean())
         return cls(targeted_imaging_depth=targeted_imaging_depth)
 
     @classmethod
