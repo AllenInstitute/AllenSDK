@@ -36,4 +36,17 @@ Visual Behavior - Neuropixels
 DATA FILE CHANGELOG
 -------------------
 
-N/A
+**v0.4.0**
+
+Added Local Field Potential data associated with individual ecephys session probes.
+Added 3424 behavior only sessions.
+stimulus_presentations/trials tables changes
+- stop_time -> end_time
+- Various data type fixes.
+Metadata changes
+- New channels metadata table
+- Various data type fixes.
+
+
+
+
