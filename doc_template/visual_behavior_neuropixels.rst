@@ -41,6 +41,7 @@ DATA FILE CHANGELOG
 Added Local Field Potential data associated with individual ecephys session probes.
 Added 3424 behavior only sessions.
 stimulus_presentations/trials tables changes
+- Add trials_id column in stimulus_presentations table.
 - stop_time -> end_time
 - Various data type fixes.
 Metadata changes
