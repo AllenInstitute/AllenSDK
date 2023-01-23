@@ -1,5 +1,5 @@
 psycopg2-binary
-hdmf
+hdmf<=3.4.7
 h5py
 matplotlib>=1.4.3,<3.4.3
 numpy

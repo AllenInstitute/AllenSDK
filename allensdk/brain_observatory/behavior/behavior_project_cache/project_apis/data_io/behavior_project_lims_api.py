@@ -359,7 +359,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query += where_clause
 
         self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
-        return self.lims_engine.select(query)
+        query_df = self.lims_engine.select(query)
+        targeted_imaging_depth = query_df[
+            ["ophys_container_id", "imaging_depth"]
+            ].groupby("ophys_container_id").mean()
+        targeted_imaging_depth.columns = ['targeted_imaging_depth']
+        return query_df.merge(targeted_imaging_depth, on='ophys_container_id')
 
     def _get_ophys_cells_table(self):
         """
