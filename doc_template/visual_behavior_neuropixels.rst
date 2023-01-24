@@ -18,6 +18,8 @@ To get started, check out these jupyter notebooks:
 3) `Aligning behavioral data to task events with the stimulus and trials tables <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.html>`_ `(download .ipynb) <_static/examples/nb/aligning_behavioral_data_to_task_events_with_the_stimulus_and_trials_tables.ipynb>`_
 4) `Plot quality metrics for the 'units' identified in these experiments <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quality_metrics.ipynb>`_
 5) `Visual Behavior Neuropixels Quickstart <_static/examples/nb/visual_behavior_neuropixels_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quickstart.ipynb>`_
+6) `Analyzing LFP data <_static/examples/nb/visual_behavior_neuropixels_LFP_analysis.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_LFP_analysis.ipynb>`_
+7) `Analyzing behavior-only data for one mouse's training history <_static/examples/nb/visual_behavior_neuropixels_analyzing_behavior_only_data.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_analyzing_behavior_only_data.ipynb>`_
 
 You may also find `these tutorials <https://github.com/AllenInstitute/swdb_2022/tree/main/DynamicBrain>`_ helpful, 
 which were made for students in the Summer Workshop for the Dynamic Brain.
@@ -34,4 +36,18 @@ Visual Behavior - Neuropixels
 DATA FILE CHANGELOG
 -------------------
 
-N/A
+**v0.4.0**
+
+Added Local Field Potential data associated with individual ecephys session probes.
+Added 3424 behavior only sessions.
+stimulus_presentations/trials tables changes
+- Add trials_id column in stimulus_presentations table.
+- stop_time -> end_time
+- Various data type fixes.
+Metadata changes
+- New channels metadata table
+- Various data type fixes.
+
+
+
+

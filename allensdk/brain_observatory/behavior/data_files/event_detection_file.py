@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from typing import Dict, Union, Tuple
+from typing import Union, Tuple
 from pathlib import Path
 
 import h5py
@@ -35,9 +35,6 @@ class EventDetectionFile(DataFile):
     def from_json(cls, dict_repr: dict) -> "EventDetectionFile":
         filepath = dict_repr["events_file"]
         return cls(filepath=filepath)
-
-    def to_json(self) -> Dict[str, str]:
-        return {"events_file": str(self.filepath)}
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)

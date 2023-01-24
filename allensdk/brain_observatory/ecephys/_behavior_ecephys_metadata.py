@@ -17,6 +17,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.session_type import \
     SessionType
 from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.project_code import \
+    ProjectCode
+from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.stimulus_frame_rate import \
     StimulusFrameRate
 from allensdk.brain_observatory.behavior.data_objects.metadata\
@@ -36,7 +39,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
             behavior_session_uuid: BehaviorSessionUUID,
             equipment: Equipment,
             session_type: SessionType,
-            stimulus_frame_rate: StimulusFrameRate
+            stimulus_frame_rate: StimulusFrameRate,
+            project_code: ProjectCode = ProjectCode(),
     ):
         super().__init__(
             date_of_acquisition=date_of_acquisition,
@@ -45,7 +49,8 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
             behavior_session_uuid=behavior_session_uuid,
             equipment=equipment,
             session_type=session_type,
-            stimulus_frame_rate=stimulus_frame_rate
+            stimulus_frame_rate=stimulus_frame_rate,
+            project_code=project_code,
         )
         self._ecephys_session_id = ecephys_session_id
 
@@ -65,6 +70,7 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
             behavior_session_uuid=behavior_metadata._behavior_session_uuid,
             equipment=behavior_metadata.equipment,
             session_type=behavior_metadata._session_type,
+            project_code=behavior_metadata._project_code,
             stimulus_frame_rate=behavior_metadata._stimulus_frame_rate
         )
 
@@ -80,5 +86,6 @@ class BehaviorEcephysMetadata(BehaviorMetadata, JsonReadableInterface,
             equipment=behavior_metadata.equipment,
             session_type=behavior_metadata._session_type,
             stimulus_frame_rate=behavior_metadata._stimulus_frame_rate,
-            subject_metadata=behavior_metadata.subject_metadata
+            project_code=behavior_metadata._project_code,
+            subject_metadata=behavior_metadata.subject_metadata,
         )

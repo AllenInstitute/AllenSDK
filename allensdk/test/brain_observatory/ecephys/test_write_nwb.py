@@ -54,6 +54,10 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_session_uuid import \
     BehaviorSessionUUID
 
+from allensdk.brain_observatory.behavior.data_objects.metadata\
+    .behavior_metadata.project_code import \
+    ProjectCode
+
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .subject_metadata.subject_metadata import \
@@ -750,7 +754,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         "sex": "M",
         "stimulus_name": "test_stim",
         "species": "Mus musculus",
-        "donor_id": 42
+        "donor_id": 42,
+        "project_code": '1234',
     }
 
     def dummy_meta_from_json(dict_repr):
@@ -763,6 +768,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
             equipment=Equipment('foo'),
             session_type=SessionType('foo'),
             stimulus_frame_rate=StimulusFrameRate(1.0),
+            project_code=ProjectCode('1234'),
             subject_metadata=SubjectMetadata(
                 sex=Sex(dict_repr['sex']),
                 age=Age(1),

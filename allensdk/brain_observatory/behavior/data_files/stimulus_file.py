@@ -69,9 +69,6 @@ class _StimulusFile(DataFile):
     def _from_json(cls, stimulus_file_path: str) -> "_StimulusFile":
         return cls(filepath=stimulus_file_path)
 
-    def to_json(self) -> Dict[str, str]:
-        return {self.file_path_key(): str(self.filepath)}
-
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
     def from_lims(

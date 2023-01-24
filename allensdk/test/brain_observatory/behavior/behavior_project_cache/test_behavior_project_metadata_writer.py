@@ -58,6 +58,8 @@ class TestVBO:
         self.test_dir.cleanup()
 
     def _get_behavior_session(self, behavior_session_id, lims_db):
+        if isinstance(behavior_session_id, BehaviorSessionId):
+            behavior_session_id = behavior_session_id.value
         return BehaviorMetadata(
             date_of_acquisition=None,
             subject_metadata=None,
@@ -116,7 +118,7 @@ class TestVBO:
                 .sort_values('ophys_experiment_id')\
                 .reset_index(drop=True)
             pd.testing.assert_frame_equal(
-                obtained, expected)
+                obtained.sort_index(axis=1), expected.sort_index(axis=1))
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_cells_table(self):

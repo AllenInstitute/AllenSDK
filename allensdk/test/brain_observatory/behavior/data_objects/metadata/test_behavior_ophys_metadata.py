@@ -5,20 +5,44 @@ from pathlib import Path
 import pynwb
 import pytest
 import pytz
-
-from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import Equipment  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import BehaviorOphysMetadata  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import FieldOfViewShape  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import ImagingDepth  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import ImagingPlaneGroup  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import MultiplaneMetadata  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import OphysContainerId  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import OphysExperimentMetadata  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import OphysSessionId  # NOQA
-from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import TargetedImagingDepth  # NOQA
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import (  # noqa: E501
+    Equipment,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import (  # noqa: E501
+    BehaviorOphysMetadata,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import (  # noqa: E501
+    FieldOfViewShape,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import (  # noqa: E501
+    ImagingDepth,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import (  # noqa: E501
+    ImagingPlaneGroup,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import (  # noqa: E501
+    MultiplaneMetadata,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import (  # noqa: E501
+    OphysContainerId,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import (  # noqa: E501
+    OphysExperimentMetadata,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_project_code import (  # noqa: E501
+    OphysProjectCode,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import (  # noqa: E501
+    OphysSessionId,
+)
+from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import (  # noqa: E501
+    TargetedImagingDepth,
+)
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
-from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import TestBehaviorMetadata  # NOQA
+from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import (  # noqa: E501
+    TestBehaviorMetadata,
+)
 
 
 class TestBOM:
@@ -34,121 +58,138 @@ class TestBOM:
         ophys_meta = OphysExperimentMetadata(
             ophys_experiment_id=1234,
             ophys_session_id=OphysSessionId(session_id=999),
-            ophys_container_id=OphysContainerId(
-                ophys_container_id=5678),
+            ophys_container_id=OphysContainerId(ophys_container_id=5678),
             field_of_view_shape=FieldOfViewShape(width=4, height=4),
             imaging_depth=ImagingDepth(imaging_depth=375),
             targeted_imaging_depth=TargetedImagingDepth(
-                targeted_imaging_depth=375)
+                targeted_imaging_depth=375
+            ),
+            project_code=OphysProjectCode("1234"),
         )
 
         behavior_metadata = TestBehaviorMetadata()
         behavior_metadata.setup_class()
         return BehaviorOphysMetadata(
-            behavior_metadata=behavior_metadata.meta,
-            ophys_metadata=ophys_meta
+            behavior_metadata=behavior_metadata.meta, ophys_metadata=ophys_meta
         )
 
     def _get_multiplane_meta(self):
         bo_meta = self.meta
-        bo_meta.behavior_metadata._equipment = \
-            Equipment(equipment_name='MESO.1')
+        bo_meta.behavior_metadata._equipment = Equipment(
+            equipment_name="MESO.1"
+        )
         ophys_experiment_metadata = bo_meta.ophys_metadata
 
-        imaging_plane_group = ImagingPlaneGroup(plane_group_count=5,
-                                                plane_group=0)
+        imaging_plane_group = ImagingPlaneGroup(
+            plane_group_count=5, plane_group=0
+        )
         multiplane_meta = MultiplaneMetadata(
             ophys_experiment_id=ophys_experiment_metadata.ophys_experiment_id,
             ophys_session_id=ophys_experiment_metadata._ophys_session_id,
             ophys_container_id=ophys_experiment_metadata._ophys_container_id,
             field_of_view_shape=ophys_experiment_metadata._field_of_view_shape,
             imaging_depth=ophys_experiment_metadata._imaging_depth,
-            targeted_imaging_depth=ophys_experiment_metadata.
-            _targeted_imaging_depth,
+            targeted_imaging_depth=ophys_experiment_metadata._targeted_imaging_depth,  # noqa: E501
             project_code=ophys_experiment_metadata._project_code,
-            imaging_plane_group=imaging_plane_group
+            imaging_plane_group=imaging_plane_group,
         )
         return BehaviorOphysMetadata(
             behavior_metadata=bo_meta.behavior_metadata,
-            ophys_metadata=multiplane_meta
+            ophys_metadata=multiplane_meta,
         )
 
 
 class TestInternal(TestBOM):
     @classmethod
     def setup_method(self, method):
-        marks = getattr(method, 'pytestmark', None)
+        marks = getattr(method, "pytestmark", None)
         if marks:
             marks = [m.name for m in marks]
 
             # Will only create a dbconn if the test requires_bamboo
-            if 'requires_bamboo' in marks:
+            if "requires_bamboo" in marks:
                 self.dbconn = db_connection_creator(
-                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+                )
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('meso', [True, False])
+    @pytest.mark.parametrize("meso", [True, False])
     def test_from_lims(self, meso):
         if meso:
             ophys_experiment_id = 951980471
         else:
             ophys_experiment_id = 994278291
         bom = BehaviorOphysMetadata.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=self.dbconn,
-            is_multiplane=meso)
+            ophys_experiment_id=ophys_experiment_id,
+            lims_db=self.dbconn,
+            is_multiplane=meso,
+        )
 
         if meso:
-            assert isinstance(bom.ophys_metadata,
-                              MultiplaneMetadata)
+            assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
             assert bom.ophys_metadata.imaging_depth == 150
             assert bom.ophys_metadata.targeted_imaging_depth == 150
-            assert bom.behavior_metadata.session_type == 'OPHYS_1_images_A'
-            assert bom.behavior_metadata.subject_metadata.reporter_line == \
-                   'Ai148(TIT2L-GC6f-ICL-tTA2)'
-            assert bom.behavior_metadata.subject_metadata.driver_line == \
-                   ['Sst-IRES-Cre']
-            assert bom.behavior_metadata.subject_metadata.mouse_id == 457841
-            assert bom.behavior_metadata.subject_metadata.full_genotype == \
-                   'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
-            assert bom.behavior_metadata.subject_metadata.age_in_days == 233
-            assert bom.behavior_metadata.subject_metadata.sex == 'F'
+
+            assert bom.behavior_metadata.session_type == "OPHYS_1_images_A"
+            assert (
+                bom.behavior_metadata.subject_metadata.reporter_line
+                == "Ai148(TIT2L-GC6f-ICL-tTA2)"
+            )
+            assert bom.behavior_metadata.subject_metadata.driver_line == [
+                "Sst-IRES-Cre"
+            ]
+            assert bom.behavior_metadata.subject_metadata.mouse_id == "457841"
+            assert (
+                bom.behavior_metadata.subject_metadata.full_genotype
+                == "Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt"
+            )
+            assert bom.behavior_metadata.subject_metadata.age_in_days == 206
+            assert bom.behavior_metadata.subject_metadata.sex == "F"
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
             assert bom.ophys_metadata.imaging_depth == 175
             assert bom.ophys_metadata.targeted_imaging_depth == 175
-            assert bom.behavior_metadata.session_type == 'OPHYS_4_images_A'
-            assert bom.behavior_metadata.subject_metadata.reporter_line == \
-                   'Ai93(TITL-GCaMP6f)'
-            assert bom.behavior_metadata.subject_metadata.driver_line == \
-                   ['Camk2a-tTA', 'Slc17a7-IRES2-Cre']
-            assert bom.behavior_metadata.subject_metadata.mouse_id == 491060
-            assert bom.behavior_metadata.subject_metadata.full_genotype == \
-                   'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt'
-            assert bom.behavior_metadata.subject_metadata.age_in_days == 130
-            assert bom.behavior_metadata.subject_metadata.sex == 'M'
+            assert bom.behavior_metadata.session_type == "OPHYS_4_images_A"
+            assert (
+                bom.behavior_metadata.subject_metadata.reporter_line
+                == "Ai93(TITL-GCaMP6f)"
+            )
+            assert bom.behavior_metadata.subject_metadata.driver_line == [
+                "Camk2a-tTA",
+                "Slc17a7-IRES2-Cre",
+            ]
+            assert bom.behavior_metadata.subject_metadata.mouse_id == "491060"
+            assert (
+                bom.behavior_metadata.subject_metadata.full_genotype
+                == "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt"
+            )
+            assert bom.behavior_metadata.subject_metadata.age_in_days == 120
+            assert bom.behavior_metadata.subject_metadata.sex == "M"
 
 
 class TestJson(TestBOM):
     @classmethod
     def setup_method(self, method):
         dir = Path(__file__).parent.resolve()
-        test_data_dir = dir.parent / 'test_data'
-        with open(test_data_dir / 'test_input.json') as f:
+        test_data_dir = dir.parent / "test_data"
+        with open(test_data_dir / "test_input.json") as f:
             dict_repr = json.load(f)
-        dict_repr = dict_repr['session_data']
-        dict_repr['sync_file'] = str(test_data_dir / 'sync.h5')
-        dict_repr['behavior_stimulus_file'] = str(test_data_dir /
-                                                  'behavior_stimulus_file.pkl')
-        dict_repr['dff_file'] = str(test_data_dir / 'demix_file.h5')
+        dict_repr = dict_repr["session_data"]
+        dict_repr["sync_file"] = str(test_data_dir / "sync.h5")
+        dict_repr["behavior_stimulus_file"] = str(
+            test_data_dir / "behavior_stimulus_file.pkl"
+        )
+        dict_repr["dff_file"] = str(test_data_dir / "demix_file.h5")
         self.dict_repr = dict_repr
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.parametrize('meso', [True, False])
+    @pytest.mark.parametrize("meso", [True, False])
     def test_from_json(self, meso):
         if meso:
-            self.dict_repr['rig_name'] = 'MESO.1'
-        bom = BehaviorOphysMetadata.from_json(dict_repr=self.dict_repr,
-                                              is_multiplane=meso)
+            self.dict_repr["rig_name"] = "MESO.1"
+        bom = BehaviorOphysMetadata.from_json(
+            dict_repr=self.dict_repr, is_multiplane=meso
+        )
 
         if meso:
             assert isinstance(bom.ophys_metadata, MultiplaneMetadata)
@@ -160,16 +201,18 @@ class TestNWB(TestBOM):
     def setup_method(self, method):
         self.meta = self._get_meta()
         self.nwbfile = pynwb.NWBFile(
-            session_description='asession',
+            session_description="asession",
             identifier=str(self.meta.ophys_metadata.ophys_experiment_id),
-            session_start_time=datetime.datetime(2022, 8, 24, 12, 35,
-                                                 tzinfo=pytz.UTC)
+            session_start_time=datetime.datetime(
+                2022, 8, 24, 12, 35, tzinfo=pytz.UTC
+            ),
         )
 
-    @pytest.mark.parametrize('meso', [True, False])
-    @pytest.mark.parametrize('roundtrip', [True, False])
-    def test_read_write_nwb(self, roundtrip,
-                            data_object_roundtrip_fixture, meso):
+    @pytest.mark.parametrize("meso", [True, False])
+    @pytest.mark.parametrize("roundtrip", [True, False])
+    def test_read_write_nwb(
+        self, roundtrip, data_object_roundtrip_fixture, meso
+    ):
         if meso:
             self.meta = self._get_multiplane_meta()
 
@@ -179,9 +222,9 @@ class TestNWB(TestBOM):
             obt = data_object_roundtrip_fixture(
                 nwbfile=self.nwbfile,
                 data_object_cls=BehaviorOphysMetadata,
-                is_multiplane=meso)
+                is_multiplane=meso,
+            )
         else:
-            obt = self.meta.from_nwb(nwbfile=self.nwbfile,
-                                     is_multiplane=meso)
+            obt = self.meta.from_nwb(nwbfile=self.nwbfile, is_multiplane=meso)
 
         assert obt == self.meta
