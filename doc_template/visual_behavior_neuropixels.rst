@@ -38,14 +38,20 @@ DATA FILE CHANGELOG
 
 **v0.4.0**
 
-Added Local Field Potential data associated with individual ecephys session probes.
-Added 3424 behavior only sessions.
-stimulus_presentations/trials tables changes
+New Data:
+
+- Added Local Field Potential (LFP) data associated with individual ecephys session probes.
+- Added 3424 behavior only sessions.
+
+Stimulus_presentations/trials tables changes:
+
 - Add trials_id column in stimulus_presentations table.
 - stop_time -> end_time
 - Various data type fixes.
-Metadata changes
-- New channels metadata table
+
+Metadata changes:
+
+- New channels metadata table.
 - Various data type fixes.
 
 

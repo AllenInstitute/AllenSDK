@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import ( # noqa
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
     ProjectCloudApiBase,
 )
 from allensdk.brain_observatory.behavior.behavior_session import (
@@ -124,7 +124,9 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
 
             return f
 
-        if not probes_meta.empty:
+        # Backwards compatibility check for VBN data that doesn't contain
+        # the LFP, probes dataset.
+        if not probes_meta.empty and "file_id" in probes_meta.columns:
             probe_data_path_map = {
                 p.name: make_lazy_load_filepath_function(
                     file_id=str(int(getattr(p, self.cache.file_id_column)))
