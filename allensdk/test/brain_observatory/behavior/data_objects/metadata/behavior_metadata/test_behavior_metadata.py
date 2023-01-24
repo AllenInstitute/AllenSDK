@@ -51,7 +51,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.
 from allensdk.brain_observatory.behavior.data_objects.metadata.subject_metadata.subject_metadata import (  # noqa: E501
     SubjectMetadata,
 )
-from allensdk.test.brain_observatory.behavior.data_objects.lims_util import (
+from allensdk.test.brain_observatory.behavior.data_objects.lims_util import (  # noqa: E501
     LimsTest,
 )
 
