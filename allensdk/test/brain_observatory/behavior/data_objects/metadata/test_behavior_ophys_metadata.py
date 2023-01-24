@@ -7,42 +7,42 @@ import pytest
 import pytz
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.equipment import (  # noqa: E501
     Equipment,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_ophys_metadata import (  # noqa: E501
     BehaviorOphysMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.field_of_view_shape import (  # noqa: E501
     FieldOfViewShape,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.imaging_depth import (  # noqa: E501
     ImagingDepth,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.imaging_plane_group import (  # noqa: E501
     ImagingPlaneGroup,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata import (  # noqa: E501
     MultiplaneMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_container_id import (  # noqa: E501
     OphysContainerId,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_experiment_metadata import (  # noqa: E501
     OphysExperimentMetadata,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_project_code import (  # noqa: E501
     OphysProjectCode,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.ophys_session_id import (  # noqa: E501
     OphysSessionId,
-)  # NOQA
+)
 from allensdk.brain_observatory.behavior.data_objects.metadata.ophys_experiment_metadata.targeted_imaging_depth import (  # noqa: E501
     TargetedImagingDepth,
-)  # NOQA
+)
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.test.brain_observatory.behavior.data_objects.metadata.behavior_metadata.test_behavior_metadata import (  # noqa: E501
     TestBehaviorMetadata,
-)  # NOQA
+)
 
 
 class TestBOM:
@@ -130,30 +130,41 @@ class TestInternal(TestBOM):
             assert bom.ophys_metadata.imaging_depth == 150
             assert bom.ophys_metadata.targeted_imaging_depth == 150
 
-            assert bom.behavior_metadata.session_type == 'OPHYS_1_images_A'
-            assert bom.behavior_metadata.subject_metadata.reporter_line == \
-                   'Ai148(TIT2L-GC6f-ICL-tTA2)'
-            assert bom.behavior_metadata.subject_metadata.driver_line == \
-                   ['Sst-IRES-Cre']
-            assert bom.behavior_metadata.subject_metadata.mouse_id == '457841'
-            assert bom.behavior_metadata.subject_metadata.full_genotype == \
-                   'Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
+            assert bom.behavior_metadata.session_type == "OPHYS_1_images_A"
+            assert (
+                bom.behavior_metadata.subject_metadata.reporter_line
+                == "Ai148(TIT2L-GC6f-ICL-tTA2)"
+            )
+            assert bom.behavior_metadata.subject_metadata.driver_line == [
+                "Sst-IRES-Cre"
+            ]
+            assert bom.behavior_metadata.subject_metadata.mouse_id == "457841"
+            assert (
+                bom.behavior_metadata.subject_metadata.full_genotype
+                == "Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt"
+            )
             assert bom.behavior_metadata.subject_metadata.age_in_days == 206
-            assert bom.behavior_metadata.subject_metadata.sex == 'F'
+            assert bom.behavior_metadata.subject_metadata.sex == "F"
         else:
             assert isinstance(bom.ophys_metadata, OphysExperimentMetadata)
             assert bom.ophys_metadata.imaging_depth == 175
             assert bom.ophys_metadata.targeted_imaging_depth == 175
-            assert bom.behavior_metadata.session_type == 'OPHYS_4_images_A'
-            assert bom.behavior_metadata.subject_metadata.reporter_line == \
-                   'Ai93(TITL-GCaMP6f)'
-            assert bom.behavior_metadata.subject_metadata.driver_line == \
-                   ['Camk2a-tTA', 'Slc17a7-IRES2-Cre']
-            assert bom.behavior_metadata.subject_metadata.mouse_id == '491060'
-            assert bom.behavior_metadata.subject_metadata.full_genotype == \
-                   'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt'
+            assert bom.behavior_metadata.session_type == "OPHYS_4_images_A"
+            assert (
+                bom.behavior_metadata.subject_metadata.reporter_line
+                == "Ai93(TITL-GCaMP6f)"
+            )
+            assert bom.behavior_metadata.subject_metadata.driver_line == [
+                "Camk2a-tTA",
+                "Slc17a7-IRES2-Cre",
+            ]
+            assert bom.behavior_metadata.subject_metadata.mouse_id == "491060"
+            assert (
+                bom.behavior_metadata.subject_metadata.full_genotype
+                == "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt"
+            )
             assert bom.behavior_metadata.subject_metadata.age_in_days == 120
-            assert bom.behavior_metadata.subject_metadata.sex == 'M'
+            assert bom.behavior_metadata.subject_metadata.sex == "M"
 
 
 class TestJson(TestBOM):
