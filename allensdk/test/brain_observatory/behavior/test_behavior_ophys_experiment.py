@@ -104,7 +104,7 @@ def test_visbeh_ophys_data_set():
         'ophys_frame_rate': 31.0,
         'imaging_depth': 375,
         'targeted_imaging_depth': 375,
-        'mouse_id': 416369,
+        'mouse_id': '416369',
         'ophys_container_id': 814796558,
         'targeted_structure': 'VISp',
         'reporter_line': 'Ai93(TITL-GCaMP6f)',
@@ -114,7 +114,7 @@ def test_visbeh_ophys_data_set():
         'field_of_view_width': 447,
         'indicator': 'GCaMP6f',
         'equipment_name': 'CAM2P.5',
-        'age_in_days': 139,
+        'age_in_days': 115,
         'sex': 'F',
         'imaging_plane_group': None,
         'project_code': 'VisualBehavior'
