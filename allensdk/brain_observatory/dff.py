@@ -294,7 +294,7 @@ def compute_dff_windowed_median(traces,
         sigma_f = noise_std(dff, **kwargs)
 
         # long timescale median filter for baseline subtraction
-        tf = median_filter(dff, median_kernel_long, mode='constant')
+        tf = median_filter(dff, median_kernel_long, mode='reflect')
         dff -= tf
         dff /= np.maximum(tf, sigma_f)
 
@@ -306,7 +306,7 @@ def compute_dff_windowed_median(traces,
             noise_stds.append(sigma_dff)
 
         # short timescale detrending
-        tf = median_filter(dff, median_kernel_short, mode='constant')
+        tf = median_filter(dff, median_kernel_short, mode='reflect')
         tf = np.minimum(tf, 2.5*sigma_dff)
         dff -= tf
 
@@ -326,7 +326,7 @@ def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5,
     _check_kernel(noise_kernel_length, len(x))
     if any(np.isnan(x)):
         return np.NaN
-    x = x - median_filter(x, noise_kernel_length, mode='constant')
+    x = x - median_filter(x, noise_kernel_length, mode='reflect')
     # first pass removing big pos peak outliers
     x = x[x < positive_peak_scale*np.abs(x.min())]
     rstd = robust_std(x)
