@@ -256,7 +256,7 @@ def compute_dff_windowed_median(traces,
 
     The operation is basically:
 
-        T_inactive = windowed_percentile(T)
+        T_inactive = T > (windowed_percentile(T) + 3 ) - noise_std(T)) 
 
         T_long = windowed_median(T_inactive) # long timescale kernel
 
