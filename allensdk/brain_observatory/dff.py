@@ -245,18 +245,18 @@ def compute_dff_windowed_mode(traces,
 
 
 def compute_dff_windowed_median(traces,
-                                            median_kernel_long=5401,
-                                            median_kernel_short=101,
-                                            noise_stds=None,
-                                            n_small_baseline_frames=None,
-                                            inactive_percentile=10,
-                                            detrending=False,
-                                            **kwargs):
+                                median_kernel_long=5401,
+                                median_kernel_short=101,
+                                noise_stds=None,
+                                n_small_baseline_frames=None,
+                                inactive_percentile=10,
+                                detrending=False,
+                                **kwargs):
     """Compute dF/F of a set of traces with median filter detrending.
 
     The operation is basically:
 
-        T_inactive = T > (windowed_percentile(T) + 3 ) - noise_std(T)) 
+        T_inactive = T > (windowed_percentile(T) + 3 ) - noise_std(T))
 
         T_long = windowed_median(T_inactive) # long timescale kernel
 
@@ -317,7 +317,7 @@ def compute_dff_windowed_median(traces,
         sigma_dff = noise_std(dff, **kwargs)
         if noise_stds is not None:
             noise_stds.append(sigma_dff)
-        
+
         if detrending:
             # short timescale detrending
             tf = median_filter(dff, median_kernel_short, mode='reflect')
@@ -326,10 +326,8 @@ def compute_dff_windowed_median(traces,
 
     return dff_traces
 
-#def median_filter_masked(input, mask, size):
-#    for i in range(input.size):
 
-def nanmedian_filter(x,filter_length):
+def nanmedian_filter(x, filter_length):
     """ 1D median filtering with np.nanmedian
     Parameters
     ----------
@@ -342,11 +340,12 @@ def nanmedian_filter(x,filter_length):
     """
     half_length = int(filter_length/2)
     # Create 'reflect' traces at the extrema
-    temp_trace = np.concatenate((np.flip(x[:half_length]), x, np.flip(x[-half_length:])))
+    temp_trace = np.concatenate(
+        (np.flip(x[:half_length]), x, np.flip(x[-half_length:])))
     filtered_trace = np.zeros_like(x)
     for i in range(len(x)):
         filtered_trace[i] = np.nanmedian(temp_trace[i:i+filter_length])
-    return filtered_trace        
+    return filtered_trace
 
 
 def _check_kernel(kernel_size, data_size):
