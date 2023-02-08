@@ -346,20 +346,7 @@ def nanmedian_filter(x,filter_length):
     filtered_trace = np.zeros_like(x)
     for i in range(len(x)):
         filtered_trace[i] = np.nanmedian(temp_trace[i:i+filter_length])
-    return filtered_trace
-
-def active_mask(traces,
-                          median_kernel_long=5401,
-                          inactive_percentile=10,
-                          **kwargs):
-    inactive_mask = np.ndarray(trace.shape, dtype='bool')
-    for i, trace in enumerate(traces):
-        sigma_f = noise_std(trace, **kwargs)
-        low_baseline = percentile_filter(trace, size=median_kernel_long, percentile=inactive_percentile, mode='reflect')
-        inactive_mask[i] = trace <= (low_baseline + 3 * sigma_f)
-
-        
-        
+    return filtered_trace        
 
 
 def _check_kernel(kernel_size, data_size):
