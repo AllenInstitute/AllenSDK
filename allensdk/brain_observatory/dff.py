@@ -39,7 +39,7 @@ import argparse
 import matplotlib.pyplot as plt
 import h5py
 import numpy as np
-from scipy.ndimage.filters import median_filter
+from scipy.ndimage.filters import median_filter, percentile_filter
 
 from allensdk.core.brain_observatory_nwb_data_set import \
     BrainObservatoryNwbDataSet
@@ -245,16 +245,20 @@ def compute_dff_windowed_mode(traces,
 
 
 def compute_dff_windowed_median(traces,
-                                median_kernel_long=5401,
-                                median_kernel_short=101,
-                                noise_stds=None,
-                                n_small_baseline_frames=None,
-                                **kwargs):
+                                            median_kernel_long=5401,
+                                            median_kernel_short=101,
+                                            noise_stds=None,
+                                            n_small_baseline_frames=None,
+                                            inactive_percentile=10,
+                                            detrending=False,
+                                            **kwargs):
     """Compute dF/F of a set of traces with median filter detrending.
 
     The operation is basically:
 
-        T_long = windowed_median(T) # long timescale kernel
+        T_inactive = windowed_percentile(T)
+
+        T_long = windowed_median(T_inactive) # long timescale kernel
 
         T_dff1 = (T - T_long) / elementwise_max(T_long, noise_std(T))
 
@@ -277,6 +281,8 @@ def compute_dff_windowed_median(traces,
         List that will contain the number of frames for each trace where
         the long-timescale median window is less than noise_std(T). The
         value for each trace will be appended to the list if provided.
+    inactive_percentile : int
+
     kwargs:
         Additional keyword arguments are passed to :func:`noise_std` .
 
@@ -291,12 +297,19 @@ def compute_dff_windowed_median(traces,
     dff_traces = np.copy(traces)
 
     for dff in dff_traces:
+        inactive_trace = dff.copy()
         sigma_f = noise_std(dff, **kwargs)
-
-        # long timescale median filter for baseline subtraction
-        tf = median_filter(dff, median_kernel_long, mode='reflect')
-        dff -= tf
-        dff /= np.maximum(tf, sigma_f)
+        if inactive_percentile > 0 or inactive_percentile < 100:
+            low_baseline = percentile_filter(
+                dff, size=median_kernel_long,
+                percentile=inactive_percentile,
+                mode='reflect')
+            active_mask = dff > (low_baseline + 3 * sigma_f)
+            inactive_trace[active_mask] = float('nan')
+            tf = nanmedian_filter(inactive_trace, median_kernel_long)
+        else:
+            tf = median_filter(dff, median_kernel_long, mode='reflect')
+        dff = (dff - tf) / np.maximum(tf, sigma_f)
 
         if n_small_baseline_frames is not None:
             n_small_baseline_frames.append(np.sum(tf <= sigma_f))
@@ -304,13 +317,49 @@ def compute_dff_windowed_median(traces,
         sigma_dff = noise_std(dff, **kwargs)
         if noise_stds is not None:
             noise_stds.append(sigma_dff)
-
-        # short timescale detrending
-        tf = median_filter(dff, median_kernel_short, mode='reflect')
-        tf = np.minimum(tf, 2.5*sigma_dff)
-        dff -= tf
+        
+        if detrending:
+            # short timescale detrending
+            tf = median_filter(dff, median_kernel_short, mode='reflect')
+            tf = np.minimum(tf, 2.5*sigma_dff)
+            dff -= tf
 
     return dff_traces
+
+#def median_filter_masked(input, mask, size):
+#    for i in range(input.size):
+
+def nanmedian_filter(x,filter_length):
+    """ 1D median filtering with np.nanmedian
+    Parameters
+    ----------
+    x: 1D trace to be filtered
+    filter_length: length of the filter
+
+    Return
+    ------
+    filtered_trace
+    """
+    half_length = int(filter_length/2)
+    # Create 'reflect' traces at the extrema
+    temp_trace = np.concatenate((np.flip(x[:half_length]), x, np.flip(x[-half_length:])))
+    filtered_trace = np.zeros_like(x)
+    for i in range(len(x)):
+        filtered_trace[i] = np.nanmedian(temp_trace[i:i+filter_length])
+    return filtered_trace
+
+def active_mask(traces,
+                          median_kernel_long=5401,
+                          inactive_percentile=10,
+                          **kwargs):
+    inactive_mask = np.ndarray(trace.shape, dtype='bool')
+    for i, trace in enumerate(traces):
+        sigma_f = noise_std(trace, **kwargs)
+        low_baseline = percentile_filter(trace, size=median_kernel_long, percentile=inactive_percentile, mode='reflect')
+        inactive_mask[i] = trace <= (low_baseline + 3 * sigma_f)
+
+        
+        
 
 
 def _check_kernel(kernel_size, data_size):
