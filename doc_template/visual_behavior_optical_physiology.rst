@@ -43,31 +43,34 @@ called optical physiology, or “ophys”) to measure the activity
 of genetically identified neurons in the visual cortex of mice performing a 
 go/no-go visual change detection task. This dataset can be used to evaluate the 
 influence of experience, expectation, and task engagement on neural coding 
-and dynamics in excitatory and inhibitory cell populations.  
+and dynamics in excitatory and inhibitory cell populations. A description of the 
+experimental design and available data is provided below.  
 
-.. image:: /_static/visual_behavior_2p/visual_behavior.png
+.. image:: /_static/visual_behavior_2p/visual_behavior_2p.png
    :align: center
    :width: 850
 
-We used single- and multi-plane imaging 
-approaches to record the activity of populations of neurons across multiple 
-cortical depths and visual areas. Each population of neurons was imaged 
+We used single- and multi-plane imaging approaches to record the activity 
+of populations of neurons across multiple cortical depths and visual areas 
+during change detection behavior. Each population of neurons was imaged 
 repeatedly over multiple days under different sensory and behavioral 
 contexts, including familiar and novel stimuli, as well as active behavior 
 and passive viewing conditions. 
 
 .. image:: /_static/visual_behavior_2p/experimental_design_session_types.png
    :align: center
-   :width: 850
+   :width: 550
 
-Different imaging configurations and stimulus sets were used in 
-different groups of mice, resulting in four unique datasets (indicated by their "project code"). 
-Two single-plane 2-photon datasets were acquired in the primary visual cortex (VISp),
-and the image set that became familiar over training was swapped to control for novelty effects.
-One multi-plane dataset was acquired at 4 cortical depths in 2 visual areas (VISp & VISl).
-Another multi-plane dataset was acquired at 2 cortical depths in 4 visual areas (VISp, VISl, VISal, VISam).
-In this dataset, two of the images that became highly familiar during training ("shared images") were interleaved
-among novel images during the novel sessions.
+Different imaging configurations and stimulus sets were used in different groups of mice, 
+resulting in four unique datasets (indicated by their "project_code" in SDK metadata tables). 
+Two single-plane 2-photon datasets were acquired in the primary visual cortex (VISp). 
+In the VisualBehavior dataset, mice were trained with image set A and tested with image set B
+which was novel to the mice. In the VisualBehaviorTask1B dataset, mice were trained with image set B
+and tested with image set A as the novel image set. One multi-plane dataset (VisualBehahviorMultiscope) was acquired 
+at 4 cortical depths in 2 visual areas (VISp & VISl) using image set A for training and image set B for novelty.
+Another multi-plane dataset (VisualBehaviorMultiscope4areasx2d) was acquired at 2 cortical depths 
+in 4 visual areas (VISp, VISl, VISal, VISam). In this dataset, two of the images that became highly familiar 
+during training with image set G were interleaved among novel images in image set H.
 
 .. image:: /_static/visual_behavior_2p/dataset_variants_GH.png
    :align: center
@@ -81,14 +84,13 @@ Imaging took place between 75-400um below the cortical surface.
 
 .. image:: /_static/visual_behavior_2p/cre_lines.png
    :align: center
-   :width: 850
+   :width: 550
 
-Overall, the dataset includes neural and behavioral measurements from 107 
+The full dataset includes neural and behavioral measurements from 107 
 mice during 704 in vivo 2-photon imaging sessions from 326 unique fields of view, 
 resulting in longitudinal recordings from 50,482 cortical neurons. 
-
 The table below describes the numbers of mice, sessions, and unique recorded 
-neurons for each transgenic line and experimental configuration (project code):
+neurons for each transgenic line and experimental configuration:
 
 .. image:: /_static/visual_behavior_2p/final_dataset_numbers.png
    :align: center
@@ -101,9 +103,13 @@ BEHAVIORAL TRAINING
 Prior to 2-photon imaging, mice were trained to perform a go/no-go visual 
 change detection task in which they learned to lick a spout in response to 
 changes in stimulus identity to earn a water reward. The full 
-behavioral training history of all imaged mice is available (4,787 behavior sessions), 
+behavioral training history of all imaged mice is provided as part of the dataset, 
 allowing investigation into task learning, behavioral strategy, and inter-animal 
-variability.
+variability. There are a total of 4,787 behavior sessions available for analysis.
+
+.. image:: /_static/visual_behavior_2p/automated_training.png
+   :align: center
+   :width: 850
 
 We used a standardized procedure to progress mice through a series of 
 training stages, with transitions between stages determined by specific 
@@ -111,7 +117,7 @@ advancement criteria. First, mice learned to detect changes in the
 orientation of full field static grating stimuli. Next, a 500ms inter 
 stimulus interval period with mean luminance gray screen was added between 
 the 250ms stimulus presentations, incorporating a short-term memory component 
-to the task. Once mice successfully and consistently performed the orientation 
+to the task. Once mice successfully and consistently performed orientation 
 change detection with flashed gratings, they moved to the image change 
 detection version of the task. During image change detection, 8 natural scene 
 images were presented during each behavioral session, for a total of 64 
@@ -120,10 +126,6 @@ criterion (d-prime >1 for 2 out of 3 consecutive days),
 mice were transitioned to the 2-photon imaging stage in which they 
 performed the task under a microscope to allow simultaneous measurement of 
 neural activity and behavior. 
-
-.. image:: /_static/visual_behavior_2p/automated_training.png
-   :align: center
-   :width: 850
 
 Behavioral training data for mice progressing through these 
 stages of task learning is accessible via the **BehaviorSession** 
@@ -144,8 +146,8 @@ contains the following data streams, event times, and metadata:
 
 Once mice are well-trained on the image change detection task, 
 they transition to performing the behavior under a 2-photon 
-microscope. During the imaging phase, mice undergo multiple 
-**session types**, allowing measurement of neural activity across 
+microscope. Each 2-photon field of view is imaged across multiple session types, 
+allowing measurement of neural activity across 
 different sensory and behavioral contexts. 
 
 .. image:: /_static/visual_behavior_2p/expt_design_notes.png
@@ -159,15 +161,16 @@ undergo several sessions with a novel image set that they had not seen
 prior to the 2-photon imaging portion of the experiment. Passive viewing 
 sessions are interleaved between active behavior sessions.
 On passive days, mice are given their daily water before the session (and are thus satiated) 
-and view the task stimuli in open loop mode, with the lick spout retracted 
-to indicate that rewards are not availabl. This allows investigation of the 
+and view the stimulus in open loop mode, with the lick spout retracted 
+to indicate that rewards are not available. This allows investigation of the 
 impact of motivation and attention on patterns of neural activity. 
 
-During ophys sessions (but not during training), stimuli were randomly 
-omitted with a 5% probability, resulting in an extended gray screen period 
-between two presentations of the same stimulus, and disrupting the expected 
+During imaging sessions (but not during training), stimulus presentations were randomly 
+omitted with a 5% probability resulting in an extended gray screen period 
+between two presentations of the same stimulus, disrupting the expected 
 cadence of stimulus presentations. The change and pre-change stimulus presentations 
-were never omitted. 
+were never omitted. Running speed, pupil diameter, licking, and reward delivery
+were measured concurrent with 2-photon imaging of neural activity.
 
 .. image:: /_static/visual_behavior_2p/data_streams.png
    :align: center
@@ -177,7 +180,7 @@ The **BehaviorOphysExperiment** class in the AllenSDK (or the
 :py:meth:`.get_behavior_ophys_experiment()` method of the 
 **VisualBehaviorOphysProjectCache**) provides all data for a 
 single imaging plane, recorded in a single session, and contains 
-the following data streams:
+the following data and metadata:
 
 - Maximum intensity image
 - Average intensity image
@@ -185,33 +188,36 @@ the following data streams:
 - dF/F traces (baseline corrected, normalized fluorescence traces)
 - Corrected fluorescence traces (neuropil subtracted and demixed, but not normalized)
 - Events (detected with an L0 event detection algorithm)
-- Pupil position
-- Pupil area
-- Running speed
+- Pupil position, diameter, and area
+- Running speed (in cm/second)
 - Lick times
 - Reward times
-- Stimulus presentations
+- Stimulus presentation times	
 - Behavioral trial information
 - Mouse metadata (age, sex, genotype, etc) 
+
+The data collected in a single continuous recording is defined as a 
+**session** and receives a unique `ophys_session_id`. 
+Each imaging plane in a given session is referred to as 
+an **experiment** and receives a unique `ophys_experiment_id`. 
+For single-plane imaging, there is only one 
+imaging plane (i.e. one experimen) per session. For 
+multi-plane imaging, there can be up to 8 imaging planes 
+(i.e. 8 experiments) per session. Due to our strict QC process, described 
+below, not all multi-plane imaging sessions have exactly 8 experiments, 
+as some imaging planes did not meet our data quality criteria. 
 
 .. image:: /_static/visual_behavior_2p/data_structure.png
    :align: center
    :width: 850
-
-The data collected in a single continuous recording is defined as a 
-**session**. For single-plane imaging experiments, there is only one 
-imaging plane (referred to as an **experiment**) per session. For 
-multi-plane imaging experiments, there can be up to 8 imaging planes 
-(aka 8 experiments) per session. Due to our strict QC process, described 
-below, not all multi-plane imaging sessions have exactly 8 experiments, 
-as some imaging planes did not meet our data quality criteria. 
 
 We aimed to track the activity of single neurons across the session 
 types described above by targeting the same population of neurons over 
 multiple recording sessions, with only one session recorded per day 
 for a given mouse. The collection of imaging sessions for a given 
 population of cells, belonging to a single imaging plane measured 
-across days, is called a **container**. A container can include between 
+across days, is called a **container** and receives a unique 
+`ophys_container_id`. A container can include between 
 3 and 11 separate sessions for that imaging plane. Mice imaged 
 with the multi-plane 2-photon microscope can have multiple containers, 
 one for each imaging plane recorded across multiple sessions. The session 
