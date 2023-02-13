@@ -57,9 +57,9 @@ repeatedly over multiple days under different sensory and behavioral
 contexts, including familiar and novel stimuli, as well as active behavior 
 and passive viewing conditions. 
 
-.. image:: /_static/visual_behavior_2p/experimental_design_session_types.png
+.. image:: /_static/visual_behavior_2p/experimental_design.png
    :align: center
-   :width: 550
+   :width: 850
 
 Different imaging configurations and stimulus sets were used in different groups of mice, 
 resulting in four unique datasets (indicated by their "project_code" in SDK metadata tables). 
@@ -84,7 +84,7 @@ Imaging took place between 75-400um below the cortical surface.
 
 .. image:: /_static/visual_behavior_2p/cre_lines.png
    :align: center
-   :width: 550
+   :width: 850
 
 The full dataset includes neural and behavioral measurements from 107 
 mice during 704 in vivo 2-photon imaging sessions from 326 unique fields of view, 
@@ -165,7 +165,7 @@ and view the stimulus in open loop mode, with the lick spout retracted
 to indicate that rewards are not available. This allows investigation of the 
 impact of motivation and attention on patterns of neural activity. 
 
-During imaging sessions (but not during training), stimulus presentations were randomly 
+During imaging sessions (but not during training), stimulus presentations are randomly 
 omitted with a 5% probability resulting in an extended gray screen period 
 between two presentations of the same stimulus, disrupting the expected 
 cadence of stimulus presentations. The change and pre-change stimulus presentations 
