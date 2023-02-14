@@ -62,13 +62,13 @@ and passive viewing conditions.
    :width: 850
 
 Different imaging configurations and stimulus sets were used in different groups of mice, 
-resulting in four unique datasets (indicated by their "project_code" in SDK metadata tables). 
+resulting in four unique datasets (indicated by their **project_code** in SDK metadata tables). 
 Two single-plane 2-photon datasets were acquired in the primary visual cortex (VISp). 
-In the VisualBehavior dataset, mice were trained with image set A and tested with image set B
-which was novel to the mice. In the VisualBehaviorTask1B dataset, mice were trained with image set B
-and tested with image set A as the novel image set. One multi-plane dataset (VisualBehahviorMultiscope) was acquired 
+In the `VisualBehavior` dataset, mice were trained with image set A and tested with image set B
+which was novel to the mice. In the `VisualBehaviorTask1B` dataset, mice were trained with image set B
+and tested with image set A as the novel image set. One multi-plane dataset (`VisualBehahviorMultiscope`) was acquired 
 at 4 cortical depths in 2 visual areas (VISp & VISl) using image set A for training and image set B for novelty.
-Another multi-plane dataset (VisualBehaviorMultiscope4areasx2d) was acquired at 2 cortical depths 
+Another multi-plane dataset (`VisualBehaviorMultiscope4areasx2d`) was acquired at 2 cortical depths 
 in 4 visual areas (VISp, VISl, VISal, VISam). In this dataset, two of the images that became highly familiar 
 during training with image set G were interleaved among novel images in image set H.
 
@@ -166,11 +166,11 @@ to indicate that rewards are not available. This allows investigation of the
 impact of motivation and attention on patterns of neural activity. 
 
 During imaging sessions (but not during training), stimulus presentations are randomly 
-omitted with a 5% probability resulting in an extended gray screen period 
-between two presentations of the same stimulus, disrupting the expected 
+omitted with a 5% probability, resulting in an extended gray screen period 
+between two presentations of the same stimulus and disrupting the expected 
 cadence of stimulus presentations. The change and pre-change stimulus presentations 
-were never omitted. Running speed, pupil diameter, licking, and reward delivery
-were measured concurrent with 2-photon imaging of neural activity.
+are never omitted. Running speed, pupil diameter, licking, and reward delivery
+are measured and aligned to neural activity traces.
 
 .. image:: /_static/visual_behavior_2p/data_streams.png
    :align: center
@@ -201,11 +201,11 @@ The data collected in a single continuous recording is defined as a
 Each imaging plane in a given session is referred to as 
 an **experiment** and receives a unique `ophys_experiment_id`. 
 For single-plane imaging, there is only one 
-imaging plane (i.e. one experimen) per session. For 
+imaging plane (i.e. one experiment) per session. For 
 multi-plane imaging, there can be up to 8 imaging planes 
 (i.e. 8 experiments) per session. Due to our strict QC process, described 
 below, not all multi-plane imaging sessions have exactly 8 experiments, 
-as some imaging planes did not meet our data quality criteria. 
+as some imaging planes may not meet our data quality criteria. 
 
 .. image:: /_static/visual_behavior_2p/data_structure.png
    :align: center
