@@ -8,6 +8,10 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     OphysMixin
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .project_table import ProjectTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.metadata_parsers import (  # noqa: E501
+    parse_num_cortical_structures,
+    parse_num_depths,
+)
 
 
 class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
@@ -33,6 +37,16 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         OphysMixin.__init__(self)
 
     def postprocess_additional(self):
+        # Add ophys specific information.
+        project_code_col = (
+            "project_code_ophys"
+            if "project_code_ophys" in self._df.columns
+            else "project_code"
+        )
+        self._df['targeted_areas'] = self._df[project_code_col].apply(
+            parse_num_cortical_structures).astype('Int64')
+        self._df['num_dpeths_per_area'] = self._df[project_code_col].apply(
+            parse_num_depths).astype('Int64')
         # Possibly explode and reindex
         self.__explode()
 

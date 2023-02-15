@@ -238,26 +238,6 @@ def _add_prior_omissions(
             'ecephys': ecephys_sessions_df}
 
 
-def _add_experience_level(
-        sessions_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Add the column 'experience_level' to a dataframe. This column
-    will be 'Novel' for any rows with
-    'prior_exposures_to_image_set' == 0 (or NULL) and 'Familiar'
-    otherwise.
-
-    Return the same dataframe with the column added
-    """
-
-    sessions_df['experience_level'] = np.where(
-                  np.logical_or(
-                      sessions_df['prior_exposures_to_image_set'] == 0,
-                      sessions_df['prior_exposures_to_image_set'].isnull()),
-                  'Novel',
-                  'Familiar')
-    return sessions_df
-
-
 def _patch_date_and_stage_from_pickle_file(
         lims_connection: PostgresQueryMixin,
         behavior_df: pd.DataFrame,

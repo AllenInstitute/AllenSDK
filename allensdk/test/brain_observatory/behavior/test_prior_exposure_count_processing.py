@@ -14,9 +14,10 @@ def test_prior_exposure_to_session_type():
         'mouse_id': [0, 0, 0, 0, 1],
         'date_of_acquisition': [0, 1, 2, 3, 0]
     }, index=pd.Series([0, 1, 2, 3, 4], name='behavior_session_id'))
-    expected = pd.Series([0, 1, np.nan, 2, 0],
-                         index=pd.Series([0, 1, 2, 3, 4],
-                                         name='behavior_session_id'))
+    expected = pd.Series(
+        [0, 1, np.nan, 2, 0],
+        index=pd.Series([0, 1, 2, 3, 4],
+                        name='behavior_session_id')).astype('Int64')
     obtained = get_prior_exposures_to_session_type(df=df)
     pd.testing.assert_series_equal(expected, obtained)
 
@@ -30,9 +31,10 @@ def test_prior_exposure_to_image_set():
         'mouse_id': [0, 0, 0, 0, 1],
         'date_of_acquisition': [0, 1, 2, 3, 0]
     }, index=pd.Index([0, 1, 2, 3, 4], name='behavior_session_id'))
-    expected = pd.Series([0, 1, np.nan, 2, np.nan],
-                         index=pd.Series([0, 1, 2, 3, 4],
-                                         name='behavior_session_id'))
+    expected = pd.Series(
+        [0, 1, np.nan, 2, np.nan],
+        index=pd.Series([0, 1, 2, 3, 4],
+                        name='behavior_session_id')).astype('Int64')
     obtained = get_prior_exposures_to_image_set(df=df)
     pd.testing.assert_series_equal(expected, obtained)
 
@@ -49,9 +51,10 @@ def test_prior_exposure_to_omissions():
         'foraging_id': [1, 2, 3, 4, 5],
         'date_of_acquisition': [0, 1, 0, 1, 2]
     }, index=pd.Index([0, 1, 2, 3, 4], name='behavior_session_id'))
-    expected = pd.Series([0, 1, 0, 0, 1],
-                         index=pd.Index([0, 1, 2, 3, 4],
-                                        name='behavior_session_id'))
+    expected = pd.Series(
+        [0, 1, 0, 0, 1],
+        index=pd.Index([0, 1, 2, 3, 4],
+                       name='behavior_session_id')).astype('Int64')
 
     class MockFetchApi:
         def get_behavior_stage_parameters(self, foraging_ids):
