@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
@@ -19,7 +20,8 @@ def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
     Series with index same as df and values prior exposure counts to
     session type
     """
-    return __get_prior_exposure_count(df=df, to=df['session_type'])
+    return __get_prior_exposure_count(df=df,
+                                      to=df['session_type']).astype('Int64')
 
 
 def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
@@ -41,7 +43,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     Series with index same as df and values prior exposure counts to image set
     """
     image_set = get_image_set(df=df)
-    return __get_prior_exposure_count(df=df, to=image_set)
+    return __get_prior_exposure_count(df=df, to=image_set).astype('Int64')
 
 
 def get_prior_exposures_to_omissions(df: pd.DataFrame,
@@ -117,7 +119,7 @@ def get_prior_exposures_to_omissions(df: pd.DataFrame,
         (~df.index.isin(habituation_sessions.index))
         ] = True
     return __get_prior_exposure_count(df=df, to=contains_omissions,
-                                      agg_method='cumsum')
+                                      agg_method='cumsum').astype('Int64')
 
 
 def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
@@ -169,3 +171,29 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
 
     # reindex to original index
     return counts.reindex(index)
+
+
+def add_experience_level(sessions_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add the column 'experience_level' to a dataframe.
+
+    This column
+    will be 'Novel' for any rows with
+    'prior_exposures_to_image_set' == 0 (or NULL) and 'Familiar'
+    otherwise.
+
+    Parameters
+    ----------
+    sessions_df : pandas.DataFrame
+        Input sessions dataframe
+
+    Returns
+    -------
+    output_df : pandas.DataFrame
+        DataFrame with added "experience_level" column.
+    """
+    tmp_exposures = sessions_df["prior_exposures_to_image_set"].fillna(0)
+    sessions_df["experience_level"] = np.where(
+        tmp_exposures == 0, "Novel", "Familiar"
+    )
+    return sessions_df

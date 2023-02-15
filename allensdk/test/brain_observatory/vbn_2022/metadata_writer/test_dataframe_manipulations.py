@@ -14,11 +14,13 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
 from allensdk.brain_observatory.vbn_2022.metadata_writer \
     .dataframe_manipulations import (
         _add_session_number,
-        _add_experience_level,
         _patch_date_and_stage_from_pickle_file,
         _add_age_in_days,
         _add_images_from_behavior,
         strip_substructure_acronym_df)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level
+)
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
     remove_invalid_sessions
 
@@ -149,7 +151,7 @@ def test_add_experience_level():
                        'prior_exposures_to_image_set': 0})
 
     input_df = pd.DataFrame(data=input_data)
-    actual = _add_experience_level(sessions_df=input_df)
+    actual = add_experience_level(sessions_df=input_df)
 
     input_data[0]['experience_level'] = 'Familiar'
     input_data[1]['experience_level'] = 'Novel'

@@ -18,6 +18,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prio
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_omissions,
     get_prior_exposures_to_session_type,
+    add_experience_level
 )
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -36,6 +37,10 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.util.multi_session_utils import (
     multiprocessing_helper,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.metadata_parsers import (  # noqa: E501
+    parse_behavior_context,
+    parse_stimulus_set,
 )
 
 
@@ -100,6 +105,12 @@ class SessionsTable(ProjectTable, OphysMixin):
         ] = get_prior_exposures_to_omissions(
             df=self._df, fetch_api=self._fetch_api
         )
+
+        self._df['behavior_type'] = self._df['session_type'].apply(
+            parse_behavior_context)
+        self._df['image_set'] = self._df['session_type'].apply(
+            parse_stimulus_set)
+        self._df = add_experience_level(self._df)
 
         if self._include_trial_metrics:
             # add trial metrics

@@ -21,7 +21,6 @@ from allensdk.brain_observatory.vbn_2022. \
         _add_prior_omissions,
         _add_session_number,
         _add_age_in_days,
-        _add_experience_level,
         _add_images_from_behavior)
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
@@ -34,6 +33,9 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
         get_image_set)
 from allensdk.internal.brain_observatory.util.multi_session_utils import \
     get_session_metadata_multiprocessing, remove_invalid_sessions
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level
+)
 
 
 def get_list_of_bad_probe_ids(
@@ -927,7 +929,7 @@ def session_tables_from_ecephys_session_id_list(
     sessions_table = _add_session_number(
                             sessions_df=summary_tbl,
                             index_col="ecephys_session_id")
-    sessions_table = _add_experience_level(
+    sessions_table = add_experience_level(
                             sessions_df=sessions_table)
 
     omission_results = _add_prior_omissions(
