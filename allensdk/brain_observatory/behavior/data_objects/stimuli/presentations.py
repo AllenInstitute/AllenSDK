@@ -205,85 +205,88 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         #   1. Nulls in `image_name` should be "gratings_<orientation>"
         #   2. Gratings are only present (or need to be fixed) when all
         #      values for `image_name` are null.
-        if pd.isnull(raw_stim_pres_df["image_name"]).all():
-            if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
-                raw_stim_pres_df["image_name"] = (
-                    raw_stim_pres_df["orientation"]
-                    .apply(lambda x: f"gratings_{x}"))
-            else:
-                raise ValueError("All values for 'orientation' and "
-                                 "'image_name are null.")
+        if "image_name" in raw_stim_pres_df:
+            if pd.isnull(raw_stim_pres_df["image_name"]).all():
+                if ~pd.isnull(raw_stim_pres_df["orientation"]).all():
+                    raw_stim_pres_df["image_name"] = (
+                        raw_stim_pres_df["orientation"]
+                        .apply(lambda x: f"gratings_{x}"))
+                else:
+                    raise ValueError("All values for 'orientation' and "
+                                    "'image_name are null.")
 
-        stimulus_metadata_df = get_stimulus_metadata(data)
+            stimulus_metadata_df = get_stimulus_metadata(data)
 
-        idx_name = raw_stim_pres_df.index.name
-        stimulus_index_df = (
-            raw_stim_pres_df
-            .reset_index()
-            .merge(stimulus_metadata_df.reset_index(),
-                   on=["image_name"])
-            .set_index(idx_name))
-        stimulus_index_df = (
-            stimulus_index_df[["image_set", "image_index", "start_time",
-                               "phase", "spatial_frequency"]]
-            .rename(columns={"start_time": "timestamps"})
-            .sort_index()
-            .set_index("timestamps", drop=True))
-        stim_pres_df = raw_stim_pres_df.merge(
-            stimulus_index_df, left_on="start_time", right_index=True,
-            how="left")
-        if len(raw_stim_pres_df) != len(stim_pres_df):
-            raise ValueError("Length of `stim_pres_df` should not change after"
-                             f" merge; was {len(raw_stim_pres_df)}, now "
-                             f" {len(stim_pres_df)}.")
+            idx_name = raw_stim_pres_df.index.name
+            stimulus_index_df = (
+                raw_stim_pres_df
+                .reset_index()
+                .merge(stimulus_metadata_df.reset_index(),
+                    on=["image_name"])
+                .set_index(idx_name))
+            stimulus_index_df = (
+                stimulus_index_df[["image_set", "image_index", "start_time",
+                                "phase", "spatial_frequency"]]
+                .rename(columns={"start_time": "timestamps"})
+                .sort_index()
+                .set_index("timestamps", drop=True))
+            stim_pres_df = raw_stim_pres_df.merge(
+                stimulus_index_df, left_on="start_time", right_index=True,
+                how="left")
+            if len(raw_stim_pres_df) != len(stim_pres_df):
+                raise ValueError("Length of `stim_pres_df` should not change after"
+                                f" merge; was {len(raw_stim_pres_df)}, now "
+                                f" {len(stim_pres_df)}.")
 
-        stim_pres_df['is_change'] = is_change_event(
-            stimulus_presentations=stim_pres_df)
-        stim_pres_df['flashes_since_change'] = get_flashes_since_change(
-            stimulus_presentations=stim_pres_df)
+            stim_pres_df['is_change'] = is_change_event(
+                stimulus_presentations=stim_pres_df)
+            stim_pres_df['flashes_since_change'] = get_flashes_since_change(
+                stimulus_presentations=stim_pres_df)
 
-        # Sort columns then drop columns which contain only all NaN values
-        stim_pres_df = \
-            stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
-        if limit_to_images is not None:
+            # Sort columns then drop columns which contain only all NaN values
             stim_pres_df = \
-                stim_pres_df[stim_pres_df['image_name'].isin(limit_to_images)]
-            stim_pres_df.index = pd.Int64Index(
-                range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
+                stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
+            if limit_to_images is not None:
+                stim_pres_df = \
+                    stim_pres_df[stim_pres_df['image_name'].isin(limit_to_images)]
+                stim_pres_df.index = pd.Int64Index(
+                    range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
 
-        stim_pres_df['stimulus_block'] = 0
-        # Match the Ecephys VBN stimulus name convention.
-        try:
-            stim_pres_df['stimulus_name'] = Path(
-                stimulus_file.stimuli['images']['image_set']).\
-                stem.split('.')[0]
-        except KeyError:
-            # if we can't find the images key in the stimuli, check for the
-            # name ``grating`` as the stimulus. If not add generic
-            # ``behavior``.
-            if 'grating' in stimulus_file.stimuli.keys():
-                stim_pres_df['stimulus_name'] = 'grating'
-            else:
-                stim_pres_df['stimulus_name'] = 'behavior'
+            stim_pres_df['stimulus_block'] = 0
+            # Match the Ecephys VBN stimulus name convention.
+            try:
+                stim_pres_df['stimulus_name'] = Path(
+                    stimulus_file.stimuli['images']['image_set']).\
+                    stem.split('.')[0]
+            except KeyError:
+                # if we can't find the images key in the stimuli, check for the
+                # name ``grating`` as the stimulus. If not add generic
+                # ``behavior``.
+                if 'grating' in stimulus_file.stimuli.keys():
+                    stim_pres_df['stimulus_name'] = 'grating'
+                else:
+                    stim_pres_df['stimulus_name'] = 'behavior'
 
-        stim_pres_df = fix_omitted_end_frame(stim_pres_df)
+            stim_pres_df = fix_omitted_end_frame(stim_pres_df)
 
-        cls._add_is_image_novel(stimulus_presentations=stim_pres_df,
-                                behavior_session_id=behavior_session_id)
+            cls._add_is_image_novel(stimulus_presentations=stim_pres_df,
+                                    behavior_session_id=behavior_session_id)
 
-        has_fingerprint_stimulus = \
-            'fingerprint' in stimulus_file.data['items']['behavior']['items']
-        if has_fingerprint_stimulus:
-            stim_pres_df = cls._add_fingerprint_stimulus(
-                stimulus_presentations=stim_pres_df,
-                stimulus_file=stimulus_file,
-                stimulus_timestamps=stimulus_timestamps
+            has_fingerprint_stimulus = \
+                'fingerprint' in stimulus_file.data['items']['behavior']['items']
+            if has_fingerprint_stimulus:
+                stim_pres_df = cls._add_fingerprint_stimulus(
+                    stimulus_presentations=stim_pres_df,
+                    stimulus_file=stimulus_file,
+                    stimulus_timestamps=stimulus_timestamps
+                )
+            stim_pres_df = cls._postprocess(
+                presentations=stim_pres_df,
+                fill_omitted_values=fill_omitted_values,
+                coerce_bool_to_boolean=True
             )
-        stim_pres_df = cls._postprocess(
-            presentations=stim_pres_df,
-            fill_omitted_values=fill_omitted_values,
-            coerce_bool_to_boolean=True
-        )
+        else:
+            stim_pres_df = raw_stim_pres_df
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 

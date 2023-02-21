@@ -36,19 +36,22 @@ class Rewards(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
             raise RuntimeError(msg)
 
         data = stimulus_file.data
+        if "trial_log" in data["items"]["behavior"]:
+            trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])
+            rewards_dict = {"volume": [], "timestamps": [], "auto_rewarded": []}
+            for idx, trial in trial_df.iterrows():
+                rewards = trial["rewards"]
+                # as i write this there can only ever be one reward per trial
+                if rewards:
+                    rewards_dict["volume"].append(rewards[0][0])
+                    rewards_dict["timestamps"].append(
+                        stimulus_timestamps.value[rewards[0][2]])
+                    auto_rwrd = trial["trial_params"]["auto_reward"]
+                    rewards_dict["auto_rewarded"].append(auto_rwrd)
 
-        trial_df = pd.DataFrame(data["items"]["behavior"]["trial_log"])
-        rewards_dict = {"volume": [], "timestamps": [], "auto_rewarded": []}
-        for idx, trial in trial_df.iterrows():
-            rewards = trial["rewards"]
-            # as i write this there can only ever be one reward per trial
-            if rewards:
-                rewards_dict["volume"].append(rewards[0][0])
-                rewards_dict["timestamps"].append(
-                    stimulus_timestamps.value[rewards[0][2]])
-                auto_rwrd = trial["trial_params"]["auto_reward"]
-                rewards_dict["auto_rewarded"].append(auto_rwrd)
-
+        else:
+            rewards_dict = data["items"]["behavior"]["rewards"]
+        
         df = pd.DataFrame(rewards_dict)
         return cls(rewards=df)
 

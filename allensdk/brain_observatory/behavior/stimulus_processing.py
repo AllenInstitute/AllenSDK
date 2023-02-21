@@ -2,6 +2,7 @@ import pickle
 import warnings
 from typing import Dict, List, Tuple, Union, Optional, Set
 
+import os
 import numpy as np
 import pandas as pd
 
@@ -433,81 +434,182 @@ def get_visual_stimuli_df(
                  that were displayed with their frame, end_frame, start_time,
                  and duration
     """
+    if data['items']['behavior']['params']['stage'] == 'STAGE_0':
+        n_frames = len(time)
+        stimuli = data['stimuli']
+        pre_blank_sec = int(data['pre_blank_sec'])
+        stim_time_stamps = {}
+        stim_table = []
+        for stim_index, stimulus in enumerate(stimuli):
+            stim_path = data['stimuli'][stim_index]['movie_path']
+            stim_path = stim_path.replace('\\','/')
+            movie_name = os.path.split(stim_path)[1].replace('.npy','')
+            
+            display_sequence = np.array(stimulus['display_sequence'])[0]
+            sweep_order = stimulus['sweep_order'][:int(np.diff(display_sequence*30))]
+            Starts = (np.argwhere(np.array(sweep_order)==0)/30).astype(int)[:,0]
+            Ends = Starts.copy()
+            Ends[:-1] = Starts[1:]
+            Ends[-1] = int(len(sweep_order)/30)
+            num_sweeps = len(Starts)
 
-    stimuli = data['items']['behavior']['stimuli']
-    n_frames = len(time)
-    visual_stimuli_data = []
-    for stim_dict in stimuli.values():
-        for idx, (attr_name, attr_value, _, frame) in \
-                enumerate(stim_dict["set_log"]):
-            orientation = attr_value if attr_name.lower() == "ori" else np.nan
-            image_name = attr_value if attr_name.lower() == "image" else np.nan
+            for i_repeat, start_frame in enumerate(Starts):
+                end_frame = Ends[i_repeat]
+                _display_sequence = np.array([np.arange(display_sequence[0],display_sequence[1]+1)[start_frame],np.arange(display_sequence[0],display_sequence[1]+1)[end_frame]])
 
-            stimulus_epoch = _get_stimulus_epoch(
-                stim_dict["set_log"],
-                idx,
-                frame,
-                n_frames,
-            )
-            draw_epochs = _get_draw_epochs(
-                stim_dict["draw_log"],
-                *stimulus_epoch
-            )
+                _display_sequence += pre_blank_sec
+                _display_sequence *= int(data['fps'])  # in stimulus frames
+                stim_time_stamps[str(movie_name)+'_r'+str(i_repeat)] = time[_display_sequence[0]:_display_sequence[1]]
 
-            for epoch_start, epoch_end in draw_epochs:
+                stim_table.append({
+                        "movie_name": movie_name,
+                        "repeat": i_repeat,
+                        "frame": _display_sequence[0],
+                        "end_frame": _display_sequence[1],
+                        "time": time[_display_sequence[0]],
+                        "duration": time[_display_sequence[1]] - time[_display_sequence[0]],
+                        # this will always work because an epoch
+                        # will never occur near the end of time
+                    })
+        df = pd.DataFrame(data=stim_table).sort_values('frame').reset_index()
+    
+    
+    elif data['items']['behavior']['params']['stage'] == 'STAGE_1':
+        
+        stimuli = data['stimuli']
+        for stim_index, stim_data in enumerate(stimuli):
 
-                visual_stimuli_data.append({
-                    "orientation": orientation,
-                    "image_name": image_name,
-                    "frame": epoch_start,
-                    "end_frame": epoch_end,
-                    "time": time[epoch_start],
-                    "duration": time[epoch_end] - time[epoch_start],
-                    # this will always work because an epoch
-                    # will never occur near the end of time
-                    "omitted": False
-                })
+            stim_path = stim_data['stim_path']      # extract stimulus name from its  path
+            stim_path = stim_path.replace('\\','/')         
+            stimulus_name = os.path.split(stim_path)[1].replace('.stim','')
 
-    visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
+            stimulus = stimuli[stim_index]
 
-    # Add omitted flash info:
-    try:
-        omitted_flash_frame_log = \
-            data['items']['behavior']['omitted_flash_frame_log']
-    except KeyError:
-        # For sessions for which there were no omitted flashes
-        omitted_flash_frame_log = dict()
+            # compute display sequence
+            display_sequence = np.array(stimulus['display_sequence'])
+            pre_blank_sec = int(data['pre_blank_sec'])
+            fps = data['fps']
+            display_sequence += pre_blank_sec
+            display_sequence *= int(data['fps'])  # in stimulus frames
 
-    omitted_flash_list = []
-    for _, omitted_flash_frames in omitted_flash_frame_log.items():
-        stim_frames = visual_stimuli_df['frame'].values
-        omitted_flash_frames = np.array(omitted_flash_frames)
+            sweep_frames = stimulus['sweep_frames']
+            timing_table = pd.DataFrame(np.array(sweep_frames).astype(int), columns=('start', 'end'))
+            timing_table['dif'] = timing_table['end'] - timing_table['start']
 
-        # Test offsets of omitted flash frames
-        # to see if they are in the stim log
-        offsets = np.arange(-3, 4)
-        offset_arr = np.add(
-            np.repeat(omitted_flash_frames[:, np.newaxis],
-                      offsets.shape[0], axis=1),
-            offsets)
-        matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
+            timing_table.start += display_sequence[0, 0]
+            for seg in range(len(display_sequence) - 1):
+                for index, row in timing_table.iterrows():
+                    if row.start >= display_sequence[seg, 1]:
+                        timing_table.start[index] = timing_table.start[index] - display_sequence[seg, 1]+ display_sequence[seg + 1, 0]
+            timing_table.end = timing_table.start + timing_table.dif
 
-        #  Remove omitted flashes that also exist in the stimulus log
-        was_true_omitted = np.logical_not(matched_any_offset)  # bool
-        omitted_flash_frames_to_keep = omitted_flash_frames[was_true_omitted]
+            timing_table = timing_table[timing_table.end <= display_sequence[-1, 1]]
+            timing_table = timing_table[timing_table.start <= display_sequence[-1, 1]]
 
-        # Have to remove frames that are double-counted in omitted log
-        omitted_flash_list += list(np.unique(omitted_flash_frames_to_keep))
+            stim_attributes = stimulus['dimnames'] # ['Contrast', 'TF', 'SF', 'Ori']
+            stim_table = pd.DataFrame(np.column_stack((timing_table['start'],timing_table['end'],time[timing_table['start']],time[timing_table['end']]-time[timing_table['start']])), columns=('frame', 'end_frame', 'time', 'duration'))
 
-    omitted = np.ones_like(omitted_flash_list).astype(bool)
-    time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted,
-                               'frame': omitted_flash_list,
-                               'time': time,
-                               'image_name': 'omitted'})
+            sweep_table = stimulus['sweep_table']
+            sweep_order = stimulus['sweep_order']
+            
+            stim_table['stimulus_name'] = [stimulus_name]*len(stim_table)
+            unique_conditions = np.unique(sweep_order)
+            num_sweeps = len(sweep_order)
+            for i_attribure, stim_attribute in enumerate(stim_attributes):
+                attribute_by_sweep = np.zeros((num_sweeps,))
+                attribute_by_sweep[:] = np.NaN
+                for i_condition, condition in enumerate(unique_conditions):
+                    sweeps_with_condition = np.argwhere(sweep_order == condition)[:, 0]
+                    if condition > -1:  # blank sweep is -1
+                        if stim_attribute.find('Size')!=-1:
+                            attribute_by_sweep[sweeps_with_condition] = sweep_table[condition][i_attribure][0]
+                        else:
+                            attribute_by_sweep[sweeps_with_condition] = sweep_table[condition][i_attribure]
 
-    df = pd.concat((visual_stimuli_df, omitted_df),
-                   sort=False).sort_values('frame').reset_index()
+                stim_table[stim_attribute] = attribute_by_sweep[:len(stim_table)]
+
+            if stim_index == 0:
+                df = stim_table
+            else:
+                df = pd.concat([df, stim_table],  ignore_index = True,sort = False)
+                
+        df = df.rename(columns={'Ori': 'direction', 'Contrast': 'contrast'})
+        df = df.sort_values('frame').reset_index()
+    else:
+        stimuli = data['items']['behavior']['stimuli']
+        n_frames = len(time)
+        visual_stimuli_data = []
+        for stim_dict in stimuli.values():
+            for idx, (attr_name, attr_value, _, frame) in \
+                    enumerate(stim_dict["set_log"]):
+                orientation = attr_value if attr_name.lower() == "ori" else np.nan
+                image_name = attr_value if attr_name.lower() == "image" else np.nan
+
+                stimulus_epoch = _get_stimulus_epoch(
+                    stim_dict["set_log"],
+                    idx,
+                    frame,
+                    n_frames,
+                )
+                draw_epochs = _get_draw_epochs(
+                    stim_dict["draw_log"],
+                    *stimulus_epoch
+                )
+
+                for epoch_start, epoch_end in draw_epochs:
+
+                    visual_stimuli_data.append({
+                        "orientation": orientation,
+                        "image_name": image_name,
+                        "frame": epoch_start,
+                        "end_frame": epoch_end,
+                        "time": time[epoch_start],
+                        "duration": time[epoch_end] - time[epoch_start],
+                        # this will always work because an epoch
+                        # will never occur near the end of time
+                        "omitted": False
+                    })
+
+        visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
+
+        # Add omitted flash info:
+        try:
+            omitted_flash_frame_log = \
+                data['items']['behavior']['omitted_flash_frame_log']
+        except KeyError:
+            # For sessions for which there were no omitted flashes
+            omitted_flash_frame_log = dict()
+
+        omitted_flash_list = []
+        for _, omitted_flash_frames in omitted_flash_frame_log.items():
+            stim_frames = visual_stimuli_df['frame'].values
+            omitted_flash_frames = np.array(omitted_flash_frames)
+
+            # Test offsets of omitted flash frames
+            # to see if they are in the stim log
+            offsets = np.arange(-3, 4)
+            offset_arr = np.add(
+                np.repeat(omitted_flash_frames[:, np.newaxis],
+                        offsets.shape[0], axis=1),
+                offsets)
+            matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
+
+            #  Remove omitted flashes that also exist in the stimulus log
+            was_true_omitted = np.logical_not(matched_any_offset)  # bool
+            omitted_flash_frames_to_keep = omitted_flash_frames[was_true_omitted]
+
+            # Have to remove frames that are double-counted in omitted log
+            omitted_flash_list += list(np.unique(omitted_flash_frames_to_keep))
+
+        omitted = np.ones_like(omitted_flash_list).astype(bool)
+        time = [time[fi] for fi in omitted_flash_list]
+        omitted_df = pd.DataFrame({'omitted': omitted,
+                                'frame': omitted_flash_list,
+                                'time': time,
+                                'image_name': 'omitted'})
+
+        df = pd.concat((visual_stimuli_df, omitted_df),
+                    sort=False).sort_values('frame').reset_index()
     return df
 
 
