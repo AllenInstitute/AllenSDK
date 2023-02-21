@@ -438,7 +438,6 @@ def get_visual_stimuli_df(
         n_frames = len(time)
         stimuli = data['stimuli']
         pre_blank_sec = int(data['pre_blank_sec'])
-        stim_time_stamps = {}
         stim_table = []
         for stim_index, stimulus in enumerate(stimuli):
             stim_path = data['stimuli'][stim_index]['movie_path']
@@ -459,8 +458,7 @@ def get_visual_stimuli_df(
 
                 _display_sequence += pre_blank_sec
                 _display_sequence *= int(data['fps'])  # in stimulus frames
-                stim_time_stamps[str(movie_name)+'_r'+str(i_repeat)] = time[_display_sequence[0]:_display_sequence[1]]
-
+                
                 stim_table.append({
                         "movie_name": movie_name,
                         "repeat": i_repeat,
