@@ -50,7 +50,8 @@ def calculate_monitor_delay(sync_file: SyncFile,
                         'CAM2P.3': 0.021390,
                         'CAM2P.4': 0.021102,
                         'CAM2P.5': 0.021192,
-                        'MESO.1': 0.03613}
+                        'MESO.1': 0.03613,
+                        'MESO.2': 0.03613}
 
         if equipment_name not in delay_lookup:
             msg = warning_msg
