@@ -11,6 +11,7 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli\
     StimulusTemplate, StimulusTemplateFactory
 from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
     convert_filepath_caseinsensitive, get_image_set_name
+from allensdk.brain_observatory.ophys.project_constants import PROJECT_CODES, VBO_ACTIVE_MAP, VBO_PASSIVE_MAP  # noqa: E501
 
 
 def load_pickle(pstream):
@@ -706,3 +707,48 @@ def fix_omitted_end_frame(stim_pres_table: pd.DataFrame) -> pd.DataFrame:
     stim_dtypes['end_frame'] = int
 
     return stim_pres_table.astype(stim_dtypes)
+
+
+def produce_stimulus_block_names(stim_df: pd.DataFrame,
+                                 session_type: str,
+                                 project_code: str) -> pd.DataFrame:
+    """Add a column stimulus_block_name to explicitly reference the kind
+    of stimulus block in addition to the numbered blocks.
+
+    Only implemented currently for the VBO dataset. Will not add the column
+    if it is not in the defined set of project codes.
+
+    Parameters
+    ----------
+    stim_df : pandas.DataFrame
+        Input stimulus presentations DataFrame with stimulus_block column
+    session_type : str
+        Full type name of session.
+    project_code : str
+        Full name of the project this session belongs to. As this function
+        is currently only written for VBO, if a non-VBO project name is
+        presented, the function will result in a noop.
+
+    Returns
+    -------
+    modified_df : pandas.DataFrame
+        Stimulus presentations DataFrame with added stimulus_block_name
+        column if the session is from a project that makes up the VBO release.
+        The data frame is return the same as the input if not.
+    """
+    if project_code not in PROJECT_CODES:
+        return stim_df
+
+    stim_df['stimulus_block_name'] = None
+
+    for stim_block in stim_df.stimulus_block.unique():
+        if 'passive' in session_type:
+            stim_df.loc[stim_df['stimulus_block'] == stim_block,
+                        'stimulus_block_name'] = \
+                VBO_PASSIVE_MAP[stim_block]
+        else:
+            stim_df.loc[stim_df['stimulus_block'] == stim_block,
+                        'stimulus_block_name'] = \
+                VBO_ACTIVE_MAP[stim_block]
+
+    return stim_df

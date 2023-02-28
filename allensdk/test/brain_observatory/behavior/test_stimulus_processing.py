@@ -7,7 +7,8 @@ import pytest
 from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
-    get_stimulus_templates, is_change_event, compute_trials_id_for_stimulus)
+    get_stimulus_templates, is_change_event, compute_trials_id_for_stimulus,
+    produce_stimulus_block_names)
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
@@ -489,3 +490,46 @@ def test_compute_trials_id_for_stimulus():
                                                        trials)
     assert np.array_equal(output_trials_ids.values,
                           expected_trials_id.values)
+
+
+def test_produce_stimulus_block_names():
+    """Test that a set of trials maps onto a stimulus table as expected.
+    """
+    stimulus_presentations = pd.DataFrame(
+        data={'stimulus_block': [0, 1, 2, 3]},
+    )
+    expected_stimulus_block_names = pd.Series(
+        name='stimulus_block_name',
+        data=['initial_gray_screen_5min',
+              'change_detection_behavior',
+              'post_behavior_gray_screen_5min',
+              'natural_movie_one'],
+        index=stimulus_presentations.index)
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations,
+                                                     'OPHYS_1',
+                                                     'VisualBehaviorTask1B')
+    assert np.array_equal(output_stim_names['stimulus_block_name'].values,
+                          expected_stimulus_block_names.values)
+
+    # Test with passive active block.
+    expected_stimulus_block_names = pd.Series(
+        name='stimulus_block_name',
+        data=['initial_gray_screen_5min',
+              'change_detection_passive',
+              'post_behavior_gray_screen_5min',
+              'natural_movie_one'],
+        index=stimulus_presentations.index)
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations,
+                                                     'OPHYS_1_passive',
+                                                     'VisualBehaviorTask1B')
+    assert np.array_equal(output_stim_names['stimulus_block_name'].values,
+                          expected_stimulus_block_names.values)
+
+    # Test with wrong project_code.
+    stimulus_presentations = pd.DataFrame(
+        data={'stimulus_block': [0, 1, 2, 3]},
+    )
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations,
+                                                     'OPHYS_1_passive',
+                                                     'NotAProject')
+    assert 'stimulus_block_name' not in output_stim_names.columns
