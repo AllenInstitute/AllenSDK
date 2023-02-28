@@ -48,6 +48,9 @@ from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import (  # noqa: E501
     DateOfAcquisition,
 )
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import (  # noqa: E501
+    ProjectCode,
+)
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
 from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import (  # noqa: E501
     Presentations,
@@ -442,6 +445,10 @@ class BehaviorSession(
             stimulus_file_lookup=stimulus_file_lookup,
             sync_file=sync_file,
             monitor_delay=monitor_delay,
+            project_code=ProjectCode.from_lims(
+                behavior_session_id=behavior_session_id.value,
+                lims_db=lims_db
+            ),
         )
 
         if date_of_acquisition is None:
@@ -1360,6 +1367,7 @@ class BehaviorSession(
         sync_file: Optional[SyncFile],
         monitor_delay: float,
         stimulus_presentation_columns: Optional[List[str]] = None,
+        project_code: Optional[ProjectCode] = None,
     ) -> Stimuli:
         """
         Construct the Stimuli data object for this session
@@ -1376,6 +1384,7 @@ class BehaviorSession(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             presentation_columns=stimulus_presentation_columns,
+            project_code=project_code,
         )
 
     @classmethod
@@ -1452,8 +1461,9 @@ class BehaviorSession(
         behavior_session_id: int,
         sync_file: Optional[SyncFile],
         monitor_delay: float,
-        include_stimuli=True,
+        include_stimuli: bool = True,
         stimulus_presentation_columns: Optional[List[str]] = None,
+        project_code: Optional[ProjectCode] = None,
     ):
         """Helper method to read data from stimulus file"""
 
@@ -1480,6 +1490,7 @@ class BehaviorSession(
                 sync_file=sync_file,
                 monitor_delay=monitor_delay,
                 stimulus_presentation_columns=stimulus_presentation_columns,
+                project_code=project_code,
             )
         else:
             stimuli = None

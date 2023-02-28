@@ -2,7 +2,7 @@ import marshmallow as mm
 from allensdk.brain_observatory.argschema_utilities import (
     InputFile,
     RaisingSchema,
-    check_write_access_overwrite,
+    check_write_access_dir,
 )
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_project_cloud_api import (  # noqa: E501
     sanitize_data_columns,
@@ -43,9 +43,9 @@ class BaseInputSchema(ArgSchema):
         "override known data issues. Example: ['mouse_id']",
         default=[],
     )
-    output_path = String(
+    output_dir_path = String(
         required=True,
-        validate=check_write_access_overwrite,
+        validate=check_write_access_dir,
         description="Path of output.json to be written",
     )
 

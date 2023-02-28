@@ -7,7 +7,7 @@ import pandas as pd
 from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
+from allensdk.brain_observatory.behavior.data_objects.stimuli \
     .fingerprint_stimulus import \
     FingerprintStimulus
 from allensdk.core import DataObject
@@ -20,15 +20,19 @@ from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event, \
-    get_flashes_since_change, fix_omitted_end_frame
+    get_flashes_since_change, fix_omitted_end_frame, \
+    produce_stimulus_block_names
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
 from allensdk.internal.brain_observatory.mouse import Mouse
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import \
+    ProjectCode  # noqa: E501
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
                     NwbReadableInterface, NwbWritableInterface):
     """Stimulus presentations"""
+
     def __init__(self, presentations: pd.DataFrame,
                  columns_to_rename: Optional[Dict[str, str]] = None,
                  column_list: Optional[List[str]] = None,
@@ -174,24 +178,34 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             behavior_session_id: int,
             limit_to_images: Optional[List] = None,
             column_list: Optional[List[str]] = None,
-            fill_omitted_values=True
+            fill_omitted_values: bool = True,
+            project_code: Optional[ProjectCode] = None
     ) -> "Presentations":
         """Get stimulus presentation data.
 
-        :param stimulus_file
-        :param limit_to_images
-            Only return images given by these image names
-        :param stimulus_timestamps
-        :param behavior_session_id
+        Parameters
+        ----------
+        stimulus_file : BehaviorStimulusFile
+            Input stimulus_file to create presentations dataframe from.
+        stimulus_timestamps : StimulusTimestamps
+            Timestamps of the stimuli
+        behavior_session_id : int
             LIMS id of behavior session
-        :param column_list: The columns and order of columns
-            in the final dataframe
-        :param fill_omitted_values: Whether to fill stop_time and duration
-            for omitted frames
+        limit_to_images : Optional, list of str
+            Only return images given by these image names
+        column_list : Optional, list of str
+            The columns and order of columns in the final dataframe
+        fill_omitted_values : Optional, bool
+            Whether to fill stop_time and duration for omitted frames
+        project_code: Optional, ProjectCode
+            For released datasets, provide a project code
+            to produce explicitly named stimulus_block column values in the
+            column stimulus_block_name
 
-
-        :returns: pd.DataFrame --
-            Table whose rows are stimulus presentations
+        Returns
+        -------
+        output_presentations: Presentations
+            Object with a table whose rows are stimulus presentations
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
         """
@@ -255,7 +269,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         # Match the Ecephys VBN stimulus name convention.
         try:
             stim_pres_df['stimulus_name'] = Path(
-                stimulus_file.stimuli['images']['image_set']).\
+                stimulus_file.stimuli['images']['image_set']). \
                 stem.split('.')[0]
         except KeyError:
             # if we can't find the images key in the stimuli, check for the
@@ -284,6 +298,12 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             fill_omitted_values=fill_omitted_values,
             coerce_bool_to_boolean=True
         )
+        if project_code is not None:
+            stim_pres_df = produce_stimulus_block_names(
+                stim_pres_df,
+                stimulus_file.session_type,
+                project_code.value
+            )
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 
@@ -372,11 +392,12 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
         """
         stimulus_presentations['is_image_novel'] = \
-            stimulus_presentations['image_name']\
-            .map(cls._get_is_image_novel(
-                image_names=stimulus_presentations['image_name'].tolist(),
-                behavior_session_id=behavior_session_id
-            ))
+            stimulus_presentations['image_name'].map(
+                cls._get_is_image_novel(
+                    image_names=stimulus_presentations['image_name'].tolist(),
+                    behavior_session_id=behavior_session_id
+                )
+            )
 
     @classmethod
     def _postprocess(cls, presentations: pd.DataFrame,
@@ -441,18 +462,26 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         different stimulus blocks. This method finds any gaps in the stimulus
         presentations. These gaps are assumed to be spontaneous stimulus.
 
-        Raises
-        ------
-        RuntimeError if there are any gaps in stimulus blocks > 1
+        Parameters
+        ---------
+        stimulus_presentations_table : pd.DataFrame
+            Input stimulus presentations table.
 
         Returns
         -------
-        pd.DataFrame: a dataframe with a single row for each spontaneous
-        stimulus shown"""
+        output_frame : pd.DataFrame
+           stimulus_presentations_table with added spotaneous stimulus blocks
+           added.
+
+        Raises
+        ------
+        RuntimeError if there are any gaps in stimulus blocks > 1
+        """
         spontaneous_stimulus_blocks = get_spontaneous_block_indices(
             stimulus_blocks=(
                 stimulus_presentations_table['stimulus_block'].values))
         res = []
+
         for spontaneous_block in spontaneous_stimulus_blocks:
             prev_stop_time = \
                 stimulus_presentations_table[
@@ -479,9 +508,29 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 'stimulus_block': spontaneous_block,
                 'stimulus_name': 'spontaneous'
             })
+        # Check for 5 minute gray screen stimulus block at the start of the
+        # movie
+        if (stimulus_presentations_table.iloc[0]['start_frame'] > 0 and
+                stimulus_presentations_table.iloc[0]['start_time'] > 0):
+            res.append({
+                'duration': stimulus_presentations_table.iloc[0]['start_time'],
+                'start_time': 0,
+                'stop_time': stimulus_presentations_table.iloc[0][
+                    'start_time'],
+                'start_frame': 0,
+                'end_frame': stimulus_presentations_table.iloc[0][
+                    'start_frame'],
+                'stimulus_block': 0,
+                'stimulus_name': 'spontaneous'
+            })
+            # Increment the stimulus blocks by 1 to to account for the
+            # new stimulus at the start of the file.
+            stimulus_presentations_table['stimulus_block'] += 1
+
         res = pd.DataFrame(res)
 
-        return res
+        return pd.concat([stimulus_presentations_table, res]).sort_values(
+            'start_frame')
 
     @classmethod
     def _add_fingerprint_stimulus(
@@ -507,12 +556,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
 
         stimulus_presentations = \
             pd.concat([stimulus_presentations, fingerprint_stimulus.table])
-        spontaneous_stimulus = cls._get_spontaneous_stimulus(
+        stimulus_presentations = cls._get_spontaneous_stimulus(
             stimulus_presentations_table=stimulus_presentations)
-        stimulus_presentations = \
-            pd.concat([stimulus_presentations, spontaneous_stimulus])
-        stimulus_presentations = \
-            stimulus_presentations.sort_values('start_frame')
 
         # reset index to go from 0...end
         stimulus_presentations.index = pd.Index(
@@ -553,6 +598,6 @@ def get_spontaneous_block_indices(
     # be [2], with a gap (== 2) at index 0, meaning that the spontaneous block
     # is at index 1
     block_indices = blocks[
-        np.where(block_diffs == 2)[0]
-    ] + 1
+                        np.where(block_diffs == 2)[0]
+                    ] + 1
     return block_indices

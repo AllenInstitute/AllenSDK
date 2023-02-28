@@ -16,6 +16,7 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
 from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
     import \
     Templates
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import ProjectCode  # noqa: E501
 
 
 class Stimuli(DataObject, StimulusFileReadableInterface,
@@ -55,7 +56,8 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             behavior_session_id: int,
             limit_to_images: Optional[List] = None,
             presentation_columns: Optional[List[str]] = None,
-            presentation_fill_omitted_values: bool = True
+            presentation_fill_omitted_values: bool = True,
+            project_code: Optional[ProjectCode] = None,
     ) -> "Stimuli":
         """
 
@@ -70,6 +72,10 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             in the final presentations dataframe
         presentation_fill_omitted_values: Whether to fill stop_time and
             duration for omitted frames
+        project_code : ProjectCode
+            For released datasets, provide a project code to produce explicitly
+            named stimulus_block column values in the column
+            stimulus_block_name
 
         Returns
         -------
@@ -81,7 +87,8 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             behavior_session_id=behavior_session_id,
             limit_to_images=limit_to_images,
             column_list=presentation_columns,
-            fill_omitted_values=presentation_fill_omitted_values
+            fill_omitted_values=presentation_fill_omitted_values,
+            project_code=project_code,
         )
         t = Templates.from_stimulus_file(stimulus_file=stimulus_file,
                                          limit_to_images=limit_to_images)

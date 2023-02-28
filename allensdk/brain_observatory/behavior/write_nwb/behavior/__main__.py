@@ -22,7 +22,7 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
         bs_id = self.args["behavior_session_id"]
         output_file = self.write_behavior_nwb(
             behavior_session_metadata=self.args["behavior_session_metadata"],
-            nwb_filepath=Path(self.args["output_path"]) / f"{bs_id}.nwb",
+            nwb_filepath=Path(self.args["output_dir_path"]) / f"{bs_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
         )
