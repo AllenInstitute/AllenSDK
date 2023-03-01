@@ -7,7 +7,8 @@ import pytz
 
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.behavior.data_files import StimulusFile
+from allensdk.brain_observatory.behavior.data_files import \
+     StimulusFile, SyncFile
 from allensdk.brain_observatory.behavior.data_objects.base \
     .readable_interfaces import \
     JsonReadableInterface, NwbReadableInterface, \
@@ -34,6 +35,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
     .ophys_experiment_metadata.multi_plane_metadata.multi_plane_metadata \
     import \
     MultiplaneMetadata
+
 from allensdk.brain_observatory.behavior.trials_processing import (
     construct_rolling_performance_df, calculate_reward_rate_fix_nans)
 from allensdk.brain_observatory.behavior.data_objects import (
@@ -84,6 +86,7 @@ class OphysSession(DataObject, LimsReadableInterface,
     @classmethod
     def from_lims(cls, ophys_session_id: int,
                   lims_db: Optional[PostgresQueryMixin] = None,
+                  sync_file: Optional[SyncFile] = None,
                   stimulus_timestamps: Optional[StimulusTimestamps] = None,
                   monitor_delay: Optional[float] = None,
                   date_of_acquisition: Optional[DateOfAcquisitionOphys] = None) \
@@ -122,6 +125,7 @@ class OphysSession(DataObject, LimsReadableInterface,
         sess_id = OphysSessionId.from_lims(
             ophys_experiment_id=ophys_session_id, lims_db=lims_db
         )
+        print(sess_id.value)
         running_acquisition = RunningAcquisition.from_ophys_lims(
             db = lims_db,
             behavior_session_id = sess_id.value
@@ -141,6 +145,16 @@ class OphysSession(DataObject, LimsReadableInterface,
             ophys_experiment_id=ophys_session_id, 
             lims_db=lims_db
         )
+        stimulus_file = StimulusFile.from_lims(
+            behavior_session_id=sess_id.value, db=lims_db
+        )
+        print(stimulus_file.filepath)
+        '''
+        stimuli, task_parameters, trials = cls._read_data_from_stimulus_file(
+                stimulus_file = stimulus_file,
+                stimulus_timestamps = stimulus_timestamps
+        )
+        '''   
         if monitor_delay is None:
             monitor_delay = cls._get_monitor_delay()
 
@@ -153,9 +167,17 @@ class OphysSession(DataObject, LimsReadableInterface,
             raw_running_speed=raw_running_speed,
             running_acquisition=running_acquisition,
             running_speed=running_speed,
-            date_of_acquisition=date_of_acquisition
+            date_of_acquisition=date_of_acquisition,
             #trials=trials,
+            #stimuli= stimuli,
+            #task_parameters=task_parameters
         )
+    
+    def from_json():
+        return 0
+    
+    def from_nwb():
+        return 1
 
 
     def to_nwb(self, add_metadata=False) -> NWBFile:
@@ -453,8 +475,7 @@ class OphysSession(DataObject, LimsReadableInterface,
     @classmethod
     def _read_data_from_stimulus_file(
             cls, stimulus_file: StimulusFile,
-            stimulus_timestamps: StimulusTimestamps,
-            trial_monitor_delay: float):
+            stimulus_timestamps: StimulusTimestamps):
         """Helper method to read data from stimulus file"""
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,

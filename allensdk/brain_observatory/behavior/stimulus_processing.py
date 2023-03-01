@@ -73,7 +73,7 @@ def get_images_dict(pkl) -> Dict:
 
     """
     # Sometimes the source is a zipped pickle:
-    pkl_stimuli = pkl["items"]["behavior"]["stimuli"]
+    pkl_stimuli = pkl["stimuli"]
     metadata = {'image_set': pkl_stimuli["images"]["image_path"]}
 
     # Get image file name;
@@ -195,8 +195,7 @@ def get_stimulus_templates(
         the experiment
 
     """
-
-    pkl_stimuli = pkl['items']['behavior']['stimuli']
+    pkl_stimuli = pkl['stimuli']
     if 'images' in pkl_stimuli:
         images = get_images_dict(pkl)
         image_set_filepath = images['metadata']['image_set']
@@ -271,7 +270,7 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         orientation, and image index.
 
     """
-    stimuli = pkl['items']['behavior']['stimuli']
+    stimuli = pkl['stimuli']
     if 'images' in stimuli:
         images = get_images_dict(pkl)
         stimulus_index_df = pd.DataFrame(images['image_attributes'])
@@ -404,6 +403,12 @@ def unpack_change_log(change):
         to_name=to_name,
     )
 
+    #/allen/programs/mindscope/workgroups/np-exp/1181330601_625554_20220601/1181330601_625554_20220601.areaClassifications.csv
+    # 625554
+    # /allen/programs/mindscope/workgroups/openscope/OPT_ILLUSION/AlignToPhysiology/625554/images/final_ccf_coordinates.csv
+    # /allen/programs/mindscope/workgroups/openscope/OPT_ILLUSION/AlignToPhysiology/625554/images
+#     Session id: 1181330601
+
 
 def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     """
@@ -420,18 +425,23 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                  that were displayed with their frame, end_frame, start_time,
                  and duration
     """
-
-    stimuli = data['items']['behavior']['stimuli']
+    stimuli = data['stimuli']
+    pd.set_option('display.max_columns', None)
+    print('stimuli')        
+    # print(data)
+    # print(stimuli)
     n_frames = len(time)
+    print(time)
     visual_stimuli_data = []
-    for stimuli_group_name, stim_dict in stimuli.items():
+    for stim_dict in stimuli:
+        print(stim_dict)
         for idx, (attr_name, attr_value, _time, frame,) in \
-                enumerate(stim_dict["set_log"]):
+                enumerate(stim_dict["stim"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
 
             stimulus_epoch = _get_stimulus_epoch(
-                stim_dict["set_log"],
+                stim_dict["stim"],
                 idx,
                 frame,
                 n_frames,
@@ -461,7 +471,7 @@ def get_visual_stimuli_df(data, time) -> pd.DataFrame:
                 })
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
-
+    print(visual_stimuli_df)
     # Add omitted flash info:
     try:
         omitted_flash_frame_log = \

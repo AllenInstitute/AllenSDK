@@ -667,6 +667,22 @@ def add_stimulus_timestamps(nwbfile, stimulus_timestamps,
 
     return nwbfile
 
+def add_stimulus_ophys_timestamps(nwbfile, stimulus_timestamps,
+                            module_name='stimulus_ophys'):
+    stimulus_ts = TimeSeries(
+        data=stimulus_timestamps,
+        name='timestamps',
+        timestamps=stimulus_timestamps,
+        unit='s'
+    )
+
+    stim_mod = ProcessingModule(module_name, 'Stimulus Times processing')
+
+    nwbfile.add_processing_module(stim_mod)
+    stim_mod.add_data_interface(stimulus_ts)
+
+    return nwbfile
+
 
 def add_trials(nwbfile, trials, description_dict={}):
     order = list(trials.index)

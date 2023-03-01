@@ -185,6 +185,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             roi_ids=cell_specimen_table['cell_roi_id'].values,
             raise_if_rois_missing=False)
 
+
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
         self._dff_traces = dff_traces
@@ -298,6 +299,7 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         dff_traces = _get_dff_traces()
         corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
         events = _get_events()
+
 
         return CellSpecimens(
             cell_specimen_table=cell_specimen_table, meta=meta,
@@ -525,7 +527,6 @@ class CellSpecimens(DataObject, LimsReadableInterface,
             metadata
         """
         mask_data = np.sum(self.roi_masks['roi_mask']).astype(int)
-
         mask_image = Image(
             data=mask_data,
             spacing=spacing,
@@ -578,6 +579,9 @@ class CellSpecimens(DataObject, LimsReadableInterface,
         for traces in (dff_traces, corrected_fluorescence_traces):
             # validate traces contain expected roi ids
             if not np.in1d(traces.value.index, cell_roi_ids).all():
+#                print(traces.value.index)
+#                print("roi table")
+#                print(cell_roi_ids)
                 raise RuntimeError(f"{traces.name} contains ROI IDs that "
                                    f"are not in "
                                    f"cell_specimen_table.cell_roi_id")

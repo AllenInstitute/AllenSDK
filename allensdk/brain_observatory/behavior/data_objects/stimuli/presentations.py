@@ -2,7 +2,8 @@ from typing import Optional, List
 
 import pandas as pd
 from pynwb import NWBFile
-
+from pathlib import Path
+from typing import Optional, List, Dict, Union
 from allensdk.brain_observatory.behavior.data_files import StimulusFile
 from allensdk.brain_observatory.behavior.data_objects import DataObject, \
     StimulusTimestamps
@@ -22,7 +23,30 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 class Presentations(DataObject, StimulusFileReadableInterface,
                     NwbReadableInterface, NwbWritableInterface):
     """Stimulus presentations"""
-    def __init__(self, presentations: pd.DataFrame):
+    def __init__(self, presentations: pd.DataFrame,
+                 columns_to_rename: Optional[Dict[str, str]] = None,
+                 column_list: Optional[List[str]] = None,
+                 sort_columns: bool = True):
+        """
+        Parameters
+        ----------
+        presentations: The stimulus presentations table
+        columns_to_rename: Optional dict mapping
+            old column name -> new column name
+        column_list: Optional list of columns to include.
+            This will reorder the columns.
+        sort_columns: Whether to sort the columns by name
+        """
+        if columns_to_rename is not None:
+            presentations = presentations.rename(columns=columns_to_rename)
+        if column_list is not None:
+            presentations = presentations[column_list]
+        if sort_columns:
+            presentations = presentations[sorted(presentations.columns)]
+        presentations = presentations.reset_index(drop=True)
+        presentations.index = pd.Index(
+            range(presentations.shape[0]), name='stimulus_presentations_id',
+            dtype='int')
         super().__init__(name='presentations', value=presentations)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
@@ -42,6 +66,7 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                                                          stimulus_name_column] == stim_name]  # noqa: E501
             # Drop columns where all values in column are NaN
             cleaned_table = specific_stimulus_table.dropna(axis=1, how='all')
+ 
             # For columns with mixed strings and NaNs, fill NaNs with 'N/A'
             for colname, series in cleaned_table.items():
                 types = set(series.map(type))
@@ -60,13 +85,14 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 description=interval_description,
                 columns_to_add=cleaned_table.columns
             )
-
+            
             for row in cleaned_table.itertuples(index=False):
                 row = row._asdict()
+    
 
                 presentation_interval.add_interval(
                     **row, tags='stimulus_time_interval', timeseries=ts)
-
+            
             nwbfile.add_time_intervals(presentation_interval)
 
         return nwbfile
@@ -154,6 +180,36 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
         stim_pres_df = cls._postprocess(presentations=stim_pres_df)
         return Presentations(presentations=stim_pres_df)
+
+
+    @classmethod
+    def from_path(cls,
+                  path: Union[str, Path],
+                  exclude_columns: Optional[List[str]] = None,
+                  columns_to_rename: Optional[Dict[str, str]] = None,
+                  sort_columns: bool = True
+                  ) -> "Presentations":
+        """
+        Reads the table directly from a precomputed csv
+        Parameters
+        -----------
+        path: Path to load table from
+        exclude_columns: Columns to exclude
+        columns_to_rename: Optional d ict mapping
+            old column name -> new column name
+        sort_columns: Whether to sort the columns by name
+        Returns
+        -------
+        Presentations instance
+        """
+        path = Path(path)
+        df = pd.read_csv(path)
+        exclude_columns = exclude_columns if exclude_columns else []
+        df = df[[c for c in df if c not in exclude_columns]]
+        return Presentations(presentations=df,
+                             columns_to_rename=columns_to_rename,
+                             sort_columns=sort_columns)
+
 
     @classmethod
     def _postprocess(cls, presentations: pd.DataFrame,

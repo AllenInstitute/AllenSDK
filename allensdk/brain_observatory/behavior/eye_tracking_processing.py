@@ -6,14 +6,16 @@ import pandas as pd
 from scipy import ndimage, stats
 
 
+class EyeTrackingError(Exception):
+    pass
+
+
 def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
     """Load a DeepLabCut hdf5 file containing eye tracking data into a
     dataframe.
-
     Note: The eye tracking hdf5 file contains 3 separate dataframes. One for
     corneal reflection (cr), eye, and pupil ellipse fits. This function
     loads and returns this data as a single dataframe.
-
     Parameters
     ----------
     eye_tracking_file : Path
@@ -21,7 +23,6 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
         The hdf5 file will contain the following keys: "cr", "eye", "pupil".
         Each key has an associated dataframe with the following
         columns: "center_x", "center_y", "height", "width", "phi".
-
     Returns
     -------
     pd.DataFrame
@@ -54,7 +55,6 @@ def determine_outliers(data_df: pd.DataFrame,
     """Given a dataframe and some z-score threshold return a pandas boolean
     Series where each entry indicates whether a given row contains at least
     one outlier (where outliers are calculated along columns).
-
     Parameters
     ----------
     data_df : pd.DataFrame
@@ -62,7 +62,6 @@ def determine_outliers(data_df: pd.DataFrame,
         desired. (e.g. "cr_area", "eye_area", "pupil_area")
     z_threshold : float
         z-score values higher than the z_threshold will be considered outliers.
-
     Returns
     -------
     pd.Series
@@ -78,17 +77,14 @@ def determine_outliers(data_df: pd.DataFrame,
 def compute_circular_area(df_row: pd.Series) -> float:
     """Calculate the area of the pupil as a circle using the max of the
     height/width as radius.
-
     Note: This calculation assumes that the pupil is a perfect circle
     and any eccentricity is a result of the angle at which the pupil is
     being viewed.
-
     Parameters
     ----------
     df_row : pd.Series
         A row from an eye tracking dataframe containing only "pupil_width"
         and "pupil_height".
-
     Returns
     -------
     float
@@ -101,7 +97,6 @@ def compute_circular_area(df_row: pd.Series) -> float:
 def compute_elliptical_area(df_row: pd.Series) -> float:
     """Calculate the area of corneal reflection (cr) or eye ellipse fits using
     the ellipse formula.
-
     Parameters
     ----------
     df_row : pd.Series
@@ -109,7 +104,6 @@ def compute_elliptical_area(df_row: pd.Series) -> float:
         "cr_width", "cr_height"
         or
         "eye_width", "eye_height"
-
     Returns
     -------
     float
@@ -123,7 +117,6 @@ def determine_likely_blinks(eye_areas: pd.Series,
                             outliers: pd.Series,
                             dilation_frames: int = 2) -> pd.Series:
     """Determine eye tracking frames which contain likely blinks or outliers
-
     Parameters
     ----------
     eye_areas : pd.Series
@@ -135,7 +128,6 @@ def determine_likely_blinks(eye_areas: pd.Series,
     dilation_frames : int, optional
         Determines the number of additional adjacent frames to mark as
         'likely_blink', by default 2.
-
     Returns
     -------
     pd.Series
@@ -148,7 +140,7 @@ def determine_likely_blinks(eye_areas: pd.Series,
                                                 iterations=dilation_frames)
     else:
         likely_blinks = blinks
-    return pd.Series(likely_blinks)
+    return pd.Series(likely_blinks, index=eye_areas.index)
 
 
 def process_eye_tracking_data(eye_data: pd.DataFrame,
@@ -157,7 +149,6 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                               dilation_frames: int = 2) -> pd.DataFrame:
     """Processes and refines raw eye tracking data by adding additional
     computed feature columns.
-
     Parameters
     ----------
     eye_data : pd.DataFrame
@@ -171,17 +162,15 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     dilation_frames : int, optional
         Determines the number of additional adjacent frames to mark as
         'likely_blink', by default 2.
-
     Returns
     -------
     pd.DataFrame
         A refined eye tracking dataframe that contains additional information
         about frame times, eye areas, pupil areas, and frames with likely
         blinks/outliers.
-
     Raises
     ------
-    RuntimeError
+    EyeTrackingError
         If the number of sync file frame times does not match the number of
         eye tracking frames.
     """
@@ -196,15 +185,15 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     # This solution was discussed in
     # https://github.com/AllenInstitute/AllenSDK/issues/1545
 
-    if n_sync > n_eye_frames and n_sync <= n_eye_frames+15:
+    if n_eye_frames < n_sync <= n_eye_frames + 15:
         frame_times = frame_times[:n_eye_frames]
         n_sync = len(frame_times)
 
     if n_sync != n_eye_frames:
-        raise RuntimeError(f"Error! The number of sync file frame times "
-                           f"({len(frame_times)}) does not match the "
-                           f"number of eye tracking frames "
-                           f"({len(eye_data.index)})!")
+        raise EyeTrackingError(f"Error! The number of sync file frame times "
+                               f"({len(frame_times)}) does not match the "
+                               f"number of eye tracking frames "
+                               f"({len(eye_data.index)})!")
 
     cr_areas = (eye_data[["cr_width", "cr_height"]]
                 .apply(compute_elliptical_area, axis=1))

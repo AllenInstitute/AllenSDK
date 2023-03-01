@@ -123,7 +123,6 @@ class RunningAcquisition(DataObject, LimsReadableInterface,
         behavior_session_id: int,
         ophys_experiment_id: Optional[int] = None,
     ) -> "RunningAcquisition":
-        print("TEST", behavior_session_id)
         stimulus_file = StimulusFile.from_lims(db, behavior_session_id)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
             stimulus_file=stimulus_file

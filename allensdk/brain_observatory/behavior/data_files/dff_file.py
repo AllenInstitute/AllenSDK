@@ -54,6 +54,7 @@ class DFFFile(DataFile):
                 AND oe.id = {};
                 """.format(ophys_experiment_id)
         filepath = db.fetchone(query, strict=True)
+        print(filepath)
         return cls(filepath=filepath)
 
     @staticmethod
@@ -61,5 +62,7 @@ class DFFFile(DataFile):
         with h5py.File(filepath, 'r') as raw_file:
             traces = np.asarray(raw_file['data'], dtype=np.float64)
             roi_names = np.asarray(raw_file['roi_names'])
-            idx = pd.Index(roi_names, name='cell_roi_id', dtype=int)
+            roi_names = roi_names.astype(str)
+            roi_names = roi_names.astype(int)
+            idx = pd.Index(roi_names, name='cell_roi_id')
             return pd.DataFrame({'dff': [x for x in traces]}, index=idx)

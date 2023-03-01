@@ -12,7 +12,22 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.data_files import DataFile
 
 # Query returns path to StimulusPickle file for given behavior session
-STIMULUS_FILE_QUERY_TEMPLATE = """
+BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
+    SELECT
+        wkf.storage_directory || wkf.filename AS stim_file
+    FROM
+        well_known_files wkf
+    WHERE
+        wkf.attachable_id = {behavior_session_id}
+        AND wkf.attachable_type = 'BehaviorSession'
+        AND wkf.well_known_file_type_id IN (
+            SELECT id
+            FROM well_known_file_types
+            WHERE name = 'StimulusPickle');
+"""
+
+
+NO_BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE = """
     SELECT
         wkf.storage_directory || wkf.filename AS stim_file
     FROM
@@ -26,12 +41,16 @@ STIMULUS_FILE_QUERY_TEMPLATE = """
 """
 
 
+
 def from_json_cache_key(cls, dict_repr: dict):
     return hashkey(json.dumps(dict_repr))
 
 
 def from_lims_cache_key(cls, db, behavior_session_id: int):
     return hashkey(behavior_session_id)
+
+def from_lims_nb_cache_key(cls, db, ophys_experiment_id: int):
+    return hashkey(ophys_experiment_id)
 
 
 class StimulusFile(DataFile):
@@ -61,8 +80,20 @@ class StimulusFile(DataFile):
         cls, db: PostgresQueryMixin,
         behavior_session_id: Union[int, str]
     ) -> "StimulusFile":
-        query = STIMULUS_FILE_QUERY_TEMPLATE.format(
+        query = NO_BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(
             behavior_session_id=behavior_session_id
+        )
+        filepath = db.fetchone(query, strict=True)
+        return cls(filepath=filepath)
+    
+    @classmethod
+    @cached(cache=LRUCache(maxsize=10), key=from_lims_nb_cache_key)
+    def no_behavior_from_lims(
+        cls, db: PostgresQueryMixin,
+        ophys_experiment_id: Union[int, str]
+    ) -> "StimulusFile":
+        query = NO_BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(
+            experiment_id = ophys_experiment_id
         )
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)

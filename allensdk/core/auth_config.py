@@ -1,10 +1,10 @@
 CREDENTIAL_KEYS = [
     # key, default value
-    ("LIMS_DBNAME", None),
-    ("LIMS_USER", None),
-    ("LIMS_HOST", None),
+    ("LIMS_DBNAME", "lims2"),
+    ("LIMS_USER", "limsreader"),
+    ("LIMS_HOST", "limsdb2"),
     ("LIMS_PORT", 5432),
-    ("LIMS_PASSWORD", None),
+    ("LIMS_PASSWORD", "limsro"),
     ("MTRAIN_DBNAME", None),
     ("MTRAIN_USER", None),
     ("MTRAIN_HOST", None),
