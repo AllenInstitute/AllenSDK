@@ -1,9 +1,7 @@
 from typing import Optional
 
 from allensdk.brain_observatory.ophys.project_constants import (
-    NUM_STRUCTURES_DICT,
-    NUM_DEPTHS_DICT,
-)
+    NUM_DEPTHS_DICT, NUM_STRUCTURES_DICT)
 
 
 ############################

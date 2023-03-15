@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import BehaviorProjectLimsApi  # noqa: E501
-from allensdk.brain_observatory.behavior.behavior_project_cache \
-    .tables.util.image_presentation_utils import (
-        get_image_set)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
+    BehaviorProjectLimsApi,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.image_presentation_utils import (  # noqa: E501
+    get_image_set,
+)
 
 
 def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
@@ -20,8 +21,9 @@ def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
     Series with index same as df and values prior exposure counts to
     session type
     """
-    return __get_prior_exposure_count(df=df,
-                                      to=df['session_type']).astype('Int64')
+    return __get_prior_exposure_count(df=df, to=df["session_type"]).astype(
+        "Int64"
+    )
 
 
 def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
@@ -43,12 +45,12 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     Series with index same as df and values prior exposure counts to image set
     """
     image_set = get_image_set(df=df)
-    return __get_prior_exposure_count(df=df, to=image_set).astype('Int64')
+    return __get_prior_exposure_count(df=df, to=image_set).astype("Int64")
 
 
-def get_prior_exposures_to_omissions(df: pd.DataFrame,
-                                     fetch_api: BehaviorProjectLimsApi) -> \
-        pd.Series:
+def get_prior_exposures_to_omissions(
+    df: pd.DataFrame, fetch_api: BehaviorProjectLimsApi
+) -> pd.Series:
     """Get prior exposures to omissions
 
     Parameters
@@ -62,18 +64,17 @@ def get_prior_exposures_to_omissions(df: pd.DataFrame,
     ---------
     Series with index same as df and values prior exposure counts to omissions
     """
-    df = df[df['session_type'].notnull()]
+    df = df[df["session_type"].notnull()]
 
     contains_omissions = pd.Series(False, index=df.index)
 
     def __get_habituation_sessions(df: pd.DataFrame):
         """Returns all habituation sessions"""
-        return df[
-            df['session_type'].str.lower().str.contains('habituation')]
+        return df[df["session_type"].str.lower().str.contains("habituation")]
 
     def __get_habituation_sessions_contain_omissions(
-            habituation_sessions: pd.DataFrame,
-            fetch_api: BehaviorProjectLimsApi) -> pd.Series:
+        habituation_sessions: pd.DataFrame, fetch_api: BehaviorProjectLimsApi
+    ) -> pd.Series:
         """Habituation sessions are not supposed to include omissions but
         because of a mistake omissions were included for some habituation
         sessions.
@@ -93,37 +94,47 @@ def get_prior_exposures_to_omissions(df: pd.DataFrame,
         """
 
         def __session_contains_omissions(
-                mtrain_stage_parameters: dict) -> bool:
-            return 'flash_omit_probability' in mtrain_stage_parameters \
-                   and \
-                   mtrain_stage_parameters['flash_omit_probability'] > 0
+            mtrain_stage_parameters: dict,
+        ) -> bool:
+            return (
+                "flash_omit_probability" in mtrain_stage_parameters
+                and mtrain_stage_parameters["flash_omit_probability"] > 0
+            )
 
-        foraging_ids = habituation_sessions['foraging_id'].tolist()
-        foraging_ids = [f'\'{x}\'' for x in foraging_ids]
-        mtrain_stage_parameters = fetch_api. \
-            get_behavior_stage_parameters(foraging_ids=foraging_ids)
+        foraging_ids = habituation_sessions["foraging_id"].tolist()
+        foraging_ids = [f"'{x}'" for x in foraging_ids]
+        mtrain_stage_parameters = fetch_api.get_behavior_stage_parameters(
+            foraging_ids=foraging_ids
+        )
         return habituation_sessions.apply(
             lambda session: __session_contains_omissions(
                 mtrain_stage_parameters=mtrain_stage_parameters[
-                    session['foraging_id']]), axis=1)
+                    session["foraging_id"]
+                ]
+            ),
+            axis=1,
+        )
 
     habituation_sessions = __get_habituation_sessions(df=df)
     if not habituation_sessions.empty:
-        contains_omissions.loc[habituation_sessions.index] = \
-            __get_habituation_sessions_contain_omissions(
-                habituation_sessions=habituation_sessions,
-                fetch_api=fetch_api)
+        contains_omissions.loc[
+            habituation_sessions.index
+        ] = __get_habituation_sessions_contain_omissions(
+            habituation_sessions=habituation_sessions, fetch_api=fetch_api
+        )
 
     contains_omissions.loc[
-        (df['session_type'].str.lower().str.contains('ophys')) &
-        (~df.index.isin(habituation_sessions.index))
-        ] = True
-    return __get_prior_exposure_count(df=df, to=contains_omissions,
-                                      agg_method='cumsum').astype('Int64')
+        (df["session_type"].str.lower().str.contains("ophys"))
+        & (~df.index.isin(habituation_sessions.index))
+    ] = True
+    return __get_prior_exposure_count(
+        df=df, to=contains_omissions, agg_method="cumsum"
+    ).astype("Int64")
 
 
-def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
-                               agg_method='cumcount') -> pd.Series:
+def __get_prior_exposure_count(
+    df: pd.DataFrame, to: pd.Series, agg_method="cumcount"
+) -> pd.Series:
     """Returns prior exposures a subject had to something
     i.e can be prior exposures to a stimulus type, a image_set or
     omission
@@ -144,8 +155,8 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
     exposure counts
     """
     index = df.index
-    df = df.sort_values('date_of_acquisition')
-    df = df[df['session_type'].notnull()]
+    df = df.sort_values("date_of_acquisition")
+    df = df[df["session_type"].notnull()]
 
     # reindex "to" to df
     to = to.loc[df.index]
@@ -156,18 +167,18 @@ def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series,
     # reindex df to match "to" index with missing values removed
     df = df.loc[to.index]
 
-    if agg_method == 'cumcount':
-        counts = df.groupby(['mouse_id', to]).cumcount()
-    elif agg_method == 'cumsum':
-        df['to'] = to
+    if agg_method == "cumcount":
+        counts = df.groupby(["mouse_id", to]).cumcount()
+    elif agg_method == "cumsum":
+        df["to"] = to
 
         def cumsum(x):
-            return x.cumsum().shift(fill_value=0).astype('int64')
+            return x.cumsum().shift(fill_value=0).astype("int64")
 
-        counts = df.groupby(['mouse_id'])['to'].apply(cumsum)
+        counts = df.groupby(["mouse_id"])["to"].apply(cumsum)
         counts.name = None
     else:
-        raise ValueError(f'agg method {agg_method} not supported')
+        raise ValueError(f"agg method {agg_method} not supported")
 
     # reindex to original index
     return counts.reindex(index)
