@@ -14,7 +14,12 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_ses
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import (  # noqa: E501
     ProjectTable,
 )
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.metadata_parsers import (  # noqa: E501
+    parse_behavior_context,
+    parse_stimulus_set,
+)
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level,
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_omissions,
     get_prior_exposures_to_session_type,
@@ -100,6 +105,14 @@ class SessionsTable(ProjectTable, OphysMixin):
         ] = get_prior_exposures_to_omissions(
             df=self._df, fetch_api=self._fetch_api
         )
+
+        self._df["behavior_type"] = self._df["session_type"].apply(
+            parse_behavior_context
+        )
+        self._df["image_set"] = self._df["session_type"].apply(
+            parse_stimulus_set
+        )
+        self._df = add_experience_level(self._df)
 
         if self._include_trial_metrics:
             # add trial metrics
