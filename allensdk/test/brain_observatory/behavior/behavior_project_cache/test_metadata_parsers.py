@@ -6,9 +6,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.meta
     parse_num_depths,
     parse_stimulus_set,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
-    add_experience_level
-)
 
 
 def test_parse_behavior_context():
@@ -119,26 +116,3 @@ def test_parse_num_depths():
         df["project_code"].apply(parse_num_depths).astype("Int64").rename(None)
     )
     pd.testing.assert_series_equal(expected, obtained)
-
-
-def test_add_experience_level():
-    """Test parsing the stimulus set used in the session from the
-    session_type.
-    """
-    df = pd.DataFrame(
-        {
-            "prior_exposures_to_image_set": [
-                0,
-                1,
-                2,
-                None,
-                0,
-            ]
-        }
-    )
-    expected = pd.Series(
-        ["Novel", "Familiar", "Familiar", "Novel", "Novel"],
-        name="experience_level",
-    )
-    obtained = add_experience_level(df)
-    pd.testing.assert_series_equal(expected, obtained["experience_level"])
