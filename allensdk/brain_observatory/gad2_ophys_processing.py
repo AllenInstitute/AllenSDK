@@ -1,7 +1,7 @@
 from scipy.ndimage import percentile_filter
 from tqdm import tqdm
 from multiprocessing import Pool
-
+import numpy as np
 def nanmedian_filter(x,filter_length):
     """ 1D median filtering with np.nanmedian
     Parameters
