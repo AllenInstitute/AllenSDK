@@ -1071,6 +1071,9 @@ class BehaviorSession(
         for a given duration, typically 250 ms) and whose columns are
         presentation characteristics.
 
+        Adds trials_id to the stimulus table if the column is not already
+        present.
+
         Returns
         -------
         pd.DataFrame
@@ -1105,9 +1108,8 @@ class BehaviorSession(
         table = self._stimuli.presentations.value
         table = table.drop(columns=["image_set", "index"], errors="ignore")
         table = table.rename(columns={"stop_time": "end_time"})
-        # Backwards compatibility for data generated without the needed
-        # ``stimulus_block`` column in the table.
-        if "stimulus_block" in table.columns:
+
+        if "trials_id" not in table.columns:
             table["trials_id"] = compute_trials_id_for_stimulus(
                 table, self.trials
             )
@@ -1366,6 +1368,7 @@ class BehaviorSession(
         behavior_session_id: int,
         sync_file: Optional[SyncFile],
         monitor_delay: float,
+        trials: Trials,
         stimulus_presentation_columns: Optional[List[str]] = None,
         project_code: Optional[ProjectCode] = None,
     ) -> Stimuli:
@@ -1385,6 +1388,7 @@ class BehaviorSession(
             stimulus_timestamps=stimulus_timestamps,
             presentation_columns=stimulus_presentation_columns,
             project_code=project_code,
+            trials=trials,
         )
 
     @classmethod
@@ -1483,18 +1487,6 @@ class BehaviorSession(
             monitor_delay=monitor_delay,
         )
 
-        if include_stimuli:
-            stimuli = cls._read_stimuli(
-                stimulus_file_lookup=stimulus_file_lookup,
-                behavior_session_id=behavior_session_id,
-                sync_file=sync_file,
-                monitor_delay=monitor_delay,
-                stimulus_presentation_columns=stimulus_presentation_columns,
-                project_code=project_code,
-            )
-        else:
-            stimuli = None
-
         trials = cls._read_trials(
             stimulus_file_lookup=stimulus_file_lookup,
             sync_file=sync_file,
@@ -1502,6 +1494,15 @@ class BehaviorSession(
             licks=licks,
             rewards=rewards,
         )
+
+        if include_stimuli:
+            stimuli = cls._read_stimuli(
+                stimulus_file_lookup=stimulus_file_lookup,
+                behavior_session_id=behavior_session_id, sync_file=sync_file,
+                monitor_delay=monitor_delay, trials=trials,
+                stimulus_presentation_columns=stimulus_presentation_columns)
+        else:
+            stimuli = None
 
         task_parameters = TaskParameters.from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file

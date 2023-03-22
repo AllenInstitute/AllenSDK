@@ -602,6 +602,9 @@ def compute_trials_id_for_stimulus(
     """Add an id to allow for merging of the stimulus presentations
     table with the trials table.
 
+    If stimulus_block is not available as a column in the input table, return
+    an empty set of trials_ids.
+
     Parameters
     ----------
     stim_pres_table : pandas.DataFrame
@@ -628,6 +631,10 @@ def compute_trials_id_for_stimulus(
         data=np.full(len(stim_pres_sorted), -1, dtype=int),
         index=stim_pres_sorted.index,
         name='trials_id')
+    # Return an empty trials_id if the stimulus block is not available.
+    if 'stimulus_block' not in stim_pres_sorted.columns:
+        return trials_ids
+
     if 'active' in stim_pres_sorted.columns:
         has_active = True
         active_sorted = stim_pres_sorted.active

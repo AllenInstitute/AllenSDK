@@ -63,13 +63,10 @@ class VBNBehaviorSession(BehaviorSession):
                 "from_lims is not supported for a VBNBehaviorSession")
 
     @classmethod
-    def _read_stimuli(
-            cls,
-            stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile],
-            monitor_delay: float,
-            stimulus_presentation_columns: Optional[List[str]] = None
-    ) -> Stimuli:
+    def _read_stimuli(cls, stimulus_file_lookup: StimulusFileLookup,
+                      behavior_session_id: Optional[SyncFile],
+                      sync_file: float,
+                      monitor_delay: Optional[List[str]] = None) -> Stimuli:
         raise NotImplementedError(
             "VBNBehaviorSessions read their stimulus tables from "
             "a precomputed csv file; they should not be computed "
