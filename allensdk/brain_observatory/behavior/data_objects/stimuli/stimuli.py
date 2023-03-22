@@ -17,6 +17,9 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
     import \
     Templates
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import ProjectCode  # noqa: E501
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
+    Trials,
+)
 
 
 class Stimuli(DataObject, StimulusFileReadableInterface,
@@ -54,6 +57,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             cls, stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
             behavior_session_id: int,
+            trials: Trials,
             limit_to_images: Optional[List] = None,
             presentation_columns: Optional[List[str]] = None,
             presentation_fill_omitted_values: bool = True,
@@ -63,8 +67,13 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
 
         Parameters
         ----------
-        stimulus_file
-        stimulus_timestamps
+        stimulus_file: BehaviorStimulusFile
+            Input stimulus file for the session.
+        stimulus_timestamps: StimulusTimestamps
+            Stimulus timestamps for the session.
+        trials: Trials
+            Trials object to add trials_id column into the presentations
+            data frame to allow for merging between the two tables.
         behavior_session_id
             behavior session id in LIMS
         limit_to_images: limit to certain images. Used for testing.
@@ -89,6 +98,7 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             column_list=presentation_columns,
             fill_omitted_values=presentation_fill_omitted_values,
             project_code=project_code,
+            trials=trials,
         )
         t = Templates.from_stimulus_file(stimulus_file=stimulus_file,
                                          limit_to_images=limit_to_images)

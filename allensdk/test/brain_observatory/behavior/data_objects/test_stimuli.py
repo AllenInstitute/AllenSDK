@@ -37,6 +37,14 @@ class TestFromBehaviorStimulusFile(LimsTest):
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
+        class DummyTrials:
+            """Mock Trials object
+            """
+            @property
+            def data(self):
+                return pd.DataFrame({'start_time': [300., 330., 360.],
+                                     'stop_time': [330., 360., 360.]})
+
         stimulus_file = BehaviorStimulusFile.from_lims(
             behavior_session_id=self.behavior_session_id, db=self.dbconn)
         stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
@@ -45,6 +53,7 @@ class TestFromBehaviorStimulusFile(LimsTest):
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
+            trials=DummyTrials(),
             limit_to_images=['im065'],
             behavior_session_id=self.behavior_session_id
         )
