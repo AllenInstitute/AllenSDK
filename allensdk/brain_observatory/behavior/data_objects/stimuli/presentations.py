@@ -21,12 +21,15 @@ from allensdk.core import \
 from allensdk.brain_observatory.behavior.stimulus_processing import \
     get_stimulus_presentations, get_stimulus_metadata, is_change_event, \
     get_flashes_since_change, fix_omitted_end_frame, \
-    produce_stimulus_block_names
+    produce_stimulus_block_names, compute_trials_id_for_stimulus
 from allensdk.brain_observatory.nwb import \
     create_stimulus_presentation_time_interval
 from allensdk.internal.brain_observatory.mouse import Mouse
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import \
     ProjectCode  # noqa: E501
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
+    Trials,
+)
 
 
 class Presentations(DataObject, StimulusFileReadableInterface,
@@ -176,10 +179,11 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             stimulus_file: BehaviorStimulusFile,
             stimulus_timestamps: StimulusTimestamps,
             behavior_session_id: int,
+            trials: Trials,
             limit_to_images: Optional[List] = None,
             column_list: Optional[List[str]] = None,
             fill_omitted_values: bool = True,
-            project_code: Optional[ProjectCode] = None
+            project_code: Optional[ProjectCode] = None,
     ) -> "Presentations":
         """Get stimulus presentation data.
 
@@ -191,6 +195,9 @@ class Presentations(DataObject, StimulusFileReadableInterface,
             Timestamps of the stimuli
         behavior_session_id : int
             LIMS id of behavior session
+        trials: Trials
+            Object to create trials_id column in Presentations table
+            allowing for mering of the two tables.
         limit_to_images : Optional, list of str
             Only return images given by these image names
         column_list : Optional, list of str
@@ -304,6 +311,13 @@ class Presentations(DataObject, StimulusFileReadableInterface,
                 stimulus_file.session_type,
                 project_code.value
             )
+
+        # Add trials_id to presentations df to allow for joining of the two
+        # tables.
+        stim_pres_df["trials_id"] = compute_trials_id_for_stimulus(
+            stim_pres_df, trials.data
+        )
+
         return Presentations(presentations=stim_pres_df,
                              column_list=column_list)
 
