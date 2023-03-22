@@ -38,7 +38,7 @@ def get_all_tables(project_code: str):
 
     experiments_table = api.get_ophys_experiment_table().reset_index()
     experiments_df = experiments_table[experiments_table.project_code==project_code].reset_index(drop=True)
-    experiments_df = experiments_df.merge(session_df.drop(columns=['mouse_id','ophys_experiment_id','ophys_container_id','session_name','date_of_acquisition','project_code','ophys_session_id']), on='behavior_session_id')
+    experiments_df = experiments_df.merge(session_df.drop(columns=['ophys_experiment_id','ophys_container_id','session_name','date_of_acquisition','project_code','ophys_session_id']), on='behavior_session_id')
 
     cells_df = api.get_ophys_cells_table().reset_index()
     cells_df = cells_df.merge(experiments_df, on='ophys_experiment_id')
@@ -79,7 +79,7 @@ def get_experiment_table(project_code: str):
     api = BehaviorProjectLimsApi.default(passed_only=False)
     experiments_table = api.get_ophys_experiment_table().reset_index()
     experiments_df = experiments_table[experiments_table.project_code==project_code].reset_index(drop=True)
-    experiments_df = experiments_df.merge(session_df.drop(columns=['mouse_id','ophys_experiment_id','ophys_container_id','session_name','date_of_acquisition','project_code','ophys_session_id']), on='behavior_session_id')
+    experiments_df = experiments_df.merge(session_df.drop(columns=['ophys_experiment_id','ophys_container_id','session_name','date_of_acquisition','project_code','ophys_session_id']), on='behavior_session_id')
 
     return experiments_df
 
