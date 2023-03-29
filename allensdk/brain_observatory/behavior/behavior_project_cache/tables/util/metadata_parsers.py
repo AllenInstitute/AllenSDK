@@ -16,8 +16,8 @@ def parse_behavior_context(session_type: str) -> str:
 
     Parameters
     ----------
-    metadata_row : pandas.Series
-        Complete set of metadata for session.
+    session_type : str
+        String session type name.
 
     Returns
     -------
@@ -37,8 +37,8 @@ def parse_stimulus_set(session_type: str) -> str:
 
     Parameters
     ----------
-    metadata_row : pandas.Series
-        Complete set of metadata for session.
+    session_type : str
+        String session type name.
 
     Returns
     -------
