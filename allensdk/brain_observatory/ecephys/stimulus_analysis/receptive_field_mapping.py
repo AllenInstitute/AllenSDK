@@ -418,7 +418,7 @@ def fit_2d_gaussian(matrix):
     if params is None:
         return (np.nan, np.nan, np.nan, np.nan, np.nan), False
 
-    errorfunction = lambda p: np.ravel(_gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix)
+    errorfunction = lambda p: np.ravel(_gaussian_function_2d(*p)(*np.flip(np.indices(matrix.shape),0)) - matrix)
     fit_params, ier = leastsq(errorfunction, params)
     success = True if ier < 5 else False
 
