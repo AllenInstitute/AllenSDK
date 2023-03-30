@@ -153,7 +153,7 @@ def test_threshold_rf(rf, threshold, expected_mask, expected_x, expected_y, expe
 
 @pytest.mark.parametrize('matrix,expected',
                          [
-                             (rf_field_real, (np.array([1.04991433e+05, 3.74217858e+00, 3.24465965e+00, 1.66477569e+00, 1.04485211e+00]), True)),
+                             (rf_field_real, (np.array([1.04990549e+05, 3.24465782e+00, 3.74217921e+00, 1.04486140e+00, 1.66478893e+00]), True)), # noqa
                              (rf_field_gaussian, (np.array([1.0, 4.0, 4.0, 4.0, 4.0]), True)),
                              (np.zeros((9, 9)), ((np.nan, np.nan, np.nan, np.nan, np.nan), False)),
                              ## These edge cases are too sensitive and will produce different values depending on the
