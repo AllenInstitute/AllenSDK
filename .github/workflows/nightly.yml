@@ -2,6 +2,8 @@ name: ci/nightly
 on:
   schedule:
     - cron: '05 6 * * *'
+  workflow_dispatch:
+
 
 
 jobs:
@@ -10,7 +12,7 @@ jobs:
     runs-on: ["self-hosted"]
     strategy:
       matrix:
-        image: ["allensdk_local_py37:latest"]
+        image: ["allensdk_local_py38:latest"]
         branch: ["master", "rc/**"]
     steps:
       - uses: actions/checkout@v2
