@@ -446,8 +446,7 @@ class BehaviorSession(
             sync_file=sync_file,
             monitor_delay=monitor_delay,
             project_code=ProjectCode.from_lims(
-                behavior_session_id=behavior_session_id.value,
-                lims_db=lims_db
+                behavior_session_id=behavior_session_id.value, lims_db=lims_db
             ),
         )
 
@@ -1498,9 +1497,12 @@ class BehaviorSession(
         if include_stimuli:
             stimuli = cls._read_stimuli(
                 stimulus_file_lookup=stimulus_file_lookup,
-                behavior_session_id=behavior_session_id, sync_file=sync_file,
-                monitor_delay=monitor_delay, trials=trials,
-                stimulus_presentation_columns=stimulus_presentation_columns)
+                behavior_session_id=behavior_session_id,
+                sync_file=sync_file,
+                monitor_delay=monitor_delay,
+                trials=trials,
+                stimulus_presentation_columns=stimulus_presentation_columns,
+            )
         else:
             stimuli = None
 
@@ -1527,7 +1529,6 @@ class BehaviorSession(
         eye_tracking_metadata_file: Optional[EyeTrackingMetadataFile] = None,
         eye_tracking_video: Optional[EyeTrackingVideo] = None,
     ) -> EyeTrackingTable:
-
         # this is possible if instantiating from_lims
         if sync_file is None:
             msg = (
