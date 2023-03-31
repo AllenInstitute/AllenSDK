@@ -97,7 +97,10 @@ def test_local_cache_construction(
         cache = VisualBehaviorOphysProjectCache.from_s3_cache(cache_dir)
 
     cmd = 'VisualBehaviorOphysProjectCache.construct_local_manifest()'
-    assert cmd in f'{warnings[0].message}'
+    warning_msgs = [
+        f'{warnings[i].message}' for i in range(len(warnings))
+        if type(warnings[i].message) is MissingLocalManifestWarning]
+    assert any([cmd in msg for msg in warning_msgs])
 
     # Because, at the point where the cache was reconstitute,
     # the metadata files already existed at their expected local paths,
