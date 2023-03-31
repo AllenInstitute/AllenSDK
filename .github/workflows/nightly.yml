@@ -2,8 +2,6 @@ name: ci/nightly
 on:
   schedule:
     - cron: '05 6 * * *'
-  workflow_dispatch:
-
 
 
 jobs:
