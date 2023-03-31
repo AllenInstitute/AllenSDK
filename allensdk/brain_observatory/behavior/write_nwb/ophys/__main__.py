@@ -17,20 +17,25 @@ from allensdk.brain_observatory.behavior.write_nwb.ophys.schemas import (
 
 class WriteOphysNWB(argschema.ArgSchemaParser):
     default_schema = OphysExperimentInputSchema
-    output_schema = OutputSchema
+    default_output_schema = OutputSchema
 
     def run(self):
         self.logger.name = type(self).__name__
         oe_id = self.args["ophys_experiment_id"]
+        oe_id_dir = Path(self.args["output_dir_path"]) / f"{oe_id}"
+        oe_id_dir.mkdir(exist_ok=True)
         output_file = self.write_experiment_nwb(
             ophys_experiment_metadata=self.args["ophys_experiment_metadata"],
-            nwb_filepath=Path(self.args["output_dir_path"]) / f"{oe_id}.nwb",
+            nwb_filepath=oe_id_dir / f"ophys_experiment_{oe_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
         )
         logging.info("File successfully created")
 
-        self.output({"output_path": output_file})
+        output_dict = {"output_path": output_file,
+                       "input_parameters": self.args}
+
+        self.output(output_dict)
 
     def write_experiment_nwb(
         self,
