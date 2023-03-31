@@ -1,38 +1,40 @@
-from typing import Optional, List, Dict, Any, Union, Callable, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from pynwb import NWBFile
-from xarray import DataArray
-
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.behavior.behavior_session import \
-    BehaviorSession
-from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import \
-    BehaviorEcephysMetadata
-from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
-from allensdk.brain_observatory.ecephys.probes import Probes
-from allensdk.brain_observatory.ecephys.data_objects.trials import (
-    VBNTrials)
-
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession,
+    StimulusFileLookup,
+)
 from allensdk.brain_observatory.behavior.data_files import SyncFile
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import (
+    EyeTrackingFile,
+)
+from allensdk.brain_observatory.behavior.data_files.eye_tracking_metadata_file import (  # noqa: E501
+    EyeTrackingMetadataFile,
+)
+from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
+from allensdk.brain_observatory.behavior.data_objects.eye_tracking.eye_tracking_table import (  # noqa: E501
+    EyeTrackingTable,
+    get_lost_frames,
+)
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.\
-    data_objects.trials.trials import Trials
-from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.brain_observatory.behavior.behavior_session import (
-    StimulusFileLookup)
 from allensdk.brain_observatory.behavior.data_objects.stimuli.stimuli import (
-    Stimuli)
-from allensdk.brain_observatory.behavior.data_files.eye_tracking_file import \
-    EyeTrackingFile
-from allensdk.brain_observatory.behavior.\
-    data_files.eye_tracking_metadata_file import EyeTrackingMetadataFile
-
-
-from allensdk.brain_observatory.behavior.data_objects.eye_tracking \
-    .eye_tracking_table import EyeTrackingTable, get_lost_frames
+    Stimuli,
+)
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
+    Trials,
+)
+from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import (
+    BehaviorEcephysMetadata,
+)
+from allensdk.brain_observatory.ecephys.data_objects.trials import VBNTrials
+from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
+from allensdk.brain_observatory.ecephys.probes import Probes
+from pynwb import NWBFile
+from xarray import DataArray
 
 
 class VBNBehaviorSession(BehaviorSession):
@@ -51,73 +53,89 @@ class VBNBehaviorSession(BehaviorSession):
         return 0.02
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
-                  lims_db: Optional[Any] = None,
-                  sync_file: Optional[Any] = None,
-                  monitor_delay: Optional[float] = None,
-                  date_of_acquisition: Optional[Any] = None,
-                  eye_tracking_z_threshold: float = 3.0,
-                  eye_tracking_dilation_frames: int = 2) \
-            -> "VBNBehaviorSession":
+    def from_lims(
+        cls,
+        behavior_session_id: int,
+        lims_db: Optional[Any] = None,
+        sync_file: Optional[Any] = None,
+        monitor_delay: Optional[float] = None,
+        date_of_acquisition: Optional[Any] = None,
+        eye_tracking_z_threshold: float = 3.0,
+        eye_tracking_dilation_frames: int = 2,
+    ) -> "VBNBehaviorSession":
         raise NotImplementedError(
-                "from_lims is not supported for a VBNBehaviorSession")
+            "from_lims is not supported for a VBNBehaviorSession"
+        )
 
     @classmethod
-    def _read_stimuli(cls, stimulus_file_lookup: StimulusFileLookup,
-                      behavior_session_id: Optional[SyncFile],
-                      sync_file: float,
-                      monitor_delay: Optional[List[str]] = None) -> Stimuli:
+    def _read_stimuli(
+        cls,
+        stimulus_file_lookup: StimulusFileLookup,
+        behavior_session_id: Optional[SyncFile],
+        sync_file: float,
+        monitor_delay: Optional[List[str]] = None,
+    ) -> Stimuli:
         raise NotImplementedError(
             "VBNBehaviorSessions read their stimulus tables from "
             "a precomputed csv file; they should not be computed "
-            "on the fly by the AllenSDK")
+            "on the fly by the AllenSDK"
+        )
 
     @classmethod
     def _read_behavior_stimulus_timestamps(
-            cls,
-            stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile],
-            monitor_delay: float) -> StimulusTimestamps:
+        cls,
+        stimulus_file_lookup: StimulusFileLookup,
+        sync_file: Optional[SyncFile],
+        monitor_delay: float,
+    ) -> StimulusTimestamps:
         """
         Assemble the StimulusTimestamps by registering behavior_
         mapping_ and replay_stimulus blocks to a single sync file
         """
         timestamps = StimulusTimestamps.from_multiple_stimulus_blocks(
-                sync_file=sync_file,
-                list_of_stims=[
-                     stimulus_file_lookup.behavior_stimulus_file,
-                     stimulus_file_lookup.mapping_stimulus_file,
-                     stimulus_file_lookup.replay_stimulus_file],
-                stims_of_interest=[0, ],
-                monitor_delay=monitor_delay)
+            sync_file=sync_file,
+            list_of_stims=[
+                stimulus_file_lookup.behavior_stimulus_file,
+                stimulus_file_lookup.mapping_stimulus_file,
+                stimulus_file_lookup.replay_stimulus_file,
+            ],
+            stims_of_interest=[
+                0,
+            ],
+            monitor_delay=monitor_delay,
+        )
         return timestamps
 
     @classmethod
     def _read_session_timestamps(
-            cls,
-            stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile],
-            monitor_delay: float) -> StimulusTimestamps:
+        cls,
+        stimulus_file_lookup: StimulusFileLookup,
+        sync_file: Optional[SyncFile],
+        monitor_delay: float,
+    ) -> StimulusTimestamps:
         """
         Assemble the StimulusTimestamps (with monitor delay) that will
         be associated with this session
         """
         timestamps = StimulusTimestamps.from_multiple_stimulus_blocks(
-                sync_file=sync_file,
-                list_of_stims=[
-                     stimulus_file_lookup.behavior_stimulus_file,
-                     stimulus_file_lookup.mapping_stimulus_file,
-                     stimulus_file_lookup.replay_stimulus_file],
-                stims_of_interest=None,
-                monitor_delay=monitor_delay)
+            sync_file=sync_file,
+            list_of_stims=[
+                stimulus_file_lookup.behavior_stimulus_file,
+                stimulus_file_lookup.mapping_stimulus_file,
+                stimulus_file_lookup.replay_stimulus_file,
+            ],
+            stims_of_interest=None,
+            monitor_delay=monitor_delay,
+        )
         return timestamps
 
     @classmethod
     def _read_licks(
-            cls,
-            stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile],
-            monitor_delay) -> Licks:
+        cls,
+        stimulus_file_lookup: StimulusFileLookup,
+        sync_file: Optional[SyncFile],
+        monitor_delay,
+    ) -> Licks:
         """
         Construct the Licks data object for this session,
         reading the lick times directly from the sync file,
@@ -126,19 +144,22 @@ class VBNBehaviorSession(BehaviorSession):
         """
 
         if sync_file is None:
-            msg = (f"{cls}._read_licks requires a sync_file; "
-                   "you passed in sync_file=None")
+            msg = (
+                f"{cls}._read_licks requires a sync_file; "
+                "you passed in sync_file=None"
+            )
             raise ValueError(msg)
 
         lick_times = StimulusTimestamps(
-                       timestamps=sync_file.data['lick_times'],
-                       monitor_delay=0.0)
+            timestamps=sync_file.data["lick_times"], monitor_delay=0.0
+        )
 
         # get the timestamps of the behavior stimulus presentations
         beh_stim_times = cls._read_behavior_stimulus_timestamps(
-                                 sync_file=sync_file,
-                                 stimulus_file_lookup=stimulus_file_lookup,
-                                 monitor_delay=monitor_delay)
+            sync_file=sync_file,
+            stimulus_file_lookup=stimulus_file_lookup,
+            monitor_delay=monitor_delay,
+        )
 
         beh_stim_times_no_monitor = beh_stim_times.subtract_monitor_delay()
 
@@ -151,8 +172,8 @@ class VBNBehaviorSession(BehaviorSession):
         max_time = beh_stim_times_no_monitor.value.max()
 
         valid = np.logical_and(
-                  lick_times.value >= min_time,
-                  lick_times.value <= max_time)
+            lick_times.value >= min_time, lick_times.value <= max_time
+        )
 
         lick_times = lick_times.value[valid]
 
@@ -164,85 +185,94 @@ class VBNBehaviorSession(BehaviorSession):
         # buffer"
 
         lick_frames = np.searchsorted(
-            beh_stim_times_no_monitor.value,
-            lick_times)
+            beh_stim_times_no_monitor.value, lick_times
+        )
 
         if len(lick_frames) != len(lick_times):
-            msg = (f"{len(lick_frames)} lick frames; "
-                   f"{len(lick_times)} lick timestamps "
-                   "in the Sync file. Should be equal")
+            msg = (
+                f"{len(lick_frames)} lick frames; "
+                f"{len(lick_times)} lick timestamps "
+                "in the Sync file. Should be equal"
+            )
             raise RuntimeError(msg)
 
-        df = pd.DataFrame({"timestamps": lick_times,
-                           "frame": lick_frames})
+        df = pd.DataFrame({"timestamps": lick_times, "frame": lick_frames})
         return Licks(licks=df)
 
     @classmethod
     def _read_eye_tracking_table(
-            cls,
-            eye_tracking_file: EyeTrackingFile,
-            eye_tracking_metadata_file: EyeTrackingMetadataFile,
-            sync_file: SyncFile,
-            z_threshold: float,
-            dilation_frames: int) -> EyeTrackingTable:
+        cls,
+        eye_tracking_file: EyeTrackingFile,
+        eye_tracking_metadata_file: EyeTrackingMetadataFile,
+        sync_file: SyncFile,
+        z_threshold: float,
+        dilation_frames: int,
+    ) -> EyeTrackingTable:
         """
         Notes
         -----
         more or less copied from
-        https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py
+        https://github.com/corbennett/NP_pipeline_QC/blob/6a66f195c4cd6b300776f089773577db542fe7eb/probeSync_qc.py  # noqa: E501
         """
 
         eye_metadata = eye_tracking_metadata_file.data
-        camera_label = eye_metadata['RecordingReport']['CameraLabel']
+        camera_label = eye_metadata["RecordingReport"]["CameraLabel"]
         exposure_sync_line_label_dict = {
-            'Eye': 'eye_cam_exposing',
-            'Face': 'face_cam_exposing',
-            'Behavior': 'beh_cam_exposing'}
+            "Eye": "eye_cam_exposing",
+            "Face": "face_cam_exposing",
+            "Behavior": "beh_cam_exposing",
+        }
         camera_line = exposure_sync_line_label_dict[camera_label]
 
         lost_frames = get_lost_frames(
-                        eye_tracking_metadata=eye_tracking_metadata_file)
+            eye_tracking_metadata=eye_tracking_metadata_file
+        )
 
         frame_times = sync_utilities.get_synchronized_frame_times(
             session_sync_file=sync_file.filepath,
             sync_line_label_keys=(camera_line,),
             drop_frames=lost_frames,
-            trim_after_spike=False)
+            trim_after_spike=False,
+        )
 
         stimulus_timestamps = StimulusTimestamps(
-                                timestamps=frame_times.values,
-                                monitor_delay=0.0)
+            timestamps=frame_times.values, monitor_delay=0.0
+        )
 
         return EyeTrackingTable.from_data_file(
-                    data_file=eye_tracking_file,
-                    stimulus_timestamps=stimulus_timestamps,
-                    z_threshold=z_threshold,
-                    dilation_frames=dilation_frames,
-                    metadata_file=eye_tracking_metadata_file,
-                    empty_on_fail=False)
+            data_file=eye_tracking_file,
+            stimulus_timestamps=stimulus_timestamps,
+            z_threshold=z_threshold,
+            dilation_frames=dilation_frames,
+            metadata_file=eye_tracking_metadata_file,
+            empty_on_fail=False,
+        )
 
     @classmethod
     def _read_trials(
-            cls,
-            stimulus_file_lookup: StimulusFileLookup,
-            sync_file: Optional[SyncFile],
-            monitor_delay: float,
-            licks: Licks,
-            rewards: Rewards) -> Trials:
+        cls,
+        stimulus_file_lookup: StimulusFileLookup,
+        sync_file: Optional[SyncFile],
+        monitor_delay: float,
+        licks: Licks,
+        rewards: Rewards,
+    ) -> Trials:
         """
         Construct the Trials data object for this session
         """
 
         stimulus_timestamps = cls._read_behavior_stimulus_timestamps(
-                sync_file=sync_file,
-                stimulus_file_lookup=stimulus_file_lookup,
-                monitor_delay=monitor_delay)
+            sync_file=sync_file,
+            stimulus_file_lookup=stimulus_file_lookup,
+            monitor_delay=monitor_delay,
+        )
 
         return VBNTrials.from_stimulus_file(
             stimulus_file=stimulus_file_lookup.behavior_stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
             licks=licks,
-            rewards=rewards)
+            rewards=rewards,
+        )
 
 
 class BehaviorEcephysSession(VBNBehaviorSession):
@@ -259,11 +289,11 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         return VBNBehaviorSession
 
     def __init__(
-            self,
-            behavior_session: VBNBehaviorSession,
-            metadata: BehaviorEcephysMetadata,
-            probes: Probes,
-            optotagging_table: OptotaggingTable
+        self,
+        behavior_session: VBNBehaviorSession,
+        metadata: BehaviorEcephysMetadata,
+        probes: Probes,
+        optotagging_table: OptotaggingTable,
     ):
         super().__init__(
             behavior_session_id=behavior_session._behavior_session_id,
@@ -280,7 +310,8 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             trials=behavior_session._trials,
             eye_tracking_table=behavior_session._eye_tracking,
             eye_tracking_rig_geometry=(
-                behavior_session._eye_tracking_rig_geometry)
+                behavior_session._eye_tracking_rig_geometry
+            ),
         )
         self._probes = probes
         self._optotagging_table = optotagging_table
@@ -317,15 +348,11 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     @property
     def metadata(self) -> dict:
-        behavior_meta = super()._get_metadata(
-            behavior_metadata=self._metadata)
+        behavior_meta = super()._get_metadata(behavior_metadata=self._metadata)
         ecephys_meta = {
-            'ecephys_session_id': self._metadata.ecephys_session_id
+            "ecephys_session_id": self._metadata.ecephys_session_id
         }
-        return {
-            **behavior_meta,
-            **ecephys_meta
-        }
+        return {**behavior_meta, **ecephys_meta}
 
     @property
     def mean_waveforms(self) -> Dict[int, np.ndarray]:
@@ -372,9 +399,12 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         -------
         `pd.DataFrame` of channels
         """
-        return pd.concat([
-            p.channels.to_dataframe(filter_by_validity=filter_by_validity)
-            for p in self._probes.probes])
+        return pd.concat(
+            [
+                p.channels.to_dataframe(filter_by_validity=filter_by_validity)
+                for p in self._probes.probes
+            ]
+        )
 
     def get_units(
         self,
@@ -382,7 +412,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         filter_out_of_brain_units: bool = False,
         amplitude_cutoff_maximum: Optional[float] = None,
         presence_ratio_minimum: Optional[float] = None,
-        isi_violations_maximum: Optional[float] = None
+        isi_violations_maximum: Optional[float] = None,
     ) -> pd.DataFrame:
         """
         Gets a dataframe representing all units detected by all probes
@@ -412,22 +442,17 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             filter_out_of_brain_units=filter_out_of_brain_units,
             amplitude_cutoff_maximum=amplitude_cutoff_maximum,
             presence_ratio_minimum=presence_ratio_minimum,
-            isi_violations_maximum=isi_violations_maximum)
+            isi_violations_maximum=isi_violations_maximum,
+        )
 
-    def get_lfp(
-        self,
-        probe_id: int
-    ) -> Optional[DataArray]:
+    def get_lfp(self, probe_id: int) -> Optional[DataArray]:
         """
         Get LFP data for a single probe given by `probe_id`
         """
         probe = self._get_probe(probe_id=probe_id)
         return probe.lfp
 
-    def get_current_source_density(
-        self,
-        probe_id: int
-    ) -> Optional[DataArray]:
+    def get_current_source_density(self, probe_id: int) -> Optional[DataArray]:
         """
         Get current source density data for a single probe given by `probe_id`
         """
@@ -436,11 +461,11 @@ class BehaviorEcephysSession(VBNBehaviorSession):
 
     @classmethod
     def from_json(
-            cls,
-            session_data: dict,
-            stimulus_presentation_exclude_columns: Optional[List[str]] = None,
-            running_speed_load_from_multiple_stimulus_files: bool = True,
-            skip_probes: Optional[List[str]] = None
+        cls,
+        session_data: dict,
+        stimulus_presentation_exclude_columns: Optional[List[str]] = None,
+        running_speed_load_from_multiple_stimulus_files: bool = True,
+        skip_probes: Optional[List[str]] = None,
     ) -> "BehaviorEcephysSession":
         """
 
@@ -464,21 +489,24 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             session_data=session_data,
             read_stimulus_presentations_table_from_file=True,
             stimulus_presentation_exclude_columns=(
-                stimulus_presentation_exclude_columns),
+                stimulus_presentation_exclude_columns
+            ),
             sync_file_permissive=True,
             eye_tracking_drop_frames=True,
             running_speed_load_from_multiple_stimulus_files=(
-                running_speed_load_from_multiple_stimulus_files)
+                running_speed_load_from_multiple_stimulus_files
+            ),
         )
-        probes = Probes.from_json(probes=session_data['probes'],
-                                  skip_probes=skip_probes)
+        probes = Probes.from_json(
+            probes=session_data["probes"], skip_probes=skip_probes
+        )
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
 
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
             probes=probes,
             optotagging_table=optotagging_table,
-            metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data)
+            metadata=BehaviorEcephysMetadata.from_json(dict_repr=session_data),
         )
 
     def to_nwb(self) -> Tuple[NWBFile, Dict[str, Optional[NWBFile]]]:
@@ -495,21 +523,22 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         nwbfile = super().to_nwb(
             add_metadata=False,
             include_experiment_description=False,
-            stimulus_presentations_stimulus_column_name='stimulus_name')
+            stimulus_presentations_stimulus_column_name="stimulus_name",
+        )
 
         self._metadata.to_nwb(nwbfile=nwbfile)
-        _, probe_nwbfile_map = self._probes.to_nwb(
-            nwbfile=nwbfile)
+        _, probe_nwbfile_map = self._probes.to_nwb(nwbfile=nwbfile)
         self._optotagging_table.to_nwb(nwbfile=nwbfile)
         return nwbfile, probe_nwbfile_map
 
     @classmethod
     def from_nwb(
-            cls,
-            nwbfile: NWBFile,
-            probe_data_path_map: Optional[
-                Dict[str, Union[str, Callable[[], str]]]] = None,
-            **kwargs
+        cls,
+        nwbfile: NWBFile,
+        probe_data_path_map: Optional[
+            Dict[str, Union[str, Callable[[], str]]]
+        ] = None,
+        **kwargs,
     ) -> "BehaviorEcephysSession":
         """
 
@@ -530,18 +559,17 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         -------
         instantiated `BehaviorEcephysSession`
         """
-        kwargs['add_is_change_to_stimulus_presentations_table'] = False
+        kwargs["add_is_change_to_stimulus_presentations_table"] = False
         behavior_session = cls.behavior_data_class().from_nwb(
-            nwbfile=nwbfile,
-            **kwargs
+            nwbfile=nwbfile, **kwargs
         )
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
             probes=Probes.from_nwb(
-                nwbfile=nwbfile,
-                probe_data_path_map=probe_data_path_map),
+                nwbfile=nwbfile, probe_data_path_map=probe_data_path_map
+            ),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
-            metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile)
+            metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile),
         )
 
     def _get_identifier(self) -> str:
@@ -551,9 +579,10 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         """Gets a probe given by `probe_id`"""
         probe = [p for p in self._probes if p.id == probe_id]
         if len(probe) == 0:
-            raise ValueError(f'Could not find probe with id {probe_id}')
+            raise ValueError(f"Could not find probe with id {probe_id}")
         if len(probe) > 1:
-            raise RuntimeError(f'Multiple probes found with probe_id '
-                               f'{probe_id}')
+            raise RuntimeError(
+                f"Multiple probes found with probe_id " f"{probe_id}"
+            )
         probe = probe[0]
         return probe
