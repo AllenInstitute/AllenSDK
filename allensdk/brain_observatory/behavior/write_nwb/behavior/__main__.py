@@ -15,20 +15,25 @@ from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
 
 class WriteBehaviorNWB(argschema.ArgSchemaParser):
     default_schema = BehaviorInputSchema
-    output_schema = OutputSchema
+    default_output_schema = OutputSchema
 
     def run(self):
         self.logger.name = type(self).__name__
         bs_id = self.args["behavior_session_id"]
+        bs_id_dir = Path(self.args["output_dir_path"]) / f"{bs_id}"
+        bs_id_dir.mkdir(exist_ok=True)
         output_file = self.write_behavior_nwb(
             behavior_session_metadata=self.args["behavior_session_metadata"],
-            nwb_filepath=Path(self.args["output_dir_path"]) / f"{bs_id}.nwb",
+            nwb_filepath=bs_id_dir / f"behavior_session_{bs_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
         )
         logging.info("File successfully created")
 
-        self.output({"output_path": output_file})
+        output_dict = {"output_path": output_file,
+                       "input_parameters": self.args}
+
+        self.output(output_dict)
 
     def write_behavior_nwb(
         self,
