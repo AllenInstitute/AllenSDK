@@ -1,17 +1,23 @@
 import pickle
 import warnings
-from typing import Dict, List, Tuple, Union, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
-
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.brain_observatory.behavior.data_objects.stimuli\
-    .stimulus_templates import \
-    StimulusTemplate, StimulusTemplateFactory
-from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
-    convert_filepath_caseinsensitive, get_image_set_name
-from allensdk.brain_observatory.ophys.project_constants import PROJECT_CODES, VBO_ACTIVE_MAP, VBO_PASSIVE_MAP  # noqa: E501
+from allensdk.brain_observatory.behavior.data_objects.stimuli.stimulus_templates import (  # noqa: E501
+    StimulusTemplate,
+    StimulusTemplateFactory,
+)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.util import (
+    convert_filepath_caseinsensitive,
+    get_image_set_name,
+)
+from allensdk.brain_observatory.ophys.project_constants import (
+    PROJECT_CODES,
+    VBO_ACTIVE_MAP,
+    VBO_PASSIVE_MAP,
+)
 
 
 def load_pickle(pstream):
@@ -32,24 +38,29 @@ def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
     stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
     # workaround to rename columns to harmonize with visual
     # coding and rebase timestamps to sync time
-    stimulus_table.insert(loc=0, column='flash_number',
-                          value=np.arange(0, len(stimulus_table)))
+    stimulus_table.insert(
+        loc=0, column="flash_number", value=np.arange(0, len(stimulus_table))
+    )
     stimulus_table = stimulus_table.rename(
-        columns={'frame': 'start_frame',
-                 'time': 'start_time',
-                 'flash_number': 'stimulus_presentations_id'})
-    stimulus_table.start_time = [stimulus_timestamps[int(start_frame)]
-                                 for start_frame in
-                                 stimulus_table.start_frame.values]
+        columns={
+            "frame": "start_frame",
+            "time": "start_time",
+            "flash_number": "stimulus_presentations_id",
+        }
+    )
+    stimulus_table.start_time = [
+        stimulus_timestamps[int(start_frame)]
+        for start_frame in stimulus_table.start_frame.values
+    ]
     end_time = []
     for end_frame in stimulus_table.end_frame.values:
         if not np.isnan(end_frame):
             end_time.append(stimulus_timestamps[int(end_frame)])
         else:
-            end_time.append(float('nan'))
+            end_time.append(float("nan"))
 
-    stimulus_table.insert(loc=4, column='stop_time', value=end_time)
-    stimulus_table.set_index('stimulus_presentations_id', inplace=True)
+    stimulus_table.insert(loc=4, column="stop_time", value=end_time)
+    stimulus_table.set_index("stimulus_presentations_id", inplace=True)
     stimulus_table = stimulus_table[sorted(stimulus_table.columns)]
     return stimulus_table
 
@@ -76,13 +87,13 @@ def get_images_dict(pkl) -> Dict:
     """
     # Sometimes the source is a zipped pickle:
     pkl_stimuli = pkl["items"]["behavior"]["stimuli"]
-    metadata = {'image_set': pkl_stimuli["images"]["image_path"]}
+    metadata = {"image_set": pkl_stimuli["images"]["image_path"]}
 
     # Get image file name;
     # These are encoded case-insensitive in the pickle file :/
-    filename = convert_filepath_caseinsensitive(metadata['image_set'])
+    filename = convert_filepath_caseinsensitive(metadata["image_set"])
 
-    image_set = load_pickle(open(filename, 'rb'))
+    image_set = load_pickle(open(filename, "rb"))
     images = []
     images_meta = []
 
@@ -135,10 +146,10 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
         This returns empty if no gratings were presented.
 
     """
-    if 'grating' in stimuli:
-        phase = stimuli['grating']['phase']
-        correct_freq = stimuli['grating']['sf']
-        set_logs = stimuli['grating']['set_log']
+    if "grating" in stimuli:
+        phase = stimuli["grating"]["phase"]
+        correct_freq = stimuli["grating"]["sf"]
+        set_logs = stimuli["grating"]["set_log"]
         unique_oris = set([set_log[1] for set_log in set_logs])
 
         image_names = []
@@ -147,29 +158,35 @@ def get_gratings_metadata(stimuli: Dict, start_idx: int = 0) -> pd.DataFrame:
             image_names.append(f"gratings_{float(unique_ori)}")
 
         grating_dict = {
-            'image_category': ['grating'] * len(unique_oris),
-            'image_name': image_names,
-            'orientation': list(unique_oris),
-            'image_set': ['grating'] * len(unique_oris),
-            'phase': [phase] * len(unique_oris),
-            'spatial_frequency': [correct_freq] * len(unique_oris),
-            'image_index': range(start_idx, start_idx + len(unique_oris), 1)
+            "image_category": ["grating"] * len(unique_oris),
+            "image_name": image_names,
+            "orientation": list(unique_oris),
+            "image_set": ["grating"] * len(unique_oris),
+            "phase": [phase] * len(unique_oris),
+            "spatial_frequency": [correct_freq] * len(unique_oris),
+            "image_index": range(start_idx, start_idx + len(unique_oris), 1),
         }
         grating_df = pd.DataFrame.from_dict(grating_dict)
     else:
-        grating_df = pd.DataFrame(columns=['image_category',
-                                           'image_name',
-                                           'image_set',
-                                           'phase',
-                                           'spatial_frequency',
-                                           'orientation',
-                                           'image_index'])
+        grating_df = pd.DataFrame(
+            columns=[
+                "image_category",
+                "image_name",
+                "image_set",
+                "phase",
+                "spatial_frequency",
+                "orientation",
+                "image_index",
+            ]
+        )
     return grating_df
 
 
 def get_stimulus_templates(
-        pkl: dict, grating_images_dict: Optional[dict] = None,
-        limit_to_images: Optional[List] = None) -> Optional[StimulusTemplate]:
+    pkl: dict,
+    grating_images_dict: Optional[dict] = None,
+    limit_to_images: Optional[List] = None,
+) -> Optional[StimulusTemplate]:
     """
     Gets images presented during experiments from the behavior stimulus file
     (*.pkl)
@@ -198,50 +215,54 @@ def get_stimulus_templates(
 
     """
 
-    pkl_stimuli = pkl['items']['behavior']['stimuli']
-    if 'images' in pkl_stimuli:
+    pkl_stimuli = pkl["items"]["behavior"]["stimuli"]
+    if "images" in pkl_stimuli:
         images = get_images_dict(pkl)
-        image_set_filepath = images['metadata']['image_set']
+        image_set_filepath = images["metadata"]["image_set"]
         image_set_name = get_image_set_name(image_set_path=image_set_filepath)
-        image_set_name = convert_filepath_caseinsensitive(
-            image_set_name)
+        image_set_name = convert_filepath_caseinsensitive(image_set_name)
 
-        attrs = images['image_attributes']
-        image_values = images['images']
+        attrs = images["image_attributes"]
+        image_values = images["images"]
         if limit_to_images is not None:
             keep_idxs = [
-                i for i in range(len(images)) if
-                attrs[i]['image_name'] in limit_to_images]
+                i
+                for i in range(len(images))
+                if attrs[i]["image_name"] in limit_to_images
+            ]
             attrs = [attrs[i] for i in keep_idxs]
             image_values = [image_values[i] for i in keep_idxs]
 
         return StimulusTemplateFactory.from_unprocessed(
             image_set_name=image_set_name,
             image_attributes=attrs,
-            images=image_values
+            images=image_values,
         )
-    elif 'grating' in pkl_stimuli:
+    elif "grating" in pkl_stimuli:
         if (grating_images_dict is None) or (not grating_images_dict):
-            raise RuntimeError("The 'grating_images_dict' param MUST "
-                               "be provided to get stimulus templates "
-                               "because this pkl data contains "
-                               "gratings presentations.")
-        gratings_metadata = get_gratings_metadata(
-            pkl_stimuli).to_dict(orient='records')
+            raise RuntimeError(
+                "The 'grating_images_dict' param MUST "
+                "be provided to get stimulus templates "
+                "because this pkl data contains "
+                "gratings presentations."
+            )
+        gratings_metadata = get_gratings_metadata(pkl_stimuli).to_dict(
+            orient="records"
+        )
 
         unwarped_images = []
         warped_images = []
         for image_attrs in gratings_metadata:
-            image_name = image_attrs['image_name']
+            image_name = image_attrs["image_name"]
             grating_imgs_sub_dict = grating_images_dict[image_name]
-            unwarped_images.append(grating_imgs_sub_dict['unwarped'])
-            warped_images.append(grating_imgs_sub_dict['warped'])
+            unwarped_images.append(grating_imgs_sub_dict["unwarped"])
+            warped_images.append(grating_imgs_sub_dict["warped"])
 
         return StimulusTemplateFactory.from_processed(
-            image_set_name='grating',
+            image_set_name="grating",
             image_attributes=gratings_metadata,
             unwarped=unwarped_images,
-            warped=warped_images
+            warped=warped_images,
         )
     else:
         warnings.warn(
@@ -273,60 +294,79 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
         orientation, and image index.
 
     """
-    stimuli = pkl['items']['behavior']['stimuli']
-    if 'images' in stimuli:
+    stimuli = pkl["items"]["behavior"]["stimuli"]
+    if "images" in stimuli:
         images = get_images_dict(pkl)
-        stimulus_index_df = pd.DataFrame(images['image_attributes'])
+        stimulus_index_df = pd.DataFrame(images["image_attributes"])
         image_set_filename = convert_filepath_caseinsensitive(
-            images['metadata']['image_set'])
-        stimulus_index_df['image_set'] = get_image_set_name(
-            image_set_path=image_set_filename)
+            images["metadata"]["image_set"]
+        )
+        stimulus_index_df["image_set"] = get_image_set_name(
+            image_set_path=image_set_filename
+        )
     else:
-        stimulus_index_df = pd.DataFrame(columns=[
-            'image_name', 'image_category', 'image_set', 'phase',
-            'spatial_frequency', 'image_index'])
-        stimulus_index_df = stimulus_index_df.astype({
-            'image_name': str,
-            'image_category': str,
-            'image_set': str,
-            'phase': float,
-            'spatial_frequency': float,
-            'image_index': int
-        })
+        stimulus_index_df = pd.DataFrame(
+            columns=[
+                "image_name",
+                "image_category",
+                "image_set",
+                "phase",
+                "spatial_frequency",
+                "image_index",
+            ]
+        )
+        stimulus_index_df = stimulus_index_df.astype(
+            {
+                "image_name": str,
+                "image_category": str,
+                "image_set": str,
+                "phase": float,
+                "spatial_frequency": float,
+                "image_index": int,
+            }
+        )
 
     # get the grating metadata will be empty if gratings are absent
-    grating_df = get_gratings_metadata(stimuli,
-                                       start_idx=len(stimulus_index_df))
-    stimulus_index_df = pd.concat([stimulus_index_df, grating_df],
-                                  ignore_index=True,
-                                  sort=False)
+    grating_df = get_gratings_metadata(
+        stimuli, start_idx=len(stimulus_index_df)
+    )
+    stimulus_index_df = pd.concat(
+        [stimulus_index_df, grating_df], ignore_index=True, sort=False
+    )
 
     # Add an entry for omitted stimuli
-    omitted_df = pd.DataFrame({'image_category': ['omitted'],
-                               'image_name': ['omitted'],
-                               'image_set': ['omitted'],
-                               'orientation': np.NaN,
-                               'phase': np.NaN,
-                               'spatial_frequency': np.NaN,
-                               'image_index': len(stimulus_index_df)})
-    stimulus_index_df = pd.concat([stimulus_index_df, omitted_df],
-                                  ignore_index=True,
-                                  sort=False)
-    stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+    omitted_df = pd.DataFrame(
+        {
+            "image_category": ["omitted"],
+            "image_name": ["omitted"],
+            "image_set": ["omitted"],
+            "orientation": np.NaN,
+            "phase": np.NaN,
+            "spatial_frequency": np.NaN,
+            "image_index": len(stimulus_index_df),
+        }
+    )
+    stimulus_index_df = pd.concat(
+        [stimulus_index_df, omitted_df], ignore_index=True, sort=False
+    )
+    stimulus_index_df.set_index(["image_index"], inplace=True, drop=True)
     return stimulus_index_df
 
 
 def _resolve_image_category(change_log, frame):
     for change in (unpack_change_log(c) for c in change_log):
-        if frame < change['frame']:
-            return change['from_category']
+        if frame < change["frame"]:
+            return change["from_category"]
 
-    return change['to_category']
+    return change["to_category"]
 
 
-def _get_stimulus_epoch(set_log: List[Tuple[str, Union[str, int], int, int]],
-                        current_set_index: int, start_frame: int,
-                        n_frames: int) -> Tuple[int, int]:
+def _get_stimulus_epoch(
+    set_log: List[Tuple[str, Union[str, int], int, int]],
+    current_set_index: int,
+    start_frame: int,
+    n_frames: int,
+) -> Tuple[int, int]:
     """
     Gets the frame range for which a stimuli was presented and the transition
     to the next stimuli was ongoing. Returns this in the form of a tuple.
@@ -355,13 +395,19 @@ def _get_stimulus_epoch(set_log: List[Tuple[str, Union[str, int], int, int]],
     try:
         next_set_event = set_log[current_set_index + 1]
     except IndexError:  # assume this is the last set event
-        next_set_event = (None, None, None, n_frames,)
+        next_set_event = (
+            None,
+            None,
+            None,
+            n_frames,
+        )
 
     return start_frame, next_set_event[3]  # end frame isn't inclusive
 
 
-def _get_draw_epochs(draw_log: List[int], start_frame: int,
-                     stop_frame: int) -> List[Tuple[int, int]]:
+def _get_draw_epochs(
+    draw_log: List[int], start_frame: int, stop_frame: int
+) -> List[Tuple[int, int]]:
     """
     Gets the frame numbers of the active frames within a stimulus window.
     Stimulus epochs come in the form [0, 0, 1, 1, 0, 0] where the stimulus is
@@ -397,14 +443,25 @@ def _get_draw_epochs(draw_log: List[int], start_frame: int,
 
         if epoch_length:
             draw_epochs.append(
-                (current_frame - epoch_length - 1, current_frame - 1,)
+                (
+                    current_frame - epoch_length - 1,
+                    current_frame - 1,
+                )
             )
 
     return draw_epochs
 
 
 def unpack_change_log(change):
-    (from_category, from_name), (to_category, to_name,), time, frame = change
+    (
+        (from_category, from_name),
+        (
+            to_category,
+            to_name,
+        ),
+        time,
+        frame,
+    ) = change
 
     return dict(
         frame=frame,
@@ -416,10 +473,7 @@ def unpack_change_log(change):
     )
 
 
-def get_visual_stimuli_df(
-        data,
-        time
-) -> pd.DataFrame:
+def get_visual_stimuli_df(data, time) -> pd.DataFrame:
     """
     This function loads the stimuli and the omitted stimuli into a dataframe.
     These stimuli are loaded from the input data, where the set_log and
@@ -435,12 +489,13 @@ def get_visual_stimuli_df(
                  and duration
     """
 
-    stimuli = data['items']['behavior']['stimuli']
+    stimuli = data["items"]["behavior"]["stimuli"]
     n_frames = len(time)
     visual_stimuli_data = []
     for stim_dict in stimuli.values():
-        for idx, (attr_name, attr_value, _, frame) in \
-                enumerate(stim_dict["set_log"]):
+        for idx, (attr_name, attr_value, _, frame) in enumerate(
+            stim_dict["set_log"]
+        ):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
 
@@ -451,46 +506,49 @@ def get_visual_stimuli_df(
                 n_frames,
             )
             draw_epochs = _get_draw_epochs(
-                stim_dict["draw_log"],
-                *stimulus_epoch
+                stim_dict["draw_log"], *stimulus_epoch
             )
 
             for epoch_start, epoch_end in draw_epochs:
-
-                visual_stimuli_data.append({
-                    "orientation": orientation,
-                    "image_name": image_name,
-                    "frame": epoch_start,
-                    "end_frame": epoch_end,
-                    "time": time[epoch_start],
-                    "duration": time[epoch_end] - time[epoch_start],
-                    # this will always work because an epoch
-                    # will never occur near the end of time
-                    "omitted": False
-                })
+                visual_stimuli_data.append(
+                    {
+                        "orientation": orientation,
+                        "image_name": image_name,
+                        "frame": epoch_start,
+                        "end_frame": epoch_end,
+                        "time": time[epoch_start],
+                        "duration": time[epoch_end] - time[epoch_start],
+                        # this will always work because an epoch
+                        # will never occur near the end of time
+                        "omitted": False,
+                    }
+                )
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
     # Add omitted flash info:
     try:
-        omitted_flash_frame_log = \
-            data['items']['behavior']['omitted_flash_frame_log']
+        omitted_flash_frame_log = data["items"]["behavior"][
+            "omitted_flash_frame_log"
+        ]
     except KeyError:
         # For sessions for which there were no omitted flashes
         omitted_flash_frame_log = dict()
 
     omitted_flash_list = []
     for _, omitted_flash_frames in omitted_flash_frame_log.items():
-        stim_frames = visual_stimuli_df['frame'].values
+        stim_frames = visual_stimuli_df["frame"].values
         omitted_flash_frames = np.array(omitted_flash_frames)
 
         # Test offsets of omitted flash frames
         # to see if they are in the stim log
         offsets = np.arange(-3, 4)
         offset_arr = np.add(
-            np.repeat(omitted_flash_frames[:, np.newaxis],
-                      offsets.shape[0], axis=1),
-            offsets)
+            np.repeat(
+                omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1
+            ),
+            offsets,
+        )
         matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
 
         #  Remove omitted flashes that also exist in the stimulus log
@@ -502,25 +560,30 @@ def get_visual_stimuli_df(
 
     omitted = np.ones_like(omitted_flash_list).astype(bool)
     time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted,
-                               'frame': omitted_flash_list,
-                               'time': time,
-                               'image_name': 'omitted'})
+    omitted_df = pd.DataFrame(
+        {
+            "omitted": omitted,
+            "frame": omitted_flash_list,
+            "time": time,
+            "image_name": "omitted",
+        }
+    )
 
-    df = pd.concat((visual_stimuli_df, omitted_df),
-                   sort=False).sort_values('frame').reset_index()
+    df = (
+        pd.concat((visual_stimuli_df, omitted_df), sort=False)
+        .sort_values("frame")
+        .reset_index()
+    )
     return df
 
 
-def get_image_names(
-        behavior_stimulus_file: BehaviorStimulusFile
-) -> Set[str]:
+def get_image_names(behavior_stimulus_file: BehaviorStimulusFile) -> Set[str]:
     """Gets set of image names shown during behavior session"""
     stimuli = behavior_stimulus_file.stimuli
     image_names = set()
     for stim_dict in stimuli.values():
         for attr_name, attr_value, _, _ in stim_dict["set_log"]:
-            if attr_name.lower() == 'image':
+            if attr_name.lower() == "image":
                 image_names.add(attr_value)
     return image_names
 
@@ -538,10 +601,10 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     :return: is_change: pd.Series indicating whether a given stimulus is a
         change stimulus
     """
-    stimuli = stimulus_presentations['image_name']
+    stimuli = stimulus_presentations["image_name"]
 
     # exclude omitted stimuli
-    stimuli = stimuli[~stimulus_presentations['omitted']]
+    stimuli = stimuli[~stimulus_presentations["omitted"]]
 
     prev_stimuli = stimuli.shift()
 
@@ -552,9 +615,9 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
     is_change = stimuli != prev_stimuli
 
     # reset back to original index
-    is_change = is_change \
-        .reindex(stimulus_presentations.index) \
-        .rename('is_change')
+    is_change = is_change.reindex(stimulus_presentations.index).rename(
+        "is_change"
+    )
 
     # Excluded stimuli are not change events
     is_change = is_change.fillna(False)
@@ -563,8 +626,9 @@ def is_change_event(stimulus_presentations: pd.DataFrame) -> pd.Series:
 
 
 def get_flashes_since_change(
-        stimulus_presentations: pd.DataFrame) -> pd.Series:
-    """ Calculate the number of times an images is flashed between changes.
+    stimulus_presentations: pd.DataFrame,
+) -> pd.Series:
+    """Calculate the number of times an images is flashed between changes.
 
     Parameters
     ----------
@@ -577,30 +641,35 @@ def get_flashes_since_change(
     flashes_since_change : pandas.Series
         Number of times the same image is flashed between image changes.
     """
-    flashes_since_change = pd.Series(data=np.zeros(len(stimulus_presentations),
-                                                   dtype=float),
-                                     index=stimulus_presentations.index,
-                                     name='flashes_since_change')
+    flashes_since_change = pd.Series(
+        data=np.zeros(len(stimulus_presentations), dtype=float),
+        index=stimulus_presentations.index,
+        name="flashes_since_change",
+    )
     for idx, (pd_index, row) in enumerate(stimulus_presentations.iterrows()):
-        omitted = row['omitted']
-        if pd.isna(row['omitted']):
+        omitted = row["omitted"]
+        if pd.isna(row["omitted"]):
             omitted = False
-        if row['image_name'] == 'omitted' or omitted:
+        if row["image_name"] == "omitted" or omitted:
             flashes_since_change.iloc[idx] = flashes_since_change.iloc[idx - 1]
         else:
-            if row['is_change'] or idx == 0:
+            if row["is_change"] or idx == 0:
                 flashes_since_change.iloc[idx] = 0
             else:
-                flashes_since_change.iloc[idx] = \
+                flashes_since_change.iloc[idx] = (
                     flashes_since_change.iloc[idx - 1] + 1
+                )
     return flashes_since_change
 
 
 def compute_trials_id_for_stimulus(
-        stim_pres_table: pd.DataFrame,
-        trials_table: pd.DataFrame) -> pd.Series:
+    stim_pres_table: pd.DataFrame, trials_table: pd.DataFrame
+) -> pd.Series:
     """Add an id to allow for merging of the stimulus presentations
     table with the trials table.
+
+    If stimulus_block is not available as a column in the input table, return
+    an empty set of trials_ids.
 
     Parameters
     ----------
@@ -621,14 +690,19 @@ def compute_trials_id_for_stimulus(
     passive stimulus/replay blocks that contain the same image ordering and
     length.
     """
-    stim_pres_sorted = stim_pres_table.sort_values('start_time')
-    trials_sorted = trials_table.sort_values('start_time')
+    stim_pres_sorted = stim_pres_table.sort_values("start_time")
+    trials_sorted = trials_table.sort_values("start_time")
     # Create a placeholder for the trials_id.
     trials_ids = pd.Series(
         data=np.full(len(stim_pres_sorted), -1, dtype=int),
         index=stim_pres_sorted.index,
-        name='trials_id')
-    if 'active' in stim_pres_sorted.columns:
+        name="trials_id",
+    )
+    # Return an empty trials_id if the stimulus block is not available.
+    if "stimulus_block" not in stim_pres_sorted.columns:
+        return trials_ids
+
+    if "active" in stim_pres_sorted.columns:
         has_active = True
         active_sorted = stim_pres_sorted.active
     else:
@@ -636,13 +710,15 @@ def compute_trials_id_for_stimulus(
         active_sorted = pd.Series(
             data=np.zeros(len(stim_pres_sorted), dtype=bool),
             index=stim_pres_sorted.index,
-            name='active')
+            name="active",
+        )
 
     # Find stimulus blocks that start within a trial. Copy the trial_id
     # into our new trials_ids series.
     for idx, trial in trials_sorted.iterrows():
-        stim_mask = (stim_pres_sorted.start_time > trial.start_time) \
-                    & (stim_pres_sorted.start_time < trial.stop_time)
+        stim_mask = (stim_pres_sorted.start_time > trial.start_time) & (
+            stim_pres_sorted.start_time < trial.stop_time
+        )
         trials_ids[stim_mask] = idx
         if not has_active:
             active_sorted[stim_mask] = True
@@ -659,7 +735,8 @@ def compute_trials_id_for_stimulus(
     # Find passive blocks that show images for potential copying of the active
     # into a passive stimulus block.
     passive_stim_blocks = stim_blocks[
-        np.logical_and(~active_sorted, ~stim_image_names.isna())].unique()
+        np.logical_and(~active_sorted, ~stim_image_names.isna())
+    ].unique()
 
     # Copy the trials_id into the passive block if it exists.
     if len(passive_stim_blocks) > 0:
@@ -668,10 +745,12 @@ def compute_trials_id_for_stimulus(
             active_images = stim_image_names[active_block_mask].values
             for passive_stim_block in passive_stim_blocks:
                 passive_block_mask = stim_blocks == passive_stim_block
-                if np.array_equal(active_images,
-                                  stim_image_names[passive_block_mask].values):
-                    trials_ids.loc[passive_block_mask] = \
-                        trials_ids[active_block_mask].values
+                if np.array_equal(
+                    active_images, stim_image_names[passive_block_mask].values
+                ):
+                    trials_ids.loc[passive_block_mask] = trials_ids[
+                        active_block_mask
+                    ].values
 
     return trials_ids.sort_index()
 
@@ -696,22 +775,23 @@ def fix_omitted_end_frame(stim_pres_table: pd.DataFrame) -> pd.DataFrame:
         stim_pres_table["end_frame"] - stim_pres_table["start_frame"]
     )
     omitted_end_frames = (
-        stim_pres_table[stim_pres_table['omitted']]['start_frame']
+        stim_pres_table[stim_pres_table["omitted"]]["start_frame"]
         + median_stim_frame_duration
     )
-    stim_pres_table.loc[stim_pres_table['omitted'], 'end_frame'] = \
-        omitted_end_frames
+    stim_pres_table.loc[
+        stim_pres_table["omitted"], "end_frame"
+    ] = omitted_end_frames
 
     stim_dtypes = stim_pres_table.dtypes.to_dict()
-    stim_dtypes['start_frame'] = int
-    stim_dtypes['end_frame'] = int
+    stim_dtypes["start_frame"] = int
+    stim_dtypes["end_frame"] = int
 
     return stim_pres_table.astype(stim_dtypes)
 
 
-def produce_stimulus_block_names(stim_df: pd.DataFrame,
-                                 session_type: str,
-                                 project_code: str) -> pd.DataFrame:
+def produce_stimulus_block_names(
+    stim_df: pd.DataFrame, session_type: str, project_code: str
+) -> pd.DataFrame:
     """Add a column stimulus_block_name to explicitly reference the kind
     of stimulus block in addition to the numbered blocks.
 
@@ -739,16 +819,16 @@ def produce_stimulus_block_names(stim_df: pd.DataFrame,
     if project_code not in PROJECT_CODES:
         return stim_df
 
-    stim_df['stimulus_block_name'] = None
+    stim_df["stimulus_block_name"] = None
 
     for stim_block in stim_df.stimulus_block.unique():
-        if 'passive' in session_type:
-            stim_df.loc[stim_df['stimulus_block'] == stim_block,
-                        'stimulus_block_name'] = \
-                VBO_PASSIVE_MAP[stim_block]
+        if "passive" in session_type:
+            stim_df.loc[
+                stim_df["stimulus_block"] == stim_block, "stimulus_block_name"
+            ] = VBO_PASSIVE_MAP[stim_block]
         else:
-            stim_df.loc[stim_df['stimulus_block'] == stim_block,
-                        'stimulus_block_name'] = \
-                VBO_ACTIVE_MAP[stim_block]
+            stim_df.loc[
+                stim_df["stimulus_block"] == stim_block, "stimulus_block_name"
+            ] = VBO_ACTIVE_MAP[stim_block]
 
     return stim_df
