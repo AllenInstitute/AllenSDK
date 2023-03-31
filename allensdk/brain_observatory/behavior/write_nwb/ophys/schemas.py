@@ -97,5 +97,5 @@ class OutputSchema(RaisingSchema):
     input_parameters = Nested(OphysExperimentInputSchema)
     output_path = OutputFile(
         required=True,
-        description="Path of output.json to be written",
+        description="Path of output NWB file.",
     )
