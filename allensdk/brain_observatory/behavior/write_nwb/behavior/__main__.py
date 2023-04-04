@@ -30,8 +30,10 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
         )
         logging.info("File successfully created")
 
-        output_dict = {"output_path": output_file,
-                       "input_parameters": self.args}
+        output_dict = {
+            "output_path": output_file,
+            "input_parameters": self.args,
+        }
 
         self.output(output_dict)
 
