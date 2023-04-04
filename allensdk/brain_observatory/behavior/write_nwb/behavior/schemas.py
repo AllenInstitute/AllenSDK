@@ -11,7 +11,13 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.metadata_
 )
 from argschema import ArgSchema
 from argschema.fields import (
-    Int, List, LogLevel, Nested, OutputDir, OutputFile, String
+    Int,
+    List,
+    LogLevel,
+    Nested,
+    OutputDir,
+    OutputFile,
+    String,
 )
 
 
