@@ -20,8 +20,8 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     session_tables_from_ecephys_session_id_list,
     units_table_from_ecephys_session_id_list,
 )
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.schemas import DataReleaseToolsInputSchema  # noqa: E501
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
-    DataReleaseToolsInputSchema,
     VBN2022MetadataWriterInputSchema,
 )
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
