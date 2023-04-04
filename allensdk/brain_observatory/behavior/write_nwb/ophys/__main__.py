@@ -26,7 +26,7 @@ class WriteOphysNWB(argschema.ArgSchemaParser):
         oe_id_dir.mkdir(exist_ok=True)
         output_file = self.write_experiment_nwb(
             ophys_experiment_metadata=self.args["ophys_experiment_metadata"],
-            nwb_filepath=oe_id_dir / f"ophys_experiment_{oe_id}.nwb",
+            nwb_filepath=oe_id_dir / f"behavior_ophys_experiment_{oe_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
         )
