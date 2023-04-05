@@ -2,7 +2,6 @@ import marshmallow as mm
 from allensdk.brain_observatory.argschema_utilities import (
     InputFile,
     RaisingSchema,
-    check_write_access_dir,
 )
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_project_cloud_api import (  # noqa: E501
     sanitize_data_columns,
@@ -11,7 +10,15 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.metadata_
     BehaviorSessionMetadataSchema,
 )
 from argschema import ArgSchema
-from argschema.fields import Int, List, LogLevel, Nested, OutputFile, String
+from argschema.fields import (
+    Int,
+    List,
+    LogLevel,
+    Nested,
+    OutputDir,
+    OutputFile,
+    String,
+)
 
 
 class BaseInputSchema(ArgSchema):
@@ -43,9 +50,8 @@ class BaseInputSchema(ArgSchema):
         "override known data issues. Example: ['mouse_id']",
         default=[],
     )
-    output_dir_path = String(
+    output_dir_path = OutputDir(
         required=True,
-        validate=check_write_access_dir,
         description="Path of output.json to be written",
     )
 
@@ -110,5 +116,5 @@ class OutputSchema(RaisingSchema):
     input_parameters = Nested(BehaviorInputSchema)
     output_path = OutputFile(
         required=True,
-        description="Path of output.json to be written",
+        description="Path of output NWB file.",
     )
