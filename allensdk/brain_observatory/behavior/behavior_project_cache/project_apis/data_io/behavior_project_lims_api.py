@@ -11,10 +11,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abc
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (  # noqa: E501
-    BehaviorMetadata,
-)
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (  # noqa: E501
     HttpEngine,
 )
@@ -28,6 +24,7 @@ from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
     build_where_clause,
 )
+
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(
@@ -418,7 +415,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 ON oec.ophys_experiment_id = oe.id
             JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
-        """
+        """ # noqa E501
         where_clause = []
         if self.data_release_date is not None:
             where_clause.append(self._get_ophys_experiment_release_filter())
