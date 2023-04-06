@@ -28,10 +28,6 @@ from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
     build_where_clause,
 )
-from allensdk.internal.brain_observatory.util.multi_session_utils import (
-    get_session_metadata_multiprocessing,
-)
-
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(
