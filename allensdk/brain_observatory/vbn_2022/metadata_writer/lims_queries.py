@@ -16,7 +16,6 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations
     _add_session_number,
 )
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.core.dataframe_utils import patch_df_from_other
 from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
 from allensdk.internal.api.queries.compound_lims_queries import (
     behavior_sessions_from_ecephys_session_ids,
@@ -774,19 +773,6 @@ def _behavior_session_table_from_ecephys_session_id_list(
             [x.behavior_session_id for x in behavior_sessions]
         )
     ]
-
-    behavior_session_df["date_of_acquisition"] = behavior_session_df[
-        "behavior_session_id"
-    ].map(
-        {
-            x.behavior_session_id: x.date_of_acquisition
-            for x in behavior_sessions
-        }
-    )
-    behavior_session_df["session_type"] = behavior_session_df[
-        "behavior_session_id"
-    ].map({x.behavior_session_id: x.session_type for x in behavior_sessions})
-
     behavior_session_df["image_set"] = get_image_set(df=behavior_session_df)
 
     behavior_session_df[
@@ -897,15 +883,6 @@ def session_tables_from_ecephys_session_id_list(
         lims_connection=lims_connection,
         ecephys_session_id_list=ecephys_session_id_list,
         failed_ecephys_session_id_list=failed_ecephys_session_id_list,
-    )
-
-    # patch date_of_acquisition and session_type from beh_table,
-    # which read them directly from the pickle file
-    summary_tbl = patch_df_from_other(
-        target_df=summary_tbl,
-        source_df=beh_table,
-        index_column="behavior_session_id",
-        columns_to_patch=["date_of_acquisition", "session_type"],
     )
 
     # since we had to read date_of_acquisition from the pickle file,
