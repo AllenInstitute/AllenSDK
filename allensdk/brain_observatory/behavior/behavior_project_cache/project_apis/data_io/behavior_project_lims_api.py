@@ -353,9 +353,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 st.acronym as targeted_structure,
                 vbc.published_at
             FROM ophys_experiments_visual_behavior_experiment_containers oec
-            LEFT JOIN visual_behavior_experiment_containers vbc
+            JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
-            LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             LEFT JOIN  ophys_imaging_plane_groups pg
                 ON pg.id = oe.ophys_imaging_plane_group_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
@@ -411,11 +411,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN ophys_cell_segmentation_runs AS ocsr
                 ON ocsr.id=cr.ophys_cell_segmentation_run_id
             JOIN ophys_experiments AS oe ON oe.id=cr.ophys_experiment_id
-            LEFT JOIN ophys_experiments_visual_behavior_experiment_containers oec
+            JOIN ophys_experiments_visual_behavior_experiment_containers oec
                 ON oec.ophys_experiment_id = oe.id
             JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
-        """ # noqa E501
+        """
         where_clause = []
         if self.data_release_date is not None:
             where_clause.append(self._get_ophys_experiment_release_filter())
@@ -470,7 +470,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
-            LEFT JOIN (
+            JOIN (
                 {self._build_container_from_session_query()}
             ) cntr_ids ON os.id = cntr_ids.id
             LEFT JOIN (
