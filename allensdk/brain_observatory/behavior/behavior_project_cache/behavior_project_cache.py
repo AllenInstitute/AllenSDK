@@ -133,8 +133,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             suppress: Optional[List[str]] = None,
             index_column: str = "ophys_session_id",
             as_df=True,
-            include_behavior_data=True,
-            n_workers: int = 1
+            include_behavior_data=True
     ) -> Union[pd.DataFrame, BehaviorOphysSessionsTable]:
         """
         Return summary table of all ophys_session_ids in the database.
@@ -150,8 +149,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         :param as_df: whether to return as df or as BehaviorOphysSessionsTable
         :param include_behavior_data
             Whether to include behavior data
-        :param n_workers
-            Number of parallel processes to use for i.e reading from pkl files
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -173,7 +170,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 suppress=suppress,
                 as_df=True,
                 include_ophys_data=False,
-                n_workers=n_workers,
                 include_trial_metrics=False
             )
             ophys_sessions = behavior_sessions_table.merge(
@@ -191,8 +187,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
     def get_ophys_experiment_table(
             self,
             suppress: Optional[List[str]] = None,
-            as_df=True,
-            n_workers: int = 1
+            as_df=True
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
         Return summary table of all ophys_experiment_ids in the database.
@@ -200,8 +195,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             dataframe.
         :type suppress: list of str
         :param as_df: whether to return as df or as SessionsTable
-        :param n_workers
-            Number of parallel processes to use for i.e reading from pkl files
         :rtype: pd.DataFrame
         """
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
@@ -221,7 +214,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         # Merge behavior data in
         behavior_sessions_table = self.get_behavior_session_table(
             suppress=suppress, as_df=True, include_ophys_data=False,
-            n_workers=n_workers,
             include_trial_metrics=False
         )
         experiments = behavior_sessions_table.merge(
@@ -257,7 +249,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
             suppress: Optional[List[str]] = None,
             as_df=True,
             include_ophys_data=True,
-            n_workers: int = 1,
             include_trial_metrics: bool = False
     ) -> Union[pd.DataFrame, SessionsTable]:
         """
@@ -267,8 +258,6 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         :param as_df: whether to return as df or as SessionsTable
         :param include_ophys_data
             Whether to include ophys data
-        :param n_workers
-            Number of parallel processes to use for i.e reading from pkl files
         :param include_trial_metrics
             Whether to include trial metrics. Set to False to skip. Is
             expensive to calculate these metrics since the data must be read
@@ -288,15 +277,14 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 lambda path: _read_json(path,
                                         index_name='behavior_session_id'))
         else:
-            sessions = self.fetch_api.get_behavior_session_table(
-                n_workers=n_workers)
+            sessions = self.fetch_api.get_behavior_session_table()
 
         if include_ophys_data:
             ophys_session_table = self.get_ophys_session_table(
                 suppress=suppress,
                 as_df=False,
-                include_behavior_data=False,
-                n_workers=n_workers)
+                include_behavior_data=False
+            )
         else:
             ophys_session_table = None
         sessions = SessionsTable(

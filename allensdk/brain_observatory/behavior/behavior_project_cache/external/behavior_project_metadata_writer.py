@@ -44,8 +44,8 @@ class BehaviorProjectMetadataWriter:
     def __init__(self, behavior_project_cache: VisualBehaviorOphysProjectCache,
                  out_dir: str, project_name: str,
                  data_release_date: Union[str, List[str]],
-                 overwrite_ok=False,
-                 n_workers=1):
+                 overwrite_ok=False
+                 ):
         """
 
         Parameters
@@ -61,8 +61,6 @@ class BehaviorProjectMetadataWriter:
                 data
         overwrite_ok
             Whether to raise an exception if output file alread exists
-        n_workers
-            Number of parallel processes to use for i.e reading pkl files
         """
 
         self._behavior_project_cache = behavior_project_cache
@@ -70,7 +68,6 @@ class BehaviorProjectMetadataWriter:
         self._project_name = project_name
         self._data_release_date = data_release_date
         self._overwrite_ok = overwrite_ok
-        self._n_workers = n_workers
 
         logging.basicConfig(level=logging.INFO)
         self._logger = logging.getLogger(__name__)
@@ -106,7 +103,6 @@ class BehaviorProjectMetadataWriter:
             get_behavior_session_table(
                 suppress=suppress,
                 as_df=True,
-                n_workers=self._n_workers,
                 include_trial_metrics=include_trial_metrics)
 
         # Add release files
@@ -136,8 +132,7 @@ class BehaviorProjectMetadataWriter:
                                   'ophys_session_table'
                               ]):
         ophys_sessions = self._behavior_project_cache. \
-            get_ophys_session_table(suppress=suppress, as_df=True,
-                                    n_workers=self._n_workers)
+            get_ophys_session_table(suppress=suppress, as_df=True)
         self._write_metadata_table(df=ophys_sessions,
                                    filename=output_filename)
 
@@ -147,8 +142,7 @@ class BehaviorProjectMetadataWriter:
                                  ]):
         ophys_experiments = \
                 self._behavior_project_cache.get_ophys_experiment_table(
-                        suppress=suppress, as_df=True,
-                        n_workers=self._n_workers)
+                        suppress=suppress, as_df=True)
 
         # Add release files
         ophys_experiments = ophys_experiments.merge(
@@ -236,9 +230,6 @@ def main():
     parser.add_argument('--overwrite_ok', help='Whether to allow overwriting '
                                                'existing output files',
                         dest='overwrite_ok', action='store_true')
-    parser.add_argument('--n_workers', help='Number of processes to use for '
-                                            'i.e reading from pkl files',
-                        default=1, type=int)
     args = parser.parse_args()
 
     bpc = VisualBehaviorOphysProjectCache.from_lims(
@@ -248,8 +239,7 @@ def main():
         out_dir=args.out_dir,
         project_name=args.project_name,
         data_release_date=args.data_release_date,
-        overwrite_ok=args.overwrite_ok,
-        n_workers=args.n_workers
+        overwrite_ok=args.overwrite_ok
     )
     bpmw.write_metadata()
 
