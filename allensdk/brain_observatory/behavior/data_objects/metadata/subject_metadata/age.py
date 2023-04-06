@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Optional
 
 import pytz
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import (  # noqa: E501
     DateOfAcquisition,
 )
