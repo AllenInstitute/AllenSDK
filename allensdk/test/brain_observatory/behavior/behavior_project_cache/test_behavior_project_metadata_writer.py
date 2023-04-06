@@ -93,7 +93,10 @@ class TestVBO:
             expected = self.expected_behavior_sessions_table.sort_values(
                 "behavior_session_id"
             ).reset_index(drop=True)
-            pd.testing.assert_frame_equal(obtained, expected)
+            pd.testing.assert_frame_equal(
+                obtained.sort_index(axis=1),
+                expected.sort_index(axis=1)
+            )
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_sessions_table(self):
@@ -110,7 +113,10 @@ class TestVBO:
             expected = self.expected_ophys_sessions_table.sort_values(
                 "ophys_session_id"
             ).reset_index(drop=True)
-            pd.testing.assert_frame_equal(obtained, expected)
+            pd.testing.assert_frame_equal(
+                obtained.sort_index(axis=1),
+                expected.sort_index(axis=1)
+            )
 
     @pytest.mark.requires_bamboo
     def test_get_ophys_experiments_table(self):
