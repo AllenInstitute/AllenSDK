@@ -252,6 +252,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             SELECT
                 bs.id AS behavior_session_id,
+                bs.stimulus_name as session_type,
                 pr.code as project_code,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
@@ -343,6 +344,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = """
             SELECT
                 oe.id as ophys_experiment_id,
+                os.stimulus_name as session_type,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
@@ -358,9 +360,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 st.acronym as targeted_structure,
                 vbc.published_at
             FROM ophys_experiments_visual_behavior_experiment_containers oec
-            JOIN visual_behavior_experiment_containers vbc
+            LEFT JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
-            JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
             LEFT JOIN  ophys_imaging_plane_groups pg
                 ON pg.id = oe.ophys_imaging_plane_group_id
             JOIN ophys_sessions os ON os.id = oe.ophys_session_id
@@ -416,7 +418,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN ophys_cell_segmentation_runs AS ocsr
                 ON ocsr.id=cr.ophys_cell_segmentation_run_id
             JOIN ophys_experiments AS oe ON oe.id=cr.ophys_experiment_id
-            JOIN ophys_experiments_visual_behavior_experiment_containers oec
+            LEFT JOIN ophys_experiments_visual_behavior_experiment_containers oec
                 ON oec.ophys_experiment_id = oe.id
             JOIN visual_behavior_experiment_containers vbc
                 ON oec.visual_behavior_experiment_container_id = vbc.id
@@ -475,7 +477,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN (
                 {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
-            JOIN (
+            LEFT JOIN (
                 {self._build_container_from_session_query()}
             ) cntr_ids ON os.id = cntr_ids.id
             LEFT JOIN (
@@ -546,14 +548,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df["imaging_plane_group"] = df["imaging_plane_group"].astype("Int64")
         return df.set_index("ophys_experiment_id")
 
-    def get_behavior_session_table(self, n_workers: int = 1) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
-
-        Parameters
-        ----------
-        n_workers
-            Number of parallel processes to use for reading from pkl files
 
         :rtype: pd.DataFrame
 
@@ -571,35 +568,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             summary_tbl["date_of_acquisition"], utc=True
         )
 
-        if n_workers > 1:
-            session_metadata = get_session_metadata_multiprocessing(
-                behavior_session_ids=(
-                    summary_tbl["behavior_session_id"].tolist()
-                ),
-                lims_engine=self.lims_engine,
-            )
-        else:
-            session_metadata = [
-                BehaviorMetadata.from_lims(
-                    behavior_session_id=BehaviorSessionId(behavior_session_id),
-                    lims_db=db_connection_creator(
-                        fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-                    ),
-                )
-                for behavior_session_id in summary_tbl["behavior_session_id"]
-            ]
-        stimulus_names = [
-            {
-                "session_type": x.session_type,
-                "behavior_session_id": x.behavior_session_id,
-            }
-            for x in session_metadata
-        ]
-        stimulus_names = pd.DataFrame(stimulus_names)
-
-        return summary_tbl.merge(
-            stimulus_names, on=["behavior_session_id"], how="left"
-        ).set_index("behavior_session_id")
+        return summary_tbl.set_index("behavior_session_id")
 
     def get_release_files(self, file_type="BehaviorNwb") -> pd.DataFrame:
         """Gets the release nwb files.
