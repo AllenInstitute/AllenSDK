@@ -11,10 +11,6 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abc
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
-from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (  # noqa: E501
-    BehaviorMetadata,
-)
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (  # noqa: E501
     HttpEngine,
 )
@@ -27,9 +23,6 @@ from allensdk.internal.api import db_connection_creator
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
     build_where_clause,
-)
-from allensdk.internal.brain_observatory.util.multi_session_utils import (
-    get_session_metadata_multiprocessing,
 )
 
 
@@ -252,6 +245,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             SELECT
                 bs.id AS behavior_session_id,
+                bs.stimulus_name as session_type,
                 pr.code as project_code,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
@@ -343,6 +337,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = """
             SELECT
                 oe.id as ophys_experiment_id,
+                os.stimulus_name as session_type,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
@@ -546,14 +541,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df["imaging_plane_group"] = df["imaging_plane_group"].astype("Int64")
         return df.set_index("ophys_experiment_id")
 
-    def get_behavior_session_table(self, n_workers: int = 1) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
-
-        Parameters
-        ----------
-        n_workers
-            Number of parallel processes to use for reading from pkl files
 
         :rtype: pd.DataFrame
 
@@ -571,35 +561,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             summary_tbl["date_of_acquisition"], utc=True
         )
 
-        if n_workers > 1:
-            session_metadata = get_session_metadata_multiprocessing(
-                behavior_session_ids=(
-                    summary_tbl["behavior_session_id"].tolist()
-                ),
-                lims_engine=self.lims_engine,
-            )
-        else:
-            session_metadata = [
-                BehaviorMetadata.from_lims(
-                    behavior_session_id=BehaviorSessionId(behavior_session_id),
-                    lims_db=db_connection_creator(
-                        fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-                    ),
-                )
-                for behavior_session_id in summary_tbl["behavior_session_id"]
-            ]
-        stimulus_names = [
-            {
-                "session_type": x.session_type,
-                "behavior_session_id": x.behavior_session_id,
-            }
-            for x in session_metadata
-        ]
-        stimulus_names = pd.DataFrame(stimulus_names)
-
-        return summary_tbl.merge(
-            stimulus_names, on=["behavior_session_id"], how="left"
-        ).set_index("behavior_session_id")
+        return summary_tbl.set_index("behavior_session_id")
 
     def get_release_files(self, file_type="BehaviorNwb") -> pd.DataFrame:
         """Gets the release nwb files.

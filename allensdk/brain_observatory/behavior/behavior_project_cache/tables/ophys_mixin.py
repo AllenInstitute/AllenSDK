@@ -1,59 +1,66 @@
 import warnings
 
+import pandas as pd
+
 
 class OphysMixin:
+    _df: pd.DataFrame
+
     """A mixin class for ophys project data"""
     def __init__(self):
-        # If we're in the state of combining behavior and ophys data
-        if 'date_of_acquisition_behavior' in self._df and \
-                'date_of_acquisition_ophys' in self._df:
+        self._merge_columns()
 
-            # Prioritize ophys_date_of_acquisition
-            self._df['date_of_acquisition'] = \
-                self._df['date_of_acquisition_ophys']
-            self._df = self._df.drop(
-                ['date_of_acquisition_behavior',
-                 'date_of_acquisition_ophys'], axis=1)
-        self._clean_up_project_code()
+    def _merge_columns(self):
+        """Some columns such as date of acquisition are stored in both
+        behavior_sessions table as well as ophys_sessions table. If a field
+        is in both, then it gets suffix _behavior or _ophys.
+        We select the value in the ophys_sessions table and remove the
+        duplicated columns"""
+        columns = self._df.columns
+        to_drop = []
+        for column in columns:
+            if column.endswith('_behavior'):
+                column = column.replace('_behavior', '')
+                if f'{column}_ophys' in self._df:
+                    self._check_behavior_ophys_equal(column=column)
+                    self._df[column] = self._merge_column_values(column=column)
+                    to_drop += [f'{column}_behavior', f'{column}_ophys']
+        self._df.drop(to_drop, axis=1, inplace=True)
 
-    def _clean_up_project_code(self):
-        """Remove duplicate project_code columns from the data frames. This is
-        as depending on the table we get the project_code either through the
-        behavior_sessions or ophys_sessions tables.
+    def _check_behavior_ophys_equal(self, column: str):
+        """Checks that the value for behavior_session and ophys_session are
+        equal. If not, issues a warning
 
-        Additionally test that the values in the columns are identical.
+        Parameters
+        ----------
+        column
+            Column to check
         """
+        mask = ~self._df[f'{column}_ophys'].isna()
 
-        if 'project_code_behavior' in self._df and \
-                'project_code_ophys' in self._df:
+        if not self._df[f'{column}_ophys'][mask].equals(
+                self._df[f'{column}_behavior'][mask]):
+            warnings.warn("BehaviorSession and OphysSession "
+                          f"{column} do not agree. This is "
+                          "likely due to issues with the data in "
+                          f"LIMS.")
 
-            if (self._df['project_code_ophys'].isna()).sum() == 0:
-                # If there are no missing ophys_session_ids for the table then
-                # we are loading of the ophys tables and should be able to
-                # compare the ids directly to assure ourselves that the
-                # project ids are the same between ophys and behavior sessions.
-                if not self._df['project_code_ophys'].equals(
-                        self._df['project_code_behavior']):
-                    warnings.warn("BehaviorSession and OphysSession "
-                                  "project_code's do not agree. This is "
-                                  "likely due to issues with the data in "
-                                  "LIMS. Using OphysSession project_code.")
-                self._df['project_code'] = self._df['project_code_ophys']
-            else:
-                # If there are missing ophys_session_ids for the table then
-                # we are loading of the behavior table first will need to mask
-                # to only the sessions that have ophys_session_ids before
-                # comparing project_codes.
-                has_ophys_session_mask = ~self._df['project_code_ophys'].isna()
-                if not self._df['project_code_behavior'][
-                        has_ophys_session_mask].equals(
-                            self._df['project_code_ophys'][
-                                has_ophys_session_mask]):
-                    warnings.warn("BehaviorSession and OphysSession "
-                                  "project_codes do not agree. This is likely "
-                                  "due to issues with the data in LIMS. Using "
-                                  "BehaviorSession project_code.")
-                self._df['project_code'] = self._df['project_code_behavior']
-            self._df = self._df.drop(
-                ['project_code_ophys',  'project_code_behavior'],
-                axis=1)
+    def _merge_column_values(self, column: str) -> pd.Series:
+        """Takes the non-null values from ophys and merges with behavior
+        values
+
+        Parameters
+        ----------
+        column
+            Column to merge
+
+        Returns
+        -------
+        pd.Series
+            Merged Series
+
+        """
+        values = self._df[f'{column}_ophys']
+        values.loc[values.isna()] = \
+            self._df[f'{column}_behavior'][values.isna()]
+        return values
