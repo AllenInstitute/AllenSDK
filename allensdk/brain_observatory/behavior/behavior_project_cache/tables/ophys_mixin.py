@@ -4,28 +4,24 @@ import warnings
 class OphysMixin:
     """A mixin class for ophys project data"""
     def __init__(self):
-        # If we're in the state of combining behavior and ophys daq
-        if 'date_of_acquisition_behavior' in self._df and \
-                'date_of_acquisition_ophys' in self._df:
-
-            # Prioritize ophys_date_of_acquisition
-            self._df['date_of_acquisition'] = \
-                self._df['date_of_acquisition_ophys']
-            self._df = self._df.drop(
-                ['date_of_acquisition_behavior',
-                 'date_of_acquisition_ophys'], axis=1)
-
-        # If we're in the state of combining behavior and ophys session_type
-        if 'session_type_behavior' in self._df and \
-                'session_type_ophys' in self._df:
-            # Prioritize ophys session_type
-            self._df['session_type'] = \
-                self._df['session_type_ophys']
-            self._df = self._df.drop(
-                ['session_type_behavior',
-                 'session_type_ophys'], axis=1)
-
+        self._merge_column_values()
         self._clean_up_project_code()
+
+    def _merge_column_values(self):
+        """Some columns such as date of acquisition are stored in both
+        behavior_sessions table as well as ophys_sessions table. If a field
+        is in both, then it gets suffix _behavior or _ophys.
+        We select the value in the ophys_sessions table and remove the
+        duplicated columns"""
+        columns = self._df.columns
+        to_drop = []
+        for column in columns:
+            if column.endswith('_behavior'):
+                column = column.replace('_behavior', '')
+                if f'{column}_ophys' in self._df:
+                    self._df[column] = self._df[f'{column}_ophys']
+                    to_drop += [f'{column}_behavior', f'{column}_ophys']
+        self._df.drop(to_drop, axis=1, inplace=True)
 
     def _clean_up_project_code(self):
         """Remove duplicate project_code columns from the data frames. This is
