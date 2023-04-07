@@ -110,9 +110,13 @@ class TestVBO:
             obtained = obtained.sort_values("ophys_session_id").reset_index(
                 drop=True
             )
+            obtained['date_of_acquisition'] = pd.to_datetime(
+                obtained['date_of_acquisition'], utc=True)
             expected = self.expected_ophys_sessions_table.sort_values(
                 "ophys_session_id"
             ).reset_index(drop=True)
+            expected['date_of_acquisition'] = pd.to_datetime(
+                expected['date_of_acquisition'], utc=True)
             pd.testing.assert_frame_equal(
                 obtained.sort_index(axis=1),
                 expected.sort_index(axis=1)
@@ -133,6 +137,11 @@ class TestVBO:
             expected = self.expected_ophys_experiments_table.sort_values(
                 "ophys_experiment_id"
             ).reset_index(drop=True)
+
+            obtained['date_of_acquisition'] = pd.to_datetime(
+                obtained['date_of_acquisition'], utc=True)
+            expected['date_of_acquisition'] = pd.to_datetime(
+                expected['date_of_acquisition'], utc=True)
             pd.testing.assert_frame_equal(
                 obtained.sort_index(axis=1), expected.sort_index(axis=1)
             )
