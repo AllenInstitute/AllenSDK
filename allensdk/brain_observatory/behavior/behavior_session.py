@@ -1502,6 +1502,7 @@ class BehaviorSession(
                 monitor_delay=monitor_delay,
                 trials=trials,
                 stimulus_presentation_columns=stimulus_presentation_columns,
+                project_code=project_code,
             )
         else:
             stimuli = None

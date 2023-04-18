@@ -156,6 +156,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
+        df = self._enforce_int_typing(df)
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -180,12 +181,11 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = self._enforce_ophys_session_typing(df)
+        df = self._enforce_int_typing(df)
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
-    def _enforce_ophys_session_typing(self,
-                                      input_df: pd.DataFrame) -> pd.DataFrame:
+    def _enforce_int_typing(self, input_df: pd.DataFrame) -> pd.DataFrame:
         """Enforce integer typing for ophys session information when loading
         from CSV.
 
@@ -199,8 +199,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         output_df : pandas.DataFrame
             DataFrame with corrected typing.
         """
-        columns_to_fix = ["ophys_session_id", "imaging_plane_group_count",
-                          "targeted_areas", "num_dpeths_per_area"]
+        columns_to_fix = ["session_number",
+                          "prior_exposures_to_image_set",
+                          "ophys_session_id", "imaging_plane_group_count",
+                          "imaging_plane_group",
+                          "targeted_areas", "num_depths_per_area",
+                          "num_targeted_structures"]
         for col in columns_to_fix:
             if col in input_df.columns:
                 input_df[col] = input_df[col].astype("Int64")
@@ -233,7 +237,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-
+        df = self._enforce_int_typing(df)
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
