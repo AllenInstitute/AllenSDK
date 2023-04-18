@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
-    add_experience_level,
+    add_experience_level_simple,
 )
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.behavior_metadata import (  # noqa: E501
@@ -184,14 +184,20 @@ def test_add_experience_level():
     """
 
     input_data = []
-    input_data.append({"session": 1, "prior_exposures_to_image_set": 2})
+    input_data.append({"session": 1,
+                       "prior_exposures_to_image_set": 2,
+                       'session_type': 'ECEPHYS_1'})
 
-    input_data.append({"session": 2, "prior_exposures_to_image_set": None})
+    input_data.append({"session": 2,
+                       "prior_exposures_to_image_set": None,
+                       'session_type': 'ECEPHYS_2'})
 
-    input_data.append({"session": 1, "prior_exposures_to_image_set": 0})
+    input_data.append({"session": 1,
+                       "prior_exposures_to_image_set": 0,
+                       'session_type': 'ECEPHYS_1'})
 
     input_df = pd.DataFrame(data=input_data)
-    actual = add_experience_level(sessions_df=input_df)
+    actual = add_experience_level_simple(input_df=input_df)
 
     input_data[0]["experience_level"] = "Familiar"
     input_data[1]["experience_level"] = "Novel"

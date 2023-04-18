@@ -5,7 +5,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.imag
     get_image_set,
 )
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
-    add_experience_level,
+    add_experience_level_simple,
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_session_type,
 )
@@ -926,7 +926,7 @@ def session_tables_from_ecephys_session_id_list(
     sessions_table = _add_session_number(
         sessions_df=summary_tbl, index_col="ecephys_session_id"
     )
-    sessions_table = add_experience_level(sessions_df=sessions_table)
+    sessions_table = add_experience_level_simple(input_df=sessions_table)
 
     omission_results = _add_prior_omissions(
         behavior_sessions_df=beh_table, ecephys_sessions_df=sessions_table

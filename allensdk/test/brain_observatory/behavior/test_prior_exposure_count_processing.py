@@ -1,7 +1,8 @@
+import copy
 import numpy as np
 import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
-    add_experience_level,
+    add_experience_level_ophys,
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_omissions,
     get_prior_exposures_to_session_type,
@@ -85,23 +86,93 @@ def test_prior_exposure_to_omissions():
 
 
 def test_add_experience_level():
-    """Test parsing the stimulus set used in the session from the
-    session_type.
-    """
-    df = pd.DataFrame(
-        {
-            "prior_exposures_to_image_set": [
-                0,
-                1,
-                2,
-                None,
-                0,
-            ]
-        }
-    )
-    expected = pd.Series(
-        ["Novel", "Familiar", "Familiar", "Novel", "Novel"],
-        name="experience_level",
-    )
-    obtained = add_experience_level(df)
-    pd.testing.assert_series_equal(expected, obtained["experience_level"])
+
+    input_data = []
+    expected_data = []
+
+    datum = {'id': 0,
+             'session_number': 1,
+             'prior_exposures_to_image_set': 4,
+             'session_type': 'OPHYS_1'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Familiar'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 1,
+             'session_number': 2,
+             'prior_exposures_to_image_set': 5,
+             'session_type': 'OPHYS_2'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Familiar'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 2,
+             'session_number': 3,
+             'prior_exposures_to_image_set': 1772,
+             'session_type': 'OPHYS_3'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Familiar'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 3,
+             'session_number': 4,
+             'prior_exposures_to_image_set': 0,
+             'session_type': 'OPHYS_4'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel 1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 4,
+             'session_number': 5,
+             'prior_exposures_to_image_set': 0,
+             'session_type': 'OPHYS_5'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel 1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 5,
+             'session_number': 6,
+             'prior_exposures_to_image_set': 0,
+             'session_type': 'OPHYS_6'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel 1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 7,
+             'session_number': 4,
+             'prior_exposures_to_image_set': 2,
+             'session_type': 'OPHYS_4'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel >1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 8,
+             'session_number': 5,
+             'prior_exposures_to_image_set': 1,
+             'session_type': 'OPHYS_5'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel >1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 9,
+             'session_number': 6,
+             'prior_exposures_to_image_set': 3,
+             'session_type': 'OPHYS_6'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'Novel >1'
+    expected_data.append(copy.deepcopy(datum))
+
+    datum = {'id': 10,
+             'session_number': 7,
+             'prior_exposures_to_image_set': 3,
+             'session_type': 'OPHYS_7'}
+    input_data.append(copy.deepcopy(datum))
+    datum['experience_level'] = 'None'
+    expected_data.append(copy.deepcopy(datum))
+
+    input_df = pd.DataFrame(input_data)
+    expected_df = pd.DataFrame(expected_data)
+    output_df = add_experience_level_ophys(input_df)
+    assert not input_df.equals(output_df)
+    assert len(input_df.columns) != len(output_df.columns)
+    assert output_df.equals(expected_df)
