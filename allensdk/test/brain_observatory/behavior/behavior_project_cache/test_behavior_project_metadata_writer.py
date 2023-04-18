@@ -23,31 +23,17 @@ class TestVBO:
     def setup_class(cls):
         test_dir = Path(__file__).parent / "test_data" / "vbo"
 
-        def add_test_dir(input_df):
-            """
-            Add in the full file path for the location we are testing. Needed
-            as the path is different depending on the value of test_dir.
-            """
-            full_file_path = []
-            for file_path in input_df['file_path']:
-                if isinstance(file_path, str):
-                    full_file_path.append(str(test_dir / file_path))
-                else:
-                    full_file_path.append(file_path)
-            input_df['file_path'] = full_file_path
         # Note: these tables will need to be updated if the expected table
         # changes
         cls.expected_behavior_sessions_table = pd.read_csv(
             test_dir / "behavior_session_table.csv"
         )
-        add_test_dir(cls.expected_behavior_sessions_table)
         cls.expected_ophys_sessions_table = pd.read_csv(
             test_dir / "ophys_session_table.csv"
         )
         cls.expected_ophys_experiments_table = pd.read_csv(
             test_dir / "ophys_experiment_table.csv"
         )
-        add_test_dir(cls.expected_ophys_experiments_table)
         cls.expected_ophys_cells_table = pd.read_csv(
             test_dir / "ophys_cells_table.csv"
         )
@@ -106,9 +92,12 @@ class TestVBO:
             expected = self.expected_behavior_sessions_table.sort_values(
                 "behavior_session_id"
             ).reset_index(drop=True)
+            # File paths are not created by
+            # AllenInstitute/informatics_release_tool hence we ignore them
+            # here.
             pd.testing.assert_frame_equal(
-                obtained.sort_index(axis=1),
-                expected.sort_index(axis=1)
+                obtained.drop('file_path', axis=1).sort_index(axis=1),
+                expected.drop('file_path', axis=1).sort_index(axis=1)
             )
 
     @pytest.mark.requires_bamboo
@@ -155,8 +144,12 @@ class TestVBO:
                 obtained['date_of_acquisition'], utc=True)
             expected['date_of_acquisition'] = pd.to_datetime(
                 expected['date_of_acquisition'], utc=True)
+            # File paths are not created by
+            # AllenInstitute/informatics_release_tool hence we ignore them
+            # here.
             pd.testing.assert_frame_equal(
-                obtained.sort_index(axis=1), expected.sort_index(axis=1)
+                obtained.drop('file_path', axis=1).sort_index(axis=1),
+                expected.drop('file_path', axis=1).sort_index(axis=1)
             )
 
     @pytest.mark.requires_bamboo
@@ -173,33 +166,21 @@ class TestVBO:
     def test_imaging_plane_group_only_mesoscope(self):
         """Tests that imaging plane group only applies to mesoscope"""
         with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
-        ophys_session_tbl = pd.read_csv(
-            Path(self.test_dir.name) / "ophys_session_table.csv"
-        )
-        ophys_experiment_tbl = pd.read_csv(
-            Path(self.test_dir.name) / "ophys_experiment_table.csv"
-        )
-        df = ophys_session_tbl.merge(
-            ophys_experiment_tbl, on="ophys_session_id"
-        )
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                        'ophys_session_table.csv')
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                           'ophys_experiment_table.csv')
+        df = ophys_session_tbl.merge(ophys_experiment_tbl,
+                                     on='ophys_session_id')
 
-        assert (
-            df[~df["equipment_name_x"].str.startswith("MESO")][
-                "imaging_plane_group_count"
-            ]
-            == 0
-        ).all()
-        assert (
-            df[~df["equipment_name_x"].str.startswith("MESO")][
-                "imaging_plane_group"
-            ]
-            .isna()
-            .all()
-        )
+        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
+                ['imaging_plane_group_count'].isna().all())
+        assert (df[~df['equipment_name_x'].str.startswith('MESO')]
+                ['imaging_plane_group'].isna().all())
 
     @pytest.mark.requires_bamboo
     def test_imaging_plane_group_count_consistent(self):
@@ -207,44 +188,37 @@ class TestVBO:
         consistent with the number of imaging plane groups in experiment
         table"""
         with patch.object(
-            BehaviorMetadata, "from_lims", wraps=self._get_behavior_session
-        ):
+            BehaviorMetadata, 'from_lims',
+                wraps=self._get_behavior_session):
             self.project_table_writer._write_ophys_sessions()
             self.project_table_writer._write_ophys_experiments()
-        ophys_session_tbl = pd.read_csv(
-            Path(self.test_dir.name) / "ophys_session_table.csv"
-        )
-        ophys_experiment_tbl = pd.read_csv(
-            Path(self.test_dir.name) / "ophys_experiment_table.csv"
-        )
-        df = ophys_session_tbl.merge(
-            ophys_experiment_tbl, on="ophys_session_id"
-        )
+        ophys_session_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                        'ophys_session_table.csv')
+        ophys_experiment_tbl = pd.read_csv(Path(self.test_dir.name) /
+                                           'ophys_experiment_table.csv')
+        df = ophys_session_tbl.merge(ophys_experiment_tbl,
+                                     on='ophys_session_id')
 
         imaging_plane_group_count = (
-            df.groupby("ophys_session_id")["imaging_plane_group"]
-            .nunique()
+            df[~df['imaging_plane_group'].isna()]
+            .groupby('ophys_session_id')['imaging_plane_group'].nunique()
             .reset_index()
             .rename(
-                columns={"imaging_plane_group": "imaging_plane_group_count"}
-            )
+                columns={'imaging_plane_group': 'imaging_plane_group_count'})
         )
 
         ophys_session_tbl = ophys_session_tbl.merge(
             imaging_plane_group_count,
-            on="ophys_session_id",
-            suffixes=("_from_lims", "_recalculated"),
-            how="left",
+            on='ophys_session_id',
+            suffixes=('_from_lims', '_recalculated'),
+            how='left'
         )
         assert (
-            ophys_session_tbl["imaging_plane_group_count_from_lims"][
-                ~ophys_session_tbl[
-                    "imaging_plane_group_count_from_lims"
-                ].isna()
-            ]
-            == ophys_session_tbl["imaging_plane_group_count_recalculated"][
-                ~ophys_session_tbl[
-                    "imaging_plane_group_count_recalculated"
-                ].isna()
-            ]
-        ).all()
+            (ophys_session_tbl['imaging_plane_group_count_from_lims']
+             [~ophys_session_tbl['imaging_plane_group_count_from_lims'].isna()]
+             ==
+             ophys_session_tbl['imaging_plane_group_count_recalculated']
+             [~ophys_session_tbl['imaging_plane_group_count_recalculated']
+             .isna()])
+            .all()
+        )

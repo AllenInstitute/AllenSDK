@@ -504,7 +504,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         # Fill NaN values of imaging_plane_group_count with zero to match
         # the behavior of the BehaviorOphysExperiment object.
         im_plane_count = (
-            table["imaging_plane_group_count"].fillna(0).astype("Int64")
+            table["imaging_plane_group_count"].astype("Int64")
         )
         table["imaging_plane_group_count"] = im_plane_count
         return table

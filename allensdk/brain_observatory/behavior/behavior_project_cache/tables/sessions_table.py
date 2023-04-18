@@ -19,10 +19,13 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.meta
     parse_stimulus_set,
 )
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
-    add_experience_level,
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_omissions,
     get_prior_exposures_to_session_type,
+    add_experience_level_ophys,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.dataframe_utils import (  # noqa: E501
+        order_metadata_table_columns
 )
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -77,6 +80,7 @@ class SessionsTable(ProjectTable, OphysMixin):
         self._include_trial_metrics = include_trial_metrics
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
+        self._df = order_metadata_table_columns(self._df)
 
     def postprocess_additional(self):
         # Add subject metadata
@@ -106,13 +110,14 @@ class SessionsTable(ProjectTable, OphysMixin):
             df=self._df, fetch_api=self._fetch_api
         )
 
+        self._df = add_experience_level_ophys(self._df)
+
         self._df["behavior_type"] = self._df["session_type"].apply(
             parse_behavior_context
         )
         self._df["image_set"] = self._df["session_type"].apply(
             parse_stimulus_set
         )
-        self._df = add_experience_level(self._df)
 
         if self._include_trial_metrics:
             # add trial metrics
@@ -172,7 +177,7 @@ class SessionsTable(ProjectTable, OphysMixin):
 
         self._df.loc[
             session_type.index, "session_number"
-        ] = session_type.apply(parse_session_number)
+        ] = session_type.apply(parse_session_number).astype('Int64')
 
     @staticmethod
     def _get_trial_metrics_helper(*args) -> Dict:

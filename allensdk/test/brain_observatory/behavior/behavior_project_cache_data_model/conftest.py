@@ -10,10 +10,11 @@ from allensdk.brain_observatory.behavior.behavior_project_cache \
 
 from allensdk.brain_observatory.behavior.behavior_project_cache.\
     tables.util.experiments_table_utils import (
-        add_experience_level_to_experiment_table,
         add_passive_flag_to_ophys_experiment_table,
         add_image_set_to_experiment_table)
-
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level_ophys,
+)
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
     .util.prior_exposure_processing import \
     get_prior_exposures_to_session_type, \
@@ -575,7 +576,7 @@ def expected_experiments_table(ophys_experiments_table,
             session_number.append(None)
     expected['session_number'] = session_number
 
-    expected = add_experience_level_to_experiment_table(expected)
+    expected = add_experience_level_ophys(expected)
     expected = add_passive_flag_to_ophys_experiment_table(expected)
     expected = add_image_set_to_experiment_table(expected)
 

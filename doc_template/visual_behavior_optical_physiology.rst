@@ -308,6 +308,40 @@ SUMMARY OF AVAILABLE DATA
 DATA FILE CHANGELOG
 -------------------
 
+**v1.1.0**
+
+Metadata Changes
+
+- Better consistency of integer typing.
+- Additions to multiple tables
+    - Added project_code and behavior_type (active/passive) value to all
+      tables.
+    - Added imaging_plane_group_count, num_depths_per_area,
+      num_targeted_structures, experience_level to Behavior and Ophys session
+      tables.
+- Behavior Session table
+    - Added trials summary columns: catch_trial_count,
+      correct_reject_trial_count, engaged_trial_count, false_alarm_trial_count,
+      miss_trial_count, trial_count.
+    - Added image_set column.
+- Ophys experiment table
+    - Added targeted_imaging_depth to experiment table, representing the
+      average depth of all experiments in the published container.
+- Ophys cells table
+    - Added corner location of ROI cutout x,y for each ROI.
+    - Added width, height of the ROI cutout for each ROI.
+
+Data Changes
+
+- The value for Age in the metadata, Session/Experiment objects. NWBs now
+  reflect the age of the animal at the time the session/experiment was taken.
+- Enforced better and more consistent typing between the metadata tables and
+  the session metadata.
+- All datetimes in metadata tables and NWBs are explicitly UTC timezone.
+- New columns in the stimulus_presentations table:
+    - is_image_novel, movie_frame_index, repeat, stimulus_block,
+      stimulus_block_name, stimulus_name,
+
 **v1.0.1**
 
 Metadata corrections

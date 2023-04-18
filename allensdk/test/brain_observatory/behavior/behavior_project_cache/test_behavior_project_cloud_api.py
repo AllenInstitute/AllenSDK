@@ -107,7 +107,8 @@ def mock_cache(request, tmpdir):
             ),
             "ophys_session_table": pd.DataFrame(
                 {
-                    "ophys_session_id": [10, 11, 12, 13],
+                    "ophys_session_id": pd.Series([10, 11, 12, 13],
+                                                  dtype='Int64'),
                     "mouse_id": ["1"] * 4,
                     "date_of_acquisition": pd.to_datetime(["2021-01-01"] * 4),
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]],
