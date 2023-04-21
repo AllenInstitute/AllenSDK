@@ -343,7 +343,7 @@ def _gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
     
     """
     
-    return lambda x,y: peak_height \
+    return lambda y, x: peak_height \
                        * np.exp( \
                        -( \
                          ((center_y - y) / width_y)**2 \
