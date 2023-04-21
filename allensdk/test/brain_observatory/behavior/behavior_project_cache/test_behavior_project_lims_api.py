@@ -7,12 +7,13 @@ import pytest
 
 from allensdk.brain_observatory.behavior.behavior_project_cache import \
     VisualBehaviorOphysProjectCache
-from allensdk.brain_observatory.behavior.behavior_project_cache.external \
-    .behavior_project_metadata_writer import \
-    SESSION_SUPPRESS, OPHYS_EXPERIMENTS_SUPPRESS, \
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.behavior_project_metadata_writer import (  # noqa: E501
+    SESSION_SUPPRESS, OPHYS_EXPERIMENTS_SUPPRESS,
     OPHYS_EXPERIMENTS_SUPPRESS_FINAL
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import \
-    BehaviorProjectLimsApi, BehaviorProjectCloudApi  # noqa: E501
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
+    BehaviorProjectLimsApi, BehaviorProjectCloudApi
+)
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
 from allensdk.brain_observatory.behavior.data_objects.metadata\
     .behavior_metadata.behavior_metadata import \

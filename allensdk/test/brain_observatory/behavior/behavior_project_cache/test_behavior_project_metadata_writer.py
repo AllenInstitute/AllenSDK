@@ -4,10 +4,7 @@ from unittest.mock import patch
 
 import pandas as pd
 import pytest
-from allensdk.brain_observatory.behavior.behavior_project_cache import (
-    VisualBehaviorOphysProjectCache,
-)
-from allensdk.brain_observatory.behavior.behavior_project_cache.external.behavior_project_metadata_writer import (  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.behavior_project_metadata_writer import (  # noqa: E501
     BehaviorProjectMetadataWriter,
 )
 from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
@@ -26,17 +23,31 @@ class TestVBO:
     def setup_class(cls):
         test_dir = Path(__file__).parent / "test_data" / "vbo"
 
+        def add_test_dir(input_df):
+            """
+            Add in the full file path for the location we are testing. Needed
+            as the path is different depending on the value of test_dir.
+            """
+            full_file_path = []
+            for file_path in input_df['file_path']:
+                if isinstance(file_path, str):
+                    full_file_path.append(str(test_dir / file_path))
+                else:
+                    full_file_path.append(file_path)
+            input_df['file_path'] = full_file_path
         # Note: these tables will need to be updated if the expected table
         # changes
         cls.expected_behavior_sessions_table = pd.read_csv(
             test_dir / "behavior_session_table.csv"
         )
+        add_test_dir(cls.expected_behavior_sessions_table)
         cls.expected_ophys_sessions_table = pd.read_csv(
             test_dir / "ophys_session_table.csv"
         )
         cls.expected_ophys_experiments_table = pd.read_csv(
             test_dir / "ophys_experiment_table.csv"
         )
+        add_test_dir(cls.expected_ophys_experiments_table)
         cls.expected_ophys_cells_table = pd.read_csv(
             test_dir / "ophys_cells_table.csv"
         )
@@ -47,16 +58,18 @@ class TestVBO:
 
         cls.test_dir = tempfile.TemporaryDirectory()
 
-        bpc = VisualBehaviorOphysProjectCache.from_lims(
-            data_release_date=["2021-03-25", "2021-08-12"]
-        )
+        input_data = {"output_dir": cls.test_dir.name,
+                      "data_release_date": ['2021-03-25', '2021-08-12'],
+                      "clobber": True,
+                      "log_level": "INFO",
+                      "behavior_nwb_dir": str(test_dir),
+                      "ophys_nwb_dir": str(test_dir),
+                      "on_missing_file": "warn"}
         cls.project_table_writer = BehaviorProjectMetadataWriter(
-            behavior_project_cache=bpc,
-            out_dir=cls.test_dir.name,
-            project_name="",
-            data_release_date="",
-            overwrite_ok=True,
+            input_data=input_data,
+            args=[],
         )
+        cls.project_table_writer._initialize_metadata_writer()
 
     def teardown_class(self):
         self.test_dir.cleanup()
