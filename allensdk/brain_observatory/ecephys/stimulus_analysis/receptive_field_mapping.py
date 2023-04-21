@@ -343,14 +343,10 @@ def _gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
     
     """
     
-    return lambda y, x: peak_height \
-                       * np.exp( \
-                       -( \
-                         ((center_y - y) / width_y)**2 \
-                       + ((center_x - x) / width_x)**2 \
-                        ) \
-                        / 2 \
-                        )
+    return lambda y, x: peak_height * np.exp(
+        -(((center_y - y) / width_y)**2 +
+        ((center_x - x) / width_x)**2)/2)
+
 
 
 def gaussian_moments_2d(data):
