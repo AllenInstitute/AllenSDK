@@ -609,14 +609,12 @@ class CellSpecimens(
     ) -> "CellSpecimens":
         # NOTE: ROI masks are stored in full frame width and height arrays
         ophys_module = nwbfile.processing["ophys"]
-        image_seg = ophys_module.data_interfaces["image_segmentation"]
-        plane_segmentations = image_seg.plane_segmentations
         try:
-             cell_specimen_table = plane_segmentations["cell_specimen_table"]
+            image_seg = ophys_module.data_interfaces["image_segmentation"]
         except KeyError:
             return CellSpecimens(
-                cell_specimen_table=df,
-                meta=meta,
+                cell_specimen_table=pd.DataFrame(),
+                meta=None,
                 dff_traces=None,
                 demixed_traces=None,
                 neuropil_traces=None,
@@ -624,8 +622,10 @@ class CellSpecimens(
                 events=None,
                 ophys_timestamps=None,
                 segmentation_mask_image_spacing=None,
-                exclude_invalid_rois=exclude_invalid_rois,
+                exclude_invalid_rois=False,
             )
+        plane_segmentations = image_seg.plane_segmentations
+        cell_specimen_table = plane_segmentations["cell_specimen_table"]
 
         def _read_table(cell_specimen_table):
             df = cell_specimen_table.to_dataframe()
