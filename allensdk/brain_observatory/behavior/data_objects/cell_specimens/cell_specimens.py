@@ -1,4 +1,5 @@
 from typing import Optional, Tuple
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -416,10 +417,7 @@ class CellSpecimens(
                     """.format(
                 ophys_experiment_id
             )
-            try:
-                return lims_db.fetchone(query, strict=True)
-            except OneResultExpectedError:
-                return -1
+            return lims_db.fetchone(query, strict=True)
 
         def _get_cell_specimen_table():
             ophys_cell_seg_run_id = _get_ophys_cell_segmentation_run_id()
@@ -492,6 +490,10 @@ class CellSpecimens(
         try:
             cell_specimen_table = _get_cell_specimen_table()
         except OneResultExpectedError:
+            warnings.warn(
+                f"No ROI data found for ophys experiment "
+                "{ophys_experiment_id}. Returning an empty CellSpecimens "
+                "object...")
             cell_specimen_table = pd.DataFrame()
 
         meta = CellSpecimenMeta.from_lims(
@@ -610,6 +612,9 @@ class CellSpecimens(
         # NOTE: ROI masks are stored in full frame width and height arrays
         ophys_module = nwbfile.processing["ophys"]
         try:
+            warnings.warn(
+                f"No segmentation data found for ophys experiment. Returning "
+                "an empty CellSpecimens object...")
             image_seg = ophys_module.data_interfaces["image_segmentation"]
         except KeyError:
             return CellSpecimens(
@@ -692,6 +697,9 @@ class CellSpecimens(
             ophys timestamps
         """
         if len(self.table) <= 0:
+            warnings.warn(
+                f"This experiment has no segmentation data. Skipping writing "
+                "segmentation/trace data to NWB.")
             return nwbfile
         # 1. Add cell specimen table
         cell_roi_table = self.table.reset_index().set_index("cell_roi_id")
