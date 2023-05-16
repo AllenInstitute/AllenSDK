@@ -5,7 +5,6 @@ import pandas as pd
 from pynwb import NWBFile, ProcessingModule
 from pynwb.ophys import OpticalChannel, ImageSegmentation
 
-from allensdk import OneResultExpectedError
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.behavior.data_files.neuropil_corrected_file \
     import NeuropilCorrectedFile
@@ -190,19 +189,18 @@ class CellSpecimens(
             name="cell_specimen_table", value=None, is_value_self=True
         )
 
-        if len(cell_specimen_table) > 0:
         # Validate ophys timestamps, traces
-            ophys_timestamps = ophys_timestamps.validate(
-                number_of_frames=dff_traces.get_number_of_frames()
-            )
-            self._validate_traces(
-                ophys_timestamps=ophys_timestamps,
-                dff_traces=dff_traces,
-                demixed_traces=demixed_traces,
-                neuropil_traces=neuropil_traces,
-                corrected_fluorescence_traces=corrected_fluorescence_traces,
-                cell_roi_ids=cell_specimen_table["cell_roi_id"].values,
-            )
+        ophys_timestamps = ophys_timestamps.validate(
+            number_of_frames=dff_traces.get_number_of_frames()
+        )
+        self._validate_traces(
+            ophys_timestamps=ophys_timestamps,
+            dff_traces=dff_traces,
+            demixed_traces=demixed_traces,
+            neuropil_traces=neuropil_traces,
+            corrected_fluorescence_traces=corrected_fluorescence_traces,
+            cell_roi_ids=cell_specimen_table["cell_roi_id"].values,
+        )
 
         if exclude_invalid_rois:
             cell_specimen_table = cell_specimen_table[
@@ -222,20 +220,18 @@ class CellSpecimens(
             neuropil_traces.filter_and_reorder(
                 roi_ids=cell_specimen_table["cell_roi_id"].values
             )
-        if corrected_fluorescence_traces is not None:
-            corrected_fluorescence_traces.filter_and_reorder(
-                roi_ids=cell_specimen_table["cell_roi_id"].values
-            )
+        corrected_fluorescence_traces.filter_and_reorder(
+            roi_ids=cell_specimen_table["cell_roi_id"].values
+        )
 
         # Note: setting raise_if_rois_missing to False for events, since
         # there seem to be cases where cell_specimen_table contains rois not in
         # events
         # See ie https://app.zenhub.com/workspaces/allensdk-10-5c17f74db59cfb36f158db8c/issues/alleninstitute/allensdk/2139     # noqa
-        if events is not None:
-            events.filter_and_reorder(
-                roi_ids=cell_specimen_table["cell_roi_id"].values,
-                raise_if_rois_missing=False,
-            )
+        events.filter_and_reorder(
+            roi_ids=cell_specimen_table["cell_roi_id"].values,
+            raise_if_rois_missing=False,
+        )
 
         self._meta = meta
         self._cell_specimen_table = cell_specimen_table
@@ -244,12 +240,9 @@ class CellSpecimens(
         self._neuropil_traces = neuropil_traces
         self._corrected_fluorescence_traces = corrected_fluorescence_traces
         self._events = events
-        if len(cell_specimen_table) > 0:
-            self._segmentation_mask_image = self._get_segmentation_mask_image(
-                spacing=segmentation_mask_image_spacing
-            )
-        else:
-            self._segmentation_mask_image = None
+        self._segmentation_mask_image = self._get_segmentation_mask_image(
+            spacing=segmentation_mask_image_spacing
+        )
 
     @property
     def table(self) -> pd.DataFrame:
@@ -416,10 +409,7 @@ class CellSpecimens(
                     """.format(
                 ophys_experiment_id
             )
-            try:
-                return lims_db.fetchone(query, strict=True)
-            except OneResultExpectedError:
-                return -1
+            return lims_db.fetchone(query, strict=True)
 
         def _get_cell_specimen_table():
             ophys_cell_seg_run_id = _get_ophys_cell_segmentation_run_id()
@@ -430,10 +420,7 @@ class CellSpecimens(
                     """.format(
                 ophys_cell_seg_run_id
             )
-            try:
-                initial_cs_table = pd.read_sql(query, lims_db.get_connection())
-            except OneResultExpectedError:
-                return pd.DataFrame()
+            initial_cs_table = pd.read_sql(query, lims_db.get_connection())
             cst = initial_cs_table.rename(
                 columns={"id": "cell_roi_id", "mask_matrix": "roi_mask"}
             )
@@ -491,10 +478,7 @@ class CellSpecimens(
                 frame_rate_hz=meta.imaging_plane.ophys_frame_rate,
             )
 
-        try:
-            cell_specimen_table = _get_cell_specimen_table()
-        except OneResultExpectedError:
-            cell_specimen_table = pd.DataFrame()
+        cell_specimen_table = _get_cell_specimen_table()
 
         meta = CellSpecimenMeta.from_lims(
             ophys_experiment_id=ophys_experiment_id,
@@ -502,18 +486,11 @@ class CellSpecimens(
             ophys_timestamps=ophys_timestamps,
         )
 
-        if len(cell_specimen_table) > 0:
-            dff_traces = _get_dff_traces()
-            demixed_traces = _get_demixed_traces()
-            neuropil_traces = _get_neuropil_traces()
-            corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
-            events = _get_events()
-        else:
-            dff_traces = None
-            demixed_traces = None
-            neuropil_traces = None
-            corrected_fluorescence_traces = None
-            events = None
+        dff_traces = _get_dff_traces()
+        demixed_traces = _get_demixed_traces()
+        neuropil_traces = _get_neuropil_traces()
+        corrected_fluorescence_traces = _get_corrected_fluorescence_traces()
+        events = _get_events()
 
         return CellSpecimens(
             cell_specimen_table=cell_specimen_table,
@@ -614,19 +591,6 @@ class CellSpecimens(
         image_seg = ophys_module.data_interfaces["image_segmentation"]
         plane_segmentations = image_seg.plane_segmentations
         cell_specimen_table = plane_segmentations["cell_specimen_table"]
-        if len(cell_specimen_table.to_dataframe()) <= 0:
-            return CellSpecimens(
-                cell_specimen_table=df,
-                meta=meta,
-                dff_traces=None,
-                demixed_traces=None,
-                neuropil_traces=None,
-                corrected_fluorescence_traces=None,
-                events=None,
-                ophys_timestamps=None,
-                segmentation_mask_image_spacing=None,
-                exclude_invalid_rois=exclude_invalid_rois,
-            )
 
         def _read_table(cell_specimen_table):
             df = cell_specimen_table.to_dataframe()
@@ -692,8 +656,6 @@ class CellSpecimens(
         :param ophys_timestamps
             ophys timestamps
         """
-        if len(self.table) <= 0:
-            return nwbfile
         # 1. Add cell specimen table
         cell_roi_table = self.table.reset_index().set_index("cell_roi_id")
         metadata = nwbfile.lab_meta_data["metadata"]
