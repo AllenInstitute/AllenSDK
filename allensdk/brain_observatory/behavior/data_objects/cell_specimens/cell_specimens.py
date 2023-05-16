@@ -494,6 +494,7 @@ class CellSpecimens(
                 f"No ROI data found for ophys experiment "
                 "{ophys_experiment_id}. Returning an empty CellSpecimens "
                 "object...")
+            exclude_invalid_rois = False
             cell_specimen_table = pd.DataFrame()
 
         meta = CellSpecimenMeta.from_lims(
