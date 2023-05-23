@@ -66,7 +66,8 @@ class BehaviorOphysExperiment(BehaviorSession):
         self._projections.to_nwb(nwbfile=nwbfile)
         self._cell_specimens.to_nwb(nwbfile=nwbfile,
                                     ophys_timestamps=self._ophys_timestamps)
-        self._motion_correction.to_nwb(nwbfile=nwbfile)
+        self._motion_correction.to_nwb(nwbfile=nwbfile,
+                                       ophys_timestamps=self._ophys_timestamps)
 
         return nwbfile
     # ==================== class and utility methods ======================

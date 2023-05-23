@@ -83,6 +83,9 @@ class TestNWB:
             session_start_time=datetime.now()
         )
 
+        self.ophys_timestamps = OphysTimestamps(
+            timestamps=np.array([.1, .2, .3]))
+
         def _write_cell_specimen():
             # write metadata
             tbom = TestBOM()
@@ -92,15 +95,14 @@ class TestNWB:
 
             # write cell specimen
             ij = NwbInputJson()
-            ophys_timestamps = OphysTimestamps(
-                timestamps=np.array([.1, .2, .3]))
             csp = CellSpecimens.from_json(
-                dict_repr=ij.dict_repr, ophys_timestamps=ophys_timestamps,
+                dict_repr=ij.dict_repr, ophys_timestamps=self.ophys_timestamps,
                 segmentation_mask_image_spacing=(.78125e-3, .78125e-3),
                 events_params=EventsParams(
                                filter_scale_seconds=2.0/31.0,
                                filter_n_time_steps=20))
-            csp.to_nwb(nwbfile=self.nwbfile, ophys_timestamps=ophys_timestamps)
+            csp.to_nwb(nwbfile=self.nwbfile,
+                       ophys_timestamps=self.ophys_timestamps)
 
         # need to write cell specimen, since it is a dependency
         _write_cell_specimen()
@@ -108,7 +110,8 @@ class TestNWB:
     @pytest.mark.parametrize('roundtrip', [True, False])
     def test_read_write_nwb(self, roundtrip,
                             data_object_roundtrip_fixture):
-        self.motion_correction.to_nwb(nwbfile=self.nwbfile)
+        self.motion_correction.to_nwb(nwbfile=self.nwbfile,
+                                      ophys_timestamps=self.ophys_timestamps)
 
         if roundtrip:
             obt = data_object_roundtrip_fixture(

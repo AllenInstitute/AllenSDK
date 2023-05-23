@@ -9,6 +9,9 @@ from allensdk.core import \
     DataFileReadableInterface, NwbReadableInterface
 from allensdk.core import \
     NwbWritableInterface
+from allensdk.brain_observatory.behavior.data_objects.timestamps\
+    .ophys_timestamps import \
+    OphysTimestamps
 
 
 class MotionCorrection(DataObject, DataFileReadableInterface,
@@ -44,22 +47,22 @@ class MotionCorrection(DataObject, DataFileReadableInterface,
         df = pd.DataFrame(motion_correction_data)
         return cls(motion_correction=df)
 
-    def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
+    def to_nwb(self,
+               nwbfile: NWBFile,
+               ophys_timestamps: OphysTimestamps) -> NWBFile:
         ophys_module = nwbfile.processing['ophys']
-        ophys_timestamps = ophys_module.get_data_interface(
-            'dff').roi_response_series['traces'].timestamps
 
         t1 = TimeSeries(
             name='ophys_motion_correction_x',
             data=self.value['x'].values,
-            timestamps=ophys_timestamps,
+            timestamps=ophys_timestamps.value,
             unit='pixels'
         )
 
         t2 = TimeSeries(
             name='ophys_motion_correction_y',
             data=self.value['y'].values,
-            timestamps=ophys_timestamps,
+            timestamps=ophys_timestamps.value,
             unit='pixels'
         )
 
