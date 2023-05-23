@@ -1,4 +1,4 @@
-from matplotlib import image as mpimg
+from PIL import Image as PILImage
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
@@ -150,7 +150,7 @@ class Projections(DataObject, LimsReadableInterface, JsonReadableInterface,
         :param pixel_size
             pixel size in um
         """
-        img = mpimg.imread(filepath)
+        img = PILImage.open(filepath)
         img = ImageApi.serialize(img, [pixel_size / 1000.,
                                        pixel_size / 1000.], 'mm')
         img = ImageApi.deserialize(img=img)
