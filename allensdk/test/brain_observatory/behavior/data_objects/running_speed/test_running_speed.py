@@ -35,7 +35,7 @@ def test_nonzero_monitor_delay_speed():
                        match="should be no monitor delay"):
 
         RunningSpeed(
-            running_speed=4.0,
+            running_speed=pd.DataFrame({'speed': [4.0]}),
             stimulus_file=None,
             sync_file=None,
             stimulus_timestamps=OtherTimestamps())
