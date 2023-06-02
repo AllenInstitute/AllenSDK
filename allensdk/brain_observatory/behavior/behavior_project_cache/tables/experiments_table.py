@@ -15,9 +15,10 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .util.experiments_table_utils import (
         add_passive_flag_to_ophys_experiment_table,
         add_image_set_to_experiment_table)
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.dataframe_utils import (  # noqa: E501
-        order_metadata_table_columns
+from allensdk.core.dataframe_utils import (
+        enforce_df_column_order
 )
+from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
 class ExperimentsTable(ProjectTable, OphysMixin):
@@ -41,7 +42,10 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
         self.final_processing()
-        self._df = order_metadata_table_columns(self._df)
+        self._df = enforce_df_column_order(
+            self._df,
+            VBO_METADATA_COLUMN_ORDER
+        )
 
     def postprocess_base(self):
         """
