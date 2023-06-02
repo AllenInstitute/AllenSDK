@@ -12,6 +12,9 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.meta
     parse_num_cortical_structures,
     parse_num_depths,
 )
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.dataframe_utils import (  # noqa: E501
+        order_metadata_table_columns
+)
 
 
 class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
@@ -39,6 +42,7 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         self._index_column = index_column
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
+        self._df = order_metadata_table_columns(self._df)
 
     def postprocess_additional(self):
         # Add ophys specific information.
@@ -47,12 +51,12 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
             if "project_code_ophys" in self._df.columns
             else "project_code"
         )
-        self._df["targeted_areas"] = (
+        self._df["num_targeted_structures"] = (
             self._df[project_code_col]
             .apply(parse_num_cortical_structures)
             .astype("Int64")
         )
-        self._df["num_dpeths_per_area"] = (
+        self._df["num_depths_per_area"] = (
             self._df[project_code_col].apply(parse_num_depths).astype("Int64")
         )
         # Possibly explode and reindex

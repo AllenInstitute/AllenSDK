@@ -599,10 +599,13 @@ class Presentations(
                 }
             )
         # Check for 5 minute gray screen stimulus block at the start of the
-        # movie
+        # movie. We give some leeway around 5 minutes at 285 seconds to account
+        # for some sessions which have start times slightly less than 300
+        # seconds. This also makes sure that presentations that start slightly
+        # late are not erroneously added as a "grey screen".
         if (
             stimulus_presentations_table.iloc[0]["start_frame"] > 0
-            and stimulus_presentations_table.iloc[0]["start_time"] > 0
+            and stimulus_presentations_table.iloc[0]["start_time"] > 285
         ):
             res.append(
                 {

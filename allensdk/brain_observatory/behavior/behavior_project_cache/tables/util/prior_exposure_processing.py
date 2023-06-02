@@ -184,18 +184,78 @@ def __get_prior_exposure_count(
     return counts.reindex(index)
 
 
-def add_experience_level(sessions_df: pd.DataFrame) -> pd.DataFrame:
+def add_experience_level_ophys(
+        input_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Add the column 'experience_level' to a dataframe.
-
-    This column
-    will be 'Novel' for any rows with
-    'prior_exposures_to_image_set' == 0 (or NULL) and 'Familiar'
-    otherwise.
+    adds a column to ophys tables that contains a string
+    indicating whether a session had exposure level of Familiar,
+    Novel 1, or Novel >1, based on session number and
+    prior_exposure_to_image_set
 
     Parameters
     ----------
-    sessions_df : pandas.DataFrame
+    input_df: pd.DataFrame
+
+    Returns
+    -------
+    experiments_table: pd.DataFrame
+
+    Notes
+    -----
+    Does not change the input DataFrame in-place
+    """
+    # Ported from
+    # https://github.com/AllenInstitute/visual_behavior_analysis/
+    # blob/master/visual_behavior/data_access/utilities.py#L1307
+
+    # do not modify in place
+    table = input_df.copy(deep=True)
+    session_number = 'session_number' \
+        if 'session_number' in table.columns else 'session'
+
+    # add experience_level column with strings indicating relevant conditions
+    table['experience_level'] = 'None'
+
+    session_training = table.session_type.str.startswith('TRAINING')
+    train_indices = table[session_training].index.values
+    table.loc[train_indices, 'experience_level'] = 'Training'
+
+    session_0123 = table[session_number].isin([0, 1, 2, 3])
+    familiar_indices = table[session_0123].index.values
+
+    table.loc[familiar_indices, 'experience_level'] = 'Familiar'
+
+    session_456 = table[session_number].isin([4, 5, 6])
+    zero_prior_exp = (table.prior_exposures_to_image_set == 0)
+
+    novel_indices = table[session_456
+                          & zero_prior_exp].index.values
+
+    table.loc[novel_indices, 'experience_level'] = 'Novel 1'
+
+    session_456 = table[session_number].isin([4, 5, 6])
+    nonzero_prior_exp = (table.prior_exposures_to_image_set != 0)
+    novel_gt_1_indices = table[
+                             session_456
+                             & nonzero_prior_exp].index.values
+
+    table.loc[novel_gt_1_indices, 'experience_level'] = 'Novel >1'
+
+    return table
+
+
+def add_experience_level_simple(input_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add the column 'experience_level' to a dataframe. This column
+    will be 'Novel' for any rows with
+    'prior_exposures_to_image_set' == 0 (or NULL) and 'Familiar' otherwise.
+
+    This experience level is mainly for VBN as the logic of Novel/Familiar
+    differs between VBO and VBN.
+
+    Parameters
+    ----------
+    input_df : pandas.DataFrame
         Input sessions dataframe
 
     Returns
@@ -203,8 +263,8 @@ def add_experience_level(sessions_df: pd.DataFrame) -> pd.DataFrame:
     output_df : pandas.DataFrame
         DataFrame with added "experience_level" column.
     """
-    tmp_exposures = sessions_df["prior_exposures_to_image_set"].fillna(0)
-    sessions_df["experience_level"] = np.where(
+    tmp_exposures = input_df["prior_exposures_to_image_set"].fillna(0)
+    input_df["experience_level"] = np.where(
         tmp_exposures == 0, "Novel", "Familiar"
     )
-    return sessions_df
+    return input_df
