@@ -222,8 +222,8 @@ def test_add_stimulus_presentations(nwbfile, presentations, roundtripper):
         presentations.value['color_triplet'] = [''] + ['[1.0, 1.0, 1.0]'] * 4
         presentations.value['color'] = ''
     pd.testing.assert_frame_equal(
-        presentations.value,
-        obtained_stimulus_table,
+        presentations.value[sorted(presentations.value.columns)],
+        obtained_stimulus_table[sorted(obtained_stimulus_table.columns)],
         check_dtype=False)
 
 
@@ -583,10 +583,12 @@ def test_read_stimulus_table(tmpdir_factory, presentations,
             behavior_session_id=1,
             exclude_columns=columns_to_drop,
             columns_to_rename=column_renames_map,
-            sort_columns=False
+            sort_columns=True
         )
 
-    pd.testing.assert_frame_equal(obt.value, expected)
+    obtained = obt.value[sorted(obt.value.columns)]
+    expected = expected[sorted(expected.columns)]
+    pd.testing.assert_frame_equal(obtained, expected)
 
 
 def test_read_spike_times_to_dictionary(tmpdir_factory):

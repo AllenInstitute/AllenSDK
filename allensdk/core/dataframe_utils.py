@@ -1,6 +1,13 @@
 from typing import List
 import pandas as pd
 
+# Null value fill for integer Pandas.Series objects. NWB currently doesn't
+# support using the new Int64 type that has explicit N/A values so we fill
+# instead with -99.
+INT_NULL = -99
+
+"""A collection of utilities to manipulate pandas DataFrames."""
+
 
 def patch_df_from_other(
         target_df: pd.DataFrame,
@@ -85,3 +92,61 @@ def patch_df_from_other(
     if original_index is not None:
         target_df = target_df.set_index(original_index)
     return target_df
+
+
+def enforce_df_column_order(
+        input_df: pd.DataFrame,
+        column_order: List[str]) -> pd.DataFrame:
+    """Return the data frame but with columns ordered.
+
+    Parameters
+    ----------
+    input_df : pandas.DataFrame
+        Data frame with columns to be ordered.
+    column_order : list of str
+        Ordering of column names to enforce. Columns not specified are shifted
+        to the end of the order but retain their order amongst others not
+        specified. If a specified column is not in the DataFrame it is ignored.
+
+    Returns
+    -------
+    output_df : pandas.DataFrame
+        DataFrame the same as the input but with columns reordered.
+    """
+    # Use only columns that are in the input dataframe's columns.
+    pruned_order = []
+    for col in column_order:
+        if col in input_df.columns:
+            pruned_order.append(col)
+    # Get the full list of columns in the data frame with our ordered columns
+    # first.
+    pruned_order.extend(
+        list(set(input_df.columns).difference(set(pruned_order))))
+    return input_df[pruned_order]
+
+
+def enforce_df_int_typing(input_df: pd.DataFrame,
+                          int_columns: List[str]) -> pd.DataFrame:
+    """Enforce integer typing for columns that may have lost int typing when
+    combined into the final DataFrame.
+
+    Parameters
+    ----------
+    input_df : pandas.DataFrame
+        DataFrame with typing to enforce.
+    int_columns : list of str
+        Columns to enforce int typing and fill any NaN/None values with the
+        value set in INT_NULL in this file. Requested columns not in the
+        dataframe are ignored.
+
+    Returns
+    -------
+    output_df : pandas.DataFrame
+        DataFrame specific columns hard typed to Int64 to allow NA values
+        without resorting to float type.
+    """
+    for col in int_columns:
+        if col in input_df.columns:
+            input_df[col] = \
+                input_df[col].fillna(INT_NULL).astype(int)
+    return input_df

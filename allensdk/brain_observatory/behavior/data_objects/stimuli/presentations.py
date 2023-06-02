@@ -38,6 +38,10 @@ from allensdk.core import (
 )
 from allensdk.internal.brain_observatory.mouse import Mouse
 from pynwb import NWBFile
+from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
+    enforce_df_int_typing
+)
 
 
 class Presentations(
@@ -71,13 +75,26 @@ class Presentations(
         if column_list is not None:
             presentations = presentations[column_list]
         if sort_columns:
-            presentations = presentations[sorted(presentations.columns)]
+            presentations = enforce_df_column_order(
+                presentations,
+                ['stimulus_block', 'stimulus_block_name', 'image_index',
+                 'image_name', 'movie_frame_index', 'duration',
+                 'start_time', 'end_time', 'start_frame', 'end_frame',
+                 'is_change', 'is_image_novel', 'omitted', 'repeat',
+                 'flashes_since_change', 'trials_id']
+            )
         presentations = presentations.reset_index(drop=True)
+        presentations = enforce_df_int_typing(
+            presentations,
+            ["flashes_since_change", "image_index", "movie_frame_index",
+             "repeat", "stimulus_index"]
+        )
         presentations.index = pd.Index(
             range(presentations.shape[0]),
             name="stimulus_presentations_id",
             dtype="int",
         )
+
         super().__init__(name="presentations", value=presentations)
 
     def to_nwb(
@@ -292,6 +309,8 @@ class Presentations(
             .sort_index()
             .set_index("timestamps", drop=True)
         )
+        stimulus_index_df["image_index"] = stimulus_index_df[
+            "image_index"].astype("int")
         stim_pres_df = raw_stim_pres_df.merge(
             stimulus_index_df,
             left_on="start_time",
@@ -563,41 +582,7 @@ class Presentations(
         ------
         RuntimeError if there are any gaps in stimulus blocks > 1
         """
-        spontaneous_stimulus_blocks = get_spontaneous_block_indices(
-            stimulus_blocks=(
-                stimulus_presentations_table["stimulus_block"].values
-            )
-        )
         res = []
-
-        for spontaneous_block in spontaneous_stimulus_blocks:
-            prev_stop_time = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block - 1
-            ]["stop_time"].max()
-            prev_end_frame = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block - 1
-            ]["end_frame"].max()
-            next_start_time = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block + 1
-            ]["start_time"].min()
-            next_start_frame = stimulus_presentations_table[
-                stimulus_presentations_table["stimulus_block"]
-                == spontaneous_block + 1
-            ]["start_frame"].min()
-            res.append(
-                {
-                    "duration": next_start_time - prev_stop_time,
-                    "start_time": prev_stop_time,
-                    "stop_time": next_start_time,
-                    "start_frame": prev_end_frame,
-                    "end_frame": next_start_frame,
-                    "stimulus_block": spontaneous_block,
-                    "stimulus_name": "spontaneous",
-                }
-            )
         # Check for 5 minute gray screen stimulus block at the start of the
         # movie. We give some leeway around 5 minutes at 285 seconds to account
         # for some sessions which have start times slightly less than 300
@@ -627,6 +612,41 @@ class Presentations(
             # Increment the stimulus blocks by 1 to to account for the
             # new stimulus at the start of the file.
             stimulus_presentations_table["stimulus_block"] += 1
+
+        spontaneous_stimulus_blocks = get_spontaneous_block_indices(
+            stimulus_blocks=(
+                stimulus_presentations_table["stimulus_block"].values
+            )
+        )
+
+        for spontaneous_block in spontaneous_stimulus_blocks:
+            prev_stop_time = stimulus_presentations_table[
+                stimulus_presentations_table["stimulus_block"]
+                == spontaneous_block - 1
+            ]["stop_time"].max()
+            prev_end_frame = stimulus_presentations_table[
+                stimulus_presentations_table["stimulus_block"]
+                == spontaneous_block - 1
+            ]["end_frame"].max()
+            next_start_time = stimulus_presentations_table[
+                stimulus_presentations_table["stimulus_block"]
+                == spontaneous_block + 1
+            ]["start_time"].min()
+            next_start_frame = stimulus_presentations_table[
+                stimulus_presentations_table["stimulus_block"]
+                == spontaneous_block + 1
+            ]["start_frame"].min()
+            res.append(
+                {
+                    "duration": next_start_time - prev_stop_time,
+                    "start_time": prev_stop_time,
+                    "stop_time": next_start_time,
+                    "start_frame": prev_end_frame,
+                    "end_frame": next_start_frame,
+                    "stimulus_block": spontaneous_block,
+                    "stimulus_name": "spontaneous",
+                }
+            )
 
         res = pd.DataFrame(res)
 
