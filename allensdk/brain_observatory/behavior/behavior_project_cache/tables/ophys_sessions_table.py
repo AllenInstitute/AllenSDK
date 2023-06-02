@@ -12,9 +12,10 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.meta
     parse_num_cortical_structures,
     parse_num_depths,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.dataframe_utils import (  # noqa: E501
-        order_metadata_table_columns
+from allensdk.core.dataframe_utils import (
+        enforce_df_column_order
 )
+from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
 class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
@@ -42,7 +43,10 @@ class BehaviorOphysSessionsTable(ProjectTable, OphysMixin):
         self._index_column = index_column
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
-        self._df = order_metadata_table_columns(self._df)
+        self._df = enforce_df_column_order(
+            self._df,
+            VBO_METADATA_COLUMN_ORDER
+        )
 
     def postprocess_additional(self):
         # Add ophys specific information.

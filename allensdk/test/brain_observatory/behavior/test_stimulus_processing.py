@@ -476,20 +476,21 @@ def test_compute_trials_id_for_stimulus():
     })
     expected_trials_id = pd.Series(
         name='trials_id',
-        data=[0, 1, -1, -1, -1, -1, 0, 1],
-        index=stimulus_presentations.index)
+        data=[0, 1, -99, -99, -99, -99, 0, 1],
+        index=stimulus_presentations.index,
+        dtype='int')
     output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations,
                                                        trials)
-    assert np.array_equal(output_trials_ids.values,
-                          expected_trials_id.values)
+    pd.testing.assert_series_equal(output_trials_ids,
+                                   expected_trials_id)
 
     # Test with explicit active block.
     stimulus_presentations['active'] = np.array(
         [True, True, False, False, False, False, False, False])
     output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations,
                                                        trials)
-    assert np.array_equal(output_trials_ids.values,
-                          expected_trials_id.values)
+    pd.testing.assert_series_equal(output_trials_ids,
+                                   expected_trials_id)
 
 
 def test_produce_stimulus_block_names():

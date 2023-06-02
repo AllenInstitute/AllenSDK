@@ -18,6 +18,7 @@ from allensdk.brain_observatory.ophys.project_constants import (
     VBO_ACTIVE_MAP,
     VBO_PASSIVE_MAP,
 )
+from allensdk.core.dataframe_utils import INT_NULL
 
 
 def load_pickle(pstream):
@@ -645,6 +646,7 @@ def get_flashes_since_change(
         data=np.zeros(len(stimulus_presentations), dtype=float),
         index=stimulus_presentations.index,
         name="flashes_since_change",
+        dtype='int'
     )
     for idx, (pd_index, row) in enumerate(stimulus_presentations.iterrows()):
         omitted = row["omitted"]
@@ -694,10 +696,10 @@ def compute_trials_id_for_stimulus(
     trials_sorted = trials_table.sort_values("start_time")
     # Create a placeholder for the trials_id.
     trials_ids = pd.Series(
-        data=np.full(len(stim_pres_sorted), -1, dtype=int),
+        data=np.full(len(stim_pres_sorted), INT_NULL, dtype=int),
         index=stim_pres_sorted.index,
         name="trials_id",
-    )
+    ).astype('int')
     # Return an empty trials_id if the stimulus block is not available.
     if "stimulus_block" not in stim_pres_sorted.columns:
         return trials_ids
@@ -718,7 +720,7 @@ def compute_trials_id_for_stimulus(
     for idx, trial in trials_sorted.iterrows():
         stim_mask = (stim_pres_sorted.start_time > trial.start_time) & (
             stim_pres_sorted.start_time < trial.stop_time
-        )
+        ) & (~stim_pres_sorted.image_name.isna())
         trials_ids[stim_mask] = idx
         if not has_active:
             active_sorted[stim_mask] = True
@@ -819,16 +821,17 @@ def produce_stimulus_block_names(
     if project_code not in PROJECT_CODES:
         return stim_df
 
-    stim_df["stimulus_block_name"] = None
+    vbo_map = VBO_PASSIVE_MAP if "passive" in session_type else VBO_ACTIVE_MAP
 
     for stim_block in stim_df.stimulus_block.unique():
-        if "passive" in session_type:
-            stim_df.loc[
-                stim_df["stimulus_block"] == stim_block, "stimulus_block_name"
-            ] = VBO_PASSIVE_MAP[stim_block]
-        else:
-            stim_df.loc[
-                stim_df["stimulus_block"] == stim_block, "stimulus_block_name"
-            ] = VBO_ACTIVE_MAP[stim_block]
+        # If we have a single block then this is a training session and we
+        # add +1 to the block number to reuse the general VBO map and get the
+        # correct task.
+        block_id = stim_block
+        if len(stim_df.stimulus_block.unique()) == 1:
+            block_id += 1
+        stim_df.loc[
+            stim_df["stimulus_block"] == stim_block, "stimulus_block_name"
+        ] = vbo_map[block_id]
 
     return stim_df
