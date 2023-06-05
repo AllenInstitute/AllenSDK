@@ -12,6 +12,8 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli\
 from allensdk.brain_observatory.behavior.data_objects.stimuli.util import \
     convert_filepath_caseinsensitive, get_image_set_name
 
+import pathlib
+
 
 def load_pickle(pstream):
     return pickle.load(pstream, encoding="bytes")
@@ -52,6 +54,11 @@ def get_stimulus_presentations(data, stimulus_timestamps) -> pd.DataFrame:
     stimulus_table = stimulus_table[sorted(stimulus_table.columns)]
     return stimulus_table
 
+def get_stimulus_network_filepath(file_path:str):
+    network_path = pathlib.Path('//allen/programs/braintv/workgroups/nc-ophys/corbettb/dev')
+
+    stimulus_network_filepath = pathlib.Path(network_path, file_path[file_path.rindex('/')+1:]).as_posix()
+    return stimulus_network_filepath
 
 def get_images_dict(pkl) -> Dict:
     """
@@ -76,10 +83,14 @@ def get_images_dict(pkl) -> Dict:
     # Sometimes the source is a zipped pickle:
     pkl_stimuli = pkl["items"]["behavior"]["stimuli"]
     metadata = {'image_set': pkl_stimuli["images"]["image_path"]}
-
+    #print(pkl_stimuli['images']['image_path'])
     # Get image file name;
     # These are encoded case-insensitive in the pickle file :/
+   
     filename = convert_filepath_caseinsensitive(metadata['image_set'])
+
+    if not pathlib.Path(filename).exists():
+        filename = get_stimulus_network_filepath(metadata['image_set'])
 
     image_set = load_pickle(open(filename, 'rb'))
     images = []
@@ -89,8 +100,8 @@ def get_images_dict(pkl) -> Dict:
     for cat, cat_images in image_set.items():
         for img_name, img in cat_images.items():
             meta = dict(
-                image_category=cat.decode("utf-8"),
-                image_name=img_name.decode("utf-8"),
+                image_category=cat,
+                image_name=img_name,
                 orientation=np.NaN,
                 phase=np.NaN,
                 spatial_frequency=np.NaN,
@@ -201,6 +212,7 @@ def get_stimulus_templates(
     if 'images' in pkl_stimuli:
         images = get_images_dict(pkl)
         image_set_filepath = images['metadata']['image_set']
+
         image_set_name = get_image_set_name(image_set_path=image_set_filepath)
         image_set_name = convert_filepath_caseinsensitive(
             image_set_name)

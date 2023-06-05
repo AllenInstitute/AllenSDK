@@ -36,3 +36,5 @@ example_ecephys_project_cache/
 /.vs
 *.toml
 /allensdk/core/auth_config.py
+allensdk/core/auth_config.py
+allensdk/core/auth_config.py

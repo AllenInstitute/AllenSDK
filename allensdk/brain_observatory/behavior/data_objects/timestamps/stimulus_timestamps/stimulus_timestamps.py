@@ -21,6 +21,13 @@ from allensdk.core import NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.timestamps\
     .stimulus_timestamps.timestamps_processing import (
         get_behavior_stimulus_timestamps, get_ophys_stimulus_timestamps)
+
+from allensdk.brain_observatory import sync_dataset
+
+from allensdk.brain_observatory.behavior.data_objects.\
+    running_speed.multi_stim_running_processing import (
+        get_stim_order)
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.sync_stim_aligner import (
     get_stim_timestamps_from_stimulus_blocks)
@@ -46,7 +53,7 @@ class StimulusTimestamps(DataObject,
         self,
         timestamps: np.ndarray,
         monitor_delay: float,
-        stimulus_file: Optional[BehaviorStimulusFile] = None,
+        stimulus_file: Optional[Union[Optional[BehaviorStimulusFile], Optional[MappingStimulusFile]]] = None,
         sync_file: Optional[SyncFile] = None
     ):
         super().__init__(name="stimulus_timestamps",
@@ -158,7 +165,8 @@ class StimulusTimestamps(DataObject,
             sync_file: SyncFile,
             list_of_stims: List[Union[BehaviorStimulusFile,
                                       MappingStimulusFile,
-                                      ReplayStimulusFile]],
+                                      ReplayStimulusFile
+                                      ]],
             stims_of_interest: Optional[List[int]] = None,
             monitor_delay: float = 0.0,
             frame_time_lines: Union[str, List[str]] = 'vsync_stim',
@@ -233,6 +241,105 @@ class StimulusTimestamps(DataObject,
             [t for t in stimulus_times["timestamps"]] \
             if stims_of_interest is None else  \
             [stimulus_times["timestamps"][idx] for idx in stims_of_interest]
+
+        timestamps = np.concatenate(to_concatenate)
+
+        return cls(timestamps=timestamps,
+                   monitor_delay=monitor_delay,
+                   sync_file=sync_file,
+                   stimulus_file=behavior_stimulus_files[0])
+
+    @classmethod
+    def from_dual_stimulus_blocks(
+            cls,
+            sync_file: SyncFile,
+            list_of_stims,
+            stims_of_interest: Optional[List[int]] = None,
+            monitor_delay: float = 0.0,
+            frame_time_lines: Union[str, List[str]] = 'vsync_stim',
+            frame_time_line_direction: str = 'rising',
+            frame_count_tolerance: float = 0.0) -> "StimulusTimestamps":
+        """
+        Construct a StimulusTimestamps instance by registering
+        multiple stimulus blocks to one sync file and concatenating the results
+
+        Parameters
+        ----------
+        sync_file: SyncFile
+
+        list_of_stims: List[Union[BehaviorStimulusFile,
+                                  MappingStimulusFile]]
+            The list of StimulusFiles to be registered to the SyncFile
+            **in the order that they were presented to the mouse**
+
+        stims_of_interest: Optional[List[int]]
+            The indexes in list_of_stims of the timestamps to be
+            concatenated into this one StimulusTimestamps object.
+            If `None` (default), the timestamps from all stimulus files
+            are concatenated
+
+        monitor_delay: float
+            in seconds
+
+        frame_time_lines: Union[str, List[str]]
+            The line to be used to find raw frame times (usually 'vsync_stim').
+            If a list, the code will scan the list in order until a line
+            that is present in the sync file is found. That line will be used.
+
+        frame_time_line_direction: str
+            Either 'rising' or 'falling' indicating which edge
+            to use in finding the raw frame times
+
+        frame_count_tolerance: float
+            The tolerance to within two blocks of frame counts are considered
+            equal
+        """
+        with sync_dataset.Dataset(sync_file.filepath) as sync_data:
+            order = get_stim_order(sync_data, [list_of_stims[0], list_of_stims[1]])
+
+        if order[0] == 0:
+            final_list_of_stims = [list_of_stims[0],
+                                      list_of_stims[1],
+                                      ]
+        else:
+            final_list_of_stims = [list_of_stims[1],
+                                      list_of_stims[0],
+                                      ]
+
+        print('Stim list', final_list_of_stims)
+        behavior_stimulus_files = [list_of_stims[0]]
+        if len(behavior_stimulus_files) == 0:
+            raise ValueError(
+                'One of the values in `list_of_stims` must be a '
+                '`BehaviorStimulusFile`')
+        elif len(behavior_stimulus_files) > 1:
+            raise ValueError('You passed multiple `BehaviorStimulusFile` to '
+                             '`list_of_stims`. Please pass only 1.')
+
+        if stims_of_interest:
+            if len(stims_of_interest) > len(final_list_of_stims):
+                raise ValueError(
+                    f'stims_of_interest has length {len(stims_of_interest)} '
+                    f'but list_of_stims has length {len(list_of_stims)}. '
+                    f'len(stims_of_interest) should be <= len(list_of_stims)')
+            if any([x < 0 for x in stims_of_interest]):
+                raise ValueError('stims_of_interest should not be negative')
+            if any([x >= len(final_list_of_stims) for x in stims_of_interest]):
+                raise ValueError('stims_of_interest contains an index '
+                                 'greater than the number of elements in '
+                                 'list_of_stims')
+        stimulus_times = get_stim_timestamps_from_stimulus_blocks(
+                        stimulus_files=final_list_of_stims,
+                        sync_file=sync_file.filepath,
+                        raw_frame_time_lines=frame_time_lines,
+                        raw_frame_time_direction=frame_time_line_direction,
+                        frame_count_tolerance=frame_count_tolerance,
+                        order=order)
+
+        to_concatenate = \
+                [t for t in stimulus_times["timestamps"]] \
+                if stims_of_interest is None else  \
+                [stimulus_times["timestamps"][idx] for idx in stims_of_interest]
 
         timestamps = np.concatenate(to_concatenate)
 

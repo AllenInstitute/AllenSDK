@@ -75,7 +75,7 @@ class PostgresQueryMixin(object):
         return {}
 
 
-def db_connection_creator(credentials: Optional[DbCredentials] = None,
+def db_connection_creator(credentials: Optional[dict] = None,
                           fallback_credentials: Optional[dict] = None,
                           ) -> PostgresQueryMixin:
     """Create a db connection using credentials. If credentials are not
@@ -112,9 +112,9 @@ def db_connection_creator(credentials: Optional[DbCredentials] = None,
     """
     if credentials:
         db_conn = PostgresQueryMixin(
-            dbname=credentials.dbname, user=credentials.user,
-            host=credentials.host, port=credentials.port,
-            password=credentials.password)
+            dbname=credentials['dbname'], user=credentials['user'],
+            host=credentials['host'], port=credentials['port'],
+            password=credentials['password'])
     elif fallback_credentials:
         db_conn = (credential_injector(fallback_credentials)
                    (PostgresQueryMixin)())

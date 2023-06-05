@@ -431,6 +431,10 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed,
 def create_stimulus_presentation_time_interval(
         name: str, description: str,
         columns_to_add: Iterable) -> pynwb.epoch.TimeIntervals:
+    
+    if '/' in name:
+        name = name[name.rindex('/')+1:]
+
     column_descriptions = {
         "stimulus_name": "Name of stimulus",
         "stimulus_block": ("Index of contiguous presentations of "

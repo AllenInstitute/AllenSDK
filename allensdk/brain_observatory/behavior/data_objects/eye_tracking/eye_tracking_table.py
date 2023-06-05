@@ -316,6 +316,8 @@ class EyeTrackingTable(DataObject, DataFileReadableInterface,
                 f'Number of eye tracking timestamps: {len(times.value)}. '
                 f'Number of eye tracking frames: {len(frames)}. '
                 f'We expect these to be equal')
+            
+
         return frames, times
 
 

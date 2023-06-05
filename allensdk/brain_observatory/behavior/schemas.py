@@ -273,7 +273,11 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Total number of stimuli frames',
         required=True,
     )
-
+    no_reward = fields.List(
+        fields.Float,
+        doc='No reward lick disable interval',
+        required=False
+    )
 
 class EyeTrackingRigGeometry(RaisingSchema):
     """Eye tracking rig geometry"""

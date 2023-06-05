@@ -35,7 +35,7 @@ class Licks(DataObject, StimulusFileReadableInterface, NwbReadableInterface,
     def from_stimulus_file(
             cls,
             stimulus_file: BehaviorStimulusFile,
-            stimulus_timestamps: Union[StimulusTimestamps, np.ndarray]
+            stimulus_timestamps: Union[StimulusTimestamps, np.ndarray],
             ) -> "Licks":
         """Get lick data from pkl file.
         This function assumes that the first sensor in the list of

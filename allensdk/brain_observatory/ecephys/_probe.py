@@ -143,9 +143,11 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         units = Units.from_json(probe=probe)
 
         if probe['lfp'] is not None:
+            print('LFP is not None!')
             lfp = LFP.from_json(
                 probe_meta=probe
             )
+
             csd = CurrentSourceDensity.from_json(
                 probe_meta=probe
             )
@@ -215,7 +217,6 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         probe `NWBFile` instance if LFP data exists else None)
         """
         nwbfile = self._add_probe_to_nwb(nwbfile=nwbfile)
-
         if self._lfp is not None:
             probe_nwbfile = self.add_lfp_to_nwb(
                 session_id=nwbfile.session_id,
@@ -359,6 +360,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             path = self._probe_nwb_path()
         else:
             path = self._probe_nwb_path
+
+
         with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
             nwbfile = f.read()
             probe = nwbfile.electrode_groups[self._name]

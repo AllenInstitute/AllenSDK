@@ -145,6 +145,18 @@ class BehaviorStimulusFile(_StimulusFile):
         return len(self.data['items']['behavior']['intervalsms']) + 1
 
     @property
+    def start_time(self) -> datetime.datetime:
+        """ Gets the start time from the pkl session"""
+        start_time = self._data['start_time']
+        if not isinstance(start_time, datetime.datetime):
+            if isinstance(start_time, float):
+                start_time = datetime.datetime.fromtimestamp(start_time)
+            else:
+                raise TypeError('Start time of behavior stimulus is not in right format (datetime or float)')
+
+        return start_time
+
+    @property
     def date_of_acquisition(self) -> datetime.datetime:
         """
         Return the date_of_acquisition as a datetime.datetime.
@@ -258,6 +270,18 @@ class MappingStimulusFile(_StimulusFile):
     @classmethod
     def file_path_key(cls) -> str:
         return "mapping_stimulus_file"
+
+    @property
+    def start_time(self) -> datetime.datetime:
+        """ Gets the start time from the pkl session"""
+        start_time = self._data['start_time']
+        if not isinstance(start_time, datetime.datetime):
+            if isinstance(start_time, float):
+                start_time = datetime.datetime.fromtimestamp(start_time)
+            else:
+                raise TypeError('Start time of mapping stimulus is not in right format (datetime or float)')
+
+        return start_time
 
 
 class StimulusFileReadableInterface(abc.ABC):

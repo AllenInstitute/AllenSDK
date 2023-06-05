@@ -9,16 +9,11 @@ from allensdk.brain_observatory.ecephys.write_nwb.schemas import \
     BaseNeuropixelsSchema
 
 
-class _VBNSessionDataSchema(BaseBehaviorSessionDataSchema,
+class _DynamicGatingSessionDataSchema(BaseBehaviorSessionDataSchema,
                             BaseNeuropixelsSchema):
     mapping_stimulus_file = argschema.fields.InputFile(
         required=True,
         description='path to mapping_stimulus_file'
-    )
-
-    replay_stimulus_file = argschema.fields.InputFile(
-        required=True,
-        description='path to replay_stimulus_file'
     )
 
     stim_table_file = argschema.fields.InputFile(
@@ -30,19 +25,19 @@ class _VBNSessionDataSchema(BaseBehaviorSessionDataSchema,
         description='path to eye tracking metadata'
     )
     eye_dlc_file = argschema.fields.InputFile(
-        required=True,
+        required=False,
         description='path to deeplabcut eye tracking h5 file'
     )
     side_dlc_file = argschema.fields.InputFile(
-        required=True,
+        required=False,
         description='path to deeplabcut side tracking h5 file'
     )
     face_dlc_file = argschema.fields.InputFile(
-        required=True,
+        required=False,
         description='path to deeplabcut face tracking h5 file'
     )
     eye_tracking_filepath = argschema.fields.InputFile(
-        required=True,
+        required=False,
         description="h5 filepath containing eye tracking ellipses"
     )
     sync_file = argschema.fields.InputFile(
@@ -54,13 +49,17 @@ class _VBNSessionDataSchema(BaseBehaviorSessionDataSchema,
         description='ecephys session id'
     )
 
-class VBNInputSchema(ArgSchema):
+    death_on = argschema.fields.String(
+        required=False,
+        description='death on date')
+
+class DynamicGatingInputSchema(ArgSchema):
     """Input schema for visual behavior neuropixels"""
     log_level = LogLevel(
         default='INFO',
         description='Logging level of the module')
     session_data = argschema.fields.Nested(
-        _VBNSessionDataSchema,
+        _DynamicGatingSessionDataSchema,
         required=True,
         description='Data pertaining to a behavior session')
     skip_probes = argschema.fields.List(
@@ -75,7 +74,7 @@ class VBNInputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
-    input_parameters = argschema.fields.Nested(VBNInputSchema)
+    input_parameters = argschema.fields.Nested(DynamicGatingInputSchema)
     output_path = argschema.fields.OutputFile(
         required=True,
         description='write outputs to here')

@@ -14,6 +14,8 @@ from .probe_synchronizer import ProbeSynchronizer
 def align_timestamps(args):
     sync_dataset = BarcodeSyncDataset.factory(args["sync_h5_path"])
     sync_times, sync_codes = sync_dataset.extract_barcodes()
+    print('Sync times', sync_times)
+    print('Sync codes', sync_codes)
 
     probe_output_info = []
     for probe in args["probes"]:

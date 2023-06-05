@@ -13,12 +13,12 @@ CREDENTIAL_KEYS = [
 ]
 
 # For PostgresQueryMixin
-LIMS_DB_CREDENTIAL_MAP = {
-    "dbname": "LIMS_DBNAME",
-    "user": "LIMS_USER",
-    "host": "LIMS_HOST",
-    "password": "LIMS_PASSWORD",
-    "port": "LIMS_PORT"
+LIMS_DB_CREDENTIAL_MAP = {  
+    "dbname": "lims2",
+    "user": "limsreader",
+    "host": "limsdb2",
+    "password": "limsro",
+    "port": 5432
 }
 
 # For PostgresQueryMixin

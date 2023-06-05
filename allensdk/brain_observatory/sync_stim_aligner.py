@@ -306,7 +306,8 @@ def get_stim_timestamps_from_stimulus_blocks(
         sync_file: Union[str, pathlib.Path],
         raw_frame_time_lines: Union[str, List[str]],
         raw_frame_time_direction: str,
-        frame_count_tolerance: float) -> Dict[str, Any]:
+        frame_count_tolerance: float,
+        order:list=None) -> Dict[str, Any]:
     """
     Find the timestamps associated a set of stimulus blocks
     that have to be aligned with a single sync file
@@ -382,9 +383,15 @@ def get_stim_timestamps_from_stimulus_blocks(
                             stimulus_frame_counts=frame_count_list,
                             tolerance=frame_count_tolerance)
 
+        if order is not None and order[0] == 1:
+            start_frames = [start_frame + stimulus_files[0].num_frames for start_frame in start_frames]
+            print('Added offset', start_frames)
+
         for f0, nf in zip(start_frames, frame_count_list):
             this_array = raw_frame_times[f0:f0+nf]
             list_of_timestamps.append(this_array)
 
+    print('Frames', start_frames)
+    print('List of timestamps', list_of_timestamps)
     return {"timestamps": list_of_timestamps,
             "start_frames": start_frames}

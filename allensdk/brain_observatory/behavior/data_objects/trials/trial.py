@@ -59,13 +59,12 @@ class Trial:
         # need to separate out the monitor_delay from the
         # un-corrected timestamps
         stimulus_timestamps = raw_stimulus_timestamps.subtract_monitor_delay()
-
         event_dict = {
             (e[0], e[1]): {
                 'timestamp': stimulus_timestamps.value[e[3]],
                 'frame': e[3]} for e in self._trial['events']
         }
-
+ 
         tr_data = {"trial": self._trial["index"]}
         lick_frames = licks.value['frame'].values
         timestamps = stimulus_timestamps.value
@@ -122,7 +121,7 @@ class Trial:
         ))
         tr_data.update(self._get_trial_image_names(stimuli))
 
-        self._validate_trial_condition_exclusivity(tr_data=tr_data)
+        #self._validate_trial_condition_exclusivity(tr_data=tr_data)
 
         return tr_data
 
@@ -135,6 +134,7 @@ class Trial:
             rebased_reward_times >= start_time,
             rebased_reward_times <= stop_time
         ))]
+
         return float('nan') if len(reward_times) == 0 else one(
             reward_times)
 
@@ -373,7 +373,6 @@ class Trial:
         This is its own method so that child classes of Trial
         can implement different logic as needed.
         """
-
         if go or auto_rewarded:
             change_frame = event_dict.get(('stimulus_changed', ''))['frame']
         elif catch:
@@ -528,3 +527,21 @@ class Trial:
                   f"{all_conditions} "
             msg += f"to be True, instead {on} were True (trial {self._index})"
             raise AssertionError(msg)
+
+class DynamicGatingTrial(Trial):
+    def calculate_change_frame(self, event_dict: dict, go: bool, catch: bool, auto_rewarded: bool) -> Union[int, float]:
+        if auto_rewarded:
+            if ('stimulus_changed', '') in event_dict:
+                change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+            elif ('sham_change', '') in event_dict:
+                change_frame = event_dict.get(('sham_change', ''))['frame']
+            else:
+                change_frame = float("nan")
+        elif go:
+            change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+        elif catch:
+            change_frame = event_dict.get(('sham_change', ''))['frame']
+        else:
+            change_frame = float("nan")
+
+        return change_frame

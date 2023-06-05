@@ -12,6 +12,10 @@ from pynwb.image import GrayscaleImage
 
 from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
+
+from allensdk.brain_observatory.ecephys.dynamic_gating_ecephys_session import \
+    DynamicGatingEcephysSession
+
 from allensdk.brain_observatory.behavior.image_api import ImageApi, Image
 from allensdk.brain_observatory.session_api_utils import sessions_are_equal
 from allensdk.core import DataObject, JsonReadableInterface, \
@@ -159,6 +163,39 @@ class NWBWriter:
                 session=lims_session, **kwargs)
             self._compare_sessions(nwbfile=nwbfile, lims_session=lims_session,
                                    **kwargs)
+            os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
+        except Exception as e:
+            if os.path.isfile(self.nwb_filepath_inprogress):
+                os.rename(self.nwb_filepath_inprogress,
+                          self._nwb_filepath_error)
+            raise e
+
+    def write_nwb_dynamic_gating_session(self, **kwargs):
+        """Tries to write nwb to disk. If it fails, the filepath has ".error"
+        appended
+
+        Parameters
+        ----------
+        kwargs: kwargs sent to `from_nwb`, `to_nwb`
+
+        """
+        from_lims_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_lims).parameters}
+        print(self._session_data['behavior_session_id'])
+
+        """
+        lims_session = self._serializer.from_lims(
+            behavior_session_id=self._session_data['behavior_session_id'],
+            **from_lims_kwargs)
+        """
+        session = self._serializer.from_json(self._session_data)
+        print(session.behavior_session.task_parameters)
+        try:
+            nwbfile = self._write_nwb(
+                session=session, **kwargs)
+            #self._compare_sessions(nwbfile=nwbfile, lims_session=session,
+                                   #**kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:
             if os.path.isfile(self.nwb_filepath_inprogress):

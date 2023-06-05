@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
+from xmlrpc.client import DateTime
+from dateutil import parser
 
 import pytz
 from pynwb import NWBFile
@@ -99,10 +101,14 @@ class SubjectMetadata(DataObject, LimsReadableInterface, NwbReadableInterface,
         full_genotype = FullGenotype.from_json(dict_repr=dict_repr)
         driver_line = DriverLine.from_json(dict_repr=dict_repr)
         mouse_id = MouseId.from_json(dict_repr=dict_repr)
+
+        """
         death_on = cls._get_death_date_from_lims(
             mouse_id=mouse_id.value,
             lims_db=db_connection_creator(
                 fallback_credentials=LIMS_DB_CREDENTIAL_MAP))
+        """
+        death_on = parser.parse(dict_repr['death_on'])
 
         return cls(
             sex=sex,

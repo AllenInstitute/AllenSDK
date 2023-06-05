@@ -87,8 +87,7 @@ class LFP(DataObject, JsonReadableInterface):
                                              amplitude_scale_factor)
 
         sampling_rate = (
-                probe_meta['lfp_sampling_rate'] /
-                probe_meta['temporal_subsampling_factor'])
+                probe_meta['lfp_sampling_rate'])
 
         return cls(
             data=lfp_data,

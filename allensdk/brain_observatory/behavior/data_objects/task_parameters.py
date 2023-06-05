@@ -44,7 +44,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
                  stimulus: str,
                  stimulus_distribution: StimulusDistribution,
                  task_type: TaskType,
-                 n_stimulus_frames: int):
+                 n_stimulus_frames: int,
+                 no_reward:list=None):
         super().__init__(name='task_parameters', value=None,
                          is_value_self=True)
         self._blank_duration_sec = blank_duration_sec
@@ -59,6 +60,11 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
             stimulus_distribution)
         self._task = TaskType(task_type)
         self._n_stimulus_frames = n_stimulus_frames
+        self._no_reward = no_reward
+
+    @property
+    def no_reward(self) -> list:
+        return self._no_reward
 
     @property
     def blank_duration_sec(self) -> List[float]:
@@ -112,13 +118,14 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         task_parameters_clean = BehaviorTaskParametersSchema().dump(
             task_parameters
         )
-
+        print('Clean', task_parameters_clean)
         new_task_parameters_dict = {}
         for key, val in task_parameters_clean.items():
             if isinstance(val, list):
                 new_task_parameters_dict[key] = np.array(val)
             else:
                 new_task_parameters_dict[key] = val
+
         nwb_task_parameters = nwb_extension(
             name='task_parameters', **new_task_parameters_dict)
         nwbfile.add_lab_meta_data(nwb_task_parameters)
@@ -156,6 +163,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         task = cls._parse_task(stimulus_file=stimulus_file)
         n_stimulus_frames = cls._calculuate_n_stimulus_frames(
             stimulus_file=stimulus_file)
+        no_reward = behavior['params']['lick_disable_intervals'][0]
         return TaskParameters(
             blank_duration_sec=blank_duration_sec,
             stimulus_duration_sec=stim_duration,
@@ -167,7 +175,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
             stimulus=stimulus,
             stimulus_distribution=stimulus_distribution,
             task_type=task,
-            n_stimulus_frames=n_stimulus_frames
+            n_stimulus_frames=n_stimulus_frames,
+            no_reward=no_reward
         )
 
     @staticmethod

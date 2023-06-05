@@ -310,6 +310,7 @@ def get_probe_time_offset(
         master_endpoints, probe_endpoints
     )
 
+    print('Time offset', time_offset)
     if time_offset is not None:
         probe_rate = local_probe_rate * rate_scale
         acq_start_time = acq_start_index / probe_rate

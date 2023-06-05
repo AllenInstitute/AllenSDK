@@ -42,6 +42,11 @@ groups:
   - name: session_type
     dtype: text
     doc: Stage of behavioral task
+  - name: no_reward
+    dtype: text
+    shape:
+    - 2
+    doc: No reward lick disable interval
 - neurodata_type_def: BehaviorSubject
   neurodata_type_inc: Subject
   doc: Metadata for an AIBS behavior or behavior + ophys subject

@@ -22,7 +22,9 @@ from allensdk.core import \
     NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
-from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
+from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial, DynamicGatingTrial
+
+from functools import partial
 
 
 class Trials(DataObject, StimulusFileReadableInterface,
@@ -187,6 +189,10 @@ class Trials(DataObject, StimulusFileReadableInterface,
 
         # Order/Filter columns
         trials = trials[cls.columns_to_output()]
+
+        trials["no_reward_epoch"] = trials.apply(partial(cls.infer_no_reward_epoch, raw=bsf), axis=1)
+        trials["omitted_reward"] = trials.apply(partial(cls.infer_omitted_reward, raw=bsf), axis=1)
+        trials["is_sham_change"] = trials.apply(cls.infer_is_sham_change, axis=1)
 
         return cls(
             trials=trials,
@@ -507,3 +513,100 @@ class Trials(DataObject, StimulusFileReadableInterface,
             engaged_trial_reward_rate_threshold=(
                 engaged_trial_reward_rate_threshold))
         return engaged_trials.sum()
+
+class DynamicGatingTrials(Trials):
+    @classmethod
+    def get_associated_raw_trial_log(cls, row, raw: dict) -> dict:
+        if int(row.name) < len(raw["items"]["behavior"]["trial_log"]):
+            return raw["items"]["behavior"]["trial_log"][int(row.name)]
+
+    @classmethod
+    def infer_no_reward_epoch(cls, row, raw: dict):
+        """when licks arent enabled
+        """
+        if int(row.name) < len(raw["items"]["behavior"]["trial_log"]):
+            return not cls.get_associated_raw_trial_log(row, raw)["licks_enabled"]
+        else:
+            return False
+
+    @classmethod
+    def infer_omitted_reward(cls, row, raw: dict):
+        if int(row.name) < len(raw["items"]["behavior"]["trial_log"]):
+            raw_log = cls.get_associated_raw_trial_log(row, raw)
+            return len(raw_log["omitted_rewards"]) > 0 or \
+                raw_log.get("has_omitted_reward", False)
+        else:
+            return False
+
+    @classmethod
+    def infer_is_sham_change(cls, row):
+        return row.initial_image_name == row.change_image_name
+
+    @classmethod
+    def remove_missing_entries(cls, trial_log):
+        trial_log_remove_bad_entries = []
+
+        for trial in trial_log:
+            for event in trial['events']:
+                if 'hit' in event or 'false_alarm' in event or 'miss' in event or 'sham_change' in event or 'stimulus_changed' in event or 'abort' in event:
+                    trial_log_remove_bad_entries.append(trial)
+
+        return trial_log_remove_bad_entries
+
+    @classmethod
+    def dynamic_gating_trials_class(cls):
+        return DynamicGatingTrial
+
+    @classmethod
+    def trials_from_dynamic_gating_stimulus(
+        cls, stimulus_file: BehaviorStimulusFile,
+        stimulus_timestamps: StimulusTimestamps,
+        licks: Licks,
+        rewards: Rewards,
+        sync_file: Optional[SyncFile] = None
+        ) -> "DynamicGatingTrials":
+
+        bsf = stimulus_file.data
+
+        stimuli = bsf["items"]["behavior"]["stimuli"]
+        trial_log = bsf["items"]["behavior"]["trial_log"]
+
+        #trial_log_remove_bad_entries = cls.remove_missing_entries(trial_log)
+        #bsf['items']['behavior']['new_trial_log'] = trial_log_remove_bad_entries
+
+        trial_bounds = cls._get_trial_bounds(trial_log=trial_log)
+
+        all_trial_data = [None] * len(trial_log)
+
+        for idx, trial in enumerate(trial_log):
+            trial_start, trial_end = trial_bounds[idx]
+            t = cls.trial_class()(
+                      trial=trial,
+                      start=trial_start,
+                      end=trial_end,
+                      behavior_stimulus_file=stimulus_file,
+                      index=idx,
+                      stimulus_timestamps=stimulus_timestamps,
+                      licks=licks, rewards=rewards,
+                      stimuli=stimuli,
+                      sync_file=sync_file
+                      )
+            all_trial_data[idx] = t.data
+
+        trials = pd.DataFrame(all_trial_data).set_index('trial')
+        trials.index = trials.index.rename('trials_id')
+
+        # Order/Filter columns
+        trials = trials[cls.columns_to_output()]
+
+        trials["no_reward_epoch"] = trials.apply(partial(cls.infer_no_reward_epoch, raw=bsf), axis=1)
+        trials["omitted_reward"] = trials.apply(partial(cls.infer_omitted_reward, raw=bsf), axis=1)
+        trials["is_sham_change"] = trials.apply(cls.infer_is_sham_change, axis=1)
+
+        return cls(
+            trials=trials,
+            response_window_start=TaskParameters.from_stimulus_file(
+                stimulus_file=stimulus_file
+            ).response_window_sec[0]
+        )
+

@@ -39,7 +39,7 @@ class Mouse:
         List[BehaviorMetadata]
         """
         lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+            credentials=LIMS_DB_CREDENTIAL_MAP
         )
 
         query = f"""
@@ -66,7 +66,7 @@ class Mouse:
     ) -> "Mouse":
         """Instantiates `Mouse` from `behavior_session_id`"""
         lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+            credentials=LIMS_DB_CREDENTIAL_MAP,
         )
         mouse_id = MouseId.from_lims(
             behavior_session_id=behavior_session_id,
@@ -92,11 +92,11 @@ class Mouse:
             stimulus files
         """
         lims_db = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
+            credentials=LIMS_DB_CREDENTIAL_MAP
         )
 
         behavior_sessions = self.get_behavior_sessions()
-
+        """
         if up_to_behavior_session_id is not None:
             this_date_of_acquisition = [
                 x.date_of_acquisition for x in behavior_sessions
@@ -108,6 +108,7 @@ class Mouse:
             behavior_sessions = [
                 x for x in behavior_sessions
                 if x.behavior_session_id in prior_behavior_session_ids]
+        """
         images_shown = get_images_shown(
             behavior_session_ids=(
                 [x.behavior_session_id for x in behavior_sessions]),

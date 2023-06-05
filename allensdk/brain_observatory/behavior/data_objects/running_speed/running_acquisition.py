@@ -23,7 +23,7 @@ from allensdk.brain_observatory.behavior.data_objects.running_speed.running_proc
 
 from allensdk.brain_observatory.behavior.data_objects.\
     running_speed.multi_stim_running_processing import (
-        _get_multi_stim_running_df)
+        _get_multi_stim_running_df, _get_dual_stim_running_df)
 
 
 class RunningAcquisition(DataObject,
@@ -116,6 +116,31 @@ class RunningAcquisition(DataObject,
                 behavior_stimulus_file=behavior_stimulus_file,
                 mapping_stimulus_file=mapping_stimulus_file,
                 replay_stimulus_file=replay_stimulus_file,
+                use_lowpass_filter=False,
+                zscore_threshold=10.0)['running_acquisition']
+
+        return cls(
+                running_acquisition=df,
+                stimulus_file=None,
+                stimulus_timestamps=None)
+
+    @classmethod
+    def from_dual_stimulus_files(
+            cls,
+            behavior_stimulus_file: BehaviorStimulusFile,
+            mapping_stimulus_file: MappingStimulusFile,
+            sync_file: SyncFile) -> "RunningAcquisition":
+
+        """
+        sync_file is used for generating timestamps.
+
+        Stimulus blocks order determined in dual stim function in multi stim running module
+        """
+
+        df = _get_dual_stim_running_df(
+                sync_path=sync_file.filepath,
+                behavior_stimulus_file=behavior_stimulus_file,
+                mapping_stimulus_file=mapping_stimulus_file,
                 use_lowpass_filter=False,
                 zscore_threshold=10.0)['running_acquisition']
 

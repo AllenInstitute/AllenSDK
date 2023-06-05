@@ -42,6 +42,7 @@ def get_synchronized_frame_times(session_sync_file: Path,
                                  sync_line_label_keys: Tuple[str, ...],
                                  drop_frames: Optional[List[int]] = None,
                                  trim_after_spike: bool = True,
+                                 line_type='rising'
                                  ) -> pd.Series:
     """Get experimental frame times from an experiment session sync file.
 
@@ -77,7 +78,7 @@ def get_synchronized_frame_times(session_sync_file: Path,
     sync_dataset = Dataset(str(session_sync_file))
 
     times = sync_dataset.get_edges(
-        "rising", sync_line_label_keys, units="seconds"
+        line_type, sync_line_label_keys, units="seconds"
     )
 
     times = trim_discontiguous_times(times) if trim_after_spike else times

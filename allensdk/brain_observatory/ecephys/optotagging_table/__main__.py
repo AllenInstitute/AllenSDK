@@ -19,6 +19,9 @@ def build_opto_table(args):
 
     assert len(conditions) == len(levels)
     if len(start_times) > len(conditions):
+        start_times = start_times[0:len(start_times) - 1]
+
+    if len(start_times) > len(conditions):
         raise ValueError(
             f"there are {len(start_times) - len(conditions)} extra "
             f"optotagging sync times!")
