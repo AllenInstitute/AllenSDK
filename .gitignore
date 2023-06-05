@@ -33,3 +33,6 @@ debug.log
 example_ecephys_project_cache/
 .DS_Store
 /venv/
+/.vs
+*.toml
+/allensdk/core/auth_config.py
