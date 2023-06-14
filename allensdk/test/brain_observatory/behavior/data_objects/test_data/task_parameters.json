@@ -9,5 +9,6 @@
 	"stimulus": "images",
 	"stimulus_distribution": "geometric",
 	"stimulus_duration_sec": 0.25,
-	"task_type": "change detection"
+	"task_type": "change detection",
+        "stimulus_name": "Natural_Images_Lum_Matched_set_training_2017" 
 }
