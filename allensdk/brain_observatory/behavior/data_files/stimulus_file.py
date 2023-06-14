@@ -203,6 +203,38 @@ class BehaviorStimulusFile(_StimulusFile):
         """
         return self._retrieve_from_params("stage")
 
+    @property
+    def stimulus_name(self) -> str:
+        """
+        Get the image stimulus name by parsing the file path of the image set.
+
+        If no image set, check for gratings and return "behavior" if not found.
+
+        Parameters
+        ----------
+        stimulus_file : BehaviorStimulusFile
+            Stimulus pickle file to parse.
+
+        Returns
+        -------
+        stimulus_name : str
+            Name of the image stimulus from the image file path set shown to
+            the mouse.
+        """
+        try:
+            stimulus_name = Path(
+                self.stimuli["images"]["image_set"]
+            ).stem.split(".")[0]
+        except KeyError:
+            # if we can't find the images key in the stimuli, check for the
+            # name ``grating`` as the stimulus. If not add generic
+            # ``behavior``.
+            if "grating" in self.stimuli.keys():
+                stimulus_name = "grating"
+            else:
+                stimulus_name = "behavior"
+        return stimulus_name
+
     def _retrieve_from_params(self, key_name: str):
         """Retrieve data from either data['items']['behavior']['params'] or
         data['items']['behavior']['cl_params'].
