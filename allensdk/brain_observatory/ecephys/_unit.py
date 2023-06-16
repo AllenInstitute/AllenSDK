@@ -15,6 +15,7 @@ class Unit(DataObject):
             id: int,
             peak_channel_id: int,
             local_index: int,
+            location: str,
             cluster_id: int,
             quality: str,
             firing_rate: float,
@@ -53,6 +54,7 @@ class Unit(DataObject):
         self._id = id
         self._peak_channel_id = peak_channel_id
         self._local_index = local_index
+        self._location = location
         self._cluster_id = cluster_id
         self._quality = quality
         self._firing_rate = firing_rate

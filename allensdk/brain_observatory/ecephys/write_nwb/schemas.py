@@ -40,6 +40,7 @@ class Channel(RaisingSchema):
     probe_horizontal_position = Int(required=True)
     structure_id = Int(required=True, allow_none=True)
     structure_acronym = String(required=True)
+    isi_area = String(required=False)
     anterior_posterior_ccf_coordinate = Float(allow_none=True)
     dorsal_ventral_ccf_coordinate = Float(allow_none=True)
     left_right_ccf_coordinate = Float(allow_none=True)
