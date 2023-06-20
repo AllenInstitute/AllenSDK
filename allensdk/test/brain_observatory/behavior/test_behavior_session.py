@@ -20,7 +20,8 @@ def test_nwb_end_to_end_session(
     tmpdir = pathlib.Path(tmpdir)
     nwb_path = tmpdir / f'session_{session_id}.nwb'
     session = BehaviorSession.from_lims(
-            behavior_session_id=session_id)
+            behavior_session_id=session_id,
+            load_stimulus_movie=False)
     nwb_file = session.to_nwb()
     with NWBHDF5IO(nwb_path, 'w') as nwb_file_writer:
         nwb_file_writer.write(nwb_file)
@@ -87,6 +88,7 @@ def test_behavior_session_list_data_attributes_and_methods(monkeypatch):
         'running_speed',
         'stimulus_presentations',
         'stimulus_templates',
+        'stimulus_fingerprint_movie_template',
         'stimulus_timestamps',
         'task_parameters',
         'trials',
@@ -103,7 +105,10 @@ def test_behavior_session_equivalent_json_lims(session_data_fixture):
     json_session = BehaviorSession.from_json(session_data_fixture)
 
     behavior_session_id = session_data_fixture['behavior_session_id']
-    lims_session = BehaviorSession.from_lims(behavior_session_id)
+    lims_session = BehaviorSession.from_lims(
+        behavior_session_id,
+        load_stimulus_movie=False
+    )
 
     assert sessions_are_equal(json_session, lims_session, reraise=True)
 
@@ -115,5 +120,6 @@ class TestBehaviorSession(LimsTest):
         sess_id = 1154034257
 
         sess = BehaviorSession.from_lims(behavior_session_id=sess_id,
-                                         lims_db=self.dbconn)
+                                         lims_db=self.dbconn,
+                                         load_stimulus_movie=False)
         assert not sess.eye_tracking.empty
