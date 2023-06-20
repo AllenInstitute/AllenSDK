@@ -31,7 +31,9 @@ class Stimuli(
     NwbReadableInterface,
     NwbWritableInterface,
 ):
-    def __init__(self, presentations: Presentations, templates: Templates):
+    def __init__(self,
+                 presentations: Presentations,
+                 templates: Templates):
         super().__init__(name="stimuli", value=None, is_value_self=True)
         self._presentations = presentations
         self._templates = templates
@@ -70,6 +72,7 @@ class Stimuli(
         presentation_columns: Optional[List[str]] = None,
         presentation_fill_omitted_values: bool = True,
         project_code: Optional[ProjectCode] = None,
+        load_stimulus_movie: bool = False
     ) -> "Stimuli":
         """
 
@@ -93,6 +96,9 @@ class Stimuli(
             For released datasets, provide a project code to produce explicitly
             named stimulus_block column values in the column
             stimulus_block_name
+        load_stimulus_movie : bool
+            Whether to load the stimulus movie (e.g natrual_movie_one) as
+            part of loading stimuli. Default False.
 
         Returns
         -------
@@ -109,7 +115,9 @@ class Stimuli(
             trials=trials,
         )
         t = Templates.from_stimulus_file(
-            stimulus_file=stimulus_file, limit_to_images=limit_to_images
+            stimulus_file=stimulus_file,
+            limit_to_images=limit_to_images,
+            load_stimulus_movie=load_stimulus_movie
         )
         return Stimuli(presentations=p, templates=t)
 

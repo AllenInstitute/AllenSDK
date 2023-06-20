@@ -38,7 +38,8 @@ class TestFromBehaviorStimulusFile(LimsTest):
         cls.expected_presentations = StimulusPresentations(
             presentations=presentations
         )
-        cls.expected_templates = Templates(templates=templates)
+        cls.expected_templates = Templates(
+            templates={templates.image_set_name: templates})
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
@@ -137,7 +138,7 @@ class TestNWB:
         presentations = presentations.drop("is_change", axis=1)
         presentations = presentations.drop("flashes_since_change", axis=1)
         p = StimulusPresentations(presentations=presentations)
-        t = Templates(templates=templates)
+        t = Templates(templates={templates.image_set_name: templates})
         cls.stimuli = Stimuli(presentations=p, templates=t)
 
     def setup_method(self, method):
