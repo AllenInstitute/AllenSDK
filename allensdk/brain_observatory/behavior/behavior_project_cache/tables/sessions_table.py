@@ -14,7 +14,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_ses
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import (  # noqa: E501
     ProjectTable,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.metadata_parsers import (  # noqa: E501
+from allensdk.brain_observatory.behavior.utils.metadata_parsers import (  # noqa: E501
     parse_behavior_context,
     parse_stimulus_set,
 )
