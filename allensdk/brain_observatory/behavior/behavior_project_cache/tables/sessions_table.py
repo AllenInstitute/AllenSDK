@@ -24,8 +24,8 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prio
     get_prior_exposures_to_session_type,
     add_experience_level_ophys,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.dataframe_utils import (  # noqa: E501
-        order_metadata_table_columns
+from allensdk.core.dataframe_utils import (
+        enforce_df_column_order
 )
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -45,6 +45,7 @@ from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.util.multi_session_utils import (
     multiprocessing_helper,
 )
+from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
 class SessionsTable(ProjectTable, OphysMixin):
@@ -80,7 +81,10 @@ class SessionsTable(ProjectTable, OphysMixin):
         self._include_trial_metrics = include_trial_metrics
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
-        self._df = order_metadata_table_columns(self._df)
+        self._df = enforce_df_column_order(
+            self._df,
+            VBO_METADATA_COLUMN_ORDER
+        )
 
     def postprocess_additional(self):
         # Add subject metadata
