@@ -273,6 +273,10 @@ class BehaviorTaskParametersSchema(RaisingSchema):
         doc='Total number of stimuli frames',
         required=True,
     )
+    stimulus_name = fields.String(
+        doc="Name of the stimulus file set presented",
+        required=False
+    )
 
 
 class EyeTrackingRigGeometry(RaisingSchema):

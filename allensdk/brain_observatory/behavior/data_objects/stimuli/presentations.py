@@ -79,9 +79,9 @@ class Presentations(
                 presentations,
                 ['stimulus_block', 'stimulus_block_name', 'image_index',
                  'image_name', 'movie_frame_index', 'duration',
-                 'start_time', 'end_time', 'start_frame', 'end_frame',
-                 'is_change', 'is_image_novel', 'omitted', 'repeat',
-                 'flashes_since_change', 'trials_id']
+                 'start_time', 'end_time', 'stop_time', 'start_frame',
+                 'end_frame', 'is_change', 'is_image_novel', 'omitted',
+                 'repeat', 'flashes_since_change', 'trials_id']
             )
         presentations = presentations.reset_index(drop=True)
         presentations = enforce_df_int_typing(
@@ -344,19 +344,7 @@ class Presentations(
             )
 
         stim_pres_df["stimulus_block"] = 0
-        # Match the Ecephys VBN stimulus name convention.
-        try:
-            stim_pres_df["stimulus_name"] = Path(
-                stimulus_file.stimuli["images"]["image_set"]
-            ).stem.split(".")[0]
-        except KeyError:
-            # if we can't find the images key in the stimuli, check for the
-            # name ``grating`` as the stimulus. If not add generic
-            # ``behavior``.
-            if "grating" in stimulus_file.stimuli.keys():
-                stim_pres_df["stimulus_name"] = "grating"
-            else:
-                stim_pres_df["stimulus_name"] = "behavior"
+        stim_pres_df["stimulus_name"] = stimulus_file.stimulus_name
 
         stim_pres_df = fix_omitted_end_frame(stim_pres_df)
 

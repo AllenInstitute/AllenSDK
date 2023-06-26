@@ -2,7 +2,7 @@ import warnings
 from pathlib import Path
 
 from allensdk.brain_observatory.behavior.data_files import SyncFile
-from allensdk.brain_observatory.behavior.data_objects.metadata\
+from allensdk.brain_observatory.behavior.data_objects.metadata \
     .behavior_metadata.equipment import \
     Equipment
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
