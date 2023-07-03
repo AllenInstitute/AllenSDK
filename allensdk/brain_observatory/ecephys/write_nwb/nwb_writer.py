@@ -101,14 +101,14 @@ class DynamicGatingEcephysNwbWriter(NWBWriter):
             nwb_file_writer.write(session_nwbfile)
         logging.info(f'Wrote session NWB file to '
                      f'{self.nwb_filepath_inprogress}')
-
+        session_id = session.metadata['ecephys_session_id']
         for probe_name, probe_nwbfile in probe_nwbfile_map.items():
             probe_id = [p.id for p in session.get_probes_obj()
                         if p.name == probe_name][0]
 
             if probe_nwbfile is not None:
                 probe_nwb_path = Path(self._nwb_filepath).parent / \
-                    f'lfp_{probe_name}.nwb'
+                    f'{session_id}_lfp_{probe_name}.nwb'
                 logging.info(f'Writing probe NWB file to '
                              f'{probe_nwb_path}')
                 with NWBHDF5IO(probe_nwb_path, 'w') as nwb_file_writer:

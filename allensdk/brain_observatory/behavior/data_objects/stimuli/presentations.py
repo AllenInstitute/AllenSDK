@@ -345,6 +345,8 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         -------
         Dict mapping image name to is_novel
         """
+
+        """
         mouse = Mouse.from_behavior_session_id(
             behavior_session_id=behavior_session_id)
         prior_images_shown = mouse.get_images_shown(
@@ -355,6 +357,21 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         is_novel = {
             f'{image_name}': image_name not in prior_images_shown
             for image_name in image_names}
+        """
+
+        prior_images_shown = ['im047', 'im115']
+        is_novel = {}
+
+        for image_name in image_names:
+            if pd.isna(image_name) or image_name == 'omitted':
+                is_novel[image_name] = False
+            else:
+                image_name_main = image_name[0:image_name.index('_')]
+                if image_name_main in prior_images_shown:
+                    is_novel[image_name] = False
+                else:
+                    is_novel[image_name] = True
+
         return is_novel
 
     @classmethod
