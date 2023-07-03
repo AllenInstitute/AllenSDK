@@ -19,6 +19,9 @@ groups:
   - name: probe_id
     dtype: text
     doc: Unique ID of the neuropixels probe
+  - name: id
+    dtype: text
+    doc: unique id of electrode
   - name: lfp_sampling_rate
     dtype: float64
     doc: The sampling rate at which data were acquired on this electrode group's channels
