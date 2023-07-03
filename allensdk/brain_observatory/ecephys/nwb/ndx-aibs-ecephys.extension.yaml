@@ -7,7 +7,7 @@ groups:
     dtype: float64
     doc: The sampling rate for the device
   - name: probe_id
-    dtype: str
+    dtype: text
     doc: Unique ID of the neuropixels probe
 - neurodata_type_def: EcephysElectrodeGroup
   neurodata_type_inc: ElectrodeGroup
@@ -17,7 +17,7 @@ groups:
     dtype: bool
     doc: Indicates availability of LFP data
   - name: probe_id
-    dtype: str
+    dtype: text
     doc: Unique ID of the neuropixels probe
   - name: lfp_sampling_rate
     dtype: float64
