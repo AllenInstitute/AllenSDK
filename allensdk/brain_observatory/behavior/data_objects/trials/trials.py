@@ -570,6 +570,8 @@ class DynamicGatingTrials(Trials):
 
         stimuli = bsf["items"]["behavior"]["stimuli"]
         trial_log = bsf["items"]["behavior"]["trial_log"]
+        for ind, _ in enumerate(trial_log):
+            trial_log[ind]['index'] = ind
 
         #trial_log_remove_bad_entries = cls.remove_missing_entries(trial_log)
         #bsf['items']['behavior']['new_trial_log'] = trial_log_remove_bad_entries
@@ -592,7 +594,7 @@ class DynamicGatingTrials(Trials):
                       sync_file=sync_file
                       )
             all_trial_data[idx] = t.data
-
+        
         trials = pd.DataFrame(all_trial_data).set_index('trial')
         trials.index = trials.index.rename('trials_id')
 
