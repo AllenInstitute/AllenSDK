@@ -9,6 +9,7 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
     BehaviorEcephysSession,
 )
+from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
@@ -125,18 +126,24 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             return f
 
         # Backwards compatibility check for VBN data that doesn't contain
-        # the LFP, probes dataset.
-        if not probes_meta.empty and "file_id" in probes_meta.columns:
-            probe_data_path_map = {
-                p.name: make_lazy_load_filepath_function(
-                    file_id=str(int(getattr(p, self.cache.file_id_column)))
+        # the LFP dataset.
+        has_probe_file = self.cache.file_id_column in probes_meta.columns
+
+        if not probes_meta.empty and has_probe_file:
+            probe_meta = {
+                p.name: ProbeWithLFPMeta(
+                    lfp_csd_filepath=make_lazy_load_filepath_function(
+                        file_id=str(int(getattr(
+                            p, self.cache.file_id_column)))
+                        ),
+                    lfp_sampling_rate=p.lfp_sampling_rate
                 )
                 for p in probes_meta.itertuples(index=False)
             }
         else:
-            probe_data_path_map = None
+            probe_meta = None
         return BehaviorEcephysSession.from_nwb_path(
-            str(session_data_path), probe_data_path_map=probe_data_path_map
+            str(session_data_path), probe_meta=probe_meta
         )
 
     def _get_ecephys_session_table(self):
