@@ -33,6 +33,7 @@ from allensdk.brain_observatory.ecephys._behavior_ecephys_metadata import (
 from allensdk.brain_observatory.ecephys.data_objects.trials import VBNTrials
 from allensdk.brain_observatory.ecephys.optotagging import OptotaggingTable
 from allensdk.brain_observatory.ecephys.probes import Probes
+from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 from pynwb import NWBFile
 from xarray import DataArray
 
@@ -500,7 +501,8 @@ class BehaviorEcephysSession(VBNBehaviorSession):
             ),
         )
         probes = Probes.from_json(
-            probes=session_data["probes"], skip_probes=skip_probes
+            probes=session_data["probes"],
+            skip_probes=skip_probes
         )
         optotagging_table = OptotaggingTable.from_json(dict_repr=session_data)
 
@@ -537,8 +539,8 @@ class BehaviorEcephysSession(VBNBehaviorSession):
     def from_nwb(
         cls,
         nwbfile: NWBFile,
-        probe_data_path_map: Optional[
-            Dict[str, Union[str, Callable[[], str]]]
+        probe_meta: Optional[
+            Dict[str, ProbeWithLFPMeta]
         ] = None,
         **kwargs,
     ) -> "BehaviorEcephysSession":
@@ -547,14 +549,8 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         Parameters
         ----------
         nwbfile
-        probe_data_path_map
-            Maps the probe name to the path to the probe nwb file, or a
-            callable that returns the nwb path. This file should contain
-            LFP and CSD data. The nwb file is loaded
-            separately from the main session nwb file in order to load the LFP
-            data on the fly rather than with the main
-            session NWB file. This is to speed up download of the NWB
-            for users who don't wish to load the LFP data (it is large).
+        probe_meta
+            Maps the probe name to the `ProbeWithLFPMeta`
         kwargs: kwargs sent to `BehaviorSession.from_nwb`
 
         Returns
@@ -568,7 +564,7 @@ class BehaviorEcephysSession(VBNBehaviorSession):
         return BehaviorEcephysSession(
             behavior_session=behavior_session,
             probes=Probes.from_nwb(
-                nwbfile=nwbfile, probe_data_path_map=probe_data_path_map
+                nwbfile=nwbfile, probe_lfp_meta_map=probe_meta
             ),
             optotagging_table=OptotaggingTable.from_nwb(nwbfile=nwbfile),
             metadata=BehaviorEcephysMetadata.from_nwb(nwbfile=nwbfile),
