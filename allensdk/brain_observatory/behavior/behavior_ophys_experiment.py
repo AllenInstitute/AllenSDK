@@ -109,22 +109,31 @@ class BehaviorOphysExperiment(BehaviorSession):
         eye_tracking_dilation_frames: int = 2,
         events_filter_scale_seconds: float = 2.0 / 31.0,
         events_filter_n_time_steps: int = 20,
-        exclude_invalid_rois=True,
+        exclude_invalid_rois: bool = True,
+        load_stimulus_movie: bool = True
     ) -> "BehaviorOphysExperiment":
         """
         Parameters
         ----------
-        ophys_experiment_id
-        eye_tracking_z_threshold
+        ophys_experiment_id : int
+            Id of experiment to load.
+        eye_tracking_z_threshold : float
             See `BehaviorOphysExperiment.from_nwb`
-        eye_tracking_dilation_frames
+        eye_tracking_dilation_frames : int
             See `BehaviorOphysExperiment.from_nwb`
-        events_filter_scale_seconds
+        events_filter_scale_seconds : float
             See `BehaviorOphysExperiment.from_nwb`
-        events_filter_n_time_steps
+        events_filter_n_time_steps : int
             See `BehaviorOphysExperiment.from_nwb`
-        exclude_invalid_rois
+        exclude_invalid_rois : bool
             Whether to exclude invalid rois
+        load_stimulus_movie : bool
+            Whether to load the stimulus movie (e.g natrual_movie_one) as
+            part of loading stimuli. Default True.
+
+        Returns
+        -------
+        `BehaviorOphysExperiment` instance
         """
 
         def _is_multi_plane_session():
@@ -148,7 +157,8 @@ class BehaviorOphysExperiment(BehaviorSession):
         )
 
         behavior_session_id = BehaviorSessionId.from_lims(
-            db=lims_db, ophys_experiment_id=ophys_experiment_id
+            db=lims_db,
+            ophys_experiment_id=ophys_experiment_id,
         )
 
         is_multiplane_session = _is_multi_plane_session()
@@ -178,6 +188,7 @@ class BehaviorOphysExperiment(BehaviorSession):
             date_of_acquisition=date_of_acquisition,
             eye_tracking_z_threshold=eye_tracking_z_threshold,
             eye_tracking_dilation_frames=eye_tracking_dilation_frames,
+            load_stimulus_movie=load_stimulus_movie
         )
         if is_multiplane_session:
             ophys_timestamps = OphysTimestampsMultiplane.from_sync_file(

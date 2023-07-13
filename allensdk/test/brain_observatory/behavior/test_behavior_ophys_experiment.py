@@ -31,7 +31,10 @@ def test_nwb_end_to_end(tmpdir_factory):
         str(tmpdir_factory.mktemp(tmpdir)), "nwbfile.nwb"
     )
 
-    d1 = BehaviorOphysExperiment.from_lims(oeid)
+    d1 = BehaviorOphysExperiment.from_lims(
+        oeid,
+        load_stimulus_movie=False
+    )
     nwbfile = d1.to_nwb()
     with NWBHDF5IO(nwb_filepath, "w") as nwb_file_writer:
         nwb_file_writer.write(nwbfile)
@@ -47,7 +50,9 @@ def test_nwb_end_to_end(tmpdir_factory):
 def test_visbeh_ophys_data_set():
     ophys_experiment_id = 789359614
     data_set = BehaviorOphysExperiment.from_lims(
-        ophys_experiment_id, exclude_invalid_rois=False
+        ophys_experiment_id,
+        exclude_invalid_rois=False,
+        load_stimulus_movie=False
     )
 
     # TODO: need to improve testing here:
@@ -61,13 +66,17 @@ def test_visbeh_ophys_data_set():
         fallback_credentials=LIMS_DB_CREDENTIAL_MAP
     )
     behavior_session_id = BehaviorSessionId.from_lims(
-        db=lims_db, ophys_experiment_id=ophys_experiment_id
+        db=lims_db,
+        ophys_experiment_id=ophys_experiment_id,
+        load_stimulus_movie=False
     )
 
     # All sorts of assert relationships:
     assert (
         ForagingId.from_lims(
-            behavior_session_id=behavior_session_id.value, lims_db=lims_db
+            behavior_session_id=behavior_session_id.value,
+            lims_db=lims_db,
+            load_stimulus_movie=False
         ).value
         == data_set.metadata["behavior_session_uuid"]
     )
@@ -157,7 +166,8 @@ def test_visbeh_ophys_data_set():
 def test_legacy_dff_api():
     ophys_experiment_id = 792813858
     session = BehaviorOphysExperiment.from_lims(
-        ophys_experiment_id=ophys_experiment_id
+        ophys_experiment_id=ophys_experiment_id,
+        load_stimulus_movie=False
     )
 
     _, dff_array = session.get_dff_traces()
@@ -175,7 +185,10 @@ def test_legacy_dff_api():
     [pytest.param(789359614, 153), pytest.param(792813858, 129)],
 )
 def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
-    session = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
+    session = BehaviorOphysExperiment.from_lims(
+        ophys_experiment_id,
+        load_stimulus_movie=False
+    )
     df = session.stimulus_presentations
     assert df["omitted"].sum() == number_omitted
 
@@ -184,7 +197,8 @@ def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
 def test_event_detection():
     ophys_experiment_id = 789359614
     session = BehaviorOphysExperiment.from_lims(
-        ophys_experiment_id=ophys_experiment_id
+        ophys_experiment_id=ophys_experiment_id,
+        load_stimulus_movie=False
     )
     events = session.events
 
@@ -213,7 +227,10 @@ def test_event_detection():
 @pytest.mark.requires_bamboo
 def test_BehaviorOphysExperiment_property_data():
     ophys_experiment_id = 960410026
-    dataset = BehaviorOphysExperiment.from_lims(ophys_experiment_id)
+    dataset = BehaviorOphysExperiment.from_lims(
+        ophys_experiment_id,
+        load_stimulus_movie=False
+    )
 
     assert dataset.ophys_session_id == 959458018
     assert dataset.ophys_experiment_id == 960410026
@@ -260,6 +277,7 @@ def test_behavior_ophys_experiment_list_data_attributes_and_methods(
         "segmentation_mask_image",
         "stimulus_presentations",
         "stimulus_templates",
+        'stimulus_fingerprint_movie_template',
         "stimulus_timestamps",
         "task_parameters",
         "trials",

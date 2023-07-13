@@ -1,4 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
+import os
+from multiprocessing import Pool
+from tqdm import tqdm
 
 import numpy as np
 import pandas as pd
@@ -85,6 +88,20 @@ class StimulusImageFactory:
         return self._monitor.warp_image(img=arr)
 
 
+class StimulusMovieFrameFactory(StimulusImageFactory):
+
+    def _get_unwarped(self, arr: np.ndarray):
+        """This produces the pixels that would be visible in the unwarped
+        movie frame post-warping"""
+        # 1. Resize image to the same size as the monitor
+        resized_array = self._monitor.natural_movie_image_to_screen(
+            arr, origin='upper')
+        # 2. Remove unseen pixels
+        arr = self._exclude_unseen_pixels(arr=resized_array)
+
+        return resized_array, arr
+
+
 class StimulusTemplate:
     """Container class for a collection of image stimuli"""
 
@@ -129,8 +146,29 @@ class StimulusTemplate:
     def items(self):
         return self._images.items()
 
-    def to_dataframe(self) -> pd.DataFrame:
-        index = pd.Index(self.image_names, name='image_name')
+    def to_dataframe(self,
+                     index_name: str = 'image_name',
+                     index_type: str = 'str') -> pd.DataFrame:
+        """
+        Convert the collection of stimulus templates to a dataframe.
+
+        Parameters
+        ----------
+        index_name : str
+            Name apply to the index column of the data frame to return.
+            Defaults to "image_name".
+        index_type : str
+            Type of the index of the dataframe to set. Defaults to 'str'.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            Dataframe containing an index and two columns: warped, unwarped.
+            (un)warped columns return as a list of lists representing the
+            displayed image/frame.
+        """
+        index = pd.Index(np.array(list(self.image_names), dtype=index_type),
+                         name=index_name)
         warped = [img.warped for img in self.images]
         unwarped = [img.unwarped for img in self.images]
         df = pd.DataFrame({'unwarped': unwarped, 'warped': warped},
@@ -288,3 +326,62 @@ class StimulusTemplateFactory:
             stimulus_images.append(stimulus_image)
         return StimulusTemplate(image_set_name=image_set_name,
                                 images=stimulus_images)
+
+
+class StimulusMovieTemplateFactory(StimulusTemplateFactory):
+    """
+    Modified stimulus template factory to read a natural movie.
+    """
+
+    @staticmethod
+    def from_unprocessed(movie_name: str,
+                         movie_frames: List[np.ndarray],
+                         n_workers: Optional[int] = None) -> StimulusTemplate:
+        """Create StimulusTemplate from pkl or unprocessed input. Stimulus
+        templates created this way need to be processed to acquire unwarped
+        versions of the movie frames presented.
+
+        NOTE: Warped movie frames display what was seen on a monitor by a
+        subject. Unwarped images display a 'diagnostic' version of the stimuli
+        to be presented.
+
+        Parameters
+        ----------
+        movie_name : str
+            The name of the image set. Example:
+                Natural_Images_Lum_Matched_set_TRAINING_2017.07.14
+        movie_frames : List[np.ndarray]
+            A list of image arrays
+        n_workers : int, Optional
+            Number of processes to spawn to warp movie frames. Defaults to
+            os.cpu_count if not specified.
+
+        Returns
+        -------
+        StimulusTemplate
+            A StimulusTemplate object
+        """
+        if n_workers is None:
+            n_workers = os.cpu_count()
+
+        with Pool(n_workers) as worker_pool:
+            stimulus_images = list(tqdm(
+                worker_pool.imap(
+                    _movie_warper_helper,
+                    [(idx, frame) for idx, frame in enumerate(movie_frames)]
+                ),
+                total=len(movie_frames),
+                desc="Warping natural movie frames"
+            ))
+
+        return StimulusTemplate(image_set_name=movie_name,
+                                images=stimulus_images)
+
+
+def _movie_warper_helper(*args):
+    """
+    Simple helper wrapping the stimulus movie frame factory.
+    """
+    name, frame = args[0]
+    return StimulusMovieFrameFactory().from_unprocessed(
+        name=name, input_array=frame)
