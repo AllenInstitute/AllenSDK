@@ -90,6 +90,7 @@ def mock_cache(tmpdir):
                 "name": ["probeA", "probeB", "probeA", "probeB"],
                 "ecephys_session_id": [10, 10, 11, 11],
                 "has_lfp_data": [True] * 4,
+                "lfp_sampling_rate": [1, 2, 3, 4],
                 "file_id": [0, 1, 2, 3]
             }),
             "channels": pd.DataFrame({
@@ -177,7 +178,7 @@ def test_VisualBehaviorNeuropixelsProjectCloudApi(
     ut = ut.reset_index()
     pd.testing.assert_frame_equal(ut, expected["units"])
 
-    def mock_nwb(nwb_path, probe_data_path_map):
+    def mock_nwb(nwb_path, probe_meta):
         return nwb_path
 
     monkeypatch.setattr(cloudapi.BehaviorEcephysSession,
@@ -186,40 +187,40 @@ def test_VisualBehaviorNeuropixelsProjectCloudApi(
 
 
 @pytest.mark.parametrize('has_lfp_data', [True, False])
-def test_probe_data_path_map(mock_cache, monkeypatch, has_lfp_data):
-    """tests that probe_data_path_map is set correctly"""
+def test_probe_meta(mock_cache, monkeypatch, has_lfp_data):
+    """tests that probe_meta is set correctly"""
     mocked_cache, _ = mock_cache
 
-    probe_meta = pd.read_csv(mocked_cache.probe_table_path)
-    probe_meta['has_lfp_data'] = has_lfp_data
-    probe_meta.to_csv(mocked_cache.probe_table_path, index=False)
+    probe_meta_table = pd.read_csv(mocked_cache.probe_table_path)
+    probe_meta_table['has_lfp_data'] = has_lfp_data
+    probe_meta_table.to_csv(mocked_cache.probe_table_path, index=False)
 
     api = cloudapi.VisualBehaviorNeuropixelsProjectCloudApi(
         mocked_cache,
         skip_version_check=True,
         local=False)
 
-    def mock_from_nwb_path(nwb_path, probe_data_path_map):
-        return probe_data_path_map
+    def mock_from_nwb_path(nwb_path, probe_meta):
+        return probe_meta
 
     ecephys_session_id = 10
     with patch.object(BehaviorEcephysSession, 'from_nwb_path',
                       wraps=mock_from_nwb_path):
-        probe_data_path_map = api.get_ecephys_session(ecephys_session_id)
+        probe_meta = api.get_ecephys_session(ecephys_session_id)
 
-    probe_meta = api.get_probe_table()
-    probe_meta = probe_meta.loc[
-        probe_meta['ecephys_session_id'] == ecephys_session_id]
+    probe_meta_table = api.get_probe_table()
+    probes = probe_meta_table.loc[
+        probe_meta_table['ecephys_session_id'] == ecephys_session_id]
 
     if has_lfp_data:
-        for probe_name in probe_meta['name'].unique():
-            obtained_probe_nwb_path = probe_data_path_map[probe_name]()
-            expected_probe_nwb_path = str(probe_meta.loc[
-                (probe_meta['name'] == probe_name)
+        for probe_name in probes['name'].unique():
+            obtained_probe_nwb_path = probe_meta[probe_name].lfp_csd_filepath()
+            expected_probe_nwb_path = str(probe_meta_table.loc[
+                (probe_meta_table['name'] == probe_name)
             ].iloc[0]['file_id'])
             assert obtained_probe_nwb_path == expected_probe_nwb_path
     else:
-        assert probe_data_path_map is None
+        assert probe_meta is None
 
 
 @pytest.mark.parametrize(

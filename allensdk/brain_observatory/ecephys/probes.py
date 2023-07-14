@@ -1,12 +1,12 @@
 import logging
-from typing import List, Dict, Any, Optional, Union, Callable, Tuple
+from typing import List, Dict, Any, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import pynwb
 from pynwb import NWBFile
 
-from allensdk.brain_observatory.ecephys._probe import Probe
+from allensdk.brain_observatory.ecephys._probe import Probe, ProbeWithLFPMeta
 from allensdk.brain_observatory.ecephys.nwb_util import \
     add_ragged_data_to_dynamic_table
 from allensdk.core import DataObject, JsonReadableInterface, \
@@ -182,28 +182,28 @@ class Probes(DataObject, JsonReadableInterface, NwbReadableInterface,
     def from_nwb(
             cls,
             nwbfile: NWBFile,
-            probe_data_path_map: Optional[
-                Dict[str, Union[str, Callable[[], str]]]] = None
+            probe_lfp_meta_map: Optional[
+                Dict[str, ProbeWithLFPMeta]] = None
     ) -> "Probes":
         """
 
         Parameters
         ----------
         nwbfile
-        probe_data_path_map
+        probe_lfp_meta_map
             See description in `BehaviorEcephysSession.from_nwb`
 
         Returns
         -------
         `NWBFile` with probes added
         """
-        if probe_data_path_map is None:
-            probe_data_path_map = dict()
+        if probe_lfp_meta_map is None:
+            probe_lfp_meta_map = dict()
         probes = [
             Probe.from_nwb(
                 nwbfile=nwbfile,
                 probe_name=probe_name,
-                probe_nwb_path=probe_data_path_map.get(probe_name)
+                lfp_meta=probe_lfp_meta_map.get(probe_name)
             )
             for probe_name in nwbfile.electrode_groups]
         return Probes(probes=probes)
