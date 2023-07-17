@@ -520,6 +520,16 @@ class Presentations(
                     )
                 }
             )
+        # Check if the first entry in the DataFrame is an omitted stimulus.
+        # This shouldn't happen and likely reflects some sort of camstim error
+        # with appending frames to the omitted flash frame log. See
+        # explanation here:
+        # https://github.com/AllenInstitute/AllenSDK/issues/2577
+        if 'omitted' in df.columns:
+            first_row = df.iloc[0]
+            if not pd.isna(first_row['omitted']):
+                if first_row['omitted']:
+                    df = df.drop(first_row.name, axis=0)
         return df
 
     @staticmethod
