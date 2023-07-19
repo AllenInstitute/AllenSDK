@@ -317,7 +317,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             # parse the injection structures
             injs = [ int(i) for i in e['injection_structures'].split('/') ]
             e['injection_structures'] = injs
-            e['primary_injection_structure'] = injs[0]
+            e['primary_injection_structure'] = e['structure_id']
 
             # remove storage dir
             del e['storage_directory']
