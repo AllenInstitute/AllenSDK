@@ -545,7 +545,7 @@ class Presentations(
         # with appending frames to the omitted flash frame log. See
         # explanation here:
         # https://github.com/AllenInstitute/AllenSDK/issues/2577
-        if 'omitted' in df.columns:
+        if 'omitted' in df.columns and len(df) > 0:
             first_row = df.iloc[0]
             if not pd.isna(first_row['omitted']):
                 if first_row['omitted']:
