@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any, Union, Callable, Tuple
+from typing import Optional, List, Dict, Any, Union, Callable, Tuple, Type
 
 import numpy as np
 import pandas as pd
@@ -49,6 +49,10 @@ class VBNBehaviorSession(BehaviorSession):
         # as the monitor_delay for the NP.0 and NP.1 rigs
         # used to collect the ecephys sessions for VBN
         return 0.02
+
+    @classmethod
+    def _trials_class(cls) -> Type[Trials]:
+        return VBNTrials
 
     @classmethod
     def from_lims(cls, behavior_session_id: int,
