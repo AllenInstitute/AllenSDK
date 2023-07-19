@@ -122,3 +122,17 @@ def test_getters_sanity(behavior_ecephys_session_fixture):
     behavior_ecephys_session_fixture.get_performance_metrics()
     behavior_ecephys_session_fixture.get_rolling_performance_df()
     behavior_ecephys_session_fixture.get_reward_rate()
+
+
+@pytest.mark.requires_bamboo
+def test_getters_sanity_from_nwb(
+        behavior_ecephys_session_fixture):
+    """Sanity check to make sure that the BehaviorEcephysSession
+    can use the BehaviorSession base class getter methods when read from nwb
+    """
+    nwbfile, _ = behavior_ecephys_session_fixture.to_nwb()
+
+    sess = BehaviorEcephysSession.from_nwb(nwbfile=nwbfile)
+    sess.get_performance_metrics()
+    sess.get_rolling_performance_df()
+    sess.get_reward_rate()
