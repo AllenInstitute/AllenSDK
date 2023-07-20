@@ -36,12 +36,12 @@ from allensdk.core import (
     NwbReadableInterface,
     NwbWritableInterface,
 )
-from allensdk.internal.brain_observatory.mouse import Mouse
-from pynwb import NWBFile
 from allensdk.core.dataframe_utils import (
     enforce_df_column_order,
-    enforce_df_int_typing
+    enforce_df_int_typing,
 )
+from allensdk.internal.brain_observatory.mouse import Mouse
+from pynwb import NWBFile
 
 
 class Presentations(
@@ -77,17 +77,36 @@ class Presentations(
         if sort_columns:
             presentations = enforce_df_column_order(
                 presentations,
-                ['stimulus_block', 'stimulus_block_name', 'image_index',
-                 'image_name', 'movie_frame_index', 'duration',
-                 'start_time', 'end_time', 'stop_time', 'start_frame',
-                 'end_frame', 'is_change', 'is_image_novel', 'omitted',
-                 'repeat', 'flashes_since_change', 'trials_id']
+                [
+                    "stimulus_block",
+                    "stimulus_block_name",
+                    "image_index",
+                    "image_name",
+                    "movie_frame_index",
+                    "duration",
+                    "start_time",
+                    "end_time",
+                    "stop_time",
+                    "start_frame",
+                    "end_frame",
+                    "is_change",
+                    "is_image_novel",
+                    "omitted",
+                    "repeat",
+                    "flashes_since_change",
+                    "trials_id",
+                ],
             )
         presentations = presentations.reset_index(drop=True)
         presentations = enforce_df_int_typing(
             presentations,
-            ["flashes_since_change", "image_index", "movie_frame_index",
-             "repeat", "stimulus_index"]
+            [
+                "flashes_since_change",
+                "image_index",
+                "movie_frame_index",
+                "repeat",
+                "stimulus_index",
+            ],
         )
         presentations.index = pd.Index(
             range(presentations.shape[0]),
@@ -310,7 +329,8 @@ class Presentations(
             .set_index("timestamps", drop=True)
         )
         stimulus_index_df["image_index"] = stimulus_index_df[
-            "image_index"].astype("int")
+            "image_index"
+        ].astype("int")
         stim_pres_df = raw_stim_pres_df.merge(
             stimulus_index_df,
             left_on="start_time",
@@ -520,6 +540,16 @@ class Presentations(
                     )
                 }
             )
+        # Check if the first entry in the DataFrame is an omitted stimulus.
+        # This shouldn't happen and likely reflects some sort of camstim error
+        # with appending frames to the omitted flash frame log. See
+        # explanation here:
+        # https://github.com/AllenInstitute/AllenSDK/issues/2577
+        if "omitted" in df.columns and len(df) > 0:
+            first_row = df.iloc[0]
+            if not pd.isna(first_row["omitted"]):
+                if first_row["omitted"]:
+                    df = df.drop(first_row.name, axis=0)
         return df
 
     @staticmethod
