@@ -22,7 +22,7 @@ xarray
 pynwb
 tables
 seaborn<1.0.0
-aiohttp==3.7.4
+aiohttp==3.8.5
 nest_asyncio
 tqdm>=4.27
 ndx-events<=0.2.0
