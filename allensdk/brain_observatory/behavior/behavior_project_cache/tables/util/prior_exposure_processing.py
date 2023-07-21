@@ -181,6 +181,7 @@ def __get_prior_exposure_count(
         raise ValueError(f"agg method {agg_method} not supported")
 
     # reindex to original index
+    counts.reset_index(drop=True, inplace=True)
     return counts.reindex(index)
 
 
