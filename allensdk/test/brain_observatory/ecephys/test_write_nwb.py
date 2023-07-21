@@ -563,7 +563,7 @@ def test_add_raw_running_data_to_nwbfile(
 def test_read_stimulus_table(tmpdir_factory, presentations,
                              column_renames_map, columns_to_drop, expected):
     expected = expected.set_index(
-        pd.Int64Index(range(expected.shape[0]),
+        pd.Index(range(expected.shape[0]),
                       name='stimulus_presentations_id'))
     dirname = str(tmpdir_factory.mktemp("ecephys_nwb_test"))
     stim_table_path = os.path.join(dirname, "stim_table.csv")

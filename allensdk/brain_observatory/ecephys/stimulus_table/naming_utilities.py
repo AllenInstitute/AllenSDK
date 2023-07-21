@@ -154,7 +154,7 @@ def standardize_movie_numbers(
 
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
     table.loc[movie_rows, stim_colname] = \
-        table.loc[movie_rows, stim_colname].str.replace(numeral_re, replace)
+        table.loc[movie_rows, stim_colname].str.replace(numeral_re, replace, regex=True)
 
     return table
 

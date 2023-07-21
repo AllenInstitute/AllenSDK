@@ -359,7 +359,7 @@ class Presentations(
             stim_pres_df = stim_pres_df[
                 stim_pres_df["image_name"].isin(limit_to_images)
             ]
-            stim_pres_df.index = pd.Int64Index(
+            stim_pres_df.index = pd.Index(
                 range(stim_pres_df.shape[0]), name=stim_pres_df.index.name
             )
 
