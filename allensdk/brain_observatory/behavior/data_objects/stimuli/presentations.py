@@ -246,10 +246,12 @@ class Presentations(DataObject, StimulusFileReadableInterface,
         stim_pres_df = \
             stim_pres_df[sorted(stim_pres_df)].dropna(axis=1, how='all')
         if limit_to_images is not None:
-            stim_pres_df = \
-                stim_pres_df[stim_pres_df['image_name'].isin(limit_to_images)]
-            stim_pres_df.index = pd.Int64Index(
-                range(stim_pres_df.shape[0]), name=stim_pres_df.index.name)
+            stim_pres_df = stim_pres_df[
+                stim_pres_df["image_name"].isin(limit_to_images)
+            ]
+            stim_pres_df.index = pd.Index(
+                range(stim_pres_df.shape[0]), name=stim_pres_df.index.name
+            )
 
         stim_pres_df['stimulus_block'] = 0
         # Match the Ecephys VBN stimulus name convention.
