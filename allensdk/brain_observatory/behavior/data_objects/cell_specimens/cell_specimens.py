@@ -820,7 +820,7 @@ class CellSpecimens(
             curr_roi.width = table_row["width"]
             curr_roi.height = table_row["height"]
             curr_roi.mask = np.array(table_row["roi_mask"])
-            roi_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
+            roi_mask_list.append(curr_roi.get_mask_plane().astype(bool))
 
         cell_specimen_table["roi_mask"] = roi_mask_list
         cell_specimen_table = cell_specimen_table[

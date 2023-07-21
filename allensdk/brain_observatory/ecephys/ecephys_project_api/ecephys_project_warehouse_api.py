@@ -288,7 +288,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         columns = set(output.columns.values.tolist())
         if "p_value_rf" in columns and "on_screen_rf" in columns:
 
-            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], np.bool)
+            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
             on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
 
             # this is not a good test, but it avoids the case where we fix

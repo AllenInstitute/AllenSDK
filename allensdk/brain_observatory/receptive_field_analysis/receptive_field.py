@@ -93,13 +93,13 @@ def compute_receptive_field(data, cell_index, stimulus, **kwargs):
 
     fdr_corrected_pvalues_on = fdr_corrected_pvalues[
                                :number_of_pixels].reshape(s1, s2)
-    _fdr_mask_on = np.zeros_like(pvalues_on, dtype=np.bool)
+    _fdr_mask_on = np.zeros_like(pvalues_on, dtype=bool)
     _fdr_mask_on[fdr_corrected_pvalues_on < alpha] = True
     components_on, number_of_components_on = get_components(_fdr_mask_on)
 
     fdr_corrected_pvalues_off = fdr_corrected_pvalues[
                                 number_of_pixels:].reshape(s1, s2)
-    _fdr_mask_off = np.zeros_like(pvalues_off, dtype=np.bool)
+    _fdr_mask_off = np.zeros_like(pvalues_off, dtype=bool)
     _fdr_mask_off[fdr_corrected_pvalues_off < alpha] = True
     components_off, number_of_components_off = get_components(_fdr_mask_off)
 

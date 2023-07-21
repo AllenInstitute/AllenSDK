@@ -106,7 +106,7 @@ def run_postprocessing(data, rf):
     cell_index = rf['attrs']['cell_index']
     locally_sparse_noise_template = data.get_stimulus_template(stimulus)
 
-    event_array = np.zeros((rf['event_vector']['data'].shape[0], 1), dtype=np.bool)
+    event_array = np.zeros((rf['event_vector']['data'].shape[0], 1), dtype=bool)
     event_array[:,0] = rf['event_vector']['data']
 
     chi_squared_grid = chi_square_binary(event_array, locally_sparse_noise_template)

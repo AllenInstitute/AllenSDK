@@ -9,9 +9,9 @@ SLIDING_WINDOW = 100
 
 def get_go_responses(hit=None, miss=None, aborted=None):
     assert len(hit) == len(miss) == len(aborted)
-    not_aborted = np.logical_not(np.array(aborted, dtype=np.bool))
-    hit = np.array(hit, dtype=np.bool)[not_aborted]
-    miss = np.array(miss, dtype=np.bool)[not_aborted]
+    not_aborted = np.logical_not(np.array(aborted, dtype=bool))
+    hit = np.array(hit, dtype=bool)[not_aborted]
+    miss = np.array(miss, dtype=bool)[not_aborted]
 
     # Go responses are nan when catch (aborted are masked out); 0 for miss, 1 for hit
     # This allows pd.Series.rolling to ignore non-go trial data
@@ -38,9 +38,9 @@ def get_trial_count_corrected_hit_rate(hit=None, miss=None, aborted=None, slidin
 
 def get_catch_responses(correct_reject=None, false_alarm=None, aborted=None):
     assert len(correct_reject) == len(false_alarm) == len(aborted)
-    not_aborted = np.logical_not(np.array(aborted, dtype=np.bool))
-    correct_reject = np.array(correct_reject, dtype=np.bool)[not_aborted]
-    false_alarm = np.array(false_alarm, dtype=np.bool)[not_aborted]
+    not_aborted = np.logical_not(np.array(aborted, dtype=bool))
+    correct_reject = np.array(correct_reject, dtype=bool)[not_aborted]
+    false_alarm = np.array(false_alarm, dtype=bool)[not_aborted]
 
     # Catch responses are nan when go (aborted are masked out); 0 for correct-rejection, 1 for false-alarm
     # This allows pd.Series.rolling to ignore non-catch trial data
