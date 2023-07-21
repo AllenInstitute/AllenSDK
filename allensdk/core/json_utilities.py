@@ -164,7 +164,7 @@ def json_handler(obj):
         return float(obj)
     elif isinstance(obj, np.integer):
         return int(obj)
-    elif (isinstance(obj, np.bool) or
+    elif (isinstance(obj, bool) or
           isinstance(obj, np.bool_)):
         return bool(obj)
     elif hasattr(obj, 'isoformat'):

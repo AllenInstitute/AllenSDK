@@ -89,7 +89,7 @@ def stim_table_to_categories(stim_table,
     all_tried = False
     while not all_tried:
         
-        matches_combination = np.ones((num_sweeps,),dtype=np.bool)
+        matches_combination = np.ones((num_sweeps,),dtype=bool)
         for i_col,column in enumerate(columns):
             param = unique_params[i_col][curr_combination[i_col]]
             matches_param = stim_table[column].values == param
@@ -140,7 +140,7 @@ def make_category_dummy(sweep_categories):
     categories = np.unique(sweep_categories)
     num_categories = len(categories)
     
-    sweep_category_mat = np.zeros((num_sweeps,num_categories),dtype=np.bool)
+    sweep_category_mat = np.zeros((num_sweeps,num_categories),dtype=bool)
     for i_cat,category in enumerate(categories):
         category_idx = np.argwhere(sweep_categories==category)[:,0]
         sweep_category_mat[category_idx,i_cat] = True

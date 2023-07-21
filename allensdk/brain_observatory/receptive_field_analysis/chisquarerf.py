@@ -146,9 +146,9 @@ def get_peak_significance(chi_square_grid_NLL,
         best_p[n] = p_value_corrected_per_pixel[y,x]
         if best_p[n] < alpha:
             significant_cells[n] = True
-            best_exclusion_region_list.append(disc_masks[y, x, :,:].astype(np.bool))
+            best_exclusion_region_list.append(disc_masks[y, x, :,:].astype(bool))
         else:
-            best_exclusion_region_list.append(np.zeros((disc_masks.shape[0], disc_masks.shape[1]), dtype=np.bool))
+            best_exclusion_region_list.append(np.zeros((disc_masks.shape[0], disc_masks.shape[1]), dtype=bool))
 
     return significant_cells, best_p, corrected_p_value_array_list, best_exclusion_region_list
 

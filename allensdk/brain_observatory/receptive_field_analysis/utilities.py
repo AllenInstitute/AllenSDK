@@ -130,7 +130,7 @@ def get_shuffle_matrix(data, event_vector, A, number_of_shuffles=5000, response_
         size = number_of_events + int(np.round(response_detection_error_std_dev*number_of_events*np.random.randn()))
         shuffled_event_inds = np.random.choice(evr, size=size, replace=False)
 
-        b_tmp = np.zeros(len(event_vector), dtype=np.bool)
+        b_tmp = np.zeros(len(event_vector), dtype=bool)
         b_tmp[shuffled_event_inds] = True
         shuffle_data[:, ii] = A[:,b_tmp].sum(axis=1)/float(size)
 
@@ -270,7 +270,7 @@ def get_components(receptive_field_data):
         return_array = np.zeros((len(component_list), receptive_field_data.shape[0], receptive_field_data.shape[1]))
 
     for ii, component in enumerate(component_list):
-        curr_component_mask = np.zeros_like(receptive_field_data, dtype=np.bool).flatten()
+        curr_component_mask = np.zeros_like(receptive_field_data, dtype=bool).flatten()
         curr_component_mask[component] = True
         return_array[ii,:,:] = curr_component_mask.reshape(receptive_field_data.shape)
 
