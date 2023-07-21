@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "allensdk"
+version = "2.15.2"
+description = "core libraries for the allensdk."
+authors = ["Allen Institute for Brain Science"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<=3.11"
+psycopg2-binary = "^2.9.6"
+hdmf = "^3.7.0"
+h5py = "^3.9.0"
+matplotlib = "^3.7.2"
+numpy = "<1.25"
+pandas = "^2.0.3"
+jinja2 = "^3.1.2"
+scipy = "<1.11"
+six = "^1.16.0"
+pynrrd = "^1.0.0"
+future = "^0.18.3"
+requests = "^2.31.0"
+requests-toolbelt = "^1.0.0"
+simplejson = "^3.19.1"
+scikit-image = "^0.21.0"
+scikit-build = "^0.17.6"
+statsmodels = "^0.14.0"
+simpleitk = "^2.2.1"
+argschema = "^3.0.4"
+glymur = "^0.12.8"
+xarray = "<2023.2.0"
+pynwb = "^2.3.3"
+tables = "^3.8.0"
+seaborn = "^0.12.2"
+aiohttp = "^3.8.5"
+nest-asyncio = "^1.5.6"
+tqdm = "^4.65.0"
+ndx-events = "^0.2.0"
+boto3 = "^1.28.8"
+semver = "^3.0.1"
+cachetools = "^5.3.1"
+sqlalchemy = "^2.0.19"
+python-dateutil = "^2.8.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
