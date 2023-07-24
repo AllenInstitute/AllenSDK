@@ -15,7 +15,7 @@ def get_go_responses(hit=None, miss=None, aborted=None):
 
     # Go responses are nan when catch (aborted are masked out); 0 for miss, 1 for hit
     # This allows pd.Series.rolling to ignore non-go trial data
-    go_responses = np.empty_like(hit, dtype=np.float)
+    go_responses = np.empty_like(hit, dtype='float')
     go_responses.fill(float('nan'))
     go_responses[hit] = 1
     go_responses[miss] = 0
@@ -44,7 +44,7 @@ def get_catch_responses(correct_reject=None, false_alarm=None, aborted=None):
 
     # Catch responses are nan when go (aborted are masked out); 0 for correct-rejection, 1 for false-alarm
     # This allows pd.Series.rolling to ignore non-catch trial data
-    catch_responses = np.empty_like(correct_reject, dtype=np.float)
+    catch_responses = np.empty_like(correct_reject, dtype='float')
     catch_responses.fill(float('nan'))
     catch_responses[false_alarm] = 1
     catch_responses[correct_reject] = 0

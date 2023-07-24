@@ -381,7 +381,7 @@ def plot_max_proj_and_roi_masks(session, save_dir=None):
     ax[2].set_title(str(session.metadata['ophys_experiment_id']))
 
     tmp = session.segmentation_mask_image.data.copy()
-    mask = np.empty(session.segmentation_mask_image.data.shape, dtype=np.float)
+    mask = np.empty(session.segmentation_mask_image.data.shape, dtype='float')
     mask[:] = np.nan
     mask[tmp > 0] = 1
     cax = ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
