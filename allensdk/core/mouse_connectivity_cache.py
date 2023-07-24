@@ -481,7 +481,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
             this_experiment_unionizes = this_experiment_unionizes.loc[:, output_keys]
 
-            records = this_experiment_unionizes.to_dict('record')
+            records = this_experiment_unionizes.to_dict('records')
             if len(records) > n:
                 records = records[:n]
             results.append(records)

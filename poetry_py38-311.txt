@@ -1,9 +1,9 @@
 psycopg2-binary
-hdmf<=3.6.1
+hdmf<=3.4.7
 h5py
 matplotlib
-numpy<1.25
-pandas
+numpy<1.24
+pandas==1.5.3
 jinja2
 scipy<1.11
 six
@@ -19,7 +19,7 @@ simpleitk
 argschema
 glymur
 xarray<2023.2.0
-pynwb
+pynwb<=2.3.3
 tables
 seaborn
 aiohttp
