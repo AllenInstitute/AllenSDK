@@ -185,7 +185,7 @@ def test_conditionwise_statistics(ecephys_api):
         ["spike_count", "stimulus_presentation_count", "spike_mean", "spike_std", "spike_sem"]
     )
     obtained = stim_analysis.conditionwise_statistics.loc[(0, 1)]
-    pd.testing.assert_series_equal(expected, obtained[expected.index], check_less_precise=5, check_names=False)
+    pd.testing.assert_series_equal(expected, obtained[expected.index], check_dtype=True, check_names=False, rtol=1e-5, atol=1e-8)
 
 
 def test_presentationwise_spike_times(ecephys_api):
