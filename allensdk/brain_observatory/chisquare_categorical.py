@@ -84,8 +84,8 @@ def stim_table_to_categories(stim_table,
 
     category = 0
     sweep_categories = -1*np.ones((num_sweeps,))
-    curr_combination = np.zeros((num_params,),dtype=np.int)
-    options_per_column = np.array(options_per_column).astype(np.int)
+    curr_combination = np.zeros((num_params,),dtype='int')
+    options_per_column = np.array(options_per_column).astype('int')
     all_tried = False
     while not all_tried:
         
