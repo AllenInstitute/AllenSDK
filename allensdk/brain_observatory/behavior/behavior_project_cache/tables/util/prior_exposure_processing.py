@@ -157,7 +157,6 @@ def __get_prior_exposure_count(
     index = df.index
     df = df.sort_values("date_of_acquisition")
     df = df[df["session_type"].notnull()]
-
     # reindex "to" to df
     to = to.loc[df.index]
 
@@ -171,17 +170,17 @@ def __get_prior_exposure_count(
         counts = df.groupby(["mouse_id", to]).cumcount()
     elif agg_method == "cumsum":
         df["to"] = to
-
+        df_index_name = df.index.name
         def cumsum(x):
             return x.cumsum().shift(fill_value=0).astype("int64")
 
         counts = df.groupby(["mouse_id"])["to"].apply(cumsum)
         counts.name = None
+        counts.index = counts.index.get_level_values(df_index_name)
     else:
         raise ValueError(f"agg method {agg_method} not supported")
 
     # reindex to original index
-    counts.reset_index(drop=True, inplace=True)
     return counts.reindex(index)
 
 
