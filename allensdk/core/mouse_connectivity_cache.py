@@ -498,8 +498,8 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         n=5,
         threshold=10**-2,
     ):
-        """Produces one or more (per experiment) ranked lists of brain structures,
-using a specified data field.
+        """Produces one or more (per experiment) ranked lists of
+        brain structures, using a specified data field.
 
         Parameters
         ----------
