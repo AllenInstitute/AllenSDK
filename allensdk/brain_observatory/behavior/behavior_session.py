@@ -1149,7 +1149,7 @@ class BehaviorSession(
             return None
 
     @property
-    def stimulus_fingerprint_movie_template(self) -> Optional[pd.DataFrame]:
+    def stimulus_natural_movie_template(self) -> Optional[pd.DataFrame]:
         """Get stimulus templates movie for the behavior session.
 
         Returns None if no stimulus movie is available.

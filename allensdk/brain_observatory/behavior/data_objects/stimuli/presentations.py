@@ -92,7 +92,7 @@ class Presentations(
                     "is_change",
                     "is_image_novel",
                     "omitted",
-                    "repeat",
+                    "movie_repeat",
                     "flashes_since_change",
                     "trials_id",
                 ],
@@ -104,7 +104,7 @@ class Presentations(
                 "flashes_since_change",
                 "image_index",
                 "movie_frame_index",
-                "repeat",
+                "movie_repeat",
                 "stimulus_index",
             ],
         )
@@ -290,6 +290,8 @@ class Presentations(
             data, stimulus_timestamps.value
         )
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=["index"])
+        raw_stim_pres_df = cls._check_for_errant_omitted_stimulus(
+            input_df=raw_stim_pres_df)
 
         # Fill in nulls for image_name
         # This makes two assumptions:
@@ -540,17 +542,37 @@ class Presentations(
                     )
                 }
             )
-        # Check if the first entry in the DataFrame is an omitted stimulus.
-        # This shouldn't happen and likely reflects some sort of camstim error
-        # with appending frames to the omitted flash frame log. See
-        # explanation here:
-        # https://github.com/AllenInstitute/AllenSDK/issues/2577
-        if "omitted" in df.columns and len(df) > 0:
-            first_row = df.iloc[0]
+        df = cls._check_for_errant_omitted_stimulus(input_df=df)
+        return df
+
+    @staticmethod
+    def _check_for_errant_omitted_stimulus(
+        input_df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """Check if the first entry in the DataFrame is an omitted stimulus.
+
+        This shouldn't happen and likely reflects some sort of camstim error
+        with appending frames to the omitted flash frame log. See
+        explanation here:
+        https://github.com/AllenInstitute/AllenSDK/issues/2577
+
+        Parameters
+        ----------/
+        input_df : DataFrame
+            Input stimulus table to check for "omitted" stimulus.
+
+        Returns
+        -------
+        modified_df : DataFrame
+            Dataframe with omitted stimulus removed from first row or if not
+            found, return input_df unmodified.
+        """
+        if "omitted" in input_df.columns and len(input_df) > 0:
+            first_row = input_df.iloc[0]
             if not pd.isna(first_row["omitted"]):
                 if first_row["omitted"]:
-                    df = df.drop(first_row.name, axis=0)
-        return df
+                    input_df = input_df.drop(first_row.name, axis=0)
+        return input_df
 
     @staticmethod
     def _fill_missing_values_for_omitted_flashes(

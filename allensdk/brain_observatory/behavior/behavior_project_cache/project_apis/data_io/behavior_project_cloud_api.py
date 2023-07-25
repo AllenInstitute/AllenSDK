@@ -163,7 +163,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS)
+        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -188,7 +188,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS)
+        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -218,7 +218,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS)
+        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
