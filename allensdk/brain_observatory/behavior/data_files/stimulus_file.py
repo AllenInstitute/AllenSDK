@@ -156,8 +156,10 @@ class BehaviorStimulusFile(_StimulusFile):
             raise KeyError(
                 "No 'start_time' listed in pickle file "
                 f"{self.filepath}")
-
-        return copy.deepcopy(self.data['start_time'])
+        start_time = self.data['start_time']
+        if not isinstance(start_time, datetime.datetime):
+            start_time = datetime.datetime.fromtimestamp(start_time)
+        return copy.deepcopy(start_time)
 
     @property
     def session_type(self) -> str:
@@ -239,10 +241,12 @@ class BehaviorStimulusFile(_StimulusFile):
         return self.data['items']['behavior']['stimuli']
 
     def validate(self) -> "BehaviorStimulusFile":
-        if 'items' not in self.data or 'behavior' not in self.data['items']:
-            raise MalformedStimulusFileError(
-                f'Expected to find key "behavior" in "items" dict. '
+        if 'items' not in self.data or ('behavior' not in self.data['items']  and 'foraging' not in self.data['items']):
+             raise MalformedStimulusFileError(
+                f'Expected to find keys "behavior" or "foraging" in "items" dict. '
                 f'Found {self.data["items"].keys()}')
+        elif 'behavior' not in self.data['items']:
+                self.data['items']['behavior'] = self.data['items']['foraging']
         return self
 
 

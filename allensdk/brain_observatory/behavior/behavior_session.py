@@ -1484,17 +1484,25 @@ class BehaviorSession(
         else:
             stimuli = None
 
-        trials = cls._read_trials(
+        stimulus_file = stimulus_file_lookup.behavior_stimulus_file.data
+        if "trial_log" in stimulus_file["items"]["behavior"]:
+            trials = cls._read_trials(
             stimulus_file_lookup=stimulus_file_lookup,
             sync_file=sync_file,
             monitor_delay=monitor_delay,
             licks=licks,
             rewards=rewards,
-        )
+            )
+        else:
+            trials = None
 
-        task_parameters = TaskParameters.from_stimulus_file(
-            stimulus_file=stimulus_file_lookup.behavior_stimulus_file
-        )
+
+        if "DoC" in stimulus_file["items"]["behavior"]["config"]: 
+            task_parameters = TaskParameters.from_stimulus_file(
+                stimulus_file=stimulus_file_lookup.behavior_stimulus_file
+            )
+        else:
+            task_parameters = None
 
         return (
             session_stimulus_timestamps.subtract_monitor_delay(),

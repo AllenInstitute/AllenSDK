@@ -37,7 +37,7 @@ def get_keys(sync_dset: Dataset) -> dict:
     # line labels
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
-            "2p": ["2p_vsync"],
+            "2p": ["vsync_2p","2p_vsync"],
             "stimulus": ["stim_vsync", "vsync_stim"],
             "eye_camera": ["cam2_exposure", "eye_tracking",
                            "eye_frame_received"],
@@ -62,12 +62,12 @@ def get_keys(sync_dset: Dataset) -> dict:
 
     # the contents of the `remove_keys` list is printed to the console
     # as a user warning
-    if len(remove_keys) > 0:
-        logging.warning("Could not find valid lines for the following data "
-                        "sources")
-        for key in remove_keys:
-            logging.warning(f"{key} (valid line label(s) = {key_dict[key]}")
-            key_dict.pop(key)
+    # if len(remove_keys) > 0:
+    #     logging.warning("Could not find valid lines for the following data "
+    #                     "sources")
+    #     for key in remove_keys:
+    #         logging.warning(f"{key} (valid line label(s) = {key_dict[key]}")
+    #         key_dict.pop(key)
     return key_dict
 
 
