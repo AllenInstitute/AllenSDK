@@ -158,3 +158,51 @@ def enforce_df_int_typing(input_df: pd.DataFrame,
                 input_df[col] = \
                     input_df[col].fillna(INT_NULL).astype(int)
     return input_df
+
+
+def return_one_dataframe_row_only(input_table: pd.DataFrame,
+                                  index_value: int,
+                                  table_name: str) ->  pd.Series:
+    """Lookup and return one and only one row from the DataFrame returning
+    an informative error if no or multiple rows are returned for a given
+    index.
+
+    This method is used mainly to return a more informative error when
+    attempting to retrieve metadata from the values behavior cache metadata
+    tables.
+
+    Parameters
+    ----------
+    input_table : pandas.DataFrame
+        Input dataframe to retrieve row from.
+    index_value : int
+        Index of the row to return. Must match an index in the input
+         dataframe/table. i.e. in the case of ecephys_session_table or
+        behavior_session_table.
+    table_name : str
+        Name of the table being returned. Used to output the table name
+        in case of error.
+
+    Returns
+    -------
+    row : pandas.Series
+        Row corresponding to the input index.
+    """
+    try:
+        row = input_table.loc[index_value]
+    except KeyError:
+        raise RuntimeError(
+            f"The {table_name} should have "
+            "1 and only 1 entry for a given "
+            f"{input_table.index.name}. No indexed rows found for "
+            f"id={index_value}"
+        )
+    if not isinstance(row, pd.Series):
+        raise RuntimeError(
+            f"The {table_name} should have "
+            "1 and only 1 entry for a given "
+            f"{input_table.index.name}. For "
+            f"{index_value} "
+            f" there are {len(row)} entries."
+    )
+    return row

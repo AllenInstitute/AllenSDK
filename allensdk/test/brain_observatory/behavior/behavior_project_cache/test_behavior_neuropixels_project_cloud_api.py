@@ -79,10 +79,14 @@ def mock_cache(tmpdir):
     c = {
             "behavior_sessions": pd.DataFrame({
                 "behavior_session_id": [1, 2, 3, 4],
-                "ecephys_session_id": [10, 11, 12, 13],
+                "ecephys_session_id": pd.Series(
+                    [10, 11, 12, 13],
+                    dtype='Int64'),
                 "mouse_id": [4, 4, 2, 1]}),
             "ecephys_sessions": pd.DataFrame({
-                "ecephys_session_id": [10, 11, 12, 13],
+                "ecephys_session_id": pd.Series(
+                    [10, 11, 12, 13],
+                    dtype='Int64'),
                 "behavior_session_id": [1, 2, 3, 4],
                 "file_id": [10, 11, 12, 13]}),
             "probes": pd.DataFrame({
@@ -96,12 +100,14 @@ def mock_cache(tmpdir):
             "channels": pd.DataFrame({
                 "ecephys_channel_id": [14, 15, 16],
                 "ecephys_probe_id": [4, 4, 4],
-                "ecephys_session_id": [10, 10, 10]}),
+                "ecephys_session_id": [10, 10, 10]
+            }),
             "units": pd.DataFrame({
                 "unit_id": [204, 205, 206],
                 "ecephys_channel_id": [14, 15, 16],
                 "ecephys_probe_id": [4, 4, 4],
-                "ecephys_session_id": [10, 10, 10]}),
+                "ecephys_session_id": [10, 10, 10]
+            }),
     }
 
     # round-trip the tables through csv to pick up

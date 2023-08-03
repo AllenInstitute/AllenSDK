@@ -24,6 +24,7 @@
     "probe_vertical_position",
     "silhouette_score",
     "snr",
+    "quality",
     "unit_id",
     "valid_data",
     "amplitude",

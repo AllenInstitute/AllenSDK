@@ -2,7 +2,9 @@ import pytest
 import pandas as pd
 
 from allensdk.core.dataframe_utils import (
-    patch_df_from_other)
+    patch_df_from_other,
+    return_one_dataframe_row_only
+)
 
 
 @pytest.fixture
@@ -198,3 +200,52 @@ def test_patch_new_column(
                 columns_to_patch=['e'])
 
     pd.testing.assert_frame_equal(actual, expected_df)
+
+
+def test_row_index_not_in_dataframe_error():
+    """Test for the correct failure row index not in dataframe"""
+    mock_behavior_sessions = pd.DataFrame({
+        "behavior_session_id": [1, 2, 3, 4],
+        "ecephys_session_id": pd.Series(
+            [10, 11, 12, 13],
+            dtype='Int64'),
+        "mouse_id": [4, 4, 2, 1]}).set_index("behavior_session_id")
+    table_name = "behavior_session_table"
+    index_name = "behavior_session_id"
+    session_id = 1234
+    with pytest.raises(
+            RuntimeError,
+            match=f"The {table_name} should have "
+                  "1 and only 1 entry for a given "
+                  f"{index_name}. No indexed rows found for "
+                  f"id={session_id}"
+    ):
+        return_one_dataframe_row_only(input_table=mock_behavior_sessions,
+                                      index_value=session_id,
+                                      table_name=table_name)
+
+
+def test_multiple_indexes_in_dataframe():
+    """Test for the correct failure on multiple rows with same index
+    dataframe"""
+    mock_behavior_sessions = pd.DataFrame({
+        "behavior_session_id": [1, 2, 2, 3, 4],
+        "ecephys_session_id": pd.Series(
+            [10, 11, 0, 12, 13],
+            dtype='Int64'),
+        "mouse_id": [4, 4, 4, 2, 1]}).set_index("behavior_session_id")
+    table_name = "behavior_session_table"
+    index_name = "behavior_session_id"
+    session_id = 2
+    n_rows = len(mock_behavior_sessions.loc[session_id])
+    with pytest.raises(
+            RuntimeError,
+            match=f"The {table_name} should have "
+                  "1 and only 1 entry for a given "
+                  f"{index_name}. For "
+                  f"{session_id} "
+                  f" there are {n_rows} entries."
+    ):
+        return_one_dataframe_row_only(input_table=mock_behavior_sessions,
+                                      index_value=session_id,
+                                      table_name=table_name)

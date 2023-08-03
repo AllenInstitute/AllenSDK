@@ -15,7 +15,8 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 )
 from allensdk.core.utilities import literal_col_eval
 from allensdk.core.dataframe_utils import (
-    enforce_df_int_typing
+    enforce_df_int_typing,
+    return_one_dataframe_row_only
 )
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
@@ -103,23 +104,21 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         from the nwb file for the first-listed ophys_experiment.
 
         """
-        row = self._behavior_session_table.query(
-            f"behavior_session_id=={behavior_session_id}"
+        row = return_one_dataframe_row_only(
+            input_table=self._behavior_session_table,
+            index_value=behavior_session_id,
+            table_name="behavior_session_table"
         )
-        if row.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_session_table should have "
-                "1 and only 1 entry for a given "
-                "behavior_session_id. For "
-                f"{behavior_session_id} "
-                f" there are {row.shape[0]} entries."
-            )
         row = row.squeeze()
         has_file_id = (not pd.isna(row[self.cache.file_id_column])
                        and row[self.cache.file_id_column] > 0)
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
-            row = self._ophys_experiment_table.query(f"index=={oeid}")
+            row = return_one_dataframe_row_only(
+                input_table=self._ophys_experiment_table,
+                index_value=oeid,
+                table_name="ophys_experiment_table"
+            )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(nwb_path=str(data_path))
@@ -139,17 +138,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         BehaviorOphysExperiment
 
         """
-        row = self._ophys_experiment_table.query(
-            f"index=={ophys_experiment_id}"
+        row = return_one_dataframe_row_only(
+            input_table=self._ophys_experiment_table,
+            index_value=ophys_experiment_id,
+            table_name="ophys_experiment_table"
+        
         )
-        if row.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_ophys_experiment_table should "
-                "have 1 and only 1 entry for a given "
-                f"ophys_experiment_id. For "
-                f"{ophys_experiment_id} "
-                f" there are {row.shape[0]} entries."
-            )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))

@@ -10,6 +10,15 @@ from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
     BehaviorEcephysSession,
 )
 from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
+from allensdk.core.dataframe_utils import (
+    enforce_df_int_typing,
+    return_one_dataframe_row_only
+)
+
+INTEGER_COLUMNS = [
+    "prior_exposures_to_image_set", "ecephys_session_id", "unit_count",
+    "probe_count", "channel_count"
+]
 
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
@@ -44,18 +53,11 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         -------
         BehaviorSession
         """
-        row = self._behavior_session_table.query(
-            f"behavior_session_id=={behavior_session_id}"
+        row = return_one_dataframe_row_only(
+            input_table=self._behavior_session_table,
+            index_value=behavior_session_id,
+            table_name="behavior_session_table"
         )
-        if row.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_session_table should have "
-                "1 and only 1 entry for a given "
-                "behavior_session_id. For "
-                f"{behavior_session_id} "
-                f" there are {row.shape[0]} entries."
-            )
-
         row = row.squeeze()
         ecephys_session_id = row.ecephys_session_id
         # If a file_id for the behavior session is not set, attempt to load
@@ -63,17 +65,10 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         if row[self.cache.file_id_column] < 0 or np.isnan(
             row[self.cache.file_id_column]
         ):
-            row = self._ecephys_session_table.query(
-                f"index=={ecephys_session_id}"
-            )
-
-        if len(row) == 0:
-            raise RuntimeError(
-                f"behavior_session: {behavior_session_id} "
-                f"corresponding to "
-                f"ecephys_session: {ecephys_session_id}"
-                f"does not exist in the behavior_session  "
-                "or ecephys_session tables."
+            row = return_one_dataframe_row_only(
+                input_table=self._ecephys_session_table,
+                index_value=ecephys_session_id,
+                table_name="ecephys_session_table"
             )
 
         file_id = str(int(row[self.cache.file_id_column]))
@@ -97,21 +92,15 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         BehaviorEcephysSession
 
         """
-        session_meta = self._ecephys_session_table.query(
-            f"index=={ecephys_session_id}"
+        session_meta = return_one_dataframe_row_only(
+            input_table=self._ecephys_session_table,
+            index_value=ecephys_session_id,
+            table_name="ecephys_session_table"
         )
         probes_meta = self._probe_table[
             (self._probe_table["ecephys_session_id"] == ecephys_session_id)
             & (self._probe_table["has_lfp_data"])
         ]
-        if session_meta.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_ecephys_session_table should "
-                "have 1 and only 1 entry for a given "
-                f"ecephys_session_id. For "
-                f"{ecephys_session_id} "
-                f" there are {session_meta.shape[0]} entries."
-            )
         session_file_id = str(int(session_meta[self.cache.file_id_column]))
         session_data_path = self._get_data_path(file_id=session_file_id)
 
@@ -149,6 +138,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
     def _get_ecephys_session_table(self):
         session_table_path = self._get_metadata_path(fname="ecephys_sessions")
         df = pd.read_csv(session_table_path)
+        df = enforce_df_int_typing(df, INTEGER_COLUMNS, use_pandas_type=True)
         self._ecephys_session_table = df.set_index("ecephys_session_id")
 
     def get_ecephys_session_table(self) -> pd.DataFrame:
@@ -161,6 +151,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
     def _get_behavior_session_table(self):
         session_table_path = self._get_metadata_path(fname="behavior_sessions")
         df = pd.read_csv(session_table_path)
+        df = enforce_df_int_typing(df, INTEGER_COLUMNS, use_pandas_type=True)
         self._behavior_session_table = df.set_index("behavior_session_id")
 
     def get_behavior_session_table(self) -> pd.DataFrame:

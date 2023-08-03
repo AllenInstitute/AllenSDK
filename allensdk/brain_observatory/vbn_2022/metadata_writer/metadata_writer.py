@@ -101,6 +101,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
                 "probe_vertical_position",
                 "silhouette_score",
                 "snr",
+                "quality",
                 "valid_data",
                 "amplitude",
                 "waveform_duration",
