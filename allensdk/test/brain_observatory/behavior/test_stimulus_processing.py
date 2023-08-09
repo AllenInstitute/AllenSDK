@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
     get_stimulus_presentations, _get_stimulus_epoch, _get_draw_epochs,
     get_visual_stimuli_df, get_stimulus_metadata, get_gratings_metadata,
     get_stimulus_templates, is_change_event, compute_trials_id_for_stimulus,
-    produce_stimulus_block_names)
+    produce_stimulus_block_names, add_active_flag, compute_is_sham_change)
 from allensdk.brain_observatory.behavior.data_objects.stimuli\
     .stimulus_templates import StimulusImage
 from allensdk.test.brain_observatory.behavior.conftest import get_resources_dir
@@ -462,17 +462,43 @@ def test_is_change_mult_omission():
     pd.testing.assert_series_equal(obtained, expected)
 
 
+def test_compute_active():
+    """Test that the active column is added correctly to the stimulus
+    presentations table.
+    """
+    stimulus_presentations = pd.DataFrame(
+        data={'start_time': [1.1, 2.1, 3, 4, 5, 6, 7, 8],
+              'image_name': ['A', 'B', None, None, 'A', 'A', 'A', 'B'],
+              'stimulus_block': [0, 0, 1, 1, 2, 2, 3, 3]}
+    )
+    trials = pd.DataFrame({
+        'start_time': [1., 2.],
+        'stop_time': [2., 3.]
+    })
+    expected = pd.Series(
+        name='active',
+        data=[True, True, False, False,
+              False, False, False, False],
+        index=stimulus_presentations.index,
+        dtype='bool')
+    stimulus_presentations = add_active_flag(stimulus_presentations, trials)
+    pd.testing.assert_series_equal(stimulus_presentations['active'],
+                                   expected)
+
+
 def test_compute_trials_id_for_stimulus():
     """Test that a set of trials maps onto a stimulus table as expected.
     """
     stimulus_presentations = pd.DataFrame(
         data={'start_time': [1.1, 2.1, 3, 4, 5, 6, 7, 8],
               'image_name': ['A', 'B', None, None, 'A', 'A', 'A', 'B'],
-              'stimulus_block': [0, 0, 1, 1, 2, 2, 3, 3]},
+              'stimulus_block': [0, 0, 1, 1, 2, 2, 3, 3],
+              'active': [True, True, False, False,
+                         False, False, False, False]}
     )
     trials = pd.DataFrame({
         'start_time': [1., 2.],
-        'stop_time': [2., 3.]
+        'stop_time': [2., 3.],
     })
     expected_trials_id = pd.Series(
         name='trials_id',
@@ -491,6 +517,37 @@ def test_compute_trials_id_for_stimulus():
                                                        trials)
     pd.testing.assert_series_equal(output_trials_ids,
                                    expected_trials_id)
+
+
+def test_compute_is_shame_change():
+    """Test that the is_sham_change column is added correctly to the stimulus
+    presentations table.
+    """
+    stimulus_presentations = pd.DataFrame(
+        data={'start_time': [1.1, 2.1, 3, 4, 5, 6, 7, 8],
+              'image_name': ['A', 'B', None, None, 'A', 'A', 'A', 'B'],
+              'stimulus_block': [0, 0, 1, 1, 2, 2, 3, 3],
+              'active': [True, True, False, False,
+                         False, False, False, False],
+              'trials_id': [0, 1, -99, -99, -99, -99, 0, 1],
+              'start_frame': [0, 10, 20, 30, 40, 50, 60, 70]}
+    )
+    trials = pd.DataFrame({
+        'start_time': [1., 2.],
+        'stop_time': [2., 3.],
+        'catch': [True, False],
+        'change_frame': [10, -99]
+    })
+    expected = pd.Series(
+        name='is_sham_change',
+        data=[False, True, False, False,
+              False, False, False, True],
+        index=stimulus_presentations.index,
+        dtype='bool')
+    stimulus_presentations = compute_is_sham_change(stimulus_presentations,
+                                                    trials)
+    pd.testing.assert_series_equal(stimulus_presentations['is_sham_change'],
+                                   expected)
 
 
 def test_produce_stimulus_block_names():

@@ -52,6 +52,8 @@ class TestFromBehaviorStimulusFile(LimsTest):
                     {
                         "start_time": [300.0, 330.0, 360.0],
                         "stop_time": [330.0, 360.0, 360.0],
+                        "catch": [False, True, False],
+                        "change_frame": [-99, 99, -99]
                     }
                 )
 

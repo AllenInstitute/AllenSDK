@@ -285,6 +285,7 @@ class BehaviorSession(
                     path=session_data["stim_table_file"],
                     behavior_session_id=session_data["behavior_session_id"],
                     exclude_columns=stimulus_presentation_exclude_columns,
+                    trials=trials
                 ),
                 templates=Templates.from_stimulus_file(
                     stimulus_file=stimulus_file_lookup.behavior_stimulus_file

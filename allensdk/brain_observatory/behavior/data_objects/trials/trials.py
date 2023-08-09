@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 from pynwb import NWBFile
 
+from allensdk.core.dataframe_utils import (
+    enforce_df_int_typing
+)
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.data_files import (
     BehaviorStimulusFile, SyncFile)
@@ -50,6 +53,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
         """
         trials = trials.rename(columns={'stimulus_change': 'is_change'})
         super().__init__(name='trials', value=None, is_value_self=True)
+        trials = enforce_df_int_typing(trials, ["change_frame"])
 
         self._trials = trials
         self._response_window_start = response_window_start

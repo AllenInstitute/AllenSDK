@@ -664,8 +664,44 @@ def get_flashes_since_change(
     return flashes_since_change
 
 
+def add_active_flag(
+        stim_pres_table: pd.DataFrame,
+        trials: pd.DataFrame
+) -> pd.DataFrame:
+    """Mark the active stimuli by lining up the stimulus times with the
+    trials times.
+
+    Parameters
+    ----------
+    stim_pres_table : pandas.DataFrame
+        Stimulus table to add active column to.
+    trials : pandas.DataFrame
+        Trials table to align with the stimulus table.
+
+    Returns
+    -------
+    stimulus_table : pandas.DataFrame
+        Copy of ``stim_pres_table`` with added acive column.
+    """
+    if "active" in stim_pres_table.columns:
+        return stim_pres_table
+    else:
+        active = pd.Series(
+            data=np.zeros(len(stim_pres_table), dtype=bool),
+            index=stim_pres_table.index,
+            name="active",
+        )
+        stim_mask = (stim_pres_table.start_time > trials.start_time.min()) & (
+            stim_pres_table.start_time < trials.stop_time.max()
+        ) & (~stim_pres_table.image_name.isna())
+        active[stim_mask] = True
+        stim_pres_table['active'] = active
+        return stim_pres_table
+
+
 def compute_trials_id_for_stimulus(
-    stim_pres_table: pd.DataFrame, trials_table: pd.DataFrame
+        stim_pres_table: pd.DataFrame,
+        trials_table: pd.DataFrame
 ) -> pd.Series:
     """Add an id to allow for merging of the stimulus presentations
     table with the trials table.
@@ -692,38 +728,28 @@ def compute_trials_id_for_stimulus(
     passive stimulus/replay blocks that contain the same image ordering and
     length.
     """
-    stim_pres_sorted = stim_pres_table.sort_values("start_time")
-    trials_sorted = trials_table.sort_values("start_time")
     # Create a placeholder for the trials_id.
     trials_ids = pd.Series(
-        data=np.full(len(stim_pres_sorted), INT_NULL, dtype=int),
-        index=stim_pres_sorted.index,
+        data=np.full(len(stim_pres_table), INT_NULL, dtype=int),
+        index=stim_pres_table.index,
         name="trials_id",
     ).astype('int')
-    # Return an empty trials_id if the stimulus block is not available.
-    if "stimulus_block" not in stim_pres_sorted.columns:
+    # Return input frame if the stimulus_block or active is not available.
+    if "stimulus_block" not in stim_pres_table.columns \
+            or "active" not in stim_pres_table.columns:
         return trials_ids
-
-    if "active" in stim_pres_sorted.columns:
-        has_active = True
-        active_sorted = stim_pres_sorted.active
-    else:
-        has_active = False
-        active_sorted = pd.Series(
-            data=np.zeros(len(stim_pres_sorted), dtype=bool),
-            index=stim_pres_sorted.index,
-            name="active",
-        )
+    active_sorted = stim_pres_table.active
 
     # Find stimulus blocks that start within a trial. Copy the trial_id
-    # into our new trials_ids series.
-    for idx, trial in trials_sorted.iterrows():
-        stim_mask = (stim_pres_sorted.start_time > trial.start_time) & (
-            stim_pres_sorted.start_time < trial.stop_time
-        ) & (~stim_pres_sorted.image_name.isna())
+    # into our new trials_ids series. For some sessions there are gaps in
+    # between one trial's end and the next's stop time so we account for this
+    # by only using the max time for all trials as the limit.
+    max_trials_stop = trials_table.stop_time.max()
+    for idx, trial in trials_table.iterrows():
+        stim_mask = (stim_pres_table.start_time > trial.start_time) & (
+            stim_pres_table.start_time < max_trials_stop
+        ) & (~stim_pres_table.image_name.isna())
         trials_ids[stim_mask] = idx
-        if not has_active:
-            active_sorted[stim_mask] = True
 
     # The code below finds all stimulus blocks that contain images/trials
     # and attempts to detect blocks that are identical to copy the associated
@@ -731,8 +757,8 @@ def compute_trials_id_for_stimulus(
     # copying the active stimulus block data into the passive stimulus block.
 
     # Get the block ids for the behavior trial presentations
-    stim_blocks = stim_pres_sorted.stimulus_block
-    stim_image_names = stim_pres_sorted.image_name
+    stim_blocks = stim_pres_table.stimulus_block
+    stim_image_names = stim_pres_table.image_name
     active_stim_blocks = stim_blocks[active_sorted].unique()
     # Find passive blocks that show images for potential copying of the active
     # into a passive stimulus block.
@@ -835,3 +861,64 @@ def produce_stimulus_block_names(
         ] = vbo_map[block_id]
 
     return stim_df
+
+
+def compute_is_sham_change(
+        stim_df: pd.DataFrame,
+        trials: pd.DataFrame
+) -> pd.DataFrame:
+    """Add is_sham_change to stimulus presentation table.
+
+    Parameters
+    ----------
+    stim_df : pandas.DataFrame
+        Stimulus presentations table to add is_sham_change to.
+    trials : pandas.DataFrame
+        Trials data frame to pull info from to create
+
+    Returns
+    -------
+    stimulus_presentations : pandas.DataFrame
+        Input ``stim_df`` DataFrame with the is_sham_change column added.
+    """
+    if "trials_id" not in stim_df.columns \
+            or "active" not in stim_df.columns \
+            or "stimulus_block" not in stim_df.columns:
+        return stim_df
+    stim_trials = stim_df.merge(trials,
+                                left_on='trials_id',
+                                right_index=True,
+                                how='left')
+    catch_frames = stim_trials[
+        stim_trials['catch'].fillna(False)]['change_frame'].unique()
+
+    stim_df['is_sham_change'] = False
+    catch_flashes = stim_df[
+        stim_df['start_frame'].isin(catch_frames)].index.values
+    stim_df.loc[catch_flashes, 'is_sham_change'] = True
+
+    stim_blocks = stim_df.stimulus_block
+    stim_image_names = stim_df.image_name
+    active_stim_blocks = stim_blocks[stim_df.active].unique()
+    # Find passive blocks that show images for potential copying of the active
+    # into a passive stimulus block.
+    passive_stim_blocks = stim_blocks[
+        np.logical_and(~stim_df.active, ~stim_image_names.isna())
+    ].unique()
+
+    # Copy the trials_id into the passive block if it exists.
+    if len(passive_stim_blocks) > 0:
+        for active_stim_block in active_stim_blocks:
+            active_block_mask = stim_blocks == active_stim_block
+            active_images = stim_image_names[active_block_mask].values
+            for passive_stim_block in passive_stim_blocks:
+                passive_block_mask = stim_blocks == passive_stim_block
+                if np.array_equal(
+                        active_images,
+                        stim_image_names[passive_block_mask].values
+                ):
+                    stim_df.loc[passive_block_mask, 'is_sham_change'] = \
+                        stim_df[active_block_mask][
+                            'is_sham_change'].values
+
+    return stim_df.sort_index()
