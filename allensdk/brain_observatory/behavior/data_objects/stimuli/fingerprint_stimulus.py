@@ -85,7 +85,7 @@ class FingerprintStimulus:
                     'stop_time': stop_time,
                     'start_frame': start_frame,
                     'end_frame': end_frame,
-                    'repeat': repeat,
+                    'movie_repeat': repeat,
                     'duration': stop_time - start_time
                 })
         table = pd.DataFrame(res)

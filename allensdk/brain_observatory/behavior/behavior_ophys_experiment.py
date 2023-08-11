@@ -611,13 +611,17 @@ class BehaviorOphysExperiment(BehaviorSession):
                     which image plane an ROI resides on. Overlapping
                     ROIs are stored on different mask image planes
                 max_corretion_down: (float)
-                    max motion correction in down direction in pixels
+                   max motion correction in down direction in pixels. Defines
+                   the motion border at the top of the image.
                 max_correction_left: (float)
-                    max motion correction in left direction in pixels
+                    max motion correction in left direction in pixels. Defines
+                    the motion border at the right of the image.
                 max_correction_right: (float)
-                    max motion correction in right direction in pixels
+                    max motion correction in right direction in pixels. Defines
+                    the motion border at the left of the image.
                 max_correction_up: (float)
-                    max motion correction in up direction in pixels
+                    max motion correction in up direction in pixels. Defines
+                    the motion border at the bottom of the image.
                 roi_mask: (array of bool)
                     an image array that displays the location of the
                     roi mask in the field of view

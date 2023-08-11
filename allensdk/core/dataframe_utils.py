@@ -126,7 +126,8 @@ def enforce_df_column_order(
 
 
 def enforce_df_int_typing(input_df: pd.DataFrame,
-                          int_columns: List[str]) -> pd.DataFrame:
+                          int_columns: List[str],
+                          use_pandas_type=False) -> pd.DataFrame:
     """Enforce integer typing for columns that may have lost int typing when
     combined into the final DataFrame.
 
@@ -138,6 +139,10 @@ def enforce_df_int_typing(input_df: pd.DataFrame,
         Columns to enforce int typing and fill any NaN/None values with the
         value set in INT_NULL in this file. Requested columns not in the
         dataframe are ignored.
+    use_pandas_type : bool
+        Instead of filling with the value INT_NULL to enforce integer typing,
+        use the pandas type Int64. This type can have issues converting to
+        numpy/array type values.
 
     Returns
     -------
@@ -147,6 +152,9 @@ def enforce_df_int_typing(input_df: pd.DataFrame,
     """
     for col in int_columns:
         if col in input_df.columns:
-            input_df[col] = \
-                input_df[col].fillna(INT_NULL).astype(int)
+            if use_pandas_type:
+                input_df[col] = input_df[col].astype('Int64')
+            else:
+                input_df[col] = \
+                    input_df[col].fillna(INT_NULL).astype(int)
     return input_df

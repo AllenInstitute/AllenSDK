@@ -88,7 +88,7 @@ def test_behavior_session_list_data_attributes_and_methods(monkeypatch):
         'running_speed',
         'stimulus_presentations',
         'stimulus_templates',
-        'stimulus_fingerprint_movie_template',
+        'stimulus_natural_movie_template',
         'stimulus_timestamps',
         'task_parameters',
         'trials',
