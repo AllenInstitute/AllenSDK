@@ -128,7 +128,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
 
 
     assert len(var_dict) == len(stimulus_table)
-    b = np.zeros(len(stimulus_table), dtype=np.bool)
+    b = np.zeros(len(stimulus_table), dtype=bool)
     for yi in yes_set:
         b[yi] = True
 

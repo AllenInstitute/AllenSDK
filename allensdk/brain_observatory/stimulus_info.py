@@ -518,9 +518,6 @@ class Monitor(object):
 
     def natural_scene_image_to_screen(self, img, origin='lower', translation=(0,0)):
 
-        # assert img.dtype == np.float32
-        # img = img.astype(np.uint8)
-
         full_image = np.full((self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8)
         mr, mc = natural_scene_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
         Mr, Mc = natural_scene_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c))
@@ -756,7 +753,7 @@ def warp_stimulus_coords(vertices,
     distance = float(distance)
     mon_res_x, mon_res_y = float(mon_res[0]), float(mon_res[1])
 
-    vertices = vertices.astype(np.float)
+    vertices = vertices.astype('float')
 
     # from pixels (-1920/2 -> 1920/2) to stimulus space (-0.5->0.5)
     vertices[:, 0] = vertices[:, 0] / mon_res_x

@@ -93,11 +93,11 @@ def get_projection_data(projection_density_path, projection_energy_path,
         logging.info('getting aav exclusion fraction')
         aav_exclusion_fraction = read(aav_exclusion_fraction_path)
         aav_exclusion_fraction[aav_exclusion_fraction > 0] = 1
-        aav_exclusion_fraction = aav_exclusion_fraction.astype(np.bool_, order='C')
+        aav_exclusion_fraction = aav_exclusion_fraction.astype(bool, order='C')
     
     except (IOError, OSError, RuntimeError):
         logging.info('skipping aav exclusion fraction')
-        aav_exclusion_fraction = np.zeros(projection_density.shape, dtype=np.bool_, order='C')
+        aav_exclusion_fraction = np.zeros(projection_density.shape, dtype=bool, order='C')
     
     return {'projection_density': projection_density, 
             'projection_energy': projection_energy, 
