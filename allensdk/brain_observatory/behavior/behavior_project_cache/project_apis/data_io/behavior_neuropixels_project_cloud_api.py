@@ -6,27 +6,28 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.dat
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
+from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
     BehaviorEcephysSession,
 )
-from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 from allensdk.core.dataframe_utils import (
     enforce_df_int_typing,
-    return_one_dataframe_row_only
+    return_one_dataframe_row_only,
 )
 
 INTEGER_COLUMNS = [
-    "prior_exposures_to_image_set", "ecephys_session_id", "unit_count",
-    "probe_count", "channel_count"
+    "prior_exposures_to_image_set",
+    "ecephys_session_id",
+    "unit_count",
+    "probe_count",
+    "channel_count",
 ]
 
 
 class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
-
     MANIFEST_COMPATIBILITY = ["0.1.0", "10.0.0"]
 
     def _load_manifest_tables(self):
-
         self._get_ecephys_session_table()
         self._get_behavior_session_table()
         self._get_unit_table()
@@ -56,7 +57,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         row = return_one_dataframe_row_only(
             input_table=self._behavior_session_table,
             index_value=behavior_session_id,
-            table_name="behavior_session_table"
+            table_name="behavior_session_table",
         )
         row = row.squeeze()
         ecephys_session_id = row.ecephys_session_id
@@ -68,7 +69,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             row = return_one_dataframe_row_only(
                 input_table=self._ecephys_session_table,
                 index_value=ecephys_session_id,
-                table_name="ecephys_session_table"
+                table_name="ecephys_session_table",
             )
 
         file_id = str(int(row[self.cache.file_id_column]))
@@ -79,7 +80,6 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
     def get_ecephys_session(
         self, ecephys_session_id: int
     ) -> BehaviorEcephysSession:
-
         """get a BehaviorEcephysSession by specifying ecephys_session_id
 
         Parameters
@@ -95,7 +95,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         session_meta = return_one_dataframe_row_only(
             input_table=self._ecephys_session_table,
             index_value=ecephys_session_id,
-            table_name="ecephys_session_table"
+            table_name="ecephys_session_table",
         )
         probes_meta = self._probe_table[
             (self._probe_table["ecephys_session_id"] == ecephys_session_id)
@@ -122,10 +122,9 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             probe_meta = {
                 p.name: ProbeWithLFPMeta(
                     lfp_csd_filepath=make_lazy_load_filepath_function(
-                        file_id=str(int(getattr(
-                            p, self.cache.file_id_column)))
-                        ),
-                    lfp_sampling_rate=p.lfp_sampling_rate
+                        file_id=str(int(getattr(p, self.cache.file_id_column)))
+                    ),
+                    lfp_sampling_rate=p.lfp_sampling_rate,
                 )
                 for p in probes_meta.itertuples(index=False)
             }

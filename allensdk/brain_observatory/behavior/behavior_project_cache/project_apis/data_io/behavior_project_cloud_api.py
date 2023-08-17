@@ -13,17 +13,23 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.dat
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
-from allensdk.core.utilities import literal_col_eval
 from allensdk.core.dataframe_utils import (
     enforce_df_int_typing,
-    return_one_dataframe_row_only
+    return_one_dataframe_row_only,
 )
+from allensdk.core.utilities import literal_col_eval
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
-INTEGER_COLUMNS = ["session_number", "prior_exposures_to_image_set",
-                   "ophys_session_id", "imaging_plane_group_count",
-                   "imaging_plane_group", "targeted_areas",
-                   "num_depths_per_area", "num_targeted_structures"]
+INTEGER_COLUMNS = [
+    "session_number",
+    "prior_exposures_to_image_set",
+    "ophys_session_id",
+    "imaging_plane_group_count",
+    "imaging_plane_group",
+    "targeted_areas",
+    "num_depths_per_area",
+    "num_targeted_structures",
+]
 
 
 def sanitize_data_columns(
@@ -107,17 +113,19 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         row = return_one_dataframe_row_only(
             input_table=self._behavior_session_table,
             index_value=behavior_session_id,
-            table_name="behavior_session_table"
+            table_name="behavior_session_table",
         )
         row = row.squeeze()
-        has_file_id = (not pd.isna(row[self.cache.file_id_column])
-                       and row[self.cache.file_id_column] > 0)
+        has_file_id = (
+            not pd.isna(row[self.cache.file_id_column])
+            and row[self.cache.file_id_column] > 0
+        )
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
             row = return_one_dataframe_row_only(
                 input_table=self._ophys_experiment_table,
                 index_value=oeid,
-                table_name="ophys_experiment_table"
+                table_name="ophys_experiment_table",
             )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
@@ -141,8 +149,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         row = return_one_dataframe_row_only(
             input_table=self._ophys_experiment_table,
             index_value=ophys_experiment_id,
-            table_name="ophys_experiment_table"
-        
+            table_name="ophys_experiment_table",
         )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)

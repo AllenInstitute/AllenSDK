@@ -4,13 +4,16 @@ import time
 import allensdk
 import argschema
 import pandas as pd
-from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import ( # noqa
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.schemas import (  # noqa: E501
+    DataReleaseToolsInputSchema,
+)
+from allensdk.brain_observatory.data_release_utils.metadata_utils.id_generator import (  # noqa: E501
     FileIDGenerator,
 )
-from allensdk.brain_observatory.data_release_utils.metadata_utils.utils import ( # noqa
+from allensdk.brain_observatory.data_release_utils.metadata_utils.utils import (  # noqa: E501
     add_file_paths_to_metadata_table,
 )
-from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import ( # noqa
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import (  # noqa: E501
     strip_substructure_acronym_df,
 )
 from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
@@ -20,7 +23,6 @@ from allensdk.brain_observatory.vbn_2022.metadata_writer.lims_queries import (
     session_tables_from_ecephys_session_id_list,
     units_table_from_ecephys_session_id_list,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.schemas import DataReleaseToolsInputSchema  # noqa: E501
 from allensdk.brain_observatory.vbn_2022.metadata_writer.schemas import (
     VBN2022MetadataWriterInputSchema,
 )
@@ -181,7 +183,7 @@ class VBN2022MetadataWriterClass(argschema.ArgSchemaParser):
             ecephys_session_id_list=session_id_list,
             failed_ecephys_session_id_list=failed_session_list,
             probe_ids_to_skip=probe_ids_to_skip,
-            n_workers=self.args["n_workers"]
+            n_workers=self.args["n_workers"],
         )
 
         ecephys_nwb_dir = pathlib.Path(self.args["ecephys_nwb_dir"])
