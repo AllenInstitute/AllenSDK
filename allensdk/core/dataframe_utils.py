@@ -1,4 +1,5 @@
 from typing import List
+
 import pandas as pd
 
 # Null value fill for integer Pandas.Series objects. NWB currently doesn't
@@ -10,10 +11,11 @@ INT_NULL = -99
 
 
 def patch_df_from_other(
-        target_df: pd.DataFrame,
-        source_df: pd.DataFrame,
-        columns_to_patch: List[str],
-        index_column: str) -> pd.DataFrame:
+    target_df: pd.DataFrame,
+    source_df: pd.DataFrame,
+    columns_to_patch: List[str],
+    index_column: str,
+) -> pd.DataFrame:
     """
     Overwrite column values in target_df from column
     values in source_df in rows where the two dataframes
@@ -70,9 +72,11 @@ def patch_df_from_other(
             target_df[column] = None
 
     if index_column in columns_to_patch:
-        msg += (f"{index_column} is in the list of "
-                f"columns to patch {columns_to_patch}; "
-                "unsure how to handle that case\n")
+        msg += (
+            f"{index_column} is in the list of "
+            f"columns to patch {columns_to_patch}; "
+            "unsure how to handle that case\n"
+        )
 
     if len(msg) > 0:
         msg = f"failures in patch_df_from_other:\n{msg}"
@@ -83,10 +87,7 @@ def patch_df_from_other(
     patch_df = source_df[columns_to_patch + [index_column]]
     patch_df = patch_df.set_index(index_column)
 
-    target_df.update(
-        patch_df,
-        join='left',
-        overwrite=True)
+    target_df.update(patch_df, join="left", overwrite=True)
 
     target_df = target_df.reset_index()
     if original_index is not None:
@@ -95,8 +96,8 @@ def patch_df_from_other(
 
 
 def enforce_df_column_order(
-        input_df: pd.DataFrame,
-        column_order: List[str]) -> pd.DataFrame:
+    input_df: pd.DataFrame, column_order: List[str]
+) -> pd.DataFrame:
     """Return the data frame but with columns ordered.
 
     Parameters
@@ -121,13 +122,14 @@ def enforce_df_column_order(
     # Get the full list of columns in the data frame with our ordered columns
     # first.
     pruned_order.extend(
-        list(set(input_df.columns).difference(set(pruned_order))))
+        list(set(input_df.columns).difference(set(pruned_order)))
+    )
     return input_df[pruned_order]
 
 
-def enforce_df_int_typing(input_df: pd.DataFrame,
-                          int_columns: List[str],
-                          use_pandas_type=False) -> pd.DataFrame:
+def enforce_df_int_typing(
+    input_df: pd.DataFrame, int_columns: List[str], use_pandas_type=False
+) -> pd.DataFrame:
     """Enforce integer typing for columns that may have lost int typing when
     combined into the final DataFrame.
 
@@ -153,8 +155,55 @@ def enforce_df_int_typing(input_df: pd.DataFrame,
     for col in int_columns:
         if col in input_df.columns:
             if use_pandas_type:
-                input_df[col] = input_df[col].astype('Int64')
+                input_df[col] = input_df[col].astype("Int64")
             else:
-                input_df[col] = \
-                    input_df[col].fillna(INT_NULL).astype(int)
+                input_df[col] = input_df[col].fillna(INT_NULL).astype(int)
     return input_df
+
+
+def return_one_dataframe_row_only(
+    input_table: pd.DataFrame, index_value: int, table_name: str
+) -> pd.Series:
+    """Lookup and return one and only one row from the DataFrame returning
+    an informative error if no or multiple rows are returned for a given
+    index.
+
+    This method is used mainly to return a more informative error when
+    attempting to retrieve metadata from the values behavior cache metadata
+    tables.
+
+    Parameters
+    ----------
+    input_table : pandas.DataFrame
+        Input dataframe to retrieve row from.
+    index_value : int
+        Index of the row to return. Must match an index in the input
+         dataframe/table. i.e. in the case of ecephys_session_table or
+        behavior_session_table.
+    table_name : str
+        Name of the table being returned. Used to output the table name
+        in case of error.
+
+    Returns
+    -------
+    row : pandas.Series
+        Row corresponding to the input index.
+    """
+    try:
+        row = input_table.loc[index_value]
+    except KeyError:
+        raise RuntimeError(
+            f"The {table_name} should have "
+            "1 and only 1 entry for a given "
+            f"{input_table.index.name}. No indexed rows found for "
+            f"id={index_value}"
+        )
+    if not isinstance(row, pd.Series):
+        raise RuntimeError(
+            f"The {table_name} should have "
+            "1 and only 1 entry for a given "
+            f"{input_table.index.name}. For "
+            f"{index_value} "
+            f" there are {len(row)} entries."
+        )
+    return row

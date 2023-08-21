@@ -33,22 +33,22 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-
-from .reference_space_cache import ReferenceSpaceCache
+import functools
+import operator as op
+import os
+import re
+import warnings
 
 import nrrd
-import re
-import os
-import SimpleITK as sitk
-import pandas as pd
 import numpy as np
+import pandas as pd
+import SimpleITK as sitk
+from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.config.manifest import Manifest
-import warnings
-import operator as op
-import functools
 from six.moves import reduce
+
+from .reference_space_cache import ReferenceSpaceCache
 
 
 class MouseConnectivityCache(ReferenceSpaceCache):
@@ -478,6 +478,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             return pd.DataFrame(x).rename(
                 columns={"section_data_set_id": "experiment_id"}
             )
+
         return self.api.get_structure_unionizes(
             [experiment_id],
             path=file_name,
@@ -572,11 +573,17 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                 :, output_keys
             ]
 
-            this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
-            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
-            this_experiment_unionizes = this_experiment_unionizes.loc[:, output_keys]
+            this_experiment_unionizes = unionizes[
+                unionizes["experiment_id"] == eid
+            ]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(
+                by=rank_on, ascending=False
+            )
+            this_experiment_unionizes = this_experiment_unionizes.loc[
+                :, output_keys
+            ]
 
-            records = this_experiment_unionizes.to_dict('records')
+            records = this_experiment_unionizes.to_dict("records")
             if len(records) > n:
                 records = records[:n]
             results.append(records)
@@ -867,9 +874,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         if direction not in ("trv", "tvr"):
             raise ValueError(
                 "invalid direction: {}. direction must be one of tvr,"
-                "trv".format(
-                    direction
-                )
+                "trv".format(direction)
             )
 
         file_name = self.get_cache_path(file_name, self.ALIGNMENT3D_KEY)
@@ -878,7 +883,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             strategy="lazy",
             path=file_name,
             section_data_set_id=section_data_set_id,
-            **Cache.cache_json()
+            **Cache.cache_json(),
         )
 
         alignment_re = re.compile(r"{}_(?P<index>\d+)".format(direction))

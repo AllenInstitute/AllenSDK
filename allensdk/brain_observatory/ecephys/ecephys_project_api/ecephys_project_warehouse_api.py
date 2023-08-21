@@ -1,17 +1,16 @@
-import re
-import json
 import ast
+import json
+import re
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from .rma_engine import RmaEngine, AsyncRmaEngine
 from .ecephys_project_api import EcephysProjectApi
-from .utilities import rma_macros, build_and_execute
+from .rma_engine import AsyncRmaEngine, RmaEngine
+from .utilities import build_and_execute, rma_macros
 
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):
-
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
     scene_re = re.compile(r".*/(?P<num>\d+).tiff")
 
@@ -28,27 +27,38 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 "[attachable_type$eq'EcephysSession']"
                 r"[attachable_id$eq{{session_id}}]"
             ),
-            engine=self.rma_engine.get_rma_tabular, session_id=session_id
+            engine=self.rma_engine.get_rma_tabular,
+            session_id=session_id,
         )
 
         if well_known_files.shape[0] != 1:
-            raise ValueError(f"expected exactly 1 nwb file for session {session_id}, found: {well_known_files}")
+            raise ValueError(
+                f"expected exactly 1 nwb file for session {session_id}, found: {well_known_files}"  # noqa: E501
+            )
 
         download_link = well_known_files.iloc[0]["download_link"]
         return self.rma_engine.stream(download_link)
 
     def get_natural_movie_template(self, number):
-        well_known_files = self.stimulus_templates[self.stimulus_templates["movie_number"] == number]
+        well_known_files = self.stimulus_templates[
+            self.stimulus_templates["movie_number"] == number
+        ]
         if well_known_files.shape[0] != 1:
-            raise ValueError(f"expected exactly one natural movie template with number {number}, found {well_known_files}")
+            raise ValueError(
+                f"expected exactly one natural movie template with number {number}, found {well_known_files}"  # noqa: E501
+            )
 
         download_link = well_known_files.iloc[0]["download_link"]
         return self.rma_engine.stream(download_link)
 
     def get_natural_scene_template(self, number):
-        well_known_files = self.stimulus_templates[self.stimulus_templates["scene_number"] == number]
+        well_known_files = self.stimulus_templates[
+            self.stimulus_templates["scene_number"] == number
+        ]
         if well_known_files.shape[0] != 1:
-            raise ValueError(f"expected exactly one natural scene template with number {number}, found {well_known_files}")
+            raise ValueError(
+                f"expected exactly one natural scene template with number {number}, found {well_known_files}"  # noqa: E501
+            )
 
         download_link = well_known_files.iloc[0]["download_link"]
         return self.rma_engine.stream(download_link)
@@ -68,7 +78,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"[attachable_id$eq{{ecephys_product_id}}]"
             ),
             engine=self.rma_engine.get_rma_tabular,
-            ecephys_product_id=ecephys_product_id
+            ecephys_product_id=ecephys_product_id,
         )
 
         scene_number = []
@@ -97,24 +107,29 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 "[attachable_type$eq'EcephysProbe']"
                 r"[attachable_id$eq{{probe_id}}]"
             ),
-            engine=self.rma_engine.get_rma_tabular, probe_id=probe_id
+            engine=self.rma_engine.get_rma_tabular,
+            probe_id=probe_id,
         )
 
         if well_known_files.shape[0] != 1:
-            raise ValueError(f"expected exactly 1 LFP NWB file for probe {probe_id}, found: {well_known_files}")
+            raise ValueError(
+                f"expected exactly 1 LFP NWB file for probe {probe_id}, found: {well_known_files}"  # noqa: E501
+            )
 
         download_link = well_known_files.loc[0, "download_link"]
         return self.rma_engine.stream(download_link)
 
-    def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
+    def get_sessions(
+        self, session_ids=None, has_eye_tracking=None, stimulus_names=None
+    ):
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"
                 "criteria=model::EcephysSession"
                 r"{{rm.optional_contains('id',session_ids)}}"
-                r"{%if has_eye_tracking is not none%}[fail_eye_tracking$eq{{m.str(not has_eye_tracking).lower()}}]{%endif%}"
-                r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"
+                r"{%if has_eye_tracking is not none%}[fail_eye_tracking$eq{{m.str(not has_eye_tracking).lower()}}]{%endif%}"  # noqa: E501
+                r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"  # noqa: E501
                 ",rma::include,specimen(donor(age))"
                 ",well_known_files(well_known_file_type)"
             ),
@@ -122,7 +137,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             engine=self.rma_engine.get_rma_tabular,
             session_ids=session_ids,
             has_eye_tracking=has_eye_tracking,
-            stimulus_names=stimulus_names
+            stimulus_names=stimulus_names,
         )
 
         response.set_index("id", inplace=True)
@@ -152,8 +167,13 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         response["genotype"] = genotype
         response["has_nwb"] = has_nwb
 
-        response.drop(columns=["specimen", "fail_eye_tracking", "well_known_files"], inplace=True)
-        response.rename(columns={"stimulus_name": "session_type"}, inplace=True)
+        response.drop(
+            columns=["specimen", "fail_eye_tracking", "well_known_files"],
+            inplace=True,
+        )
+        response.rename(
+            columns={"stimulus_name": "session_type"}, inplace=True
+        )
 
         return response
 
@@ -169,7 +189,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             base=rma_macros(),
             engine=self.rma_engine.get_rma_tabular,
             session_ids=session_ids,
-            probe_ids=probe_ids
+            probe_ids=probe_ids,
         )
         response.set_index("id", inplace=True)
         # Clarify name for external users
@@ -186,50 +206,62 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"{{rm.optional_contains('ecephys_probe_id',probe_ids)}}"
                 ",rma::include,structure"
                 ",rma::options[tabular$eq'"
-                    "ecephys_channels.id"
-                    ",ecephys_probe_id"
-                    ",local_index"
-                    ",probe_horizontal_position"
-                    ",probe_vertical_position"
-                    ",anterior_posterior_ccf_coordinate"
-                    ",dorsal_ventral_ccf_coordinate"
-                    ",left_right_ccf_coordinate"
-                    ",structures.id as ecephys_structure_id"
-                    ",structures.acronym as ecephys_structure_acronym"
+                "ecephys_channels.id"
+                ",ecephys_probe_id"
+                ",local_index"
+                ",probe_horizontal_position"
+                ",probe_vertical_position"
+                ",anterior_posterior_ccf_coordinate"
+                ",dorsal_ventral_ccf_coordinate"
+                ",left_right_ccf_coordinate"
+                ",structures.id as ecephys_structure_id"
+                ",structures.acronym as ecephys_structure_acronym"
                 "']"
             ),
             base=rma_macros(),
             engine=self.rma_engine.get_rma_tabular,
             probe_ids=probe_ids,
-            channel_ids=channel_ids
+            channel_ids=channel_ids,
         )
 
         response.set_index("id", inplace=True)
         return response
 
-    def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):
+    def get_units(
+        self,
+        unit_ids=None,
+        channel_ids=None,
+        probe_ids=None,
+        session_ids=None,
+        *a,
+        **k,
+    ):
         response = build_and_execute(
             (
                 "{% import 'macros' as m %}"
                 "criteria=model::EcephysUnit"
-                r"{% if unit_ids is not none %},rma::criteria[id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
-                r"{% if channel_ids is not none %},rma::criteria[ecephys_channel_id$in{{m.comma_sep(channel_ids)}}]{% endif %}"
-                r"{% if probe_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){% endif %}"
-                r"{% if session_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){% endif %}"
+                r"{% if unit_ids is not none %},rma::criteria[id$in{{m.comma_sep(unit_ids)}}]{% endif %}"  # noqa: E501
+                r"{% if channel_ids is not none %},rma::criteria[ecephys_channel_id$in{{m.comma_sep(channel_ids)}}]{% endif %}"  # noqa: E501
+                r"{% if probe_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){% endif %}"  # noqa: E501
+                r"{% if session_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){% endif %}"  # noqa: E501
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular,
+            base=rma_macros(),
+            engine=self.rma_engine.get_rma_tabular,
             session_ids=session_ids,
             probe_ids=probe_ids,
             channel_ids=channel_ids,
-            unit_ids=unit_ids
+            unit_ids=unit_ids,
         )
 
         response.set_index("id", inplace=True)
 
         return response
 
-    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
-        """ Download analysis metrics - precalculated descriptions of unitwise responses to visual stimulation.
+    def get_unit_analysis_metrics(
+        self, unit_ids=None, ecephys_session_ids=None, session_types=None
+    ):
+        """Download analysis metrics - precalculated descriptions of unitwise
+        responses to visual stimulation.
 
         Parameters
         ----------
@@ -255,15 +287,15 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             (
                 "{% import 'macros' as m %}"
                 "criteria=model::EcephysUnitMetricBundle"
-                r"{% if unit_ids is not none %},rma::criteria[ecephys_unit_id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
-                r"{% if session_ids is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}]))){% endif %}"
-                r"{% if session_types is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[stimulus_name$in{{m.comma_sep(session_types, True)}}]))){% endif %}"
+                r"{% if unit_ids is not none %},rma::criteria[ecephys_unit_id$in{{m.comma_sep(unit_ids)}}]{% endif %}"  # noqa: E501
+                r"{% if session_ids is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}]))){% endif %}"  # noqa: E501
+                r"{% if session_types is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[stimulus_name$in{{m.comma_sep(session_types, True)}}]))){% endif %}"  # noqa: E501
             ),
             base=rma_macros(),
             engine=self.rma_engine.get_rma_list,
             session_ids=ecephys_session_ids,
             unit_ids=unit_ids,
-            session_types=session_types
+            session_types=session_types,
         )
 
         output = []
@@ -278,7 +310,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         for colname in output.columns:
             try:
-                output[colname] = output.apply(lambda row: ast.literal_eval(str(row[colname])), axis=1)
+                output[colname] = output.apply(
+                    lambda row: ast.literal_eval(str(row[colname])), axis=1
+                )
             except ValueError:
                 pass
 
@@ -287,9 +321,10 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         # but switched with one another. This snippet unswitches them.
         columns = set(output.columns.values.tolist())
         if "p_value_rf" in columns and "on_screen_rf" in columns:
-
             pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
-            on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
+            on_screen_is_float = np.issubdtype(
+                output["on_screen_rf"].values[0].dtype, np.floating
+            )
 
             # this is not a good test, but it avoids the case where we fix
             # these in the data for a future release, but

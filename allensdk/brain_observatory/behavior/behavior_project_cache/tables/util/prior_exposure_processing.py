@@ -171,6 +171,7 @@ def __get_prior_exposure_count(
     elif agg_method == "cumsum":
         df["to"] = to
         df_index_name = df.index.name
+
         def cumsum(x):
             return x.cumsum().shift(fill_value=0).astype("int64")
 
@@ -184,8 +185,7 @@ def __get_prior_exposure_count(
     return counts.reindex(index)
 
 
-def add_experience_level_ophys(
-        input_df: pd.DataFrame) -> pd.DataFrame:
+def add_experience_level_ophys(input_df: pd.DataFrame) -> pd.DataFrame:
     """
     adds a column to ophys tables that contains a string
     indicating whether a session had exposure level of Familiar,
@@ -210,36 +210,34 @@ def add_experience_level_ophys(
 
     # do not modify in place
     table = input_df.copy(deep=True)
-    session_number = 'session_number' \
-        if 'session_number' in table.columns else 'session'
+    session_number = (
+        "session_number" if "session_number" in table.columns else "session"
+    )
 
     # add experience_level column with strings indicating relevant conditions
-    table['experience_level'] = 'None'
+    table["experience_level"] = "None"
 
-    session_training = table.session_type.str.startswith('TRAINING')
+    session_training = table.session_type.str.startswith("TRAINING")
     train_indices = table[session_training].index.values
-    table.loc[train_indices, 'experience_level'] = 'Training'
+    table.loc[train_indices, "experience_level"] = "Training"
 
     session_0123 = table[session_number].isin([0, 1, 2, 3])
     familiar_indices = table[session_0123].index.values
 
-    table.loc[familiar_indices, 'experience_level'] = 'Familiar'
+    table.loc[familiar_indices, "experience_level"] = "Familiar"
 
     session_456 = table[session_number].isin([4, 5, 6])
-    zero_prior_exp = (table.prior_exposures_to_image_set == 0)
+    zero_prior_exp = table.prior_exposures_to_image_set == 0
 
-    novel_indices = table[session_456
-                          & zero_prior_exp].index.values
+    novel_indices = table[session_456 & zero_prior_exp].index.values
 
-    table.loc[novel_indices, 'experience_level'] = 'Novel 1'
+    table.loc[novel_indices, "experience_level"] = "Novel 1"
 
     session_456 = table[session_number].isin([4, 5, 6])
-    nonzero_prior_exp = (table.prior_exposures_to_image_set != 0)
-    novel_gt_1_indices = table[
-                             session_456
-                             & nonzero_prior_exp].index.values
+    nonzero_prior_exp = table.prior_exposures_to_image_set != 0
+    novel_gt_1_indices = table[session_456 & nonzero_prior_exp].index.values
 
-    table.loc[novel_gt_1_indices, 'experience_level'] = 'Novel >1'
+    table.loc[novel_gt_1_indices, "experience_level"] = "Novel >1"
 
     return table
 
