@@ -39,7 +39,8 @@ class TestFromBehaviorStimulusFile(LimsTest):
             presentations=presentations
         )
         cls.expected_templates = Templates(
-            templates={templates.image_set_name: templates})
+            templates={templates.image_set_name: templates}
+        )
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
@@ -52,6 +53,8 @@ class TestFromBehaviorStimulusFile(LimsTest):
                     {
                         "start_time": [300.0, 330.0, 360.0],
                         "stop_time": [330.0, 360.0, 360.0],
+                        "catch": [False, True, False],
+                        "change_frame": [-99, 99, -99],
                     }
                 )
 

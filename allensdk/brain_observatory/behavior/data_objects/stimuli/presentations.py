@@ -20,6 +20,8 @@ from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
     Trials,
 )
 from allensdk.brain_observatory.behavior.stimulus_processing import (
+    add_active_flag,
+    compute_is_sham_change,
     compute_trials_id_for_stimulus,
     fix_omitted_end_frame,
     get_flashes_since_change,
@@ -58,22 +60,61 @@ class Presentations(
         columns_to_rename: Optional[Dict[str, str]] = None,
         column_list: Optional[List[str]] = None,
         sort_columns: bool = True,
+        trials: Optional[Trials] = None,
     ):
         """
 
         Parameters
         ----------
-        presentations: The stimulus presentations table
-        columns_to_rename: Optional dict mapping
-            old column name -> new column name
+        presentations : pandas.DataFrame
+            The stimulus presentations table
+        columns_to_rename : Optional dict mapping
+            Mapping to rename columns. old column name -> new column name
         column_list: Optional list of columns to include.
             This will reorder the columns.
-        sort_columns: Whether to sort the columns by name
+        sort_columns: bool
+            Whether to sort the columns by name
+        trials : Optional Trials object.
+            allensdk Trials object for the same session as the presentations
+            table.
         """
         if columns_to_rename is not None:
             presentations = presentations.rename(columns=columns_to_rename)
         if column_list is not None:
             presentations = presentations[column_list]
+        presentations = enforce_df_int_typing(
+            presentations,
+            [
+                "flashes_since_change",
+                "image_index",
+                "movie_frame_index",
+                "repeat",
+                "stimulus_index",
+            ],
+        )
+        presentations = presentations.reset_index(drop=True)
+        presentations.index = pd.Index(
+            range(presentations.shape[0]),
+            name="stimulus_presentations_id",
+            dtype="int",
+        )
+        if trials is not None:
+            if "active" not in presentations.columns:
+                # Add column marking where the mouse is engaged in active,
+                # trained behavior.
+                presentations = add_active_flag(presentations, trials.data)
+            if "trials_id" not in presentations.columns:
+                # Add trials_id to presentations df to allow for joining of the
+                # two tables.
+                presentations["trials_id"] = compute_trials_id_for_stimulus(
+                    presentations, trials.data
+                )
+            if "is_sham_change" not in presentations.columns:
+                # Mark changes in active and replay stimulus that are
+                # #sham-changes
+                presentations = compute_is_sham_change(
+                    presentations, trials.data
+                )
         if sort_columns:
             presentations = enforce_df_column_order(
                 presentations,
@@ -97,23 +138,6 @@ class Presentations(
                     "trials_id",
                 ],
             )
-        presentations = presentations.reset_index(drop=True)
-        presentations = enforce_df_int_typing(
-            presentations,
-            [
-                "flashes_since_change",
-                "image_index",
-                "movie_frame_index",
-                "movie_repeat",
-                "stimulus_index",
-            ],
-        )
-        presentations.index = pd.Index(
-            range(presentations.shape[0]),
-            name="stimulus_presentations_id",
-            dtype="int",
-        )
-
         super().__init__(name="presentations", value=presentations)
 
     def to_nwb(
@@ -181,6 +205,7 @@ class Presentations(
         cls,
         nwbfile: NWBFile,
         add_is_change: bool = True,
+        add_trials_dependent_values: bool = True,
         column_list: Optional[List[str]] = None,
     ) -> "Presentations":
         """
@@ -240,7 +265,13 @@ class Presentations(
             table["flashes_since_change"] = get_flashes_since_change(
                 stimulus_presentations=table
             )
-        return Presentations(presentations=table, column_list=column_list)
+        trials = None
+        if add_trials_dependent_values and nwbfile.trials is not None:
+            trials = Trials.from_nwb(nwbfile)
+
+        return Presentations(
+            presentations=table, column_list=column_list, trials=trials
+        )
 
     @classmethod
     def from_stimulus_file(
@@ -291,7 +322,8 @@ class Presentations(
         )
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=["index"])
         raw_stim_pres_df = cls._check_for_errant_omitted_stimulus(
-            input_df=raw_stim_pres_df)
+            input_df=raw_stim_pres_df
+        )
 
         # Fill in nulls for image_name
         # This makes two assumptions:
@@ -394,14 +426,8 @@ class Presentations(
                 stim_pres_df, stimulus_file.session_type, project_code.value
             )
 
-        # Add trials_id to presentations df to allow for joining of the two
-        # tables.
-        stim_pres_df["trials_id"] = compute_trials_id_for_stimulus(
-            stim_pres_df, trials.data
-        )
-
         return Presentations(
-            presentations=stim_pres_df, column_list=column_list
+            presentations=stim_pres_df, column_list=column_list, trials=trials
         )
 
     @classmethod
@@ -412,6 +438,7 @@ class Presentations(
         exclude_columns: Optional[List[str]] = None,
         columns_to_rename: Optional[Dict[str, str]] = None,
         sort_columns: bool = True,
+        trials: Optional[Trials] = None,
     ) -> "Presentations":
         """
         Reads the table directly from a precomputed csv
@@ -446,6 +473,7 @@ class Presentations(
             presentations=df,
             columns_to_rename=columns_to_rename,
             sort_columns=sort_columns,
+            trials=trials,
         )
 
     @classmethod
@@ -547,7 +575,7 @@ class Presentations(
 
     @staticmethod
     def _check_for_errant_omitted_stimulus(
-        input_df: pd.DataFrame
+        input_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Check if the first entry in the DataFrame is an omitted stimulus.
 

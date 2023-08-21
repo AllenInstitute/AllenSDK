@@ -1,33 +1,44 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from pynwb import NWBFile
-
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.behavior.data_files import (
-    BehaviorStimulusFile, SyncFile)
-from allensdk.brain_observatory.behavior.data_objects.task_parameters import \
-    TaskParameters
-from allensdk.brain_observatory.behavior.dprime import get_hit_rate, \
-    get_trial_count_corrected_hit_rate, get_false_alarm_rate, \
-    get_trial_count_corrected_false_alarm_rate, get_rolling_dprime
-from allensdk.core import DataObject
+    BehaviorStimulusFile,
+    SyncFile,
+)
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileReadableInterface,
+)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
-    StimulusFileReadableInterface
-from allensdk.core import \
-    NwbWritableInterface
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
 from allensdk.brain_observatory.behavior.data_objects.rewards import Rewards
+from allensdk.brain_observatory.behavior.data_objects.task_parameters import (
+    TaskParameters,
+)
 from allensdk.brain_observatory.behavior.data_objects.trials.trial import Trial
+from allensdk.brain_observatory.behavior.dprime import (
+    get_false_alarm_rate,
+    get_hit_rate,
+    get_rolling_dprime,
+    get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate,
+)
+from allensdk.core import (
+    DataObject,
+    NwbReadableInterface,
+    NwbWritableInterface,
+)
+from allensdk.core.dataframe_utils import enforce_df_int_typing
+from pynwb import NWBFile
 
 
-class Trials(DataObject, StimulusFileReadableInterface,
-             NwbReadableInterface, NwbWritableInterface):
-
+class Trials(
+    DataObject,
+    StimulusFileReadableInterface,
+    NwbReadableInterface,
+    NwbWritableInterface,
+):
     @classmethod
     def trial_class(cls):
         """
@@ -35,11 +46,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
         """
         return Trial
 
-    def __init__(
-            self,
-            trials: pd.DataFrame,
-            response_window_start: float
-    ):
+    def __init__(self, trials: pd.DataFrame, response_window_start: float):
         """
         Parameters
         ----------
@@ -48,8 +55,9 @@ class Trials(DataObject, StimulusFileReadableInterface,
             [seconds] relative to the non-display-lag-compensated presentation
             of the change-image
         """
-        trials = trials.rename(columns={'stimulus_change': 'is_change'})
-        super().__init__(name='trials', value=None, is_value_self=True)
+        trials = trials.rename(columns={"stimulus_change": "is_change"})
+        super().__init__(name="trials", value=None, is_value_self=True)
+        trials = enforce_df_int_typing(trials, ["change_frame"])
 
         self._trials = trials
         self._response_window_start = response_window_start
@@ -67,75 +75,75 @@ class Trials(DataObject, StimulusFileReadableInterface,
     @property
     def go_trial_count(self) -> int:
         """Number of 'go' trials"""
-        return self._trials['go'].sum()
+        return self._trials["go"].sum()
 
     @property
     def catch_trial_count(self) -> int:
         """Number of 'catch' trials"""
-        return self._trials['catch'].sum()
+        return self._trials["catch"].sum()
 
     @property
     def hit_trial_count(self) -> int:
         """Number of trials with a hit behavior response"""
-        return self._trials['hit'].sum()
+        return self._trials["hit"].sum()
 
     @property
     def miss_trial_count(self) -> int:
         """Number of trials with a hit behavior response"""
-        return self._trials['miss'].sum()
+        return self._trials["miss"].sum()
 
     @property
     def false_alarm_trial_count(self) -> int:
         """Number of trials where the mouse had a false alarm
         behavior response"""
-        return self._trials['false_alarm'].sum()
+        return self._trials["false_alarm"].sum()
 
     @property
     def correct_reject_trial_count(self) -> int:
         """Number of trials with a correct reject behavior
         response"""
-        return self._trials['correct_reject'].sum()
+        return self._trials["correct_reject"].sum()
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         trials = self.data
         order = list(trials.index)
-        for _, row in trials[['start_time', 'stop_time']].iterrows():
+        for _, row in trials[["start_time", "stop_time"]].iterrows():
             row_dict = row.to_dict()
             nwbfile.add_trial(**row_dict)
 
         for c in trials.columns:
-            if c in ['start_time', 'stop_time']:
+            if c in ["start_time", "stop_time"]:
                 continue
             index, data = dict_to_indexed_array(trials[c].to_dict(), order)
-            if data.dtype == '<U1':  # data type is composed of unicode
+            if data.dtype == "<U1":  # data type is composed of unicode
                 # characters
                 data = trials[c].tolist()
             if not len(data) == len(order):
                 if len(data) == 0:
-                    data = ['']
+                    data = [""]
                 nwbfile.add_trial_column(
                     name=c,
-                    description='NOT IMPLEMENTED: %s' % c,
+                    description="NOT IMPLEMENTED: %s" % c,
                     data=data,
-                    index=index)
+                    index=index,
+                )
             else:
                 nwbfile.add_trial_column(
-                    name=c,
-                    description='NOT IMPLEMENTED: %s' % c,
-                    data=data)
+                    name=c, description="NOT IMPLEMENTED: %s" % c, data=data
+                )
         return nwbfile
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "Trials":
         trials = nwbfile.trials.to_dataframe()
-        if 'lick_events' in trials.columns:
-            trials.drop('lick_events', inplace=True, axis=1)
-        trials.index = trials.index.rename('trials_id')
+        if "lick_events" in trials.columns:
+            trials.drop("lick_events", inplace=True, axis=1)
+        trials.index = trials.index.rename("trials_id")
         return cls(
             trials=trials,
             response_window_start=TaskParameters.from_nwb(
                 nwbfile=nwbfile
-            ).response_window_sec[0]
+            ).response_window_sec[0],
         )
 
     @classmethod
@@ -143,21 +151,39 @@ class Trials(DataObject, StimulusFileReadableInterface,
         """
         Return the list of columns to be output in this table
         """
-        return ['initial_image_name', 'change_image_name',
-                'stimulus_change', 'change_time',
-                'go', 'catch', 'lick_times', 'response_time',
-                'response_latency', 'reward_time', 'reward_volume',
-                'hit', 'false_alarm', 'miss', 'correct_reject',
-                'aborted', 'auto_rewarded', 'change_frame',
-                'start_time', 'stop_time', 'trial_length']
+        return [
+            "initial_image_name",
+            "change_image_name",
+            "stimulus_change",
+            "change_time",
+            "go",
+            "catch",
+            "lick_times",
+            "response_time",
+            "response_latency",
+            "reward_time",
+            "reward_volume",
+            "hit",
+            "false_alarm",
+            "miss",
+            "correct_reject",
+            "aborted",
+            "auto_rewarded",
+            "change_frame",
+            "start_time",
+            "stop_time",
+            "trial_length",
+        ]
 
     @classmethod
-    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile,
-                           stimulus_timestamps: StimulusTimestamps,
-                           licks: Licks,
-                           rewards: Rewards,
-                           sync_file: Optional[SyncFile] = None
-                           ) -> "Trials":
+    def from_stimulus_file(
+        cls,
+        stimulus_file: BehaviorStimulusFile,
+        stimulus_timestamps: StimulusTimestamps,
+        licks: Licks,
+        rewards: Rewards,
+        sync_file: Optional[SyncFile] = None,
+    ) -> "Trials":
         bsf = stimulus_file.data
 
         stimuli = bsf["items"]["behavior"]["stimuli"]
@@ -170,20 +196,21 @@ class Trials(DataObject, StimulusFileReadableInterface,
         for idx, trial in enumerate(trial_log):
             trial_start, trial_end = trial_bounds[idx]
             t = cls.trial_class()(
-                      trial=trial,
-                      start=trial_start,
-                      end=trial_end,
-                      behavior_stimulus_file=stimulus_file,
-                      index=idx,
-                      stimulus_timestamps=stimulus_timestamps,
-                      licks=licks, rewards=rewards,
-                      stimuli=stimuli,
-                      sync_file=sync_file
-                      )
+                trial=trial,
+                start=trial_start,
+                end=trial_end,
+                behavior_stimulus_file=stimulus_file,
+                index=idx,
+                stimulus_timestamps=stimulus_timestamps,
+                licks=licks,
+                rewards=rewards,
+                stimuli=stimuli,
+                sync_file=sync_file,
+            )
             all_trial_data[idx] = t.data
 
-        trials = pd.DataFrame(all_trial_data).set_index('trial')
-        trials.index = trials.index.rename('trials_id')
+        trials = pd.DataFrame(all_trial_data).set_index("trial")
+        trials.index = trials.index.rename("trials_id")
 
         # Order/Filter columns
         trials = trials[cls.columns_to_output()]
@@ -192,7 +219,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
             trials=trials,
             response_window_start=TaskParameters.from_stimulus_file(
                 stimulus_file=stimulus_file
-            ).response_window_sec[0]
+            ).response_window_sec[0],
         )
 
     @staticmethod
@@ -221,8 +248,8 @@ class Trials(DataObject, StimulusFileReadableInterface,
 
         for trial in trial_log:
             start_f = None
-            for event in trial['events']:
-                if event[0] == 'trial_start':
+            for event in trial["events"]:
+                if event[0] == "trial_start":
                     start_f = event[-1]
                     break
             if start_f is None:
@@ -248,35 +275,35 @@ class Trials(DataObject, StimulusFileReadableInterface,
 
     @property
     def change_time(self) -> pd.Series:
-        return self.data['change_time']
+        return self.data["change_time"]
 
     @property
     def lick_times(self) -> pd.Series:
-        return self.data['lick_times']
+        return self.data["lick_times"]
 
     @property
     def start_time(self) -> pd.Series:
-        return self.data['start_time']
+        return self.data["start_time"]
 
     @property
     def aborted(self) -> pd.Series:
-        return self.data['aborted']
+        return self.data["aborted"]
 
     @property
     def hit(self) -> pd.Series:
-        return self.data['hit']
+        return self.data["hit"]
 
     @property
     def miss(self) -> pd.Series:
-        return self.data['miss']
+        return self.data["miss"]
 
     @property
     def false_alarm(self) -> pd.Series:
-        return self.data['false_alarm']
+        return self.data["false_alarm"]
 
     @property
     def correct_reject(self) -> pd.Series:
-        return self.data['correct_reject']
+        return self.data["correct_reject"]
 
     @property
     def rolling_performance(self) -> pd.DataFrame:
@@ -319,69 +346,69 @@ class Trials(DataObject, StimulusFileReadableInterface,
 
         # Indices to build trial metrics dataframe:
         trials_index = self.data.index
-        not_aborted_index = \
-            self.data[np.logical_not(self.aborted)].index
+        not_aborted_index = self.data[np.logical_not(self.aborted)].index
 
         # Initialize dataframe:
         performance_metrics_df = pd.DataFrame(index=trials_index)
 
         # Reward rate:
-        performance_metrics_df['reward_rate'] = \
-            pd.Series(reward_rate, index=self.data.index)
+        performance_metrics_df["reward_rate"] = pd.Series(
+            reward_rate, index=self.data.index
+        )
 
         # Hit rate raw:
         hit_rate_raw = get_hit_rate(
-            hit=self.hit,
-            miss=self.miss,
-            aborted=self.aborted)
-        performance_metrics_df['hit_rate_raw'] = \
-            pd.Series(hit_rate_raw, index=not_aborted_index)
+            hit=self.hit, miss=self.miss, aborted=self.aborted
+        )
+        performance_metrics_df["hit_rate_raw"] = pd.Series(
+            hit_rate_raw, index=not_aborted_index
+        )
 
         # Hit rate with trial count correction:
         hit_rate = get_trial_count_corrected_hit_rate(
-                hit=self.hit,
-                miss=self.miss,
-                aborted=self.aborted)
-        performance_metrics_df['hit_rate'] = \
-            pd.Series(hit_rate, index=not_aborted_index)
+            hit=self.hit, miss=self.miss, aborted=self.aborted
+        )
+        performance_metrics_df["hit_rate"] = pd.Series(
+            hit_rate, index=not_aborted_index
+        )
 
         # False-alarm rate raw:
-        false_alarm_rate_raw = \
-            get_false_alarm_rate(
-                    false_alarm=self.false_alarm,
-                    correct_reject=self.correct_reject,
-                    aborted=self.aborted)
-        performance_metrics_df['false_alarm_rate_raw'] = \
-            pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+        false_alarm_rate_raw = get_false_alarm_rate(
+            false_alarm=self.false_alarm,
+            correct_reject=self.correct_reject,
+            aborted=self.aborted,
+        )
+        performance_metrics_df["false_alarm_rate_raw"] = pd.Series(
+            false_alarm_rate_raw, index=not_aborted_index
+        )
 
         # False-alarm rate with trial count correction:
-        false_alarm_rate = \
-            get_trial_count_corrected_false_alarm_rate(
-                    false_alarm=self.false_alarm,
-                    correct_reject=self.correct_reject,
-                    aborted=self.aborted)
-        performance_metrics_df['false_alarm_rate'] = \
-            pd.Series(false_alarm_rate, index=not_aborted_index)
+        false_alarm_rate = get_trial_count_corrected_false_alarm_rate(
+            false_alarm=self.false_alarm,
+            correct_reject=self.correct_reject,
+            aborted=self.aborted,
+        )
+        performance_metrics_df["false_alarm_rate"] = pd.Series(
+            false_alarm_rate, index=not_aborted_index
+        )
 
         # Rolling-dprime:
-        is_passive_session = (
-                (self.data['reward_volume'] == 0).all() and
-                (self.data['lick_times'].apply(lambda x: len(x)) == 0).all()
-        )
+        is_passive_session = (self.data["reward_volume"] == 0).all() and (
+            self.data["lick_times"].apply(lambda x: len(x)) == 0
+        ).all()
         if is_passive_session:
             # It does not make sense to calculate d' for a passive session
             # So just set it to zeros
             rolling_dprime = np.zeros(len(hit_rate))
         else:
             rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
-        performance_metrics_df['rolling_dprime'] = \
-            pd.Series(rolling_dprime, index=not_aborted_index)
+        performance_metrics_df["rolling_dprime"] = pd.Series(
+            rolling_dprime, index=not_aborted_index
+        )
 
         return performance_metrics_df
 
-    def _calculate_response_latency_list(
-        self
-    ) -> List:
+    def _calculate_response_latency_list(self) -> List:
         """per trial, determines a response latency
 
         Returns
@@ -402,32 +429,36 @@ class Trials(DataObject, StimulusFileReadableInterface,
         (the two instance of monitor delay cancel out in the
         difference).
         """
-        df = pd.DataFrame({'lick_times': self.lick_times,
-                           'change_time': self.change_time})
-        df['valid_response_licks'] = df.apply(
-            lambda trial: [lt for lt in trial['lick_times']
-                           if lt - trial['change_time'] >
-                           self._response_window_start],
-            axis=1)
+        df = pd.DataFrame(
+            {"lick_times": self.lick_times, "change_time": self.change_time}
+        )
+        df["valid_response_licks"] = df.apply(
+            lambda trial: [
+                lt
+                for lt in trial["lick_times"]
+                if lt - trial["change_time"] > self._response_window_start
+            ],
+            axis=1,
+        )
         response_latency = df.apply(
-            lambda trial: trial['valid_response_licks'][0] -
-            trial['change_time']
-            if len(trial['valid_response_licks']) > 0 else float('inf'),
-            axis=1)
+            lambda trial: trial["valid_response_licks"][0]
+            - trial["change_time"]
+            if len(trial["valid_response_licks"]) > 0
+            else float("inf"),
+            axis=1,
+        )
         return response_latency.tolist()
 
     def calculate_reward_rate(
-            self,
-            window=0.75,
-            trial_window=25,
-            initial_trials=10
+        self, window=0.75, trial_window=25, initial_trials=10
     ):
         response_latency = self._calculate_response_latency_list()
         starttime = self.start_time.values
         assert len(response_latency) == len(starttime)
 
-        df = pd.DataFrame({'response_latency': response_latency,
-                           'starttime': starttime})
+        df = pd.DataFrame(
+            {"response_latency": response_latency, "starttime": starttime}
+        )
 
         # adds a column called reward_rate to the input dataframe
         # the reward_rate column contains a rolling average of rewards/min
@@ -443,7 +474,6 @@ class Trials(DataObject, StimulusFileReadableInterface,
         reward_rate[:initial_trials] = np.inf
 
         for trial_number in range(initial_trials, len(df)):
-
             min_index = np.max((0, trial_number - trial_window))
             max_index = np.min((trial_number + trial_window, len(df)))
             df_roll = df.iloc[min_index:max_index]
@@ -452,20 +482,20 @@ class Trials(DataObject, StimulusFileReadableInterface,
             correct = len(df_roll[df_roll.response_latency < window])
 
             # get the time elapsed over the trials
-            time_elapsed = df_roll.starttime.iloc[-1] - \
-                df_roll.starttime.iloc[0]
+            time_elapsed = (
+                df_roll.starttime.iloc[-1] - df_roll.starttime.iloc[0]
+            )
 
             # calculate the reward rate, rewards/min
             reward_rate_on_this_lap = correct / time_elapsed * 60
 
             reward_rate[trial_number] = reward_rate_on_this_lap
 
-        reward_rate[np.isinf(reward_rate)] = float('nan')
+        reward_rate[np.isinf(reward_rate)] = float("nan")
         return reward_rate
 
     def _get_engaged_trials(
-        self,
-        engaged_trial_reward_rate_threshold: float = 2.0
+        self, engaged_trial_reward_rate_threshold: float = 2.0
     ) -> pd.Series:
         """
         Gets `Series` where each trial that is considered "engaged" is set to
@@ -483,13 +513,13 @@ class Trials(DataObject, StimulusFileReadableInterface,
         """
         rolling_performance = self.rolling_performance
         engaged_trial_mask = (
-                rolling_performance['reward_rate'] >
-                engaged_trial_reward_rate_threshold)
+            rolling_performance["reward_rate"]
+            > engaged_trial_reward_rate_threshold
+        )
         return engaged_trial_mask
 
     def get_engaged_trial_count(
-        self,
-        engaged_trial_reward_rate_threshold: float = 2.0
+        self, engaged_trial_reward_rate_threshold: float = 2.0
     ) -> int:
         """Gets count of trials considered "engaged"
 
@@ -505,5 +535,7 @@ class Trials(DataObject, StimulusFileReadableInterface,
         """
         engaged_trials = self._get_engaged_trials(
             engaged_trial_reward_rate_threshold=(
-                engaged_trial_reward_rate_threshold))
+                engaged_trial_reward_rate_threshold
+            )
+        )
         return engaged_trials.sum()
