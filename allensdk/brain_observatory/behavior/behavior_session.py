@@ -285,7 +285,7 @@ class BehaviorSession(
                     path=session_data["stim_table_file"],
                     behavior_session_id=session_data["behavior_session_id"],
                     exclude_columns=stimulus_presentation_exclude_columns,
-                    trials=trials
+                    trials=trials,
                 ),
                 templates=Templates.from_stimulus_file(
                     stimulus_file=stimulus_file_lookup.behavior_stimulus_file
@@ -358,7 +358,7 @@ class BehaviorSession(
         date_of_acquisition: Optional[DateOfAcquisition] = None,
         eye_tracking_z_threshold: float = 3.0,
         eye_tracking_dilation_frames: int = 2,
-        load_stimulus_movie: bool = True
+        load_stimulus_movie: bool = True,
     ) -> "BehaviorSession":
         """
 
@@ -454,7 +454,7 @@ class BehaviorSession(
             project_code=ProjectCode.from_lims(
                 behavior_session_id=behavior_session_id.value, lims_db=lims_db
             ),
-            load_stimulus_movie=load_stimulus_movie
+            load_stimulus_movie=load_stimulus_movie,
         )
 
         if date_of_acquisition is None:
@@ -1115,8 +1115,10 @@ class BehaviorSession(
         table = table.drop(columns=["image_set", "index"], errors="ignore")
         table = table.rename(columns={"stop_time": "end_time"})
 
-        if "trials_id" not in table.columns \
-                and 'stimulus_block' in table.columns:
+        if (
+            "trials_id" not in table.columns
+            and "stimulus_block" in table.columns
+        ):
             table["trials_id"] = compute_trials_id_for_stimulus(
                 table, self.trials
             )
@@ -1173,9 +1175,7 @@ class BehaviorSession(
         if self._stimuli.templates.fingerprint_movie_template_key is not None:
             return self._stimuli.templates.value[
                 self._stimuli.templates.fingerprint_movie_template_key
-            ].to_dataframe(
-                index_name='frame_number',
-                index_type='int')
+            ].to_dataframe(index_name="frame_number", index_type="int")
         else:
             return None
 
@@ -1413,7 +1413,7 @@ class BehaviorSession(
         trials: Trials,
         stimulus_presentation_columns: Optional[List[str]] = None,
         project_code: Optional[ProjectCode] = None,
-        load_stimulus_movie: bool = False
+        load_stimulus_movie: bool = False,
     ) -> Stimuli:
         """
         Construct the Stimuli data object for this session
@@ -1432,7 +1432,7 @@ class BehaviorSession(
             presentation_columns=stimulus_presentation_columns,
             project_code=project_code,
             trials=trials,
-            load_stimulus_movie=load_stimulus_movie
+            load_stimulus_movie=load_stimulus_movie,
         )
 
     @classmethod
@@ -1512,7 +1512,7 @@ class BehaviorSession(
         include_stimuli: bool = True,
         stimulus_presentation_columns: Optional[List[str]] = None,
         project_code: Optional[ProjectCode] = None,
-        load_stimulus_movie: bool = False
+        load_stimulus_movie: bool = False,
     ):
         """Helper method to read data from stimulus file"""
 
@@ -1549,7 +1549,7 @@ class BehaviorSession(
                 trials=trials,
                 stimulus_presentation_columns=stimulus_presentation_columns,
                 project_code=project_code,
-                load_stimulus_movie=load_stimulus_movie
+                load_stimulus_movie=load_stimulus_movie,
             )
         else:
             stimuli = None

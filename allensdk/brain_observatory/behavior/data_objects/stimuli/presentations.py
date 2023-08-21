@@ -60,7 +60,7 @@ class Presentations(
         columns_to_rename: Optional[Dict[str, str]] = None,
         column_list: Optional[List[str]] = None,
         sort_columns: bool = True,
-        trials: Optional[Trials] = None
+        trials: Optional[Trials] = None,
     ):
         """
 
@@ -102,13 +102,11 @@ class Presentations(
             if "active" not in presentations.columns:
                 # Add column marking where the mouse is engaged in active,
                 # trained behavior.
-                presentations = add_active_flag(
-                    presentations, trials.data
-                )
+                presentations = add_active_flag(presentations, trials.data)
             if "trials_id" not in presentations.columns:
                 # Add trials_id to presentations df to allow for joining of the
                 # two tables.
-                presentations['trials_id'] = compute_trials_id_for_stimulus(
+                presentations["trials_id"] = compute_trials_id_for_stimulus(
                     presentations, trials.data
                 )
             if "is_sham_change" not in presentations.columns:
@@ -271,9 +269,9 @@ class Presentations(
         if add_trials_dependent_values and nwbfile.trials is not None:
             trials = Trials.from_nwb(nwbfile)
 
-        return Presentations(presentations=table,
-                             column_list=column_list,
-                             trials=trials)
+        return Presentations(
+            presentations=table, column_list=column_list, trials=trials
+        )
 
     @classmethod
     def from_stimulus_file(
@@ -324,7 +322,8 @@ class Presentations(
         )
         raw_stim_pres_df = raw_stim_pres_df.drop(columns=["index"])
         raw_stim_pres_df = cls._check_for_errant_omitted_stimulus(
-            input_df=raw_stim_pres_df)
+            input_df=raw_stim_pres_df
+        )
 
         # Fill in nulls for image_name
         # This makes two assumptions:
@@ -428,9 +427,7 @@ class Presentations(
             )
 
         return Presentations(
-            presentations=stim_pres_df,
-            column_list=column_list,
-            trials=trials
+            presentations=stim_pres_df, column_list=column_list, trials=trials
         )
 
     @classmethod
@@ -441,7 +438,7 @@ class Presentations(
         exclude_columns: Optional[List[str]] = None,
         columns_to_rename: Optional[Dict[str, str]] = None,
         sort_columns: bool = True,
-        trials: Optional[Trials] = None
+        trials: Optional[Trials] = None,
     ) -> "Presentations":
         """
         Reads the table directly from a precomputed csv
@@ -578,7 +575,7 @@ class Presentations(
 
     @staticmethod
     def _check_for_errant_omitted_stimulus(
-        input_df: pd.DataFrame
+        input_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Check if the first entry in the DataFrame is an omitted stimulus.
 
