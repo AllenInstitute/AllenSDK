@@ -358,7 +358,7 @@ class BehaviorSession(
         date_of_acquisition: Optional[DateOfAcquisition] = None,
         eye_tracking_z_threshold: float = 3.0,
         eye_tracking_dilation_frames: int = 2,
-        load_stimulus_movie: bool = True,
+        load_stimulus_movie: bool = False,
     ) -> "BehaviorSession":
         """
 
@@ -386,7 +386,9 @@ class BehaviorSession(
             See `BehaviorSession.from_nwb`, default 2
         load_stimulus_movie : bool
             Whether to load the stimulus movie (e.g natrual_movie_one) as
-            part of loading stimuli. Default True.
+            part of loading stimuli. Default False. The warped+unwarped
+            movie loaded will be very large in memory/on disk so be
+            careful when requesting this option.
 
         Returns
         -------

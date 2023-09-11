@@ -110,7 +110,7 @@ class BehaviorOphysExperiment(BehaviorSession):
         events_filter_scale_seconds: float = 2.0 / 31.0,
         events_filter_n_time_steps: int = 20,
         exclude_invalid_rois: bool = True,
-        load_stimulus_movie: bool = True
+        load_stimulus_movie: bool = False
     ) -> "BehaviorOphysExperiment":
         """
         Parameters
