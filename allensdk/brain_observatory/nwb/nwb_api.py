@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 import pynwb
 import SimpleITK as sitk
@@ -24,7 +22,8 @@ class NwbApi:
         return io.read()
 
     def __init__(self, path, **kwargs):
-        ''' Reads data for a single Brain Observatory session from an NWB 2.0 file
+        ''' Reads data for a single Brain Observatory session from an NWB 2.0
+        file
         '''
 
         self.path = path

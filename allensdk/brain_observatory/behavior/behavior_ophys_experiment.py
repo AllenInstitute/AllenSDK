@@ -110,7 +110,6 @@ class BehaviorOphysExperiment(BehaviorSession):
         events_filter_scale_seconds: float = 2.0 / 31.0,
         events_filter_n_time_steps: int = 20,
         exclude_invalid_rois: bool = True,
-        load_stimulus_movie: bool = False
     ) -> "BehaviorOphysExperiment":
         """
         Parameters
@@ -127,9 +126,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             See `BehaviorOphysExperiment.from_nwb`
         exclude_invalid_rois : bool
             Whether to exclude invalid rois
-        load_stimulus_movie : bool
-            Whether to load the stimulus movie (e.g natrual_movie_one) as
-            part of loading stimuli. Default True.
 
         Returns
         -------
@@ -188,7 +184,6 @@ class BehaviorOphysExperiment(BehaviorSession):
             date_of_acquisition=date_of_acquisition,
             eye_tracking_z_threshold=eye_tracking_z_threshold,
             eye_tracking_dilation_frames=eye_tracking_dilation_frames,
-            load_stimulus_movie=load_stimulus_movie
         )
         if is_multiplane_session:
             ophys_timestamps = OphysTimestampsMultiplane.from_sync_file(
