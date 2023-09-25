@@ -196,7 +196,7 @@ class NWBWriter:
                 skip_stim=skip_stim,
             )
             self._compare_sessions(
-                nwbfile=nwbfile, lims_session=lims_session, **kwargs
+                nwbfile=nwbfile, loaded_session=lims_session, **kwargs
             )
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:
@@ -326,7 +326,7 @@ class NWBWriter:
             raise ValueError(error_message)
 
     def _compare_sessions(
-        self, nwbfile: NWBFile, lims_session: DataObject, **kwargs
+        self, nwbfile: NWBFile, loaded_session: DataObject, **kwargs
     ):
         kwargs = {
             k: v
@@ -334,4 +334,4 @@ class NWBWriter:
             if k in inspect.signature(self._serializer.from_nwb).parameters
         }
         nwb_session = self._serializer.from_nwb(nwbfile, **kwargs)
-        assert sessions_are_equal(lims_session, nwb_session, reraise=True)
+        assert sessions_are_equal(loaded_session, nwb_session, reraise=True)
