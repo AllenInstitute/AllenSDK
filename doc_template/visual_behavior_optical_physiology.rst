@@ -312,7 +312,7 @@ DATA FILE CHANGELOG
 
 Metadata Changes
 
-- Better consistency of integer typing.
+- Better consistency of integer typing throughout.
 - Additions to multiple tables
     - Added project_code and behavior_type (active/passive) value to all
       tables.
@@ -331,16 +331,17 @@ Metadata Changes
     - Added corner location of ROI cutout x,y for each ROI.
     - Added width, height of the ROI cutout for each ROI.
 
-Data Changes
+NWB Data Changes
 
-- The value for Age in the metadata, Session/Experiment objects. NWBs now
-  reflect the age of the animal at the time the session/experiment was taken.
+- The value for Age in the metadata, Session/Experiment objects now consistent.
+  NWBs now reflect the age of the animal at the time the session/experiment was
+  taken.
 - Enforced better and more consistent typing between the metadata tables and
   the session metadata.
-- All datetimes in metadata tables and NWBs are explicitly UTC timezone.
+- All datetimes in NWBs and metadata tables are now explicitly UTC timezone.
 - New columns in the stimulus_presentations table:
-    - is_image_novel, movie_frame_index, repeat, stimulus_block,
-      stimulus_block_name, stimulus_name,
+    - active, is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
+      stimulus_block, stimulus_block_name, stimulus_name
 
 **v1.0.1**
 

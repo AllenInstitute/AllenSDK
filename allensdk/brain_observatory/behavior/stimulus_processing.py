@@ -696,6 +696,14 @@ def add_active_flag(
             & (~stim_pres_table.image_name.isna())
         )
         active[stim_mask] = True
+
+        # Clean up potential stimuli that fall outside in time of the trials
+        # but are part of the "active" stimulus block.
+        if "stimulus_block" in stim_pres_table.columns:
+            for stim_block in stim_pres_table["stimulus_block"].unique():
+                block_mask = stim_pres_table["stimulus_block"] == stim_block
+                if np.any(active[block_mask]):
+                    active[block_mask] = True
         stim_pres_table["active"] = active
         return stim_pres_table
 

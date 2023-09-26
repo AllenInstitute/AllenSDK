@@ -36,6 +36,13 @@ Visual Behavior - Neuropixels
 DATA FILE CHANGELOG
 -------------------
 
+**v0.4.0-fix**
+
+- Added stimulus presentations columns that are computed on load:
+  is_sham_change
+- Fixed sessions where mouse appears to be running backwards.
+- Fixed issues with loading probes
+
 **v0.4.0**
 
 New Data:
