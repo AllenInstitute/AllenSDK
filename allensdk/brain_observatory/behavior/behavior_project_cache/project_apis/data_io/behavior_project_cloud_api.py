@@ -57,7 +57,7 @@ def sanitize_data_columns(
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
-    MANIFEST_COMPATIBILITY = ["0.0.0", "2.0.0"]
+    MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
     def _load_manifest_tables(self):
         expected_metadata = set(
