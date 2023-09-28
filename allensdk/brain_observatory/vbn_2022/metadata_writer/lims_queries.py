@@ -773,6 +773,11 @@ def _behavior_session_table_from_ecephys_session_id_list(
             [x.behavior_session_id for x in behavior_sessions]
         )
     ]
+    # Add timezone information to behavior daq. Matches ecephys table.
+    behavior_session_df["date_of_acquisition"] = behavior_session_df[
+        "date_of_acquisition"
+    ].dt.tz_localize("UTC")
+
     behavior_session_df["image_set"] = get_image_set(df=behavior_session_df)
 
     behavior_session_df[
