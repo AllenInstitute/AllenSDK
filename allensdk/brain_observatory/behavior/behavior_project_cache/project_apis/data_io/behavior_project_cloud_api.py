@@ -1,4 +1,6 @@
-from typing import Iterable
+from typing import Iterable, Union
+import numpy as np
+import pathlib
 
 import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
@@ -10,6 +12,9 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abc
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
     ProjectCloudApiBase,
 )
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.natural_movie_one_cache import (  # noqa: E501
+    NaturalMovieOneCache,
+)
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
@@ -18,6 +23,9 @@ from allensdk.core.dataframe_utils import (
     return_one_dataframe_row_only,
 )
 from allensdk.core.utilities import literal_col_eval
+from allensdk.api.cloud_cache.cloud_cache import (
+    S3CloudCache, LocalCache, StaticLocalCache)
+
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
 INTEGER_COLUMNS = [
@@ -58,6 +66,26 @@ def sanitize_data_columns(
 
 class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
     MANIFEST_COMPATIBILITY = ["0.0.0", "2.0.0"]
+
+    def __init__(
+        self,
+        cache: Union[S3CloudCache, LocalCache, StaticLocalCache],
+        skip_version_check: bool = False,
+        local: bool = False
+    ):
+        super().__init__(cache=cache,
+                         skip_version_check=skip_version_check,
+                         local=local)
+        self._load_manifest_tables()
+
+        if isinstance(cache, S3CloudCache):
+            bucket_name = cache.bucket_name
+        else:
+            bucket_name = None
+        self._natural_movie_cache = NaturalMovieOneCache(
+            bucket_name=bucket_name,
+            cache_dir=str(pathlib.Path(cache.cache_dir) / "resources"),
+        )
 
     def _load_manifest_tables(self):
         expected_metadata = set(
@@ -249,14 +277,36 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         """
         return self._ophys_experiment_table
 
-    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """Download a template for the natural movie stimulus. This is the
-        actual movie that was shown during the recording session.
-        :param number: identifier for this scene
-        :type number: int
-        :returns: An iterable yielding an npy file as bytes
+    def get_raw_natural_movie(self) -> np.ndarray:
+        """Download the raw natural movie presented to the mouse.
+
+        Returns
+        -------
+        natural_movie_one : numpy.ndarray
         """
-        raise NotImplementedError()
+        return self._natural_movie_cache.get_raw_movie()
+
+    def get_natural_movie_template(self, n_workers=None) -> pd.DataFrame:
+        """Download the movie if needed and process it into warped and unwarped
+        frames as presented to the mouse. The DataFrame is indexed with the
+        same frame index as shown in the stimulus presentation table.
+
+        The processing of the movie requires signicant processing and its
+        return size is very large so take care in requesting this data.
+
+        Parameters
+        ----------
+        n_workers : int
+            Number of processes to use to transform the movie to what was shown
+            on the monitor. Default=None (use all cores).
+
+        Returns
+        -------
+        processed_movie : pd.DataFrame
+        """
+        return self._natural_movie_cache.get_processed_template_movie(
+            n_workers=n_workers
+        )
 
     def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
         """Download a template for the natural scene stimulus. This is the

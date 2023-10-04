@@ -1,6 +1,7 @@
 from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
@@ -329,6 +330,36 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         return self.fetch_api.get_behavior_session(
             behavior_session_id=behavior_session_id
         )
+
+    def get_raw_natural_movie(self) -> np.ndarray:
+        """Download the raw movie data from the cloud and return it as a numpy
+        array.
+
+        Returns
+        -------
+        raw_movie : np.ndarray
+        """
+        return self.fetch_api.get_raw_natural_movie()
+
+    def get_natural_movie_template(self, n_workers=None) -> pd.DataFrame:
+        """Download the movie if needed and process it into warped and unwarped
+        frames as presented to the mouse. The DataFrame is indexed with the
+        same frame index as shown in the stimulus presentation table.
+
+        The processing of the movie requires signicant processing and its
+        return size is very large so take care in requesting this data.
+
+        Parameters
+        ----------
+        n_workers : int
+            Number of processes to use to transform the movie to what was shown
+            on the monitor. Default=None (use all cores).
+
+        Returns
+        -------
+        processed_movie : pd.DataFrame
+        """
+        return self.fetch_api.get_natural_movie_template(n_workers=n_workers)
 
 
 def _write_json(path, df):

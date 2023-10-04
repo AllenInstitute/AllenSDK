@@ -25,6 +25,8 @@ class MockCache:
         ophys_cells_table,
         cachedir,
     ):
+        self.bucket_name = "test_bucket"
+        self.cache_dir = cachedir
         self.file_id_column = "file_id"
         self.session_table_path = cachedir / "session.csv"
         self.behavior_session_table_path = cachedir / "behavior_session.csv"
