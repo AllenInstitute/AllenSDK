@@ -134,6 +134,17 @@ class BasicLocalCache(ABC):
         """
         return self._find_latest_file(self.manifest_file_names)
 
+    @property
+    def cache_dir(self) -> str:
+        """Return the cache directory path.
+
+        Returns
+        -------
+        str
+            Full cache directory path
+        """
+        return self._cache_dir
+
     # ====================== BasicLocalCache methods ==========================
 
     @abstractmethod
@@ -330,7 +341,7 @@ class BasicLocalCache(ABC):
         RuntimeError
             If the file cannot be downloaded
         """
-        file_attributes = self._manifest.data_file_attributes(file_id)
+        file_attributes = self.get_file_attributes(file_id)
         exists = self._file_exists(file_attributes)
         local_path = file_attributes.local_path
         output = {'local_path': local_path,
@@ -338,6 +349,21 @@ class BasicLocalCache(ABC):
                   'file_attributes': file_attributes}
 
         return output
+
+    def get_file_attributes(self, file_id):
+        """
+        Retrieve file attributes for a given file_id from the meatadata.
+
+        Parameters
+        ----------
+        file_id: str or int
+            The unique identifier of the file to be accessed
+
+        Returns
+        -------
+        CacheFileAttributes
+        """
+        return self._manifest.data_file_attributes(file_id)
 
 
 class CloudCacheBase(BasicLocalCache):
@@ -1041,6 +1067,10 @@ class S3CloudCache(CloudCacheBase):
                          ui_class_name=ui_class_name)
 
     _s3_client = None
+
+    @property
+    def bucket_name(self) -> str:
+        return self._bucket_name
 
     @property
     def s3_client(self):
