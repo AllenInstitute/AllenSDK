@@ -65,7 +65,7 @@ def sanitize_data_columns(
 
 
 class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
-    MANIFEST_COMPATIBILITY = ["0.0.0", "2.0.0"]
+    MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
     def __init__(
         self,

@@ -2,6 +2,7 @@ from typing import Optional, List, Union
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import warnings
 
 from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
@@ -23,6 +24,10 @@ from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from allensdk.brain_observatory.behavior.behavior_project_cache \
     .project_cache_base import ProjectCacheBase
+
+
+class UpdatedStimulusPresentationTableWarning(UserWarning):
+    pass
 
 
 class VBOLimsCache(Cache):
@@ -64,7 +69,7 @@ class VBOLimsCache(Cache):
 class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
     PROJECT_NAME = "visual-behavior-ophys"
-    BUCKET_NAME = "visual-behavior-ophys-data"
+    BUCKET_NAME = "staging.visual-behavior-ophys-data"
 
     def __init__(
             self,
@@ -120,6 +125,23 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 self.cache = VBOLimsCache(manifest=manifest_,
                                           version=version,
                                           cache=cache)
+
+        warnings.warn(
+            message="\n\tAs of AllenSDK version 2.16.0, the latest Visual "
+                    "Behavior Ophys data has been significantly updated from "
+                    "previous releases. Specifically the user will need to "
+                    "update all processing of the stimulus_presentations "
+                    "tables. These tables now include multiple stimulus types "
+                    "delineated by the columns `stimulus_block` and "
+                    "`stimulus_block_name`.\n\nThe data that was available in "
+                    "previous releases are stored in the "
+                    "block name containing 'change_detection' and can be "
+                    "accessed in the pandas table by using: \n\t"
+                    "`stimulus_presentations["
+                    "stimulus_presentations.stimulus_block_name.str.contains"
+                    "('change_detection')]`",
+            category=UpdatedStimulusPresentationTableWarning
+        )
 
     @classmethod
     def cloud_api_class(cls):
@@ -346,7 +368,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         frames as presented to the mouse. The DataFrame is indexed with the
         same frame index as shown in the stimulus presentation table.
 
-        The processing of the movie requires signicant processing and its
+        The processing of the movie requires significant processing and its
         return size is very large so take care in requesting this data.
 
         Parameters

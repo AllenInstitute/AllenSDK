@@ -67,9 +67,6 @@ from allensdk.brain_observatory.behavior.data_objects.task_parameters import (
 from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
     Trials,
 )
-from allensdk.brain_observatory.behavior.stimulus_processing import (
-    compute_trials_id_for_stimulus,
-)
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from allensdk.core import (
     DataObject,
@@ -1068,55 +1065,113 @@ class BehaviorSession(
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
-        """Table whose rows are stimulus presentations (i.e. a given image,
+        """Table whose rows are stimulus presentations (e.g. a given image,
         for a given duration, typically 250 ms) and whose columns are
         presentation characteristics.
 
-        Adds trials_id to the stimulus table if the column is not already
-        present.
+        For VBO, the stimulus presentations tables now contain data from all
+        stimuli not just the active/passive image stimulus. These new stimuli
+        are delineated by stimulus_block and stimulus_block_name. The
+        previously released image behavior stimulus is accessible as the block
+        with a name containing "change_detection". Use the following example
+        code snippet to retrieve the original stimulus block from the pandas
+        table:
+            `stimulus_presentations[
+                stimulus_presentations.stimulus_block_name.str.contains(
+                    'change_detection'
+                )
+            ]`
 
         Returns
         -------
         pd.DataFrame
             Table whose rows are stimulus presentations
-            (i.e. a given image, for a given duration, typically 250 ms)
+            (e.g. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
 
             dataframe columns:
                 stimulus_presentations_id [index]: (int)
                     identifier for a stimulus presentation
                     (presentation of an image)
+                stimulus_block: (int)
+                    Index of the different stimuli presented to the mouse
+                    in order.
+                stimulus_block_name [VBO only]: (int)
+                    Name of the individual stimulus blocks describing briefly
+                    what was shown to the mouse.
+                image_index [VBO only]: (int)
+                    image index (0-7) for a given session,
+                    corresponding to each image name
+                image_name: (string)
+                    Name of the image presented to the mouse if applicable.
+                    This indexes in to the stimulus_templates object.
+                movie_frame_index [VBO only]: (int)
+                    Index into the natural movie presented. use with the
+                    method get_raw_natural_movie or if you need the movie
+                    frames stretched and warped to the monitor use
+                    get_natural_movie_template. (Warning this is a very compute
+                    intensive process).
                 duration: (float)
                     duration of an image presentation (flash)
                     in seconds (stop_time - start_time). NaN if omitted
-                start_frame: (int)
-                    image presentation start frame
-                end_frame: (float)
-                    image presentation end frame
                 start_time: (float)
                     image presentation start time in seconds
                 end_time: (float)
                     image presentation end time in seconds
-                image_index: (int)
-                    image index (0-7) for a given session,
-                    corresponding to each image name
+                start_frame: (int)
+                    image presentation start frame
+                end_frame: (int)
+                    image presentation end frame
+                is_change: (bool)
+                    True if the image stimulus has changed. <NA> if not
+                    an image stimulus block.
+                is_image_novel: (bool)
+                    True if the image stimulus is novel. <NA> if not
+                    an image stimulus block.
                 omitted: (bool)
                     True if no image was shown for this stimulus
-                    presentation
+                    presentation. <NA> if not an image stimulus block.
+                movie_repeat [VBO only]: (int)
+                    Number of times the movie has been repeated during the
+                    natural movie block. -99 if not a movie block.
+                flashes_since_change: (bool)
+                    Number of times the image has been flashed in between when
+                    it has changed.
                 trials_id: (int)
                     Id to match to the table Index of the trials table.
+                active: (bool)
+                    Stimulus block overlaps with the trials.
+                is_sham_change: (bool)
+                    True if the stimulus overlaps with a catch trial.
+                stimulus_index [VBN only]: (int)
+                    0 for gabor_20_deg_250ms, 1 for flash_250ms. -99 otherwise
+                position_x [VBN only]: (float)
+                    X position of gabor grating when shown. NaN if not
+                    applicable.
+                position_y [VBN only]: (float)
+                    Y position of gabor grating when shown. NaN if not
+                    applicable.
+                color [VBN only]: (float)
+                    Value of the color int flash_250ms stimulus. Either -1 or
+                    1. NaN if not applicable.
+                rewarded [VBN only]: (bool)
+                    Merge of trials data. True if the mouse was rewarded during
+                    the stimulus. <NA> if not applicable to stimulus block.
+                orientation [VBN only]: (float)
+                    Orientation of the gabor grating in degrees.
+                temporal_frequency [VBN only]: (float)
+                    Temporal frequency of the gabor grating. NaN if not
+                    applicable.
+                spatial_frequency [VBN only]: (float)
+                    Spatial frequency of the gabor grating. NaN if not
+                    applicable.
+                contrast [VBN only]: float
+                    Contrast value of the gabor grating. NaN if not applicable.
         """
         table = self._stimuli.presentations.value
         table = table.drop(columns=["image_set", "index"], errors="ignore")
         table = table.rename(columns={"stop_time": "end_time"})
 
-        if (
-            "trials_id" not in table.columns
-            and "stimulus_block" in table.columns
-        ):
-            table["trials_id"] = compute_trials_id_for_stimulus(
-                table, self.trials
-            )
         return table
 
     @property
@@ -1220,11 +1275,10 @@ class BehaviorSession(
         Returns
         -------
         pd.DataFrame
-            A dataframe containing trial and behavioral response data,
-            by cell specimen id
+            A dataframe containing trial and behavioral response data.
 
             dataframe columns:
-                trials_id: (int)
+                trials_id [index]: (int)
                     trial identifier
                 lick_times: (array of float)
                     array of lick times in seconds during that trial.
@@ -1279,6 +1333,17 @@ class BehaviorSession(
                 change_image_name: (string)
                     name of image that is changed to at the change time,
                     on go trials
+                change_time: (float)
+                    Time in the session at which the change occurred.
+                response_latency [VBO only]: (float)
+                    Delay between change and first lick in seconds. NaN if
+                    no change occurred.
+                change_frame: (int)
+                    Frame in the session at which the change occurred. -99 if
+                    no change.
+                change_time_no_display_delay [VBN only]: (float)
+                    Time of the change in seconds, before the display lag is
+                    accounted for and applied.
         """
         return self._trials.data
 

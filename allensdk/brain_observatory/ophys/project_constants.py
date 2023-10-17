@@ -8,11 +8,19 @@
 #
 #####################################################################
 
+# Last three codes are projects that have experiments that were pulled into
+# the data release. The mouse in these codes had most of its sessions
+# reassigned to one of the first 4 codes. This is a patch to allow these
+# projects to get the proper stimulus presentation tables with correct
+# stimulus_block_names.
 PROJECT_CODES = [
     "VisualBehavior",
     "VisualBehaviorTask1B",
     "VisualBehaviorMultiscope",
     "VisualBehaviorMultiscope4areasx2d",
+    "DevelopmentMultiscope4areasx2d",
+    "MesoscopeDevelopment",
+    "VisBIntTestDatacube"
 ]
 
 NUM_STRUCTURES_DICT = {

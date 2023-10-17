@@ -87,6 +87,7 @@ class Presentations(
             [
                 "flashes_since_change",
                 "image_index",
+                "movie_repeat",
                 "movie_frame_index",
                 "repeat",
                 "stimulus_index",

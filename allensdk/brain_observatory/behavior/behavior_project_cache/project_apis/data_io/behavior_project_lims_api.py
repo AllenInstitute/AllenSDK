@@ -402,11 +402,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
             cr.id as cell_roi_id,
             cr.cell_specimen_id,
-            cr.ophys_experiment_id,
-            cr.x,
-            cr.y,
-            cr.height,
-            cr.width
+            cr.ophys_experiment_id
             FROM cell_rois AS cr
             JOIN ophys_cell_segmentation_runs AS ocsr
                 ON ocsr.id=cr.ophys_cell_segmentation_run_id
