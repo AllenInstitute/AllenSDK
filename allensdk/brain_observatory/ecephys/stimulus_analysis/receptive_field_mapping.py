@@ -284,8 +284,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         dataset[spike_count_key] = dataset.sum(dim=time_key)
         dataset = dataset.drop(time_key)
 
-        dataset[row_key] = presentations.loc[:, row_key]
-        dataset[column_key] = presentations.loc[:, column_key]
+        dataset = dataset.assign_coords(
+            {row_key: ("stimulus_presentation_id",
+                       presentations.loc[:, row_key].to_numpy())})
+        dataset = dataset.assign_coords(
+            {column_key: ("stimulus_presentation_id",
+                          presentations.loc[:, column_key].to_numpy())})
         dataset = dataset.to_dataframe()
 
         dataset = (
