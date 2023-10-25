@@ -234,7 +234,6 @@ class TestLimsCloudConsistency:
             return cls.test_dir / 'ophys_cells_table.csv'
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_behavior_session_table(self):
         with patch.object(
                 BehaviorMetadata,
@@ -244,7 +243,7 @@ class TestLimsCloudConsistency:
         from_lims = from_lims.drop(columns=list(SESSION_SUPPRESS))
 
         from_s3 = self.cloud_cache.get_behavior_session_table()
-        from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+        from_s3 = from_s3.drop(columns=['file_id', 'file_path'])
 
         from_lims = from_lims.sort_index()
         from_s3 = from_s3.sort_index()
@@ -252,7 +251,6 @@ class TestLimsCloudConsistency:
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_ophys_session_table(self):
         with patch.object(
                 BehaviorMetadata,
@@ -269,7 +267,6 @@ class TestLimsCloudConsistency:
         pd.testing.assert_frame_equal(from_lims, from_s3)
 
     @pytest.mark.requires_bamboo
-    @pytest.mark.skip('Skipping until data on s3 has been updated')
     def test_ophys_experiments_table(self):
         with patch.object(
                 BehaviorMetadata,
@@ -281,7 +278,7 @@ class TestLimsCloudConsistency:
             list(OPHYS_EXPERIMENTS_SUPPRESS_FINAL), errors='ignore')
 
         from_s3 = self.cloud_cache.get_ophys_experiment_table()
-        from_s3 = from_s3.drop(columns=['file_id', 'isilon_filepath'])
+        from_s3 = from_s3.drop(columns=['file_id', 'file_path'])
 
         from_lims = from_lims.sort_index()
         from_s3 = from_s3.sort_index()

@@ -24,22 +24,17 @@ from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
 )
 from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
     enforce_df_int_typing,
     return_one_dataframe_row_only,
 )
 from allensdk.core.utilities import literal_col_eval
+from allensdk.brain_observatory.ophys.project_constants import (
+    VBO_METADATA_COLUMN_ORDER,
+    VBO_INTEGER_COLUMNS
+)
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
-INTEGER_COLUMNS = [
-    "session_number",
-    "prior_exposures_to_image_set",
-    "ophys_session_id",
-    "imaging_plane_group_count",
-    "imaging_plane_group",
-    "targeted_areas",
-    "num_depths_per_area",
-    "num_targeted_structures",
-]
 
 
 def sanitize_data_columns(
@@ -194,7 +189,15 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -219,7 +222,15 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -249,7 +260,15 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df["date_of_acquisition"] = pd.to_datetime(
             df["date_of_acquisition"], utc="True"
         )
-        df = enforce_df_int_typing(df, INTEGER_COLUMNS, True)
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):

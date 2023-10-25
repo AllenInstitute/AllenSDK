@@ -24,6 +24,14 @@ from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
     build_where_clause,
 )
+from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
+    enforce_df_int_typing
+)
+from allensdk.brain_observatory.ophys.project_constants import (
+    VBO_METADATA_COLUMN_ORDER,
+    VBO_INTEGER_COLUMNS
+)
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -384,7 +392,17 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             .astype(int)
         )
         targeted_imaging_depth.columns = ["targeted_imaging_depth"]
-        return query_df.merge(targeted_imaging_depth, on="ophys_container_id")
+        df = query_df.merge(targeted_imaging_depth, on="ophys_container_id")
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
+        return df
 
     def _get_ophys_cells_table(self):
         """
@@ -427,8 +445,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = self.lims_engine.select(query)
 
         # NaN's for invalid cells force this to float, push to int
-        df["cell_specimen_id"] = pd.array(
-            df["cell_specimen_id"], dtype="Int64"
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
         )
         return df
 
@@ -491,17 +511,28 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
-        table = (
-            self._get_ophys_session_table()
-            .drop_duplicates(subset=["ophys_session_id"], keep=False)
-            .set_index("ophys_session_id")
+        table = self._get_ophys_session_table().drop_duplicates(
+            subset=["ophys_session_id"],
+            keep=False
+        )
+        # Make date time explicitly UTC.
+        table["date_of_acquisition"] = pd.to_datetime(
+            table["date_of_acquisition"],
+            utc=True
         )
 
         # Fill NaN values of imaging_plane_group_count with zero to match
         # the behavior of the BehaviorOphysExperiment object.
-        im_plane_count = table["imaging_plane_group_count"].astype("Int64")
-        table["imaging_plane_group_count"] = im_plane_count
-        return table
+        table = enforce_df_int_typing(
+            input_df=table,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        table = enforce_df_column_order(
+            input_df=table,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
+        return table.set_index("ophys_session_id")
 
     def get_behavior_session(
         self, behavior_session_id: int
@@ -530,9 +561,22 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: pd.DataFrame
         """
         df = self._get_ophys_experiment_table()
+        df["date_of_acquisition"] = pd.to_datetime(
+            df["date_of_acquisition"],
+            utc=True
+        )
         # Set type to pandas.Int64 to enforce integer typing and not revert to
         # float.
-        df["imaging_plane_group"] = df["imaging_plane_group"].astype("Int64")
+        df = enforce_df_int_typing(
+            input_df=df,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df,
+            column_order=VBO_METADATA_COLUMN_ORDER
+        )
+
         return df.set_index("ophys_experiment_id")
 
     def get_behavior_session_table(self) -> pd.DataFrame:
@@ -547,12 +591,20 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         """
         summary_tbl = self._get_behavior_summary_table()
-        # Query returns float typing of age_in_days. Convert to int to match
-        # typing of the Age data_object.
-        summary_tbl["age_in_days"] = summary_tbl["age_in_days"].astype("Int64")
         # Add UTC time zone to match timezone from DateOfAcquisition object.
         summary_tbl["date_of_acquisition"] = pd.to_datetime(
             summary_tbl["date_of_acquisition"], utc=True
+        )
+        # Query returns float typing of age_in_days. Convert to int to match
+        # typing of the Age data_object.
+        summary_tbl = enforce_df_int_typing(
+            input_df=summary_tbl,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True
+        )
+        summary_tbl = enforce_df_column_order(
+            input_df=summary_tbl,
+            column_order=VBO_METADATA_COLUMN_ORDER
         )
 
         return summary_tbl.set_index("behavior_session_id")

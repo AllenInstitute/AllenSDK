@@ -96,7 +96,8 @@ def patch_df_from_other(
 
 
 def enforce_df_column_order(
-    input_df: pd.DataFrame, column_order: List[str]
+        input_df: pd.DataFrame,
+        column_order: List[str]
 ) -> pd.DataFrame:
     """Return the data frame but with columns ordered.
 
@@ -128,7 +129,9 @@ def enforce_df_column_order(
 
 
 def enforce_df_int_typing(
-    input_df: pd.DataFrame, int_columns: List[str], use_pandas_type=False
+        input_df: pd.DataFrame,
+        int_columns: List[str],
+        use_pandas_type: object = False
 ) -> pd.DataFrame:
     """Enforce integer typing for columns that may have lost int typing when
     combined into the final DataFrame.
