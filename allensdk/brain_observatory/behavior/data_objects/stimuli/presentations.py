@@ -597,10 +597,18 @@ class Presentations(
             found, return input_df unmodified.
         """
         if "omitted" in input_df.columns and len(input_df) > 0:
-            first_row = input_df.iloc[0]
-            if not pd.isna(first_row["omitted"]):
-                if first_row["omitted"]:
-                    input_df = input_df.drop(first_row.name, axis=0)
+            if "stimulus_block" in input_df.columns:
+                for stim_block in input_df['stimulus_block'].unique():
+                    first_row = input_df[
+                        input_df['stimulus_block'] == stim_block].iloc[0]
+                    if not pd.isna(first_row["omitted"]):
+                        if first_row["omitted"]:
+                            input_df = input_df.drop(first_row.name, axis=0)
+            else:
+                first_row = input_df.iloc[0]
+                if not pd.isna(first_row["omitted"]):
+                    if first_row["omitted"]:
+                        input_df = input_df.drop(first_row.name, axis=0)
         return input_df
 
     @staticmethod
