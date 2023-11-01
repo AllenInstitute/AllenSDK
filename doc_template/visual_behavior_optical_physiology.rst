@@ -87,8 +87,8 @@ Imaging took place between 75-400um below the cortical surface.
    :width: 850
 
 The full dataset includes neural and behavioral measurements from 107 
-mice during 704 in vivo 2-photon imaging sessions from 326 unique fields of view, 
-resulting in longitudinal recordings from 50,482 cortical neurons. 
+mice during 703 in vivo 2-photon imaging sessions from 326 unique fields of view,
+resulting in longitudinal recordings from 50,476 cortical neurons.
 The table below describes the numbers of mice, sessions, and unique recorded 
 neurons for each transgenic line and experimental configuration:
 
@@ -310,16 +310,38 @@ DATA FILE CHANGELOG
 
 **v1.1.0**
 
+Removed data
+
+- Removed behavior session with incorrect image presentations: 931566300.
+    - This results in the removal several other subordinate data:
+        - ophys session removed: 931566300
+        - ophys experiments removed: 932372699, 932372701, 932372705,
+          932372707, 932372711
+- Removed ophys session 875259383 from the ophys metadata table.
+  The behavior component of this session is available as behavior session
+  id=875471358. No ophys data for this session was previously released.
+- Removed truncated behavior sessions with ids: 934610593, 958310218,
+  975358131, 1011688792
+- The above identifiers have also been removed from their respective metadata
+  tables. Columns such as prior_exposures however, are correctly calculated
+  with knowledge of these sessions.
+- The cell ROIs associated with the above experiments have also been removed
+  from the cell ROI metadata table.
+- Current data counts
+    - 107 mice (same as v1.0.0)
+    - 4079 behavior training session (down from 4082)
+    - 703 in vivo 2-photon imaging sessions (down from 705)
+    - 50,476 logitudinal recordings (down from 50,489)
+
 Metadata Changes
 
-- Better consistency of integer typing throughout.
 - Additions to multiple tables
     - Added project_code and behavior_type (active/passive) value to all
       tables.
     - Added imaging_plane_group_count, num_depths_per_area,
       num_targeted_structures, experience_level to Behavior and Ophys session
       tables.
-- Behavior Session table
+- Behavior session table
     - Added trials summary columns: catch_trial_count,
       correct_reject_trial_count, engaged_trial_count, false_alarm_trial_count,
       miss_trial_count, trial_count.
@@ -327,9 +349,7 @@ Metadata Changes
 - Ophys experiment table
     - Added targeted_imaging_depth to experiment table, representing the
       average depth of all experiments in the published container.
-- Ophys cells table
-    - Added corner location of ROI cutout x,y for each ROI.
-    - Added width, height of the ROI cutout for each ROI.
+- Better consistency of integer typing throughout.
 
 NWB Data Changes
 
@@ -338,10 +358,38 @@ NWB Data Changes
   taken.
 - Enforced better and more consistent typing between the metadata tables and
   the session metadata.
-- All datetimes in NWBs and metadata tables are now explicitly UTC timezone.
+- All date/times in NWBs and metadata tables are now explicitly UTC timezone.
+- Stimulus presentations tables now contain information for additional stimulus
+  conditions, including 10 repeats of a 30 second movie clip at the end of
+  session_types starting with OPHYS, and 5 minute gray screen period before and
+  after change detection behavior in session_types starting with OPHYS. These
+  new stimuli are delineated by stimulus_block and stimulus_block_name. The
+  previously released image behavior stimulus is accessible as the block with a
+  name containing "change_detection". Use the following example code snippet to
+  retrieve the original stimulus block from the pandas table:
+      stimulus_presentations[stimulus_presentations.stimulus_block_name.str.contains('change_detection')]
 - New columns in the stimulus_presentations table:
-    - active, is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
-      stimulus_block, stimulus_block_name, stimulus_name
+    - is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
+      stimulus_block, stimulus_block_name, stimulus_name, active
+    - See in code documentation for stimulus_presentations table for
+      definitions of these new columns.
+- New trials columns:
+    - change_time, change_frame, response_latency
+    - See in code documentation for trials table for definitions of these new
+      columns.
+
+Supplemental cache data
+
+- New accessors in VisualBehaviorOphysProjectCache to download and cache the
+  natural movie presented to the mice. Additional accessor to convert the movie
+  to the format as shown on the screen during the session. (Warning this
+  conversion is compute intensive). Methods are:
+    - get_raw_natural_movie: Downloads the raw movie if needed and returns as
+      an ndarray.
+    - get_natural_movie_template: Converts the raw movie to the format as shown
+      on the screen during the session. Return a pandas dataframe in a similar
+      formate to the image templates. Warning this conversion is compute
+      intensive.
 
 **v1.0.1**
 

@@ -742,13 +742,6 @@ def compute_trials_id_for_stimulus(
         index=stim_pres_table.index,
         name="trials_id",
     ).astype("int")
-    # Return input frame if the stimulus_block or active is not available.
-    if (
-        "stimulus_block" not in stim_pres_table.columns
-        or "active" not in stim_pres_table.columns
-    ):
-        return trials_ids
-    active_sorted = stim_pres_table.active
 
     # Find stimulus blocks that start within a trial. Copy the trial_id
     # into our new trials_ids series. For some sessions there are gaps in
@@ -762,6 +755,14 @@ def compute_trials_id_for_stimulus(
             & (~stim_pres_table.image_name.isna())
         )
         trials_ids[stim_mask] = idx
+
+    # Return input frame if the stimulus_block or active is not available.
+    if (
+        "stimulus_block" not in stim_pres_table.columns
+        or "active" not in stim_pres_table.columns
+    ):
+        return trials_ids
+    active_sorted = stim_pres_table.active
 
     # The code below finds all stimulus blocks that contain images/trials
     # and attempts to detect blocks that are identical to copy the associated
