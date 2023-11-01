@@ -1,19 +1,24 @@
-from typing import Iterable, Union
-import numpy as np
 import pathlib
+from typing import Iterable, Union
 
+import numpy as np
 import pandas as pd
+from allensdk.api.cloud_cache.cloud_cache import (
+    LocalCache,
+    S3CloudCache,
+    StaticLocalCache,
+)
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment,
 )
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import (  # noqa: E501
     BehaviorProjectBase,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
-    ProjectCloudApiBase,
-)
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.natural_movie_one_cache import (  # noqa: E501
     NaturalMovieOneCache,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
+    ProjectCloudApiBase,
 )
 from allensdk.brain_observatory.behavior.behavior_session import (
     BehaviorSession,
@@ -23,9 +28,6 @@ from allensdk.core.dataframe_utils import (
     return_one_dataframe_row_only,
 )
 from allensdk.core.utilities import literal_col_eval
-from allensdk.api.cloud_cache.cloud_cache import (
-    S3CloudCache, LocalCache, StaticLocalCache)
-
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
 INTEGER_COLUMNS = [
@@ -71,11 +73,11 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         self,
         cache: Union[S3CloudCache, LocalCache, StaticLocalCache],
         skip_version_check: bool = False,
-        local: bool = False
+        local: bool = False,
     ):
-        super().__init__(cache=cache,
-                         skip_version_check=skip_version_check,
-                         local=local)
+        super().__init__(
+            cache=cache, skip_version_check=skip_version_check, local=local
+        )
         self._load_manifest_tables()
 
         if isinstance(cache, S3CloudCache):

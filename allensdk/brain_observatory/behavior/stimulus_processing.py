@@ -750,9 +750,9 @@ def compute_trials_id_for_stimulus(
     max_trials_stop = trials_table.stop_time.max()
     for idx, trial in trials_table.iterrows():
         stim_mask = (
-                (stim_pres_table.start_time > trial.start_time)
-                & (stim_pres_table.start_time < max_trials_stop)
-                & (~stim_pres_table.image_name.isna())
+            (stim_pres_table.start_time > trial.start_time)
+            & (stim_pres_table.start_time < max_trials_stop)
+            & (~stim_pres_table.image_name.isna())
         )
         trials_ids[stim_mask] = idx
 
