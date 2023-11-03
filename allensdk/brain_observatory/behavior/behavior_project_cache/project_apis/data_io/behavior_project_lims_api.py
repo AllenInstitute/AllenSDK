@@ -14,23 +14,23 @@ from allensdk.brain_observatory.behavior.behavior_session import (
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (  # noqa: E501
     HttpEngine,
 )
+from allensdk.brain_observatory.ophys.project_constants import (
+    VBO_INTEGER_COLUMNS,
+    VBO_METADATA_COLUMN_ORDER,
+)
 from allensdk.core.auth_config import (
     LIMS_DB_CREDENTIAL_MAP,
     MTRAIN_DB_CREDENTIAL_MAP,
 )
 from allensdk.core.authentication import DbCredentials
+from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
+    enforce_df_int_typing,
+)
 from allensdk.internal.api import db_connection_creator
 from allensdk.internal.api.queries.utils import (
     build_in_list_selector_query,
     build_where_clause,
-)
-from allensdk.core.dataframe_utils import (
-    enforce_df_column_order,
-    enforce_df_int_typing
-)
-from allensdk.brain_observatory.ophys.project_constants import (
-    VBO_METADATA_COLUMN_ORDER,
-    VBO_INTEGER_COLUMNS
 )
 
 
@@ -394,13 +394,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         targeted_imaging_depth.columns = ["targeted_imaging_depth"]
         df = query_df.merge(targeted_imaging_depth, on="ophys_container_id")
         df = enforce_df_int_typing(
-            input_df=df,
-            int_columns=VBO_INTEGER_COLUMNS,
-            use_pandas_type=True
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
         )
         df = enforce_df_column_order(
-            input_df=df,
-            column_order=VBO_METADATA_COLUMN_ORDER
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
         )
         return df
 
@@ -446,9 +443,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         # NaN's for invalid cells force this to float, push to int
         df = enforce_df_int_typing(
-            input_df=df,
-            int_columns=VBO_INTEGER_COLUMNS,
-            use_pandas_type=True
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
         )
         return df
 
@@ -512,13 +507,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
         table = self._get_ophys_session_table().drop_duplicates(
-            subset=["ophys_session_id"],
-            keep=False
+            subset=["ophys_session_id"], keep=False
         )
         # Make date time explicitly UTC.
         table["date_of_acquisition"] = pd.to_datetime(
-            table["date_of_acquisition"],
-            utc=True
+            table["date_of_acquisition"], utc=True
         )
 
         # Fill NaN values of imaging_plane_group_count with zero to match
@@ -526,11 +519,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         table = enforce_df_int_typing(
             input_df=table,
             int_columns=VBO_INTEGER_COLUMNS,
-            use_pandas_type=True
+            use_pandas_type=True,
         )
         table = enforce_df_column_order(
-            input_df=table,
-            column_order=VBO_METADATA_COLUMN_ORDER
+            input_df=table, column_order=VBO_METADATA_COLUMN_ORDER
         )
         return table.set_index("ophys_session_id")
 
@@ -562,19 +554,15 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         df = self._get_ophys_experiment_table()
         df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"],
-            utc=True
+            df["date_of_acquisition"], utc=True
         )
         # Set type to pandas.Int64 to enforce integer typing and not revert to
         # float.
         df = enforce_df_int_typing(
-            input_df=df,
-            int_columns=VBO_INTEGER_COLUMNS,
-            use_pandas_type=True
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
         )
         df = enforce_df_column_order(
-            input_df=df,
-            column_order=VBO_METADATA_COLUMN_ORDER
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
         )
 
         return df.set_index("ophys_experiment_id")
@@ -600,11 +588,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         summary_tbl = enforce_df_int_typing(
             input_df=summary_tbl,
             int_columns=VBO_INTEGER_COLUMNS,
-            use_pandas_type=True
+            use_pandas_type=True,
         )
         summary_tbl = enforce_df_column_order(
-            input_df=summary_tbl,
-            column_order=VBO_METADATA_COLUMN_ORDER
+            input_df=summary_tbl, column_order=VBO_METADATA_COLUMN_ORDER
         )
 
         return summary_tbl.set_index("behavior_session_id")

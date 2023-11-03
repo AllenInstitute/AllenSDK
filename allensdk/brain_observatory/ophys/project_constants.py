@@ -52,17 +52,40 @@ VBO_PASSIVE_MAP = {
 }
 
 VBO_METADATA_COLUMN_ORDER = [
-             'behavior_session_id', 'ophys_session_id', 'ophys_container_id',
-             'mouse_id', 'indicator', 'full_genotype', 'driver_line',
-             'cre_line', 'reporter_line', 'sex', 'age_in_days',
-             'imaging_depth', 'targeted_structure', 'targeted_imaging_depth',
-             'imaging_plane_group_count', 'imaging_plane_group',
-             'project_code', 'session_type', 'session_number', 'image_set',
-             'behavior_type', 'passive', 'experience_level',
-             'prior_exposures_to_session_type', 'prior_exposures_to_image_set',
-             'prior_exposures_to_omissions', 'date_of_acquisition',
-             'equipment_name', 'num_depths_per_area', 'ophys_experiment_id',
-             'num_targeted_structures', 'published_at', 'isi_experiment_id']
+    "behavior_session_id",
+    "ophys_session_id",
+    "ophys_container_id",
+    "mouse_id",
+    "indicator",
+    "full_genotype",
+    "driver_line",
+    "cre_line",
+    "reporter_line",
+    "sex",
+    "age_in_days",
+    "imaging_depth",
+    "targeted_structure",
+    "targeted_imaging_depth",
+    "imaging_plane_group_count",
+    "imaging_plane_group",
+    "project_code",
+    "session_type",
+    "session_number",
+    "image_set",
+    "behavior_type",
+    "passive",
+    "experience_level",
+    "prior_exposures_to_session_type",
+    "prior_exposures_to_image_set",
+    "prior_exposures_to_omissions",
+    "date_of_acquisition",
+    "equipment_name",
+    "num_depths_per_area",
+    "ophys_experiment_id",
+    "num_targeted_structures",
+    "published_at",
+    "isi_experiment_id",
+]
 
 
 VBO_INTEGER_COLUMNS = [
@@ -77,5 +100,5 @@ VBO_INTEGER_COLUMNS = [
     "targeted_areas",
     "num_depths_per_area",
     "num_targeted_structures",
-    "cell_specimen_id"
+    "cell_specimen_id",
 ]

@@ -74,7 +74,7 @@ class VBOLimsCache(Cache):
 
 class VisualBehaviorOphysProjectCache(ProjectCacheBase):
     PROJECT_NAME = "visual-behavior-ophys"
-    BUCKET_NAME = "visual-behavior-ophys-data"
+    BUCKET_NAME = "staging.visual-behavior-ophys-data"
 
     def __init__(
         self,
