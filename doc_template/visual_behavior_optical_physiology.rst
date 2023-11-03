@@ -229,6 +229,28 @@ unique imaging plane (**experiment**) that has been targeted on
 multiple recording days (**sessions**), under different behavioral and 
 sensory conditions (**session types**).
 
+SESSION STRUCTURE
+-----------------
+
+During behavioral training, sessions consist of 60 minutes of change detection
+behavior (other than the `TRAINING_0` sessions, which are 15 minutes of
+associative reward pairing).
+
+During ophys sessions (`session_type` starting with `OPHYS`), there is a 5
+minute period where no stimulus is shown before the change detection task
+begins, as well as 5 minutes of gray screen after the task ends. This allows
+evaluation of spontaneous activity in the absence of stimulus or task. After
+the second 5 minute gray screen period, a 30 second natural movie clip is
+shown 10 times. This movie clip is the same as the Visual Coding 2P stimulus
+called `natural_movie_one`. This allows evaluation of stimulus driven activity
+that is independent of the task.
+
+Ophys session structure:
+
+.. image:: /_static/visual_behavior_2p/vbo_session_structure.png
+   :align: center
+   :width: 850
+
 
 DATA PROCESSING
 ---------------
@@ -330,7 +352,9 @@ Removed data
 - Current data counts
     - 107 mice (same as v1.0.0)
     - 4079 behavior training session (down from 4082)
-    - 703 in vivo 2-photon imaging sessions (down from 705)
+    - 703 in vivo 2-photon imaging sessions (down from 704 sessions,
+      previous releases erroneously included session 875259383 in their
+      metadata tables and claimed 705 sessions.)
     - 50,476 logitudinal recordings (down from 50,489)
 
 Metadata Changes
@@ -368,6 +392,7 @@ NWB Data Changes
   name containing "change_detection". Use the following example code snippet to
   retrieve the original stimulus block from the pandas table:
       stimulus_presentations[stimulus_presentations.stimulus_block_name.str.contains('change_detection')]
+  See "SESSION STRUCTURE" section above for more details.
 - New columns in the stimulus_presentations table:
     - is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
       stimulus_block, stimulus_block_name, stimulus_name, active
