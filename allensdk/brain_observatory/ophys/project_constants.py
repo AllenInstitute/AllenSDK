@@ -66,6 +66,7 @@ VBO_METADATA_COLUMN_ORDER = [
     "imaging_depth",
     "targeted_structure",
     "targeted_imaging_depth",
+    "imaging_plane_group_count",
     "imaging_plane_group",
     "project_code",
     "session_type",
@@ -79,6 +80,25 @@ VBO_METADATA_COLUMN_ORDER = [
     "prior_exposures_to_omissions",
     "date_of_acquisition",
     "equipment_name",
+    "num_depths_per_area",
+    "ophys_experiment_id",
+    "num_targeted_structures",
     "published_at",
     "isi_experiment_id",
+]
+
+
+VBO_INTEGER_COLUMNS = [
+    "session_number",
+    "age_in_days",
+    "prior_exposures_to_image_set",
+    "prior_exposures_to_session_type",
+    "prior_exposures_to_omissions",
+    "ophys_session_id",
+    "imaging_plane_group_count",
+    "imaging_plane_group",
+    "targeted_areas",
+    "num_depths_per_area",
+    "num_targeted_structures",
+    "cell_specimen_id",
 ]

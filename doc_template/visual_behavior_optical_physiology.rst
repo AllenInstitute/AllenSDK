@@ -16,6 +16,9 @@ data access and subsequent analysis. No knowledge of the NWB file format is requ
 Specific information about how Visual Behavior Optical Physiology data is stored 
 in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
 
+TUTORIALS
+--------------------------------------------
+
 To get started, check out these jupyter notebooks to learn how to:
 
 1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
@@ -24,6 +27,10 @@ To get started, check out these jupyter notebooks to learn how to:
 4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_mouse_history.ipynb>`_
 5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
 
+DOCUMENTATION
+--------------------------------------------
+
+To learn more about the experimental design and available data, read through the Visual Behavior and Visual Behavior Ophys chapters in the `SWDB Databook <https://allenswdb.github.io/visual-behavior/vb-background.html>`_.
 
 For a description of available AllenSDK methods and attributes for data access, see this 
 `further documentation <https://visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/VBP_WhitePaper_SDK_Documentation.pdf>`_.
@@ -229,6 +236,28 @@ unique imaging plane (**experiment**) that has been targeted on
 multiple recording days (**sessions**), under different behavioral and 
 sensory conditions (**session types**).
 
+SESSION STRUCTURE
+-----------------
+
+During behavioral training, sessions consist of 60 minutes of change detection
+behavior (other than the `TRAINING_0` sessions, which are 15 minutes of
+associative reward pairing).
+
+During ophys sessions (`session_type` starting with `OPHYS`), there is a 5
+minute period where no stimulus is shown before the change detection task
+begins, as well as 5 minutes of gray screen after the task ends. This allows
+evaluation of spontaneous activity in the absence of stimulus or task. After
+the second 5 minute gray screen period, a 30 second natural movie clip is
+shown 10 times. This movie clip is the same as the Visual Coding 2P stimulus
+called `natural_movie_one`. This allows evaluation of stimulus driven activity
+that is independent of the task.
+
+Ophys session structure:
+
+.. image:: /_static/visual_behavior_2p/vbo_session_structure.png
+   :align: center
+   :width: 850
+
 
 DATA PROCESSING
 ---------------
@@ -330,7 +359,9 @@ Removed data
 - Current data counts
     - 107 mice (same as v1.0.0)
     - 4079 behavior training session (down from 4082)
-    - 703 in vivo 2-photon imaging sessions (down from 705)
+    - 703 in vivo 2-photon imaging sessions (down from 704 sessions,
+      previous releases erroneously included session 875259383 in their
+      metadata tables and claimed 705 sessions.)
     - 50,476 logitudinal recordings (down from 50,489)
 
 Metadata Changes
@@ -368,6 +399,7 @@ NWB Data Changes
   name containing "change_detection". Use the following example code snippet to
   retrieve the original stimulus block from the pandas table:
       stimulus_presentations[stimulus_presentations.stimulus_block_name.str.contains('change_detection')]
+  See "SESSION STRUCTURE" section above for more details.
 - New columns in the stimulus_presentations table:
     - is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
       stimulus_block, stimulus_block_name, stimulus_name, active
