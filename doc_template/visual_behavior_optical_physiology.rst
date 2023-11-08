@@ -409,6 +409,10 @@ NWB Data Changes
     - change_time, change_frame, response_latency
     - See in code documentation for trials table for definitions of these new
       columns.
+- Include additional traces in the ophys experiment object:
+    - corrected_fluorescence_traces, demixed_fluorescence_traces,
+      neuropil_traces, roi_masks, roi_response_series
+    - corrected_fluorescence_traces are now the correct trace.
 
 Supplemental cache data
 
