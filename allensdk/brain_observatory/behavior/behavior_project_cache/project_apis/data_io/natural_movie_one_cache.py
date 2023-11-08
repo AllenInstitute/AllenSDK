@@ -23,8 +23,8 @@ class NaturalMovieOneCache(S3CloudCache):
         # The hash has been pre-calculated from the file_hash_from_path
         # method in allensdk/api/cloud_cache/utils.py
         self._file_attributes = CacheFileAttributes(
-            url="https://staging.visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/resources/Movie_TOE1.npy",  # noqa E501
-            version_id="0y.DEg5ASDGaWA4Syls5MeC.S5Y6oIIS",
+            url="https://visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/resources/Movie_TOE1.npy",  # noqaL E501
+            version_id="Czht4ouDiTvs4CC_s8hsaE7VtVt_E9rO",
             file_hash="7e44cba154b29e1511ab8e5453b7aa5070f1ae456724b5b2541c97c052fbd80aebf159e5f933ab319bda8fdab7b863a096cdb44f129abd20a8c4cc791af4bc41",  # noqa E501
             local_path=pathlib.Path(cache_dir) / "Movie_TOE1.npy",
         )
