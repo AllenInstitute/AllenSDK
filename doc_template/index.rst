@@ -118,6 +118,15 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's new - 2.16.0
+----------------------------------------------------------------------
+- See release notes on Github
+- compatibility for python 3.10, 3.11
+
+What's new - 2.15.0
+----------------------------------------------------------------------
+- See release notes on Github
+
 What's new - 2.14.0
 ----------------------------------------------------------------------
 - Support for updated vbn release containing probe, lfp and behavior only data.

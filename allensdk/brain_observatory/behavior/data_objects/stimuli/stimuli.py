@@ -1,28 +1,40 @@
-from typing import Optional, List
-
-from pynwb import NWBFile
+from typing import List, Optional
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
-from allensdk.core import DataObject
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
+    StimulusFileReadableInterface,
+)
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
-from allensdk.core import \
-    NwbReadableInterface
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import \
-    StimulusFileReadableInterface
-from allensdk.core import NwbWritableInterface
-from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
-    import \
-    Presentations
-from allensdk.brain_observatory.behavior.data_objects.stimuli.templates \
-    import \
-    Templates
+from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.project_code import (  # noqa: E501
+    ProjectCode,
+)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations import (  # noqa: E501
+    Presentations,
+)
+from allensdk.brain_observatory.behavior.data_objects.stimuli.templates import (  # noqa: E501
+    Templates,
+)
+from allensdk.brain_observatory.behavior.data_objects.trials.trials import (
+    Trials,
+)
+from allensdk.core import (
+    DataObject,
+    NwbReadableInterface,
+    NwbWritableInterface,
+)
+from pynwb import NWBFile
 
 
-class Stimuli(DataObject, StimulusFileReadableInterface,
-              NwbReadableInterface, NwbWritableInterface):
-    def __init__(self, presentations: Presentations,
+class Stimuli(
+    DataObject,
+    StimulusFileReadableInterface,
+    NwbReadableInterface,
+    NwbWritableInterface,
+):
+    def __init__(self,
+                 presentations: Presentations,
                  templates: Templates):
-        super().__init__(name='stimuli', value=None, is_value_self=True)
+        super().__init__(name="stimuli", value=None, is_value_self=True)
         self._presentations = presentations
         self._templates = templates
 
@@ -36,33 +48,43 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
 
     @classmethod
     def from_nwb(
-            cls,
-            nwbfile: NWBFile,
-            presentation_columns: Optional[List[str]] = None,
-            add_is_change_to_presentations_table=True
+        cls,
+        nwbfile: NWBFile,
+        presentation_columns: Optional[List[str]] = None,
+        add_is_change_to_presentations_table=True,
     ) -> "Stimuli":
         p = Presentations.from_nwb(
             nwbfile=nwbfile,
             column_list=presentation_columns,
-            add_is_change=add_is_change_to_presentations_table)
+            add_is_change=add_is_change_to_presentations_table,
+        )
         t = Templates.from_nwb(nwbfile=nwbfile)
         return Stimuli(presentations=p, templates=t)
 
     @classmethod
     def from_stimulus_file(
-            cls, stimulus_file: BehaviorStimulusFile,
-            stimulus_timestamps: StimulusTimestamps,
-            behavior_session_id: int,
-            limit_to_images: Optional[List] = None,
-            presentation_columns: Optional[List[str]] = None,
-            presentation_fill_omitted_values: bool = True
+        cls,
+        stimulus_file: BehaviorStimulusFile,
+        stimulus_timestamps: StimulusTimestamps,
+        behavior_session_id: int,
+        trials: Trials,
+        limit_to_images: Optional[List] = None,
+        presentation_columns: Optional[List[str]] = None,
+        presentation_fill_omitted_values: bool = True,
+        project_code: Optional[ProjectCode] = None,
+        load_stimulus_movie: bool = False
     ) -> "Stimuli":
         """
 
         Parameters
         ----------
-        stimulus_file
-        stimulus_timestamps
+        stimulus_file: BehaviorStimulusFile
+            Input stimulus file for the session.
+        stimulus_timestamps: StimulusTimestamps
+            Stimulus timestamps for the session.
+        trials: Trials
+            Trials object to add trials_id column into the presentations
+            data frame to allow for merging between the two tables.
         behavior_session_id
             behavior session id in LIMS
         limit_to_images: limit to certain images. Used for testing.
@@ -70,6 +92,13 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             in the final presentations dataframe
         presentation_fill_omitted_values: Whether to fill stop_time and
             duration for omitted frames
+        project_code : ProjectCode
+            For released datasets, provide a project code to produce explicitly
+            named stimulus_block column values in the column
+            stimulus_block_name
+        load_stimulus_movie : bool
+            Whether to load the stimulus movie (e.g natrual_movie_one) as
+            part of loading stimuli. Default False.
 
         Returns
         -------
@@ -81,14 +110,22 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
             behavior_session_id=behavior_session_id,
             limit_to_images=limit_to_images,
             column_list=presentation_columns,
-            fill_omitted_values=presentation_fill_omitted_values
+            fill_omitted_values=presentation_fill_omitted_values,
+            project_code=project_code,
+            trials=trials,
         )
-        t = Templates.from_stimulus_file(stimulus_file=stimulus_file,
-                                         limit_to_images=limit_to_images)
+        t = Templates.from_stimulus_file(
+            stimulus_file=stimulus_file,
+            limit_to_images=limit_to_images,
+            load_stimulus_movie=load_stimulus_movie
+        )
         return Stimuli(presentations=p, templates=t)
 
-    def to_nwb(self, nwbfile: NWBFile,
-               presentations_stimulus_column_name='stimulus_name') -> NWBFile:
+    def to_nwb(
+        self,
+        nwbfile: NWBFile,
+        presentations_stimulus_column_name="stimulus_name",
+    ) -> NWBFile:
         """
 
         Parameters
@@ -102,9 +139,11 @@ class Stimuli(DataObject, StimulusFileReadableInterface,
         NWBFile
         """
         nwbfile = self._templates.to_nwb(
-            nwbfile=nwbfile, stimulus_presentations=self._presentations)
+            nwbfile=nwbfile, stimulus_presentations=self._presentations
+        )
         nwbfile = self._presentations.to_nwb(
             nwbfile=nwbfile,
-            stimulus_name_column=presentations_stimulus_column_name)
+            stimulus_name_column=presentations_stimulus_column_name,
+        )
 
         return nwbfile

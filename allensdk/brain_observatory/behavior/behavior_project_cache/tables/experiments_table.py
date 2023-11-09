@@ -8,11 +8,17 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .project_table import \
     ProjectTable
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level_ophys,
+)
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables\
     .util.experiments_table_utils import (
-        add_experience_level_to_experiment_table,
         add_passive_flag_to_ophys_experiment_table,
         add_image_set_to_experiment_table)
+from allensdk.core.dataframe_utils import (
+        enforce_df_column_order
+)
+from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
 class ExperimentsTable(ProjectTable, OphysMixin):
@@ -36,6 +42,10 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
         self.final_processing()
+        self._df = enforce_df_column_order(
+            self._df,
+            VBO_METADATA_COLUMN_ORDER
+        )
 
     def postprocess_base(self):
         """
@@ -61,6 +71,6 @@ class ExperimentsTable(ProjectTable, OphysMixin):
         # possible for the function calls below to be incorporated
         # into post_process_additional
 
-        self._df = add_experience_level_to_experiment_table(self._df)
+        self._df = add_experience_level_ophys(self._df)
         self._df = add_passive_flag_to_ophys_experiment_table(self._df)
         self._df = add_image_set_to_experiment_table(self._df)

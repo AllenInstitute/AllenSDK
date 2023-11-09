@@ -1,29 +1,90 @@
-import pandas as pd
-from typing import Iterable
+import pathlib
+from typing import Iterable, Union
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import (  # noqa: E501
-    BehaviorProjectBase,
-)
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession,
+import numpy as np
+import pandas as pd
+from allensdk.api.cloud_cache.cloud_cache import (
+    LocalCache,
+    S3CloudCache,
+    StaticLocalCache,
 )
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
     BehaviorOphysExperiment,
 )
-from allensdk.core.utilities import literal_col_eval
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import (  # noqa: E501
+    BehaviorProjectBase,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.natural_movie_one_cache import (  # noqa: E501
+    NaturalMovieOneCache,
+)
 from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.project_cloud_api_base import (  # noqa: E501
     ProjectCloudApiBase,
 )
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession,
+)
+from allensdk.brain_observatory.ophys.project_constants import (
+    VBO_INTEGER_COLUMNS,
+    VBO_METADATA_COLUMN_ORDER,
+)
+from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
+    enforce_df_int_typing,
+    return_one_dataframe_row_only,
+)
+from allensdk.core.utilities import literal_col_eval
 
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
 
 
-class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
+def sanitize_data_columns(
+    input_csv_path: str, dtype_convert: dict = None
+) -> pd.DataFrame:
+    """Given an input csv path, parse the data and convert columns.
 
+    Parameters
+    ----------
+    input_csv_path : str
+        Path to csv file
+    dtype_convert :  dict
+        Dictionary of column -> type mappings to enforce for pandas load of the
+        csv file.
+
+    Returns
+    -------
+    output_table : pandas.DataFrame
+        Parsed DataFrame
+    """
+    return literal_col_eval(
+        pd.read_csv(input_csv_path, dtype=dtype_convert),
+        columns=COL_EVAL_LIST,
+    )
+
+
+class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
     MANIFEST_COMPATIBILITY = ["1.0.0", "2.0.0"]
 
-    def _load_manifest_tables(self):
+    def __init__(
+        self,
+        cache: Union[S3CloudCache, LocalCache, StaticLocalCache],
+        skip_version_check: bool = False,
+        local: bool = False,
+    ):
+        super().__init__(
+            cache=cache, skip_version_check=skip_version_check, local=local
+        )
+        self._load_manifest_tables()
 
+        if isinstance(cache, S3CloudCache):
+            bucket_name = cache.bucket_name
+        else:
+            bucket_name = None
+        self._natural_movie_cache = NaturalMovieOneCache(
+            bucket_name=bucket_name,
+            cache_dir=str(pathlib.Path(cache.cache_dir) / "resources"),
+        )
+
+    def _load_manifest_tables(self):
         expected_metadata = set(
             [
                 "behavior_session_table",
@@ -74,22 +135,23 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         from the nwb file for the first-listed ophys_experiment.
 
         """
-        row = self._behavior_session_table.query(
-            f"behavior_session_id=={behavior_session_id}"
+        row = return_one_dataframe_row_only(
+            input_table=self._behavior_session_table,
+            index_value=behavior_session_id,
+            table_name="behavior_session_table",
         )
-        if row.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_session_table should have "
-                "1 and only 1 entry for a given "
-                "behavior_session_id. For "
-                f"{behavior_session_id} "
-                f" there are {row.shape[0]} entries."
-            )
         row = row.squeeze()
-        has_file_id = not pd.isna(row[self.cache.file_id_column])
+        has_file_id = (
+            not pd.isna(row[self.cache.file_id_column])
+            and row[self.cache.file_id_column] > 0
+        )
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
-            row = self._ophys_experiment_table.query(f"index=={oeid}")
+            row = return_one_dataframe_row_only(
+                input_table=self._ophys_experiment_table,
+                index_value=oeid,
+                table_name="ophys_experiment_table",
+            )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(nwb_path=str(data_path))
@@ -109,17 +171,11 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         BehaviorOphysExperiment
 
         """
-        row = self._ophys_experiment_table.query(
-            f"index=={ophys_experiment_id}"
+        row = return_one_dataframe_row_only(
+            input_table=self._ophys_experiment_table,
+            index_value=ophys_experiment_id,
+            table_name="ophys_experiment_table",
         )
-        if row.shape[0] != 1:
-            raise RuntimeError(
-                "The behavior_ophys_experiment_table should "
-                "have 1 and only 1 entry for a given "
-                f"ophys_experiment_id. For "
-                f"{ophys_experiment_id} "
-                f" there are {row.shape[0]} entries."
-            )
         file_id = str(int(row[self.cache.file_id_column]))
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
@@ -128,11 +184,17 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         session_table_path = self._get_metadata_path(
             fname="ophys_session_table"
         )
-        df = literal_col_eval(
-            pd.read_csv(session_table_path, dtype={"mouse_id": str}),
-            columns=COL_EVAL_LIST,
+        df = sanitize_data_columns(session_table_path, {"mouse_id": str})
+        # Add UTC to match DateOfAcquisition object.
+        df["date_of_acquisition"] = pd.to_datetime(
+            df["date_of_acquisition"], utc="True"
         )
-        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
+        )
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -152,11 +214,17 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         session_table_path = self._get_metadata_path(
             fname="behavior_session_table"
         )
-        df = literal_col_eval(
-            pd.read_csv(session_table_path, dtype={"mouse_id": str}),
-            columns=COL_EVAL_LIST,
+        df = sanitize_data_columns(session_table_path, {"mouse_id": str})
+        # Add UTC to match DateOfAcquisition object.
+        df["date_of_acquisition"] = pd.to_datetime(
+            df["date_of_acquisition"], utc="True"
         )
-        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
+        )
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -181,21 +249,24 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         experiment_table_path = self._get_metadata_path(
             fname="ophys_experiment_table"
         )
-        df = literal_col_eval(
-            pd.read_csv(experiment_table_path, dtype={"mouse_id": str}),
-            columns=COL_EVAL_LIST,
+        df = sanitize_data_columns(experiment_table_path, {"mouse_id": str})
+        # Add UTC to match DateOfAcquisition object.
+        df["date_of_acquisition"] = pd.to_datetime(
+            df["date_of_acquisition"], utc="True"
         )
-        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"])
-
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
+        )
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
         ophys_cells_table_path = self._get_metadata_path(
             fname="ophys_cells_table"
         )
-        df = literal_col_eval(
-            pd.read_csv(ophys_cells_table_path), columns=COL_EVAL_LIST
-        )
+        df = sanitize_data_columns(ophys_cells_table_path)
         # NaN's for invalid cells force this to float, push to int
         df["cell_specimen_id"] = pd.array(
             df["cell_specimen_id"], dtype="Int64"
@@ -218,14 +289,36 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         """
         return self._ophys_experiment_table
 
-    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """Download a template for the natural movie stimulus. This is the
-        actual movie that was shown during the recording session.
-        :param number: identifier for this scene
-        :type number: int
-        :returns: An iterable yielding an npy file as bytes
+    def get_raw_natural_movie(self) -> np.ndarray:
+        """Download the raw natural movie presented to the mouse.
+
+        Returns
+        -------
+        natural_movie_one : numpy.ndarray
         """
-        raise NotImplementedError()
+        return self._natural_movie_cache.get_raw_movie()
+
+    def get_natural_movie_template(self, n_workers=None) -> pd.DataFrame:
+        """Download the movie if needed and process it into warped and unwarped
+        frames as presented to the mouse. The DataFrame is indexed with the
+        same frame index as shown in the stimulus presentation table.
+
+        The processing of the movie requires signicant processing and its
+        return size is very large so take care in requesting this data.
+
+        Parameters
+        ----------
+        n_workers : int
+            Number of processes to use to transform the movie to what was shown
+            on the monitor. Default=None (use all cores).
+
+        Returns
+        -------
+        processed_movie : pd.DataFrame
+        """
+        return self._natural_movie_cache.get_processed_template_movie(
+            n_workers=n_workers
+        )
 
     def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
         """Download a template for the natural scene stimulus. This is the

@@ -1,44 +1,38 @@
-from typing import List, Tuple, Dict, Any, Optional
-import pandas as pd
+from typing import Any, Dict, List, Optional, Tuple
 
+import pandas as pd
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.image_presentation_utils import (  # noqa: E501
+    get_image_set,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
+    add_experience_level_simple,
+    get_prior_exposures_to_image_set,
+    get_prior_exposures_to_session_type,
+)
+from allensdk.brain_observatory.vbn_2022.metadata_writer.dataframe_manipulations import (  # noqa: E501
+    _add_age_in_days,
+    _add_images_from_behavior,
+    _add_prior_omissions,
+    _add_session_number,
+)
 from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 from allensdk.internal.api import PostgresQueryMixin, db_connection_creator
-
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
-
-from allensdk.internal.api.queries.ecephys_lims_queries import (
-    donor_id_lookup_from_ecephys_session_ids)
-
 from allensdk.internal.api.queries.compound_lims_queries import (
-    behavior_sessions_from_ecephys_session_ids)
-
-from allensdk.core.dataframe_utils import (
-    patch_df_from_other)
-
-from allensdk.brain_observatory.vbn_2022. \
-    metadata_writer.dataframe_manipulations import (
-        _add_prior_omissions,
-        _add_session_number,
-        _add_age_in_days,
-        _add_experience_level,
-        _add_images_from_behavior)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.prior_exposure_processing import (
-        get_prior_exposures_to_image_set,
-        get_prior_exposures_to_session_type)
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.tables \
-    .util.image_presentation_utils import (
-        get_image_set)
-from allensdk.internal.brain_observatory.util.multi_session_utils import \
-    get_session_metadata_multiprocessing, remove_invalid_sessions
+    behavior_sessions_from_ecephys_session_ids,
+)
+from allensdk.internal.api.queries.ecephys_lims_queries import (
+    donor_id_lookup_from_ecephys_session_ids,
+)
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
+from allensdk.internal.brain_observatory.util.multi_session_utils import (
+    get_session_metadata_multiprocessing,
+    remove_invalid_sessions,
+)
 
 
 def get_list_of_bad_probe_ids(
-        lims_connection: PostgresQueryMixin,
-        probes_to_skip: List[Dict[str, Any]]) -> List[int]:
+    lims_connection: PostgresQueryMixin, probes_to_skip: List[Dict[str, Any]]
+) -> List[int]:
     """
     Given a list of probes to skip,each of the form
 
@@ -83,9 +77,10 @@ def get_list_of_bad_probe_ids(
 
 
 def units_table_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    probe_ids_to_skip: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will return the units table.
 
@@ -200,17 +195,19 @@ def units_table_from_ecephys_session_id_list(
     """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=ecephys_session_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
-                        col='ecephys_probes.id',
-                        valid_list=probe_ids_to_skip,
-                        operator='AND',
-                        valid=False)
+            col="ecephys_probes.id",
+            valid_list=probe_ids_to_skip,
+            operator="AND",
+            valid=False,
+        )
         query += f"""{skip_clause}"""
 
     units_table = lims_connection.select(query)
@@ -219,9 +216,10 @@ def units_table_from_ecephys_session_id_list(
 
 
 def probes_table_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    probe_ids_to_skip: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will return the probes table.
 
@@ -284,17 +282,19 @@ def probes_table_from_ecephys_session_id_list(
     """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=ecephys_session_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
-                        col='ecephys_probes.id',
-                        valid_list=probe_ids_to_skip,
-                        operator='AND',
-                        valid=False)
+            col="ecephys_probes.id",
+            valid_list=probe_ids_to_skip,
+            operator="AND",
+            valid=False,
+        )
         query += f"""{skip_clause}"""
 
     query += """group by ecephys_probes.id"""
@@ -304,9 +304,10 @@ def probes_table_from_ecephys_session_id_list(
 
 
 def channels_table_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    probe_ids_to_skip: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will return the channels table.
 
@@ -373,17 +374,19 @@ def channels_table_from_ecephys_session_id_list(
     """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=ecephys_session_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
-                        col='ecephys_probes.id',
-                        valid_list=probe_ids_to_skip,
-                        operator='AND',
-                        valid=False)
+            col="ecephys_probes.id",
+            valid_list=probe_ids_to_skip,
+            operator="AND",
+            valid=False,
+        )
         query += f"""{skip_clause}"""
 
     query += """
@@ -398,9 +401,10 @@ def channels_table_from_ecephys_session_id_list(
 
 
 def _merge_ecephys_id_and_failed(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        failed_ecephys_session_id_list: List[int]) -> List[int]:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    failed_ecephys_session_id_list: List[int],
+) -> List[int]:
     """
     Take a list of passed ecephys_session_ids and a list of
     failed ecephys_session_ids and return return the union of
@@ -424,17 +428,19 @@ def _merge_ecephys_id_and_failed(
 
     passed_donor_lookup = donor_id_lookup_from_ecephys_session_ids(
         lims_connection=lims_connection,
-        session_id_list=ecephys_session_id_list)
+        session_id_list=ecephys_session_id_list,
+    )
 
     passed_donor_ids = set(passed_donor_lookup.donor_id.values)
 
     failed_donor_lookup = donor_id_lookup_from_ecephys_session_ids(
         lims_connection=lims_connection,
-        session_id_list=failed_ecephys_session_id_list)
+        session_id_list=failed_ecephys_session_id_list,
+    )
     to_keep = []
     for session_id, donor_id in zip(
-            failed_donor_lookup.ecephys_session_id,
-            failed_donor_lookup.donor_id):
+        failed_donor_lookup.ecephys_session_id, failed_donor_lookup.donor_id
+    ):
         if donor_id in passed_donor_ids:
             to_keep.append(int(session_id))
 
@@ -444,9 +450,10 @@ def _merge_ecephys_id_and_failed(
 
 
 def _ecephys_summary_table_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        failed_ecephys_session_id_list: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    failed_ecephys_session_id_list: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will return the session summary table.
 
@@ -498,9 +505,10 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
 
     if failed_ecephys_session_id_list is not None:
         query_id_list = _merge_ecephys_id_and_failed(
-                lims_connection=lims_connection,
-                ecephys_session_id_list=ecephys_session_id_list,
-                failed_ecephys_session_id_list=failed_ecephys_session_id_list)
+            lims_connection=lims_connection,
+            ecephys_session_id_list=ecephys_session_id_list,
+            failed_ecephys_session_id_list=failed_ecephys_session_id_list,
+        )
     else:
         query_id_list = ecephys_session_id_list
 
@@ -536,24 +544,27 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
         """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=query_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=query_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     summary_table = lims_connection.select(query)
 
     # Add UTC tz
-    summary_table['date_of_acquisition'] = \
-        summary_table['date_of_acquisition'].dt.tz_localize('UTC')
+    summary_table["date_of_acquisition"] = summary_table[
+        "date_of_acquisition"
+    ].dt.tz_localize("UTC")
 
     return summary_table
 
 
 def _ecephys_counts_per_session_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    probe_ids_to_skip: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will produce a table enumerating
     how many units, channels, and probes there are in each
@@ -599,17 +610,19 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
     """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=ecephys_session_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
-                        col='ecephys_probes.id',
-                        valid_list=probe_ids_to_skip,
-                        operator='AND',
-                        valid=False)
+            col="ecephys_probes.id",
+            valid_list=probe_ids_to_skip,
+            operator="AND",
+            valid=False,
+        )
         query += f"""{skip_clause}"""
 
     query += """
@@ -620,9 +633,10 @@ def _ecephys_counts_per_session_from_ecephys_session_id_list(
 
 
 def _ecephys_structure_acronyms_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        probe_ids_to_skip: Optional[List[int]]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    probe_ids_to_skip: Optional[List[int]],
+) -> pd.DataFrame:
     """
     Perform the database query that will produce a table listing the
     acronyms of all of the structures encompassed by a given
@@ -664,17 +678,19 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
     """
 
     query += build_in_list_selector_query(
-            col='ecephys_sessions.id',
-            valid_list=ecephys_session_id_list,
-            operator='WHERE',
-            valid=True)
+        col="ecephys_sessions.id",
+        valid_list=ecephys_session_id_list,
+        operator="WHERE",
+        valid=True,
+    )
 
     if probe_ids_to_skip is not None:
         skip_clause = build_in_list_selector_query(
-                        col='ecephys_probes.id',
-                        valid_list=probe_ids_to_skip,
-                        operator='AND',
-                        valid=False)
+            col="ecephys_probes.id",
+            valid_list=probe_ids_to_skip,
+            operator="AND",
+            valid=False,
+        )
         query += f"""{skip_clause}"""
 
     query += """
@@ -685,10 +701,10 @@ def _ecephys_structure_acronyms_from_ecephys_session_id_list(
 
 
 def _behavior_session_table_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        exclude_invalid_sessions: bool = True,
-        n_workers: Optional[int] = None
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    exclude_invalid_sessions: bool = True,
+    n_workers: Optional[int] = None,
 ) -> pd.DataFrame:
     """
     Given a list of ecephys_session_ids, find all of the behavior_sessions
@@ -737,65 +753,58 @@ def _behavior_session_table_from_ecephys_session_id_list(
         session_number  --  int64
     """
     behavior_session_df = behavior_sessions_from_ecephys_session_ids(
-                            lims_connection=lims_connection,
-                            ecephys_session_id_list=ecephys_session_id_list)
+        lims_connection=lims_connection,
+        ecephys_session_id_list=ecephys_session_id_list,
+    )
     behavior_sessions = get_session_metadata_multiprocessing(
-        behavior_session_ids=behavior_session_df['behavior_session_id'],
+        behavior_session_ids=behavior_session_df["behavior_session_id"],
         lims_engine=db_connection_creator(
             fallback_credentials=LIMS_DB_CREDENTIAL_MAP
         ),
-        n_workers=n_workers
+        n_workers=n_workers,
     )
     if exclude_invalid_sessions:
         behavior_sessions = remove_invalid_sessions(
-            behavior_sessions=behavior_sessions)
+            behavior_sessions=behavior_sessions
+        )
 
-    behavior_session_df = \
-        behavior_session_df[
-            behavior_session_df['behavior_session_id']
-            .isin([x.behavior_session_id for x in behavior_sessions])]
+    behavior_session_df = behavior_session_df[
+        behavior_session_df["behavior_session_id"].isin(
+            [x.behavior_session_id for x in behavior_sessions]
+        )
+    ]
+    # Add timezone information to behavior daq. Matches ecephys table.
+    behavior_session_df["date_of_acquisition"] = behavior_session_df[
+        "date_of_acquisition"
+    ].dt.tz_localize("UTC")
 
-    behavior_session_df['date_of_acquisition'] = \
-        behavior_session_df['behavior_session_id']\
-        .map({
-            x.behavior_session_id: x.date_of_acquisition
-            for x in behavior_sessions
-        })
-    behavior_session_df['session_type'] = \
-        behavior_session_df['behavior_session_id']\
-        .map({
-            x.behavior_session_id: x.session_type
-            for x in behavior_sessions
-        })
+    behavior_session_df["image_set"] = get_image_set(df=behavior_session_df)
 
-    behavior_session_df['image_set'] = get_image_set(
-            df=behavior_session_df)
+    behavior_session_df[
+        "prior_exposures_to_session_type"
+    ] = get_prior_exposures_to_session_type(df=behavior_session_df)
 
-    behavior_session_df['prior_exposures_to_session_type'] = \
-        get_prior_exposures_to_session_type(
-            df=behavior_session_df)
-
-    behavior_session_df['prior_exposures_to_image_set'] = \
-        get_prior_exposures_to_image_set(
-            df=behavior_session_df)
+    behavior_session_df[
+        "prior_exposures_to_image_set"
+    ] = get_prior_exposures_to_image_set(df=behavior_session_df)
 
     behavior_session_df = _add_age_in_days(
-        df=behavior_session_df,
-        index_column="behavior_session_id")
+        df=behavior_session_df, index_column="behavior_session_id"
+    )
 
     behavior_session_df = _add_session_number(
-        sessions_df=behavior_session_df,
-        index_col="behavior_session_id")
+        sessions_df=behavior_session_df, index_col="behavior_session_id"
+    )
 
     return behavior_session_df
 
 
 def session_tables_from_ecephys_session_id_list(
-        lims_connection: PostgresQueryMixin,
-        ecephys_session_id_list: List[int],
-        failed_ecephys_session_id_list: Optional[List[int]],
-        probe_ids_to_skip: Optional[List[int]],
-        n_workers: Optional[int] = None
+    lims_connection: PostgresQueryMixin,
+    ecephys_session_id_list: List[int],
+    failed_ecephys_session_id_list: Optional[List[int]],
+    probe_ids_to_skip: Optional[List[int]],
+    n_workers: Optional[int] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Perform the database query to generate the ecephys_session_table
@@ -870,93 +879,93 @@ def session_tables_from_ecephys_session_id_list(
     """
 
     beh_table = _behavior_session_table_from_ecephys_session_id_list(
-            lims_connection=lims_connection,
-            ecephys_session_id_list=ecephys_session_id_list,
-            n_workers=n_workers
+        lims_connection=lims_connection,
+        ecephys_session_id_list=ecephys_session_id_list,
+        n_workers=n_workers,
     )
 
     summary_tbl = _ecephys_summary_table_from_ecephys_session_id_list(
-                lims_connection=lims_connection,
-                ecephys_session_id_list=ecephys_session_id_list,
-                failed_ecephys_session_id_list=failed_ecephys_session_id_list)
-
-    # patch date_of_acquisition and session_type from beh_table,
-    # which read them directly from the pickle file
-    summary_tbl = patch_df_from_other(
-                    target_df=summary_tbl,
-                    source_df=beh_table,
-                    index_column='behavior_session_id',
-                    columns_to_patch=['date_of_acquisition',
-                                      'session_type'])
+        lims_connection=lims_connection,
+        ecephys_session_id_list=ecephys_session_id_list,
+        failed_ecephys_session_id_list=failed_ecephys_session_id_list,
+    )
 
     # since we had to read date_of_acquisition from the pickle file,
     # we now need to calculate age_in_days
     summary_tbl = _add_age_in_days(
-                        df=summary_tbl,
-                        index_column="ecephys_session_id")
+        df=summary_tbl, index_column="ecephys_session_id"
+    )
 
     summary_tbl.drop(
-            labels=['date_of_birth', 'equipment_id'],
-            axis='columns',
-            inplace=True)
+        labels=["date_of_birth", "equipment_id"], axis="columns", inplace=True
+    )
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
-                        lims_connection=lims_connection,
-                        ecephys_session_id_list=ecephys_session_id_list,
-                        probe_ids_to_skip=probe_ids_to_skip)
+        lims_connection=lims_connection,
+        ecephys_session_id_list=ecephys_session_id_list,
+        probe_ids_to_skip=probe_ids_to_skip,
+    )
 
     summary_tbl = summary_tbl.join(
-                        ct_tbl.set_index("ecephys_session_id"),
-                        on="ecephys_session_id",
-                        how='left')
+        ct_tbl.set_index("ecephys_session_id"),
+        on="ecephys_session_id",
+        how="left",
+    )
 
     struct_tbl = _ecephys_structure_acronyms_from_ecephys_session_id_list(
-                        lims_connection=lims_connection,
-                        ecephys_session_id_list=ecephys_session_id_list,
-                        probe_ids_to_skip=probe_ids_to_skip)
+        lims_connection=lims_connection,
+        ecephys_session_id_list=ecephys_session_id_list,
+        probe_ids_to_skip=probe_ids_to_skip,
+    )
 
     summary_tbl = summary_tbl.join(
-                     struct_tbl.set_index("ecephys_session_id"),
-                     on="ecephys_session_id",
-                     how='left')
+        struct_tbl.set_index("ecephys_session_id"),
+        on="ecephys_session_id",
+        how="left",
+    )
 
     summary_tbl = _add_images_from_behavior(
-            ecephys_table=summary_tbl,
-            behavior_table=beh_table)
+        ecephys_table=summary_tbl, behavior_table=beh_table
+    )
 
     sessions_table = _add_session_number(
-                            sessions_df=summary_tbl,
-                            index_col="ecephys_session_id")
-    sessions_table = _add_experience_level(
-                            sessions_df=sessions_table)
+        sessions_df=summary_tbl, index_col="ecephys_session_id"
+    )
+    sessions_table = add_experience_level_simple(input_df=sessions_table)
 
     omission_results = _add_prior_omissions(
-                behavior_sessions_df=beh_table,
-                ecephys_sessions_df=sessions_table)
+        behavior_sessions_df=beh_table, ecephys_sessions_df=sessions_table
+    )
 
-    beh_table = omission_results['behavior']
-    sessions_table = omission_results['ecephys']
+    beh_table = omission_results["behavior"]
+    sessions_table = omission_results["ecephys"]
 
     beh_table = beh_table[
-            ['behavior_session_id',
-             'equipment_name',
-             'genotype',
-             'mouse_id',
-             'sex',
-             'age_in_days',
-             'session_number',
-             'prior_exposures_to_session_type',
-             'prior_exposures_to_image_set',
-             'prior_exposures_to_omissions',
-             'ecephys_session_id',
-             'date_of_acquisition',
-             'session_type',
-             'image_set']]
+        [
+            "behavior_session_id",
+            "equipment_name",
+            "genotype",
+            "mouse_id",
+            "sex",
+            "age_in_days",
+            "session_number",
+            "prior_exposures_to_session_type",
+            "prior_exposures_to_image_set",
+            "prior_exposures_to_omissions",
+            "ecephys_session_id",
+            "date_of_acquisition",
+            "session_type",
+            "image_set",
+        ]
+    ]
 
     # pare back down to only passed sessions
     if failed_ecephys_session_id_list is not None:
         sessions_table = sessions_table[
-                [eid in set(ecephys_session_id_list)
-                 for eid in sessions_table.ecephys_session_id]]
+            [
+                eid in set(ecephys_session_id_list)
+                for eid in sessions_table.ecephys_session_id
+            ]
+        ]
 
     return sessions_table, beh_table

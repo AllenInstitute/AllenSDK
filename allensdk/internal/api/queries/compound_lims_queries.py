@@ -28,6 +28,7 @@ def behavior_sessions_from_ecephys_session_ids(
         Dataframe with columns
             mouse_id
             behavior_session_id
+            session_type
             date_of_acquisition
             date_of_birth
             ecephys_session_id
@@ -44,6 +45,7 @@ def behavior_sessions_from_ecephys_session_ids(
     SELECT
       donors.external_donor_name as mouse_id
       ,behavior.id as behavior_session_id
+      ,behavior.stimulus_name as session_type
       ,behavior.date_of_acquisition as date_of_acquisition
       ,behavior.ecephys_session_id as ecephys_session_id
       ,donors.date_of_birth as date_of_birth

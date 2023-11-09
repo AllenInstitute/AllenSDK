@@ -16,6 +16,9 @@ data access and subsequent analysis. No knowledge of the NWB file format is requ
 Specific information about how Visual Behavior Optical Physiology data is stored 
 in NWB files and how AllenSDK accesses NWB files can be found `here <visual_behavior_ophys_nwb.html>`_.
 
+TUTORIALS
+--------------------------------------------
+
 To get started, check out these jupyter notebooks to learn how to:
 
 1) `Download data using the AllenSDK or directly from our Amazon S3 bucket <_static/examples/nb/visual_behavior_ophys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_ophys_data_access.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_ophys_data_access.ipynb>`_
@@ -24,6 +27,10 @@ To get started, check out these jupyter notebooks to learn how to:
 4) `Examine the full training history of one mouse <_static/examples/nb/visual_behavior_mouse_history.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_mouse_history.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_mouse_history.ipynb>`_
 5) `Compare behavior and neural activity across different trial types in the task <_static/examples/nb/visual_behavior_compare_across_trial_types.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_ `(Open in Colab) <https://colab.research.google.com/github/AllenInstitute/allenSDK/blob/master/doc_template/examples_root/examples/nb/visual_behavior_compare_across_trial_types.ipynb>`_
 
+DOCUMENTATION
+--------------------------------------------
+
+To learn more about the experimental design and available data, read through the Visual Behavior and Visual Behavior Ophys chapters in the `SWDB Databook <https://allenswdb.github.io/visual-behavior/vb-background.html>`_.
 
 For a description of available AllenSDK methods and attributes for data access, see this 
 `further documentation <https://visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/VBP_WhitePaper_SDK_Documentation.pdf>`_.
@@ -87,8 +94,8 @@ Imaging took place between 75-400um below the cortical surface.
    :width: 850
 
 The full dataset includes neural and behavioral measurements from 107 
-mice during 704 in vivo 2-photon imaging sessions from 326 unique fields of view, 
-resulting in longitudinal recordings from 50,482 cortical neurons. 
+mice during 703 in vivo 2-photon imaging sessions from 326 unique fields of view,
+resulting in longitudinal recordings from 50,476 cortical neurons.
 The table below describes the numbers of mice, sessions, and unique recorded 
 neurons for each transgenic line and experimental configuration:
 
@@ -229,6 +236,28 @@ unique imaging plane (**experiment**) that has been targeted on
 multiple recording days (**sessions**), under different behavioral and 
 sensory conditions (**session types**).
 
+SESSION STRUCTURE
+-----------------
+
+During behavioral training, sessions consist of 60 minutes of change detection
+behavior (other than the `TRAINING_0` sessions, which are 15 minutes of
+associative reward pairing).
+
+During ophys sessions (`session_type` starting with `OPHYS`), there is a 5
+minute period where no stimulus is shown before the change detection task
+begins, as well as 5 minutes of gray screen after the task ends. This allows
+evaluation of spontaneous activity in the absence of stimulus or task. After
+the second 5 minute gray screen period, a 30 second natural movie clip is
+shown 10 times. This movie clip is the same as the Visual Coding 2P stimulus
+called `natural_movie_one`. This allows evaluation of stimulus driven activity
+that is independent of the task.
+
+Ophys session structure:
+
+.. image:: /_static/visual_behavior_2p/vbo_session_structure.png
+   :align: center
+   :width: 850
+
 
 DATA PROCESSING
 ---------------
@@ -307,6 +336,96 @@ SUMMARY OF AVAILABLE DATA
 
 DATA FILE CHANGELOG
 -------------------
+
+**v1.1.0**
+
+Removed data
+
+- Removed behavior session with incorrect image presentations: 931566300.
+    - This results in the removal several other subordinate data:
+        - ophys session removed: 931566300
+        - ophys experiments removed: 932372699, 932372701, 932372705,
+          932372707, 932372711
+- Removed ophys session 875259383 from the ophys metadata table.
+  The behavior component of this session is available as behavior session
+  id=875471358. No ophys data for this session was previously released.
+- Removed truncated behavior sessions with ids: 934610593, 958310218,
+  975358131, 1011688792
+- The above identifiers have also been removed from their respective metadata
+  tables. Columns such as prior_exposures however, are correctly calculated
+  with knowledge of these sessions.
+- The cell ROIs associated with the above experiments have also been removed
+  from the cell ROI metadata table.
+- Current data counts
+    - 107 mice (same as v1.0.0)
+    - 4079 behavior training session (down from 4082)
+    - 703 in vivo 2-photon imaging sessions (down from 704 sessions,
+      previous releases erroneously included session 875259383 in their
+      metadata tables and claimed 705 sessions.)
+    - 50,476 logitudinal recordings (down from 50,489)
+
+Metadata Changes
+
+- Additions to multiple tables
+    - Added project_code and behavior_type (active/passive) value to all
+      tables.
+    - Added imaging_plane_group_count, num_depths_per_area,
+      num_targeted_structures, experience_level to Behavior and Ophys session
+      tables.
+- Behavior session table
+    - Added trials summary columns: catch_trial_count,
+      correct_reject_trial_count, engaged_trial_count, false_alarm_trial_count,
+      miss_trial_count, trial_count.
+    - Added image_set column.
+- Ophys experiment table
+    - Added targeted_imaging_depth to experiment table, representing the
+      average depth of all experiments in the published container.
+- Better consistency of integer typing throughout.
+
+NWB Data Changes
+
+- The value for Age in the metadata, Session/Experiment objects now consistent.
+  NWBs now reflect the age of the animal at the time the session/experiment was
+  taken.
+- Enforced better and more consistent typing between the metadata tables and
+  the session metadata.
+- All date/times in NWBs and metadata tables are now explicitly UTC timezone.
+- Stimulus presentations tables now contain information for additional stimulus
+  conditions, including 10 repeats of a 30 second movie clip at the end of
+  session_types starting with OPHYS, and 5 minute gray screen period before and
+  after change detection behavior in session_types starting with OPHYS. These
+  new stimuli are delineated by stimulus_block and stimulus_block_name. The
+  previously released image behavior stimulus is accessible as the block with a
+  name containing "change_detection". Use the following example code snippet to
+  retrieve the original stimulus block from the pandas table:
+      stimulus_presentations[stimulus_presentations.stimulus_block_name.str.contains('change_detection')]
+  See "SESSION STRUCTURE" section above for more details.
+- New columns in the stimulus_presentations table:
+    - is_image_novel, is_sham_change, movie_frame_index, movie_repeat,
+      stimulus_block, stimulus_block_name, stimulus_name, active
+    - See in code documentation for stimulus_presentations table for
+      definitions of these new columns.
+- New trials columns:
+    - change_time, change_frame, response_latency
+    - See in code documentation for trials table for definitions of these new
+      columns.
+- Include additional traces in the ophys experiment object:
+    - corrected_fluorescence_traces, demixed traces,
+      neuropil traces, df/f traces
+    - corrected_fluorescence_traces are now the correct trace.
+
+Supplemental cache data
+
+- New accessors in VisualBehaviorOphysProjectCache to download and cache the
+  natural movie presented to the mice. Additional accessor to convert the movie
+  to the format as shown on the screen during the session. (Warning this
+  conversion is compute intensive). Methods are:
+    - get_raw_natural_movie: Downloads the raw movie if needed and returns as
+      an ndarray.
+    - get_natural_movie_template: Converts the raw movie to the format as shown
+      on the screen during the session. Return a pandas dataframe in a similar
+      formate to the image templates. Warning this conversion is compute
+      intensive.
 
 **v1.0.1**
 

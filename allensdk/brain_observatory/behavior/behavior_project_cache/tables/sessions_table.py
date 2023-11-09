@@ -14,10 +14,18 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.ophys_ses
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.project_table import (  # noqa: E501
     ProjectTable,
 )
+from allensdk.brain_observatory.behavior.utils.metadata_parsers import (  # noqa: E501
+    parse_behavior_context,
+    parse_stimulus_set,
+)
 from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prior_exposure_processing import (  # noqa: E501
     get_prior_exposures_to_image_set,
     get_prior_exposures_to_omissions,
     get_prior_exposures_to_session_type,
+    add_experience_level_ophys,
+)
+from allensdk.core.dataframe_utils import (
+        enforce_df_column_order
 )
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
@@ -37,6 +45,7 @@ from allensdk.internal.api import db_connection_creator
 from allensdk.internal.brain_observatory.util.multi_session_utils import (
     multiprocessing_helper,
 )
+from allensdk.brain_observatory.ophys.project_constants import VBO_METADATA_COLUMN_ORDER  # noqa: E501
 
 
 class SessionsTable(ProjectTable, OphysMixin):
@@ -72,6 +81,10 @@ class SessionsTable(ProjectTable, OphysMixin):
         self._include_trial_metrics = include_trial_metrics
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
+        self._df = enforce_df_column_order(
+            self._df,
+            VBO_METADATA_COLUMN_ORDER
+        )
 
     def postprocess_additional(self):
         # Add subject metadata
@@ -99,6 +112,15 @@ class SessionsTable(ProjectTable, OphysMixin):
             "prior_exposures_to_omissions"
         ] = get_prior_exposures_to_omissions(
             df=self._df, fetch_api=self._fetch_api
+        )
+
+        self._df = add_experience_level_ophys(self._df)
+
+        self._df["behavior_type"] = self._df["session_type"].apply(
+            parse_behavior_context
+        )
+        self._df["image_set"] = self._df["session_type"].apply(
+            parse_stimulus_set
         )
 
         if self._include_trial_metrics:
@@ -159,7 +181,7 @@ class SessionsTable(ProjectTable, OphysMixin):
 
         self._df.loc[
             session_type.index, "session_number"
-        ] = session_type.apply(parse_session_number)
+        ] = session_type.apply(parse_session_number).astype('Int64')
 
     @staticmethod
     def _get_trial_metrics_helper(*args) -> Dict:

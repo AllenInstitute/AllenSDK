@@ -7,6 +7,7 @@ import copy
 
 from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
     BehaviorEcephysSession
+from allensdk.brain_observatory.ecephys._probe import ProbeWithLFPMeta
 
 
 @pytest.fixture(scope='module')
@@ -70,18 +71,25 @@ def test_read_write_session_with_probe_nwb(
     nwbfile, probe_nwbfile_map = \
         behavior_ecephys_session_with_lfp_fixture.to_nwb()
 
-    probe_data_path_map = dict()
+    probe_meta = dict()
     for probe_name, probe_nwbfile in probe_nwbfile_map.items():
         path = Path(tmpdir) / f'probe_{probe_name}_lfp.nwb'
         with pynwb.NWBHDF5IO(path, 'w') as write_io:
             write_io.write(probe_nwbfile)
-        probe_data_path_map[probe_name] = path
+        probe_meta[probe_name] = ProbeWithLFPMeta(
+            lfp_csd_filepath=path,
+            lfp_sampling_rate=1
+        )
 
     obt = data_object_roundtrip_fixture(
         nwbfile=nwbfile,
         data_object_cls=BehaviorEcephysSession,
-        probe_data_path_map=probe_data_path_map
+        probe_meta=probe_meta
     )
+
+    # check that the lfp metadata fields are set before loading lfp
+    assert obt.probes['has_lfp_data'].all()
+    assert not obt.probes['lfp_sampling_rate'].isnull().any()
 
     # Load the LFP data into memory
     for probe in obt._probes:

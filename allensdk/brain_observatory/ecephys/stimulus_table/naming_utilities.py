@@ -3,14 +3,14 @@ import warnings
 
 import numpy as np
 
-
-GABOR_DIAMETER_RE = \
-    re.compile(r"gabor_(\d*\.{0,1}\d*)_{0,1}deg(?:_\d+ms){0,1}")
+GABOR_DIAMETER_RE = re.compile(
+    r"gabor_(\d*\.{0,1}\d*)_{0,1}deg(?:_\d+ms){0,1}"
+)
 
 GENERIC_MOVIE_RE = re.compile(
-    r"natural_movie_" +
-    r"(?P<number>\d+|one|two|three|four|five|six|seven|eight|nine)" +
-    r"(_shuffled){0,1}(_more_repeats){0,1}"
+    r"natural_movie_"
+    + r"(?P<number>\d+|one|two|three|four|five|six|seven|eight|nine)"
+    + r"(_shuffled){0,1}(_more_repeats){0,1}"
 )
 DIGIT_NAMES = {
     "1": "one",
@@ -28,8 +28,7 @@ NUMERAL_RE = re.compile(r"(?P<number>\d+)")
 
 
 def drop_empty_columns(table):
-    """ Remove from the stimulus table columns whose values are all nan
-    """
+    """Remove from the stimulus table columns whose values are all nan"""
 
     to_drop = []
 
@@ -42,7 +41,7 @@ def drop_empty_columns(table):
 
 
 def collapse_columns(table):
-    """ merge, where possible, columns that describe the same parameter. This
+    """merge, where possible, columns that describe the same parameter. This
     is pretty conservative - it only matches columns by capitalization and
     it only overrides nans.
     """
@@ -53,7 +52,6 @@ def collapse_columns(table):
     for col in table.columns:
         for transformed in (col.upper(), col.capitalize()):
             if transformed in colnames and col != transformed:
-
                 col_notna = ~(table[col].isna())
                 trans_notna = ~(table[transformed].isna())
                 if (col_notna & trans_notna).sum() != 0:
@@ -77,24 +75,23 @@ def add_number_to_shuffled_movie(
     template="natural_movie_{}_shuffled",
     tmp_colname="__movie_number__",
 ):
-    """
-    """
+    """ """
 
     if not table[stim_colname].str.contains(SHUFFLED_MOVIE_RE).any():
         return table
     table = table.copy()
 
-    table[tmp_colname] = \
-        table[stim_colname].str.extract(natural_movie_re,
-                                        expand=True)["number"]
+    table[tmp_colname] = table[stim_colname].str.extract(
+        natural_movie_re, expand=True
+    )["number"]
 
     unique_numbers = [
         item for item in table[tmp_colname].dropna(inplace=False).unique()
     ]
     if len(unique_numbers) != 1:
         raise ValueError(
-            "unable to uniquely determine a movie number for this session. " +
-            f"Candidates: {unique_numbers}"
+            "unable to uniquely determine a movie number for this session. "
+            + f"Candidates: {unique_numbers}"
         )
     movie_number = unique_numbers[0]
 
@@ -119,7 +116,7 @@ def standardize_movie_numbers(
     digit_names=DIGIT_NAMES,
     stim_colname="stimulus_name",
 ):
-    """ Natural movie stimuli in visual coding are numbered using words, like
+    """Natural movie stimuli in visual coding are numbered using words, like
     "natural_movie_two" rather than "natural_movie_2". This function ensures
     that all of the natural movie stimuli in an experiment are named by that
     convention.
@@ -153,14 +150,15 @@ def standardize_movie_numbers(
     warnings.filterwarnings("ignore", category=UserWarning)
 
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
-    table.loc[movie_rows, stim_colname] = \
-        table.loc[movie_rows, stim_colname].str.replace(numeral_re, replace)
+    table.loc[movie_rows, stim_colname] = table.loc[
+        movie_rows, stim_colname
+    ].str.replace(numeral_re, replace, regex=True)
 
     return table
 
 
 def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
-    """ Applies a mappting to the stimulus names in a stimulus table
+    """Applies a mappting to the stimulus names in a stimulus table
 
     Parameters
     ----------
@@ -188,7 +186,6 @@ def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
 
 
 def map_column_names(table, name_map=None, ignore_case=True):
-
     if ignore_case and name_map is not None:
         name_map = {key.lower(): value for key, value in name_map.items()}
 

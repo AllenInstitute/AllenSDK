@@ -1,39 +1,49 @@
-import pandas as pd
-from typing import Optional, List, Dict, Any, Iterable, Union
 import logging
+from typing import Any, Dict, Iterable, List, Optional, Union
 
-
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import BehaviorProjectBase  # noqa: E501
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.data_objects.metadata\
-    .behavior_metadata.behavior_metadata import \
-    BehaviorMetadata
-from allensdk.internal.api import db_connection_creator
-from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine \
-    import (HttpEngine)
-from allensdk.core.authentication import DbCredentials
+    BehaviorOphysExperiment,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.abcs import (  # noqa: E501
+    BehaviorProjectBase,
+)
+from allensdk.brain_observatory.behavior.behavior_session import (
+    BehaviorSession,
+)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (  # noqa: E501
+    HttpEngine,
+)
+from allensdk.brain_observatory.ophys.project_constants import (
+    VBO_INTEGER_COLUMNS,
+    VBO_METADATA_COLUMN_ORDER,
+)
 from allensdk.core.auth_config import (
-    MTRAIN_DB_CREDENTIAL_MAP, LIMS_DB_CREDENTIAL_MAP)
+    LIMS_DB_CREDENTIAL_MAP,
+    MTRAIN_DB_CREDENTIAL_MAP,
+)
+from allensdk.core.authentication import DbCredentials
+from allensdk.core.dataframe_utils import (
+    enforce_df_column_order,
+    enforce_df_int_typing,
+)
+from allensdk.internal.api import db_connection_creator
 from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query, build_where_clause)
-from allensdk.internal.brain_observatory.util.multi_session_utils import \
-    get_session_metadata_multiprocessing
-from allensdk.brain_observatory.behavior.data_objects import BehaviorSessionId
+    build_in_list_selector_query,
+    build_where_clause,
+)
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
     def __init__(
-            self,
-            lims_engine,
-            mtrain_engine,
-            app_engine,
-            data_release_date: Optional[Union[str, List[str]]] = None,
-            passed_only: bool = True
+        self,
+        lims_engine,
+        mtrain_engine,
+        app_engine,
+        data_release_date: Optional[Union[str, List[str]]] = None,
+        passed_only: bool = True,
     ):
-        """ Downloads visual behavior data from the Allen Institute's
+        """Downloads visual behavior data from the Allen Institute's
         internal Laboratory Information Management System (LIMS). Only
         functional if connected to the Allen Institute Network. Used to load
         data into BehaviorProjectCache.
@@ -87,12 +97,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
     @classmethod
     def default(
-            cls,
-            lims_credentials: Optional[DbCredentials] = None,
-            mtrain_credentials: Optional[DbCredentials] = None,
-            app_kwargs: Optional[Dict[str, Any]] = None,
-            data_release_date: Optional[Union[str, List[str]]] = None,
-            passed_only: bool = True
+        cls,
+        lims_credentials: Optional[DbCredentials] = None,
+        mtrain_credentials: Optional[DbCredentials] = None,
+        app_kwargs: Optional[Dict[str, Any]] = None,
+        data_release_date: Optional[Union[str, List[str]]] = None,
+        passed_only: bool = True,
     ) -> "BehaviorProjectLimsApi":
         """Construct a BehaviorProjectLimsApi instance with default
         postgres and app engines.
@@ -126,15 +136,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         lims_engine = db_connection_creator(
             credentials=lims_credentials,
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+            fallback_credentials=LIMS_DB_CREDENTIAL_MAP,
+        )
         mtrain_engine = db_connection_creator(
             credentials=mtrain_credentials,
-            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP)
+            fallback_credentials=MTRAIN_DB_CREDENTIAL_MAP,
+        )
 
         app_engine = HttpEngine(**_app_kwargs)
-        return cls(lims_engine, mtrain_engine, app_engine,
-                   data_release_date=data_release_date,
-                   passed_only=passed_only)
+        return cls(
+            lims_engine,
+            mtrain_engine,
+            app_engine,
+            data_release_date=data_release_date,
+            passed_only=passed_only,
+        )
 
     def _build_experiment_from_session_query(self) -> str:
         """Aggregate sql sub-query to get all ophys_experiment_ids associated
@@ -237,6 +253,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             SELECT
                 bs.id AS behavior_session_id,
+                bs.stimulus_name as session_type,
                 pr.code as project_code,
                 equipment.name as equipment_name,
                 bs.date_of_acquisition,
@@ -268,8 +285,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_behavior_session_table query: \n{query}")
         return self.lims_engine.select(query)
 
-    def get_behavior_stage_parameters(self,
-                                      foraging_ids: List[str]) -> pd.Series:
+    def get_behavior_stage_parameters(
+        self, foraging_ids: List[str]
+    ) -> pd.Series:
         """Gets the stage parameters for each foraging id from mtrain
 
         Parameters
@@ -283,7 +301,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Series with index of foraging id and values stage parameters
         """
         foraging_ids_query = build_in_list_selector_query(
-            "bs.id", foraging_ids)
+            "bs.id", foraging_ids
+        )
 
         query = f"""
             SELECT
@@ -294,11 +313,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             {foraging_ids_query};
         """
         df = self.mtrain_engine.select(query)
-        df = df.set_index('foraging_id')
-        return df['stage_parameters']
+        df = df.set_index("foraging_id")
+        return df["stage_parameters"]
 
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int
-                                      ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(
+        self, ophys_experiment_id: int
+    ) -> BehaviorOphysExperiment:
         """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
         :param ophys_experiment_id: id that corresponds to an ophys experiment
@@ -306,7 +326,8 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: BehaviorOphysExperiment
         """
         return BehaviorOphysExperiment.from_lims(
-            ophys_experiment_id=ophys_experiment_id)
+            ophys_experiment_id=ophys_experiment_id
+        )
 
     def _get_ophys_experiment_table(self) -> pd.DataFrame:
         """
@@ -324,6 +345,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = """
             SELECT
                 oe.id as ophys_experiment_id,
+                os.stimulus_name as session_type,
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
                 oec.visual_behavior_experiment_container_id as
@@ -360,11 +382,24 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
         self.logger.debug(f"get_ophys_experiment_table query: \n{query}")
         query_df = self.lims_engine.select(query)
-        targeted_imaging_depth = query_df[
-            ["ophys_container_id", "imaging_depth"]
-            ].groupby("ophys_container_id").mean()
-        targeted_imaging_depth.columns = ['targeted_imaging_depth']
-        return query_df.merge(targeted_imaging_depth, on='ophys_container_id')
+
+        # Hard type targeted_imaging_depth to int to match the data_object
+        # type.
+        targeted_imaging_depth = (
+            query_df[["ophys_container_id", "imaging_depth"]]
+            .groupby("ophys_container_id")
+            .mean()
+            .astype(int)
+        )
+        targeted_imaging_depth.columns = ["targeted_imaging_depth"]
+        df = query_df.merge(targeted_imaging_depth, on="ophys_container_id")
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
+        )
+        return df
 
     def _get_ophys_cells_table(self):
         """
@@ -382,11 +417,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
             cr.id as cell_roi_id,
             cr.cell_specimen_id,
-            cr.ophys_experiment_id,
-            cr.x,
-            cr.y,
-            cr.height,
-            cr.width
+            cr.ophys_experiment_id
             FROM cell_rois AS cr
             JOIN ophys_cell_segmentation_runs AS ocsr
                 ON ocsr.id=cr.ophys_cell_segmentation_run_id
@@ -411,8 +442,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         df = self.lims_engine.select(query)
 
         # NaN's for invalid cells force this to float, push to int
-        df['cell_specimen_id'] = pd.array(df['cell_specimen_id'],
-                                          dtype="Int64")
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
         return df
 
     def get_ophys_cells_table(self):
@@ -474,14 +506,29 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         # There is one ophys_session_id from 2018 that has multiple behavior
         # ids, causing duplicates -- drop all dupes for now; # TODO
-        table = (self._get_ophys_session_table()
-                 .drop_duplicates(subset=["ophys_session_id"], keep=False)
-                 .set_index("ophys_session_id"))
-        return table
+        table = self._get_ophys_session_table().drop_duplicates(
+            subset=["ophys_session_id"], keep=False
+        )
+        # Make date time explicitly UTC.
+        table["date_of_acquisition"] = pd.to_datetime(
+            table["date_of_acquisition"], utc=True
+        )
+
+        # Fill NaN values of imaging_plane_group_count with zero to match
+        # the behavior of the BehaviorOphysExperiment object.
+        table = enforce_df_int_typing(
+            input_df=table,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True,
+        )
+        table = enforce_df_column_order(
+            input_df=table, column_order=VBO_METADATA_COLUMN_ORDER
+        )
+        return table.set_index("ophys_session_id")
 
     def get_behavior_session(
-            self,
-            behavior_session_id: int) -> BehaviorSession:
+        self, behavior_session_id: int
+    ) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
@@ -489,11 +536,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: BehaviorSession
         """
         return BehaviorSession.from_lims(
-            behavior_session_id=behavior_session_id)
+            behavior_session_id=behavior_session_id
+        )
 
-    def get_ophys_experiment_table(
-            self
-    ) -> pd.DataFrame:
+    def get_ophys_experiment_table(self) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_experiment_ids and
         relevant metadata. This is the most specific and most informative
         level to examine the data.
@@ -507,16 +553,23 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: pd.DataFrame
         """
         df = self._get_ophys_experiment_table()
+        df["date_of_acquisition"] = pd.to_datetime(
+            df["date_of_acquisition"], utc=True
+        )
+        # Set type to pandas.Int64 to enforce integer typing and not revert to
+        # float.
+        df = enforce_df_int_typing(
+            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
+        )
+        df = enforce_df_column_order(
+            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
+        )
+
         return df.set_index("ophys_experiment_id")
 
-    def get_behavior_session_table(self, n_workers: int = 1) -> pd.DataFrame:
+    def get_behavior_session_table(self) -> pd.DataFrame:
         """Returns a pd.DataFrame table with all behavior session_ids to the
         user with additional metadata.
-
-        Parameters
-        ----------
-        n_workers
-            Number of parallel processes to use for reading from pkl files
 
         :rtype: pd.DataFrame
 
@@ -526,34 +579,24 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         """
         summary_tbl = self._get_behavior_summary_table()
+        # Add UTC time zone to match timezone from DateOfAcquisition object.
+        summary_tbl["date_of_acquisition"] = pd.to_datetime(
+            summary_tbl["date_of_acquisition"], utc=True
+        )
+        # Query returns float typing of age_in_days. Convert to int to match
+        # typing of the Age data_object.
+        summary_tbl = enforce_df_int_typing(
+            input_df=summary_tbl,
+            int_columns=VBO_INTEGER_COLUMNS,
+            use_pandas_type=True,
+        )
+        summary_tbl = enforce_df_column_order(
+            input_df=summary_tbl, column_order=VBO_METADATA_COLUMN_ORDER
+        )
 
-        if n_workers > 1:
-            session_metadata = get_session_metadata_multiprocessing(
-                behavior_session_ids=(
-                    summary_tbl['behavior_session_id'].tolist()),
-                lims_engine=self.lims_engine
-            )
-        else:
-            session_metadata = [
-                BehaviorMetadata.from_lims(
-                    behavior_session_id=BehaviorSessionId(behavior_session_id),
-                    lims_db=db_connection_creator(
-                        fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-                    )
-                )
-                for behavior_session_id in summary_tbl['behavior_session_id']]
-        stimulus_names = [{
-                'session_type': x.session_type,
-                'behavior_session_id': x.behavior_session_id
-            } for x in session_metadata
-        ]
-        stimulus_names = pd.DataFrame(stimulus_names)
+        return summary_tbl.set_index("behavior_session_id")
 
-        return (summary_tbl.merge(stimulus_names,
-                                  on=["behavior_session_id"], how="left")
-                .set_index("behavior_session_id"))
-
-    def get_release_files(self, file_type='BehaviorNwb') -> pd.DataFrame:
+    def get_release_files(self, file_type="BehaviorNwb") -> pd.DataFrame:
         """Gets the release nwb files.
 
         Parameters
@@ -568,25 +611,25 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             -columns file_id and isilon filepath
         """
         if self.data_release_date is None:
-            raise RuntimeError('data_release_date must be set in constructor')
+            raise RuntimeError("data_release_date must be set in constructor")
 
-        if file_type not in ('BehaviorNwb', 'BehaviorOphysNwb'):
-            raise ValueError(f'cannot retrieve file type {file_type}')
+        if file_type not in ("BehaviorNwb", "BehaviorOphysNwb"):
+            raise ValueError(f"cannot retrieve file type {file_type}")
 
-        if file_type == 'BehaviorNwb':
-            attachable_id_alias = 'behavior_session_id'
-            select_clause = f'''
+        if file_type == "BehaviorNwb":
+            attachable_id_alias = "behavior_session_id"
+            select_clause = f"""
                 SELECT attachable_id as {attachable_id_alias}, id as file_id,
                     filename, storage_directory
-            '''
-            join_clause = ''
+            """
+            join_clause = ""
         else:
-            attachable_id_alias = 'ophys_experiment_id'
-            select_clause = f'''
+            attachable_id_alias = "ophys_experiment_id"
+            select_clause = f"""
                 SELECT attachable_id as {attachable_id_alias},
                     bs.id as behavior_session_id, wkf.id as file_id,
                     filename, wkf.storage_directory
-            '''
+            """
             join_clause = """
                 JOIN ophys_experiments oe ON oe.id = attachable_id
                 JOIN ophys_sessions os ON os.id = oe.ophys_session_id
@@ -599,7 +642,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             release_date_list = self.data_release_date
         release_date_str = ",".join([f"'{i}'" for i in release_date_list])
 
-        query = f'''
+        query = f"""
             {select_clause}
             FROM well_known_files wkf
             {join_clause}
@@ -609,49 +652,56 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                     FROM well_known_file_types
                     WHERE name = '{file_type}'
                 );
-        '''
+        """
 
         res = self.lims_engine.select(query)
-        res['isilon_filepath'] = res['storage_directory'] \
-            .str.cat(res['filename'])
-        res = res.drop(['filename', 'storage_directory'], axis=1)
+        res["isilon_filepath"] = res["storage_directory"].str.cat(
+            res["filename"]
+        )
+        res = res.drop(["filename", "storage_directory"], axis=1)
         return res.set_index(attachable_id_alias)
 
     def _get_behavior_session_release_filter(self):
         # 1) Get release behavior only session ids
         behavior_only_release_files = self.get_release_files(
-            file_type='BehaviorNwb')
-        release_behavior_only_session_ids = \
+            file_type="BehaviorNwb"
+        )
+        release_behavior_only_session_ids = (
             behavior_only_release_files.index.tolist()
+        )
 
         # 2) Get release behavior with ophys session ids
         ophys_release_files = self.get_release_files(
-            file_type='BehaviorOphysNwb')
-        release_behavior_with_ophys_session_ids = \
-            ophys_release_files['behavior_session_id'].tolist()
+            file_type="BehaviorOphysNwb"
+        )
+        release_behavior_with_ophys_session_ids = ophys_release_files[
+            "behavior_session_id"
+        ].tolist()
 
         # 3) release behavior session ids is combination
-        release_behavior_session_ids = \
-            release_behavior_only_session_ids + \
-            release_behavior_with_ophys_session_ids
+        release_behavior_session_ids = (
+            release_behavior_only_session_ids
+            + release_behavior_with_ophys_session_ids
+        )
 
         return build_in_list_selector_query(
-            "bs.id", release_behavior_session_ids)
+            "bs.id", release_behavior_session_ids
+        )
 
     def _get_ophys_session_release_filter(self):
-        release_files = self.get_release_files(
-            file_type='BehaviorOphysNwb')
+        release_files = self.get_release_files(file_type="BehaviorOphysNwb")
         return build_in_list_selector_query(
-            "bs.id", release_files['behavior_session_id'].tolist())
+            "bs.id", release_files["behavior_session_id"].tolist()
+        )
 
     def _get_ophys_experiment_release_filter(self):
-        release_files = self.get_release_files(
-            file_type='BehaviorOphysNwb')
+        release_files = self.get_release_files(file_type="BehaviorOphysNwb")
         return build_in_list_selector_query(
-            "oe.id", release_files.index.tolist())
+            "oe.id", release_files.index.tolist()
+        )
 
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """ Download a template for the natural movie stimulus. This is the
+        """Download a template for the natural movie stimulus. This is the
         actual movie that was shown during the recording session.
         :param number: identifier for this scene
         :type number: int
@@ -671,5 +721,4 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
 
 
 def _get_passed_ophys_experiment_clauses():
-    return ["oe.workflow_state = 'passed'",
-            "vbc.workflow_state = 'published'"]
+    return ["oe.workflow_state = 'passed'", "vbc.workflow_state = 'published'"]

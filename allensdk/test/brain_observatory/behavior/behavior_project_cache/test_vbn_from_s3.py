@@ -67,16 +67,16 @@ def test_probe_nwb_file(monkeypatch, tmpdir, vbn_s3_cloud_cache_data):
     cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     probe_meta_table = cache.get_probe_table()
-    for probe_meta in probe_meta_table.itertuples():
+    for probe in probe_meta_table.itertuples():
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path, probe_data_path_map: probe_data_path_map)
-            probe_data_path_map = \
+                        lambda path, probe_meta: probe_meta)
+            probe_meta = \
                 cache.get_ecephys_session(
-                    ecephys_session_id=probe_meta.ecephys_session_id)
+                    ecephys_session_id=probe.ecephys_session_id)
 
-        probe_id = probe_meta.Index
-        probe_nwb = probe_data_path_map[probe_meta.name]()
+        probe_id = probe.Index
+        probe_nwb = probe_meta[probe.name].lfp_csd_filepath()
         expected_path = (cache_dir / f'{project_name}-0.{len(data)}.0' /
                          'data' / f'probe_{probe_id}_lfp.nwb')
         assert probe_nwb == expected_path
@@ -145,7 +145,7 @@ def test_local_cache_construction(
 
     with monkeypatch.context() as ctx:
         ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                    lambda path, probe_data_path_map: create_autospec(
+                    lambda path, probe_meta: create_autospec(
                         BehaviorEcephysSession, instance=True))
         cache.get_ecephys_session(ecephys_session_id=5111)
     assert cache.fetch_api.cache._downloaded_data_path.is_file()
@@ -157,7 +157,10 @@ def test_local_cache_construction(
         cache = VisualBehaviorNeuropixelsProjectCache.from_s3_cache(cache_dir)
 
     cmd = 'VisualBehaviorNeuropixelsProjectCache.construct_local_manifest()'
-    assert cmd in f'{warnings[0].message}'
+    warning_msgs = [
+        f'{warnings[i].message}' for i in range(len(warnings))
+        if type(warnings[i].message) is MissingLocalManifestWarning]
+    assert any([cmd in msg for msg in warning_msgs])
 
     # Because, at the point where the cache was reconstitute,
     # the metadata files already existed at their expected local paths,
@@ -209,7 +212,7 @@ def test_load_out_of_date_manifest(
     for ses_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path, probe_data_path_map: create_autospec(
+                        lambda path, probe_meta: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=ses_id)
 
@@ -282,7 +285,7 @@ def test_file_linkage(
     for sess_id in (5111, 5112):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path, probe_data_path_map: create_autospec(
+                        lambda path, probe_meta: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 
@@ -312,7 +315,7 @@ def test_file_linkage(
     for sess_id in (222, 333):
         with monkeypatch.context() as ctx:
             ctx.setattr(BehaviorEcephysSession, 'from_nwb_path',
-                        lambda path, probe_data_path_map: create_autospec(
+                        lambda path, probe_meta: create_autospec(
                             BehaviorEcephysSession, instance=True))
             cache.get_ecephys_session(ecephys_session_id=sess_id)
 

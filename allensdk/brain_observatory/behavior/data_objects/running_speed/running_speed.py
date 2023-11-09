@@ -48,6 +48,7 @@ class RunningSpeed(DataObject,
         stimulus_timestamps: Optional[StimulusTimestamps] = None,
         filtered: bool = True
     ):
+        running_speed = self._fix_polarity(running_speed)
         super().__init__(name='running_speed', value=running_speed)
 
         if stimulus_timestamps is not None:
@@ -62,6 +63,35 @@ class RunningSpeed(DataObject,
         self._sync_file = sync_file
         self._stimulus_timestamps = stimulus_timestamps
         self._filtered = filtered
+
+    @staticmethod
+    def _fix_polarity(running_speed: pd.DataFrame) -> pd.DataFrame:
+        """Check for negative average running speed.
+
+        If an average < -1 cm/s is found, flip the speed value. This function
+        is needed as a set of experiments for VBN were found to have the
+        polarity of their running speed reversed, making it appear as if the
+        mouse was running backwards.
+
+        The value of -1 cm/s was suggested by Engineering and confirmed by
+        the histogram shown on this issue:
+            https://github.com/AllenInstitute/AllenSDK/issues/2661
+
+        Parameters
+        ----------
+        running_speed : pandas.DataFrame
+            Running speed DataFrame.
+
+        Returns
+        -------
+        output_frame : pandas.DataFrame
+           DataFrame with potentially flipped value of running speed if the
+           average speed is < -1 cm/s
+        """
+        mean_speed = running_speed['speed'].mean()
+        if mean_speed < -1:
+            running_speed['speed'] = -1 * running_speed['speed']
+        return running_speed
 
     @staticmethod
     def _get_running_speed_df(

@@ -54,7 +54,7 @@ def test_incomplete_eye_tracking_from_lims(
 
     incomplete_exp_id = 806456687
     incomplete_experiment = BehaviorOphysExperiment.from_lims(
-                                   incomplete_exp_id)
+        incomplete_exp_id)
     complete = behavior_ophys_experiment_fixture.eye_tracking
     incomplete = incomplete_experiment.eye_tracking
 

@@ -33,11 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import logging
+import re
+
 import numpy as np
 import simplejson as json
-import math
-import re
-import logging
 
 ju_logger = logging.getLogger(__name__)
 
@@ -52,45 +52,51 @@ except ImportError:
 
 
 def read(file_name):
-    """ Shortcut reading JSON from a file. """
-    with open(file_name, 'rb') as f:
-        json_string = f.read().decode('utf-8')
-        if len(json_string)==0: # If empty file
-            json_string='{}' # Create a string that will give an empty JSON object instead of an error
+    """Shortcut reading JSON from a file."""
+    with open(file_name, "rb") as f:
+        json_string = f.read().decode("utf-8")
+        if len(json_string) == 0:  # If empty file
+            # Create a string that will give an empty JSON object instead of an
+            # error
+            json_string = "{}"
         json_obj = json.loads(json_string)
 
     return json_obj
 
 
 def write(file_name, obj):
-    """ Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. """
-    with open(file_name, 'wb') as f:
+    """Shortcut for writing JSON to a file.  This also takes care of
+    serializing numpy and data types."""
+    with open(file_name, "wb") as f:
         try:
-            f.write(write_string(obj))   # Python 2.7
+            f.write(write_string(obj))  # Python 2.7
         except TypeError:
-            f.write(bytes(write_string(obj), 'utf-8'))  # Python 3
+            f.write(bytes(write_string(obj), "utf-8"))  # Python 3
 
 
 def write_string(obj):
-    """ Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types. """
-    return json.dumps(obj,
-                      indent=2,
-                      ignore_nan=True,
-                      default=json_handler,
-                      iterable_as_array=True)
+    """Shortcut for writing JSON to a string.  This also takes care of
+    serializing numpy and data types."""
+    return json.dumps(
+        obj,
+        indent=2,
+        ignore_nan=True,
+        default=json_handler,
+        iterable_as_array=True,
+    )
 
 
-def read_url(url, method='POST'):
-    if method == 'GET':
+def read_url(url, method="POST"):
+    if method == "GET":
         return read_url_get(url)
-    elif method == 'POST':
+    elif method == "POST":
         return read_url_post(url)
     else:
-        raise Exception('Unknown request method: (%s)' % method)
+        raise Exception("Unknown request method: (%s)" % method)
 
 
 def read_url_get(url):
-    '''Transform a JSON contained in a file into an equivalent
+    """Transform a JSON contained in a file into an equivalent
     nested python dict.
 
     Parameters
@@ -105,15 +111,15 @@ def read_url_get(url):
 
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
-    '''
+    """
     response = urllib_request.urlopen(url)
-    json_string = response.read().decode('utf-8')
+    json_string = response.read().decode("utf-8")
 
     return json.loads(json_string)
 
 
 def read_url_post(url):
-    '''Transform a JSON contained in a file into an equivalent
+    """Transform a JSON contained in a file into an equivalent
     nested python dict.
 
     Parameters
@@ -128,18 +134,19 @@ def read_url_post(url):
 
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
-    '''
+    """
     urlp = urlparse.urlparse(url)
     main_url = urlparse.urlunsplit(
-        (urlp.scheme, urlp.netloc, urlp.path, '', ''))
+        (urlp.scheme, urlp.netloc, urlp.path, "", "")
+    )
     data = json.dumps(dict(urlparse.parse_qsl(urlp.query)))
 
     handler = urllib_request.HTTPHandler()
     opener = urllib_request.build_opener(handler)
 
     request = urllib_request.Request(main_url, data)
-    request.add_header("Content-Type", 'application/json')
-    request.get_method = lambda: 'POST'
+    request.add_header("Content-Type", "application/json")
+    request.get_method = lambda: "POST"
 
     try:
         response = opener.open(request)
@@ -155,8 +162,9 @@ def read_url_post(url):
 
 
 def json_handler(obj):
-    """ Used by write_json convert a few non-standard types to things that the json package can handle. """
-    if hasattr(obj, 'to_dict'):
+    """Used by write_json convert a few non-standard types to things that the
+    json package can handle."""
+    if hasattr(obj, "to_dict"):
         return obj.to_dict()
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
@@ -164,26 +172,21 @@ def json_handler(obj):
         return float(obj)
     elif isinstance(obj, np.integer):
         return int(obj)
-    elif (isinstance(obj, np.bool) or
-          isinstance(obj, np.bool_)):
+    elif isinstance(obj, bool) or isinstance(obj, np.bool_):
         return bool(obj)
-    elif hasattr(obj, 'isoformat'):
+    elif hasattr(obj, "isoformat"):
         return obj.isoformat()
     else:
         raise TypeError(
-            'Object of type %s with value of %s is not JSON serializable' %
-            (type(obj), repr(obj)))
+            "Object of type %s with value of %s is not JSON serializable"
+            % (type(obj), repr(obj))
+        )
 
 
 class JsonComments(object):
-    _oneline_comment = re.compile(r"\/\/.*$",
-                                  re.MULTILINE)
-    _multiline_comment_start = re.compile(r"\/\*",
-                                          re.MULTILINE |
-                                          re.DOTALL)
-    _multiline_comment_end = re.compile(r"\*\/",
-                                        re.MULTILINE |
-                                        re.DOTALL)
+    _oneline_comment = re.compile(r"\/\/.*$", re.MULTILINE)
+    _multiline_comment_start = re.compile(r"\/\*", re.MULTILINE | re.DOTALL)
+    _multiline_comment_end = re.compile(r"\*\/", re.MULTILINE | re.DOTALL)
     _blank_line = re.compile(r"\n?^\s*$", re.MULTILINE)
     _carriage_return = re.compile(r"\r$", re.MULTILINE)
 
@@ -202,12 +205,13 @@ class JsonComments(object):
                 return json_object
         except ValueError:
             ju_logger.error(
-                "Could not load json object from file: %s" % (file_name))
+                "Could not load json object from file: %s" % (file_name)
+            )
             raise
 
     @classmethod
     def remove_comments(cls, json_string):
-        '''Strip single and multiline javascript-style comments.
+        """Strip single and multiline javascript-style comments.
 
         Parameters
         ----------
@@ -220,17 +224,17 @@ class JsonComments(object):
             Copy of the input with comments removed.
 
         Note: A JSON decoder MAY accept and ignore comments.
-        '''
-        json_string = JsonComments._oneline_comment.sub('', json_string)
-        json_string = JsonComments._carriage_return.sub('', json_string)
+        """
+        json_string = JsonComments._oneline_comment.sub("", json_string)
+        json_string = JsonComments._carriage_return.sub("", json_string)
         json_string = JsonComments.remove_multiline_comments(json_string)
-        json_string = JsonComments._blank_line.sub('', json_string)
+        json_string = JsonComments._blank_line.sub("", json_string)
 
         return json_string
 
     @classmethod
     def remove_multiline_comments(cls, json_string):
-        '''Rebuild input without substrings matching /*...*/.
+        """Rebuild input without substrings matching /*...*/.
 
         Parameters
         ----------
@@ -241,22 +245,24 @@ class JsonComments(object):
         -------
         string
             Copy of the input without the comments.
-        '''
+        """
         new_json = []
         start_iter = JsonComments._multiline_comment_start.finditer(
-            json_string)
+            json_string
+        )
         json_slice_start = 0
 
         for comment_start in start_iter:
             json_slice_end = comment_start.start()
             new_json.append(json_string[json_slice_start:json_slice_end])
             search_start = comment_start.end()
-            comment_end = JsonComments._multiline_comment_end.search(json_string[
-                                                                     search_start:])
+            comment_end = JsonComments._multiline_comment_end.search(
+                json_string[search_start:]
+            )
             if comment_end is None:
                 break
             else:
                 json_slice_start = search_start + comment_end.end()
         new_json.append(json_string[json_slice_start:])
 
-        return ''.join(new_json)
+        return "".join(new_json)

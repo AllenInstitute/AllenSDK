@@ -1,6 +1,6 @@
 from enum import Enum
 import numpy as np
-from typing import List
+from typing import List, Optional
 
 from pynwb import NWBFile
 
@@ -15,6 +15,9 @@ from allensdk.core import \
 from allensdk.brain_observatory.behavior.schemas import \
     BehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb import load_pynwb_extension
+from allensdk.brain_observatory.behavior.utils.metadata_parsers import (  # noqa E501
+    parse_stimulus_set
+)
 
 
 class BehaviorStimulusType(Enum):
@@ -44,7 +47,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
                  stimulus: str,
                  stimulus_distribution: StimulusDistribution,
                  task_type: TaskType,
-                 n_stimulus_frames: int):
+                 n_stimulus_frames: int,
+                 stimulus_name: Optional[str] = None):
         super().__init__(name='task_parameters', value=None,
                          is_value_self=True)
         self._blank_duration_sec = blank_duration_sec
@@ -59,6 +63,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
             stimulus_distribution)
         self._task = TaskType(task_type)
         self._n_stimulus_frames = n_stimulus_frames
+        self._stimulus_name = stimulus_name
+        self._image_set = parse_stimulus_set(session_type)
 
     @property
     def blank_duration_sec(self) -> List[float]:
@@ -103,6 +109,14 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
     @property
     def n_stimulus_frames(self) -> int:
         return self._n_stimulus_frames
+
+    @property
+    def stimulus_name(self) -> Optional[str]:
+        return self._stimulus_name
+
+    @property
+    def image_set(self) -> str:
+        return self._image_set
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         nwb_extension = load_pynwb_extension(
@@ -152,6 +166,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         auto_reward_volume = doc['auto_reward_volume']
         session_type = behavior["params"]["stage"]
         stimulus = next(iter(behavior["stimuli"]))
+        stimulus_name = stimulus_file.stimulus_name
         stimulus_distribution = doc["change_time_dist"]
         task = cls._parse_task(stimulus_file=stimulus_file)
         n_stimulus_frames = cls._calculuate_n_stimulus_frames(
@@ -167,7 +182,8 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
             stimulus=stimulus,
             stimulus_distribution=stimulus_distribution,
             task_type=task,
-            n_stimulus_frames=n_stimulus_frames
+            n_stimulus_frames=n_stimulus_frames,
+            stimulus_name=stimulus_name
         )
 
     @staticmethod

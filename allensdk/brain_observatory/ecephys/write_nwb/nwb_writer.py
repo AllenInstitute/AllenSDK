@@ -30,6 +30,34 @@ class BehaviorEcephysNwbWriter(NWBWriter):
             serializer=serializer
         )
 
+    def write_nwb(self, **kwargs):
+        """Tries to write nwb to disk. If it fails, the filepath has ".error"
+        appended
+
+        Parameters
+        ----------
+        kwargs: kwargs sent to `from_json`, `from_nwb`, `to_nwb`
+
+        """
+        from_json_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in inspect.signature(self._serializer.from_json).parameters}
+        json_session = self._serializer.from_json(
+            session_data=self._session_data, **from_json_kwargs)
+
+        try:
+            nwbfile = self._write_nwb(
+                session=json_session, **kwargs)
+            self._compare_sessions(nwbfile=nwbfile,
+                                   loaded_session=json_session,
+                                   **kwargs)
+            os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
+        except Exception as e:
+            if os.path.isfile(self.nwb_filepath_inprogress):
+                os.rename(self.nwb_filepath_inprogress,
+                          self._nwb_filepath_error)
+            raise e
+
     def _write_nwb(
             self,
             session: BehaviorEcephysSession,

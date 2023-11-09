@@ -1,5 +1,4 @@
 import os
-import re
 
 from setuptools import find_packages, setup
 
@@ -87,9 +86,13 @@ setup(
         "License :: Other/Proprietary License", # Allen Institute License
         "Natural Language :: English",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        'Programming Language :: Python :: 3 :: Only',
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
 )

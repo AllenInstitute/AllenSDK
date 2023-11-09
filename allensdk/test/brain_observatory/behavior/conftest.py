@@ -126,5 +126,6 @@ def behavior_ophys_experiment_fixture():
     """
 
     experiment_id = 953443028
-    experiment = BehaviorOphysExperiment.from_lims(experiment_id)
+    experiment = BehaviorOphysExperiment.from_lims(
+        experiment_id)
     return experiment

@@ -1,26 +1,32 @@
-import pytest
-import pandas as pd
 from pathlib import Path
 from unittest.mock import MagicMock, create_autospec
 
+import pandas as pd
+import pytest
 from allensdk.api.cloud_cache.manifest import Manifest
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-    data_io import behavior_project_cloud_api as cloudapi
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
+    behavior_project_cloud_api as cloudapi,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io import (  # noqa: E501
+    project_cloud_api_base as cloudapibase,
+)
+from allensdk.brain_observatory.behavior.behavior_project_cache.utils import (
+    BehaviorCloudCacheVersionException,
+    version_check,
+)
 
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.\
-    data_io import project_cloud_api_base as cloudapibase
 
-from allensdk.brain_observatory.behavior.behavior_project_cache. \
-    utils import version_check, BehaviorCloudCacheVersionException
-
-
-class MockCache():
-    def __init__(self,
-                 behavior_session_table,
-                 ophys_session_table,
-                 ophys_experiment_table,
-                 ophys_cells_table,
-                 cachedir):
+class MockCache:
+    def __init__(
+        self,
+        behavior_session_table,
+        ophys_session_table,
+        ophys_experiment_table,
+        ophys_cells_table,
+        cachedir,
+    ):
+        self.bucket_name = "test_bucket"
+        self.cache_dir = cachedir
         self.file_id_column = "file_id"
         self.session_table_path = cachedir / "session.csv"
         self.behavior_session_table_path = cachedir / "behavior_session.csv"
@@ -29,21 +35,26 @@ class MockCache():
 
         ophys_session_table.to_csv(self.session_table_path, index=False)
         ophys_cells_table.to_csv(self.ophys_cells_table_path, index=False)
-        behavior_session_table.to_csv(self.behavior_session_table_path,
-                                      index=False)
-        ophys_experiment_table.to_csv(self.ophys_experiment_table_path,
-                                      index=False)
+        behavior_session_table.to_csv(
+            self.behavior_session_table_path, index=False
+        )
+        ophys_experiment_table.to_csv(
+            self.ophys_experiment_table_path, index=False
+        )
 
         self._manifest = MagicMock()
-        self._manifest.metadata_file_names = ["behavior_session_table",
-                                              "ophys_session_table",
-                                              "ophys_experiment_table",
-                                              "ophys_cells_table"]
+        self._manifest.metadata_file_names = [
+            "behavior_session_table",
+            "ophys_session_table",
+            "ophys_experiment_table",
+            "ophys_cells_table",
+        ]
         self._metadata_name_path_map = {
-                "behavior_session_table": self.behavior_session_table_path,
-                "ophys_session_table": self.session_table_path,
-                "ophys_experiment_table": self.ophys_experiment_table_path,
-                "ophys_cells_table": self.ophys_cells_table_path}
+            "behavior_session_table": self.behavior_session_table_path,
+            "ophys_session_table": self.session_table_path,
+            "ophys_experiment_table": self.ophys_experiment_table_path,
+            "ophys_cells_table": self.ophys_cells_table_path,
+        }
 
     def download_metadata(self, fname):
         return self._metadata_name_path_map[fname]
@@ -53,16 +64,10 @@ class MockCache():
 
     def metadata_path(self, fname):
         local_path = self._metadata_name_path_map[fname]
-        return {
-            'local_path': local_path,
-            'exists': Path(local_path).exists()
-        }
+        return {"local_path": local_path, "exists": Path(local_path).exists()}
 
     def data_path(self, file_id):
-        return {
-            'local_path': file_id,
-            'exists': True
-        }
+        return {"local_path": file_id, "exists": True}
 
     def load_last_manifest(self):
         return None
@@ -90,41 +95,58 @@ def mock_cache(request, tmpdir):
 
 
 @pytest.mark.parametrize(
-        "mock_cache",
-        [
-            {
-                "behavior_session_table": pd.DataFrame({
+    "mock_cache",
+    [
+        {
+            "behavior_session_table": pd.DataFrame(
+                {
                     "behavior_session_id": [1, 2, 3, 4],
-                    "mouse_id": ['1'] * 4,
-                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 4),
+                    "mouse_id": ["1"] * 4,
+                    "date_of_acquisition": pd.to_datetime(["2021-01-01"] * 4),
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]],
-                    "file_id": [4, 5, 6, None]}),
-                "ophys_session_table": pd.DataFrame({
-                    "ophys_session_id": [10, 11, 12, 13],
-                    "mouse_id": ['1'] * 4,
-                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 4),
-                    "ophys_experiment_id": [4, 5, 6, [7, 8, 9]]}),
-                "ophys_experiment_table": pd.DataFrame({
+                    "file_id": [4, 5, 6, None],
+                }
+            ),
+            "ophys_session_table": pd.DataFrame(
+                {
+                    "ophys_session_id": pd.Series([10, 11, 12, 13],
+                                                  dtype='Int64'),
+                    "mouse_id": ["1"] * 4,
+                    "date_of_acquisition": pd.to_datetime(["2021-01-01"] * 4),
+                    "ophys_experiment_id": [4, 5, 6, [7, 8, 9]],
+                }
+            ),
+            "ophys_experiment_table": pd.DataFrame(
+                {
                     "ophys_experiment_id": [4, 5, 6, 7, 8, 9],
-                    "mouse_id": ['1'] * 6,
-                    "date_of_acquisition": pd.to_datetime(['2021-01-01'] * 6),
-                    "file_id": [4, 5, 6, 7, 8, 9]}),
-                "ophys_cells_table": pd.DataFrame({
+                    "mouse_id": ["1"] * 6,
+                    "date_of_acquisition": pd.to_datetime(
+                        ["2021-01-01"] * 6, utc=True
+                    ),
+                    "file_id": [4, 5, 6, 7, 8, 9],
+                }
+            ),
+            "ophys_cells_table": pd.DataFrame(
+                {
                     "cell_roi_id": [4, 5, 6],
                     "cell_specimen_id": [104, 105, 106],
-                    "ophys_experiment_id": [4, 5, 6]})}
-                ],
-        indirect=["mock_cache"])
+                    "ophys_experiment_id": [4, 5, 6],
+                }
+            ),
+        }
+    ],
+    indirect=["mock_cache"],
+)
 @pytest.mark.parametrize("local", [True, False])
 def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     mocked_cache, expected = mock_cache
-    api = cloudapi.BehaviorProjectCloudApi(mocked_cache,
-                                           skip_version_check=True,
-                                           local=False)
+    api = cloudapi.BehaviorProjectCloudApi(
+        mocked_cache, skip_version_check=True, local=False
+    )
     if local:
-        api = cloudapi.BehaviorProjectCloudApi(mocked_cache,
-                                               skip_version_check=True,
-                                               local=True)
+        api = cloudapi.BehaviorProjectCloudApi(
+            mocked_cache, skip_version_check=True, local=True
+        )
 
     # behavior session table as expected
     bost = api.get_behavior_session_table()
@@ -134,8 +156,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     for k in ["behavior_session_id", "file_id"]:
         pd.testing.assert_series_equal(bost[k], ebost[k])
     for k in ["ophys_experiment_id"]:
-        assert all([i == j
-                    for i, j in zip(bost[k].values, ebost[k].values)])
+        assert all([i == j for i, j in zip(bost[k].values, ebost[k].values)])
 
     # ophys session table as expected
     ost = api.get_ophys_session_table()
@@ -145,8 +166,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     for k in ["ophys_session_id"]:
         pd.testing.assert_series_equal(ost[k], eost[k])
     for k in ["ophys_experiment_id"]:
-        assert all([i == j
-                    for i, j in zip(ost[k].values, eost[k].values)])
+        assert all([i == j for i, j in zip(ost[k].values, eost[k].values)])
 
     # experiment table as expected
     et = api.get_ophys_experiment_table()
@@ -158,29 +178,34 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     # both directly and via experiment table
     def mock_nwb(nwb_path):
         return nwb_path
+
     monkeypatch.setattr(cloudapi.BehaviorSession, "from_nwb_path", mock_nwb)
     assert api.get_behavior_session(2) == "5"
     assert api.get_behavior_session(4) == "7"
 
     # direct check only for ophys experiment
-    monkeypatch.setattr(cloudapi.BehaviorOphysExperiment,
-                        "from_nwb_path", mock_nwb)
+    monkeypatch.setattr(
+        cloudapi.BehaviorOphysExperiment, "from_nwb_path", mock_nwb
+    )
     assert api.get_behavior_ophys_experiment(8) == "8"
 
 
 @pytest.mark.parametrize(
-        "manifest_version, data_pipeline_version, cmin, cmax, exception",
-        [
-            ("0.0.1", "2.9.0", "0.0.0", "1.0.0", False),
-            ("1.0.1", "2.9.0", "0.0.0", "1.0.0", True)
-            ])
-def test_version_check(manifest_version, data_pipeline_version,
-                       cmin, cmax, exception):
+    "manifest_version, data_pipeline_version, cmin, cmax, exception",
+    [
+        ("0.0.1", "2.9.0", "0.0.0", "1.0.0", False),
+        ("1.0.1", "2.9.0", "0.0.0", "1.0.0", True),
+    ],
+)
+def test_version_check(
+    manifest_version, data_pipeline_version, cmin, cmax, exception
+):
     if exception:
-        with pytest.raises(BehaviorCloudCacheVersionException,
-                           match=f".*{data_pipeline_version}"):
-            version_check(manifest_version, data_pipeline_version,
-                          cmin, cmax)
+        with pytest.raises(
+            BehaviorCloudCacheVersionException,
+            match=f".*{data_pipeline_version}",
+        ):
+            version_check(manifest_version, data_pipeline_version, cmin, cmax)
     else:
         version_check(manifest_version, data_pipeline_version, cmin, cmax)
 
@@ -188,20 +213,21 @@ def test_version_check(manifest_version, data_pipeline_version,
 def test_from_local_cache(monkeypatch):
     mock_manifest = create_autospec(Manifest)
     mock_manifest.metadata_file_names = {
-        'ophys_experiment_table',
-        'ophys_session_table',
-        'behavior_session_table',
-        'ophys_cells_table'
+        "ophys_experiment_table",
+        "ophys_session_table",
+        "behavior_session_table",
+        "ophys_cells_table",
     }
     mock_manifest._data_pipeline = [
         {
             "name": "AllenSDK",
             "version": "2.11.0",
-            "comment": "This is a test entry. NOT REAL."
+            "comment": "This is a test entry. NOT REAL.",
         }
     ]
-    mock_manifest.version = cloudapi. \
-        BehaviorProjectCloudApi.MANIFEST_COMPATIBILITY[0]
+    mock_manifest.version = (
+        cloudapi.BehaviorProjectCloudApi.MANIFEST_COMPATIBILITY[0]
+    )
 
     mock_local_cache = create_autospec(cloudapibase.LocalCache)
     type(mock_local_cache.return_value)._manifest = mock_manifest

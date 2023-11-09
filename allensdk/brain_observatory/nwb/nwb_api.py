@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 import pynwb
 import SimpleITK as sitk
@@ -9,10 +7,6 @@ from allensdk.brain_observatory.behavior.data_objects.stimuli.presentations \
     Presentations
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
-
-namespace_path = Path(__file__).parent / \
-                 'ndx-aibs-behavior-ophys.namespace.yaml'
-pynwb.load_namespaces(str(namespace_path))
 
 
 class NwbApi:
@@ -24,11 +18,12 @@ class NwbApi:
         if hasattr(self, '_nwbfile'):
             return self._nwbfile
 
-        io = pynwb.NWBHDF5IO(self.path, 'r')
+        io = pynwb.NWBHDF5IO(self.path, 'r', load_namespaces=True)
         return io.read()
 
     def __init__(self, path, **kwargs):
-        ''' Reads data for a single Brain Observatory session from an NWB 2.0 file
+        ''' Reads data for a single Brain Observatory session from an NWB 2.0
+        file
         '''
 
         self.path = path

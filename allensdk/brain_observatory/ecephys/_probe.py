@@ -1,5 +1,7 @@
+import dataclasses
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Union, Callable, Tuple
 
 import numpy as np
@@ -22,6 +24,26 @@ from allensdk.core import DataObject, JsonReadableInterface, \
     NwbWritableInterface, NwbReadableInterface
 
 
+@dataclasses.dataclass
+class ProbeWithLFPMeta:
+    """
+    Metadata for a single probe which has LFP data associated with it
+
+    Attributes:
+
+    - lfp_csd_filepath --> Either a path to the NWB file containing the LFP 
+    and CSD data or a callable which returns it. The nwb file is loaded 
+    separately from the main session nwb file in order to load the LFP data 
+    on the fly rather than with the main session NWB file. This is to speed 
+    up download of the NWB for users who don't wish to load the LFP data (it 
+    is large).
+    - lfp_sampling_rate --> LFP sampling rate
+    """  # noqa E402
+
+    lfp_csd_filepath: Union[Path, Callable[[], Path]]
+    lfp_sampling_rate: float
+
+
 class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             NwbReadableInterface):
     """A single probe"""
@@ -33,7 +55,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             units: Units,
             sampling_rate: float = 30000.0,
             lfp: Optional[LFP] = None,
-            probe_nwb_path: Optional[Union[str, Callable[[], str]]] = None,
+            lfp_meta: Optional[ProbeWithLFPMeta] = None,
             current_source_density: Optional[CurrentSourceDensity] = None,
             location: str = 'See electrode locations',
             temporal_subsampling_factor: Optional[float] = 2.0
@@ -54,11 +76,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             probe sampling rate
         lfp:
             probe LFP
-        probe_nwb_path
-            The file at this path should contain LFP, CSD data for this probe
-            Can be one of the following:
-                Path to the probe NWB file
-                Callable that returns path to the probe NWB file
+        lfp_meta
+            `ProbeWithLFPMeta`
         current_source_density
             probe current source density
         location:
@@ -72,7 +91,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         self._units = units
         self._sampling_rate = sampling_rate
         self._lfp = lfp
-        self._probe_nwb_path = probe_nwb_path
+        self._lfp_meta = lfp_meta
         self._current_source_density = current_source_density
         self._location = location
         self._temporal_subsampling_factor = temporal_subsampling_factor
@@ -103,7 +122,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
     @property
     def lfp(self) -> Optional[DataArray]:
         if self._lfp is None:
-            if self._probe_nwb_path is None:
+            if self._lfp_meta is None:
                 return None
             lfp = self._read_lfp_from_nwb()
             self._lfp = lfp
@@ -114,7 +133,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
     @property
     def current_source_density(self) -> Optional[DataArray]:
         if self._current_source_density is None:
-            if self._probe_nwb_path is None:
+            if self._lfp_meta is None:
                 return None
             csd = self._read_csd_data_from_nwb()
             self._current_source_density = csd
@@ -169,7 +188,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             cls,
             nwbfile: NWBFile,
             probe_name: str,
-            probe_nwb_path: Optional[str] = None,
+            lfp_meta: Optional[ProbeWithLFPMeta] = None
     ) -> "Probe":
         """
 
@@ -178,9 +197,8 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         nwbfile
         probe_name
             Probe name
-        probe_nwb_path
-            Path to load probe NWB file, which should contain LFP and CSD data,
-            if LFP data exists
+        lfp_meta
+            `ProbeWithLFPMeta`
 
         Returns
         -------
@@ -196,7 +214,7 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             sampling_rate=probe.device.sampling_rate,
             channels=channels,
             units=units,
-            probe_nwb_path=probe_nwb_path
+            lfp_meta=lfp_meta
         )
 
     def to_nwb(
@@ -354,11 +372,11 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         return nwbfile
 
     def _read_lfp_from_nwb(self) -> LFP:
-        if isinstance(self._probe_nwb_path, Callable):
+        if isinstance(self._lfp_meta.lfp_csd_filepath, Callable):
             logging.info('Fetching LFP NWB file')
-            path = self._probe_nwb_path()
+            path = self._lfp_meta.lfp_csd_filepath()
         else:
-            path = self._probe_nwb_path
+            path = self._lfp_meta.lfp_csd_filepath
         with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
             nwbfile = f.read()
             probe = nwbfile.electrode_groups[self._name]
@@ -378,11 +396,11 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
         )
 
     def _read_csd_data_from_nwb(self) -> CurrentSourceDensity:
-        if isinstance(self._probe_nwb_path, Callable):
+        if isinstance(self._lfp_meta.lfp_csd_filepath, Callable):
             logging.info('Fetching LFP NWB file')
-            path = self._probe_nwb_path()
+            path = self._lfp_meta.lfp_csd_filepath()
         else:
-            path = self._probe_nwb_path
+            path = self._lfp_meta.lfp_csd_filepath
         with pynwb.NWBHDF5IO(path, 'r', load_namespaces=True) as f:
             nwbfile = f.read()
             csd_mod = nwbfile.get_processing_module(
@@ -404,12 +422,21 @@ class Probe(DataObject, JsonReadableInterface, NwbWritableInterface,
             )
 
     def to_dict(self) -> dict:
+        has_lfp_data = False
+        lfp_sampling_rate = None
+
+        if self._lfp is not None:
+            lfp_sampling_rate = self._lfp.sampling_rate
+            has_lfp_data = True
+        elif self._lfp_meta is not None:
+            lfp_sampling_rate = self._lfp_meta.lfp_sampling_rate
+            has_lfp_data = True
+
         return {
             'id': self._id,
             'name': self._name,
             'location': self._location,
             'sampling_rate': self._sampling_rate,
-            'lfp_sampling_rate':
-                self._lfp.sampling_rate if self._lfp is not None else None,
-            'has_lfp_data': self._lfp is not None
+            'lfp_sampling_rate': lfp_sampling_rate,
+            'has_lfp_data': has_lfp_data
         }

@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Optional
 
 import pytz
-from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects.metadata.behavior_metadata.date_of_acquisition import (  # noqa: E501
     DateOfAcquisition,
 )
@@ -39,13 +38,9 @@ class Age(
     def from_lims(
         cls, behavior_session_id: int, lims_db: PostgresQueryMixin
     ) -> "Age":
-        # TODO PSB-17: Need to likewise grab the daq from the stimulus
-        # file for now as the data for daq in LIMS needs to be
-        # updated.
-        date_of_acquisition = DateOfAcquisition.from_stimulus_file(
-            BehaviorStimulusFile.from_lims(
-                db=lims_db, behavior_session_id=behavior_session_id
-            ).validate()
+        date_of_acquisition = DateOfAcquisition.from_lims(
+            behavior_session_id=behavior_session_id,
+            lims_db=lims_db
         ).value
 
         query = f"""
