@@ -1,12 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.16.0] = 2023-XX-XX
+## [2.16.0] = 2023-11-09
 - Python 3.10 and 3.11 support
 - Support for VBO update release.
-- Added new stimulus presentations columns that can be computed/added when 
-loading previous data.
+- Uspport for new VBO release
 - Various bug fixes.
+- See release notes on Github
 
 ## [2.14.0] = 2022-12-12
 - Support for updated vbn release containing probe, lfp and behavior only data.
