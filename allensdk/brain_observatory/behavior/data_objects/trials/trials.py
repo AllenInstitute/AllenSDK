@@ -275,7 +275,11 @@ class Trials(
 
     @property
     def change_time(self) -> pd.Series:
-        return self.data["change_time"]
+        if "change_time" in self.data:
+            return self.data["change_time"]
+        elif "change_time_no_display_delay" in self.data:
+            return self.data["change_time_no_display_delay"]
+
 
     @property
     def lick_times(self) -> pd.Series:
