@@ -280,7 +280,6 @@ class Trials(
         elif "change_time_no_display_delay" in self.data:
             return self.data["change_time_no_display_delay"]
 
-
     @property
     def lick_times(self) -> pd.Series:
         return self.data["lick_times"]
