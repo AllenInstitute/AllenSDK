@@ -9,7 +9,7 @@ sphinx:
 
 build:
   os: ubuntu-22.04
-    tools:
+  tools:
       python: "3.7"
 
 python:
