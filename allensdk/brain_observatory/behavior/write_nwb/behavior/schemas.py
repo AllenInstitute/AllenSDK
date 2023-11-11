@@ -1,4 +1,6 @@
 import marshmallow as mm
+from warnings import warn
+import pandas as pd
 from allensdk.brain_observatory.argschema_utilities import (
     InputFile,
     RaisingSchema,
@@ -18,6 +20,7 @@ from argschema.fields import (
     OutputDir,
     OutputFile,
     String,
+    Bool
 )
 
 
@@ -54,28 +57,80 @@ class BaseInputSchema(ArgSchema):
         required=True,
         description="Path of output.json to be written",
     )
+    include_experiment_description = Bool(
+        required=False,
+        description="If True, include experiment description in NWB file.",
+        default=True
+    )
 
     def _get_behavior_metadata(self, bs_row):
         """ """
         behavior_session_metadata = {}
 
-        behavior_session_metadata["age_in_days"] = bs_row["age_in_days"]
-        behavior_session_metadata["cre_line"] = bs_row["cre_line"]
-        behavior_session_metadata["date_of_acquisition"] = bs_row[
-            "date_of_acquisition"
-        ]
-        behavior_session_metadata["driver_line"] = sorted(
-            bs_row["driver_line"]
+        behavior_session_metadata["age_in_days"] = self._retrieve_value(
+            bs_row=bs_row, column_name="age_in_days"
         )
-        behavior_session_metadata["equipment_name"] = bs_row["equipment_name"]
-        behavior_session_metadata["full_genotype"] = bs_row["full_genotype"]
-        behavior_session_metadata["mouse_id"] = bs_row["mouse_id"]
-        behavior_session_metadata["project_code"] = bs_row["project_code"]
-        behavior_session_metadata["reporter_line"] = bs_row["reporter_line"]
-        behavior_session_metadata["session_type"] = bs_row["session_type"]
-        behavior_session_metadata["sex"] = bs_row["sex"]
+        behavior_session_metadata["cre_line"] = self._retrieve_value(
+            bs_row=bs_row, column_name="cre_line"
+        )
+        behavior_session_metadata["date_of_acquisition"] = self._retrieve_value(  # noqa: E501
+            bs_row=bs_row, column_name="date_of_acquisition"
+        )
+        behavior_session_metadata["driver_line"] = self._retrieve_value(
+            bs_row=bs_row, column_name="driver_line"
+        )
+        behavior_session_metadata["equipment_name"] = self._retrieve_value(
+            bs_row=bs_row, column_name="equipment_name"
+        )
+        behavior_session_metadata["full_genotype"] = self._retrieve_value(
+            bs_row=bs_row, column_name="full_genotype"
+        )
+        behavior_session_metadata["mouse_id"] = self._retrieve_value(
+            bs_row=bs_row, column_name="mouse_id"
+        )
+        behavior_session_metadata["project_code"] = self._retrieve_value(
+            bs_row=bs_row, column_name="project_code"
+        )
+        behavior_session_metadata["reporter_line"] = self._retrieve_value(
+            bs_row=bs_row, column_name="reporter_line"
+        )
+        behavior_session_metadata["session_type"] = self._retrieve_value(
+            bs_row=bs_row, column_name="session_type"
+        )
+        behavior_session_metadata["sex"] = self._retrieve_value(
+            bs_row=bs_row,
+            column_name="sex"
+        )
 
         return behavior_session_metadata
+
+    def _retrieve_value(self, bs_row: pd.Series, column_name: str):
+        """Pull a column safely, return None otherwise.
+
+        Parameters
+        ----------
+        bs_row : pd.Series
+            Row of a BehaviorSessionTable
+        column_name : str
+            Name of column to retrieve
+
+        Returns
+        -------
+        value : object
+            Value of column_name in bs_row, or None if column_name is not in
+            bs_row
+        """
+        if column_name not in bs_row.index:
+            warn(f"Warning, {column_name} not in metadata table. Unless this "
+                 "has been added to the inputs skip_metadata_key or "
+                 "skip_stimulus_file_key, creating the NWB file "
+                 "may fail.")
+            return None
+        else:
+            value = bs_row[column_name]
+            if isinstance(value, list):
+                value = sorted(value)
+            return value
 
 
 class BehaviorInputSchema(BaseInputSchema):
