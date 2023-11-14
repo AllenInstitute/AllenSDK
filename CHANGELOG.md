@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.16.1] = 2023-11-13
+- See release notes on Github
+- Update testing
+- Update readthedocs configuration
+- Fix bug in trials change time loading.
+
 ## [2.16.0] = 2023-11-09
 - Python 3.10 and 3.11 support
 - Support for VBO update release.
