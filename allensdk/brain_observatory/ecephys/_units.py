@@ -47,7 +47,8 @@ class Units(DataObject, JsonReadableInterface, NwbReadableInterface):
         )
         mean_waveforms = _read_waveforms_to_dictionary(
             probe['mean_waveforms_path'],
-            local_to_global_unit_map
+            local_to_global_unit_map,
+            mean_waveform_scale=probe.get('scale_mean_waveform_and_csd', 1)
         )
         spike_amplitudes = _read_spike_amplitudes_to_dictionary(
             probe["spike_amplitudes_path"],
@@ -132,6 +133,7 @@ def _read_waveforms_to_dictionary(
         waveforms_path,
         local_to_global_unit_map=None,
         peak_channel_map=None,
+        mean_waveform_scale=1,
 ):
     """ Builds a lookup table for unitwise waveform data
 
@@ -146,6 +148,8 @@ def _read_waveforms_to_dictionary(
         Maps unit identifiers to indices of peak channels. If provided,
         the output will contain only samples on the peak
         channel for each unit.
+    mean_waveform_scale : float, optional
+        Divide out a scaling from the mean_waveform. Default 1.
 
     Returns
     -------
@@ -171,7 +175,7 @@ def _read_waveforms_to_dictionary(
         if peak_channel_map is not None:
             waveform = waveform[:, peak_channel_map[unit_id]]
 
-        output_waveforms[unit_id] = np.squeeze(waveform)
+        output_waveforms[unit_id] = np.squeeze(waveform) / mean_waveform_scale
 
     return output_waveforms
 

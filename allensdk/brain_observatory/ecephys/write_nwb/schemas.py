@@ -204,6 +204,16 @@ class Probe(RaisingSchema):
         help="""amplitude scale factor converting raw amplitudes to Volts.
                 Default converts from bits -> uV -> V""",
     )
+    scale_mean_waveform_and_csd = Float(
+        default=1,
+        allow_none=True,
+        help="""Amount to scale the mean waveform and CSD by. (data / scale).
+                This is a fix for a set of data documented in the change log.
+                The values for unit amplitudes were changed in the input_json
+                file and do not use this scale.
+                If the data in LIMS for these sessions is updated, this scaling
+                is not needed. Default is 1"""
+    )
 
 
 class InvalidEpoch(RaisingSchema):
