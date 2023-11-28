@@ -36,6 +36,18 @@ Visual Behavior - Neuropixels
 DATA FILE CHANGELOG
 -------------------
 
+**v0.5.0**
+
+- Updated stimulus presentations tables.
+- Add LFP sample rate when loading from cache.
+- Fixed scaling of LFP data in multiple sessions. Amplitudes were off by a
+  factor of 2 for most ecephys sessions. The scaling is also
+  corrected in released metadata tables.
+    - All ecephys sessions except those listed here had the issue with the
+      LFP amplitude scaling: 1059678195, 1108334384, 1108531612, 1109680280,
+      1109889304, 1111013640, 1111216934, 1112302803, 1112515874, 1113751921,
+      1113957627, 1115077618, 1115356973, 1118324999, 1118512505
+
 **v0.4.0-fix**
 
 - Added stimulus presentations columns that are computed on load:

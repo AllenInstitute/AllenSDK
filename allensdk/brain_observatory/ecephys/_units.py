@@ -129,7 +129,9 @@ def _read_spike_amplitudes_to_dictionary(
 
 
 def _read_waveforms_to_dictionary(
-        waveforms_path, local_to_global_unit_map=None, peak_channel_map=None
+        waveforms_path,
+        local_to_global_unit_map=None,
+        peak_channel_map=None,
 ):
     """ Builds a lookup table for unitwise waveform data
 
