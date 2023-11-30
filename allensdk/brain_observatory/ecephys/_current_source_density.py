@@ -50,9 +50,10 @@ class CurrentSourceDensity(DataObject, JsonReadableInterface):
 
     @classmethod
     def from_json(cls, probe_meta: dict) -> "CurrentSourceDensity":
+        scale = probe_meta.get("scale_mean_waveform_and_csd", 1)
         with h5py.File(probe_meta['csd_path'], "r") as csd_file:
             return CurrentSourceDensity(
-                data=csd_file["current_source_density"][:],
+                data=csd_file["current_source_density"][:] / scale,
                 timestamps=csd_file["timestamps"][:],
                 interpolated_channel_locations=csd_file["csd_locations"][:]
             )

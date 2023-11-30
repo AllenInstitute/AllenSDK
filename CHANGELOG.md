@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.16.2] = 2023-11-29
+- See release notes on Github
+- Commit code used to create new VBN data release.
+- Update VBN changelog..
+
 ## [2.16.1] = 2023-11-13
 - See release notes on Github
 - Update testing
