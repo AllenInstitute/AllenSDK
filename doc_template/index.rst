@@ -118,6 +118,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's new - 2.16.2
+----------------------------------------------------------------------
+- See full release notes on Github
+- Commit code used to create new VBN data release.
+- Update VBN changelog.
+
 What's new - 2.16.1
 ----------------------------------------------------------------------
 - See full release notes on Github

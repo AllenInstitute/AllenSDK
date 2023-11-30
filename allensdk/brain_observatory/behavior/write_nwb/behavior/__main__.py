@@ -27,6 +27,9 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
             nwb_filepath=bs_id_dir / f"behavior_session_{bs_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
+            include_experiment_description=self.args[
+                'include_experiment_description'
+            ]
         )
         logging.info("File successfully created")
 
@@ -43,6 +46,7 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
         nwb_filepath: Path,
         skip_metadata: List[str],
         skip_stim: List[str],
+        include_experiment_description=True
     ) -> str:
         """Load and write a BehaviorSession as NWB.
 
@@ -61,6 +65,8 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
             List of metadata keys to skip when comparing data.
         skip_stim : list of str
             List of stimulus file keys to skip when comparing data.
+        include_experiment_description : bool
+            If True, include experiment description in NWB file.
 
         Returns
         -------
@@ -79,7 +85,11 @@ class WriteBehaviorNWB(argschema.ArgSchemaParser):
             session_data=behavior_session_metadata,
             serializer=BehaviorSession,
         )
-        nwb_writer.write_nwb(skip_metadata=skip_metadata, skip_stim=skip_stim)
+        nwb_writer.write_nwb(
+            skip_metadata=skip_metadata,
+            skip_stim=skip_stim,
+            include_experiment_description=include_experiment_description
+        )
 
         return str(nwb_filepath)
 
