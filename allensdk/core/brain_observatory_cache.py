@@ -654,7 +654,7 @@ class BrainObservatoryCache(Cache):
         Returns
         -------
         `numpy.ndarray`
-            Shape of array is (n_frames, 5). Values at axis=1 store the following:
+            Shape of array is (n_frames, 5); axis=1 stores the following:
                 [:, 0] is the 2-photon frame number. Can be parsed as int and
                     used to index calcium imaging dF/F arrays, for example.
                 [:, 1] is the computed eye area in cm^2
@@ -663,9 +663,9 @@ class BrainObservatoryCache(Cache):
                 [:, 4] is the y (altitude) position of the pupil in degrees
             Metrics are computed using DeepLabCut (Mathis et al., 2018, Nature)
             from videos of the mouse's eye during experimentation.
-            See King et al., 2023, eNeuro, and de Vries et al., 2018, Nature for
-            more info on eye tracking methods.
-            Contact saskiad@alleninstitute.org and chase.king@alleninstitute.org
+            See King et al., 2023, eNeuro, and de Vries et al., 2018, Nature
+            for more info on eye tracking methods.
+            Contact saskiad@alleninstitute.org, chase.king@alleninstitute.org
             with any questions.
         """
         cloud_cache = S3CloudCache(
