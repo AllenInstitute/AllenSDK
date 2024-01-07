@@ -655,7 +655,8 @@ class BrainObservatoryCache(Cache):
         -------
         `numpy.ndarray`
             Shape of array is (n_frames, 5). Values at axis=1 store the following:
-                [:, 0] is the frame number
+                [:, 0] is the 2-photon frame number. Can be parsed as int and
+                    uses the same indexing as calcium imaging frames.
                 [:, 1] is the computed eye area in cm^2
                 [:, 2] is the pupil area in cm^2
                 [:, 3] is the x (azimuth) position of the pupil in degrees
