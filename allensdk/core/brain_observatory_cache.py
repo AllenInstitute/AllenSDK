@@ -654,9 +654,15 @@ class BrainObservatoryCache(Cache):
         Returns
         -------
         `numpy.ndarray`
-            Contents of array unknown. Assumed to be [n_frames, 5] where
-            the meaning of the values in each column are unknown.
-            Ask Saskia De Vries saskiad@alleninstitute.org
+            Shape of array is (n_frames, 5). Values at axis=1 store the following data:
+                [:, 0] is the frame number
+                [:, 1] is the DLC-computed eye area in cm^2
+                [:, 2] is the pupil area in cm^2
+                [:, 3] is the x (azimuth) position of the pupil in degrees
+                [:, 4] is the y (altitude/elevation) position of the pupil in degrees
+            DLC refers to DeepLabCut (Mathis et al., 2018, Nature), a tool used to track eyes from videos.
+            See King et al., 2023, eNeuro, and de Vries et al., 2018, Nature for more info on eye tracking methods.
+            Contact saskiad@alleninstitute.org and chase.king@alleninstitute.org with any questions.
         """
         cloud_cache = S3CloudCache(
             cache_dir=Path(self.manifest_path).parent / "s3_cache",
