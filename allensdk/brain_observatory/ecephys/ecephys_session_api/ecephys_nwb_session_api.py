@@ -90,7 +90,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             # coded as rgb triplets and the other as -1 or 1
             if "color_triplet" not in table.columns:
                 table["color_triplet"] = pd.Series("", index=table.index)
-            rgb_color_match = table["color"].str.match(color_triplet_re)
+            rgb_color_match = table["color"].str.match(color_triplet_re).astype(bool)
             table.loc[rgb_color_match, "color_triplet"] = table.loc[
                 rgb_color_match, "color"]
             table.loc[rgb_color_match, "color"] = ""
