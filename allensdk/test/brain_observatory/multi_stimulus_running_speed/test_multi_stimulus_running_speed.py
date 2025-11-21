@@ -30,7 +30,6 @@ MAPPING_START = 215999
 REPLAY_START = 307199
 
 
-@pytest.mark.requires_bamboo
 @pytest.fixture(scope="session")
 def sync_h5_path_fixture():
     sync_h5_path = os.path.join(
@@ -40,7 +39,6 @@ def sync_h5_path_fixture():
     return sync_h5_path
 
 
-@pytest.mark.requires_bamboo
 @pytest.fixture(scope="session")
 def pkl_path_fixture():
     mapping_pkl_path = os.path.join(
@@ -63,7 +61,6 @@ def pkl_path_fixture():
             'replay': replay_pkl_path}
 
 
-@pytest.mark.requires_bamboo
 @pytest.fixture(scope="session")
 def multi_stimulus_fixture(tmpdir_factory,
                            sync_h5_path_fixture,

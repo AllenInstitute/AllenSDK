@@ -1,7 +1,7 @@
 import sys
 
 
-def pytest_ignore_collect(path, config):
+def pytest_ignore_collect(collection_path, config):
     '''
     The brain_observatory.ecephys submodule uses python 3.6 features
     that may not be backwards compatible!
