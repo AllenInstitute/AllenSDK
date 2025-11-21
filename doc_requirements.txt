@@ -11,7 +11,7 @@ jupyter
 psycopg2-binary
 h5py
 matplotlib
-numpy<1.24
+numpy<1.25
 pandas==1.5.3
 jinja2
 scipy<1.11
