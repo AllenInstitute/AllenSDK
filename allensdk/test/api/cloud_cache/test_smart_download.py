@@ -2,14 +2,14 @@ import pytest
 import json
 import hashlib
 import pathlib
-from moto import mock_s3
+from moto import mock_aws
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import MissingLocalManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache, LocalCache
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
-@mock_s3
+@mock_aws
 def test_smart_file_downloading(tmpdir, example_datasets):
     """
     Test that the CloudCache is smart enough to build symlinks
@@ -94,7 +94,7 @@ def test_smart_file_downloading(tmpdir, example_datasets):
     assert not downloaded['3.0.0']['3'].is_symlink()
 
 
-@mock_s3
+@mock_aws
 def test_on_corrupted_files(tmpdir, example_datasets):
     """
     Test that the CloudCache re-downloads files when they have been
@@ -168,7 +168,7 @@ def test_on_corrupted_files(tmpdir, example_datasets):
     assert other_path.absolute() != redownloaded_path.absolute()
 
 
-@mock_s3
+@mock_aws
 def test_on_removed_files(tmpdir, example_datasets):
     """
     Test that the CloudCache re-downloads files when the
@@ -247,7 +247,7 @@ def test_on_removed_files(tmpdir, example_datasets):
     assert hasher.hexdigest() == true_hash
 
 
-@mock_s3
+@mock_aws
 def test_on_removed_symlinks(tmpdir, example_datasets):
     """
     Test that the CloudCache re-downloads files when the
@@ -311,7 +311,7 @@ def test_on_removed_symlinks(tmpdir, example_datasets):
     assert hasher.hexdigest() == true_hash
 
 
-@mock_s3
+@mock_aws
 def test_corrupted_download_manifest(tmpdir, example_datasets):
     """
     Test that CloudCache can handle the case where the
@@ -386,7 +386,7 @@ def test_corrupted_download_manifest(tmpdir, example_datasets):
     assert attr['local_path'].absolute() != downloaded_path.absolute()
 
 
-@mock_s3
+@mock_aws
 def test_reconstruction_of_local_manifest(tmpdir):
     """
     Test that, if _downloaded_data.json gets lost, it can be reconstructed
@@ -478,7 +478,7 @@ def test_reconstruction_of_local_manifest(tmpdir):
         dummy.download_data('1')
 
 
-@mock_s3
+@mock_aws
 def test_local_cache_symlink(tmpdir, example_datasets):
     """
     Test that a LocalCache is smart enough to construct
