@@ -149,7 +149,6 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
 
 
 @mock_aws
-@mock_aws
 def test_compare_manifesst_string(tmpdir, example_datasets_with_metadata):
     """
     Test that CloudCacheBase.compare_manifests reports the correct
