@@ -26,7 +26,7 @@ jobs:
     name: Lint
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: flake8 linting
         run: |
           pip install flake8
@@ -43,15 +43,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
+        # Use macos-13 for x86_64 architecture (macos-latest is now ARM64)
+        os: ["macos-13", "windows-latest", "ubuntu-latest"]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
       fail-fast: false
     defaults:
       run:
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
@@ -73,7 +74,7 @@ jobs:
       matrix:
         image: ["allensdk_local_py38:latest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: run test in docker
         run: |
           docker run \
