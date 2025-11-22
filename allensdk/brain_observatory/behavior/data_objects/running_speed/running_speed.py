@@ -188,7 +188,7 @@ class RunningSpeed(DataObject,
         nwbfile: NWBFile,
         filtered=True
     ) -> "RunningSpeed":
-        running_module = nwbfile.modules['running']
+        running_module = nwbfile.processing['running']
         interface_name = 'speed' if filtered else 'speed_unfiltered'
         running_interface = running_module.get_data_interface(interface_name)
 
