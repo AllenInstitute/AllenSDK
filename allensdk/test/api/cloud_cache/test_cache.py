@@ -5,14 +5,14 @@ import pathlib
 import pandas as pd
 import io
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import OutdatedManifestWarning
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache  # noqa: E501
 from allensdk.api.cloud_cache.file_attributes import CacheFileAttributes  # noqa: E501
 
 
-@mock_s3
+@mock_aws
 def test_list_all_manifests(tmpdir):
     """
     Test that S3CloudCache.list_al_manifests() returns the correct result
@@ -40,7 +40,7 @@ def test_list_all_manifests(tmpdir):
                                          'manifest_v2.0.0.json']
 
 
-@mock_s3
+@mock_aws
 def test_list_all_manifests_many(tmpdir):
     """
     Test the extreme case when there are more manifests than list_objects_v2
@@ -69,7 +69,7 @@ def test_list_all_manifests_many(tmpdir):
     assert cache.manifest_file_names == expected
 
 
-@mock_s3
+@mock_aws
 def test_loading_manifest(tmpdir):
     """
     Test loading manifests with S3CloudCache
@@ -135,7 +135,7 @@ def test_loading_manifest(tmpdir):
     assert msg in context.value.args[0]
 
 
-@mock_s3
+@mock_aws
 def test_file_exists(tmpdir):
     """
     Test that cache._file_exists behaves correctly
@@ -183,7 +183,7 @@ def test_file_exists(tmpdir):
     assert 'but is not a file' in context.value.args[0]
 
 
-@mock_s3
+@mock_aws
 def test_download_file(tmpdir):
     """
     Test that S3CloudCache._download_file behaves as expected
@@ -231,7 +231,7 @@ def test_download_file(tmpdir):
     assert hasher.hexdigest() == true_checksum
 
 
-@mock_s3
+@mock_aws
 def test_download_file_multiple_versions(tmpdir):
     """
     Test that S3CloudCache._download_file behaves as expected
@@ -322,7 +322,7 @@ def test_download_file_multiple_versions(tmpdir):
     assert hasher.hexdigest() == true_checksum_2
 
 
-@mock_s3
+@mock_aws
 def test_re_download_file(tmpdir):
     """
     Test that S3CloudCache._download_file will re-download a file
@@ -382,7 +382,7 @@ def test_re_download_file(tmpdir):
     assert hasher.hexdigest() == true_checksum
 
 
-@mock_s3
+@mock_aws
 def test_download_data(tmpdir):
     """
     Test that S3CloudCache.download_data() correctly downloads files from S3
@@ -457,7 +457,7 @@ def test_download_data(tmpdir):
     # assert attr['exists']
 
 
-@mock_s3
+@mock_aws
 def test_download_metadata(tmpdir):
     """
     Test that S3CloudCache.download_metadata() correctly
@@ -541,7 +541,7 @@ def test_download_metadata(tmpdir):
     # assert attr['exists']
 
 
-@mock_s3
+@mock_aws
 def test_metadata(tmpdir):
     """
     Test that S3CloudCache.metadata() returns the expected pandas DataFrame
@@ -603,7 +603,7 @@ def test_metadata(tmpdir):
     assert true_df.equals(metadata_df)
 
 
-@mock_s3
+@mock_aws
 def test_latest_manifest(tmpdir, example_datasets_with_metadata):
     """
     Test that the methods which return the latest and latest downloaded
@@ -629,7 +629,7 @@ def test_latest_manifest(tmpdir, example_datasets_with_metadata):
     assert cache.latest_downloaded_manifest_file == expected
 
 
-@mock_s3
+@mock_aws
 def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
     """
     Test that a warning is raised the first time you try to load an outdated
@@ -669,7 +669,7 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
             assert w._category_name != 'OutdatedManifestWarning'
 
 
-@mock_s3
+@mock_aws
 def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
     """
     Test that list_all_downloaded_manifests works
@@ -700,7 +700,7 @@ def test_list_all_downloaded(tmpdir, example_datasets_with_metadata):
     assert downloaded == expected
 
 
-@mock_s3
+@mock_aws
 def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
     """
     Test that the correct warning is emitted when the user tries
@@ -729,7 +729,7 @@ def test_latest_manifest_warning(tmpdir, example_datasets_with_metadata):
     assert cmd in msg
 
 
-@mock_s3
+@mock_aws
 def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     """
     Test that load_last_manifest works
@@ -785,7 +785,7 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     assert cache.current_manifest == 'project-x_manifest_v4.0.0.json'
 
 
-@mock_s3
+@mock_aws
 def test_corrupted_load_last_manifest(tmpdir,
                                       example_datasets_with_metadata):
     """

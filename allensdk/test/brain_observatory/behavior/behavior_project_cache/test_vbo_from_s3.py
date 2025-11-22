@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from .utils import create_bucket, load_dataset
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 import pathlib
 import json
 import semver
@@ -20,7 +20,7 @@ from allensdk.brain_observatory.\
     import VisualBehaviorOphysProjectCache
 
 
-@mock_s3
+@mock_aws
 def test_manifest_methods(tmpdir, vbo_s3_cloud_cache_data):
 
     data, versions = vbo_s3_cloud_cache_data
@@ -62,7 +62,7 @@ def test_manifest_methods(tmpdir, vbo_s3_cloud_cache_data):
     assert 'behavior_file_4.nwb' not in change_msg
 
 
-@mock_s3
+@mock_aws
 def test_local_cache_construction(
     tmpdir,
     vbo_s3_cloud_cache_data,
@@ -118,7 +118,7 @@ def test_local_cache_construction(
     assert len(local_manifest) == 9  # 8 metadata files and 1 data file
 
 
-@mock_s3
+@mock_aws
 def test_load_out_of_date_manifest(
     tmpdir,
     vbo_s3_cloud_cache_data,
@@ -182,7 +182,7 @@ def test_load_out_of_date_manifest(
     assert file_contents == expected
 
 
-@mock_s3
+@mock_aws
 @pytest.mark.parametrize("delete_cache", [True, False])
 def test_file_linkage(
     tmpdir,
@@ -285,7 +285,7 @@ def test_file_linkage(
     assert 'ophys_file_5.nwb' in v2_paths
 
 
-@mock_s3
+@mock_aws
 def test_when_data_updated(tmpdir, vbo_s3_cloud_cache_data, data_update):
     """
     Test that when a cache is instantiated after an update has
@@ -331,7 +331,7 @@ def test_when_data_updated(tmpdir, vbo_s3_cloud_cache_data, data_update):
     assert checked_msg
 
 
-@mock_s3
+@mock_aws
 def test_load_last(tmpdir, vbo_s3_cloud_cache_data, data_update):
     """
     Test that, when a cache is instantiated over an old
