@@ -45,7 +45,7 @@ jobs:
       matrix:
         # Use macos-13 for x86_64 architecture (macos-latest is now ARM64)
         os: ["macos-13", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.10", "3.11"]
       fail-fast: false
     defaults:
       run:
@@ -72,7 +72,7 @@ jobs:
     runs-on: ["self-hosted"]
     strategy:
       matrix:
-        image: ["allensdk_local_py38:latest"]
+        image: ["allensdk_local_py310:latest"]
     steps:
       - uses: actions/checkout@v4
       - name: run test in docker

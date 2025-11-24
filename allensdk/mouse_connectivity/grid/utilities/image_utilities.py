@@ -1,9 +1,7 @@
-from __future__ import division
 import logging
 import os
 import sys
 
-from six import iteritems
 import numpy as np
 import SimpleITK as sitk
 from skimage.draw import polygon
@@ -11,17 +9,15 @@ from skimage.draw import polygon
 from allensdk.config.manifest import Manifest
 
 
-if sys.version_info[0] > 2:
-    failed_import = (ImportError, ModuleNotFoundError)
-else:
-    failed_import = (ImportError,)
+# Exception types to catch when importing optional JPEG2000 libraries
+failed_import = (ImportError, ModuleNotFoundError)
 
 
 # use np_sitk_convert or sitk_np_convert to access
 # TODO: check if this already exists. If not: add more dtypes
 # it does not
 NUMPY_SITK_TYPE_LOOKUP = {np.dtype(np.float32): sitk.sitkFloat32}
-SITK_NUMPY_TYPE_LOOKUP = {v: k for k, v in iteritems(NUMPY_SITK_TYPE_LOOKUP)}
+SITK_NUMPY_TYPE_LOOKUP = {v: k for k, v in NUMPY_SITK_TYPE_LOOKUP.items()}
 
 
 # ITK/Numpy
@@ -273,7 +269,12 @@ def __read_intensity_image_with_glymur(path):
     return glymur.Jp2k(path)[:]
 
 
-try:
+def _get_jpeg_readers():
+    """Get the appropriate JPEG2000 readers based on available libraries.
+
+    Returns a tuple of (read_segmentation_image, read_intensity_image) functions.
+    Raises ImportError if neither jpeg_twok nor glymur is available.
+    """
     # we use a proprietary library called kakadu internally
     # (jpeg_twok is a python interface around that library)
     # kakadu offers really good performance as well as support for
@@ -281,11 +282,42 @@ try:
     # however, since it is proprietary, we can't share it
     # alongside the allensdk,
     # so we default to glymur (a python openjpeg) for external users.
-    sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
-    import jpeg_twok
-    read_segmentation_image = __read_segmentation_image_with_kakadu
-    read_intensity_image = __read_intensity_image_with_kakadu
-except failed_import:
-    import glymur
-    read_segmentation_image = __read_segmentation_image_with_glymur
-    read_intensity_image = __read_intensity_image_with_glymur
+    try:
+        sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
+        import jpeg_twok
+        return (__read_segmentation_image_with_kakadu,
+                __read_intensity_image_with_kakadu)
+    except failed_import:
+        pass
+
+    try:
+        import glymur
+        return (__read_segmentation_image_with_glymur,
+                __read_intensity_image_with_glymur)
+    except failed_import:
+        pass
+
+    raise ImportError(
+        "Neither jpeg_twok nor glymur is available. "
+        "Please install glymur (pip install glymur) and ensure openjpeg "
+        "is installed on your system."
+    )
+
+
+try:
+    read_segmentation_image, read_intensity_image = _get_jpeg_readers()
+except ImportError:
+    # Define placeholder functions that raise on use rather than on import
+    def read_segmentation_image(path):
+        raise ImportError(
+            "Neither jpeg_twok nor glymur is available. "
+            "Please install glymur (pip install glymur) and ensure openjpeg "
+            "is installed on your system."
+        )
+
+    def read_intensity_image(path, reduce_level=None, channel=None):
+        raise ImportError(
+            "Neither jpeg_twok nor glymur is available. "
+            "Please install glymur (pip install glymur) and ensure openjpeg "
+            "is installed on your system."
+        )
