@@ -61,6 +61,9 @@ def test_get_ophys_session_table_by_experiment(TempdirBehaviorCache,
         index_column="ophys_experiment_id")[
         ["ophys_session_id"]]
 
+    # Match index dtype (pandas 2.x may return different dtypes)
+    expected.index = expected.index.astype(actual.index.dtype)
+
     pd.testing.assert_frame_equal(expected, actual)
 
 
