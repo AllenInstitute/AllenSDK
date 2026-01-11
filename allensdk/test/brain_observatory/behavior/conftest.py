@@ -27,7 +27,7 @@ def pytest_assertrepr_compare(config, op, left, right):
                 f"{left.orig} != {right_compare}.", "Diff:"] + left.diff
 
 
-def pytest_ignore_collect(path, config):
+def pytest_ignore_collect(collection_path, config):
     ''' The brain_observatory.ecephys submodule uses
     python 3.6 features that may not be backwards compatible!
     '''

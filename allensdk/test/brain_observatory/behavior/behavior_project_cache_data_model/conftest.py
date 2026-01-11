@@ -128,9 +128,10 @@ def driver_lookup(behavior_session_id_list):
                 ["aa", "bb"],
                 ["cc"],
                 ["cc", "dd"])
-    chosen = rng.choice(possible,
-                        size=len(behavior_session_id_list),
-                        replace=True)
+    # Use integers to index into possible since numpy 1.24+ doesn't support
+    # choice() with sequences of inhomogeneous shapes (lists of different lengths)
+    indices = rng.integers(0, len(possible), size=len(behavior_session_id_list))
+    chosen = [possible[i] for i in indices]
     return {ii: val
             for ii, val in zip(behavior_session_id_list,
                                chosen)}

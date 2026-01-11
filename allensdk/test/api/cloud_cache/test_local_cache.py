@@ -1,11 +1,11 @@
 import pathlib
-from moto import mock_s3
+from moto import mock_aws
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 from allensdk.api.cloud_cache.cloud_cache import LocalCache
 
 
-@mock_s3
+@mock_aws
 def test_local_cache_file_access(tmpdir, example_datasets):
     """
     Create a cache; download some, but not all of the files

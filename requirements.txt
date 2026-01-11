@@ -2,7 +2,7 @@ psycopg2-binary
 hdmf!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*
 h5py
 matplotlib
-numpy<1.24
+numpy<1.25
 pandas==1.5.3
 jinja2
 scipy<1.11

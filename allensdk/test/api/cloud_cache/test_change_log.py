@@ -1,10 +1,10 @@
 import pathlib
-from moto import mock_s3
+from moto import mock_aws
 from .utils import create_bucket
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
 
-@mock_s3
+@mock_aws
 def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
     """
     Test that CloudCacheBase.summarize_comparison reports the correct
@@ -148,8 +148,7 @@ def test_summarize_comparison(tmpdir, example_datasets_with_metadata):
     assert set(log['metadata_changes']) == {ans1, ans2, ans3}
 
 
-@mock_s3
-@mock_s3
+@mock_aws
 def test_compare_manifesst_string(tmpdir, example_datasets_with_metadata):
     """
     Test that CloudCacheBase.compare_manifests reports the correct

@@ -289,7 +289,9 @@ class GazeMapper(object):
 
         mag = np.linalg.norm(self.monitor.position)
         meridian = np.degrees(np.arctan(x / mag))
-        elevation = np.degrees(np.arctan(y / np.linalg.norm([x, mag], axis=0)))
+        # Use np.vstack to create a homogeneous 2D array (numpy 1.24+ compatibility)
+        elevation = np.degrees(np.arctan(y / np.linalg.norm(
+            np.vstack([x, np.full_like(x, mag, dtype=float)]), axis=0)))
 
         angles = np.vstack([meridian, elevation]).T
 

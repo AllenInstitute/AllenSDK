@@ -8,7 +8,7 @@ from allensdk.brain_observatory.behavior.behavior_session import \
     BehaviorSession
 from .utils import create_bucket, load_dataset
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 import pathlib
 import json
 import semver
@@ -20,7 +20,7 @@ from allensdk.brain_observatory.\
     import VisualBehaviorNeuropixelsProjectCache
 
 
-@mock_s3
+@mock_aws
 def test_vbn_metadata_tables(tmpdir, vbn_s3_cloud_cache_data):
     """
     Test that we can load all metadata tables from the VBN cache
@@ -53,7 +53,7 @@ def test_vbn_metadata_tables(tmpdir, vbn_s3_cloud_cache_data):
     assert len(abnormal) == 3
 
 
-@mock_s3
+@mock_aws
 def test_probe_nwb_file(monkeypatch, tmpdir, vbn_s3_cloud_cache_data):
     """Tests that the probe nwb file is downloaded"""
     data, versions = vbn_s3_cloud_cache_data
@@ -83,7 +83,7 @@ def test_probe_nwb_file(monkeypatch, tmpdir, vbn_s3_cloud_cache_data):
         assert expected_path.is_file()
 
 
-@mock_s3
+@mock_aws
 def test_manifest_methods(tmpdir, vbn_s3_cloud_cache_data):
 
     data, versions = vbn_s3_cloud_cache_data
@@ -122,7 +122,7 @@ def test_manifest_methods(tmpdir, vbn_s3_cloud_cache_data):
     assert 'ecephys_file_3.nwb created' in change_msg
 
 
-@mock_s3
+@mock_aws
 def test_local_cache_construction(
     tmpdir,
     vbn_s3_cloud_cache_data,
@@ -178,7 +178,7 @@ def test_local_cache_construction(
     assert len(local_manifest) == 9  # 8 metadata files and 1 data file
 
 
-@mock_s3
+@mock_aws
 def test_load_out_of_date_manifest(
     tmpdir,
     vbn_s3_cloud_cache_data,
@@ -238,7 +238,7 @@ def test_load_out_of_date_manifest(
     assert file_contents == expected
 
 
-@mock_s3
+@mock_aws
 @pytest.mark.parametrize("delete_cache", [True, False])
 def test_file_linkage(
     tmpdir,
@@ -336,7 +336,7 @@ def test_file_linkage(
     assert not v2_paths[name].absolute() == v1_paths[name].absolute()
 
 
-@mock_s3
+@mock_aws
 def test_when_data_updated(tmpdir, vbn_s3_cloud_cache_data, data_update):
     """
     Test that when a cache is instantiated after an update has
@@ -382,7 +382,7 @@ def test_when_data_updated(tmpdir, vbn_s3_cloud_cache_data, data_update):
     assert checked_msg
 
 
-@mock_s3
+@mock_aws
 def test_load_last(tmpdir, vbn_s3_cloud_cache_data, data_update):
     """
     Test that, when a cache is instantiated over an old

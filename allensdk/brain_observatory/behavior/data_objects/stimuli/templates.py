@@ -1,4 +1,5 @@
 import os
+import warnings
 import numpy as np
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -184,17 +185,44 @@ class Templates(DataObject, StimulusFileReadableInterface,
 
             nwbfile.add_stimulus_template(visual_stimulus_image_series)
 
+        # DEPRECATED (11/2025): _add_image_index_to_nwb is no longer called.
+        # The IndexSeries using indexed_timeseries is deprecated in pynwb 2.x
+        # and would require significant refactoring to use indexed_images instead.
+        # Since this NWB writing code will not be used for new data generation,
+        # we skip this step rather than refactor. The stimulus template data
+        # is still written above; only the IndexSeries linking is skipped.
+        # See: https://pynwb.readthedocs.io/en/stable/pynwb.image.html#pynwb.image.IndexSeries
         if 'image_index' in stimulus_presentations.value \
                 and self._image_template_key is not None:
-            nwbfile = self._add_image_index_to_nwb(
-                nwbfile=nwbfile, presentations=stimulus_presentations)
+            warnings.warn(
+                "As of 11/2025, Templates.to_nwb() no longer adds the image "
+                "index (IndexSeries) to the NWB file. The IndexSeries "
+                "indexed_timeseries field is deprecated in pynwb 2.x. "
+                "The stimulus template data is still written.",
+                UserWarning,
+                stacklevel=2
+            )
 
         return nwbfile
 
     def _add_image_index_to_nwb(
             self, nwbfile: NWBFile, presentations: Presentations):
         """Adds the image index and start_time for all stimulus templates
-        to NWB"""
+        to NWB
+
+        .. deprecated:: 2.16.3
+            This method is deprecated as of 11/2025. The IndexSeries
+            indexed_timeseries field is deprecated in pynwb 2.x. This method
+            is no longer called from to_nwb() and will be removed in a future
+            release.
+        """
+        warnings.warn(
+            "_add_image_index_to_nwb is deprecated and will be removed in a "
+            "future release. The IndexSeries indexed_timeseries field is "
+            "deprecated in pynwb 2.x.",
+            DeprecationWarning,
+            stacklevel=2
+        )
         stimulus_templates = self.value[self._image_template_key]
         presentations = presentations.value
 
@@ -208,7 +236,7 @@ class Templates(DataObject, StimulusFileReadableInterface,
         image_index = IndexSeries(
             name=nwb_template.name,
             data=stimulus_index['image_index'].values,
-            unit='None',
+            unit='N/A',
             indexed_timeseries=nwb_template,
             timestamps=stimulus_index['start_time'].values)
         nwbfile.add_stimulus(image_index)
