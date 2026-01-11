@@ -351,8 +351,9 @@ class ApplicationConfig(object):
             cfg_string = self.from_json_file(config_file_path)
             try:
                 config.readfp(io.BytesIO(cfg_string))
-            except (NameError, TypeError):
-                config.read_string(cfg_string)  # Python 3
+            except (NameError, TypeError, AttributeError):
+                # readfp was removed in Python 3.12
+                config.read_string(cfg_string)
         else:
             config.read(config_file_path)
 
