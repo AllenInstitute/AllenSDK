@@ -320,7 +320,8 @@ def interpolate_RF(rf_map, deg_per_pnt):
     except NotImplementedError:
         # RectBivariateSpline uses (row, col) ordering vs interp2d's (x, y),
         # so arguments are swapped: (y_coor, x_coor) and (y_interpolated, x_interpolated)
-        interpolator = si.RectBivariateSpline(y_coor, x_coor, rf_map)
+        # Use kx=ky=1 (linear) to match interp2d default behavior
+        interpolator = si.RectBivariateSpline(y_coor, x_coor, rf_map, kx=1, ky=1)
         interpolated = interpolator(y_interpolated, x_interpolated)
 
     return interpolated

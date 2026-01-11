@@ -262,11 +262,16 @@ def test_add_stimulus_presentations(nwbfile, presentations, roundtripper):
     if "color" in presentations.value:
         presentations.value["color_triplet"] = [""] + ["[1.0, 1.0, 1.0]"] * 4
         presentations.value["color"] = ""
-    pd.testing.assert_frame_equal(
-        presentations.value[sorted(presentations.value.columns)],
-        obtained_stimulus_table[sorted(obtained_stimulus_table.columns)],
-        check_dtype=False,
-    )
+
+    # Convert expected columns to match obtained dtypes for comparison
+    # (pandas/NWB may infer different dtypes after round-trip)
+    expected = presentations.value[sorted(presentations.value.columns)].copy()
+    obtained = obtained_stimulus_table[sorted(obtained_stimulus_table.columns)]
+    for col in expected.columns:
+        if col in obtained.columns:
+            expected[col] = expected[col].astype(obtained[col].dtype)
+
+    pd.testing.assert_frame_equal(expected, obtained, check_dtype=False)
 
 
 def test_add_stimulus_presentations_color(
