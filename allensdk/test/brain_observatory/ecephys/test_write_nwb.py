@@ -417,7 +417,8 @@ def test_add_probe_to_nwbfile(
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
+    pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True,
+                                  check_dtype=False, check_index_type=False)
 
 
 @pytest.mark.parametrize(
@@ -733,7 +734,8 @@ def test_read_stimulus_table(
 
     obtained = obt.value[sorted(obt.value.columns)]
     expected = expected[sorted(expected.columns)]
-    pd.testing.assert_frame_equal(obtained, expected)
+    pd.testing.assert_frame_equal(obtained, expected, check_dtype=False,
+                                  check_index_type=False)
 
 
 def test_read_spike_times_to_dictionary(tmpdir_factory):

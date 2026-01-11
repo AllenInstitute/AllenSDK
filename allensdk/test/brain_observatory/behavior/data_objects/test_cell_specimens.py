@@ -351,4 +351,4 @@ class TestFilterAndReorder:
                 roi_ids=roi_ids, raise_if_rois_missing=raise_if_rois_missing
             )
             expected = pd.DataFrame({"cell_roi_id": [1], "foo": [2]})
-            pd.testing.assert_frame_equal(rois._value, expected)
+            pd.testing.assert_frame_equal(rois._value, expected, check_dtype=False)

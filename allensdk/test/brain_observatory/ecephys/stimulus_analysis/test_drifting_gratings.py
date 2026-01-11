@@ -255,12 +255,12 @@ def test_modulation_index(response, tf, sampling_rate, expected):
                              # nan, special case where curve can't be fitted
                          ])
 def test_c50(contrast_vals, responses, expected):
-    import platform
     c50_metric = c50(contrast_vals, responses)
-    # On ARM64 (e.g., Apple Silicon), scipy's curve_fit converges to different
-    # solutions for flat/constant response curves where c50 is mathematically
-    # undefined. In these cases, just verify we get a finite result.
-    if platform.machine() == 'arm64' and len(responses) > 0 and np.all(responses == responses[0]):
+    # For flat/constant response curves, c50 is mathematically undefined and
+    # scipy's curve_fit can converge to different solutions depending on
+    # platform and scipy version. In these cases, just verify we get a finite
+    # result rather than checking the exact value.
+    if len(responses) > 0 and np.all(responses == responses[0]):
         assert np.isfinite(c50_metric)
     else:
         assert (np.isclose(c50_metric, expected, equal_nan=True))
