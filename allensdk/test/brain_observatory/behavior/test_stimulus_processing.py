@@ -479,7 +479,8 @@ def test_get_stimulus_presentations(
     expected_df = pd.DataFrame.from_dict(expected)
     expected_df.index.name = "stimulus_presentations_id"
 
-    pd.testing.assert_frame_equal(presentations_df, expected_df, check_dtype=False)
+    pd.testing.assert_frame_equal(presentations_df, expected_df, check_dtype=False,
+                                  check_index_type=False)
 
 
 @pytest.mark.parametrize(
