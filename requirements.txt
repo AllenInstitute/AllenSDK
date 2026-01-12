@@ -2,6 +2,9 @@ psycopg2-binary
 hdmf!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*
 h5py
 matplotlib
+# Note: numpy 2.1.0 was the first version to support Python 3.13.
+# The <2 constraint means Windows+Python 3.13 is excluded from CI
+# (conda-forge has no numpy 1.x builds for Python 3.13).
 numpy>=1.24,<2
 pandas>=1.5.3
 jinja2

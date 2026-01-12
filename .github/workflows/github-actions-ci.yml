@@ -47,8 +47,11 @@ jobs:
         os: ["macos-15-intel", "macos-latest", "windows-latest", "ubuntu-latest"]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
         exclude:
-          # Exclude Windows Python 3.13 - numpy crashes due to experimental
-          # MINGW-W64 builds. See: https://github.com/numpy/numpy/issues
+          # Exclude Windows Python 3.13 - numpy<2 doesn't officially support
+          # Python 3.13 (numpy 2.1.0 was the first to add Python 3.13 support).
+          # conda-forge has no numpy 1.x builds for Python 3.13, so conda falls
+          # back to an experimental MINGW-W64 build that segfaults on import.
+          # To support Windows Python 3.13, remove the numpy<2 constraint.
           - os: windows-latest
             python-version: "3.13"
       fail-fast: false
