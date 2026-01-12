@@ -65,13 +65,10 @@ jobs:
           pip install .
       - name: Test
         run: |
-          # Disable parallel testing on Windows Python 3.12+ due to segfaults
-          # with pytest-xdist. Also disable coverage on Windows Python 3.13
+          # Disable parallel testing and coverage on Windows Python 3.13
           # due to segfaults with pytest-cov.
           if [[ "${{ runner.os }}" == "Windows" && "${{ matrix.python-version }}" == "3.13" ]]; then
             py.test
-          elif [[ "${{ runner.os }}" == "Windows" && "${{ matrix.python-version }}" =~ ^3\.1[2-9] ]]; then
-            py.test --cov=allensdk
           else
             py.test --cov=allensdk -n 4
           fi
