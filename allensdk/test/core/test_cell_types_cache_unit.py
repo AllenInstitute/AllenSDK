@@ -530,8 +530,8 @@ def test_get_ephys_sweeps(cache_fixture,
                         _ = ctc.get_ephys_sweeps(cell_id)
 
     if path_exists:
-        # When path exists, read from cache
-        ju_read.assert_called_once()
+        # When path exists, should not call the API
+        assert not get_ephys_sweeps_mock.called
     else:
         # When path doesn't exist, call API (with additional kwargs)
         get_ephys_sweeps_mock.assert_called_once()
