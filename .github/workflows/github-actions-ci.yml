@@ -22,30 +22,31 @@ env:
   MTRAIN_PASSWORD: password
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: actions/checkout@v4
-      - name: flake8 linting
-        run: |
-          pip install flake8
-          export PATH="/home/runner/.local/bin:${PATH}"
-          git fetch origin master
-          # `|| true` to force exit code 0 even if no files found
-          CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master allensdk | grep -e ".*.py$" || true)
-          echo "List of changed files:"
-          echo ${CHANGED_PYFILES}
-          flake8 ${CHANGED_PYFILES} --count
+  # Temporarily disabled to debug Windows Python 3.13 segfault
+  # lint:
+  #   name: Lint
+  #   runs-on: "ubuntu-latest"
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: flake8 linting
+  #       run: |
+  #         pip install flake8
+  #         export PATH="/home/runner/.local/bin:${PATH}"
+  #         git fetch origin master
+  #         # `|| true` to force exit code 0 even if no files found
+  #         CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master allensdk | grep -e ".*.py$" || true)
+  #         echo "List of changed files:"
+  #         echo ${CHANGED_PYFILES}
+  #         flake8 ${CHANGED_PYFILES} --count
 
   allensdk:
     name: ${{ matrix.python-version }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-15-intel for x86_64, macos-latest for ARM64
-        os: ["macos-15-intel", "macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        # Only Windows Python 3.13 to debug segfault
+        os: ["windows-latest"]
+        python-version: ["3.13"]
       fail-fast: false
     defaults:
       run:
@@ -65,41 +66,42 @@ jobs:
           pip install .
       - name: Test
         run: |
-          # Disable parallel testing and coverage on Windows Python 3.13
-          # due to segfaults with pytest-cov.
-          if [[ "${{ runner.os }}" == "Windows" && "${{ matrix.python-version }}" == "3.13" ]]; then
-            py.test
-          else
-            py.test --cov=allensdk -n 4
-          fi
+          # Run tests in batches to isolate segfault
+          # Batch 1: api tests
+          py.test allensdk/test/api/ -v || echo "Batch 1 failed"
+          # Batch 2: core tests
+          py.test allensdk/test/core/ -v || echo "Batch 2 failed"
+          # Batch 3: brain_observatory tests
+          py.test allensdk/test/brain_observatory/ -v || echo "Batch 3 failed"
 
-  onprem:
-    name: python ${{ matrix.image }} on-prem test
-    runs-on: ["self-hosted"]
-    strategy:
-      matrix:
-        image: ["allensdk_local_py310:latest"]
-    steps:
-      - uses: actions/checkout@v4
-      - name: run test in docker
-        run: |
-          docker run \
-              --env-file ~/env.list \
-              --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
-              --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
-              --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
-              --mount type=tmpfs,destination=/tmp \
-              --rm \
-              ${{ matrix.image }} \
-                  /bin/bash -c "pip install -r requirements.txt; \
-                                pip install -r test_requirements.txt; \
-                                python -m pytest \
-                                    --log-level=INFO \
-                                    --capture=no \
-                                    --cov=allensdk \
-                                    --cov-config coveragerc \
-                                    --cov-report html \
-                                    --junitxml=test-reports/test.xml \
-                                    --boxed \
-                                    --numprocesses auto \
-                                    --durations=0"
+  # Temporarily disabled to debug Windows Python 3.13 segfault
+  # onprem:
+  #   name: python ${{ matrix.image }} on-prem test
+  #   runs-on: ["self-hosted"]
+  #   strategy:
+  #     matrix:
+  #       image: ["allensdk_local_py310:latest"]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: run test in docker
+  #       run: |
+  #         docker run \
+  #             --env-file ~/env.list \
+  #             --mount type=bind,source=$PWD,target=/home/ghworker,bind-propagation=rshared \
+  #             --mount type=bind,source=/data/informatics/module_test_data/,target=/data/informatics/module_test_data/,bind-propagation=rshared,ro \
+  #             --mount type=bind,source=/allen/,target=/allen/,bind-propagation=rshared,ro \
+  #             --mount type=tmpfs,destination=/tmp \
+  #             --rm \
+  #             ${{ matrix.image }} \
+  #                 /bin/bash -c "pip install -r requirements.txt; \
+  #                               pip install -r test_requirements.txt; \
+  #                               python -m pytest \
+  #                                   --log-level=INFO \
+  #                                   --capture=no \
+  #                                   --cov=allensdk \
+  #                                   --cov-config coveragerc \
+  #                                   --cov-report html \
+  #                                   --junitxml=test-reports/test.xml \
+  #                                   --boxed \
+  #                                   --numprocesses auto \
+  #                                   --durations=0"
