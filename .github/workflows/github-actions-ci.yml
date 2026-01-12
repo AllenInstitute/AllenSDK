@@ -66,13 +66,23 @@ jobs:
           pip install .
       - name: Test
         run: |
-          # Run tests in batches to isolate segfault
-          # Batch 1: api tests
-          py.test allensdk/test/api/ -v || echo "Batch 1 failed"
-          # Batch 2: core tests
-          py.test allensdk/test/core/ -v || echo "Batch 2 failed"
-          # Batch 3: brain_observatory tests
-          py.test allensdk/test/brain_observatory/ -v || echo "Batch 3 failed"
+          # Debug: Check if pytest itself works
+          echo "=== Testing basic pytest ==="
+          py.test --version
+
+          echo "=== Testing collect only ==="
+          py.test --collect-only allensdk/test/api/test_api.py || echo "Collect failed"
+
+          echo "=== Testing single simple test file ==="
+          py.test allensdk/test/api/test_api.py -v || echo "Single test failed"
+
+          echo "=== Testing Python imports ==="
+          python -c "import allensdk; print('allensdk imported')"
+          python -c "import numpy; print('numpy', numpy.__version__)"
+          python -c "import scipy; print('scipy', scipy.__version__)"
+          python -c "import pandas; print('pandas', pandas.__version__)"
+          python -c "import h5py; print('h5py', h5py.__version__)"
+          python -c "import tables; print('tables', tables.__version__)"
 
   # Temporarily disabled to debug Windows Python 3.13 segfault
   # onprem:
