@@ -530,9 +530,9 @@ def test_get_ephys_sweeps(cache_fixture,
                         _ = ctc.get_ephys_sweeps(cell_id)
 
     if path_exists:
-        assert ju_read.called_once_with(_MOCK_PATH)
+        ju_read.assert_called_once_with(_MOCK_PATH)
     else:
-        assert get_ephys_sweeps_mock.called_once_with(cell_id)
+        get_ephys_sweeps_mock.assert_called_once_with(cell_id)
 
 
 @pytest.mark.parametrize('path_exists',
@@ -557,7 +557,7 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                             _ = ctc.get_ephys_sweeps(cell_id)
 
     # read will be called regardless
-    assert ju_read.called_once_with(_MOCK_PATH)
+    ju_read.assert_called_once_with(_MOCK_PATH)
 
     if path_exists:
         assert not query_mock.called

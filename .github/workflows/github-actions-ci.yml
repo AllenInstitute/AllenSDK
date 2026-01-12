@@ -65,7 +65,13 @@ jobs:
           pip install .
       - name: Test
         run: |
-          py.test --cov=allensdk -n 4
+          # Disable parallel testing on Windows Python 3.12+ due to segfaults
+          # with pytest-xdist
+          if [[ "${{ runner.os }}" == "Windows" && "${{ matrix.python-version }}" =~ ^3\.1[2-9] ]]; then
+            py.test --cov=allensdk
+          else
+            py.test --cov=allensdk -n 4
+          fi
 
   onprem:
     name: python ${{ matrix.image }} on-prem test
