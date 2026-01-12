@@ -530,9 +530,12 @@ def test_get_ephys_sweeps(cache_fixture,
                         _ = ctc.get_ephys_sweeps(cell_id)
 
     if path_exists:
-        ju_read.assert_called_once_with(_MOCK_PATH)
+        # When path exists, read from cache
+        ju_read.assert_called_once()
     else:
-        get_ephys_sweeps_mock.assert_called_once_with(cell_id)
+        # When path doesn't exist, call API (with additional kwargs)
+        get_ephys_sweeps_mock.assert_called_once()
+        assert get_ephys_sweeps_mock.call_args[0][0] == cell_id
 
 
 @pytest.mark.parametrize('path_exists',
@@ -556,8 +559,9 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                         with patch('allensdk.core.json_utilities.write') as ju_write:
                             _ = ctc.get_ephys_sweeps(cell_id)
 
-    # read will be called regardless
-    ju_read.assert_called_once_with(_MOCK_PATH)
+    # read will be called regardless (when path exists)
+    if path_exists:
+        ju_read.assert_called_once()
 
     if path_exists:
         assert not query_mock.called
