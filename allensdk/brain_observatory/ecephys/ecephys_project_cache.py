@@ -737,9 +737,12 @@ def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace
     if not inplace:
         this = this.copy()
 
-    uniques = other.groupby(foreign_key)\
-        .apply(lambda grp: pd.DataFrame(grp)[field_key].unique())
-    this[unique_key] = 0
+    # Select only the field_key column before apply to avoid FutureWarning about
+    # grouping columns in pandas 2.2+
+    uniques = other.groupby(foreign_key)[field_key]\
+        .apply(lambda x: x.unique())
+    # Use object dtype to allow storing arrays of strings
+    this[unique_key] = None
     this.loc[uniques.index.values, unique_key] = uniques.values
 
     if not inplace:
