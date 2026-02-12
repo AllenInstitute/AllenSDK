@@ -122,7 +122,7 @@ class AsyncHttpEngine(HttpEngine):
             self._session = session
             self._owns_session = False
             warnings.warn(
-                "Recieved preconstructed session, ignoring timeout parameter."
+                "Received preconstructed session, ignoring timeout parameter."
             )
         else:
             # Defer session creation until actually needed in an async context

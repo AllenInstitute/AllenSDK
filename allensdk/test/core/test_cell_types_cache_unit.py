@@ -523,7 +523,7 @@ def test_get_ephys_sweeps(cache_fixture,
     get_ephys_sweeps = \
         'allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps'
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch(get_ephys_sweeps, return_value=[]) as get_ephys_sweeps_mock:
+        with patch(get_ephys_sweeps, return_value=[]):
             with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
                 with patch('allensdk.core.json_utilities.read',
                         return_value=['mock_data']) as ju_read:
