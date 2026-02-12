@@ -5,11 +5,11 @@ import hashlib
 import pandas as pd
 import io
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 from allensdk.api.cloud_cache.cloud_cache import S3CloudCache
 
 
-@mock_s3
+@mock_aws
 def test_full_cache_system(tmpdir):
     """
     Test the process of loading different versions of the same dataset,

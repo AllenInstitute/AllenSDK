@@ -93,10 +93,10 @@ AsyncStreamCallbackType = Callable[[AsyncIterator[bytes]], Awaitable[None]]
 class AsyncHttpEngine(HttpEngine):
 
     def __init__(
-        self, 
-        scheme: str, 
-        host: str, 
-        session: Optional[aiohttp.ClientSession] = None, 
+        self,
+        scheme: str,
+        host: str,
+        session: Optional[aiohttp.ClientSession] = None,
         **kwargs
     ):
         """ Simple tool for making asynchronous streaming http requests.
@@ -105,11 +105,11 @@ class AsyncHttpEngine(HttpEngine):
         ----------
         scheme :
             e.g "http" or "https"
-        host : 
+        host :
             will be used as the base for request urls
-        session : 
-            If provided, this preconstructed session will be used rather than 
-            a new one. Keep in mind that AsyncHttpEngine closes its session 
+        session :
+            If provided, this preconstructed session will be used rather than
+            a new one. Keep in mind that AsyncHttpEngine closes its session
             when it is garbage collected!
         **kwargs :
             Will be passed to parent.
@@ -119,14 +119,25 @@ class AsyncHttpEngine(HttpEngine):
         super(AsyncHttpEngine, self).__init__(scheme, host, **kwargs)
 
         if session:
-            self.session = session
+            self._session = session
+            self._owns_session = False
             warnings.warn(
-                "Recieved preconstructed session, ignoring timeout parameter."
+                "Received preconstructed session, ignoring timeout parameter."
             )
         else:
-            self.session = aiohttp.ClientSession(
+            # Defer session creation until actually needed in an async context
+            # (aiohttp 3.9+ requires ClientSession to be created within an event loop)
+            self._session = None
+            self._owns_session = True
+
+    @property
+    def session(self) -> aiohttp.ClientSession:
+        """Lazily create the aiohttp session when first accessed."""
+        if self._session is None:
+            self._session = aiohttp.ClientSession(
                 timeout=aiohttp.client.ClientTimeout(self.timeout)
             )
+        return self._session
 
     async def _stream_coroutine(
         self, 
@@ -169,10 +180,10 @@ class AsyncHttpEngine(HttpEngine):
         return functools.partial(self._stream_coroutine, route)
 
     def __del__(self):
-        if hasattr(self, "session"):
+        if hasattr(self, "_session") and self._session is not None:
             nest_asyncio.apply()
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.session.close())
+            loop.run_until_complete(self._session.close())
 
     @staticmethod
     def write_bytes(

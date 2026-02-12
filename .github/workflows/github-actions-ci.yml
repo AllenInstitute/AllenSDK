@@ -26,7 +26,7 @@ jobs:
     name: Lint
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: flake8 linting
         run: |
           pip install flake8
@@ -43,15 +43,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        # macos-15-intel for x86_64, macos-latest for ARM64
+        os: ["macos-15-intel", "macos-latest", "windows-latest", "ubuntu-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        exclude:
+          # Exclude Windows Python 3.13 because numpy<2 lacks support: conda-forge
+          # has no numpy 1.x builds, so conda falls back to an experimental
+          # MINGW-W64 build that segfaults on import; remove numpy<2 to enable it.
+          - os: windows-latest
+            python-version: "3.13"
+      fail-fast: false
+    defaults:
       fail-fast: false
     defaults:
       run:
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
@@ -71,9 +80,9 @@ jobs:
     runs-on: ["self-hosted"]
     strategy:
       matrix:
-        image: ["allensdk_local_py38:latest"]
+        image: ["allensdk_local_py310:latest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: run test in docker
         run: |
           docker run \

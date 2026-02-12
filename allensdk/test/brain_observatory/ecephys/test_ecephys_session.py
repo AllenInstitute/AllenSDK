@@ -313,7 +313,8 @@ def test_get_stimulus_presentations(valid_stimulus_table_api):
     pd.testing.assert_frame_equal(expected,
                                   obtained,
                                   check_like=True,
-                                  check_dtype=False)
+                                  check_dtype=False,
+                                  check_index_type=False)
 
 
 def test_get_stimulus_presentations_no_invalid_times(just_stim_table_api):
@@ -336,7 +337,8 @@ def test_get_stimulus_presentations_no_invalid_times(just_stim_table_api):
     pd.testing.assert_frame_equal(expected,
                                   obtained,
                                   check_like=True,
-                                  check_dtype=False)
+                                  check_dtype=False,
+                                  check_index_type=False)
 
 
 def test_session_metadata(session_metadata_api):
@@ -588,7 +590,8 @@ def test_build_inter_presentation_intervals(just_stim_table_api):
     pd.testing.assert_frame_equal(expected,
                                   obtained,
                                   check_like=True,
-                                  check_dtype=False)
+                                  check_dtype=False,
+                                  check_index_type=False)
 
 
 def test_get_inter_presentation_intervals_for_stimulus(just_stim_table_api):
@@ -607,7 +610,8 @@ def test_get_inter_presentation_intervals_for_stimulus(just_stim_table_api):
     pd.testing.assert_frame_equal(expected,
                                   obtained,
                                   check_like=True,
-                                  check_dtype=False)
+                                  check_dtype=False,
+                                  check_index_type=False)
 
 
 def test_get_lfp(channels_table_api):

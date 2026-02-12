@@ -121,7 +121,8 @@ def test_get_sfdi(sf_tuning_responses, mean_sweeps_trials, expected):
                               [0.02, 0.04, 0.08, 0.16, 0.32], 0, (0.0, 0.019999999552965164, np.nan, 0.32))
                          ])
 def test_fit_sf_tuning(sf_tuning_response, sf_vals, pref_sf_index, expected):
-    assert(np.allclose(fit_sf_tuning(sf_tuning_response, sf_vals, pref_sf_index), expected, equal_nan=True))
+    # Use tolerance for curve fitting which can vary across platforms (x86_64 vs ARM64)
+    assert(np.allclose(fit_sf_tuning(sf_tuning_response, sf_vals, pref_sf_index), expected, equal_nan=True, rtol=1e-3, atol=1e-4))
 
 
 if __name__ == '__main__':

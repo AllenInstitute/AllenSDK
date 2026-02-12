@@ -129,7 +129,7 @@ class RunningAcquisition(DataObject,
         cls,
         nwbfile: NWBFile
     ) -> "RunningAcquisition":
-        running_module = nwbfile.modules['running']
+        running_module = nwbfile.processing['running']
         dx_interface = running_module.get_data_interface('dx')
 
         dx = dx_interface.data

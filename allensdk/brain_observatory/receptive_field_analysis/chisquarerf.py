@@ -313,8 +313,16 @@ def interpolate_RF(rf_map, deg_per_pnt):
         1,
     )
 
-    interpolated = si.interp2d(x_coor, y_coor, rf_map)
-    interpolated = interpolated(x_interpolated, y_interpolated)
+    # interp2d was removed in scipy 1.14, use RectBivariateSpline instead
+    try:
+        interpolator = si.interp2d(x_coor, y_coor, rf_map)
+        interpolated = interpolator(x_interpolated, y_interpolated)
+    except NotImplementedError:
+        # RectBivariateSpline uses (row, col) ordering vs interp2d's (x, y),
+        # so arguments are swapped: (y_coor, x_coor) and (y_interpolated, x_interpolated)
+        # Use kx=ky=1 (linear) to match interp2d default behavior
+        interpolator = si.RectBivariateSpline(y_coor, x_coor, rf_map, kx=1, ky=1)
+        interpolated = interpolator(y_interpolated, x_interpolated)
 
     return interpolated
 
