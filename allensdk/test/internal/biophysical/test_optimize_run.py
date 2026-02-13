@@ -1,10 +1,10 @@
 import pytest
 import sys
-from mock import patch, mock_open, Mock, MagicMock
+from unittest.mock import patch, mock_open, Mock, MagicMock
 from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config
 import os
-import mock
+from unittest import mock
 import shutil
 try:
     import __builtin__ as builtins

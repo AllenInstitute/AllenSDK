@@ -1,7 +1,7 @@
 from allensdk.internal.api.queries.optimize_config_reader import \
     OptimizeConfigReader
 import pytest
-from mock import patch, mock_open
+from unittest.mock import patch, mock_open
 try:
     import __builtin__ as builtins
 except:

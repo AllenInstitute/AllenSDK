@@ -223,7 +223,7 @@ class TaskParameters(DataObject, StimulusFileReadableInterface,
         # displayed stimuli (no flashes).
 
         if stim_duration is None:
-            stim_duration = np.NaN
+            stim_duration = np.nan
         else:
             stim_duration = stim_duration[0]
         return stim_duration

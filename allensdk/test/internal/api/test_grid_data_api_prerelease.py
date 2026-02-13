@@ -1,7 +1,7 @@
 import os
 
 import nrrd
-import mock
+from unittest import mock
 import pytest
 import numpy as np
 from numpy.testing import assert_raises

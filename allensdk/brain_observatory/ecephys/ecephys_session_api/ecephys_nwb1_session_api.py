@@ -169,8 +169,8 @@ class EcephysNwb1Api(EcephysSessionApi):
             if stimulus_presentations_df is None:
                 stimulus_presentations_df = stim_df
             else:
-                stimulus_presentations_df = stimulus_presentations_df.append(
-                    stim_df)
+                stimulus_presentations_df = pd.concat(
+                    [stimulus_presentations_df, stim_df])
 
         stimulus_presentations_df[
             'stimulus_index'] = 0  # I'm not sure what column is, but is

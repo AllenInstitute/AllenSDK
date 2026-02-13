@@ -3,7 +3,7 @@ import sys
 import os
 
 import pytest
-import mock
+from unittest import mock
 import pandas as pd
 import numpy as np
 

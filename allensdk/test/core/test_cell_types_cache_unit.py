@@ -38,7 +38,7 @@ from allensdk.core.cell_types_cache import ReporterStatus as RS
 import pytest
 from pandas.core.frame import DataFrame
 from allensdk.config import enable_console_log
-from mock import MagicMock, patch, call, mock_open
+from unittest.mock import MagicMock, patch, call, mock_open
 from six.moves import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
@@ -529,10 +529,8 @@ def test_get_ephys_sweeps(cache_fixture,
                     with patch('allensdk.core.json_utilities.write') as ju_write:
                         _ = ctc.get_ephys_sweeps(cell_id)
 
-    if path_exists:
-        assert ju_read.called_once_with(_MOCK_PATH)
-    else:
-        assert get_ephys_sweeps_mock.called_once_with(cell_id)
+    if not path_exists:
+        get_ephys_sweeps_mock.assert_called_once()
 
 
 @pytest.mark.parametrize('path_exists',
@@ -557,7 +555,7 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                             _ = ctc.get_ephys_sweeps(cell_id)
 
     # read will be called regardless
-    assert ju_read.called_once_with(_MOCK_PATH)
+    ju_read.assert_called_once()
 
     if path_exists:
         assert not query_mock.called

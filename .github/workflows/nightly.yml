@@ -13,7 +13,7 @@ jobs:
         image: ["allensdk_local_py38:latest"]
         branch: ["master", "rc/**"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
       - name: run test in docker

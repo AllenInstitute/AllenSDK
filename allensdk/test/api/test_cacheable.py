@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch, mock_open
 from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.rma_api import RmaApi
 import pandas as pd

@@ -227,7 +227,7 @@ def main():
         hf.create_dataset("r", data=r_list)
         hf.create_dataset("RMSE", data=RMSE_list)
         hf.create_dataset("FC", data=corrected, compression="gzip")
-        hf.create_dataset("roi_names", data=roi_names.astype(np.string_))
+        hf.create_dataset("roi_names", data=roi_names.astype(np.bytes_))
 
         for n in range(num_traces):
             r = r_vals[n]

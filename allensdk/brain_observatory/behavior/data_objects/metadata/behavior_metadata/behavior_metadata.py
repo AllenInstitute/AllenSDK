@@ -149,7 +149,7 @@ def get_task_parameters(data: Dict) -> Dict:
     # displayed stimuli (no flashes).
 
     if stim_duration is None:
-        stim_duration = np.NaN
+        stim_duration = np.nan
     else:
         stim_duration = stim_duration[0]
 

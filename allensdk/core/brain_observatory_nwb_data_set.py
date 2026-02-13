@@ -742,7 +742,7 @@ class BrainObservatoryNwbDataSet(object):
                     v = f[disk_key][()]
 
                     # convert numpy strings to python strings
-                    if v.dtype.type is np.string_:
+                    if v.dtype.type is np.bytes_:
                         if len(v.shape) == 0:
                             v = v.decode('UTF-8')
                         elif len(v.shape) == 1:
@@ -1002,11 +1002,11 @@ def align_running_speed(dxcm, dxtime, timestamps):
     if dxtime[0] != timestamps[0]:
         adjust = np.where(timestamps == dxtime[0])[0][0]
         dxtime = np.insert(dxtime, 0, timestamps[:adjust])
-        dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
+        dxcm = np.insert(dxcm, 0, np.repeat(np.nan, adjust))
     adjust = len(timestamps) - len(dxtime)
     if adjust > 0:
         dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
-        dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        dxcm = np.append(dxcm, np.repeat(np.nan, adjust))
 
     return dxcm, dxtime
 

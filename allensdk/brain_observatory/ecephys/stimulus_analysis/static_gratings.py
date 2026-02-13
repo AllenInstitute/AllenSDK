@@ -388,10 +388,10 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
     :return: index for the preferred sf from the curve fit, prefered sf from the curve fit, low cutoff sf from the
         curve fit, high cutoff sf from the curve fit
     """
-    fit_sf_ind = np.NaN
-    fit_sf = np.NaN
-    sf_low_cutoff = np.NaN
-    sf_high_cutoff = np.NaN
+    fit_sf_ind = np.nan
+    fit_sf = np.nan
+    sf_low_cutoff = np.nan
+    sf_high_cutoff = np.nan
     if pref_sf_index in range(1, len(sf_values)-1):
         # If the prefered spatial freq is an interior case try to fit the tunning curve with a gaussian.
         try:

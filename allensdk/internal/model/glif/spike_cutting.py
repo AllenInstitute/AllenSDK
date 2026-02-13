@@ -174,7 +174,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
 
     if MAKE_PLOT:
         xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
-        plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.NAN, xlim)
+        plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.nan, xlim)
         plt.legend(loc=2, fontsize=20)
         if SHOW_PLOT:
             plt.show(block=BLOCK)                   

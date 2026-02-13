@@ -1,7 +1,7 @@
 
 
 import pytest
-import mock
+from unittest import mock
 
 from allensdk.internal.mouse_connectivity.interval_unionize.unionize_record import Unionize
 

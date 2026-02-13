@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import patch, mock_open
+from unittest.mock import patch, mock_open
 from allensdk.model.biophys_sim.config import Config
 try:
     import __builtin__ as builtins  # @UnresolvedImport

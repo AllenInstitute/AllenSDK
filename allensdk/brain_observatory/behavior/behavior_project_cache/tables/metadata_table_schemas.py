@@ -78,7 +78,7 @@ class BehaviorSessionMetadataSchema(RaisingSchema):
     def convert_date_time(self, data, **kwargs):
         """Change date_of_acquisition to a date time type from string."""
         data["date_of_acquisition"] = pd.to_datetime(
-            data["date_of_acquisition"], utc=True
+            data["date_of_acquisition"], format="ISO8601", utc=True
         )
         return data
 

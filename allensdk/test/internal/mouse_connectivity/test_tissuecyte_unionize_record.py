@@ -2,7 +2,7 @@ from __future__ import division
 
 import numpy as np
 import pytest
-import mock
+from unittest import mock
 from six import iteritems
 from six.moves import xrange
 

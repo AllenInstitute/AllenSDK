@@ -187,7 +187,7 @@ def get_attribute_dict(rf):
 
 
 def print_summary(rf):
-    for key_val in sorted(get_attribute_dict(rf).iteritems(),
+    for key_val in sorted(get_attribute_dict(rf).items(),
                           key=lambda x: x[0]):
         print("%s : %s" % key_val)
 
@@ -212,12 +212,12 @@ def write_receptive_field_to_h5(rf, file_name, prefix=''):
             if prefix == '':
 
                 if x[-1] is None:
-                    f.attrs[x[-2]] = np.NaN
+                    f.attrs[x[-2]] = np.nan
                 else:
                     f.attrs[x[-2]] = x[-1]
             else:
                 if x[-1] is None:
-                    f[prefix].attrs[x[-2]] = np.NaN
+                    f[prefix].attrs[x[-2]] = np.nan
                 else:
                     f[prefix].attrs[x[-2]] = x[-1]
 

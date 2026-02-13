@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 import numpy as np
 from allensdk.api.queries.image_download_api import ImageDownloadApi
 

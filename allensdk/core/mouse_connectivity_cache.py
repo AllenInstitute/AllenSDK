@@ -734,7 +734,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         ncolumns = len(projection_structure_ids) * len(hemisphere_ids)
 
         matrix = np.empty((nrows, ncolumns))
-        matrix[:] = np.NAN
+        matrix[:] = np.nan
 
         row_lookup = {}
         for idx, e in enumerate(experiment_ids):

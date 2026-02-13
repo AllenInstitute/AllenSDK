@@ -1,5 +1,5 @@
 import pytest
-from mock import patch, mock_open, Mock, MagicMock
+from unittest.mock import patch, mock_open, Mock, MagicMock
 try:
     import __builtin__ as builtins
 except:

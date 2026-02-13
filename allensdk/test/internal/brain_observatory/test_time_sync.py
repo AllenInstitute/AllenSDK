@@ -4,7 +4,7 @@ import json
 import os
 import h5py
 from pkg_resources import resource_filename
-from mock import patch
+from unittest.mock import patch
 from allensdk.internal.brain_observatory import time_sync as ts
 from allensdk.internal.pipeline_modules import run_ophys_time_sync
 from allensdk.brain_observatory.sync_dataset import Dataset
@@ -65,7 +65,7 @@ def calculate_stimulus_alignment(stim_time, valid_twop_vsync_fall):
         try:
             stimulus_alignment[index] = int(crossings[0][0])
         except:  # noqa: E722
-            stimulus_alignment[index] = np.NaN
+            stimulus_alignment[index] = np.nan
 
     return stimulus_alignment
 
@@ -153,7 +153,7 @@ def sync_camera_stimulus(sync_data, sample_frequency, camera,
         try:
             frames[i] = crossings[0][0]
         except:  # noqa: E722
-            frames[i] = np.NaN
+            frames[i] = np.nan
 
     return frames
 

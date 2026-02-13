@@ -35,7 +35,7 @@
 #
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture

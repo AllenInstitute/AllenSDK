@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import mock
+from unittest import mock
 
 import pytest
 import numpy as np

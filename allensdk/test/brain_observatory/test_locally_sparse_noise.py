@@ -36,7 +36,7 @@
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 import itertools as it
 
 

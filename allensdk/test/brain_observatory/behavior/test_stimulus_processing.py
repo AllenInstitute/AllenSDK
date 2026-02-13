@@ -454,10 +454,10 @@ def test_get_stimulus_metadata(
             {
                 "duration": [3.0, 2.0, 3.0, 2.0],
                 "end_frame": [4.0, 4.0, 11.0, 11.0],
-                "image_name": [np.NaN, "im065", np.NaN, "im064"],
+                "image_name": [np.nan, "im065", np.nan, "im064"],
                 "index": [2, 0, 3, 1],
                 "omitted": [False, False, False, False],
-                "orientation": [90, np.NaN, 270, np.NaN],
+                "orientation": [90, np.nan, 270, np.nan],
                 "start_frame": [1.0, 2.0, 8.0, 9.0],
                 "start_time": [1, 2, 8, 9],
                 "stop_time": [4, 4, 11, 11],

@@ -103,6 +103,8 @@ def _demix_point(source_frame: np.ndarray, mask_traces: np.ndarray,
     overlap = flat_masks.dot(weighted_masks.T).toarray()
     try:
         demix_traces = linalg.solve(overlap, mask_weighted_trace)
+        if not np.all(np.isfinite(demix_traces)):
+            raise linalg.LinAlgError("non-finite result")
     except linalg.LinAlgError:
         logging.warning("Singular matrix, using least squares to solve.")
         x, _, _, _ = linalg.lstsq(overlap, mask_weighted_trace)

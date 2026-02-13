@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import patch, mock_open, Mock
+from unittest.mock import patch, mock_open, Mock
 from simplejson.scanner import JSONDecodeError
 import allensdk.core.json_utilities as ju
 from allensdk.core.json_utilities import JsonComments

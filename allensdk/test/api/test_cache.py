@@ -41,7 +41,7 @@ import numpy as np
 import time
 
 import pytest
-from mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 from allensdk.api.warehouse_cache.cache import Cache, memoize, get_default_manifest_file
 from allensdk.api.queries.rma_api import RmaApi

@@ -187,7 +187,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df = sanitize_data_columns(session_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
         df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], utc="True"
+            df["date_of_acquisition"], format="ISO8601", utc=True
         )
         df = enforce_df_int_typing(
             input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
@@ -217,7 +217,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df = sanitize_data_columns(session_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
         df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], utc="True"
+            df["date_of_acquisition"], format="ISO8601", utc=True
         )
         df = enforce_df_int_typing(
             input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
@@ -252,7 +252,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         df = sanitize_data_columns(experiment_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
         df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], utc="True"
+            df["date_of_acquisition"], format="ISO8601", utc=True
         )
         df = enforce_df_int_typing(
             input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True

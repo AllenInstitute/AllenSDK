@@ -1,7 +1,7 @@
 import pytest
 import os
 import numpy as np
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 from allensdk.test_utilities import temp_dir
 
 

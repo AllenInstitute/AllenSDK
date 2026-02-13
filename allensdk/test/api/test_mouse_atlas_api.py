@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 import pytest
 
 from allensdk.api.queries.mouse_atlas_api import MouseAtlasApi as MAA

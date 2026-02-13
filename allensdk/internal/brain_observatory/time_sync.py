@@ -151,7 +151,7 @@ def get_photodiode_events(sync_dset, photodiode_key):
         The last valid event occured ~1.0s before
     """
     all_events = sync_dset.get_events_by_line(photodiode_key, units="seconds")
-    all_events_diff = np.ediff1d(all_events, to_begin=0, to_end=0)
+    all_events_diff = np.ediff1d(all_events, to_begin=0.0, to_end=0.0)
     all_events_diff_prev = all_events_diff[:-1]
     all_events_diff_next = all_events_diff[1:]
     min_interval = REG_PHOTODIODE_INTERVAL - REG_PHOTODIODE_STD

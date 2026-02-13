@@ -26,7 +26,7 @@ jobs:
     name: Lint
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: flake8 linting
         run: |
           pip install flake8
@@ -43,28 +43,30 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "windows-latest", "ubuntu-latest"]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        os: ["ubuntu-latest"]
+        python-version: ["3.10", "3.13"]
+        include:
+          - os: "macos-latest"
+            python-version: "3.13"
+          - os: "windows-latest"
+            python-version: "3.13"
       fail-fast: false
-    defaults:
-      run:
-        shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          activate-environment: test-env
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            test_requirements.txt
       - name: Install
         run: |
-          conda activate test-env
-          pip install codecov
           pip install -r test_requirements.txt
           pip install .
       - name: Test
         run: |
-          py.test --cov=allensdk -n 4
+          python -m pytest -n 4 ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13') && '--cov=allensdk' || '' }}
 
   onprem:
     name: python ${{ matrix.image }} on-prem test
@@ -73,7 +75,7 @@ jobs:
       matrix:
         image: ["allensdk_local_py38:latest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: run test in docker
         run: |
           docker run \

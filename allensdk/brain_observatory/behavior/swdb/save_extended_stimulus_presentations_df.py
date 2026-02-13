@@ -116,7 +116,7 @@ def get_extended_stimulus_presentations(session):
     )
     block_repetition_number = np.copy(block_inds)
 
-    for image_name, image_blocks in blocks_per_image.iteritems():
+    for image_name, image_blocks in blocks_per_image.items():
         if image_name != "omitted":
             for ind_block, block_number in enumerate(image_blocks):
                 # block_rep_number starts as a copy of block_inds, so we can

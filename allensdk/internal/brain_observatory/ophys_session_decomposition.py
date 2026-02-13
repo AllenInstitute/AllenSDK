@@ -38,7 +38,7 @@ def read_strided(filename, dtype, offset, shape, strides):
     '''Load a frame without memory-mapping.'''
     frame_size = np.dtype(dtype).itemsize
     arr = np.empty(shape, dtype=dtype)
-    frame_size = arr.dtype.itemsize*np.product(shape[1:])
+    frame_size = arr.dtype.itemsize*np.prod(shape[1:])
     step = strides[0] - frame_size
     with open(filename, "rb") as f:
         f.seek(offset)
