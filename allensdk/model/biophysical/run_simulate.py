@@ -41,7 +41,7 @@ import traceback
 import subprocess
 import logging.config as lc
 from ..biophys_sim.config import Config
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 
 
 class RunSimulate(object):
@@ -118,8 +118,7 @@ def main(command, lims_strategy_json, lims_response_json):
     RunSimulate._log.debug("lims strategy json: %s" % (lims_strategy_json))
     RunSimulate._log.debug("lims upload json: %s" % (lims_response_json))
 
-    log_config = resource_filename('allensdk.model.biophysical.run_simulate',
-                                   'logging.conf')
+    log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
     lc.fileConfig(log_config)
     os.environ['LOG_CFG'] = log_config
 

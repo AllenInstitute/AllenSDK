@@ -35,7 +35,7 @@
 #
 import re
 import logging
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 from allensdk.config.app.application_config import ApplicationConfig
 from allensdk.config.model.description_parser import DescriptionParser
 from allensdk.config.model.description import Description
@@ -44,7 +44,7 @@ from allensdk.config.model.description import Description
 class Config(ApplicationConfig):
     _log = logging.getLogger(__name__)
 
-    _DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
+    _DEFAULT_LOG_CONFIG = str(files(__package__).joinpath('logging.conf'))
 
     #: A structure that defines the available configuration parameters.
     #: The default value and help strings may be seen by viewing the source.

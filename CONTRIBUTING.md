@@ -36,7 +36,7 @@ If you are comfortable addressing this issue yourself, take a look at the [guide
 Adding example notebooks are a great way to contribute to documentation and help
 other users get started on the AllenSDK. Take a look at our [existing notebooks](https://github.com/AllenInstitute/AllenSDK/tree/master/doc_template/examples_root/examples/nb)
 as a general guide for the style and content. We have many great notebooks, but 
-[Extracellular Electrophysiology Data](https://github.com/AllenInstitute/AllenSDK/blob/master/doc_template/examples_root/examples/nb/ecephys_session.ipynb) is a good one to take a look at to get a sense for what we're looking for. All new notebook contributions should be compatible with Python 3.6+.
+[Extracellular Electrophysiology Data](https://github.com/AllenInstitute/AllenSDK/blob/master/doc_template/examples_root/examples/nb/ecephys_session.ipynb) is a good one to take a look at to get a sense for what we're looking for. All new notebook contributions should be compatible with Python 3.10+.
 
 Notebook Guidelines:
 
@@ -112,14 +112,14 @@ visual git plugins, we prefer the following convention for branch naming:
     GH-712/bugfix/auto-reward-key
     GH-9999/feature/parallel-behavior-analysis
     ```
-* Create an environment and install necessary requirements: `requirements.txt` and `test_requirements.txt`
+* Create an environment and install with test dependencies: `pip install -e ".[test]"`
 * Start writing code!
 
 ### Style Guidelines
 We follow [PEP-8 guidelines](https://www.python.org/dev/peps/pep-0008/) for new python code.
 We also follow [PEP-484](https://www.python.org/dev/peps/pep-0484/) for type annotations.
 Before submitting a pull request, run [flake8](https://pypi.python.org/pypi/flake8/) and 
-[mypy](https://pypi.org/project/mypy/) linters to check the style of your code. All new code contributions should be compatible with Python 3.6+.
+[mypy](https://pypi.org/project/mypy/) linters to check the style of your code. All new code contributions should be compatible with Python 3.10+.
 
 #### Docstrings
 Docstrings for new code should follow the [Numpy docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html). This allows us to ensure consistency in our auto-generated API documentation.

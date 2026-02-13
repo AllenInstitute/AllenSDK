@@ -35,7 +35,7 @@
 #
 import functools
 import numpy as np
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import allensdk.core.brain_observatory_nwb_data_set as bonds
 import pytest
@@ -52,7 +52,7 @@ NWB_FLAVORS = []
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']
 else:
-    nwb_list_file = resource_filename(__name__, 'nwb_files.txt')
+    nwb_list_file = str(files('allensdk.test.core').joinpath('nwb_files.txt'))
 
 if os.environ.get('TEST_COMPLETE', None) == 'true':
     with open(nwb_list_file, 'r') as f:

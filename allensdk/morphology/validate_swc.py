@@ -40,7 +40,6 @@ try:
 except:
     from past.builtins import xrange
 
-
 def validate_swc(swc_file):
     """
     To be compatible with NEURON, SWC files must have the following properties:

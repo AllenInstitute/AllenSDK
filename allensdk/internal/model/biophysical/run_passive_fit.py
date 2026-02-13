@@ -10,7 +10,7 @@ from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit2
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit_elec
-from pkg_resources import resource_filename #@UnresolvedImport
+from importlib.resources import files
 import logging
 import logging.config as lc
 
@@ -128,8 +128,7 @@ def main(limit, manifest_path):
     if 'LOG_CFG' in os.environ:
         log_config = os.environ['LOG_CFG']
     else:
-        log_config = resource_filename('allensdk.model.biophysical',
-                                       'logging.conf')
+        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
         os.environ['LOG_CFG'] = log_config
     lc.fileConfig(log_config)
 

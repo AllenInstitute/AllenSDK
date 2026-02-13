@@ -46,12 +46,12 @@ from allensdk.brain_observatory.natural_movie import NaturalMovie
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import allensdk.brain_observatory.stimulus_info as stiminfo
 import allensdk.core.json_utilities as ju
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 
 
 data_file = os.environ.get('TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA', 'skip')
 if data_file == 'default':
-    data_file = resource_filename(__name__, 'test_observatory_plots_data.json')
+    data_file = str(files('allensdk.test.brain_observatory').joinpath('test_observatory_plots_data.json'))
 
 if data_file == 'skip':
     EXPERIMENT_CONTAINER=None
