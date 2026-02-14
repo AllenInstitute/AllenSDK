@@ -472,10 +472,10 @@ class DriftingGratings(StimulusAnalysis):
         ### NEEDS TO BE UPDATED FOR NEW ADAPTER
 
         tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
-        fit_tf_ind = np.NaN
-        fit_tf = np.NaN
-        tf_low_cutoff = np.NaN
-        tf_high_cutoff = np.NaN
+        fit_tf_ind = np.nan
+        fit_tf = np.nan
+        tf_low_cutoff = np.nan
+        tf_high_cutoff = np.nan
         if pref_tf in range(1, 4):
             try:
                 popt, pcov = curve_fit(gauss_function, range(5), tf_tuning, p0=[np.amax(tf_tuning), pref_tf, 1.],

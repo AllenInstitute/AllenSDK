@@ -1,6 +1,6 @@
 name: Notebooks
 on:
-  pull_request:
+  push:
     branches:
       - master
 jobs:
@@ -8,16 +8,20 @@ jobs:
     name: Notebook runner
     strategy:
       matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.8"]
+        python-version: ["3.13"]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest-8x
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            dev_requirements.txt
+            notebook_requirements.txt
       - name: Install
         run: |
           pip install -r requirements.txt

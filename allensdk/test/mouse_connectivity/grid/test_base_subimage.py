@@ -1,6 +1,6 @@
 import sys
 
-import mock
+from unittest import mock
 import numpy as np
 import pytest
 from allensdk.mouse_connectivity.grid.subimage.base_subimage import (

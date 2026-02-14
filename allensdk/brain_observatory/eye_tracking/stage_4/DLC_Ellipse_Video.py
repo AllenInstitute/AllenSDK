@@ -53,7 +53,7 @@ pupil = pd.read_hdf(source_ellipse_data_file, key='pupil')
 
 def make_frame(t):      
 
-    fi = np.int(np.round(t*fps))
+    fi = int(np.round(t*fps))
 
     ax.clear()
     ax.imshow(clip.get_frame(t))

@@ -170,9 +170,9 @@ def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, 
             except Exception as e:
                 logging.warning("fit didn't work: " + str(e))
                 llh=np.nan
-                fit_R=np.NAN
-                fit_asc_amp=np.ones(ncos)*np.NAN
-                ipsc=np.ones(len(b_ipsp_spikes_deleted[:,0]))*np.NAN
+                fit_R=np.nan
+                fit_asc_amp=np.ones(ncos)*np.nan
+                ipsc=np.ones(len(b_ipsp_spikes_deleted[:,0]))*np.nan
                 
             R_for_each_sweep.append(fit_R)
             asc_amp_for_each_sweep.append(fit_asc_amp)

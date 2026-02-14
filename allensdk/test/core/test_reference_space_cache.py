@@ -36,7 +36,7 @@
 import os
 
 import pytest
-import mock
+from unittest import mock
 import numpy as np
 import nrrd
 import pandas as pd

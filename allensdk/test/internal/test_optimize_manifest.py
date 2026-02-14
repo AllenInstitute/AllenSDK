@@ -1,7 +1,7 @@
 from allensdk.internal.api.queries.optimize_config_reader import \
     OptimizeConfigReader
 import pytest
-from mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open, MagicMock
 from six import StringIO
 from io import IOBase
 import json

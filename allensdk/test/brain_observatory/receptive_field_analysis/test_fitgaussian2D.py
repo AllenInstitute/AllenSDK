@@ -37,7 +37,7 @@
 import itertools as it
 
 import pytest
-import mock
+from unittest import mock
 
 from scipy.stats import multivariate_normal
 from skimage.transform import rotate
@@ -183,6 +183,7 @@ def test_fitgaussian2D_failure():
     res.success = False
     res.status = 3
     res.message = 'foo'
+    res.x = np.array([1.0, 1.0, 1.0, 0.0])
 
     with mock.patch('scipy.optimize.minimize', return_value=res) as p:
         with pytest.raises( gauss.GaussianFitError ):

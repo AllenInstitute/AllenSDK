@@ -37,7 +37,7 @@ from allensdk.api.queries.ontologies_api import OntologiesApi
 import pandas as pd
 from numpy import allclose
 import pytest
-from mock import patch
+from unittest.mock import patch
 
 
 @pytest.fixture

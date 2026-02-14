@@ -38,7 +38,7 @@ import numpy as np
 import pytest
 from functools import partial
 from matplotlib.pyplot import Figure
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 
 def test_movingmode_fast():

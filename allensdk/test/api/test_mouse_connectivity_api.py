@@ -35,7 +35,7 @@
 #
 import os
 import pytest
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 import itertools as it
 import numpy as np
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA

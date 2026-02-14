@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import patch
+from unittest.mock import patch
 from allensdk.core.brain_observatory_nwb_data_set import \
     BrainObservatoryNwbDataSet
 from allensdk.brain_observatory.session_analysis import SessionAnalysis

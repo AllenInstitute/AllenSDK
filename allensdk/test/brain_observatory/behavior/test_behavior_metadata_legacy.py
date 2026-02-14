@@ -174,7 +174,7 @@ from allensdk.brain_observatory.behavior.data_objects.metadata\
                              },
                                  {
                                      "blank_duration_sec": [0.5, 0.5],
-                                     "stimulus_duration_sec": np.NaN,
+                                     "stimulus_duration_sec": np.nan,
                                      "omitted_flash_fraction": 0.05,
                                      "response_window_sec": [0.15, 0.75],
                                      "reward_volume": 0.007,

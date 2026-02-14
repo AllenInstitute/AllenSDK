@@ -36,7 +36,7 @@
 import pytest
 import os
 import numpy as np
-from mock import call, patch, mock_open, MagicMock
+from unittest.mock import call, patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json

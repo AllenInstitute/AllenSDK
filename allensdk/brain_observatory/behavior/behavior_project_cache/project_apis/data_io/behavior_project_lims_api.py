@@ -511,7 +511,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         )
         # Make date time explicitly UTC.
         table["date_of_acquisition"] = pd.to_datetime(
-            table["date_of_acquisition"], utc=True
+            table["date_of_acquisition"], format="ISO8601", utc=True
         )
 
         # Fill NaN values of imaging_plane_group_count with zero to match
@@ -554,7 +554,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         df = self._get_ophys_experiment_table()
         df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], utc=True
+            df["date_of_acquisition"], format="ISO8601", utc=True
         )
         # Set type to pandas.Int64 to enforce integer typing and not revert to
         # float.
@@ -581,7 +581,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         summary_tbl = self._get_behavior_summary_table()
         # Add UTC time zone to match timezone from DateOfAcquisition object.
         summary_tbl["date_of_acquisition"] = pd.to_datetime(
-            summary_tbl["date_of_acquisition"], utc=True
+            summary_tbl["date_of_acquisition"], format="ISO8601", utc=True
         )
         # Query returns float typing of age_in_days. Convert to int to match
         # typing of the Age data_object.

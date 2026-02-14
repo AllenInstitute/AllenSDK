@@ -497,7 +497,7 @@ def test_remove_pretest_sessions():
                         None,
                     ],
                 },
-                {"a": 5, "b": np.NaN},
+                {"a": 5, "b": np.nan},
             ],
             [
                 {"a": 1, "b": "DG"},
@@ -510,7 +510,7 @@ def test_remove_pretest_sessions():
         ),
         (
             [
-                {"a": 1, "b": ["DG-mo", "AB-x", "DG-pb", np.NaN]},
+                {"a": 1, "b": ["DG-mo", "AB-x", "DG-pb", np.nan]},
                 {"a": 2, "b": "DG-s"},
             ],
             [{"a": 1, "b": ["AB", "DG"]}, {"a": 2, "b": "DG"}],

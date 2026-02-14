@@ -2,10 +2,10 @@ psycopg2-binary
 hdmf!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*
 h5py
 matplotlib
-numpy<1.24
-pandas==1.5.3
+numpy
+pandas>=1.5.3,<3
 jinja2
-scipy<1.11
+scipy
 six
 pynrrd
 future
@@ -14,12 +14,13 @@ requests-toolbelt
 simplejson
 scikit-image
 scikit-build
+setuptools<81
 statsmodels
 simpleitk
 argschema
 glymur
-xarray<2023.2.0
-pynwb
+xarray
+pynwb<3
 tables
 seaborn
 aiohttp
@@ -31,3 +32,4 @@ semver
 cachetools
 sqlalchemy
 python-dateutil
+pytz

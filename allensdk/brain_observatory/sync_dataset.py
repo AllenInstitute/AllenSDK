@@ -205,7 +205,7 @@ class Dataset(object):
 
         """
         bit_array = self.get_bit(bit)
-        return np.ediff1d(bit_array, to_begin=0)
+        return np.ediff1d(bit_array, to_begin=np.zeros(1, dtype=bit_array.dtype))
 
     def get_line_changes(self, line):
         """

@@ -325,7 +325,7 @@ def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5,
     """Robust estimate of the standard deviation of the trace noise."""
     _check_kernel(noise_kernel_length, len(x))
     if any(np.isnan(x)):
-        return np.NaN
+        return np.nan
     x = x - median_filter(x, noise_kernel_length, mode='constant')
     # first pass removing big pos peak outliers
     x = x[x < positive_peak_scale*np.abs(x.min())]

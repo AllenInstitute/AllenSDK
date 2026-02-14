@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-import mock
+from unittest import mock
 from numpy import allclose
 import sys
 import pandas as pd

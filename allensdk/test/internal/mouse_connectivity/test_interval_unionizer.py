@@ -2,7 +2,7 @@ from __future__ import division
 
 import numpy as np
 import pytest
-import mock
+from unittest import mock
 from six import iteritems
 
 from allensdk.internal.mouse_connectivity.interval_unionize.interval_unionizer \

@@ -1,7 +1,7 @@
 from allensdk.internal.api.queries.biophysical_module_reader import \
     BiophysicalModuleReader
 import pytest
-from mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open, MagicMock
 from six import StringIO
 from io import IOBase
 import json

@@ -33,7 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 from allensdk.core.nwb_data_set import NwbDataSet

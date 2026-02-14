@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import MagicMock, call, patch, mock_open
+from unittest.mock import MagicMock, call, patch, mock_open
 from allensdk.api.queries.rma_pager import RmaPager, pageable
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju

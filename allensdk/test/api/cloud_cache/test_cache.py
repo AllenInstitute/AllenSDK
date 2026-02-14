@@ -1,3 +1,4 @@
+import warnings as warnings_mod
 import pytest
 import json
 import hashlib
@@ -662,11 +663,11 @@ def test_outdated_manifest_warning(tmpdir, example_datasets_with_metadata):
     # assert no warning is raised the second time by catching
     # any warnings that are emitted and making sure they are
     # not OutdatedManifestWarnings
-    with pytest.warns(None) as warnings:
+    with warnings_mod.catch_warnings(record=True) as w:
+        warnings_mod.simplefilter("always")
         cache.load_manifest('project-x_manifest_v11.0.0.json')
-    if len(warnings) > 0:
-        for w in warnings.list:
-            assert w._category_name != 'OutdatedManifestWarning'
+    for wi in w:
+        assert wi.category.__name__ != 'OutdatedManifestWarning'
 
 
 @mock_s3
@@ -745,11 +746,12 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
 
     # check that load_last_manifest in a new cache loads the
     # latest manifest without emitting a warning
-    with pytest.warns(None) as warnings:
+    with warnings_mod.catch_warnings(record=True) as w:
+        warnings_mod.simplefilter("always")
         cache.load_last_manifest()
     ct = 0
-    for w in warnings.list:
-        if w._category_name == 'OutdatedManifestWarning':
+    for wi in w:
+        if wi.category.__name__ == 'OutdatedManifestWarning':
             ct += 1
     assert ct == 0
     assert cache.current_manifest == 'project-x_manifest_v15.0.0.json'
@@ -779,7 +781,7 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     expected += 'dataset -- project-x_manifest_v15.0.0.json '
     expected += '-- exists online'
     with pytest.warns(OutdatedManifestWarning,
-                      match=expected) as warnings:
+                      match=expected):
         cache.load_last_manifest()
 
     assert cache.current_manifest == 'project-x_manifest_v4.0.0.json'

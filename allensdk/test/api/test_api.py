@@ -41,7 +41,7 @@ import os
 
 import numpy as np
 import pytest
-from mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch, mock_open
 from requests.exceptions import HTTPError
 import requests
 

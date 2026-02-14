@@ -36,7 +36,6 @@
 from allensdk.core.json_utilities import JsonComments
 import argparse
 import os
-import io
 import logging
 import logging.config as lc
 from pkg_resources import resource_filename  # @UnresolvedImport
@@ -349,10 +348,7 @@ class ApplicationConfig(object):
 
         if config_file_path.endswith('.json'):
             cfg_string = self.from_json_file(config_file_path)
-            try:
-                config.readfp(io.BytesIO(cfg_string))
-            except (NameError, TypeError):
-                config.read_string(cfg_string)  # Python 3
+            config.read_string(cfg_string)
         else:
             config.read(config_file_path)
 

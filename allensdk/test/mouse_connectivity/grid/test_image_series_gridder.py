@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 from six.moves import range
 
 import numpy as np

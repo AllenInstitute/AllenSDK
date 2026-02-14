@@ -124,13 +124,13 @@ def driver_lookup(behavior_session_id_list):
     Note: driver_line is a list of strings
     """
     rng = np.random.default_rng(1723213)
-    possible = (["aa"],
+    possible = [["aa"],
                 ["aa", "bb"],
                 ["cc"],
-                ["cc", "dd"])
-    chosen = rng.choice(possible,
-                        size=len(behavior_session_id_list),
-                        replace=True)
+                ["cc", "dd"]]
+    indices = rng.integers(0, len(possible),
+                           size=len(behavior_session_id_list))
+    chosen = [possible[i] for i in indices]
     return {ii: val
             for ii, val in zip(behavior_session_id_list,
                                chosen)}

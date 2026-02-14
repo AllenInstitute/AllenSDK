@@ -71,7 +71,7 @@ def compute_chi_shuffle(
 def stim_table_to_categories(stim_table, columns, verbose=False):
     # get the categories for all sweeps with each unique combination of
     #   parameters in 'columns' being one category
-    # sweeps with non-finite values in ANY column (e.g. np.NaN) are labeled
+    # sweeps with non-finite values in ANY column (e.g. np.nan) are labeled
     #   as blank sweeps (category = -1)
     # TODO: Replace with EcephysSession.get_stimulus_conditions
 

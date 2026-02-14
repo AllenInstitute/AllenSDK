@@ -35,7 +35,7 @@
 #
 import os
 import warnings
-import mock
+from unittest import mock
 import pytest
 import numpy as np
 import nrrd

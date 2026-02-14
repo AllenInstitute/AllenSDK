@@ -3,7 +3,7 @@ import json
 
 import numpy as np
 import pytest
-from mock import patch
+from unittest.mock import patch
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 

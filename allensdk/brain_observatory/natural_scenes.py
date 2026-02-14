@@ -171,8 +171,8 @@ class NaturalScenes(StimulusAnalysis):
             #                peak.run_modulation_ns[nc] = subset_run[
             #                    str(nc)].mean() / subset_stat[str(nc)].mean()
             #            else:
-            #                peak.p_run_ns[nc] = np.NaN
-            #                peak.run_modulation_ns[nc] = np.NaN
+            #                peak.p_run_ns[nc] = np.nan
+            #                peak.run_modulation_ns[nc] = np.nan
             groups = []
             for im in range(self.number_scenes):
                 subset = self.mean_sweep_response[
@@ -207,8 +207,8 @@ class NaturalScenes(StimulusAnalysis):
                                 subset_run[str(nc)].mean()) /
                                np.abs(subset_stat[str(nc)].mean())))
             else:
-                peak.p_run_ns.iloc[nc] = np.NaN
-                peak.run_modulation_ns.iloc[nc] = np.NaN
+                peak.p_run_ns.iloc[nc] = np.nan
+                peak.run_modulation_ns.iloc[nc] = np.nan
 
                 # reliability
             subset = self.sweep_response[self.stim_table.frame == nsp]
@@ -222,7 +222,7 @@ class NaturalScenes(StimulusAnalysis):
             for i in range(len(subset)):
                 for j in range(len(subset)):
                     if i >= j:
-                        mask[i, j] = np.NaN
+                        mask[i, j] = np.nan
             corr_matrix *= mask
             peak.reliability_ns.iloc[nc] = np.nanmean(corr_matrix)
 

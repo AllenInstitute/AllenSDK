@@ -37,7 +37,7 @@
 from allensdk.api.queries.tree_search_api import TreeSearchApi
 import pytest
 import json
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 @pytest.fixture
 def tree_search():

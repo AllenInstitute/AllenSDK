@@ -632,7 +632,7 @@ def running_modulation(spike_counts, running_speeds, speed_threshold=1.0):
         warnings.warn(
             'spike_counts and running_speeds must be arrays of the same '
             'shape.')
-        return np.NaN, np.NaN
+        return np.nan, np.nan
 
     # keep track of when the animal is and isn't running
     is_running = running_speeds >= speed_threshold
@@ -649,7 +649,7 @@ def running_modulation(spike_counts, running_speeds, speed_threshold=1.0):
         stat_mean = np.mean(stat)
 
         if run_mean == stat_mean == 0:
-            return np.NaN, np.NaN
+            return np.nan, np.nan
         if run_mean > stat_mean:
             run_mod = (run_mean - stat_mean) / run_mean
         else:
@@ -659,7 +659,7 @@ def running_modulation(spike_counts, running_speeds, speed_threshold=1.0):
         (_, p) = st.ttest_ind(run, stat, equal_var=False)
         return p, run_mod
     else:
-        return np.NaN, np.NaN
+        return np.nan, np.nan
 
 
 def lifetime_sparseness(responses):

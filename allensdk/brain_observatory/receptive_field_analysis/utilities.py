@@ -49,10 +49,11 @@ def upsample_image_to_degrees(img):
     x = np.arange(img.shape[0])
     y = np.arange(img.shape[1])
 
-    g = spinterp.interp2d(y, x, img, kind="linear")
+    g = spinterp.RectBivariateSpline(x, y, img, kx=1, ky=1)
     ZZ_on = g(
-        np.arange(0, img.shape[1], 1.0 / upsample),
         np.arange(0, img.shape[0], 1.0 / upsample),
+        np.arange(0, img.shape[1], 1.0 / upsample),
+        grid=True,
     )
 
     return ZZ_on
@@ -73,7 +74,7 @@ def convolve(img, sigma=4):
 
     x = np.arange(3 * img.shape[0])
     y = np.arange(3 * img.shape[1])
-    g = spinterp.interp2d(y, x, img_pad, kind="linear")
+    g = spinterp.RectBivariateSpline(x, y, img_pad, kx=1, ky=1)
 
     if img.shape[0] == 16:
         upsample = 4
@@ -84,8 +85,9 @@ def convolve(img, sigma=4):
     else:
         raise NotImplementedError
     ZZ_on = g(
-        offset + np.arange(0, img.shape[1] * 3, 1.0 / upsample),
         offset + np.arange(0, img.shape[0] * 3, 1.0 / upsample),
+        offset + np.arange(0, img.shape[1] * 3, 1.0 / upsample),
+        grid=True,
     )
     ZZ_on_f = gaussian_filter(ZZ_on, float(sigma), mode="constant")
 

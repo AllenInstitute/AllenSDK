@@ -59,9 +59,9 @@ class NwbApi:
         """
 
         interface_name = 'speed' if lowpass else 'speed_unfiltered'
-        values = self.nwbfile.modules['running'].get_data_interface(
+        values = self.nwbfile.processing['running'].get_data_interface(
             interface_name).data[:]
-        timestamps = self.nwbfile.modules['running'].get_data_interface(
+        timestamps = self.nwbfile.processing['running'].get_data_interface(
             interface_name).timestamps[:]
 
         return RunningSpeed(
@@ -87,7 +87,7 @@ class NwbApi:
         if image_api is None:
             image_api = ImageApi
 
-        nwb_img = self.nwbfile.modules[module].get_data_interface(
+        nwb_img = self.nwbfile.processing[module].get_data_interface(
             'images')[name]
         data = nwb_img.data
         resolution = nwb_img.resolution  # px/cm

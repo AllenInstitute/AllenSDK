@@ -36,7 +36,10 @@
 import copy
 import warnings
 import functools
-from numpy import VisibleDeprecationWarning
+try:
+    from numpy import VisibleDeprecationWarning
+except ImportError:
+    VisibleDeprecationWarning = DeprecationWarning
 
     
 def deprecated(message=None):

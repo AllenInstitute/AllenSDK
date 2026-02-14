@@ -40,7 +40,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from mock import patch, call
+from unittest.mock import patch, call
 from collections import Counter
 import datetime
 from allensdk.api.queries.brain_observatory_api import (

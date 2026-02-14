@@ -46,7 +46,7 @@ def align_timestamps(args):
             min_time = probe_split_times[idx]
 
             if idx == (len(probe_split_times) - 1):
-                max_time = np.Inf
+                max_time = np.inf
             else:
                 max_time = probe_split_times[idx + 1]
 

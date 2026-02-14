@@ -35,7 +35,7 @@
 #
 import os
 import pytest
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 import itertools as it
 import numpy as np
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi as RSA

@@ -1,7 +1,7 @@
 from allensdk.internal.api.queries.biophysical_module_api \
     import BiophysicalModuleApi
 import pytest
-from mock import patch
+from unittest.mock import patch
 
 
 @pytest.fixture

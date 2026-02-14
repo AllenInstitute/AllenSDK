@@ -63,10 +63,10 @@ class BarcodeSyncDataset(EcephysSyncDataset):
 
         """
         warnings.warn(
-            np.VisibleDeprecationWarning(
-                """This function is deprecated as unecessary (and slated for
-                removal). Instead, simply use extract_barcodes."""
-            )
+            """This function is deprecated as unecessary (and slated for
+            removal). Instead, simply use extract_barcodes.""",
+            DeprecationWarning,
+            stacklevel=2,
         )
 
         barcode_times, barcodes = self.extract_barcodes(**barcode_kwargs)

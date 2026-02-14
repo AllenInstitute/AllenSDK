@@ -247,8 +247,8 @@ class DriftingGratings(StimulusAnalysis):
                          np.abs(subset_stat[str(nc)].mean()))
 
             else:
-                peak.p_run_dg.iloc[nc] = np.NaN
-                peak.run_modulation_dg.iloc[nc] = np.NaN
+                peak.p_run_dg.iloc[nc] = np.nan
+                peak.run_modulation_dg.iloc[nc] = np.nan
 
             # reliability
             subset = self.sweep_response[
@@ -264,7 +264,7 @@ class DriftingGratings(StimulusAnalysis):
             for i in range(len(subset)):
                 for j in range(len(subset)):
                     if i >= j:
-                        mask[i, j] = np.NaN
+                        mask[i, j] = np.nan
             corr_matrix *= mask
             peak.reliability_dg.iloc[nc] = np.nanmean(corr_matrix)
 

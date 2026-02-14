@@ -85,7 +85,7 @@ def write_trace_file(data, names, path):
 
     with h5py.File(path, 'w') as fil:
         fil["data"] = data
-        fil.create_dataset("roi_names", data=np.array(names).astype(np.string_), dtype=utf_dtype)
+        fil.create_dataset("roi_names", data=np.array(names).astype(np.bytes_), dtype=utf_dtype)
 
 
 def extract_traces(motion_corrected_stack, motion_border, storage_directory, rois, log_0, **kwargs):
