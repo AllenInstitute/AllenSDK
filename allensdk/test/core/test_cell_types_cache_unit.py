@@ -39,7 +39,7 @@ import pytest
 from pandas.core.frame import DataFrame
 from allensdk.config import enable_console_log
 from unittest.mock import MagicMock, patch, call, mock_open
-from six.moves import builtins
+import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj

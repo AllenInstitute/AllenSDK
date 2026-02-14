@@ -39,7 +39,7 @@ from .locally_sparse_noise import LocallySparseNoise
 from .natural_scenes import NaturalScenes
 from .drifting_gratings import DriftingGratings
 from .natural_movie import NaturalMovie
-import six
+
 from allensdk.core.brain_observatory_nwb_data_set \
     import BrainObservatoryNwbDataSet
 from . import stimulus_info
@@ -99,7 +99,7 @@ class SessionAnalysis(object):
     def append_metadata(self, df):
         """ Append the metadata fields from the NWB file as columns to a pd.DataFrame """
 
-        for k, v in six.iteritems(self.metadata):
+        for k, v in self.metadata.items():
             df[k] = v
 
     def save_session_a(self, dg, nm1, nm3, peak):

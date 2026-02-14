@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os, sys
-from six.moves import xrange
+
 import allensdk.internal.core.swc as swc
 
 
@@ -217,7 +217,7 @@ def validate_swc(swc_file):
 
     # sort the ids and make sure there are no gaps
     sorted_ids = sorted(all_ids)
-    for i in xrange(1, len(sorted_ids)):
+    for i in range(1, len(sorted_ids)):
         if sorted_ids[i] - sorted_ids[i-1] != 1:
             print("Node IDs are not sequential")
             print("This can be fixed by calling resave_swc() on the file")

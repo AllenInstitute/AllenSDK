@@ -1,8 +1,8 @@
 import json, sys, os
 import logging
 import argparse
-from six import iteritems
-from six.moves import xrange
+
+
 import allensdk.core.json_utilities as ju
 
 
@@ -25,7 +25,7 @@ def get_sweep_numbers(sweep_list):
 
 def get_sweeps_by_name(sweeps, sweep_type):
     if isinstance(sweeps, dict):
-        return [ s for sn,s in iteritems(sweeps) if s[u'ephys_stimulus'][u'ephys_stimulus_type'][u'name'] == sweep_type ]
+        return [ s for sn,s in sweeps.items() if s[u'ephys_stimulus'][u'ephys_stimulus_type'][u'name'] == sweep_type ]
     else:
         return [ s for s in sweeps if s[u'ephys_stimulus'][u'ephys_stimulus_type'][u'name'] == sweep_type ]
 
@@ -36,7 +36,7 @@ def find_ranked_sweep(sweep_list, key, reverse=False):
         
         out_sweeps = [ sorted_sweep_list[0] ]
  
-        for i in xrange(1,len(sweep_list)):
+        for i in range(1,len(sweep_list)):
             if sorted_sweep_list[i][key] == out_sweeps[0][key]:
                 out_sweeps.append(sorted_sweep_list[i])
             else:

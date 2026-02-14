@@ -20,7 +20,7 @@ import allensdk.brain_observatory.stimulus_info as si
 import allensdk.core.json_utilities as json_util
 from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module, SHARED_PYTHON
 import allensdk.internal.core.lims_utilities as lu
-from six import iteritems
+
 import os
 import logging
 
@@ -71,7 +71,7 @@ def main():
 
     results = {}
 
-    for ident, experiment in iteritems(jin):
+    for ident, experiment in jin.items():
         nwb_file = experiment['nwb_file']
         output_file = experiment['output_file']
 

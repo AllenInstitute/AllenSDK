@@ -1,7 +1,7 @@
 import logging
 
 import SimpleITK as sitk
-from six.moves import xrange
+
 import numpy as np
 
 from . import volume_utilities as vol
@@ -71,7 +71,7 @@ class VolumeProjector(object):
         vpar = vol.sitk_get_size_parity(volume)
         lpar = np.mod(max_extent, 2)
 
-        for ax in xrange(volume.GetDimension()):
+        for ax in range(volume.GetDimension()):
             if vpar[ax] != lpar[ax]:
                 max_extent[ax] += 1
         

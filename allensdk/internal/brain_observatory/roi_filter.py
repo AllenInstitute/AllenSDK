@@ -1,5 +1,5 @@
 import itertools
-from six.moves import cPickle
+import pickle
 import logging
 from allensdk.internal.brain_observatory import roi_filter_utils
 import allensdk.internal.brain_observatory.mask_set as mask_set
@@ -156,13 +156,13 @@ class ROIClassifier(object):
     def save(self, filename):
         '''Save the classifier to file by pickling.'''
         with open(filename, "wb") as f:
-            cPickle.dump(self.model_data, f)
+            pickle.dump(self.model_data, f)
 
     @staticmethod
     def from_file(filename):
         '''Load an ROIClassifier from file.'''
         with open(filename, "rb") as f:
-            return ROIClassifier(cPickle.load(f))
+            return ROIClassifier(pickle.load(f))
 
 
 def mean_gray_to_sigma(meanInt0, snpoffsetstdv):

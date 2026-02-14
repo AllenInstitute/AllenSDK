@@ -1,5 +1,3 @@
-from six import iteritems
-
 
 class Unionize(object):
     '''Abstract base class for unionize records.
@@ -36,4 +34,4 @@ class Unionize(object):
         
         '''
     
-        return {k: v[low:high] for k, v in iteritems(data_arrays)}
+        return {k: v[low:high] for k, v in data_arrays.items()}
