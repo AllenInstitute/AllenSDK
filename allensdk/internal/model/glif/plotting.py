@@ -52,7 +52,7 @@ def plotSpikes(voltage_list, spike_ind_list, dt, blockME=False, method=False):
     plt.figure(figsize=(20, 5))
     plt.plot(time, np.concatenate(voltage_list), 'b')
     plt.plot(subsampled_time, [np.concatenate(voltage_list)[ii] for ii in np.concatenate(converted_spike_ind_list)], 'r.', ms=16)
-    if method==False:
+    if not method:
         plt.title('Spikes')
     else:
         plt.title('Spikes. Method used: '+method)

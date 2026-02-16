@@ -236,7 +236,7 @@ def main():
         sys.exit(1)
     try:
         for i in range(1, argc):
-            if validate_swc(sys.argv[i]) == True:
+            if validate_swc(sys.argv[i]):
                 print("    PASS")
             else:
                 print("    FAIL")

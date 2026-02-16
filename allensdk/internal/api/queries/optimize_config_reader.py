@@ -146,7 +146,7 @@ class OptimizeConfigReader(object):
             superseded = reconstruction['superseded']
             manual = reconstruction['manual']
             
-            if manual == True and superseded == False:
+            if manual and not superseded:
                 well_known_files = reconstruction['well_known_files']
                 
                 for well_known_file in well_known_files:

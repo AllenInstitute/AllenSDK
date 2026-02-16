@@ -71,7 +71,7 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
     if save_file_name is not None:
         fig.savefig(save_file_name)
 
-    if show == True:
+    if show:
         plt.show()
 
     if close:
@@ -258,7 +258,7 @@ def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=Tru
     if save_file_name is not None:
         fig.savefig(save_file_name)
 
-    if show == True:
+    if show:
         plt.show()
 
     if close:

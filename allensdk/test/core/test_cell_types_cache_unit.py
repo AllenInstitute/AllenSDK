@@ -492,7 +492,7 @@ def test_get_morphology_features(read_csv,
                         data = ctc.get_morphology_features(df, _MOCK_PATH)
 
     if df:
-        assert ('stuff' in data) == True
+        assert ('stuff' in data)
     else:
         assert all(['stuff' in f for f in data])
 
