@@ -1,8 +1,5 @@
 ########################################################################
 # library code
-import math
-import argparse
-import sys
 import numpy as np
 from scipy.spatial.distance import euclidean
 import skimage.draw

@@ -1,9 +1,6 @@
 from __future__ import division
 import logging
-import functools
-from collections import defaultdict
 
-import numpy as np
 
 from interval_unionizer import IntervalUnionizer
 from cav_unionize import CavUnionize

@@ -4,7 +4,6 @@ import json
 import subprocess
 import glob
 import pandas as pd
-import numpy as np
 
 def createInputJson(output_file):
 

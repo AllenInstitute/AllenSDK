@@ -2,15 +2,9 @@ import time
 t0 = time.time()
 import os
 
-from matplotlib.patches import Ellipse
-import matplotlib.pyplot as plt
-from moviepy.video.io.bindings import mplfig_to_npimage
 from moviepy.editor import *
 import numpy as np
-import collections
 import pandas as pd
-import sys
-import re
 import argparse
 import logging
 from ellipses import LSqEllipse

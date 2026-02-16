@@ -1,5 +1,4 @@
 import numpy as np
-import logging
 
 class FitEllipse (object):
 

@@ -37,7 +37,6 @@ from .rma_api import RmaApi
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from allensdk.core.obj_utilities import read_obj
 import allensdk.core.sitk_utilities as sitk_utilities
-import numpy as np
 import nrrd
 
 class ReferenceSpaceApi(RmaApi):
@@ -168,7 +167,7 @@ class ReferenceSpaceApi(RmaApi):
 
         try:
             self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
-        except Exception as e:
+        except Exception:
             self._file_download_log.error('''We weren't able to download a structure mask for structure {0}. 
                                              You can instead build the mask locally using 
                                              ReferenceSpace.many_structure_masks''')
@@ -202,7 +201,7 @@ class ReferenceSpaceApi(RmaApi):
 
         try:
             self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
-        except Exception as e:
+        except Exception:
             self._file_download_log.error('unable to download a structure mesh for structure {0}.'.format(structure_id))
             raise
 

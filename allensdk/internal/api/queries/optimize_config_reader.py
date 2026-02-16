@@ -20,7 +20,6 @@ import allensdk.internal.core.lims_utilities as lims_utilities
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.config.manifest import Manifest
 import json
-import traceback
 
 
 class OptimizeConfigReader(object):

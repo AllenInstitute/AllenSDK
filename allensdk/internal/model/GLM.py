@@ -30,7 +30,7 @@ def create_basis_IPSP(neye,ncos,kpeaks,ks,DTsim,t0,I_stim,nkt,flag_exp,npcut):
         bconv = np.convolve(spike_stim,np.flipud(basisfilt),'full')
         c[:,jj] = bconv[range(len(spike_stim))]        
     
-    basis_IPSP = c;
+    basis_IPSP = c
     
     return basis_IPSP, gg0
 

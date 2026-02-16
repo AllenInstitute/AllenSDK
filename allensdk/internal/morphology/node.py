@@ -113,7 +113,7 @@ class Node(object):
         """ create string with node information in succinct, 
         single-line form """
         return "%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self.n, self.t, self.x, self.y, self.z, self.radius, self.parent,
-        str(self.children), self.tree_id);
+        str(self.children), self.tree_id)
 
 # Morphology nodes have the following fields. These allow dictionary access
 #   to node fields (this is for backward compatibility)

@@ -36,16 +36,13 @@
 import os
 
 import pandas as pd
-import pandas.io.json as pj
-import numpy as np
 import time
 
 import pytest
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import patch
 
 from allensdk.api.warehouse_cache.cache import Cache, memoize, get_default_manifest_file
 from allensdk.api.queries.rma_api import RmaApi
-import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 

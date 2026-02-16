@@ -37,7 +37,7 @@
 import numpy as np
 
 import pytest
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import mock_open, patch
 
 from allensdk.core.obj_utilities import read_obj, parse_obj
 

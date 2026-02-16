@@ -5,9 +5,7 @@ import numpy as np
 import time
 
 from scipy.optimize import fminbound, fmin
-from scipy.optimize import minimize
 
-import json
 
 from uuid import uuid4
 
@@ -60,7 +58,7 @@ class GlifOptimizer(object):
         logging.info('outer_iterations: %s' % outer_iterations)
         logging.info('inner_iterations: %s' % inner_iterations)
 
-        self.iteration_info = [];
+        self.iteration_info = []
 
         expected_param_count = experiment.neuron_parameter_count()
 

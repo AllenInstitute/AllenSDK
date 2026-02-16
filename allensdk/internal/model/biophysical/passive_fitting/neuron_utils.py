@@ -8,7 +8,6 @@ def get_h():
     
 get_h.h = None
 
-import sys, os
 from .output_grabber import OutputGrabber
 
 def load_morphology(filename):

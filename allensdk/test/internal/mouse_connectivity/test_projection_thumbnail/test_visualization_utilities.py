@@ -3,7 +3,6 @@ import pytest
 
 import SimpleITK as sitk
 import numpy as np
-import matplotlib as mpl
 
 from allensdk.internal.mouse_connectivity.projection_thumbnail import visualization_utilities as vis
 

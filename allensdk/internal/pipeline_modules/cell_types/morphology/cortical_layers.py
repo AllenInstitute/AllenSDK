@@ -1,12 +1,8 @@
 #!/usr/bin/python
-import json
 import math
 import cv2
 import numpy as np
 import sys
-import psycopg2
-import psycopg2.extras
-import allensdk.core.json_utilities as json
 from neuron_morphology import swc
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 

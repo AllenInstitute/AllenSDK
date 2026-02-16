@@ -1,14 +1,9 @@
 import numpy as np
-import pandas as pd
 
-import scipy.ndimage as ndi
-import scipy.stats as st
-from scipy.optimize import curve_fit
 import logging
 
-import matplotlib.pyplot as plt
 
-from .stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)

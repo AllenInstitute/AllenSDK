@@ -1,4 +1,3 @@
-import pytest
 import allensdk.internal.pipeline_modules.gbm.generate_gbm_heatmap as heatmap
 import pandas as pd
 import os

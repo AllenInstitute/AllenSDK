@@ -1,4 +1,3 @@
-import sys
 
 import neuron_morphology.swc as swc
 import neuron_morphology.features.feature_extractor as feature_extractor
@@ -13,7 +12,7 @@ def main(jin):
         xform = jin["pia_transform"]
         depth = jin["relative_soma_depth"]
     except:
-        print("** Unable to find requisite fields in input json");
+        print("** Unable to find requisite fields in input json")
         raise
 
 

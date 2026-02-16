@@ -228,7 +228,7 @@ def test_call_caching(
     if isinstance(expected, str) and expected == "raise":
         with pytest.raises(ValueError):
             fn()
-        assert not ("data" in dc)
+        assert "data" not in dc
     elif isinstance(expected, str) and expected == "warn":
         with pytest.warns(UserWarning) as warning:
             fn()

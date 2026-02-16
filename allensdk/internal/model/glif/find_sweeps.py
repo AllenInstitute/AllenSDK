@@ -1,4 +1,5 @@
-import json, sys, os
+import sys
+import os
 import logging
 import argparse
 
@@ -177,7 +178,7 @@ def parse_arguments():
         if not os.path.exists(args.sweep_list_file):
             raise Exception("sweep list file (%s) does not exist" % args.sweep_file)
 
-    except Exception as e:
+    except Exception:
         parser.print_help()
         sys.exit(1)
 

@@ -86,9 +86,9 @@ def pageable(total_rows=None,
         @functools.wraps(func)
         def w(*args,
               **kwargs):
-            if decor.num_rows and not 'num_rows' in kwargs:
+            if decor.num_rows and 'num_rows' not in kwargs:
                 kwargs['num_rows'] = decor.num_rows
-            if decor.total_rows and not 'total_rows' in kwargs:
+            if decor.total_rows and 'total_rows' not in kwargs:
                 kwargs['total_rows'] = decor.total_rows
 
             result = RmaPager.pager(func,

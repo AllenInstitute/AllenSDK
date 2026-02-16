@@ -1,6 +1,4 @@
-import json, os
-import sys
-import subprocess
+import os
 
 import run_observatory_thumbnails as robsth
 import allensdk.internal.core.lims_utilities as lu

@@ -3,7 +3,6 @@ import sys
 import marshmallow
 import argparse
 import os
-import sys
 
 import numpy as np
 import requests
@@ -151,7 +150,7 @@ def main():
             schema_type=InputSchema,
             output_schema_type=OutputSchema,
         )
-    except marshmallow.exceptions.ValidationError as err:
+    except marshmallow.exceptions.ValidationError:
         print(input_data)
         raise
 

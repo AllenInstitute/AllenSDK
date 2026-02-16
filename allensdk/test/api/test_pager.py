@@ -37,12 +37,8 @@ import pytest
 from unittest.mock import MagicMock, call, patch, mock_open
 from allensdk.api.queries.rma_pager import RmaPager, pageable
 from allensdk.api.queries.rma_api import RmaApi
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
 import pandas as pd
 import builtins
-import os
-import simplejson as json
 from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 try:

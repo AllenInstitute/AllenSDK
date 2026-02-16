@@ -35,7 +35,6 @@
 #
 import functools
 import operator as op
-from collections import defaultdict
 
 from allensdk.deprecated import deprecated
 

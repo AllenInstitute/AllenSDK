@@ -1,8 +1,8 @@
 import subprocess as sp
 import numpy as np
 import logging
-import sys, os
-from collections import deque
+import sys
+import os
 import scipy.misc
 import traceback
 import signal

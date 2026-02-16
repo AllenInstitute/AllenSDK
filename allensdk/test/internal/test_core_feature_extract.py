@@ -1,4 +1,3 @@
-import pytest
 from allensdk.internal.ephys.core_feature_extract import ( find_stim_start, 
                                                            filter_sweeps,
                                                            find_coarse_long_square_amp_delta,

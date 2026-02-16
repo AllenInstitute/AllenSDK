@@ -37,16 +37,13 @@ import pytest
 from unittest.mock import Mock, patch
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 from allensdk.config.manifest import Manifest
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
-import pandas as pd
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
 
 
 try:
-    import StringIO
+    pass
 except:
-    import io as StringIO
+    pass
 
 
 @pytest.fixture

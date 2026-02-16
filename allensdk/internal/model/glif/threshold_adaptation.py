@@ -1,6 +1,4 @@
 import numpy as np
-import copy
-from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import logging

@@ -5,20 +5,14 @@ matplotlib.use('agg')
 import logging
 
 import allensdk.internal.core.lims_utilities as lims_utilities
-import allensdk.core.json_utilities as json_utilities
 
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.ephys_features as ft
-from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics, get_stim_characteristics
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics
 
-import sys
-import argparse
 import os
-import json
-import h5py
 import numpy as np
 
-from scipy.optimize import curve_fit
 import scipy.signal as sg
 import scipy.misc
 

@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import json, sys, traceback, logging
+import logging
 from allensdk.brain_observatory.session_analysis import run_session_analysis
 import allensdk.brain_observatory.stimulus_info as si
-import allensdk.core.json_utilities as json_util
 from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module, SHARED_PYTHON
 import allensdk.internal.core.lims_utilities as lu
 
 import os
-import logging
 
 def get_experiment_nwb_file(experiment_id):
     res = lu.query("""

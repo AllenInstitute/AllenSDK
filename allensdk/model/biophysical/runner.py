@@ -38,13 +38,11 @@ from .utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
-import numpy
 import logging
 import time
 import os
 import multiprocessing as mp
 from functools import partial
-import argschema as ags
 import argparse
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')

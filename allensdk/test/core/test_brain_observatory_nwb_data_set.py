@@ -33,18 +33,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import functools
 import numpy as np
 from importlib.resources import files
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import allensdk.core.brain_observatory_nwb_data_set as bonds
 import pytest
 import os
-import h5py
 
 from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
 
-from test_h5_utilities import mem_h5
 
 
 NWB_FLAVORS = []

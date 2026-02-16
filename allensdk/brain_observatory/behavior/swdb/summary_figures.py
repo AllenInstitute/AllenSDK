@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +5,7 @@ import seaborn as sns
 
 sns.set_context('notebook', font_scale=1.5, rc={'lines.markeredgewidth': 2})
 sns.set_style('white')
-sns.set_palette('deep');
+sns.set_palette('deep')
 
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from allensdk.brain_observatory.behavior.swdb import utilities as ut
@@ -100,11 +99,11 @@ def plot_traces_heatmap(session, ax=None):
     if ax is None:
         fig, ax = plt.subplots(figsize=(20, 5))
     cax = ax.pcolormesh(dff_traces_array, cmap='magma', vmin=0, vmax=np.percentile(dff_traces_array, 99))
-    ax.set_yticks(np.arange(0, len(dff_traces_array)), 10);
+    ax.set_yticks(np.arange(0, len(dff_traces_array)), 10)
     ax.set_ylabel('cells')
     ax.set_xlabel('time (sec)')
-    ax.set_xticks(np.arange(0, len(session.ophys_timestamps), 10*60*31.));
-    ax.set_xticklabels(np.arange(0, session.ophys_timestamps[-1], 10*60));
+    ax.set_xticks(np.arange(0, len(session.ophys_timestamps), 10*60*31.))
+    ax.set_xticklabels(np.arange(0, session.ophys_timestamps[-1], 10*60))
     cb = plt.colorbar(cax, pad=0.015)
     cb.set_label('dF/F', labelpad=3)
     return ax
@@ -507,8 +506,8 @@ def plot_experiment_summary_figure(session, save_dir=None):
     traces = tr[(tr.go == True)].dff_trace.values
     ax = ut.plot_mean_trace(traces, window=[-4, 8], ax=ax)
     ax = ut.plot_flashes_on_trace(ax, window=[-4, 8], go_trials_only=True)
-    ax.set_xlabel('time after change (sec)');
-    ax.set_ylabel('mean dF/F');
+    ax.set_xlabel('time after change (sec)')
+    ax.set_ylabel('mean dF/F')
 
     fig.tight_layout()
 

@@ -1,9 +1,7 @@
 import os
 
-import nrrd
 from unittest import mock
 import pytest
-import numpy as np
 from numpy.testing import assert_raises
 
 from allensdk.core import json_utilities

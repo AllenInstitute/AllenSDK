@@ -4,7 +4,6 @@ import json
 import subprocess as sp
 
 import pytest
-import pandas as pd
 
 @pytest.fixture
 def use_temp_dir(tmpdir_factory):

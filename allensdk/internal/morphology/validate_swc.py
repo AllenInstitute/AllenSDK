@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os, sys
+import sys
 
 import allensdk.internal.core.swc as swc
 

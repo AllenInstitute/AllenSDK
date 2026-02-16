@@ -134,6 +134,6 @@ if __name__ == '__main__':
     try:
         main(command, input_json, output_json)
         RunSimulate._log.debug("success")
-    except Exception as e:
+    except Exception:
         RunSimulate._log.error(traceback.format_exc())
         exit(1)

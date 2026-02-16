@@ -41,7 +41,6 @@ import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
 from scipy.stats import gaussian_kde
-import matplotlib.colorbar as cbar
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 import allensdk.brain_observatory.circle_plots as cplots

@@ -1,5 +1,6 @@
-import pytest, os
-from unittest.mock import patch, mock_open, MagicMock
+import pytest
+import os
+from unittest.mock import patch
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
 @pytest.fixture

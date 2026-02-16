@@ -1,5 +1,5 @@
-import argparse, logging
-import itertools
+import argparse
+import logging
 from scipy.optimize import fmin
 import numpy as np
 import os
@@ -287,7 +287,7 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
             tag_plot(tag)
             plt.savefig(os.path.join(save_figure_path, tag), format='png')
             plt.close()
-    except MissingSpikeException as e:
+    except MissingSpikeException:
         raise MissingSpikeException("The suprathreshold short square sweep must have a spike, but no spike was detected. This means that feature extraction and GLIF spike detection are inconsistent.")
 
     #-----------------------------------------------------------------------------------------------------

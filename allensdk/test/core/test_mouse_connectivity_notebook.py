@@ -35,7 +35,6 @@
 #
 import pytest
 
-import os
 
 
 @pytest.mark.nightly

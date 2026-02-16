@@ -37,7 +37,7 @@ def run_passive_fit(description):
 
     if len(cap_check_sweeps) > 0:
         data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
-        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set);
+        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set)
 
         grand_up_file = os.path.join(output_directory, 'upbase.dat')
         np.savetxt(grand_up_file, d['grand_up'])

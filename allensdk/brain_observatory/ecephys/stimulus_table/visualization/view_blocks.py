@@ -1,5 +1,4 @@
 import argparse
-import itertools as it
 
 import numpy as np
 import pandas as pd
@@ -86,7 +85,7 @@ def plot_blocks(blocks, colormap):
             linestyle="-",
             edgecolor="black",
         )
-        if not block["name"] in used:
+        if block["name"] not in used:
             labels.append(block["name"])
             handles.append(handle)
 

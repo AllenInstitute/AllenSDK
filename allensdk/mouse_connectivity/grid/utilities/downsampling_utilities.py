@@ -4,7 +4,6 @@ import itertools as it
 import logging
 
 from skimage.measure import block_reduce
-from skimage.util import view_as_windows
 from scipy.ndimage.filters import convolve
 import numpy as np
 

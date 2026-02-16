@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 import numpy as np
-import h5py
 
 from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import EcephysSyncDataset
 

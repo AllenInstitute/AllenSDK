@@ -33,7 +33,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 from unittest.mock import MagicMock, patch, mock_open
 from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.rma_api import RmaApi
@@ -45,7 +44,6 @@ try:
     import StringIO
 except:
     import io as StringIO
-import os
 
 
 _msg = [{'whatever': True}]

@@ -1,4 +1,5 @@
-import sys, os, shutil
+import os
+import shutil
 import logging
 from collections import defaultdict
 import numpy as np
@@ -239,7 +240,7 @@ def extract_data(data, nwb_file):
     for s in iclamp_sweep_list:
         try:
             stimulus_type_name = s['ephys_stimulus']['ephys_stimulus_type']['name']
-        except KeyError as e:
+        except KeyError:
             raise Exception("Sweep %d has no ephys stimulus record in features JSON file: %s" % (s['sweep_number'], json.dumps(s, indent=3, default=json_handler)))
 
         if stimulus_type_name == "Unknown":

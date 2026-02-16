@@ -1,6 +1,5 @@
 import logging
 
-import numpy as np
 
 # TODO: license
 # TODO: document

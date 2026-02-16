@@ -1,6 +1,7 @@
 import os.path
 import numpy as np
-import json, logging
+import json
+import logging
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config

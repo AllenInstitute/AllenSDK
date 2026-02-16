@@ -41,10 +41,7 @@ from allensdk.config import enable_console_log
 from unittest.mock import MagicMock, patch, call, mock_open
 import builtins
 import itertools as it
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
 import pandas as pd
-import os
 
 _MOCK_PATH = '/path/to/xyz.txt'
 

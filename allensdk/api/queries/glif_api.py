@@ -166,7 +166,7 @@ class GlifApi(RmaTemplate):
                 if wkf['path'].endswith('neuron_config.json'):
                     self.neuron_config_url = wkf['download_link']
                     break
-        except Exception as e:
+        except Exception:
             self.neuron_config_url = None
 
         if self.neuron_config_url is None:
@@ -180,7 +180,7 @@ class GlifApi(RmaTemplate):
                 if wkf['well_known_file_type']['name'] == 'NWBDownload':
                     self.stimulus_url = wkf['download_link']
                     break
-        except Exception as e:
+        except Exception:
             self.stimulus_url = None
 
         if self.stimulus_url is None:

@@ -1,16 +1,13 @@
 import pytest
-import sys
-from unittest.mock import patch, mock_open, Mock, MagicMock
+from unittest.mock import patch, mock_open, MagicMock
 from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config
 import os
 from unittest import mock
-import shutil
 try:
     import __builtin__ as builtins
 except:
     import builtins
-from allensdk.model.biophysical import runner
 from allensdk.internal.model.biophysical.run_optimize \
     import RunOptimize
 from allensdk.internal.api.queries.optimize_config_reader \

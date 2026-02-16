@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from __future__ import division, print_function, absolute_import
-import re
 import operator as op
 import functools
 
@@ -444,9 +443,9 @@ class StructureTree( SimpleTree ):
         replaces them with a single list of id records.
         '''
 
-        if not 'structure_sets' in structure:
+        if 'structure_sets' not in structure:
             structure['structure_sets'] = []
-        if not 'structure_set_ids' in structure:
+        if 'structure_set_ids' not in structure:
             structure['structure_set_ids'] = []    
         
         structure['structure_set_ids'].extend([sts['id'] for sts 

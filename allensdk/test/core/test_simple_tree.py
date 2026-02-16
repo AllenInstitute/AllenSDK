@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from unittest import mock
 from numpy import allclose
 
 from allensdk.core.simple_tree import SimpleTree

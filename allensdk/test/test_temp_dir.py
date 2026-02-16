@@ -1,6 +1,5 @@
 import pytest
 import os
-import numpy as np
 from unittest.mock import patch, MagicMock
 from allensdk.test_utilities import temp_dir
 

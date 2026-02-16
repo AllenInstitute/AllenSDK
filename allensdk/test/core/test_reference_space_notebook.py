@@ -135,10 +135,8 @@ def test_notebook(tmpdir_factory):
 
     # In[7]:
 
-    import os
     import nrrd
     from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-    from allensdk.config.manifest import Manifest
 
     # the annotation download writes a file, so we will need somwhere to put it
     annotation_dir = str(tmpdir_factory.mktemp('annotation'))
@@ -232,7 +230,6 @@ def test_notebook(tmpdir_factory):
 
     # In[13]:
 
-    import numpy as np
 
 
     # #### Downsample the space

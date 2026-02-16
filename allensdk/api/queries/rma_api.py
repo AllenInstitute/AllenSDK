@@ -83,7 +83,7 @@ class RmaApi(Api):
         string
             complete RMA url
         '''
-        if not type(stage_clauses) is list:
+        if type(stage_clauses) is not list:
             stage_clauses = [stage_clauses]
 
         url = ''.join([

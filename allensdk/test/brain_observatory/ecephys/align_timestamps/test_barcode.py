@@ -1,6 +1,5 @@
 import pytest
 import numpy as np
-import pandas as pd
 
 import allensdk.brain_observatory.ecephys.align_timestamps.barcode as barcode
 

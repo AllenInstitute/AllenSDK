@@ -35,9 +35,6 @@
 #
 from .fitgaussian2D import fitgaussian2D, GaussianFitError, gaussian2D
 import numpy as np
-import pandas as pd
-import collections
-import sys
 import warnings
 
 def add_to_fit_parameters_dict_single(fit_parameters_dict, p):

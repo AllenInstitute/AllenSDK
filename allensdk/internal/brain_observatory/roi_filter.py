@@ -1,7 +1,6 @@
 import itertools
 import pickle
 import logging
-from allensdk.internal.brain_observatory import roi_filter_utils
 import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.brain_observatory.roi_masks import create_roi_mask_array
 

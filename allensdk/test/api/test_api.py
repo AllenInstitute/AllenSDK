@@ -39,13 +39,11 @@ import builtins
 import zipfile
 import os
 
-import numpy as np
 import pytest
 from unittest.mock import MagicMock, patch, mock_open
 from requests.exceptions import HTTPError
 import requests
 
-import allensdk.core.json_utilities as ju
 from allensdk.api.api import Api, stream_file_over_http, stream_zip_directory_over_http
 
 

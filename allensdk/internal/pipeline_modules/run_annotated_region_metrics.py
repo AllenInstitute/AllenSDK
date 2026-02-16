@@ -1,5 +1,4 @@
 """Run annotated region metrics calculations"""
-import logging
 import os
 import h5py
 from allensdk.internal.core.lims_utilities import get_input_json

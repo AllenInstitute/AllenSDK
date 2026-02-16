@@ -1,7 +1,6 @@
 '''Written by Corinne Teeter 3-31-14
 '''
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 

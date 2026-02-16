@@ -2,14 +2,9 @@
 #a preprocessed model configuration and preprocessed_config file
 #
 #something will have to tell it what parameters to take out of the preprocessed dict
-import os
-import sys
-import logging
-import time
 import numpy as np
 import argparse
 import allensdk.core.json_utilities as ju
-import find_sweeps as fs
 
 class ModelConfigurationException( Exception ): pass
 
