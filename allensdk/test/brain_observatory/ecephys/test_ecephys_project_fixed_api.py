@@ -5,7 +5,7 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjec
 
 def test_get_sessions():
     api = EcephysProjectFixedApi()
-    with pytest.raises(MissingDataError) as err:
+    with pytest.raises(MissingDataError):
         api.get_sessions()
 
 

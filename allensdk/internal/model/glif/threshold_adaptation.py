@@ -174,7 +174,6 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, dv_cutoff, th
         #will be no spike component of the threshold
         if decay_const >0 or const_to_add_to_thresh_for_reset < 0:
             const_to_add_to_thresh_for_reset=0
-            decay=-1.0  #note that this number doesnt matter since the amplitude is set to zero
             
         # This decay constant was originally forced to be positive (i.e. decay_const=abs(popt_force[1]))
         # and then it is negated everywhere it is utilized elsewhere in the code.  Now things are forced in 

@@ -7,7 +7,7 @@ import pandas as pd
 
 def createInputJson(output_file):
 
-    df = pd.read_csv('/mnt/md0/data/production_QC/experiment_table_2019-08-27.csv',index_col=0)
+    pd.read_csv('/mnt/md0/data/production_QC/experiment_table_2019-08-27.csv',index_col=0)
 
     #fc_mice = np.sort(df[df['stimulus_set'].str.match('Functional')].index.values)
 

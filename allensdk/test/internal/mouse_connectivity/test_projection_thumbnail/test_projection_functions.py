@@ -31,6 +31,6 @@ def test_max_projection(example_volume):
 
 def test_template_projection(example_volume):
 
-    obt = prf.template_projection(example_volume, 2, 1, 1)
-    exp = np.array([[16, 25], [20, 5]])
+    prf.template_projection(example_volume, 2, 1, 1)
+    np.array([[16, 25], [20, 5]])
 

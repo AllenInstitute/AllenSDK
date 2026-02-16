@@ -299,14 +299,14 @@ def test_filter_experiments(mcc, experiments):
                 return [[97, 98], []]
         return FakeTree()
 
-    with mock.patch.object(mcc, 'get_structure_tree', new=fake_tree) as p:
+    with mock.patch.object(mcc, 'get_structure_tree', new=fake_tree):
         sid_line = mcc.filter_experiments(experiments, cre=True, injection_structure_ids=[97, 98])
 
     assert len(sid_line) == 1
 
 def test_rank_structures(mcc, top_injection_unionizes):
 
-    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+    os.path.join(os.path.dirname(mcc.manifest_path), 
                         'experiment_{0}'.format(1), 
                         'structure_unionizes.csv')
 
@@ -324,12 +324,12 @@ def test_rank_structures(mcc, top_injection_unionizes):
 
 def test_default_structure_ids(mcc, new_nodes):
 
-    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+    os.path.join(os.path.dirname(mcc.manifest_path), 
                         'structures.json')
 
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
-                    return_value=new_nodes) as p:
+                    return_value=new_nodes):
 
         default_structure_ids = mcc.default_structure_ids
         assert(len(default_structure_ids) == 1)
@@ -377,7 +377,7 @@ def test_filter_structure_unionizes(mcc, unionizes):
 
     assert obtained.loc[0, 'volume'] == 0.016032
 
-    obt_sid = mcc.filter_structure_unionizes(pd.DataFrame(unionizes),
+    mcc.filter_structure_unionizes(pd.DataFrame(unionizes),
                                               hemisphere_ids=[1],
                                               structure_ids=[1,60,90])
 
@@ -459,7 +459,7 @@ def test_get_structure_mask(mcc):
 def test_validate_structure_id(inp, fails):
 
     if fails:
-        with pytest.raises(ValueError) as exc:
+        with pytest.raises(ValueError):
             MouseConnectivityCache.validate_structure_id(inp)
     else:
         out = MouseConnectivityCache.validate_structure_id(inp)
@@ -472,7 +472,7 @@ def test_validate_structure_id(inp, fails):
 def test_validate_structure_ids(inp, fails):
 
     if fails:
-        with pytest.raises(ValueError) as exc:
+        with pytest.raises(ValueError):
             MouseConnectivityCache.validate_structure_ids(inp)
     else:
         out = MouseConnectivityCache.validate_structure_ids(inp)
@@ -487,7 +487,7 @@ def test_get_deformation_field(mcc):
         img = sitk.GetImageFromArray(arr)
         sitk.WriteImage(img, str(k['header_path']), True) # TODO the str call here is only necessary in 2.7
 
-    with mock.patch.object(mcc.api, 'download_deformation_field', new=write_dfmfld) as p:
+    with mock.patch.object(mcc.api, 'download_deformation_field', new=write_dfmfld):
         obtained = mcc.get_deformation_field(123)
 
     assert np.allclose(arr, obtained)

@@ -41,6 +41,7 @@ import pytest
 import os
 
 from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
+from test_h5_utilities import mem_h5  # noqa: F401 -- pytest fixture
 
 
 
@@ -262,7 +263,6 @@ def test_get_stimulus_table_master(data_set):
 
 def test_make_indexed_time_series_stimulus_table():
 
-    stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.arange(10)
 
@@ -274,7 +274,6 @@ def test_make_indexed_time_series_stimulus_table():
 
 def test_make_indexed_time_series_stimulus_table_out_of_order():
 
-    stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
     inds_exp = np.arange(10)
@@ -287,7 +286,6 @@ def test_make_indexed_time_series_stimulus_table_out_of_order():
 
 def test_make_abstract_feature_series_stimulus_table_out_of_order():
 
-    stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
     features_exp = ['orientation', 'spatial_frequency', 'phase']
@@ -316,7 +314,6 @@ def test_make_spontanous_activity_stimulus_table():
 
 def test_make_repeated_indexed_time_series_stimulus_table():
 
-    stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
     repeats_exp = np.array([0] * 5 + [1] * 5)
@@ -344,7 +341,7 @@ def test_find_stimulus_presentation_group_missing(stim_pres_h5):
     stim_pres_h5 = stim_pres_h5('fowl')
 
     with pytest.raises(MissingStimulusException):
-        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+        bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
 
 
 def test_find_stimulus_presentation_group_duplicate(stim_pres_h5):
@@ -354,4 +351,4 @@ def test_find_stimulus_presentation_group_duplicate(stim_pres_h5):
     stim_pres_h5.create_group('/stimulus/presentation/fish_stimulus')
 
     with pytest.raises(MissingStimulusException):
-        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+        bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)

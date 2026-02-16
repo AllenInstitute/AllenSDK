@@ -63,11 +63,11 @@ def test_from_file_name(storage_dirs, fn_temp_dir):
     with mock.patch('allensdk.internal.api.queries.grid_data_api_prerelease.'
                     '_get_grid_storage_directories',
                     new=lambda a: storage_dirs):
-        grid_data = GridDataApiPrerelease.from_file_name(file_name)
+        GridDataApiPrerelease.from_file_name(file_name)
 
     with mock.patch('allensdk.internal.api.queries.grid_data_api_prerelease.'
             '_get_grid_storage_directories') as ggsd:
-        grid_data = GridDataApiPrerelease.from_file_name(file_name)
+        GridDataApiPrerelease.from_file_name(file_name)
 
     ggsd.assert_not_called()
     assert os.path.exists(file_name)
@@ -77,7 +77,6 @@ def test_from_file_name(storage_dirs, fn_temp_dir):
 def test_download_projection_grid_data(grid_data, fn_temp_dir):
 
     eye = np.eye(100)
-    eid = 111
     target = os.path.join(fn_temp_dir, 'target')
 
     # test invalid experiment id/no grid

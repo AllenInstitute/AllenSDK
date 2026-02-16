@@ -124,13 +124,13 @@ def test_sweep_data_exception(cache_fixture):
 
     with pytest.raises(Exception) as exc:
         with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http') as mock_http:
+            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http'):
                 with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                     MagicMock(name='model query',
-                                return_value=ephys_result)) as query_mock:
-                    with patch('os.path.exists', MagicMock(return_value=False)) as ope:
+                                return_value=ephys_result)):
+                    with patch('os.path.exists', MagicMock(return_value=False)):
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
-                            with patch('allensdk.core.cell_types_cache.NwbDataSet') as nwb:
+                            with patch('allensdk.core.cell_types_cache.NwbDataSet'):
                                 _ = ctc.get_ephys_data(specimen_id)
     
     assert 'has no ephys data' in str(exc.value)
@@ -154,14 +154,14 @@ def test_get_cells(cache_fixture,
     ctc = cache_fixture
     # this downloads metadata for all cells with morphology images
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+        with patch('os.path.exists', MagicMock(return_value=path_exists)):
             with patch('allensdk.core.json_utilities.read',
-                       return_value=['mock_cells_from_server']) as ju_read:
+                       return_value=['mock_cells_from_server']):
                 with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells_api',
-                           MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
+                           MagicMock(return_value=['mock_cells_from_server'])):
                     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells_api',
                                MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
-                        with patch('allensdk.core.json_utilities.write') as ju_write:
+                        with patch('allensdk.core.json_utilities.write'):
                             cells = ctc.get_cells(require_morphology=morph_flag,
                                                   require_reconstruction=recon_flag,
                                                   reporter_status=statuses,
@@ -214,13 +214,13 @@ def test_get_cells_with_api(cache_fixture,
 
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
-                MagicMock(name='model query', return_value=return_dicts)) as query_mock:
-            with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+                MagicMock(name='model query', return_value=return_dicts)):
+            with patch('os.path.exists', MagicMock(return_value=path_exists)):
                 with patch('allensdk.core.json_utilities.read',
                         return_value=return_dicts) as ju_read:
                     with patch('allensdk.core.json_utilities.write') as ju_write:
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
-                            cells = ctc.get_cells(require_morphology=morph_flag,
+                            ctc.get_cells(require_morphology=morph_flag,
                                                   require_reconstruction=recon_flag,
                                                   reporter_status=statuses,
                                                   simple=True)
@@ -265,12 +265,12 @@ def test_get_reconstruction_with_api(to_csv,
                              {'download_link': 'http://example.org'}]}]}]
 
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http') as mock_http:
+        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http'):
             with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                     MagicMock(name='model query',
                                 return_value=reconstruction_data)) as query_mock:
                 with patch('allensdk.core.swc.read_swc') as read_swc_mock:
-                    with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+                    with patch('os.path.exists', MagicMock(return_value=path_exists)):
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                             _ = ctc.get_reconstruction(cell_id)
 
@@ -291,12 +291,12 @@ def test_get_reconstruction_exception(to_csv,
 
     with pytest.raises(Exception) as exc:
         with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http') as mock_http:
+            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http'):
                 with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                         MagicMock(name='model query',
-                                    return_value=reconstruction_data)) as query_mock:
-                    with patch('allensdk.core.swc.read_swc') as read_swc_mock:
-                        with patch('os.path.exists', MagicMock(return_value=False)) as ope:
+                                    return_value=reconstruction_data)):
+                    with patch('allensdk.core.swc.read_swc'):
+                        with patch('os.path.exists', MagicMock(return_value=False)):
                             with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                                 _ = ctc.get_reconstruction(cell_id)
 
@@ -356,9 +356,9 @@ def test_get_reconstruction_markers_with_api(cache_fixture,
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http') as mock_http:
             with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                     MagicMock(name='model query',
-                                return_value=reconstruction_data)) as query_mock:
+                                return_value=reconstruction_data)):
                 with patch('allensdk.core.swc.read_marker_file') as marker_mock:
-                    with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+                    with patch('os.path.exists', MagicMock(return_value=path_exists)):
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                             _ = ctc.get_reconstruction_markers(cell_id)
 
@@ -377,12 +377,12 @@ def test_get_reconstruction_markers_exception(cache_fixture,
                             {'well_known_files': []}]}]
 
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http') as mock_http:
+        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.retrieve_file_over_http'):
             with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                     MagicMock(name='model query',
-                                return_value=reconstruction_data)) as query_mock:
-                with patch('allensdk.core.swc.read_marker_file') as marker_mock:
-                    with patch('os.path.exists', MagicMock(return_value=False)) as ope:
+                                return_value=reconstruction_data)):
+                with patch('allensdk.core.swc.read_marker_file'):
+                    with patch('os.path.exists', MagicMock(return_value=False)):
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                             markers = ctc.get_reconstruction_markers(cell_id)
 
@@ -427,10 +427,10 @@ def test_get_ephys_features_with_api(read_csv,
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                 MagicMock(name='model query',
                             return_value=mock_data)) as query_mock:
-            with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+            with patch('os.path.exists', MagicMock(return_value=path_exists)):
                 with patch(builtins.__name__ + '.open',
                         mock_open(),
-                        create=True) as open_mock:
+                        create=True):
                     with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs') as mkd:
                         _ = ctc.get_ephys_features(dataframe=df)
 
@@ -455,7 +455,7 @@ def test_get_ephys_features_cache_roundtrip(cached_csv,
     with patch.object(ctc, "get_cache_path", return_value=cached_csv):
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                 MagicMock(name='model query',
-                            return_value=mock_data)) as query_mock:
+                            return_value=mock_data)):
             data = ctc.get_ephys_features()
     pandas_data = pd.read_csv(cached_csv, parse_dates=True)
 
@@ -481,11 +481,11 @@ def test_get_morphology_features(read_csv,
                  { 'stuff': 'nonsense'}]
     
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+        with patch('os.path.exists', MagicMock(return_value=path_exists)):
             with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs') as mkd:
                 with patch(builtins.__name__ + '.open',
                         mock_open(),
-                        create=True) as open_mock:
+                        create=True):
                     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                             MagicMock(name='model query',
                                         return_value=json_data)) as query_mock:
@@ -520,10 +520,10 @@ def test_get_ephys_sweeps(cache_fixture,
         'allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps'
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
         with patch(get_ephys_sweeps) as get_ephys_sweeps_mock:
-            with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+            with patch('os.path.exists', MagicMock(return_value=path_exists)):
                 with patch('allensdk.core.json_utilities.read',
-                        return_value=['mock_data']) as ju_read:
-                    with patch('allensdk.core.json_utilities.write') as ju_write:
+                        return_value=['mock_data']):
+                    with patch('allensdk.core.json_utilities.write'):
                         _ = ctc.get_ephys_sweeps(cell_id)
 
     if not path_exists:
@@ -544,11 +544,11 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                 MagicMock(name='model query',
                             return_value=return_dicts)) as query_mock:
-            with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+            with patch('os.path.exists', MagicMock(return_value=path_exists)):
                 with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                     with patch('allensdk.core.json_utilities.read',
                             return_value=['mock_data']) as ju_read:
-                        with patch('allensdk.core.json_utilities.write') as ju_write:
+                        with patch('allensdk.core.json_utilities.write'):
                             _ = ctc.get_ephys_sweeps(cell_id)
 
     # read will be called regardless
@@ -584,14 +584,14 @@ def test_get_all_features(read_csv,
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                 MagicMock(name='model query',
                             return_value=return_dicts)) as query_mock:
-                with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+                with patch('os.path.exists', MagicMock(return_value=path_exists)):
                     with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                         with patch('allensdk.core.json_utilities.read',
-                                return_value=return_dicts) as ju_read:
+                                return_value=return_dicts):
                             with patch(builtins.__name__ + '.open',
                                     mock_open(),
-                                    create=True) as open_mock:
-                                with patch('allensdk.core.json_utilities.write') as ju_write:
+                                    create=True):
+                                with patch('allensdk.core.json_utilities.write'):
                                     _ = ctc.get_all_features(
                                         require_reconstruction=require_reconstruction)
 

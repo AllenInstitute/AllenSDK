@@ -94,7 +94,6 @@ def adjust_r_for_negativity(r, F_C, F_M, F_N):
 
 def main():
     module = PipelineModule()
-    args = module.args
 
     jin = module.input_data()
 
@@ -188,9 +187,6 @@ def main():
             corrected[n,:] = fc
         else:
             logging.warning("fc has negative baseline, skipping this r value")
-
-    # compute mean valid r value 
-    r_mean = np.array([r for r in r_list if r is not None ]).mean()
 
     # fill in empty r values
     for n in range(num_traces):        

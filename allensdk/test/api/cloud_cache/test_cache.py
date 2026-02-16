@@ -767,7 +767,7 @@ def test_load_last_manifest(tmpdir, example_datasets_with_metadata):
     expected += 'dataset -- project-x_manifest_v15.0.0.json '
     expected += '-- exists online'
     with pytest.warns(OutdatedManifestWarning,
-                      match=expected) as warnings:
+                      match=expected):
         cache.load_last_manifest()
 
     assert cache.current_manifest == 'project-x_manifest_v7.0.0.json'

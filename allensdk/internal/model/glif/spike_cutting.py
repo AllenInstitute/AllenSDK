@@ -56,7 +56,6 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
     chi2 = []
     sum_residuals_4_each_time_end=[]
     xdata = np.array([v[all_thresholdInd[ii]] for ii, v in enumerate(all_v_spike_shape_list)])
-    var_of_Vdata_beforeSpike = np.var(xdata)
     for jj, vectorOfIndAcrossWaves in enumerate(list_of_endPointArrays):  # these indices should be in terms of the spike waveforms
 #        print('jj', jj)
         # TODO: Teeter get rid of the nonblipness

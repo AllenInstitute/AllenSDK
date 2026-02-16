@@ -137,9 +137,9 @@ def extract_cell_features(data_set,
             hero_sweep = sweep
 
     if hero_sweep:
-        adapt = hero_sweep.sweep_feature("adapt")
-        latency = hero_sweep.sweep_feature("latency")
-        mean_isi = hero_sweep.sweep_feature("mean_isi")
+        hero_sweep.sweep_feature("adapt")
+        hero_sweep.sweep_feature("latency")
+        hero_sweep.sweep_feature("mean_isi")
     else:
         raise ft.FeatureError("Could not find hero sweep.")
 

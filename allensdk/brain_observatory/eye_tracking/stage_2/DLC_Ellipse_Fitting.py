@@ -61,7 +61,6 @@ def fit_ellipse(h5name):
         #fit ellipses to the pupil & eye points in 4/25
         
         frac_completed = max(1,float(j))/len(df)
-        frac_rem = 1-frac_completed
         tot_time_est = (time.time() - loop_t0)/frac_completed
         progress_str = "{:10.2f} {:10.2f} {:5s} {:10.2f}".format(time.time()-last_loop_time, time.time()-loop_t0, "{0:.0%}".format(frac_completed), tot_time_est)
         logger.info('Ellipse fit: {}'.format(progress_str))

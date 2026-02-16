@@ -383,7 +383,7 @@ def plot_max_proj_and_roi_masks(session, save_dir=None):
     mask = np.empty(session.segmentation_mask_image.data.shape, dtype='float')
     mask[:] = np.nan
     mask[tmp > 0] = 1
-    cax = ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
+    ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
 
     if save_dir:
         ut.save_figure(fig, figsize, save_dir, 'roi_masks', str(session.metadata['ophys_experiment_id']))
@@ -444,9 +444,6 @@ def plot_experiment_summary_figure(session, save_dir=None):
     meta = session.metadata
     title = meta['driver_line'][0] + ', ' + meta['targeted_structure'] + ', ' + str(meta['imaging_depth']) + ', ' + \
             session.task_parameters['stage']
-
-    interval_seconds = 600
-    ophys_frame_rate = int(session.metadata['ophys_frame_rate'])
 
     figsize = [2 * 11, 2 * 8.5]
     fig = plt.figure(figsize=figsize, facecolor='white')

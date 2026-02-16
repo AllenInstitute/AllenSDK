@@ -17,7 +17,7 @@ def dup_stim_repr():
 
 def test_extract_const_params_from_stim_repr_duplicates(dup_stim_repr):
     with pytest.raises(KeyError):
-        obtained = spe.extract_const_params_from_stim_repr(dup_stim_repr)
+        spe.extract_const_params_from_stim_repr(dup_stim_repr)
 
 
 def test_extract_const_params_from_stim_repr(stim_repr):

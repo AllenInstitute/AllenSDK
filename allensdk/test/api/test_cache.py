@@ -107,12 +107,12 @@ def dummy_cache():
 def test_version_update(fn_temp_dir, dummy_cache):
 
     mpath = os.path.join(fn_temp_dir, 'manifest.json')
-    dc = dummy_cache(manifest=mpath)
+    dummy_cache(manifest=mpath)
 
-    same_dc = dummy_cache(manifest=mpath)
+    dummy_cache(manifest=mpath)
 
     with pytest.raises(ManifestVersionError):
-        new_dc = dummy_cache(manifest=mpath, version=1.0)
+        dummy_cache(manifest=mpath, version=1.0)
 
 
 def test_load_manifest(tmpdir_factory, dummy_cache):

@@ -272,7 +272,7 @@ def test_cacheable_lazy_csv_no_file(mkdir, dictwriter, ju_read_url_get,
     def get_hemispheres():
         return RmaApi().model_query(model='Hemisphere')
 
-    with patch('os.path.exists', MagicMock(return_value=False)) as ope:
+    with patch('os.path.exists', MagicMock(return_value=False)):
         with patch(builtins.__name__ + '.open',
                    mock_open(),
                    create=True) as open_mock:
@@ -302,7 +302,7 @@ def test_cacheable_lazy_csv_file_exists(read_csv, ju_read_url_get, ju_read,
     def get_hemispheres():
         return RmaApi().model_query(model='Hemisphere')
 
-    with patch('os.path.exists', MagicMock(return_value=True)) as ope:
+    with patch('os.path.exists', MagicMock(return_value=True)):
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              strategy='lazy',
                              **Cache.cache_csv())

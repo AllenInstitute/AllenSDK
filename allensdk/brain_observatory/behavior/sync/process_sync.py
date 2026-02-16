@@ -33,7 +33,6 @@ def filter_digital(rising, falling, threshold=0.0001):
 
 def calculate_delay(sync_data, stim_vsync_fall, sample_frequency):
     # from http://stash.corp.alleninstitute.org/projects/INF/repos/lims2_modules/browse/CAM/ophys_time_sync/ophys_time_sync.py
-    ASSUMED_DELAY = 0.0351
     DELAY_THRESHOLD = 0.001
     FIRST_ELEMENT_INDEX = 0
     ROUND_PRECISION = 4

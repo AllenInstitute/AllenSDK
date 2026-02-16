@@ -152,7 +152,7 @@ def test_clean_structures_no_sets():
                   'name': 'root'}
     
     clean_node = StructureTree.clean_structures([dirty_node])
-    st = StructureTree(clean_node)
+    StructureTree(clean_node)
     
     assert( len(clean_node[0]['structure_set_ids']) == 0 )
     
@@ -164,7 +164,7 @@ def test_clean_structures_only_ids():
                   'name': 'root', 'structure_set_ids': [1, 2, 3] }
     
     clean_node = StructureTree.clean_structures([dirty_node])
-    st = StructureTree(clean_node)
+    StructureTree(clean_node)
     
     assert( len(clean_node[0]['structure_set_ids']) == 3 )
     
@@ -177,7 +177,7 @@ def test_clean_structures_ids_sets():
                   'structure_sets': [{'id': 1}, {'id': 4}] }
     
     clean_node = StructureTree.clean_structures([dirty_node])
-    st = StructureTree(clean_node)
+    StructureTree(clean_node)
     
     assert( len(clean_node[0]['structure_set_ids']) == 4 )
     

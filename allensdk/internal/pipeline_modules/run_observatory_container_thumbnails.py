@@ -53,8 +53,6 @@ def main():
 
     for input_file in data:
         exp_input_json = input_file['input_json']
-        exp_output_json = input_file['output_json']
-
         exp_input_data = ju.read(exp_input_json)
 
         nwb_file, analysis_file, output_directory = robsth.parse_input(exp_input_data)

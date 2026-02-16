@@ -71,7 +71,6 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
         alpha = 1.0
 
     ax = plt.gca()
-    ps = []
     for sig_corr, color, label in zip(sig_corrs, colors, labels):
         ax.hist(sig_corr, bins=30, range=[-1,1],
                 histtype='stepfilled',

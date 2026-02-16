@@ -174,10 +174,9 @@ def test_cacheable_pageable_csv(os_makedirs, read_csv,
 
         with patch(builtins.__name__ + '.open',
                 mock_open(),
-                create=True) as open_mock:
+                create=True):
             with patch('csv.DictWriter.writerow') as csv_writerow:
-                cam_cell_metrics = \
-                    get_cam_cell_metrics(strategy='create',
+                get_cam_cell_metrics(strategy='create',
                                         path='/path/to/cam_cell_metrics.csv',
                                         num_rows=1,
                                         total_rows='all',

@@ -670,7 +670,7 @@ def _plot_3sb(sg, nm1, ns, save_dir):
         ax1 = plt.subplot2grid((6, 6), (0, 0), colspan=4)  # full trace
         ax2 = plt.subplot2grid((6, 6), (0, 4))  # histogram of F
         ax14 = plt.subplot2grid((6, 6), (1, 4))  # speed tuning
-        ax16 = plt.subplot2grid((6, 6), (1, 5), sharex=ax14, sharey=ax14)
+        plt.subplot2grid((6, 6), (1, 5), sharex=ax14, sharey=ax14)
         ax15 = plt.subplot2grid((6, 6), (1, 0), colspan=4)
         ax3 = plt.subplot2grid((6, 6), (2, 0), colspan=2)  # Ori tuning
         ax4 = plt.subplot2grid((6, 6), (2, 2), colspan=2)  # sf tuning

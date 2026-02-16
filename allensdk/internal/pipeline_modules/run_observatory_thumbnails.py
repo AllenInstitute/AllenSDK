@@ -116,7 +116,7 @@ def build_plots(prefix, aspect, configs, output_dir, axes=None, transparent=Fals
         file_name = os.path.join(output_dir, config["pattern"] % prefix)
 
         logging.debug("file: %s", file_name)
-        with oplots.figure_in_px(w, h, file_name, transparent=transparent) as fig:
+        with oplots.figure_in_px(w, h, file_name, transparent=transparent):
             matplotlib.rcParams.update({'font.size': config['font_size']})
             yield file_name
 
@@ -513,7 +513,7 @@ def build_experiment_thumbnails(nwb_file, analysis_file, output_directory,
         p = multiprocessing.Pool(threads)
 
         func = functools.partial(build_type, nwb_file, analysis_file, PLOT_CONFIGS, output_directory)
-        results = p.map(func, types)
+        p.map(func, types)
         p.close()
         p.join()
 

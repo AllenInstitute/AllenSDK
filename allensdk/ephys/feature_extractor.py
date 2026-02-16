@@ -397,7 +397,6 @@ class EphysFeatureExtractor( object ):
                     close_idx += 1
                 spk["downstroke"] = dvdt[close_idx]
 
-        features = {}
         feature.mean["base_v"] = v[np.where((t > onset - 0.1) & (t < onset - 0.001))].mean() # baseline voltage, 100ms before stim
         feature.mean["spikes"] = spikes
         isi_cv = self.isicv(spikes)

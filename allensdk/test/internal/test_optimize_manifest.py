@@ -141,7 +141,6 @@ def test_to_manifest(one_param_config):
                mock_open(),
                create=True) as manifest_f:
         manifest_f.return_value = MagicMock(spec=IOBase)
-        file_handle = manifest_f.return_value.__enter__.return_value
         one_param_config.to_manifest("test_manifest.json")
         manifest_f.assert_called_once_with("test_manifest.json", "wb+")
 

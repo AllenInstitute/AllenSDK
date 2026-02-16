@@ -90,8 +90,7 @@ class ROIClassifier(object):
         --------
         create_feature_array : Create a feature array given model and inputs
         '''
-        features = create_feature_array(self.model_data, object_data, depth,
-                                        structure_id, drivers, reporters)
+        pass
 
     def get_labels(self, object_data, depth, structure_id, drivers,
                    reporters):

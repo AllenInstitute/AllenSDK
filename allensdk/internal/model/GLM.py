@@ -99,7 +99,6 @@ def makeBasis_StimKernel(kbasprs,nkt):
 
 def makeBasis_StimKernel_exp(kbasprs,nkt):
     ks = kbasprs['ks']
-    b = kbasprs['b']
     x0 = np.arange(0,nkt)
     kbasis = np.zeros((nkt,len(ks)))
     for ii in range(len(ks)):

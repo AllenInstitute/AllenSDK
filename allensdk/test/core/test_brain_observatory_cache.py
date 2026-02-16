@@ -171,7 +171,7 @@ def test_get_experiment_containers(mock_json_msg_query,
             with patch('allensdk.core.json_utilities.read',
                        MagicMock(name='read_json')):
                 # Download experiment containers for VISp experiments
-                visp_ecs = brain_observatory_cache.get_experiment_containers(
+                brain_observatory_cache.get_experiment_containers(
                     targeted_structures=['VISp'])
 
     mock_json_msg_query.assert_called_once_with(
@@ -193,7 +193,7 @@ def test_get_all_cre_lines(mock_json_msg_query,
             with patch('allensdk.core.json_utilities.read',
                        MagicMock(name='read_json')):
                 # Download a list of all cre lines
-                tls = brain_observatory_cache.get_all_cre_lines()
+                brain_observatory_cache.get_all_cre_lines()
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -214,7 +214,7 @@ def test_get_ophys_experiments(mock_json_msg_query,
             with patch('allensdk.core.json_utilities.read',
                        MagicMock(name='read_json')):
                 # Download a list of all transgenic driver lines
-                tls = brain_observatory_cache.get_ophys_experiments()
+                brain_observatory_cache.get_ophys_experiments()
 
     calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
                   "model::OphysExperiment,rma::include,experiment_container,"
@@ -240,7 +240,7 @@ def test_get_all_session_types(mock_json_msg_query,
             with patch('allensdk.core.json_utilities.read',
                        MagicMock(name='read_json')):
                 # Download a list of all transgenic driver lines
-                tls = brain_observatory_cache.get_all_session_types()
+                brain_observatory_cache.get_all_session_types()
 
     calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
                   "model::OphysExperiment,rma::include,experiment_container,"
@@ -266,7 +266,7 @@ def test_get_stimulus_mappings(mock_json_msg_query,
             with patch('allensdk.core.json_utilities.read',
                        MagicMock(name='read_json')):
                 # Download a list of all transgenic driver lines
-                tls = brain_observatory_cache._get_stimulus_mappings()
+                brain_observatory_cache._get_stimulus_mappings()
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -284,7 +284,7 @@ def test_get_cell_specimens(mock_json_msg_query,
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
             # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache.get_cell_specimens()
+            brain_observatory_cache.get_cell_specimens()
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q=")
@@ -299,7 +299,7 @@ def test_get_ophys_pupil_data(mock_json_msg_query,
     with patch.dict('allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map', {111: 777}, clear=True):
         # We are only testing that rma query is correct
         try:
-            tls = brain_observatory_cache.get_ophys_pupil_data(111, suppress_pupil_data=False)
+            brain_observatory_cache.get_ophys_pupil_data(111, suppress_pupil_data=False)
         except Exception:
             pass
 
@@ -321,7 +321,7 @@ def test_build_manifest(tmpdir_factory):
     with patch('allensdk.config.manifest_builder.ManifestBuilder.write_json_string') as mock_write_json_string:
         mock_write_json_string.return_value = manifest_data
 
-        brain_observatory_cache = BrainObservatoryCache(manifest_file=manifest_file)
+        BrainObservatoryCache(manifest_file=manifest_file)
         with open(manifest_file, 'rb') as f:
             read_manifest_data = f.read()
 

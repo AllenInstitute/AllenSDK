@@ -68,7 +68,7 @@ def test_extract_running_speed_module(
 
         return input_json_data
 
-    output_json_data = use_temp_dir(
+    use_temp_dir(
         DATA_DIR, 'test_extract_running_speed', input_json_fname, output_json_fname, 
         'allensdk.brain_observatory.extract_running_speed', renamer
     )

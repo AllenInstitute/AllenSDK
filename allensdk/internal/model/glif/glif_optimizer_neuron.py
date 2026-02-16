@@ -205,7 +205,6 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 grid_bio_spike_model_voltage = np.empty(num_spikes)
                 grid_bio_spike_model_threshold = np.empty(num_spikes)
 
-                spikeIndStart = 0
                 
                 voltage = np.empty(len(stimulus))
                 voltage[:] = np.nan  

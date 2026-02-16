@@ -42,7 +42,7 @@ def get_blocks(table):
                 )
             )
         else:
-            recorded_block = recorded_blocks[0]
+            pass
 
         start = block["Start"].values[0]
         end = block["End"].values[-1]

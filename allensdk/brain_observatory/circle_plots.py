@@ -611,9 +611,6 @@ class FanPlotter( PolarPlotter ):
         r = self.inner_radius*.5
         angle = 90.0
         
-        x = r * np.cos(angle)
-        y = r * np.sin(angle)
-
         for group in groups:
             off = self.group_offset_map[group]
 

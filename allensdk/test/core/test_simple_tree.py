@@ -92,7 +92,7 @@ def test_value_map(tree):
 def test_value_map_nonunique(tree):
     
     with pytest.raises( RuntimeError ):
-        parent_map = tree.value_map(lambda node: node['parent'], 
+        tree.value_map(lambda node: node['parent'], 
                                     lambda node: node['id'])
 
     

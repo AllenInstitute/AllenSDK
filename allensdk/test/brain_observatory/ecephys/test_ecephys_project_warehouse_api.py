@@ -70,4 +70,4 @@ def test_query(method, conditions, expected_query):
             return []
 
     api = epwa.EcephysProjectWarehouseApi(rma_engine=MockRmaEngine())
-    results = getattr(api, method)(**conditions)
+    getattr(api, method)(**conditions)

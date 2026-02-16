@@ -82,7 +82,7 @@ def test_file_download_lazy(nrrd_read, safe_mkdir, mca, cache, file_exists):
 
         with patch('os.path.exists',
                 Mock(name="os.path.exists",
-                        return_value=file_exists)) as mkdir:
+                        return_value=file_exists)):
             nrrd_read.reset_mock()
             download_volumetric_data(MCA.AVERAGE_TEMPLATE,
                                     'annotation_10.nrrd',
@@ -126,7 +126,7 @@ def test_file_download_server(nrrd_read, safe_mkdir, mca, cache, file_exists):
 
         with patch('os.path.exists',
                 Mock(name="os.path.exists",
-                        return_value=file_exists)) as mkdir:
+                        return_value=file_exists)):
             nrrd_read.reset_mock()
             
             download_volumetric_data(MCA.AVERAGE_TEMPLATE,
@@ -168,7 +168,7 @@ def test_file_download_cached_file(nrrd_read, safe_mkdir, mca, cache, file_exist
 
         with patch('os.path.exists',
                 Mock(name="os.path.exists",
-                        return_value=file_exists)) as mkdir:
+                        return_value=file_exists)):
             nrrd_read.reset_mock()
 
             download_volumetric_data(MCA.AVERAGE_TEMPLATE,
@@ -209,7 +209,7 @@ def test_file_kwarg(nrrd_read, safe_mkdir, mca, cache, file_exists):
 
         with patch('os.path.exists',
                 Mock(name="os.path.exists",
-                        return_value=file_exists)) as mkdir:
+                        return_value=file_exists)):
             nrrd_read.reset_mock()
 
             download_volumetric_data(MCA.AVERAGE_TEMPLATE,

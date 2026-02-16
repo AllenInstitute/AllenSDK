@@ -64,9 +64,6 @@ def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, 
         raise Exception('figure subplots will need to be changed as there is a different number than 10 ks_pairs.')
     
     #Initialize list to hold charge dump values and amp-vectors
-    fitprs_list = []
-    llf_list = []
-    R_list = []
     #Iterate over all pairs
     if SHORT_RUN:
         logging.warning("You are not doing all the ks pairs in ASGLM_pairwise")
@@ -74,14 +71,11 @@ def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, 
 
     R_for_all_ks_pairs=[]
     asc_amp_for_all_ks_pairs=[]
-    El_for_all_ks_pairs=[] 
-    C_for_all_ks_pairs=[]
     llh_for_all_ks_pairs=[]
     for ks_ind, (ks_fit_units, ks_SI_units) in enumerate(zip(ks_pairs, ks_pairs_in_SI_units)):
         print('ks_fit_units', ks_fit_units)
         #Create basis IPSPs
         if MAKE_PLOT:
-            plotting_colors=['r', 'b', 'g', 'm', 'c']
             plt.figure(78, figsize=(20,10))
         basis_IPSP_list = []
         for rr in range(len(I_stim)): #loop over repeats

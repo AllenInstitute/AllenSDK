@@ -736,15 +736,15 @@ def test_simulate(hoc_init, mock_h, run_simulate):
                       h=mock_h)
 
     with patch('allensdk.internal.api.queries.biophysical_module_reader.BiophysicalModuleReader',
-               MagicMock(name="bio_mod_reader")) as bio_mod_reader:
+               MagicMock(name="bio_mod_reader")):
         with patch('allensdk.model.biophysical.runner.save_nwb',
-                   MagicMock(name="save_nwb")) as save_nwb:
+                   MagicMock(name="save_nwb")):
             with patch('allensdk.model.biophysical.runner.NwbDataSet',
-                       MagicMock(name='nwb_data_set')) as nwb_data_set:
+                       MagicMock(name='nwb_data_set')):
                 with patch('allensdk.model.biophysical.runner.copy',
-                           MagicMock(name='shutil_copy')) as cp:
+                           MagicMock(name='shutil_copy')):
                     with patch('allensdk.model.biophysical.utils.create_utils',
-                               return_value=mock_utils) as cu:
+                               return_value=mock_utils):
                         with patch(builtins.__name__ + ".open",
                                    mock_open(
                                        read_data=MANIFEST_JSON)):

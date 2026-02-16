@@ -76,7 +76,7 @@ def run(args, sweeps=None, procs=6):
         return
 
     if sweeps is None:
-        stimulus_path = description.manifest.get_path('stimulus_path')
+        description.manifest.get_path('stimulus_path')
         run_params = description.data['runs'][0]
         sweeps = run_params['sweeps']
 

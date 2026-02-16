@@ -339,11 +339,9 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
     if neuron.threshold_components is None:
         neuron.threshold_components = { 'spike': [], 'voltage': [] }
         th_spike = 0
-        th_voltage = 0
     else:                
         tcs = neuron.threshold_components
         th_spike = tcs['spike'][-1]
-        th_voltage = tcs['voltage'][-1] 
 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  

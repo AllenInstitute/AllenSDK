@@ -185,6 +185,6 @@ def test_fitgaussian2D_failure():
     res.message = 'foo'
     res.x = np.array([1.0, 1.0, 1.0, 0.0])
 
-    with mock.patch('scipy.optimize.minimize', return_value=res) as p:
+    with mock.patch('scipy.optimize.minimize', return_value=res):
         with pytest.raises( gauss.GaussianFitError ):
             gauss.fitgaussian2D(data)

@@ -101,7 +101,6 @@ class Report:
             
     def setup_model(self):
         morphology_path = os.path.realpath(self.top_level_description.manifest.get_path('MORPHOLOGY'))
-        cwd = os.path.realpath(os.curdir)
         self.utils = Utils(self.fit_config)
         h = self.utils.h
         self.utils.generate_morphology(morphology_path)
@@ -179,8 +178,7 @@ class Report:
 
                 v = v_vec.as_numpy()
                 t = t_vec.as_numpy()
-                i = i_vec.as_numpy()
-                stim_start_idx = 0
+                i_vec.as_numpy()
                 stim_end_idx = len(t) - 1
                 bool_v = np.array(v > depol_block_threshold, dtype=int)
                 up_indexes = np.flatnonzero(np.diff(bool_v) == 1)

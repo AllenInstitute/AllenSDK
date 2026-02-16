@@ -106,7 +106,7 @@ def test_harness(dataset,
                  stimulus,
                  trigger):
     with patch('allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning',
-               mock_speed_tuning()) as get_speed_tuning:
+               mock_speed_tuning()):
         lsn = LocallySparseNoise(dataset, stimulus)
 
         assert lsn._stim_table is StimulusAnalysis._PRELOAD

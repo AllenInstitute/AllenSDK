@@ -12,8 +12,6 @@ def createInputJson(directory, resort_directory, module, output_file, last_unit_
 
     session_id = basename(directory)
 
-    userID = 'joshs'
-    description = 'Neuropixels experiment in visual cortex'
 
     sync_file = glob(join(directory, '*.sync'))[0]
 
@@ -21,7 +19,7 @@ def createInputJson(directory, resort_directory, module, output_file, last_unit_
 
     nwb_output_path = join('/mnt/nvme0/ecephys_nwb_files_20190827-2', session_id + '.spikes.nwb2')
 
-    stimulus_table_path = join(directory, 'stim_table.csv')
+    join(directory, 'stim_table.csv')
 
     #print(resort_directory)
 

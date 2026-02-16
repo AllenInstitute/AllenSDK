@@ -174,9 +174,7 @@ def main(jin):
             # pull data streams from file (this is for detecting truncated
             #   sweeps)
             sweep_data = NwbDataSet(nwb_file).get_sweep(sweep_num)
-            volts = sweep_data['response']
             current = sweep_data['stimulus']
-            hz = sweep_data['sampling_rate']
             idx_start, idx_stop = sweep_data['index_range']
 
             if sweep["pre_noise_rms_mv"] > qc_criteria["pre_noise_rms_mv_max"]:

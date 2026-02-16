@@ -115,7 +115,7 @@ def assert_images_match(new_file, test_file, shape):
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_ttp.png', STATIC_GRATINGS ] ])
 def test_ttp_static_gratings(new_file, static_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         static_gratings().plot_time_to_peak()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -125,7 +125,7 @@ def test_ttp_static_gratings(new_file, static_gratings, shape=[500,500]):
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_pref_ori.png', STATIC_GRATINGS ] ])
 def test_pref_ori_static_gratings(new_file, static_gratings, shape=[250,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         static_gratings().plot_preferred_orientation()
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -135,7 +135,7 @@ def test_pref_ori_static_gratings(new_file, static_gratings, shape=[250,500]):
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_ori.png', STATIC_GRATINGS ] ])
 def test_osi_static_gratings(new_file, static_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         static_gratings().plot_orientation_selectivity()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -145,7 +145,7 @@ def test_osi_static_gratings(new_file, static_gratings, shape=[500,500]):
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_pref_sf.png', STATIC_GRATINGS ] ])
 def test_pref_sf(new_file, static_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         static_gratings().plot_preferred_spatial_frequency()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -155,7 +155,7 @@ def test_pref_sf(new_file, static_gratings, shape=[500,500]):
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_pref_dir.png', DRIFTING_GRATINGS ] ])
 def test_pref_dir_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         drifting_gratings().plot_preferred_direction()
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -165,7 +165,7 @@ def test_pref_dir_drifting_gratings(new_file, drifting_gratings, shape=[500,500]
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_pref_tf.png', DRIFTING_GRATINGS ] ])
 def test_pref_tf_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         drifting_gratings().plot_preferred_temporal_frequency()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -175,7 +175,7 @@ def test_pref_tf_drifting_gratings(new_file, drifting_gratings, shape=[500,500])
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_dsi.png', DRIFTING_GRATINGS ] ])
 def test_dsi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         drifting_gratings().plot_direction_selectivity()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -185,7 +185,7 @@ def test_dsi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_osi.png', DRIFTING_GRATINGS ] ])
 def test_osi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         drifting_gratings().plot_orientation_selectivity()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -195,7 +195,7 @@ def test_osi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
 @pytest.mark.parametrize("new_file,natural_scenes", 
                          [ [ 'natural_scenes_ttp.png', NATURAL_SCENES ] ])
 def test_ttp_natural_scenes(new_file, natural_scenes, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         natural_scenes().plot_time_to_peak()
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -205,7 +205,7 @@ def test_ttp_natural_scenes(new_file, natural_scenes, shape=[500,500]):
 @pytest.mark.parametrize("new_file,static_gratings,cell_specimen_id",
                          [ [ 'static_gratings_fan_plot.png', STATIC_GRATINGS, CELL_SPECIMEN_ID ] ])
 def test_fan_plot(new_file, static_gratings, cell_specimen_id, shape=[250,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         static_gratings().open_fan_plot(cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -215,7 +215,7 @@ def test_fan_plot(new_file, static_gratings, cell_specimen_id, shape=[250,500]):
 @pytest.mark.parametrize("new_file,natural_scenes,cell_specimen_id", 
                          [ [ 'natural_scenes_fan_plot.png', NATURAL_SCENES, CELL_SPECIMEN_ID ] ])
 def test_corona_plot(new_file, natural_scenes, cell_specimen_id, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         natural_scenes().open_corona_plot(cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -229,7 +229,7 @@ def test_corona_plot(new_file, natural_scenes, cell_specimen_id, shape=[500,500]
                            ("natural_movie_two_track_plot.png", NATURAL_MOVIE_TWO, CELL_SPECIMEN_ID),
                            ("natural_movie_three_track_plot.png", NATURAL_MOVIE_THREE, CELL_SPECIMEN_ID) ])
 def test_track_plot(new_file, natural_movie, cell_specimen_id, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         natural_movie().open_track_plot(cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -239,7 +239,7 @@ def test_track_plot(new_file, natural_movie, cell_specimen_id, shape=[500,500]):
 @pytest.mark.parametrize("new_file,drifting_gratings,cell_specimen_id", 
                          [ [ 'drifting_gratings_star_plot.png', DRIFTING_GRATINGS, CELL_SPECIMEN_ID ] ])
 def test_star_plot(new_file, drifting_gratings, cell_specimen_id, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         drifting_gratings().open_star_plot(cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -251,7 +251,7 @@ def test_star_plot(new_file, drifting_gratings, cell_specimen_id, shape=[500,500
                            ("3sb_speed_tuning_plot.png", STATIC_GRATINGS, CELL_SPECIMEN_ID),
                            ("3sc_speed_tuning_plot.png", NATURAL_MOVIE_TWO, CELL_SPECIMEN_ID) ])
 def test_speed_tuning_plot(new_file, analysis, cell_specimen_id, shape=[500,500]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         analysis().plot_speed_tuning(cell_specimen_id)
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
@@ -262,7 +262,7 @@ def test_speed_tuning_plot(new_file, analysis, cell_specimen_id, shape=[500,500]
                          [ ('locally_sparse_noise_on.png', LOCALLY_SPARSE_NOISE, True, CELL_SPECIMEN_ID),
                            ('locally_sparse_noise_off.png', LOCALLY_SPARSE_NOISE, False, CELL_SPECIMEN_ID) ])
 def test_pincushion_plot(new_file, locally_sparse_noise, on, cell_specimen_id, shape=[500,877]):
-    with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
+    with oplots.figure_in_px(shape[1], shape[0], new_file):
         locally_sparse_noise().open_pincushion_plot(on, cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)

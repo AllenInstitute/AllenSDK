@@ -115,7 +115,6 @@ class FfmpegInputStream( FrameInputStream ):
 
         command += ['-']
 
-        frame_size = np.prod(self.frame_shape)
         self.pipe = sp.Popen(command, stdout=sp.PIPE, bufsize=0)
         logging.debug("opened pipe")
 
