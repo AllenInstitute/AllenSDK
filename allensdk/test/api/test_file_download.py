@@ -42,7 +42,7 @@ from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as 
 
 try:
     pass
-except:
+except Exception:
     pass
 
 

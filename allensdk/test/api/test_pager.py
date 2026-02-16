@@ -43,7 +43,7 @@ from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 try:
     import StringIO
-except:
+except Exception:
     import io as StringIO
 from . import SafeJsonMsg
 

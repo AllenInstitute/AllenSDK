@@ -134,7 +134,7 @@ class ApplicationConfig(object):
             try:
                 lc.fileConfig(self.log_config_path,
                               disable_existing_loggers=disable_existing_loggers)
-            except:
+            except Exception:
                 logging.error("Could not load log configuration file: %s" %
                               (parsed_args.log_config_path))
         else:
@@ -337,7 +337,7 @@ class ApplicationConfig(object):
         try:
             config = ConfigParser(defaults=none_defaults,
                                   allow_no_value=True)
-        except:
+        except Exception:
             logging.warn(
                 "This python installation does not support configuration defaults.")
             config = ConfigParser()
@@ -354,6 +354,6 @@ class ApplicationConfig(object):
                 if file_value:
                     logging.info("setting %s to %s" % (key, file_value))
                     setattr(self, key, file_value)
-            except:
+            except Exception:
                 logging.info("Configuration option not specified: %s" %
                              (key))

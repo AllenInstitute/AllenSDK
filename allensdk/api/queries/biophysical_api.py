@@ -237,7 +237,7 @@ class BiophysicalApi(RmaTemplate):
         '''
         try:
             return wkf['well_known_file_type']['name'] == name
-        except:
+        except Exception:
             return False
 
     def get_well_known_file_ids(self, neuronal_model_id):

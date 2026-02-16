@@ -125,4 +125,5 @@ def main():
     except Exception as e:
         logging.error(e.message)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

@@ -30,7 +30,7 @@ def parse_neuron_output(output_str):
             v = toks[1].strip()
             try:
                 v = float(v)
-            except:
+            except Exception:
                 pass
             
             printed_fields[toks[0].strip()] = v

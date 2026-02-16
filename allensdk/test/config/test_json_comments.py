@@ -41,7 +41,7 @@ from allensdk.core.json_utilities import JsonComments
 import logging
 try:
     import __builtin__ as builtins  # @UnresolvedImport
-except:
+except Exception:
     import builtins  # @UnresolvedImport
 
 

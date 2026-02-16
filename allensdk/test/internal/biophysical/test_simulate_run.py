@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, mock_open, Mock, MagicMock
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
 from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config

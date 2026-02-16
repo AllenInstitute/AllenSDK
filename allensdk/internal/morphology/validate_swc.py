@@ -19,12 +19,12 @@ def resave_swc(orig_swc, new_file):
     """
     try:
         morphology = swc.read_swc(orig_swc)
-    except:
+    except Exception:
         print("Failed to read SWC file '%s'" % orig_swc)
         raise
     try:
         morphology.save(new_file)
-    except:
+    except Exception:
         print("Failed to save SWC file '%s'" % new_file)
 
 
@@ -69,7 +69,7 @@ def validate_swc(swc_file):
     print("Validating " + swc_file)
     try:
         morphology = swc.read_swc(swc_file)
-    except:
+    except Exception:
         print("Fatal error reading SWC file")
         return False
 
@@ -132,7 +132,7 @@ def validate_swc(swc_file):
                 node_table[vals.n] = vals
                 # increment line number (used for error reporting only)
                 line_num += 1
-    except:
+    except Exception:
         err = "File not recognized as valid SWC file.\n"
         err += "Problem parsing line %d\n" % line_num
         if line is not None:
@@ -147,7 +147,7 @@ def validate_swc(swc_file):
             if node.pn >= 0:
                 par = node_table[node.pn]
                 par.children.append(node.n)
-    except:
+    except Exception:
         print("Error reading SWC file -- fail to link child to parent")
         print("Node:    %s" % str(node))
         print("----------------------------------")
@@ -245,4 +245,5 @@ def main():
         print("    FAIL")
         print(str(e))
         exit(1)
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

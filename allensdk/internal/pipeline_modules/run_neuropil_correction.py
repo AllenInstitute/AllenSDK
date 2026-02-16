@@ -110,7 +110,7 @@ def main():
 
     try:
         os.makedirs(plot_dir)
-    except:
+    except Exception:
         pass
 
     logging.info("Neuropil correcting '%s'", trace_file)
@@ -120,13 +120,13 @@ def main():
 
     try:
         roi_traces = h5py.File(trace_file, "r")
-    except:
+    except Exception:
         logging.error("Error: unable to open ROI trace file '%s'", trace_file)
         raise
 
     try:
         neuropil_traces = h5py.File(neuropil_file, "r")
-    except:
+    except Exception:
         logging.error("Error: unable to open neuropil trace file '%s'", neuropil_file)
         raise
 
@@ -227,7 +227,7 @@ def main():
             if r is not None:
                 hf.create_dataset("r_vals/%d" % n, data=r)
         hf.close()
-    except:
+    except Exception:
         logging.error("Error creating output h5 file")
         raise   
     
@@ -240,4 +240,5 @@ def main():
 
     logging.info("finished")
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

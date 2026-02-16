@@ -11,7 +11,7 @@ def main(jin):
         swc_file = jin["swc_file"]
         xform = jin["pia_transform"]
         depth = jin["relative_soma_depth"]
-    except:
+    except Exception:
         print("** Unable to find requisite fields in input json")
         raise
 
@@ -21,7 +21,7 @@ def main(jin):
 
     try:
         nrn = swc.read_swc(swc_file)
-    except:
+    except Exception:
         print("** Error reading swc file")
         raise
 
@@ -30,7 +30,7 @@ def main(jin):
         for i in range(12):
             aff.append(xform["tvr_%02d" % i])
         nrn.apply_affine(aff)
-    except:
+    except Exception:
         print("** Error applying affine transform")
         raise
 
@@ -51,7 +51,7 @@ def main(jin):
         data["basal_dendrite"] = features.basal_dendrite
         data["apical_dendrite"] = features.apical_dendrite
         data["all_neurites"] = features.all_neurites
-    except:
+    except Exception:
         print("** Error calculating morphology features")
         raise
 

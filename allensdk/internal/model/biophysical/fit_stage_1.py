@@ -278,7 +278,7 @@ def prepare_stage_1(description, passive_fit_data):
     for s in all_sweeps:
         try:
             v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s['sweep_number'])
-        except:
+        except Exception:
             pass
         if np.max(i) > max_i:
             max_i = np.max(i)

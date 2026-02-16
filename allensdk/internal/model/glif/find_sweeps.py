@@ -18,7 +18,8 @@ SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 
-class MissingSweepException( Exception ): pass
+class MissingSweepException( Exception ):
+    pass
 
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
@@ -199,4 +200,5 @@ def main():
             logging.error(err)
         sys.exit(1)
 
-if __name__ == "__main__":  main()
+if __name__ == "__main__":
+    main()

@@ -119,4 +119,5 @@ def main():
 
     mod.write_output_data(jout)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

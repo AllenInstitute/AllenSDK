@@ -132,7 +132,7 @@ def write_svg(svgname, jin, nrn):
         for c in nrn.compartment_list:
             try:
                 color = color_table[c.node1.layer_num]
-            except:
+            except Exception:
                 color = (45, 67, 89)
             x0 = int(c.node1.x / resolution + dx)
             x1 = int(c.node2.x / resolution + dx)
@@ -340,7 +340,7 @@ def main(jin):
         idx = -1
         try:
             idx = master_idx[y][x]
-        except:
+        except Exception:
             errs += 1
         if idx >= 0:
             desc["label"] = layers[idx]["label"]

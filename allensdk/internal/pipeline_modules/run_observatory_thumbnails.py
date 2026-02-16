@@ -60,7 +60,7 @@ def get_experiment_files(experiment_id):
     nwb_file = get_experiment_nwb_file(experiment_id)
     try:
         analysis_file = get_experiment_analysis_file(experiment_id)
-    except:
+    except Exception:
         analysis_file = None
 
     if not os.path.exists(nwb_file):
@@ -541,4 +541,5 @@ def main():
 
     ju.write(args.output_json, {})
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

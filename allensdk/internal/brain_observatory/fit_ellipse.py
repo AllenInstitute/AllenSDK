@@ -100,7 +100,7 @@ class FitEllipse (object):
 
             params = U.T[0]
             error = np.dot(params, np.dot(S,params))/len(inlier_points)
-        except:
+        except Exception:
             #TODO - check if this is correct
             params = None      #WBW error handling
             error = 0.00000001 #WBW error handling

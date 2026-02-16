@@ -13,7 +13,7 @@ def prep_json(spec_id):
         conn_string = "host='limsdb2' dbname='lims2' user='atlasreader' password='atlasro'"
         conn = psycopg2.connect(conn_string)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    except:
+    except Exception:
         print("unable to connect")
         raise
 
@@ -130,7 +130,7 @@ def prep_json(spec_id):
         img_res = cursor.fetchall()
         img_path = img_res[0][0] + img_res[0][1]
         #img_path = "%s-20x.jpeg" % str(spec_id)
-    except:
+    except Exception:
         print("Error fetching path to 20x image from database")
         print(img_sql % spec_id)
         raise

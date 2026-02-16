@@ -122,7 +122,7 @@ class iTracker (object):
 
     def estimate_bbox_from_mean_frame(self, margin=75, image_type='png'):
         try:
-            import keras
+            import keras  # noqa: F401
         except ImportError:
             logging.debug("keras failed to import.  Returning None for bbox_pupil and bbox_cr")
             return None, None
@@ -226,7 +226,7 @@ class iTracker (object):
     def detect_eye_closed(self):
 
         try:
-            import keras
+            import keras  # noqa: F401
         except ImportError:
             logging.debug("keras failed to import.  Can't detect eye closure")
             return None
@@ -463,7 +463,8 @@ class iTracker (object):
 
         for i,frame in enumerate(frame_list):
             logging.debug("Processing frame %d", i)
-            if frame[-4:]!='.jpg' and frame[-4:]!='.png':  continue  # just in case some OS specific files snuck in (like in OS X)
+            if frame[-4:]!='.jpg' and frame[-4:]!='.png':
+                continue  # just in case some OS specific files snuck in (like in OS X)
             frame_path = os.path.join(self.input_image_folder,frame)
 
             # open Image, convert to gray scale and then to numpy array

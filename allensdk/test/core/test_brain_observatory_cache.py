@@ -44,7 +44,7 @@ from allensdk.test_utilities.regression_fixture import get_list_of_path_dict
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
-except:
+except Exception:
     import builtins  # @UnresolvedImport
 
 
@@ -125,7 +125,7 @@ def brain_observatory_cache():
 
     try:
         manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
-    except:
+    except Exception:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
     with patch('os.path.exists',
@@ -314,7 +314,7 @@ def test_get_ophys_pupil_data(mock_json_msg_query,
 def test_build_manifest(tmpdir_factory):
     try:
         manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
-    except:
+    except Exception:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
     manifest_file = str(tmpdir_factory.mktemp("boc").join("manifest.json"))

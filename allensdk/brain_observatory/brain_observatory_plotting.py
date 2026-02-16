@@ -59,7 +59,7 @@ def plot_drifting_grating_traces(dg, save_dir):
                 (blank[str(nc)].std() / len(blank[str(nc)]))
             blank_n = blank[str(nc)].mean() - \
                 (blank[str(nc)].std() / len(blank[str(nc)]))
-        except:
+        except Exception:
             blank_p = blank.iloc[:, nc].apply(
                 np.mean) + (blank.iloc[:, nc].apply(np.std) / blank.iloc[:, nc].apply(len))
             blank_n = blank.iloc[:, nc].apply(
@@ -76,7 +76,7 @@ def plot_drifting_grating_traces(dg, save_dir):
                     ) + (subset_response[str(nc)][:-1].std() / len(subset_response[str(nc)]))
                     subset_response_n = subset_response[str(nc)].mean(
                     ) - (subset_response[str(nc)][:-1].std() / len(subset_response[str(nc)]))
-                except:
+                except Exception:
                     subset_response_p = subset_response.iloc[:, nc].apply(
                         np.mean) + (subset_response.iloc[:, nc].apply(np.std) / subset_response.iloc[:, nc].apply(len))
                     subset_response_n = subset_response.iloc[:, nc].apply(
@@ -87,17 +87,17 @@ def plot_drifting_grating_traces(dg, save_dir):
                 try:
                     ax.fill_between(xtime, subset_response_p,
                                     subset_response_n, color='b', alpha=0.5)
-                except:
+                except Exception:
                     pass
                 try:
                     ax.fill_between(xtime, blank_p, blank_n,
                                     color='k', alpha=0.5)
-                except:
+                except Exception:
                     pass
                 try:
                     ax.plot(xtime, subset_response[
                             str(nc)].mean(), color='b', lw=2)
-                except:
+                except Exception:
                     pass
                 ax.plot(xtime, subset_response[
                         str(nc)].mean(), color='b', lw=2)
@@ -162,7 +162,7 @@ def plot_ns_traces(nsa, save_dir):
             try:
                 ax.fill_between(xtime, subset_response_p,
                                 subset_response_n, color='b', alpha=0.5)
-            except:
+            except Exception:
                 xtime = xtime[:-1]
                 ax.fill_between(xtime, subset_response_p,
                                 subset_response_n, color='b', alpha=0.5)
@@ -762,7 +762,7 @@ def _plot_3sb(sg, nm1, ns, save_dir):
         ) - (subset[str(nc)].std() / np.sqrt(len(subset[str(nc)])))
         try:
             ax13.fill_between(xtime, subset_p, subset_n, color='b', alpha=0.5)
-        except:
+        except Exception:
             xtime = xtime[:-1]
             ax13.fill_between(xtime, subset_p, subset_n, color='b', alpha=0.5)
         blank = sg.sweep_response[(sg.stim_table.orientation == 0) & (
@@ -860,7 +860,7 @@ def _plot_3sb(sg, nm1, ns, save_dir):
         try:
             ax12.fill_between(xtime, subset_response_p,
                               subset_response_n, color='b', alpha=0.5)
-        except:
+        except Exception:
             xtime = xtime[:-1]
             ax12.fill_between(xtime, subset_response_p,
                               subset_response_n, color='b', alpha=0.5)

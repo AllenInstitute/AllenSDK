@@ -196,7 +196,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
                          cbar_size="7%",
                          cbar_pad=0.05)
         
-        for ax in grid: pass
+        for ax in grid:
+            pass
     else:
         ax = plt.gca()
 

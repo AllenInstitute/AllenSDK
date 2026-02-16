@@ -13,7 +13,7 @@ def main(jin):
         experiment_data = jin['experiment_data']
         sweep_data = jin['sweep_data']
         nwb_file = jin["nwb_file"]
-    except:
+    except Exception:
         raise IOError("Input json file is missing requisite data")
 
     jout = {}
@@ -95,12 +95,12 @@ def main(jin):
     try:
         sir_ratio = experiment_data['input_access_resistance_ratio']
         #r = experiment_data['input_resistance_mohm']
-    except:
+    except Exception:
         sr_tags.append("Resistance ratio not available")
 
     try:
         sr = experiment_data['initial_access_resistance_mohm']
-    except:
+    except Exception:
         sr_tags.append("Initial access resistance not available")
 
     try:
@@ -220,7 +220,7 @@ def main(jin):
             else:
                 sweep_state[name]["state"] = "Pass"
 
-        except:
+        except Exception:
             print("Error processing sweep %s" % name)
             raise
 

@@ -28,7 +28,8 @@ SHOW_PLOT = False
 SAVE_FIG =True
 SHORT_RUN = False
 
-class MissingSpikeException(Exception): pass
+class MissingSpikeException(Exception):
+    pass
 
 RESTING_POTENTIAL = 'slow_vm_mv'
 
@@ -482,4 +483,5 @@ def main():
     ju.write(args.output_json, values)
     
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

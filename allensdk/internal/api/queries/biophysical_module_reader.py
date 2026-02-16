@@ -70,7 +70,7 @@ class BiophysicalModuleReader(object):
                 
                 if file_type_id == lims_utilities.NWB_FILE_TYPE_ID:
                     stimulus_file_entries.append(well_known_file)
-            except:
+            except Exception:
                 self._log.warn('skipping well known file record with no well known file type.')
 
         return stimulus_file_entries

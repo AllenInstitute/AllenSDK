@@ -42,7 +42,7 @@ from allensdk.config.manifest import Manifest
 
 try:
     import StringIO
-except:
+except Exception:
     import io as StringIO
 
 

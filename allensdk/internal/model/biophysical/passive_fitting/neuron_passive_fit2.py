@@ -101,4 +101,5 @@ def main():
     
     json_utilities.write(output_file, data)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

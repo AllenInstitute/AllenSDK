@@ -6,7 +6,7 @@ import os
 from unittest import mock
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
 from allensdk.internal.model.biophysical.run_optimize \
     import RunOptimize

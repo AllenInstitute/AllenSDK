@@ -46,4 +46,5 @@ def main():
 
     mod.write_output_data(output_data)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

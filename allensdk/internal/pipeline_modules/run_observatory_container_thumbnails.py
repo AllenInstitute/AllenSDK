@@ -60,4 +60,5 @@ def main():
         robsth.build_experiment_thumbnails(nwb_file, analysis_file, output_directory, 
                                            types, mod.args.threads)
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main()

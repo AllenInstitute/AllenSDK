@@ -6,7 +6,8 @@ import numpy as np
 import argparse
 import allensdk.core.json_utilities as ju
 
-class ModelConfigurationException( Exception ): pass
+class ModelConfigurationException( Exception ):
+    pass
 
 DEFAULT_NEURON_PARAMETERS = {
     "type": "GLIF", 
@@ -402,4 +403,5 @@ def main():
     ju.write(args.output_path, out_config)
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

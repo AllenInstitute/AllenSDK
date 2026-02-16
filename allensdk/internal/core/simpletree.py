@@ -37,7 +37,7 @@ class SimpleTree( object ):
             while pid:
                 yield pid
                 pid = self.parent_id(pid)
-        except:
+        except Exception:
             raise KeyError("Could not find ancestors for node %s" % str(nid))
         
     def descendant_ids(self, nid):
