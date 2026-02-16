@@ -722,8 +722,8 @@ def run_simulate():
 def test_init(run_simulate):
     assert run_simulate.input_json == 'manifest.json'
     assert run_simulate.output_json == 'out.json'
-    assert run_simulate.app_config == None
-    assert run_simulate.manifest == None
+    assert run_simulate.app_config is None
+    assert run_simulate.manifest is None
 
 
 @pytest.mark.xfail

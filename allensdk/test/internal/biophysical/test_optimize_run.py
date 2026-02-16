@@ -6813,8 +6813,8 @@ def run_optimize():
 def xtest_init(run_optimize):
     assert run_optimize.input_json == 'manifest_sdk.json'
     assert run_optimize.output_json == 'out.json'
-    assert run_optimize.app_config == None
-    assert run_optimize.manifest == None
+    assert run_optimize.app_config is None
+    assert run_optimize.manifest is None
 
 
 orig_open = open

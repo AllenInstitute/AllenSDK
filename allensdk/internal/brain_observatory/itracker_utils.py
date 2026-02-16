@@ -36,7 +36,8 @@ def generate_rays(image_array, seed_pixel):
 
     ray_grads = []
 
-    good_coords_mask = lambda y,x:  np.logical_and(np.logical_and(y>=0,y<shape[0]),np.logical_and(x>=0,x<shape[1]))
+    def good_coords_mask(y, x):
+        return np.logical_and(np.logical_and(y>=0,y<shape[0]),np.logical_and(x>=0,x<shape[1]))
 
     for theta in angles:
         new_ray = rotate_ray(default_ray(n),theta)

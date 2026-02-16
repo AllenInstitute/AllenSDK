@@ -1,7 +1,7 @@
 # in place of global from neuron import h
 
 def get_h():   
-    if get_h.h == None:
+    if get_h.h is None:
         from neuron import h
         get_h.h = h
     return get_h.h

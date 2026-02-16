@@ -157,10 +157,12 @@ class SimpleTree( object ):
         '''
 
         if to_fn is None:
-            to_fn = lambda x: x
+            def to_fn(x):
+                return x
 
         if not callable( key ):
-            from_fn = lambda x: x[key]
+            def from_fn(x):
+                return x[key]
         else:
             from_fn = key
 

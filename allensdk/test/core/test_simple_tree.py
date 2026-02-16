@@ -48,8 +48,10 @@ def tree():
              {'id': 2, 'parent': 0, 1: 3, s: 'b'}, {'id': 3, 'parent': 1, 1: 6, s: 'e'}, 
              {'id': 4, 'parent': 1, 1: 4, s: 'c'}, {'id': 5, 'parent': 2, 1: 5, s: 'f'}]
             
-    parent_fn = lambda node: node['parent']
-    id_fn = lambda node: node['id']
+    def parent_fn(node):
+        return node['parent']
+    def id_fn(node):
+        return node['id']
     
     return SimpleTree(nodes, id_fn, parent_fn)
     

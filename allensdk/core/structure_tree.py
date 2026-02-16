@@ -154,7 +154,8 @@ class StructureTree( SimpleTree ):
             
         '''
         
-        overlap = lambda x: (set(structure_set_ids) & set(x['structure_set_ids']))
+        def overlap(x):
+            return (set(structure_set_ids) & set(x['structure_set_ids']))
         return self.filter_nodes(overlap)
         
         

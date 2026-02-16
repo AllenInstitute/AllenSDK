@@ -250,7 +250,8 @@ def test_one_file_call_caching(tmpdir_factory, existing):
 
     if existing:
         data.to_csv(path, index=False)
-        getter = lambda: "foo"
+        def getter():
+            return "foo"
 
     obtained = cu.one_file_call_caching(
         path,

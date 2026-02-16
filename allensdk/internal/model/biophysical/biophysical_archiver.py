@@ -27,7 +27,7 @@ class BiophysicalArchiver(object):
         self.template_names = {}
         self.nwb_list = []
         
-        if archive_dir == None:
+        if archive_dir is None:
             archive_dir = '.'
         self.archive_dir = archive_dir
     

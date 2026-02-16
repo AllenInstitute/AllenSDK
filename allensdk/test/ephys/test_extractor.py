@@ -159,7 +159,8 @@ def test_fit_fi_slope():
 
     design = np.array([amps, np.ones_like(amps)]).T
     rates = np.dot(design, weights)
-    build_stim_amps = lambda: lambda sweep: next(iteramps)
+    def build_stim_amps():
+        return lambda sweep: next(iteramps)
 
     class Ext(object):
         def sweeps(self):

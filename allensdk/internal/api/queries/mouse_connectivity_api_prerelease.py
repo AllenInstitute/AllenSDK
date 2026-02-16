@@ -66,7 +66,8 @@ where      iser.storage_directory is not null and d.organism_id = 2
 
 def _experiment_dict(row):
     # use empty strings instead of null
-    null_fill = lambda s: s if s is not None else ""
+    def null_fill(s):
+        return s if s is not None else ""
 
     exp = dict()
 

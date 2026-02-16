@@ -211,7 +211,7 @@ def test_fit():
 
     fe=FitEllipse(40,100,0.0001,40)
     result = fe.ransac_fit(candidate_points)
-    if result!=None:
+    if result is not None:
         center, angle, (axis1,axis2) = fe.ransac_fit(candidate_points)
 
     print("center = ", center)

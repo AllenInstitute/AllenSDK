@@ -381,7 +381,7 @@ class iTracker (object):
         #     pupil_params = ((np.nan,np.nan),np.nan,(np.nan,np.nan))  #  np.nan*np.ones(5)
 
 
-        if result!=None:    #should use np.any(np.isnan(result))
+        if result is not None:    #should use np.any(np.isnan(result))
             pupil_params = result  #fe.ransac_fit(pupil_candidate_points)
         else:
             logging.debug("No good fit found")
@@ -401,7 +401,7 @@ class iTracker (object):
             fe=FitEllipse(10,10,0.0001,4)
             result = fe.ransac_fit(cr_candidate_points)
 
-            if result!=None:
+            if result is not None:
                 cr_params = result #fe.ransac_fit(cr_candidate_points)
             else:
                 logging.debug("No good fit found")

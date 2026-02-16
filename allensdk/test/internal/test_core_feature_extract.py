@@ -88,7 +88,7 @@ def test_find_coarse_long_square_amp_delta():
 def test_nan_get():
     a = {}
     v = nan_get(a, 'fish')
-    assert v == None
+    assert v is None
 
     a = { 'fish': 1 }
     v = nan_get(a, 'fish')
@@ -96,7 +96,7 @@ def test_nan_get():
 
     a = { 'fish': float("nan") }
     v = nan_get(a, 'fish')
-    assert v == None
+    assert v is None
 
     
 
