@@ -4,7 +4,7 @@ import sys
 import pytest
 import os
 import json
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 import numpy as np
 import pandas as pd
 
@@ -23,8 +23,7 @@ logging.basicConfig(level=logging.DEBUG)
 if 'TEST_SESSION_ANALYSIS_REGRESSION_DATA' in os.environ:
     data_file = os.environ['TEST_SESSION_ANALYSIS_REGRESSION_DATA']
 else:
-    data_file = resource_filename(__name__,
-                                  'test_session_analysis_regression_data.json')
+    data_file = str(files('allensdk.test.brain_observatory').joinpath('test_session_analysis_regression_data.json'))
 
 
 @pytest.fixture(scope="module")

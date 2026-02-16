@@ -3,13 +3,13 @@ import numpy as np
 import os
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import numpy as np
-from pkg_resources import resource_filename  # @UnresolvedImport
+from pathlib import Path
 NWB_FLAVORS = []
 
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']
 else:
-    nwb_list_file = resource_filename(__name__, os.path.join('..','core','nwb_files.txt'))
+    nwb_list_file = str(Path(__file__).parent / '..' / 'core' / 'nwb_files.txt')
 
 if nwb_list_file == 'skip':
     NWB_FLAVORS = []

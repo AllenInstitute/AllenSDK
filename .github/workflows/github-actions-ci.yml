@@ -57,13 +57,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            test_requirements.txt
+          cache-dependency-path: pyproject.toml
       - name: Install
         run: |
-          pip install -r test_requirements.txt
-          pip install .
+          pip install -e ".[test]"
       - name: Test
         run: |
           python -m pytest -n 4 ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13') && '--cov=allensdk' || '' }}
@@ -86,8 +83,7 @@ jobs:
               --mount type=tmpfs,destination=/tmp \
               --rm \
               ${{ matrix.image }} \
-                  /bin/bash -c "pip install -r requirements.txt; \
-                                pip install -r test_requirements.txt; \
+                  /bin/bash -c "pip install -e '.[test]'; \
                                 python -m pytest \
                                     --log-level=INFO \
                                     --capture=no \

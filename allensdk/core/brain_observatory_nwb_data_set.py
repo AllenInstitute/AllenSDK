@@ -40,7 +40,7 @@ import os
 import six
 import itertools
 import logging
-from pkg_resources import parse_version
+from packaging.version import Version
 
 import h5py
 import pandas as pd
@@ -145,9 +145,9 @@ class BrainObservatoryNwbDataSet(object):
             meta = self.get_metadata()
             if meta and 'pipeline_version' in meta:
                 pipeline_version_str = meta['pipeline_version']
-                self.pipeline_version = parse_version(pipeline_version_str)
+                self.pipeline_version = Version(pipeline_version_str)
 
-                if self.pipeline_version > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+                if self.pipeline_version > Version(self.SUPPORTED_PIPELINE_VERSION):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
@@ -289,7 +289,7 @@ class BrainObservatoryNwbDataSet(object):
         timestamps = self.get_fluorescence_timestamps()
 
         with h5py.File(self.nwb_file, 'r') as f:
-            if self.pipeline_version >= parse_version("2.0"):
+            if self.pipeline_version >= Version("2.0"):
                 ds = f['processing'][self.PIPELINE_DATASET][
                     'Fluorescence']['imaging_plane_1_neuropil_response']['data']
             else:
@@ -321,7 +321,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         with h5py.File(self.nwb_file, 'r') as f:
-            if self.pipeline_version >= parse_version("2.0"):
+            if self.pipeline_version >= Version("2.0"):
                 r_ds = f['processing'][self.PIPELINE_DATASET][
                     'Fluorescence']['imaging_plane_1_neuropil_response']['r']
             else:
@@ -388,7 +388,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         # starting in version 2.0, neuropil correction follows trace demixing
-        if self.pipeline_version >= parse_version("2.0"):
+        if self.pipeline_version >= Version("2.0"):
             timestamps, cell_traces = self.get_demixed_traces(cell_specimen_ids)
         else:
             timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)

@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from unittest.mock import patch, MagicMock
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 import numpy as np
 from allensdk.core.nwb_data_set import NwbDataSet
 import pytest
@@ -45,7 +45,7 @@ NWB_FLAVORS = []
 if 'TEST_EPHYS_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_EPHYS_NWB_FILES']
 else:
-    nwb_list_file = resource_filename(__name__, 'nwb_ephys_files.txt')
+    nwb_list_file = str(files('allensdk.test.core').joinpath('nwb_ephys_files.txt'))
 with open(nwb_list_file, 'r') as f:
     NWB_FLAVORS = [x.strip() for x in f]
 

@@ -4,7 +4,7 @@ import sys
 import traceback
 import logging.config as lc
 import shutil
-from pkg_resources import resource_filename #@UnresolvedImport
+from importlib.resources import files
 from allensdk.model.biophysical.run_simulate import RunSimulate
 
 
@@ -86,8 +86,7 @@ class RunSimulateLims(RunSimulate):
         shutil.copyfile(self.manifest.get_path('stimulus_path'),
                         self.manifest.get_path('output_path'))
         
-        shutil.copy(resource_filename(allensdk.model.biophysical.run_simulate.__name__,
-                                      'cell.hoc'),
+        shutil.copy(str(files('allensdk.model.biophysical').joinpath('cell.hoc')),
                     os.curdir)
     
     
@@ -107,8 +106,7 @@ def main(command, lims_strategy_json, lims_response_json):
     RunSimulateLims._log.debug("lims strategy json: %s" % (lims_strategy_json))
     RunSimulateLims._log.debug("lims upload json: %s" % (lims_response_json))
         
-    log_config = resource_filename('allensdk.model.biophysical.run_simulate',
-                                    'logging.conf')
+    log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
     lc.fileConfig(log_config)
     os.environ['LOG_CFG'] = log_config
     
