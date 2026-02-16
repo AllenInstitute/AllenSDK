@@ -2,6 +2,7 @@
 import sys
 import psycopg2
 import psycopg2.extras
+
 sys.path.append("/home/keithg/allen/allensd")
 import allensdk.core.json_utilities as json
 
@@ -38,7 +39,7 @@ def prep_json(spec_id):
         order by 1
     """
     cursor.execute(layer_sql % spec_id)
-    #print layer_sql % spec_id
+    # print layer_sql % spec_id
     poly_info = cursor.fetchall()
     if len(poly_info) == 0:
         print("Error -- cannot no polygon data for Specimen %d" % spec_id)
@@ -52,13 +53,13 @@ def prep_json(spec_id):
         block["label"] = label
         poly.append(block)
         ## break down string path into two numeric arrays
-        #path_array = np.array(path.split(','))
-        #path_x = np.array(path_array[0::2], dtype=float)
-        #path_y = np.array(path_array[1::2], dtype=float)
-        #block["path_array"] = path_array
-        #block["path_x"] = path_x
-        #block["path_y"] = path_y
-        #poly[label] = block
+        # path_array = np.array(path.split(','))
+        # path_x = np.array(path_array[0::2], dtype=float)
+        # path_y = np.array(path_array[1::2], dtype=float)
+        # block["path_array"] = path_array
+        # block["path_x"] = path_x
+        # block["path_y"] = path_y
+        # poly[label] = block
     jin["layers"] = poly
     jin["storage_directory"] = poly_info[0][2]
     jin["swc_file"] = poly_info[0][3]
@@ -69,7 +70,6 @@ def prep_json(spec_id):
     reconstruction_id = int(fname[-9:])
     jin["reconstruction_id"] = reconstruction_id
     jin["resolution"] = 0.363
-
 
     # it appears that we need to restrict image query to use this ims_id
     ims_id = poly_info[0][4]
@@ -96,7 +96,7 @@ def prep_json(spec_id):
         and agl.name = 'Soma'
         and cell.id = %d
     """
-    #print soma_sql % spec_id
+    # print soma_sql % spec_id
     cursor.execute(soma_sql % spec_id)
     soma_res = cursor.fetchall()
     som = {}
@@ -126,25 +126,25 @@ def prep_json(spec_id):
     """
     try:
         cursor.execute(img_sql % ims_id)
-        #cursor.execute(img_sql % spec_id)
+        # cursor.execute(img_sql % spec_id)
         img_res = cursor.fetchall()
         img_path = img_res[0][0] + img_res[0][1]
-        #img_path = "%s-20x.jpeg" % str(spec_id)
+        # img_path = "%s-20x.jpeg" % str(spec_id)
     except Exception:
         print("Error fetching path to 20x image from database")
         print(img_sql % spec_id)
         raise
 
     img = {}
-    #img["img_res"] = img_res
+    # img["img_res"] = img_res
     img["img_path"] = img_path
     jin["20x"] = img
 
     return jin
+
 
 if __name__ == "__main__":
     spec_id = 490387590
     jin = prep_json(spec_id)
     print("Test mode: creating input.json for specimen.id=%d" % spec_id)
     json.write("input.json", jin)
-

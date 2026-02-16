@@ -1,6 +1,4 @@
-from allensdk.brain_observatory.vbn_2022.\
-    input_json_writer.input_json_writer import (
-        VBN2022InputJsonWriter)
+from allensdk.brain_observatory.vbn_2022.input_json_writer.input_json_writer import VBN2022InputJsonWriter
 
 
 def main():

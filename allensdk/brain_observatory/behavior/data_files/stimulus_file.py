@@ -69,9 +69,7 @@ class _StimulusFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str]
-    ) -> "_StimulusFile":
+    def from_lims(cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str]) -> "_StimulusFile":
         raise NotImplementedError()
 
     @staticmethod
@@ -97,12 +95,8 @@ class BehaviorStimulusFile(_StimulusFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str]
-    ) -> "BehaviorStimulusFile":
-        query = BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(
-            behavior_session_id=behavior_session_id
-        )
+    def from_lims(cls, db: PostgresQueryMixin, behavior_session_id: Union[int, str]) -> "BehaviorStimulusFile":
+        query = BEHAVIOR_STIMULUS_FILE_QUERY_TEMPLATE.format(behavior_session_id=behavior_session_id)
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)
 
@@ -121,10 +115,7 @@ class BehaviorStimulusFile(_StimulusFile):
                 msg += "self.data['items']['behavior'] not present\n"
             else:
                 if "intervalsms" not in self.data["items"]["behavior"]:
-                    msg += (
-                        "self.data['items']['behavior']['intervalsms'] "
-                        "not present\n"
-                    )
+                    msg += "self.data['items']['behavior']['intervalsms'] not present\n"
 
         if len(msg) > 0:
             full_msg = f"When getting num_frames from {type(self)}\n"
@@ -161,9 +152,7 @@ class BehaviorStimulusFile(_StimulusFile):
         """
         assert isinstance(self.data, dict)
         if "start_time" not in self.data:
-            raise KeyError(
-                "No 'start_time' listed in pickle file " f"{self.filepath}"
-            )
+            raise KeyError(f"No 'start_time' listed in pickle file {self.filepath}")
 
         return copy.deepcopy(self.data["start_time"])
 
@@ -222,9 +211,7 @@ class BehaviorStimulusFile(_StimulusFile):
             the mouse.
         """
         try:
-            stimulus_name = Path(
-                self.stimuli["images"]["image_set"]
-            ).stem.split(".")[0]
+            stimulus_name = Path(self.stimuli["images"]["image_set"]).stem.split(".")[0]
         except KeyError:
             # if we can't find the images key in the stimuli, check for the
             # name ``grating`` as the stimulus. If not add generic
@@ -255,21 +242,15 @@ class BehaviorStimulusFile(_StimulusFile):
         param_value = None
         if "params" in self.data["items"]["behavior"]:
             if key_name in self.data["items"]["behavior"]["params"]:
-                param_value = self.data["items"]["behavior"]["params"][
-                    key_name
-                ]
+                param_value = self.data["items"]["behavior"]["params"][key_name]
 
         cl_value = None
         if "cl_params" in self.data["items"]["behavior"]:
             if key_name in self.data["items"]["behavior"]["cl_params"]:
-                cl_value = self.data["items"]["behavior"]["cl_params"][
-                    key_name
-                ]
+                cl_value = self.data["items"]["behavior"]["cl_params"][key_name]
 
         if cl_value is None and param_value is None:
-            raise RuntimeError(
-                f"Could not find {key_name} in pickle file " f"{self.filepath}"
-            )
+            raise RuntimeError(f"Could not find {key_name} in pickle file {self.filepath}")
 
         if param_value is None:
             return cl_value
@@ -328,8 +309,7 @@ class BehaviorStimulusFile(_StimulusFile):
     def validate(self) -> "BehaviorStimulusFile":
         if "items" not in self.data or "behavior" not in self.data["items"]:
             raise MalformedStimulusFileError(
-                f'Expected to find key "behavior" in "items" dict. '
-                f'Found {self.data["items"].keys()}'
+                f'Expected to find key "behavior" in "items" dict. Found {self.data["items"].keys()}'
             )
         return self
 
@@ -351,9 +331,7 @@ class StimulusFileReadableInterface(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_stimulus_file(
-        cls, stimulus_file: BehaviorStimulusFile
-    ) -> "DataObject":
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile) -> "DataObject":
         """Populate a DataObject from the stimulus file
 
         Returns
@@ -376,9 +354,7 @@ class StimulusFileLookup(object):
     @property
     def behavior_stimulus_file(self) -> BehaviorStimulusFile:
         if "behavior" not in self._values:
-            raise ValueError(
-                "This StimulusFileLookup has no " "BehaviorStimulusFile"
-            )
+            raise ValueError("This StimulusFileLookup has no BehaviorStimulusFile")
         return self._values["behavior"]
 
     @behavior_stimulus_file.setter
@@ -394,27 +370,21 @@ class StimulusFileLookup(object):
     @property
     def replay_stimulus_file(self) -> ReplayStimulusFile:
         if "replay" not in self._values:
-            raise ValueError(
-                "This StimulusFileLookup has no " "ReplayStimulusFile"
-            )
+            raise ValueError("This StimulusFileLookup has no ReplayStimulusFile")
         return self._values["replay"]
 
     @replay_stimulus_file.setter
     def replay_stimulus_file(self, value: ReplayStimulusFile):
         if not isinstance(value, ReplayStimulusFile):
             raise ValueError(
-                "Trying to set replay_stimulus_file to "
-                f"value of type {type(value)}; type should "
-                "be ReplayStimulusFile"
+                f"Trying to set replay_stimulus_file to value of type {type(value)}; type should be ReplayStimulusFile"
             )
         self._values["replay"] = value
 
     @property
     def mapping_stimulus_file(self) -> MappingStimulusFile:
         if "mapping" not in self._values:
-            raise ValueError(
-                "This StimulusFileLookup has no " "MappingStimulusFile"
-            )
+            raise ValueError("This StimulusFileLookup has no MappingStimulusFile")
         return self._values["mapping"]
 
     @mapping_stimulus_file.setter

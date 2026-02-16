@@ -40,28 +40,23 @@ import logging
 
 
 class Hdf5Util(object):
-
     def __init__(self):
         self.log = logging.getLogger(__name__)
 
     def read(self, file_path):
         try:
-            with h5py.File(file_path, 'r') as csr:
-                return csr_matrix((csr['data'][...],
-                                   csr['indices'][...],
-                                   csr['indptr'][...]))
+            with h5py.File(file_path, "r") as csr:
+                return csr_matrix((csr["data"][...], csr["indices"][...], csr["indptr"][...]))
         except Exception:
-            self.log.error(
-                "Couldn't read AllenSDK HDF5 CSR configuration: %s" % file_path)
+            self.log.error("Couldn't read AllenSDK HDF5 CSR configuration: %s" % file_path)
             raise
 
     def write(self, file_path, m):
         try:
-            with h5py.File(file_path, 'w') as csr:
-                csr.create_dataset('data', data=m.data, dtype=np.uint8)
-                csr.create_dataset('indices', data=m.indices, dtype=np.uint32)
-                csr.create_dataset('indptr', data=m.indptr, dtype=np.uint32)
+            with h5py.File(file_path, "w") as csr:
+                csr.create_dataset("data", data=m.data, dtype=np.uint8)
+                csr.create_dataset("indices", data=m.indices, dtype=np.uint32)
+                csr.create_dataset("indptr", data=m.indptr, dtype=np.uint32)
         except Exception:
-            self.log.warn(
-                "Couldn't write AllenSDK HDF5 CSR configuration: %s" % file_path)
+            self.log.warn("Couldn't write AllenSDK HDF5 CSR configuration: %s" % file_path)
             raise

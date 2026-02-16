@@ -1,10 +1,10 @@
-
 import neuron_morphology.swc as swc
 import neuron_morphology.features.feature_extractor as feature_extractor
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 
 ########################################################################
+
 
 def main(jin):
     try:
@@ -14,7 +14,6 @@ def main(jin):
     except Exception:
         print("** Unable to find requisite fields in input json")
         raise
-
 
     ####################################################################
     # calculate features
@@ -34,11 +33,11 @@ def main(jin):
         print("** Error applying affine transform")
         raise
 
-    #try:
+    # try:
     #    # save a copy of affine-corrected file
     #    tmp_swc_file = swc_file[:-4] + "_pia.swc"
     #    nrn.write(tmp_swc_file)
-    #except:
+    # except:
     #    # treat this as a soft error and print a warning
     #    print("Note: unable to write copy of affine corrected pia file")
 
@@ -81,14 +80,13 @@ def main(jin):
     feat["soma_surface"] = data["dendrite"]["soma_surface"]
     feat["overall_height"] = data["dendrite"]["height"]
 
-
     md["features"] = feat
     data["morphology_data"] = md
 
     return data
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     module = PipelineModule()
     jin = module.input_data()
     jout = main(jin)

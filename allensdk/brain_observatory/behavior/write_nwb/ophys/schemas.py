@@ -14,9 +14,7 @@ from argschema.fields import Int, List, Nested, OutputFile
 
 
 class OphysExperimentInputSchema(BaseInputSchema):
-    ophys_experiment_id = Int(
-        required=True, description="Id of OphysExperiment to create."
-    )
+    ophys_experiment_id = Int(required=True, description="Id of OphysExperiment to create.")
 
     ophys_container_experiment_ids = List(
         Int,
@@ -42,9 +40,7 @@ class OphysExperimentInputSchema(BaseInputSchema):
         """Load the data from csv using Pandas the same as the
         project_cloud api.
         """
-        df = sanitize_data_columns(
-            data["metadata_table"], dtype_convert={"mouse_id": str}
-        )
+        df = sanitize_data_columns(data["metadata_table"], dtype_convert={"mouse_id": str})
         df.set_index("ophys_experiment_id", inplace=True)
         try:
             # Enforce type as we haven't enfoced type in the
@@ -52,39 +48,24 @@ class OphysExperimentInputSchema(BaseInputSchema):
             oe_row = df.loc[int(data["ophys_experiment_id"])]
         except KeyError:
             raise KeyError(
-                f"Ophys experiment id {data['ophys_experiment_id']} "
-                "not in input OphysExperimentTable. Exiting."
+                f"Ophys experiment id {data['ophys_experiment_id']} not in input OphysExperimentTable. Exiting."
             )
 
         data["ophys_experiment_metadata"] = self._get_behavior_metadata(oe_row)
-        data["ophys_experiment_metadata"]["behavior_session_id"] = oe_row[
-            "behavior_session_id"
-        ]
+        data["ophys_experiment_metadata"]["behavior_session_id"] = oe_row["behavior_session_id"]
 
         # Ophys Experiment specific data.
-        data["ophys_experiment_metadata"]["imaging_depth"] = oe_row[
-            "imaging_depth"
-        ]
+        data["ophys_experiment_metadata"]["imaging_depth"] = oe_row["imaging_depth"]
         imaging_plane_group = oe_row["imaging_plane_group"]
         if pd.isna(imaging_plane_group):
             imaging_plane_group = None
-        data["ophys_experiment_metadata"][
-            "imaging_plane_group"
-        ] = imaging_plane_group
+        data["ophys_experiment_metadata"]["imaging_plane_group"] = imaging_plane_group
         data["ophys_experiment_metadata"]["indicator"] = oe_row["indicator"]
-        data["ophys_experiment_metadata"]["ophys_container_id"] = oe_row[
-            "ophys_container_id"
-        ]
+        data["ophys_experiment_metadata"]["ophys_container_id"] = oe_row["ophys_container_id"]
         data["ophys_experiment_metadata"]["ophys_experiment_id"] = oe_row.name
-        data["ophys_experiment_metadata"]["ophys_session_id"] = oe_row[
-            "ophys_session_id"
-        ]
-        data["ophys_experiment_metadata"]["targeted_imaging_depth"] = oe_row[
-            "targeted_imaging_depth"
-        ]
-        data["ophys_experiment_metadata"]["targeted_structure"] = oe_row[
-            "targeted_structure"
-        ]
+        data["ophys_experiment_metadata"]["ophys_session_id"] = oe_row["ophys_session_id"]
+        data["ophys_experiment_metadata"]["targeted_imaging_depth"] = oe_row["targeted_imaging_depth"]
+        data["ophys_experiment_metadata"]["targeted_structure"] = oe_row["targeted_structure"]
 
         data["ophys_container_experiment_ids"] = df[
             df["ophys_container_id"] == oe_row["ophys_container_id"]

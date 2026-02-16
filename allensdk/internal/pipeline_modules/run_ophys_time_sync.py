@@ -11,13 +11,11 @@ import h5py
 import allensdk
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.internal.brain_observatory import time_sync as ts
-from allensdk.brain_observatory.argschema_utilities import \
-    check_write_access_overwrite
+from allensdk.brain_observatory.argschema_utilities import check_write_access_overwrite
 
 
 class TimeSyncOutputs(NamedTuple):
-    """ Schema for synchronization outputs
-    """
+    """Schema for synchronization outputs"""
 
     # unique identifier for the experiment being aligned
     experiment_id: int
@@ -25,7 +23,7 @@ class TimeSyncOutputs(NamedTuple):
     # calculated monitor delay (s)
     stimulus_delay: float
 
-    # For each data stream, the count of "extra" timestamps (compared to the 
+    # For each data stream, the count of "extra" timestamps (compared to the
     # number of samples)
     ophys_delta: int
     stimulus_delta: int
@@ -33,12 +31,12 @@ class TimeSyncOutputs(NamedTuple):
     behavior_delta: int
 
     # aligned timestamps for each data stream (s)
-    ophys_times: np.ndarray 
+    ophys_times: np.ndarray
     stimulus_times: np.ndarray
     eye_times: np.ndarray
     behavior_times: np.ndarray
 
-    # for non-ophys data streams, a mapping from samples to corresponding ophys 
+    # for non-ophys data streams, a mapping from samples to corresponding ophys
     # frames
     stimulus_alignment: np.ndarray
     eye_alignment: np.ndarray
@@ -46,21 +44,16 @@ class TimeSyncOutputs(NamedTuple):
 
 
 class TimeSyncWriter:
-
-    def __init__(
-        self, 
-        output_h5_path: str, 
-        output_json_path: Optional[str] = None
-    ):
-        """ Writes synchronization outputs to h5 and (optionally) json.
+    def __init__(self, output_h5_path: str, output_json_path: Optional[str] = None):
+        """Writes synchronization outputs to h5 and (optionally) json.
 
         Parameters
         ----------
-        output_h5_path : "heavy" outputs (e.g aligned timestamps and 
-            ophy frame correspondances) will ONLY be stored here. Lightweight 
+        output_h5_path : "heavy" outputs (e.g aligned timestamps and
+            ophy frame correspondances) will ONLY be stored here. Lightweight
             outputs (e.g. stimulus delay) will also be written here as scalars.
-        output_json_path : if provided, lightweight outputs will be written 
-            here, along with provenance information, such as the date and 
+        output_json_path : if provided, lightweight outputs will be written
+            here, along with provenance information, such as the date and
             allensdk version.
 
         """
@@ -69,8 +62,8 @@ class TimeSyncWriter:
         self.output_json_path: Optional[str] = output_json_path
 
     def validate_paths(self):
-        """ Determines whether we can actually write to the specified paths, 
-        allowing for creation of intermediate directories. It is a good idea 
+        """Determines whether we can actually write to the specified paths,
+        allowing for creation of intermediate directories. It is a good idea
         to run this beore doing any heavy calculations!
         """
 
@@ -80,7 +73,7 @@ class TimeSyncWriter:
             check_write_access_overwrite(self.output_json_path)
 
     def write(self, outputs: TimeSyncOutputs):
-        """ Convenience for writing both an output h5 and (if applicable) an 
+        """Convenience for writing both an output h5 and (if applicable) an
         output json.
 
         Parameters
@@ -95,7 +88,7 @@ class TimeSyncWriter:
             self.write_output_json(outputs)
 
     def write_output_h5(self, outputs):
-        """ Write (mainly) heaviweight data to an h5 file.
+        """Write (mainly) heaviweight data to an h5 file.
 
         Parameters
         ----------
@@ -117,7 +110,7 @@ class TimeSyncWriter:
             output_h5["behavior_delta"] = outputs.behavior_delta
 
     def write_output_json(self, outputs):
-        """ Write lightweight data to a json
+        """Write lightweight data to a json
 
         Parameters
         ----------
@@ -127,21 +120,25 @@ class TimeSyncWriter:
         os.makedirs(os.path.dirname(self.output_json_path), exist_ok=True)
 
         with open(self.output_json_path, "w") as output_json:
-            json.dump({
-                "allensdk_version": allensdk.__version__,
-                "date": str(datetime.datetime.now()),
-                "experiment_id": outputs.experiment_id,
-                "output_h5_path": self.output_h5_path,
-                "ophys_delta": outputs.ophys_delta,
-                "stim_delta": outputs.stimulus_delta,
-                "stim_delay": outputs.stimulus_delay,
-                "eye_delta": outputs.eye_delta,
-                "behavior_delta": outputs.behavior_delta
-            }, output_json, indent=2)
+            json.dump(
+                {
+                    "allensdk_version": allensdk.__version__,
+                    "date": str(datetime.datetime.now()),
+                    "experiment_id": outputs.experiment_id,
+                    "output_h5_path": self.output_h5_path,
+                    "ophys_delta": outputs.ophys_delta,
+                    "stim_delta": outputs.stimulus_delta,
+                    "stim_delay": outputs.stimulus_delay,
+                    "eye_delta": outputs.eye_delta,
+                    "behavior_delta": outputs.behavior_delta,
+                },
+                output_json,
+                indent=2,
+            )
 
 
 def check_stimulus_delay(obt_delay: float, min_delay: float, max_delay: float):
-    """ Raise an exception if the monitor delay is not within specified bounds
+    """Raise an exception if the monitor delay is not within specified bounds
 
     Parameters
     ----------
@@ -153,34 +150,29 @@ def check_stimulus_delay(obt_delay: float, min_delay: float, max_delay: float):
 
     if obt_delay < min_delay or obt_delay > max_delay:
         raise ValueError(
-            f"calculated monitor delay was {obt_delay:.3f}s "
-            f"(acceptable interval: [{min_delay:.3f}s, "
-            f"{max_delay:.3f}s])"
+            f"calculated monitor delay was {obt_delay:.3f}s (acceptable interval: [{min_delay:.3f}s, {max_delay:.3f}s])"
         )
 
 
 def run_ophys_time_sync(
-    aligner: ts.OphysTimeAligner, 
-    experiment_id: int,
-    min_stimulus_delay: float,
-    max_stimulus_delay: float
+    aligner: ts.OphysTimeAligner, experiment_id: int, min_stimulus_delay: float, max_stimulus_delay: float
 ) -> TimeSyncOutputs:
-    """ Carry out synchronization of timestamps across the data streams of an 
+    """Carry out synchronization of timestamps across the data streams of an
     ophys experiment.
 
     Parameters
     ----------
-    aligner : drives alignment. See OphysTimeAligner for details of the 
+    aligner : drives alignment. See OphysTimeAligner for details of the
         attributes and properties that must be implemented.
     experiment_id : unique identifier for the experiment being aligned
-    min_stimulus_delay : reject alignment run (raise a ValueError) if the 
+    min_stimulus_delay : reject alignment run (raise a ValueError) if the
         calculated monitor delay is below this value (s).
-    max_stimulus_delay : reject alignment run (raise a ValueError) if the 
+    max_stimulus_delay : reject alignment run (raise a ValueError) if the
         calculated monitor delay is above this value (s).
 
     Returns
     -------
-    A TimeSyncOutputs (see definintion for more information) of output 
+    A TimeSyncOutputs (see definintion for more information) of output
         parameters and arrays of aligned timestamps.
 
     """
@@ -199,11 +191,9 @@ def run_ophys_time_sync(
     # camera arrays are index of camera frame for each ophys frame ...
     # cam_nwb_creator depends on this so keeping it that way even though
     # it makes little sense... len(video_times)
-    eye_alignment = ts.get_alignment_array(eye_times, ophys_times,
-                                           int_method=np.ceil)
+    eye_alignment = ts.get_alignment_array(eye_times, ophys_times, int_method=np.ceil)
 
-    behavior_alignment = ts.get_alignment_array(beh_times, ophys_times,
-                                                int_method=np.ceil)
+    behavior_alignment = ts.get_alignment_array(beh_times, ophys_times, int_method=np.ceil)
 
     return TimeSyncOutputs(
         experiment_id,
@@ -218,24 +208,23 @@ def run_ophys_time_sync(
         beh_times,
         stim_alignment,
         eye_alignment,
-        behavior_alignment
+        behavior_alignment,
     )
 
 
 def main():
     parser = argparse.ArgumentParser("Generate brain observatory alignment.")
-    parser.add_argument("input_json", type=str, 
-        help="path to input json"
-    )
-    parser.add_argument("output_json", type=str, nargs="?",
-        help="path to which output json will be written"
-    )
+    parser.add_argument("input_json", type=str, help="path to input json")
+    parser.add_argument("output_json", type=str, nargs="?", help="path to which output json will be written")
     parser.add_argument("--log-level", default=logging.DEBUG)
-    parser.add_argument("--min-stimulus-delay", type=float, default=0.0, 
-        help="reject results if monitor delay less than this value (s)"
+    parser.add_argument(
+        "--min-stimulus-delay", type=float, default=0.0, help="reject results if monitor delay less than this value (s)"
     )
-    parser.add_argument("--max-stimulus-delay", type=float, default=0.07, 
-        help="reject results if monitor delay greater than this value (s)"
+    parser.add_argument(
+        "--max-stimulus-delay",
+        type=float,
+        default=0.07,
+        help="reject results if monitor delay greater than this value (s)",
     )
     mod = PipelineModule("Generate brain observatory alignment.", parser)
 
@@ -245,22 +234,17 @@ def main():
     writer.validate_paths()
 
     aligner = ts.OphysTimeAligner(
-        input_data.get("sync_file"), 
+        input_data.get("sync_file"),
         scanner=input_data.get("scanner", None),
         dff_file=input_data.get("dff_file", None),
         stimulus_pkl=input_data.get("stimulus_pkl", None),
         eye_video=input_data.get("eye_video", None),
         behavior_video=input_data.get("behavior_video", None),
-        long_stim_threshold=input_data.get(
-            "long_stim_threshold", ts.LONG_STIM_THRESHOLD
-        )
+        long_stim_threshold=input_data.get("long_stim_threshold", ts.LONG_STIM_THRESHOLD),
     )
 
     outputs = run_ophys_time_sync(
-        aligner, 
-        input_data.get("ophys_experiment_id"), 
-        mod.args.min_stimulus_delay, 
-        mod.args.max_stimulus_delay
+        aligner, input_data.get("ophys_experiment_id"), mod.args.min_stimulus_delay, mod.args.max_stimulus_delay
     )
     writer.write(outputs)
 

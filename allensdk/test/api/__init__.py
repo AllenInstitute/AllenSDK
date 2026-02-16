@@ -1,8 +1,8 @@
 class SafeJsonMsg:
-    ''' Apes a paged query response from api.brain-map.org. 
-        Safe to use with Pythons >= 3.7 (which implement pep 479, such that StopIteration errors in 
-        generators are converted to RunTimeErrors).
-    '''
+    """Apes a paged query response from api.brain-map.org.
+    Safe to use with Pythons >= 3.7 (which implement pep 479, such that StopIteration errors in
+    generators are converted to RunTimeErrors).
+    """
 
     def __init__(self, data):
         self.data = iter(data)
@@ -11,4 +11,4 @@ class SafeJsonMsg:
         try:
             return next(self.data)
         except StopIteration:
-            return {'msg': []}
+            return {"msg": []}

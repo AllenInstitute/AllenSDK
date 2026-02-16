@@ -38,8 +38,7 @@ def is_equal(a: Any, b: Any) -> bool:
                 return False
         return True
     elif isinstance(a, dict):
-        for (a_k, a_v), (b_k, b_v) in zip_longest(sorted(a.items()),
-                                                  sorted(b.items())):
+        for (a_k, a_v), (b_k, b_v) in zip_longest(sorted(a.items()), sorted(b.items())):
             if (a_k != b_k) or (not is_equal(a_v, b_v)):
                 return False
         return True
@@ -76,20 +75,19 @@ class ParamsMixin:
     'needs_data_refresh', and 'clear_updated_params' will be available.
     """
 
-    def __init__(self, ignore: set = {'api'}):
+    def __init__(self, ignore: set = {"api"}):
         self._updated_params: set = set()
         self._ignore = ignore
 
     @classmethod
     def _get_param_signatures(cls) -> List[inspect.Parameter]:
-        init = getattr(cls, '__init__')
+        init = getattr(cls, "__init__")
         if init is object.__init__:
             # Class has a default __init__ and thus no params
             return []
         init_signature = inspect.signature(init)
         # Filter out 'self' and '**kwargs' params
-        parameters = [p for p in init_signature.parameters.values()
-                      if (p.name != 'self') and (p.kind != p.VAR_KEYWORD)]
+        parameters = [p for p in init_signature.parameters.values() if (p.name != "self") and (p.kind != p.VAR_KEYWORD)]
         return parameters
 
     @classmethod
@@ -127,18 +125,20 @@ class ParamsMixin:
                         setattr(self, f"_{param}", value)
                         self._updated_params.add(param)
                 else:
-                    warnings.warn(f"The value ({value}) for parameter "
-                                  f"'{param}' should be of type "
-                                  f"'{param_types[param]}' but is instead "
-                                  f"{type(value)}. It will remain as: "
-                                  f"{current_value} "
-                                  f"({type(current_value)}).",
-                                  stacklevel=2)
+                    warnings.warn(
+                        f"The value ({value}) for parameter "
+                        f"'{param}' should be of type "
+                        f"'{param_types[param]}' but is instead "
+                        f"{type(value)}. It will remain as: "
+                        f"{current_value} "
+                        f"({type(current_value)}).",
+                        stacklevel=2,
+                    )
             else:
-                warnings.warn(f"The parameter '{param}' is not valid "
-                              f"and is being ignored! "
-                              f"Possible params are: {valid_params}",
-                              stacklevel=2)
+                warnings.warn(
+                    f"The parameter '{param}' is not valid and is being ignored! Possible params are: {valid_params}",
+                    stacklevel=2,
+                )
 
     def needs_data_refresh(self, data_params: set) -> bool:
         """Check if specific params have been updated via `set_params()`"""
@@ -149,11 +149,14 @@ class ParamsMixin:
         self._updated_params -= data_params
 
 
-def sessions_are_equal(A, B, reraise=False,
-                       ignore_keys: Optional[Dict[str, Set[str]]] = None,
-                       skip_fields: Optional[Iterable] = None,
-                       test_methods=False) \
-        -> bool:
+def sessions_are_equal(
+    A,
+    B,
+    reraise=False,
+    ignore_keys: Optional[Dict[str, Set[str]]] = None,
+    skip_fields: Optional[Iterable] = None,
+    test_methods=False,
+) -> bool:
     """Check if two Session objects are equal (have same property and
     get method values).
 
@@ -182,7 +185,6 @@ def sessions_are_equal(A, B, reraise=False,
     if ignore_keys is None:
         ignore_keys = dict()
     if skip_fields is None:
-
         skip_fields = set()
 
     A_data_attrs_and_methods = A.list_data_attributes_and_methods()
@@ -205,22 +207,17 @@ def sessions_are_equal(A, B, reraise=False,
             else:
                 continue
 
-            err_msg = (f"{field} on {A} did not equal {field} "
-                       f"on {B} (\n{x1} vs\n{x2}\n)")
+            err_msg = f"{field} on {A} did not equal {field} on {B} (\n{x1} vs\n{x2}\n)"
             if isinstance(x1, DataObject):
                 x1 = x1.value
             if isinstance(x2, DataObject):
                 x2 = x2.value
-            compare_fields(x1, x2, err_msg,
-                           ignore_keys=ignore_keys.get(field, None))
+            compare_fields(x1, x2, err_msg, ignore_keys=ignore_keys.get(field, None))
 
         except NotImplementedError:
-            A_implements_get_field = hasattr(
-                A.api, getattr(type(A), field).getter_name)
-            B_implements_get_field = hasattr(
-                B.api, getattr(type(B), field).getter_name)
-            assert ((A_implements_get_field is False)
-                    and (B_implements_get_field is False))
+            A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
+            B_implements_get_field = hasattr(B.api, getattr(type(B), field).getter_name)
+            assert (A_implements_get_field is False) and (B_implements_get_field is False)
 
         except (AssertionError, AttributeError):
             if reraise:

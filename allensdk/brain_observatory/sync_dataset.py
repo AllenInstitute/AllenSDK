@@ -14,6 +14,7 @@ numpy  http://www.numpy.org/
 h5py   http://www.h5py.org/
 
 """
+
 import collections
 from typing import Union, Sequence, Optional
 
@@ -22,12 +23,13 @@ import numpy as np
 
 import warnings
 import logging
+
 logger = logging.getLogger(__name__)
 
 dset_version = 1.04
 
 
-def unpack_uint32(uint32_array, endian='L'):
+def unpack_uint32(uint32_array, endian="L"):
     """
     Unpacks an array of 32-bit unsigned integers into bits.
 
@@ -45,7 +47,7 @@ def unpack_uint32(uint32_array, endian='L'):
     uint8_array = np.frombuffer(buff, dtype=np.uint8)
     uint8_array = np.fliplr(uint8_array.reshape(-1, 4))
     bits = np.unpackbits(uint8_array).reshape(-1, 32)
-    if endian.upper() == 'B':
+    if endian.upper() == "B":
         bits = np.fliplr(bits)
     return bits
 
@@ -62,7 +64,7 @@ def get_bit(uint_array, bit):
         The bit to extract.
 
     """
-    return np.bitwise_and(uint_array, 2 ** bit).astype(bool).astype(np.uint8)
+    return np.bitwise_and(uint_array, 2**bit).astype(bool).astype(np.uint8)
 
 
 class Dataset(object):
@@ -93,23 +95,28 @@ class Dataset(object):
 
 
     """
-    FRAME_KEYS = ('frames', 'stim_vsync', 'vsync_stim')
-    PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
+
+    FRAME_KEYS = ("frames", "stim_vsync", "vsync_stim")
+    PHOTODIODE_KEYS = ("photodiode", "stim_photodiode")
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
-    EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking
-                                                # line label after 3/27/2020
-                         # clocks eye tracking frame pulses (port 0, line 9)
-                         "cam2_exposure",
-                         # previous line label for eye tracking
-                         # (prior to ~ Oct. 2018)
-                         "eyetracking",
-                         "eye_cam_exposing",
-                         "eye_tracking")  # An undocumented, but possible eye tracking line label  # NOQA E114
-    BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020  # NOQA E127
-                                                    # clocks behavior tracking frame # NOQA E127
-                                                    # pulses (port 0, line 8)
-                              "cam1_exposure",
-                              "behavior_monitoring")
+    EYE_TRACKING_KEYS = (
+        "eye_frame_received",  # Expected eye tracking
+        # line label after 3/27/2020
+        # clocks eye tracking frame pulses (port 0, line 9)
+        "cam2_exposure",
+        # previous line label for eye tracking
+        # (prior to ~ Oct. 2018)
+        "eyetracking",
+        "eye_cam_exposing",
+        "eye_tracking",
+    )  # An undocumented, but possible eye tracking line label  # NOQA E114
+    BEHAVIOR_TRACKING_KEYS = (
+        "beh_frame_received",  # Expected behavior line label after 3/27/2020  # NOQA E127
+        # clocks behavior tracking frame # NOQA E127
+        # pulses (port 0, line 8)
+        "cam1_exposure",
+        "behavior_monitoring",
+    )
 
     DEPRECATED_KEYS = set()
 
@@ -121,13 +128,17 @@ class Dataset(object):
         if hasattr(self, "line_labels"):
             deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
             if deprecated_keys:
-                warnings.warn((f"The loaded sync file contains the "
-                               f"following deprecated line label keys: "
-                               f"{deprecated_keys}. Consider updating the "
-                               f"sync file line labels."), stacklevel=2)
+                warnings.warn(
+                    (
+                        f"The loaded sync file contains the "
+                        f"following deprecated line label keys: "
+                        f"{deprecated_keys}. Consider updating the "
+                        f"sync file line labels."
+                    ),
+                    stacklevel=2,
+                )
         else:
-            warnings.warn(("The loaded sync file has no line labels and may "
-                           "not be valid."), stacklevel=2)
+            warnings.warn(("The loaded sync file has no line labels and may not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
@@ -156,18 +167,19 @@ class Dataset(object):
 
         """
         self.dfile = h5.File(
-            path, 'r')  # MG edit 3/15 removed 'r' because some sync files were unable to load  # NOQA E501
-        self.meta_data = eval(self.dfile['meta'][()])
-        self.line_labels = self.meta_data['line_labels']
+            path, "r"
+        )  # MG edit 3/15 removed 'r' because some sync files were unable to load  # NOQA E501
+        self.meta_data = eval(self.dfile["meta"][()])
+        self.line_labels = self.meta_data["line_labels"]
         self.times = self._process_times()
         return self.dfile
 
     @property
     def sample_freq(self):
         try:
-            return float(self.meta_data['ni_daq']['sample_freq'])
+            return float(self.meta_data["ni_daq"]["sample_freq"])
         except KeyError:
-            return float(self.meta_data['ni_daq']['counter_output_freq'])
+            return float(self.meta_data["ni_daq"]["counter_output_freq"])
 
     def get_bit(self, bit):
         """
@@ -226,9 +238,9 @@ class Dataset(object):
         Returns the data for all bits.
 
         """
-        return self.dfile['data'][()][:, -1]
+        return self.dfile["data"][()][:, -1]
 
-    def get_all_times(self, units='samples'):
+    def get_all_times(self, units="samples"):
         """
         Returns all counter values.
 
@@ -238,14 +250,14 @@ class Dataset(object):
             Return times in 'samples' or 'seconds'
 
         """
-        if self.meta_data['ni_daq']['counter_bits'] == 32:
+        if self.meta_data["ni_daq"]["counter_bits"] == 32:
             times = self.get_all_events()[:, 0]
         else:
             times = self.times
         units = units.lower()
-        if units == 'samples':
+        if units == "samples":
             return times
-        elif units in ['seconds', 'sec', 'secs']:
+        elif units in ["seconds", "sec", "secs"]:
             freq = self.sample_freq
             return times / freq
         else:
@@ -255,9 +267,9 @@ class Dataset(object):
         """
         Returns all counter values and their cooresponding IO state.
         """
-        return self.dfile['data'][()]
+        return self.dfile["data"][()]
 
-    def get_events_by_bit(self, bit, units='samples'):
+    def get_events_by_bit(self, bit, units="samples"):
         """
         Returns all counter values for transitions (both rising and falling)
             for a specific bit.
@@ -271,7 +283,7 @@ class Dataset(object):
         changes = self.get_bit_changes(bit)
         return self.get_all_times(units)[np.where(changes != 0)]
 
-    def get_events_by_line(self, line, units='samples'):
+    def get_events_by_line(self, line, units="samples"):
         """
         Returns all counter values for transitions (both rising and falling)
             for a specific line.
@@ -314,7 +326,7 @@ class Dataset(object):
         """
         return self.line_labels[bit]
 
-    def get_rising_edges(self, line, units='samples'):
+    def get_rising_edges(self, line, units="samples"):
         """
         Returns the counter values for the rizing edges for a specific bit or
             line.
@@ -330,13 +342,9 @@ class Dataset(object):
         return self.get_all_times(units)[np.where(changes == 1)]
 
     def get_edges(
-        self,
-        kind: str,
-        keys: Union[str, Sequence[str]],
-        units: str = "seconds",
-        permissive: bool = False
+        self, kind: str, keys: Union[str, Sequence[str]], units: str = "seconds", permissive: bool = False
     ) -> Optional[np.ndarray]:
-        """ Utility function for extracting edge times from a line
+        """Utility function for extracting edge times from a line
 
         Parameters
         ----------
@@ -361,15 +369,14 @@ class Dataset(object):
             line labels
 
         """
-        if kind == 'falling':
+        if kind == "falling":
             fn = self.get_falling_edges
-        elif kind == 'rising':
+        elif kind == "rising":
             fn = self.get_rising_edges
-        elif kind == 'all':
-            return np.sort(np.concatenate([
-                self.get_edges('rising', keys, units),
-                self.get_edges('falling', keys, units)
-            ]))
+        elif kind == "all":
+            return np.sort(
+                np.concatenate([self.get_edges("rising", keys, units), self.get_edges("falling", keys, units)])
+            )
 
         if isinstance(keys, str):
             keys = [keys]
@@ -381,10 +388,9 @@ class Dataset(object):
                 continue
 
         if not permissive:
-            raise KeyError(
-                f"none of {keys} were found in this dataset's line labels")
+            raise KeyError(f"none of {keys} were found in this dataset's line labels")
 
-    def get_falling_edges(self, line, units='samples'):
+    def get_falling_edges(self, line, units="samples"):
         """
         Returns the counter values for the falling edges for a specific bit
             or line.
@@ -399,14 +405,15 @@ class Dataset(object):
         changes = self.get_bit_changes(bit)
         return self.get_all_times(units)[np.where(changes == 255)]
 
-    def get_nearest(self,
-                    source,
-                    target,
-                    source_edge="rising",
-                    target_edge="rising",
-                    direction="previous",
-                    units='indices',
-                    ):
+    def get_nearest(
+        self,
+        source,
+        target,
+        source_edge="rising",
+        target_edge="rising",
+        direction="previous",
+        units="indices",
+    ):
         """
         For all values of the source line, finds the nearest edge from the
             target line.
@@ -423,30 +430,23 @@ class Dataset(object):
             units (str): "indices"
 
         """
-        source_edges = getattr(self,
-                               "get_{}_edges".format(source_edge.lower()))(source.lower(), units="samples")  # NOQA E501
-        target_edges = getattr(self,
-                               "get_{}_edges".format(target_edge.lower()))(target.lower(), units="samples")  # NOQA E501
+        source_edges = getattr(self, "get_{}_edges".format(source_edge.lower()))(source.lower(), units="samples")  # NOQA E501
+        target_edges = getattr(self, "get_{}_edges".format(target_edge.lower()))(target.lower(), units="samples")  # NOQA E501
         indices = np.searchsorted(target_edges, source_edges, side="right")
         if direction.lower() == "previous":
             indices[np.where(indices != 0)] -= 1
         elif direction.lower() == "next":
             indices[np.where(indices == len(target_edges))] = -1
-        if units in ["indices", 'index']:
+        if units in ["indices", "index"]:
             return indices
         elif units == "samples":
             return target_edges[indices]
-        elif units in ['sec', 'seconds', 'second']:
+        elif units in ["sec", "seconds", "second"]:
             return target_edges[indices] / self.sample_freq
         else:
-            raise KeyError(
-                "Invalid units.  Try 'seconds', 'samples' or 'indices'")
+            raise KeyError("Invalid units.  Try 'seconds', 'samples' or 'indices'")
 
-    def get_analog_channel(self,
-                           channel,
-                           start_time=0.0,
-                           stop_time=None,
-                           downsample=1):
+    def get_analog_channel(self, channel, start_time=0.0, stop_time=None, downsample=1):
         """
         Returns the data from the specified analog channel between the
             timepoints.
@@ -465,15 +465,13 @@ class Dataset(object):
 
         """
         if isinstance(channel, str):
-            channel_index = self.analog_meta_data['analog_labels'].index(
-                channel)
-            channel = self.analog_meta_data['analog_channels'].index(
-                channel_index)
+            channel_index = self.analog_meta_data["analog_labels"].index(channel)
+            channel = self.analog_meta_data["analog_channels"].index(channel_index)
 
         if "analog_data" in self.dfile.keys():
-            dset = self.dfile['analog_data']
+            dset = self.dfile["analog_data"]
             analog_meta = self.get_analog_meta()
-            sample_rate = analog_meta['analog_sample_rate']
+            sample_rate = analog_meta["analog_sample_rate"]
             start = int(start_time * sample_rate)
             if stop_time:
                 stop = int(stop_time * sample_rate)
@@ -488,7 +486,7 @@ class Dataset(object):
         Returns the metadata for the analog data.
         """
         if "analog_meta" in self.dfile.keys():
-            return eval(self.dfile['analog_meta'].value)
+            return eval(self.dfile["analog_meta"].value)
         else:
             raise KeyError("No analog data was saved.")
 
@@ -536,22 +534,21 @@ class Dataset(object):
                 logger.info("Falling: %s" % total_falling)
                 logger.info("*" * 70)
             return {
-                'line': line,
-                'bit': bit,
-                'total_rising': total_rising,
-                'total_falling': total_falling,
-                'avg_freq': None,
-                'duty_cycle': None,
+                "line": line,
+                "bit": bit,
+                "total_rising": total_rising,
+                "total_falling": total_falling,
+                "avg_freq": None,
+                "duty_cycle": None,
             }
         else:
-
             # period
             period = self.period(line)
 
-            avg_period = period['avg']
-            max_period = period['max']
-            min_period = period['min']
-            period_sd = period['sd']
+            avg_period = period["avg"]
+            max_period = period["max"]
+            min_period = period["min"]
+            period_sd = period["sd"]
 
             # freq
             avg_freq = self.frequency(line)
@@ -578,18 +575,18 @@ class Dataset(object):
                 logger.info("*" * 70)
 
             return {
-                'line': line,
-                'bit': bit,
-                'total_data_points': total_data_points,
-                'total_events': total_events,
-                'total_rising': total_rising,
-                'total_falling': total_falling,
-                'avg_period': avg_period,
-                'min_period': min_period,
-                'max_period': max_period,
-                'period_sd': period_sd,
-                'avg_freq': avg_freq,
-                'duty_cycle': duty_cycle,
+                "line": line,
+                "bit": bit,
+                "total_data_points": total_data_points,
+                "total_events": total_events,
+                "total_rising": total_rising,
+                "total_falling": total_falling,
+                "avg_period": avg_period,
+                "min_period": min_period,
+                "max_period": max_period,
+                "period_sd": period_sd,
+                "avg_freq": avg_freq,
+                "duty_cycle": duty_cycle,
             }
 
     def period(self, line, edge="rising"):
@@ -604,8 +601,7 @@ class Dataset(object):
             edges = self.get_falling_edges(bit)
 
         if len(edges) > 2:
-
-            timebase_freq = self.meta_data['ni_daq']['counter_output_freq']
+            timebase_freq = self.meta_data["ni_daq"]["counter_output_freq"]
             avg_period = np.mean(np.ediff1d(edges[1:])) / timebase_freq
             max_period = np.max(np.ediff1d(edges[1:])) / timebase_freq
             min_period = np.min(np.ediff1d(edges[1:])) / timebase_freq
@@ -615,10 +611,10 @@ class Dataset(object):
             raise IndexError("Not enough edges for period: %i" % len(edges))
 
         return {
-            'avg': avg_period,
-            'max': max_period,
-            'min': min_period,
-            'sd': period_sd,
+            "avg": avg_period,
+            "max": max_period,
+            "min": min_period,
+            "sd": period_sd,
         }
 
     def frequency(self, line, edge="rising"):
@@ -627,7 +623,7 @@ class Dataset(object):
         """
 
         period = self.period(line, edge)
-        return 1.0 / period['avg']
+        return 1.0 / period["avg"]
 
     def duty_cycle(self, line):
         """
@@ -657,8 +653,7 @@ class Dataset(object):
             high = falling - rising
         else:
             # line starts high
-            high = np.concatenate(falling, self.get_all_events()[-1, 0]) - \
-                np.concatenate(0, rising)
+            high = np.concatenate(falling, self.get_all_events()[-1, 0]) - np.concatenate(0, rising)
 
         total_high_time = np.sum(high)
         all_events = self.get_events_by_bit(bit)
@@ -677,20 +672,21 @@ class Dataset(object):
         logger.info("Active bits: ", len(active_bits))
         for bit in active_bits:
             logger.info("*" * 70)
-            logger.info("Bit: %i" % bit['bit'])
-            logger.info("Label: %s" % self.line_labels[bit['bit']])
-            logger.info("Rising edges: %i" % bit['total_rising'])
+            logger.info("Bit: %i" % bit["bit"])
+            logger.info("Label: %s" % self.line_labels[bit["bit"]])
+            logger.info("Rising edges: %i" % bit["total_rising"])
             logger.info("Falling edges: %i" % bit["total_falling"])
-            logger.info("Average freq: %s" % bit['avg_freq'])
-            logger.info("Duty cycle: %s" % bit['duty_cycle'])
+            logger.info("Average freq: %s" % bit["avg_freq"])
+            logger.info("Duty cycle: %s" % bit["duty_cycle"])
         logger.info("*" * 70)
         return active_bits
 
-    def plot_all(self,
-                 start_time,
-                 stop_time,
-                 auto_show=True,
-                 ):
+    def plot_all(
+        self,
+        start_time,
+        stop_time,
+        auto_show=True,
+    ):
         """
         Plot all active bits.
 
@@ -698,21 +694,25 @@ class Dataset(object):
 
         """
         import matplotlib.pyplot as plt
+
         for bit in range(32):
             if len(self.get_events_by_bit(bit)) > 0:
-                self.plot_bit(bit,
-                              start_time,
-                              stop_time,
-                              auto_show=False, )
+                self.plot_bit(
+                    bit,
+                    start_time,
+                    stop_time,
+                    auto_show=False,
+                )
         if auto_show:
             plt.show()
 
-    def plot_bits(self,
-                  bits,
-                  start_time=0.0,
-                  end_time=None,
-                  auto_show=True,
-                  ):
+    def plot_bits(
+        self,
+        bits,
+        start_time=0.0,
+        end_time=None,
+        auto_show=True,
+    ):
         """
         Plots a list of bits.
         """
@@ -724,11 +724,7 @@ class Dataset(object):
             axes = [axes]
 
         for bit, ax in zip(bits, axes):
-            self.plot_bit(bit,
-                          start_time,
-                          end_time,
-                          auto_show=False,
-                          axes=ax)
+            self.plot_bit(bit, start_time, end_time, auto_show=False, axes=ax)
         # f.set_size_inches(18, 10, forward=True)
         f.subplots_adjust(hspace=0)
 
@@ -737,22 +733,23 @@ class Dataset(object):
 
         return f, axes
 
-    def plot_bit(self,
-                 bit,
-                 start_time=0.0,
-                 end_time=None,
-                 auto_show=True,
-                 axes=None,
-                 name="",
-                 ):
+    def plot_bit(
+        self,
+        bit,
+        start_time=0.0,
+        end_time=None,
+        auto_show=True,
+        axes=None,
+        name="",
+    ):
         """
         Plots a specific bit at a specific time period.
         """
         import matplotlib.pyplot as plt
 
-        times = self.get_all_times(units='sec')
+        times = self.get_all_times(units="sec")
         if not end_time:
-            end_time = 2 ** 32
+            end_time = 2**32
 
         window = (times < end_time) & (times > start_time)
 
@@ -767,7 +764,7 @@ class Dataset(object):
             name = str(bit)
 
         bit = self.get_bit(bit)
-        ax.step(times[window], bit[window], where='post')
+        ax.step(times[window], bit[window], where="post")
         if hasattr(ax, "set_ylim"):
             ax.set_ylim(-0.1, 1.1)
         else:
@@ -776,7 +773,7 @@ class Dataset(object):
         # ax.set_ylabel('Logic State')
         # ax.yaxis.set_ticks_position('none')
         plt.setp(ax.get_yticklabels(), visible=False)
-        ax.set_xlabel('time (seconds)')
+        ax.set_xlabel("time (seconds)")
         ax.legend([name])
 
         if auto_show:
@@ -784,16 +781,18 @@ class Dataset(object):
 
         return plt.gcf()
 
-    def plot_line(self,
-                  line,
-                  start_time=0.0,
-                  end_time=None,
-                  auto_show=True,
-                  ):
+    def plot_line(
+        self,
+        line,
+        start_time=0.0,
+        end_time=None,
+        auto_show=True,
+    ):
         """
         Plots a specific line at a specific time period.
         """
         import matplotlib.pyplot as plt
+
         bit = self._line_to_bit(line)
         self.plot_bit(bit, start_time, end_time, auto_show=False)
 
@@ -801,23 +800,27 @@ class Dataset(object):
         if auto_show:
             plt.show()
 
-    def plot_lines(self,
-                   lines,
-                   start_time=0.0,
-                   end_time=None,
-                   auto_show=True,
-                   ):
+    def plot_lines(
+        self,
+        lines,
+        start_time=0.0,
+        end_time=None,
+        auto_show=True,
+    ):
         """
         Plots specific lines at a specific time period.
         """
         import matplotlib.pyplot as plt
+
         bits = []
         for line in lines:
             bits.append(self._line_to_bit(line))
-        f, axes = self.plot_bits(bits,
-                                 start_time,
-                                 end_time,
-                                 auto_show=False, )
+        f, axes = self.plot_bits(
+            bits,
+            start_time,
+            end_time,
+            auto_show=False,
+        )
 
         plt.subplots_adjust(left=0.025, right=0.975, bottom=0.05, top=0.95)
         if auto_show:
@@ -850,5 +853,5 @@ class Dataset(object):
         self.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

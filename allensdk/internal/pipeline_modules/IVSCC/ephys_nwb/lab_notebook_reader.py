@@ -24,8 +24,7 @@ class LabNotebookReader(object):
     # lab notebook has two sections, one for numeric data and the other
     #   for text data. this is an internal function to fetch data from
     #   the numeric part of the notebook
-    def get_numeric_value(self, name, data_col, sweep_col, enable_col,
-                          sweep_num, default_val):
+    def get_numeric_value(self, name, data_col, sweep_col, enable_col, sweep_num, default_val):
         data = self.val_number
         # val_number has 3 dimensions -- the first has a shape of
         #   (#fields * 9). there are many hundreds of elements in this
@@ -51,8 +50,7 @@ class LabNotebookReader(object):
         return return_val
 
     # internal function for fetching data from the text part of the notebook
-    def get_text_value(self, name, data_col, sweep_col, enable_col, sweep_num,
-                       default_val):
+    def get_text_value(self, name, data_col, sweep_col, enable_col, sweep_num, default_val):
         data = self.val_text
         # algorithm mirrors get_numeric_value
         # return value is last non-empty entry in specified column
@@ -96,8 +94,7 @@ class LabNotebookReader(object):
                 enable_col = self.enabled[name]
                 enable_idx = numeric_fields.tolist().index(enable_col)
             field_idx = numeric_fields.tolist().index(name)
-            return self.get_numeric_value(name, field_idx, sweep_idx,
-                                          enable_idx, sweep_num, default_val)
+            return self.get_numeric_value(name, field_idx, sweep_idx, enable_idx, sweep_num, default_val)
         elif name in text_fields:
             # first check to see if file includes old version of column name
             if "Sweep #" in text_fields:
@@ -109,8 +106,7 @@ class LabNotebookReader(object):
                 enable_col = self.enabled[name]
                 enable_idx = text_fields.tolist().index(enable_col)
             field_idx = text_fields.tolist().index(name)
-            return self.get_text_value(name, field_idx, sweep_idx, enable_idx,
-                                       sweep_num, default_val)
+            return self.get_text_value(name, field_idx, sweep_idx, enable_idx, sweep_num, default_val)
         else:
             return default_val
 

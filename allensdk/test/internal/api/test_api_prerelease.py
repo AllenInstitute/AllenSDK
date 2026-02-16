@@ -16,8 +16,8 @@ def api():
 def test_retrieve_file_from_storage(api, fn_temp_dir):
     eye = np.eye(100)
 
-    target = os.path.join(fn_temp_dir, 'target')
-    store = os.path.join(fn_temp_dir, 'store')
+    target = os.path.join(fn_temp_dir, "target")
+    store = os.path.join(fn_temp_dir, "store")
     nrrd.write(store, eye)
 
     api.retrieve_file_from_storage(store, target)

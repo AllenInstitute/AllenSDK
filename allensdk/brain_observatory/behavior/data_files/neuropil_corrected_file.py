@@ -36,9 +36,7 @@ class NeuropilCorrectedFile(DataFile):
 
     @classmethod
     @cached(cache=LRUCache(maxsize=10), key=from_lims_cache_key)
-    def from_lims(
-        cls, db: PostgresQueryMixin, ophys_experiment_id: Union[int, str]
-    ) -> "NeuropilCorrectedFile":
+    def from_lims(cls, db: PostgresQueryMixin, ophys_experiment_id: Union[int, str]) -> "NeuropilCorrectedFile":
         query = """
                 SELECT wkf.storage_directory || wkf.filename AS \
                 neuropil_corrected_file
@@ -49,9 +47,7 @@ class NeuropilCorrectedFile(DataFile):
                 WHERE wkf.attachable_type = 'OphysExperiment'
                 AND wkft.name = 'NeuropilCorrection'
                 AND oe.id = {};
-                """.format(
-            ophys_experiment_id
-        )
+                """.format(ophys_experiment_id)
         filepath = db.fetchone(query, strict=True)
         return cls(filepath=filepath)
 

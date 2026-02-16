@@ -77,10 +77,7 @@ class MockSessionApi(EcephysSessionApi):
             {
                 "start_time": np.linspace(0.0, 4.5, 10, endpoint=True),
                 "stop_time": np.linspace(0.5, 5.0, 10, endpoint=True),
-                "stimulus_name": ["spontaneous"]
-                + ["s0"] * 6
-                + ["spontaneous"]
-                + ["s1"] * 2,
+                "stimulus_name": ["spontaneous"] + ["s0"] * 6 + ["spontaneous"] + ["s1"] * 2,
                 "stimulus_block": [0] + [1] * 6 + [0] + [2] * 2,
                 "duration": 0.5,
                 "stimulus_index": [0] + [1] * 6 + [0] + [2] * 2,
@@ -131,48 +128,36 @@ def test_unit_ids_filter_by_id(ecephys_api):
     assert set(stim_analysis.unit_ids) == {1, 2, 3}
     assert stim_analysis.unit_count == 3
 
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, filter={"unit_id": [3, 0]}
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={"unit_id": [3, 0]})
     assert set(stim_analysis.unit_ids) == {0, 3}
     assert stim_analysis.unit_count == 2
 
     with pytest.raises(KeyError):
         # If unit ids don't exists should raise an error
-        stim_analysis = StimulusAnalysis(
-            ecephys_session=session, filter=[100, 200]
-        )
+        stim_analysis = StimulusAnalysis(ecephys_session=session, filter=[100, 200])
         stim_analysis.unit_ids
 
 
 def test_unit_ids_filtered(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, filter={"location": "VISp"}
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={"location": "VISp"})
     assert set(stim_analysis.unit_ids) == {0, 2, 3, 5}
     assert stim_analysis.unit_count == 4
 
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, filter={"location": "VISp", "quality": "good"}
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={"location": "VISp", "quality": "good"})
     assert set(stim_analysis.unit_ids) == {0, 3, 5}
     assert stim_analysis.unit_count == 3
 
     with pytest.raises(Exception):
         # No units found should raise exception
-        stim_analysis = StimulusAnalysis(
-            ecephys_session=session, filter={"location": "pSIV"}
-        )
+        stim_analysis = StimulusAnalysis(ecephys_session=session, filter={"location": "pSIV"})
         stim_analysis.unit_ids
         stim_analysis.unit_count
 
 
 def test_stim_table(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
     assert isinstance(stim_analysis.stim_table, pd.DataFrame)
     assert len(stim_analysis.stim_table) == 6
     assert stim_analysis.total_presentations == 6
@@ -185,9 +170,7 @@ def test_stim_table(ecephys_api):
     assert "duration" in stim_analysis.stim_table
 
     with pytest.raises(Exception):
-        stim_analysis = StimulusAnalysis(
-            ecephys_session=session, stimulus_key="0s"
-        )
+        stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="0s")
         stim_analysis.stim_table
 
 
@@ -195,16 +178,12 @@ def test_stim_table_spontaneous(ecephys_api):
     # By default table should be empty because non of the stimulus are above
     # the duration threshold
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, spontaneous_threshold=0.49
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, spontaneous_threshold=0.49)
     assert isinstance(stim_analysis.stim_table_spontaneous, pd.DataFrame)
     assert len(stim_analysis.stim_table_spontaneous) == 2
 
     # Check that threshold is working
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, spontaneous_threshold=0.51
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, spontaneous_threshold=0.51)
     assert len(stim_analysis.stim_table_spontaneous) == 0
 
 
@@ -218,21 +197,11 @@ def test_conditionwise_psth(ecephys_api):
     )
     assert isinstance(stim_analysis.conditionwise_psth, xr.DataArray)
     # assert(stim_analysis.conditionwise_psth.shape == (2, 4, 6))
-    assert (
-        stim_analysis.conditionwise_psth.coords[
-            "time_relative_to_stimulus_onset"
-        ].size
-        == 4
-    )  # 0.5/0.1 - 1
+    assert stim_analysis.conditionwise_psth.coords["time_relative_to_stimulus_onset"].size == 4  # 0.5/0.1 - 1
     assert stim_analysis.conditionwise_psth.coords["unit_id"].size == 6
-    assert (
-        stim_analysis.conditionwise_psth.coords["stimulus_condition_id"].size
-        == 2
-    )
+    assert stim_analysis.conditionwise_psth.coords["stimulus_condition_id"].size == 2
     assert np.allclose(
-        stim_analysis.conditionwise_psth[
-            {"unit_id": 0, "stimulus_condition_id": 1}
-        ].values,
+        stim_analysis.conditionwise_psth[{"unit_id": 0, "stimulus_condition_id": 1}].values,
         np.array([1.0 / 3.0, 0.0, 0.0, 0.0]),
     )
 
@@ -243,27 +212,15 @@ def test_conditionwise_psth(ecephys_api):
         trial_duration=0.5,
         psth_resolution=0.1,
     )
-    assert (
-        stim_analysis.conditionwise_psth.coords[
-            "time_relative_to_stimulus_onset"
-        ].size
-        == 4
-    )
+    assert stim_analysis.conditionwise_psth.coords["time_relative_to_stimulus_onset"].size == 4
     assert stim_analysis.conditionwise_psth.coords["unit_id"].size == 6
-    assert (
-        stim_analysis.conditionwise_psth.coords["stimulus_condition_id"].size
-        == 2
-    )
+    assert stim_analysis.conditionwise_psth.coords["stimulus_condition_id"].size == 2
 
 
 def test_conditionwise_statistics(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
-    assert (
-        len(stim_analysis.conditionwise_statistics) == 2 * 6
-    )  # units x condition_ids
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
+    assert len(stim_analysis.conditionwise_statistics) == 2 * 6  # units x condition_ids
     assert set(stim_analysis.conditionwise_statistics.index.names) == {
         "unit_id",
         "stimulus_condition_id",
@@ -299,36 +256,23 @@ def test_conditionwise_statistics(ecephys_api):
 
 def test_presentationwise_spike_times(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
     assert len(stim_analysis.presentationwise_spike_times) == 12
-    assert list(stim_analysis.presentationwise_spike_times.index.names) == [
-        "spike_time"
-    ]
+    assert list(stim_analysis.presentationwise_spike_times.index.names) == ["spike_time"]
     assert set(stim_analysis.presentationwise_spike_times.columns) == {
         "stimulus_presentation_id",
         "unit_id",
         "time_since_stimulus_presentation_onset",
     }
     assert stim_analysis.presentationwise_spike_times.loc[1.01]["unit_id"] == 2
-    assert (
-        stim_analysis.presentationwise_spike_times.loc[1.01][
-            "stimulus_presentation_id"
-        ]
-        == 2
-    )
+    assert stim_analysis.presentationwise_spike_times.loc[1.01]["stimulus_presentation_id"] == 2
     assert len(stim_analysis.presentationwise_spike_times.loc[3.0]) == 2
 
 
 def test_presentationwise_statistics(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0", trial_duration=0.5
-    )
-    assert (
-        len(stim_analysis.presentationwise_statistics) == 6 * 6
-    )  # units x presentation_ids
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0", trial_duration=0.5)
+    assert len(stim_analysis.presentationwise_statistics) == 6 * 6  # units x presentation_ids
     assert set(stim_analysis.presentationwise_statistics.index.names) == {
         "stimulus_presentation_id",
         "unit_id",
@@ -338,16 +282,8 @@ def test_presentationwise_statistics(ecephys_api):
         "stimulus_condition_id",
         "running_speed",
     }
-    assert (
-        stim_analysis.presentationwise_statistics.loc[1, 0]["spike_counts"]
-        == 1.0
-    )
-    assert (
-        stim_analysis.presentationwise_statistics.loc[1, 0][
-            "stimulus_condition_id"
-        ]
-        == 1.0
-    )
+    assert stim_analysis.presentationwise_statistics.loc[1, 0]["spike_counts"] == 1.0
+    assert stim_analysis.presentationwise_statistics.loc[1, 0]["stimulus_condition_id"] == 1.0
     assert np.isclose(
         stim_analysis.presentationwise_statistics.loc[1, 0]["running_speed"],
         0.684848,
@@ -356,13 +292,9 @@ def test_presentationwise_statistics(ecephys_api):
 
 def test_stimulus_conditions(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0", trial_duration=0.5
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0", trial_duration=0.5)
     assert len(stim_analysis.stimulus_conditions) == 2
-    assert np.all(
-        stim_analysis.stimulus_conditions["stimulus_name"].unique() == ["s0"]
-    )
+    assert np.all(stim_analysis.stimulus_conditions["stimulus_name"].unique() == ["s0"])
     assert set(stim_analysis.stimulus_conditions["conditions"].unique()) == {
         0,
         1,
@@ -371,26 +303,16 @@ def test_stimulus_conditions(ecephys_api):
 
 def test_running_speed(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
     assert set(stim_analysis.running_speed.index.values) == set(range(1, 7))
-    assert np.isclose(
-        stim_analysis.running_speed.loc[1]["running_speed"], 0.684848
-    )
-    assert np.isclose(
-        stim_analysis.running_speed.loc[3]["running_speed"], 1.806061
-    )
-    assert np.isclose(
-        stim_analysis.running_speed.loc[6]["running_speed"], 3.487879
-    )
+    assert np.isclose(stim_analysis.running_speed.loc[1]["running_speed"], 0.684848)
+    assert np.isclose(stim_analysis.running_speed.loc[3]["running_speed"], 1.806061)
+    assert np.isclose(stim_analysis.running_speed.loc[6]["running_speed"], 3.487879)
 
 
 def test_spikes(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
     assert isinstance(stim_analysis.spikes, dict)
     assert stim_analysis.spikes.keys() == set(range(6))
     assert np.allclose(stim_analysis.spikes[0], [1, 2, 3, 4])
@@ -399,17 +321,13 @@ def test_spikes(ecephys_api):
 
     # Check that spikes dict is filtering units
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0", filter=[0, 2]
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0", filter=[0, 2])
     assert stim_analysis.spikes.keys() == {0, 2}
 
 
 def test_get_preferred_condition(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
     assert stim_analysis._get_preferred_condition(3) == 1
 
     with pytest.raises(KeyError):
@@ -418,31 +336,16 @@ def test_get_preferred_condition(ecephys_api):
 
 def test_check_multiple_preferred_conditions(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0"
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0")
 
-    assert (
-        stim_analysis._check_multiple_pref_conditions(0, "conditions", [0, 1])
-        is False
-    )
-    assert (
-        stim_analysis._check_multiple_pref_conditions(3, "conditions", [0, 1])
-        is True
-    )
+    assert stim_analysis._check_multiple_pref_conditions(0, "conditions", [0, 1]) is False
+    assert stim_analysis._check_multiple_pref_conditions(3, "conditions", [0, 1]) is True
 
 
 def test_get_time_to_peak(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    stim_analysis = StimulusAnalysis(
-        ecephys_session=session, stimulus_key="s0", trial_duration=0.5
-    )
-    assert (
-        stim_analysis._get_time_to_peak(
-            1, stim_analysis._get_preferred_condition(1)
-        )
-        == 0.0005
-    )
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key="s0", trial_duration=0.5)
+    assert stim_analysis._get_time_to_peak(1, stim_analysis._get_preferred_condition(1)) == 0.0005
 
 
 @pytest.mark.parametrize(
@@ -504,9 +407,7 @@ def test_get_time_to_peak(ecephys_api):
         ),
     ],
 )
-def test_running_modulation(
-    spike_counts, running_speeds, speed_threshold, expected
-):
+def test_running_modulation(spike_counts, running_speeds, speed_threshold, expected):
     rm = running_modulation(spike_counts, running_speeds, speed_threshold)
     assert np.allclose(rm, expected, equal_nan=True)
 
@@ -619,9 +520,7 @@ def test_overall_firing_rate(start_times, stop_times, spike_times, expected):
     ],
 )
 def test_get_fr(spikes, sampling_freq, sweep_length, expected):
-    frs = get_fr(
-        spikes, num_timestep_second=sampling_freq, sweep_length=sweep_length
-    )
+    frs = get_fr(spikes, num_timestep_second=sampling_freq, sweep_length=sweep_length)
     assert len(frs) == int(sampling_freq * sweep_length)
     assert np.allclose(frs, expected)
 

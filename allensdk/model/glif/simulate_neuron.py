@@ -43,25 +43,30 @@ from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.api.queries.glif_api import GlifApi
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
-DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
+DEFAULT_SPIKE_CUT_VALUE = 0.05  # 50mV
+
 
 def parse_arguments():
-    ''' Use argparse to get required arguments from the command line '''
-    parser = argparse.ArgumentParser(description='fit a neuron')
+    """Use argparse to get required arguments from the command line"""
+    parser = argparse.ArgumentParser(description="fit a neuron")
 
-    parser.add_argument('--ephys_file', help='ephys file name')
-    parser.add_argument('--sweeps_file', help='JSON file listing sweep properties')
-    parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ')
-    parser.add_argument('--neuronal_model_id', help='id of the neuronal model. Used when downloading sweep properties.', type=int)
-    parser.add_argument('--output_ephys_file', help='output file name')
-    parser.add_argument('--log_level', help='log level', default=logging.INFO)
-    parser.add_argument('--spike_cut_value', help='value to fill in for spike duration', default=DEFAULT_SPIKE_CUT_VALUE, type=float)
+    parser.add_argument("--ephys_file", help="ephys file name")
+    parser.add_argument("--sweeps_file", help="JSON file listing sweep properties")
+    parser.add_argument("--neuron_config_file", help="neuron configuration JSON file ")
+    parser.add_argument(
+        "--neuronal_model_id", help="id of the neuronal model. Used when downloading sweep properties.", type=int
+    )
+    parser.add_argument("--output_ephys_file", help="output file name")
+    parser.add_argument("--log_level", help="log level", default=logging.INFO)
+    parser.add_argument(
+        "--spike_cut_value", help="value to fill in for spike duration", default=DEFAULT_SPIKE_CUT_VALUE, type=float
+    )
 
     return parser.parse_args()
 
 
 def simulate_sweep(neuron, stimulus, spike_cut_value):
-    ''' Simulate a neuron given a stimulus and initial conditions. '''
+    """Simulate a neuron given a stimulus and initial conditions."""
 
     start_time = time.time()
 
@@ -69,7 +74,7 @@ def simulate_sweep(neuron, stimulus, spike_cut_value):
 
     data = neuron.run(stimulus)
 
-    voltage = data['voltage']
+    voltage = data["voltage"]
     voltage[np.isnan(voltage)] = spike_cut_value
 
     logging.debug("simulation time %f" % (time.time() - start_time))
@@ -78,7 +83,7 @@ def simulate_sweep(neuron, stimulus, spike_cut_value):
 
 
 def load_sweep(file_name, sweep_number):
-    ''' Load the stimulus for a sweep from file. '''
+    """Load the stimulus for a sweep from file."""
     logging.debug("loading sweep %d" % sweep_number)
 
     load_start_time = time.time()
@@ -90,7 +95,7 @@ def load_sweep(file_name, sweep_number):
 
 
 def write_sweep_response(file_name, sweep_number, response, spike_times):
-    ''' Overwrite the response in a file. '''
+    """Overwrite the response in a file."""
 
     logging.debug("writing sweep")
 
@@ -104,7 +109,7 @@ def write_sweep_response(file_name, sweep_number, response, spike_times):
 
 
 def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, spike_cut_value):
-    ''' Load a sweep stimulus, simulate the response, and write it out. '''
+    """Load a sweep stimulus, simulate the response, and write it out."""
 
     sweep_start_time = time.time()
 
@@ -115,16 +120,16 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
         raise
 
         # tell the neuron what dt should be for this sweep
-    neuron.dt = 1.0 / data['sampling_rate']
+    neuron.dt = 1.0 / data["sampling_rate"]
 
-    sim_data = simulate_sweep(neuron, data['stimulus'], spike_cut_value)
+    sim_data = simulate_sweep(neuron, data["stimulus"], spike_cut_value)
 
-    write_sweep_response(output_file_name, sweep_number, sim_data['voltage'], sim_data['interpolated_spike_times'])
+    write_sweep_response(output_file_name, sweep_number, sim_data["voltage"], sim_data["interpolated_spike_times"])
 
-    logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
+    logging.debug("total sweep time %f" % (time.time() - sweep_start_time))
+
 
 def simulate_neuron(neuron, sweep_numbers, input_file_name, output_file_name, spike_cut_value):
-
     start_time = time.time()
 
     for sweep_number in sweep_numbers:
@@ -132,17 +137,17 @@ def simulate_neuron(neuron, sweep_numbers, input_file_name, output_file_name, sp
 
     logging.debug("total elapsed time %f" % (time.time() - start_time))
 
+
 def main():
     args = parse_arguments()
 
     logging.getLogger().setLevel(args.log_level)
 
     glif_api = None
-    if (args.neuron_config_file is None or
-        args.sweeps_file is None or
-        args.ephys_file is None):
-
-        assert args.neuronal_model_id is not None, Exception("A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.")
+    if args.neuron_config_file is None or args.sweeps_file is None or args.ephys_file is None:
+        assert args.neuronal_model_id is not None, Exception(
+            "A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided."
+        )
 
         glif_api = GlifApi()
         glif_api.get_neuronal_model(args.neuronal_model_id)
@@ -160,7 +165,7 @@ def main():
     if args.ephys_file:
         ephys_file = args.ephys_file
     else:
-        ephys_file = 'stimulus_%d.nwb' % args.neuronal_model_id
+        ephys_file = "stimulus_%d.nwb" % args.neuronal_model_id
 
         if not os.path.exists(ephys_file):
             logging.info("Downloading stimulus to %s." % ephys_file)
@@ -174,14 +179,12 @@ def main():
         logging.warning("Overwriting input file data with simulated data in place.")
         output_ephys_file = ephys_file
 
-
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # filter out test sweeps
-    sweep_numbers = [ s['sweep_number'] for s in sweeps if s['stimulus_name'] != 'Test' ]
+    sweep_numbers = [s["sweep_number"] for s in sweeps if s["stimulus_name"] != "Test"]
 
     simulate_neuron(neuron, sweep_numbers, ephys_file, output_ephys_file, args.spike_cut_value)
-
 
 
 if __name__ == "__main__":

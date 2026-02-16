@@ -36,6 +36,7 @@
 import pytest
 from unittest.mock import patch, mock_open
 from allensdk.model.biophys_sim.config import Config
+
 try:
     import __builtin__ as builtins  # @UnresolvedImport
 except Exception:
@@ -44,7 +45,7 @@ except Exception:
 
 @pytest.fixture
 def simple_config():
-    manifest = '''{
+    manifest = """{
         "manifest": [
             { "type": "dir",
               "spec": "MOCK_DOT",
@@ -52,22 +53,21 @@ def simple_config():
             }],
         "biophys":
             [{ "hoc": [ "stdgui.hoc"] }]
-    }'''
+    }"""
 
-    with patch(builtins.__name__ + ".open",
-               mock_open(read_data=manifest)):
-        config = Config().load('config.json', False)
+    with patch(builtins.__name__ + ".open", mock_open(read_data=manifest)):
+        config = Config().load("config.json", False)
 
     return config
 
 
 def testAccessHocFilesInData(simple_config):
-    assert simple_config.data['biophys'][0]['hoc'][0] == 'stdgui.hoc'
+    assert simple_config.data["biophys"][0]["hoc"][0] == "stdgui.hoc"
 
 
 def testManifestIsNotInData(simple_config):
-    assert 'manifest' not in simple_config.data
+    assert "manifest" not in simple_config.data
 
 
 def testManifestInReservedData(simple_config):
-    assert 'manifest' in simple_config.reserved_data[0]
+    assert "manifest" in simple_config.reserved_data[0]

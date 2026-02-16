@@ -29,14 +29,11 @@ class WriteOphysNWB(argschema.ArgSchemaParser):
             nwb_filepath=oe_id_dir / f"behavior_ophys_experiment_{oe_id}.nwb",
             skip_metadata=self.args["skip_metadata_key"],
             skip_stim=self.args["skip_stimulus_file_key"],
-            include_experiment_description=self.args[
-                'include_experiment_description'
-            ]
+            include_experiment_description=self.args["include_experiment_description"],
         )
         logging.info("File successfully created")
 
-        output_dict = {"output_path": output_file,
-                       "input_parameters": self.args}
+        output_dict = {"output_path": output_file, "input_parameters": self.args}
 
         self.output(output_dict)
 
@@ -46,7 +43,7 @@ class WriteOphysNWB(argschema.ArgSchemaParser):
         nwb_filepath: Path,
         skip_metadata: List[str],
         skip_stim: List[str],
-        include_experiment_description=True
+        include_experiment_description=True,
     ) -> str:
         """Load and write a BehaviorOphysExperiment as NWB.
 
@@ -89,7 +86,7 @@ class WriteOphysNWB(argschema.ArgSchemaParser):
             ophys_experiment_ids=self.args["ophys_container_experiment_ids"],
             skip_metadata=skip_metadata,
             skip_stim=skip_stim,
-            include_experiment_description=include_experiment_description
+            include_experiment_description=include_experiment_description,
         )
 
         return str(nwb_filepath)

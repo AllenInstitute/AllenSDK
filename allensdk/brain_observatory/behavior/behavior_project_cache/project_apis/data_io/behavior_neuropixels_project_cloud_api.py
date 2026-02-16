@@ -34,9 +34,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         self._get_probe_table()
         self._get_channel_table()
 
-    def get_behavior_session(
-        self, behavior_session_id: int
-    ) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """
         Retrieve behavior session data from either the released behavior
         only nwb or the behavior side of the released ecephys data.
@@ -63,9 +61,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
         ecephys_session_id = row.ecephys_session_id
         # If a file_id for the behavior session is not set, attempt to load
         # an associated ecephys session.
-        if row[self.cache.file_id_column] < 0 or np.isnan(
-            row[self.cache.file_id_column]
-        ):
+        if row[self.cache.file_id_column] < 0 or np.isnan(row[self.cache.file_id_column]):
             row = return_one_dataframe_row_only(
                 input_table=self._ecephys_session_table,
                 index_value=ecephys_session_id,
@@ -77,9 +73,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
 
         return BehaviorSession.from_nwb_path(str(data_path))
 
-    def get_ecephys_session(
-        self, ecephys_session_id: int
-    ) -> BehaviorEcephysSession:
+    def get_ecephys_session(self, ecephys_session_id: int) -> BehaviorEcephysSession:
         """get a BehaviorEcephysSession by specifying ecephys_session_id
 
         Parameters
@@ -98,8 +92,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             table_name="ecephys_session_table",
         )
         probes_meta = self._probe_table[
-            (self._probe_table["ecephys_session_id"] == ecephys_session_id)
-            & (self._probe_table["has_lfp_data"])
+            (self._probe_table["ecephys_session_id"] == ecephys_session_id) & (self._probe_table["has_lfp_data"])
         ]
         session_file_id = str(int(session_meta[self.cache.file_id_column]))
         session_data_path = self._get_data_path(file_id=session_file_id)
@@ -130,9 +123,7 @@ class VisualBehaviorNeuropixelsProjectCloudApi(ProjectCloudApiBase):
             }
         else:
             probe_meta = None
-        return BehaviorEcephysSession.from_nwb_path(
-            str(session_data_path), probe_meta=probe_meta
-        )
+        return BehaviorEcephysSession.from_nwb_path(str(session_data_path), probe_meta=probe_meta)
 
     def _get_ecephys_session_table(self):
         session_table_path = self._get_metadata_path(fname="ecephys_sessions")

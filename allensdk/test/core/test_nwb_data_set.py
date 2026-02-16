@@ -42,11 +42,11 @@ import os
 
 NWB_FLAVORS = []
 
-if 'TEST_EPHYS_NWB_FILES' in os.environ:
-    nwb_list_file = os.environ['TEST_EPHYS_NWB_FILES']
+if "TEST_EPHYS_NWB_FILES" in os.environ:
+    nwb_list_file = os.environ["TEST_EPHYS_NWB_FILES"]
 else:
-    nwb_list_file = str(files('allensdk.test.core').joinpath('nwb_ephys_files.txt'))
-with open(nwb_list_file, 'r') as f:
+    nwb_list_file = str(files("allensdk.test.core").joinpath("nwb_ephys_files.txt"))
+with open(nwb_list_file, "r") as f:
     NWB_FLAVORS = [x.strip() for x in f]
 
 
@@ -103,7 +103,7 @@ def mock_h5py_file(m=None, data=None):
 
 @pytest.fixture
 def mock_data_set():
-    nwb_file = 'fixture.nwb'
+    nwb_file = "fixture.nwb"
     data_set = NwbDataSet(nwb_file)
     return data_set
 
@@ -124,33 +124,24 @@ def test_fill_sweep_responses_extend(mock_data_set):
             return self.value
 
     h5 = {
-        'epochs': {
-            'Sweep_1': {
-                'response': {
-                    'timeseries': {
-                        'data': np.ones(DATA_LENGTH)
-                    }
+        "epochs": {
+            "Sweep_1": {"response": {"timeseries": {"data": np.ones(DATA_LENGTH)}}},
+            "Experiment_1": {
+                "stimulus": {
+                    "idx_start": H5Scalar(1),
+                    "count": H5Scalar(3),  # truncation is here
+                    "timeseries": {"data": np.ones(DATA_LENGTH)},
                 }
             },
-            'Experiment_1': {
-                'stimulus': {
-                    'idx_start': H5Scalar(1),
-                    'count': H5Scalar(3),  # truncation is here
-                    'timeseries': {
-                        'data': np.ones(DATA_LENGTH)
-                    }
-                }
-            }
         }
     }
 
-    with patch('h5py.File', mock_h5py_file(data=h5)):
+    with patch("h5py.File", mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1], extend_experiment=True)
 
-    assert h5['epochs']['Experiment_1']['stimulus']['count'] == 4
-    assert h5['epochs']['Experiment_1']['stimulus']['idx_start'] == 1
-    assert np.all(
-        h5['epochs']['Sweep_1']['response']['timeseries']['data'] == 0.0)
+    assert h5["epochs"]["Experiment_1"]["stimulus"]["count"] == 4
+    assert h5["epochs"]["Experiment_1"]["stimulus"]["idx_start"] == 1
+    assert np.all(h5["epochs"]["Sweep_1"]["response"]["timeseries"]["data"] == 0.0)
 
 
 def test_fill_sweep_responses(mock_data_set):
@@ -158,39 +149,31 @@ def test_fill_sweep_responses(mock_data_set):
     DATA_LENGTH = 5
 
     h5 = {
-        'stimulus': {
-            'presentation': {
-                'Sweep_1': {
-                    'aibs_stimulus_amplitude_pa': 15.0,
-                    'aibs_stimulus_name': 'Joe',
-                    'gain': 1.0,
-                    'initial_access_resistance': 0.05,
-                    'seal': True
+        "stimulus": {
+            "presentation": {
+                "Sweep_1": {
+                    "aibs_stimulus_amplitude_pa": 15.0,
+                    "aibs_stimulus_name": "Joe",
+                    "gain": 1.0,
+                    "initial_access_resistance": 0.05,
+                    "seal": True,
                 }
             }
         },
-        'epochs': {
-            'Sweep_1': {
-                'description': 'sweep 1 description',
-                'stimulus': {},
-                'response': {
-                    'count': DATA_LENGTH,
-                    'idx_start': 0,
-                    'timeseries': {
-                        'data': np.ones(DATA_LENGTH) * 1.0
-                    }
-                }
+        "epochs": {
+            "Sweep_1": {
+                "description": "sweep 1 description",
+                "stimulus": {},
+                "response": {"count": DATA_LENGTH, "idx_start": 0, "timeseries": {"data": np.ones(DATA_LENGTH) * 1.0}},
             }
-        }
+        },
     }
 
-    with patch('h5py.File', mock_h5py_file(data=h5)):
+    with patch("h5py.File", mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1])
 
-    assert not np.any(
-        h5['epochs']['Sweep_1']['response']['timeseries']['data'])
-    assert len(h5['epochs']['Sweep_1']['response']['timeseries']['data']) == \
-           DATA_LENGTH
+    assert not np.any(h5["epochs"]["Sweep_1"]["response"]["timeseries"]["data"])
+    assert len(h5["epochs"]["Sweep_1"]["response"]["timeseries"]["data"]) == DATA_LENGTH
 
 
 @pytest.mark.xfail
@@ -199,38 +182,28 @@ def test_set_spike_times(mock_data_set):
     DATA_LENGTH = 5
 
     h5 = {
-        'analysis': {
-            'spike_times': {
-                'Sweep_1': {}
-            }
-        },
-        'stimulus': {
-            'presentation': {
-                'Sweep_1': {
-                    'aibs_stimulus_amplitude_pa': 15.0,
-                    'aibs_stimulus_name': 'Joe',
-                    'gain': 1.0,
-                    'initial_access_resistance': 0.05,
-                    'seal': True
+        "analysis": {"spike_times": {"Sweep_1": {}}},
+        "stimulus": {
+            "presentation": {
+                "Sweep_1": {
+                    "aibs_stimulus_amplitude_pa": 15.0,
+                    "aibs_stimulus_name": "Joe",
+                    "gain": 1.0,
+                    "initial_access_resistance": 0.05,
+                    "seal": True,
                 }
             }
         },
-        'epochs': {
-            'Sweep_1': {
-                'description': 'sweep 1 description',
-                'stimulus': {},
-                'response': {
-                    'count': DATA_LENGTH,
-                    'idx_start': 0,
-                    'timeseries': {
-                        'data': np.ones(DATA_LENGTH) * 1.0
-                    }
-                }
+        "epochs": {
+            "Sweep_1": {
+                "description": "sweep 1 description",
+                "stimulus": {},
+                "response": {"count": DATA_LENGTH, "idx_start": 0, "timeseries": {"data": np.ones(DATA_LENGTH) * 1.0}},
             }
-        }
+        },
     }
 
-    with patch('h5py.File', mock_h5py_file(data=h5)):
+    with patch("h5py.File", mock_h5py_file(data=h5)):
         data_set.set_spike_times(1, [0.1, 0.2, 0.3, 0.4, 0.5])
 
     assert False

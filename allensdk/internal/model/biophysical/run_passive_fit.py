@@ -15,65 +15,80 @@ import logging
 import logging.config as lc
 
 
-_run_passive_fit_log = logging.getLogger('allensdk.internal.model.biophysical.run_passive_fit')
+_run_passive_fit_log = logging.getLogger("allensdk.internal.model.biophysical.run_passive_fit")
 
 
 def run_passive_fit(description):
-    output_directory = description.manifest.get_path('WORKDIR')
-    neuronal_model = ju.read(description.manifest.get_path('neuronal_model_data'))
-    specimen_data = neuronal_model['specimen']
-    
-    is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
-    
-    all_sweeps = specimen_data['ephys_sweeps']
+    output_directory = description.manifest.get_path("WORKDIR")
+    neuronal_model = ju.read(description.manifest.get_path("neuronal_model_data"))
+    specimen_data = neuronal_model["specimen"]
+
+    is_spiny = not any(t["name"] == "dendrite type - aspiny" for t in specimen_data["specimen_tags"])
+
+    all_sweeps = specimen_data["ephys_sweeps"]
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
-    cap_check_sweeps, _, _ = \
-        ephys_utils.get_sweeps_of_type('C1SQCAPCHK',
-                                       all_sweeps)
-    
+    cap_check_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1SQCAPCHK", all_sweeps)
+
     passive_fit_data = {}
 
     if len(cap_check_sweeps) > 0:
-        data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
+        data_set = NwbDataSet(description.manifest.get_path("stimulus_path"))
         d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set)
 
-        grand_up_file = os.path.join(output_directory, 'upbase.dat')
-        np.savetxt(grand_up_file, d['grand_up'])
+        grand_up_file = os.path.join(output_directory, "upbase.dat")
+        np.savetxt(grand_up_file, d["grand_up"])
 
-        grand_down_file = os.path.join(output_directory, 'downbase.dat')
-        np.savetxt(grand_down_file, d['grand_down'])
-        
-        passive_fit_data["bridge"] = d['bridge_avg']
-        passive_fit_data["escape_time"] = d['escape_t']
+        grand_down_file = os.path.join(output_directory, "downbase.dat")
+        np.savetxt(grand_down_file, d["grand_down"])
 
-        fit_1_file = description.manifest.get_path('fit_1_file')
-        subprocess.check_output([sys.executable,
-                                                '-m', neuron_passive_fit.__name__, 
-                                                str(d['escape_t']),
-                                                os.path.realpath(description.manifest.get_path('manifest')) ])
-        passive_fit_data['fit_1'] = ju.read(fit_1_file)
+        passive_fit_data["bridge"] = d["bridge_avg"]
+        passive_fit_data["escape_time"] = d["escape_t"]
 
-        fit_2_file = description.manifest.get_path('fit_2_file')
+        fit_1_file = description.manifest.get_path("fit_1_file")
+        subprocess.check_output(
+            [
+                sys.executable,
+                "-m",
+                neuron_passive_fit.__name__,
+                str(d["escape_t"]),
+                os.path.realpath(description.manifest.get_path("manifest")),
+            ]
+        )
+        passive_fit_data["fit_1"] = ju.read(fit_1_file)
 
-        subprocess.check_output([sys.executable,
-                                                '-m', neuron_passive_fit2.__name__,
-                                                str(d['escape_t']),
-                                                os.path.realpath(description.manifest.get_path('manifest')) ])
-        passive_fit_data['fit_2'] = ju.read(fit_2_file)
+        fit_2_file = description.manifest.get_path("fit_2_file")
 
-        fit_3_file = description.manifest.get_path('fit_3_file')
-        subprocess.check_output([sys.executable,
-                                                '-m', neuron_passive_fit_elec.__name__,
-                                                str(d['escape_t']),
-                                                str(d['bridge_avg']),
-                                                str(1.0),
-                                                os.path.realpath(description.manifest.get_path('manifest')) ])
-        passive_fit_data['fit_3'] = ju.read(fit_3_file)
-        
+        subprocess.check_output(
+            [
+                sys.executable,
+                "-m",
+                neuron_passive_fit2.__name__,
+                str(d["escape_t"]),
+                os.path.realpath(description.manifest.get_path("manifest")),
+            ]
+        )
+        passive_fit_data["fit_2"] = ju.read(fit_2_file)
+
+        fit_3_file = description.manifest.get_path("fit_3_file")
+        subprocess.check_output(
+            [
+                sys.executable,
+                "-m",
+                neuron_passive_fit_elec.__name__,
+                str(d["escape_t"]),
+                str(d["bridge_avg"]),
+                str(1.0),
+                os.path.realpath(description.manifest.get_path("manifest")),
+            ]
+        )
+        passive_fit_data["fit_3"] = ju.read(fit_3_file)
+
         # Check for potentially problematic outcomes
-        cm_rel_delta = (passive_fit_data["fit_1"]["Cm"] - passive_fit_data["fit_3"]["Cm"]) / passive_fit_data["fit_1"]["Cm"]
+        cm_rel_delta = (passive_fit_data["fit_1"]["Cm"] - passive_fit_data["fit_3"]["Cm"]) / passive_fit_data["fit_1"][
+            "Cm"
+        ]
         if passive_fit_data["fit_2"]["err"] < passive_fit_data["fit_1"]["err"]:
             _run_passive_fit_log.debug("Fixed Ri gave better results than original")
             if passive_fit_data["fit_2"]["err"] < passive_fit_data["fit_3"]["err"]:
@@ -114,10 +129,10 @@ def run_passive_fit(description):
         else:
             cm2 = 1.0
 
-    passive_fit_data['ra'] = ra
-    passive_fit_data['cm1'] = cm1
-    passive_fit_data['cm2'] = cm2
-    
+    passive_fit_data["ra"] = ra
+    passive_fit_data["cm1"] = cm1
+    passive_fit_data["cm2"] = cm2
+
     return passive_fit_data
 
 
@@ -125,11 +140,11 @@ def main(limit, manifest_path):
     app_config = Config()
     description = app_config.load(manifest_path)
 
-    if 'LOG_CFG' in os.environ:
-        log_config = os.environ['LOG_CFG']
+    if "LOG_CFG" in os.environ:
+        log_config = os.environ["LOG_CFG"]
     else:
-        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
-        os.environ['LOG_CFG'] = log_config
+        log_config = str(files("allensdk.model.biophysical").joinpath("logging.conf"))
+        os.environ["LOG_CFG"] = log_config
     lc.fileConfig(log_config)
 
     run_passive_fit(description)
@@ -138,6 +153,5 @@ def main(limit, manifest_path):
 if __name__ == "__main__":
     limit = sys.argv[-2]
     manifest_path = sys.argv[-1]
-    
+
     main(limit, manifest_path)
-    

@@ -35,39 +35,28 @@ class Manifest(object):
         local paths for remote resources. Defaults to False.
     """
 
-    def __init__(
-        self,
-        cache_dir: Union[str, pathlib.Path],
-        json_input,
-        use_static_project_dir: bool = False
-    ):
+    def __init__(self, cache_dir: Union[str, pathlib.Path], json_input, use_static_project_dir: bool = False):
         if isinstance(cache_dir, str):
             self._cache_dir = pathlib.Path(cache_dir).resolve()
         elif isinstance(cache_dir, pathlib.Path):
             self._cache_dir = cache_dir.resolve()
         else:
-            raise ValueError("cache_dir must be either a str "
-                             "or a pathlib.Path; "
-                             f"got {type(cache_dir)}")
+            raise ValueError(f"cache_dir must be either a str or a pathlib.Path; got {type(cache_dir)}")
 
         self._use_static_project_dir = use_static_project_dir
 
         self._data: Dict[str, Any] = json.load(json_input)
         if not isinstance(self._data, dict):
-            raise ValueError("Expected to deserialize manifest into a dict; "
-                             f"instead got {type(self._data)}")
+            raise ValueError(f"Expected to deserialize manifest into a dict; instead got {type(self._data)}")
         self._project_name: str = self._data["project_name"]
-        self._version: str = self._data['manifest_version']
-        self._file_id_column: str = self._data['metadata_file_id_column_name']
+        self._version: str = self._data["manifest_version"]
+        self._file_id_column: str = self._data["metadata_file_id_column_name"]
         self._data_pipeline: str = self._data["data_pipeline"]
 
-        self._metadata_file_names: List[str] = [
-            file_name for file_name in self._data['metadata_files']
-        ]
+        self._metadata_file_names: List[str] = [file_name for file_name in self._data["metadata_files"]]
         self._metadata_file_names.sort()
 
-        self._file_id_values: List[Any] = [ii for ii in
-                                           self._data['data_files'].keys()]
+        self._file_id_values: List[Any] = [ii for ii in self._data["data_files"].keys()]
         self._file_id_values.sort()
 
     @property
@@ -107,10 +96,7 @@ class Manifest(object):
         """
         return self._file_id_values
 
-    def _create_file_attributes(self,
-                                remote_path: str,
-                                version_id: str,
-                                file_hash: str) -> CacheFileAttributes:
+    def _create_file_attributes(self, remote_path: str, version_id: str, file_hash: str) -> CacheFileAttributes:
         """
         Create the cache_file_attributes describing a file.
         This method does the work of assigning a local_path for a remote file.
@@ -151,19 +137,11 @@ class Manifest(object):
 
         local_path = project_dir / shaved_rel_path
 
-        obj = CacheFileAttributes(
-            remote_path,
-            version_id,
-            file_hash,
-            local_path
-        )
+        obj = CacheFileAttributes(remote_path, version_id, file_hash, local_path)
 
         return obj
 
-    def metadata_file_attributes(
-        self,
-        metadata_file_name: str
-    ) -> CacheFileAttributes:
+    def metadata_file_attributes(self, metadata_file_name: str) -> CacheFileAttributes:
         """
         Return the CacheFileAttributes associated with a metadata file
 
@@ -186,19 +164,15 @@ class Manifest(object):
             If the metadata_file_name is not a valid option
         """
         if self._data is None:
-            raise RuntimeError("You cannot retrieve "
-                               "metadata_file_attributes;\n"
-                               "you have not yet loaded a manifest.json file")
+            raise RuntimeError(
+                "You cannot retrieve metadata_file_attributes;\nyou have not yet loaded a manifest.json file"
+            )
 
         if metadata_file_name not in self._metadata_file_names:
-            raise ValueError(f"{metadata_file_name}\n"
-                             "is not in self.metadata_file_names:\n"
-                             f"{self._metadata_file_names}")
+            raise ValueError(f"{metadata_file_name}\nis not in self.metadata_file_names:\n{self._metadata_file_names}")
 
-        file_data = self._data['metadata_files'][metadata_file_name]
-        return self._create_file_attributes(file_data['url'],
-                                            file_data['version_id'],
-                                            file_data['file_hash'])
+        file_data = self._data["metadata_files"][metadata_file_name]
+        return self._create_file_attributes(file_data["url"], file_data["version_id"], file_data["file_hash"])
 
     def data_file_attributes(self, file_id) -> CacheFileAttributes:
         """
@@ -224,17 +198,14 @@ class Manifest(object):
             If the file_id is not a valid option
         """
         if self._data is None:
-            raise RuntimeError("You cannot retrieve data_file_attributes;\n"
-                               "you have not yet loaded a manifest.json file")
+            raise RuntimeError(
+                "You cannot retrieve data_file_attributes;\nyou have not yet loaded a manifest.json file"
+            )
 
-        if file_id not in self._data['data_files']:
-            valid_keys = list(self._data['data_files'].keys())
+        if file_id not in self._data["data_files"]:
+            valid_keys = list(self._data["data_files"].keys())
             valid_keys.sort()
-            raise ValueError(f"file_id: {file_id}\n"
-                             "Is not a data file listed in manifest:\n"
-                             f"{valid_keys}")
+            raise ValueError(f"file_id: {file_id}\nIs not a data file listed in manifest:\n{valid_keys}")
 
-        file_data = self._data['data_files'][file_id]
-        return self._create_file_attributes(file_data['url'],
-                                            file_data['version_id'],
-                                            file_data['file_hash'])
+        file_data = self._data["data_files"][file_id]
+        return self._create_file_attributes(file_data["url"], file_data["version_id"], file_data["file_hash"])

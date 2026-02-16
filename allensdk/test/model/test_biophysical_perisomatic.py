@@ -42,26 +42,25 @@ from allensdk.core.dat_utilities import DatUtilities
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 
-@pytest.mark.skipif(True,
-                    reason="partial testing")
+@pytest.mark.skipif(True, reason="partial testing")
 @pytest.mark.xfail
 def test_biophysical():
-    neuronal_model_id = 472451419    # get this from the web site
+    neuronal_model_id = 472451419  # get this from the web site
 
-    model_directory = '.'
+    model_directory = "."
 
-    bp = BiophysicalApi('http://api.brain-map.org')
+    bp = BiophysicalApi("http://api.brain-map.org")
     bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
     bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    os.system('nrnivmodl modfiles')
+    os.system("nrnivmodl modfiles")
 
-    description = Config().load('manifest.json')
+    description = Config().load("manifest.json")
     utils = Utils(description)
     h = utils.h
 
     manifest = description.manifest
-    morphology_path = manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    morphology_path = manifest.get_path("MORPHOLOGY")
+    utils.generate_morphology(morphology_path.encode("ascii", "ignore"))
     utils.load_cell_parameters()
 
     stim = h.IClamp(h.soma[0](0.5))
@@ -76,15 +75,15 @@ def test_biophysical():
     h.finitialize()
     h.run()
 
-    output_path = 'output_voltage.dat'
+    output_path = "output_voltage.dat"
 
-    junction_potential = description.data['fitting'][0]['junction_potential']
+    junction_potential = description.data["fitting"][0]["junction_potential"]
     mV = 1.0e-3
     ms = 1.0e-3
 
-    output_data = (numpy.array(vec['v']) - junction_potential) * mV
-    output_times = numpy.array(vec['t']) * ms
+    output_data = (numpy.array(vec["v"]) - junction_potential) * mV
+    output_times = numpy.array(vec["t"]) * ms
 
     DatUtilities.save_voltage(output_path, output_data, output_times)
-    
+
     assert numpy.count_nonzero(output_data) > 0

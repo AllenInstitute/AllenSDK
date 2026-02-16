@@ -3,14 +3,12 @@ import pandas as pd
 
 from allensdk.internal.api import PostgresQueryMixin
 import logging
-from allensdk.internal.api.queries.utils import (
-    build_in_list_selector_query)
+from allensdk.internal.api.queries.utils import build_in_list_selector_query
 
 
 def foraging_id_map_from_behavior_session_id(
-        lims_engine: PostgresQueryMixin,
-        behavior_session_ids: List[int],
-        logger: Optional[logging.RootLogger] = None) -> pd.DataFrame:
+    lims_engine: PostgresQueryMixin, behavior_session_ids: List[int], logger: Optional[logging.RootLogger] = None
+) -> pd.DataFrame:
     """
     Returns DataFrame with two columns:
         foraging_id
@@ -26,9 +24,7 @@ def foraging_id_map_from_behavior_session_id(
         the foraging_id
     """
 
-    behav_ids = build_in_list_selector_query("id",
-                                             behavior_session_ids,
-                                             operator="AND")
+    behav_ids = build_in_list_selector_query("id", behavior_session_ids, operator="AND")
     forag_ids_query = f"""
             SELECT foraging_id, id as behavior_session_id
             FROM behavior_sessions
@@ -36,20 +32,21 @@ def foraging_id_map_from_behavior_session_id(
             {behav_ids};
             """
     if logger is not None:
-        logger.debug("get_foraging_ids_from_behavior_session query: \n"
-                     f"{forag_ids_query}")
+        logger.debug(f"get_foraging_ids_from_behavior_session query: \n{forag_ids_query}")
     foraging_id_map = lims_engine.select(forag_ids_query)
 
     if logger is not None:
-        logger.debug(f"Retrieved {len(foraging_id_map)} foraging ids for"
-                     " behavior stage query. "
-                     f"Ids = {foraging_id_map.foraging_id}")
+        logger.debug(
+            f"Retrieved {len(foraging_id_map)} foraging ids for"
+            " behavior stage query. "
+            f"Ids = {foraging_id_map.foraging_id}"
+        )
     return foraging_id_map
 
 
 def stimulus_pickle_paths_from_behavior_session_ids(
-        lims_connection: PostgresQueryMixin,
-        behavior_session_id_list: List[int]) -> pd.DataFrame:
+    lims_connection: PostgresQueryMixin, behavior_session_id_list: List[int]
+) -> pd.DataFrame:
     """
     Get a DataFrame mapping behavior_session_id to
     stimulus_pickle_path
@@ -82,10 +79,7 @@ def stimulus_pickle_paths_from_behavior_session_ids(
         wkft.name = 'StimulusPickle'
       AND
         wkf.attachable_type = 'BehaviorSession'
-        {build_in_list_selector_query(
-        operator='AND',
-        col='beh.id',
-        valid_list=behavior_session_id_list)}
+        {build_in_list_selector_query(operator="AND", col="beh.id", valid_list=behavior_session_id_list)}
     """
 
     beh_to_path = lims_connection.select(query)

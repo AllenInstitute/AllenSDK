@@ -37,30 +37,25 @@
 import functools
 
 
+def decode_bytes(bytes_dataset, encoding="UTF-8"):
+    """Convert the elements of a dataset of bytes to str"""
 
-def decode_bytes(bytes_dataset, encoding='UTF-8'):
-    ''' Convert the elements of a dataset of bytes to str
-    '''
-
-    return [ item.decode(encoding) for item in bytes_dataset[:].flat ]
+    return [item.decode(encoding) for item in bytes_dataset[:].flat]
 
 
 def load_datasets_by_relnames(relnames, h5_file, start_node):
-    ''' A convenience function for finding and loading into memory one or more
+    """A convenience function for finding and loading into memory one or more
     datasets from an h5 file
-    '''
+    """
 
-    matcher_cbs = {
-        relname: functools.partial(h5_object_matcher_relname_in, [relname]) 
-        for relname in relnames
-    }
+    matcher_cbs = {relname: functools.partial(h5_object_matcher_relname_in, [relname]) for relname in relnames}
 
     matches = keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=start_node)
-    return { key: value[:] for key, value in matches.items() }
+    return {key: value[:] for key, value in matches.items()}
 
 
 def h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
-    ''' Asks if an h5 object's relative name (the final section of its absolute name)
+    """Asks if an h5 object's relative name (the final section of its absolute name)
     is contained within a provided array
 
     Parameters
@@ -74,22 +69,23 @@ def h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
 
     Returns
     -------
-    bool : 
+    bool :
         whether the match succeeded
     h5_object : h5py.group, h5py.Dataset
         the argued object
 
-    '''
+    """
 
-    return h5_object_name.split('/')[-1] in relnames, h5_object
+    return h5_object_name.split("/")[-1] in relnames, h5_object
 
 
 def keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
-    ''' Traverse an h5 file and build up a dictionary mapping supplied keys to 
+    """Traverse an h5 file and build up a dictionary mapping supplied keys to
     located objects
-    '''
+    """
 
     matches = {}
+
     def matcher(obj_name, obj):
         for key, matcher_cb in matcher_cbs.items():
             match, _ = matcher_cb(obj_name, obj)
@@ -101,10 +97,10 @@ def keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
 
 
 def locate_h5_objects(matcher_cb, h5_file, start_node=None):
-    ''' Traverse an h5 file and return objects matching supplied criteria
-    '''
+    """Traverse an h5 file and return objects matching supplied criteria"""
 
     matches = []
+
     def matcher(h5_object_name, h5_object):
         match, _ = matcher_cb(h5_object_name, h5_object)
         if match:
@@ -115,11 +111,10 @@ def locate_h5_objects(matcher_cb, h5_file, start_node=None):
 
 
 def traverse_h5_file(callback, h5_file, start_node=None):
-    ''' Traverse an h5 file and apply a callback to each node
-    '''
+    """Traverse an h5 file and apply a callback to each node"""
 
     if start_node is None:
-        start_node = h5_file['/']
+        start_node = h5_file["/"]
     elif isinstance(start_node, str):
         start_node = h5_file[start_node]
 

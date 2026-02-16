@@ -92,9 +92,7 @@ def test_error_on_not_unique_index(target_df_fixture):
 
 
 @pytest.mark.parametrize("original_index", [None, "a", "c", "b"])
-def test_patch_no_duplicates(
-    source_df_fixture, target_df_fixture, original_index
-):
+def test_patch_no_duplicates(source_df_fixture, target_df_fixture, original_index):
     """
     Test that we get the expected dataframe back in the case
     where there are no duplicate values of index_column
@@ -131,9 +129,7 @@ def test_patch_no_duplicates(
 
 
 @pytest.mark.parametrize("original_index", [None, "c", "b"])
-def test_patch_with_duplicates(
-    source_df_fixture, target_df_fixture, original_index
-):
+def test_patch_with_duplicates(source_df_fixture, target_df_fixture, original_index):
     """
     Test that we get the expected dataframe back in the case
     where there are duplicate values of index_column
@@ -231,9 +227,7 @@ def test_multiple_indexes_in_dataframe():
     mock_behavior_sessions = pd.DataFrame(
         {
             "behavior_session_id": [1, 2, 2, 3, 4],
-            "ecephys_session_id": pd.Series(
-                [10, 11, 0, 12, 13], dtype="Int64"
-            ),
+            "ecephys_session_id": pd.Series([10, 11, 0, 12, 13], dtype="Int64"),
             "mouse_id": [4, 4, 4, 2, 1],
         }
     ).set_index("behavior_session_id")

@@ -37,23 +37,20 @@ from ..api import Api
 
 
 class SynchronizationApi(Api):
-    '''HTTP client for image synchronization services uses the image alignment results from
+    """HTTP client for image synchronization services uses the image alignment results from
     the Informatics Data Processing Pipeline.
     Note: all locations on SectionImages are reported in pixel coordinates
     and all locations in 3-D ReferenceSpaces are reported in microns.
 
     See `Image to Image Synchronization <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
     for additional documentation.
-    '''
+    """
 
     def __init__(self, base_uri=None):
         super(SynchronizationApi, self).__init__(base_uri)
 
-    def get_image_to_atlas(self,
-                           section_image_id,
-                           x, y,
-                           atlas_id):
-        '''For a specified Atlas, find the closest annotated SectionImage
+    def get_image_to_atlas(self, section_image_id, x, y, atlas_id):
+        """For a specified Atlas, find the closest annotated SectionImage
         and (x,y) location as defined by a seed SectionImage and seed (x,y) location.
 
         Parameters
@@ -71,22 +68,23 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.image_to_atlas_endpoint,
-                       '/',
-                       str(section_image_id),
-                       '.json',
-                       '?x=%f&y=%f' % (x, y),
-                       '&atlas_id=',
-                       str(atlas_id)])
+        """
+        url = "".join(
+            [
+                self.image_to_atlas_endpoint,
+                "/",
+                str(section_image_id),
+                ".json",
+                "?x=%f&y=%f" % (x, y),
+                "&atlas_id=",
+                str(atlas_id),
+            ]
+        )
 
         return self.json_msg_query(url)
 
-    def get_image_to_image(self,
-                           section_image_id,
-                           x, y,
-                           section_data_set_ids):
-        '''For a list of target SectionDataSets, find the closest SectionImage
+    def get_image_to_image(self, section_image_id, x, y, section_data_set_ids):
+        """For a list of target SectionDataSets, find the closest SectionImage
         and (x,y) location as defined by a seed SectionImage and seed (x,y) pixel location.
 
         Parameters
@@ -104,22 +102,23 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.image_to_image_endpoint,
-                       '/',
-                       str(section_image_id),
-                       '.json',
-                       '?x=%f&y=%f' % (x, y),
-                       '&section_data_set_ids=',
-                       ','.join(str(i) for i in section_data_set_ids)])
+        """
+        url = "".join(
+            [
+                self.image_to_image_endpoint,
+                "/",
+                str(section_image_id),
+                ".json",
+                "?x=%f&y=%f" % (x, y),
+                "&section_data_set_ids=",
+                ",".join(str(i) for i in section_data_set_ids),
+            ]
+        )
 
         return self.json_msg_query(url)
 
-    def get_image_to_image_2d(self,
-                              section_image_id,
-                              x, y,
-                              section_image_ids):
-        '''For a list of target SectionImages, find the closest (x,y) location
+    def get_image_to_image_2d(self, section_image_id, x, y, section_image_ids):
+        """For a list of target SectionImages, find the closest (x,y) location
         as defined by a seed SectionImage and seed (x,y) location.
 
         Parameters
@@ -137,22 +136,23 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.image_to_image_2d_endpoint,
-                       '/',
-                       str(section_image_id),
-                       '.json',
-                       '?x=%f&y=%f' % (x, y),
-                       '&section_image_ids=',
-                       ','.join(str(i) for i in section_image_ids)])
+        """
+        url = "".join(
+            [
+                self.image_to_image_2d_endpoint,
+                "/",
+                str(section_image_id),
+                ".json",
+                "?x=%f&y=%f" % (x, y),
+                "&section_image_ids=",
+                ",".join(str(i) for i in section_image_ids),
+            ]
+        )
 
         return self.json_msg_query(url)
 
-    def get_reference_to_image(self,
-                               reference_space_id,
-                               x, y, z,
-                               section_data_set_ids):
-        '''For a list of target SectionDataSets, find the closest SectionImage
+    def get_reference_to_image(self, reference_space_id, x, y, z, section_data_set_ids):
+        """For a list of target SectionDataSets, find the closest SectionImage
         and (x,y) location as defined by a (x,y,z) location in a specified ReferenceSpace.
 
         Parameters
@@ -172,21 +172,23 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.reference_to_image_endpoint,
-                       '/',
-                       str(reference_space_id),
-                       '.json',
-                       '?x=%f&y=%f&z=%f' % (x, y, z),
-                       '&section_data_set_ids=',
-                       ','.join(str(i) for i in section_data_set_ids)])
+        """
+        url = "".join(
+            [
+                self.reference_to_image_endpoint,
+                "/",
+                str(reference_space_id),
+                ".json",
+                "?x=%f&y=%f&z=%f" % (x, y, z),
+                "&section_data_set_ids=",
+                ",".join(str(i) for i in section_data_set_ids),
+            ]
+        )
 
         return self.json_msg_query(url)
 
-    def get_image_to_reference(self,
-                               section_image_id,
-                               x, y):
-        '''For a specified SectionImage and (x,y) location,
+    def get_image_to_reference(self, section_image_id, x, y):
+        """For a specified SectionImage and (x,y) location,
         return the (x,y,z) location in the ReferenceSpace of the associated SectionDataSet.
 
         Parameters
@@ -202,19 +204,13 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.image_to_reference_endpoint,
-                       '/',
-                       str(section_image_id),
-                       '.json',
-                       '?x=%f&y=%f' % (x, y)])
+        """
+        url = "".join([self.image_to_reference_endpoint, "/", str(section_image_id), ".json", "?x=%f&y=%f" % (x, y)])
 
         return self.json_msg_query(url)
 
-    def get_structure_to_image(self,
-                               section_data_set_id,
-                               structure_ids):
-        '''For a list of target structures, find the closest SectionImage
+    def get_structure_to_image(self, section_data_set_id, structure_ids):
+        """For a list of target structures, find the closest SectionImage
         and (x,y) location as defined by the centroid of each Structure.
 
         Parameters
@@ -228,12 +224,16 @@ class SynchronizationApi(Api):
         -------
         dict
             The parsed json response
-        '''
-        url = ''.join([self.structure_to_image_endpoint,
-                       '/',
-                       str(section_data_set_id),
-                       '.json',
-                       '?structure_ids=',
-                       ','.join([str(i) for i in structure_ids])])
+        """
+        url = "".join(
+            [
+                self.structure_to_image_endpoint,
+                "/",
+                str(section_data_set_id),
+                ".json",
+                "?structure_ids=",
+                ",".join([str(i) for i in structure_ids]),
+            ]
+        )
 
         return self.json_msg_query(url)

@@ -9,7 +9,8 @@ from allensdk.brain_observatory.argschema_utilities import (
     OutputFile,
     RaisingSchema,
     check_write_access,
-    check_write_access_overwrite)
+    check_write_access_overwrite,
+)
 from marshmallow import Schema, ValidationError
 
 READ_ONLY = stat.S_IREAD | stat.S_IRGRP | stat.S_IROTH
@@ -102,7 +103,6 @@ class FileInBadPermissionsMiddleDir(WriteAccessTestHarness):
     ],
 )
 def test_check_write_access(tmpdir_factory, harness_cls, fn, raises):
-
     base_dir = str(tmpdir_factory.mktemp("HW"))
 
     harness = harness_cls(base_dir)
@@ -126,13 +126,15 @@ class GenericOutputSchema(RaisingSchema):
 
 
 class TestInputFile(object):
-
     def setup_method(self):
         self.parser = GenericInputSchema()
 
-    @pytest.mark.parametrize("input_data", [
-        ({"input_file": "/some/invalid_filepath/input.h5"}),
-    ])
+    @pytest.mark.parametrize(
+        "input_data",
+        [
+            ({"input_file": "/some/invalid_filepath/input.h5"}),
+        ],
+    )
     def test_invalid_input_file(self, input_data):
         with pytest.raises(ValidationError, match=r"No such file or directory"):
             self.parser.load(input_data)
@@ -147,19 +149,21 @@ class TestInputFile(object):
 
 
 class TestOutputFile(object):
-
     def setup_method(self):
         self.parser = GenericOutputSchema()
 
-    @pytest.mark.parametrize("output_data", [
-        ({"output_file": "////invalid_filepath/output.json"}),
-    ])
+    @pytest.mark.parametrize(
+        "output_data",
+        [
+            ({"output_file": "////invalid_filepath/output.json"}),
+        ],
+    )
     def test_invalid_output_file(self, output_data):
         # Apparently allensdk.brain_observatory.argschema_utilities tests are
         # skipped on Windows systems and the `check_write_access_overwrite`
         # function itself does not work correctly on Windows systems.
         # TODO: This is a stopgap for now
-        if os.name == 'nt':
+        if os.name == "nt":
             pytest.skip()
         # This test was failing on Bamboo because it was run in a container
         # as root (which means pretty much anything is writable). If this test

@@ -40,22 +40,20 @@ import warnings
 
 @pytest.fixture
 def deprecated_method():
-
     @deprecated()
     def i_am_deprecated():
         pass
 
     return i_am_deprecated
-    
-    
+
+
 @pytest.fixture
 def deprecated_class():
-
-    @class_deprecated('msg')
+    @class_deprecated("msg")
     class dep_cls(object):
         def __init__(self, a):
             self.a = a
-        
+
     return dep_cls
 
 
@@ -63,23 +61,23 @@ def test_deprecated(deprecated_method):
     expected = "Function i_am_deprecated is deprecated. "
 
     with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
+        warnings.simplefilter("always")
         deprecated_method()
 
         print(expected)
         print(str(c[-1].message))
 
         assert expected == str(c[-1].message)
-        
-        
+
+
 def test_deprecated_class(deprecated_class, deprecated_method):
-    expected = 'Class dep_cls is deprecated. msg'
-    
+    expected = "Class dep_cls is deprecated. msg"
+
     with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
+        warnings.simplefilter("always")
         deprecated_method()
 
         obj = deprecated_class(1)
 
-        assert( expected == str(c[-1].message) )
-        assert( obj.a == 1 )
+        assert expected == str(c[-1].message)
+        assert obj.a == 1

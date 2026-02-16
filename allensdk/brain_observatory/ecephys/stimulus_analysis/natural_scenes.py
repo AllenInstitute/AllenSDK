@@ -5,7 +5,7 @@ import warnings
 from .stimulus_analysis import StimulusAnalysis
 
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class NaturalScenes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_image='frame', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_image="frame", trial_duration=0.25, **kwargs):
         super(NaturalScenes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._images = None
@@ -46,18 +46,18 @@ class NaturalScenes(StimulusAnalysis):
         self._col_image = col_image
 
         if self._params is not None:
-            self._params = self._params.get('natural_scenes', {})
-            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
+            self._params = self._params.get("natural_scenes", {})
+            self._stimulus_key = self._params.get("stimulus_key", None)  # Overwrites parent value with argvars
         else:
             self._params = {}
 
     @property
     def name(self):
-        return 'Natural Scenes'
+        return "Natural Scenes"
 
     @property
     def images(self):
-        """ Array of iamge labels """
+        """Array of iamge labels"""
         if self._images is None:
             self._get_stim_table_stats()
 
@@ -77,7 +77,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def number_images(self):
-        """ Number of images shown """
+        """Number of images shown"""
         if self._images is None:
             self._get_stim_table_stats()
 
@@ -85,7 +85,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def number_nonblank(self):
-        """ Number of images shown (excluding blank condition) """
+        """Number of images shown (excluding blank condition)"""
         if self._number_nonblank is None:
             self._get_stim_table_stats()
 
@@ -93,45 +93,50 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def null_condition(self):
-        """ Stimulus condition ID for null (blank) stimulus """
+        """Stimulus condition ID for null (blank) stimulus"""
         return self.stimulus_conditions[self.stimulus_conditions[self._col_image] == -1].index
 
     @property
     def METRICS_COLUMNS(self):
-        return [('pref_image_ns', np.uint64), 
-                ('image_selectivity_ns', np.float64), 
-                ('firing_rate_ns', np.float64), 
-                ('fano_ns', np.float64),
-                ('time_to_peak_ns', np.float64), 
-                ('lifetime_sparseness_ns', np.float64),
-                ('run_pval_ns', np.float64), 
-                ('run_mod_ns', np.float64)]
+        return [
+            ("pref_image_ns", np.uint64),
+            ("image_selectivity_ns", np.float64),
+            ("firing_rate_ns", np.float64),
+            ("fano_ns", np.float64),
+            ("time_to_peak_ns", np.float64),
+            ("lifetime_sparseness_ns", np.float64),
+            ("run_pval_ns", np.float64),
+            ("run_mod_ns", np.float64),
+        ]
 
     @property
     def metrics(self):
         if self._metrics is None:
-            logger.info('Calculating metrics for ' + self.name)
+            logger.info("Calculating metrics for " + self.name)
 
             unit_ids = self.unit_ids
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
-                logger.info('Calculating metrics for ' + self.name)
+                logger.info("Calculating metrics for " + self.name)
 
-                metrics_df['pref_image_ns'] = [self._get_preferred_condition(unit) for unit in unit_ids]
-                metrics_df['pref_images_multi_ns'] = [
+                metrics_df["pref_image_ns"] = [self._get_preferred_condition(unit) for unit in unit_ids]
+                metrics_df["pref_images_multi_ns"] = [
                     self._check_multiple_pref_conditions(unit_id, self._col_image, self.images_nonblank)
                     for unit_id in unit_ids
                 ]
-                metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
-                metrics_df['firing_rate_ns'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_ns'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
-                                         for unit in unit_ids]
-                metrics_df['time_to_peak_ns'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
-                                                 for unit in unit_ids]
-                metrics_df['lifetime_sparseness_ns'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
-                metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = [
-                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df["image_selectivity_ns"] = [self._get_image_selectivity(unit) for unit in unit_ids]
+                metrics_df["firing_rate_ns"] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df["fano_ns"] = [
+                    self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids
+                ]
+                metrics_df["time_to_peak_ns"] = [
+                    self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids
+                ]
+                metrics_df["lifetime_sparseness_ns"] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ["run_pval_ns", "run_mod_ns"]] = [
+                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids
+                ]
 
             self._metrics = metrics_df
 
@@ -139,20 +144,20 @@ class NaturalScenes(StimulusAnalysis):
 
     @classmethod
     def known_stimulus_keys(cls):
-        return ['natural_scenes', 'Natural_Images', 'Natural Images']
+        return ["natural_scenes", "Natural_Images", "Natural Images"]
 
     def _get_stim_table_stats(self):
-        """ Extract image labels from the stimulus table """
+        """Extract image labels from the stimulus table"""
         self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
         self._images_nonblank = self._images[self._images >= 0]
         self._number_nonblank = len(self._images_nonblank)
 
     def _get_image_selectivity(self, unit_id, num_steps=1000):
-        """ Calculate the image selectivity for a given unit using spike means at every image"""
+        """Calculate the image selectivity for a given unit using spike means at every image"""
 
         unit_stats = self.conditionwise_statistics.loc[unit_id].drop(index=self.null_condition)
-        return image_selectivity(unit_stats['spike_mean'].values, num_steps=num_steps)
+        return image_selectivity(unit_stats["spike_mean"].values, num_steps=num_steps)
 
 
 def image_selectivity(spike_means, num_steps=1000):
@@ -185,7 +190,7 @@ def image_selectivity(spike_means, num_steps=1000):
         return 0.0
 
     j = np.arange(num_steps)
-    thresh = fmin + j*((fmax - fmin) / num_steps)
+    thresh = fmin + j * ((fmax - fmin) / num_steps)
     rtj = [np.mean(spike_means > t) for t in thresh]
 
     return 1 - (2 * np.mean(rtj))

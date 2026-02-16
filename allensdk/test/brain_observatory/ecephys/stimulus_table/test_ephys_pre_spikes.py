@@ -28,7 +28,6 @@ def stimulus_psuedofixture_1():
 
 
 def test_assign_sweep_values():
-
     stim_table = pd.DataFrame(
         [
             {
@@ -103,7 +102,6 @@ def test_assign_sweep_values():
     ],
 )
 def test_split_column(table, column, new_columns, drop, expected):
-
     obtained = ephys_pre_spikes.split_column(table, column, new_columns, drop)
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_column_type=False, check_dtype=False)
 
@@ -128,7 +126,6 @@ def test_split_column(table, column, new_columns, drop, expected):
     ],
 )
 def test_apply_display_sequence(sweeps, disp_seq, expected):
-
     table = pd.DataFrame(sweeps)
     disp_seq = np.array(disp_seq)
     obt_table = ephys_pre_spikes.apply_display_sequence(table, disp_seq)
@@ -153,11 +150,12 @@ def test_apply_display_sequence(sweeps, disp_seq, expected):
     ],
 )
 def test_make_spontaneous_activity_tables(stimulus_tables, expected):
-
     obtained = ephys_pre_spikes.make_spontaneous_activity_tables(stimulus_tables)
 
     if len(obtained) == 1:
-        pd.testing.assert_frame_equal(obtained[0], expected[0], check_like=True, check_column_type=False, check_dtype=False)
+        pd.testing.assert_frame_equal(
+            obtained[0], expected[0], check_like=True, check_column_type=False, check_dtype=False
+        )
     else:
         assert len(obtained) == len(expected)
 
@@ -182,22 +180,15 @@ def test_make_spontaneous_activity_tables(stimulus_tables, expected):
     ],
 )
 def test_create_stim_table(stimuli, stim_tabler, spon_tabler, sort_key, expected):
-
-    obtained = ephys_pre_spikes.create_stim_table(
-        stimuli, stim_tabler, spon_tabler, sort_key
-    )
-    pd.testing.assert_frame_equal(
-        obtained, expected, check_like=True, check_dtype=False, check_column_type=False
-    )
+    obtained = ephys_pre_spikes.create_stim_table(stimuli, stim_tabler, spon_tabler, sort_key)
+    pd.testing.assert_frame_equal(obtained, expected, check_like=True, check_dtype=False, check_column_type=False)
 
 
 @pytest.mark.parametrize(
     "stim_table,frame_times,fps,eft,map_cols,expected",
     [
         [
-            pd.DataFrame(
-                {"Start": [1, 2, 3, 4], "End": [2, 3, 4, 5], "data": [-1, -2, -3, -4]}
-            ),
+            pd.DataFrame({"Start": [1, 2, 3, 4], "End": [2, 3, 4, 5], "data": [-1, -2, -3, -4]}),
             np.array([100, 50, 25, 12.5, 6.25]),
             10,
             True,
@@ -213,10 +204,7 @@ def test_create_stim_table(stimuli, stim_tabler, spon_tabler, sort_key, expected
     ],
 )
 def test_apply_frame_times(stim_table, frame_times, fps, eft, map_cols, expected):
-
-    obtained = ephys_pre_spikes.apply_frame_times(
-        stim_table, frame_times, fps, eft, map_cols
-    )
+    obtained = ephys_pre_spikes.apply_frame_times(stim_table, frame_times, fps, eft, map_cols)
     pd.testing.assert_frame_equal(obtained, expected, check_like=True, check_column_type=False, check_dtype=False)
 
 
@@ -262,9 +250,8 @@ def test_apply_frame_times(stim_table, frame_times, fps, eft, map_cols, expected
     ],
 )
 def test_build_stimuluswise_table(stimulus, stf, start_key, end_key, expected):
-
-    obtained = ephys_pre_spikes.build_stimuluswise_table(
-        stimulus, stf, start_key, end_key
-    )
+    obtained = ephys_pre_spikes.build_stimuluswise_table(stimulus, stf, start_key, end_key)
     for obtained_table, expected_table in zip(obtained, expected):
-        pd.testing.assert_frame_equal(obtained_table, expected_table, check_like=True, check_column_type=False, check_dtype=False)
+        pd.testing.assert_frame_equal(
+            obtained_table, expected_table, check_like=True, check_column_type=False, check_dtype=False
+        )

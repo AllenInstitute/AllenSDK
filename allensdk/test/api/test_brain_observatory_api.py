@@ -66,11 +66,7 @@ def safe_msg5():
 
 @pytest.fixture()
 def bo_api():
-    endpoint = (
-        os.environ["TEST_API_ENDPOINT"]
-        if "TEST_API_ENDPOINT" in os.environ
-        else "http://twarehouse-backup"
-    )
+    endpoint = os.environ["TEST_API_ENDPOINT"] if "TEST_API_ENDPOINT" in os.environ else "http://twarehouse-backup"
     return BrainObservatoryApi(endpoint)
 
 
@@ -80,41 +76,17 @@ def mock_containers():
         {
             "targeted_structure": {"acronym": "CBS"},
             "imaging_depth": 100,
-            "specimen": {
-                "donor": {
-                    "transgenic_lines": [
-                        {
-                            "name": "Shiny",
-                            "transgenic_line_type_name": "driver"}
-                    ]
-                }
-            },
+            "specimen": {"donor": {"transgenic_lines": [{"name": "Shiny", "transgenic_line_type_name": "driver"}]}},
         },
         {
             "targeted_structure": {"acronym": "ABC"},
             "imaging_depth": 150,
-            "specimen": {
-                "donor": {
-                    "transgenic_lines": [
-                        {
-                            "name": "ShinyCre",
-                            "transgenic_line_type_name": "driver"}
-                    ]
-                }
-            },
+            "specimen": {"donor": {"transgenic_lines": [{"name": "ShinyCre", "transgenic_line_type_name": "driver"}]}},
         },
         {
             "targeted_structure": {"acronym": "NBC"},
             "imaging_depth": 200,
-            "specimen": {
-                "donor": {
-                    "transgenic_lines": [
-                        {
-                            "name": "Don",
-                            "transgenic_line_type_name": "reporter"}
-                    ]
-                }
-            },
+            "specimen": {"donor": {"transgenic_lines": [{"name": "Don", "transgenic_line_type_name": "reporter"}]}},
         },
     ]
 
@@ -176,8 +148,7 @@ def mock_specimens():
 def test_list_isi_experiments(mock_json_msg_query, bo_api):
     bo_api.list_isi_experiments()
     mock_json_msg_query.assert_called_once_with(
-        bo_api.api_url + "/api/v2/data/query.json?q="
-        "model::IsiExperiment,rma::options[num_rows$eq'all'][count$eqfalse]"
+        bo_api.api_url + "/api/v2/data/query.json?q=model::IsiExperiment,rma::options[num_rows$eq'all'][count$eqfalse]"
     )
 
 
@@ -296,7 +267,7 @@ def test_get_cell_metrics_no_ids(mock_json_msg_query, bo_api):
     mock_json_msg_query.assert_called_once_with(
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
-        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"   # noqa e501
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"  # noqa e501
     )
 
 
@@ -308,7 +279,7 @@ def test_get_cell_metrics_one_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843],"
-        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"   # noqa e501
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"  # noqa e501
     )
 
 
@@ -320,14 +291,12 @@ def test_get_cell_metrics_two_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
-        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"   # noqa e501
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'cell_specimen_id'][count$eqfalse]"  # noqa e501
     )
 
 
 def test_get_cell_metrics_five_messages(bo_api, safe_msg5):
-    with patch(
-        "allensdk.core.json_utilities.read_url_get", side_effect=safe_msg5
-    ) as ju_read_url_get:
+    with patch("allensdk.core.json_utilities.read_url_get", side_effect=safe_msg5) as ju_read_url_get:
         ids = [517394843, 517394850]
         list(bo_api.get_cell_metrics(cell_specimen_ids=ids))
 
@@ -337,10 +306,7 @@ def test_get_cell_metrics_five_messages(bo_api, safe_msg5):
             "rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,"
             "rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Border$eq%27cell_specimen_id%27%5D%5Bcount$eqfalse%5D"  # noqa e501
         )
-        expected_calls = map(
-            lambda c: call(base_query.format(c)),
-            [0, 2000, 4000, 6000, 8000, 10000]
-        )
+        expected_calls = map(lambda c: call(base_query.format(c)), [0, 2000, 4000, 6000, 8000, 10000])
 
         assert ju_read_url_get.call_args_list == list(expected_calls)
 
@@ -351,22 +317,16 @@ def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
 
 
 def test_filter_experiment_containers_depth_filter(bo_api, mock_containers):
-    containers = bo_api.filter_experiment_containers(
-        mock_containers, imaging_depths=[100]
-    )
+    containers = bo_api.filter_experiment_containers(mock_containers, imaging_depths=[100])
     assert len(containers) == 1
 
 
-def test_filter_experiment_containers_structures_filter(
-        bo_api, mock_containers):
-    containers = bo_api.filter_experiment_containers(
-        mock_containers, targeted_structures=["CBS"]
-    )
+def test_filter_experiment_containers_structures_filter(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers, targeted_structures=["CBS"])
     assert len(containers) == 1
 
 
-def test_filter_experiment_containers_lines_all_filters(
-        bo_api, mock_containers):
+def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers):
     containers = bo_api.filter_experiment_containers(
         mock_containers,
         imaging_depths=[200],
@@ -386,23 +346,16 @@ def test_filter_experiment_containers_lines_all_filters(
     assert len(containers) == 1
 
 
-def test_filter_experiment_containers_transgenic_lines(
-        bo_api, mock_containers):
-    containers = bo_api.filter_experiment_containers(
-        mock_containers, cre_lines=["Shiny"]
-    )
+def test_filter_experiment_containers_transgenic_lines(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers, cre_lines=["Shiny"])
 
     assert len(containers) == 0
 
-    containers = bo_api.filter_experiment_containers(
-        mock_containers, cre_lines=["ShinyCre"]
-    )
+    containers = bo_api.filter_experiment_containers(mock_containers, cre_lines=["ShinyCre"])
 
     assert len(containers) == 1
 
-    containers = bo_api.filter_experiment_containers(
-        mock_containers, transgenic_lines=["DON"]
-    )
+    containers = bo_api.filter_experiment_containers(mock_containers, transgenic_lines=["DON"])
 
     assert len(containers) == 1
 
@@ -413,37 +366,28 @@ def test_filter_ophys_experiments_no_filters(bo_api, mock_ophys_experiments):
 
 
 def test_filter_ophys_experiments_container_id(bo_api, mock_ophys_experiments):
-    experiments = bo_api.filter_ophys_experiments(
-        mock_ophys_experiments, experiment_container_ids=[1]
-    )
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments, experiment_container_ids=[1])
     assert len(experiments) == 1
 
 
 def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
-    experiments = bo_api.filter_ophys_experiments(
-        mock_ophys_experiments, stimuli=["static_gratings"]
-    )
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments, stimuli=["static_gratings"])
     assert len(experiments) == 1
 
 
 def test_filter_ophys_experiments_eye_tracking(bo_api, mock_ophys_experiments):
-    experiments = bo_api.filter_ophys_experiments(
-        mock_ophys_experiments, require_eye_tracking=True
-    )
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments, require_eye_tracking=True)
     assert len(experiments) == 1
 
 
 def test_filter_cell_specimens(bo_api, mock_specimens):
-    specimens = bo_api.filter_cell_specimens(mock_specimens,
-                                             include_failed=True)
+    specimens = bo_api.filter_cell_specimens(mock_specimens, include_failed=True)
     assert specimens == mock_specimens
 
     specimens = bo_api.filter_cell_specimens(mock_specimens)
     assert len(specimens) == 2
 
-    specimens = bo_api.filter_cell_specimens(
-        mock_specimens, ids=[mock_specimens[0]["cell_specimen_id"]]
-    )
+    specimens = bo_api.filter_cell_specimens(mock_specimens, ids=[mock_specimens[0]["cell_specimen_id"]])
     assert len(specimens) == 1
     assert specimens[0] == mock_specimens[0]
 
@@ -452,9 +396,7 @@ def test_filter_cell_specimens(bo_api, mock_specimens):
         cnt[sp["experiment_container_id"]] += 1
 
     ecid = mock_specimens[0]["experiment_container_id"]
-    specimens = bo_api.filter_cell_specimens(
-        mock_specimens, experiment_container_ids=[ecid]
-    )
+    specimens = bo_api.filter_cell_specimens(mock_specimens, experiment_container_ids=[ecid])
     assert len(specimens) == cnt[ecid]
     assert specimens[0] == mock_specimens[0]
 
@@ -465,9 +407,7 @@ def test_filter_cell_specimens(bo_api, mock_specimens):
     "json_msg_query",
     return_value=[{"download_link": "/url/path/to/file"}],
 )
-def test_save_ophys_experiment_data(
-    mock_json_msg_query, mock_retrieve_file_over_http, bo_api
-):
+def test_save_ophys_experiment_data(mock_json_msg_query, mock_retrieve_file_over_http, bo_api):
     with patch("allensdk.config.manifest.Manifest.safe_mkdir") as mkdir:
         bo_api.save_ophys_experiment_data(1, "/path/to/filename")
 
@@ -480,9 +420,7 @@ def test_save_ophys_experiment_data(
         "[attachable_id$eq1],well_known_file_type[name$eqNWBOphys],"
         "rma::options[num_rows$eq'all'][count$eqfalse]"
     )
-    mock_retrieve_file_over_http.assert_called_with(
-        bo_api.api_url + "/url/path/to/file", "/path/to/filename"
-    )
+    mock_retrieve_file_over_http.assert_called_with(bo_api.api_url + "/url/path/to/file", "/path/to/filename")
 
 
 @patch.object(BrainObservatoryApi, "retrieve_file_over_http")
@@ -491,9 +429,7 @@ def test_save_ophys_experiment_data(
     "json_msg_query",
     return_value=[{"download_link": "/url/path/to/file"}],
 )
-def test_save_ophys_experiment_event_data(
-    mock_json_msg_query, mock_retrieve_file_over_http, bo_api
-):
+def test_save_ophys_experiment_event_data(mock_json_msg_query, mock_retrieve_file_over_http, bo_api):
     with patch("allensdk.config.manifest.Manifest.safe_mkdir") as mkdir:
         bo_api.save_ophys_experiment_event_data(1, "/path/to/filename")
 
@@ -503,12 +439,10 @@ def test_save_ophys_experiment_event_data(
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::WellKnownFile,"
         "rma::criteria,"
-        "[attachable_id$eq1],well_known_file_type[name$eqObservatoryEventsFile],"   # noqa e501
+        "[attachable_id$eq1],well_known_file_type[name$eqObservatoryEventsFile],"  # noqa e501
         "rma::options[num_rows$eq'all'][count$eqfalse]"
     )
-    mock_retrieve_file_over_http.assert_called_with(
-        bo_api.api_url + "/url/path/to/file", "/path/to/filename"
-    )
+    mock_retrieve_file_over_http.assert_called_with(bo_api.api_url + "/url/path/to/file", "/path/to/filename")
 
 
 @pytest.mark.parametrize("ophys_experiment_id", [1, 2])
@@ -529,19 +463,11 @@ def test_save_ophys_experiment_eye_tracking_data(bo_api, ophys_experiment_id):
         def dummy_cloud_cache_init(cache_dir, bucket_name, project_name):
             pass
 
-        with patch.object(S3CloudCache, "__init__",
-                          wraps=dummy_cloud_cache_init):
-            with patch.object(S3CloudCache, "load_latest_manifest",
-                              wraps=lambda: None):
-                with patch.object(
-                    S3CloudCache, "get_metadata", wraps=get_dummy_metadata
-                ):
-                    with patch.object(
-                        S3CloudCache, "download_data", wraps=get_dummy_data
-                    ):
-                        cloud_cache = S3CloudCache(
-                            cache_dir="", bucket_name="", project_name=""
-                        )
+        with patch.object(S3CloudCache, "__init__", wraps=dummy_cloud_cache_init):
+            with patch.object(S3CloudCache, "load_latest_manifest", wraps=lambda: None):
+                with patch.object(S3CloudCache, "get_metadata", wraps=get_dummy_metadata):
+                    with patch.object(S3CloudCache, "download_data", wraps=get_dummy_data):
+                        cloud_cache = S3CloudCache(cache_dir="", bucket_name="", project_name="")
                         if ophys_experiment_id == 2:
                             with pytest.raises(ValueError):
                                 bo_api.save_ophys_experiment_eye_tracking_data(  # noqa E501
@@ -549,11 +475,10 @@ def test_save_ophys_experiment_eye_tracking_data(bo_api, ophys_experiment_id):
                                     cloud_cache=cloud_cache,
                                 )
                         else:
-                            file_path = bo_api.\
-                                save_ophys_experiment_eye_tracking_data(
-                                    ophys_experiment_id=ophys_experiment_id,
-                                    cloud_cache=cloud_cache,
-                                )
+                            file_path = bo_api.save_ophys_experiment_eye_tracking_data(
+                                ophys_experiment_id=ophys_experiment_id,
+                                cloud_cache=cloud_cache,
+                            )
                             actual = np.load(str(file_path))
                             np.testing.assert_array_equal(actual, expected)
 
@@ -564,9 +489,7 @@ def test_save_ophys_experiment_eye_tracking_data(bo_api, ophys_experiment_id):
     "json_msg_query",
     return_value=[{"download_link": "/url/path/to/file"}],
 )
-def test_get_cell_specimen_id_mapping(
-    mock_json_msg_query, mock_retrieve_file_over_http, bo_api
-):
+def test_get_cell_specimen_id_mapping(mock_json_msg_query, mock_retrieve_file_over_http, bo_api):
     with patch("pandas.read_csv") as readcsv:
         bo_api.get_cell_specimen_id_mapping("/path/to/filename", 1)
 
@@ -579,9 +502,7 @@ def test_get_cell_specimen_id_mapping(
         "[id$eq1],well_known_file_type[name$eqOphysCellSpecimenIdMapping],"
         "rma::options[num_rows$eq'all'][count$eqfalse]"
     )
-    mock_retrieve_file_over_http.assert_called_with(
-        bo_api.api_url + "/url/path/to/file", "/path/to/filename"
-    )
+    mock_retrieve_file_over_http.assert_called_with(bo_api.api_url + "/url/path/to/file", "/path/to/filename")
 
 
 def test_find_container_tags():
@@ -613,35 +534,17 @@ def test_find_specimen_cre_line():
     assert cre is None
 
     # None if no 'Cre'
-    s = {
-        "donor": {
-            "transgenic_lines": [
-                {"transgenic_line_type_name": "driver", "name": "banana"}
-            ]
-        }
-    }
+    s = {"donor": {"transgenic_lines": [{"transgenic_line_type_name": "driver", "name": "banana"}]}}
     cre = find_specimen_cre_line(s)
     assert cre is None
 
     # None if no 'Cre'
-    s = {
-        "donor": {
-            "transgenic_lines": [
-                {"transgenic_line_type_name": "driver", "name": "bananaCre"}
-            ]
-        }
-    }
+    s = {"donor": {"transgenic_lines": [{"transgenic_line_type_name": "driver", "name": "bananaCre"}]}}
     cre = find_specimen_cre_line(s)
     assert cre == "bananaCre"
 
     # None if no 'driver'
-    s = {
-        "donor": {
-            "transgenic_lines": [
-                {"transgenic_line_type_name": "reporter", "name": "bananaCre"}
-            ]
-        }
-    }
+    s = {"donor": {"transgenic_lines": [{"transgenic_line_type_name": "reporter", "name": "bananaCre"}]}}
     cre = find_specimen_cre_line(s)
     assert cre is None
 
@@ -652,24 +555,12 @@ def test_find_specimen_reporter_line():
     cre = find_specimen_reporter_line(s)
     assert cre is None
 
-    s = {
-        "donor": {
-            "transgenic_lines": [
-                {"transgenic_line_type_name": "reporter", "name": "banana"}
-            ]
-        }
-    }
+    s = {"donor": {"transgenic_lines": [{"transgenic_line_type_name": "reporter", "name": "banana"}]}}
     cre = find_specimen_reporter_line(s)
     assert cre == "banana"
 
     # None if no "reporter"
-    s = {
-        "donor": {
-            "transgenic_lines": [
-                {"transgenic_line_type_name": "driver", "name": "bananaCre"}
-            ]
-        }
-    }
+    s = {"donor": {"transgenic_lines": [{"transgenic_line_type_name": "driver", "name": "bananaCre"}]}}
     cre = find_specimen_reporter_line(s)
     assert cre is None
 

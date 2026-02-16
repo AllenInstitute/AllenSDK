@@ -4,9 +4,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory import sync_utilities
-from allensdk.brain_observatory.argschema_utilities import \
-    ArgSchemaParserPlus, \
-    write_or_print_outputs
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus, write_or_print_outputs
 from allensdk.brain_observatory.sync_dataset import Dataset
 from ._schemas import InputParameters, OutputParameters
 
@@ -24,13 +22,9 @@ def check_encoder(parent, key):
 
 
 def running_from_stim_file(stim_file, key, expected_length):
-    if "behavior" in stim_file["items"] and check_encoder(
-            stim_file["items"]["behavior"], key
-    ):
+    if "behavior" in stim_file["items"] and check_encoder(stim_file["items"]["behavior"], key):
         return stim_file["items"]["behavior"]["encoders"][0][key][:]
-    if "foraging" in stim_file["items"] and check_encoder(
-            stim_file["items"]["foraging"], key
-    ):
+    if "foraging" in stim_file["items"] and check_encoder(stim_file["items"]["foraging"], key):
         return stim_file["items"]["foraging"]["encoders"][0][key][:]
     if key in stim_file:
         return stim_file[key][:]
@@ -47,10 +41,7 @@ def angular_to_linear_velocity(angular_velocity, radius):
     return np.multiply(angular_velocity, radius)
 
 
-def extract_running_speeds(
-        frame_times, dx_deg, vsig, vin, wheel_radius, subject_position,
-        use_median_duration=False
-):
+def extract_running_speeds(frame_times, dx_deg, vsig, vin, wheel_radius, subject_position, use_median_duration=False):
     # the first interval does not have a known start time, so we can't compute
     # an average velocity from dx
     dx_rad = degrees_to_radians(dx_deg[1:])
@@ -84,10 +75,7 @@ def extract_running_speeds(
     return df
 
 
-def main(
-        stimulus_pkl_path, sync_h5_path, output_path, wheel_radius,
-        subject_position, use_median_duration, **kwargs
-):
+def main(stimulus_pkl_path, sync_h5_path, output_path, wheel_radius, subject_position, use_median_duration, **kwargs):
     stim_file = pd.read_pickle(stimulus_pkl_path)
     sync_dataset = Dataset(sync_h5_path)
 
@@ -96,13 +84,11 @@ def main(
     # 2. updates the "items", causing a running speed sample to be acquired
     # 3. sets the vsync line high
     # 4. flips the buffer
-    frame_times = sync_dataset.get_edges(
-        "rising", Dataset.FRAME_KEYS, units="seconds"
-    )
+    frame_times = sync_dataset.get_edges("rising", Dataset.FRAME_KEYS, units="seconds")
 
     # occasionally an extra set of frame times are acquired after the rest of
     # the signals. We detect and remove these
-    if kwargs.get('trim_discontiguous_frame_times', True):
+    if kwargs.get("trim_discontiguous_frame_times", True):
         frame_times = sync_utilities.trim_discontiguous_times(frame_times)
 
     num_raw_timestamps = len(frame_times)
@@ -111,8 +97,7 @@ def main(
 
     if num_raw_timestamps != len(dx_deg):
         raise ValueError(
-            f"found {num_raw_timestamps} rising edges on the vsync line, "
-            f"but only {len(dx_deg)} rotation samples"
+            f"found {num_raw_timestamps} rising edges on the vsync line, but only {len(dx_deg)} rotation samples"
         )
 
     vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
@@ -131,12 +116,10 @@ def main(
         vin=vin,
         wheel_radius=wheel_radius,
         subject_position=subject_position,
-        use_median_duration=use_median_duration
+        use_median_duration=use_median_duration,
     )
 
-    raw_data = pd.DataFrame(
-        {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg}
-    )
+    raw_data = pd.DataFrame({"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg})
 
     store = pd.HDFStore(output_path)
     store.put("running_speed", velocities)
@@ -147,9 +130,7 @@ def main(
 
 
 if __name__ == "__main__":
-    mod = ArgSchemaParserPlus(
-        schema_type=InputParameters, output_schema_type=OutputParameters
-    )
+    mod = ArgSchemaParserPlus(schema_type=InputParameters, output_schema_type=OutputParameters)
 
     output = main(**mod.args)
     write_or_print_outputs(data=output, parser=mod)

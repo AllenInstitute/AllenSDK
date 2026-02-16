@@ -11,17 +11,18 @@ import allensdk.internal.model.biophysical.optimize as optimize
 FIT_TYPES = {"f6": "f9", "f12": "f13"}
 DEFAULT_NUM_PROCESSES = 240
 
-_fit_stage_2_log = logging.getLogger('allensdk.model.biophysical.fit_stage_2')
+_fit_stage_2_log = logging.getLogger("allensdk.model.biophysical.fit_stage_2")
+
 
 def prepare_stage_2(output_directory):
-    config_base_data = json_utilities.read(os.path.join(FIT_BASE_DIR, 'config_base.json'))
+    config_base_data = json_utilities.read(os.path.join(FIT_BASE_DIR, "config_base.json"))
 
     jobs = []
 
     for fit_type in FIT_TYPES:
         best_error = 1e12
         best_seed = 0
-        
+
         fit_type_dir = os.path.join(output_directory, fit_type)
 
         if not os.path.exists(fit_type_dir):
@@ -56,13 +57,13 @@ def prepare_stage_2(output_directory):
 
         config = config_base_data.copy()
         config_path = os.path.join(new_fit_type_dir, "config.json")
-        config["biophys"][0]["model_file"] = [ target_file, config_path]
+        config["biophys"][0]["model_file"] = [target_file, config_path]
 
         if has_apic:
             fit_style_file = os.path.join(FIT_BASE_DIR, "fit_styles", FIT_TYPES[fit_type] + "_fit_style.json")
         else:
             fit_style_file = os.path.join(FIT_BASE_DIR, "fit_styles", FIT_TYPES[fit_type] + "_noapic_fit_style.json")
-        config["biophys"][0]["model_file"].append( fit_style_file )
+        config["biophys"][0]["model_file"].append(fit_style_file)
 
         config["manifest"].append({"type": "dir", "spec": new_fit_type_dir, "key": "FITDIR"})
         config["manifest"].append({"type": "file", "spec": start_pop_file, "key": "STARTPOP"})
@@ -70,46 +71,51 @@ def prepare_stage_2(output_directory):
         json_utilities.write(config_path, config)
 
         for seed in SEEDS:
-            logfile = os.path.join(new_fit_type_dir, 's%d' % seed, 'stage_2.log')
+            logfile = os.path.join(new_fit_type_dir, "s%d" % seed, "stage_2.log")
 
-            jobs.append({
-                    'config_path': os.path.abspath(config_path),
-                    'fit_type': fit_type,
-                    'log': os.path.abspath(logfile),
-                    'seed': seed,
-                    'num_processes': DEFAULT_NUM_PROCESSES
-                    })
+            jobs.append(
+                {
+                    "config_path": os.path.abspath(config_path),
+                    "fit_type": fit_type,
+                    "log": os.path.abspath(logfile),
+                    "seed": seed,
+                    "num_processes": DEFAULT_NUM_PROCESSES,
+                }
+            )
 
     return jobs
 
 
 def run_stage_2(jobs):
     for job in jobs:
-        args = [MPIEXEC,
-                '-np', str(job['num_processes']),
-                sys.executable,
-                '-m',
-                optimize.__name__,
-                str(job['seed']),
-                job['config_path'],
-                str(optimize.DEFAULT_NGEN),
-                str(optimize.DEFAULT_MU)]
+        args = [
+            MPIEXEC,
+            "-np",
+            str(job["num_processes"]),
+            sys.executable,
+            "-m",
+            optimize.__name__,
+            str(job["seed"]),
+            job["config_path"],
+            str(optimize.DEFAULT_NGEN),
+            str(optimize.DEFAULT_MU),
+        ]
         _fit_stage_2_log.debug(args)
-        with open(job['log'], "w") as outfile:
+        with open(job["log"], "w") as outfile:
             subprocess.call(args, stdout=outfile)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Set up DEAP-style fit for second stage')
-    parser.add_argument('--output_dir', required=True)
-    parser.add_argument('specimen_id', type=int)
+    parser = argparse.ArgumentParser(description="Set up DEAP-style fit for second stage")
+    parser.add_argument("--output_dir", required=True)
+    parser.add_argument("specimen_id", type=int)
     args = parser.parse_args()
 
-    output_directory = os.path.join(args.output_dir, 'specimen_%d' % args.specimen_id)
+    output_directory = os.path.join(args.output_dir, "specimen_%d" % args.specimen_id)
 
     jobs = prepare_stage_2(output_directory)
     run_stage_2(jobs)
 
-if __name__ == "__main__": 
-    main()
 
+if __name__ == "__main__":
+    main()

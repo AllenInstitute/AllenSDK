@@ -47,14 +47,14 @@ import matplotlib.pyplot as plt
 
 
 class DriftingGratings(StimulusAnalysis):
-    """ Perform tuning analysis specific to drifting gratings stimulus.
+    """Perform tuning analysis specific to drifting gratings stimulus.
 
     Parameters
     ----------
     data_set: BrainObservatoryNwbDataSet object
     """
 
-    _log = logging.getLogger('allensdk.brain_observatory.drifting_gratings')
+    _log = logging.getLogger("allensdk.brain_observatory.drifting_gratings")
 
     def __init__(self, data_set, **kwargs):
         super(DriftingGratings, self).__init__(data_set, **kwargs)
@@ -97,16 +97,15 @@ class DriftingGratings(StimulusAnalysis):
         return self._number_tf
 
     def populate_stimulus_table(self):
-        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
-        self._stim_table = stimulus_table.fillna(value=0.)
+        stimulus_table = self.data_set.get_stimulus_table("drifting_gratings")
+        self._stim_table = stimulus_table.fillna(value=0.0)
         self._orivals = np.unique(self.stim_table.orientation).astype(int)
-        self._tfvals = np.unique(self.stim_table.temporal_frequency).astype(
-            int)
+        self._tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
         self._number_ori = len(self.orivals)
         self._number_tf = len(self.tfvals)
 
     def get_response(self):
-        ''' Computes the mean response for each cell to each stimulus
+        """Computes the mean response for each cell to each stimulus
         condition.  Return is
         a (# orientations, # temporal frequencies, # cells, 3) np.ndarray.
         The final dimension
@@ -119,11 +118,10 @@ class DriftingGratings(StimulusAnalysis):
         Returns
         -------
         Numpy array storing mean responses.
-        '''
+        """
         DriftingGratings._log.info("Calculating mean responses")
 
-        response = np.empty(
-            (self.number_ori, self.number_tf, self.numbercells + 1, 3))
+        response = np.empty((self.number_ori, self.number_tf, self.numbercells + 1, 3))
 
         def ptest(x):
             if x.empty:
@@ -135,20 +133,18 @@ class DriftingGratings(StimulusAnalysis):
             for tf in self.tfvals:
                 tf_pt = np.where(self.tfvals == tf)[0][0]
                 subset_response = self.mean_sweep_response[
-                    (self.stim_table.temporal_frequency == tf) & (
-                                self.stim_table.orientation == ori)]
+                    (self.stim_table.temporal_frequency == tf) & (self.stim_table.orientation == ori)
+                ]
                 subset_pval = self.pval[
-                    (self.stim_table.temporal_frequency == tf) & (
-                            self.stim_table.orientation == ori)]
+                    (self.stim_table.temporal_frequency == tf) & (self.stim_table.orientation == ori)
+                ]
                 response[ori_pt, tf_pt, :, 0] = subset_response.mean(axis=0)
-                response[ori_pt, tf_pt, :, 1] = subset_response.std(
-                    axis=0) / sqrt(len(subset_response))
-                response[ori_pt, tf_pt, :, 2] = subset_pval.apply(
-                    ptest, axis=0)
+                response[ori_pt, tf_pt, :, 1] = subset_response.std(axis=0) / sqrt(len(subset_response))
+                response[ori_pt, tf_pt, :, 2] = subset_pval.apply(ptest, axis=0)
         return response
 
     def get_peak(self):
-        ''' Computes metrics related to each cell's peak response condition.
+        """Computes metrics related to each cell's peak response condition.
 
         Returns
         -------
@@ -164,22 +160,32 @@ class DriftingGratings(StimulusAnalysis):
             * p_run_dg
             * run_modulation_dg
             * cv_dg (circular variance)
-        '''
-        DriftingGratings._log.info('Calculating peak response properties')
+        """
+        DriftingGratings._log.info("Calculating peak response properties")
 
-        peak = pd.DataFrame(index=range(self.numbercells),
-                            columns=('ori_dg', 'tf_dg', 'reliability_dg',
-                                     'osi_dg', 'dsi_dg', 'peak_dff_dg',
-                                     'ptest_dg', 'p_run_dg',
-                                     'run_modulation_dg',
-                                     'cv_os_dg', 'cv_ds_dg', 'tf_index_dg',
-                                     'cell_specimen_id'))
+        peak = pd.DataFrame(
+            index=range(self.numbercells),
+            columns=(
+                "ori_dg",
+                "tf_dg",
+                "reliability_dg",
+                "osi_dg",
+                "dsi_dg",
+                "peak_dff_dg",
+                "ptest_dg",
+                "p_run_dg",
+                "run_modulation_dg",
+                "cv_os_dg",
+                "cv_ds_dg",
+                "tf_index_dg",
+                "cell_specimen_id",
+            ),
+        )
         cids = self.data_set.get_cell_specimen_ids()
 
         orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
-            cell_peak = np.where(self.response[:, 1:, nc, 0] == np.nanmax(
-                self.response[:, 1:, nc, 0]))
+            cell_peak = np.where(self.response[:, 1:, nc, 0] == np.nanmax(self.response[:, 1:, nc, 0]))
             prefori = cell_peak[0][0]
             preftf = cell_peak[1][0] + 1
             peak.cell_specimen_id.iloc[nc] = cids[nc]
@@ -198,8 +204,8 @@ class DriftingGratings(StimulusAnalysis):
             CV_top_os = np.empty((8), dtype=np.complex128)
             CV_top_ds = np.empty((8), dtype=np.complex128)
             for i in range(8):
-                CV_top_os[i] = (tuning[i] * np.exp(1j * 2 * orivals_rad[i]))
-                CV_top_ds[i] = (tuning[i] * np.exp(1j * orivals_rad[i]))
+                CV_top_os[i] = tuning[i] * np.exp(1j * 2 * orivals_rad[i])
+                CV_top_ds[i] = tuning[i] * np.exp(1j * orivals_rad[i])
             peak.cv_os_dg.iloc[nc] = np.abs(CV_top_os.sum()) / tuning.sum()
             peak.cv_ds_dg.iloc[nc] = np.abs(CV_top_ds.sum()) / tuning.sum()
 
@@ -212,39 +218,34 @@ class DriftingGratings(StimulusAnalysis):
                 for tf in self.tfvals[1:]:
                     groups.append(
                         self.mean_sweep_response[
-                            (self.stim_table.temporal_frequency == tf) &
-                            (self.stim_table.orientation == ori)][str(nc)])
-            groups.append(self.mean_sweep_response[
-                              self.stim_table.temporal_frequency == 0][
-                              str(nc)])
+                            (self.stim_table.temporal_frequency == tf) & (self.stim_table.orientation == ori)
+                        ][str(nc)]
+                    )
+            groups.append(self.mean_sweep_response[self.stim_table.temporal_frequency == 0][str(nc)])
             _, p = st.f_oneway(*groups)
             peak.ptest_dg.iloc[nc] = p
 
             subset = self.mean_sweep_response[
-                (self.stim_table.temporal_frequency == self.tfvals[preftf]) &
-                (self.stim_table.orientation == self.orivals[prefori])]
+                (self.stim_table.temporal_frequency == self.tfvals[preftf])
+                & (self.stim_table.orientation == self.orivals[prefori])
+            ]
 
             # running modulation
             subset_stat = subset[subset.dx < 1]
             subset_run = subset[subset.dx >= 1]
             if (len(subset_run) > 2) & (len(subset_stat) > 2):
-                (_, peak.p_run_dg.iloc[nc]) = st.ttest_ind(subset_run[str(nc)],
-                                                           subset_stat[
-                                                               str(nc)],
-                                                           equal_var=False)
+                (_, peak.p_run_dg.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
 
                 if subset_run[str(nc)].mean() > subset_stat[str(nc)].mean():
-                    peak.run_modulation_dg.iloc[nc] = (subset_run[
-                                                           str(nc)].mean() -
-                                                       subset_stat[
-                                                           str(nc)].mean()) \
-                                                      / np.abs(
-                        subset_run[str(nc)].mean())
+                    peak.run_modulation_dg.iloc[nc] = (
+                        subset_run[str(nc)].mean() - subset_stat[str(nc)].mean()
+                    ) / np.abs(subset_run[str(nc)].mean())
                 elif subset_run[str(nc)].mean() < subset_stat[str(nc)].mean():
-                    peak.run_modulation_dg.iloc[nc] = \
-                        (-1 * (subset_stat[str(nc)].mean() -
-                               subset_run[str(nc)].mean()) /
-                         np.abs(subset_stat[str(nc)].mean()))
+                    peak.run_modulation_dg.iloc[nc] = (
+                        -1
+                        * (subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())
+                        / np.abs(subset_stat[str(nc)].mean())
+                    )
 
             else:
                 peak.p_run_dg.iloc[nc] = np.nan
@@ -252,13 +253,13 @@ class DriftingGratings(StimulusAnalysis):
 
             # reliability
             subset = self.sweep_response[
-                (self.stim_table.temporal_frequency == self.tfvals[preftf]) &
-                (self.stim_table.orientation == self.orivals[prefori])]
+                (self.stim_table.temporal_frequency == self.tfvals[preftf])
+                & (self.stim_table.orientation == self.orivals[prefori])
+            ]
             corr_matrix = np.empty((len(subset), len(subset)))
             for i in range(len(subset)):
                 for j in range(len(subset)):
-                    r, p = st.pearsonr(subset[str(nc)].iloc[i][30:90],
-                                       subset[str(nc)].iloc[j][30:90])
+                    r, p = st.pearsonr(subset[str(nc)].iloc[i][30:90], subset[str(nc)].iloc[j][30:90])
                     corr_matrix[i, j] = r
             mask = np.ones((len(subset), len(subset)))
             for i in range(len(subset)):
@@ -271,23 +272,19 @@ class DriftingGratings(StimulusAnalysis):
             # TF index
             tf_tuning = self.response[prefori, 1:, nc, 0]
             trials = self.mean_sweep_response[
-                (self.stim_table.temporal_frequency != 0) &
-                (self.stim_table.orientation == self.orivals[prefori])
+                (self.stim_table.temporal_frequency != 0) & (self.stim_table.orientation == self.orivals[prefori])
             ][str(nc)].values
-            SSE_part = np.sqrt(
-                np.sum((trials - trials.mean()) ** 2) / (len(trials) - 5))
-            peak.tf_index_dg.iloc[nc] = (np.ptp(tf_tuning)) / (
-                        np.ptp(tf_tuning) + 2 * SSE_part)
+            SSE_part = np.sqrt(np.sum((trials - trials.mean()) ** 2) / (len(trials) - 5))
+            peak.tf_index_dg.iloc[nc] = (np.ptp(tf_tuning)) / (np.ptp(tf_tuning) + 2 * SSE_part)
 
         return peak
 
-    def open_star_plot(self, cell_specimen_id=None, include_labels=False,
-                       cell_index=None):
+    def open_star_plot(self, cell_specimen_id=None, include_labels=False, cell_index=None):
         cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         df = self.mean_sweep_response[str(cell_index)]
-        st = self.data_set.get_stimulus_table('drifting_gratings')
-        mask = st.dropna(subset=['orientation']).index
+        st = self.data_set.get_stimulus_table("drifting_gratings")
+        mask = st.dropna(subset=["orientation"]).index
 
         data = df.values
 
@@ -295,264 +292,234 @@ class DriftingGratings(StimulusAnalysis):
         cmax = max(cmin, data.mean() + data.std() * 3)
 
         fp = cplots.FanPlotter.for_drifting_gratings()
-        fp.plot(r_data=st.temporal_frequency.loc[mask].values,
-                angle_data=st.orientation.loc[mask].values,
-                data=df.loc[mask].values,
-                clim=[cmin, cmax])
+        fp.plot(
+            r_data=st.temporal_frequency.loc[mask].values,
+            angle_data=st.orientation.loc[mask].values,
+            data=df.loc[mask].values,
+            clim=[cmin, cmax],
+        )
         fp.show_axes(closed=True)
 
         if include_labels:
             fp.show_r_labels()
             fp.show_angle_labels()
 
-    def plot_orientation_selectivity(self,
-                                     si_range=oplots.SI_RANGE,
-                                     n_hist_bins=oplots.N_HIST_BINS,
-                                     color=oplots.STIM_COLOR,
-                                     p_value_max=oplots.P_VALUE_MAX,
-                                     peak_dff_min=oplots.PEAK_DFF_MIN):
+    def plot_orientation_selectivity(
+        self,
+        si_range=oplots.SI_RANGE,
+        n_hist_bins=oplots.N_HIST_BINS,
+        color=oplots.STIM_COLOR,
+        p_value_max=oplots.P_VALUE_MAX,
+        peak_dff_min=oplots.PEAK_DFF_MIN,
+    ):
         # responsive cells
-        vis_cells = (self.peak.ptest_dg < p_value_max) & (
-                    self.peak.peak_dff_dg > peak_dff_min)
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
 
         # orientation selective cells
-        osi_cells = vis_cells & (self.peak.osi_dg > si_range[0]) & (
-                    self.peak.osi_dg < si_range[1])
+        osi_cells = vis_cells & (self.peak.osi_dg > si_range[0]) & (self.peak.osi_dg < si_range[1])
 
         peak_osi = self.peak.loc[osi_cells]
         osis = peak_osi.osi_dg.values
 
-        oplots.plot_selectivity_cumulative_histogram(osis,
-                                                     "orientation "
-                                                     "selectivity index",
-                                                     si_range=si_range,
-                                                     n_hist_bins=n_hist_bins,
-                                                     color=color)
+        oplots.plot_selectivity_cumulative_histogram(
+            osis, "orientation selectivity index", si_range=si_range, n_hist_bins=n_hist_bins, color=color
+        )
 
-    def plot_direction_selectivity(self,
-                                   si_range=oplots.SI_RANGE,
-                                   n_hist_bins=oplots.N_HIST_BINS,
-                                   color=oplots.STIM_COLOR,
-                                   p_value_max=oplots.P_VALUE_MAX,
-                                   peak_dff_min=oplots.PEAK_DFF_MIN):
-
+    def plot_direction_selectivity(
+        self,
+        si_range=oplots.SI_RANGE,
+        n_hist_bins=oplots.N_HIST_BINS,
+        color=oplots.STIM_COLOR,
+        p_value_max=oplots.P_VALUE_MAX,
+        peak_dff_min=oplots.PEAK_DFF_MIN,
+    ):
         # responsive cells
-        vis_cells = (self.peak.ptest_dg < p_value_max) & (
-                    self.peak.peak_dff_dg > peak_dff_min)
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
 
         # direction selective cells
-        dsi_cells = vis_cells & (self.peak.dsi_dg > si_range[0]) & (
-                    self.peak.dsi_dg < si_range[1])
+        dsi_cells = vis_cells & (self.peak.dsi_dg > si_range[0]) & (self.peak.dsi_dg < si_range[1])
 
         peak_dsi = self.peak.loc[dsi_cells]
         dsis = peak_dsi.dsi_dg.values
 
-        oplots.plot_selectivity_cumulative_histogram(dsis,
-                                                     "direction selectivity "
-                                                     "index",
-                                                     si_range=si_range,
-                                                     n_hist_bins=n_hist_bins,
-                                                     color=color)
+        oplots.plot_selectivity_cumulative_histogram(
+            dsis, "direction selectivity index", si_range=si_range, n_hist_bins=n_hist_bins, color=color
+        )
 
-    def plot_preferred_direction(self,
-                                 include_labels=False,
-                                 si_range=oplots.SI_RANGE,
-                                 color=oplots.STIM_COLOR,
-                                 p_value_max=oplots.P_VALUE_MAX,
-                                 peak_dff_min=oplots.PEAK_DFF_MIN):
-        vis_cells = (self.peak.ptest_dg < p_value_max) & (
-                    self.peak.peak_dff_dg > peak_dff_min)
+    def plot_preferred_direction(
+        self,
+        include_labels=False,
+        si_range=oplots.SI_RANGE,
+        color=oplots.STIM_COLOR,
+        p_value_max=oplots.P_VALUE_MAX,
+        peak_dff_min=oplots.PEAK_DFF_MIN,
+    ):
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
         pref_dirs = self.peak.loc[vis_cells].ori_dg.values
         pref_dirs = [self.orivals[pref_dir] for pref_dir in pref_dirs]
 
         angles, counts = np.unique(pref_dirs, return_counts=True)
-        oplots.plot_radial_histogram(angles,
-                                     counts,
-                                     include_labels=include_labels,
-                                     all_angles=self.orivals,
-                                     direction=-1,
-                                     offset=0.0,
-                                     closed=True,
-                                     color=color)
+        oplots.plot_radial_histogram(
+            angles,
+            counts,
+            include_labels=include_labels,
+            all_angles=self.orivals,
+            direction=-1,
+            offset=0.0,
+            closed=True,
+            color=color,
+        )
 
-    def plot_preferred_temporal_frequency(self,
-                                          si_range=oplots.SI_RANGE,
-                                          color=oplots.STIM_COLOR,
-                                          p_value_max=oplots.P_VALUE_MAX,
-                                          peak_dff_min=oplots.PEAK_DFF_MIN):
-
-        vis_cells = (self.peak.ptest_dg < p_value_max) & (
-                    self.peak.peak_dff_dg > peak_dff_min)
+    def plot_preferred_temporal_frequency(
+        self,
+        si_range=oplots.SI_RANGE,
+        color=oplots.STIM_COLOR,
+        p_value_max=oplots.P_VALUE_MAX,
+        peak_dff_min=oplots.PEAK_DFF_MIN,
+    ):
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
         pref_tfs = self.peak.loc[vis_cells].tf_dg.values
 
-        oplots.plot_condition_histogram(pref_tfs,
-                                        self.tfvals[1:],
-                                        color=color)
+        oplots.plot_condition_histogram(pref_tfs, self.tfvals[1:], color=color)
 
         plt.xlabel("temporal frequency (Hz)")
         plt.ylabel("number of cells")
 
     def reshape_response_array(self):
-        '''
+        """
         :return: response array in cells x stim x repetition for noise
         correlations
-        '''
+        """
 
-        mean_sweep_response = \
-            self.mean_sweep_response.values[:, :self.numbercells]
+        mean_sweep_response = self.mean_sweep_response.values[:, : self.numbercells]
 
         stim_table = self.stim_table
 
         tfvals = self.tfvals
         tfvals = tfvals[tfvals != 0]  # blank sweep
 
-        response_new = np.zeros(
-            (self.numbercells, self.number_ori, self.number_tf - 1),
-            dtype='object')
+        response_new = np.zeros((self.numbercells, self.number_ori, self.number_tf - 1), dtype="object")
 
         for i, ori in enumerate(self.orivals):
             for j, tf in enumerate(tfvals):
-                ind = (stim_table.orientation.values == ori) * (
-                            stim_table.temporal_frequency.values == tf)
+                ind = (stim_table.orientation.values == ori) * (stim_table.temporal_frequency.values == tf)
                 for c in range(self.numbercells):
                     response_new[c, i, j] = mean_sweep_response[ind, c]
 
-        ind = (stim_table.temporal_frequency.values == 0)
+        ind = stim_table.temporal_frequency.values == 0
         response_blank = mean_sweep_response[ind, :].T
 
         return response_new, response_blank
 
-    def get_signal_correlation(self, corr='spearman'):
+    def get_signal_correlation(self, corr="spearman"):
         logging.debug("Calculating signal correlation")
 
         # orientation x freq x cell, no blank
-        response = \
-            self.response[:, 1:, :self.numbercells, 0]
+        response = self.response[:, 1:, : self.numbercells, 0]
 
-        response = response.reshape(self.number_ori * (self.number_tf - 1),
-                                    self.numbercells).T
+        response = response.reshape(self.number_ori * (self.number_tf - 1), self.numbercells).T
         N, Nstim = response.shape
 
         signal_corr = np.zeros((N, N))
         signal_p = np.empty((N, N))
-        if corr == 'pearson':
+        if corr == "pearson":
             for i in range(N):
                 for j in range(i, N):  # matrix is symmetric
-                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(
-                        response[i], response[j])
+                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(response[i], response[j])
 
-        elif corr == 'spearman':
+        elif corr == "spearman":
             for i in range(N):
                 for j in range(i, N):  # matrix is symmetric
-                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(
-                        response[i], response[j])
+                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(response[i], response[j])
 
         else:
-            raise Exception('correlation should be pearson or spearman')
+            raise Exception("correlation should be pearson or spearman")
 
         # fill in lower triangle
-        signal_corr = \
-            np.triu(signal_corr) + \
-            np.triu(signal_corr, 1).T
+        signal_corr = np.triu(signal_corr) + np.triu(signal_corr, 1).T
 
         # fill in lower triangle
-        signal_p = \
-            np.triu(signal_p) + \
-            np.triu(signal_p, 1).T
+        signal_p = np.triu(signal_p) + np.triu(signal_p, 1).T
 
         return signal_corr, signal_p
 
-    def get_representational_similarity(self, corr='spearman'):
+    def get_representational_similarity(self, corr="spearman"):
         logging.debug("Calculating representational similarity")
 
         # orientation x freq x phase x cell, no blank
-        response = self.response[:, 1:, :self.numbercells, 0]
+        response = self.response[:, 1:, : self.numbercells, 0]
 
-        response = response.reshape(self.number_ori * (self.number_tf - 1),
-                                    self.numbercells)
+        response = response.reshape(self.number_ori * (self.number_tf - 1), self.numbercells)
 
         # TODO 25 lines of repeated code!!!!!!!!
         Nstim, N = response.shape
 
         rep_sim = np.zeros((Nstim, Nstim))
         rep_sim_p = np.empty((Nstim, Nstim))
-        if corr == 'pearson':
+        if corr == "pearson":
             for i in range(Nstim):
                 for j in range(i, Nstim):  # matrix is symmetric
-                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i],
-                                                                 response[j])
+                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i], response[j])
 
-        elif corr == 'spearman':
+        elif corr == "spearman":
             for i in range(Nstim):
                 for j in range(i, Nstim):  # matrix is symmetric
-                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i],
-                                                                  response[j])
+                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i], response[j])
 
         else:
-            raise Exception('correlation should be pearson or spearman')
+            raise Exception("correlation should be pearson or spearman")
 
-        rep_sim = np.triu(rep_sim) + np.triu(rep_sim,
-                                             1).T  # fill in lower triangle
-        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p,
-                                                 1).T  # fill in lower triangle
+        rep_sim = np.triu(rep_sim) + np.triu(rep_sim, 1).T  # fill in lower triangle
+        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
 
         return rep_sim, rep_sim_p
 
-    def get_noise_correlation(self, corr='spearman'):
+    def get_noise_correlation(self, corr="spearman"):
         logging.debug("Calculating noise correlations")
 
         response, response_blank = self.reshape_response_array()
-        noise_corr = np.zeros((self.numbercells, self.numbercells,
-                               self.number_ori, self.number_tf - 1))
-        noise_corr_p = np.zeros((self.numbercells, self.numbercells,
-                                 self.number_ori, self.number_tf - 1))
+        noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_tf - 1))
+        noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_tf - 1))
 
         noise_corr_blank = np.zeros((self.numbercells, self.numbercells))
         noise_corr_blank_p = np.zeros((self.numbercells, self.numbercells))
 
-        if corr == 'pearson':
+        if corr == "pearson":
             for k in range(self.number_ori):
-                for l in range(self.number_tf - 1):     # noqa E741
+                for l in range(self.number_tf - 1):  # noqa E741
                     for i in range(self.numbercells):
                         for j in range(i, self.numbercells):
-                            noise_corr[i, j, k, l], noise_corr_p[
-                                i, j, k, l] = st.pearsonr(response[i, k, l],
-                                                          response[j, k, l])
+                            noise_corr[i, j, k, l], noise_corr_p[i, j, k, l] = st.pearsonr(
+                                response[i, k, l], response[j, k, l]
+                            )
 
-                    noise_corr[:, :, k, l] = np.triu(
-                        noise_corr[:, :, k, l]) + np.triu(
-                        noise_corr[:, :, k, l], 1).T
+                    noise_corr[:, :, k, l] = np.triu(noise_corr[:, :, k, l]) + np.triu(noise_corr[:, :, k, l], 1).T
 
             for i in range(self.numbercells):
                 for j in range(i, self.numbercells):
-                    noise_corr_blank[i, j], noise_corr_blank_p[
-                        i, j] = st.pearsonr(response_blank[i],
-                                            response_blank[j])
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.pearsonr(response_blank[i], response_blank[j])
 
-        elif corr == 'spearman':
+        elif corr == "spearman":
             for k in range(self.number_ori):
-                for l in range(self.number_tf - 1):     # noqa E741
+                for l in range(self.number_tf - 1):  # noqa E741
                     for i in range(self.numbercells):
                         for j in range(i, self.numbercells):
-                            noise_corr[i, j, k, l], noise_corr_p[
-                                i, j, k, l] = st.spearmanr(response[i, k, l],
-                                                           response[j, k, l])
+                            noise_corr[i, j, k, l], noise_corr_p[i, j, k, l] = st.spearmanr(
+                                response[i, k, l], response[j, k, l]
+                            )
 
-                    noise_corr[:, :, k, l] = np.triu(
-                        noise_corr[:, :, k, l]) + np.triu(
-                        noise_corr[:, :, k, l], 1).T
+                    noise_corr[:, :, k, l] = np.triu(noise_corr[:, :, k, l]) + np.triu(noise_corr[:, :, k, l], 1).T
 
             for i in range(self.numbercells):
                 for j in range(i, self.numbercells):
-                    noise_corr_blank[i, j], noise_corr_blank_p[
-                        i, j] = st.spearmanr(response_blank[i],
-                                             response_blank[j])
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.spearmanr(
+                        response_blank[i], response_blank[j]
+                    )
 
         else:
-            raise Exception('correlation should be pearson or spearman')
+            raise Exception("correlation should be pearson or spearman")
 
-        noise_corr_blank[:, :] = np.triu(noise_corr_blank[:, :]) + np.triu(
-            noise_corr_blank[:, :], 1).T
+        noise_corr_blank[:, :] = np.triu(noise_corr_blank[:, :]) + np.triu(noise_corr_blank[:, :], 1).T
 
         return noise_corr, noise_corr_p, noise_corr_blank, noise_corr_blank_p
 
@@ -563,10 +530,8 @@ class DriftingGratings(StimulusAnalysis):
         try:
             dg.populate_stimulus_table()
 
-            dg._sweep_response = pd.read_hdf(analysis_file,
-                                             "analysis/sweep_response_dg")
-            dg._mean_sweep_response = pd.read_hdf(
-                analysis_file, "analysis/mean_sweep_response_dg")
+            dg._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_dg")
+            dg._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_dg")
             dg._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:
@@ -580,8 +545,7 @@ class DriftingGratings(StimulusAnalysis):
                 if "analysis/signal_corr_dg" in f:
                     dg.signal_correlation = f["analysis/signal_corr_dg"][()]
                 if "analysis/rep_similarity_dg" in f:
-                    dg.representational_similarity = f[
-                        "analysis/rep_similarity_dg"][()]
+                    dg.representational_similarity = f["analysis/rep_similarity_dg"][()]
 
         except Exception as e:
             raise MissingStimulusException(e.args)

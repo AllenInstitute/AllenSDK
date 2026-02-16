@@ -21,9 +21,7 @@ def get_prior_exposures_to_session_type(df: pd.DataFrame) -> pd.Series:
     Series with index same as df and values prior exposure counts to
     session type
     """
-    return __get_prior_exposure_count(df=df, to=df["session_type"]).astype(
-        "Int64"
-    )
+    return __get_prior_exposure_count(df=df, to=df["session_type"]).astype("Int64")
 
 
 def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
@@ -48,9 +46,7 @@ def get_prior_exposures_to_image_set(df: pd.DataFrame) -> pd.Series:
     return __get_prior_exposure_count(df=df, to=image_set).astype("Int64")
 
 
-def get_prior_exposures_to_omissions(
-    df: pd.DataFrame, fetch_api: BehaviorProjectLimsApi
-) -> pd.Series:
+def get_prior_exposures_to_omissions(df: pd.DataFrame, fetch_api: BehaviorProjectLimsApi) -> pd.Series:
     """Get prior exposures to omissions
 
     Parameters
@@ -103,38 +99,27 @@ def get_prior_exposures_to_omissions(
 
         foraging_ids = habituation_sessions["foraging_id"].tolist()
         foraging_ids = [f"'{x}'" for x in foraging_ids]
-        mtrain_stage_parameters = fetch_api.get_behavior_stage_parameters(
-            foraging_ids=foraging_ids
-        )
+        mtrain_stage_parameters = fetch_api.get_behavior_stage_parameters(foraging_ids=foraging_ids)
         return habituation_sessions.apply(
             lambda session: __session_contains_omissions(
-                mtrain_stage_parameters=mtrain_stage_parameters[
-                    session["foraging_id"]
-                ]
+                mtrain_stage_parameters=mtrain_stage_parameters[session["foraging_id"]]
             ),
             axis=1,
         )
 
     habituation_sessions = __get_habituation_sessions(df=df)
     if not habituation_sessions.empty:
-        contains_omissions.loc[
-            habituation_sessions.index
-        ] = __get_habituation_sessions_contain_omissions(
+        contains_omissions.loc[habituation_sessions.index] = __get_habituation_sessions_contain_omissions(
             habituation_sessions=habituation_sessions, fetch_api=fetch_api
         )
 
     contains_omissions.loc[
-        (df["session_type"].str.lower().str.contains("ophys"))
-        & (~df.index.isin(habituation_sessions.index))
+        (df["session_type"].str.lower().str.contains("ophys")) & (~df.index.isin(habituation_sessions.index))
     ] = True
-    return __get_prior_exposure_count(
-        df=df, to=contains_omissions, agg_method="cumsum"
-    ).astype("Int64")
+    return __get_prior_exposure_count(df=df, to=contains_omissions, agg_method="cumsum").astype("Int64")
 
 
-def __get_prior_exposure_count(
-    df: pd.DataFrame, to: pd.Series, agg_method="cumcount"
-) -> pd.Series:
+def __get_prior_exposure_count(df: pd.DataFrame, to: pd.Series, agg_method="cumcount") -> pd.Series:
     """Returns prior exposures a subject had to something
     i.e can be prior exposures to a stimulus type, a image_set or
     omission
@@ -210,9 +195,7 @@ def add_experience_level_ophys(input_df: pd.DataFrame) -> pd.DataFrame:
 
     # do not modify in place
     table = input_df.copy(deep=True)
-    session_number = (
-        "session_number" if "session_number" in table.columns else "session"
-    )
+    session_number = "session_number" if "session_number" in table.columns else "session"
 
     # add experience_level column with strings indicating relevant conditions
     table["experience_level"] = "None"
@@ -262,7 +245,5 @@ def add_experience_level_simple(input_df: pd.DataFrame) -> pd.DataFrame:
         DataFrame with added "experience_level" column.
     """
     tmp_exposures = input_df["prior_exposures_to_image_set"].fillna(0)
-    input_df["experience_level"] = np.where(
-        tmp_exposures == 0, "Novel", "Familiar"
-    )
+    input_df["experience_level"] = np.where(tmp_exposures == 0, "Novel", "Familiar")
     return input_df

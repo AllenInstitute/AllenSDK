@@ -1,14 +1,18 @@
 # in place of global from neuron import h
 
-def get_h():   
+
+def get_h():
     if get_h.h is None:
         from neuron import h
+
         get_h.h = h
     return get_h.h
-    
+
+
 get_h.h = None
 
 from .output_grabber import OutputGrabber
+
 
 def load_morphology(filename):
     h = get_h()
@@ -22,8 +26,8 @@ def load_morphology(filename):
 def parse_neuron_output(output_str):
     printed_fields = {}
 
-    for line in output_str.split('\n'):
-        if line.startswith('nquad'):
+    for line in output_str.split("\n"):
+        if line.startswith("nquad"):
             continue
         toks = line.split()
         if len(toks) == 2:
@@ -32,7 +36,7 @@ def parse_neuron_output(output_str):
                 v = float(v)
             except Exception:
                 pass
-            
+
             printed_fields[toks[0].strip()] = v
 
     return printed_fields
@@ -40,7 +44,6 @@ def parse_neuron_output(output_str):
 
 def read_neuron_fit_stdout(func):
     def call(*args, **kwargs):
-
         g = OutputGrabber()
         g.start()
         data = func(*args, **kwargs)
@@ -52,5 +55,3 @@ def read_neuron_fit_stdout(func):
         return data
 
     return call
-
-

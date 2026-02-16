@@ -35,12 +35,9 @@ class Age(
         return cls(age=age)
 
     @classmethod
-    def from_lims(
-        cls, behavior_session_id: int, lims_db: PostgresQueryMixin
-    ) -> "Age":
+    def from_lims(cls, behavior_session_id: int, lims_db: PostgresQueryMixin) -> "Age":
         date_of_acquisition = DateOfAcquisition.from_lims(
-            behavior_session_id=behavior_session_id,
-            lims_db=lims_db
+            behavior_session_id=behavior_session_id, lims_db=lims_db
         ).value
 
         query = f"""
@@ -49,9 +46,7 @@ class Age(
             JOIN donors d ON d.id = bs.donor_id
             WHERE bs.id = {behavior_session_id};
         """
-        date_of_birth = cls._check_timezone(
-            lims_db.fetchone(query, strict=True)
-        )
+        date_of_birth = cls._check_timezone(lims_db.fetchone(query, strict=True))
 
         age = (date_of_acquisition - date_of_birth).days
         return cls(age=age)
@@ -87,20 +82,14 @@ class Age(
         """
         if not age.startswith("P"):
             if warn:
-                warnings.warn(
-                    "Could not parse numeric age from age code "
-                    '(age code does not start with "P")'
-                )
+                warnings.warn('Could not parse numeric age from age code (age code does not start with "P")')
             return None
 
         match = re.search(r"\d+", age)
 
         if match is None:
             if warn:
-                warnings.warn(
-                    "Could not parse numeric age from age code "
-                    "(no numeric values found in age code)"
-                )
+                warnings.warn("Could not parse numeric age from age code (no numeric values found in age code)")
             return None
 
         start, end = match.span()

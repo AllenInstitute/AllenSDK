@@ -61,14 +61,13 @@ def memoize(f):
     Access the underlying function with f.__wrapped__.
     """
     cache = {}
-    sentinel = object()         # unique object for cache misses
-    make_key = _make_key        # efficient key building from function args
+    sentinel = object()  # unique object for cache misses
+    make_key = _make_key  # efficient key building from function args
     cache_get = cache.get
     cache_len = cache.__len__
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-
         # Don't consider 3.0 and 3 different
         key = make_key(args, kwargs, typed=False)
 
@@ -92,20 +91,16 @@ def memoize(f):
 
 
 class Cache(object):
-    _log = logging.getLogger('allensdk.api.cache')
+    _log = logging.getLogger("allensdk.api.cache")
 
-    def __init__(self,
-                 manifest=None,
-                 cache=True,
-                 version=None,
-                 **kwargs):
+    def __init__(self, manifest=None, cache=True, version=None, **kwargs):
         self.cache = cache
-        if version is None and hasattr(self, 'MANIFEST_VERSION'):
+        if version is None and hasattr(self, "MANIFEST_VERSION"):
             version = self.MANIFEST_VERSION
         self.load_manifest(manifest, version)
 
     def get_cache_path(self, file_name, manifest_key, *args):
-        '''Helper method for accessing path specs from manifest keys.
+        """Helper method for accessing path specs from manifest keys.
 
         Parameters
         ----------
@@ -117,7 +112,7 @@ class Cache(object):
         -------
         string or None
             path
-        '''
+        """
         if self.cache:
             if file_name:
                 return file_name
@@ -127,7 +122,7 @@ class Cache(object):
         return None
 
     def load_manifest(self, file_name, version=None):
-        '''Read a keyed collection of path specifications.
+        """Read a keyed collection of path specifications.
 
         Parameters
         ----------
@@ -137,10 +132,9 @@ class Cache(object):
         Returns
         -------
         Manifest
-        '''
+        """
         if file_name is not None:
             if not os.path.exists(file_name):
-
                 # make the directory if it doesn't exist already
                 dirname = os.path.dirname(file_name)
                 if dirname:
@@ -149,10 +143,7 @@ class Cache(object):
                 self.build_manifest(file_name)
 
             try:
-                self.manifest = Manifest(
-                    ju.read(file_name)['manifest'],
-                    os.path.dirname(file_name),
-                    version=version)
+                self.manifest = Manifest(ju.read(file_name)["manifest"], os.path.dirname(file_name), version=version)
             except ManifestVersionError as e:
                 if e.outdated is True:
                     intro = "is out of date"
@@ -162,24 +153,27 @@ class Cache(object):
                     intro = "version did not match the expected version"
 
                 ref_url = "https://github.com/alleninstitute/allensdk/wiki"
-                raise ManifestVersionError(("Your manifest file (%s) %s" +
-                                            " (its version is '%s', but" +
-                                            " version '%s' is expected). " +
-                                            " Please remove this file" +
-                                            " and it will be regenerated for" +
-                                            " you the next time you" +
-                                            " instantiate this class." +
-                                            " WARNING: There may be new data" +
-                                            " files available that replace" +
-                                            " the ones you already have" +
-                                            " downloaded. Read the notes" +
-                                            " for this release for more" +
-                                            " details on what has changed" +
-                                            " (%s).") %
-                                           (file_name, intro,
-                                            e.found_version, e.version,
-                                            ref_url),
-                                           e.version, e.found_version)
+                raise ManifestVersionError(
+                    (
+                        "Your manifest file (%s) %s"
+                        + " (its version is '%s', but"
+                        + " version '%s' is expected). "
+                        + " Please remove this file"
+                        + " and it will be regenerated for"
+                        + " you the next time you"
+                        + " instantiate this class."
+                        + " WARNING: There may be new data"
+                        + " files available that replace"
+                        + " the ones you already have"
+                        + " downloaded. Read the notes"
+                        + " for this release for more"
+                        + " details on what has changed"
+                        + " (%s)."
+                    )
+                    % (file_name, intro, e.found_version, e.version, ref_url),
+                    e.version,
+                    e.found_version,
+                )
 
             self.manifest_path = file_name
 
@@ -187,13 +181,13 @@ class Cache(object):
             self.manifest = None
 
     def build_manifest(self, file_name):
-        '''Creation of default path specifications.
+        """Creation of default path specifications.
 
         Parameters
         ----------
         file_name : string
             where to save it
-        '''
+        """
 
         manifest_builder = ManifestBuilder()
         manifest_builder.set_version(self.MANIFEST_VERSION)
@@ -203,20 +197,18 @@ class Cache(object):
         manifest_builder.write_json_file(file_name)
 
     def add_manifest_paths(self, manifest_builder):
-        '''Add cache-class specific paths to the manifest. In derived classes,
+        """Add cache-class specific paths to the manifest. In derived classes,
         should call super.
-        '''
-        manifest_builder.add_path('BASEDIR', '.')
-        if hasattr(self, 'MANIFEST_CONFIG'):
+        """
+        manifest_builder.add_path("BASEDIR", ".")
+        if hasattr(self, "MANIFEST_CONFIG"):
             for key, config in self.MANIFEST_CONFIG.items():
                 manifest_builder.add_path(key, **config)
         return manifest_builder
 
     def manifest_dataframe(self):
-        '''Convenience method to view manifest as a pandas dataframe.
-        '''
-        return pd.DataFrame.from_dict(self.manifest.path_info,
-                                      orient='index')
+        """Convenience method to view manifest as a pandas dataframe."""
+        return pd.DataFrame.from_dict(self.manifest.path_info, orient="index")
 
     @staticmethod
     def json_remove_keys(data, keys):
@@ -228,8 +220,7 @@ class Cache(object):
 
     @staticmethod
     def remove_keys(data, keys=None):
-        ''' DataFrame version
-        '''
+        """DataFrame version"""
         if keys is None:
             keys = []
 
@@ -237,16 +228,15 @@ class Cache(object):
             del data[key]
 
     @staticmethod
-    def json_rename_columns(data,
-                            new_old_name_tuples=None):
-        '''Convenience method to rename columns in a pandas dataframe.
+    def json_rename_columns(data, new_old_name_tuples=None):
+        """Convenience method to rename columns in a pandas dataframe.
 
         Parameters
         ----------
         data : dataframe
             edited in place.
         new_old_name_tuples : list of string tuples (new, old)
-        '''
+        """
         if new_old_name_tuples is None:
             new_old_name_tuples = []
 
@@ -256,28 +246,23 @@ class Cache(object):
                 del r[old_name]
 
     @staticmethod
-    def rename_columns(data,
-                       new_old_name_tuples=None):
-        '''Convenience method to rename columns in a pandas dataframe.
+    def rename_columns(data, new_old_name_tuples=None):
+        """Convenience method to rename columns in a pandas dataframe.
 
         Parameters
         ----------
         data : dataframe
             edited in place.
         new_old_name_tuples : list of string tuples (new, old)
-        '''
+        """
         if new_old_name_tuples is None:
             new_old_name_tuples = []
 
         for new_name, old_name in new_old_name_tuples:
-            data.columns = [new_name if c == old_name else c
-                            for c in data.columns]
+            data.columns = [new_name if c == old_name else c for c in data.columns]
 
-    def load_csv(self,
-                 path,
-                 rename=None,
-                 index=None):
-        '''Read a csv file as a pandas dataframe.
+    def load_csv(self, path, rename=None, index=None):
+        """Read a csv file as a pandas dataframe.
 
         Parameters
         ----------
@@ -285,7 +270,7 @@ class Cache(object):
             columns to rename
         index : string, optional
             post-rename column to use as the row label.
-        '''
+        """
         data = pd.read_csv(path, parse_dates=True)
 
         Cache.rename_columns(data, rename)
@@ -295,11 +280,8 @@ class Cache(object):
 
         return data
 
-    def load_json(self,
-                  path,
-                  rename=None,
-                  index=None):
-        '''Read a json file as a pandas dataframe.
+    def load_json(self, path, rename=None, index=None):
+        """Read a json file as a pandas dataframe.
 
         Parameters
         ----------
@@ -307,8 +289,8 @@ class Cache(object):
             columns to rename
         index : string, optional
             post-rename column to use as the row label.
-        '''
-        data = pj.read_json(path, orient='records')
+        """
+        data = pj.read_json(path, orient="records")
 
         Cache.rename_columns(data, rename)
 
@@ -318,10 +300,8 @@ class Cache(object):
         return data
 
     @staticmethod
-    def cacher(fn,
-               *args,
-               **kwargs):
-        '''make an rma query, save it and return the dataframe.
+    def cacher(fn, *args, **kwargs):
+        """make an rma query, save it and return the dataframe.
 
         Parameters
         ----------
@@ -350,33 +330,32 @@ class Cache(object):
         -------
         Object or None
             data type depends on fn, reader and/or post methods.
-        '''
-        path = kwargs.pop('path', None)
-        strategy = kwargs.pop('strategy', None)
-        pre = kwargs.pop('pre', lambda d: d)
-        post = kwargs.pop('post', None)
-        reader = kwargs.pop('reader', None)
-        writer = kwargs.pop('writer', None)
+        """
+        path = kwargs.pop("path", None)
+        strategy = kwargs.pop("strategy", None)
+        pre = kwargs.pop("pre", lambda d: d)
+        post = kwargs.pop("post", None)
+        reader = kwargs.pop("reader", None)
+        writer = kwargs.pop("writer", None)
 
         if strategy is None:
             if writer or path:
-                strategy = 'lazy'
+                strategy = "lazy"
             else:
-                strategy = 'pass_through'
+                strategy = "pass_through"
 
-        if strategy not in ['lazy', 'pass_through',
-                            'file', 'create']:
+        if strategy not in ["lazy", "pass_through", "file", "create"]:
             raise ValueError("Unknown query strategy: {}.".format(strategy))
 
-        if 'lazy' == strategy:
+        if "lazy" == strategy:
             if os.path.exists(path):
-                strategy = 'file'
+                strategy = "file"
             else:
-                strategy = 'create'
+                strategy = "create"
 
-        if strategy == 'pass_through':
+        if strategy == "pass_through":
             data = fn(*args, **kwargs)
-        elif strategy in ['create']:
+        elif strategy in ["create"]:
             Manifest.safe_make_parent_dirs(path)
 
             if writer:
@@ -409,75 +388,51 @@ class Cache(object):
         first_row = True
         row_count = 1
 
-        with open(pth, 'w') as output:
+        with open(pth, "w") as output:
             for row in gen:
                 if first_row:
                     field_names = [str(k) for k in row.keys()]
-                    csv_writer = csv.DictWriter(output,
-                                                fieldnames=field_names,
-                                                delimiter=',',
-                                                quoting=csv.QUOTE_ALL)
+                    csv_writer = csv.DictWriter(output, fieldnames=field_names, delimiter=",", quoting=csv.QUOTE_ALL)
                     csv_writer.writeheader()
                     first_row = False
-                Cache._log.info('row: {}'.format(row_count))
+                Cache._log.info("row: {}".format(row_count))
                 row_count = row_count + 1
                 csv_writer.writerow(row)
 
     @staticmethod
     def cache_csv_json():
-
         def reader(f):
-            return pd.read_csv(f, parse_dates=True).to_dict('records')
+            return pd.read_csv(f, parse_dates=True).to_dict("records")
 
-        return {
-             'writer': Cache.csv_writer,
-             'reader': reader
-        }
+        return {"writer": Cache.csv_writer, "reader": reader}
 
     @staticmethod
     def cache_csv_dataframe():
-        return {
-             'writer': Cache.csv_writer,
-             'reader': lambda f: pd.read_csv(f, parse_dates=True)
-        }
+        return {"writer": Cache.csv_writer, "reader": lambda f: pd.read_csv(f, parse_dates=True)}
 
     @staticmethod
     def nocache_dataframe():
-        return {
-             'post': pd.DataFrame
-        }
+        return {"post": pd.DataFrame}
 
     @staticmethod
     def nocache_json():
-        return {
-        }
+        return {}
 
     @staticmethod
     def cache_json_dataframe():
-        return {
-             'writer': ju.write,
-             'reader': lambda p: pj.read_json(p, orient='records')
-        }
+        return {"writer": ju.write, "reader": lambda p: pj.read_json(p, orient="records")}
 
     @staticmethod
     def cache_json():
-        return {
-            'writer': ju.write,
-            'reader': ju.read
-        }
+        return {"writer": ju.write, "reader": ju.read}
 
     @staticmethod
     def cache_csv():
-        return {
-            'writer': Cache.csv_writer,
-            'reader': lambda f: pd.read_csv(f, parse_dates=True)
-        }
+        return {"writer": Cache.csv_writer, "reader": lambda f: pd.read_csv(f, parse_dates=True)}
 
     @staticmethod
-    def pathfinder(file_name_position,
-                   secondary_file_name_position=None,
-                   path_keyword=None):
-        '''helper method to find path argument in legacy methods written
+    def pathfinder(file_name_position, secondary_file_name_position=None, path_keyword=None):
+        """helper method to find path argument in legacy methods written
         prior to the @cacheable decorator.  Do not use for new
         @cacheable methods.
 
@@ -497,7 +452,8 @@ class Cache(object):
         This method is only intended to provide backward-compatibility
         for some methods that otherwise do not follow the path conventions
         of the @cacheable decorator.
-        '''
+        """
+
         def pf(*args, **kwargs):
             file_name = None
 
@@ -507,22 +463,16 @@ class Cache(object):
                 if file_name_position < len(args):
                     file_name = args[file_name_position]
 
-                if (file_name is None and
-                    secondary_file_name_position and
-                    secondary_file_name_position < len(args)):  # noqa E129
+                if file_name is None and secondary_file_name_position and secondary_file_name_position < len(args):  # noqa E129
                     file_name = args[secondary_file_name_position]
 
             return file_name
+
         return pf
 
     @deprecated()
-    def wrap(self, fn, path, cache,
-             save_as_json=True,
-             return_dataframe=False,
-             index=None,
-             rename=None,
-             **kwargs):
-        '''make an rma query, save it and return the dataframe.
+    def wrap(self, fn, path, cache, save_as_json=True, return_dataframe=False, index=None, rename=None, **kwargs):
+        """make an rma query, save it and return the dataframe.
 
         Parameters
         ----------
@@ -552,7 +502,7 @@ class Cache(object):
         Notes
         -----
         Column renaming happens after the file is reloaded for json
-        '''
+        """
         if cache is True:
             json_data = fn(**kwargs)
 
@@ -570,7 +520,7 @@ class Cache(object):
         # read it back in
         if save_as_json is True:
             if return_dataframe is True:
-                data = pj.read_json(path, orient='records')
+                data = pj.read_json(path, orient="records")
                 Cache.rename_columns(data, rename)
                 if index is not None:
                     data.set_index([index], inplace=True)
@@ -579,20 +529,13 @@ class Cache(object):
         elif return_dataframe is True:
             data = pd.read_csv(path, parse_dates=True)
         else:
-            raise ValueError(
-                'save_as_json=False cannot be used with '
-                'return_dataframe=False')
+            raise ValueError("save_as_json=False cannot be used with return_dataframe=False")
 
         return data
 
 
-def cacheable(strategy=None,
-              pre=None,
-              writer=None,
-              reader=None,
-              post=None,
-              pathfinder=None):
-    '''decorator for rma queries, save it and return the dataframe.
+def cacheable(strategy=None, pre=None, writer=None, reader=None, post=None, pathfinder=None):
+    """decorator for rma queries, save it and return the dataframe.
 
     Parameters
     ----------
@@ -625,7 +568,8 @@ def cacheable(strategy=None,
     Notes
     -----
     Column renaming happens after the file is reloaded for json
-    '''
+    """
+
     def decor(func):
         decor.strategy = strategy
         decor.pre = pre
@@ -635,40 +579,35 @@ def cacheable(strategy=None,
         decor.pathfinder = pathfinder
 
         @functools.wraps(func)
-        def w(*args,
-              **kwargs):
-            if decor.pathfinder and 'pathfinder' not in kwargs:
+        def w(*args, **kwargs):
+            if decor.pathfinder and "pathfinder" not in kwargs:
                 pathfinder = decor.pathfinder
             else:
-                pathfinder = kwargs.pop('pathfinder', None)
+                pathfinder = kwargs.pop("pathfinder", None)
 
-            if pathfinder and 'path' not in kwargs:
+            if pathfinder and "path" not in kwargs:
                 found_path = pathfinder(*args, **kwargs)
 
                 if found_path:
-                    kwargs['path'] = found_path
-            if decor.strategy and 'strategy' not in kwargs:
-                kwargs['strategy'] = decor.strategy
-            if decor.pre and 'pre' not in kwargs:
-                kwargs['pre'] = decor.pre
-            if decor.writer and 'writer' not in kwargs:
-                kwargs['writer'] = decor.writer
-            if decor.reader and 'reader' not in kwargs:
-                kwargs['reader'] = decor.reader
-            if decor.post and not 'post in kwargs':
-                kwargs['post'] = decor.post
+                    kwargs["path"] = found_path
+            if decor.strategy and "strategy" not in kwargs:
+                kwargs["strategy"] = decor.strategy
+            if decor.pre and "pre" not in kwargs:
+                kwargs["pre"] = decor.pre
+            if decor.writer and "writer" not in kwargs:
+                kwargs["writer"] = decor.writer
+            if decor.reader and "reader" not in kwargs:
+                kwargs["reader"] = decor.reader
+            if decor.post and not "post in kwargs":
+                kwargs["post"] = decor.post
 
-            result = Cache.cacher(func,
-                                  *args,
-                                  **kwargs)
+            result = Cache.cacher(func, *args, **kwargs)
             return result
 
         return w
+
     return decor
 
 
 def get_default_manifest_file(cache_name):
-    return os.environ.get(
-        '{}_MANIFEST'.format(cache_name.upper()),
-        '{}/manifest.json'.format(cache_name.lower())
-    )
+    return os.environ.get("{}_MANIFEST".format(cache_name.upper()), "{}/manifest.json".format(cache_name.lower()))

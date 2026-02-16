@@ -49,9 +49,7 @@ def get_ophys_stimulus_timestamps(sync_path: Union[str, Path]) -> np.ndarray:
     return stimulus_timestamps
 
 
-def get_frame_indices(
-        frame_timestamps: np.ndarray,
-        event_timestamps: np.ndarray) -> np.ndarray:
+def get_frame_indices(frame_timestamps: np.ndarray, event_timestamps: np.ndarray) -> np.ndarray:
     """
     Given an array of timestamps corresponding to stimulus frames
     and an array of timestamps corresponding to some event (i.e.
@@ -85,21 +83,18 @@ def get_frame_indices(
 
     n_frames = len(frame_timestamps)
 
-    event_indices = np.searchsorted(
-                        frame_timestamps,
-                        event_timestamps,
-                        side='left')
+    event_indices = np.searchsorted(frame_timestamps, event_timestamps, side="left")
 
-    event_indices = np.clip(event_indices, None, n_frames-1)
+    event_indices = np.clip(event_indices, None, n_frames - 1)
 
     # correct for fact that searchsorted will select as
     # frame index the first frame time that is larger
     # than lick_times; we want the lick_times associated
     # with the last frame that is smaller than the lick_time
     event_frame_times = frame_timestamps[event_indices]
-    delta = event_timestamps-event_frame_times
-    to_decrement = (delta < -1.0e-6)
+    delta = event_timestamps - event_frame_times
+    to_decrement = delta < -1.0e-6
     event_indices[to_decrement] -= 1
-    event_indices = np.clip(event_indices, 0, n_frames-1)
+    event_indices = np.clip(event_indices, 0, n_frames - 1)
 
     return event_indices

@@ -7,7 +7,6 @@ import seaborn as sns
 
 
 def build_colormap(table, existing_map={}, base_colors=sns.color_palette("pastel")):
-
     colormap = {}
 
     unique_names = table["stimulus_name"].unique()
@@ -36,11 +35,7 @@ def get_blocks(table):
 
         recorded_blocks = np.unique(block["stimulus_block"].values)
         if len(recorded_blocks) > 1:
-            raise ValueError(
-                "expected one recorded block per block, found: {}".format(
-                    recorded_blocks
-                )
-            )
+            raise ValueError("expected one recorded block per block, found: {}".format(recorded_blocks))
         else:
             pass
 
@@ -76,7 +71,6 @@ def plot_blocks(blocks, colormap):
     labels = []
 
     for block in blocks:
-
         handle = ax.axvspan(
             block["start"],
             block["end"],
@@ -100,7 +94,6 @@ def plot_blocks(blocks, colormap):
 
 
 def main(table_csv_path):
-
     table = pd.read_csv(table_csv_path)
 
     colormap = build_colormap(table)
@@ -112,9 +105,7 @@ def main(table_csv_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "table_csv_path", type=str, help="filesystem path to stimulus table csv"
-    )
+    parser.add_argument("table_csv_path", type=str, help="filesystem path to stimulus table csv")
 
     args = parser.parse_args()
     main(args.table_csv_path)

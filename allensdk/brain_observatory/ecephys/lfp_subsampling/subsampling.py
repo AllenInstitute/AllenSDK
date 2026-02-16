@@ -41,16 +41,18 @@ from scipy.signal import decimate, butter, filtfilt
 logger = logging.getLogger(__name__)
 
 
-def select_channels(total_channels,
-                    surface_channel,
-                    surface_padding,
-                    start_channel_offset,
-                    channel_stride,
-                    channel_order,
-                    noisy_channels=np.array([]),
-                    remove_noisy_channels=False,
-                    reference_channels=np.array([]),
-                    remove_references=False):
+def select_channels(
+    total_channels,
+    surface_channel,
+    surface_padding,
+    start_channel_offset,
+    channel_stride,
+    channel_order,
+    noisy_channels=np.array([]),
+    remove_noisy_channels=False,
+    reference_channels=np.array([]),
+    remove_references=False,
+):
     """
     Selects a subset of channels for spatial downsampling
 
@@ -91,12 +93,10 @@ def select_channels(total_channels,
 
     max_channel = np.min([total_channels, surface_channel + surface_padding])
 
-    selected_channels = channel_order[
-                        start_channel_offset:max_channel:channel_stride]
+    selected_channels = channel_order[start_channel_offset:max_channel:channel_stride]
 
     actual_channel_numbers = np.arange(total_channels)
-    actual_channel_numbers = actual_channel_numbers[
-                             start_channel_offset:max_channel:channel_stride]
+    actual_channel_numbers = actual_channel_numbers[start_channel_offset:max_channel:channel_stride]
 
     if remove_references or remove_noisy_channels:
         # TODO: Is there a case that reference/noisy channels won't be
@@ -105,16 +105,14 @@ def select_channels(total_channels,
         logger.info("Before:")
         logger.info(actual_channel_numbers)
         # create mask to filter out reference channels
-        mask = (not remove_references) or np.isin(actual_channel_numbers,
-                                                  reference_channels,
-                                                  assume_unique=True,
-                                                  invert=True)
+        mask = (not remove_references) or np.isin(
+            actual_channel_numbers, reference_channels, assume_unique=True, invert=True
+        )
 
         # mask to remove noisy channels
-        mask &= (not remove_noisy_channels) or np.isin(actual_channel_numbers,
-                                                       noisy_channels,
-                                                       assume_unique=True,
-                                                       invert=True)
+        mask &= (not remove_noisy_channels) or np.isin(
+            actual_channel_numbers, noisy_channels, assume_unique=True, invert=True
+        )
         actual_channel_numbers = actual_channel_numbers[mask]
         selected_channels = selected_channels[mask]
         logger.info("After:")
@@ -165,18 +163,16 @@ def subsample_lfp(lfp_raw, selected_channels, subsampling_factor):
 
     """
 
-    num_samples = len(lfp_raw[::subsampling_factor,
-                      0])  # np.round(lfp_raw.shape[0] /
+    num_samples = len(lfp_raw[::subsampling_factor, 0])  # np.round(lfp_raw.shape[0] /
     # subsampling_factor).astype('int')
     num_channels = selected_channels.size
 
-    lfp_subsampled = np.zeros((num_samples, num_channels), dtype='int16')
+    lfp_subsampled = np.zeros((num_samples, num_channels), dtype="int16")
 
     for new_ch, old_ch in enumerate(selected_channels):
-        tmp = decimate(lfp_raw[:, old_ch], subsampling_factor, ftype='iir',
-                       zero_phase=True)
-        assert (len(tmp) == num_samples)
-        lfp_subsampled[:, new_ch] = tmp.astype('int16')
+        tmp = decimate(lfp_raw[:, old_ch], subsampling_factor, ftype="iir", zero_phase=True)
+        assert len(tmp) == num_samples
+        lfp_subsampled[:, new_ch] = tmp.astype("int16")
 
     return lfp_subsampled
 
@@ -203,19 +199,19 @@ def remove_lfp_offset(lfp, sampling_frequency, cutoff_frequency, filter_order):
         New 2D array of LFP values
 
     """
-    lfp_filtered = np.zeros(lfp.shape, dtype='int16')
-    b, a = butter(filter_order, cutoff_frequency / (sampling_frequency / 2),
-                  btype='high')
+    lfp_filtered = np.zeros(lfp.shape, dtype="int16")
+    b, a = butter(filter_order, cutoff_frequency / (sampling_frequency / 2), btype="high")
 
     for ch in range(lfp.shape[1]):
         tmp = filtfilt(b, a, lfp[:, ch])
-        lfp_filtered[:, ch] = tmp.astype('int16')
+        lfp_filtered[:, ch] = tmp.astype("int16")
 
     return lfp_filtered
 
 
-def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384,
-                     channel_limit=380, max_out_of_brain_channels=50):
+def remove_lfp_noise(
+    lfp, surface_channel, channel_numbers, channel_max=384, channel_limit=380, max_out_of_brain_channels=50
+):
     """
     Subtract mean of channels out of brain to remove noise
 
@@ -242,10 +238,9 @@ def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384,
 
     """
 
-    lfp_noise_removed = np.zeros(lfp.shape, dtype='int16')
+    lfp_noise_removed = np.zeros(lfp.shape, dtype="int16")
 
-    surface_channel = channel_limit if surface_channel >= channel_max else \
-        surface_channel
+    surface_channel = channel_limit if surface_channel >= channel_max else surface_channel
 
     channel_selection = np.where(channel_numbers > surface_channel)[0]
     if len(channel_selection) > max_out_of_brain_channels:
@@ -255,6 +250,6 @@ def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384,
 
     for ch in range(lfp.shape[1]):
         tmp = lfp[:, ch] - median_signal_out_of_brain
-        lfp_noise_removed[:, ch] = tmp.astype('int16')
+        lfp_noise_removed[:, ch] = tmp.astype("int16")
 
     return lfp_noise_removed

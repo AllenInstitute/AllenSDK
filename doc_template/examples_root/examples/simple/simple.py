@@ -2,7 +2,7 @@ from allensdk.model.biophys_sim.config import Config
 from utils import Utils
 import numpy
 
-config = Config().load('config.json')
+config = Config().load("config.json")
 
 # configure NEURON
 utils = Utils(config)
@@ -30,11 +30,11 @@ h.run()
 # scaling
 mV = 1.0e-3
 ms = 1.0e-3
-output_data = numpy.array(vec['v']) * mV
-output_times = numpy.array(vec['t']) * ms
+output_data = numpy.array(vec["v"]) * mV
+output_times = numpy.array(vec["t"]) * ms
 output = numpy.column_stack((output_times, output_data))
 
 # write to a dat File
 v_out_path = manifest.get_path("output_dat")
-with open (v_out_path, "w") as f:
+with open(v_out_path, "w") as f:
     numpy.savetxt(f, output)

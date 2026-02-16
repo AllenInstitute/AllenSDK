@@ -58,43 +58,24 @@ def get_gaussian_fit(rf):
     counter = {"on": 0, "off": 0}
     for on_off_key in ["on", "off"]:
         fit_parameters_dict = fit_parameters_dict_combined[on_off_key]
-        for ci in range(
-            rf[on_off_key]["fdr_mask"]["attrs"]["number_of_components"]
-        ):
+        for ci in range(rf[on_off_key]["fdr_mask"]["attrs"]["number_of_components"]):
             curr_component_mask = (
-                upsample_image_to_degrees(
-                    np.logical_not(
-                        rf[on_off_key]["fdr_mask"]["data"][ci, :, :]
-                    )
-                )
-                > 0.5
+                upsample_image_to_degrees(np.logical_not(rf[on_off_key]["fdr_mask"]["data"][ci, :, :])) > 0.5
             )
-            rf_response = upsample_image_to_degrees(
-                rf[on_off_key]["rts_convolution"]["data"].copy()
-            )
+            rf_response = upsample_image_to_degrees(rf[on_off_key]["rts_convolution"]["data"].copy())
             rf_response[curr_component_mask] = 0
 
             if rf_response.sum() > 0:
-                get_gaussian_fit_single_channel(
-                    rf_response, fit_parameters_dict
-                )
+                get_gaussian_fit_single_channel(rf_response, fit_parameters_dict)
                 counter[on_off_key] += 1
 
     for ii_off in range(counter["on"]):
-        fit_parameters_dict_combined["on"]["distance"].append(
-            [None] * counter["off"]
-        )
-        fit_parameters_dict_combined["on"]["overlap"].append(
-            [None] * counter["off"]
-        )
+        fit_parameters_dict_combined["on"]["distance"].append([None] * counter["off"])
+        fit_parameters_dict_combined["on"]["overlap"].append([None] * counter["off"])
 
     for ii_off in range(counter["off"]):
-        fit_parameters_dict_combined["off"]["distance"].append(
-            [None] * counter["on"]
-        )
-        fit_parameters_dict_combined["off"]["overlap"].append(
-            [None] * counter["on"]
-        )
+        fit_parameters_dict_combined["off"]["distance"].append([None] * counter["on"])
+        fit_parameters_dict_combined["off"]["overlap"].append([None] * counter["on"])
 
     for ii_on in range(counter["on"]):
         for ii_off in range(counter["off"]):
@@ -107,22 +88,14 @@ def get_gaussian_fit(rf):
                 fit_parameters_dict_combined["off"]["center_y"][ii_off],
             )
             curr_distance = compute_distance(center_on, center_off)
-            fit_parameters_dict_combined["on"]["distance"][ii_on][
-                ii_off
-            ] = curr_distance
-            fit_parameters_dict_combined["off"]["distance"][ii_off][
-                ii_on
-            ] = curr_distance
+            fit_parameters_dict_combined["on"]["distance"][ii_on][ii_off] = curr_distance
+            fit_parameters_dict_combined["off"]["distance"][ii_off][ii_on] = curr_distance
 
             data_on = fit_parameters_dict_combined["on"]["data"][ii_on]
             data_off = fit_parameters_dict_combined["off"]["data"][ii_off]
             curr_overlap = compute_overlap(data_on, data_off)
-            fit_parameters_dict_combined["on"]["overlap"][ii_on][
-                ii_off
-            ] = curr_overlap
-            fit_parameters_dict_combined["off"]["overlap"][ii_off][
-                ii_on
-            ] = curr_overlap
+            fit_parameters_dict_combined["on"]["overlap"][ii_on][ii_off] = curr_overlap
+            fit_parameters_dict_combined["off"]["overlap"][ii_off][ii_on] = curr_overlap
 
     return fit_parameters_dict_combined, counter
 
@@ -143,29 +116,21 @@ def run_postprocessing(data, rf):
                 if key == "data":
                     rf[on_off_key]["gaussian_fit"]["data"] = np.array(val)
                 else:
-                    rf[on_off_key]["gaussian_fit"]["attrs"][key] = np.array(
-                        val
-                    )
+                    rf[on_off_key]["gaussian_fit"]["attrs"][key] = np.array(val)
 
     # Chi squared test statistic postprocessing:
     # cell_index = rf["attrs"]["cell_index"]
     locally_sparse_noise_template = data.get_stimulus_template(stimulus)
 
-    event_array = np.zeros(
-        (rf["event_vector"]["data"].shape[0], 1), dtype=bool
-    )
+    event_array = np.zeros((rf["event_vector"]["data"].shape[0], 1), dtype=bool)
     event_array[:, 0] = rf["event_vector"]["data"]
 
-    chi_squared_grid = chi_square_binary(
-        event_array, locally_sparse_noise_template
-    )
+    chi_squared_grid = chi_square_binary(event_array, locally_sparse_noise_template)
     alpha = rf["on"]["fdr_mask"]["attrs"]["alpha"]
     assert rf["off"]["fdr_mask"]["attrs"]["alpha"] == alpha
     chi_square_grid_NLL = pvalue_to_NLL(chi_squared_grid)
 
-    peak_significance = get_peak_significance(
-        chi_square_grid_NLL, locally_sparse_noise_template, alpha=alpha
-    )
+    peak_significance = get_peak_significance(chi_square_grid_NLL, locally_sparse_noise_template, alpha=alpha)
     significant = peak_significance[0][0]
     min_p = peak_significance[1][0]
     pvalues_chi_square = peak_significance[2][0]

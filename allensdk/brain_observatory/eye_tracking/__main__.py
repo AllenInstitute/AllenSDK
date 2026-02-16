@@ -1,6 +1,4 @@
-
-
-raise NotImplementedError('refactoring in progress')
+raise NotImplementedError("refactoring in progress")
 
 # def run_rule(rule, **kwargs):
 

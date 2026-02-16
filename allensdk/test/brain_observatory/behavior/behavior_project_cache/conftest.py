@@ -3,17 +3,16 @@ import io
 import pandas as pd
 import pytest
 import semver
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_neuropixels_project_cloud_api import ( # noqa
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_neuropixels_project_cloud_api import (  # noqa
     VisualBehaviorNeuropixelsProjectCloudApi,
 )
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_project_cloud_api import ( # noqa
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_apis.data_io.behavior_project_cloud_api import (  # noqa
     BehaviorProjectCloudApi,
 )
 
 
 @pytest.fixture
 def vbo_s3_cloud_cache_data():
-
     all_versions = {}
     all_versions["data"] = {}
     all_versions["metadata"] = {}
@@ -226,7 +225,6 @@ def vbo_s3_cloud_cache_data():
 
 @pytest.fixture
 def vbn_s3_cloud_cache_data():
-
     all_versions = {}
     all_versions["data"] = {}
     all_versions["metadata"] = {}

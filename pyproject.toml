@@ -108,6 +108,9 @@ notebooks = [
 packages = ["allensdk"]
 exclude = ["allensdk/test", "allensdk/test_utilities"]
 
+[tool.black]
+line-length = 120
+
 [tool.ruff]
 line-length = 120
 

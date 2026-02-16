@@ -23,11 +23,7 @@ from argschema.fields import (
 class BaseBehaviorSessionDataSchema(RaisingSchema):
     behavior_session_id = Int(
         required=True,
-        description=(
-            "Unique identifier for the "
-            "behavior session to write into "
-            "NWB format"
-        ),
+        description=("Unique identifier for the behavior session to write into NWB format"),
     )
     driver_line = List(
         String,
@@ -41,27 +37,19 @@ class BaseBehaviorSessionDataSchema(RaisingSchema):
         cli_as_single_argument=True,
         description="Genetic reporter line(s) of subject",
     )
-    full_genotype = String(
-        required=True, description="Full genotype of subject"
-    )
+    full_genotype = String(required=True, description="Full genotype of subject")
     rig_name = String(
         required=True,
-        description=(
-            "Name of experimental rig used for " "the behavior session"
-        ),
+        description=("Name of experimental rig used for the behavior session"),
     )
     date_of_acquisition = String(
         required=True,
-        description=(
-            "Date of acquisition of " "behavior session, in string " "format"
-        ),
+        description=("Date of acquisition of behavior session, in string format"),
     )
-    external_specimen_name = Int(
-        required=True, description="LabTracks ID of the subject"
-    )
+    external_specimen_name = Int(required=True, description="LabTracks ID of the subject")
     behavior_stimulus_file = argschema.fields.InputFile(
         required=True,
-        description=("Path of behavior_stimulus " "camstim *.pkl file"),
+        description=("Path of behavior_stimulus camstim *.pkl file"),
     )
     date_of_birth = String(required=True, description="Subject date of birth")
     sex = String(required=True, description="Subject sex")
@@ -72,9 +60,7 @@ class Channel(RaisingSchema):
     @mm.pre_load
     def set_field_defaults(self, data, **kwargs):
         if data.get("filtering") is None:
-            data["filtering"] = (
-                "AP band: 500 Hz high-pass; " "LFP band: 1000 Hz low-pass"
-            )
+            data["filtering"] = "AP band: 500 Hz high-pass; LFP band: 1000 Hz low-pass"
         if data.get("structure_acronym") is None:
             data["structure_acronym"] = ""
         return data
@@ -212,7 +198,7 @@ class Probe(RaisingSchema):
                 The values for unit amplitudes were changed in the input_json
                 file and do not use this scale.
                 If the data in LIMS for these sessions is updated, this scaling
-                is not needed. Default is 1"""
+                is not needed. Default is 1""",
     )
 
 
@@ -268,17 +254,13 @@ class VCNInputSchema(BaseNeuropixelsSchema):
     class Meta:
         unknown = mm.RAISE
 
-    log_level = LogLevel(
-        default="INFO", help="set the logging level of the module"
-    )
+    log_level = LogLevel(default="INFO", help="set the logging level of the module")
     output_path = String(
         required=True,
         validate=check_write_access,
         help="write outputs to here",
     )
-    session_id = Int(
-        required=True, help="unique identifier for this ecephys session"
-    )
+    session_id = Int(required=True, help="unique identifier for this ecephys session")
     session_start_time = DateTime(
         required=True,
         help="the date and time (iso8601) at which the session started",
@@ -288,9 +270,7 @@ class VCNInputSchema(BaseNeuropixelsSchema):
         validate=check_read_access,
         help="path to stimulus table file",
     )
-    invalid_epochs = Nested(
-        InvalidEpoch, many=True, required=True, help="epochs with invalid data"
-    )
+    invalid_epochs = Nested(InvalidEpoch, many=True, required=True, help="epochs with invalid data")
     session_sync_path = String(
         required=True,
         validate=check_read_access,
@@ -319,7 +299,7 @@ class VCNInputSchema(BaseNeuropixelsSchema):
         SessionMetadata,
         allow_none=True,
         required=False,
-        help="miscellaneous information describing this session" "",
+        help="miscellaneous information describing this session",
     )
     running_speed_path = String(
         required=True,

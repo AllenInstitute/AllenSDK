@@ -38,9 +38,7 @@ class BehaviorOphysMetadata(
         behavior_metadata: BehaviorMetadata,
         ophys_metadata: Union[OphysExperimentMetadata, MultiplaneMetadata],
     ):
-        super().__init__(
-            name="behavior_ophys_metadata", value=None, is_value_self=True
-        )
+        super().__init__(name="behavior_ophys_metadata", value=None, is_value_self=True)
 
         self._behavior_metadata = behavior_metadata
         self._ophys_metadata = ophys_metadata
@@ -72,22 +70,14 @@ class BehaviorOphysMetadata(
             Whether to fetch metadata for an experiment that is part of a
             container containing multiple imaging planes
         """
-        behavior_session_id = BehaviorSessionId.from_lims(
-            ophys_experiment_id=ophys_experiment_id, db=lims_db
-        )
+        behavior_session_id = BehaviorSessionId.from_lims(ophys_experiment_id=ophys_experiment_id, db=lims_db)
 
-        behavior_metadata = BehaviorMetadata.from_lims(
-            behavior_session_id=behavior_session_id, lims_db=lims_db
-        )
+        behavior_metadata = BehaviorMetadata.from_lims(behavior_session_id=behavior_session_id, lims_db=lims_db)
 
         if is_multiplane:
-            ophys_metadata = MultiplaneMetadata.from_lims(
-                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-            )
+            ophys_metadata = MultiplaneMetadata.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         else:
-            ophys_metadata = OphysExperimentMetadata.from_lims(
-                ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-            )
+            ophys_metadata = OphysExperimentMetadata.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         if ophys_metadata.project_code != behavior_metadata.project_code:
             raise warnings.warn(
@@ -97,13 +87,9 @@ class BehaviorOphysMetadata(
                 f"behavior_session_id={behavior_session_id}."
             )
 
-        return cls(
-            behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata
-        )
+        return cls(behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata)
 
-    def update_targeted_imaging_depth(
-        self, ophys_experiment_ids: List[int], lims_db: PostgresQueryMixin
-    ):
+    def update_targeted_imaging_depth(self, ophys_experiment_ids: List[int], lims_db: PostgresQueryMixin):
         """Update the value for targeted imaging depth given a set of
         experiments to be published.
 
@@ -118,14 +104,10 @@ class BehaviorOphysMetadata(
         lims_db : PostgresQueryMixin
             Connection to the LIMS2 database.
         """
-        self._ophys_metadata.update_targeted_imaging_depth(
-            ophys_experiment_ids, lims_db
-        )
+        self._ophys_metadata.update_targeted_imaging_depth(ophys_experiment_ids, lims_db)
 
     @classmethod
-    def from_json(
-        cls, dict_repr: dict, is_multiplane=False
-    ) -> "BehaviorOphysMetadata":
+    def from_json(cls, dict_repr: dict, is_multiplane=False) -> "BehaviorOphysMetadata":
         """
 
         Parameters
@@ -144,18 +126,12 @@ class BehaviorOphysMetadata(
         if is_multiplane:
             ophys_metadata = MultiplaneMetadata.from_json(dict_repr=dict_repr)
         else:
-            ophys_metadata = OphysExperimentMetadata.from_json(
-                dict_repr=dict_repr
-            )
+            ophys_metadata = OphysExperimentMetadata.from_json(dict_repr=dict_repr)
 
-        return cls(
-            behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata
-        )
+        return cls(behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata)
 
     @classmethod
-    def from_nwb(
-        cls, nwbfile: NWBFile, is_multiplane=False
-    ) -> "BehaviorOphysMetadata":
+    def from_nwb(cls, nwbfile: NWBFile, is_multiplane=False) -> "BehaviorOphysMetadata":
         """
 
         Parameters
@@ -172,17 +148,13 @@ class BehaviorOphysMetadata(
         else:
             ophys_metadata = OphysExperimentMetadata.from_nwb(nwbfile=nwbfile)
 
-        return cls(
-            behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata
-        )
+        return cls(behavior_metadata=behavior_metadata, ophys_metadata=ophys_metadata)
 
     def to_nwb(self, nwbfile: NWBFile) -> NWBFile:
         self._behavior_metadata.subject_metadata.to_nwb(nwbfile=nwbfile)
         self._behavior_metadata.equipment.to_nwb(nwbfile=nwbfile)
 
-        nwb_extension = load_pynwb_extension(
-            OphysBehaviorMetadataSchema, "ndx-aibs-behavior-ophys"
-        )
+        nwb_extension = load_pynwb_extension(OphysBehaviorMetadataSchema, "ndx-aibs-behavior-ophys")
 
         behavior_meta = self._behavior_metadata
         ophys_meta = self._ophys_metadata

@@ -54,8 +54,7 @@ def one(x):
     except TypeError:
         return x
     if xlen != 1:
-        raise OneResultExpectedError("Expected length one result, received: "
-                                     f"{x} results from query")
+        raise OneResultExpectedError(f"Expected length one result, received: {x} results from query")
     if isinstance(x, set):
         return list(x)[0]
     else:
@@ -65,11 +64,9 @@ def one(x):
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 if True:
-    file_download_log = logging.getLogger(
-        'allensdk.api.api.retrieve_file_over_http')
+    file_download_log = logging.getLogger("allensdk.api.api.retrieve_file_over_http")
     file_download_log.setLevel(logging.INFO)
     console = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(name)-12s "
-                                  "%(levelname)-8s %(message)s")
+    formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
     console.setFormatter(formatter)
     file_download_log.addHandler(console)

@@ -27,9 +27,7 @@ def test_nwb_end_to_end(tmpdir_factory):
 
     oeid = 795073741
     tmpdir = "test_nwb_end_to_end"
-    nwb_filepath = os.path.join(
-        str(tmpdir_factory.mktemp(tmpdir)), "nwbfile.nwb"
-    )
+    nwb_filepath = os.path.join(str(tmpdir_factory.mktemp(tmpdir)), "nwbfile.nwb")
 
     d1 = BehaviorOphysExperiment.from_lims(
         oeid,
@@ -40,9 +38,7 @@ def test_nwb_end_to_end(tmpdir_factory):
 
     d2 = BehaviorOphysExperiment.from_nwb(nwbfile=nwbfile)
 
-    assert sessions_are_equal(
-        d1, d2, reraise=True, ignore_keys={"metadata": {"project_code"}}
-    )
+    assert sessions_are_equal(d1, d2, reraise=True, ignore_keys={"metadata": {"project_code"}})
 
 
 @pytest.mark.nightly
@@ -60,9 +56,7 @@ def test_visbeh_ophys_data_set():
     # for _, row in data_set.roi_masks.iterrows():
     #     print(np.array(row.to_dict()['mask']).sum())
 
-    lims_db = db_connection_creator(
-        fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-    )
+    lims_db = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
     behavior_session_id = BehaviorSessionId.from_lims(
         db=lims_db,
         ophys_experiment_id=ophys_experiment_id,
@@ -82,12 +76,10 @@ def test_visbeh_ophys_data_set():
     assert stimulus_templates.loc["im000"].warped.shape == MONITOR_DIMENSIONS
     assert stimulus_templates.loc["im000"].unwarped.shape == MONITOR_DIMENSIONS
 
-    assert len(data_set.licks) == 2421 and set(data_set.licks.columns) == set(
-        ["timestamps", "frame"]
+    assert len(data_set.licks) == 2421 and set(data_set.licks.columns) == set(["timestamps", "frame"])
+    assert len(data_set.rewards) == 85 and set(data_set.rewards.columns) == set(
+        ["timestamps", "volume", "auto_rewarded"]
     )
-    assert len(data_set.rewards) == 85 and set(
-        data_set.rewards.columns
-    ) == set(["timestamps", "volume", "auto_rewarded"])
     assert len(data_set.corrected_fluorescence_traces) == 258 and set(
         data_set.corrected_fluorescence_traces.columns
     ) == set(["cell_roi_id", "corrected_fluorescence", "RMSE", "r"])
@@ -100,17 +92,13 @@ def test_visbeh_ophys_data_set():
     )
 
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
-    assert (
-        data_set.average_projection.data.shape
-        == data_set.max_projection.data.shape
-    )
+    assert data_set.average_projection.data.shape == data_set.max_projection.data.shape
     assert set(data_set.motion_correction.columns) == set(["x", "y"])
     assert len(data_set.trials) == 602
 
     expected_metadata = {
         "stimulus_frame_rate": 60.0,
-        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93("
-        "TITL-GCaMP6f)/wt",
+        "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
         "ophys_experiment_id": 789359614,
         "behavior_session_id": 789295700,
         "imaging_plane_group_count": 0,
@@ -118,12 +106,8 @@ def test_visbeh_ophys_data_set():
         "session_type": "OPHYS_6_images_B",
         "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
         "cre_line": "Slc17a7-IRES2-Cre",
-        "behavior_session_uuid": uuid.UUID(
-            "69cdbe09-e62b-4b42-aab1-54b5773dfe78"
-        ),
-        "date_of_acquisition": pytz.utc.localize(
-            datetime.datetime(2018, 11, 30, 15, 58, 50, 325000)
-        ),
+        "behavior_session_uuid": uuid.UUID("69cdbe09-e62b-4b42-aab1-54b5773dfe78"),
+        "date_of_acquisition": pytz.utc.localize(datetime.datetime(2018, 11, 30, 15, 58, 50, 325000)),
         "ophys_frame_rate": 31.0,
         "imaging_depth": 375,
         "targeted_imaging_depth": 375,
@@ -206,9 +190,7 @@ def test_event_detection():
     ]
     assert len(events.columns) == len(expected_columns)
     # Assert they contain the same columns
-    assert len(set(expected_columns).intersection(events.columns)) == len(
-        expected_columns
-    )
+    assert len(set(expected_columns).intersection(events.columns)) == len(expected_columns)
 
     assert events.index.name == "cell_specimen_id"
 
@@ -298,15 +280,9 @@ def test_stim_v_trials_time(behavior_ophys_experiment_fixture):
     """
     exp = behavior_ophys_experiment_fixture
 
-    stim = exp.stimulus_presentations[
-        exp.stimulus_presentations["is_change"]
-    ].start_time.reset_index(drop=True)
+    stim = exp.stimulus_presentations[exp.stimulus_presentations["is_change"]].start_time.reset_index(drop=True)
 
-    trials = (
-        exp.trials.query("not aborted")
-        .query("go or auto_rewarded")["change_time"]
-        .reset_index(drop=True)
-    )
+    trials = exp.trials.query("not aborted").query("go or auto_rewarded")["change_time"].reset_index(drop=True)
 
     delta = np.abs(stim - trials)
     assert delta.max() < 1.0e-6

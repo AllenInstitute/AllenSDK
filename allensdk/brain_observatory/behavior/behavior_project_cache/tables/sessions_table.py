@@ -24,9 +24,7 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.util.prio
     get_prior_exposures_to_session_type,
     add_experience_level_ophys,
 )
-from allensdk.core.dataframe_utils import (
-        enforce_df_column_order
-)
+from allensdk.core.dataframe_utils import enforce_df_column_order
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.brain_observatory.behavior.data_objects import StimulusTimestamps
 from allensdk.brain_observatory.behavior.data_objects.licks import Licks
@@ -81,64 +79,39 @@ class SessionsTable(ProjectTable, OphysMixin):
         self._include_trial_metrics = include_trial_metrics
         ProjectTable.__init__(self, df=df, suppress=suppress)
         OphysMixin.__init__(self)
-        self._df = enforce_df_column_order(
-            self._df,
-            VBO_METADATA_COLUMN_ORDER
-        )
+        self._df = enforce_df_column_order(self._df, VBO_METADATA_COLUMN_ORDER)
 
     def postprocess_additional(self):
         # Add subject metadata
-        self._df["reporter_line"] = self._df["reporter_line"].apply(
-            ReporterLine.parse
-        )
-        self._df["cre_line"] = self._df["full_genotype"].apply(
-            lambda x: FullGenotype(x).parse_cre_line()
-        )
-        self._df["indicator"] = self._df["reporter_line"].apply(
-            lambda x: ReporterLine(x).parse_indicator()
-        )
+        self._df["reporter_line"] = self._df["reporter_line"].apply(ReporterLine.parse)
+        self._df["cre_line"] = self._df["full_genotype"].apply(lambda x: FullGenotype(x).parse_cre_line())
+        self._df["indicator"] = self._df["reporter_line"].apply(lambda x: ReporterLine(x).parse_indicator())
 
         # add session number
         self.__add_session_number()
 
         # add prior exposure
-        self._df[
-            "prior_exposures_to_session_type"
-        ] = get_prior_exposures_to_session_type(df=self._df)
-        self._df[
-            "prior_exposures_to_image_set"
-        ] = get_prior_exposures_to_image_set(df=self._df)
-        self._df[
-            "prior_exposures_to_omissions"
-        ] = get_prior_exposures_to_omissions(
+        self._df["prior_exposures_to_session_type"] = get_prior_exposures_to_session_type(df=self._df)
+        self._df["prior_exposures_to_image_set"] = get_prior_exposures_to_image_set(df=self._df)
+        self._df["prior_exposures_to_omissions"] = get_prior_exposures_to_omissions(
             df=self._df, fetch_api=self._fetch_api
         )
 
         self._df = add_experience_level_ophys(self._df)
 
-        self._df["behavior_type"] = self._df["session_type"].apply(
-            parse_behavior_context
-        )
-        self._df["image_set"] = self._df["session_type"].apply(
-            parse_stimulus_set
-        )
+        self._df["behavior_type"] = self._df["session_type"].apply(parse_behavior_context)
+        self._df["image_set"] = self._df["session_type"].apply(parse_stimulus_set)
 
         if self._include_trial_metrics:
             # add trial metrics
             trial_metrics = multiprocessing_helper(
                 target=self._get_trial_metrics_helper,
                 behavior_session_ids=self._df.index.tolist(),
-                lims_engine=db_connection_creator(
-                    fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-                ),
+                lims_engine=db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP),
                 progress_bar_title="Getting trial metrics for each session",
             )
-            trial_metrics = pd.DataFrame(trial_metrics).set_index(
-                "behavior_session_id"
-            )
-            self._df = self._df.merge(
-                trial_metrics, left_index=True, right_index=True
-            )
+            trial_metrics = pd.DataFrame(trial_metrics).set_index("behavior_session_id")
+            self._df = self._df.merge(trial_metrics, left_index=True, right_index=True)
 
         # Add data from ophys session
         if self._ophys_session_table is not None:
@@ -152,9 +125,7 @@ class SessionsTable(ProjectTable, OphysMixin):
             self._df = self._df.set_index("behavior_session_id")
 
             # Prioritize behavior date_of_acquisition
-            self._df["date_of_acquisition"] = self._df[
-                "date_of_acquisition_behavior"
-            ]
+            self._df["date_of_acquisition"] = self._df["date_of_acquisition_behavior"]
             self._df = self._df.drop(
                 ["date_of_acquisition_behavior", "date_of_acquisition_ophys"],
                 axis=1,
@@ -162,9 +133,7 @@ class SessionsTable(ProjectTable, OphysMixin):
             # Enforce an integer type on due to there not being a value for
             # ophys_session_id for every behavior_session. Pandas defaults to
             # NaN here, changing the type to float unless otherwise fixed.
-            self._df["ophys_session_id"] = self._df["ophys_session_id"].astype(
-                "Int64"
-            )
+            self._df["ophys_session_id"] = self._df["ophys_session_id"].astype("Int64")
 
     def __add_session_number(self):
         """Parses session number from session type and and adds to dataframe"""
@@ -179,9 +148,7 @@ class SessionsTable(ProjectTable, OphysMixin):
         session_type = self._df["session_type"]
         session_type = session_type[session_type.notnull()]
 
-        self._df.loc[
-            session_type.index, "session_number"
-        ] = session_type.apply(parse_session_number).astype('Int64')
+        self._df.loc[session_type.index, "session_number"] = session_type.apply(parse_session_number).astype("Int64")
 
     @staticmethod
     def _get_trial_metrics_helper(*args) -> Dict:
@@ -189,12 +156,8 @@ class SessionsTable(ProjectTable, OphysMixin):
         Meant to be called by a multiprocessing worker"""
         behavior_session_id, db_conn = args[0]
 
-        stimulus_file = BehaviorStimulusFile.from_lims(
-            behavior_session_id=behavior_session_id, db=db_conn
-        )
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file, monitor_delay=0.0
-        )
+        stimulus_file = BehaviorStimulusFile.from_lims(behavior_session_id=behavior_session_id, db=db_conn)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(stimulus_file=stimulus_file, monitor_delay=0.0)
 
         trials = Trials.from_stimulus_file(
             stimulus_file=stimulus_file,

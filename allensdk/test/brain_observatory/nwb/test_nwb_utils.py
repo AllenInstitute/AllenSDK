@@ -25,9 +25,7 @@ from allensdk.brain_observatory.nwb.nwb_utils import NWBWriter
         ),
     ],
 )
-def test_get_stimulus_name_column(
-    input_cols, possible_names, expected_intersection
-):
+def test_get_stimulus_name_column(input_cols, possible_names, expected_intersection):
     column_name = nwb_utils.get_column_name(input_cols, possible_names)
     assert column_name == expected_intersection
 
@@ -53,9 +51,7 @@ def test_get_stimulus_name_column(
         ),
     ],
 )
-def test_get_stimulus_name_column_exceptions(
-    input_cols, possible_names, expected_excep_cols
-):
+def test_get_stimulus_name_column_exceptions(input_cols, possible_names, expected_excep_cols):
     with pytest.raises(KeyError) as error:
         nwb_utils.get_column_name(input_cols, possible_names)
     for expected_value in expected_excep_cols:

@@ -12,8 +12,8 @@ class WhitespaceStrippedString(object):
     matches the regex \\s, (which includes [ \\t\\n\\r\\f\\v],
     and other unicode whitespace characters).
     """
-    def __init__(self, string: str, whitespace_chars: str = r"\s",
-                 ASCII: bool = False):
+
+    def __init__(self, string: str, whitespace_chars: str = r"\s", ASCII: bool = False):
         self.orig = string
         self.whitespace_chars = whitespace_chars
         self.flags = re.ASCII if ASCII else 0
@@ -22,15 +22,12 @@ class WhitespaceStrippedString(object):
 
     def __eq__(self, other: Union[str, "WhitespaceStrippedString"]):
         if isinstance(other, str):
-            other = WhitespaceStrippedString(
-                other, self.whitespace_chars, self.flags)
+            other = WhitespaceStrippedString(other, self.whitespace_chars, self.flags)
         self.diff = list(self.differ.compare(self.value, other.value))
         return self.value == other.value
 
 
-def safe_df_comparison(expected: pd.DataFrame,
-                       obtained: pd.DataFrame,
-                       expect_identical_column_order: bool = False):
+def safe_df_comparison(expected: pd.DataFrame, obtained: pd.DataFrame, expect_identical_column_order: bool = False):
     """
     Compare two dataframes in a way that is agnostic to column order
     and datatype of NULL values
@@ -60,7 +57,7 @@ def safe_df_comparison(expected: pd.DataFrame,
             - loops over non-null values, casts arrays into lists, and
               compares with ==
     """
-    msg = ''
+    msg = ""
     columns_match = True
     if not expect_identical_column_order:
         obtained_column_set = set(obtained.columns)
@@ -72,11 +69,11 @@ def safe_df_comparison(expected: pd.DataFrame,
             columns_match = False
 
     if not columns_match:
-        msg += 'column mis-match\n'
-        msg += 'obtained columns\n'
-        msg += f'{obtained.columns}\n'
-        msg += 'expected columns\n'
-        msg += f'{expected.columns}\n'
+        msg += "column mis-match\n"
+        msg += "obtained columns\n"
+        msg += f"{obtained.columns}\n"
+        msg += "expected columns\n"
+        msg += f"{expected.columns}\n"
 
         missing_from_obtained = []
         for c in expected.columns:
@@ -86,30 +83,30 @@ def safe_df_comparison(expected: pd.DataFrame,
         for c in obtained.columns:
             if c not in expected.columns:
                 missing_from_expected.append(c)
-        msg += f'missing from obtained\n{missing_from_obtained}\n'
-        msg += f'missing from expected\n{missing_from_expected}\n'
+        msg += f"missing from obtained\n{missing_from_obtained}\n"
+        msg += f"missing from expected\n{missing_from_expected}\n"
         raise RuntimeError(msg)
 
     if not expected.index.equals(obtained.index):
-        msg += 'index mis-match\n'
-        msg += 'expected index\n'
-        msg += f'{expected.index}\n'
-        msg += 'obtained index\n'
-        msg += f'{obtained.index}\n'
+        msg += "index mis-match\n"
+        msg += "expected index\n"
+        msg += f"{expected.index}\n"
+        msg += "obtained index\n"
+        msg += f"{obtained.index}\n"
         raise RuntimeError(msg)
 
     for col in expected.columns:
         expected_null = expected[col].isnull()
         obtained_null = obtained[col].isnull()
         if not expected_null.equals(obtained_null):
-            msg += f'\n{col} not null at same point in '
-            msg += 'obtained and expected\n'
+            msg += f"\n{col} not null at same point in "
+            msg += "obtained and expected\n"
             continue
         expected_valid = expected[~expected_null]
         obtained_valid = obtained[~obtained_null]
         if not expected_valid.index.equals(obtained_valid.index):
-            msg += '\nindex mismatch in non-null when checking '
-            msg += f'{col}\n'
+            msg += "\nindex mismatch in non-null when checking "
+            msg += f"{col}\n"
         for index_val in expected_valid.index.values:
             e = expected_valid.loc[index_val, col]
             o = obtained_valid.loc[index_val, col]
@@ -118,16 +115,14 @@ def safe_df_comparison(expected: pd.DataFrame,
             if isinstance(o, pd.Series):
                 o = list(o)
             if not e == o:
-                msg += f'\n{col}\n'
-                msg += f'expected: {e}\n'
-                msg += f'obtained: {o}\n'
-    if msg != '':
+                msg += f"\n{col}\n"
+                msg += f"expected: {e}\n"
+                msg += f"obtained: {o}\n"
+    if msg != "":
         raise RuntimeError(msg)
 
 
-def stimulus_pickle_equivalence(
-        data0: dict,
-        data1: dict) -> bool:
+def stimulus_pickle_equivalence(data0: dict, data1: dict) -> bool:
     """
     Compare two sets of data loaded from a stimulus pickle file.
     Return True if they are identical.
@@ -136,9 +131,7 @@ def stimulus_pickle_equivalence(
     return _nested_dict_equivalence(data0, data1)
 
 
-def _nested_scalar_equivalence(
-        val0: Any,
-        val1: Any) -> bool:
+def _nested_scalar_equivalence(val0: Any, val1: Any) -> bool:
     """
     Compare two scalars.
     Return True if the scalars are identical.
@@ -163,9 +156,7 @@ def _nested_scalar_equivalence(
     return True
 
 
-def _nested_iterable_equivalence(
-        list0: Iterable,
-        list1: Iterable) -> bool:
+def _nested_iterable_equivalence(list0: Iterable, list1: Iterable) -> bool:
     """
     Compare the contents of two iterables.
     Return True if they are identical.
@@ -187,7 +178,7 @@ def _nested_iterable_equivalence(
         if isinstance(v0, dict):
             if not _nested_dict_equivalence(v0, v1):
                 return False
-        elif hasattr(v0, '__len__'):
+        elif hasattr(v0, "__len__"):
             if not _nested_iterable_equivalence(v0, v1):
                 return False
         else:
@@ -197,9 +188,7 @@ def _nested_iterable_equivalence(
     return True
 
 
-def _nested_dict_equivalence(
-        dict0: dict,
-        dict1: dict) -> bool:
+def _nested_dict_equivalence(dict0: dict, dict1: dict) -> bool:
     """
     Compare the contents of two dicts.
     Return True if the dicts are identical.
@@ -223,7 +212,7 @@ def _nested_dict_equivalence(
         if isinstance(val0, dict):
             if not _nested_dict_equivalence(val0, val1):
                 return False
-        elif hasattr(val0, '__len__'):
+        elif hasattr(val0, "__len__"):
             if not _nested_iterable_equivalence(val0, val1):
                 return False
         else:

@@ -7,14 +7,13 @@ from pynwb import NWBFile
 
 from allensdk.brain_observatory.behavior.data_files import BehaviorStimulusFile
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class DateOfAcquisition(DataObject, LimsReadableInterface,
-                        JsonReadableInterface, NwbReadableInterface):
+class DateOfAcquisition(DataObject, LimsReadableInterface, JsonReadableInterface, NwbReadableInterface):
     """timestamp for when experiment was started in UTC"""
+
     def __init__(self, date_of_acquisition: datetime):
         if date_of_acquisition.tzinfo is None:
             # Add UTC tzinfo if not already set
@@ -23,7 +22,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "DateOfAcquisition":
-        doa = dict_repr['date_of_acquisition']
+        doa = dict_repr["date_of_acquisition"]
         doa = datetime_parser.parse(doa)
 
         if doa.tzinfo is None:
@@ -38,9 +37,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         return cls(date_of_acquisition=doa)
 
     @classmethod
-    def from_lims(
-            cls, behavior_session_id: int,
-            lims_db: PostgresQueryMixin) -> "DateOfAcquisition":
+    def from_lims(cls, behavior_session_id: int, lims_db: PostgresQueryMixin) -> "DateOfAcquisition":
         query = """
                 SELECT bs.date_of_acquisition
                 FROM behavior_sessions bs
@@ -51,10 +48,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         return cls(date_of_acquisition=experiment_date)
 
     @classmethod
-    def from_stimulus_file(
-            cls,
-            stimulus_file: BehaviorStimulusFile
-    ) -> "DateOfAcquisition":
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile) -> "DateOfAcquisition":
         return cls(date_of_acquisition=stimulus_file.date_of_acquisition)
 
     @classmethod
@@ -62,8 +56,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
         date_of_acquisition = nwbfile.session_start_time
         return cls(date_of_acquisition=date_of_acquisition)
 
-    def validate(self, stimulus_file: BehaviorStimulusFile,
-                 behavior_session_id: int) -> "DateOfAcquisition":
+    def validate(self, stimulus_file: BehaviorStimulusFile, behavior_session_id: int) -> "DateOfAcquisition":
         """raise a warning if the date differs too much from the
         datetime obtained from the behavior stimulus (*.pkl) file."""
         pkl_data = stimulus_file.data
@@ -85,8 +78,7 @@ class DateOfAcquisition(DataObject, LimsReadableInterface,
             )
 
         if pkl_acq_date:
-            acq_start_diff = (
-                    self.value - pkl_acq_date).total_seconds()
+            acq_start_diff = (self.value - pkl_acq_date).total_seconds()
             # If acquisition dates differ by more than an hour
             if abs(acq_start_diff) > 3600:
                 session_id = behavior_session_id
@@ -106,9 +98,7 @@ class DateOfAcquisitionOphys(DateOfAcquisition):
     table in LIMS instead of the behavior_sessions table"""
 
     @classmethod
-    def from_lims(
-            cls, ophys_experiment_id: int,
-            lims_db: PostgresQueryMixin) -> "DateOfAcquisitionOphys":
+    def from_lims(cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin) -> "DateOfAcquisitionOphys":
         query = f"""
             SELECT os.date_of_acquisition
             FROM ophys_experiments oe

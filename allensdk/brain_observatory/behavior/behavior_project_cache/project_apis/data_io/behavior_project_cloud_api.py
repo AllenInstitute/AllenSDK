@@ -37,9 +37,7 @@ from allensdk.core.utilities import literal_col_eval
 COL_EVAL_LIST = ["ophys_experiment_id", "ophys_container_id", "driver_line"]
 
 
-def sanitize_data_columns(
-    input_csv_path: str, dtype_convert: dict = None
-) -> pd.DataFrame:
+def sanitize_data_columns(input_csv_path: str, dtype_convert: dict = None) -> pd.DataFrame:
     """Given an input csv path, parse the data and convert columns.
 
     Parameters
@@ -70,9 +68,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         skip_version_check: bool = False,
         local: bool = False,
     ):
-        super().__init__(
-            cache=cache, skip_version_check=skip_version_check, local=local
-        )
+        super().__init__(cache=cache, skip_version_check=skip_version_check, local=local)
         self._load_manifest_tables()
 
         if isinstance(cache, S3CloudCache):
@@ -108,9 +104,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         self._get_ophys_experiment_table()
         self._get_ophys_cells_table()
 
-    def get_behavior_session(
-        self, behavior_session_id: int
-    ) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """get a BehaviorSession by specifying behavior_session_id
 
         Parameters
@@ -141,10 +135,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
             table_name="behavior_session_table",
         )
         row = row.squeeze()
-        has_file_id = (
-            not pd.isna(row[self.cache.file_id_column])
-            and row[self.cache.file_id_column] > 0
-        )
+        has_file_id = not pd.isna(row[self.cache.file_id_column]) and row[self.cache.file_id_column] > 0
         if not has_file_id:
             oeid = row.ophys_experiment_id[0]
             row = return_one_dataframe_row_only(
@@ -156,9 +147,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         data_path = self._get_data_path(file_id=file_id)
         return BehaviorSession.from_nwb_path(nwb_path=str(data_path))
 
-    def get_behavior_ophys_experiment(
-        self, ophys_experiment_id: int
-    ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int) -> BehaviorOphysExperiment:
         """get a BehaviorOphysExperiment by specifying ophys_experiment_id
 
         Parameters
@@ -181,20 +170,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         return BehaviorOphysExperiment.from_nwb_path(str(data_path))
 
     def _get_ophys_session_table(self):
-        session_table_path = self._get_metadata_path(
-            fname="ophys_session_table"
-        )
+        session_table_path = self._get_metadata_path(fname="ophys_session_table")
         df = sanitize_data_columns(session_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
-        df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], format="ISO8601", utc=True
-        )
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
-        df = enforce_df_column_order(
-            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"], format="ISO8601", utc=True)
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
+        df = enforce_df_column_order(input_df=df, column_order=VBO_METADATA_COLUMN_ORDER)
         self._ophys_session_table = df.set_index("ophys_session_id")
 
     def get_ophys_session_table(self) -> pd.DataFrame:
@@ -211,20 +192,12 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         return self._ophys_session_table
 
     def _get_behavior_session_table(self):
-        session_table_path = self._get_metadata_path(
-            fname="behavior_session_table"
-        )
+        session_table_path = self._get_metadata_path(fname="behavior_session_table")
         df = sanitize_data_columns(session_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
-        df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], format="ISO8601", utc=True
-        )
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
-        df = enforce_df_column_order(
-            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"], format="ISO8601", utc=True)
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
+        df = enforce_df_column_order(input_df=df, column_order=VBO_METADATA_COLUMN_ORDER)
 
         self._behavior_session_table = df.set_index("behavior_session_id")
 
@@ -246,31 +219,19 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         return self._behavior_session_table
 
     def _get_ophys_experiment_table(self):
-        experiment_table_path = self._get_metadata_path(
-            fname="ophys_experiment_table"
-        )
+        experiment_table_path = self._get_metadata_path(fname="ophys_experiment_table")
         df = sanitize_data_columns(experiment_table_path, {"mouse_id": str})
         # Add UTC to match DateOfAcquisition object.
-        df["date_of_acquisition"] = pd.to_datetime(
-            df["date_of_acquisition"], format="ISO8601", utc=True
-        )
-        df = enforce_df_int_typing(
-            input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True
-        )
-        df = enforce_df_column_order(
-            input_df=df, column_order=VBO_METADATA_COLUMN_ORDER
-        )
+        df["date_of_acquisition"] = pd.to_datetime(df["date_of_acquisition"], format="ISO8601", utc=True)
+        df = enforce_df_int_typing(input_df=df, int_columns=VBO_INTEGER_COLUMNS, use_pandas_type=True)
+        df = enforce_df_column_order(input_df=df, column_order=VBO_METADATA_COLUMN_ORDER)
         self._ophys_experiment_table = df.set_index("ophys_experiment_id")
 
     def _get_ophys_cells_table(self):
-        ophys_cells_table_path = self._get_metadata_path(
-            fname="ophys_cells_table"
-        )
+        ophys_cells_table_path = self._get_metadata_path(fname="ophys_cells_table")
         df = sanitize_data_columns(ophys_cells_table_path)
         # NaN's for invalid cells force this to float, push to int
-        df["cell_specimen_id"] = pd.array(
-            df["cell_specimen_id"], dtype="Int64"
-        )
+        df["cell_specimen_id"] = pd.array(df["cell_specimen_id"], dtype="Int64")
         self._ophys_cells_table = df.set_index("cell_roi_id")
 
     def get_ophys_cells_table(self):
@@ -316,9 +277,7 @@ class BehaviorProjectCloudApi(BehaviorProjectBase, ProjectCloudApiBase):
         -------
         processed_movie : pd.DataFrame
         """
-        return self._natural_movie_cache.get_processed_template_movie(
-            n_workers=n_workers
-        )
+        return self._natural_movie_cache.get_processed_template_movie(n_workers=n_workers)
 
     def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
         """Download a template for the natural scene stimulus. This is the

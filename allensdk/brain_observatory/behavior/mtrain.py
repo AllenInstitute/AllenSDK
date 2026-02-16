@@ -4,7 +4,7 @@ import numpy as np
 
 
 def annotate_change_detect(trials):
-    """ adds `change` and `detect` columns to dataframe
+    """adds `change` and `detect` columns to dataframe
 
     Parameters
     ----------
@@ -18,14 +18,14 @@ def annotate_change_detect(trials):
     io.load_trials
     """
 
-    trials['change'] = trials['trial_type'] == 'go'
-    trials['detect'] = trials['response'] == 1.0
+    trials["change"] = trials["trial_type"] == "go"
+    trials["detect"] = trials["response"] == 1.0
 
     return trials
 
 
 def assign_session_id(trials):
-    """ adds a column with a unique ID for the session defined as
+    """adds a column with a unique ID for the session defined as
             a combination of the mouse ID and startdatetime
 
     Parameters
@@ -39,16 +39,13 @@ def assign_session_id(trials):
     --------
     io.load_trials
     """
-    trials['session_id'] = (trials['mouse_id']
-                            + '_'
-                            + trials['startdatetime'].map(
-                                lambda x: x.isoformat()))
+    trials["session_id"] = trials["mouse_id"] + "_" + trials["startdatetime"].map(lambda x: x.isoformat())
 
     return trials
 
 
 def fix_change_time(trials):
-    """ forces `None` values in the `change_time` column to numpy NaN
+    """forces `None` values in the `change_time` column to numpy NaN
 
     Parameters
     ----------
@@ -61,14 +58,13 @@ def fix_change_time(trials):
     --------
     io.load_trials
     """
-    trials['change_time'] = trials['change_time'].map(
-            lambda x: np.nan if x is None else x)
+    trials["change_time"] = trials["change_time"].map(lambda x: np.nan if x is None else x)
 
     return trials
 
 
 def explode_response_window(trials):
-    """ explodes the `response_window` column in lower & upper columns
+    """explodes the `response_window` column in lower & upper columns
 
     Parameters
     ----------
@@ -81,16 +77,14 @@ def explode_response_window(trials):
     --------
     io.load_trials
     """
-    trials['response_window_lower'] = \
-        trials['response_window'].map(lambda x: x[0])
-    trials['response_window_upper'] = \
-        trials['response_window'].map(lambda x: x[1])
+    trials["response_window_lower"] = trials["response_window"].map(lambda x: x[0])
+    trials["response_window_upper"] = trials["response_window"].map(lambda x: x[1])
 
     return trials
 
 
 def annotate_trials(trials):
-    """ performs multiple annotatations:
+    """performs multiple annotatations:
 
     - annotate_change_detect
     - fix_change_time
@@ -144,23 +138,23 @@ class ExtendedTrialSchema(Schema):
     """
 
     index = fields.Int(
-        description='Trial number in this session',
+        description="Trial number in this session",
         required=True,
     )
     startframe = fields.Int(
-        description='frame when this trial starts',
+        description="frame when this trial starts",
         required=True,
     )
     starttime = fields.Float(
-        description='time in seconds when this trial starts',
+        description="time in seconds when this trial starts",
         required=True,
     )
     endframe = fields.Int(
-        description='frame when this trial ends',
+        description="frame when this trial ends",
         required=True,
     )
     endtime = fields.Float(
-        description='time in seconds when this trial ends',
+        description="time in seconds when this trial ends",
         required=True,
     )
     trial_length = fields.Float(
@@ -169,69 +163,66 @@ class ExtendedTrialSchema(Schema):
 
     # timing paramters
     change_frame = fields.Float(
-        description='The stimulus frame when the change occured on this trial',
+        description="The stimulus frame when the change occured on this trial",
         required=True,
         allow_nan=True,
     )
     scheduled_change_time = fields.Float(
-        description=("The time when the change was scheduled to occur "
-                     "on this trial"),
+        description=("The time when the change was scheduled to occur on this trial"),
         required=True,
     )
     change_time = fields.Float(
-        description='The time when the change occured on this trial',
+        description="The time when the change occured on this trial",
         required=True,
         allow_nan=True,
     )
 
     # image parameters
     initial_image_category = fields.String(
-        description='The category of the initial images on this trial',
+        description="The category of the initial images on this trial",
         required=True,
         allow_none=True,
     )
     initial_image_name = fields.String(
-        description=("The name of the last initial image before the "
-                     "change on this trial"),
+        description=("The name of the last initial image before the change on this trial"),
         required=True,
         allow_none=True,
     )
     change_image_category = fields.String(
-        description='The category of the change images on this trial',
+        description="The category of the change images on this trial",
         required=True,
         allow_none=True,
     )
     change_image_name = fields.String(
-        description='The name of the first change image on this trial',
+        description="The name of the first change image on this trial",
         required=True,
         allow_none=True,
     )
 
     # oriented gratings paramters
     initial_contrast = fields.Float(
-        description='The contrast of the initial orientation on this trial',
+        description="The contrast of the initial orientation on this trial",
         required=True,
         allow_none=True,
     )
     change_contrast = fields.Float(
-        description='The contrast of the change orientation on this trial',
+        description="The contrast of the change orientation on this trial",
         required=True,
         allow_none=True,
     )
     initial_ori = fields.Float(
-        description='The orientation of the initial orientation on this trial',
+        description="The orientation of the initial orientation on this trial",
         required=True,
         allow_none=True,
     )
     change_ori = fields.Float(
-        description='The orientation of the change orientation on this trial',
+        description="The orientation of the change orientation on this trial",
         required=True,
         allow_none=True,
         allow_nan=True,
     )
     delta_ori = fields.Float(
-        description=("The difference between the initial and change "
-                     "orientations on this trial"),
+        description=("The difference between the initial and change orientations on this trial"),
         required=True,
         allow_none=True,
     )
@@ -239,18 +230,17 @@ class ExtendedTrialSchema(Schema):
     # licks
     lick_times = fields.List(
         fields.Float,
-        description='times of licks on this trial',
+        description="times of licks on this trial",
         required=True,
     )
     response_latency = fields.Float(
-        description=("The latency between the change and the first lick "
-                     "on this trial"),
+        description=("The latency between the change and the first lick on this trial"),
         required=True,
         allow_nan=True,
     )
     response_time = fields.List(
         fields.Float,
-        description='need to check this with Doug',
+        description="need to check this with Doug",
         required=True,
     )
     reward_frames = fields.List(
@@ -269,24 +259,22 @@ class ExtendedTrialSchema(Schema):
     )
 
     auto_rewarded = fields.Bool(
-        description='whether this trial was an auto_rewarded trial',
+        description="whether this trial was an auto_rewarded trial",
         required=True,
         allow_none=True,
     )
     cumulative_reward_number = fields.Int(
-        description=("the cumulative number of rewards in the session at "
-                     "trial end"),
+        description=("the cumulative number of rewards in the session at trial end"),
         required=True,
     )
     cumulative_volume = fields.Float(
-        description='the total volume of rewards in the session at trial end',
+        description="the total volume of rewards in the session at trial end",
         required=True,
     )
 
     # optogenetics
     optogenetics = fields.Bool(
-        description=("whether optogenetic stimulation was applied "
-                     "on this trial"),
+        description=("whether optogenetic stimulation was applied on this trial"),
         required=True,
     )
 
@@ -385,9 +373,7 @@ class ExtendedTrialSchema(Schema):
     date = FriendlyDate(
         required=True,
     )
-    year = fields.Integer(
-        strict=True
-    )
+    year = fields.Integer(strict=True)
     month = fields.Integer(
         required=True,
         strict=True,

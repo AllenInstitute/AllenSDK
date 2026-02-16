@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_rewards(data: Dict,
-                timestamps: np.ndarray) -> pd.DataFrame:
+def get_rewards(data: Dict, timestamps: np.ndarray) -> pd.DataFrame:
     """
     Construct and return a pandas DataFrame containing reward data for this
     session

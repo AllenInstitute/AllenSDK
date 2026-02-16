@@ -1,45 +1,33 @@
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, \
-    NWBDatasetSpec
+from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBDatasetSpec
 
-NAMESPACE = 'ndx-aibs-ophys-event-detection'
+NAMESPACE = "ndx-aibs-ophys-event-detection"
 
 
 def main():
-
     ns_builder = NWBNamespaceBuilder(
         doc="Detected events from optical physiology ROI fluorescence traces",
         name=f"""{NAMESPACE}""",
         version="""0.1.0""",
         author="""Allen Institute for Brain Science""",
-        contact="""waynew@alleninstitute.org"""
+        contact="""waynew@alleninstitute.org""",
     )
 
-    ns_builder.include_type('RoiResponseSeries', namespace='core')
-    ns_builder.include_type('DynamicTableRegion', namespace='core')
-    ns_builder.include_type('TimeSeries', namespace='core')
-    ns_builder.include_type('NWBDataInterface', namespace='core')
+    ns_builder.include_type("RoiResponseSeries", namespace="core")
+    ns_builder.include_type("DynamicTableRegion", namespace="core")
+    ns_builder.include_type("TimeSeries", namespace="core")
+    ns_builder.include_type("NWBDataInterface", namespace="core")
 
     ophys_events_spec = NWBGroupSpec(
-        neurodata_type_def='OphysEventDetection',
-        neurodata_type_inc='RoiResponseSeries',
-        name='event_detection',
-        doc='Stores event detection output',
+        neurodata_type_def="OphysEventDetection",
+        neurodata_type_inc="RoiResponseSeries",
+        name="event_detection",
+        doc="Stores event detection output",
         datasets=[
-            NWBDatasetSpec(
-                name='lambdas',
-                dtype='float',
-                doc='calculated regularization weights',
-                shape=(None,)
-            ),
-            NWBDatasetSpec(
-                name='noise_stds',
-                dtype='float',
-                doc='calculated noise std deviations',
-                shape=(None,)
-            )
-        ]
+            NWBDatasetSpec(name="lambdas", dtype="float", doc="calculated regularization weights", shape=(None,)),
+            NWBDatasetSpec(name="noise_stds", dtype="float", doc="calculated noise std deviations", shape=(None,)),
+        ],
     )
 
     new_data_types = [ophys_events_spec]

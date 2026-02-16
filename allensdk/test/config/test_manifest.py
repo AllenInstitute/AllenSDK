@@ -42,55 +42,49 @@ from allensdk.config.manifest import Manifest
 @pytest.fixture
 def builder():
     b = ManifestBuilder()
-    b.add_path('BASEDIR', '/home/username/example')
+    b.add_path("BASEDIR", "/home/username/example")
 
     return b
 
 
 def testManifestConstructor(builder):
     manifest = builder.get_manifest()
-    expected = os.path.abspath('/home/username/example')
-    actual = manifest.get_path('BASEDIR')
-    assert(expected == actual)
+    expected = os.path.abspath("/home/username/example")
+    actual = manifest.get_path("BASEDIR")
+    assert expected == actual
 
 
 def testManifestParent(builder):
-    builder.add_path('WORKDIR',
-                     'work',
-                     parent_key='BASEDIR')
+    builder.add_path("WORKDIR", "work", parent_key="BASEDIR")
     manifest = builder.get_manifest()
-    expected = os.path.abspath('/home/username/example/work')
-    actual = manifest.get_path('WORKDIR')
-    assert(expected == actual)
+    expected = os.path.abspath("/home/username/example/work")
+    actual = manifest.get_path("WORKDIR")
+    assert expected == actual
 
 
 def testManifestBuilderDataFrame(builder):
-    builder.add_path('WORKDIR',
-                     'work',
-                     parent_key='BASEDIR')
+    builder.add_path("WORKDIR", "work", parent_key="BASEDIR")
     builder_df = builder.as_dataframe()
 
-    assert('key' in builder_df.keys())
-    assert('type' in builder_df.keys())
-    assert('spec' in builder_df.keys())
-    assert('parent_key' in builder_df.keys())
-    assert('format' in builder_df.keys())
-    assert(5 == len(builder_df.keys()))
+    assert "key" in builder_df.keys()
+    assert "type" in builder_df.keys()
+    assert "spec" in builder_df.keys()
+    assert "parent_key" in builder_df.keys()
+    assert "format" in builder_df.keys()
+    assert 5 == len(builder_df.keys())
 
 
 def testManifestDataFrame(builder):
-    builder.add_path('WORKDIR',
-                     'work',
-                     parent_key='BASEDIR')
+    builder.add_path("WORKDIR", "work", parent_key="BASEDIR")
 
     manifest = builder.get_manifest()
     df = manifest.as_dataframe()
 
-    assert('type' in df.keys())
-    assert('spec' in df.keys())
-    assert(2 == len(df.keys()))
+    assert "type" in df.keys()
+    assert "spec" in df.keys()
+    assert 2 == len(df.keys())
 
 
 def safe_mkdir_root_dir():
     directory = os.path.abspath(os.sep)
-    Manifest.safe_mkdir(directory) # should not error
+    Manifest.safe_mkdir(directory)  # should not error

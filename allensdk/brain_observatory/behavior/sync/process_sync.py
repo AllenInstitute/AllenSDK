@@ -1,9 +1,8 @@
-
-
 import numpy as np
 
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,11 +37,11 @@ def calculate_delay(sync_data, stim_vsync_fall, sample_frequency):
     ROUND_PRECISION = 4
     ONE = 1
 
-    logger.info('calculating monitor delay')
+    logger.info("calculating monitor delay")
 
     # try:
     # photodiode transitions
-    photodiode_rise = sync_data.get_rising_edges('stim_photodiode') / sample_frequency
+    photodiode_rise = sync_data.get_rising_edges("stim_photodiode") / sample_frequency
 
     # Find start and stop of stimulus
     # test and correct for photodiode transition errors
@@ -53,12 +52,16 @@ def calculate_delay(sync_data, stim_vsync_fall, sample_frequency):
     max_medium_photodiode_rise = 1.5
 
     # find the short and medium length photodiode rises
-    short_rise_indexes = np.where(np.logical_and(photodiode_rise_diff > min_short_photodiode_rise,
-                                                    photodiode_rise_diff < max_short_photodiode_rise))[
-        FIRST_ELEMENT_INDEX]
-    medium_rise_indexes = np.where(np.logical_and(photodiode_rise_diff > min_medium_photodiode_rise,
-                                                    photodiode_rise_diff < max_medium_photodiode_rise))[
-        FIRST_ELEMENT_INDEX]
+    short_rise_indexes = np.where(
+        np.logical_and(
+            photodiode_rise_diff > min_short_photodiode_rise, photodiode_rise_diff < max_short_photodiode_rise
+        )
+    )[FIRST_ELEMENT_INDEX]
+    medium_rise_indexes = np.where(
+        np.logical_and(
+            photodiode_rise_diff > min_medium_photodiode_rise, photodiode_rise_diff < max_medium_photodiode_rise
+        )
+    )[FIRST_ELEMENT_INDEX]
 
     short_set = set(short_rise_indexes)
 
@@ -86,8 +89,10 @@ def calculate_delay(sync_data, stim_vsync_fall, sample_frequency):
 
         # iterate until all of the errors have been corrected
         while any(photodiode_rise_diff[ptd_start:ptd_end] < photodiode_rise_error_threshold):
-            error_frames = np.where(photodiode_rise_diff[ptd_start:ptd_end] < photodiode_rise_error_threshold)[
-                FIRST_ELEMENT_INDEX] + ptd_start
+            error_frames = (
+                np.where(photodiode_rise_diff[ptd_start:ptd_end] < photodiode_rise_error_threshold)[FIRST_ELEMENT_INDEX]
+                + ptd_start
+            )
             # remove the bad photodiode event
             photodiode_rise = np.delete(photodiode_rise, error_frames[last_frame_index])
             ptd_end -= 1
@@ -102,16 +107,24 @@ def calculate_delay(sync_data, stim_vsync_fall, sample_frequency):
 
         delay_rise = np.empty(number_of_photodiode_rises)
         for photodiode_rise_index in range(number_of_photodiode_rises):
-            delay_rise[photodiode_rise_index] = photodiode_rise[photodiode_rise_index + first_pulse] - \
-                stim_vsync_fall[(photodiode_rise_index * vsync_fall_events_per_photodiode_rise) + half_vsync_fall_events_per_photodiode_rise]
+            delay_rise[photodiode_rise_index] = (
+                photodiode_rise[photodiode_rise_index + first_pulse]
+                - stim_vsync_fall[
+                    (photodiode_rise_index * vsync_fall_events_per_photodiode_rise)
+                    + half_vsync_fall_events_per_photodiode_rise
+                ]
+            )
 
         # get a single delay value by finding the mean of all of the delays - skip the last element in the array (the end of the experimenet)
         delay = np.mean(delay_rise[:last_frame_index])
         delay_std = np.std(delay_rise[:last_frame_index])
 
-        if (delay_std > DELAY_THRESHOLD or np.isnan(delay)):
-    
-            logger.error("Sync photodiode error needs to be fixed. Using assumed monitor delay: {}".format(round(delay, ROUND_PRECISION)))
+        if delay_std > DELAY_THRESHOLD or np.isnan(delay):
+            logger.error(
+                "Sync photodiode error needs to be fixed. Using assumed monitor delay: {}".format(
+                    round(delay, ROUND_PRECISION)
+                )
+            )
             raise
 
     # assume delay

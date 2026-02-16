@@ -38,17 +38,17 @@ import copy
 import math
 
 # Morphology nodes have the following fields. SWC fields are numeric.
-NODE_ID = 'id'
-NODE_TYPE = 'type'
-NODE_X = 'x'
-NODE_Y = 'y'
-NODE_Z = 'z'
-NODE_R = 'radius'
-NODE_PN = 'parent'
+NODE_ID = "id"
+NODE_TYPE = "type"
+NODE_X = "x"
+NODE_Y = "y"
+NODE_Z = "z"
+NODE_R = "radius"
+NODE_PN = "parent"
 SWC_COLUMNS = [NODE_ID, NODE_TYPE, NODE_X, NODE_Y, NODE_Z, NODE_R, NODE_PN]
 
-NODE_TREE_ID = 'tree_id'
-NODE_CHILDREN = 'children'
+NODE_TREE_ID = "tree_id"
+NODE_CHILDREN = "children"
 
 # shorthand for dictionary entries, to shorten sometimes long code lines
 _N = NODE_ID
@@ -83,21 +83,23 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
         with open(file_name, "r") as f:
             for line in f:
                 # remove comments
-                if line.lstrip().startswith('#'):
+                if line.lstrip().startswith("#"):
                     continue
                 # read values. expected SWC format is:
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
-                toks = line.split(' ')
-                vals = Compartment({
-                    NODE_ID: int(toks[0]),
-                    NODE_TYPE: int(toks[1]),
-                    NODE_X: float(toks[2]),
-                    NODE_Y: float(toks[3]),
-                    NODE_Z: float(toks[4]),
-                    NODE_R: float(toks[5]),
-                    NODE_PN: int(toks[6].rstrip())
-                })
+                toks = line.split(" ")
+                vals = Compartment(
+                    {
+                        NODE_ID: int(toks[0]),
+                        NODE_TYPE: int(toks[1]),
+                        NODE_X: float(toks[2]),
+                        NODE_Y: float(toks[3]),
+                        NODE_Z: float(toks[4]),
+                        NODE_R: float(toks[5]),
+                        NODE_PN: int(toks[6].rstrip()),
+                    }
+                )
                 # store this compartment
                 compartments.append(vals)
                 # increment line number (used for error reporting only)
@@ -121,15 +123,16 @@ class Compartment(dict):
 
     def __init__(self, *args, **kwargs):
         super(Compartment, self).__init__(*args, **kwargs)
-        if (NODE_ID not in self or
-                NODE_TYPE not in self or
-                NODE_X not in self or
-                NODE_Y not in self or
-                NODE_Z not in self or
-                NODE_R not in self or
-                NODE_PN not in self):
-            raise ValueError(
-                "Compartment was not initialized with requisite fields")
+        if (
+            NODE_ID not in self
+            or NODE_TYPE not in self
+            or NODE_X not in self
+            or NODE_Y not in self
+            or NODE_Z not in self
+            or NODE_R not in self
+            or NODE_PN not in self
+        ):
+            raise ValueError("Compartment was not initialized with requisite fields")
         # Each unconnected graph has its own ID. This is the ID
         #   of graph that the node resides in
         self[NODE_TREE_ID] = -1
@@ -138,9 +141,11 @@ class Compartment(dict):
         self[NODE_CHILDREN] = []
 
     def print_node(self):
-        """ print out compartment information with field names """
-        print("%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self[_N], self[_TYP], self[
-              _X], self[_Y], self[_Z], self[_R], self[_P], str(self[_C]), self[_TID]))
+        """print out compartment information with field names"""
+        print(
+            "%d %d %.4f %.4f %.4f %.4f %d %s %d"
+            % (self[_N], self[_TYP], self[_X], self[_Y], self[_Z], self[_R], self[_P], str(self[_C]), self[_TID])
+        )
 
 
 class Morphology(object):
@@ -209,36 +214,36 @@ class Morphology(object):
 
     @property
     def compartment_list(self):
-        """ Return the compartment list.  This is a property to ensure that the
-        compartment list and compartment index are in sync. """
+        """Return the compartment list.  This is a property to ensure that the
+        compartment list and compartment index are in sync."""
         return self._compartment_list
 
     @compartment_list.setter
     def compartment_list(self, compartment_list):
-        """ Update the compartment list.  Update the compartment index. """
+        """Update the compartment list.  Update the compartment index."""
         self._set_compartments(compartment_list)
 
     @property
     def compartment_index(self):
-        """ Return the compartment index.  This is a property to ensure that the
-        compartment list and compartment index are in sync. """
+        """Return the compartment index.  This is a property to ensure that the
+        compartment list and compartment index are in sync."""
         return self._compartment_index
 
     @compartment_index.setter
     def compartment_index(self, compartment_index):
-        """ Update the compartment index.  Update the compartment list. """
+        """Update the compartment index.  Update the compartment list."""
         self._set_compartments(compartment_index.values())
 
     @property
     def num_trees(self):
-        """ Return the number of trees in the morphology. A tree is
-        defined as everything following from a single root compartment. """
+        """Return the number of trees in the morphology. A tree is
+        defined as everything following from a single root compartment."""
         return len(self._tree_list)
 
     # TODO add filter for number of nodes of a particular type
     @property
     def num_nodes(self):
-        """ Return the number of compartments in the morphology. """
+        """Return the number of compartments in the morphology."""
         return len(self.compartment_list)
 
     # internal function
@@ -263,12 +268,12 @@ class Morphology(object):
 
     @property
     def soma(self):
-        """ Returns root node of soma, if present"""
+        """Returns root node of soma, if present"""
         return self._soma
 
     @property
     def root(self):
-        """ [deprecated] Returns root node of soma, if present. Use 'soma' instead of 'root'"""
+        """[deprecated] Returns root node of soma, if present. Use 'soma' instead of 'root'"""
         return self._soma
 
     ####################################################################
@@ -314,7 +319,7 @@ class Morphology(object):
         return self._resolve_node_type(n)
 
     def parent_of(self, seg):
-        """ Returns parent of the specified node.
+        """Returns parent of the specified node.
 
         Parameters
         ----------
@@ -336,7 +341,7 @@ class Morphology(object):
         return None
 
     def children_of(self, seg):
-        """ Returns a list of the children of the specified node
+        """Returns a list of the children of the specified node
 
         Parameters
         ----------
@@ -368,12 +373,11 @@ class Morphology(object):
                     return None
                 seg = self._compartment_list[seg]
             except ValueError:
-                raise TypeError(
-                    "Object not recognized as morphology node or index")
+                raise TypeError("Object not recognized as morphology node or index")
         return seg
 
     def change_parent(self, child, parent):
-        """ Change the parent of a node. The child node is adjusted to
+        """Change the parent of a node. The child node is adjusted to
         point to the new parent, the child is taken off of the previous
         parent's child list, and it is added to the new parent's child list.
 
@@ -400,7 +404,7 @@ class Morphology(object):
 
     # returns a list of nodes located within dist of x,y,z
     def find(self, x, y, z, dist, node_type=None):
-        """ Returns a list of Morphology Objects located within 'dist'
+        """Returns a list of Morphology Objects located within 'dist'
         of coordinate (x,y,z). If node_type is specified, the search
         will be constrained to return only nodes of that type.
 
@@ -431,7 +435,7 @@ class Morphology(object):
         return found
 
     def compartment_list_by_type(self, compartment_type):
-        """ Return an list of all compartments having the specified
+        """Return an list of all compartments having the specified
         compartment type.
 
         Parameters
@@ -446,7 +450,7 @@ class Morphology(object):
         return [x for x in self._compartment_list if x[NODE_TYPE] == compartment_type]
 
     def compartment_index_by_type(self, compartment_type):
-        """ Return an dictionary of compartments indexed by id that all have
+        """Return an dictionary of compartments indexed by id that all have
         a particular compartment type.
 
         Parameters
@@ -461,7 +465,7 @@ class Morphology(object):
         return {c[NODE_ID]: c for c in self._compartment_list if c[NODE_TYPE] == compartment_type}
 
     def save(self, file_name):
-        """ Write this morphology out to an SWC file
+        """Write this morphology out to an SWC file
 
         Parameters
         ----------
@@ -484,7 +488,7 @@ class Morphology(object):
         self.save(file_name)
 
     def sparsify(self, modulo, compress_ids=False):
-        """ Return a new Morphology object that has a given number of non-leaf,
+        """Return a new Morphology object that has a given number of non-leaf,
         non-root nodes removed.  IDs can be reassigned so as to be continuous.
 
         Parameters
@@ -528,8 +532,7 @@ class Morphology(object):
                     compartments[child_id][NODE_PN] = parent_id
 
         # filter out the orphans
-        sparsified_compartments = {k: v for k,
-                                   v in compartments.items() if keep[k]}
+        sparsified_compartments = {k: v for k, v in compartments.items() if keep[k]}
         if compress_ids:
             ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
             id_hash = {fid: str(i + 1) for i, fid in enumerate(ids)}
@@ -584,14 +587,12 @@ class Morphology(object):
         for seg in self.compartment_list:
             par_num = seg[NODE_PN]
             if par_num >= 0:
-                self.compartment_list[par_num][
-                    NODE_CHILDREN].append(seg[NODE_ID])
+                self.compartment_list[par_num][NODE_CHILDREN].append(seg[NODE_ID])
         # update tree lists
         self._separate_trees()
         ############################
         # Rebuild internal index and links between parents and children
-        self._compartment_index = {
-            c[NODE_ID]: c for c in self.compartment_list}
+        self._compartment_index = {c[NODE_ID]: c for c in self.compartment_list}
         # compartment list is complete and sequential so don't need index
         #   to resolve relationships
         # for each node, reset children array
@@ -600,17 +601,15 @@ class Morphology(object):
             seg[NODE_CHILDREN] = []
         for seg in self._compartment_list:
             if seg[NODE_PN] >= 0:
-                self._compartment_list[seg[NODE_PN]][
-                    NODE_CHILDREN].append(seg[NODE_ID])
+                self._compartment_list[seg[NODE_PN]][NODE_CHILDREN].append(seg[NODE_ID])
         # verify that each node ID is the same as its position in the
         #   compartment list
         for i in range(len(self.compartment_list)):
             if i != self.node(i)[NODE_ID]:
-                raise RuntimeError(
-                    "Internal error detected -- compartment list not properly formed")
+                raise RuntimeError("Internal error detected -- compartment list not properly formed")
 
     def append(self, node_list):
-        """ Add additional nodes to this Morphology. Those nodes must
+        """Add additional nodes to this Morphology. Those nodes must
         originate from another morphology object.
 
         Parameters
@@ -639,7 +638,7 @@ class Morphology(object):
         self._reconstruct()
 
     def stumpify_axon(self, count=10):
-        """ Remove all axon compartments except the first 'count'
+        """Remove all axon compartments except the first 'count'
         nodes, as counted from the connected axon root.
 
         Parameters
@@ -677,7 +676,7 @@ class Morphology(object):
 
     # strip out everything but the soma and the specified SWC type
     def strip_all_other_types(self, node_type, keep_soma=True):
-        """ Strips everything from the morphology except for the
+        """Strips everything from the morphology except for the
         specified type.
         Parent and child relationships are updated accordingly, creating
         new roots when necessary.
@@ -718,7 +717,7 @@ class Morphology(object):
 
     # strip out the specified SWC type
     def strip_type(self, node_type):
-        """ Strips all compartments of the specified type from the
+        """Strips all compartments of the specified type from the
         morphology.
         Parent and child relationships are updated accordingly, creating
         new roots when necessary.
@@ -750,7 +749,7 @@ class Morphology(object):
 
     # strip out the specified SWC type
     def convert_type(self, old_type, new_type):
-        """ Converts all compartments from one type to another.
+        """Converts all compartments from one type to another.
         Nodes of the original type are not affected so this
         procedure can also be used as a merge procedure.
 
@@ -771,7 +770,7 @@ class Morphology(object):
                 seg[NODE_TYPE] = new_type
 
     def apply_affine(self, aff, scale=None):
-        """ Apply an affine transform to all compartments in this
+        """Apply an affine transform to all compartments in this
         morphology. Node radius is adjusted as well.
 
         Format of the affine matrix is:
@@ -815,20 +814,17 @@ class Morphology(object):
             det_scale = math.pow(abs(det), 1.0 / 3.0)
             # measure scale along each axis
             # keep this code here in case
-            #scale_x = abs(aff[0] + aff[3] + aff[6])
-            #scale_y = abs(aff[1] + aff[4] + aff[7])
-            #scale_z = abs(aff[2] + aff[5] + aff[8])
-            #avg_scale = (scale_x + scale_y + scale_z) / 3.0;
+            # scale_x = abs(aff[0] + aff[3] + aff[6])
+            # scale_y = abs(aff[1] + aff[4] + aff[7])
+            # scale_z = abs(aff[2] + aff[5] + aff[8])
+            # avg_scale = (scale_x + scale_y + scale_z) / 3.0;
             #
             # use determinant for scaling for now as it's most simple
             scale = det_scale
         for seg in self.compartment_list:
-            x = seg[NODE_X] * aff[0] + seg[NODE_Y] * \
-                aff[1] + seg[NODE_Z] * aff[2] + aff[9]
-            y = seg[NODE_X] * aff[3] + seg[NODE_Y] * \
-                aff[4] + seg[NODE_Z] * aff[5] + aff[10]
-            z = seg[NODE_X] * aff[6] + seg[NODE_Y] * \
-                aff[7] + seg[NODE_Z] * aff[8] + aff[11]
+            x = seg[NODE_X] * aff[0] + seg[NODE_Y] * aff[1] + seg[NODE_Z] * aff[2] + aff[9]
+            y = seg[NODE_X] * aff[3] + seg[NODE_Y] * aff[4] + seg[NODE_Z] * aff[5] + aff[10]
+            z = seg[NODE_X] * aff[6] + seg[NODE_Y] * aff[7] + seg[NODE_Z] * aff[8] + aff[11]
             seg[NODE_X] = x
             seg[NODE_Y] = y
             seg[NODE_Z] = z
@@ -849,8 +845,7 @@ class Morphology(object):
             # see what trees this node is adjacent to
             local_trees = []
             if seg[NODE_PN] >= 0 and self.compartment_list[seg[NODE_PN]][NODE_TREE_ID] >= 0:
-                local_trees.append(self.compartment_list[
-                                   seg[NODE_PN]][NODE_TREE_ID])
+                local_trees.append(self.compartment_list[seg[NODE_PN]][NODE_TREE_ID])
             for child_id in seg[NODE_CHILDREN]:
                 child = self.compartment_list[child_id]
                 if child[NODE_TREE_ID] >= 0:
@@ -860,7 +855,7 @@ class Morphology(object):
             if len(local_trees) == 0:
                 tree_num = len(trees)  # create new tree
             elif len(local_trees) == 1:
-                tree_num = local_trees[0]   # use existing tree
+                tree_num = local_trees[0]  # use existing tree
             elif len(local_trees) > 1:
                 # this node is an intersection of multiple trees
                 # merge all trees into the first one found
@@ -918,8 +913,7 @@ class Morphology(object):
         for seg in self.compartment_list:
             if seg[NODE_PN] >= 0:
                 if seg[NODE_PN] >= n:
-                    print("Parent for node %d is invalid (%d)" %
-                          (seg[NODE_ID], seg[NODE_PN]))
+                    print("Parent for node %d is invalid (%d)" % (seg[NODE_ID], seg[NODE_PN]))
                     errs += 1
         # make sure that each tree has exactly one root
         for i in range(self.num_trees):
@@ -970,7 +964,7 @@ class Morphology(object):
 
     # remove tree from swc's "forest"
     def delete_tree(self, n):
-        """ Delete tree, and all of its compartments, from the morphology.
+        """Delete tree, and all of its compartments, from the morphology.
 
         Parameters
         ----------
@@ -997,11 +991,12 @@ class Morphology(object):
         for node in self.compartment_list:
             print(node)
 
+
 ########################################################################
 class Marker(dict):
-    """ Simple dictionary class for handling reconstruction marker objects. """
+    """Simple dictionary class for handling reconstruction marker objects."""
 
-    SPACING = [.1144, .1144, .28]
+    SPACING = [0.1144, 0.1144, 0.28]
 
     CUT_DENDRITE = 10
     NO_RECONSTRUCTION = 20
@@ -1011,20 +1006,20 @@ class Marker(dict):
 
         # marker file x,y,z coordinates are offset by a single image-space
         # pixel
-        self['x'] -= self.SPACING[0]
-        self['y'] -= self.SPACING[1]
-        self['z'] -= self.SPACING[2]
+        self["x"] -= self.SPACING[0]
+        self["y"] -= self.SPACING[1]
+        self["z"] -= self.SPACING[2]
 
 
 def read_marker_file(file_name):
-    """ read in a marker file and return a list of dictionaries """
+    """read in a marker file and return a list of dictionaries"""
 
-    with open(file_name, 'r') as f:
-        rows = csv.DictReader((r for r in f if not r.startswith('#')),
-                              fieldnames=['x', 'y', 'z', 'radius', 'shape', 'name', 'comment',
-                                          'color_r', 'color_g', 'color_b'])
+    with open(file_name, "r") as f:
+        rows = csv.DictReader(
+            (r for r in f if not r.startswith("#")),
+            fieldnames=["x", "y", "z", "radius", "shape", "name", "comment", "color_r", "color_g", "color_b"],
+        )
 
-        return [Marker({'x': float(r['x']),
-                        'y': float(r['y']),
-                        'z': float(r['z']),
-                        'name': int(r['name'])}) for r in rows]
+        return [
+            Marker({"x": float(r["x"]), "y": float(r["y"]), "z": float(r["z"]), "name": int(r["name"])}) for r in rows
+        ]

@@ -45,16 +45,18 @@ import multiprocessing as mp
 from functools import partial
 import argparse
 
-_runner_log = logging.getLogger('allensdk.model.biophysical.runner')
+_runner_log = logging.getLogger("allensdk.model.biophysical.runner")
 
 _lock = None
+
 
 def _init_lock(lock):
     global _lock
     _lock = lock
 
+
 def run(args, sweeps=None, procs=6):
-    '''Main function for simulating sweeps in a biophysical experiment.
+    """Main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
@@ -64,21 +66,20 @@ def run(args, sweeps=None, procs=6):
         number of sweeps to simulate simultaneously.
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
-    '''
+    """
 
     description = load_description(args)
-    
-    prepare_nwb_output(description.manifest.get_path('stimulus_path'),
-                       description.manifest.get_path('output_path'))
+
+    prepare_nwb_output(description.manifest.get_path("stimulus_path"), description.manifest.get_path("output_path"))
 
     if procs == 1:
         run_sync(description, sweeps)
         return
 
     if sweeps is None:
-        description.manifest.get_path('stimulus_path')
-        run_params = description.data['runs'][0]
-        sweeps = run_params['sweeps']
+        description.manifest.get_path("stimulus_path")
+        run_params = description.data["runs"][0]
+        sweeps = run_params["sweeps"]
 
     lock = mp.Lock()
     pool = mp.Pool(procs, initializer=_init_lock, initargs=(lock,))
@@ -88,7 +89,7 @@ def run(args, sweeps=None, procs=6):
 
 
 def run_sync(description, sweeps=None):
-    '''Single-process main function for simulating sweeps in a biophysical experiment.
+    """Single-process main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
@@ -96,7 +97,7 @@ def run_sync(description, sweeps=None):
         All information needed to run the experiment.
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
-    '''
+    """
 
     # configure NEURON
     utils = create_utils(description)
@@ -104,17 +105,17 @@ def run_sync(description, sweeps=None):
 
     # configure model
     manifest = description.manifest
-    morphology_path = description.manifest.get_path('MORPHOLOGY').encode('ascii', 'ignore')
+    morphology_path = description.manifest.get_path("MORPHOLOGY").encode("ascii", "ignore")
     morphology_path = morphology_path.decode("utf-8")
     utils.generate_morphology(morphology_path)
     utils.load_cell_parameters()
 
     # configure stimulus and recording
-    stimulus_path = description.manifest.get_path('stimulus_path')
-    run_params = description.data['runs'][0]
+    stimulus_path = description.manifest.get_path("stimulus_path")
+    run_params = description.data["runs"][0]
     if sweeps is None:
-        sweeps = run_params['sweeps']
-    sweeps_by_type = run_params['sweeps_by_type']
+        sweeps = run_params["sweeps"]
+    sweeps_by_type = run_params["sweeps_by_type"]
 
     output_path = manifest.get_path("output_path")
 
@@ -142,9 +143,8 @@ def run_sync(description, sweeps=None):
             _lock.release()
 
 
-def prepare_nwb_output(nwb_stimulus_path,
-                       nwb_result_path):
-    '''Copy the stimulus file, zero out the recorded voltages and spike times.
+def prepare_nwb_output(nwb_stimulus_path, nwb_result_path):
+    """Copy the stimulus file, zero out the recorded voltages and spike times.
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ def prepare_nwb_output(nwb_stimulus_path,
         NWB file name
     nwb_result_path : string
         NWB file name
-    '''
+    """
 
     output_dir = os.path.dirname(nwb_result_path)
     if not os.path.exists(output_dir):
@@ -166,7 +166,7 @@ def prepare_nwb_output(nwb_stimulus_path,
 
 
 def save_nwb(output_path, v, sweep, sweeps_by_type):
-    '''Save a single voltage output result into an existing sweep in a NWB file.
+    """Save a single voltage output result into an existing sweep in a NWB file.
     This is intended to overwrite a recorded trace with a simulated voltage.
 
     Parameters
@@ -177,30 +177,28 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         voltage
     sweep : integer
         which entry to overwrite in the file.
-    '''
+    """
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
 
-    sweep_by_type = {t: [sweep]
-                     for t, ss in sweeps_by_type.items() if sweep in ss}
-    sweep_features = extract_cell_features.extract_sweep_features(output,
-                                                                  sweep_by_type)
+    sweep_by_type = {t: [sweep] for t, ss in sweeps_by_type.items() if sweep in ss}
+    sweep_features = extract_cell_features.extract_sweep_features(output, sweep_by_type)
     try:
-        spikes = sweep_features[sweep]['spikes']
-        spike_times = [s['threshold_t'] for s in spikes]
+        spikes = sweep_features[sweep]["spikes"]
+        spike_times = [s["threshold_t"] for s in spikes]
         output.set_spike_times(sweep, spike_times)
     except Exception as e:
         logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
 def load_description(args_dict):
-    '''Read configurations.
+    """Read configurations.
 
     Parameters
     ----------
     args_dict : dict
         Parsed arguments dictionary with following keys.
-        
+
         manifest_file : string
             .json file with containing the experiment configuration
         axon_type : string
@@ -210,29 +208,34 @@ def load_description(args_dict):
     -------
     Config
         Object with all information needed to run the experiment.
-    '''
-    manifest_json_path = args_dict['manifest_file']
-    
+    """
+    manifest_json_path = args_dict["manifest_file"]
+
     description = Config().load(manifest_json_path)
-    
+
     # For newest all-active models update the axon replacement
-    axon_replacement_dict = {'axon_type': args_dict.get('axon_type', 'truncated')}
-    description.update_data(axon_replacement_dict, 'biophys')
+    axon_replacement_dict = {"axon_type": args_dict.get("axon_type", "truncated")}
+    description.update_data(axon_replacement_dict, "biophys")
 
     # fix nonstandard description sections
-    fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
+    fix_sections = ["passive", "axon_morph,", "conditions", "fitting"]
     description.fix_unary_sections(fix_sections)
 
     return description
 
 
 # Create the parser
-sim_parser = argparse.ArgumentParser(description='Run simulation for biophysical models with the provided configuration')
-sim_parser.add_argument('manifest_file',
-                        help='.json configurations for running the simulations')
-sim_parser.add_argument('--axon_type', default='truncated', choices=['stub', 'truncated'],
-                        help='axon replacement for all-active models; truncated: truncate reconstructed axon after 60 micron, stub: replace reconstructed axon with a uniform stub 60 micron long and 1 micron in diameter')
+sim_parser = argparse.ArgumentParser(
+    description="Run simulation for biophysical models with the provided configuration"
+)
+sim_parser.add_argument("manifest_file", help=".json configurations for running the simulations")
+sim_parser.add_argument(
+    "--axon_type",
+    default="truncated",
+    choices=["stub", "truncated"],
+    help="axon replacement for all-active models; truncated: truncate reconstructed axon after 60 micron, stub: replace reconstructed axon with a uniform stub 60 micron long and 1 micron in diameter",
+)
 
-if '__main__' == __name__:
+if "__main__" == __name__:
     schema = sim_parser.parse_args()
     run(vars(schema))

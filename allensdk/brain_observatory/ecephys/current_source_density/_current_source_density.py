@@ -16,12 +16,12 @@ def extract_trial_windows(
     post_stimulus_time: float,
     num_trials: Optional[int] = None,
     stimulus_index: Optional[int] = None,
-    name_field: str = 'stimulus_name',
-    index_field: str = 'stimulus_index',
-    start_field: str = 'Start',
-    end_field: str = 'End'
+    name_field: str = "stimulus_name",
+    index_field: str = "stimulus_index",
+    start_field: str = "Start",
+    end_field: str = "End",
 ) -> Tuple[List[np.ndarray], np.ndarray]:
-    '''Obtains time interval surrounding stimulus sweep onsets
+    """Obtains time interval surrounding stimulus sweep onsets
 
     Parameters
     ----------
@@ -62,42 +62,38 @@ def extract_trial_windows(
             trial's onset.
         relative_times : numpy.ndarray
             The basic time domain, centered on 0.
-    '''
+    """
 
     if stimulus_index is None:
-        stimulus_index = np.amin(stimulus_table[stimulus_table[name_field]
-                                 == stimulus_name][index_field].values)
+        stimulus_index = np.amin(stimulus_table[stimulus_table[name_field] == stimulus_name][index_field].values)
 
-    stimulus_name_mask = (stimulus_table[name_field] == stimulus_name)
-    stimulus_index_mask = (stimulus_table[index_field] == stimulus_index)
+    stimulus_name_mask = stimulus_table[name_field] == stimulus_name
+    stimulus_index_mask = stimulus_table[index_field] == stimulus_index
     trials = stimulus_table[stimulus_name_mask & stimulus_index_mask]
 
     if num_trials is not None:
         trials = trials.iloc[:num_trials, :]
-    trials = trials.to_dict('records')
+    trials = trials.to_dict("records")
 
-    relative_times = np.arange(-pre_stimulus_time,
-                               post_stimulus_time,
-                               time_step)
+    relative_times = np.arange(-pre_stimulus_time, post_stimulus_time, time_step)
     trial_windows = [relative_times + trial[start_field] for trial in trials]
 
-    msg = 'calculated relative timestamps: {} ({} timestamps per trial)'
+    msg = "calculated relative timestamps: {} ({} timestamps per trial)"
     logging.info(msg.format(relative_times, len(relative_times)))
-    msg = 'setup {} trial windows spanning {} to {}'
-    logging.info(msg.format(len(trial_windows),
-                            trial_windows[0][0],
-                            trial_windows[-1][-1]))
+    msg = "setup {} trial windows spanning {} to {}"
+    logging.info(msg.format(len(trial_windows), trial_windows[0][0], trial_windows[-1][-1]))
     return (trial_windows, relative_times)
 
 
-def accumulate_lfp_data(timestamps: np.ndarray, lfp_raw: np.ndarray,
-                        lfp_channels: np.ndarray,
-                        trial_windows: List[np.ndarray],
-                        volts_per_bit: float = 1.0,
-                        extractor_factory: Callable = (
-                            regular_grid_extractor_factory)
-                        ) -> np.ndarray:
-    ''' Extracts slices of LFP data at defined channels and times.
+def accumulate_lfp_data(
+    timestamps: np.ndarray,
+    lfp_raw: np.ndarray,
+    lfp_channels: np.ndarray,
+    trial_windows: List[np.ndarray],
+    volts_per_bit: float = 1.0,
+    extractor_factory: Callable = (regular_grid_extractor_factory),
+) -> np.ndarray:
+    """Extracts slices of LFP data at defined channels and times.
 
     Parameters
     ----------
@@ -121,17 +117,16 @@ def accumulate_lfp_data(timestamps: np.ndarray, lfp_raw: np.ndarray,
     accumulated : numpy.ndarray
         Extracted data. Dimensions are trials X channels X samples
 
-    '''
+    """
 
     num_samples = min(len(tw) for tw in trial_windows)
     num_trials = len(trial_windows)
     num_channels = len(lfp_channels)
 
-    accumulated = np.zeros((num_trials, num_channels, num_samples),
-                           dtype=lfp_raw.dtype)
+    accumulated = np.zeros((num_trials, num_channels, num_samples), dtype=lfp_raw.dtype)
 
     for channel_idx, chan in enumerate(lfp_channels):
-        logging.info('extracting lfp for channel {}'.format(chan))
+        logging.info("extracting lfp for channel {}".format(chan))
         extractor = extractor_factory(timestamps, lfp_raw, chan)
 
         for trial_index, trial_window in enumerate(trial_windows):
@@ -141,14 +136,13 @@ def accumulate_lfp_data(timestamps: np.ndarray, lfp_raw: np.ndarray,
                 current = np.around(current).astype(accumulated.dtype)
             accumulated[trial_index, channel_idx, :] = current
 
-    msg = 'extracted lfp data for {} trials, {} channels, and {} samples'
+    msg = "extracted lfp data for {} trials, {} channels, and {} samples"
     logging.info(msg.format(*accumulated.shape))
     return accumulated * volts_per_bit
 
 
-def compute_csd(trial_mean_lfp: np.ndarray,
-                spacing: float) -> Tuple[np.ndarray, np.ndarray]:
-    '''Compute current source density for real or virtual channels from
+def compute_csd(trial_mean_lfp: np.ndarray, spacing: float) -> Tuple[np.ndarray, np.ndarray]:
+    """Compute current source density for real or virtual channels from
     a neuropixels probe.
 
     Compute a second spatial derivative along the probe length
@@ -171,16 +165,12 @@ def compute_csd(trial_mean_lfp: np.ndarray,
             Current source density. Dimensions are channels X time samples.
         csd_channels: numpy.ndarray
             Array of channel indices for CSD.
-    '''
+    """
 
     # Need to pad lfp channels for Laplacian approx.
-    padded_lfp = np.pad(trial_mean_lfp,
-                        pad_width=((1, 1), (0, 0)),
-                        mode='edge')
+    padded_lfp = np.pad(trial_mean_lfp, pad_width=((1, 1), (0, 0)), mode="edge")
 
-    csd = (1 / (spacing ** 2)) * (padded_lfp[2:, :]
-                                  - (2 * padded_lfp[1:-1, :])
-                                  + padded_lfp[:-2, :])
+    csd = (1 / (spacing**2)) * (padded_lfp[2:, :] - (2 * padded_lfp[1:-1, :]) + padded_lfp[:-2, :])
 
     csd_channels = np.arange(0, trial_mean_lfp.shape[0])
 

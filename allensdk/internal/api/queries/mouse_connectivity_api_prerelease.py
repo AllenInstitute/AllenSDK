@@ -10,7 +10,7 @@ _STRUCTURE_TREE_ROOT_ID = 997
 _STRUCTURE_TREE_ROOT_NAME = "root"
 _STRUCTURE_TREE_ROOT_ACRONYM = "root"
 
-_EXPERIMENT_QUERY = '''
+_EXPERIMENT_QUERY = """
 with    specimens_concat_workflows as  (
     select    sp.id,
               string_agg(w.name, '|') as workflows
@@ -62,7 +62,8 @@ left join  specimens_concat_workflows as spcw on spcw.id = iser.specimen_id
 left join  injections_concat_structures as ics on ics.injection_id = inj.id
 -- only image series we can pull and ensure mice (should all be mice already) --
 where      iser.storage_directory is not null and d.organism_id = 2
-'''
+"""
+
 
 def _experiment_dict(row):
     # use empty strings instead of null
@@ -71,50 +72,50 @@ def _experiment_dict(row):
 
     exp = dict()
 
-    exp['id'] = row[b'id']
+    exp["id"] = row[b"id"]
 
-    exp['age'] = null_fill(row[b'age'])
-    exp['gender'] = null_fill(row[b'gender'])
-    exp['project_code'] = null_fill(row[b'project_code'])
-    exp['specimen_name'] = null_fill(row[b'specimen_name'])
-    exp['transgenic_line'] = null_fill(row[b'transgenic_line'])
-    exp['workflow_state'] = null_fill(row[b'workflow_state'])
+    exp["age"] = null_fill(row[b"age"])
+    exp["gender"] = null_fill(row[b"gender"])
+    exp["project_code"] = null_fill(row[b"project_code"])
+    exp["specimen_name"] = null_fill(row[b"specimen_name"])
+    exp["transgenic_line"] = null_fill(row[b"transgenic_line"])
+    exp["workflow_state"] = null_fill(row[b"workflow_state"])
 
     # list : [''] or ['workflow1', 'workflow2', ... ]
-    exp['workflows'] = null_fill(row[b'workflows'])
-    exp['workflows'] = exp['workflows'].split('|')
+    exp["workflows"] = null_fill(row[b"workflows"])
+    exp["workflows"] = exp["workflows"].split("|")
 
-    if row[b'structure_id'] is not None:
-        exp['structure_id'] = row[b'structure_id']
-        exp['structure_name'] = row[b'structure_name']
-        exp['structure_abbrev'] = row[b'structure_acronym']
+    if row[b"structure_id"] is not None:
+        exp["structure_id"] = row[b"structure_id"]
+        exp["structure_name"] = row[b"structure_name"]
+        exp["structure_abbrev"] = row[b"structure_acronym"]
     else:
         # use root structure for compatibility with structure tree
-        exp['structure_id'] = _STRUCTURE_TREE_ROOT_ID
-        exp['structure_name'] = _STRUCTURE_TREE_ROOT_NAME
-        exp['structure_abbrev'] = _STRUCTURE_TREE_ROOT_ACRONYM
+        exp["structure_id"] = _STRUCTURE_TREE_ROOT_ID
+        exp["structure_name"] = _STRUCTURE_TREE_ROOT_NAME
+        exp["structure_abbrev"] = _STRUCTURE_TREE_ROOT_ACRONYM
 
-    if row[b'injection_structures_id'] is not None:
-        ids = row[b'injection_structures_id'].split('|')
-        names = row[b'injection_structures_name'].split('|')
-        acronyms = row[b'injection_structures_acronym'].split('|')
+    if row[b"injection_structures_id"] is not None:
+        ids = row[b"injection_structures_id"].split("|")
+        names = row[b"injection_structures_name"].split("|")
+        acronyms = row[b"injection_structures_acronym"].split("|")
     else:
         # have at least prim. inj. struct. in structures
-        ids = (exp['structure_id'], )
-        names = (exp['structure_name'], )
-        acronyms = (exp['structure_abbrev'], )
+        ids = (exp["structure_id"],)
+        names = (exp["structure_name"],)
+        acronyms = (exp["structure_abbrev"],)
 
-    keys = 'id', 'name', 'abbreviation'
+    keys = "id", "name", "abbreviation"
     values = zip(ids, names, acronyms)
 
     structures = map(lambda s: dict(zip(keys, s)), values)
-    exp['injection_structures'] = list(structures)
+    exp["injection_structures"] = list(structures)
 
     return exp
 
 
 class MouseConnectivityApiPrerelease(MouseConnectivityApi):
-    '''Client for retrieving prereleased mouse connectivity data from lims.
+    """Client for retrieving prereleased mouse connectivity data from lims.
 
     Parameters
     ----------
@@ -123,15 +124,13 @@ class MouseConnectivityApiPrerelease(MouseConnectivityApi):
     file_name : string, optional
         File name to save/read storage_directories dict. Passed to
         GridDataApiPrerelease constructor.
-    '''
+    """
 
-    def __init__(self,
-                 storage_directories_file_name,
-                 cache_storage_directories=True,
-                 base_uri=None):
+    def __init__(self, storage_directories_file_name, cache_storage_directories=True, base_uri=None):
         super(MouseConnectivityApiPrerelease, self).__init__(base_uri=base_uri)
         self.grid_data_api = GridDataApiPrerelease.from_file_name(
-               storage_directories_file_name, cache=cache_storage_directories)
+            storage_directories_file_name, cache=cache_storage_directories
+        )
 
     @cacheable()
     def get_experiments(self):
@@ -139,49 +138,36 @@ class MouseConnectivityApiPrerelease(MouseConnectivityApi):
 
         experiments = []
         for row in query_result:
-            if str(row[b'id']) in self.grid_data_api.storage_directories:
-
+            if str(row[b"id"]) in self.grid_data_api.storage_directories:
                 exp_dict = _experiment_dict(row)
                 experiments.append(exp_dict)
 
         return experiments
 
-    #@cacheable()
+    # @cacheable()
     def get_structure_unionizes(self):
         raise NotImplementedError()
 
-    @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_injection_density(self, path, experiment_id, resolution):
         file_name = "%s_%s.nrrd" % (GridDataApi.INJECTION_DENSITY, resolution)
 
-        self.grid_data_api.download_projection_grid_data(
-            path, experiment_id, file_name)
+        self.grid_data_api.download_projection_grid_data(path, experiment_id, file_name)
 
-    @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_projection_density(self, path, experiment_id, resolution):
         file_name = "%s_%s.nrrd" % (GridDataApi.PROJECTION_DENSITY, resolution)
 
-        self.grid_data_api.download_projection_grid_data(
-            path, experiment_id, file_name)
+        self.grid_data_api.download_projection_grid_data(path, experiment_id, file_name)
 
-    @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_injection_fraction(self, path, experiment_id, resolution):
         file_name = "%s_%s.nrrd" % (GridDataApi.INJECTION_FRACTION, resolution)
 
-        self.grid_data_api.download_projection_grid_data(
-            path, experiment_id, file_name)
+        self.grid_data_api.download_projection_grid_data(path, experiment_id, file_name)
 
-    @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_data_mask(self, path, experiment_id, resolution):
         file_name = "%s_%s.nrrd" % (GridDataApi.DATA_MASK, resolution)
 
-        self.grid_data_api.download_projection_grid_data(
-            path, experiment_id, file_name)
+        self.grid_data_api.download_projection_grid_data(path, experiment_id, file_name)

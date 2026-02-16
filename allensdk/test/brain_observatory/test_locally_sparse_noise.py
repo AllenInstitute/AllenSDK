@@ -42,71 +42,58 @@ import itertools as it
 
 @pytest.fixture
 def dataset():
-    dataset = MagicMock(name='dataset')
+    dataset = MagicMock(name="dataset")
 
-    timestamps = MagicMock(name='timestamps')
-    celltraces = MagicMock(name='celltraces')
-    dataset.get_corrected_fluorescence_traces = \
-        MagicMock(name='get_corrected_fluorescence_traces',
-                  return_value=(timestamps, celltraces))
-    dataset.get_roi_ids = MagicMock(name='get_roi_ids')
-    dataset.get_cell_specimen_ids = MagicMock(name='get_cell_specimen_ids')
+    timestamps = MagicMock(name="timestamps")
+    celltraces = MagicMock(name="celltraces")
+    dataset.get_corrected_fluorescence_traces = MagicMock(
+        name="get_corrected_fluorescence_traces", return_value=(timestamps, celltraces)
+    )
+    dataset.get_roi_ids = MagicMock(name="get_roi_ids")
+    dataset.get_cell_specimen_ids = MagicMock(name="get_cell_specimen_ids")
     dff_traces = MagicMock(name="dfftraces")
-    dataset.get_dff_traces = MagicMock(name='get_dff_traces',
-                                       return_value=(None, dff_traces))
-    dxcm = MagicMock(name='dxcm')
-    dxtime = MagicMock(name='dxtime')
-    dataset.get_running_speed=MagicMock(name='get_running_speed',
-                                        return_value=(dxcm, dxtime))
+    dataset.get_dff_traces = MagicMock(name="get_dff_traces", return_value=(None, dff_traces))
+    dxcm = MagicMock(name="dxcm")
+    dxtime = MagicMock(name="dxtime")
+    dataset.get_running_speed = MagicMock(name="get_running_speed", return_value=(dxcm, dxtime))
 
-    LSN = MagicMock(name='LSN')
-    LSN_mask = MagicMock(name='LSN_mask')
-    dataset.get_locally_sparse_noise_stimulus_template = \
-        MagicMock(name='get_locally_sparse_noise_stimulus_template',
-                  return_value=(LSN, LSN_mask))
+    LSN = MagicMock(name="LSN")
+    LSN_mask = MagicMock(name="LSN_mask")
+    dataset.get_locally_sparse_noise_stimulus_template = MagicMock(
+        name="get_locally_sparse_noise_stimulus_template", return_value=(LSN, LSN_mask)
+    )
 
     return dataset
 
+
 def mock_speed_tuning():
-    binned_dx_sp = MagicMock(name='binned_dx_sp')
-    binned_cells_sp = MagicMock(name='binned_cells_sp')
-    binned_dx_vis = MagicMock(name='binned_dx_vis')
-    binned_cells_vis = MagicMock(name='binned_cells_vis')
-    peak_run = MagicMock(name='peak_run')
-    
-    return MagicMock(name='get_speed_tuning',
-                     return_value=(binned_dx_sp,
-                                   binned_cells_sp,
-                                   binned_dx_vis,
-                                   binned_cells_vis,
-                                   peak_run))
+    binned_dx_sp = MagicMock(name="binned_dx_sp")
+    binned_cells_sp = MagicMock(name="binned_cells_sp")
+    binned_dx_vis = MagicMock(name="binned_dx_vis")
+    binned_cells_vis = MagicMock(name="binned_cells_vis")
+    peak_run = MagicMock(name="peak_run")
+
+    return MagicMock(
+        name="get_speed_tuning", return_value=(binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run)
+    )
+
 
 def mock_sweep_response():
-    sweep_response = MagicMock(name='sweep_response')
-    mean_sweep_response = MagicMock(name='mean_sweep_response')
-    pval = MagicMock(name='pval')
-    
-    return MagicMock(name='get_sweep_response',
-                     return_value=(sweep_response,
-                                   mean_sweep_response,
-                                   pval))
+    sweep_response = MagicMock(name="sweep_response")
+    mean_sweep_response = MagicMock(name="mean_sweep_response")
+    pval = MagicMock(name="pval")
 
-@patch.object(StimulusAnalysis,
-              'get_sweep_response',
-              mock_sweep_response())
-@patch.object(LocallySparseNoise,
-              'get_receptive_field',
-              MagicMock(name='get_receptive_field'))
-@pytest.mark.parametrize('stimulus,trigger',
-                         it.product(('locally_sparse_noise',
-                                     'locally_sparse_noise_4deg',
-                                     'locally_sparse_noise_8deg'),
-                                    (1,2,3,4,5,6)))
-def test_harness(dataset,
-                 stimulus,
-                 trigger):
-    with patch('allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning',
-               mock_speed_tuning()):
+    return MagicMock(name="get_sweep_response", return_value=(sweep_response, mean_sweep_response, pval))
+
+
+@patch.object(StimulusAnalysis, "get_sweep_response", mock_sweep_response())
+@patch.object(LocallySparseNoise, "get_receptive_field", MagicMock(name="get_receptive_field"))
+@pytest.mark.parametrize(
+    "stimulus,trigger",
+    it.product(("locally_sparse_noise", "locally_sparse_noise_4deg", "locally_sparse_noise_8deg"), (1, 2, 3, 4, 5, 6)),
+)
+def test_harness(dataset, stimulus, trigger):
+    with patch("allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning", mock_speed_tuning()):
         lsn = LocallySparseNoise(dataset, stimulus)
 
         assert lsn._stim_table is StimulusAnalysis._PRELOAD
@@ -119,7 +106,7 @@ def test_harness(dataset,
         assert lsn._mean_sweep_response is StimulusAnalysis._PRELOAD
         assert lsn._pval is StimulusAnalysis._PRELOAD
         assert lsn._receptive_field is StimulusAnalysis._PRELOAD
-    
+
         if trigger == 1:
             print(lsn.stim_table)
             print(lsn.sweep_response)

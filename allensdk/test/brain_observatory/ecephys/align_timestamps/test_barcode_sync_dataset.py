@@ -8,11 +8,8 @@ from allensdk.brain_observatory.ecephys.align_timestamps.barcode_sync_dataset im
 )
 
 
-@pytest.mark.parametrize(
-    "line_labels,expected", [[["barcode"], 0], [["barcodes"], 0], [[], None]]
-)
+@pytest.mark.parametrize("line_labels,expected", [[["barcode"], 0], [["barcodes"], 0], [[], None]])
 def test_barcode_line(line_labels, expected):
-
     dataset = BarcodeSyncDataset()
     dataset.line_labels = line_labels
 
@@ -32,10 +29,7 @@ def test_barcode_line(line_labels, expected):
         [1, np.array([30, 50, 50.08]), np.array([31, 50.04, 50.12]), [50], [3], True],
     ],
 )
-def test_extract_barcodes(
-    sample_frequency, rising_edges, falling_edges, times_exp, codes_exp, table
-):
-
+def test_extract_barcodes(sample_frequency, rising_edges, falling_edges, times_exp, codes_exp, table):
     dataset = BarcodeSyncDataset()
     dataset.sample_frequency = sample_frequency
     dataset.line_labels = ["barcode"]
@@ -48,7 +42,6 @@ def test_extract_barcodes(
             "allensdk.brain_observatory.sync_dataset.Dataset.get_falling_edges",
             return_value=falling_edges,
         ):
-
             if table:
                 table = dataset.get_barcode_table()
                 times = table["times"]

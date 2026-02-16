@@ -51,7 +51,7 @@ def postgres_macros():
                 {% endif %}
             {% endmacro %}
         """,
-        "macros": macros()["macros"]
+        "macros": macros()["macros"],
     }
 
 
@@ -63,9 +63,8 @@ def rma_macros():
                 {%- if data is not none %}[{{key}}$in{{m.comma_sep(data,quote)}}]{% endif -%}
             {%- endmacro -%}
         """,
-        "macros": macros()["macros"]
+        "macros": macros()["macros"],
     }
-
 
 
 def build_and_execute(query, base=None, engine=None, **kwargs):
