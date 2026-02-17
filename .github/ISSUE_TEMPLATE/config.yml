@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Allen Brain Map Community Forum
+    url: https://community.brain-map.org
+    about: Ask general Allen Brain Map or data/tool questions here.
+  - name: AllenSDK documentation
+    url: https://allensdk.readthedocs.io/en/latest/
+    about: Check install, API, and usage docs before filing an issue.
+  - name: Support guide
+    url: https://github.com/AllenInstitute/AllenSDK/blob/master/SUPPORT.md
+    about: Where to ask questions, report bugs, and request features.
