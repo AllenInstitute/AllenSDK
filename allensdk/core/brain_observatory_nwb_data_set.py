@@ -37,7 +37,6 @@ import functools
 import dateutil
 import re
 import os
-import six
 import itertools
 import logging
 from packaging.version import Version
@@ -769,7 +768,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance( session_start_time, six.string_types ):
+        if isinstance( session_start_time, str ):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)

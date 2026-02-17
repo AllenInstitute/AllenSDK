@@ -39,8 +39,6 @@ from allensdk.core.obj_utilities import read_obj
 import allensdk.core.sitk_utilities as sitk_utilities
 import numpy as np
 import nrrd
-import six
-
 
 class ReferenceSpaceApi(RmaApi):
 

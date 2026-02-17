@@ -38,7 +38,6 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-from six import string_types
 
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 
@@ -785,7 +784,7 @@ class BrainObservatoryApi(RmaTemplate):
         """
 
         def _quote_string(v):
-            if isinstance(v, string_types):
+            if isinstance(v, str):
                 return "'%s'" % (v)
             else:
                 return str(v)

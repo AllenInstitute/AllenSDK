@@ -1,7 +1,6 @@
 import logging
 import os
 import functools
-import six
 
 import SimpleITK as sitk
 from scipy.misc import imread, imsave
@@ -69,7 +68,7 @@ def main():
                                                      path=str(os.path.join(output_dir, rot['depth_path'])))
         output_data['output_file_paths'].append(os.path.join(output_dir, rot['depth_path']))
 
-        if isinstance(rot['window_size'], six.string_types):
+        if isinstance(rot['window_size'], str):
             if rot['window_size'] == 'no_pad':
                 rot['window_size'] = no_pad(volume)
             elif rot['window_size'] == 'pad':

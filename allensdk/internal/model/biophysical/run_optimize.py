@@ -11,7 +11,7 @@ from allensdk.model.biophys_sim.config import Config
 from allensdk.internal.model.biophysical.make_deap_fit_json import Report
 from allensdk.internal.api.queries.biophysical_module_api import BiophysicalModuleApi
 import allensdk.model.biophysical as hoc_location
-from six.moves import reduce
+from functools import reduce
 
 
 class RunOptimize(object):

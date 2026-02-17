@@ -3,7 +3,6 @@ import logging
 from collections import defaultdict
 import numpy as np
 import json
-from six import iteritems
 
 from allensdk.config.manifest import Manifest
 from allensdk.core.json_utilities import json_handler
@@ -95,7 +94,7 @@ def find_coarse_long_square_amp_delta(sweeps, decimals=0):
 
 def update_output_sweep_features(cell_features, sweep_features, sweep_index):
     # add peak deflection for subthreshold long squares
-    for sweep_number, sweep in iteritems(sweep_index):
+    for sweep_number, sweep in sweep_index.items():
         pd = sweep_features.get(sweep_number,{}).get('peak_deflect', None)
         if pd is not None:
             sweep['peak_deflection'] = pd[0]

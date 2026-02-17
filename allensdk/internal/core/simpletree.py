@@ -1,5 +1,3 @@
-from six import iteritems
-
 
 class SimpleTree( object ):
     def __init__(self, nodes, 
@@ -9,7 +7,7 @@ class SimpleTree( object ):
         self.node_list = nodes
 
         self._nodes = { node_id_cb(n):n for n in nodes }
-        self._parent_ids = { nid:parent_id_cb(n) for nid,n in iteritems(self._nodes) }
+        self._parent_ids = { nid:parent_id_cb(n) for nid,n in self._nodes.items() }
         self._child_ids = { nid:[] for nid in self._nodes }
 
         for nid in self._parent_ids:

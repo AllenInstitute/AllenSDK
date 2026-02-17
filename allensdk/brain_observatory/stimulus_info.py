@@ -37,7 +37,6 @@ import itertools
 
 import numpy as np
 import scipy.ndimage.interpolation as spndi
-import six
 from allensdk.api.warehouse_cache.cache import memoize
 from PIL import Image
 
@@ -172,7 +171,7 @@ def sessions_with_stimulus(stimulus):
     """Return the names of the sessions that contain a given stimulus."""
 
     sessions = set()
-    for session, session_stimuli in six.iteritems(SESSION_STIMULUS_MAP):
+    for session, session_stimuli in SESSION_STIMULUS_MAP.items():
         if stimulus in session_stimuli:
             sessions.add(session)
 
@@ -204,7 +203,7 @@ def stimuli_in_session(session, allow_unknown=True):
 def all_stimuli():
     """Return a list of all stimuli in the data set"""
     return set(
-        [v for k, vl in six.iteritems(SESSION_STIMULUS_MAP) for v in vl]
+        [v for k, vl in SESSION_STIMULUS_MAP.items() for v in vl]
     )
 
 

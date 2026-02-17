@@ -17,7 +17,6 @@ import os
 import json
 import h5py
 import numpy as np
-from six import iteritems
 
 from scipy.optimize import curve_fit
 import scipy.signal as sg
@@ -282,7 +281,7 @@ def save_figure(fig, image_name, image_set_name, image_dir, sizes, image_sets, s
     if image_set_name not in image_sets:
         image_sets[image_set_name] = { size_name: [] for size_name in sizes }
 
-    for size_name, size in iteritems(sizes):
+    for size_name, size in sizes.items():
         fig.set_size_inches(size*scalew, size*scaleh)
 
         image_file = os.path.join(image_dir, "%s_%s.%s" % (image_name, size_name, ext))
@@ -313,7 +312,7 @@ def plot_images(ephys_roi_result, image_dir, sizes, image_sets):
         
         image_data = np.array((image_data - vmin) / (vmax - vmin) * 255.0, dtype=np.uint8)
 
-        for size_name, size in iteritems(sizes):
+        for size_name, size in sizes.items():
             if size:
                 s = image_data.shape
                 skip = int(s[0] / size)

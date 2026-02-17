@@ -1,6 +1,5 @@
 import sys
 import string
-from six import iteritems
 
 class ResourceFile(object):
     def __init__(self):
@@ -43,7 +42,7 @@ class ResourceFile(object):
         self.accessed[key] = True
         val = self.key_value.get(key, default)
         if replace_table is not None:
-            for k,v in iteritems(replace_table):
+            for k,v in replace_table.items():
                 val = string.replace(val, k, v)
         return val
 
@@ -53,7 +52,7 @@ class ResourceFile(object):
         err = False
         print("-------------------------------")
         print("---     Resource report      --")
-        for k,v in iteritems(self.accessed):
+        for k,v in self.accessed.items():
             if not v:
                 if not err:
                     err = True
@@ -113,7 +112,7 @@ class ResourceFile(object):
     # internal procedure to read keys out of dictionary recursively
     def read_keys(self, resources):
         err = False
-        for k,v in iteritems(resources):
+        for k,v in resources.items():
             if isinstance(v, dict):
                 self.read_keys(v)
             else:

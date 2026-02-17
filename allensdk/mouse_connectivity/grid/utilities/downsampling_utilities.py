@@ -1,6 +1,6 @@
 from __future__ import division
 import itertools as it
-from six.moves import xrange
+
 import logging
 
 from skimage.measure import block_reduce
@@ -34,13 +34,13 @@ def block_average(volume, factor):
 
 def apply_divisions(image, window_size):
 
-    for axis in xrange(image.ndim):
+    for axis in range(image.ndim):
 
         slc = tuple([
             slice(window_size-1, None, window_size) 
             if ii == axis 
             else slice(0, None) 
-            for ii in xrange(image.ndim)
+            for ii in range(image.ndim)
         ])
 
         image[slc] = image[slc] / 2

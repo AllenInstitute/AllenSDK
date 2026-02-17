@@ -2,7 +2,6 @@ from __future__ import division
 import logging
 
 import numpy as np
-from six import iteritems
 
 from .interval_unionizer import IntervalUnionizer
 from .tissuecyte_unionize_record import TissuecyteInjectionUnionize, \
@@ -38,7 +37,7 @@ class TissuecyteUnionizer(IntervalUnionizer):
         '''As parent
         '''
 
-        for k, v in iteritems(child_record):
+        for k, v in child_record.items():
             v.propagate(ancestor_record[k], copy_all)
         
         return ancestor_record
@@ -63,7 +62,7 @@ class TissuecyteUnionizer(IntervalUnionizer):
         total_injection_volume = 0
         
         logging.info('getting formatted unionize output')
-        for sid, un in iteritems(raw_unionizes):
+        for sid, un in raw_unionizes.items():
             
             if sid < 0:
                 hemisphere = 1
@@ -71,7 +70,7 @@ class TissuecyteUnionizer(IntervalUnionizer):
                 hemisphere = 2
                 
             current = []
-            for ij, item in iteritems(un):
+            for ij, item in un.items():
             
                 v = item.output(output_spacing_iso, volume_scale, target_shape, sort)
                 injection = True if ij == 'injection' else False

@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from six.moves import xrange
+
 import scipy.interpolate as spi
 
 import allensdk.model.glif.glif_neuron as glif_neuron
@@ -561,7 +561,7 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
 def find_first_model_spike(voltage, threshold, voltage_t1, threshold_t1, dt):
     num_time_steps = len(voltage)
 
-    for time_step in xrange(num_time_steps): 
+    for time_step in range(num_time_steps): 
         if voltage[time_step] > threshold[time_step]:
             grid_model_spike_time = dt * (time_step-1)
             grid_model_spike_voltage = voltage[time_step-1]

@@ -3,8 +3,6 @@ from __future__ import division
 import numpy as np
 import pytest
 from unittest import mock
-from six import iteritems
-from six.moves import xrange
 
 from allensdk.internal.mouse_connectivity.interval_unionize\
     .tissuecyte_unionize_record import TissuecyteBaseUnionize, \
@@ -86,14 +84,14 @@ def test_base_set_max_voxel(spp):
         
 def test_base_slice_arrays():
 
-    arrays = {ii: np.arange(10) + ii for ii in xrange(20)}
+    arrays = {ii: np.arange(10) + ii for ii in range(20)}
     low = 5
     high = 8
-    
+
     tbu = TissuecyteBaseUnionize()
     sl = tbu.slice_arrays(low, high, arrays)
-    
-    for k, v in iteritems(sl):
+
+    for k, v in sl.items():
         assert( len(v) == 3 )
         assert( v.sum() == k * 3 + 18 )
         

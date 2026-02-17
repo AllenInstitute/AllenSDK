@@ -38,6 +38,7 @@ import operator as op
 import os
 import re
 import warnings
+from functools import reduce
 
 import nrrd
 import numpy as np
@@ -46,7 +47,6 @@ import SimpleITK as sitk
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.config.manifest import Manifest
-from six.moves import reduce
 
 from .reference_space_cache import ReferenceSpaceCache
 

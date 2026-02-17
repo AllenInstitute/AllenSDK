@@ -35,10 +35,6 @@
 #
 import argparse
 import allensdk.core.swc as swc
-try:
-    xrange
-except:
-    from past.builtins import xrange
 
 def validate_swc(swc_file):
     """
@@ -81,7 +77,7 @@ def validate_swc(swc_file):
 
     # sort the ids and make sure there are no gaps
     sorted_ids = sorted(all_ids)
-    for i in xrange(1, len(sorted_ids)):
+    for i in range(1, len(sorted_ids)):
         if sorted_ids[i] - sorted_ids[i - 1] != 1:
             raise Exception("Compartment IDs are not sequential")
     return True

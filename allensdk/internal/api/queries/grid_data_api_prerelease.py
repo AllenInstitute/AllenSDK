@@ -1,5 +1,4 @@
 import os
-import six
 
 from allensdk.config.manifest import Manifest
 from allensdk.api.warehouse_cache.cache import Cache, cacheable
@@ -107,7 +106,7 @@ class GridDataApiPrerelease(GridDataApi):
 
             self._file_download_log.error(error)
             self.cleanup_truncated_file(path)
-            raise six.raise_from(ValueError(error), e)
+            raise ValueError(error) from e
 
         storage_path = os.path.join(
             storage_path, self.GRID_DATA_DIRECTORY, file_name)

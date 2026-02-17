@@ -9,7 +9,6 @@ import json
 import numpy as np
 import argparse
 import h5py
-from six import iteritems
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.core.nwb_data_set import NwbDataSet
@@ -146,7 +145,7 @@ def main(jin):
     # check features for each sweep
     sweep_state = {}
     jout["sweep_state"] = sweep_state
-    for name, sweep in iteritems(jin["sweep_data"]):
+    for name, sweep in jin["sweep_data"].items():
         try:
             # keep track of failures
             fail_tags = []

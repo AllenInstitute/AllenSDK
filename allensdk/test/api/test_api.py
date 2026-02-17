@@ -35,7 +35,7 @@
 #
 
 import io
-from six.moves import builtins
+import builtins
 import zipfile
 import os
 

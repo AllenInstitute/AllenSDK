@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from six import string_types
+
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit

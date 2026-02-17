@@ -3,7 +3,6 @@ from __future__ import division
 import numpy as np
 import pytest
 from unittest import mock
-from six import iteritems
 
 from allensdk.internal.mouse_connectivity.interval_unionize.interval_unionizer \
     import IntervalUnionizer
@@ -34,8 +33,8 @@ def test_setup_interval_map(annotation):
     
     iu = IntervalUnionizer()
     iu.setup_interval_map(annotation)
-    
-    for k, v in iteritems(iu.interval_map):
+
+    for k, v in iu.interval_map.items():
         assert( np.allclose(v, bounds_exp[k]) )
         
     
