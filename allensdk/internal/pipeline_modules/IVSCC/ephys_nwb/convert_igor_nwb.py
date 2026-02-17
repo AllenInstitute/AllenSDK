@@ -5,7 +5,6 @@ import sys
 import shutil
 import traceback
 import subprocess
-from six import iteritems
 
 import nwb
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
@@ -48,7 +47,7 @@ def main():
     #   in original files
     acq = f["acquisition/timeseries"]
     sweep_nums = []
-    for k, v in iteritems(acq):
+    for k, v in acq.items():
         # parse out sweep number
         try:
             num = int(k[5:10])
@@ -85,7 +84,7 @@ def main():
     ###################################
     # ... ditto for stimulus time series
     stim = f["stimulus/presentation"]
-    for k, v in iteritems(stim):
+    for k, v in stim.items():
         # parse out sweep number
         try:
             num = int(k[5:10])

@@ -5,9 +5,6 @@ from collections import defaultdict
 import copy as cp
 
 import numpy as np
-from six import iteritems
-
-
 
 class IntervalUnionizer(object):
 
@@ -133,7 +130,7 @@ class IntervalUnionizer(object):
 
         
         output_unionizes = defaultdict(cls.record_cb, cp.deepcopy(direct_unionizes))
-        for k, v in iteritems(direct_unionizes):
+        for k, v in direct_unionizes.items():
             for aid in ancestor_id_map[k]:
 
                 if k == aid:
@@ -196,7 +193,7 @@ class IntervalUnionizer(object):
         '''
         
         logging.info('sorting data arrays')
-        return {k: v[self.sort] for k, v in iteritems(data_arrays)}
+        return {k: v[self.sort] for k, v in data_arrays.items()}
         
         
     def direct_unionize(self, data_arrays, pre_sorted=False, **kwargs):
@@ -215,7 +212,7 @@ class IntervalUnionizer(object):
             data_arrays = self.sort_data_arrays(data_arrays)
         
         unionizes = {}
-        for sid, (low, high) in iteritems(self.interval_map):
+        for sid, (low, high) in self.interval_map.items():
             logging.debug( 'unionizing structure {0} :: voxel_count={1}'.format(sid, high - low) )
             unionizes[sid] = self.extract_data(data_arrays, low, high, **kwargs)
             

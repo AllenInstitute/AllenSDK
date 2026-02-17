@@ -1,7 +1,7 @@
 import multiprocessing as mp
 import logging
 
-from six import iteritems
+
 import SimpleITK as sitk
 import numpy as np
 
@@ -108,7 +108,7 @@ class ImageSeriesGridder(object):
         '''Inserts planar accumulators into coarse grid volumes
         '''
         
-        for key, array in iteritems(output):
+        for key, array in output.items():
             self.paste_slice(key, index, array)
             output[key] = None
             

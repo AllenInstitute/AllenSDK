@@ -40,7 +40,6 @@ import logging
 from collections import Counter
 
 from . import ephys_features as ft
-import six
 
 # Constants for stimulus-specific analysis
 RAMPS_START = 1.02
@@ -192,7 +191,7 @@ class EphysSweepFeatureExtractor:
         spikes_df = DataFrame(data=thresholds, columns=["threshold_index"])
         spikes_df["clipped"] = clipped
 
-        for k, all_vals in six.iteritems(vit_data_indexes):
+        for k, all_vals in vit_data_indexes.items():
             valid_ind = ~np.isnan(all_vals)
             vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
@@ -217,7 +216,7 @@ class EphysSweepFeatureExtractor:
                     k + "_i",
                 ]
 
-        for k, all_vals in six.iteritems(dvdt_data_indexes):
+        for k, all_vals in dvdt_data_indexes.items():
             valid_ind = ~np.isnan(all_vals)
             vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
@@ -239,7 +238,7 @@ class EphysSweepFeatureExtractor:
         spikes_df["isi_type"] = isi_types
         self._affected_by_clipping += ["isi_type"]
 
-        for k, all_vals in six.iteritems(trough_detail_indexes):
+        for k, all_vals in trough_detail_indexes.items():
             valid_ind = ~np.isnan(all_vals)
             vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
@@ -298,7 +297,7 @@ class EphysSweepFeatureExtractor:
                                             self.end),
             }
 
-        for k, v in six.iteritems(sweep_level_features):
+        for k, v in sweep_level_features.items():
             self._sweep_features[k] = v
 
     def _process_pauses(self, cost_weight=1.0):

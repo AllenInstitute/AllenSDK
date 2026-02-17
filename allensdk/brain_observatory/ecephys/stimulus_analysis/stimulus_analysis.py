@@ -1,4 +1,3 @@
-from six import string_types
 import numpy as np
 import pandas as pd
 import scipy.stats as st
@@ -25,7 +24,7 @@ class StimulusAnalysis(object):
         # TODO: Create a set of a class methods.
         if isinstance(ecephys_session, EcephysSession):
             self._ecephys_session = ecephys_session
-        elif isinstance(ecephys_session, string_types):
+        elif isinstance(ecephys_session, str):
             nwb_version = kwargs.get('nwb_version', 2)
             self._ecephys_session = EcephysSession.from_nwb_path(
                 path=ecephys_session, nwb_version=nwb_version)
@@ -172,7 +171,7 @@ class StimulusAnalysis(object):
 
             self._stim_table = self.ecephys_session.get_stimulus_table(
                 [self._stimulus_key] if isinstance(self._stimulus_key,
-                                                   string_types) else
+                                                   str) else
                 self._stimulus_key
             )
 

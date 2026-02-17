@@ -36,7 +36,6 @@
 from __future__ import division, print_function, absolute_import
 import re
 import operator as op
-from six import iteritems, string_types
 import functools
 
 import numpy as np
@@ -417,7 +416,7 @@ class StructureTree( SimpleTree ):
         
         '''
         
-        if not isinstance(hex_color, string_types):
+        if not isinstance(hex_color, str):
             return list(hex_color)
 
         if hex_color[0] == '#':
@@ -432,7 +431,7 @@ class StructureTree( SimpleTree ):
         This method converts them to a list of integers, if needed.
         '''
 
-        if not isinstance(path, string_types):
+        if not isinstance(path, str):
             return list(path)
 
         return [int(stid) for stid in path.split('/') if stid != '']

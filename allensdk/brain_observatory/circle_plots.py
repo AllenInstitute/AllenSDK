@@ -36,10 +36,6 @@
 
 import math
 
-try:
-    xrange
-except:
-    from past.builtins import xrange
 
 import numpy as np
 import pandas as pd
@@ -50,7 +46,6 @@ from matplotlib.collections import PatchCollection, LineCollection
 import matplotlib.transforms as mxfms
 import matplotlib.colors as mcolors
 import skimage.transform
-from six import iteritems
 
 
 DEFAULT_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[.7,0,.7,0.0],[.7,0,0,1]])
@@ -178,7 +173,7 @@ def build_hex_pack(n):
             mag = 1
             sign = 1
                       
-            for j in xrange(N-1):
+            for j in range(N-1):
                 x += v[0] * mag * sign
                 y += v[1] * mag * sign
                 mag += 1
@@ -277,7 +272,7 @@ def make_pincushion_plot(data, trials, on, nrows, ncols, clim=None, color_map=No
         color_map = LSN_ON_COLOR_MAP if on else LSN_OFF_COLOR_MAP
 
     ax = plt.gca()
-    for (col,row,on_state), sweeps in iteritems(trials):
+    for (col,row,on_state), sweeps in trials.items():
         if on_state != on:
             continue
 
@@ -477,7 +472,7 @@ class CoronaPlotter( PolarPlotter ):
         df = pd.DataFrame({ 'category': category_data })
         gb = df.groupby(['category'])
 
-        for category, trials in iteritems(gb.groups):
+        for category, trials in gb.groups.items():
             idx = self.cat_idx_map[category]
             order = np.argsort(data[trials])[::-1]
             trial_order = np.array(trials)[order]
@@ -714,7 +709,7 @@ class FanPlotter( PolarPlotter ):
 
         gb = df.groupby(['group', 'angle', 'r'])
 
-        for (group, angle, r), trials in iteritems(gb.groups):
+        for (group, angle, r), trials in gb.groups.items():
             responses = np.sort(data[trials])[::-1]
 
             circles = spiral_trials_polar(self.r_radius_map[r],

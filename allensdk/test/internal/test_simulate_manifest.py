@@ -2,13 +2,9 @@ from allensdk.internal.api.queries.biophysical_module_reader import \
     BiophysicalModuleReader
 import pytest
 from unittest.mock import patch, mock_open, MagicMock
-from six import StringIO
-from io import IOBase
+from io import StringIO, IOBase
 import json
-try:
-    import __builtin__ as builtins
-except:
-    import builtins
+import builtins
 
 
 LIMS_MESSAGE_ONE_PARAM_FILE = """

@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
-from six import string_types
 
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
@@ -132,7 +131,7 @@ class CellTypesCache(Cache):
                                         strategy='lazy',
                                         **Cache.cache_json())
 
-        if isinstance(reporter_status, string_types):
+        if isinstance(reporter_status, str):
             reporter_status = [reporter_status]
 
         # filter the cells on the way out

@@ -1,6 +1,5 @@
 import functools
 import logging
-from six.moves import xrange
 
 import numpy as np
 import SimpleITK as sitk
@@ -26,7 +25,7 @@ def apply_colormap(image, colormap):
 
 def blend_with_background(image, background):
 
-    for ii in xrange(3):
+    for ii in range(3):
         image[:, :, ii] = np.multiply(np.squeeze(image[:, :, ii]), 
                                       np.squeeze(image[:, :, -1]))
         image[:, :, ii] += np.multiply(np.squeeze(background), 
@@ -38,7 +37,7 @@ def blend_with_background(image, background):
 
 def do_blur(image, blur):
 
-    for ii in xrange(3):
+    for ii in range(3):
         im = sitk.GetImageFromArray(image[:, :, ii])
         im = sitk.DiscreteGaussian(im, blur)
         image[:, :, ii] = sitk.GetArrayFromImage(im)

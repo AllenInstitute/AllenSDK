@@ -35,7 +35,6 @@
 #
 
 import functools
-import six
 
 import h5py
 
@@ -58,7 +57,7 @@ def load_datasets_by_relnames(relnames, h5_file, start_node):
     }
 
     matches = keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=start_node)
-    return { key: value[:] for key, value in six.iteritems(matches) }
+    return { key: value[:] for key, value in matches.items() }
 
 
 def h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
@@ -93,7 +92,7 @@ def keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
 
     matches = {}
     def matcher(obj_name, obj):
-        for key, matcher_cb in six.iteritems(matcher_cbs):
+        for key, matcher_cb in matcher_cbs.items():
             match, _ = matcher_cb(obj_name, obj)
             if match:
                 matches[key] = obj

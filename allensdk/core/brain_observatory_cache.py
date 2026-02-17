@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
-import six
+
 import numpy as np
 import pandas as pd
 
@@ -821,7 +821,7 @@ class BrainObservatoryCache(Cache):
 
 
 def _assert_not_string(arg, name):
-    if isinstance(arg, six.string_types):
+    if isinstance(arg, str):
         raise TypeError(
             "Argument '%s' with value '%s' is a string type, but "
             "should be a list."

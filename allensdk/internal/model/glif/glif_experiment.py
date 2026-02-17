@@ -1,5 +1,5 @@
 import logging
-from six.moves import xrange
+
 import numpy as np
 
 # TODO: license
@@ -49,7 +49,7 @@ class GlifExperiment( object ):
 
         run_data = []
         
-        for stim_list_index in xrange(len(self.stim_list)):
+        for stim_list_index in range(len(self.stim_list)):
             run_data.append(self.neuron.run_with_biological_spikes(self.stim_list[stim_list_index],
                                                                    self.resp_list[stim_list_index],
                                                                    self.spike_time_steps[stim_list_index]))
@@ -102,7 +102,7 @@ class GlifExperiment( object ):
         
         run_data = []
 
-        for stim_list_index in xrange(len(stim_list)):
+        for stim_list_index in range(len(stim_list)):
             run_data.append(self.neuron.run(stim_list[stim_list_index]))
 
           
