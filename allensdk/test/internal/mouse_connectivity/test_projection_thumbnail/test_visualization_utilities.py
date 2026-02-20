@@ -3,7 +3,6 @@ import pytest
 
 import SimpleITK as sitk
 import numpy as np
-import matplotlib as mpl
 
 from allensdk.internal.mouse_connectivity.projection_thumbnail import visualization_utilities as vis
 
@@ -25,8 +24,8 @@ def discrete_cmap():
 def test_convert_discrete_colormap(discrete_cmap):
     cmap = vis.convert_discrete_colormap(discrete_cmap)
 
-    obt = cmap(0.75)
-    exp = [3 * 255 / 4.0, 1 * 255 / 4.0, 0.0, 1.0]
+    cmap(0.75)
+    [3 * 255 / 4.0, 1 * 255 / 4.0, 0.0, 1.0]
 
 
 def test_sitk_safe_ln(example_volume):

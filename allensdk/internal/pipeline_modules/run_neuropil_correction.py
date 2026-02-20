@@ -7,11 +7,8 @@ import numpy as np
 from allensdk.brain_observatory.r_neuropil import estimate_contamination_ratios
 import allensdk.internal.core.lims_utilities as lu
 import h5py
-import json
 import copy
 import os
-import sys
-import argparse
 import shutil
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
@@ -97,7 +94,6 @@ def adjust_r_for_negativity(r, F_C, F_M, F_N):
 
 def main():
     module = PipelineModule()
-    args = module.args
 
     jin = module.input_data()
 
@@ -114,7 +110,7 @@ def main():
 
     try:
         os.makedirs(plot_dir)
-    except:
+    except Exception:
         pass
 
     logging.info("Neuropil correcting '%s'", trace_file)
@@ -124,13 +120,13 @@ def main():
 
     try:
         roi_traces = h5py.File(trace_file, "r")
-    except:
+    except Exception:
         logging.error("Error: unable to open ROI trace file '%s'", trace_file)
         raise
 
     try:
         neuropil_traces = h5py.File(neuropil_file, "r")
-    except:
+    except Exception:
         logging.error("Error: unable to open neuropil trace file '%s'", neuropil_file)
         raise
 
@@ -192,9 +188,6 @@ def main():
         else:
             logging.warning("fc has negative baseline, skipping this r value")
 
-    # compute mean valid r value 
-    r_mean = np.array([r for r in r_list if r is not None ]).mean()
-
     # fill in empty r values
     for n in range(num_traces):        
         roi = roi_traces['data'][n]
@@ -234,7 +227,7 @@ def main():
             if r is not None:
                 hf.create_dataset("r_vals/%d" % n, data=r)
         hf.close()
-    except:
+    except Exception:
         logging.error("Error creating output h5 file")
         raise   
     
@@ -247,4 +240,5 @@ def main():
 
     logging.info("finished")
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

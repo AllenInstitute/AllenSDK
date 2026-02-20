@@ -33,11 +33,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-class BrainObservatoryAnalysisException(Exception): pass
+class BrainObservatoryAnalysisException(Exception):
+    pass
 
-class MissingStimulusException(Exception): pass
+class MissingStimulusException(Exception):
+    pass
 
-class NoEyeTrackingException(Exception): pass
+class NoEyeTrackingException(Exception):
+    pass
 
 class EpochSeparationException(Exception):
 

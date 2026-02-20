@@ -1,4 +1,7 @@
-import os, sys, threading, time
+import os
+import sys
+import threading
+import time
 
 class OutputGrabber(object):
     """

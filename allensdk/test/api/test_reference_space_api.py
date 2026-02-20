@@ -33,11 +33,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
 import pytest
 from unittest.mock import patch, MagicMock
 import itertools as it
-import numpy as np
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi as RSA
 
 

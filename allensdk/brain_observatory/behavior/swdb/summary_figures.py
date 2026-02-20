@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +5,7 @@ import seaborn as sns
 
 sns.set_context('notebook', font_scale=1.5, rc={'lines.markeredgewidth': 2})
 sns.set_style('white')
-sns.set_palette('deep');
+sns.set_palette('deep')
 
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from allensdk.brain_observatory.behavior.swdb import utilities as ut
@@ -36,7 +35,7 @@ def add_stim_color_span(session, ax, xlim=None):
         stim_table = session.stimulus_presentations.copy()
         stim_table = stim_table[(stim_table.start_time >= xlim[0]) & (stim_table.stop_time <= xlim[1])]
     if 'omitted' in stim_table.keys():
-        stim_table = stim_table[stim_table.omitted == False].copy()
+        stim_table = stim_table[~stim_table.omitted].copy()
     for idx in stim_table.index:
         start_time = stim_table.loc[idx]['start_time']
         end_time = stim_table.loc[idx]['stop_time']
@@ -100,11 +99,11 @@ def plot_traces_heatmap(session, ax=None):
     if ax is None:
         fig, ax = plt.subplots(figsize=(20, 5))
     cax = ax.pcolormesh(dff_traces_array, cmap='magma', vmin=0, vmax=np.percentile(dff_traces_array, 99))
-    ax.set_yticks(np.arange(0, len(dff_traces_array)), 10);
+    ax.set_yticks(np.arange(0, len(dff_traces_array)), 10)
     ax.set_ylabel('cells')
     ax.set_xlabel('time (sec)')
-    ax.set_xticks(np.arange(0, len(session.ophys_timestamps), 10*60*31.));
-    ax.set_xticklabels(np.arange(0, session.ophys_timestamps[-1], 10*60));
+    ax.set_xticks(np.arange(0, len(session.ophys_timestamps), 10*60*31.))
+    ax.set_xticklabels(np.arange(0, session.ophys_timestamps[-1], 10*60))
     cb = plt.colorbar(cax, pad=0.015)
     cb.set_label('dF/F', labelpad=3)
     return ax
@@ -125,7 +124,7 @@ def plot_behavior_segment(session, xlims=[620, 640], ax=None):
     for index, row in session.stimulus_presentations.iterrows():
         if row.omitted is False:
             ax.axvspan(row.start_time, row.stop_time, alpha=0.3, facecolor='gray')
-        if not (row.image_index == image_index) and (last_omitted==False):
+        if not (row.image_index == image_index) and (not last_omitted):
             ax.axvspan(row.start_time, row.stop_time, alpha=0.3, facecolor='blue')
         image_index = row.image_index
         last_omitted = row.omitted
@@ -133,7 +132,7 @@ def plot_behavior_segment(session, xlims=[620, 640], ax=None):
 
 
 def plot_lick_raster(trials, ax=None):
-    trials = trials[trials.aborted == False]
+    trials = trials[~trials.aborted]
     trials = trials.reset_index()
     if ax is None:
         fig, ax = plt.subplots(figsize=(5, 10))
@@ -256,7 +255,7 @@ def plot_example_traces_and_behavior(session, xmin_seconds, length_mins, cell_la
 
 
 def plot_transitions_response_heatmap(trials, ax=None):
-    trials = trials[trials.aborted == False]
+    trials = trials[~trials.aborted]
     trials['response_binary'] = [1 if response_latency < 0.75 else 0 for response_latency in
                                  trials.response_latency.values]
 
@@ -278,7 +277,7 @@ def plot_mean_trace_heatmap(mean_df, ax=None, save_dir=None, window=[-4, 8], int
     There must be only one row per cell in the input df.
     For example, if it is a mean of the trial_response_df, select only trials where go=True before passing to this function.
     """
-    data = mean_df[mean_df.pref_stim == True].copy()
+    data = mean_df[mean_df.pref_stim].copy()
     if ax is None:
         figsize = (3, 6)
         fig, ax = plt.subplots(1, 1, figsize=figsize)
@@ -324,7 +323,7 @@ def plot_mean_image_response_heatmap(mean_df, title=None, ax=None, save_dir=None
     images = np.sort(df[image_key].unique())
     cell_list = []
     for image in images:
-        tmp = df[(df[image_key] == image) & (df.pref_stim == True)]
+        tmp = df[(df[image_key] == image) & df.pref_stim]
         order = np.argsort(tmp.mean_response.values)[::-1]
         cell_ids = list(tmp.cell_specimen_id.values[order])
         cell_list = cell_list + cell_ids
@@ -384,7 +383,7 @@ def plot_max_proj_and_roi_masks(session, save_dir=None):
     mask = np.empty(session.segmentation_mask_image.data.shape, dtype='float')
     mask[:] = np.nan
     mask[tmp > 0] = 1
-    cax = ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
+    ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
 
     if save_dir:
         ut.save_figure(fig, figsize, save_dir, 'roi_masks', str(session.metadata['ophys_experiment_id']))
@@ -421,12 +420,12 @@ def placeAxesOnGrid(fig, dim=[1, 1], xspan=[0, 1], yspan=[0, 1], wspace=None, hs
     idx = 0
     for row in range(dim[0]):
         for col in range(dim[1]):
-            if row > 0 and sharex == True:
+            if row > 0 and sharex:
                 share_x_with = inner_ax[0][col]
             else:
                 share_x_with = None
 
-            if col > 0 and sharey == True:
+            if col > 0 and sharey:
                 share_y_with = inner_ax[row][0]
             else:
                 share_y_with = None
@@ -445,9 +444,6 @@ def plot_experiment_summary_figure(session, save_dir=None):
     meta = session.metadata
     title = meta['driver_line'][0] + ', ' + meta['targeted_structure'] + ', ' + str(meta['imaging_depth']) + ', ' + \
             session.task_parameters['stage']
-
-    interval_seconds = 600
-    ophys_frame_rate = int(session.metadata['ophys_frame_rate'])
 
     figsize = [2 * 11, 2 * 8.5]
     fig = plt.figure(figsize=figsize, facecolor='white')
@@ -504,11 +500,11 @@ def plot_experiment_summary_figure(session, save_dir=None):
     plot_behavior_segment(session, xlims=[620, 640], ax=ax)
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(.76, .98), yspan=(.86, .99))
-    traces = tr[(tr.go == True)].dff_trace.values
+    traces = tr[tr.go].dff_trace.values
     ax = ut.plot_mean_trace(traces, window=[-4, 8], ax=ax)
     ax = ut.plot_flashes_on_trace(ax, window=[-4, 8], go_trials_only=True)
-    ax.set_xlabel('time after change (sec)');
-    ax.set_ylabel('mean dF/F');
+    ax.set_xlabel('time after change (sec)')
+    ax.set_ylabel('mean dF/F')
 
     fig.tight_layout()
 

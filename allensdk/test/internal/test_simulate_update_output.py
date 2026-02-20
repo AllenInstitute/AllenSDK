@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch, mock_open
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
 
 

@@ -33,13 +33,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.warehouse_cache.cache import Cache
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
-from allensdk.deprecated import deprecated
 
-from .ontology import Ontology
 from .structure_tree import StructureTree
 from .reference_space import ReferenceSpace
 
@@ -61,10 +58,10 @@ class ReferenceSpaceCache(Cache):
                  reference_space_key,
                  **kwargs):
 
-        if not 'version' in kwargs:
+        if 'version' not in kwargs:
             kwargs['version'] = self.MANIFEST_VERSION
 
-        if not 'base_uri' in kwargs:
+        if 'base_uri' not in kwargs:
             kwargs['base_uri'] = None
 
         super(ReferenceSpaceCache, self).__init__(**kwargs)
@@ -315,7 +312,7 @@ class ReferenceSpaceCache(Cache):
 
         try:
             structure_id = int(structure_id)
-        except ValueError as e:
+        except ValueError:
             raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
 
         return structure_id

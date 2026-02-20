@@ -37,7 +37,7 @@ def run_passive_fit(description):
 
     if len(cap_check_sweeps) > 0:
         data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
-        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set);
+        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set)
 
         grand_up_file = os.path.join(output_directory, 'upbase.dat')
         np.savetxt(grand_up_file, d['grand_up'])
@@ -49,7 +49,7 @@ def run_passive_fit(description):
         passive_fit_data["escape_time"] = d['escape_t']
 
         fit_1_file = description.manifest.get_path('fit_1_file')
-        fit_1_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit.__name__, 
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
@@ -57,14 +57,14 @@ def run_passive_fit(description):
 
         fit_2_file = description.manifest.get_path('fit_2_file')
 
-        fit_2_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit2.__name__,
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
         fit_3_file = description.manifest.get_path('fit_3_file')
-        fit_3_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit_elec.__name__,
                                                 str(d['escape_t']),
                                                 str(d['bridge_avg']),

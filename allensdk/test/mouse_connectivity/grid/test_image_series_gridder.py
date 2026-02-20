@@ -147,7 +147,7 @@ def test_build_coarse_grids():
             for ii in range(20):
                 yield ii, ii
 
-    with mock.patch('multiprocessing.Pool', new=Dummy) as p:
+    with mock.patch('multiprocessing.Pool', new=Dummy):
 
         gridder = small_gridder()
         gridder.paste_subimage = mock.MagicMock()
@@ -172,11 +172,11 @@ def test_resample_volume():
     volume.SetSpacing([1, 1, 1])
     volume += 1
         
-    with mock.patch('SimpleITK.ReadImage', new=make_dfield) as p:
+    with mock.patch('SimpleITK.ReadImage', new=make_dfield):
         with mock.patch(
             'allensdk.mouse_connectivity.grid.utilities.image_utilities.build_composite_transform', 
             new=make_transform
-        ) as q:
+        ):
                         
             gridder = small_gridder()
             gridder.out_dims = [10, 10, 10]

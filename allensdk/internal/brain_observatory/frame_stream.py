@@ -1,8 +1,8 @@
 import subprocess as sp
 import numpy as np
 import logging
-import sys, os
-from collections import deque
+import sys
+import os
 import scipy.misc
 import traceback
 import signal
@@ -115,7 +115,6 @@ class FfmpegInputStream( FrameInputStream ):
 
         command += ['-']
 
-        frame_size = np.prod(self.frame_shape)
         self.pipe = sp.Popen(command, stdout=sp.PIPE, bufsize=0)
         logging.debug("opened pipe")
 

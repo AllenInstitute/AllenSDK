@@ -108,5 +108,16 @@ notebooks = [
 packages = ["allensdk"]
 exclude = ["allensdk/test", "allensdk/test_utilities"]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = [
+    "E402",   # module-level import not at top of file
+    "E741",   # ambiguous variable name (l, O, I, etc.)
+    "F403",   # wildcard import used
+    "F405",   # name may be undefined from wildcard import
+]
+
 [tool.pytest.ini_options]
 addopts = "--junitxml=test-reports/test.xml"

@@ -1,16 +1,13 @@
 import pytest
-import sys
-from unittest.mock import patch, mock_open, Mock, MagicMock
+from unittest.mock import patch, mock_open, MagicMock
 from allensdk.model.biophysical.utils import Utils
 from allensdk.model.biophys_sim.config import Config
 import os
 from unittest import mock
-import shutil
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
-from allensdk.model.biophysical import runner
 from allensdk.internal.model.biophysical.run_optimize \
     import RunOptimize
 from allensdk.internal.api.queries.optimize_config_reader \
@@ -6816,8 +6813,8 @@ def run_optimize():
 def xtest_init(run_optimize):
     assert run_optimize.input_json == 'manifest_sdk.json'
     assert run_optimize.output_json == 'out.json'
-    assert run_optimize.app_config == None
-    assert run_optimize.manifest == None
+    assert run_optimize.app_config is None
+    assert run_optimize.manifest is None
 
 
 orig_open = open

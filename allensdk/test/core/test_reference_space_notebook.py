@@ -135,10 +135,8 @@ def test_notebook(tmpdir_factory):
 
     # In[7]:
 
-    import os
     import nrrd
     from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-    from allensdk.config.manifest import Manifest
 
     # the annotation download writes a file, so we will need somwhere to put it
     annotation_dir = str(tmpdir_factory.mktemp('annotation'))
@@ -171,7 +169,7 @@ def test_notebook(tmpdir_factory):
     # In[9]:
 
     # A complete mask for one structure
-    whole_cortex_mask = rsp.make_structure_mask([315])
+    rsp.make_structure_mask([315])
 
     # view in coronal section
 
@@ -184,7 +182,7 @@ def test_notebook(tmpdir_factory):
     brain_observatory_structures = rsp.structure_tree.get_structures_by_set_id([514166994])
     brain_observatory_ids = [st['id'] for st in brain_observatory_structures]
 
-    brain_observatory_mask = rsp.make_structure_mask(brain_observatory_ids)
+    rsp.make_structure_mask(brain_observatory_ids)
 
     # view in horizontal section
 
@@ -232,7 +230,6 @@ def test_notebook(tmpdir_factory):
 
     # In[13]:
 
-    import numpy as np
 
 
     # #### Downsample the space

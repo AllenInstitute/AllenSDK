@@ -9,16 +9,12 @@ import allensdk.core.json_utilities as json_utilities
 
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.ephys_features as ft
-from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics, get_stim_characteristics
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics
 
-import sys
 import argparse
 import os
-import json
-import h5py
 import numpy as np
 
-from scipy.optimize import curve_fit
 import scipy.signal as sg
 import scipy.misc
 
@@ -176,10 +172,7 @@ def plot_sweep_figures(nwb_file, ephys_roi_result, image_dir, sizes):
 
     image_file_sets = {}
 
-    tp_set = []
-    exp_set = []
 
-    prev_sweep_number = None
 
     tp_len = 0.035
     tp_steps = int(tp_len * 200000)
@@ -221,7 +214,7 @@ def plot_sweep_figures(nwb_file, ephys_roi_result, image_dir, sizes):
             axDP.set_xlim(t_exp[0], t_exp[-1])
 #            sns.despine()
 
-            v_prev, i_prev, t_prev, r_prev = v_init, i_init, t_init, r_init
+            v_prev, _i_prev, _t_prev, _r_prev = v_init, i_init, t_init, r_init  # noqa: F841
 
         else:
             v, i, t, r, dt = load_experiment(nwb_file, sweep_number)    
@@ -266,9 +259,8 @@ def plot_sweep_figures(nwb_file, ephys_roi_result, image_dir, sizes):
             axDP.set_xlim(t_exp[0], t_exp[-1])
 #            sns.despine()
 
-            v_prev, i_prev, t_prev, r_prev = v, i, t, r
+            v_prev, _i_prev, _t_prev, _r_prev = v, i, t, r  # noqa: F841
             
-        prev_sweep_number = sweep_number
 
         save_figure(tp_fig, 'test_pulse_%d' % sweep_number, 'test_pulses', image_dir, sizes, image_file_sets)
         save_figure(exp_fig, 'experiment_%d' % sweep_number, 'experiments', image_dir, sizes, image_file_sets)
@@ -328,7 +320,6 @@ def plot_images(ephys_roi_result, image_dir, sizes, image_sets):
         
 
 def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
-    lsq_sweeps = cell_features["long_squares"]["sweeps"]
     sub_sweeps = cell_features["long_squares"]["subthreshold_sweeps"]
     tau_sweeps = cell_features["long_squares"]["subthreshold_membrane_property_sweeps"]
 
@@ -449,7 +440,6 @@ def plot_instantaneous_threshold_thumbnail(nwb_file, sweep_numbers, cell_feature
 
     tstart = stim_start - 0.002
     tend = stim_start + stim_dur + 0.005
-    tscale = 0.005
 
     plt.plot(t, v, linewidth=1, color=color)
     
@@ -801,4 +791,5 @@ def main():
 
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()

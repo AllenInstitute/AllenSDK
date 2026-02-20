@@ -228,7 +228,7 @@ def test_call_caching(
     if isinstance(expected, str) and expected == "raise":
         with pytest.raises(ValueError):
             fn()
-        assert not ("data" in dc)
+        assert "data" not in dc
     elif isinstance(expected, str) and expected == "warn":
         with pytest.warns(UserWarning) as warning:
             fn()
@@ -250,7 +250,8 @@ def test_one_file_call_caching(tmpdir_factory, existing):
 
     if existing:
         data.to_csv(path, index=False)
-        getter = lambda: "foo"
+        def getter():
+            return "foo"
 
     obtained = cu.one_file_call_caching(
         path,

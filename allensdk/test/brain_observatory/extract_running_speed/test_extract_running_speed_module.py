@@ -4,7 +4,6 @@ import json
 import subprocess as sp
 
 import pytest
-import pandas as pd
 
 @pytest.fixture
 def use_temp_dir(tmpdir_factory):
@@ -69,7 +68,7 @@ def test_extract_running_speed_module(
 
         return input_json_data
 
-    output_json_data = use_temp_dir(
+    use_temp_dir(
         DATA_DIR, 'test_extract_running_speed', input_json_fname, output_json_fname, 
         'allensdk.brain_observatory.extract_running_speed', renamer
     )

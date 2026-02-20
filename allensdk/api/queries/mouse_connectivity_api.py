@@ -37,7 +37,6 @@ from .reference_space_api import ReferenceSpaceApi
 from .grid_data_api import GridDataApi
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 import numpy as np
-import nrrd
 
 class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
     '''

@@ -1,14 +1,10 @@
 #!/usr/bin/python
-import sys, logging
+import logging
 import os
-import json
 import shutil
 import argparse
 import copy
-import numpy as np
-import shutil
 
-from allensdk.config.manifest import Manifest
 
 import allensdk.internal.core.lims_utilities as lims_utilities
 import allensdk.core.json_utilities as json_utilities

@@ -41,7 +41,6 @@ import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
 from scipy.stats import gaussian_kde
-import matplotlib.colorbar as cbar
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 import allensdk.brain_observatory.circle_plots as cplots
@@ -72,7 +71,6 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
         alpha = 1.0
 
     ax = plt.gca()
-    ps = []
     for sig_corr, color, label in zip(sig_corrs, colors, labels):
         ax.hist(sig_corr, bins=30, range=[-1,1],
                 histtype='stepfilled',
@@ -198,7 +196,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
                          cbar_size="7%",
                          cbar_pad=0.05)
         
-        for ax in grid: pass
+        for ax in grid:
+            pass
     else:
         ax = plt.gca()
 

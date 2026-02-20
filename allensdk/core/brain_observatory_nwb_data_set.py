@@ -37,7 +37,6 @@ import functools
 import dateutil
 import re
 import os
-import itertools
 import logging
 from packaging.version import Version
 
@@ -750,7 +749,7 @@ class BrainObservatoryNwbDataSet(object):
                             raise Exception("Unrecognized metadata formatting for field %s" % disk_key)
 
                     meta[memory_key] = v
-                except KeyError as e:
+                except KeyError:
                     logging.warning("could not find key %s", disk_key)
 
         # extract cre line from genotype string
@@ -893,7 +892,7 @@ class BrainObservatoryNwbDataSet(object):
 
                     # break out if we found it
                     break
-                except KeyError as e:
+                except KeyError:
                     pass
 
         if motion_correction is None:

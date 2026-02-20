@@ -42,7 +42,7 @@ import copy
 
 try:
     from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
-except:
+except Exception:
     from .glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
 class GlifBadResetException( Exception ):

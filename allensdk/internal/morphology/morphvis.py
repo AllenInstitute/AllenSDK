@@ -337,7 +337,7 @@ def draw_density_hist(img, morph, vert_scale,
     y1 = img_height-inset_bottom
     canvas.line((x0, y0, x1, y1), col)
 
-    hist_step = 1.0 * draw_height / num_bins;
+    hist_step = 1.0 * draw_height / num_bins
     hist_scale = (draw_width-1) / hist.max()
     for seg in morph.compartment_list:
         ypos = 1.0 * inset_top

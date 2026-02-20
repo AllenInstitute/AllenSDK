@@ -322,27 +322,27 @@ class Api(object):
             else:
                 stream_file_over_http(url, file_path)
 
-        except exceptions.StreamingError as e:
+        except exceptions.StreamingError:
             self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
 
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError:
             self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
 
-        except requests.exceptions.ReadTimeout as e:
+        except requests.exceptions.ReadTimeout:
             self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
 
-        except Exception as e:
+        except Exception:
             self._file_download_log.error("Couldn't retrieve file %s from %s" % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise

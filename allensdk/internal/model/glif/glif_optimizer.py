@@ -5,9 +5,7 @@ import numpy as np
 import time
 
 from scipy.optimize import fminbound, fmin
-from scipy.optimize import minimize
 
-import json
 
 from uuid import uuid4
 
@@ -60,7 +58,7 @@ class GlifOptimizer(object):
         logging.info('outer_iterations: %s' % outer_iterations)
         logging.info('inner_iterations: %s' % inner_iterations)
 
-        self.iteration_info = [];
+        self.iteration_info = []
 
         expected_param_count = experiment.neuron_parameter_count()
 
@@ -95,7 +93,7 @@ class GlifOptimizer(object):
     
     def initiate_unique_seed(self, seed=None):
         
-        if seed == None:
+        if seed is None:
             x1=str(int(uuid4())) #get a uuid, turn it into int then turn it into string
             x2=[x1[ii:ii+8]for ii in range(0,40,8)] #break it up into chunks    
             x3=[int(ii) for ii in x2]#turn string chunks back into integers

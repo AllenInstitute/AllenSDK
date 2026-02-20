@@ -37,7 +37,6 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import numpy as np
 import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 DEFAULT_CMAP = 'magma'
@@ -69,10 +68,10 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
                                        facecolor='none')
             ax.add_artist(ellipse)
 
-    if not save_file_name is None:
+    if save_file_name is not None:
         fig.savefig(save_file_name)
 
-    if show == True:
+    if show:
         plt.show()
 
     if close:
@@ -201,7 +200,7 @@ def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=Tru
     plot_chi_square_summary(rf, ax=curr_axes, cax=cbar_axes, cmap=cmap)
 
     # MSR plot:
-    if not lsn is None:
+    if lsn is not None:
         row += 1
         curr_on_axes = fig.add_subplot(gsp[row, 0])
         curr_off_axes = fig.add_subplot(gsp[row, 1])
@@ -256,10 +255,10 @@ def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=Tru
     for ax in ax_list:
         ax.set_adjustable('box-forced')
 
-    if not save_file_name is None:
+    if save_file_name is not None:
         fig.savefig(save_file_name)
 
-    if show == True:
+    if show:
         plt.show()
 
     if close:

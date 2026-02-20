@@ -76,7 +76,7 @@ def demix_time_dep_masks(raw_traces, stack, masks):
             overlap = flat_masks.dot(flat_weighted_masks.T).toarray()  # cast to dense numpy array for linear solver because solution is dense
             try:
                 demix_traces[:, t] = linalg.solve(overlap, F[:, t])
-            except linalg.LinAlgError as e:
+            except linalg.LinAlgError:
                 logging.warning("singular matrix, using least squares")
                 x, _, _, _ = linalg.lstsq(overlap, F[:, t])
                 demix_traces[:, t] = x

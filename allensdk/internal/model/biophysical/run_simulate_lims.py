@@ -58,7 +58,6 @@ class RunSimulateLims(RunSimulate):
         lr.to_manifest(manifest_path)
 
     def copy_local(self):
-        import allensdk.model.biophysical.run_simulate
 
         self.load_manifest()
 
@@ -130,6 +129,6 @@ if __name__ == '__main__':
     try:
         main(command, input_json, output_json)
         RunSimulateLims._log.debug("success")
-    except Exception as e:
+    except Exception:
         RunSimulate._log.error(traceback.format_exc())
         exit(1)

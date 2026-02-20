@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from __future__ import division, print_function, absolute_import
-import re
 import operator as op
 import functools
 
@@ -155,7 +154,8 @@ class StructureTree( SimpleTree ):
             
         '''
         
-        overlap = lambda x: (set(structure_set_ids) & set(x['structure_set_ids']))
+        def overlap(x):
+            return (set(structure_set_ids) & set(x['structure_set_ids']))
         return self.filter_nodes(overlap)
         
         
@@ -444,9 +444,9 @@ class StructureTree( SimpleTree ):
         replaces them with a single list of id records.
         '''
 
-        if not 'structure_sets' in structure:
+        if 'structure_sets' not in structure:
             structure['structure_sets'] = []
-        if not 'structure_set_ids' in structure:
+        if 'structure_set_ids' not in structure:
             structure['structure_set_ids'] = []    
         
         structure['structure_set_ids'].extend([sts['id'] for sts 

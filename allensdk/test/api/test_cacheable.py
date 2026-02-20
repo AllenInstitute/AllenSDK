@@ -33,7 +33,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import pytest
 from unittest.mock import MagicMock, patch, mock_open
 from allensdk.api.warehouse_cache.cache import Cache, cacheable
 from allensdk.api.queries.rma_api import RmaApi
@@ -43,9 +42,8 @@ from allensdk.config.manifest import Manifest
 
 try:
     import StringIO
-except:
+except Exception:
     import io as StringIO
-import os
 
 
 _msg = [{'whatever': True}]
@@ -274,7 +272,7 @@ def test_cacheable_lazy_csv_no_file(mkdir, dictwriter, ju_read_url_get,
     def get_hemispheres():
         return RmaApi().model_query(model='Hemisphere')
 
-    with patch('os.path.exists', MagicMock(return_value=False)) as ope:
+    with patch('os.path.exists', MagicMock(return_value=False)):
         with patch(builtins.__name__ + '.open',
                    mock_open(),
                    create=True) as open_mock:
@@ -304,7 +302,7 @@ def test_cacheable_lazy_csv_file_exists(read_csv, ju_read_url_get, ju_read,
     def get_hemispheres():
         return RmaApi().model_query(model='Hemisphere')
 
-    with patch('os.path.exists', MagicMock(return_value=True)) as ope:
+    with patch('os.path.exists', MagicMock(return_value=True)):
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              strategy='lazy',
                              **Cache.cache_csv())

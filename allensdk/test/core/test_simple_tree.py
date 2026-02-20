@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from unittest import mock
 from numpy import allclose
 
 from allensdk.core.simple_tree import SimpleTree
@@ -49,8 +48,10 @@ def tree():
              {'id': 2, 'parent': 0, 1: 3, s: 'b'}, {'id': 3, 'parent': 1, 1: 6, s: 'e'}, 
              {'id': 4, 'parent': 1, 1: 4, s: 'c'}, {'id': 5, 'parent': 2, 1: 5, s: 'f'}]
             
-    parent_fn = lambda node: node['parent']
-    id_fn = lambda node: node['id']
+    def parent_fn(node):
+        return node['parent']
+    def id_fn(node):
+        return node['id']
     
     return SimpleTree(nodes, id_fn, parent_fn)
     
@@ -91,7 +92,7 @@ def test_value_map(tree):
 def test_value_map_nonunique(tree):
     
     with pytest.raises( RuntimeError ):
-        parent_map = tree.value_map(lambda node: node['parent'], 
+        tree.value_map(lambda node: node['parent'], 
                                     lambda node: node['id'])
 
     

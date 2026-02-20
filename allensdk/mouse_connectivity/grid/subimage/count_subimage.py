@@ -1,12 +1,8 @@
 from __future__ import division
 import logging
-import sys
-import functools
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
-from allensdk.mouse_connectivity.grid.utilities import image_utilities as iu
 from .base_subimage import PolygonSubImage, SegmentationSubImage
 
 

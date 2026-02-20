@@ -1,4 +1,5 @@
-import argparse, sys, logging
+import argparse
+import logging
 
 import allensdk.core.json_utilities as ju
 import allensdk.internal.model.glif.find_sweeps as fs
@@ -9,7 +10,6 @@ from allensdk.internal.model.glif.glif_optimizer import GlifOptimizer
 
 from allensdk.internal.model.data_access import load_sweeps
 from allensdk.internal.model.glif.find_spikes import find_spikes_list
-import allensdk.core.json_utilities as ju
 import allensdk.internal.model.glif.preprocess_neuron as pn
 
 def get_optimize_sweep_numbers(sweep_index): 
@@ -125,4 +125,5 @@ def main():
     except Exception as e:
         logging.error(e.message)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

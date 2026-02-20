@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 import nrrd
 import numpy as np
-import pandas as pd
 
 from allensdk.core import json_utilities
 

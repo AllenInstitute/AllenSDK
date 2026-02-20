@@ -1,6 +1,5 @@
 from __future__ import division
 import logging
-import functools
 from collections import defaultdict
 import copy as cp
 

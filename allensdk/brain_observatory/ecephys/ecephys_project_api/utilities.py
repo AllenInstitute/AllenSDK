@@ -1,6 +1,6 @@
 import copy as cp
 
-from jinja2 import Environment, BaseLoader, DictLoader
+from jinja2 import Environment, DictLoader
 
 
 def macros():

@@ -1,5 +1,4 @@
 import sys
-import pytest
 import subprocess
 
 def test_args():

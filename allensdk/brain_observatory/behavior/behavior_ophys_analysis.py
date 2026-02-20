@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
+from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_experiment import \
         BehaviorOphysExperiment
 

@@ -1,11 +1,8 @@
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.api.warehouse_cache.cache import cacheable
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 import allensdk.internal.core.lims_utilities as lu
 import os
 import collections
-import pandas as pd
-import sys
 
 sql_query_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pre_release_sql')
 
@@ -146,7 +143,7 @@ class BrainObservatoryApiPreRelease(BrainObservatoryApi):
                     c[key] = q['crarc_data']['roi_cell_metrics'].get(key,None)
             
             for suffix in ['a', 'b', 'c']:
-                if not q['crar%s_data' % suffix] is None:
+                if q['crar%s_data' % suffix] is not None:
                     c['reliability_nm1_%s' % suffix] = q['crar%s_data' % suffix]['roi_cell_metrics'].get('reliability_nm1',None)
                 else:
                     c['reliability_nm1_%s' % suffix] = None

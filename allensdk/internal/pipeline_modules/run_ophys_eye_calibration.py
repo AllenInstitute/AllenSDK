@@ -175,4 +175,5 @@ def main():
 
     mod.write_output_data({"screen_mapping_file": outfile})
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

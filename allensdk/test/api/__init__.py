@@ -10,5 +10,5 @@ class SafeJsonMsg:
     def __call__(self, *a, **k):
         try:
             return next(self.data)
-        except StopIteration as err:
+        except StopIteration:
             return {'msg': []}

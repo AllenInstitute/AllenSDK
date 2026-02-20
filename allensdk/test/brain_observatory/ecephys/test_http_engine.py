@@ -60,7 +60,7 @@ def test_stream_to_file(tmpdir_factory):
         chunksize="hi"
     )
 
-    with mock.patch("requests.get", return_value=MockResponse()) as p:
+    with mock.patch("requests.get", return_value=MockResponse()):
 
         stream = engine.stream("fish")
         http_engine.write_from_stream(path, stream)

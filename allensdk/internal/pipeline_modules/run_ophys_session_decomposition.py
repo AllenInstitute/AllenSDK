@@ -1,8 +1,5 @@
-import logging
 from allensdk.internal.core.lims_pipeline_module import (PipelineModule,
                                                          run_module)
-import allensdk.core.json_utilities as ju
-import allensdk.internal.core.lims_utilities as lu
 from allensdk.internal.brain_observatory import ophys_session_decomposition as osd
 from multiprocessing import Pool
 import os
@@ -112,4 +109,5 @@ def main():
 
     mod.write_output_data(output_data)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

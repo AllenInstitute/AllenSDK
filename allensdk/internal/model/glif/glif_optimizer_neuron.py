@@ -149,7 +149,7 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         AScurrents_t0 = self.init_AScurrents
         
         if voltage_t0>threshold_t0:
-            raise GlifBadInitializationException("Voltage STARTS above threshold: voltage_t0 (%f) threshold_t0 (%f)" % ( voltage_t0, threshold_t0, voltage_t0 - threshold_t0, 10000000.0))
+            raise GlifBadInitializationException("Voltage STARTS above threshold: voltage_t0 (%f) threshold_t0 (%f)" % ( voltage_t0, threshold_t0))
 
         start_index = 0
         end_index = 0
@@ -205,7 +205,6 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 grid_bio_spike_model_voltage = np.empty(num_spikes)
                 grid_bio_spike_model_threshold = np.empty(num_spikes)
 
-                spikeIndStart = 0
                 
                 voltage = np.empty(len(stimulus))
                 voltage[:] = np.nan  

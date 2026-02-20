@@ -1,5 +1,4 @@
 import argparse
-import itertools as it
 
 import numpy as np
 import pandas as pd
@@ -43,7 +42,7 @@ def get_blocks(table):
                 )
             )
         else:
-            recorded_block = recorded_blocks[0]
+            pass
 
         start = block["Start"].values[0]
         end = block["End"].values[-1]
@@ -86,7 +85,7 @@ def plot_blocks(blocks, colormap):
             linestyle="-",
             edgecolor="black",
         )
-        if not block["name"] in used:
+        if block["name"] not in used:
             labels.append(block["name"])
             handles.append(handle)
 

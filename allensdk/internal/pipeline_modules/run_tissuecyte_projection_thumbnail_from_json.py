@@ -3,14 +3,14 @@ import os
 import functools
 
 import SimpleITK as sitk
-from scipy.misc import imread, imsave
+from scipy.misc import imsave
 import numpy as np
 import pandas as pd
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_utilities import sitk_get_diagonal_length
-from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import run, apply_colormap
+from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import run
 from allensdk.internal.mouse_connectivity.projection_thumbnail.visualization_utilities import convert_discrete_colormap
 
 

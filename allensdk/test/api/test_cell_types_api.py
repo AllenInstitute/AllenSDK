@@ -1,5 +1,6 @@
-import pytest, os
-from unittest.mock import patch, mock_open, MagicMock
+import pytest
+import os
+from unittest.mock import patch
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
 @pytest.fixture
@@ -100,7 +101,7 @@ def test_list_cells_unmocked(cell_types_api):
     enable_console_log()
 
     # this test will always require the latest warehouse
-    cells = cell_types_api.list_cells()
+    cell_types_api.list_cells()
 
 
 def test_list_cells_mocked(mock_cells):

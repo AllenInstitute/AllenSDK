@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from allensdk.api.queries.grid_data_api import GridDataApi
 
 

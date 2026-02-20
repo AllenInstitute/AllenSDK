@@ -33,9 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import os
 import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 import itertools as it
 import numpy as np
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA

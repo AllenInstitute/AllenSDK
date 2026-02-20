@@ -15,7 +15,8 @@
 import matplotlib
 matplotlib.use('agg')
 
-import sys, os
+import sys
+import os
 
 
 # If extensions (or modules to document with autodoc) are in another directory,

@@ -1,5 +1,4 @@
 import numpy as np
-import logging
 
 class FitEllipse (object):
 
@@ -101,7 +100,7 @@ class FitEllipse (object):
 
             params = U.T[0]
             error = np.dot(params, np.dot(S,params))/len(inlier_points)
-        except:
+        except Exception:
             #TODO - check if this is correct
             params = None      #WBW error handling
             error = 0.00000001 #WBW error handling
@@ -110,18 +109,18 @@ class FitEllipse (object):
 
 
 def ellipse_center(a):
-    b,c,d,f,g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]
+    b,c,d,f,_g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]  # noqa: F841
     num = b*b-a*c
     x0=(c*d-b*f)/num
     y0=(a*f-b*d)/num
     return np.array([x0,y0])
 
 def ellipse_angle_of_rotation( a ):
-    b,c,d,f,g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]
+    b,c,_d,_f,_g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]  # noqa: F841
     return 0.5*np.arctan(2*b/(a-c))
 
 def ellipse_angle_of_rotation2( a ):
-    b,c,d,f,g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]
+    b,c,_d,_f,_g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]  # noqa: F841
     if b == 0:
         if a > c:
             return 0
@@ -212,7 +211,7 @@ def test_fit():
 
     fe=FitEllipse(40,100,0.0001,40)
     result = fe.ransac_fit(candidate_points)
-    if result!=None:
+    if result is not None:
         center, angle, (axis1,axis2) = fe.ransac_fit(candidate_points)
 
     print("center = ", center)

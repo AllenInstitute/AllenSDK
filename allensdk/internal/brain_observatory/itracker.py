@@ -1,15 +1,11 @@
 import numpy as np
-import sys
 import os
-import subprocess as sp
 from PIL import Image, ImageDraw
-from scipy.misc import imsave
 from scipy.signal import medfilt2d
-import ast
 import json
 
-from fit_ellipse import fit_ellipse, FitEllipse
-from itracker_utils import generate_rays, initial_pupil_point, initial_cr_point, sobel_grad
+from fit_ellipse import FitEllipse
+from itracker_utils import generate_rays, initial_pupil_point, initial_cr_point
 import logging
 
 import matplotlib.pyplot as plt
@@ -126,7 +122,7 @@ class iTracker (object):
 
     def estimate_bbox_from_mean_frame(self, margin=75, image_type='png'):
         try:
-            import keras
+            import keras  # noqa: F401
         except ImportError:
             logging.debug("keras failed to import.  Returning None for bbox_pupil and bbox_cr")
             return None, None
@@ -230,7 +226,7 @@ class iTracker (object):
     def detect_eye_closed(self):
 
         try:
-            import keras
+            import keras  # noqa: F401
         except ImportError:
             logging.debug("keras failed to import.  Can't detect eye closure")
             return None
@@ -385,7 +381,7 @@ class iTracker (object):
         #     pupil_params = ((np.nan,np.nan),np.nan,(np.nan,np.nan))  #  np.nan*np.ones(5)
 
 
-        if result!=None:    #should use np.any(np.isnan(result))
+        if result is not None:    #should use np.any(np.isnan(result))
             pupil_params = result  #fe.ransac_fit(pupil_candidate_points)
         else:
             logging.debug("No good fit found")
@@ -405,7 +401,7 @@ class iTracker (object):
             fe=FitEllipse(10,10,0.0001,4)
             result = fe.ransac_fit(cr_candidate_points)
 
-            if result!=None:
+            if result is not None:
                 cr_params = result #fe.ransac_fit(cr_candidate_points)
             else:
                 logging.debug("No good fit found")
@@ -467,7 +463,8 @@ class iTracker (object):
 
         for i,frame in enumerate(frame_list):
             logging.debug("Processing frame %d", i)
-            if frame[-4:]!='.jpg' and frame[-4:]!='.png':  continue  # just in case some OS specific files snuck in (like in OS X)
+            if frame[-4:]!='.jpg' and frame[-4:]!='.png':
+                continue  # just in case some OS specific files snuck in (like in OS X)
             frame_path = os.path.join(self.input_image_folder,frame)
 
             # open Image, convert to gray scale and then to numpy array

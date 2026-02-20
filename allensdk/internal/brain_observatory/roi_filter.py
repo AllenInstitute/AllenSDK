@@ -1,7 +1,6 @@
 import itertools
 import pickle
 import logging
-from allensdk.internal.brain_observatory import roi_filter_utils
 import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.brain_observatory.roi_masks import create_roi_mask_array
 
@@ -91,8 +90,7 @@ class ROIClassifier(object):
         --------
         create_feature_array : Create a feature array given model and inputs
         '''
-        features = create_feature_array(self.model_data, object_data, depth,
-                                        structure_id, drivers, reporters)
+        pass
 
     def get_labels(self, object_data, depth, structure_id, drivers,
                    reporters):

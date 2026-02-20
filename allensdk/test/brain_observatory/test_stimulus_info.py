@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 import os
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
-import numpy as np
 from pathlib import Path
 NWB_FLAVORS = []
 

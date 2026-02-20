@@ -36,7 +36,6 @@
 from .rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable
 
-from allensdk.core.structure_tree import StructureTree
 
 
 class OntologiesApi(RmaTemplate):

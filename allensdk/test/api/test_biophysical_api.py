@@ -59,7 +59,7 @@ def test_is_well_known_file_type(biophys_api):
 
 @patch.object(BiophysicalApi, "json_msg_query")
 def test_get_neuronal_models(mock_json_msg_query, biophys_api):
-    mck = biophys_api.get_neuronal_models([386049446,469753383])
+    biophys_api.get_neuronal_models([386049446,469753383])
 
     mock_json_msg_query.assert_called_once_with(
         "http://twarehouse-backup/api/v2/data/query.json?"

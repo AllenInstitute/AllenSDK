@@ -2,7 +2,9 @@ from allensdk.api.queries.biophysical_api import \
     BiophysicalApi
 from allensdk.api.queries.cell_types_api import CellTypesApi
 from allensdk.api.queries.rma_api import RmaApi
-import os, sys, shutil
+import os
+import sys
+import shutil
 
 
 #bp = BiophysicalApi('http://api.brain-map.org')
@@ -25,7 +27,7 @@ class BiophysicalArchiver(object):
         self.template_names = {}
         self.nwb_list = []
         
-        if archive_dir == None:
+        if archive_dir is None:
             archive_dir = '.'
         self.archive_dir = archive_dir
     

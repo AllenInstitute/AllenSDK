@@ -39,13 +39,11 @@ import builtins
 import zipfile
 import os
 
-import numpy as np
 import pytest
 from unittest.mock import MagicMock, patch, mock_open
 from requests.exceptions import HTTPError
 import requests
 
-import allensdk.core.json_utilities as ju
 from allensdk.api.api import Api, stream_file_over_http, stream_zip_directory_over_http
 
 
@@ -149,7 +147,7 @@ def test_stream_file_over_http(response, tmpdir_factory):
 
     path = tmpdir_factory.mktemp('file_stream_test').join('test.txt')
 
-    with patch('requests.get', return_value=response) as get_mock:
+    with patch('requests.get', return_value=response):
         stream_file_over_http('https://fish.gov', str(path))
 
     with open(str(path), 'r') as fil:
@@ -162,7 +160,7 @@ def test_stream_zip_directory_over_http(zip_response, tmpdir_factory):
 
     path = tmpdir_factory.mktemp('zip_stream_test').join('test.txt')
 
-    with patch('requests.get') as get_mock:
+    with patch('requests.get'):
         with patch('requests_toolbelt.downloadutils.stream.stream_response_to_file', 
                    side_effect=lambda r, b: b.write(zip_response)):
 

@@ -20,7 +20,6 @@ import allensdk.internal.core.lims_utilities as lims_utilities
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.config.manifest import Manifest
 import json
-import traceback
 
 
 class OptimizeConfigReader(object):
@@ -82,7 +81,7 @@ class OptimizeConfigReader(object):
                 
                 if file_type_id == lims_utilities.NWB_FILE_TYPE_ID:
                     stimulus_file_entries.append(well_known_file)
-            except:
+            except Exception:
                 OptimizeConfigReader._log.warn('skipping well known file record with no well known file type.')
 
         return stimulus_file_entries
@@ -147,7 +146,7 @@ class OptimizeConfigReader(object):
             superseded = reconstruction['superseded']
             manual = reconstruction['manual']
             
-            if manual == True and superseded == False:
+            if manual and not superseded:
                 well_known_files = reconstruction['well_known_files']
                 
                 for well_known_file in well_known_files:
@@ -247,7 +246,7 @@ class OptimizeConfigReader(object):
     def update_well_known_file(self,
                                path,
                                well_known_file_type_id=None):
-        if well_known_file_type_id == None:
+        if well_known_file_type_id is None:
             well_known_file_type_id = lims_utilities.MODEL_PARAMETERS_FILE_TYPE_ID
         well_known_files = self.lims_data['well_known_files']
 
@@ -403,7 +402,7 @@ class OptimizeConfigReader(object):
 
         m = Manifest(config=b.path_info)
 
-        if manifest_path != None:
+        if manifest_path is not None:
             b.write_json_file(manifest_path, overwrite=True)
 
         return m

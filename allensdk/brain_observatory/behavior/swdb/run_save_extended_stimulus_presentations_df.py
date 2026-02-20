@@ -1,4 +1,3 @@
-import os
 import sys
 sys.path.append('/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/pbstools')
 from pbstools import PythonJob 

@@ -1,7 +1,6 @@
 from __future__ import division
 import logging
 
-import numpy as np
 
 from .interval_unionizer import IntervalUnionizer
 from .tissuecyte_unionize_record import TissuecyteInjectionUnionize, \

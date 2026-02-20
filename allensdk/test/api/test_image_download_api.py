@@ -385,7 +385,6 @@ def test_api_doc_url_download_projection_image_view(image_api):
 
 
 def test_api_doc_url_download_projection_image_view_exception(image_api):
-    path = '126862583.jpg'
 
     section_image_id = 126862583
     

@@ -34,11 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-import os
 import numpy
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical.utils import Utils, AllActiveUtils
-from allensdk.api.queries.biophysical_api import BiophysicalApi
+from allensdk.model.biophysical.utils import Utils
 from allensdk.core.dat_utilities import DatUtilities
 from allensdk.ephys import ephys_features
 import subprocess

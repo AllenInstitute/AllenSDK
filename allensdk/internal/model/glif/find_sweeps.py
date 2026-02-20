@@ -1,4 +1,5 @@
-import json, sys, os
+import sys
+import os
 import logging
 import argparse
 
@@ -17,7 +18,8 @@ SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 
-class MissingSweepException( Exception ): pass
+class MissingSweepException( Exception ):
+    pass
 
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
@@ -177,7 +179,7 @@ def parse_arguments():
         if not os.path.exists(args.sweep_list_file):
             raise Exception("sweep list file (%s) does not exist" % args.sweep_file)
 
-    except Exception as e:
+    except Exception:
         parser.print_help()
         sys.exit(1)
 
@@ -198,4 +200,5 @@ def main():
             logging.error(err)
         sys.exit(1)
 
-if __name__ == "__main__":  main()
+if __name__ == "__main__":
+    main()

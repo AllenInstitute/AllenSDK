@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from __future__ import division, print_function, absolute_import
-from collections import defaultdict
 import operator as op
 import functools
 import os
@@ -43,7 +42,6 @@ import csv
 from scipy.ndimage.interpolation import zoom
 import numpy as np
 import nrrd
-import pandas as pd
 
 from allensdk.core.structure_tree import StructureTree
 

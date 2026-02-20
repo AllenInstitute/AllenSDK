@@ -1,8 +1,5 @@
 ########################################################################
 # library code
-import math
-import argparse
-import sys
 import numpy as np
 from scipy.spatial.distance import euclidean
 import skimage.draw
@@ -240,7 +237,7 @@ def main(jin):
         pia = jin["primary"]["Pia"]["path"]
         wm = jin["primary"]["White Matter"]["path"]
         res = float(jin["primary"]["Pia"]["resolution"])
-    except:
+    except Exception:
         print("** Error -- missing requisite primary (20x) field(s) in input json")
         raise
     
@@ -248,7 +245,7 @@ def main(jin):
     try:
         sx, sy = convert_coords_str(soma)
         soma_x, soma_y = calculate_centroid(sx, sy)
-    except:
+    except Exception:
         print("** Error -- unable to calculate soma information (primary)")
         raise
     try:
@@ -261,7 +258,7 @@ def main(jin):
         # calculate soma depth and cortical thickness
         depth = res * euclidean((soma_x, soma_y), (px, py))
         raw_thickness = res * euclidean((wx, wy), (px, py))
-    except:
+    except Exception:
         print("** Error calculating shortest path (primary)")
         raise
     
@@ -273,14 +270,14 @@ def main(jin):
     primary["soma_depth_um"] = depth
     try:
         primary["soma_depth_relative"] = depth / raw_thickness
-    except:
+    except Exception:
         primary["soma_depth_relative"] = -1.0   # NaN is not friendly to ruby
     primary["cort_thickness_um"] = raw_thickness
     primary["theta"] = theta
     
     try:
         scale = raw_thickness / blk_thickness
-    except:
+    except Exception:
         scale = -1.0    # NaN is not ruby-friendly
     
     soma_coords_avail = False
@@ -293,7 +290,7 @@ def main(jin):
             soma_y = root.y
             soma_z = root.z
             soma_coords_avail = True
-        except:
+        except Exception:
             # treat this as a fatal error -- if SWC was specified then
             #   it should be used
             print("**** Error reading SWC file '%s'" % jin["swc_file"])
@@ -311,7 +308,7 @@ def main(jin):
             soma_y *= float(info["resolution"])
             soma_z = float(info["idx"]) * float(info["thickness"])
             soma_coords_avail = True
-        except:
+        except Exception:
             print("** Error reading soma 63x info from input json")
             print("** Translation component of affine matrix is invalid **")
 
@@ -327,7 +324,7 @@ def main(jin):
         tr_rot[ 9] = -translate_x
         tr_rot[10] = -translate_y - depth
         tr_rot[11] = -translate_z
-    except:
+    except Exception:
         print("** Error calculating affine tranform (math fault?)")
         raise
     soma_x = -translate_x
@@ -365,7 +362,7 @@ def main(jin):
         alignment["skew_y"] = 0.0
         alignment["skew_z"] = 0.0
         jout["alignment"] = alignment
-    except:
+    except Exception:
         print("** Internal error **")
         raise
     

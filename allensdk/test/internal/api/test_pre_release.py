@@ -29,7 +29,6 @@ def test_pre_release_get_containers(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     containers_extended = boc_extended.get_experiment_containers()
@@ -80,7 +79,6 @@ def test_pre_release_get_experiments(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     experiments_extended = boc_extended.get_ophys_experiments()
@@ -136,7 +134,6 @@ def test_pre_release_get_cell_specimens(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     cell_specimens_extended = boc_extended.get_cell_specimens(include_failed=True)

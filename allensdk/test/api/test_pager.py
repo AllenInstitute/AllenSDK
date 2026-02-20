@@ -37,17 +37,13 @@ import pytest
 from unittest.mock import MagicMock, call, patch, mock_open
 from allensdk.api.queries.rma_pager import RmaPager, pageable
 from allensdk.api.queries.rma_api import RmaApi
-import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
 import pandas as pd
 import builtins
-import os
-import simplejson as json
 from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 try:
     import StringIO
-except:
+except Exception:
     import io as StringIO
 from . import SafeJsonMsg
 
@@ -178,10 +174,9 @@ def test_cacheable_pageable_csv(os_makedirs, read_csv,
 
         with patch(builtins.__name__ + '.open',
                 mock_open(),
-                create=True) as open_mock:
+                create=True):
             with patch('csv.DictWriter.writerow') as csv_writerow:
-                cam_cell_metrics = \
-                    get_cam_cell_metrics(strategy='create',
+                get_cam_cell_metrics(strategy='create',
                                         path='/path/to/cam_cell_metrics.csv',
                                         num_rows=1,
                                         total_rows='all',

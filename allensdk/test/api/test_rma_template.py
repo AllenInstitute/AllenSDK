@@ -34,8 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from unittest.mock import MagicMock, patch
-import allensdk.core.json_utilities as ju
+from unittest.mock import patch
 from allensdk.api.queries.rma_template import RmaTemplate
 
 

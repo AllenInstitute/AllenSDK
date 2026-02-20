@@ -1,14 +1,6 @@
 #!/usr/bin/python
 import logging
-import sys
 import math
-import os
-import re
-import copy
-import json
-import numpy as np
-import argparse
-import h5py
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.core.nwb_data_set import NwbDataSet
@@ -21,7 +13,7 @@ def main(jin):
         experiment_data = jin['experiment_data']
         sweep_data = jin['sweep_data']
         nwb_file = jin["nwb_file"]
-    except:
+    except Exception:
         raise IOError("Input json file is missing requisite data")
 
     jout = {}
@@ -103,12 +95,12 @@ def main(jin):
     try:
         sir_ratio = experiment_data['input_access_resistance_ratio']
         #r = experiment_data['input_resistance_mohm']
-    except:
+    except Exception:
         sr_tags.append("Resistance ratio not available")
 
     try:
         sr = experiment_data['initial_access_resistance_mohm']
-    except:
+    except Exception:
         sr_tags.append("Initial access resistance not available")
 
     try:
@@ -182,9 +174,7 @@ def main(jin):
             # pull data streams from file (this is for detecting truncated
             #   sweeps)
             sweep_data = NwbDataSet(nwb_file).get_sweep(sweep_num)
-            volts = sweep_data['response']
             current = sweep_data['stimulus']
-            hz = sweep_data['sampling_rate']
             idx_start, idx_stop = sweep_data['index_range']
 
             if sweep["pre_noise_rms_mv"] > qc_criteria["pre_noise_rms_mv_max"]:
@@ -230,7 +220,7 @@ def main(jin):
             else:
                 sweep_state[name]["state"] = "Pass"
 
-        except:
+        except Exception:
             print("Error processing sweep %s" % name)
             raise
 

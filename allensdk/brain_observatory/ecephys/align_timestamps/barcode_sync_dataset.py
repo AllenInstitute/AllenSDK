@@ -1,6 +1,5 @@
 import warnings
 
-import numpy as np
 
 from . import barcode
 from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import (

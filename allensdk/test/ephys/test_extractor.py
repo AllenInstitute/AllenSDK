@@ -45,7 +45,7 @@ path = os.path.dirname(__file__)
 
 
 def test_extractor_no_values():
-    ext = EphysSweepSetFeatureExtractor()
+    EphysSweepSetFeatureExtractor()
 
 
 def test_extractor_wrong_inputs():
@@ -55,19 +55,19 @@ def test_extractor_wrong_inputs():
     i = np.zeros_like(v)
 
     with pytest.raises(ValueError):
-        ext = EphysSweepSetFeatureExtractor(t, v, i)
+        EphysSweepSetFeatureExtractor(t, v, i)
 
     with pytest.raises(ValueError):
-        ext = EphysSweepSetFeatureExtractor([t], v, i)
+        EphysSweepSetFeatureExtractor([t], v, i)
 
     with pytest.raises(ValueError):
-        ext = EphysSweepSetFeatureExtractor([t], [v], i)
+        EphysSweepSetFeatureExtractor([t], [v], i)
 
     with pytest.raises(ValueError):
-        ext = EphysSweepSetFeatureExtractor([t, t], [v], [i])
+        EphysSweepSetFeatureExtractor([t, t], [v], [i])
 
     with pytest.raises(ValueError):
-        ext = EphysSweepSetFeatureExtractor([t, t], [v, v], [i])
+        EphysSweepSetFeatureExtractor([t, t], [v, v], [i])
 
 
 def test_extractor_on_sample_data():
@@ -78,20 +78,20 @@ def test_extractor_on_sample_data():
     ext = EphysSweepSetFeatureExtractor([t], [v])
     ext.process_spikes()
     swp = ext.sweeps()[0]
-    spikes = swp.spikes()
+    swp.spikes()
 
     keys = swp.spike_feature_keys()
-    swp_keys = swp.sweep_feature_keys()
-    result = swp.spike_feature(keys[0])
-    result = swp.sweep_feature("first_isi")
-    result = ext.sweep_features("first_isi")
-    result = ext.spike_feature_averages(keys[0])
+    swp.sweep_feature_keys()
+    swp.spike_feature(keys[0])
+    swp.sweep_feature("first_isi")
+    ext.sweep_features("first_isi")
+    ext.spike_feature_averages(keys[0])
 
     with pytest.raises(KeyError):
-        result = swp.spike_feature("nonexistent_key")
+        swp.spike_feature("nonexistent_key")
 
     with pytest.raises(KeyError):
-        result = swp.sweep_feature("nonexistent_key")
+        swp.sweep_feature("nonexistent_key")
 
 
 def test_extractor_on_sample_data_with_i():
@@ -159,7 +159,8 @@ def test_fit_fi_slope():
 
     design = np.array([amps, np.ones_like(amps)]).T
     rates = np.dot(design, weights)
-    build_stim_amps = lambda: lambda sweep: next(iteramps)
+    def build_stim_amps():
+        return lambda sweep: next(iteramps)
 
     class Ext(object):
         def sweeps(self):
@@ -169,7 +170,7 @@ def test_fit_fi_slope():
 
     with mock.patch(
         'allensdk.ephys.ephys_extractor._step_stim_amp', 
-        new_callable=build_stim_amps) as p:
+        new_callable=build_stim_amps):
 
         slope_obt = ephys_extractor.fit_fi_slope(Ext())
         assert(np.allclose(weights[0], slope_obt))

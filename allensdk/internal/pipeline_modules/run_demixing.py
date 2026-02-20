@@ -1,20 +1,18 @@
 import matplotlib
 matplotlib.use('agg')
-import matplotlib.pyplot as plt
 
 import allensdk.internal.core.lims_utilities as lu
 from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
 
-import argparse, os, logging, shutil
+import os
+import logging
+import shutil
 import h5py
 import numpy as np
-import shutil
 
 import allensdk.brain_observatory.demixer as demixer
 from allensdk.config.manifest import Manifest
 
-import allensdk.core.json_utilities as ju
-import logging
 
 EXCLUDE_LABELS = ["union", "duplicate", "motion_border",
                   "decrosstalk_ghost",
@@ -123,7 +121,7 @@ def parse_input(data, exclude_labels):
         rid = int(roi["id"])
         try:
             ridx = trace_ids.index(rid)
-        except ValueError as e:
+        except ValueError:
             raise ValueError("Could not find cell roi id %d in roi traces file" % rid)
 
         masks[ridx,:,:] = mask
@@ -195,4 +193,5 @@ def main():
             ))
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
