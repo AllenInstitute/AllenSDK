@@ -28,7 +28,7 @@ def bucket_name_from_url(url: str) -> Optional[str]:
     here
     https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
     """
-    s3_pattern = re.compile('\.s3[\.,a-z,0-9,\-]*\.amazonaws.com')  # noqa: W605, E501
+    s3_pattern = re.compile("\.s3[\.,a-z,0-9,\-]*\.amazonaws.com")  # noqa: W605, E501
     url_params = url_parse.urlparse(url)
     raw_location = url_params.netloc
     s3_match = s3_pattern.search(raw_location)
@@ -37,8 +37,8 @@ def bucket_name_from_url(url: str) -> Optional[str]:
         warnings.warn(f"{s3_pattern} does not occur in url {url}")
         return None
 
-    s3_match = raw_location[s3_match.start():s3_match.end()]
-    return url_params.netloc.replace(s3_match, '')
+    s3_match = raw_location[s3_match.start() : s3_match.end()]
+    return url_params.netloc.replace(s3_match, "")
 
 
 def relative_path_from_url(url: str) -> str:
@@ -81,7 +81,7 @@ def file_hash_from_path(file_path: Union[str, Path]) -> str:
         The file hash (Blake2b; hexadecimal) of the file
     """
     hasher = hashlib.blake2b()
-    with open(file_path, 'rb') as in_file:
+    with open(file_path, "rb") as in_file:
         chunk = in_file.read(1000000)
         while len(chunk) > 0:
             hasher.update(chunk)

@@ -37,7 +37,7 @@ import logging
 
 
 class HocUtils(object):
-    '''A helper class for containing references to NEUORN.
+    """A helper class for containing references to NEUORN.
 
     Attributes
     ----------
@@ -47,7 +47,8 @@ class HocUtils(object):
         The NEURON python object.
     neuron : module
         The NEURON module.
-    '''
+    """
+
     _log = logging.getLogger(__name__)
     h = None
     nrn = None
@@ -65,31 +66,31 @@ class HocUtils(object):
         self.description = description
         self.manifest = description.manifest
 
-        self.hoc_files = description.data['neuron'][0]['hoc']
+        self.hoc_files = description.data["neuron"][0]["hoc"]
 
         self.initialize_hoc()
 
     def initialize_hoc(self):
-        '''Basic setup for NEURON.'''
+        """Basic setup for NEURON."""
         h = self.h
-        params = self.description.data['conditions'][0]
+        params = self.description.data["conditions"][0]
 
         for hoc_file in self.hoc_files:
             HocUtils._log.info("loading hoc file %s" % (hoc_file))
             HocUtils.h.load_file(str(hoc_file))
 
-        h('starttime = startsw()')
+        h("starttime = startsw()")
 
-        if 'celsius' in params:
-            h.celsius = params['celsius']
+        if "celsius" in params:
+            h.celsius = params["celsius"]
 
-        if 'v_init' in params:
-            h.v_init = params['v_init']
+        if "v_init" in params:
+            h.v_init = params["v_init"]
 
-        if 'dt' in params:
-            h.dt = params['dt']
+        if "dt" in params:
+            h.dt = params["dt"]
             h.steps_per_ms = 1.0 / h.dt
 
-        if 'tstop' in params:
-            h.tstop = params['tstop']
+        if "tstop" in params:
+            h.tstop = params["tstop"]
             h.runStopAt = h.tstop

@@ -1,21 +1,18 @@
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class OphysContainerId(DataObject, LimsReadableInterface,
-                       JsonReadableInterface, NwbReadableInterface):
-    """"experiment container id"""
+class OphysContainerId(DataObject, LimsReadableInterface, JsonReadableInterface, NwbReadableInterface):
+    """ "experiment container id"""
+
     def __init__(self, ophys_container_id: int):
-        super().__init__(name='ophys_container_id',
-                         value=ophys_container_id)
+        super().__init__(name="ophys_container_id", value=ophys_container_id)
 
     @classmethod
-    def from_lims(cls, ophys_experiment_id: int,
-                  lims_db: PostgresQueryMixin) -> "ExperimentContainerId":
+    def from_lims(cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin) -> "ExperimentContainerId":
         query = """
                 SELECT visual_behavior_experiment_container_id
                 FROM ophys_experiments_visual_behavior_experiment_containers
@@ -26,12 +23,12 @@ class OphysContainerId(DataObject, LimsReadableInterface,
 
     @classmethod
     def from_json(cls, dict_repr: dict) -> "ExperimentContainerId":
-        return cls(ophys_container_id=dict_repr['container_id'])
+        return cls(ophys_container_id=dict_repr["container_id"])
 
     @classmethod
     def from_nwb(cls, nwbfile: NWBFile) -> "ExperimentContainerId":
         try:
-            metadata = nwbfile.lab_meta_data['metadata']
+            metadata = nwbfile.lab_meta_data["metadata"]
             return cls(ophys_container_id=metadata.ophys_container_id)
         except AttributeError:
             return None

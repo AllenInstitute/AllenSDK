@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 import numpy as np
 
+
 class MorphologyColors(object):
     def __init__(self):
         self.soma = (0, 0, 0)
@@ -24,38 +25,38 @@ class MorphologyColors(object):
 # create empty image
 def create_image(w, h, color=None, alpha=False):
     if alpha:
-        mode = 'RGBA'
+        mode = "RGBA"
     else:
-        mode = 'RGB'
+        mode = "RGB"
     if color is not None:
-        return Image.new(mode, (w,h), color)
+        return Image.new(mode, (w, h), color)
     else:
-        return Image.new(mode, (w,h))
+        return Image.new(mode, (w, h))
 
 
 def calculate_scale(morph, pix_width, pix_height):
-    """ Calculates scaling factor and x,y insets required to auto-scale
-        and center morphology into box with specified numbers of pixels
+    """Calculates scaling factor and x,y insets required to auto-scale
+    and center morphology into box with specified numbers of pixels
 
-        Parameters
-        ----------
+    Parameters
+    ----------
 
-        morph: AISDK Morphology object
+    morph: AISDK Morphology object
 
-        pix_width: int
-        Number of image pixels on X axis
+    pix_width: int
+    Number of image pixels on X axis
 
-        pix_height: int
-        Number of image pixels on Y axis
+    pix_height: int
+    Number of image pixels on Y axis
 
-        Returns
-        -------
-        real, real, real
-        First return value is the scaling factor. Second is the
-        number of pixels needed to adjust x-coordinates so that the
-        morphology is horizontally centered. Third is the number of 
-        pixels needed to adjust the y-coordinates so that the morphology 
-        is vertically centered.
+    Returns
+    -------
+    real, real, real
+    First return value is the scaling factor. Second is the
+    number of pixels needed to adjust x-coordinates so that the
+    morphology is horizontally centered. Third is the number of
+    pixels needed to adjust the y-coordinates so that the morphology
+    is vertically centered.
     """
     dims, low, high = morph.get_dimensions()
     # get boundaries of morphology
@@ -77,75 +78,83 @@ def calculate_scale(morph, pix_width, pix_height):
         v_center = (ylow + yhigh) / 2.0
         scale_inset_x = -low[0] * scale_factor
         # invert y coordinates for conversion to pixel space
-        scale_inset_y = pix_height/2 + scale_factor*v_center
+        scale_inset_y = pix_height / 2 + scale_factor * v_center
     else:
         # image constrained on vertical axis
         scale_factor = vscale
         # center image horizontally
         h_center = (xlow + xhigh) / 2.0
-        scale_inset_x = pix_width/2 - scale_factor*h_center
+        scale_inset_x = pix_width / 2 - scale_factor * h_center
         scale_inset_y = -low[1] * scale_factor
     return scale_factor, scale_inset_x, scale_inset_y
 
 
 # draw morphology on image -- takes image and morphology, modifies image
 #       options: scale to fit | linear scaling
-def draw_morphology(img, morph, 
-        inset_left=0, inset_right=0, inset_top=0, inset_bottom=0, 
-        scale_to_fit=False, scale_factor=1.0, colors=None):
-    """ Draws morphology onto image
-        When no scaling is applied, and no insets are provided, the 
-        coordinates of the morphology are used directly -- i.e., 100 in
-        morphology coordinates is equal to 100 pixels.
+def draw_morphology(
+    img,
+    morph,
+    inset_left=0,
+    inset_right=0,
+    inset_top=0,
+    inset_bottom=0,
+    scale_to_fit=False,
+    scale_factor=1.0,
+    colors=None,
+):
+    """Draws morphology onto image
+    When no scaling is applied, and no insets are provided, the
+    coordinates of the morphology are used directly -- i.e., 100 in
+    morphology coordinates is equal to 100 pixels.
 
-        The scale factor is multiplied to morphology coordinates before
-        being drawn. If scale_factor=2 then 50 in morphology coordinates
-        is 100 pixels. Left and top insets shift the coordinate axes
-        for drawing. E.g., if left=10 and top=5 then 0,0 in morphology
-        coordinates is 10,5 in pixel space. Bottom and right insets are
-        ignored.
-        
-        If scale_to_fit is set then scale factor is ignored. The 
-        morphology is scaled to be the maximum size that fits in
-        the image, taking into account insets. In a 100x100 image, if
-        all insets=10, then the image is scaled to fit into the center
-        80x80 pixel area, and nothing is drawn in the inset border areas.
+    The scale factor is multiplied to morphology coordinates before
+    being drawn. If scale_factor=2 then 50 in morphology coordinates
+    is 100 pixels. Left and top insets shift the coordinate axes
+    for drawing. E.g., if left=10 and top=5 then 0,0 in morphology
+    coordinates is 10,5 in pixel space. Bottom and right insets are
+    ignored.
 
-        Axons are drawn before soma and dendrite compartments.
+    If scale_to_fit is set then scale factor is ignored. The
+    morphology is scaled to be the maximum size that fits in
+    the image, taking into account insets. In a 100x100 image, if
+    all insets=10, then the image is scaled to fit into the center
+    80x80 pixel area, and nothing is drawn in the inset border areas.
+
+    Axons are drawn before soma and dendrite compartments.
 
 
-        Parameters
-        ----------
-        
-        img: PIL image object
+    Parameters
+    ----------
 
-        morph: AISDK Morphology object
+    img: PIL image object
 
-        inset_*: real
-        This is the number of pixels to use as border on top/bottom/
-        right/left. If scale_to_fit is false then only the top/left
-        values are used, as the scale_factor will determine how
-        large the morphology is (it can be drawn beyond insets and even
-        beyond image boundaries)
+    morph: AISDK Morphology object
 
-        scale_to_fit: boolean
-        If true then morphology is scaled to the inset area of the 
-        image and scale_factor is ignored. Morphology is centered
-        in the image in the sense that the top/bottom and left/right
-        edges of the morphology are equidistant from image borders.
+    inset_*: real
+    This is the number of pixels to use as border on top/bottom/
+    right/left. If scale_to_fit is false then only the top/left
+    values are used, as the scale_factor will determine how
+    large the morphology is (it can be drawn beyond insets and even
+    beyond image boundaries)
 
-        scale_factor: real
-        A scalar amount that is multiplied to morphology coordinates
-        before drawing
+    scale_to_fit: boolean
+    If true then morphology is scaled to the inset area of the
+    image and scale_factor is ignored. Morphology is centered
+    in the image in the sense that the top/bottom and left/right
+    edges of the morphology are equidistant from image borders.
 
-        colors: MorphologyColors object
-        This is the color scheme used to draw the morphology. If 
-        colors=None then default coloring is used
+    scale_factor: real
+    A scalar amount that is multiplied to morphology coordinates
+    before drawing
 
-        Returns
-        -------
+    colors: MorphologyColors object
+    This is the color scheme used to draw the morphology. If
+    colors=None then default coloring is used
 
-        2-dimensional array, the pixel coordinates of the soma root [x,y]
+    Returns
+    -------
+
+    2-dimensional array, the pixel coordinates of the soma root [x,y]
     """
     # determine drawing area, scaling factor, offset to origin
     # if scaling to fit, find value that scales morphology so height
@@ -176,21 +185,21 @@ def draw_morphology(img, morph,
     for i in range(3):
         for comp in morph.compartment_list:
             if comp.node2.t == 1:
-                if i != 2: # soma drawn last
+                if i != 2:  # soma drawn last
                     # NOTE: there are unlikely to be soma compartments
                     # additional soma-drawing code is below
                     continue
                 color = colors.soma
             elif comp.node2.t == 2:
-                if i != 0: # axon drawn first
+                if i != 0:  # axon drawn first
                     continue
                 color = colors.axon
             elif comp.node2.t == 3:
-                if i != 1: # dendrite drawn second
+                if i != 1:  # dendrite drawn second
                     continue
                 color = colors.basal
             elif comp.node2.t == 4:
-                if i != 1: # dendrite drawn second
+                if i != 1:  # dendrite drawn second
                     continue
                 color = colors.apical
             x0 = scale_inset_x + inset_left + scale_factor * comp.node1.x
@@ -211,72 +220,72 @@ def draw_morphology(img, morph,
     rad = scale_factor * root.radius
     x0 = int(x - rad)
     y0 = int(y - rad)
-    x1 = int(x0 + 2*rad)
-    y1 = int(y0 + 2*rad)
-    canvas.ellipse((x0,y0,x1,y1), fill=colors.soma, outline=colors.soma)
+    x1 = int(x0 + 2 * rad)
+    y1 = int(y0 + 2 * rad)
+    canvas.ellipse((x0, y0, x1, y1), fill=colors.soma, outline=colors.soma)
 
     # return soma root coordinate, in unit of pixels
     return [x, y]
 
 
-def draw_density_hist(img, morph, vert_scale,
-        inset_left=0, inset_right=0, inset_top=0, inset_bottom=0, 
-        num_bins=None, colors=None):
-    """ Draws density histogram onto image
-        When no scaling is applied, and no insets are provided, the 
-        coordinates of the morphology are used directly -- i.e., 100 in
-        morphology coordinates is equal to 100 pixels.
+def draw_density_hist(
+    img, morph, vert_scale, inset_left=0, inset_right=0, inset_top=0, inset_bottom=0, num_bins=None, colors=None
+):
+    """Draws density histogram onto image
+    When no scaling is applied, and no insets are provided, the
+    coordinates of the morphology are used directly -- i.e., 100 in
+    morphology coordinates is equal to 100 pixels.
 
-        The scale factor is multiplied to morphology coordinates before
-        being drawn. If scale_factor=2 then 50 in morphology coordinates
-        is 100 pixels. Left and top insets shift the coordinate axes
-        for drawing. E.g., if left=10 and top=5 then 0,0 in morphology
-        coordinates is 10,5 in pixel space. Bottom and right insets are
-        ignored.
-        
-        If scale_to_fit is set then scale factor is ignored. The 
-        morphology is scaled to be the maximum size that fits in
-        the image, taking into account insets. In a 100x100 image, if
-        all insets=10, then the image is scaled to fit into the center
-        80x80 pixel area, and nothing is drawn in the inset border areas.
+    The scale factor is multiplied to morphology coordinates before
+    being drawn. If scale_factor=2 then 50 in morphology coordinates
+    is 100 pixels. Left and top insets shift the coordinate axes
+    for drawing. E.g., if left=10 and top=5 then 0,0 in morphology
+    coordinates is 10,5 in pixel space. Bottom and right insets are
+    ignored.
 
-        Axons are drawn before soma and dendrite compartments.
+    If scale_to_fit is set then scale factor is ignored. The
+    morphology is scaled to be the maximum size that fits in
+    the image, taking into account insets. In a 100x100 image, if
+    all insets=10, then the image is scaled to fit into the center
+    80x80 pixel area, and nothing is drawn in the inset border areas.
+
+    Axons are drawn before soma and dendrite compartments.
 
 
-        Parameters
-        ----------
-        
-        img: PIL image object
+    Parameters
+    ----------
 
-        morph: AISDK Morphology object
+    img: PIL image object
 
-        vert_scale: real
-        This is the amout required to multiply to a moprhology
-        y-coordinate to convert it to relative cortical depth (on [0,1]).
-        This is the inverse of the cortical thickness.
+    morph: AISDK Morphology object
 
-        inset_*: real
-        This is the number of pixels to use as border on top/bottom/
-        right/left. If scale_to_fit is false then only the top/left
-        values are used, as the scale_factor will determine how
-        large the morphology is (it can be drawn beyond insets and even
-        beyond image boundaries)
+    vert_scale: real
+    This is the amout required to multiply to a moprhology
+    y-coordinate to convert it to relative cortical depth (on [0,1]).
+    This is the inverse of the cortical thickness.
 
-        num_bins: int
-        The number of bins in the histogram
+    inset_*: real
+    This is the number of pixels to use as border on top/bottom/
+    right/left. If scale_to_fit is false then only the top/left
+    values are used, as the scale_factor will determine how
+    large the morphology is (it can be drawn beyond insets and even
+    beyond image boundaries)
 
-        colors: MorphologyColors object
-        This is the color scheme used to draw the morphology. If 
-        colors=None then default coloring is used
+    num_bins: int
+    The number of bins in the histogram
 
-        Returns
-        -------
+    colors: MorphologyColors object
+    This is the color scheme used to draw the morphology. If
+    colors=None then default coloring is used
 
-        Histogram arrays: [hist, hist2, hist3, hist4]
-        where hist is the histgram of all neurites, and hist[234] are
-        the histograms of SWC types 2,3,4
+    Returns
+    -------
+
+    Histogram arrays: [hist, hist2, hist3, hist4]
+    where hist is the histgram of all neurites, and hist[234] are
+    the histograms of SWC types 2,3,4
     """
-    # if number of bins not specified, default to vertical size of 
+    # if number of bins not specified, default to vertical size of
     #   drawing area in image
     img_width, img_height = img.size
     draw_width = img_width - (inset_left + inset_right)
@@ -298,14 +307,14 @@ def draw_density_hist(img, morph, vert_scale,
 
     canvas = ImageDraw.Draw(img)
 
-    # for each compartment, split its length (weight) between bins for 
+    # for each compartment, split its length (weight) between bins for
     #   start and end nodes
     for seg in morph.compartment_list:
         wt = seg.length / 2.0
         # node 1
         bin1 = int(-vert_scale * seg.node1.y * num_bins)
         if bin1 == num_bins:
-            bin1 = num_bins-1
+            bin1 = num_bins - 1
         # only include parts of the histogram that are in the viewable
         #   range (ie, exclude parts that extend to pia and/or wm)
         if bin1 >= 0 and bin1 < num_bins:
@@ -319,7 +328,7 @@ def draw_density_hist(img, morph, vert_scale,
         # node 2
         bin2 = int(-vert_scale * seg.node1.y * num_bins)
         if bin2 == num_bins:
-            bin2 = num_bins-1
+            bin2 = num_bins - 1
         if bin2 >= 0 and bin2 < num_bins:
             if seg.node2.t == 2:
                 hist_2[bin2] += wt
@@ -334,11 +343,11 @@ def draw_density_hist(img, morph, vert_scale,
     x0 = inset_left
     x1 = x0
     y0 = inset_top
-    y1 = img_height-inset_bottom
+    y1 = img_height - inset_bottom
     canvas.line((x0, y0, x1, y1), col)
 
     hist_step = 1.0 * draw_height / num_bins
-    hist_scale = (draw_width-1) / hist.max()
+    hist_scale = (draw_width - 1) / hist.max()
     for seg in morph.compartment_list:
         ypos = 1.0 * inset_top
         for i in range(num_bins):
@@ -369,11 +378,12 @@ def draw_density_hist(img, morph, vert_scale,
 
     return hist, hist_2, hist_3, hist_4
 
+
 # TODO
 # draw path on image -- takes image and path, modifies image
-#def draw_path(img, path, color):
-    # path is in units of pixels
-    # foreach vertex, draw line in specified color
+# def draw_path(img, path, color):
+# path is in units of pixels
+# foreach vertex, draw line in specified color
 
 # refine section boundaries -- takes labeled regions and generates labeled mask
 # -> need constraints on input. lookup of points is easy. categorizing
@@ -381,5 +391,3 @@ def draw_density_hist(img, morph, vert_scale,
 
 # label morphology -- takes morpholgoy and labeled mask and adds lables
 #   to each compartment
-
-

@@ -9,20 +9,14 @@ from allensdk.core import DataObject, NwbReadableInterface
 from pynwb import NWBFile
 
 
-class BehaviorSessionUUID(
-    DataObject, StimulusFileReadableInterface, NwbReadableInterface
-):
+class BehaviorSessionUUID(DataObject, StimulusFileReadableInterface, NwbReadableInterface):
     """the universally unique identifier (UUID)"""
 
     def __init__(self, behavior_session_uuid: Optional[uuid.UUID]):
-        super().__init__(
-            name="behavior_session_uuid", value=behavior_session_uuid
-        )
+        super().__init__(name="behavior_session_uuid", value=behavior_session_uuid)
 
     @classmethod
-    def from_stimulus_file(
-        cls, stimulus_file: BehaviorStimulusFile
-    ) -> "BehaviorSessionUUID":
+    def from_stimulus_file(cls, stimulus_file: BehaviorStimulusFile) -> "BehaviorSessionUUID":
         bs_uuid = stimulus_file.behavior_session_uuid
         return cls(behavior_session_uuid=bs_uuid)
 
@@ -30,11 +24,7 @@ class BehaviorSessionUUID(
     def from_nwb(cls, nwbfile: NWBFile) -> "BehaviorSessionUUID":
         metadata = nwbfile.lab_meta_data["metadata"]
         behavior_session_uuid = metadata.behavior_session_uuid
-        behavior_session_uuid = (
-            uuid.UUID(behavior_session_uuid)
-            if behavior_session_uuid != "None"
-            else None
-        )
+        behavior_session_uuid = uuid.UUID(behavior_session_uuid) if behavior_session_uuid != "None" else None
         return cls(behavior_session_uuid=behavior_session_uuid)
 
     def validate(

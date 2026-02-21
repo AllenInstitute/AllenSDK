@@ -16,20 +16,31 @@ def test_windows_path_to_isilon(monkeypatch, tmpdir):
 
     cache_dir = Path(tmpdir)
 
-    manifest_1 = {'manifest_version': '1',
-                  'metadata_file_id_column_name': 'file_id',
-                  'data_pipeline': 'placeholder',
-                  'project_name': 'my-project',
-                  'metadata_files': {'a.csv': {'url': 'http://www.junk.com/path/to/a.csv',  # noqa: E501
-                                               'version_id': '1111',
-                                               'file_hash': 'abcde'},
-                                     'b.csv': {'url': 'http://silly.com/path/to/b.csv',  # noqa: E501
-                                               'version_id': '2222',
-                                               'file_hash': 'fghijk'}},
-                  'data_files': {'data_1': {'url': 'http://www.junk.com/data/path/data.csv',  # noqa: E501
-                                            'version_id': '1111',
-                                            'file_hash': 'lmnopqrst'}}
-                  }
+    manifest_1 = {
+        "manifest_version": "1",
+        "metadata_file_id_column_name": "file_id",
+        "data_pipeline": "placeholder",
+        "project_name": "my-project",
+        "metadata_files": {
+            "a.csv": {
+                "url": "http://www.junk.com/path/to/a.csv",  # noqa: E501
+                "version_id": "1111",
+                "file_hash": "abcde",
+            },
+            "b.csv": {
+                "url": "http://silly.com/path/to/b.csv",  # noqa: E501
+                "version_id": "2222",
+                "file_hash": "fghijk",
+            },
+        },
+        "data_files": {
+            "data_1": {
+                "url": "http://www.junk.com/data/path/data.csv",  # noqa: E501
+                "version_id": "1111",
+                "file_hash": "lmnopqrst",
+            }
+        },
+    }
     manifest_path = tmpdir / "manifest.json"
     with open(manifest_path, "w") as f:
         json.dump(manifest_1, f)
@@ -39,15 +50,15 @@ def test_windows_path_to_isilon(monkeypatch, tmpdir):
 
     # we do not want paths to `/allen` to be resolved to
     # a local drive on the user's machine
-    bad_windows_pattern = re.compile('^[A-Z]\:')  # noqa: W605
+    bad_windows_pattern = re.compile("^[A-Z]\:")  # noqa: W605
 
     # make sure pattern is correctly formulated
-    m = bad_windows_pattern.search('C:\\a\windows\path')  # noqa: W605
+    m = bad_windows_pattern.search("C:\\a\windows\path")  # noqa: W605
     assert m is not None
 
     with monkeypatch.context() as ctx:
-        class TestCloudCache(CloudCacheBase):
 
+        class TestCloudCache(CloudCacheBase):
             def _download_file(self, m, o):
                 pass
 
@@ -57,14 +68,12 @@ def test_windows_path_to_isilon(monkeypatch, tmpdir):
             def _list_all_manifests(self):
                 pass
 
-        ctx.setattr(TestCloudCache,
-                    '_file_exists',
-                    dummy_file_exists)
+        ctx.setattr(TestCloudCache, "_file_exists", dummy_file_exists)
 
-        cache = TestCloudCache(cache_dir, 'proj')
+        cache = TestCloudCache(cache_dir, "proj")
         cache._manifest = Manifest(cache_dir, json_input=manifest_path)
 
-        m_path = cache.metadata_path('a.csv')
+        m_path = cache.metadata_path("a.csv")
         assert bad_windows_pattern.match(str(m_path)) is None
-        d_path = cache.data_path('data_1')
+        d_path = cache.data_path("data_1")
         assert bad_windows_pattern.match(str(d_path)) is None

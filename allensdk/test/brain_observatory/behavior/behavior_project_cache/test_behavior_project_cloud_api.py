@@ -35,12 +35,8 @@ class MockCache:
 
         ophys_session_table.to_csv(self.session_table_path, index=False)
         ophys_cells_table.to_csv(self.ophys_cells_table_path, index=False)
-        behavior_session_table.to_csv(
-            self.behavior_session_table_path, index=False
-        )
-        ophys_experiment_table.to_csv(
-            self.ophys_experiment_table_path, index=False
-        )
+        behavior_session_table.to_csv(self.behavior_session_table_path, index=False)
+        ophys_experiment_table.to_csv(self.ophys_experiment_table_path, index=False)
 
         self._manifest = MagicMock()
         self._manifest.metadata_file_names = [
@@ -109,8 +105,7 @@ def mock_cache(request, tmpdir):
             ),
             "ophys_session_table": pd.DataFrame(
                 {
-                    "ophys_session_id": pd.Series([10, 11, 12, 13],
-                                                  dtype='Int64'),
+                    "ophys_session_id": pd.Series([10, 11, 12, 13], dtype="Int64"),
                     "mouse_id": ["1"] * 4,
                     "date_of_acquisition": pd.to_datetime(["2021-01-01"] * 4),
                     "ophys_experiment_id": [4, 5, 6, [7, 8, 9]],
@@ -120,9 +115,7 @@ def mock_cache(request, tmpdir):
                 {
                     "ophys_experiment_id": [4, 5, 6, 7, 8, 9],
                     "mouse_id": ["1"] * 6,
-                    "date_of_acquisition": pd.to_datetime(
-                        ["2021-01-01"] * 6, utc=True
-                    ),
+                    "date_of_acquisition": pd.to_datetime(["2021-01-01"] * 6, utc=True),
                     "file_id": [4, 5, 6, 7, 8, 9],
                 }
             ),
@@ -140,13 +133,9 @@ def mock_cache(request, tmpdir):
 @pytest.mark.parametrize("local", [True, False])
 def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     mocked_cache, expected = mock_cache
-    api = cloudapi.BehaviorProjectCloudApi(
-        mocked_cache, skip_version_check=True, local=False
-    )
+    api = cloudapi.BehaviorProjectCloudApi(mocked_cache, skip_version_check=True, local=False)
     if local:
-        api = cloudapi.BehaviorProjectCloudApi(
-            mocked_cache, skip_version_check=True, local=True
-        )
+        api = cloudapi.BehaviorProjectCloudApi(mocked_cache, skip_version_check=True, local=True)
 
     # behavior session table as expected
     bost = api.get_behavior_session_table()
@@ -184,9 +173,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
     assert api.get_behavior_session(4) == "7"
 
     # direct check only for ophys experiment
-    monkeypatch.setattr(
-        cloudapi.BehaviorOphysExperiment, "from_nwb_path", mock_nwb
-    )
+    monkeypatch.setattr(cloudapi.BehaviorOphysExperiment, "from_nwb_path", mock_nwb)
     assert api.get_behavior_ophys_experiment(8) == "8"
 
 
@@ -197,9 +184,7 @@ def test_BehaviorProjectCloudApi(mock_cache, monkeypatch, local):
         ("1.0.1", "2.9.0", "0.0.0", "1.0.0", True),
     ],
 )
-def test_version_check(
-    manifest_version, data_pipeline_version, cmin, cmax, exception
-):
+def test_version_check(manifest_version, data_pipeline_version, cmin, cmax, exception):
     if exception:
         with pytest.raises(
             BehaviorCloudCacheVersionException,
@@ -225,9 +210,7 @@ def test_from_local_cache(monkeypatch):
             "comment": "This is a test entry. NOT REAL.",
         }
     ]
-    mock_manifest.version = (
-        cloudapi.BehaviorProjectCloudApi.MANIFEST_COMPATIBILITY[0]
-    )
+    mock_manifest.version = cloudapi.BehaviorProjectCloudApi.MANIFEST_COMPATIBILITY[0]
 
     mock_local_cache = create_autospec(cloudapibase.LocalCache)
     type(mock_local_cache.return_value)._manifest = mock_manifest
@@ -252,9 +235,7 @@ def test_from_local_cache(monkeypatch):
         except (TypeError, FileNotFoundError):
             pass
 
-        mock_local_cache.assert_called_once_with(
-            "first_cache_dir", "project_1", "ui_1"
-        )
+        mock_local_cache.assert_called_once_with("first_cache_dir", "project_1", "ui_1")
 
         # Test from_local_cache with use_static_cache=True
         try:
@@ -269,6 +250,4 @@ def test_from_local_cache(monkeypatch):
         except (TypeError, FileNotFoundError):
             pass
 
-        mock_static_local_cache.assert_called_once_with(
-            "second_cache_dir", "project_2", "ui_2"
-        )
+        mock_static_local_cache.assert_called_once_with("second_cache_dir", "project_2", "ui_2")

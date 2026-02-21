@@ -14,9 +14,9 @@ class DataObject(abc.ABC):
     data sources and sinks (e.g. LIMS, JSON, NWB).
     """
 
-    def __init__(self, name: str, value: Any,
-                 exclude_from_equals: Optional[Set[str]] = None,
-                 is_value_self: bool = False):
+    def __init__(
+        self, name: str, value: Any, exclude_from_equals: Optional[Set[str]] = None, is_value_self: bool = False
+    ):
         """
         :param name
             Name
@@ -31,10 +31,9 @@ class DataObject(abc.ABC):
             array or dataframe
         """
         if value is self:
-            raise ValueError('Passing value of self is not supported')
+            raise ValueError("Passing value of self is not supported")
         if is_value_self and value is not None:
-            raise ValueError('If passing is_value_self=True, then value '
-                             'should be None')
+            raise ValueError("If passing is_value_self=True, then value should be None")
         self._name = name
         self._value = value
         self._is_value_self = is_value_self
@@ -107,7 +106,7 @@ class DataObject(abc.ABC):
                             # skip properties that return self
                             # (leads to infinite recursion)
                             continue
-                        if name == 'name':
+                        if name == "name":
                             # The name is the key
                             continue
 
@@ -119,6 +118,7 @@ class DataObject(abc.ABC):
                             pass
                         properties.append((name, value, newpath))
                     return properties
+
                 properties = _get_keys_and_values(base_value=value)
 
                 # Find the nested dict
@@ -126,8 +126,7 @@ class DataObject(abc.ABC):
                 for p in path:
                     cur = cur[p]
 
-                if isinstance(value._value, DataObject) or \
-                        value._is_value_self:
+                if isinstance(value._value, DataObject) or value._is_value_self:
                     # it's nested
                     cur[value._name] = dict()
                     for p in properties:
@@ -150,14 +149,16 @@ class DataObject(abc.ABC):
 
     def _get_properties(self):
         """Returns all property names and values"""
+
         def is_prop(attr):
             return isinstance(getattr(type(self), attr, None), property)
+
         props = [attr for attr in dir(self) if is_prop(attr)]
         return {name: getattr(self, name) for name in props}
 
     def __eq__(self, other: "DataObject"):
-        if type(self) != type(other):
-            msg = f'Do not know how to compare with type {type(other)}'
+        if type(self) != type(other):  # noqa: E721
+            msg = f"Do not know how to compare with type {type(other)}"
             raise NotImplementedError(msg)
 
         d_self = self.to_dict()
@@ -170,8 +171,7 @@ class DataObject(abc.ABC):
             x2 = d_other[p]
 
             try:
-                compare_fields(x1=x1, x2=x2,
-                               ignore_keys=self._exclude_from_equals)
+                compare_fields(x1=x1, x2=x2, ignore_keys=self._exclude_from_equals)
             except AssertionError:
                 return False
         return True

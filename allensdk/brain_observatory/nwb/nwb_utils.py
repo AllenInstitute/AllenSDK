@@ -45,10 +45,7 @@ def get_column_name(table_cols: list, possible_names: set) -> str:
     column_set = set(table_cols)
     column_names = list(column_set.intersection(possible_names))
     if not len(column_names) == 1:
-        raise KeyError(
-            "Table expected one name column in intersection, found:"
-            f" {column_names}"
-        )
+        raise KeyError(f"Table expected one name column in intersection, found: {column_names}")
     return column_names[0]
 
 
@@ -93,9 +90,7 @@ def add_image_to_nwb(nwbfile: NWBFile, image_data: Image, image_name: str):
     else:
         ophys_mod = nwbfile.processing[module_name]
 
-    image = GrayscaleImage(
-        image_name, data, resolution=spacing[0] / 10, description=description
-    )
+    image = GrayscaleImage(image_name, data, resolution=spacing[0] / 10, description=description)
 
     if "images" not in ophys_mod.containers:
         images = Images(name="images")
@@ -112,9 +107,7 @@ class NWBWriter:
         self,
         nwb_filepath: str,
         session_data: dict,
-        serializer: Union[
-            JsonReadableInterface, NwbReadableInterface, NwbWritableInterface
-        ],
+        serializer: Union[JsonReadableInterface, NwbReadableInterface, NwbWritableInterface],
     ):
         """
 
@@ -174,13 +167,9 @@ class NWBWriter:
 
         """
         from_lims_kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.from_lims).parameters
+            k: v for k, v in kwargs.items() if k in inspect.signature(self._serializer.from_lims).parameters
         }
-        lims_session = self._serializer.from_lims(
-            self._session_data[id_column_name], **from_lims_kwargs
-        )
+        lims_session = self._serializer.from_lims(self._session_data[id_column_name], **from_lims_kwargs)
         lims_session = self._update_session(lims_session, **kwargs)
 
         try:
@@ -195,20 +184,14 @@ class NWBWriter:
                 input_session=lims_session,
                 skip_stim=skip_stim,
             )
-            self._compare_sessions(
-                nwbfile=nwbfile, loaded_session=lims_session, **kwargs
-            )
+            self._compare_sessions(nwbfile=nwbfile, loaded_session=lims_session, **kwargs)
             os.rename(self.nwb_filepath_inprogress, self._nwb_filepath)
         except Exception as e:
             if os.path.isfile(self.nwb_filepath_inprogress):
-                os.rename(
-                    self.nwb_filepath_inprogress, self._nwb_filepath_error
-                )
+                os.rename(self.nwb_filepath_inprogress, self._nwb_filepath_error)
             raise e
 
-    def _update_session(
-        self, lims_session: BehaviorSession, **kwargs
-    ) -> BehaviorSession:
+    def _update_session(self, lims_session: BehaviorSession, **kwargs) -> BehaviorSession:
         """Call session methods to update certain values within the session.
 
         Should be used as part of a datarelease to resolve known data issues.
@@ -227,11 +210,7 @@ class NWBWriter:
         -------
 
         """
-        to_nwb_kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.to_nwb).parameters
-        }
+        to_nwb_kwargs = {k: v for k, v in kwargs.items() if k in inspect.signature(self._serializer.to_nwb).parameters}
         nwbfile = session.to_nwb(**to_nwb_kwargs)
 
         with NWBHDF5IO(self.nwb_filepath_inprogress, "w") as nwb_file_writer:
@@ -299,12 +278,8 @@ class NWBWriter:
             skip_stim = []
         error_message = ""
         behavior_session_id = input_session.behavior_session_id
-        db_conn = db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        )
-        stimulus_file = BehaviorStimulusFile.from_lims(
-            db=db_conn, behavior_session_id=behavior_session_id
-        ).validate()
+        db_conn = db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP)
+        stimulus_file = BehaviorStimulusFile.from_lims(db=db_conn, behavior_session_id=behavior_session_id).validate()
         stim_file_methods = dir(stimulus_file)
         for key, bs_val in input_session.metadata.items():
             if key in skip_stim:
@@ -325,13 +300,7 @@ class NWBWriter:
         if len(error_message) > 0:
             raise ValueError(error_message)
 
-    def _compare_sessions(
-        self, nwbfile: NWBFile, loaded_session: DataObject, **kwargs
-    ):
-        kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if k in inspect.signature(self._serializer.from_nwb).parameters
-        }
+    def _compare_sessions(self, nwbfile: NWBFile, loaded_session: DataObject, **kwargs):
+        kwargs = {k: v for k, v in kwargs.items() if k in inspect.signature(self._serializer.from_nwb).parameters}
         nwb_session = self._serializer.from_nwb(nwbfile, **kwargs)
         assert sessions_are_equal(loaded_session, nwb_session, reraise=True)

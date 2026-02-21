@@ -40,7 +40,6 @@ import pytest
 from allensdk.api.queries.mouse_atlas_api import MouseAtlasApi as MAA
 
 
-
 @pytest.fixture
 def atlas():
     maa = MAA()
@@ -49,55 +48,51 @@ def atlas():
 
 @patch.object(MAA, "json_msg_query")
 def test_get_genes(mock_query, atlas):
-
-    expected = 'http://api.brain-map.org/api/v2/data/query.json?'\
-               'q=model::Gene,rma::criteria,[organism_id$in2],rma::include,chromosome,'\
-               'rma::options[num_rows$eq2000][start_row$eq0][order$eq\'id\'][count$eqfalse]'
+    expected = (
+        "http://api.brain-map.org/api/v2/data/query.json?"
+        "q=model::Gene,rma::criteria,[organism_id$in2],rma::include,chromosome,"
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'id'][count$eqfalse]"
+    )
 
     for result in atlas.get_genes():
         pass
-    
+
     mock_query.assert_called_once_with(expected)
 
 
 @patch.object(MAA, "json_msg_query")
 def test_get_section_data_sets(mock_query, atlas):
-
-    expected = 'http://api.brain-map.org/api/v2/data/query.json?'\
-               'q=model::SectionDataSet,rma::criteria,products[id$in1],rma::include,genes,'\
-               'rma::options[num_rows$eq2000][start_row$eq0][order$eq\'id\'][count$eqfalse]'
+    expected = (
+        "http://api.brain-map.org/api/v2/data/query.json?"
+        "q=model::SectionDataSet,rma::criteria,products[id$in1],rma::include,genes,"
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq'id'][count$eqfalse]"
+    )
 
     for result in atlas.get_section_data_sets():
         pass
-    
+
     mock_query.assert_called_once_with(expected)
 
 
 def test_download_expression_density(atlas):
-    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+    with patch("allensdk.api.api.Api.retrieve_file_over_http") as gda:
         with pytest.raises(RuntimeError):
-            atlas.download_expression_density('file.name', 12345)
+            atlas.download_expression_density("file.name", 12345)
 
-            gda.assert_called_once_with(
-                'http://api.brain-map.org/grid_data/download/'\
-                '12345?include=density')
-                
+            gda.assert_called_once_with("http://api.brain-map.org/grid_data/download/12345?include=density")
+
 
 def test_download_expression_intensity(atlas):
-    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+    with patch("allensdk.api.api.Api.retrieve_file_over_http") as gda:
         with pytest.raises(RuntimeError):
-            atlas.download_expression_intensity('file.name', 12345)
+            atlas.download_expression_intensity("file.name", 12345)
 
-            gda.assert_called_once_with(
-                'http://api.brain-map.org/grid_data/download/'\
-                '12345?include=intensity')
+            gda.assert_called_once_with("http://api.brain-map.org/grid_data/download/12345?include=intensity")
 
 
 def test_download_expression_energy(atlas):
-    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+    with patch("allensdk.api.api.Api.retrieve_file_over_http") as gda:
         with pytest.raises(RuntimeError):
-            atlas.download_expression_energy('file.name', 12345)
+            atlas.download_expression_energy("file.name", 12345)
 
-            gda.assert_called_once_with(
-                'http://api.brain-map.org/grid_data/download/'\
-                '12345?include=energy')
+            gda.assert_called_once_with("http://api.brain-map.org/grid_data/download/12345?include=energy")

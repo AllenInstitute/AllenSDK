@@ -46,9 +46,7 @@ class OphysExperimentMetadata(
         targeted_imaging_depth: TargetedImagingDepth,
         project_code: OphysProjectCode = OphysProjectCode(),
     ):
-        super().__init__(
-            name="ophys_experiment_metadata", value=None, is_value_self=True
-        )
+        super().__init__(name="ophys_experiment_metadata", value=None, is_value_self=True)
         self._ophys_experiment_id = ophys_experiment_id
         self._ophys_session_id = ophys_session_id
         self._ophys_container_id = ophys_container_id
@@ -58,27 +56,15 @@ class OphysExperimentMetadata(
         self._project_code = project_code
 
     @classmethod
-    def from_lims(
-        cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin
-    ) -> "OphysExperimentMetadata":
-        ophys_session_id = OphysSessionId.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
-        ophys_container_id = OphysContainerId.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
-        field_of_view_shape = FieldOfViewShape.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
-        imaging_depth = ImagingDepth.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
+    def from_lims(cls, ophys_experiment_id: int, lims_db: PostgresQueryMixin) -> "OphysExperimentMetadata":
+        ophys_session_id = OphysSessionId.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        ophys_container_id = OphysContainerId.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        field_of_view_shape = FieldOfViewShape.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
+        imaging_depth = ImagingDepth.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
         targeted_imaging_depth = TargetedImagingDepth.from_lims(
             ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
         )
-        project_code = OphysProjectCode.from_lims(
-            ophys_experiment_id=ophys_experiment_id, lims_db=lims_db
-        )
+        project_code = OphysProjectCode.from_lims(ophys_experiment_id=ophys_experiment_id, lims_db=lims_db)
 
         return cls(
             ophys_experiment_id=ophys_experiment_id,
@@ -97,9 +83,7 @@ class OphysExperimentMetadata(
         ophys_experiment_id = dict_repr["ophys_experiment_id"]
         field_of_view_shape = FieldOfViewShape.from_json(dict_repr=dict_repr)
         imaging_depth = ImagingDepth.from_json(dict_repr=dict_repr)
-        targeted_imaging_depth = TargetedImagingDepth.from_json(
-            dict_repr=dict_repr
-        )
+        targeted_imaging_depth = TargetedImagingDepth.from_json(dict_repr=dict_repr)
 
         return OphysExperimentMetadata(
             ophys_experiment_id=ophys_experiment_id,
@@ -155,9 +139,7 @@ class OphysExperimentMetadata(
             return None
         return self._targeted_imaging_depth.value
 
-    def update_targeted_imaging_depth(
-        self, ophys_experiment_ids: List[int], lims_db: PostgresQueryMixin
-    ):
+    def update_targeted_imaging_depth(self, ophys_experiment_ids: List[int], lims_db: PostgresQueryMixin):
         """Update the value for targeted imaging depth given a set of
         experiments to be published.
 

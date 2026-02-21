@@ -67,13 +67,8 @@ class BehaviorMetaTestCase:
             sex=Sex(sex="M"),
             age=Age(age=139),
             reporter_line=ReporterLine(reporter_line="Ai93(TITL-GCaMP6f)"),
-            full_genotype=FullGenotype(
-                full_genotype="Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;"
-                "Ai93(TITL-GCaMP6f)/wt"
-            ),
-            driver_line=DriverLine(
-                driver_line=["Camk2a-tTA", "Slc17a7-IRES2-Cre"]
-            ),
+            full_genotype=FullGenotype(full_genotype="Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt"),
+            driver_line=DriverLine(driver_line=["Camk2a-tTA", "Slc17a7-IRES2-Cre"]),
             mouse_id=MouseId(mouse_id="416369"),
         )
         behavior_meta = BehaviorMetadata(
@@ -82,12 +77,8 @@ class BehaviorMetaTestCase:
             equipment=Equipment(equipment_name="my_device"),
             stimulus_frame_rate=StimulusFrameRate(stimulus_frame_rate=60.0),
             session_type=SessionType(session_type="Unknown"),
-            behavior_session_uuid=BehaviorSessionUUID(
-                behavior_session_uuid=uuid.uuid4()
-            ),
-            date_of_acquisition=DateOfAcquisition(
-                datetime.datetime(2022, 8, 24, 12, 35)
-            ),
+            behavior_session_uuid=BehaviorSessionUUID(behavior_session_uuid=uuid.uuid4()),
+            date_of_acquisition=DateOfAcquisition(datetime.datetime(2022, 8, 24, 12, 35)),
             project_code=ProjectCode("1234"),
         )
         return behavior_meta
@@ -98,22 +89,16 @@ class TestLims(LimsTest):
     def test_behavior_session_uuid(self):
         behavior_session_id = 823847007
         meta = BehaviorMetadata.from_lims(
-            behavior_session_id=BehaviorSessionId(
-                behavior_session_id=behavior_session_id
-            ),
+            behavior_session_id=BehaviorSessionId(behavior_session_id=behavior_session_id),
             lims_db=self.dbconn,
         )
-        assert meta.behavior_session_uuid == uuid.UUID(
-            "394a910e-94c7-4472-9838-5345aff59ed8"
-        )
+        assert meta.behavior_session_uuid == uuid.UUID("394a910e-94c7-4472-9838-5345aff59ed8")
 
 
 class TestBehaviorMetadata(BehaviorMetaTestCase):
     def test_cre_line(self):
         """Tests that cre_line properly parsed from driver_line"""
-        fg = FullGenotype(
-            full_genotype="Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt"
-        )
+        fg = FullGenotype(full_genotype="Sst-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt")
         assert fg.parse_cre_line() == "Sst-IRES-Cre"
 
     def test_cre_line_bad_full_genotype(self):
@@ -123,10 +108,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         with pytest.warns(UserWarning) as record:
             cre_line = fg.parse_cre_line(warn=True)
         assert cre_line is None
-        assert (
-            str(record[0].message) == "Unable to parse cre_line from "
-            "full_genotype"
-        )
+        assert str(record[0].message) == "Unable to parse cre_line from full_genotype"
 
     def test_cre_line_full_genotype_is_none(self):
         """Test that cre_line is None and no error raised"""
@@ -135,10 +117,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         with pytest.warns(UserWarning) as record:
             cre_line = fg.parse_cre_line(warn=True)
         assert cre_line is None
-        assert (
-            str(record[0].message) == "Unable to parse cre_line from "
-            "full_genotype"
-        )
+        assert str(record[0].message) == "Unable to parse cre_line from full_genotype"
 
     def test_reporter_line(self):
         """Test that reporter line properly parsed from list"""
@@ -155,21 +134,17 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         (
             (
                 ("foo", "bar"),
-                "More than 1 reporter line. " "Returning the first one",
+                "More than 1 reporter line. Returning the first one",
                 "foo",
             ),
             (None, "Error parsing reporter line. It is null.", None),
             ([], "Error parsing reporter line. The array is empty", None),
         ),
     )
-    def test_reporter_edge_cases(
-        self, input_reporter_line, warning_msg, expected
-    ):
+    def test_reporter_edge_cases(self, input_reporter_line, warning_msg, expected):
         """Test reporter line edge cases"""
         with pytest.warns(UserWarning) as record:
-            reporter_line = ReporterLine.parse(
-                reporter_line=input_reporter_line, warn=True
-            )
+            reporter_line = ReporterLine.parse(reporter_line=input_reporter_line, warn=True)
         assert reporter_line == expected
         assert str(record[0].message) == warning_msg
 
@@ -183,21 +158,17 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         (
             (
                 "unkown",
-                "Could not parse numeric age from age code "
-                '(age code does not start with "P")',
+                'Could not parse numeric age from age code (age code does not start with "P")',
                 None,
             ),
             (
                 "P",
-                "Could not parse numeric age from age code "
-                "(no numeric values found in age code)",
+                "Could not parse numeric age from age code (no numeric values found in age code)",
                 None,
             ),
         ),
     )
-    def test_age_in_days_edge_cases(
-        self, monkeypatch, input_age, warning_msg, expected
-    ):
+    def test_age_in_days_edge_cases(self, monkeypatch, input_age, warning_msg, expected):
         """Test age in days edge cases"""
         with pytest.warns(UserWarning) as record:
             age_in_days = Age._age_code_to_days(age=input_age, warn=True)
@@ -211,12 +182,8 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             # Vanilla test case
             (
                 {
-                    "extractor_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
-                    "pkl_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    "extractor_expt_date": datetime.datetime.strptime("2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"),
+                    "pkl_expt_date": datetime.datetime.strptime("2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"),
                     "behavior_session_id": 1,
                 },
                 None,
@@ -224,9 +191,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             # pkl expt date stored in unix format
             (
                 {
-                    "extractor_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    "extractor_expt_date": datetime.datetime.strptime("2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"),
                     "pkl_expt_date": 1615716855.0,
                     "behavior_session_id": 2,
                 },
@@ -235,12 +200,8 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             # Extractor and pkl dates differ significantly
             (
                 {
-                    "extractor_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
-                    "pkl_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 20:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    "extractor_expt_date": datetime.datetime.strptime("2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"),
+                    "pkl_expt_date": datetime.datetime.strptime("2021-03-14 20:14:15", "%Y-%m-%d %H:%M:%S"),
                     "behavior_session_id": 3,
                 },
                 "The `date_of_acquisition` field in LIMS *",
@@ -248,9 +209,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             # pkl file contains an unparseable datetime
             (
                 {
-                    "extractor_expt_date": datetime.datetime.strptime(
-                        "2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    "extractor_expt_date": datetime.datetime.strptime("2021-03-14 03:14:15", "%Y-%m-%d %H:%M:%S"),
                     "pkl_expt_date": None,
                     "behavior_session_id": 4,
                 },
@@ -258,9 +217,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             ),
         ],
     )
-    def test_get_date_of_acquisition(
-        self, tmp_path, test_params, expected_warn_msg
-    ):
+    def test_get_date_of_acquisition(self, tmp_path, test_params, expected_warn_msg):
         mock_session_id = test_params["behavior_session_id"]
 
         pkl_save_path = tmp_path / f"mock_pkl_{mock_session_id}.pkl"
@@ -268,9 +225,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             pickle.dump({"start_time": test_params["pkl_expt_date"]}, handle)
 
         tz = pytz.timezone("America/Los_Angeles")
-        extractor_expt_date = tz.localize(
-            test_params["extractor_expt_date"]
-        ).astimezone(pytz.utc)
+        extractor_expt_date = tz.localize(test_params["extractor_expt_date"]).astimezone(pytz.utc)
 
         stimulus_file = BehaviorStimulusFile(filepath=pkl_save_path)
         obt_date = DateOfAcquisition(date_of_acquisition=extractor_expt_date)
@@ -286,9 +241,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
 
     def test_indicator(self):
         """Test that indicator is parsed from full_genotype"""
-        reporter_line = ReporterLine(
-            reporter_line="Ai148(TIT2L-GC6f-ICL-tTA2)"
-        )
+        reporter_line = ReporterLine(reporter_line="Ai148(TIT2L-GC6f-ICL-tTA2)")
         assert reporter_line.parse_indicator() == "GCaMP6f"
 
     @pytest.mark.parametrize(
@@ -296,8 +249,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
         (
             (
                 None,
-                "Could not parse indicator from reporter because there is no "
-                "reporter",
+                "Could not parse indicator from reporter because there is no reporter",
                 None,
             ),
             (
@@ -308,9 +260,7 @@ class TestBehaviorMetadata(BehaviorMetaTestCase):
             ),
         ),
     )
-    def test_indicator_edge_cases(
-        self, input_reporter_line, warning_msg, expected
-    ):
+    def test_indicator_edge_cases(self, input_reporter_line, warning_msg, expected):
         """Test indicator parsing edge cases"""
         with pytest.warns(UserWarning) as record:
             reporter_line = ReporterLine(reporter_line=input_reporter_line)
@@ -326,33 +276,23 @@ class TestBehaviorStimulusFile:
         dir = Path(__file__).parent.parent.parent.resolve()
         test_data_dir = dir / "test_data"
         sf_path = test_data_dir / "stimulus_file.pkl"
-        cls.stimulus_file = BehaviorStimulusFile.from_json(
-            dict_repr={"behavior_stimulus_file": str(sf_path)}
-        )
+        cls.stimulus_file = BehaviorStimulusFile.from_json(dict_repr={"behavior_stimulus_file": str(sf_path)})
 
     def test_session_uuid(self):
-        uuid = BehaviorSessionUUID.from_stimulus_file(
-            stimulus_file=self.stimulus_file
-        )
+        uuid = BehaviorSessionUUID.from_stimulus_file(stimulus_file=self.stimulus_file)
         expected = UUID("138531ab-fe59-4523-9154-07c8d97bbe03")
         assert expected == uuid.value
 
     def test_get_stimulus_frame_rate(self):
-        rate = StimulusFrameRate.from_stimulus_file(
-            stimulus_file=self.stimulus_file
-        )
+        rate = StimulusFrameRate.from_stimulus_file(stimulus_file=self.stimulus_file)
         assert 62.0 == rate.value
 
 
 def test_date_of_acquisition_utc():
     """Tests that when read from json (in Pacific time), that
     date of acquisition is converted to utc"""
-    expected = DateOfAcquisition(
-        date_of_acquisition=datetime.datetime(2019, 9, 26, 16, tzinfo=pytz.UTC)
-    )
-    actual = DateOfAcquisition.from_json(
-        dict_repr={"date_of_acquisition": "2019-09-26 09:00:00"}
-    )
+    expected = DateOfAcquisition(date_of_acquisition=datetime.datetime(2019, 9, 26, 16, tzinfo=pytz.UTC))
+    actual = DateOfAcquisition.from_json(dict_repr={"date_of_acquisition": "2019-09-26 09:00:00"})
     assert expected == actual
 
 
@@ -361,21 +301,15 @@ class TestNWB(BehaviorMetaTestCase):
         self.nwbfile = pynwb.NWBFile(
             session_description="asession",
             identifier="afile",
-            session_start_time=datetime.datetime(
-                2022, 8, 24, 12, 35, tzinfo=pytz.UTC
-            ),
+            session_start_time=datetime.datetime(2022, 8, 24, 12, 35, tzinfo=pytz.UTC),
         )
 
     @pytest.mark.parametrize("roundtrip", [True, False])
-    def test_add_behavior_only_metadata(
-        self, roundtrip, data_object_roundtrip_fixture
-    ):
+    def test_add_behavior_only_metadata(self, roundtrip, data_object_roundtrip_fixture):
         self.meta.to_nwb(nwbfile=self.nwbfile)
 
         if roundtrip:
-            meta_obt = data_object_roundtrip_fixture(
-                self.nwbfile, BehaviorMetadata
-            )
+            meta_obt = data_object_roundtrip_fixture(self.nwbfile, BehaviorMetadata)
         else:
             meta_obt = BehaviorMetadata.from_nwb(nwbfile=self.nwbfile)
         assert self.meta == meta_obt

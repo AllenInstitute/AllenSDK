@@ -7,6 +7,7 @@ from allensdk.core import DataObject
 
 class JsonReadableInterface(abc.ABC):
     """Marks a data object as readable from json"""
+
     @classmethod
     @abc.abstractmethod
     def from_json(cls, dict_repr: dict) -> "DataObject":  # pragma: no cover
@@ -23,6 +24,7 @@ class JsonReadableInterface(abc.ABC):
 
 class LimsReadableInterface(abc.ABC):
     """Marks a data object as readable from LIMS"""
+
     @classmethod
     @abc.abstractmethod
     def from_lims(cls, *args) -> "DataObject":  # pragma: no cover
@@ -40,13 +42,10 @@ class LimsReadableInterface(abc.ABC):
 
 class NwbReadableInterface(abc.ABC):
     """Marks a data object as readable from NWB"""
+
     @classmethod
     @abc.abstractmethod
-    def from_nwb(
-            cls,
-            nwbfile: NWBFile,
-            **kwargs
-    ) -> "DataObject":  # pragma: no cover
+    def from_nwb(cls, nwbfile: NWBFile, **kwargs) -> "DataObject":  # pragma: no cover
         """Populate a DataObject from a pyNWB file object.
 
         Parameters
@@ -65,6 +64,7 @@ class NwbReadableInterface(abc.ABC):
 class DataFileReadableInterface(abc.ABC):
     """Marks a data object as readable from various data files, not covered by
     existing interfaces"""
+
     @classmethod
     @abc.abstractmethod
     def from_data_file(cls, *args) -> "DataObject":

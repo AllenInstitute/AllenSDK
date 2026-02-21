@@ -48,28 +48,15 @@ def extract_barcodes_from_times(
     barcodes = []
 
     for i, t in enumerate(barcode_start_times):
-
-        oncode = on_times[
-            np.where(
-                np.logical_and(on_times > t,
-                               on_times < t + barcode_duration_ceiling)
-            )[0]
-        ]
-        offcode = off_times[
-            np.where(
-                np.logical_and(off_times > t,
-                               off_times < t + barcode_duration_ceiling)
-            )[0]
-        ]
+        oncode = on_times[np.where(np.logical_and(on_times > t, on_times < t + barcode_duration_ceiling))[0]]
+        offcode = off_times[np.where(np.logical_and(off_times > t, off_times < t + barcode_duration_ceiling))[0]]
 
         if len(offcode) > 0:
-
             currTime = offcode[0]
 
             bits = np.zeros((nbits,))
 
             for bit in range(0, nbits):
-
                 nextOn = np.where(oncode > currTime)[0]
                 nextOff = np.where(offcode > currTime)[0]
 
@@ -99,9 +86,7 @@ def extract_barcodes_from_times(
     return barcode_start_times, barcodes
 
 
-def find_matching_index(master_barcodes,
-                        probe_barcodes,
-                        alignment_type="start"):
+def find_matching_index(master_barcodes, probe_barcodes, alignment_type="start"):
     """Given a set of barcodes for the master clock and the probe clock, find the
     indices of a matching set, either starting from the beginning or the end
     of the list.
@@ -135,10 +120,7 @@ def find_matching_index(master_barcodes,
         direction = -1
 
     while not foundMatch and abs(probe_barcode_index) < len(probe_barcodes):
-
-        master_barcode_index = np.where(
-            master_barcodes == probe_barcodes[probe_barcode_index]
-        )[0]
+        master_barcode_index = np.where(master_barcodes == probe_barcodes[probe_barcode_index])[0]
 
         assert len(master_barcode_index) < 2
 
@@ -187,9 +169,7 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
 
     """
 
-    master_start_index, probe_start_index = find_matching_index(
-        master_barcodes, probe_barcodes, alignment_type="start"
-    )
+    master_start_index, probe_start_index = find_matching_index(master_barcodes, probe_barcodes, alignment_type="start")
 
     if master_start_index is not None:
         t_m_start = master_times[master_start_index]
@@ -202,10 +182,7 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
 
     print("Master start index: " + str(master_start_index))
     if len(probe_barcodes) > 2:
-        master_end_index, probe_end_index = \
-            find_matching_index(master_barcodes,
-                                probe_barcodes,
-                                alignment_type='end')
+        master_end_index, probe_end_index = find_matching_index(master_barcodes, probe_barcodes, alignment_type="end")
 
         if probe_end_index is not None:
             print("Probe end index: " + str(probe_end_index))
@@ -303,12 +280,8 @@ def get_probe_time_offset(
 
     """
 
-    probe_endpoints, master_endpoints = match_barcodes(
-        master_times, master_barcodes, probe_times, probe_barcodes
-    )
-    rate_scale, time_offset = linear_transform_from_intervals(
-        master_endpoints, probe_endpoints
-    )
+    probe_endpoints, master_endpoints = match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes)
+    rate_scale, time_offset = linear_transform_from_intervals(master_endpoints, probe_endpoints)
 
     if time_offset is not None:
         probe_rate = local_probe_rate * rate_scale

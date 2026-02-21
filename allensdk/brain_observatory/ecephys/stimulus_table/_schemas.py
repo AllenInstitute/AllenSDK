@@ -7,7 +7,6 @@ from argschema.fields import Nested, String, Float, Dict, List, Bool
 
 default_stimulus_renames = {
     "": "spontaneous",
-
     "natural_movie_1": "natural_movie_one",
     "natural_movie_3": "natural_movie_three",
     "Natural Images": "natural_scenes",
@@ -15,18 +14,14 @@ default_stimulus_renames = {
     "gabor_20_deg_250ms": "gabors",
     "drifting_gratings": "drifting_gratings",
     "static_gratings": "static_gratings",
-
     "contrast_response": "drifting_gratings_contrast",
-
     "Natural_Images_Shuffled": "natural_scenes_shuffled",
     "Natural_Images_Sequential": "natural_scenes_sequential",
     "natural_movie_1_more_repeats": "natural_movie_one",
     "natural_movie_shuffled": "natural_movie_one_shuffled",
     "motion_stimulus": "dot_motion",
     "drifting_gratings_more_repeats": "drifting_gratings_75_repeats",
-
     "signal_noise_test_0_200_repeats": "test_movie_one",
-
     "signal_noise_test_0": "test_movie_one",
     "signal_noise_test_1": "test_movie_two",
     "signal_noise_session_1": "dense_movie_one",
@@ -40,33 +35,22 @@ default_stimulus_renames = {
 
 default_column_renames = {
     "Contrast": "contrast",
-    "Ori":	"orientation",
+    "Ori": "orientation",
     "SF": "spatial_frequency",
     "TF": "temporal_frequency",
     "Phase": "phase",
     "Color": "color",
     "Image": "frame",
     "Pos_x": "x_position",
-    "Pos_y": "y_position"
+    "Pos_y": "y_position",
 }
 
 
 class InputParameters(ArgSchema):
-    stimulus_pkl_path = String(
-        required=True,
-        help="""path to pkl file containing raw stimulus information"""
-    )
-    sync_h5_path = String(
-        required=True,
-        help="""path to h5 file containing syncronization information"""
-    )
-    output_stimulus_table_path = String(
-        required=True,
-        help="""the output stimulus table csv will be written here"""
-    )
-    output_frame_times_path = String(
-        required=True,
-        help="""output all frame times here""")
+    stimulus_pkl_path = String(required=True, help="""path to pkl file containing raw stimulus information""")
+    sync_h5_path = String(required=True, help="""path to h5 file containing syncronization information""")
+    output_stimulus_table_path = String(required=True, help="""the output stimulus table csv will be written here""")
+    output_frame_times_path = String(required=True, help="""output all frame times here""")
     minimum_spontaneous_activity_duration = Float(
         default=sys.float_info.epsilon,
         help="""detected spontaneous activity sweeps will be rejected if
@@ -85,16 +69,10 @@ class InputParameters(ArgSchema):
         which is preferred when reliable vsync times are available.""",
     )
     stimulus_name_map = Dict(
-        keys=String(),
-        values=String(),
-        help="optionally rename stimuli",
-        default=default_stimulus_renames
+        keys=String(), values=String(), help="optionally rename stimuli", default=default_stimulus_renames
     )
     column_name_map = Dict(
-        keys=String(),
-        values=String(),
-        help="optionally rename stimulus parameters",
-        default=default_column_renames
+        keys=String(), values=String(), help="optionally rename stimulus parameters", default=default_column_renames
     )
     extract_const_params_from_repr = Bool(default=True)
     drop_const_params = List(
@@ -106,22 +84,24 @@ class InputParameters(ArgSchema):
     fail_on_negative_duration = Bool(
         default=False,
         help="""Determine if the module should fail if a
-        stimulus epoch has a negative duration."""
+        stimulus epoch has a negative duration.""",
     )
 
     trim_discontiguous_frame_times = Bool(
         default=True,
         help="""set to False if stimulus was shown in chunks,
-        and discontiguous vsyncs are expected"""
+        and discontiguous vsyncs are expected""",
     )
 
 
 class OutputSchema(DefaultSchema):
     input_parameters = Nested(
         InputParameters,
-        description=("Input parameters the module " "was run with"),
+        description=("Input parameters the module was run with"),
         required=True,
     )
     output_path = String(help="Path to output csv file")
     output_frame_times_path = String(help="output all frame times here")
+
+
 #

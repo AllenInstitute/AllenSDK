@@ -9,15 +9,11 @@ from allensdk.api.warehouse_cache import caching_utilities as cu
 
 
 def get_data():
-    return pd.DataFrame(
-        {"a": [1, 2, 3, 4], "b": ["duck", "kangaroo", "walrus", "ibex"]}
-    )
+    return pd.DataFrame({"a": [1, 2, 3, 4], "b": ["duck", "kangaroo", "walrus", "ibex"]})
 
 
 def swapped_data():
-    return pd.DataFrame(
-        {"b": [1, 2, 3, 4], "a": ["duck", "kangaroo", "walrus", "ibex"]}
-    )
+    return pd.DataFrame({"b": [1, 2, 3, 4], "a": ["duck", "kangaroo", "walrus", "ibex"]})
 
 
 def write_to_dict(dc, data):
@@ -94,7 +90,7 @@ def swap(data):
             swapped_data(),
             1,
             0,
-            id="simple case"
+            id="simple case",
         ),
         pytest.param(
             False,
@@ -109,7 +105,7 @@ def swap(data):
             swapped_data(),
             1,
             0,
-            id="eager success case"
+            id="eager success case",
         ),
         pytest.param(
             False,
@@ -124,7 +120,7 @@ def swap(data):
             "raise",
             1,
             1,
-            id="lazy failure case"
+            id="lazy failure case",
         ),
         pytest.param(
             False,
@@ -139,7 +135,7 @@ def swap(data):
             swapped_data(),
             10,
             9,
-            id="repeated failure case"
+            id="repeated failure case",
         ),
         pytest.param(
             False,
@@ -154,7 +150,7 @@ def swap(data):
             "warn",
             10,
             9,
-            id="warning case"
+            id="warning case",
         ),
         pytest.param(
             False,
@@ -169,7 +165,7 @@ def swap(data):
             "raise",
             1,
             1,
-            id="eager failure case"
+            id="eager failure case",
         ),
         pytest.param(
             True,
@@ -184,7 +180,7 @@ def swap(data):
             get_data(),
             0,
             0,
-            id="existing data case"
+            id="existing data case",
         ),
     ],
 )
@@ -202,7 +198,6 @@ def test_call_caching(
     expected_fetches,
     expected_cleanups,
 ):
-
     dc = {}
     if existing:
         write(dc, fetch())
@@ -213,17 +208,7 @@ def test_call_caching(
     read_fn = partial(read, dc)
     cleanup_fn = partial(cleanup, dc)
 
-    fn = partial(
-        cu.call_caching,
-        fetch,
-        write_fn,
-        read_fn,
-        pre_write,
-        cleanup_fn,
-        lazy,
-        num_tries,
-        failure_message
-    )
+    fn = partial(cu.call_caching, fetch, write_fn, read_fn, pre_write, cleanup_fn, lazy, num_tries, failure_message)
 
     if isinstance(expected, str) and expected == "raise":
         with pytest.raises(ValueError):
@@ -250,15 +235,12 @@ def test_one_file_call_caching(tmpdir_factory, existing):
 
     if existing:
         data.to_csv(path, index=False)
+
         def getter():
             return "foo"
 
     obtained = cu.one_file_call_caching(
-        path,
-        getter,
-        lambda path, df: df.to_csv(path, index=False),
-        lambda path: pd.read_csv(path),
-        num_tries=2
+        path, getter, lambda path, df: df.to_csv(path, index=False), lambda path: pd.read_csv(path), num_tries=2
     )
 
     pd.testing.assert_frame_equal(get_data(), obtained, check_like=True, check_dtype=False)

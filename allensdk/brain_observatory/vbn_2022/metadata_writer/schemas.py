@@ -2,18 +2,17 @@ import pathlib
 
 import argschema
 from allensdk.brain_observatory.vbn_2022.utils.schemas import ProbeToSkip
-from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.schemas import BaseMetadataWriterInputSchema  # noqa: E501
+from allensdk.brain_observatory.behavior.behavior_project_cache.project_metadata_writer.schemas import (
+    BaseMetadataWriterInputSchema,
+)  # noqa: E501
 from marshmallow import post_load
 
 
 class VBN2022MetadataWriterInputSchema(BaseMetadataWriterInputSchema):
-
     ecephys_session_id_list = argschema.fields.List(
         argschema.fields.Int,
         required=True,
-        description=(
-            "List of ecephys_sessions.id values " "of sessions to be released"
-        ),
+        description=("List of ecephys_sessions.id values of sessions to be released"),
     )
 
     failed_ecephys_session_id_list = argschema.fields.List(
@@ -41,9 +40,7 @@ class VBN2022MetadataWriterInputSchema(BaseMetadataWriterInputSchema):
     ecephys_nwb_dir = argschema.fields.InputDir(
         required=True,
         allow_none=False,
-        description=(
-            "The directory where ecephys_nwb sessions are " "to be found"
-        ),
+        description=("The directory where ecephys_nwb sessions are to be found"),
     )
 
     ecephys_nwb_prefix = argschema.fields.Str(
@@ -72,10 +69,10 @@ class VBN2022MetadataWriterInputSchema(BaseMetadataWriterInputSchema):
     n_workers = argschema.fields.Int(
         default=8,
         allow_none=True,
-        description='Number of workers for reading from pkl file. '
-                    'Default=8 due to issues with making too many '
-                    'requests to the database. Increase if too slow, decrease '
-                    'if the database rejects the connection'
+        description="Number of workers for reading from pkl file. "
+        "Default=8 due to issues with making too many "
+        "requests to the database. Increase if too slow, decrease "
+        "if the database rejects the connection",
     )
 
     @post_load
@@ -98,8 +95,6 @@ class VBN2022MetadataWriterInputSchema(BaseMetadataWriterInputSchema):
 
         if len(msg) > 0:
             raise RuntimeError(
-                "The following files already exist\n"
-                f"{msg}"
-                "Run with clobber=True if you want to overwrite"
+                f"The following files already exist\n{msg}Run with clobber=True if you want to overwrite"
             )
         return data

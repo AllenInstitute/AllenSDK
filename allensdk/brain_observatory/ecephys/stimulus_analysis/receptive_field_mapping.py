@@ -52,11 +52,9 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         trial_duration=0.25,
         minimum_spike_count=10.0,
         mask_threshold=0.5,
-        **kwargs
+        **kwargs,
     ):
-        super(ReceptiveFieldMapping, self).__init__(
-            ecephys_session, trial_duration=trial_duration, **kwargs
-        )
+        super(ReceptiveFieldMapping, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._pos_x = None
         self._pos_y = None
@@ -103,9 +101,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         if self._pos_x is None:
             self._get_stim_table_stats()
 
-        return len(
-            self._pos_y
-        )  # TODO: Save this instead of calculating every time.
+        return len(self._pos_y)  # TODO: Save this instead of calculating every time.
 
     @property
     def null_condition(self):
@@ -121,20 +117,14 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         if self._rf_matrix is None:
             bin_edges = np.linspace(0, 0.249, 3)
 
-            self.stim_table.loc[:, self._col_pos_y] = (
-                40.0 - self.stim_table[self._col_pos_y]
-            )
-            presentationwise_response_matrix = (
-                self.ecephys_session.presentationwise_spike_counts(
-                    bin_edges=bin_edges,
-                    stimulus_presentation_ids=self.stim_table.index.values,
-                    unit_ids=self.unit_ids,
-                )
+            self.stim_table.loc[:, self._col_pos_y] = 40.0 - self.stim_table[self._col_pos_y]
+            presentationwise_response_matrix = self.ecephys_session.presentationwise_spike_counts(
+                bin_edges=bin_edges,
+                stimulus_presentation_ids=self.stim_table.index.values,
+                unit_ids=self.unit_ids,
             )
 
-            self._rf_matrix = self._response_by_stimulus_position(
-                presentationwise_response_matrix, self.stim_table
-            )
+            self._rf_matrix = self._response_by_stimulus_position(presentationwise_response_matrix, self.stim_table)
 
         return self._rf_matrix
 
@@ -176,29 +166,16 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                         "on_screen_rf",
                     ],
                 ] = [self._get_rf_stats(unit) for unit in unit_ids]
-                metrics_df["firing_rate_rf"] = [
-                    self._get_overall_firing_rate(unit) for unit in unit_ids
-                ]
+                metrics_df["firing_rate_rf"] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df["fano_rf"] = [
-                    self._get_fano_factor(
-                        unit, self._get_preferred_condition(unit)
-                    )
-                    for unit in unit_ids
+                    self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids
                 ]
                 metrics_df["time_to_peak_rf"] = [
-                    self._get_time_to_peak(
-                        unit, self._get_preferred_condition(unit)
-                    )
-                    for unit in unit_ids
+                    self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids
                 ]
-                metrics_df["lifetime_sparseness_rf"] = [
-                    self._get_lifetime_sparseness(unit) for unit in unit_ids
-                ]
+                metrics_df["lifetime_sparseness_rf"] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ["run_pval_rf", "run_mod_rf"]] = [
-                    self._get_running_modulation(
-                        unit, self._get_preferred_condition(unit)
-                    )
-                    for unit in unit_ids
+                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids
                 ]
 
             self._metrics = metrics_df
@@ -210,9 +187,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         return ["receptive_field_mapping", "gabor", "gabors"]
 
     def _find_stimulus_key(self, stim_table):
-        known_keys_lc = [
-            k.lower() for k in self.__class__.known_stimulus_keys()
-        ]
+        known_keys_lc = [k.lower() for k in self.__class__.known_stimulus_keys()]
 
         for table_key in stim_table["stimulus_name"].unique():
             table_key_lc = table_key.lower()
@@ -227,14 +202,10 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         """Extract azimuths and elevations from stimulus table."""
 
         self._pos_y = np.sort(
-            self.stimulus_conditions.loc[
-                self.stimulus_conditions[self._col_pos_y] != "null"
-            ][self._col_pos_y].unique()
+            self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_y] != "null"][self._col_pos_y].unique()
         )
         self._pos_x = np.sort(
-            self.stimulus_conditions.loc[
-                self.stimulus_conditions[self._col_pos_x] != "null"
-            ][self._col_pos_x].unique()
+            self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x] != "null"][self._col_pos_x].unique()
         )
 
     def get_receptive_field(self, unit_id):
@@ -285,18 +256,14 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         dataset = dataset.drop(time_key)
 
         dataset = dataset.assign_coords(
-            {row_key: ("stimulus_presentation_id",
-                       presentations.loc[:, row_key].to_numpy())})
+            {row_key: ("stimulus_presentation_id", presentations.loc[:, row_key].to_numpy())}
+        )
         dataset = dataset.assign_coords(
-            {column_key: ("stimulus_presentation_id",
-                          presentations.loc[:, column_key].to_numpy())})
+            {column_key: ("stimulus_presentation_id", presentations.loc[:, column_key].to_numpy())}
+        )
         dataset = dataset.to_dataframe()
 
-        dataset = (
-            dataset.reset_index(unit_key)
-            .groupby([row_key, column_key, unit_key])
-            .sum()
-        )
+        dataset = dataset.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
 
         return dataset.to_xarray()
 
@@ -331,9 +298,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             based on Gaussian fit
         """
         rf = self._get_rf(unit_id)
-        spikes_per_trial = self.presentationwise_statistics.xs(
-            unit_id, level=1
-        )["spike_counts"].values
+        spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)["spike_counts"].values
 
         if np.sum(spikes_per_trial) < self._minimum_spike_count:
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, False
@@ -346,20 +311,21 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         # print(self._params)
         # exit()
-        rf_thresh, azimuth, elevation, area = threshold_rf(
-            rf, self._mask_threshold
-        )
+        rf_thresh, azimuth, elevation, area = threshold_rf(rf, self._mask_threshold)
 
         if is_rf_inverted(rf_thresh):
             rf = invert_rf(rf)
 
         (
-            peak_height,
-            center_y,
-            center_x,
-            width_y,
-            width_x,
-        ), success = fit_2d_gaussian(rf)
+            (
+                peak_height,
+                center_y,
+                center_x,
+                width_y,
+                width_x,
+            ),
+            success,
+        ) = fit_2d_gaussian(rf)
         on_screen = rf_on_screen(rf, center_y, center_x)
 
         height_deg = convert_pixels_to_degrees(width_y)
@@ -380,51 +346,25 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     # VISUALIZATION
     def plot_raster(self, stimulus_condition_id, unit_id):
-
         """Plot raster for one condition and one unit"""
 
-        idx_elev = np.where(
-            self.elevations
-            == self.stimulus_conditions.loc[stimulus_condition_id][
-                self._col_pos_y
-            ]
-        )[0]
-        idx_azi = np.where(
-            self.azimuths
-            == self.stimulus_conditions.loc[stimulus_condition_id][
-                self._col_pos_x
-            ]
-        )[0]
+        idx_elev = np.where(self.elevations == self.stimulus_conditions.loc[stimulus_condition_id][self._col_pos_y])[0]
+        idx_azi = np.where(self.azimuths == self.stimulus_conditions.loc[stimulus_condition_id][self._col_pos_x])[0]
 
         if len(idx_elev) == len(idx_azi) == 1:
-
-            presentation_ids = self.presentationwise_statistics.xs(
-                unit_id, level=1
-            )[
-                self.presentationwise_statistics.xs(unit_id, level=1)[
-                    "stimulus_condition_id"
-                ]
-                == stimulus_condition_id
+            presentation_ids = self.presentationwise_statistics.xs(unit_id, level=1)[
+                self.presentationwise_statistics.xs(unit_id, level=1)["stimulus_condition_id"] == stimulus_condition_id
             ].index.values
 
             df = self.presentationwise_spike_times[
-                (
-                    self.presentationwise_spike_times[
-                        "stimulus_presentation_id"
-                    ].isin(presentation_ids)
-                )
+                (self.presentationwise_spike_times["stimulus_presentation_id"].isin(presentation_ids))
                 & (self.presentationwise_spike_times["unit_id"] == unit_id)
             ]
 
-            x = (
-                df.index.values
-                - self.stim_table.loc[df.stimulus_presentation_id].start_time
-            )
+            x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
             _, y = np.unique(df.stimulus_presentation_id, return_inverse=True)
 
-            idx_elev = (
-                self.number_elevations - idx_elev - 1
-            )  # reverse the elevation index so it matches the RF
+            idx_elev = self.number_elevations - idx_elev - 1  # reverse the elevation index so it matches the RF
 
             plt.subplot(
                 self.number_elevations,
@@ -465,10 +405,7 @@ def _gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
 
     """
 
-    return lambda y, x: peak_height * np.exp(
-        -(((center_y - y) / width_y) ** 2 + ((center_x - x) / width_x) ** 2)
-        / 2
-    )
+    return lambda y, x: peak_height * np.exp(-(((center_y - y) / width_y) ** 2 + ((center_x - x) / width_x) ** 2) / 2)
 
 
 def gaussian_moments_2d(data):
@@ -501,23 +438,14 @@ def gaussian_moments_2d(data):
     center_y = (Y * data).sum() / total
     center_x = (X * data).sum() / total
 
-    if (
-        np.isnan(center_y)
-        or np.isinf(center_y)
-        or np.isnan(center_x)
-        or np.isinf(center_x)
-    ):
+    if np.isnan(center_y) or np.isinf(center_y) or np.isnan(center_x) or np.isinf(center_x):
         return None
 
     col = data[:, int(center_x)]
     row = data[int(center_y), :]
 
-    width_y = np.sqrt(
-        np.abs((np.arange(row.size) - center_y) ** 2 * row).sum() / row.sum()
-    )
-    width_x = np.sqrt(
-        np.abs((np.arange(col.size) - center_x) ** 2 * col).sum() / col.sum()
-    )
+    width_y = np.sqrt(np.abs((np.arange(row.size) - center_y) ** 2 * row).sum() / row.sum())
+    width_x = np.sqrt(np.abs((np.arange(col.size) - center_x) ** 2 * col).sum() / col.sum())
 
     return height, center_y, center_x, width_y, width_x
 
@@ -548,9 +476,7 @@ def fit_2d_gaussian(matrix):
         return (np.nan, np.nan, np.nan, np.nan, np.nan), False
 
     def errorfunction(p):
-        return np.ravel(
-            _gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix
-        )
+        return np.ravel(_gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix)
 
     fit_params, ier = leastsq(errorfunction, params)
     success = True if ier < 5 else False
@@ -631,9 +557,7 @@ def threshold_rf(rf, threshold):
 
     labels, num_features = ndi.label(rf_thresh)
 
-    best_label = np.argmax(
-        ndi.maximum(rf_filt, labels=labels, index=np.unique(labels))
-    )
+    best_label = np.argmax(ndi.maximum(rf_filt, labels=labels, index=np.unique(labels)))
 
     labels[labels != best_label] = 0
     labels[labels > 0] = 1
@@ -650,9 +574,7 @@ def rf_on_screen(rf, center_y, center_x):
     return 0 < center_y < rf.shape[0] and 0 < center_x < rf.shape[1]
 
 
-def convert_elevation_to_degrees(
-    elevation_in_pixels, elevation_offset_degrees=-30
-):
+def convert_elevation_to_degrees(elevation_in_pixels, elevation_offset_degrees=-30):
     """Converts a pixel-based elevation into degrees relative to
     center of gaze
 
@@ -673,10 +595,7 @@ def convert_elevation_to_degrees(
     -------
     elevation_in_degrees : float
     """
-    elevation_in_degrees = (
-        convert_pixels_to_degrees(8 - elevation_in_pixels)
-        + elevation_offset_degrees
-    )
+    elevation_in_degrees = convert_pixels_to_degrees(8 - elevation_in_pixels) + elevation_offset_degrees
 
     return elevation_in_degrees
 
@@ -694,9 +613,7 @@ def convert_azimuth_to_degrees(azimuth_in_pixels, azimuth_offset_degrees=10):
     -------
     azimuth_in_degrees : float
     """
-    azimuth_in_degrees = (
-        convert_pixels_to_degrees((azimuth_in_pixels)) + azimuth_offset_degrees
-    )
+    azimuth_in_degrees = convert_pixels_to_degrees((azimuth_in_pixels)) + azimuth_offset_degrees
 
     return azimuth_in_degrees
 

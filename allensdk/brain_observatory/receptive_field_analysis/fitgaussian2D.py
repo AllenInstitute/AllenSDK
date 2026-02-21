@@ -42,7 +42,7 @@ class GaussianFitError(RuntimeError):
 
 
 def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
-    '''Build a function which evaluates a scaled 2d gaussian pdf
+    """Build a function which evaluates a scaled 2d gaussian pdf
 
     Parameters
     ----------
@@ -62,29 +62,30 @@ def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
     Returns
     -------
     rotgauss: fn
-      parameters are x and y positions (row/column semantics are set by your 
-      inputs to this function). Return value is the scaled gaussian pdf 
+      parameters are x and y positions (row/column semantics are set by your
+      inputs to this function). Return value is the scaled gaussian pdf
       evaluated at the argued point.
 
-    '''
+    """
 
     width_x = float(width_x)
     width_y = float(width_y)
-    
+
     rotation = np.deg2rad(rotation)
-    center_xp = center_x*np.cos(rotation) - center_y*np.sin(rotation)
-    center_yp = center_x*np.sin(rotation) + center_y*np.cos(rotation)
-    
-    def rotgauss(x,y):
-        xp = x*np.cos(rotation) - y*np.sin(rotation)
-        yp = x*np.sin(rotation) + y*np.cos(rotation)
-        g = height*np.exp(-((center_xp-xp)/width_x)**2/2.0 - ((center_yp-yp)/width_y)**2/2.)
+    center_xp = center_x * np.cos(rotation) - center_y * np.sin(rotation)
+    center_yp = center_x * np.sin(rotation) + center_y * np.cos(rotation)
+
+    def rotgauss(x, y):
+        xp = x * np.cos(rotation) - y * np.sin(rotation)
+        yp = x * np.sin(rotation) + y * np.cos(rotation)
+        g = height * np.exp(-(((center_xp - xp) / width_x) ** 2) / 2.0 - ((center_yp - yp) / width_y) ** 2 / 2.0)
         return g
+
     return rotgauss
-            
+
 
 def moments2(data):
-    '''Treating input image data as an independent multivariate gaussian, 
+    """Treating input image data as an independent multivariate gaussian,
     estimate mean and standard deviations
 
     Parameters
@@ -101,37 +102,37 @@ def moments2(data):
     x : float
         Mean column index
     width_y : float
-        The standard deviation along the mean row 
+        The standard deviation along the mean row
     width_x : float
         The standard deviation along the mean column
-    None : 
+    None :
         This function returns an instance of None.
 
     Notes
     -----
     uses original method from website for finding center
 
-    '''
+    """
 
     total = data.sum()
 
-    Y,X = np.indices(data.shape)
-    x = ( X * data ).sum() / total
-    y = ( Y * data ).sum() / total
+    Y, X = np.indices(data.shape)
+    x = (X * data).sum() / total
+    y = (Y * data).sum() / total
 
     col = data[:, int(np.around(x))]
-    width_x = np.sqrt( abs( ( np.arange(col.size) - y ) ** 2 * col ).sum() / col.sum() )
+    width_x = np.sqrt(abs((np.arange(col.size) - y) ** 2 * col).sum() / col.sum())
 
     row = data[int(np.around(y)), :]
-    width_y = np.sqrt( abs( ( np.arange(row.size) - x ) ** 2 * row  ).sum() / row.sum() )
+    width_y = np.sqrt(abs((np.arange(row.size) - x) ** 2 * row).sum() / row.sum())
 
     height = data.max()
 
     return height, y, x, width_y, width_x, None
-    
+
 
 def fitgaussian2D(data):
-    '''Fit a 2D gaussian to an image
+    """Fit a 2D gaussian to an image
 
     Parameters
     ----------
@@ -147,30 +148,34 @@ def fitgaussian2D(data):
         row standard deviation
         column standard deviation
         rotation
-    
+
     Notes
     -----
     see gaussian2D for details about output values
 
-    '''
+    """
 
     params = moments2(data)
+
     def errorfunction(p):
         p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
-
 
         val = np.ravel(gaussian2D(*p2)(*np.indices(data.shape)) - data)
 
         return (val**2).sum()
 
-    res = optimize.minimize(errorfunction, [ params[0], params[3], params[4], 0.0 ], method='Nelder-Mead', options={'maxfev':2500})
+    res = optimize.minimize(
+        errorfunction, [params[0], params[3], params[4], 0.0], method="Nelder-Mead", options={"maxfev": 2500}
+    )
     p = res.x
     p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
     success = res.success
-    if not success and res.status != 2: # Status 2 is loss of precision; might need to handle this separately instead of passing...
+    if (
+        not success and res.status != 2
+    ):  # Status 2 is loss of precision; might need to handle this separately instead of passing...
         print(success)
         print(res.message)
         print(res.status)
-        raise GaussianFitError('Gaussian optimization failed to converge:\n%s' % res.message)
+        raise GaussianFitError("Gaussian optimization failed to converge:\n%s" % res.message)
 
     return p2

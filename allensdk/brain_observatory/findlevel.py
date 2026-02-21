@@ -36,11 +36,11 @@
 import numpy as np
 
 
-def findlevel(inwave, threshold, direction='both'):
+def findlevel(inwave, threshold, direction="both"):
     temp = inwave - threshold
-    if (direction.find("up") + 1):
+    if direction.find("up") + 1:
         crossings = np.nonzero(np.ediff1d(np.sign(temp), to_begin=0.0) > 0)
-    elif (direction.find("down") + 1):
+    elif direction.find("down") + 1:
         crossings = np.nonzero(np.ediff1d(np.sign(temp), to_begin=0.0) < 0)
     else:
         crossings = np.nonzero(np.ediff1d(np.sign(temp), to_begin=0.0))

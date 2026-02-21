@@ -128,9 +128,7 @@ class Trials(
                     index=index,
                 )
             else:
-                nwbfile.add_trial_column(
-                    name=c, description="NOT IMPLEMENTED: %s" % c, data=data
-                )
+                nwbfile.add_trial_column(name=c, description="NOT IMPLEMENTED: %s" % c, data=data)
         return nwbfile
 
     @classmethod
@@ -141,9 +139,7 @@ class Trials(
         trials.index = trials.index.rename("trials_id")
         return cls(
             trials=trials,
-            response_window_start=TaskParameters.from_nwb(
-                nwbfile=nwbfile
-            ).response_window_sec[0],
+            response_window_start=TaskParameters.from_nwb(nwbfile=nwbfile).response_window_sec[0],
         )
 
     @classmethod
@@ -217,9 +213,7 @@ class Trials(
 
         return cls(
             trials=trials,
-            response_window_start=TaskParameters.from_stimulus_file(
-                stimulus_file=stimulus_file
-            ).response_window_sec[0],
+            response_window_start=TaskParameters.from_stimulus_file(stimulus_file=stimulus_file).response_window_sec[0],
         )
 
     @staticmethod
@@ -355,25 +349,15 @@ class Trials(
         performance_metrics_df = pd.DataFrame(index=trials_index)
 
         # Reward rate:
-        performance_metrics_df["reward_rate"] = pd.Series(
-            reward_rate, index=self.data.index
-        )
+        performance_metrics_df["reward_rate"] = pd.Series(reward_rate, index=self.data.index)
 
         # Hit rate raw:
-        hit_rate_raw = get_hit_rate(
-            hit=self.hit, miss=self.miss, aborted=self.aborted
-        )
-        performance_metrics_df["hit_rate_raw"] = pd.Series(
-            hit_rate_raw, index=not_aborted_index
-        )
+        hit_rate_raw = get_hit_rate(hit=self.hit, miss=self.miss, aborted=self.aborted)
+        performance_metrics_df["hit_rate_raw"] = pd.Series(hit_rate_raw, index=not_aborted_index)
 
         # Hit rate with trial count correction:
-        hit_rate = get_trial_count_corrected_hit_rate(
-            hit=self.hit, miss=self.miss, aborted=self.aborted
-        )
-        performance_metrics_df["hit_rate"] = pd.Series(
-            hit_rate, index=not_aborted_index
-        )
+        hit_rate = get_trial_count_corrected_hit_rate(hit=self.hit, miss=self.miss, aborted=self.aborted)
+        performance_metrics_df["hit_rate"] = pd.Series(hit_rate, index=not_aborted_index)
 
         # False-alarm rate raw:
         false_alarm_rate_raw = get_false_alarm_rate(
@@ -381,9 +365,7 @@ class Trials(
             correct_reject=self.correct_reject,
             aborted=self.aborted,
         )
-        performance_metrics_df["false_alarm_rate_raw"] = pd.Series(
-            false_alarm_rate_raw, index=not_aborted_index
-        )
+        performance_metrics_df["false_alarm_rate_raw"] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
 
         # False-alarm rate with trial count correction:
         false_alarm_rate = get_trial_count_corrected_false_alarm_rate(
@@ -391,9 +373,7 @@ class Trials(
             correct_reject=self.correct_reject,
             aborted=self.aborted,
         )
-        performance_metrics_df["false_alarm_rate"] = pd.Series(
-            false_alarm_rate, index=not_aborted_index
-        )
+        performance_metrics_df["false_alarm_rate"] = pd.Series(false_alarm_rate, index=not_aborted_index)
 
         # Rolling-dprime:
         is_passive_session = (self.data["reward_volume"] == 0).all() and (
@@ -405,9 +385,7 @@ class Trials(
             rolling_dprime = np.zeros(len(hit_rate))
         else:
             rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
-        performance_metrics_df["rolling_dprime"] = pd.Series(
-            rolling_dprime, index=not_aborted_index
-        )
+        performance_metrics_df["rolling_dprime"] = pd.Series(rolling_dprime, index=not_aborted_index)
 
         return performance_metrics_df
 
@@ -432,36 +410,25 @@ class Trials(
         (the two instance of monitor delay cancel out in the
         difference).
         """
-        df = pd.DataFrame(
-            {"lick_times": self.lick_times, "change_time": self.change_time}
-        )
+        df = pd.DataFrame({"lick_times": self.lick_times, "change_time": self.change_time})
         df["valid_response_licks"] = df.apply(
-            lambda trial: [
-                lt
-                for lt in trial["lick_times"]
-                if lt - trial["change_time"] > self._response_window_start
-            ],
+            lambda trial: [lt for lt in trial["lick_times"] if lt - trial["change_time"] > self._response_window_start],
             axis=1,
         )
         response_latency = df.apply(
-            lambda trial: trial["valid_response_licks"][0]
-            - trial["change_time"]
+            lambda trial: trial["valid_response_licks"][0] - trial["change_time"]
             if len(trial["valid_response_licks"]) > 0
             else float("inf"),
             axis=1,
         )
         return response_latency.tolist()
 
-    def calculate_reward_rate(
-        self, window=0.75, trial_window=25, initial_trials=10
-    ):
+    def calculate_reward_rate(self, window=0.75, trial_window=25, initial_trials=10):
         response_latency = self._calculate_response_latency_list()
         starttime = self.start_time.values
         assert len(response_latency) == len(starttime)
 
-        df = pd.DataFrame(
-            {"response_latency": response_latency, "starttime": starttime}
-        )
+        df = pd.DataFrame({"response_latency": response_latency, "starttime": starttime})
 
         # adds a column called reward_rate to the input dataframe
         # the reward_rate column contains a rolling average of rewards/min
@@ -485,9 +452,7 @@ class Trials(
             correct = len(df_roll[df_roll.response_latency < window])
 
             # get the time elapsed over the trials
-            time_elapsed = (
-                df_roll.starttime.iloc[-1] - df_roll.starttime.iloc[0]
-            )
+            time_elapsed = df_roll.starttime.iloc[-1] - df_roll.starttime.iloc[0]
 
             # calculate the reward rate, rewards/min
             reward_rate_on_this_lap = correct / time_elapsed * 60
@@ -497,9 +462,7 @@ class Trials(
         reward_rate[np.isinf(reward_rate)] = float("nan")
         return reward_rate
 
-    def _get_engaged_trials(
-        self, engaged_trial_reward_rate_threshold: float = 2.0
-    ) -> pd.Series:
+    def _get_engaged_trials(self, engaged_trial_reward_rate_threshold: float = 2.0) -> pd.Series:
         """
         Gets `Series` where each trial that is considered "engaged" is set to
         `True`
@@ -515,15 +478,10 @@ class Trials(
         `pd.Series`
         """
         rolling_performance = self.rolling_performance
-        engaged_trial_mask = (
-            rolling_performance["reward_rate"]
-            > engaged_trial_reward_rate_threshold
-        )
+        engaged_trial_mask = rolling_performance["reward_rate"] > engaged_trial_reward_rate_threshold
         return engaged_trial_mask
 
-    def get_engaged_trial_count(
-        self, engaged_trial_reward_rate_threshold: float = 2.0
-    ) -> int:
+    def get_engaged_trial_count(self, engaged_trial_reward_rate_threshold: float = 2.0) -> int:
         """Gets count of trials considered "engaged"
 
         Parameters
@@ -537,8 +495,6 @@ class Trials(
         count of trials considered "engaged"
         """
         engaged_trials = self._get_engaged_trials(
-            engaged_trial_reward_rate_threshold=(
-                engaged_trial_reward_rate_threshold
-            )
+            engaged_trial_reward_rate_threshold=(engaged_trial_reward_rate_threshold)
         )
         return engaged_trials.sum()

@@ -30,9 +30,7 @@ from allensdk.internal.brain_observatory.util.multi_session_utils import (
 )
 
 
-def get_list_of_bad_probe_ids(
-    lims_connection: PostgresQueryMixin, probes_to_skip: List[Dict[str, Any]]
-) -> List[int]:
+def get_list_of_bad_probe_ids(lims_connection: PostgresQueryMixin, probes_to_skip: List[Dict[str, Any]]) -> List[int]:
     """
     Given a list of probes to skip,each of the form
 
@@ -438,9 +436,7 @@ def _merge_ecephys_id_and_failed(
         session_id_list=failed_ecephys_session_id_list,
     )
     to_keep = []
-    for session_id, donor_id in zip(
-        failed_donor_lookup.ecephys_session_id, failed_donor_lookup.donor_id
-    ):
+    for session_id, donor_id in zip(failed_donor_lookup.ecephys_session_id, failed_donor_lookup.donor_id):
         if donor_id in passed_donor_ids:
             to_keep.append(int(session_id))
 
@@ -553,9 +549,7 @@ def _ecephys_summary_table_from_ecephys_session_id_list(
     summary_table = lims_connection.select(query)
 
     # Add UTC tz
-    summary_table["date_of_acquisition"] = summary_table[
-        "date_of_acquisition"
-    ].dt.tz_localize("UTC")
+    summary_table["date_of_acquisition"] = summary_table["date_of_acquisition"].dt.tz_localize("UTC")
 
     return summary_table
 
@@ -758,43 +752,27 @@ def _behavior_session_table_from_ecephys_session_id_list(
     )
     behavior_sessions = get_session_metadata_multiprocessing(
         behavior_session_ids=behavior_session_df["behavior_session_id"],
-        lims_engine=db_connection_creator(
-            fallback_credentials=LIMS_DB_CREDENTIAL_MAP
-        ),
+        lims_engine=db_connection_creator(fallback_credentials=LIMS_DB_CREDENTIAL_MAP),
         n_workers=n_workers,
     )
     if exclude_invalid_sessions:
-        behavior_sessions = remove_invalid_sessions(
-            behavior_sessions=behavior_sessions
-        )
+        behavior_sessions = remove_invalid_sessions(behavior_sessions=behavior_sessions)
 
     behavior_session_df = behavior_session_df[
-        behavior_session_df["behavior_session_id"].isin(
-            [x.behavior_session_id for x in behavior_sessions]
-        )
+        behavior_session_df["behavior_session_id"].isin([x.behavior_session_id for x in behavior_sessions])
     ]
     # Add timezone information to behavior daq. Matches ecephys table.
-    behavior_session_df["date_of_acquisition"] = behavior_session_df[
-        "date_of_acquisition"
-    ].dt.tz_localize("UTC")
+    behavior_session_df["date_of_acquisition"] = behavior_session_df["date_of_acquisition"].dt.tz_localize("UTC")
 
     behavior_session_df["image_set"] = get_image_set(df=behavior_session_df)
 
-    behavior_session_df[
-        "prior_exposures_to_session_type"
-    ] = get_prior_exposures_to_session_type(df=behavior_session_df)
+    behavior_session_df["prior_exposures_to_session_type"] = get_prior_exposures_to_session_type(df=behavior_session_df)
 
-    behavior_session_df[
-        "prior_exposures_to_image_set"
-    ] = get_prior_exposures_to_image_set(df=behavior_session_df)
+    behavior_session_df["prior_exposures_to_image_set"] = get_prior_exposures_to_image_set(df=behavior_session_df)
 
-    behavior_session_df = _add_age_in_days(
-        df=behavior_session_df, index_column="behavior_session_id"
-    )
+    behavior_session_df = _add_age_in_days(df=behavior_session_df, index_column="behavior_session_id")
 
-    behavior_session_df = _add_session_number(
-        sessions_df=behavior_session_df, index_col="behavior_session_id"
-    )
+    behavior_session_df = _add_session_number(sessions_df=behavior_session_df, index_col="behavior_session_id")
 
     return behavior_session_df
 
@@ -892,13 +870,9 @@ def session_tables_from_ecephys_session_id_list(
 
     # since we had to read date_of_acquisition from the pickle file,
     # we now need to calculate age_in_days
-    summary_tbl = _add_age_in_days(
-        df=summary_tbl, index_column="ecephys_session_id"
-    )
+    summary_tbl = _add_age_in_days(df=summary_tbl, index_column="ecephys_session_id")
 
-    summary_tbl.drop(
-        labels=["date_of_birth", "equipment_id"], axis="columns", inplace=True
-    )
+    summary_tbl.drop(labels=["date_of_birth", "equipment_id"], axis="columns", inplace=True)
 
     ct_tbl = _ecephys_counts_per_session_from_ecephys_session_id_list(
         lims_connection=lims_connection,
@@ -924,18 +898,12 @@ def session_tables_from_ecephys_session_id_list(
         how="left",
     )
 
-    summary_tbl = _add_images_from_behavior(
-        ecephys_table=summary_tbl, behavior_table=beh_table
-    )
+    summary_tbl = _add_images_from_behavior(ecephys_table=summary_tbl, behavior_table=beh_table)
 
-    sessions_table = _add_session_number(
-        sessions_df=summary_tbl, index_col="ecephys_session_id"
-    )
+    sessions_table = _add_session_number(sessions_df=summary_tbl, index_col="ecephys_session_id")
     sessions_table = add_experience_level_simple(input_df=sessions_table)
 
-    omission_results = _add_prior_omissions(
-        behavior_sessions_df=beh_table, ecephys_sessions_df=sessions_table
-    )
+    omission_results = _add_prior_omissions(behavior_sessions_df=beh_table, ecephys_sessions_df=sessions_table)
 
     beh_table = omission_results["behavior"]
     sessions_table = omission_results["ecephys"]
@@ -962,10 +930,7 @@ def session_tables_from_ecephys_session_id_list(
     # pare back down to only passed sessions
     if failed_ecephys_session_id_list is not None:
         sessions_table = sessions_table[
-            [
-                eid in set(ecephys_session_id_list)
-                for eid in sessions_table.ecephys_session_id
-            ]
+            [eid in set(ecephys_session_id_list) for eid in sessions_table.ecephys_session_id]
         ]
 
     return sessions_table, beh_table

@@ -1,17 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from allensdk.brain_observatory.behavior.behavior_ophys_experiment import (
-    BehaviorOphysExperiment)
-from allensdk.brain_observatory.behavior.behavior_session import (
-    BehaviorSession)
+from allensdk.brain_observatory.behavior.behavior_ophys_experiment import BehaviorOphysExperiment
+from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession
 import pandas as pd
 
 
 class BehaviorProjectBase(ABC):
     @abstractmethod
-    def get_behavior_ophys_experiment(self, ophys_experiment_id: int
-                                      ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int) -> BehaviorOphysExperiment:
         """Returns a BehaviorOphysExperiment object that contains methods
         to analyze a single behavior+ophys session.
         :param ophys_experiment_id: id that corresponds to an ophys experiment
@@ -27,8 +24,7 @@ class BehaviorProjectBase(ABC):
         pass
 
     @abstractmethod
-    def get_behavior_session(
-            self, behavior_session_id: int) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """Returns a BehaviorSession object that contains methods to
         analyze a single behavior session.
         :param behavior_session_id: id that corresponds to a behavior session
@@ -47,7 +43,7 @@ class BehaviorProjectBase(ABC):
 
     @abstractmethod
     def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """ Download a template for the natural movie stimulus. This is the
+        """Download a template for the natural movie stimulus. This is the
         actual movie that was shown during the recording session.
         :param number: identifier for this scene
         :type number: int

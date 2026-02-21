@@ -11,45 +11,44 @@ class Unit(DataObject):
     from a single cell", it is called a "unit" rather than a "neuron" """
 
     def __init__(
-            self,
-            id: int,
-            peak_channel_id: int,
-            local_index: int,
-            cluster_id: int,
-            quality: str,
-            firing_rate: float,
-            isi_violations: float,
-            presence_ratio: float,
-            amplitude_cutoff: float,
-            mean_waveforms: np.ndarray,
-            spike_amplitudes: np.ndarray,
-            spike_times: np.ndarray,
-            isolation_distance: Optional[float] = None,
-            l_ratio: Optional[float] = None,
-            d_prime: Optional[float] = None,
-            nn_hit_rate: Optional[float] = None,
-            nn_miss_rate: Optional[float] = None,
-            max_drift: Optional[float] = None,
-            cumulative_drift: Optional[float] = None,
-            silhouette_score: Optional[float] = None,
-            waveform_duration: Optional[float] = None,
-            waveform_halfwidth: Optional[float] = None,
-            PT_ratio: Optional[float] = None,
-            repolarization_slope: Optional[float] = None,
-            recovery_slope: Optional[float] = None,
-            amplitude: Optional[float] = None,
-            spread: Optional[float] = None,
-            velocity_above: Optional[float] = None,
-            velocity_below: Optional[float] = None,
-            snr: Optional[float] = None,
-            filter_and_sort_spikes=True
+        self,
+        id: int,
+        peak_channel_id: int,
+        local_index: int,
+        cluster_id: int,
+        quality: str,
+        firing_rate: float,
+        isi_violations: float,
+        presence_ratio: float,
+        amplitude_cutoff: float,
+        mean_waveforms: np.ndarray,
+        spike_amplitudes: np.ndarray,
+        spike_times: np.ndarray,
+        isolation_distance: Optional[float] = None,
+        l_ratio: Optional[float] = None,
+        d_prime: Optional[float] = None,
+        nn_hit_rate: Optional[float] = None,
+        nn_miss_rate: Optional[float] = None,
+        max_drift: Optional[float] = None,
+        cumulative_drift: Optional[float] = None,
+        silhouette_score: Optional[float] = None,
+        waveform_duration: Optional[float] = None,
+        waveform_halfwidth: Optional[float] = None,
+        PT_ratio: Optional[float] = None,
+        repolarization_slope: Optional[float] = None,
+        recovery_slope: Optional[float] = None,
+        amplitude: Optional[float] = None,
+        spread: Optional[float] = None,
+        velocity_above: Optional[float] = None,
+        velocity_below: Optional[float] = None,
+        snr: Optional[float] = None,
+        filter_and_sort_spikes=True,
     ):
-        super().__init__(name='unit',
-                         value=None,
-                         is_value_self=True)
+        super().__init__(name="unit", value=None, is_value_self=True)
         if filter_and_sort_spikes:
             spike_times, spike_amplitudes = _get_filtered_and_sorted_spikes(
-                spike_times=spike_times, spike_amplitudes=spike_amplitudes)
+                spike_times=spike_times, spike_amplitudes=spike_amplitudes
+            )
         self._id = id
         self._peak_channel_id = peak_channel_id
         self._local_index = local_index
@@ -211,8 +210,8 @@ class Unit(DataObject):
 
 
 def _get_filtered_and_sorted_spikes(
-        spike_times: np.ndarray, spike_amplitudes: np.ndarray) -> \
-        Tuple[np.ndarray, np.ndarray]:
+    spike_times: np.ndarray, spike_amplitudes: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
     """Filter out invalid spike timepoints and sort spike data
     (times + amplitudes) by times.
 

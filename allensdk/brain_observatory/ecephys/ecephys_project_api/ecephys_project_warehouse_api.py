@@ -40,9 +40,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         return self.rma_engine.stream(download_link)
 
     def get_natural_movie_template(self, number):
-        well_known_files = self.stimulus_templates[
-            self.stimulus_templates["movie_number"] == number
-        ]
+        well_known_files = self.stimulus_templates[self.stimulus_templates["movie_number"] == number]
         if well_known_files.shape[0] != 1:
             raise ValueError(
                 f"expected exactly one natural movie template with number {number}, found {well_known_files}"  # noqa: E501
@@ -52,9 +50,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         return self.rma_engine.stream(download_link)
 
     def get_natural_scene_template(self, number):
-        well_known_files = self.stimulus_templates[
-            self.stimulus_templates["scene_number"] == number
-        ]
+        well_known_files = self.stimulus_templates[self.stimulus_templates["scene_number"] == number]
         if well_known_files.shape[0] != 1:
             raise ValueError(
                 f"expected exactly one natural scene template with number {number}, found {well_known_files}"  # noqa: E501
@@ -119,9 +115,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         download_link = well_known_files.loc[0, "download_link"]
         return self.rma_engine.stream(download_link)
 
-    def get_sessions(
-        self, session_ids=None, has_eye_tracking=None, stimulus_names=None
-    ):
+    def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
@@ -171,9 +165,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             columns=["specimen", "fail_eye_tracking", "well_known_files"],
             inplace=True,
         )
-        response.rename(
-            columns={"stimulus_name": "session_type"}, inplace=True
-        )
+        response.rename(columns={"stimulus_name": "session_type"}, inplace=True)
 
         return response
 
@@ -257,9 +249,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         return response
 
-    def get_unit_analysis_metrics(
-        self, unit_ids=None, ecephys_session_ids=None, session_types=None
-    ):
+    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
         """Download analysis metrics - precalculated descriptions of unitwise
         responses to visual stimulation.
 
@@ -310,9 +300,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         for colname in output.columns:
             try:
-                output[colname] = output.apply(
-                    lambda row: ast.literal_eval(str(row[colname])), axis=1
-                )
+                output[colname] = output.apply(lambda row: ast.literal_eval(str(row[colname])), axis=1)
             except ValueError:
                 pass
 
@@ -322,9 +310,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         columns = set(output.columns.values.tolist())
         if "p_value_rf" in columns and "on_screen_rf" in columns:
             pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
-            on_screen_is_float = np.issubdtype(
-                output["on_screen_rf"].values[0].dtype, np.floating
-            )
+            on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
 
             # this is not a good test, but it avoids the case where we fix
             # these in the data for a future release, but

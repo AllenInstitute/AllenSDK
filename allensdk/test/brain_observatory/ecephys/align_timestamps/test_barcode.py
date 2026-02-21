@@ -6,7 +6,6 @@ import allensdk.brain_observatory.ecephys.align_timestamps.barcode as barcode
 
 @pytest.fixture
 def two_barcodes():
-
     on_times = np.array([11, 14, 30, 32, 34])
     off_times = np.array([13, 15, 31, 33, 35])
 
@@ -20,7 +19,6 @@ def two_barcodes():
 
 @pytest.fixture
 def master_barcodes_sequence():
-
     master_times = np.array([10, 25, 30, 37, 44, 45])
     master_barcodes = np.array([1, 2, 3, 4, 5, 6])
 
@@ -28,7 +26,6 @@ def master_barcodes_sequence():
 
 
 def test_extract_barcodes_from_times(two_barcodes):
-
     starts_obt, codes_obt = barcode.extract_barcodes_from_times(*two_barcodes)
 
     starts_exp = [30]
@@ -44,14 +41,11 @@ def test_extract_barcodes_from_times(two_barcodes):
 @pytest.mark.parametrize("prate", [10])  # , 1, -7, 0.1])
 @pytest.mark.parametrize("npcodes", [-1])  # , 3])
 def test_get_time_offset(sc, tr, sind, prate, npcodes, master_barcodes_sequence):
-
     master_times, master_barcodes = master_barcodes_sequence
     probe_times = (master_times[:npcodes] + tr) * sc
     probe_barcodes = master_barcodes[:npcodes]
 
-    obt = barcode.get_probe_time_offset(
-        master_times, master_barcodes, probe_times, probe_barcodes, sind, prate
-    )
+    obt = barcode.get_probe_time_offset(master_times, master_barcodes, probe_times, probe_barcodes, sind, prate)
     obt = [obt[0][0], obt[1][0], (obt[2][0][0], obt[2][1][0])]
 
     # total_time_shift, probe_rate, master_endpoints
@@ -68,7 +62,6 @@ def test_get_time_offset(sc, tr, sind, prate, npcodes, master_barcodes_sequence)
 @pytest.mark.parametrize("sc", [-10, -2, -1, -0.5, 0.5, 1, 2, 10])
 @pytest.mark.parametrize("tr", [-10, -2, -1, -0.5, 0, 0.5, 1, 2, 10])
 def test_linear_transform_from_intervals(sc, tr, master_barcodes_sequence):
-
     master = np.array([1, 2])
     probe = (master + tr) * sc
 
@@ -80,17 +73,12 @@ def test_linear_transform_from_intervals(sc, tr, master_barcodes_sequence):
 
 @pytest.mark.parametrize("sc", [-10, -2, -1, -0.5, 0.5, 1, 2, 10])
 @pytest.mark.parametrize("tr", [-10, -2, -1, -0.5, 0, 0.5, 1, 2, 10])
-@pytest.mark.parametrize(
-    "npcodes", [-1, 3]
-)  # fails in region [0, 2] due to insufficient samples
+@pytest.mark.parametrize("npcodes", [-1, 3])  # fails in region [0, 2] due to insufficient samples
 def test_match_barcodes(sc, tr, npcodes, master_barcodes_sequence):
-
     master_times, master_barcodes = master_barcodes_sequence
     probe_times = (master_times + tr) * sc
     probe_times_cut = probe_times[:npcodes]
     probe_barcodes = master_barcodes[:npcodes]
 
-    pint, mint = barcode.match_barcodes(
-        master_times, master_barcodes, probe_times_cut, probe_barcodes
-    )
+    pint, mint = barcode.match_barcodes(master_times, master_barcodes, probe_times_cut, probe_barcodes)
     assert pint[1] - pint[0] == sc * (mint[1] - mint[0])

@@ -31,9 +31,7 @@ class Stimuli(
     NwbReadableInterface,
     NwbWritableInterface,
 ):
-    def __init__(self,
-                 presentations: Presentations,
-                 templates: Templates):
+    def __init__(self, presentations: Presentations, templates: Templates):
         super().__init__(name="stimuli", value=None, is_value_self=True)
         self._presentations = presentations
         self._templates = templates
@@ -72,7 +70,7 @@ class Stimuli(
         presentation_columns: Optional[List[str]] = None,
         presentation_fill_omitted_values: bool = True,
         project_code: Optional[ProjectCode] = None,
-        load_stimulus_movie: bool = False
+        load_stimulus_movie: bool = False,
     ) -> "Stimuli":
         """
 
@@ -115,9 +113,7 @@ class Stimuli(
             trials=trials,
         )
         t = Templates.from_stimulus_file(
-            stimulus_file=stimulus_file,
-            limit_to_images=limit_to_images,
-            load_stimulus_movie=load_stimulus_movie
+            stimulus_file=stimulus_file, limit_to_images=limit_to_images, load_stimulus_movie=load_stimulus_movie
         )
         return Stimuli(presentations=p, templates=t)
 
@@ -138,9 +134,7 @@ class Stimuli(
         -------
         NWBFile
         """
-        nwbfile = self._templates.to_nwb(
-            nwbfile=nwbfile, stimulus_presentations=self._presentations
-        )
+        nwbfile = self._templates.to_nwb(nwbfile=nwbfile, stimulus_presentations=self._presentations)
         nwbfile = self._presentations.to_nwb(
             nwbfile=nwbfile,
             stimulus_name_column=presentations_stimulus_column_name,

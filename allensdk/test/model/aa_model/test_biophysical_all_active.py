@@ -41,25 +41,26 @@ from allensdk.core.dat_utilities import DatUtilities
 from allensdk.ephys import ephys_features
 import subprocess
 
+
 @pytest.mark.requires_neuron
 def test_biophysical_aa():
     """
     Test for backward compatibility of the legacy all-active models
     """
-    
-    subprocess.check_call(['nrnivmodl', 'modfiles/'])
 
-    description = Config().load('manifest.json')
+    subprocess.check_call(["nrnivmodl", "modfiles/"])
+
+    description = Config().load("manifest.json")
     utils = AllActiveUtils(description)
     h = utils.h
 
     manifest = description.manifest
-    morphology_path = manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore').decode("utf-8"))
+    morphology_path = manifest.get_path("MORPHOLOGY")
+    utils.generate_morphology(morphology_path.encode("ascii", "ignore").decode("utf-8"))
     utils.load_cell_parameters()
 
     stim = h.IClamp(h.soma[0](0.5))
-    stim.amp = 0.33   # Sweep 46
+    stim.amp = 0.33  # Sweep 46
     stim.delay = 1000.0
     stim.dur = 1000.0
 
@@ -70,12 +71,12 @@ def test_biophysical_aa():
     h.finitialize()
     h.run()
 
-    junction_potential = description.data['fitting'][0]['junction_potential']
+    junction_potential = description.data["fitting"][0]["junction_potential"]
     ms = 1.0e-3
 
-    output_data = (numpy.array(vec['v']) - junction_potential)  # in mV
-    output_times = numpy.array(vec['t']) * ms  # in s
-    output_path = 'output_voltage.dat'
+    output_data = numpy.array(vec["v"]) - junction_potential  # in mV
+    output_times = numpy.array(vec["t"]) * ms  # in s
+    output_path = "output_voltage.dat"
 
     DatUtilities.save_voltage(output_path, output_data, output_times)
 

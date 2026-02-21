@@ -21,7 +21,7 @@ def parse_stim_repr(
     array_re=ARRAY_RE,
     raise_on_unrecognized=False,
 ):
-    """ Read the string representation of a psychopy stimulus and extract
+    """Read the string representation of a psychopy stimulus and extract
     stimulus parameters.
 
     Parameters
@@ -39,9 +39,7 @@ def parse_stim_repr(
 
     """
 
-    stim_params = extract_const_params_from_stim_repr(
-        stim_repr, repr_params_re=repr_params_re, array_re=array_re
-    )
+    stim_params = extract_const_params_from_stim_repr(stim_repr, repr_params_re=repr_params_re, array_re=array_re)
 
     for drop_param in drop_params:
         if drop_param in stim_params:
@@ -58,9 +56,7 @@ def extract_stim_class_from_repr(stim_repr, repr_class_re=REPR_CLASS_RE):
         return match["class_name"]
 
 
-def extract_const_params_from_stim_repr(
-    stim_repr, repr_params_re=REPR_PARAMS_RE, array_re=ARRAY_RE
-):
+def extract_const_params_from_stim_repr(stim_repr, repr_params_re=REPR_PARAMS_RE, array_re=ARRAY_RE):
     """Parameters which are not set as sweep_params in the stimulus script
     (usually because they are not varied during the course of the session) are
     not output in an easily machine-readable format. This function
@@ -90,7 +86,6 @@ def extract_const_params_from_stim_repr(
         k, v = match.split("=")
 
         if k not in repr_params:
-
             m = array_re.match(v)
             if m is not None:
                 v = m["contents"]

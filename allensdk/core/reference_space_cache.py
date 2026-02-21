@@ -42,36 +42,30 @@ from .reference_space import ReferenceSpace
 
 
 class ReferenceSpaceCache(Cache):
-
-    REFERENCE_SPACE_VERSION_KEY = 'REFERENCE_SPACE_VERSION'
-    ANNOTATION_KEY = 'ANNOTATION'
-    TEMPLATE_KEY = 'TEMPLATE'
-    STRUCTURES_KEY = 'STRUCTURES'
-    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
-    STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
-    STRUCTURE_MESH_KEY = 'STRUCTURE_MESH'
+    REFERENCE_SPACE_VERSION_KEY = "REFERENCE_SPACE_VERSION"
+    ANNOTATION_KEY = "ANNOTATION"
+    TEMPLATE_KEY = "TEMPLATE"
+    STRUCTURES_KEY = "STRUCTURES"
+    STRUCTURE_TREE_KEY = "STRUCTURE_TREE"
+    STRUCTURE_MASK_KEY = "STRUCTURE_MASK"
+    STRUCTURE_MESH_KEY = "STRUCTURE_MESH"
 
     MANIFEST_VERSION = 1.2
 
-    def __init__(self, 
-                 resolution, 
-                 reference_space_key,
-                 **kwargs):
+    def __init__(self, resolution, reference_space_key, **kwargs):
+        if "version" not in kwargs:
+            kwargs["version"] = self.MANIFEST_VERSION
 
-        if 'version' not in kwargs:
-            kwargs['version'] = self.MANIFEST_VERSION
-
-        if 'base_uri' not in kwargs:
-            kwargs['base_uri'] = None
+        if "base_uri" not in kwargs:
+            kwargs["base_uri"] = None
 
         super(ReferenceSpaceCache, self).__init__(**kwargs)
 
         self.resolution = resolution
-        self.reference_space_key = reference_space_key        
-        
-        self.api = ReferenceSpaceApi(base_uri=kwargs['base_uri'])
+        self.reference_space_key = reference_space_key
 
-        
+        self.api = ReferenceSpaceApi(base_uri=kwargs["base_uri"])
+
     def get_annotation_volume(self, file_name=None):
         """
         Read the annotation volume.  Download it first if it doesn't exist.
@@ -86,17 +80,13 @@ class ReferenceSpaceCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.reference_space_key, self.resolution)
+        file_name = self.get_cache_path(file_name, self.ANNOTATION_KEY, self.reference_space_key, self.resolution)
 
         annotation, info = self.api.download_annotation_volume(
-            self.reference_space_key,
-            self.resolution,
-            file_name, 
-            strategy='lazy')
+            self.reference_space_key, self.resolution, file_name, strategy="lazy"
+        )
 
         return annotation, info
-
 
     def get_template_volume(self, file_name=None):
         """
@@ -112,19 +102,15 @@ class ReferenceSpaceCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.TEMPLATE_KEY, self.resolution)
+        file_name = self.get_cache_path(file_name, self.TEMPLATE_KEY, self.resolution)
 
-        template, info = self.api.download_template_volume(self.resolution, 
-                                                           file_name, 
-                                                           strategy='lazy')
+        template, info = self.api.download_template_volume(self.resolution, file_name, strategy="lazy")
 
         return template, info
 
-
     def get_structure_tree(self, file_name=None, structure_graph_id=1):
         """
-        Read the list of adult mouse structures and return an StructureTree 
+        Read the list of adult mouse structures and return an StructureTree
         instance.
 
         Parameters
@@ -137,43 +123,44 @@ class ReferenceSpaceCache(Cache):
         structure_graph_id: int
             Build a tree using structure only from the identified structure graph.
         """
-        
+
         file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
 
         return OntologiesApi(self.api.api_url).get_structures_with_sets(
-            strategy='lazy',
+            strategy="lazy",
             path=file_name,
             pre=StructureTree.clean_structures,
-            post=lambda x: StructureTree(StructureTree.clean_structures(x)), 
+            post=lambda x: StructureTree(StructureTree.clean_structures(x)),
             structure_graph_ids=structure_graph_id,
-            **Cache.cache_json())
+            **Cache.cache_json(),
+        )
 
-
-    def get_reference_space(self, structure_file_name=None, 
-                            annotation_file_name=None):
+    def get_reference_space(self, structure_file_name=None, annotation_file_name=None):
         """
-        Build a ReferenceSpace from this cache's annotation volume and 
-        structure tree. The ReferenceSpace does operations that relate brain 
+        Build a ReferenceSpace from this cache's annotation volume and
+        structure tree. The ReferenceSpace does operations that relate brain
         structures to spatial domains.
-        
+
         Parameters
         ----------
-        
+
         structure_file_name: string
             File name to save/read the structures table.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
-            
+
         annotation_file_name: string
             File name to store the annotation volume.  If it already exists,
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
-        
+
         """
-        
-        return ReferenceSpace(self.get_structure_tree(structure_file_name), 
-                              self.get_annotation_volume(annotation_file_name)[0], 
-                              [self.resolution] * 3)
+
+        return ReferenceSpace(
+            self.get_structure_tree(structure_file_name),
+            self.get_annotation_volume(annotation_file_name)[0],
+            [self.resolution] * 3,
+        )
 
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
@@ -182,9 +169,9 @@ class ReferenceSpaceCache(Cache):
 
         Notes
         -----
-        This method downloads structure masks from the Allen Institute. To make your own locally, see 
+        This method downloads structure masks from the Allen Institute. To make your own locally, see
         ReferenceSpace.many_structure_masks.
-        
+
         Parameters
         ----------
 
@@ -204,19 +191,16 @@ class ReferenceSpaceCache(Cache):
         structure_id = ReferenceSpaceCache.validate_structure_id(structure_id)
 
         file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MASK_KEY, self.reference_space_key, 
-            self.resolution, structure_id)
+            file_name, self.STRUCTURE_MASK_KEY, self.reference_space_key, self.resolution, structure_id
+        )
 
-        return self.api.download_structure_mask(structure_id, 
-                                                self.reference_space_key,
-                                                self.resolution,
-                                                file_name, 
-                                                strategy='lazy')
-
+        return self.api.download_structure_mask(
+            structure_id, self.reference_space_key, self.resolution, file_name, strategy="lazy"
+        )
 
     def get_structure_mesh(self, structure_id, file_name=None):
         """Obtain a 3D mesh specifying the surface of an annotated structure.
-    
+
         Parameters
         -----------
         structure_id: int
@@ -234,29 +218,24 @@ class ReferenceSpaceCache(Cache):
         vertex_normals : np.ndarray
             Dimensions are (nSample, nElements=3). Vectors normal to vertices.
         face_vertices : np.ndarray
-            Dimensions are (sample, nVertices=3). References are given in indices 
+            Dimensions are (sample, nVertices=3). References are given in indices
             (0-indexed here, but 1-indexed in the file) of vertices that make up each face.
         face_normals : np.ndarray
-            Dimensions are (sample, nNormals=3). References are given in indices 
+            Dimensions are (sample, nNormals=3). References are given in indices
             (0-indexed here, but 1-indexed in the file) of vertex normals that make up each face.
 
         Notes
         -----
-        These meshes are meant for 3D visualization and as such have been smoothed. 
-        If you are interested in performing quantative analyses, we recommend that you 
+        These meshes are meant for 3D visualization and as such have been smoothed.
+        If you are interested in performing quantative analyses, we recommend that you
         use the structure masks instead.
 
         """
         structure_id = ReferenceSpaceCache.validate_structure_id(structure_id)
 
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MESH_KEY, self.reference_space_key, structure_id)
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_MESH_KEY, self.reference_space_key, structure_id)
 
-        return self.api.download_structure_mesh(structure_id, 
-                                                self.reference_space_key,
-                                                file_name, 
-                                                strategy='lazy')
-
+        return self.api.download_structure_mesh(structure_id, self.reference_space_key, file_name, strategy="lazy")
 
     def add_manifest_paths(self, manifest_builder):
         """
@@ -271,45 +250,35 @@ class ReferenceSpaceCache(Cache):
         """
 
         manifest_builder = super(ReferenceSpaceCache, self).add_manifest_paths(manifest_builder)
-                                  
-        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
-                                  'structures.json',
-                                  parent_key='BASEDIR',
-                                  typename='file')
 
-        manifest_builder.add_path(self.REFERENCE_SPACE_VERSION_KEY,
-                                  '%s',
-                                  parent_key='BASEDIR',
-                                  typename='dir')
+        manifest_builder.add_path(self.STRUCTURE_TREE_KEY, "structures.json", parent_key="BASEDIR", typename="file")
 
-        manifest_builder.add_path(self.ANNOTATION_KEY,
-                                  'annotation_%d.nrrd',
-                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
-                                  typename='file')
+        manifest_builder.add_path(self.REFERENCE_SPACE_VERSION_KEY, "%s", parent_key="BASEDIR", typename="dir")
 
-        manifest_builder.add_path(self.TEMPLATE_KEY,
-                                  'average_template_%d.nrrd',
-                                  parent_key='BASEDIR',
-                                  typename='file')
+        manifest_builder.add_path(
+            self.ANNOTATION_KEY, "annotation_%d.nrrd", parent_key=self.REFERENCE_SPACE_VERSION_KEY, typename="file"
+        )
 
-        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
-                                  'structure_masks/resolution_%d/structure_%d.nrrd',
-                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
-                                  typename='file')
+        manifest_builder.add_path(self.TEMPLATE_KEY, "average_template_%d.nrrd", parent_key="BASEDIR", typename="file")
 
-        manifest_builder.add_path(self.STRUCTURE_MESH_KEY,
-                                  'structure_meshes/structure_%d.obj',
-                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
-                                  typename='file')
+        manifest_builder.add_path(
+            self.STRUCTURE_MASK_KEY,
+            "structure_masks/resolution_%d/structure_%d.nrrd",
+            parent_key=self.REFERENCE_SPACE_VERSION_KEY,
+            typename="file",
+        )
+
+        manifest_builder.add_path(
+            self.STRUCTURE_MESH_KEY,
+            "structure_meshes/structure_%d.obj",
+            parent_key=self.REFERENCE_SPACE_VERSION_KEY,
+            typename="file",
+        )
 
         return manifest_builder
 
-
-       
- 
     @classmethod
     def validate_structure_id(cls, structure_id):
-
         try:
             structure_id = int(structure_id)
         except ValueError:
@@ -317,10 +286,8 @@ class ReferenceSpaceCache(Cache):
 
         return structure_id
 
-
     @classmethod
     def validate_structure_ids(cls, structure_ids):
-
         for ii, sid in enumerate(structure_ids):
             structure_ids[ii] = cls.validate_structure_id(sid)
 

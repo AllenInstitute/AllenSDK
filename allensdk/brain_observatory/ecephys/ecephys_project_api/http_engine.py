@@ -17,29 +17,24 @@ DEFAULT_CHUNKSIZE = 1024 * 10  # bytes
 
 class HttpEngine:
     def __init__(
-        self, 
-        scheme: str, 
-        host: str, 
-        timeout: float = DEFAULT_TIMEOUT, 
-        chunksize: int = DEFAULT_CHUNKSIZE,
-        **kwargs
+        self, scheme: str, host: str, timeout: float = DEFAULT_TIMEOUT, chunksize: int = DEFAULT_CHUNKSIZE, **kwargs
     ):
-        """ Simple tool for making streaming http requests.
+        """Simple tool for making streaming http requests.
 
         Parameters
         ----------
         scheme :
             e.g "http" or "https"
-        host : 
+        host :
             will be used as the base for request urls
-        timeout : 
-            requests taking longer than this (in seconds) will raise a 
-            `requests.Timeout` error. The clock on this timeout starts running 
+        timeout :
+            requests taking longer than this (in seconds) will raise a
+            `requests.Timeout` error. The clock on this timeout starts running
             when the initial request is made.
-        chunksize : 
+        chunksize :
             When streaming data, how many bytes ought to be requested at once.
-        **kwargs : 
-            unused. Defined here so that parameters can fall through from 
+        **kwargs :
+            unused. Defined here so that parameters can fall through from
             subclasses
         """
 
@@ -52,7 +47,7 @@ class HttpEngine:
         return f"{self.scheme}://{self.host}/{route}"
 
     def stream(self, route):
-        """ Makes an http request and returns an iterator over the response.
+        """Makes an http request and returns an iterator over the response.
 
         Parameters
         ----------
@@ -62,19 +57,19 @@ class HttpEngine:
         """
 
         url = self._build_url(route)
-        
+
         start_time = time.perf_counter()
         response = requests.get(url, stream=True)
         response_b = None
         if "Content-length" in response.headers:
             response_b = float(response.headers["Content-length"])
 
-        size_message = f"{response_b / 1024 ** 2:3.3f}MiB" if response_b is not None else "potentially large"
+        size_message = f"{response_b / 1024**2:3.3f}MiB" if response_b is not None else "potentially large"
         logging.warning(f"downloading a {size_message} file from {url}")
-        progress = tqdm( unit="B", total=response_b, unit_scale=True,  desc="Downloading")
+        progress = tqdm(unit="B", total=response_b, unit_scale=True, desc="Downloading")
 
         for chunk in response.iter_content(self.chunksize):
-            if chunk: # filter out keep-alive new chunks
+            if chunk:  # filter out keep-alive new chunks
                 progress.update(len(chunk))
                 yield chunk
 
@@ -91,25 +86,18 @@ AsyncStreamCallbackType = Callable[[AsyncIterator[bytes]], Awaitable[None]]
 
 
 class AsyncHttpEngine(HttpEngine):
-
-    def __init__(
-        self, 
-        scheme: str, 
-        host: str, 
-        session: Optional[aiohttp.ClientSession] = None, 
-        **kwargs
-    ):
-        """ Simple tool for making asynchronous streaming http requests.
+    def __init__(self, scheme: str, host: str, session: Optional[aiohttp.ClientSession] = None, **kwargs):
+        """Simple tool for making asynchronous streaming http requests.
 
         Parameters
         ----------
         scheme :
             e.g "http" or "https"
-        host : 
+        host :
             will be used as the base for request urls
-        session : 
-            If provided, this preconstructed session will be used rather than 
-            a new one. Keep in mind that AsyncHttpEngine closes its session 
+        session :
+            If provided, this preconstructed session will be used rather than
+            a new one. Keep in mind that AsyncHttpEngine closes its session
             when it is garbage collected!
         **kwargs :
             Will be passed to parent.
@@ -121,33 +109,22 @@ class AsyncHttpEngine(HttpEngine):
         self._session = None
         if session:
             self._session = session
-            warnings.warn(
-                "Recieved preconstructed session, ignoring timeout parameter."
-            )
+            warnings.warn("Recieved preconstructed session, ignoring timeout parameter.")
 
     @property
     def session(self):
         if self._session is None:
-            self._session = aiohttp.ClientSession(
-                timeout=aiohttp.client.ClientTimeout(self.timeout)
-            )
+            self._session = aiohttp.ClientSession(timeout=aiohttp.client.ClientTimeout(self.timeout))
         return self._session
 
-    async def _stream_coroutine(
-        self, 
-        route: str, 
-        callback: AsyncStreamCallbackType
-    ):
+    async def _stream_coroutine(self, route: str, callback: AsyncStreamCallbackType):
         url = self._build_url(route)
 
         async with self.session.get(url) as response:
             await callback(response.content.iter_chunked(self.chunksize))
 
-    def stream(
-        self, 
-        route: str
-    ) -> Callable[[AsyncStreamCallbackType], Awaitable[None]]:
-        """ Returns a coroutine which
+    def stream(self, route: str) -> Callable[[AsyncStreamCallbackType], Awaitable[None]]:
+        """Returns a coroutine which
             - makes an http request
             - exposes internally an asynchronous iterator over the response
             - takes a callback parameter, which should consume the iterator.
@@ -180,40 +157,35 @@ class AsyncHttpEngine(HttpEngine):
             loop.run_until_complete(self._session.close())
 
     @staticmethod
-    def write_bytes(
-            path: str,
-            coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]):
+    def write_bytes(path: str, coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]):
         write_bytes_from_coroutine(path, coroutine)
 
 
-def write_bytes_from_coroutine(
-    path: str, 
-    coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]
-):
-    """ Utility for streaming http from an asynchronous requester to a file.
+def write_bytes_from_coroutine(path: str, coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]):
+    """Utility for streaming http from an asynchronous requester to a file.
 
     Parameters
     ----------
-    path : 
+    path :
         Write to this file
-    coroutine : 
+    coroutine :
         The source of the data. Needs to have a specific structure, namely:
             - the first-position parameter of the coroutine ought to accept a
             callback. This callback ought to itself be awaitable.
-            - within the coroutine, this callback ought to be called with a 
-            single argument. That single argument should be an asynchronous 
+            - within the coroutine, this callback ought to be called with a
+            single argument. That single argument should be an asynchronous
             iterator.
-        Please see AsyncHttpEngine.stream (and 
-        AsyncHttpEngine._stream_coroutine) for an example. 
-    
+        Please see AsyncHttpEngine.stream (and
+        AsyncHttpEngine._stream_coroutine) for an example.
+
     """
-    
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    
+
     async def callback(file_, iterable):
         async for chunk in iterable:
             file_.write(chunk)
-            
+
     async def wrapper():
         with open(path, "wb") as file_:
             callback_ = functools.partial(callback, file_)
@@ -225,13 +197,13 @@ def write_bytes_from_coroutine(
 
 
 def write_from_stream(path: str, stream: Iterable[bytes]):
-    """ Write bytes to a file from an iterator
+    """Write bytes to a file from an iterator
 
     Parameters
     ----------
-    path : 
+    path :
         write to this file
-    stream : 
+    stream :
         iterable yielding bytes to be written
 
     """

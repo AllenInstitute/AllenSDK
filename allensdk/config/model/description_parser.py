@@ -44,7 +44,7 @@ class DescriptionParser(object):
         pass
 
     def read(self, file_path, description=None, section=None, **kwargs):
-        '''Parse data needed for a simulation.
+        """Parse data needed for a simulation.
 
         Parameters
         ----------
@@ -52,7 +52,7 @@ class DescriptionParser(object):
             Configuration from parsing previous files.
         section : string, optional
             What configuration section to read it into if the file does not specify.
-        '''
+        """
         if description is None:
             description = Description()
 
@@ -62,7 +62,7 @@ class DescriptionParser(object):
         return description
 
     def read_string(self, data_string, description=None, section=None, header=None):
-        '''Parse data needed for a simulation from a string.'''
+        """Parse data needed for a simulation from a string."""
         raise Exception("Not implemented, use a sub class")
 
     def write(self, filename, description):
@@ -78,7 +78,7 @@ class DescriptionParser(object):
         writer.write(filename, description)
 
     def parser_for_extension(self, filename):
-        '''Choose a subclass that can read the format.
+        """Choose a subclass that can read the format.
 
         Parameters
         ----------
@@ -89,18 +89,18 @@ class DescriptionParser(object):
         -------
         DescriptionParser
             Appropriate subclass.
-        '''
+        """
         # Circular imports
         from allensdk.config.model.formats.json_description_parser import JsonDescriptionParser
         from allensdk.config.model.formats.pycfg_description_parser import PycfgDescriptionParser
 
         parser = None
 
-        if filename.endswith('.json'):
+        if filename.endswith(".json"):
             parser = JsonDescriptionParser()
-        elif filename.endswith('.pycfg'):
+        elif filename.endswith(".pycfg"):
             parser = PycfgDescriptionParser()
         else:
-            raise Exception('could not determine file format')
+            raise Exception("could not determine file format")
 
         return parser

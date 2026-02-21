@@ -53,7 +53,8 @@ def test_get_structure_graph(mock_json_msg_query, ontologies):
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,[graph_id$in1],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -62,7 +63,8 @@ def test_list_structure_graphs(mock_json_msg_query, ontologies):
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureGraph,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -70,7 +72,8 @@ def test_list_structure_sets_noarg(mock_json_msg_query, ontologies):
     ontologies.get_structure_sets()
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]")
+        "model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -79,15 +82,16 @@ def test_list_structure_sets_args(mock_json_msg_query, ontologies):
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::criteria,[id$in2,3],"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
 def test_list_atlases(mock_json_msg_query, ontologies):
     ontologies.get_atlases()
     mock_json_msg_query.assert_called_once_with(
-        "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::Atlas,rma::options[num_rows$eq'all'][count$eqfalse]")
+        "http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -98,20 +102,21 @@ def test_structure_graph_by_name(mock_json_msg_query, ontologies):
         "model::Structure,rma::criteria,"
         "graph[structure_graphs.name$in'Mouse Brain Atlas'],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
 def test_structure_graphs_by_names(mock_json_msg_query, ontologies):
-    ontologies.get_structures(structure_graph_names=["'Mouse Brain Atlas'",
-                                                     "'Human Brain Atlas'"])
+    ontologies.get_structures(structure_graph_names=["'Mouse Brain Atlas'", "'Human Brain Atlas'"])
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "graph[structure_graphs.name$in'Mouse Brain Atlas',"
         "'Human Brain Atlas'],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -121,7 +126,8 @@ def test_structure_set_by_id(mock_json_msg_query, ontologies):
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,[structure_set_id$in8],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -131,20 +137,20 @@ def test_structure_sets_by_ids(mock_json_msg_query, ontologies):
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,[structure_set_id$in7,8],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
 def test_structure_set_by_name(mock_json_msg_query, ontologies):
-    ontologies.get_structures(
-        structure_set_names=ontologies.quote_string(
-            "Mouse Connectivity - Summary"))
+    ontologies.get_structures(structure_set_names=ontologies.quote_string("Mouse Connectivity - Summary"))
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "structure_sets[name$in'Mouse Connectivity - Summary'],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -152,13 +158,16 @@ def test_structure_set_by_names(mock_json_msg_query, ontologies):
     ontologies.get_structures(
         structure_set_names=[
             ontologies.quote_string("NHP - Coarse"),
-            ontologies.quote_string("Mouse Connectivity - Summary")])
+            ontologies.quote_string("Mouse Connectivity - Summary"),
+        ]
+    )
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "structure_sets[name$in'NHP - Coarse','Mouse Connectivity - Summary'],"
         "rma::options"
-        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]")
+        "[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -167,7 +176,8 @@ def test_structure_set_no_order(mock_json_msg_query, ontologies):
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
-        "[graph_id$in1],rma::options[num_rows$eq'all'][count$eqfalse]")
+        "[graph_id$in1],rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -183,7 +193,8 @@ def test_atlas_1(mock_json_msg_query, ontologies):
         "ontologies.id,ontologies.name,"
         "structure_graphs.id,structure_graphs.name,"
         "graphic_group_labels.id,graphic_group_labels.name']"
-        "[num_rows$eq'all'][count$eqfalse]")
+        "[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -194,7 +205,8 @@ def test_atlas_verbose(mock_json_msg_query, ontologies):
         "model::Atlas,rma::criteria,"
         "structure_graph(ontology),graphic_group_labels,"
         "rma::include,structure_graph(ontology),graphic_group_labels,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 @patch.object(OntologiesApi, "json_msg_query")
@@ -205,13 +217,13 @@ def test_get_structures_with_sets(mock_json_msg_query, ontologies):
         "model::Structure,rma::criteria,[graph_id$in1],"
         "rma::include,structure_sets,"
         "rma::options[num_rows$eq'all'][order$eqstructures.graph_order]"
-        "[count$eqfalse]")
+        "[count$eqfalse]"
+    )
 
 
 def test_unpack_structure_set_ancestors(ontologies):
-
-    sdf = pd.DataFrame([{'structure_id_path': '/1/2/3/'}])
+    sdf = pd.DataFrame([{"structure_id_path": "/1/2/3/"}])
     ontologies.unpack_structure_set_ancestors(sdf)
-    
-    assert( 'structure_set_ancestor' in sdf.columns.values )
-    assert( allclose(sdf['structure_set_ancestor'].values[0], [1, 2, 3]) )
+
+    assert "structure_set_ancestor" in sdf.columns.values
+    assert allclose(sdf["structure_set_ancestor"].values[0], [1, 2, 3])

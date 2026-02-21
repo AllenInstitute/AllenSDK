@@ -33,6 +33,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-''' Subclasses of allensdk.api.api.Api to implement specific queries to the
+"""Subclasses of allensdk.api.api.Api to implement specific queries to the
 `Allen Brain Atlas Data Portal <http://www.brain-map.org/api/index.html>`_.
-'''
+"""

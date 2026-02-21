@@ -31,16 +31,10 @@ class TestFromBehaviorStimulusFile(LimsTest):
         dir = Path(__file__).parent.resolve()
         test_data_dir = dir / "test_data"
 
-        presentations = pd.read_pickle(
-            str(test_data_dir / "presentations.pkl")
-        )
+        presentations = pd.read_pickle(str(test_data_dir / "presentations.pkl"))
         templates = pd.read_pickle(str(test_data_dir / "templates.pkl"))
-        cls.expected_presentations = StimulusPresentations(
-            presentations=presentations
-        )
-        cls.expected_templates = Templates(
-            templates={templates.image_set_name: templates}
-        )
+        cls.expected_presentations = StimulusPresentations(presentations=presentations)
+        cls.expected_templates = Templates(templates={templates.image_set_name: templates})
 
     @pytest.mark.requires_bamboo
     def test_from_stimulus_file(self):
@@ -58,12 +52,8 @@ class TestFromBehaviorStimulusFile(LimsTest):
                     }
                 )
 
-        stimulus_file = BehaviorStimulusFile.from_lims(
-            behavior_session_id=self.behavior_session_id, db=self.dbconn
-        )
-        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=stimulus_file, monitor_delay=0.0
-        )
+        stimulus_file = BehaviorStimulusFile.from_lims(behavior_session_id=self.behavior_session_id, db=self.dbconn)
+        stimulus_timestamps = StimulusTimestamps.from_stimulus_file(stimulus_file=stimulus_file, monitor_delay=0.0)
         stimuli = Stimuli.from_stimulus_file(
             stimulus_file=stimulus_file,
             stimulus_timestamps=stimulus_timestamps,
@@ -82,17 +72,13 @@ def presentations_fixture(behavior_ecephys_session_config_fixture):
     """
     obj = Presentations.from_path(
         path=behavior_ecephys_session_config_fixture["stim_table_file"],
-        behavior_session_id=(
-            behavior_ecephys_session_config_fixture["behavior_session_id"]
-        ),
+        behavior_session_id=(behavior_ecephys_session_config_fixture["behavior_session_id"]),
     )
     return obj
 
 
 @pytest.mark.requires_bamboo
-@pytest.mark.parametrize(
-    "roundtrip, add_is_change", ([True, False], [True, False])
-)
+@pytest.mark.parametrize("roundtrip, add_is_change", ([True, False], [True, False]))
 def test_read_write_nwb(
     roundtrip,
     add_is_change,
@@ -104,12 +90,8 @@ def test_read_write_nwb(
     nwbfile = helper_functions.create_blank_nwb_file()
 
     # Need to write stimulus timestamps first
-    bsf = BehaviorStimulusFile.from_json(
-        dict_repr=behavior_ecephys_session_config_fixture
-    )
-    ts = StimulusTimestamps.from_stimulus_file(
-        stimulus_file=bsf, monitor_delay=0.0
-    )
+    bsf = BehaviorStimulusFile.from_json(dict_repr=behavior_ecephys_session_config_fixture)
+    ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf, monitor_delay=0.0)
     ts.to_nwb(nwbfile=nwbfile)
 
     presentations_fixture.to_nwb(nwbfile=nwbfile)
@@ -121,9 +103,7 @@ def test_read_write_nwb(
             add_is_change=add_is_change,
         )
     else:
-        obt = Presentations.from_nwb(
-            nwbfile=nwbfile, add_is_change=add_is_change
-        )
+        obt = Presentations.from_nwb(nwbfile=nwbfile, add_is_change=add_is_change)
 
     assert obt == presentations_fixture
 
@@ -134,9 +114,7 @@ class TestNWB:
         dir = Path(__file__).parent.resolve()
         cls.test_data_dir = dir / "test_data"
 
-        presentations = pd.read_pickle(
-            str(cls.test_data_dir / "presentations.pkl")
-        )
+        presentations = pd.read_pickle(str(cls.test_data_dir / "presentations.pkl"))
         templates = pd.read_pickle(str(cls.test_data_dir / "templates.pkl"))
         presentations = presentations.drop("is_change", axis=1)
         presentations = presentations.drop("flashes_since_change", axis=1)
@@ -152,12 +130,8 @@ class TestNWB:
         )
 
         # Need to write stimulus timestamps first
-        bsf = BehaviorStimulusFile(
-            filepath=self.test_data_dir / "behavior_stimulus_file.pkl"
-        )
-        ts = StimulusTimestamps.from_stimulus_file(
-            stimulus_file=bsf, monitor_delay=0.0
-        )
+        bsf = BehaviorStimulusFile(filepath=self.test_data_dir / "behavior_stimulus_file.pkl")
+        ts = StimulusTimestamps.from_stimulus_file(stimulus_file=bsf, monitor_delay=0.0)
         ts.to_nwb(nwbfile=self.nwbfile)
 
     @pytest.mark.parametrize("roundtrip", [True, False])
@@ -165,18 +139,14 @@ class TestNWB:
         self.stimuli.to_nwb(nwbfile=self.nwbfile)
 
         if roundtrip:
-            obt = data_object_roundtrip_fixture(
-                nwbfile=self.nwbfile, data_object_cls=Stimuli
-            )
+            obt = data_object_roundtrip_fixture(nwbfile=self.nwbfile, data_object_cls=Stimuli)
         else:
             obt = Stimuli.from_nwb(nwbfile=self.nwbfile)
 
         # is_change different due to limit_to_images. flashes_since_change
         # also relies on this column so we ommit that.
         obt.presentations.value.drop("is_change", axis=1, inplace=True)
-        obt.presentations.value.drop(
-            "flashes_since_change", axis=1, inplace=True
-        )
+        obt.presentations.value.drop("flashes_since_change", axis=1, inplace=True)
 
         assert obt == self.stimuli
 
@@ -213,11 +183,7 @@ class TestNWB:
 def test_set_omitted_stop_time(stimulus_table, expected_table_data):
     stimulus_table = pd.DataFrame.from_dict(data=stimulus_table)
     expected_table = pd.DataFrame.from_dict(data=expected_table_data)
-    stimulus_table = (
-        StimulusPresentations._fill_missing_values_for_omitted_flashes(
-            df=stimulus_table
-        )
-    )
+    stimulus_table = StimulusPresentations._fill_missing_values_for_omitted_flashes(df=stimulus_table)
     assert stimulus_table.equals(expected_table)
 
 
@@ -227,9 +193,7 @@ def stimulus_templates_fixture(behavior_ecephys_session_config_fixture):
     Return a Templates object
     """
 
-    sf = BehaviorStimulusFile.from_json(
-        dict_repr=behavior_ecephys_session_config_fixture
-    )
+    sf = BehaviorStimulusFile.from_json(dict_repr=behavior_ecephys_session_config_fixture)
     obj = Templates.from_stimulus_file(stimulus_file=sf)
     return obj
 
@@ -248,14 +212,10 @@ def test_read_write_nwb_no_image_index(
 
     nwbfile = helper_functions.create_blank_nwb_file()
 
-    stimulus_templates_fixture.to_nwb(
-        nwbfile=nwbfile, stimulus_presentations=presentations_fixture
-    )
+    stimulus_templates_fixture.to_nwb(nwbfile=nwbfile, stimulus_presentations=presentations_fixture)
 
     if roundtrip:
-        obt = data_object_roundtrip_fixture(
-            nwbfile=nwbfile, data_object_cls=Templates
-        )
+        obt = data_object_roundtrip_fixture(nwbfile=nwbfile, data_object_cls=Templates)
     else:
         obt = Templates.from_nwb(nwbfile=nwbfile)
 

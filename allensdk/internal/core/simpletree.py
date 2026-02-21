@@ -1,14 +1,10 @@
-
-class SimpleTree( object ):
-    def __init__(self, nodes, 
-                 node_id_cb, 
-                 parent_id_cb):
-
+class SimpleTree(object):
+    def __init__(self, nodes, node_id_cb, parent_id_cb):
         self.node_list = nodes
 
-        self._nodes = { node_id_cb(n):n for n in nodes }
-        self._parent_ids = { nid:parent_id_cb(n) for nid,n in self._nodes.items() }
-        self._child_ids = { nid:[] for nid in self._nodes }
+        self._nodes = {node_id_cb(n): n for n in nodes}
+        self._parent_ids = {nid: parent_id_cb(n) for nid, n in self._nodes.items()}
+        self._child_ids = {nid: [] for nid in self._nodes}
 
         for nid in self._parent_ids:
             pid = self._parent_ids[nid]
@@ -39,7 +35,7 @@ class SimpleTree( object ):
                 pid = self.parent_id(pid)
         except Exception:
             raise KeyError("Could not find ancestors for node %s" % str(nid))
-        
+
     def descendant_ids(self, nid):
         ids = [nid]
         try:
@@ -74,7 +70,3 @@ class SimpleTree( object ):
     def ancestors(self, nid):
         for node in self.nodes(self.ancestor_ids(nid)):
             yield node
-
-
-        
-

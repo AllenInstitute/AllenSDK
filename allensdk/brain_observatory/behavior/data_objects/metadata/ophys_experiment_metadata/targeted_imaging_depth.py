@@ -22,9 +22,7 @@ class TargetedImagingDepth(
     """
 
     def __init__(self, targeted_imaging_depth: int):
-        super().__init__(
-            name="targeted_imaging_depth", value=targeted_imaging_depth
-        )
+        super().__init__(name="targeted_imaging_depth", value=targeted_imaging_depth)
 
     @classmethod
     def from_lims(
@@ -50,9 +48,7 @@ class TargetedImagingDepth(
             SELECT visual_behavior_experiment_container_id
             FROM ophys_experiments_visual_behavior_experiment_containers
             WHERE ophys_experiment_id = {}
-        """.format(
-            ophys_experiment_id
-        )
+        """.format(ophys_experiment_id)
 
         container_id = lims_db.fetchone(query_container_id, strict=True)
 
@@ -62,9 +58,7 @@ class TargetedImagingDepth(
             JOIN ophys_experiments oe ON oe.id = ec.ophys_experiment_id
             LEFT JOIN imaging_depths imd ON imd.id = oe.imaging_depth_id
             WHERE ec.visual_behavior_experiment_container_id = {};
-        """.format(
-            container_id
-        )
+        """.format(container_id)
         depths = lims_db.select(query_depths).set_index("ophys_experiment_id")
         if ophys_experiment_ids is not None:
             if ophys_experiment_id not in ophys_experiment_ids:

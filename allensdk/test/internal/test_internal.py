@@ -7,6 +7,7 @@ test_internal
 
 Tests for `internal` module.
 """
+
 import pytest
 
 
@@ -16,10 +17,6 @@ def decorated_example():
     See more at: http://doc.pytest.org/en/latest/fixture.html
     """
 
+
 def test_example(decorated_example):
-    """Sample pytest test function with the pytest fixture as an argument.
-    """
-
-
-
-
+    """Sample pytest test function with the pytest fixture as an argument."""

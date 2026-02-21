@@ -12,27 +12,19 @@ import warnings
 import numpy as np
 
 
-def chisq_from_stim_table(
-    stim_table, columns, mean_sweep_events, num_shuffles=1000, verbose=False
-):
+def chisq_from_stim_table(stim_table, columns, mean_sweep_events, num_shuffles=1000, verbose=False):
     #  stim_table is a pandas DataFrame with len = num_sweeps
     #  columns is a list of column names that define the categories (e.g.
     # ['Ori','Contrast']) mean_sweep_events is a numpy array with shape
     # (num_sweeps,num_cells)
 
-    sweep_categories = stim_table_to_categories(
-        stim_table, columns, verbose=verbose
-    )
-    p_vals = compute_chi_shuffle(
-        mean_sweep_events, sweep_categories, num_shuffles=num_shuffles
-    )
+    sweep_categories = stim_table_to_categories(stim_table, columns, verbose=verbose)
+    p_vals = compute_chi_shuffle(mean_sweep_events, sweep_categories, num_shuffles=num_shuffles)
 
     return p_vals
 
 
-def compute_chi_shuffle(
-    mean_sweep_events, sweep_categories, num_shuffles=1000
-):
+def compute_chi_shuffle(mean_sweep_events, sweep_categories, num_shuffles=1000):
     #  mean_sweep_events is a numpy array with shape (num_sweeps,num_cells)
     #  sweep_conditions is a numpy array with shape (num_sweeps)
     #       sweep_conditions gives the category label for each sweep
@@ -54,12 +46,8 @@ def compute_chi_shuffle(
         shuffle_sweeps = np.random.choice(num_sweeps, size=(num_sweeps,))
         shuffle_sweep_events = mean_sweep_events[shuffle_sweeps]
 
-        shuffle_expected = compute_expected(
-            shuffle_sweep_events, sweep_categories_dummy
-        )
-        shuffle_observed = compute_observed(
-            shuffle_sweep_events, sweep_categories_dummy
-        )
+        shuffle_expected = compute_expected(shuffle_sweep_events, sweep_categories_dummy)
+        shuffle_observed = compute_observed(shuffle_sweep_events, sweep_categories_dummy)
 
         chi_shuffle[:, ns] = compute_chi(shuffle_observed, shuffle_expected)
 
@@ -111,9 +99,7 @@ def stim_table_to_categories(stim_table, columns, verbose=False):
             category += 1
 
         # advance the combination
-        curr_combination = advance_combination(
-            curr_combination, options_per_column
-        )
+        curr_combination = advance_combination(curr_combination, options_per_column)
         all_tried = curr_combination[0] == options_per_column[0]
 
     if verbose:
@@ -158,9 +144,9 @@ def compute_observed(mean_sweep_events, sweep_conditions):
     (num_sweeps, num_conditions) = np.shape(sweep_conditions)
     num_cells = np.shape(mean_sweep_events)[1]
 
-    observed_mat = (mean_sweep_events.T).reshape(
-        num_cells, num_sweeps, 1
-    ) * sweep_conditions.reshape(1, num_sweeps, num_conditions)
+    observed_mat = (mean_sweep_events.T).reshape(num_cells, num_sweeps, 1) * sweep_conditions.reshape(
+        1, num_sweeps, num_conditions
+    )
     observed = np.sum(observed_mat, axis=1)
 
     return observed
@@ -173,9 +159,7 @@ def compute_expected(mean_sweep_events, sweep_conditions):
     sweeps_per_condition = np.sum(sweep_conditions, axis=0)
     events_per_sweep = np.mean(mean_sweep_events, axis=0)
 
-    expected = sweeps_per_condition.reshape(
-        1, num_conditions
-    ) * events_per_sweep.reshape(num_cells, 1)
+    expected = sweeps_per_condition.reshape(1, num_conditions) * events_per_sweep.reshape(num_cells, 1)
 
     return expected
 

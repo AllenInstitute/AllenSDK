@@ -41,7 +41,7 @@ import numpy as np
 
 
 def get_sitk_image_information(image):
-    ''' Extract information about a SimpleITK image
+    """Extract information about a SimpleITK image
 
     Parameters
     ----------
@@ -50,71 +50,73 @@ def get_sitk_image_information(image):
 
     Returns
     -------
-    dict : 
-        Extracted information. Includes spacing, origin, size, direction, and 
+    dict :
+        Extracted information. Includes spacing, origin, size, direction, and
         number of components per pixel
 
-    '''
+    """
 
-    return {'spacing': image.GetSpacing(),
-            'origin': image.GetOrigin(),
-            'size': image.GetSize(),
-            'direction': image.GetDirection(),
-            'ncomponents': image.GetNumberOfComponentsPerPixel()}
+    return {
+        "spacing": image.GetSpacing(),
+        "origin": image.GetOrigin(),
+        "size": image.GetSize(),
+        "direction": image.GetDirection(),
+        "ncomponents": image.GetNumberOfComponentsPerPixel(),
+    }
 
 
 def set_sitk_image_information(image, information):
-    ''' Set information on a SimpleITK image
+    """Set information on a SimpleITK image
 
     Parameters
     ----------
     image : sitk.Image
         Set information on this image.
     information : dict
-        Stores information to be set. Supports spacing, origin, direction. Also 
+        Stores information to be set. Supports spacing, origin, direction. Also
         checks (but cannot set) size and number of components per pixel
 
-    '''
+    """
 
-    if 'spacing' in information:
-        image.SetSpacing(information.pop('spacing'))
-    if 'origin' in information:
-        image.SetOrigin(information.pop('origin'))
-    if 'direction' in information:
-        image.SetDirection(information.pop('direction'))
+    if "spacing" in information:
+        image.SetSpacing(information.pop("spacing"))
+    if "origin" in information:
+        image.SetOrigin(information.pop("origin"))
+    if "direction" in information:
+        image.SetDirection(information.pop("direction"))
 
-    if 'size' in information:
-        assert(np.array_equal( information.pop('size'), image.GetSize() ))
-    if 'ncomponents' in information:
-        assert( information.pop('ncomponents') == image.GetNumberOfComponentsPerPixel() )
-    
+    if "size" in information:
+        assert np.array_equal(information.pop("size"), image.GetSize())
+    if "ncomponents" in information:
+        assert information.pop("ncomponents") == image.GetNumberOfComponentsPerPixel()
+
     if not len(information) == 0:
-        warnings.warn('unwritten keys: {}'.format(','.join(information.keys())))
+        warnings.warn("unwritten keys: {}".format(",".join(information.keys())))
 
 
 def fix_array_dimensions(array, ncomponents=1):
-    ''' Convenience function that reorders ndarray dimensions for io with SimpleITK
+    """Convenience function that reorders ndarray dimensions for io with SimpleITK
 
     Parameters
     ----------
     array : np.ndarray
         The array to be reordered
     ncomponents : int, optional
-        Number of components per pixel, default 1. 
+        Number of components per pixel, default 1.
 
     Returns
     -------
-    np.ndarray : 
+    np.ndarray :
         Reordered array
 
-    '''
+    """
 
     act_size = list(array.shape)
     ndims = len(act_size)
     multicomponent = ncomponents > 1
 
-    from_order = list(range( ndims - multicomponent ))
-    to_order = list(range( ndims - multicomponent ))[::-1]
+    from_order = list(range(ndims - multicomponent))
+    to_order = list(range(ndims - multicomponent))[::-1]
 
     if multicomponent:
         from_order += [-1]
@@ -124,13 +126,13 @@ def fix_array_dimensions(array, ncomponents=1):
 
 
 def read_ndarray_with_sitk(path):
-    ''' Read a numpy array from a file using SimpleITK
+    """Read a numpy array from a file using SimpleITK
 
     Parameters
     ----------
     path : str
         Read from this path
-    
+
     Returns
     -------
     image : np.ndarray
@@ -138,18 +140,18 @@ def read_ndarray_with_sitk(path):
     information : dict
         Additional information about the array
 
-    '''
+    """
 
     image = sitk.ReadImage(str(path))
     information = get_sitk_image_information(image)
     image = sitk.GetArrayFromImage(image)
 
-    image = fix_array_dimensions(image, information['ncomponents'])
+    image = fix_array_dimensions(image, information["ncomponents"])
     return image, information
 
 
 def write_ndarray_with_sitk(array, path, **information):
-    ''' Write a numpy array to a file using SimpleITK
+    """Write a numpy array to a file using SimpleITK
 
     Parameters
     ----------
@@ -158,17 +160,17 @@ def write_ndarray_with_sitk(array, path, **information):
     path : str
         Write to here
     **information : dict
-        Contains additional information to be stored in the image file. 
+        Contains additional information to be stored in the image file.
         See set_sitk_image_information for more information.
 
-    '''
+    """
 
-    if 'ncomponents' not in information:
-        information['ncomponents'] = 1
-    ncomponents = information.pop('ncomponents')
+    if "ncomponents" not in information:
+        information["ncomponents"] = 1
+    ncomponents = information.pop("ncomponents")
 
     array = fix_array_dimensions(array, ncomponents)
-    
+
     array = sitk.GetImageFromArray(array, ncomponents > 1)
     set_sitk_image_information(array, information)
 

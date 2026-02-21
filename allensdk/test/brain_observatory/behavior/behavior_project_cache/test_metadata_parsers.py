@@ -88,12 +88,7 @@ def test_parse_num_cortical_structures():
         }
     )
     expected = pd.Series([1, 1, 2, 4, None], dtype="Int64")
-    obtained = (
-        df["project_code"]
-        .apply(parse_num_cortical_structures)
-        .astype("Int64")
-        .rename(None)
-    )
+    obtained = df["project_code"].apply(parse_num_cortical_structures).astype("Int64").rename(None)
     pd.testing.assert_series_equal(expected, obtained)
 
 
@@ -112,7 +107,5 @@ def test_parse_num_depths():
         }
     )
     expected = pd.Series([1, 1, 4, 2, None], dtype="Int64")
-    obtained = (
-        df["project_code"].apply(parse_num_depths).astype("Int64").rename(None)
-    )
+    obtained = df["project_code"].apply(parse_num_depths).astype("Int64").rename(None)
     pd.testing.assert_series_equal(expected, obtained)

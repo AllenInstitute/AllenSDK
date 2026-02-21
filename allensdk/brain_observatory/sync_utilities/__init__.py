@@ -35,14 +35,15 @@ def trim_discontiguous_times(times: np.ndarray, threshold=100) -> np.ndarray:
     if len(gap_indices) == 0:
         return times
 
-    return times[:gap_indices[0] + 1]
+    return times[: gap_indices[0] + 1]
 
 
-def get_synchronized_frame_times(session_sync_file: Path,
-                                 sync_line_label_keys: Tuple[str, ...],
-                                 drop_frames: Optional[List[int]] = None,
-                                 trim_after_spike: bool = True,
-                                 ) -> pd.Series:
+def get_synchronized_frame_times(
+    session_sync_file: Path,
+    sync_line_label_keys: Tuple[str, ...],
+    drop_frames: Optional[List[int]] = None,
+    trim_after_spike: bool = True,
+) -> pd.Series:
     """Get experimental frame times from an experiment session sync file.
 
     1. Get rising edges from the sync dataset
@@ -76,9 +77,7 @@ def get_synchronized_frame_times(session_sync_file: Path,
     """
     sync_dataset = Dataset(str(session_sync_file))
 
-    times = sync_dataset.get_edges(
-        "rising", sync_line_label_keys, units="seconds"
-    )
+    times = sync_dataset.get_edges("rising", sync_line_label_keys, units="seconds")
 
     times = trim_discontiguous_times(times) if trim_after_spike else times
     if drop_frames is not None:

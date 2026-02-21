@@ -12,25 +12,14 @@ from allensdk.brain_observatory.behavior.behavior_project_cache.tables.metadata_
     BehaviorSessionMetadataSchema,
 )
 from argschema import ArgSchema
-from argschema.fields import (
-    Int,
-    List,
-    LogLevel,
-    Nested,
-    OutputDir,
-    OutputFile,
-    String,
-    Bool
-)
+from argschema.fields import Int, List, LogLevel, Nested, OutputDir, OutputFile, String, Bool
 
 
 class BaseInputSchema(ArgSchema):
     class Meta:
         unknown = mm.RAISE
 
-    log_level = LogLevel(
-        default="INFO", description="Logging level of the module"
-    )
+    log_level = LogLevel(default="INFO", description="Logging level of the module")
     metadata_table = InputFile(
         required=True,
         description="CSV file containing rows of BehaviorSession or "
@@ -58,49 +47,26 @@ class BaseInputSchema(ArgSchema):
         description="Path of output.json to be written",
     )
     include_experiment_description = Bool(
-        required=False,
-        description="If True, include experiment description in NWB file.",
-        default=True
+        required=False, description="If True, include experiment description in NWB file.", default=True
     )
 
     def _get_behavior_metadata(self, bs_row):
         """ """
         behavior_session_metadata = {}
 
-        behavior_session_metadata["age_in_days"] = self._retrieve_value(
-            bs_row=bs_row, column_name="age_in_days"
-        )
-        behavior_session_metadata["cre_line"] = self._retrieve_value(
-            bs_row=bs_row, column_name="cre_line"
-        )
+        behavior_session_metadata["age_in_days"] = self._retrieve_value(bs_row=bs_row, column_name="age_in_days")
+        behavior_session_metadata["cre_line"] = self._retrieve_value(bs_row=bs_row, column_name="cre_line")
         behavior_session_metadata["date_of_acquisition"] = self._retrieve_value(  # noqa: E501
             bs_row=bs_row, column_name="date_of_acquisition"
         )
-        behavior_session_metadata["driver_line"] = self._retrieve_value(
-            bs_row=bs_row, column_name="driver_line"
-        )
-        behavior_session_metadata["equipment_name"] = self._retrieve_value(
-            bs_row=bs_row, column_name="equipment_name"
-        )
-        behavior_session_metadata["full_genotype"] = self._retrieve_value(
-            bs_row=bs_row, column_name="full_genotype"
-        )
-        behavior_session_metadata["mouse_id"] = self._retrieve_value(
-            bs_row=bs_row, column_name="mouse_id"
-        )
-        behavior_session_metadata["project_code"] = self._retrieve_value(
-            bs_row=bs_row, column_name="project_code"
-        )
-        behavior_session_metadata["reporter_line"] = self._retrieve_value(
-            bs_row=bs_row, column_name="reporter_line"
-        )
-        behavior_session_metadata["session_type"] = self._retrieve_value(
-            bs_row=bs_row, column_name="session_type"
-        )
-        behavior_session_metadata["sex"] = self._retrieve_value(
-            bs_row=bs_row,
-            column_name="sex"
-        )
+        behavior_session_metadata["driver_line"] = self._retrieve_value(bs_row=bs_row, column_name="driver_line")
+        behavior_session_metadata["equipment_name"] = self._retrieve_value(bs_row=bs_row, column_name="equipment_name")
+        behavior_session_metadata["full_genotype"] = self._retrieve_value(bs_row=bs_row, column_name="full_genotype")
+        behavior_session_metadata["mouse_id"] = self._retrieve_value(bs_row=bs_row, column_name="mouse_id")
+        behavior_session_metadata["project_code"] = self._retrieve_value(bs_row=bs_row, column_name="project_code")
+        behavior_session_metadata["reporter_line"] = self._retrieve_value(bs_row=bs_row, column_name="reporter_line")
+        behavior_session_metadata["session_type"] = self._retrieve_value(bs_row=bs_row, column_name="session_type")
+        behavior_session_metadata["sex"] = self._retrieve_value(bs_row=bs_row, column_name="sex")
 
         return behavior_session_metadata
 
@@ -121,10 +87,12 @@ class BaseInputSchema(ArgSchema):
             bs_row
         """
         if column_name not in bs_row.index:
-            warn(f"Warning, {column_name} not in metadata table. Unless this "
-                 "has been added to the inputs skip_metadata_key or "
-                 "skip_stimulus_file_key, creating the NWB file "
-                 "may fail.")
+            warn(
+                f"Warning, {column_name} not in metadata table. Unless this "
+                "has been added to the inputs skip_metadata_key or "
+                "skip_stimulus_file_key, creating the NWB file "
+                "may fail."
+            )
             return None
         else:
             value = bs_row[column_name]
@@ -134,9 +102,7 @@ class BaseInputSchema(ArgSchema):
 
 
 class BehaviorInputSchema(BaseInputSchema):
-    behavior_session_id = Int(
-        required=True, description="Id of BehaviorSession to create."
-    )
+    behavior_session_id = Int(required=True, description="Id of BehaviorSession to create.")
 
     behavior_session_metadata = Nested(
         BehaviorSessionMetadataSchema,
@@ -149,16 +115,13 @@ class BehaviorInputSchema(BaseInputSchema):
         """Load the data from csv using Pandas the same as the
         project_cloud api.
         """
-        df = sanitize_data_columns(
-            data["metadata_table"], dtype_convert={"mouse_id": str}
-        )
+        df = sanitize_data_columns(data["metadata_table"], dtype_convert={"mouse_id": str})
         df.set_index("behavior_session_id", inplace=True)
         try:
             bs_row = df.loc[int(data["behavior_session_id"])]
         except KeyError:
             raise KeyError(
-                f"Behavior session id {data['behavior_session_id']} "
-                "not in input BehaviorSessionTable. Exiting."
+                f"Behavior session id {data['behavior_session_id']} not in input BehaviorSessionTable. Exiting."
             )
 
         data["behavior_session_metadata"] = self._get_behavior_metadata(bs_row)

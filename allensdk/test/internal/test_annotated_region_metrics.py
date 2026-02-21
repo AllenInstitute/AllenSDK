@@ -2,9 +2,10 @@ import pytest
 import numpy as np
 from allensdk.internal.brain_observatory import annotated_region_metrics
 
+
 @pytest.fixture
 def mask():
-    return np.ones((10,10), dtype=bool)
+    return np.ones((10, 10), dtype=bool)
 
 
 def retinotopic_map(return_x=True):
@@ -27,41 +28,34 @@ def altitude_map():
 
 
 def test_eccentricity(azimuth_map, altitude_map):
-    ecc = annotated_region_metrics.eccentricity(azimuth_map, altitude_map,
-                                                0.0, 0.0)
-    assert(ecc.shape == azimuth_map.shape)
+    ecc = annotated_region_metrics.eccentricity(azimuth_map, altitude_map, 0.0, 0.0)
+    assert ecc.shape == azimuth_map.shape
 
 
 def test_create_region_mask(mask):
     height, width = mask.shape
     x = y = 30
-    region_mask = annotated_region_metrics.create_region_mask((100,100),
-                                                               x, y, width,
-                                                               height,
-                                                               mask.tolist())
-    assert(region_mask.shape == (100,100))
-    assert(region_mask.sum() == mask.sum())
-    assert(np.all(region_mask[y:y+height,x:x+width] == mask))
+    region_mask = annotated_region_metrics.create_region_mask((100, 100), x, y, width, height, mask.tolist())
+    assert region_mask.shape == (100, 100)
+    assert region_mask.sum() == mask.sum()
+    assert np.all(region_mask[y : y + height, x : x + width] == mask)
 
 
 def test_retinotopy_metric(azimuth_map, mask):
     height, width = mask.shape
     x = y = 30
-    region_mask = annotated_region_metrics.create_region_mask(
-        azimuth_map.shape, x, y, width, height, mask.tolist())
-    rmin, rmax, rrange, rbias = annotated_region_metrics.retinotopy_metric(
-        region_mask, azimuth_map)
+    region_mask = annotated_region_metrics.create_region_mask(azimuth_map.shape, x, y, width, height, mask.tolist())
+    rmin, rmax, rrange, rbias = annotated_region_metrics.retinotopy_metric(region_mask, azimuth_map)
     rmap = np.degrees(azimuth_map[np.where(region_mask > 0)])
-    assert(rmin == rmap.min())
-    assert(rmax == rmap.max())
+    assert rmin == rmap.min()
+    assert rmax == rmap.max()
 
 
 def test_get_metrics(altitude_map, azimuth_map, mask):
     height, width = mask.shape
     x = y = 30
-    result = annotated_region_metrics.get_metrics(altitude_map, azimuth_map,
-                                                  x=x, y=y, width=width,
-                                                  height=height,
-                                                  mask=mask.tolist())
-    assert(isinstance(result, dict))
-    assert('azimuth_min' in result)
+    result = annotated_region_metrics.get_metrics(
+        altitude_map, azimuth_map, x=x, y=y, width=width, height=height, mask=mask.tolist()
+    )
+    assert isinstance(result, dict)
+    assert "azimuth_min" in result

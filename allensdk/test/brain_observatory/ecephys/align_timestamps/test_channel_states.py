@@ -1,4 +1,3 @@
-
 import pytest
 import numpy as np
 
@@ -17,10 +16,7 @@ from allensdk.brain_observatory.ecephys.align_timestamps import channel_states a
         ]
     ],
 )
-def test_extract_barcodes_from_states(
-    sample_frequency, events, times, times_exp, codes_exp
-):
-
+def test_extract_barcodes_from_states(sample_frequency, events, times, times_exp, codes_exp):
     times, codes = cs.extract_barcodes_from_states(events, times, sample_frequency)
 
     assert np.allclose(times, times_exp)

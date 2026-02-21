@@ -29,9 +29,7 @@ def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
-                logging.warning(
-                    f"unable to find unit at local position {local_unit}"
-                )
+                logging.warning(f"unable to find unit at local position {local_unit}")
                 continue
             global_id = local_to_global_unit_map[local_unit]
             output[global_id] = current
@@ -41,11 +39,7 @@ def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
     return output
 
 
-def scale_amplitudes(spike_amplitudes,
-                     templates,
-                     spike_templates,
-                     scale_factor=1.0):
-
+def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=1.0):
     template_full_amplitudes = templates.max(axis=1) - templates.min(axis=1)
     template_amplitudes = template_full_amplitudes.max(axis=1)
 
@@ -68,9 +62,7 @@ def clobbering_merge(to_df, from_df, **kwargs):
     return pd.merge(to_df, from_df, **kwargs)
 
 
-def strip_substructure_acronym(
-        acronym: Optional[Union[str, list, float]]
-) -> Optional[Union[str, list]]:
+def strip_substructure_acronym(acronym: Optional[Union[str, list, float]]) -> Optional[Union[str, list]]:
     """
     Sanitize a structure acronym or a list of structure acronyms
     by removing the substructure (e.g. DG-mo becomes DG).
@@ -91,7 +83,7 @@ def strip_substructure_acronym(
             acronym = None
 
     if isinstance(acronym, str):
-        return acronym.split('-')[0]
+        return acronym.split("-")[0]
     elif isinstance(acronym, list):
         new_acronym = set()
 
@@ -106,6 +98,4 @@ def strip_substructure_acronym(
     elif acronym is None:
         return None
     else:
-        raise RuntimeError(
-            "acronym must be a list or a str or None; you gave "
-            f"{acronym} which is a {type(acronym)}")
+        raise RuntimeError(f"acronym must be a list or a str or None; you gave {acronym} which is a {type(acronym)}")

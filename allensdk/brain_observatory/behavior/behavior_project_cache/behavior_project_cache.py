@@ -78,9 +78,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
     def __init__(
         self,
-        fetch_api: Optional[
-            Union[BehaviorProjectLimsApi, BehaviorProjectCloudApi]
-        ] = None,
+        fetch_api: Optional[Union[BehaviorProjectLimsApi, BehaviorProjectCloudApi]] = None,
         fetch_tries: int = 2,
         manifest: Optional[Union[str, Path]] = None,
         version: Optional[str] = None,
@@ -128,9 +126,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
         if not isinstance(self.fetch_api, BehaviorProjectCloudApi):
             if cache:
-                self.cache = VBOLimsCache(
-                    manifest=manifest_, version=version, cache=cache
-                )
+                self.cache = VBOLimsCache(manifest=manifest_, version=version, cache=cache)
 
         warnings.warn(
             message="\n\tAs of AllenSDK version 2.16.0, the latest Visual "
@@ -183,9 +179,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_ophys_session_table()
         if self.cache is not None:
-            path = self.cache.get_cache_path(
-                None, self.cache.OPHYS_SESSIONS_KEY
-            )
+            path = self.cache.get_cache_path(None, self.cache.OPHYS_SESSIONS_KEY)
             ophys_sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_ophys_session_table,
@@ -210,9 +204,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
                 suffixes=("_behavior", "_ophys"),
             )
 
-        sessions = BehaviorOphysSessionsTable(
-            df=ophys_sessions, suppress=suppress, index_column=index_column
-        )
+        sessions = BehaviorOphysSessionsTable(df=ophys_sessions, suppress=suppress, index_column=index_column)
 
         return sessions.table if as_df else sessions
 
@@ -230,16 +222,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_ophys_experiment_table()
         if self.cache is not None:
-            path = self.cache.get_cache_path(
-                None, self.cache.OPHYS_EXPERIMENTS_KEY
-            )
+            path = self.cache.get_cache_path(None, self.cache.OPHYS_EXPERIMENTS_KEY)
             experiments = one_file_call_caching(
                 path,
                 self.fetch_api.get_ophys_experiment_table,
                 _write_json,
-                lambda path: _read_json(
-                    path, index_name="ophys_experiment_id"
-                ),
+                lambda path: _read_json(path, index_name="ophys_experiment_id"),
             )
         else:
             experiments = self.fetch_api.get_ophys_experiment_table()
@@ -304,16 +292,12 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         if isinstance(self.fetch_api, BehaviorProjectCloudApi):
             return self.fetch_api.get_behavior_session_table()
         if self.cache is not None:
-            path = self.cache.get_cache_path(
-                None, self.cache.BEHAVIOR_SESSIONS_KEY
-            )
+            path = self.cache.get_cache_path(None, self.cache.BEHAVIOR_SESSIONS_KEY)
             sessions = one_file_call_caching(
                 path,
                 self.fetch_api.get_behavior_session_table,
                 _write_json,
-                lambda path: _read_json(
-                    path, index_name="behavior_session_id"
-                ),
+                lambda path: _read_json(path, index_name="behavior_session_id"),
             )
         else:
             sessions = self.fetch_api.get_behavior_session_table()
@@ -334,9 +318,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
 
         return sessions.table if as_df else sessions
 
-    def get_behavior_ophys_experiment(
-        self, ophys_experiment_id: int
-    ) -> BehaviorOphysExperiment:
+    def get_behavior_ophys_experiment(self, ophys_experiment_id: int) -> BehaviorOphysExperiment:
         """
         Gets `BehaviorOphysExperiment` for `ophys_experiment_id`
         Parameters
@@ -347,13 +329,9 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         -------
         BehaviorOphysExperiment
         """
-        return self.fetch_api.get_behavior_ophys_experiment(
-            ophys_experiment_id=ophys_experiment_id
-        )
+        return self.fetch_api.get_behavior_ophys_experiment(ophys_experiment_id=ophys_experiment_id)
 
-    def get_behavior_session(
-        self, behavior_session_id: int
-    ) -> BehaviorSession:
+    def get_behavior_session(self, behavior_session_id: int) -> BehaviorSession:
         """
         Gets `BehaviorSession` for `behavior_session_id`
         Parameters
@@ -364,9 +342,7 @@ class VisualBehaviorOphysProjectCache(ProjectCacheBase):
         -------
         BehaviorSession
         """
-        return self.fetch_api.get_behavior_session(
-            behavior_session_id=behavior_session_id
-        )
+        return self.fetch_api.get_behavior_session(behavior_session_id=behavior_session_id)
 
     def get_raw_natural_movie(self) -> np.ndarray:
         """Download the raw movie data from the cloud and return it as a numpy

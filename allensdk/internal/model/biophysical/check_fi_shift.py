@@ -3,8 +3,8 @@ from collections import Counter
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor
 import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 
-def calculate_fi_curves(data_set, sweeps):
 
+def calculate_fi_curves(data_set, sweeps):
     sweep_type = "C1LSCOARSE"
     _, sweep_numbers, statuses = ephys_utils.get_sweeps_of_type(sweep_type, sweeps)
     features = EphysFeatureExtractor()
@@ -13,7 +13,7 @@ def calculate_fi_curves(data_set, sweeps):
     sweep_status = dict(zip(sweep_numbers, statuses))
 
     for s in sweep_numbers:
-        if sweep_status[s] in [ 'auto_failed', 'manual_failed' ]:
+        if sweep_status[s] in ["auto_failed", "manual_failed"]:
             continue
 
         v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s)
@@ -31,7 +31,7 @@ def calculate_fi_curves(data_set, sweeps):
     core2_amps = {}
     amp_list = []
     for s in sweep_numbers:
-        if sweep_status[s] in [ 'auto_failed', 'manual_failed' ]:
+        if sweep_status[s] in ["auto_failed", "manual_failed"]:
             continue
 
         v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s)
@@ -55,10 +55,13 @@ def calculate_fi_curves(data_set, sweeps):
                 stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
                 features.process_instance(s, v, i, t, stim_start, stim_dur, "")
                 core2_fi_curve.append((amp, features.feature_list[-1].mean["n_spikes"] / stim_dur))
-                first_half_spike_count = len([spk for spk in features.feature_list[-1].mean["spikes"] if spk["t"] < stim_start + stim_dur / 2.0])
+                first_half_spike_count = len(
+                    [spk for spk in features.feature_list[-1].mean["spikes"] if spk["t"] < stim_start + stim_dur / 2.0]
+                )
                 core2_half_fi_curve.append((amp, first_half_spike_count / (stim_dur / 2.0)))
 
-    return { "coarse": coarse_fi_curve, "core2": core2_fi_curve, "core2_half": core2_half_fi_curve }
+    return {"coarse": coarse_fi_curve, "core2": core2_fi_curve, "core2_half": core2_half_fi_curve}
+
 
 def estimate_fi_shift(data_set, sweeps):
     curve_data = calculate_fi_curves(data_set, sweeps)
@@ -68,7 +71,7 @@ def estimate_fi_shift(data_set, sweeps):
     x = np.array([d[0] for d in coarse_fi_sorted], dtype=np.float64)
     y = np.array([d[1] for d in coarse_fi_sorted], dtype=np.float64)
 
-    if len(np.flatnonzero(y)) == 0: # original curve is all zero, so can't figure out shift
+    if len(np.flatnonzero(y)) == 0:  # original curve is all zero, so can't figure out shift
         return np.nan, 0
 
     last_zero_index = np.flatnonzero(y)[0] - 1

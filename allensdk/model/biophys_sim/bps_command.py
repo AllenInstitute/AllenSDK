@@ -40,24 +40,23 @@ import logging
 from .config import Config
 
 
-def choose_bps_command(command='bps_simple', conf_file=None):
-    log = logging.getLogger('allensdk.model.biophys_sim.bps_command')
+def choose_bps_command(command="bps_simple", conf_file=None):
+    log = logging.getLogger("allensdk.model.biophys_sim.bps_command")
 
     log.info("bps command: %s" % (command))
 
     if conf_file:
         conf_file = os.path.abspath(conf_file)
 
-    if command == 'help':
-        print(Config().argparser.parse_args(['--help']))
-    elif command == 'nrnivmodl':
-        sp.call(['nrnivmodl', 'modfiles'])
-    elif command == 'run_simple':
+    if command == "help":
+        print(Config().argparser.parse_args(["--help"]))
+    elif command == "nrnivmodl":
+        sp.call(["nrnivmodl", "modfiles"])
+    elif command == "run_simple":
         app_config = Config()
         description = app_config.load(conf_file)
-        sys.path.insert(1, description.manifest.get_path('CODE_DIR'))
-        (module_name, function_name) = description.data[
-            'runs'][0]['main'].split('#')
+        sys.path.insert(1, description.manifest.get_path("CODE_DIR"))
+        (module_name, function_name) = description.data["runs"][0]["main"].split("#")
         run_module(description, module_name, function_name)
     else:
         raise Exception("unknown command %s" % (command))
@@ -79,24 +78,23 @@ def main():
     argv = sys.argv
 
     if len(argv) > 1:
-        if argv[0] == 'nrniv':
-            command = 'run_simple'
+        if argv[0] == "nrniv":
+            command = "run_simple"
         else:
             command = argv[1]
     else:
-        command = 'run_simple'
+        command = "run_simple"
 
-    if len(argv) > 2 and (argv[-1].endswith('.conf') or
-                          argv[-1].endswith('.json')):
+    if len(argv) > 2 and (argv[-1].endswith(".conf") or argv[-1].endswith(".json")):
         conf_file = argv[-1]
     else:
         try:
-            conf_file = os.environ['CONF_FILE']
+            conf_file = os.environ["CONF_FILE"]
         except Exception:
             pass
 
     choose_bps_command(command, conf_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -35,8 +35,7 @@
 #
 import pytest
 from unittest.mock import patch
-from allensdk.core.brain_observatory_nwb_data_set import \
-    BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 from allensdk.brain_observatory.session_analysis import SessionAnalysis
 import os
 
@@ -46,18 +45,19 @@ _orig_get_stimulus_table = BrainObservatoryNwbDataSet.get_stimulus_table
 
 def mock_stimulus_table(dset, name):
     t = _orig_get_stimulus_table(dset, name)
-    t.at[0, 'end'] = t.loc[0, 'start'] + 10
+    t.at[0, "end"] = t.loc[0, "start"] + 10
 
     return t
 
 
 @pytest.fixture
 def session_a():
-    filename = os.path.abspath(os.path.join(
-            "/", "allen", "aibs", "informatics", "module_test_data",
-            "observatory", "test_nwb", "out_510390912.nwb"
-    ))
-    save_path = 'xyza'
+    filename = os.path.abspath(
+        os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data", "observatory", "test_nwb", "out_510390912.nwb"
+        )
+    )
+    save_path = "xyza"
 
     sa = SessionAnalysis(filename, save_path)
 
@@ -66,11 +66,12 @@ def session_a():
 
 @pytest.fixture
 def session_b():
-    filename = os.path.abspath(os.path.join(
-            "/", "allen", "aibs", "informatics", "module_test_data",
-            "observatory", "test_nwb", "506278598.nwb"
-    ))
-    save_path = 'xyzb'
+    filename = os.path.abspath(
+        os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data", "observatory", "test_nwb", "506278598.nwb"
+        )
+    )
+    save_path = "xyzb"
 
     sa = SessionAnalysis(filename, save_path)
 
@@ -79,11 +80,12 @@ def session_b():
 
 @pytest.fixture
 def session_c():
-    filename = os.path.abspath(os.path.join(
-            "/", "allen", "aibs", "informatics", "module_test_data",
-            "observatory", "test_nwb", "out_510221121.nwb"
-    ))
-    save_path = 'xyzc'
+    filename = os.path.abspath(
+        os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data", "observatory", "test_nwb", "out_510221121.nwb"
+        )
+    )
+    save_path = "xyzc"
 
     sa = SessionAnalysis(filename, save_path)
 
@@ -91,33 +93,36 @@ def session_c():
 
 
 @pytest.mark.nightly
-@pytest.mark.parametrize('plot_flag', [False])
+@pytest.mark.parametrize("plot_flag", [False])
 def test_session_a(session_a, plot_flag):
-    with patch('allensdk.core.brain_observatory_nwb_data_set.'
-               'BrainObservatoryNwbDataSet.get_stimulus_table',
-               mock_stimulus_table):
+    with patch(
+        "allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table",
+        mock_stimulus_table,
+    ):
         session_a.session_a(plot_flag=plot_flag)
 
         assert True
 
 
 @pytest.mark.nightly
-@pytest.mark.parametrize('plot_flag', [False])
+@pytest.mark.parametrize("plot_flag", [False])
 def test_session_b(session_b, plot_flag):
-    with patch('allensdk.core.brain_observatory_nwb_data_set.'
-               'BrainObservatoryNwbDataSet.get_stimulus_table',
-               mock_stimulus_table):
+    with patch(
+        "allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table",
+        mock_stimulus_table,
+    ):
         session_b.session_b(plot_flag=plot_flag)
 
         assert True
 
 
 @pytest.mark.nightly
-@pytest.mark.parametrize('plot_flag', [False])
+@pytest.mark.parametrize("plot_flag", [False])
 def test_session_c(session_c, plot_flag):
-    with patch('allensdk.core.brain_observatory_nwb_data_set.'
-               'BrainObservatoryNwbDataSet.get_stimulus_table',
-               mock_stimulus_table):
+    with patch(
+        "allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table",
+        mock_stimulus_table,
+    ):
         session_c.session_c(plot_flag=plot_flag)
 
         assert True
@@ -127,18 +132,18 @@ def test_session_c(session_c, plot_flag):
 def test_session_get_session_type(session_a):
     session_type = session_a.nwb.get_session_type()
 
-    assert session_type == 'three_session_A'
+    assert session_type == "three_session_A"
 
 
 @pytest.mark.nightly
 def test_session_get_session_type_b(session_b):
     session_type = session_b.nwb.get_session_type()
 
-    assert session_type == 'three_session_B'
+    assert session_type == "three_session_B"
 
 
 @pytest.mark.nightly
 def test_session_get_session_type_c(session_c):
     session_type = session_c.nwb.get_session_type()
 
-    assert session_type == 'three_session_C'
+    assert session_type == "three_session_C"

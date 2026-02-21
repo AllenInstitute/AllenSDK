@@ -202,9 +202,7 @@ def stimuli_in_session(session, allow_unknown=True):
 
 def all_stimuli():
     """Return a list of all stimuli in the data set"""
-    return set(
-        [v for k, vl in SESSION_STIMULUS_MAP.items() for v in vl]
-    )
+    return set([v for k, vl in SESSION_STIMULUS_MAP.items() for v in vl])
 
 
 class BinaryIntervalSearchTree(object):
@@ -262,9 +260,7 @@ class BinaryIntervalSearchTree(object):
         if tmp is None:
             tmp = []
 
-        if (self.data[tuple(tmp)][0] <= fi) and (
-            fi <= self.data[tuple(tmp)][1]
-        ):
+        if (self.data[tuple(tmp)][0] <= fi) and (fi <= self.data[tuple(tmp)][1]):
             return_val = self.data[tuple(tmp)]
         elif fi < self.data[tuple(tmp)][1]:
             return_val = self.search(fi, tmp=tmp + [0])
@@ -311,9 +307,7 @@ class StimulusSearch(object):
 
 def rotate(X, Y, theta):
     x = np.array([X, Y])
-    M = np.array(
-        [[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]
-    )
+    M = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     if len(x.shape) in [1, 2]:
         assert x.shape[0] == 2
         return M.dot(x)
@@ -353,25 +347,19 @@ def get_spatial_grating(
 
     img = np.cos(2.0 * np.pi * Xp * sf + ph)
 
-    return (p2p_amp / 2.0) * spndi.zoom(
-        img, height / float(_height_prime)
-    ) + baseline
+    return (p2p_amp / 2.0) * spndi.zoom(img, height / float(_height_prime)) + baseline
 
 
 # def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
 
 
 def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
-    kwargs["phase"] = (
-        kwargs.pop("phase", 0) + (float(t) * temporal_frequency) % 1
-    )
+    kwargs["phase"] = kwargs.pop("phase", 0) + (float(t) * temporal_frequency) % 1
 
     return get_spatial_grating(**kwargs)
 
 
-def map_template_coordinate_to_monitor_coordinate(
-    template_coord, monitor_shape, template_shape
-):
+def map_template_coordinate_to_monitor_coordinate(template_coord, monitor_shape, template_shape):
     rx, cx = template_coord
     n_pixels_r, n_pixels_c = monitor_shape
     tr, tc = template_shape
@@ -382,9 +370,7 @@ def map_template_coordinate_to_monitor_coordinate(
     return rx_new, cx_new
 
 
-def map_monitor_coordinate_to_template_coordinate(
-    monitor_coord, monitor_shape, template_shape
-):
+def map_monitor_coordinate_to_template_coordinate(monitor_coord, monitor_shape, template_shape):
     rx, cx = monitor_coord
     n_pixels_r, n_pixels_c = monitor_shape
     tr, tc = template_shape
@@ -395,9 +381,7 @@ def map_monitor_coordinate_to_template_coordinate(
     return rx_new, cx_new
 
 
-def lsn_coordinate_to_monitor_coordinate(
-    lsn_coordinate, monitor_shape, stimulus_type
-):
+def lsn_coordinate_to_monitor_coordinate(lsn_coordinate, monitor_shape, stimulus_type):
     template_shape = LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus_type]
     pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
 
@@ -411,9 +395,7 @@ def lsn_coordinate_to_monitor_coordinate(
     )
 
 
-def monitor_coordinate_to_lsn_coordinate(
-    monitor_coordinate, monitor_shape, stimulus_type
-):
+def monitor_coordinate_to_lsn_coordinate(monitor_coordinate, monitor_shape, stimulus_type):
     pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
     tr, tc = LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus_type]
 
@@ -426,50 +408,24 @@ def monitor_coordinate_to_lsn_coordinate(
     return (rx / pixels_per_patch, cx / pixels_per_patch)
 
 
-def natural_scene_coordinate_to_monitor_coordinate(
-    natural_scene_coordinate, monitor_shape
-):
-    return map_template_coordinate_to_monitor_coordinate(
-        natural_scene_coordinate, monitor_shape, NATURAL_SCENES_PIXELS
-    )
+def natural_scene_coordinate_to_monitor_coordinate(natural_scene_coordinate, monitor_shape):
+    return map_template_coordinate_to_monitor_coordinate(natural_scene_coordinate, monitor_shape, NATURAL_SCENES_PIXELS)
 
 
-def natural_movie_coordinate_to_monitor_coordinate(
-    natural_movie_coordinate, monitor_shape
-):
-    local_y = (
-        1.0
-        * NATURAL_MOVIE_PIXELS[0]
-        * natural_movie_coordinate[0]
-        / NATURAL_MOVIE_DIMENSIONS[0]
-    )
-    local_x = (
-        1.0
-        * NATURAL_MOVIE_PIXELS[1]
-        * natural_movie_coordinate[1]
-        / NATURAL_MOVIE_DIMENSIONS[1]
-    )
+def natural_movie_coordinate_to_monitor_coordinate(natural_movie_coordinate, monitor_shape):
+    local_y = 1.0 * NATURAL_MOVIE_PIXELS[0] * natural_movie_coordinate[0] / NATURAL_MOVIE_DIMENSIONS[0]
+    local_x = 1.0 * NATURAL_MOVIE_PIXELS[1] * natural_movie_coordinate[1] / NATURAL_MOVIE_DIMENSIONS[1]
 
-    return map_template_coordinate_to_monitor_coordinate(
-        (local_y, local_x), monitor_shape, NATURAL_MOVIE_PIXELS
-    )
+    return map_template_coordinate_to_monitor_coordinate((local_y, local_x), monitor_shape, NATURAL_MOVIE_PIXELS)
 
 
-def map_stimulus_coordinate_to_monitor_coordinate(
-    template_coordinate, monitor_shape, stimulus_type
-):
+def map_stimulus_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape, stimulus_type):
     if stimulus_type in LOCALLY_SPARSE_NOISE_STIMULUS_TYPES:
-        return lsn_coordinate_to_monitor_coordinate(
-            template_coordinate, monitor_shape, stimulus_type
-        )
+        return lsn_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape, stimulus_type)
     elif stimulus_type in NATURAL_MOVIE_STIMULUS_TYPES:
-        return natural_movie_coordinate_to_monitor_coordinate(
-            template_coordinate, monitor_shape
-        )
+        return natural_movie_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape)
     elif stimulus_type == NATURAL_SCENES:
-        return natural_scene_coordinate_to_monitor_coordinate(
-            template_coordinate, monitor_shape
-        )
+        return natural_scene_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape)
     elif stimulus_type in [
         DRIFTING_GRATINGS,
         STATIC_GRATINGS,
@@ -480,9 +436,7 @@ def map_stimulus_coordinate_to_monitor_coordinate(
         raise NotImplementedError  # pragma: no cover
 
 
-def monitor_coordinate_to_natural_movie_coordinate(
-    monitor_coordinate, monitor_shape
-):
+def monitor_coordinate_to_natural_movie_coordinate(monitor_coordinate, monitor_shape):
     local_y, local_x = map_monitor_coordinate_to_template_coordinate(
         monitor_coordinate, monitor_shape, NATURAL_MOVIE_PIXELS
     )
@@ -493,21 +447,13 @@ def monitor_coordinate_to_natural_movie_coordinate(
     )
 
 
-def map_monitor_coordinate_to_stimulus_coordinate(
-    monitor_coordinate, monitor_shape, stimulus_type
-):
+def map_monitor_coordinate_to_stimulus_coordinate(monitor_coordinate, monitor_shape, stimulus_type):
     if stimulus_type in LOCALLY_SPARSE_NOISE_STIMULUS_TYPES:
-        return monitor_coordinate_to_lsn_coordinate(
-            monitor_coordinate, monitor_shape, stimulus_type
-        )
+        return monitor_coordinate_to_lsn_coordinate(monitor_coordinate, monitor_shape, stimulus_type)
     elif stimulus_type == NATURAL_SCENES:
-        return map_monitor_coordinate_to_template_coordinate(
-            monitor_coordinate, monitor_shape, NATURAL_SCENES_PIXELS
-        )
+        return map_monitor_coordinate_to_template_coordinate(monitor_coordinate, monitor_shape, NATURAL_SCENES_PIXELS)
     elif stimulus_type in NATURAL_MOVIE_STIMULUS_TYPES:
-        return monitor_coordinate_to_natural_movie_coordinate(
-            monitor_coordinate, monitor_shape
-        )
+        return monitor_coordinate_to_natural_movie_coordinate(monitor_coordinate, monitor_shape)
     elif stimulus_type in [
         DRIFTING_GRATINGS,
         STATIC_GRATINGS,
@@ -524,12 +470,8 @@ def map_stimulus(
     target_stimulus_type,
     monitor_shape,
 ):
-    mc = map_stimulus_coordinate_to_monitor_coordinate(
-        source_stimulus_coordinate, monitor_shape, source_stimulus_type
-    )
-    return map_monitor_coordinate_to_stimulus_coordinate(
-        mc, monitor_shape, target_stimulus_type
-    )
+    mc = map_stimulus_coordinate_to_monitor_coordinate(source_stimulus_coordinate, monitor_shape, source_stimulus_type)
+    return map_monitor_coordinate_to_stimulus_coordinate(mc, monitor_shape, target_stimulus_type)
 
 
 def translate_image_and_fill(img, translation=(0, 0)):
@@ -581,9 +523,7 @@ class Monitor(object):
 
     @property
     def height(self):
-        return self.spatial_conversion_factor * np.sqrt(
-            self.panel_size**2 / (1 + self.aspect_ratio**2)
-        )
+        return self.spatial_conversion_factor * np.sqrt(self.panel_size**2 / (1 + self.aspect_ratio**2))
 
     @property
     def width(self):
@@ -604,32 +544,17 @@ class Monitor(object):
     def pixel_size(self):
         return float(self.width) / self.n_pixels_c
 
-    def pixels_to_visual_degrees(
-        self, n, distance_from_monitor, small_angle_approximation=True
-    ):
+    def pixels_to_visual_degrees(self, n, distance_from_monitor, small_angle_approximation=True):
         if small_angle_approximation:
-            return (
-                n
-                * self.pixel_size
-                / distance_from_monitor
-                * RADIANS_TO_DEGREES
-            )  # radians to degrees
+            return n * self.pixel_size / distance_from_monitor * RADIANS_TO_DEGREES  # radians to degrees
         else:
             return (
-                2
-                * np.arctan(
-                    n * 1.0 / 2 * self.pixel_size / distance_from_monitor
-                )
-                * RADIANS_TO_DEGREES
+                2 * np.arctan(n * 1.0 / 2 * self.pixel_size / distance_from_monitor) * RADIANS_TO_DEGREES
             )  # radians to degrees
 
-    def visual_degrees_to_pixels(
-        self, vd, distance_from_monitor, small_angle_approximation=True
-    ):
+    def visual_degrees_to_pixels(self, vd, distance_from_monitor, small_angle_approximation=True):
         if small_angle_approximation:
-            return vd * (
-                distance_from_monitor / self.pixel_size / RADIANS_TO_DEGREES
-            )
+            return vd * (distance_from_monitor / self.pixel_size / RADIANS_TO_DEGREES)
         else:
             raise NotImplementedError
 
@@ -650,24 +575,14 @@ class Monitor(object):
         )
 
         pixels_per_patch = float(LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type])
-        target_size = tuple(
-            int(pixels_per_patch * dimsize) for dimsize in img.shape[::-1]
-        )
-        img_full_res = np.array(
-            Image.fromarray(img).resize(target_size, 0)
-        )  # 0 -> nearest neighbor interpolator
+        target_size = tuple(int(pixels_per_patch * dimsize) for dimsize in img.shape[::-1])
+        img_full_res = np.array(Image.fromarray(img).resize(target_size, 0))  # 0 -> nearest neighbor interpolator
 
-        mr, mc = lsn_coordinate_to_monitor_coordinate(
-            (0, 0), (self.n_pixels_r, self.n_pixels_c), stimulus_type
-        )
-        Mr, Mc = lsn_coordinate_to_monitor_coordinate(
-            img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type
-        )
+        mr, mc = lsn_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), stimulus_type)
+        Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         full_image[int(mr) : int(Mr), int(mc) : int(Mc)] = img_full_res
 
-        full_image = translate_image_and_fill(
-            full_image, translation=translation
-        )
+        full_image = translate_image_and_fill(full_image, translation=translation)
 
         if origin == "lower":
             return full_image
@@ -678,23 +593,15 @@ class Monitor(object):
 
         return full_image
 
-    def natural_scene_image_to_screen(
-        self, img, origin="lower", translation=(0, 0)
-    ):
-        full_image = np.full(
-            (self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8
-        )
-        mr, mc = natural_scene_coordinate_to_monitor_coordinate(
-            (0, 0), (self.n_pixels_r, self.n_pixels_c)
-        )
+    def natural_scene_image_to_screen(self, img, origin="lower", translation=(0, 0)):
+        full_image = np.full((self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8)
+        mr, mc = natural_scene_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
         Mr, Mc = natural_scene_coordinate_to_monitor_coordinate(
             (img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c)
         )
         full_image[int(mr) : int(Mr), int(mc) : int(Mc)] = img
 
-        full_image = translate_image_and_fill(
-            full_image, translation=translation
-        )
+        full_image = translate_image_and_fill(full_image, translation=translation)
 
         if origin == "lower":
             return np.flipud(full_image)
@@ -703,20 +610,14 @@ class Monitor(object):
         else:
             raise Exception
 
-    def natural_movie_image_to_screen(
-        self, img, origin="lower", translation=(0, 0)
-    ):
-        img = np.array(
-            Image.fromarray(img).resize(NATURAL_MOVIE_PIXELS[::-1], 2)
-        ).astype(
+    def natural_movie_image_to_screen(self, img, origin="lower", translation=(0, 0)):
+        img = np.array(Image.fromarray(img).resize(NATURAL_MOVIE_PIXELS[::-1], 2)).astype(
             np.uint8
         )  # 2 -> bilinear interpolator
 
         assert img.dtype == np.uint8
 
-        full_image = np.full(
-            (self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8
-        )
+        full_image = np.full((self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8)
         mr, mc = map_template_coordinate_to_monitor_coordinate(
             (0, 0), (self.n_pixels_r, self.n_pixels_c), NATURAL_MOVIE_PIXELS
         )
@@ -728,9 +629,7 @@ class Monitor(object):
 
         full_image[int(mr) : int(Mr), int(mc) : int(Mc)] = img
 
-        full_image = translate_image_and_fill(
-            full_image, translation=translation
-        )
+        full_image = translate_image_and_fill(full_image, translation=translation)
 
         if origin == "lower":
             return np.flipud(full_image)
@@ -739,15 +638,9 @@ class Monitor(object):
         else:
             raise Exception
 
-    def spatial_frequency_to_pix_per_cycle(
-        self, spatial_frequency, distance_from_monitor
-    ):
+    def spatial_frequency_to_pix_per_cycle(self, spatial_frequency, distance_from_monitor):
         # How many cycles do I want to see post warp:
-        number_of_cycles = (
-            spatial_frequency
-            * 2
-            * np.degrees(np.arctan(self.width / 2.0 / distance_from_monitor))
-        )
+        number_of_cycles = spatial_frequency * 2 * np.degrees(np.arctan(self.width / 2.0 / distance_from_monitor))
 
         # How many pixels to I have pre-warp to place my cycles on:
         _, m_col = np.where(self.mask != 0)
@@ -765,9 +658,7 @@ class Monitor(object):
         baseline=127,
         translation=(0, 0),
     ):
-        pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(
-            spatial_frequency, distance_from_monitor
-        )
+        pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(spatial_frequency, distance_from_monitor)
 
         full_image = get_spatial_grating(
             height=self.n_pixels_r,
@@ -779,24 +670,18 @@ class Monitor(object):
             baseline=baseline,
         )
 
-        full_image = translate_image_and_fill(
-            full_image, translation=translation
-        )
+        full_image = translate_image_and_fill(full_image, translation=translation)
 
         return full_image
 
     def get_mask(self):
-        mask = make_display_mask(
-            display_shape=(self.n_pixels_c, self.n_pixels_r)
-        ).T
+        mask = make_display_mask(display_shape=(self.n_pixels_c, self.n_pixels_r)).T
         assert mask.shape[0] == self.n_pixels_r
         assert mask.shape[1] == self.n_pixels_c
 
         return mask
 
-    def show_image(
-        self, img, ax=None, show=True, mask=False, warp=False, origin="lower"
-    ):
+    def show_image(self, img, ax=None, show=True, mask=False, warp=False, origin="lower"):
         import matplotlib.pyplot as plt
 
         assert img.shape == (
@@ -816,9 +701,7 @@ class Monitor(object):
         ax.imshow(img, origin=origin, cmap=plt.cm.gray, interpolation="none")
 
         if mask:
-            mask = make_display_mask(
-                display_shape=(self.n_pixels_c, self.n_pixels_r)
-            ).T
+            mask = make_display_mask(display_shape=(self.n_pixels_c, self.n_pixels_r)).T
             alpha_mask = np.zeros((mask.shape[0], mask.shape[1], 4))
             alpha_mask[:, :, 2] = 1 - mask
             alpha_mask[:, :, 3] = 0.4
@@ -854,9 +737,7 @@ class Monitor(object):
 
 
 class ExperimentGeometry(object):
-    def __init__(
-        self, distance, mon_height_cm, mon_width_cm, mon_res, eyepoint
-    ):
+    def __init__(self, distance, mon_height_cm, mon_width_cm, mon_res, eyepoint):
         self.distance = distance
         self.mon_height_cm = mon_height_cm
         self.mon_width_cm = mon_width_cm
@@ -902,9 +783,7 @@ class BrainObservatoryMonitor(Monitor):
     def __init__(self, experiment_geometry=None):
         height, width = MONITOR_DIMENSIONS
 
-        super(BrainObservatoryMonitor, self).__init__(
-            height, width, 61.214, "cm"
-        )
+        super(BrainObservatoryMonitor, self).__init__(height, width, 61.214, "cm")
 
         if experiment_geometry is None:
             self.experiment_geometry = ExperimentGeometry(
@@ -918,24 +797,12 @@ class BrainObservatoryMonitor(Monitor):
             self.experiment_geometry = experiment_geometry
 
     def lsn_image_to_screen(self, img, **kwargs):
-        if img.shape == tuple(
-            LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE]
-        ):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(
-                img, LOCALLY_SPARSE_NOISE, **kwargs
-            )
-        elif img.shape == tuple(
-            LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_4DEG]
-        ):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(
-                img, LOCALLY_SPARSE_NOISE_4DEG, **kwargs
-            )
-        elif img.shape == tuple(
-            LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_8DEG]
-        ):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(
-                img, LOCALLY_SPARSE_NOISE_8DEG, **kwargs
-            )
+        if img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE]):
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE, **kwargs)
+        elif img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_4DEG]):
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_4DEG, **kwargs)
+        elif img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_8DEG]):
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_8DEG, **kwargs)
         else:  # pragma: no cover
             raise RuntimeError  # pragma: no cover
 
@@ -943,13 +810,11 @@ class BrainObservatoryMonitor(Monitor):
         assert img.shape == (self.n_pixels_r, self.n_pixels_c)
         assert self.spatial_unit == "cm"
 
-        return spndi.map_coordinates(
-            img, self.experiment_geometry.warp_coordinates.T
-        ).reshape((self.n_pixels_r, self.n_pixels_c))
+        return spndi.map_coordinates(img, self.experiment_geometry.warp_coordinates.T).reshape(
+            (self.n_pixels_r, self.n_pixels_c)
+        )
 
-    def grating_to_screen(
-        self, phase, spatial_frequency, orientation, **kwargs
-    ):
+    def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
         return super(BrainObservatoryMonitor, self).grating_to_screen(
             phase,
             spatial_frequency,
@@ -1097,9 +962,7 @@ def make_display_mask(display_shape=(1920, 1200)):
     return mask
 
 
-def mask_stimulus_template(
-    template_display_coords, template_shape, display_mask=None, threshold=1.0
-):
+def mask_stimulus_template(template_display_coords, template_shape, display_mask=None, threshold=1.0):
     """Build a mask for a stimulus template of a given shape and display
     coordinates that indicates which part of the template is on screen after
     warping.
@@ -1131,10 +994,7 @@ def mask_stimulus_template(
     mask = np.zeros(template_shape, dtype=bool)
     for y in range(template_shape[1]):
         for x in range(template_shape[0]):
-            tdcm = np.where(
-                (template_display_coords[0, :, :] == x)
-                & (template_display_coords[1, :, :] == y)
-            )
+            tdcm = np.where((template_display_coords[0, :, :] == x) & (template_display_coords[1, :, :] == y))
             v = display_mask[tdcm]
             f = np.sum(v) / len(v)
             frac[x, y] = f

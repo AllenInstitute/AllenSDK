@@ -31,6 +31,3 @@ def template_projection(volume, axis, gain=2, maxv=1, *a, **k):
         output += gain * np.multiply(current, current) / maxv
 
     return output
-
-
-

@@ -40,7 +40,7 @@ import logging
 
 
 def get_diagonals_from_sparse(mat):
-    ''' Returns a dictionary of diagonals keyed by offsets
+    """Returns a dictionary of diagonals keyed by offsets
 
     Parameters
     ----------
@@ -49,7 +49,7 @@ def get_diagonals_from_sparse(mat):
     Returns
     -------
     dictionary: diagonals keyed by offsets
-    '''
+    """
 
     mat_dia = mat.todia()  # make sure the matrix is in diagonal format
 
@@ -65,7 +65,7 @@ def get_diagonals_from_sparse(mat):
 
 
 def ab_from_diagonals(mat_dict):
-    ''' Constructs value for scipy.linalg.solve_banded
+    """Constructs value for scipy.linalg.solve_banded
 
     Parameters
     ----------
@@ -74,7 +74,7 @@ def ab_from_diagonals(mat_dict):
     Returns
     -------
     ab: value for scipy.linalg.solve_banded
-    '''
+    """
     offsets = list(mat_dict.keys())
     l = -np.min(offsets)
     u = np.max(offsets)
@@ -91,28 +91,26 @@ def ab_from_diagonals(mat_dict):
 
 
 def error_calc(F_M, F_N, F_C, r):
-
     er = np.sqrt(np.mean(np.square(F_C - (F_M - r * F_N)))) / np.mean(F_M)
 
     return er
 
 
 def error_calc_outlier(F_M, F_N, F_C, r):
-
     std_F_M = np.std(F_M)
     mean_F_M = np.mean(F_M)
-    ind_outlier = np.where(F_M > mean_F_M + 2. * std_F_M)
+    ind_outlier = np.where(F_M > mean_F_M + 2.0 * std_F_M)
 
-    er = np.sqrt(np.mean(np.square(
-        F_C[ind_outlier] - (F_M[ind_outlier] - r * F_N[ind_outlier])))) / np.mean(F_M[ind_outlier])
+    er = np.sqrt(np.mean(np.square(F_C[ind_outlier] - (F_M[ind_outlier] - r * F_N[ind_outlier])))) / np.mean(
+        F_M[ind_outlier]
+    )
 
     return er
 
 
 def ab_from_T(T, lam, dt):
     # using csr because multiplication is fast
-    Ls = -sparse.eye(T - 1, T, format='csr') + \
-        sparse.eye(T - 1, T, 1, format='csr')
+    Ls = -sparse.eye(T - 1, T, format="csr") + sparse.eye(T - 1, T, 1, format="csr")
     Ls /= dt
     Ls2 = Ls.T.dot(Ls)
 
@@ -138,7 +136,7 @@ def alpha_filter(A=1.0, alpha=0.05, beta=0.25, T=100):
 
 
 def validate_with_synthetic_F(T, N):
-    """ Compute N synthetic traces of length T with known values of r, then estimate r.
+    """Compute N synthetic traces of length T with known values of r, then estimate r.
     TODO: docs
     """
     af1 = alpha_filter()
@@ -151,7 +149,7 @@ def validate_with_synthetic_F(T, N):
         F_M_truth, F_N_truth, F_C_truth, r_truth = synthesize_F(T, af1, af2)
         results = estimate_contamination_ratios(F_M_truth, F_N_truth)
 
-        r_est = results['r']
+        r_est = results["r"]
 
         r_truth_vals.append(r_truth)
         r_est_vals.append(r_est)
@@ -160,14 +158,14 @@ def validate_with_synthetic_F(T, N):
 
 
 def synthesize_F(T, af1, af2, p1=0.05, p2=0.1):
-    """ Build a synthetic F_C, F_M, F_N, and r of length T
+    """Build a synthetic F_C, F_M, F_N, and r of length T
     TODO: docs
     """
     x1 = np.random.random(T) < p1
-    F_C = np.convolve(af1, x1, mode='full')[:T]
+    F_C = np.convolve(af1, x1, mode="full")[:T]
 
     x2 = np.random.random(T) < p2
-    F_N = np.convolve(af2, x2, mode='full')[:T]
+    F_N = np.convolve(af2, x2, mode="full")[:T]
 
     r = 2.0 * np.random.random()
 
@@ -177,8 +175,7 @@ def synthesize_F(T, af1, af2, p1=0.05, p2=0.1):
 
 
 class NeuropilSubtract(object):
-    """ TODO: docs
-    """
+    """TODO: docs"""
 
     def __init__(self, lam=0.05, dt=1.0, folds=4):
         self.lam = lam
@@ -198,7 +195,7 @@ class NeuropilSubtract(object):
         self.error = None
 
     def set_F(self, F_M, F_N):
-        """ Break the F_M and F_N traces into the number of folds specified
+        """Break the F_M and F_N traces into the number of folds specified
         in the class constructor and normalize each fold of F_M and R_N relative to F_N.
         """
 
@@ -206,8 +203,7 @@ class NeuropilSubtract(object):
         F_N_len = len(F_N)
 
         if F_M_len != F_N_len:
-            raise Exception(
-                "F_M and F_N must have the same length (%d vs %d)" % (F_M_len, F_N_len))
+            raise Exception("F_M and F_N must have the same length (%d vs %d)" % (F_M_len, F_N_len))
 
         if self.T != F_M_len:
             logging.debug("updating ab matrix for new T=%d", F_M_len)
@@ -221,8 +217,8 @@ class NeuropilSubtract(object):
         for fi in range(self.folds):
             # F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f],
             #                               F_N[fi*self.T_f:(fi+1)*self.T_f])
-            self.F_M.append(F_M[fi * self.T_f:(fi + 1) * self.T_f])
-            self.F_N.append(F_N[fi * self.T_f:(fi + 1) * self.T_f])
+            self.F_M.append(F_M[fi * self.T_f : (fi + 1) * self.T_f])
+            self.F_N.append(F_N[fi * self.T_f : (fi + 1) * self.T_f])
 
     def fit_block_coordinate_desc(self, r_init=5.0, min_delta_r=0.00000001):
         F_M = np.concatenate(self.F_M)
@@ -238,7 +234,7 @@ class NeuropilSubtract(object):
         ab = ab_from_T(self.T, self.lam, self.dt)
         while delta_r is None or delta_r > min_delta_r:
             F_C = solve_banded((1, 1), ab, F_M - r * F_N)
-            new_r = - np.sum((F_C - F_M) * F_N) / np.sum(np.square(F_N))
+            new_r = -np.sum((F_C - F_M) * F_N) / np.sum(np.square(F_N))
             error = self.estimate_error(new_r)
 
             error_vals.append(error)
@@ -256,7 +252,7 @@ class NeuropilSubtract(object):
         self.error = error_vals.min()
 
     def fit(self, r_range=[0.0, 2.0], iterations=3, dr=0.1, dr_factor=0.1):
-        """ Estimate error values for a range of r values.  Identify a new r range
+        """Estimate error values for a range of r values.  Identify a new r range
         around the minimum error values and repeat multiple times.
         TODO: docs
         """
@@ -292,19 +288,16 @@ class NeuropilSubtract(object):
                 global_min_error = min_error
                 global_min_r = rs[min_i]
 
-            logging.debug("iteration %d, r=%0.4f, e=%.6e",
-                          it, global_min_r, global_min_error)
+            logging.debug("iteration %d, r=%0.4f, e=%.6e", it, global_min_r, global_min_error)
 
             # if the minimum error is on the upper boundary,
             # extend the boundary and redo this iteration
             if min_i == len(it_errors) - 1:
-                logging.debug(
-                    "minimum error found on upper r bound, extending range")
+                logging.debug("minimum error found on upper r bound, extending range")
                 it_range = [rs[-1], rs[-1] + (rs[-1] - rs[0])]
             else:
                 # error is somewhere on either side of the minimum error index
-                it_range = [rs[max(min_i - 1, 0)],
-                            rs[min(min_i + 1, len(rs) - 1)]]
+                it_range = [rs[max(min_i - 1, 0)], rs[min(min_i + 1, len(rs) - 1)]]
                 it_dr *= dr_factor
                 it += 1
 
@@ -314,7 +307,7 @@ class NeuropilSubtract(object):
         self.error = global_min_error
 
     def estimate_error(self, r):
-        """ Estimate error values for a given r for each fold and return the mean. """
+        """Estimate error values for a given r for each fold and return the mean."""
 
         errors = np.zeros(self.folds)
         for fi in range(self.folds):
@@ -326,10 +319,8 @@ class NeuropilSubtract(object):
         return np.mean(errors)
 
 
-def estimate_contamination_ratios(F_M, F_N,
-                                  lam=0.05, folds=4, iterations=3,
-                                  r_range=[0.0, 2.0], dr=0.1, dr_factor=0.1):
-    ''' Calculates neuropil contamination of ROI
+def estimate_contamination_ratios(F_M, F_N, lam=0.05, folds=4, iterations=3, r_range=[0.0, 2.0], dr=0.1, dr_factor=0.1):
+    """Calculates neuropil contamination of ROI
 
     Parameters
     ----------
@@ -343,16 +334,13 @@ def estimate_contamination_ratios(F_M, F_N,
         * 'err': RMS error
         * 'min_error': minimum error
         * 'bounds_error': boolean. True if error or R are outside tolerance
-    '''
+    """
 
     ns = NeuropilSubtract(lam=lam, folds=folds)
 
     ns.set_F(F_M, F_N)
 
-    ns.fit(r_range=r_range,
-           iterations=iterations,
-           dr=dr,
-           dr_factor=dr_factor)
+    ns.fit(r_range=r_range, iterations=iterations, dr=dr, dr_factor=dr_factor)
 
     # ns.fit_block_coordinate_desc()
 
@@ -366,5 +354,5 @@ def estimate_contamination_ratios(F_M, F_N,
         "err": ns.error,
         "err_vals": ns.error_vals,
         "min_error": ns.error,
-        "it": len(ns.r_vals)
+        "it": len(ns.r_vals),
     }

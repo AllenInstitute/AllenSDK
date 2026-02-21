@@ -7,13 +7,10 @@ import logging
 import pathlib
 from allensdk.brain_observatory import sync_dataset
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.data_files.stimulus_file import (
-    _StimulusFile)
+from allensdk.brain_observatory.behavior.data_files.stimulus_file import _StimulusFile
 
 
-def _choose_line(
-        data: sync_dataset.Dataset,
-        sync_lines: Union[str, Tuple[str]]) -> str:
+def _choose_line(data: sync_dataset.Dataset, sync_lines: Union[str, Tuple[str]]) -> str:
     """
     Scan through sync_lines in order. Select the first one
     that is present in the sync file. Raise an exception if
@@ -32,7 +29,7 @@ def _choose_line(
         the sync file.
     """
     if isinstance(sync_lines, str):
-        sync_lines = (sync_lines, )
+        sync_lines = (sync_lines,)
 
     chosen_line = None
     for this_line in sync_lines:
@@ -41,17 +38,13 @@ def _choose_line(
             break
 
     if chosen_line is None:
-        msg = ("Could not find one of "
-               f"{sync_lines} in sync dataset. "
-               f"available lines:\n{data.line_labels}")
+        msg = f"Could not find one of {sync_lines} in sync dataset. available lines:\n{data.line_labels}"
         raise RuntimeError(msg)
 
     return chosen_line
 
 
-def _get_rising_times(
-        data: sync_dataset.Dataset,
-        sync_lines: Union[str, Tuple[str]]):
+def _get_rising_times(data: sync_dataset.Dataset, sync_lines: Union[str, Tuple[str]]):
     """
     Get the timestamps, in seconds, associated with the rising
     edges in a specific line in a sync file
@@ -73,20 +66,14 @@ def _get_rising_times(
         The times, in seconds, associated with the rising edges
         of the chosen line.
     """
-    chosen_line = _choose_line(
-                        data=data,
-                        sync_lines=sync_lines)
+    chosen_line = _choose_line(data=data, sync_lines=sync_lines)
 
-    timestamps = data.get_rising_edges(
-                        line=chosen_line,
-                        units='seconds')
+    timestamps = data.get_rising_edges(line=chosen_line, units="seconds")
 
     return timestamps
 
 
-def _get_falling_times(
-        data: sync_dataset.Dataset,
-        sync_lines: Union[str, Tuple[str]]):
+def _get_falling_times(data: sync_dataset.Dataset, sync_lines: Union[str, Tuple[str]]):
     """
     Get the timestamps, in seconds, associated with the falling
     edges in a specific line in a sync file.
@@ -112,25 +99,19 @@ def _get_falling_times(
         of the chosen line.
     """
 
-    chosen_line = _choose_line(
-                        data=data,
-                        sync_lines=sync_lines)
+    chosen_line = _choose_line(data=data, sync_lines=sync_lines)
 
-    rising_edges = data.get_rising_edges(
-                        line=chosen_line,
-                        units='seconds')
+    rising_edges = data.get_rising_edges(line=chosen_line, units="seconds")
 
-    falling_edges = data.get_falling_edges(
-                        line=chosen_line,
-                        units='seconds')
+    falling_edges = data.get_falling_edges(line=chosen_line, units="seconds")
 
-    valid = (falling_edges > rising_edges[0])
+    valid = falling_edges > rising_edges[0]
     return falling_edges[valid]
 
 
 def _get_line_starts_and_ends(
-        data: sync_dataset.Dataset,
-        sync_lines: Union[str, Tuple[str]]) -> Tuple[np.ndarray, np.ndarray]:
+    data: sync_dataset.Dataset, sync_lines: Union[str, Tuple[str]]
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Parameters
     ----------
@@ -149,22 +130,16 @@ def _get_line_starts_and_ends(
         np.ndarrays of times (in seconds) that the given
         line turns on (rises) and turns off (falls).
     """
-    start_times = _get_rising_times(
-                        data=data,
-                        sync_lines=sync_lines)
+    start_times = _get_rising_times(data=data, sync_lines=sync_lines)
 
-    end_times = _get_falling_times(
-                        data=data,
-                        sync_lines=sync_lines)
+    end_times = _get_falling_times(data=data, sync_lines=sync_lines)
 
     return (start_times, end_times)
 
 
 def _get_start_frames(
-        data: sync_dataset.Dataset,
-        raw_frame_times: np.ndarray,
-        stimulus_frame_counts: List[int],
-        tolerance: float) -> List[int]:
+    data: sync_dataset.Dataset, raw_frame_times: np.ndarray, stimulus_frame_counts: List[int], tolerance: float
+) -> List[int]:
     """
     Find the start frames for a series of stimuli that need to be
     registered to a single sync file.
@@ -226,9 +201,7 @@ def _get_start_frames(
 
     frame_count_arr = np.array(stimulus_frame_counts)
 
-    stim_starts, stim_ends = _get_line_starts_and_ends(
-                                   data=data,
-                                   sync_lines=('stim_running', 'sweep'))
+    stim_starts, stim_ends = _get_line_starts_and_ends(data=data, sync_lines=("stim_running", "sweep"))
 
     # break raw_frame_times into epochs based on stim_starts and stim_ends
     epoch_frame_counts = []
@@ -236,8 +209,7 @@ def _get_start_frames(
     for start, end in zip(stim_starts, stim_ends):
         # Inner expression returns a bool array where conditions are True
         # np.where evaluates bool array to return indices where bool array True
-        epoch_frames = np.where((raw_frame_times >= start)
-                                & (raw_frame_times < end))[0]
+        epoch_frames = np.where((raw_frame_times >= start) & (raw_frame_times < end))[0]
         epoch_frame_counts.append(len(epoch_frames))
         epoch_start_frames.append(epoch_frames[0])
 
@@ -266,23 +238,17 @@ def _get_start_frames(
 
         start_frames = []
         for stim_idx, fc in enumerate(frame_count_arr):
-
             logging.info(f"Finding stim start for stim with index: {stim_idx}")
             # Get index of stimulus whose frame counts most closely match
             # the expected number of frames
-            best_match = int(
-                np.argmin([np.abs(efc - fc) for efc in epoch_frame_counts])
-            )
+            best_match = int(np.argmin([np.abs(efc - fc) for efc in epoch_frame_counts]))
             lower_tol = fc * (1.0 - tolerance)
             upper_tol = fc * (1.0 + tolerance)
             if lower_tol <= epoch_frame_counts[best_match] <= upper_tol:
                 _ = epoch_frame_counts.pop(best_match)
                 start_frame = epoch_start_frames.pop(best_match)
                 start_frames.append(start_frame)
-                logging.info(
-                    f"Found stim start for stim with index ({stim_idx})"
-                    f"at vsync ({start_frame})"
-                )
+                logging.info(f"Found stim start for stim with index ({stim_idx})at vsync ({start_frame})")
             else:
                 raise RuntimeError(
                     "Could not find matching sync frames "
@@ -302,11 +268,12 @@ def _get_start_frames(
 
 
 def get_stim_timestamps_from_stimulus_blocks(
-        stimulus_files: Union[_StimulusFile, List[_StimulusFile]],
-        sync_file: Union[str, pathlib.Path],
-        raw_frame_time_lines: Union[str, List[str]],
-        raw_frame_time_direction: str,
-        frame_count_tolerance: float) -> Dict[str, Any]:
+    stimulus_files: Union[_StimulusFile, List[_StimulusFile]],
+    sync_file: Union[str, pathlib.Path],
+    raw_frame_time_lines: Union[str, List[str]],
+    raw_frame_time_direction: str,
+    frame_count_tolerance: float,
+) -> Dict[str, Any]:
     """
     Find the timestamps associated a set of stimulus blocks
     that have to be aligned with a single sync file
@@ -350,18 +317,22 @@ def get_stim_timestamps_from_stimulus_blocks(
     stimulus_block.num_frames to each stimulus block.
     """
 
-    if raw_frame_time_direction == 'rising':
+    if raw_frame_time_direction == "rising":
         frame_time_fn = _get_rising_times
-    elif raw_frame_time_direction == 'falling':
+    elif raw_frame_time_direction == "falling":
         frame_time_fn = _get_falling_times
     else:
-        msg = ("Cannot parse raw_frame_time_direction = "
-               f"'{raw_frame_time_direction}'\n"
-               "must be either 'rising' or 'falling'")
+        msg = (
+            "Cannot parse raw_frame_time_direction = "
+            f"'{raw_frame_time_direction}'\n"
+            "must be either 'rising' or 'falling'"
+        )
         raise ValueError(msg)
 
     if not isinstance(stimulus_files, list):
-        stimulus_files = [stimulus_files, ]
+        stimulus_files = [
+            stimulus_files,
+        ]
 
     if isinstance(sync_file, pathlib.Path):
         str_path = str(sync_file.resolve().absolute())
@@ -371,20 +342,18 @@ def get_stim_timestamps_from_stimulus_blocks(
 
     list_of_timestamps = []
     with sync_dataset.Dataset(safe_sync_path) as sync_data:
-        raw_frame_times = frame_time_fn(
-                            data=sync_data,
-                            sync_lines=raw_frame_time_lines)
+        raw_frame_times = frame_time_fn(data=sync_data, sync_lines=raw_frame_time_lines)
 
         frame_count_list = [s.num_frames for s in stimulus_files]
         start_frames = _get_start_frames(
-                            data=sync_data,
-                            raw_frame_times=raw_frame_times,
-                            stimulus_frame_counts=frame_count_list,
-                            tolerance=frame_count_tolerance)
+            data=sync_data,
+            raw_frame_times=raw_frame_times,
+            stimulus_frame_counts=frame_count_list,
+            tolerance=frame_count_tolerance,
+        )
 
         for f0, nf in zip(start_frames, frame_count_list):
-            this_array = raw_frame_times[f0:f0+nf]
+            this_array = raw_frame_times[f0 : f0 + nf]
             list_of_timestamps.append(this_array)
 
-    return {"timestamps": list_of_timestamps,
-            "start_frames": start_frames}
+    return {"timestamps": list_of_timestamps, "start_frames": start_frames}

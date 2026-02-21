@@ -2,6 +2,7 @@ import pytest
 
 from allensdk.brain_observatory.ecephys.ecephys_project_api import ecephys_project_warehouse_api as epwa
 
+
 @pytest.mark.skipif(True, reason="broken test")
 @pytest.mark.parametrize(
     "method,conditions,expected_query",
@@ -9,23 +10,17 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import ecephys_proje
         [
             "get_sessions",
             {},
-            (
-                "criteria=model::EcephysSession"
-            ),
+            ("criteria=model::EcephysSession"),
         ],
         [
             "get_sessions",
             {"session_ids": [779839471, 759228117]},
-            (
-                "criteria=model::EcephysSession,rma::criteria[id$in779839471,759228117]"
-            ),
+            ("criteria=model::EcephysSession,rma::criteria[id$in779839471,759228117]"),
         ],
         [
             "get_sessions",
             {"session_ids": [779839471, 759228117], "has_eye_tracking": True},
-            (
-                "criteria=model::EcephysSession,rma::criteria[id$in779839471,759228117][fail_eye_tracking$eqfalse]"
-            ),
+            ("criteria=model::EcephysSession,rma::criteria[id$in779839471,759228117][fail_eye_tracking$eqfalse]"),
         ],
         [
             "get_sessions",

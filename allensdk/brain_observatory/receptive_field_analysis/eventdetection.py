@@ -52,19 +52,13 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
     var_dict = {}
     debug_dict = {}
     for ii, fi in enumerate(stimulus_table["start"].values):
-        if (
-            ii > 0
-            and stimulus_table.iloc[ii].start
-            == stimulus_table.iloc[ii - 1].end
-        ):
+        if ii > 0 and stimulus_table.iloc[ii].start == stimulus_table.iloc[ii - 1].end:
             offset = 1
         else:
             offset = 0
 
         if fi + k_min >= 0 and fi + k_max <= len(dff_trace):
-            trace = dff_trace[
-                fi + k_min + 1 + offset : fi + k_max + 1 + offset
-            ]
+            trace = dff_trace[fi + k_min + 1 + offset : fi + k_max + 1 + offset]
 
             xx = (trace - trace[0])[delta] - (trace - trace[0])[0]
             yy = max(
@@ -122,9 +116,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
 
     # =========================================================================
 
-    noise_threshold = max(
-        allowed_sigma * std_x + mu_x, allowed_sigma * std_y + mu_y
-    )
+    noise_threshold = max(allowed_sigma * std_x + mu_x, allowed_sigma * std_y + mu_y)
     mu_array = np.array([mu_x, mu_y])
     yes_set, no_set = set(), set()
     for ii, (t0, tf, xx, yy) in var_dict.items():
@@ -136,12 +128,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
         # 3) Change evoked by this trial, not previous
         # 4) At end of trace, ended up outside of noise floor
 
-        if (
-            np.sqrt(xi_z**2 + yi_z**2) > 4
-            and yy > 0.05
-            and xx < yy
-            and tf > noise_threshold / 2
-        ):
+        if np.sqrt(xi_z**2 + yi_z**2) > 4 and yy > 0.05 and xx < yy and tf > noise_threshold / 2:
             yes_set.add(ii)
         else:
             no_set.add(ii)
@@ -161,9 +148,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
             if ti in no_set:
                 ax[0].plot(np.arange(key, key + len(trace)), trace, "b")
             elif ti in yes_set:
-                ax[0].plot(
-                    np.arange(key, key + len(trace)), trace, "r", linewidth=2
-                )
+                ax[0].plot(np.arange(key, key + len(trace)), trace, "r", linewidth=2)
             else:
                 raise Exception
 

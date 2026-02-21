@@ -32,16 +32,13 @@ def behavior_stimuli_time_fixture(request):
     timestamp_count = request.param["timestamp_count"]
     time_step = request.param["time_step"]
 
-    timestamps = np.array(
-        [time_step * i for i in range(timestamp_count)]
-    ).astype("int64")
+    timestamps = np.array([time_step * i for i in range(timestamp_count)]).astype("int64")
 
     return timestamps
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_data_fixture,current_set_ix,start_frame,"
-    "n_frames,expected",
+    "behavior_stimuli_data_fixture,current_set_ix,start_frame,n_frames,expected",
     [
         (
             {
@@ -88,8 +85,7 @@ def test_get_stimulus_epoch(
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_data_fixture,start_frame,stop_frame,expected,"
-    "stimuli_type",
+    "behavior_stimuli_data_fixture,start_frame,stop_frame,expected,stimuli_type",
     [
         (
             {
@@ -171,11 +167,7 @@ def test_get_draw_epochs(
     expected,
     stimuli_type,
 ):
-    draw_log = behavior_stimuli_data_fixture["items"]["behavior"]["stimuli"][
-        stimuli_type
-    ][
-        "draw_log"
-    ]  # noqa: E128
+    draw_log = behavior_stimuli_data_fixture["items"]["behavior"]["stimuli"][stimuli_type]["draw_log"]  # noqa: E128
     actual = _get_draw_epochs(draw_log, start_frame, stop_frame)
     assert actual == expected
 
@@ -186,9 +178,7 @@ def test_get_draw_epochs(
     indirect=["behavior_stimuli_data_fixture"],
 )
 def test_get_stimulus_templates(behavior_stimuli_data_fixture):
-    templates = get_stimulus_templates(
-        behavior_stimuli_data_fixture, grating_images_dict={}
-    )
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture, grating_images_dict={})
 
     assert templates.image_set_name == "test_image_set"
     assert len(templates) == 1
@@ -197,9 +187,7 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
     for img in templates.values():
         assert isinstance(img, StimulusImage)
 
-    expected_path = os.path.join(
-        get_resources_dir(), "stimulus_template", "expected"
-    )
+    expected_path = os.path.join(get_resources_dir(), "stimulus_template", "expected")
 
     expected_unwarped_path = os.path.join(expected_path, "im065_unwarped.pkl")
     expected_unwarped = pd.read_pickle(expected_unwarped_path)
@@ -219,7 +207,7 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
 
 
 @pytest.mark.parametrize(
-    ("behavior_stimuli_data_fixture, " "grating_images_dict, expected"),
+    ("behavior_stimuli_data_fixture, grating_images_dict, expected"),
     [
         (
             {"has_images": False},
@@ -234,21 +222,13 @@ def test_get_stimulus_templates(behavior_stimuli_data_fixture):
     ],
     indirect=["behavior_stimuli_data_fixture"],
 )
-def test_get_stimulus_templates_for_gratings(
-    behavior_stimuli_data_fixture, grating_images_dict, expected
-):
-    templates = get_stimulus_templates(
-        behavior_stimuli_data_fixture, grating_images_dict=grating_images_dict
-    )
+def test_get_stimulus_templates_for_gratings(behavior_stimuli_data_fixture, grating_images_dict, expected):
+    templates = get_stimulus_templates(behavior_stimuli_data_fixture, grating_images_dict=grating_images_dict)
 
     assert templates.image_set_name == "grating"
     assert list(templates.keys()) == ["gratings_90.0"]
-    assert np.allclose(
-        templates["gratings_90.0"].warped, np.array([[1, 1], [1, 1]])
-    )
-    assert np.allclose(
-        templates["gratings_90.0"].unwarped, np.array([[2, 2], [2, 2]])
-    )
+    assert np.allclose(templates["gratings_90.0"].warped, np.array([[1, 1], [1, 1]]))
+    assert np.allclose(templates["gratings_90.0"].unwarped, np.array([[2, 2], [2, 2]]))
 
 
 # def test_get_images_dict():
@@ -259,8 +239,7 @@ def test_get_stimulus_templates_for_gratings(
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_data_fixture, remove_stimuli, "
-    "starting_index, expected_metadata",
+    "behavior_stimuli_data_fixture, remove_stimuli, starting_index, expected_metadata",
     [
         (
             {"grating_set_log": []},
@@ -375,7 +354,7 @@ def test_get_gratings_metadata(
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_data_fixture, remove_stimuli, " "expected_metadata",
+    "behavior_stimuli_data_fixture, remove_stimuli, expected_metadata",
     [
         (
             {
@@ -419,9 +398,7 @@ def test_get_gratings_metadata(
     ],
     indirect=["behavior_stimuli_data_fixture"],
 )
-def test_get_stimulus_metadata(
-    behavior_stimuli_data_fixture, remove_stimuli, expected_metadata
-):
+def test_get_stimulus_metadata(behavior_stimuli_data_fixture, remove_stimuli, expected_metadata):
     for key in remove_stimuli:
         # do this because at current images are not tested and there's a
         # hard coded path that prevents testing when this is fixed this can
@@ -436,9 +413,7 @@ def test_get_stimulus_metadata(
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_time_fixture,"
-    "behavior_stimuli_data_fixture, "
-    "expected",
+    "behavior_stimuli_time_fixture,behavior_stimuli_data_fixture, expected",
     [
         (
             {"timestamp_count": 15, "time_step": 1},
@@ -469,12 +444,8 @@ def test_get_stimulus_metadata(
         "behavior_stimuli_data_fixture",
     ],
 )
-def test_get_stimulus_presentations(
-    behavior_stimuli_time_fixture, behavior_stimuli_data_fixture, expected
-):
-    presentations_df = get_stimulus_presentations(
-        behavior_stimuli_data_fixture, behavior_stimuli_time_fixture
-    )
+def test_get_stimulus_presentations(behavior_stimuli_time_fixture, behavior_stimuli_data_fixture, expected):
+    presentations_df = get_stimulus_presentations(behavior_stimuli_data_fixture, behavior_stimuli_time_fixture)
 
     expected_df = pd.DataFrame.from_dict(expected)
     expected_df.index.name = "stimulus_presentations_id"
@@ -483,9 +454,7 @@ def test_get_stimulus_presentations(
 
 
 @pytest.mark.parametrize(
-    "behavior_stimuli_time_fixture,"
-    "behavior_stimuli_data_fixture,"
-    "expected_data",
+    "behavior_stimuli_time_fixture,behavior_stimuli_data_fixture,expected_data",
     [
         (
             {"timestamp_count": 15, "time_step": 1},
@@ -516,9 +485,7 @@ def test_get_stimulus_presentations(
                     ("Image", "im065", 5, 0),
                     ("Image", "im064", 25, 6),
                 ],
-                "images_draw_log": (
-                    ([0] * 2 + [1] * 2 + [0] * 3) * 2 + [0] * 16
-                ),
+                "images_draw_log": (([0] * 2 + [1] * 2 + [0] * 3) * 2 + [0] * 16),
                 "grating_set_log": [
                     ("Ori", 90, -1, 12),
                     # -1 because that element is not used
@@ -542,12 +509,8 @@ def test_get_stimulus_presentations(
         "behavior_stimuli_data_fixture",
     ],
 )
-def test_get_visual_stimuli_df(
-    behavior_stimuli_time_fixture, behavior_stimuli_data_fixture, expected_data
-):
-    stimuli_df = get_visual_stimuli_df(
-        behavior_stimuli_data_fixture, behavior_stimuli_time_fixture
-    )
+def test_get_visual_stimuli_df(behavior_stimuli_time_fixture, behavior_stimuli_data_fixture, expected_data):
+    stimuli_df = get_visual_stimuli_df(behavior_stimuli_data_fixture, behavior_stimuli_time_fixture)
     stimuli_df = stimuli_df.drop("index", axis=1)
 
     expected_df = pd.DataFrame.from_dict(expected_data)
@@ -556,9 +519,7 @@ def test_get_visual_stimuli_df(
 
 def test_is_change_event_no_change():
     """Test case for no change"""
-    stimulus_presentations = pd.DataFrame(
-        {"image_name": ["A", "A", "A"], "omitted": [False, False, False]}
-    )
+    stimulus_presentations = pd.DataFrame({"image_name": ["A", "A", "A"], "omitted": [False, False, False]})
 
     obtained = is_change_event(stimulus_presentations=stimulus_presentations)
     expected = pd.Series([False, False, False], name="is_change")
@@ -567,9 +528,7 @@ def test_is_change_event_no_change():
 
 def test_is_change_event_all_change():
     """Test case for all change"""
-    stimulus_presentations = pd.DataFrame(
-        {"image_name": ["A", "B", "C"], "omitted": [False, False, False]}
-    )
+    stimulus_presentations = pd.DataFrame({"image_name": ["A", "B", "C"], "omitted": [False, False, False]})
 
     obtained = is_change_event(stimulus_presentations=stimulus_presentations)
     expected = pd.Series([False, True, True], name="is_change")
@@ -578,9 +537,7 @@ def test_is_change_event_all_change():
 
 def test_is_change_omission():
     """Test case for single omission"""
-    stimulus_presentations = pd.DataFrame(
-        {"image_name": ["A", "B", "C"], "omitted": [False, True, False]}
-    )
+    stimulus_presentations = pd.DataFrame({"image_name": ["A", "B", "C"], "omitted": [False, True, False]})
 
     obtained = is_change_event(stimulus_presentations=stimulus_presentations)
     expected = pd.Series([False, False, True], name="is_change")
@@ -645,18 +602,12 @@ def test_compute_trials_id_for_stimulus():
         index=stimulus_presentations.index,
         dtype="int",
     )
-    output_trials_ids = compute_trials_id_for_stimulus(
-        stimulus_presentations, trials
-    )
+    output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations, trials)
     pd.testing.assert_series_equal(output_trials_ids, expected_trials_id)
 
     # Test with explicit active block.
-    stimulus_presentations["active"] = np.array(
-        [True, True, False, False, False, False, False, False]
-    )
-    output_trials_ids = compute_trials_id_for_stimulus(
-        stimulus_presentations, trials
-    )
+    stimulus_presentations["active"] = np.array([True, True, False, False, False, False, False, False])
+    output_trials_ids = compute_trials_id_for_stimulus(stimulus_presentations, trials)
     pd.testing.assert_series_equal(output_trials_ids, expected_trials_id)
 
 
@@ -688,12 +639,8 @@ def test_compute_is_shame_change():
         index=stimulus_presentations.index,
         dtype="bool",
     )
-    stimulus_presentations = compute_is_sham_change(
-        stimulus_presentations, trials
-    )
-    pd.testing.assert_series_equal(
-        stimulus_presentations["is_sham_change"], expected
-    )
+    stimulus_presentations = compute_is_sham_change(stimulus_presentations, trials)
+    pd.testing.assert_series_equal(stimulus_presentations["is_sham_change"], expected)
 
 
 def test_produce_stimulus_block_names():
@@ -711,9 +658,7 @@ def test_produce_stimulus_block_names():
         ],
         index=stimulus_presentations.index,
     )
-    output_stim_names = produce_stimulus_block_names(
-        stimulus_presentations, "OPHYS_1", "VisualBehaviorTask1B"
-    )
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations, "OPHYS_1", "VisualBehaviorTask1B")
     assert np.array_equal(
         output_stim_names["stimulus_block_name"].values,
         expected_stimulus_block_names.values,
@@ -730,9 +675,7 @@ def test_produce_stimulus_block_names():
         ],
         index=stimulus_presentations.index,
     )
-    output_stim_names = produce_stimulus_block_names(
-        stimulus_presentations, "OPHYS_1_passive", "VisualBehaviorTask1B"
-    )
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations, "OPHYS_1_passive", "VisualBehaviorTask1B")
     assert np.array_equal(
         output_stim_names["stimulus_block_name"].values,
         expected_stimulus_block_names.values,
@@ -742,7 +685,5 @@ def test_produce_stimulus_block_names():
     stimulus_presentations = pd.DataFrame(
         data={"stimulus_block": [0, 1, 2, 3]},
     )
-    output_stim_names = produce_stimulus_block_names(
-        stimulus_presentations, "OPHYS_1_passive", "NotAProject"
-    )
+    output_stim_names = produce_stimulus_block_names(stimulus_presentations, "OPHYS_1_passive", "NotAProject")
     assert "stimulus_block_name" not in output_stim_names.columns

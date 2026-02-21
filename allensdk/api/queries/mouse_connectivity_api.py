@@ -38,23 +38,22 @@ from .grid_data_api import GridDataApi
 from allensdk.api.warehouse_cache.cache import cacheable, Cache
 import numpy as np
 
+
 class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
-    '''
+    """
     HTTP Client for the Allen Mouse Brain Connectivity Atlas.
 
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
-    '''
+    """
+
     PRODUCT_IDS = [5, 31]
 
     def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri=base_uri)
 
-
     @cacheable()
-    def get_experiments(self,
-                        structure_ids,
-                        **kwargs):
-        '''
+    def get_experiments(self, structure_ids, **kwargs):
+        """
         Fetch experiment metadata from the Mouse Brain Connectivity Atlas.
 
         Parameters
@@ -66,100 +65,97 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         -------
         url : string
             The constructed URL
-        '''
-        criteria_list = ['[failed$eqfalse]',
-                         'products[id$in%s]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
+        """
+        criteria_list = [
+            "[failed$eqfalse]",
+            "products[id$in%s]" % (",".join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS)),
+        ]
 
         if structure_ids is not None:
             if type(structure_ids) is not list:
                 structure_ids = [structure_ids]
-            criteria_list.append('[id$in%s]' % ','.join(str(i)
-                                                        for i in structure_ids))
+            criteria_list.append("[id$in%s]" % ",".join(str(i) for i in structure_ids))
 
-        criteria_string = ','.join(criteria_list)
+        criteria_string = ",".join(criteria_list)
 
-        return self.model_query('SectionDataSet',
-                                criteria=criteria_string,
-                                **kwargs)
+        return self.model_query("SectionDataSet", criteria=criteria_string, **kwargs)
 
     @cacheable()
     def get_experiments_api(self):
-        '''
+        """
         Fetch experiment metadata from the Mouse Brain Connectivity Atlas via the ApiConnectivity table.
 
         Returns
         -------
         url : string
             The constructed URL
-        '''
-        return self.model_query('ApiConnectivity', num_rows='all')
+        """
+        return self.model_query("ApiConnectivity", num_rows="all")
 
     @cacheable()
     def get_manual_injection_summary(self, experiment_id):
-        ''' Retrieve manual injection summary. '''
+        """Retrieve manual injection summary."""
 
-        criteria = '[id$in%d]' % (experiment_id)
+        criteria = "[id$in%d]" % (experiment_id)
 
-        include = ['specimen(donor(transgenic_mouse(transgenic_lines)),',
-                   'injections(structure,age)),',
-                   'equalization,products']
+        include = [
+            "specimen(donor(transgenic_mouse(transgenic_lines)),",
+            "injections(structure,age)),",
+            "equalization,products",
+        ]
 
-        only = ['id',
-                'failed',
-                'storage_directory',
-                'red_lower',
-                'red_upper',
-                'green_lower',
-                'green_upper',
-                'blue_lower',
-                'blue_upper',
-                'products.id',
-                'specimen_id',
-                'structure_id',
-                'reference_space_id',
-                'primary_injection_structure_id',
-                'registration_point',
-                'coordinates_ap',
-                'coordinates_dv',
-                'coordinates_ml',
-                'angle',
-                'sex',
-                'strain',
-                'injection_materials',
-                'acronym',
-                'structures.name',
-                'days',
-                'transgenic_mice.name',
-                'transgenic_lines.name',
-                'transgenic_lines.description',
-                'transgenic_lines.id',
-                'donors.id']
+        only = [
+            "id",
+            "failed",
+            "storage_directory",
+            "red_lower",
+            "red_upper",
+            "green_lower",
+            "green_upper",
+            "blue_lower",
+            "blue_upper",
+            "products.id",
+            "specimen_id",
+            "structure_id",
+            "reference_space_id",
+            "primary_injection_structure_id",
+            "registration_point",
+            "coordinates_ap",
+            "coordinates_dv",
+            "coordinates_ml",
+            "angle",
+            "sex",
+            "strain",
+            "injection_materials",
+            "acronym",
+            "structures.name",
+            "days",
+            "transgenic_mice.name",
+            "transgenic_lines.name",
+            "transgenic_lines.description",
+            "transgenic_lines.id",
+            "donors.id",
+        ]
 
-        return self.model_query('SectionDataSet',
-                                criteria=criteria,
-                                include=include,
-                                only=only)
+        return self.model_query("SectionDataSet", criteria=criteria, include=include, only=only)
 
     @cacheable()
     def get_experiment_detail(self, experiment_id):
-        '''Retrieve the experiments data.'''
+        """Retrieve the experiments data."""
 
-        criteria = '[id$eq%d]' % (experiment_id)
-        include = ['specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),',
-                   'equalization,',
-                   'sub_images']
+        criteria = "[id$eq%d]" % (experiment_id)
+        include = [
+            "specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),",
+            "equalization,",
+            "sub_images",
+        ]
         order = ["'sub_images.section_number$asc'"]
 
-        return self.model_query('SectionDataSet',
-                                criteria=criteria,
-                                include=include,
-                                order=order)
+        return self.model_query("SectionDataSet", criteria=criteria, include=include, order=order)
 
     @cacheable()
-    def get_projection_image_info(self,
-                                  experiment_id,
-                                  section_number):
-        '''Fetch meta-information of one projection image.
+    def get_projection_image_info(self, experiment_id, section_number):
+        """Fetch meta-information of one projection image.
 
         Parameters
         ----------
@@ -173,36 +169,28 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         `Experimental Overview and Metadata <http://help.brain-map.org/display/mouseconnectivity/API##API-ExperimentalOverviewandMetadata>`_
         for additional documentation.
         Download the image using :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image`
-        '''
+        """
 
-        criteria = '[id$eq%d]' % (experiment_id)
-        include = ['equalization,sub_images[section_number$eq%d]' %
-                   (section_number)]
+        criteria = "[id$eq%d]" % (experiment_id)
+        include = ["equalization,sub_images[section_number$eq%d]" % (section_number)]
 
-        return self.model_query('SectionDataSet',
-                                criteria=criteria,
-                                include=include)
-        
+        return self.model_query("SectionDataSet", criteria=criteria, include=include)
 
-    def download_reference_aligned_image_channel_volumes(self,
-                                                         data_set_id,
-                                                         save_file_path=None):
-        '''
+    def download_reference_aligned_image_channel_volumes(self, data_set_id, save_file_path=None):
+        """
         Returns
         -------
             The well known file is downloaded
-        '''
-        well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(
-            data_set_id)
+        """
+        well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(data_set_id)
 
         if save_file_path is None:
-            save_file_path = str(data_set_id) + '.zip'
+            save_file_path = str(data_set_id) + ".zip"
 
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
 
-    def build_reference_aligned_image_channel_volumes_url(self,
-                                                          data_set_id):
-        '''Construct url to download the red, green, and blue channels
+    def build_reference_aligned_image_channel_volumes_url(self, data_set_id):
+        """Construct url to download the red, green, and blue channels
         aligned to the 25um adult mouse brain reference space volume.
 
         Parameters
@@ -214,39 +202,40 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         -----
         See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
         for additional documentation.
-        '''
+        """
 
-        criteria = ['well_known_file_type',
-                    "[name$eq'ImagesResampledTo25MicronARA']",
-                    "[attachable_id$eq%d]" % (data_set_id)]
+        criteria = [
+            "well_known_file_type",
+            "[name$eq'ImagesResampledTo25MicronARA']",
+            "[attachable_id$eq%d]" % (data_set_id),
+        ]
 
-        model_stage = self.model_stage('WellKnownFile',
-                                       criteria=criteria)
+        model_stage = self.model_stage("WellKnownFile", criteria=criteria)
 
         url = self.build_query_url([model_stage])
 
         return url
 
-    def get_reference_aligned_image_channel_volumes_url(self,
-                                                        data_set_id):
-        '''Retrieve the download link for a specific data set.\
+    def get_reference_aligned_image_channel_volumes_url(self, data_set_id):
+        """Retrieve the download link for a specific data set.\
 
         Notes
         -----
         See `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
         for additional documentation.
-        '''
-        download_link = self.do_query(self.build_reference_aligned_image_channel_volumes_url,
-                                      lambda parsed_json: str(
-                                          parsed_json['msg'][0]['download_link']),
-                                      data_set_id)
+        """
+        download_link = self.do_query(
+            self.build_reference_aligned_image_channel_volumes_url,
+            lambda parsed_json: str(parsed_json["msg"][0]["download_link"]),
+            data_set_id,
+        )
 
         url = self.api_url + download_link
 
         return url
 
     def experiment_source_search(self, **kwargs):
-        '''Search over the whole projection signal statistics dataset
+        """Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
 
         Parameters
@@ -278,12 +267,12 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         and
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
 
-        '''
+        """
         tuples = [(k, v) for k, v in kwargs.items()]
-        return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
+        return self.service_query("mouse_connectivity_injection_structure", parameters=tuples)
 
     def experiment_spatial_search(self, **kwargs):
-        '''Displays all SectionDataSets
+        """Displays all SectionDataSets
         with projection signal density >= 0.1 at the seed point.
         This service also returns the path
         along the most dense pixels from the seed point
@@ -313,13 +302,13 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         and
         `service::mouse_connectivity_target_spatial <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
 
-        '''
+        """
 
         tuples = [(k, v) for k, v in kwargs.items()]
-        return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
+        return self.service_query("mouse_connectivity_target_spatial", parameters=tuples)
 
     def experiment_injection_coordinate_search(self, **kwargs):
-        '''User specifies a seed location within the 3D reference space.
+        """User specifies a seed location within the 3D reference space.
         The service returns a rank list of experiments
         by distance of its injection site to the specified seed location.
 
@@ -345,12 +334,12 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         and
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
 
-        '''
+        """
         tuples = [(k, v) for k, v in kwargs.items()]
-        return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
+        return self.service_query("mouse_connectivity_injection_coordinate", parameters=tuples)
 
     def experiment_correlation_search(self, **kwargs):
-        '''Select a seed experiment and a domain over
+        """Select a seed experiment and a domain over
         which the similarity comparison is to be made.
 
 
@@ -380,99 +369,79 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         and
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
-        '''
+        """
         tuples = sorted(kwargs.items())
-        return self.service_query('mouse_connectivity_correlation',
-                                  parameters=tuples)
+        return self.service_query("mouse_connectivity_correlation", parameters=tuples)
 
     @cacheable()
-    def get_structure_unionizes(self,
-                                experiment_ids,
-                                is_injection=None,
-                                structure_name=None,
-                                structure_ids=None,
-                                hemisphere_ids=None,
-                                normalized_projection_volume_limit=None,
-                                include=None,
-                                debug=None,
-                                order=None):
-
-        experiment_filter = '[section_data_set_id$in%s]' %\
-                            ','.join(str(i) for i in experiment_ids)
+    def get_structure_unionizes(
+        self,
+        experiment_ids,
+        is_injection=None,
+        structure_name=None,
+        structure_ids=None,
+        hemisphere_ids=None,
+        normalized_projection_volume_limit=None,
+        include=None,
+        debug=None,
+        order=None,
+    ):
+        experiment_filter = "[section_data_set_id$in%s]" % ",".join(str(i) for i in experiment_ids)
 
         if is_injection is True:
-            is_injection_filter = '[is_injection$eqtrue]'
+            is_injection_filter = "[is_injection$eqtrue]"
         elif is_injection is False:
-            is_injection_filter = '[is_injection$eqfalse]'
+            is_injection_filter = "[is_injection$eqfalse]"
         else:
-            is_injection_filter = ''
+            is_injection_filter = ""
 
         if normalized_projection_volume_limit is not None:
-            volume_filter = '[normalized_projection_volume$gt%f]' %\
-                            (normalized_projection_volume_limit)
+            volume_filter = "[normalized_projection_volume$gt%f]" % (normalized_projection_volume_limit)
         else:
-            volume_filter = ''
+            volume_filter = ""
 
         if hemisphere_ids is not None:
-            hemisphere_filter = '[hemisphere_id$in%s]' %\
-                ','.join(str(h) for h in hemisphere_ids)
+            hemisphere_filter = "[hemisphere_id$in%s]" % ",".join(str(h) for h in hemisphere_ids)
         else:
-            hemisphere_filter = ''
+            hemisphere_filter = ""
 
         if structure_name is not None:
             structure_filter = ",structure[name$eq'%s']" % (structure_name)
         elif structure_ids is not None:
-            structure_filter = '[structure_id$in%s]' %\
-                               ','.join(str(i) for i in structure_ids)
+            structure_filter = "[structure_id$in%s]" % ",".join(str(i) for i in structure_ids)
         else:
-            structure_filter = ''
+            structure_filter = ""
 
         return self.model_query(
-            'ProjectionStructureUnionize',
-            criteria=''.join([experiment_filter,
-                              is_injection_filter,
-                              volume_filter,
-                              hemisphere_filter,
-                              structure_filter]),
+            "ProjectionStructureUnionize",
+            criteria="".join(
+                [experiment_filter, is_injection_filter, volume_filter, hemisphere_filter, structure_filter]
+            ),
             include=include,
             order=order,
-            num_rows='all',
+            num_rows="all",
             debug=debug,
-            count=False)
+            count=False,
+        )
 
-    @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_injection_density(self, path, experiment_id, resolution):
-        self.download_projection_grid_data(
-            experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
+        self.download_projection_grid_data(experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
-    @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_projection_density(self, path, experiment_id, resolution):
-        self.download_projection_grid_data(
-            experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
+        self.download_projection_grid_data(experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
-    @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_injection_fraction(self, path, experiment_id, resolution):
-        self.download_projection_grid_data(
-            experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
+        self.download_projection_grid_data(experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
-    @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1,
-                                           path_keyword='path'))
+    @cacheable(strategy="create", pathfinder=Cache.pathfinder(file_name_position=1, path_keyword="path"))
     def download_data_mask(self, path, experiment_id, resolution):
-        self.download_projection_grid_data(
-            experiment_id, [GridDataApi.DATA_MASK], resolution, path)
+        self.download_projection_grid_data(experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
-    def calculate_injection_centroid(self,
-                                     injection_density,
-                                     injection_fraction,
-                                     resolution=25):
-        '''
+    def calculate_injection_centroid(self, injection_density, injection_fraction, resolution=25):
+        """
         Compute the centroid of an injection site.
 
         Parameters
@@ -484,18 +453,18 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         injection_fraction: np.ndarray
             The injection fraction volume of an experiment
 
-        '''
+        """
 
         # find all voxels with injection_fraction > 0
         injection_voxels = np.nonzero(injection_fraction)
-        injection_density_computed = np.multiply(injection_density[injection_voxels],
-                                                 injection_fraction[injection_voxels])
+        injection_density_computed = np.multiply(
+            injection_density[injection_voxels], injection_fraction[injection_voxels]
+        )
         sum_density = np.sum(injection_density_computed)
 
         # compute centroid in CCF coordinates
         if sum_density > 0:
-            centroid = np.dot(injection_density_computed,
-                              list(zip(*injection_voxels))) / sum_density * resolution
+            centroid = np.dot(injection_density_computed, list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
 

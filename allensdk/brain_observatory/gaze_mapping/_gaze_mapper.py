@@ -17,9 +17,8 @@ class EyeTrackingRigObject(object):
         in the rig object's own coordinate system
 
     """
-    def __init__(self,
-                 position_in_eye_coord_frame: np.ndarray,
-                 rotations_in_self_coord_frame: np.ndarray):
+
+    def __init__(self, position_in_eye_coord_frame: np.ndarray, rotations_in_self_coord_frame: np.ndarray):
         self.position = position_in_eye_coord_frame
         self.rotations = rotations_in_self_coord_frame
 
@@ -64,13 +63,13 @@ class EyeTrackingRigObject(object):
         # Determine rotation in ECS needed to rotate obj_norm vector so that
         # its x-axis aligns with the ECS x-axis.
         theta_z = -(np.pi / 2 + np.arctan2(obj_norm[1], obj_norm[0]))
-        rz = Rotation.from_euler('z', theta_z, degrees=False)
+        rz = Rotation.from_euler("z", theta_z, degrees=False)
         obj_norm_prime = rz.apply(obj_norm)
 
         # Determine rotation in ECS needed to rotate transformed obj_norm
         # vector so that its z-axis aligns with the ECS z-axis
         theta_x = np.pi / 2 - np.arctan2(obj_norm_prime[2], obj_norm_prime[1])
-        rx = Rotation.from_euler('x', theta_x, degrees=False)
+        rx = Rotation.from_euler("x", theta_x, degrees=False)
 
         # Compose rotations, note the order!
         eye_to_object_xform = rx * rz
@@ -101,21 +100,26 @@ class GazeMapper(object):
     cm_per_pixel : float
         Pixel size of eye-tracking camera.
     """
-    def __init__(self,
-                 monitor_position: np.ndarray,
-                 monitor_rotations: np.ndarray,
-                 led_position: np.ndarray,
-                 camera_position: np.ndarray,
-                 camera_rotations: np.ndarray,
-                 eye_radius: float,
-                 cm_per_pixel: float):
+
+    def __init__(
+        self,
+        monitor_position: np.ndarray,
+        monitor_rotations: np.ndarray,
+        led_position: np.ndarray,
+        camera_position: np.ndarray,
+        camera_rotations: np.ndarray,
+        eye_radius: float,
+        cm_per_pixel: float,
+    ):
         self.eye_radius = eye_radius
         self.cm_per_pixel = cm_per_pixel
         self.led_pos = led_position
-        self.monitor = EyeTrackingRigObject(position_in_eye_coord_frame=monitor_position,
-                                            rotations_in_self_coord_frame=monitor_rotations)
-        self.camera = EyeTrackingRigObject(position_in_eye_coord_frame=camera_position,
-                                           rotations_in_self_coord_frame=camera_rotations)
+        self.monitor = EyeTrackingRigObject(
+            position_in_eye_coord_frame=monitor_position, rotations_in_self_coord_frame=monitor_rotations
+        )
+        self.camera = EyeTrackingRigObject(
+            position_in_eye_coord_frame=camera_position, rotations_in_self_coord_frame=camera_rotations
+        )
         self.cr = self.compute_cr_coordinate()
 
     def compute_cr_coordinate(self) -> np.ndarray:
@@ -158,16 +162,13 @@ class GazeMapper(object):
         # Undo mirror pole offset
         image_dist_from_origin = self.eye_radius + image_dist
         image_height = -(image_dist / object_dist) * object_height
-        image_dist_from_origin_mag = np.linalg.norm([image_height,
-                                                     image_dist_from_origin])
+        image_dist_from_origin_mag = np.linalg.norm([image_height, image_dist_from_origin])
         # To get full 3D position of virtual image we multiply the LED unit
         # position vector with magnitude of the image distance from origin.
-        led_unit_position_vec = (self.led_pos / np.linalg.norm(self.led_pos))
+        led_unit_position_vec = self.led_pos / np.linalg.norm(self.led_pos)
         return led_unit_position_vec * image_dist_from_origin_mag
 
-    def pupil_pos_in_eye_coords(self,
-                                cam_pupil_params: np.ndarray,
-                                cam_cr_params: np.ndarray) -> np.ndarray:
+    def pupil_pos_in_eye_coords(self, cam_pupil_params: np.ndarray, cam_cr_params: np.ndarray) -> np.ndarray:
         """Compute the 3D pupil position in eye coordinates.
 
         Parameters
@@ -198,13 +199,13 @@ class GazeMapper(object):
         py_cam = cr_pos_in_cam_coord_frame[1] + delta_py
         # np.sqrt(np.array([-5, 25])) will result in np.array([np.nan,  5.])
         # and an 'invalid' value RuntimeWarning which is fine
-        with np.errstate(invalid='ignore'):
+        with np.errstate(invalid="ignore"):
             pz_cam = np.sqrt(self.eye_radius**2 - px_cam**2 - py_cam**2)
 
         # Find and assign np.nan to pupil positions which land outside of eyeball radius.
         # An operation like: np.array([np.nan, 5, 1]) > 2 will result in array([False, True, False])
         # and an 'invalid' value RuntimeWarning which is fine
-        with np.errstate(invalid='ignore'):
+        with np.errstate(invalid="ignore"):
             bad_idx = np.linalg.norm([px_cam, py_cam], axis=0) > self.eye_radius
         px_cam[bad_idx] = np.nan
         py_cam[bad_idx] = np.nan
@@ -218,9 +219,7 @@ class GazeMapper(object):
         cam_to_eye_xform = R_eye_to_cam.inv() * R_cam.inv()
         return cam_to_eye_xform.apply(pupil_pos_cam)
 
-    def pupil_position_on_monitor_in_cm(self,
-                                        cam_pupil_params: np.ndarray,
-                                        cam_cr_params: np.ndarray) -> np.ndarray:
+    def pupil_position_on_monitor_in_cm(self, cam_pupil_params: np.ndarray, cam_cr_params: np.ndarray) -> np.ndarray:
         """Compute the pupil position on the monitor in cm.
 
         General strategy:
@@ -249,16 +248,17 @@ class GazeMapper(object):
             coordinates (in centimeters). Estimate values will have the
             center of the monitor as the (0, 0) origin.
         """
-        pupil_positions = self.pupil_pos_in_eye_coords(cam_pupil_params,
-                                                       cam_cr_params)
+        pupil_positions = self.pupil_pos_in_eye_coords(cam_pupil_params, cam_cr_params)
 
         monitor_normal = self.monitor.compute_unit_normal_in_eye_coord_frame()
         # Project pupil locations from origin of eye coordinate system
         line_points = np.tile([0, 0, 0], (pupil_positions.shape[0], 1))
-        projected_positions = project_to_plane(plane_normal=monitor_normal,
-                                               plane_point=self.monitor.position,
-                                               line_vectors=pupil_positions,
-                                               line_points=line_points)
+        projected_positions = project_to_plane(
+            plane_normal=monitor_normal,
+            plane_point=self.monitor.position,
+            line_vectors=pupil_positions,
+            line_points=line_points,
+        )
 
         monitor_positions = projected_positions - self.monitor.position
 
@@ -270,8 +270,7 @@ class GazeMapper(object):
         # Discard z component of monitor locs as it's orthogonal to viewing plane
         return np.delete(result, 2, axis=1)
 
-    def pupil_position_on_monitor_in_degrees(self,
-                                             pupil_pos_on_monitor_in_cm: np.ndarray) -> np.ndarray:
+    def pupil_position_on_monitor_in_degrees(self, pupil_pos_on_monitor_in_cm: np.ndarray) -> np.ndarray:
         """Get pupil position on monitor measured in visual degrees.
 
         Parameters
@@ -289,8 +288,7 @@ class GazeMapper(object):
 
         mag = np.linalg.norm(self.monitor.position)
         meridian = np.degrees(np.arctan(x / mag))
-        elevation = np.degrees(np.arctan(y / np.linalg.norm(
-            np.vstack([x, np.full_like(x, mag, dtype=float)]), axis=0)))
+        elevation = np.degrees(np.arctan(y / np.linalg.norm(np.vstack([x, np.full_like(x, mag, dtype=float)]), axis=0)))
 
         angles = np.vstack([meridian, elevation]).T
 
@@ -345,10 +343,9 @@ def compute_elliptical_areas(ellipse_params: pd.DataFrame) -> pd.Series:
     return np.pi * ellipse_params["height"] * ellipse_params["width"]
 
 
-def project_to_plane(plane_normal: np.ndarray,
-                     plane_point: np.ndarray,
-                     line_vectors: np.ndarray,
-                     line_points: np.ndarray) -> np.ndarray:
+def project_to_plane(
+    plane_normal: np.ndarray, plane_point: np.ndarray, line_vectors: np.ndarray, line_points: np.ndarray
+) -> np.ndarray:
     """Find the points of intersection between a plane and a series of lines.
 
     See: https://en.wikipedia.org/wiki/Line–plane_intersection
@@ -377,9 +374,7 @@ def project_to_plane(plane_normal: np.ndarray,
     return factors * line_vectors + line_points
 
 
-def generate_object_rotation_xform(x_rotation: float,
-                                   y_rotation: float,
-                                   z_rotation: float) -> Rotation:
+def generate_object_rotation_xform(x_rotation: float, y_rotation: float, z_rotation: float) -> Rotation:
     """Generate a matrix for rotating an object in place.
 
     Parameters
@@ -396,9 +391,9 @@ def generate_object_rotation_xform(x_rotation: float,
         A rotation instance. See:
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.transform.Rotation.html
     """
-    rx = Rotation.from_euler('x', x_rotation, degrees=False)
-    ry = Rotation.from_euler('y', y_rotation, degrees=False)
-    rz = Rotation.from_euler('z', z_rotation, degrees=False)
+    rx = Rotation.from_euler("x", x_rotation, degrees=False)
+    ry = Rotation.from_euler("y", y_rotation, degrees=False)
+    rz = Rotation.from_euler("z", z_rotation, degrees=False)
 
     # Compose rotations with * operator. Note the order!
     return rz * ry * rx

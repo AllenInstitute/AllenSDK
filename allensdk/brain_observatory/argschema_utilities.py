@@ -10,8 +10,8 @@ from marshmallow import RAISE, ValidationError
 
 class InputFile(marshmallow.fields.String):
     """A marshmallow String field subclass which deserializes json str fields
-       that represent a desired input path to pathlib.Path.
-       Also performs read access checking.
+    that represent a desired input path to pathlib.Path.
+    Also performs read access checking.
     """
 
     def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
@@ -26,8 +26,8 @@ class InputFile(marshmallow.fields.String):
 
 class OutputFile(marshmallow.fields.String):
     """A marshmallow String field subclass which deserializes json str fields
-       that represent a desired output file path to a pathlib.Path.
-       Also performs write access checking.
+    that represent a desired output file path to a pathlib.Path.
+    Also performs write access checking.
     """
 
     def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
@@ -41,8 +41,8 @@ class OutputFile(marshmallow.fields.String):
 
 
 def write_or_print_outputs(data, parser):
-    data.update({'input_parameters': parser.args})
-    if 'output_json' in parser.args:
+    data.update({"input_parameters": parser.args})
+    if "output_json" in parser.args:
         parser.output(data, indent=2)
     else:
         print(parser.get_output_json(data))
@@ -50,25 +50,23 @@ def write_or_print_outputs(data, parser):
 
 def check_write_access_dir(dirpath):
     if os.path.exists(dirpath):
-        test_filepath = pathlib.Path(dirpath, 'test_file.txt')
+        test_filepath = pathlib.Path(dirpath, "test_file.txt")
         try:
             with test_filepath.open() as _:
                 pass
             os.remove(test_filepath)
             return True
         except PermissionError:
-            raise ValidationError(
-                f'don\'t have permissions to write in directory {dirpath}')
+            raise ValidationError(f"don't have permissions to write in directory {dirpath}")
     else:
         try:
             pathlib.Path(dirpath).mkdir(parents=True)
             pathlib.Path(dirpath).rmdir()
             return True
         except PermissionError:
-            raise ValidationError(
-                f'Can\'t build path to requested location {dirpath}')
+            raise ValidationError(f"Can't build path to requested location {dirpath}")
 
-    raise RuntimeError('Unhandled case; this should not happen')
+    raise RuntimeError("Unhandled case; this should not happen")
 
 
 def check_write_access(filepath, allow_exists=False):
@@ -78,9 +76,8 @@ def check_write_access(filepath, allow_exists=False):
         os.remove(filepath)
         return True
     except FileExistsError:
-
         if not allow_exists:
-            raise ValidationError(f'file at {filepath} already exists')
+            raise ValidationError(f"file at {filepath} already exists")
         else:
             return True
 
@@ -90,7 +87,7 @@ def check_write_access(filepath, allow_exists=False):
     except Exception as e:
         raise e
 
-    raise RuntimeError('Unhandled case; this should not happen')
+    raise RuntimeError("Unhandled case; this should not happen")
 
 
 def check_write_access_overwrite(path):
@@ -99,12 +96,11 @@ def check_write_access_overwrite(path):
 
 def check_read_access(path):
     try:
-        f = open(path, mode='r')
+        f = open(path, mode="r")
         f.close()
         return True
     except Exception as err:
-        raise ValidationError(
-            f'file at #{path} not readable (#{type(err)}: {err}')
+        raise ValidationError(f"file at #{path} not readable (#{type(err)}: {err}")
 
 
 class RaisingSchema(DefaultSchema):
@@ -113,7 +109,6 @@ class RaisingSchema(DefaultSchema):
 
 
 class ArgSchemaParserPlus(ArgSchemaParser):  # pragma: no cover
-
     def __init__(self, *args, **kwargs):
         parser = argparse.ArgumentParser()
         [known_args, extra_args] = parser.parse_known_args()
@@ -131,15 +126,11 @@ def optional_lims_inputs(argv, input_schema, output_schema, lims_input_getter):
         lims_parser.add_argument("--host", type=str, default="http://lims2")
         lims_parser.add_argument("--job_queue", type=str, default=None)
         lims_parser.add_argument("--strategy", type=str, default=None)
-        lims_parser.add_argument("--ecephys_session_id", type=int,
-                                 default=None)
+        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
         lims_parser.add_argument("--output_root", type=str, default=None)
 
-        lims_args, remaining_args = lims_parser.parse_known_args(
-            remaining_args)
-        remaining_args = [
-            item for item in remaining_args if item != "--get_inputs_from_lims"
-        ]
+        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
+        remaining_args = [item for item in remaining_args if item != "--get_inputs_from_lims"]
         input_data = lims_input_getter(**lims_args.__dict__)
 
     try:

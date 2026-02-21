@@ -9,8 +9,7 @@ import xarray as xr
 from pandas.testing import assert_frame_equal
 
 
-def compare_fields(x1: Any, x2: Any, err_msg="",
-                   ignore_keys: Optional[Set[str]] = None):
+def compare_fields(x1: Any, x2: Any, err_msg="", ignore_keys: Optional[Set[str]] = None):
     """Helper function to compare if two fields (attributes)
     are equal to one another.
 
@@ -63,7 +62,7 @@ def compare_fields(x1: Any, x2: Any, err_msg="",
         assert abs(time_delta) < 60
     elif isinstance(x1, (float,)):
         if math.isnan(x1) or math.isnan(x2):
-            both_nan = (math.isnan(x1) and math.isnan(x2))
+            both_nan = math.isnan(x1) and math.isnan(x2)
             assert both_nan, err_msg
         else:
             assert x1 == x2, err_msg

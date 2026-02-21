@@ -17,9 +17,10 @@ import csv
 from allensdk.internal.morphology.morphology import *
 from allensdk.internal.morphology.node import Node
 
+
 ########################################################################
 def read_swc(file_name):
-    """  
+    """
     Read in an SWC file and return a Morphology object.
 
     Parameters
@@ -38,21 +39,21 @@ def read_swc(file_name):
         with open(file_name, "r") as f:
             for line in f:
                 # remove comments
-                if line.lstrip().startswith('#'):
+                if line.lstrip().startswith("#"):
                     continue
                 # read values. expected SWC format is:
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
                 toks = line.split()
                 vals = Node(
-                        n =  int(toks[0]),
-                        t =  int(toks[1]),
-                        x =  float(toks[2]),
-                        y =  float(toks[3]),
-                        z =  float(toks[4]),
-                        r =  float(toks[5]),
-                        pn = int(toks[6].rstrip())
-                    )
+                    n=int(toks[0]),
+                    t=int(toks[1]),
+                    x=float(toks[2]),
+                    y=float(toks[3]),
+                    z=float(toks[4]),
+                    r=float(toks[5]),
+                    pn=int(toks[6].rstrip()),
+                )
                 # store this node
                 nodes.append(vals)
                 # increment line number (used for error reporting only)
@@ -64,38 +65,36 @@ def read_swc(file_name):
             err += "Content: '%s'\n" % line
         raise IOError(err)
 
-    return Morphology(node_list=nodes)    
+    return Morphology(node_list=nodes)
 
 
 ########################################################################
-class Marker( dict ): 
-    """ Simple dictionary class for handling reconstruction marker objects. """
+class Marker(dict):
+    """Simple dictionary class for handling reconstruction marker objects."""
 
-    SPACING = [ .1144, .1144, .28 ]
+    SPACING = [0.1144, 0.1144, 0.28]
 
-    CUT_DENDRITE = 10 
+    CUT_DENDRITE = 10
     NO_RECONSTRUCTION = 20
 
     def __init__(self, *args, **kwargs):
         super(Marker, self).__init__(*args, **kwargs)
 
         # marker file x,y,z coordinates are offset by a single image-space pixel
-        self['x'] -= self.SPACING[0]
-        self['y'] -= self.SPACING[1]
-        self['z'] -= self.SPACING[2]
-        
+        self["x"] -= self.SPACING[0]
+        self["y"] -= self.SPACING[1]
+        self["z"] -= self.SPACING[2]
 
 
 def read_marker_file(file_name):
-    """ read in a marker file and return a list of dictionaries """
+    """read in a marker file and return a list of dictionaries"""
 
-    with open(file_name, 'r') as f:
-        rows = csv.DictReader((r for r in f if not r.startswith('#')), 
-                              fieldnames=['x','y','z','radius','shape','name','comment',
-                                          'color_r','color_g','color_b'])
+    with open(file_name, "r") as f:
+        rows = csv.DictReader(
+            (r for r in f if not r.startswith("#")),
+            fieldnames=["x", "y", "z", "radius", "shape", "name", "comment", "color_r", "color_g", "color_b"],
+        )
 
-        return [ Marker({ 'x': float(r['x']), 
-                          'y': float(r['y']), 
-                          'z': float(r['z']), 
-                          'name': int(r['name']) }) for r in rows ]
-
+        return [
+            Marker({"x": float(r["x"]), "y": float(r["y"]), "z": float(r["z"]), "name": int(r["name"])}) for r in rows
+        ]

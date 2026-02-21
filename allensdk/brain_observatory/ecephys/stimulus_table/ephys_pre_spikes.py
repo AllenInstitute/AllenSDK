@@ -14,7 +14,7 @@ def create_stim_table(
     block_key="stimulus_block",
     index_key="stimulus_index",
 ):
-    """ Build a full stimulus table
+    """Build a full stimulus table
 
     Parameters
     ----------
@@ -50,8 +50,7 @@ def create_stim_table(
 
         stimulus_tables.extend(current_tables)
 
-    stimulus_tables = sorted(stimulus_tables,
-                             key=lambda df: min(df[sort_key].values))
+    stimulus_tables = sorted(stimulus_tables, key=lambda df: min(df[sort_key].values))
     for ii, stim_table in enumerate(stimulus_tables):
         stim_table[block_key] = ii
 
@@ -64,10 +63,8 @@ def create_stim_table(
     return stim_table_full
 
 
-def make_spontaneous_activity_tables(
-    stimulus_tables, start_key="Start", end_key="End", duration_threshold=0.0
-):
-    """ Fills in frame gaps in a set of stimulus tables. Suitable for use as
+def make_spontaneous_activity_tables(stimulus_tables, start_key="Start", end_key="End", duration_threshold=0.0):
+    """Fills in frame gaps in a set of stimulus tables. Suitable for use as
     the spontaneous_activity_tabler in create_stim_table.
 
     Parameters
@@ -105,11 +102,7 @@ def make_spontaneous_activity_tables(
     spon_sweeps = pd.DataFrame({start_key: spon_start, end_key: spon_end})
 
     if duration_threshold is not None:
-        spon_sweeps = spon_sweeps[
-            np.fabs(spon_sweeps[start_key]
-                    - spon_sweeps[end_key])
-            > duration_threshold
-        ]
+        spon_sweeps = spon_sweeps[np.fabs(spon_sweeps[start_key] - spon_sweeps[end_key]) > duration_threshold]
         spon_sweeps.reset_index(drop=True, inplace=True)
 
     return [spon_sweeps]
@@ -122,7 +115,7 @@ def apply_frame_times(
     extra_frame_time=False,
     map_columns=("Start", "End"),
 ):
-    """ Converts sweep times from frames to seconds.
+    """Converts sweep times from frames to seconds.
 
     Parameters
     ----------
@@ -155,13 +148,10 @@ def apply_frame_times(
     if extra_frame_time is True and frames_per_second is not None:
         extra_frame_time = 1.0 / frames_per_second
     if extra_frame_time is not False:
-        frame_times = np.append(frame_times, frame_times[-1]
-                                + extra_frame_time)
+        frame_times = np.append(frame_times, frame_times[-1] + extra_frame_time)
 
     for column in map_columns:
-        stimulus_table[column] = frame_times[
-            np.around(stimulus_table[column]).astype(int)
-        ]
+        stimulus_table[column] = frame_times[np.around(stimulus_table[column]).astype(int)]
 
     return stimulus_table
 
@@ -174,7 +164,7 @@ def apply_display_sequence(
     diff_key="dif",
     block_key="stimulus_block",
 ):
-    """ Adjust raw sweep frames for a stimulus based on the display sequence
+    """Adjust raw sweep frames for a stimulus based on the display sequence
     for that stimulus.
 
     Parameters
@@ -204,33 +194,22 @@ def apply_display_sequence(
 
     sweep_frames_table = sweep_frames_table.copy()
     if block_key not in sweep_frames_table.columns.values:
-        sweep_frames_table[block_key] = np.zeros(
-            (sweep_frames_table.shape[0]), dtype=int
-        )
+        sweep_frames_table[block_key] = np.zeros((sweep_frames_table.shape[0]), dtype=int)
 
-    sweep_frames_table[diff_key] = (
-        sweep_frames_table[end_key] - sweep_frames_table[start_key]
-    )
+    sweep_frames_table[diff_key] = sweep_frames_table[end_key] - sweep_frames_table[start_key]
 
     sweep_frames_table[start_key] += frame_display_sequence[0, 0]
     for seg in range(len(frame_display_sequence) - 1):
-        match_inds = sweep_frames_table[start_key] \
-                     >= frame_display_sequence[seg, 1]
+        match_inds = sweep_frames_table[start_key] >= frame_display_sequence[seg, 1]
 
         sweep_frames_table.loc[match_inds, start_key] += (
             frame_display_sequence[seg + 1, 0] - frame_display_sequence[seg, 1]
         )
         sweep_frames_table.loc[match_inds, block_key] = seg + 1
 
-    sweep_frames_table[end_key] = (
-        sweep_frames_table[start_key] + sweep_frames_table[diff_key]
-    )
-    sweep_frames_table = sweep_frames_table[
-        sweep_frames_table[end_key] <= frame_display_sequence[-1, 1]
-    ]
-    sweep_frames_table = sweep_frames_table[
-        sweep_frames_table[start_key] <= frame_display_sequence[-1, 1]
-    ]
+    sweep_frames_table[end_key] = sweep_frames_table[start_key] + sweep_frames_table[diff_key]
+    sweep_frames_table = sweep_frames_table[sweep_frames_table[end_key] <= frame_display_sequence[-1, 1]]
+    sweep_frames_table = sweep_frames_table[sweep_frames_table[start_key] <= frame_display_sequence[-1, 1]]
 
     sweep_frames_table.drop(diff_key, inplace=True, axis=1)
     return sweep_frames_table
@@ -271,7 +250,7 @@ def build_stimuluswise_table(
     extract_const_params_from_repr=False,
     drop_const_params=spe.DROP_PARAMS,
 ):
-    """ Construct a table of sweeps, including their times on the
+    """Construct a table of sweeps, including their times on the
     experiment-global clock and the values of each relevant parameter.
 
     Parameters
@@ -323,14 +302,9 @@ def build_stimuluswise_table(
 
     frame_display_sequence = seconds_to_frames(stimulus["display_sequence"])
 
-    sweep_frames_table = pd.DataFrame(
-        stimulus["sweep_frames"], columns=(start_key, end_key)
-    )
-    sweep_frames_table[block_key] = np.zeros([sweep_frames_table.shape[0]],
-                                             dtype=int)
-    sweep_frames_table = apply_display_sequence(
-        sweep_frames_table, frame_display_sequence, block_key=block_key
-    )
+    sweep_frames_table = pd.DataFrame(stimulus["sweep_frames"], columns=(start_key, end_key))
+    sweep_frames_table[block_key] = np.zeros([sweep_frames_table.shape[0]], dtype=int)
+    sweep_frames_table = apply_display_sequence(sweep_frames_table, frame_display_sequence, block_key=block_key)
 
     stim_table = pd.DataFrame(
         {
@@ -359,19 +333,15 @@ def build_stimuluswise_table(
         )
 
     if extract_const_params_from_repr:
-        const_params = spe.parse_stim_repr(
-            stimulus["stim"], drop_params=drop_const_params
-        )
+        const_params = spe.parse_stim_repr(stimulus["stim"], drop_params=drop_const_params)
         existing_columns = set(stim_table.columns)
         for const_param_key, const_param_value in const_params.items():
-
             existing_cap = const_param_key.capitalize() in existing_columns
             existing_upper = const_param_key.upper() in existing_columns
             existing = const_param_key in existing_columns
 
             if not (existing_cap or existing_upper or existing):
-                stim_table[const_param_key] = [const_param_value] * \
-                                              stim_table.shape[0]
+                stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
             else:
                 logging.info(
                     f"""found sweep_param named: {const_param_key},
@@ -380,14 +350,13 @@ def build_stimuluswise_table(
                 )
 
     unique_indices = np.unique(stim_table[block_key].values)
-    output = [stim_table.loc[stim_table[block_key] == ii, :]
-              for ii in unique_indices]
+    output = [stim_table.loc[stim_table[block_key] == ii, :] for ii in unique_indices]
 
     return output
 
 
 def split_column(table, column, new_columns, drop_old=True):
-    """ Divides a dataframe column into multiple columns.
+    """Divides a dataframe column into multiple columns.
 
     Parameters
     ----------
@@ -430,7 +399,7 @@ def assign_sweep_values(
     drop=True,
     tmp_suffix="_stimtable_todrop",
 ):
-    """ Left joins a stimulus table to a sweep table in order to associate
+    """Left joins a stimulus table to a sweep table in order to associate
         epochs in time with stimulus characteristics.
 
     Parameters

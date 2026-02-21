@@ -106,9 +106,7 @@ class Utils(HocUtils):
 
         self.stim_vec_list = []
 
-    def update_default_cell_hoc(
-        self, description, default_cell_hoc="cell.hoc"
-    ):
+    def update_default_cell_hoc(self, description, default_cell_hoc="cell.hoc"):
         """replace the default 'cell.hoc' path in the manifest with 'cell.hoc'
         packaged within AllenSDK if it does not exist"""
 
@@ -187,20 +185,8 @@ class Utils(HocUtils):
                 h(p["name"] + " = %g " % p["value"])
             else:
                 if p["mechanism"] != "":
-                    h(
-                        'forsec "'
-                        + p["section"]
-                        + '" { insert '
-                        + p["mechanism"]
-                        + " }"
-                    )
-                h(
-                    'forsec "'
-                    + p["section"]
-                    + '" { '
-                    + p["name"]
-                    + " = %g }" % p["value"]
-                )
+                    h('forsec "' + p["section"] + '" { insert ' + p["mechanism"] + " }")
+                h('forsec "' + p["section"] + '" { ' + p["name"] + " = %g }" % p["value"])
 
         # Set reversal potentials
         for erev in conditions["erev"]:
@@ -255,9 +241,7 @@ class Utils(HocUtils):
         sweep : integer, optional
             sweep index
         """
-        Utils._log.info(
-            "reading stimulus path: %s, sweep %s", stimulus_path, sweep
-        )
+        Utils._log.info("reading stimulus path: %s, sweep %s", stimulus_path, sweep)
 
         stimulus_data = NwbDataSet(stimulus_path)
         sweep_data = stimulus_data.get_sweep(sweep)
@@ -274,8 +258,7 @@ class Utils(HocUtils):
 
         if hz != neuron_hz:
             Utils._log.debug(
-                "changing sampling rate from %d to %d to avoid NEURON "
-                "aliasing",
+                "changing sampling rate from %d to %d to avoid NEURON aliasing",
                 hz,
                 neuron_hz,
             )
@@ -306,17 +289,13 @@ class Utils(HocUtils):
             't' = numpy.ndarray with timestamps
 
         """
-        junction_potential = self.description.data["fitting"][0][
-            "junction_potential"
-        ]
+        junction_potential = self.description.data["fitting"][0]["junction_potential"]
 
         v = np.array(vec["v"])
         t = np.array(vec["t"])
 
         if self.stimulus_sampling_rate < self.simulation_sampling_rate:
-            factor = (
-                self.simulation_sampling_rate / self.stimulus_sampling_rate
-            )
+            factor = self.simulation_sampling_rate / self.stimulus_sampling_rate
 
             Utils._log.debug("subsampling recorded traces by %dX", factor)
             v = block_reduce(v, (factor,), np.mean)[: len(self.stim_curr)]
@@ -360,16 +339,11 @@ class AllActiveUtils(Utils):
             Path to morphology.
         """
         if self.axon_type == "stub":
-            self._log.info(
-                "Replacing axon with a stub : length 60 micron, diameter 1 "
-                "micron"
-            )
+            self._log.info("Replacing axon with a stub : length 60 micron, diameter 1 micron")
             super(AllActiveUtils, self).generate_morphology(morph_filename)
             return
 
-        self._log.info(
-            "Legacy model - Truncating reconstructed axon after 60 micron"
-        )
+        self._log.info("Legacy model - Truncating reconstructed axon after 60 micron")
         morph_basename = os.path.basename(morph_filename)
         morph_extension = morph_basename.split(".")[-1]
         if morph_extension.lower() == "swc":
@@ -443,21 +417,12 @@ class AllActiveUtils(Utils):
             else:
                 if hasattr(h, section_array):
                     if mechanism != "":
-                        print(
-                            "Adding mechanism %s to %s"
-                            % (mechanism, section_array)
-                        )
+                        print("Adding mechanism %s to %s" % (mechanism, section_array))
                         for section in getattr(h, section_array):
-                            if (
-                                self.h.ismembrane(str(mechanism), sec=section)
-                                != 1
-                            ):
+                            if self.h.ismembrane(str(mechanism), sec=section) != 1:
                                 section.insert(mechanism)
 
-                    print(
-                        "Setting %s to %.6g in %s"
-                        % (param_name, param_value, section_array)
-                    )
+                    print("Setting %s to %.6g in %s" % (param_name, param_value, section_array))
                     for section in getattr(h, section_array):
                         setattr(section, param_name, param_value)
 
@@ -467,10 +432,7 @@ class AllActiveUtils(Utils):
             ek = float(erev["ek"])
             ena = float(erev["ena"])
 
-            print(
-                "Setting ek to %.6g and ena to %.6g in %s"
-                % (ek, ena, erev_section_array)
-            )
+            print("Setting ek to %.6g and ena to %.6g in %s" % (ek, ena, erev_section_array))
 
             if hasattr(h, erev_section_array):
                 for section in getattr(h, erev_section_array):
@@ -480,10 +442,7 @@ class AllActiveUtils(Utils):
                     if self.h.ismembrane("na_ion", sec=section) == 1:
                         setattr(section, "ena", ena)
             else:
-                print(
-                    "Warning: can't set erev for %s, "
-                    "section array doesn't exist" % erev_section_array
-                )
+                print("Warning: can't set erev for %s, section array doesn't exist" % erev_section_array)
 
         self.h.v_init = conditions["v_init"]
         self.h.celsius = conditions["celsius"]

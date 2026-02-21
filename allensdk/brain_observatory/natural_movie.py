@@ -44,7 +44,7 @@ from . import circle_plots as cplots
 
 
 class NaturalMovie(StimulusAnalysis):
-    """ Perform tuning analysis specific to natural movie stimulus.
+    """Perform tuning analysis specific to natural movie stimulus.
 
     Parameters
     ----------
@@ -80,19 +80,18 @@ class NaturalMovie(StimulusAnalysis):
     def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table(self.movie_name)
         self._stim_table = stimulus_table[stimulus_table.frame == 0]
-        self._sweeplength = \
-            self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
+        self._sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
 
     def get_sweep_response(self):
-        ''' Returns the dF/F response for each cell
+        """Returns the dF/F response for each cell
 
         Returns
         -------
         Numpy array
-        '''
-        sweep_response = pd.DataFrame(index=self.stim_table.index.values,
-                                      columns=np.array(
-                                          range(self.numbercells)).astype(str))
+        """
+        sweep_response = pd.DataFrame(
+            index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str)
+        )
         for index, row in self.stim_table.iterrows():
             start = row.start
             end = start + self.sweeplength
@@ -101,7 +100,7 @@ class NaturalMovie(StimulusAnalysis):
         return sweep_response
 
     def get_peak(self):
-        ''' Computes properties of the peak response condition for each cell.
+        """Computes properties of the peak response condition for each cell.
 
         Returns
         -------
@@ -110,9 +109,10 @@ class NaturalMovie(StimulusAnalysis):
         on which of three movie clips was presented.
             * peak_nm1 (frame with peak response)
             * response_variability_nm1
-        '''
-        peak_movie = pd.DataFrame(index=range(self.numbercells), columns=(
-            'peak', 'response_reliability', 'cell_specimen_id'))
+        """
+        peak_movie = pd.DataFrame(
+            index=range(self.numbercells), columns=("peak", "response_reliability", "cell_specimen_id")
+        )
         cids = self.data_set.get_cell_specimen_ids()
 
         mask = np.ones((10, 10))
@@ -150,8 +150,7 @@ class NaturalMovie(StimulusAnalysis):
             corr_matrix = np.empty((10, 10))
             for i in range(10):
                 for j in range(10):
-                    r, p = st.pearsonr(self.sweep_response[str(nc)].iloc[i],
-                                       self.sweep_response[str(nc)].iloc[j])
+                    r, p = st.pearsonr(self.sweep_response[str(nc)].iloc[i], self.sweep_response[str(nc)].iloc[j])
                     corr_matrix[i, j] = r
             corr_matrix *= mask
             peak_movie.response_reliability.iloc[nc] = np.nanmean(corr_matrix)
@@ -159,24 +158,27 @@ class NaturalMovie(StimulusAnalysis):
         if self.movie_name == stiminfo.NATURAL_MOVIE_ONE:
             peak_movie.rename(
                 columns={
-                    'peak': 'peak_' + stiminfo.NATURAL_MOVIE_ONE_SHORT,
-                    'response_reliability': 'response_reliability_' +
-                                            stiminfo.NATURAL_MOVIE_ONE_SHORT},
-                inplace=True)
+                    "peak": "peak_" + stiminfo.NATURAL_MOVIE_ONE_SHORT,
+                    "response_reliability": "response_reliability_" + stiminfo.NATURAL_MOVIE_ONE_SHORT,
+                },
+                inplace=True,
+            )
         elif self.movie_name == stiminfo.NATURAL_MOVIE_TWO:
             peak_movie.rename(
                 columns={
-                    'peak': 'peak_' + stiminfo.NATURAL_MOVIE_TWO_SHORT,
-                    'response_reliability': 'response_reliability_' +
-                                            stiminfo.NATURAL_MOVIE_TWO_SHORT},
-                inplace=True)
+                    "peak": "peak_" + stiminfo.NATURAL_MOVIE_TWO_SHORT,
+                    "response_reliability": "response_reliability_" + stiminfo.NATURAL_MOVIE_TWO_SHORT,
+                },
+                inplace=True,
+            )
         elif self.movie_name == stiminfo.NATURAL_MOVIE_THREE:
             peak_movie.rename(
                 columns={
-                    'peak': 'peak_' + stiminfo.NATURAL_MOVIE_THREE_SHORT,
-                    'response_reliability': 'response_reliability_' +
-                                            stiminfo.NATURAL_MOVIE_THREE_SHORT
-                }, inplace=True)
+                    "peak": "peak_" + stiminfo.NATURAL_MOVIE_THREE_SHORT,
+                    "response_reliability": "response_reliability_" + stiminfo.NATURAL_MOVIE_THREE_SHORT,
+                },
+                inplace=True,
+            )
 
         return peak_movie
 
@@ -191,8 +193,7 @@ class NaturalMovie(StimulusAnalysis):
         data = np.vstack(data)
 
         tp = cplots.TrackPlotter(ring_length=360)
-        tp.plot(data,
-                clim=[0, data.mean() + data.std() * 3])
+        tp.plot(data, clim=[0, data.mean() + data.std() * 3])
         tp.show_arrow()
 
     @staticmethod
@@ -202,18 +203,15 @@ class NaturalMovie(StimulusAnalysis):
 
         # TODO: deal with this properly
         suffix_map = {
-            stiminfo.NATURAL_MOVIE_ONE: '_' + stiminfo.NATURAL_MOVIE_ONE_SHORT,
-            stiminfo.NATURAL_MOVIE_TWO: '_' + stiminfo.NATURAL_MOVIE_TWO_SHORT,
-            stiminfo.NATURAL_MOVIE_THREE: '_' +
-                                          stiminfo.NATURAL_MOVIE_THREE_SHORT
+            stiminfo.NATURAL_MOVIE_ONE: "_" + stiminfo.NATURAL_MOVIE_ONE_SHORT,
+            stiminfo.NATURAL_MOVIE_TWO: "_" + stiminfo.NATURAL_MOVIE_TWO_SHORT,
+            stiminfo.NATURAL_MOVIE_THREE: "_" + stiminfo.NATURAL_MOVIE_THREE_SHORT,
         }
 
         try:
             suffix = suffix_map[movie_name]
 
-            nm._sweep_response = pd.read_hdf(analysis_file,
-                                             "analysis/sweep_response" +
-                                             suffix)
+            nm._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response" + suffix)
             nm._peak = pd.read_hdf(analysis_file, "analysis/peak")
 
             with h5py.File(analysis_file, "r") as f:

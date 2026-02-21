@@ -3,9 +3,8 @@ from allensdk.internal.api import PostgresQueryMixin
 
 
 def experiment_configs_from_equipment_id_and_type(
-        equipment_id: int,
-        config_type: str,
-        lims_connection: PostgresQueryMixin) -> pd.DataFrame:
+    equipment_id: int, config_type: str, lims_connection: PostgresQueryMixin
+) -> pd.DataFrame:
     """
     Return the configuration of a piece of experimental
     equipment as a function of time.
@@ -45,15 +44,13 @@ def experiment_configs_from_equipment_id_and_type(
     """
     config_id = lims_connection.fetchone(query)
     return experiment_configs_from_equipment_id(
-        equipment_id=equipment_id,
-        config_type_id=config_id,
-        lims_connection=lims_connection)
+        equipment_id=equipment_id, config_type_id=config_id, lims_connection=lims_connection
+    )
 
 
 def experiment_configs_from_equipment_id(
-        equipment_id: int,
-        config_type_id: int,
-        lims_connection: PostgresQueryMixin) -> pd.DataFrame:
+    equipment_id: int, config_type_id: int, lims_connection: PostgresQueryMixin
+) -> pd.DataFrame:
     """
     Return the configuration of a piece of experimental
     equipment as a function of time.

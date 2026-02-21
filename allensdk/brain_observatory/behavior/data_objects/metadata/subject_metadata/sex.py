@@ -1,14 +1,13 @@
 from pynwb import NWBFile
 
 from allensdk.core import DataObject
-from allensdk.core import \
-    JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
+from allensdk.core import JsonReadableInterface, LimsReadableInterface, NwbReadableInterface
 from allensdk.internal.api import PostgresQueryMixin
 
 
-class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
-          NwbReadableInterface):
+class Sex(DataObject, LimsReadableInterface, JsonReadableInterface, NwbReadableInterface):
     """sex of the animal (M/F)"""
+
     def __init__(self, sex: str):
         super().__init__(name="sex", value=sex)
 
@@ -17,8 +16,7 @@ class Sex(DataObject, LimsReadableInterface, JsonReadableInterface,
         return cls(sex=dict_repr["sex"])
 
     @classmethod
-    def from_lims(cls, behavior_session_id: int,
-                  lims_db: PostgresQueryMixin) -> "Sex":
+    def from_lims(cls, behavior_session_id: int, lims_db: PostgresQueryMixin) -> "Sex":
         query = f"""
             SELECT g.name AS sex
             FROM behavior_sessions bs

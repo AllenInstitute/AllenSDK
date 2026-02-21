@@ -1,10 +1,8 @@
 from typing import Callable, Iterable
 
+
 class LazyProperty(object):
-
-    def __init__(self, api_method: Callable, wrappers: Iterable = tuple(),
-                 settable: bool = False, *args, **kwargs):
-
+    def __init__(self, api_method: Callable, wrappers: Iterable = tuple(), settable: bool = False, *args, **kwargs):
         self.api_method = api_method
         self.wrappers = wrappers
         self.settable = settable

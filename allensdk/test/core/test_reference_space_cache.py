@@ -47,7 +47,7 @@ from allensdk.core.structure_tree import StructureTree
 
 @pytest.fixture()
 def rsp_version():
-    return 'annotation/look_a_version'
+    return "annotation/look_a_version"
 
 
 @pytest.fixture()
@@ -55,42 +55,48 @@ def resolution():
     return 25
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def old_nodes():
+    return [
+        {
+            "id": 0,
+            "structure_id_path": "/0/",
+            "color_hex_triplet": "000000",
+            "acronym": "rt",
+            "name": "root",
+            "parent_structure_id": 12,
+        }
+    ]
 
-    return [{'id': 0, 'structure_id_path': '/0/', 
-             'color_hex_triplet': '000000', 'acronym': 'rt', 
-             'name': 'root', 'parent_structure_id': 12}]
 
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def new_nodes():
+    return [
+        {
+            "id": 0,
+            "structure_id_path": "/0/",
+            "color_hex_triplet": "000000",
+            "acronym": "rt",
+            "name": "root",
+            "structure_sets": [{"id": 1}, {"id": 4}, {"id": 167587189}],
+        }
+    ]
 
-    return [{'id': 0, 'structure_id_path': '/0/', 
-             'color_hex_triplet': '000000', 'acronym': 'rt', 
-             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}, {'id': 167587189}] }]
 
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def rsp(fn_temp_dir, rsp_version, resolution):
-
-    manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
-    return ReferenceSpaceCache(reference_space_key=rsp_version,
-                               resolution=resolution, 
-                               manifest=manifest_path)
-
+    manifest_path = os.path.join(fn_temp_dir, "manifest.json")
+    return ReferenceSpaceCache(reference_space_key=rsp_version, resolution=resolution, manifest=manifest_path)
 
 
 def test_init(rsp, fn_temp_dir):
-
-    manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
-    assert( os.path.exists(manifest_path) )
+    manifest_path = os.path.join(fn_temp_dir, "manifest.json")
+    assert os.path.exists(manifest_path)
 
 
 def test_get_annotation_volume(rsp, fn_temp_dir, rsp_version, resolution):
-
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, rsp_version, 'annotation_{0}.nrrd'.format(resolution))
+    path = os.path.join(fn_temp_dir, rsp_version, "annotation_{0}.nrrd".format(resolution))
 
     rsp.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = rsp.get_annotation_volume()
@@ -99,14 +105,13 @@ def test_get_annotation_volume(rsp, fn_temp_dir, rsp_version, resolution):
     rsp.get_annotation_volume()
 
     rsp.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) ) 
-    assert( os.path.exists(path) )
+    assert np.allclose(obtained, eye)
+    assert os.path.exists(path)
 
 
 def test_get_template_volume(rsp, fn_temp_dir, resolution):
-
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'average_template_{0}.nrrd'.format(resolution))
+    path = os.path.join(fn_temp_dir, "average_template_{0}.nrrd".format(resolution))
 
     rsp.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = rsp.get_template_volume()
@@ -115,52 +120,45 @@ def test_get_template_volume(rsp, fn_temp_dir, resolution):
     rsp.get_template_volume()
 
     rsp.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
-    assert( os.path.exists(path) )
+    assert np.allclose(obtained, eye)
+    assert os.path.exists(path)
 
 
 def test_get_structure_tree(rsp, fn_temp_dir, new_nodes):
+    path = os.path.join(fn_temp_dir, "structures.json")
 
-    path = os.path.join(fn_temp_dir, 'structures.json')
-
-    with mock.patch('allensdk.api.queries.ontologies_api.'
-                    'OntologiesApi.model_query', 
-                    return_value=new_nodes) as p:
-
+    with mock.patch("allensdk.api.queries.ontologies_api.OntologiesApi.model_query", return_value=new_nodes) as p:
         obtained = rsp.get_structure_tree()
 
         rsp.get_structure_tree()
         p.assert_called_once()
 
-    assert(obtained.node_ids()[0] == 0)
-    
-    cm_obt = obtained.get_colormap()
-    assert(len(cm_obt[0]) == 3)
+    assert obtained.node_ids()[0] == 0
 
-    assert( os.path.exists(path) )
+    cm_obt = obtained.get_colormap()
+    assert len(cm_obt[0]) == 3
+
+    assert os.path.exists(path)
 
 
 def test_get_reference_space(rsp, new_nodes):
-
     tree = StructureTree(StructureTree.clean_structures(new_nodes))
     rsp.get_structure_tree = lambda *a, **k: tree
 
     annot = np.arange(125).reshape((5, 5, 5))
-    rsp.get_annotation_volume = lambda *a, **k: (annot, 'foo')
+    rsp.get_annotation_volume = lambda *a, **k: (annot, "foo")
 
     rsp_obt = rsp.get_reference_space()
 
-    assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
-    assert( np.allclose( rsp_obt.annotation, annot ) ) 
+    assert np.allclose(rsp_obt.resolution, [25, 25, 25])
+    assert np.allclose(rsp_obt.annotation, annot)
 
 
 def test_get_structure_mask(rsp, fn_temp_dir, rsp_version):
-  
     sid = 12
 
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, rsp_version, 'structure_masks', 
-                        'resolution_25', 'structure_{0}.nrrd'.format(sid))
+    path = os.path.join(fn_temp_dir, rsp_version, "structure_masks", "resolution_25", "structure_{0}.nrrd".format(sid))
 
     rsp.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = rsp.get_structure_mask(sid)
@@ -169,19 +167,18 @@ def test_get_structure_mask(rsp, fn_temp_dir, rsp_version):
     rsp.get_structure_mask(sid)
 
     rsp.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) ) 
-    assert( os.path.exists(path) )
+    assert np.allclose(obtained, eye)
+    assert os.path.exists(path)
 
 
 def test_get_structure_mesh(rsp, fn_temp_dir, rsp_version):
-  
     sid = 12
 
-    path = os.path.join(fn_temp_dir, rsp_version, 'structure_meshes','structure_{0}.obj'.format(sid))
+    path = os.path.join(fn_temp_dir, rsp_version, "structure_meshes", "structure_{0}.obj".format(sid))
 
     def write_obj(path):
-        with open(path, 'w') as fil:
-          fil.write('vn 1 2 4')
+        with open(path, "w") as fil:
+            fil.write("vn 1 2 4")
 
     expected = [1, 2, 4]
 
@@ -192,31 +189,27 @@ def test_get_structure_mesh(rsp, fn_temp_dir, rsp_version):
     rsp.get_structure_mesh(sid)
 
     rsp.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained[1], expected) ) 
-    assert( os.path.exists(path) )
+    assert np.allclose(obtained[1], expected)
+    assert os.path.exists(path)
 
 
-@pytest.mark.parametrize('inp,fails', [(1, False), 
-                                        (pd.Series([2]), False), 
-                                        ('qwerty', True)])
+@pytest.mark.parametrize("inp,fails", [(1, False), (pd.Series([2]), False), ("qwerty", True)])
 def test_validate_structure_id(inp, fails):
-
     if fails:
         with pytest.raises(ValueError):
             ReferenceSpaceCache.validate_structure_id(inp)
     else:
         out = ReferenceSpaceCache.validate_structure_id(inp)
-        assert( out == int(inp) )
+        assert out == int(inp)
 
 
-@pytest.mark.parametrize('inp,fails', [([1, 2, 3], False), 
-                                        ([pd.Series([2]), pd.Series([3])], False), 
-                                        (['qwerty', 1], True)])
+@pytest.mark.parametrize(
+    "inp,fails", [([1, 2, 3], False), ([pd.Series([2]), pd.Series([3])], False), (["qwerty", 1], True)]
+)
 def test_validate_structure_ids(inp, fails):
-
     if fails:
         with pytest.raises(ValueError):
             ReferenceSpaceCache.validate_structure_ids(inp)
     else:
         out = ReferenceSpaceCache.validate_structure_ids(inp)
-        assert( out == list(map(int, inp)) )
+        assert out == list(map(int, inp))

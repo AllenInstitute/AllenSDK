@@ -37,6 +37,7 @@ import pytest
 import allensdk.ephys.ephys_features as ft
 import numpy as np
 import os
+
 path = os.path.dirname(__file__)
 
 
@@ -77,7 +78,7 @@ def test_fixed_dt():
     assert ft.has_fixed_dt(t)
 
     # Change the first time point to make time steps inconsistent
-    t[0] -= 3.
+    t[0] -= 3.0
     assert not ft.has_fixed_dt(t)
 
 
@@ -211,8 +212,7 @@ def test_troughs_with_peak_at_end():
     peaks = np.array([812, 3478])
     clipped = np.array([False, True])
 
-    troughs = ft.find_trough_indexes(v[:peaks[-1]], t[:peaks[-1]],
-                                     spikes, peaks, clipped=clipped)
+    troughs = ft.find_trough_indexes(v[: peaks[-1]], t[: peaks[-1]], spikes, peaks, clipped=clipped)
     assert np.isnan(troughs[-1])
 
 
