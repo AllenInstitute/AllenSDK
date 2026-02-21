@@ -773,7 +773,7 @@ class BrainObservatoryNwbDataSet(object):
         # parse the device string (ugly, sorry)
         device_string = meta.pop("device_string", None)
         if device_string:
-            m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
+            m = re.match(r"(.*?)\.\s(.*?)\sPlease*", device_string)
             if m:
                 device, device_name = m.groups()
                 meta["device"] = device

@@ -550,7 +550,7 @@ class DriftingGratings(StimulusAnalysis):
         return fit_tf_ind, fit_tf, tf_low_cutoff, tf_high_cutoff
     '''
 
-    ## VISUALIZATION ##
+    # VISUALIZATION ##
     def plot_raster(self, stimulus_condition_id, unit_id):
         """Plot raster for one condition and one unit"""
         idx_tf = np.where(self.tfvals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_tf])[0]
@@ -638,7 +638,7 @@ class DriftingGratings(StimulusAnalysis):
         plt.axis("off")
 
 
-### General functions ###
+# General functions ###
 def _gauss_function(x, a, x0, sigma):
     """
     fit gaussian function at log scale

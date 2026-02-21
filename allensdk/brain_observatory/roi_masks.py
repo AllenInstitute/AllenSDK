@@ -472,7 +472,7 @@ def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
         neuropil_masks.append(nmask)
 
     num_rois = len(roi_mask_list)
-    combined_list = roi_mask_list + neuropil_masks  #  read the large image stack only once
+    combined_list = roi_mask_list + neuropil_masks  # read the large image stack only once
 
     with h5py.File(movie_h5, "r") as movie_f:
         stack_frames = movie_f["data"]

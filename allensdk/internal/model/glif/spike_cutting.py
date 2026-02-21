@@ -240,7 +240,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(
     if isinstance(intercept_at_min_expVar_list, np.ndarray):
         intercept_at_min_expVar_list = float(intercept_at_min_expVar_list[0])
 
-    if type(intercept_at_min_expVar_list) == list or type(intercept_at_min_expVar_list) == np.ndarray:
+    if type(intercept_at_min_expVar_list) == list or type(intercept_at_min_expVar_list) == np.ndarray:  # noqa: E721
         intercept_at_min_expVar_list = intercept_at_min_expVar_list[0]
 
     return spike_cut_length, slope_at_min_expVar_list, intercept_at_min_expVar_list

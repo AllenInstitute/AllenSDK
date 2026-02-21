@@ -137,7 +137,7 @@ def _nested_scalar_equivalence(val0: Any, val1: Any) -> bool:
     Return True if the scalars are identical.
     Return False otherwise.
     """
-    if type(val0) != type(val1):
+    if type(val0) != type(val1):  # noqa: E721
         return False
 
     if isinstance(val0, numbers.Number):
@@ -172,7 +172,7 @@ def _nested_iterable_equivalence(list0: Iterable, list1: Iterable) -> bool:
     for idx in range(len(list0)):
         v0 = list0[idx]
         v1 = list1[idx]
-        if type(v0) != type(v1):
+        if type(v0) != type(v1):  # noqa: E721
             return False
 
         if isinstance(v0, dict):
@@ -206,7 +206,7 @@ def _nested_dict_equivalence(dict0: dict, dict1: dict) -> bool:
     for this_key in k0_list:
         val0 = dict0[this_key]
         val1 = dict1[this_key]
-        if type(val0) != type(val1):
+        if type(val0) != type(val1):  # noqa: E721
             return False
 
         if isinstance(val0, dict):

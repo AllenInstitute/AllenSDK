@@ -750,13 +750,13 @@ class EphysSweepSetFeatureExtractor:
         baseline_detect_thresh,
         id_set,
     ):
-        if type(t_set) != list:
+        if type(t_set) != list:  # noqa: E721
             raise ValueError("t_set must be a list")
 
-        if type(v_set) != list:
+        if type(v_set) != list:  # noqa: E721
             raise ValueError("v_set must be a list")
 
-        if i_set is not None and type(i_set) != list:
+        if i_set is not None and type(i_set) != list:  # noqa: E721
             raise ValueError("i_set must be a list")
 
         if len(t_set) != len(v_set):

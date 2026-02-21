@@ -23,7 +23,7 @@ def create_basis_IPSP(neye, ncos, kpeaks, ks, DTsim, t0, I_stim, nkt, flag_exp, 
         # print int(t0[kk]), spind-190000
         spike_stim[spind] = 1.0
 
-    ##Convolve temporal basis functions with spike-stim
+    # Convolve temporal basis functions with spike-stim
     c = np.zeros((len(spike_stim), ncos))
     for jj in range(ncos):
         basisfilt = gg0["ktbas"][:, jj]

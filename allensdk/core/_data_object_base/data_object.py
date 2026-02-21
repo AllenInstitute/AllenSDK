@@ -157,7 +157,7 @@ class DataObject(abc.ABC):
         return {name: getattr(self, name) for name in props}
 
     def __eq__(self, other: "DataObject"):
-        if type(self) != type(other):
+        if type(self) != type(other):  # noqa: E721
             msg = f"Do not know how to compare with type {type(other)}"
             raise NotImplementedError(msg)
 

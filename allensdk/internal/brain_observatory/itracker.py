@@ -395,7 +395,7 @@ class iTracker(object):
             pupil_params = result  # fe.ransac_fit(pupil_candidate_points)
         else:
             logging.debug("No good fit found")
-            pupil_params = ((np.nan, np.nan), np.nan, (np.nan, np.nan))  #  np.nan*np.ones(5)
+            pupil_params = ((np.nan, np.nan), np.nan, (np.nan, np.nan))  # np.nan*np.ones(5)
 
         # code for finding corneal reflection, start with finding rays from center of cr
         cr_rays, cr_ray_values = generate_rays(im, self.cr_loc)

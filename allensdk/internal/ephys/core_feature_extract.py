@@ -234,7 +234,7 @@ def generate_output_cell_features(cell_features, sweep_features, sweep_index):
 
 def extract_data(data, nwb_file):
     ##########################################################
-    #### alings with ephys_sweep_qc_tool extract_features ####
+    # alings with ephys_sweep_qc_tool extract_features ####
     cell_specimen = data["specimens"][0]
     sweep_list = cell_specimen["ephys_sweeps"]
     sweep_index = {s["sweep_number"]: s for s in sweep_list}
@@ -323,7 +323,7 @@ def extract_data(data, nwb_file):
     except IndexError:
         cell_specimen["ephys_features"] = [ephys_features]
 
-    #### breaks with ephys_sweep_qc_tool extract_features ####
+    # breaks with ephys_sweep_qc_tool extract_features ####
     ##########################################################
     return sweep_list, sweep_features
 

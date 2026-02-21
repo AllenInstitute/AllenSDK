@@ -183,7 +183,7 @@ from allensdk.internal.core.lims_pipeline_module import PipelineModule
 def main(jin):
     # per IT-14567, blockface analysis is no longer required
     #########################################################################
-    ## analyze blockface image
+    # analyze blockface image
     # try:
     #    soma = jin["blockface"]["Soma"]["path"]
     #    pia = jin["blockface"]["Pia"]["path"]
@@ -193,7 +193,7 @@ def main(jin):
     #    print("** Error -- missing requisite blockface field(s) in input json")
     #    raise
     #
-    ## get soma position using weighted average of vertices
+    # get soma position using weighted average of vertices
     # try:
     #    sx, sy = convert_coords_str(soma)
     #    soma_x, soma_y = calculate_centroid(sx, sy)
@@ -201,12 +201,12 @@ def main(jin):
     #    print("** Error -- unable to calculate soma information (blockface)")
     #    raise
     #
-    ## calculate shortest path
+    # calculate shortest path
     # try:
     #    px, py, wx, wy = calculate_shortest(soma_x, soma_y, pia, wm)
-    ## calculate theta and affine
+    # calculate theta and affine
     #    theta = vector_angle((0, 1), np.asarray([px,py]) - np.asarray([wx,wy]))
-    ## calculate soma depth and cortical thickness
+    # calculate soma depth and cortical thickness
     #    depth = res * euclidean((soma_x, soma_y), (px, py))
     #    blk_thickness = res * euclidean((wx, wy), (px, py))
     # except:

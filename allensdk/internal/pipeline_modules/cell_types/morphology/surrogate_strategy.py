@@ -52,7 +52,7 @@ def prep_json(spec_id):
         block["path"] = path
         block["label"] = label
         poly.append(block)
-        ## break down string path into two numeric arrays
+        # break down string path into two numeric arrays
         # path_array = np.array(path.split(','))
         # path_x = np.array(path_array[0::2], dtype=float)
         # path_y = np.array(path_array[1::2], dtype=float)

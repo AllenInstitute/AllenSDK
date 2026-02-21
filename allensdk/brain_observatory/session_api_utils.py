@@ -20,7 +20,7 @@ def is_equal(a: Any, b: Any) -> bool:
     """Function to deal with checking if two variables of possibly mixed types
     have the same value."""
 
-    if type(a) != type(b):
+    if type(a) != type(b):  # noqa: E721
         return False
 
     if isinstance(a, (pd.Series, pd.DataFrame)):

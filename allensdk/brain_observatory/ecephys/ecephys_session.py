@@ -1287,7 +1287,7 @@ def nan_intervals(array, nan_like=["null"]):
 
 
 def is_distinct_from(left, right):
-    if type(left) != type(right):
+    if type(left) != type(right):  # noqa: E721
         return True
     if pd.isna(left) and pd.isna(right):
         return False

@@ -3,7 +3,7 @@ import time
 t0 = time.time()
 import os
 
-from moviepy.editor import *
+from moviepy.editor import *  # noqa: F401
 import numpy as np
 import pandas as pd
 import argparse

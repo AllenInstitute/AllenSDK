@@ -48,7 +48,7 @@ class RmaTemplate(RmaApi):
         self.templates = query_manifest
 
     def to_filter_rhs(self, rhs):
-        if type(rhs) == list:
+        if type(rhs) == list:  # noqa: E721
             return ",".join(str(r) for r in rhs)
 
         return rhs

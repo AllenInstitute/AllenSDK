@@ -33,7 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-####test AllenSDK tree search api for Specimen and Structure
+# test AllenSDK tree search api for Specimen and Structure
 from allensdk.api.queries.tree_search_api import TreeSearchApi
 import pytest
 from unittest.mock import MagicMock
@@ -48,7 +48,7 @@ def tree_search():
 
 
 def test_get_specimen_tree(tree_search):
-    ####ancestor true for Specimen
+    # ancestor true for Specimen
     kind = "Specimen"
     db_id = 113817886
     ancestors = True
@@ -58,7 +58,7 @@ def test_get_specimen_tree(tree_search):
         "http://api.brain-map.org/api/v2/tree_search/Specimen/113817886.json?ancestors=true"
     )
 
-    ####ancestor true for Specimen
+    # ancestor true for Specimen
     kind = "Specimen"
     db_id = 113817886
     ancestors = True
@@ -68,7 +68,7 @@ def test_get_specimen_tree(tree_search):
         "http://api.brain-map.org/api/v2/tree_search/Specimen/113817886.json?ancestors=true&descendants=false"
     )
 
-    ####ancestor false for Specimen
+    # ancestor false for Specimen
     kind = "Specimen"
     db_id = 113817886
     ancestors = False
@@ -80,7 +80,7 @@ def test_get_specimen_tree(tree_search):
 
 
 def test_get_structure_tree(tree_search):
-    ####ancestor True for Structure
+    # ancestor True for Structure
     kind = "Structure"
     db_id = 12547
     ancestors = True
@@ -90,7 +90,7 @@ def test_get_structure_tree(tree_search):
         "http://api.brain-map.org/api/v2/tree_search/Structure/12547.json?ancestors=true&descendants=true"
     )
 
-    ####ancestor False for Structure
+    # ancestor False for Structure
     kind = "Structure"
     db_id = 12547
     ancestors = False
@@ -100,7 +100,7 @@ def test_get_structure_tree(tree_search):
         "http://api.brain-map.org/api/v2/tree_search/Structure/12547.json?ancestors=false&descendants=true"
     )
 
-    ####ancestor None for Structure
+    # ancestor None for Structure
     kind = "Structure"
     db_id = 12547
     ancestors = None

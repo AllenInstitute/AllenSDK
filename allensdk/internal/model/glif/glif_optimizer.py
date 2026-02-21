@@ -305,19 +305,19 @@ class GlifOptimizer(object):
 #        options={}
 #  #      options['avextox']=eps
 #        options['maxiter']=500
-##        options['full_output']=True
-##        options['disp']=True
-##        options['retall']=True
+#        options['full_output']=True
+#        options['disp']=True
+#        options['retall']=True
 #
 #        print('Using Newton-CG method')
 #        iteration_start_time = time.time()
 #        xopt = minimize(self.error_function, param0, args=(self.experiment,), method='Newton-CG', jac=f_prime_constructor(self.error_function), callback=mycallback_ncg, options=options, tol=eps)
 #        print('Newton-CG method took', (time.time()-iteration_start_time)/60., 'seconds')
 #
-##        print('Using Nelder-Mead method')
-##        iteration_start_time = time.time()
-##        xopt = minimize(self.error_function, param0, args=(self.experiment,), method='Nelder-Mead', callback=mycallback_nm, options=options, tol=eps)
-##        print('Nelder-Mead method took', (time.time()-iteration_start_time)/60., 'seconds')
+#        print('Using Nelder-Mead method')
+#        iteration_start_time = time.time()
+#        xopt = minimize(self.error_function, param0, args=(self.experiment,), method='Nelder-Mead', callback=mycallback_nm, options=options, tol=eps)
+#        print('Nelder-Mead method took', (time.time()-iteration_start_time)/60., 'seconds')
 #
 #        print(xopt)
 #         return xopt, fopt

@@ -797,8 +797,8 @@ class Morphology(object):
             # assume equal scaling along all axes. take 3rd root to get
             #   scale factor
             det_scale = np.power(abs(determinant), 1.0 / 3.0)
-            ## measure scale along each axis
-            ## keep this code here in case
+            # measure scale along each axis
+            # keep this code here in case
             # scale_x = abs(aff[0] + aff[3] + aff[6])
             # scale_y = abs(aff[1] + aff[4] + aff[7])
             # scale_z = abs(aff[2] + aff[5] + aff[8])

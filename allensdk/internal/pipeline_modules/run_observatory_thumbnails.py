@@ -96,7 +96,7 @@ def get_input_data(experiment_id):
 
     input_data = {
         "nwb_file": nwb_file,
-        #'analysis_file': analysis_file,
+        # 'analysis_file': analysis_file,
         "analysis_file": analysis_file,
         "output_directory": output_directory,
     }

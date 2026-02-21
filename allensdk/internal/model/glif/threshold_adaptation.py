@@ -283,7 +283,7 @@ def fit_avoltage_bvoltage(
 
         # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
         # from biological voltage values at spike initiation)
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #     NOTE THAT THERE IS AN ISSUE HERE USING FAKE DATA.  THE -1 IS HERE BECAUSE THE NEURON CROSSES THRESHOLD SOMETIME BETWEEN TWO INDICIES.
         #     FOR THE FAKE DATA THE TIME OF THE SPIKE (THE POINT FOLLOWING WHEN THE VOLTAGE CROSSES THRESHOLD) IS SET TO NAN.
         #     THE INTERPOLATED VOLTAGE CAN BE USED BUT THEN THE INTERPOLATED VOLTAGE MUST BE CALCULATED FOR THE TRUE VOLTAGE
@@ -296,7 +296,7 @@ def fit_avoltage_bvoltage(
             v_comp_of_th_at_each_spike_via_data = (
                 v_trace[all_spikeInd] - internal_sp_comp_array[all_spikeInd] - th_inf
             )  # USE THIS FOR REAL DATA (although probably not necessary)
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # For each ISI, calculate the difference between the voltage dependent component of the threshold
         # and the value that would be determined via a model that uses the actual voltage of neuron.
@@ -401,7 +401,7 @@ def fit_avoltage_bvoltage_th(
 
         # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
         # from biological voltage values at spike initiation)
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #     NOTE THAT THERE IS AN ISSUE HERE USING FAKE DATA.  THE -1 IS HERE BECAUSE THE NEURON CROSSES THRESHOLD SOMETIME BETWEEN TWO INDICIES.
         #     FOR THE FAKE DATA THE TIME OF THE SPIKE (THE POINT FOLLOWING WHEN THE VOLTAGE CROSSES THRESHOLD) IS SET TO NAN.
         #     THE INTERPOLATED VOLTAGE CAN BE USED BUT THEN THE INTERPOLATED VOLTAGE MUST BE CALCULATED FOR THE TRUE VOLTAGE
@@ -414,7 +414,7 @@ def fit_avoltage_bvoltage_th(
             v_comp_of_th_at_each_spike_via_data = (
                 v_trace[all_spikeInd] - internal_sp_comp_array[all_spikeInd] - th_inf
             )  # USE THIS FOR REAL DATA (although probably not necessary)
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # For each ISI, calculate the difference between the voltage dependent component of the threshold
         # and the value that would be determined via a model that uses the actual voltage of neuron.
@@ -496,7 +496,7 @@ def fit_avoltage_bvoltage_th(
 #        t=(all_spikeInd[spike_number]-all_spikeInd[spike_number-1]-spike_cut_length)*dt #spike ISI
 #        sp_comp_of_th_offset_local = spike_component_of_threshold_exact(a_spike, b_spike, t) #spike component of threshold at each ISI for each individual spike
 #        #I THINK THE LINE BELOW MIGHT JUST BE WRONG BECAUSE THE OLD OFF SET WOULD DECAY AND I DONT THINK IT IS HERE:THIS IS WHAT IS BEING USED
-##        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike component of threshold at each spike
+#        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike component of threshold at each spike
 #        left_over_decay=spike_component_of_threshold_exact(sp_comp_of_offset_sum_vector[-1], b_spike, t)
 #        sp_comp_of_offset_sum_vector.append(left_over_decay + sp_comp_of_th_offset_local)  #keeping track of spike component of threshold with residuals at each spike
 #
@@ -509,7 +509,7 @@ def fit_avoltage_bvoltage_th(
 #    # THE INTERPOLATED VOLTAGE CAN BE USED BUT THEN THE INTERPOLATED VOLTAGE MUST BE CALCULATED FOR THE TRUE VOLTAGE
 #    # TRACE AND POSSIBLY IN THE INTEGRATION.
 #    v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd-1]-np.array(sp_comp_of_offset_sum_vector)-th_inf  #USE THIS FOR FAKE DATA
-##    v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf  #THIS IS PROBABLY APPROPRIATE FOR REAL DATA
+#    v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf  #THIS IS PROBABLY APPROPRIATE FOR REAL DATA
 #    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
 #    # For each ISI, calculate the difference between the v_trace dependent component of the threshold
@@ -567,16 +567,16 @@ def fit_avoltage_bvoltage_th(
 #            artifact_removed_voltage[smooth_window]=blah(smooth_window)
 #
 #            #windows boarders are just for plotting
-##            window_boarders_index.append(smooth_window[0])
-##            window_boarders_index.append(smooth_window[-1])
-##        plt.figure()
-##        plt.plot(voltage, 'b', lw=4)
-##        plt.plot(artifact_removed_voltage, 'r', lw=2)
-##        plt.plot(window_boarders_index, artifact_removed_voltage[window_boarders_index], '|g', ms=10)
-##        plt.xlim([40400, 41000])
-##        plt.show()
+#            window_boarders_index.append(smooth_window[0])
+#            window_boarders_index.append(smooth_window[-1])
+#        plt.figure()
+#        plt.plot(voltage, 'b', lw=4)
+#        plt.plot(artifact_removed_voltage, 'r', lw=2)
+#        plt.plot(window_boarders_index, artifact_removed_voltage[window_boarders_index], '|g', ms=10)
+#        plt.xlim([40400, 41000])
+#        plt.show()
 ##
-##        t = np.arange(0, len()) * dt
+#        t = np.arange(0, len()) * dt
 #
 #        # keeping the smooth_v convention of the SDK find spike code.  However in the SDK code
 #        # this is used to name data potentially smoothed by a bessel filter
@@ -652,29 +652,29 @@ def fit_avoltage_bvoltage_th(
 #
 #        out_spk_idxs_list.append(np.array(out_spk_idxs))
 #
-##        time_vector=np.arange(len(v))*dt
-##        plt.figure()
-##    #    plt.subplot(3,1,1)
-##    #    plt.plot(time_vector, ddv)
-##    #    plt.plot(time_vector[out_spk_idxs], ddv[out_spk_idxs], '.r', ms=16)
-##    #    plt.xlim([40300, 42000])
-##    #    plt.ylabel('ddv')
-##        plt.subplot(2,1,1)
-##        plt.plot(time_vector, dvdt)
-##        plt.plot(time_vector[out_spk_idxs], dvdt[out_spk_idxs], '.r', ms=16)
-##        plt.plot(time_vector[potential_artifact_indexes], dvdt[potential_artifact_indexes], 'b|', ms=24, lw=4)
-##        plt.xlim([40300*dt, 42000*dt])
-##        plt.ylabel('dvdt')
-##        plt.subplot(2,1,2)
-##        plt.plot(time_vector, v)
-##        plt.plot(time_vector[out_spk_idxs], v[out_spk_idxs], 'r.', ms=16, label='threshold')
-##        plt.xlim([40300*dt, 42000*dt])
-##        plt.ylabel('voltage (V)')
-##        plt.plot(time_vector[peaks], v[peaks], '.g', ms=16, label='peaks')
-##        plt.plot(time_vector[[spikes[ii]['upstroke_idx'] for ii in range(len(spikes))]], [spikes[ii]['upstroke_v'] for ii in range(len(spikes))], '.c', ms=16, label = 'max upstroke')
-##        plt.plot(time_vector[potential_artifact_indexes], v[potential_artifact_indexes], 'b|', ms=24, lw=4)
-##        plt.legend()
-##        plt.show()
+#        time_vector=np.arange(len(v))*dt
+#        plt.figure()
+#    #    plt.subplot(3,1,1)
+#    #    plt.plot(time_vector, ddv)
+#    #    plt.plot(time_vector[out_spk_idxs], ddv[out_spk_idxs], '.r', ms=16)
+#    #    plt.xlim([40300, 42000])
+#    #    plt.ylabel('ddv')
+#        plt.subplot(2,1,1)
+#        plt.plot(time_vector, dvdt)
+#        plt.plot(time_vector[out_spk_idxs], dvdt[out_spk_idxs], '.r', ms=16)
+#        plt.plot(time_vector[potential_artifact_indexes], dvdt[potential_artifact_indexes], 'b|', ms=24, lw=4)
+#        plt.xlim([40300*dt, 42000*dt])
+#        plt.ylabel('dvdt')
+#        plt.subplot(2,1,2)
+#        plt.plot(time_vector, v)
+#        plt.plot(time_vector[out_spk_idxs], v[out_spk_idxs], 'r.', ms=16, label='threshold')
+#        plt.xlim([40300*dt, 42000*dt])
+#        plt.ylabel('voltage (V)')
+#        plt.plot(time_vector[peaks], v[peaks], '.g', ms=16, label='peaks')
+#        plt.plot(time_vector[[spikes[ii]['upstroke_idx'] for ii in range(len(spikes))]], [spikes[ii]['upstroke_v'] for ii in range(len(spikes))], '.c', ms=16, label = 'max upstroke')
+#        plt.plot(time_vector[potential_artifact_indexes], v[potential_artifact_indexes], 'b|', ms=24, lw=4)
+#        plt.legend()
+#        plt.show()
 #
 #    return out_spk_idxs_list
 

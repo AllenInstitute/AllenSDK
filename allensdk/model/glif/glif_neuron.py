@@ -524,7 +524,7 @@ def interpolate_spike_value(dt, interpolated_spike_time_offset, v0, v1):
 
 def line_crossing_x(dx, a0, a1, b0, b1):
     """Find the x value of the intersection of two lines."""
-    assert type(a0) != int and type(a1) != int and type(b0) != int and type(b1) != int, Exception(
+    assert type(a0) != int and type(a1) != int and type(b0) != int and type(b1) != int, Exception(  # noqa: E721
         "Do not pass integers into this function!"
     )
     return dx * (b0 - a0) / ((a1 - a0) - (b1 - b0))

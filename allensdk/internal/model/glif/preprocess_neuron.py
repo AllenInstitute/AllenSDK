@@ -525,7 +525,7 @@ def preprocess_neuron(
 
     for_reference_dict[
         "resistance"
-    ] = {  #'R_lssq_Wrest':{'mean': R_lssq_wrest_mean, 'list': R_lssq_wrest_list, 'dependencies': 'from subthreshold (no spike cutting) noise'},
+    ] = {  # 'R_lssq_Wrest':{'mean': R_lssq_wrest_mean, 'list': R_lssq_wrest_list, 'dependencies': 'from subthreshold (no spike cutting) noise'},
         "R_from_lims": {"value": cell_properties["ri"] * 1e6},
         "R_test_list": {"mean": R_test_list_mean, "list": R_test_list},
         "R_fit_ASC_and_R": {"mean": R_from_ASGLM, "list": best_R_fit_ascR},
@@ -533,7 +533,7 @@ def preprocess_neuron(
 
     for_reference_dict[
         "capacitance"
-    ] = {  #'C_lssq_Wrest': {'mean':C_lssq_wrest_mean, 'list':C_lssq_wrest_list, 'dependencies': 'from subthreshold (no spike cutting) noise'},
+    ] = {  # 'C_lssq_Wrest': {'mean':C_lssq_wrest_mean, 'list':C_lssq_wrest_list, 'dependencies': 'from subthreshold (no spike cutting) noise'},
         "C_from_lims": {"value": (cell_properties["tau"] * 1e-3) / (cell_properties["ri"] * 1e6)},
         "C_test_list": {"mean": C_test_list_mean, "list": C_test_list},
     }

@@ -39,7 +39,7 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
-from . import json_utilities as json_utilities
+from . import json_utilities as json_utilities  # noqa: F401
 from .nwb_data_set import NwbDataSet
 from . import swc
 

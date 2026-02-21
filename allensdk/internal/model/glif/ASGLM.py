@@ -250,7 +250,7 @@ def ASGLM_pairwise(
         asc_amp_for_all_ks_pairs.append(asc_amp_for_each_sweep)
         llh_for_all_ks_pairs.append(llh_for_each_sweep)
 
-        #!!!!!!!!!!!!!we multiplied ks by dt for SI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # !!!!!!!!!!!!!we multiplied ks by dt for SI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ave_llh_for_each_pair = np.mean(llh_for_all_ks_pairs, axis=1)
     best_ks_pair_ind = np.where(np.max(ave_llh_for_each_pair) == ave_llh_for_each_pair)[0][0]
 

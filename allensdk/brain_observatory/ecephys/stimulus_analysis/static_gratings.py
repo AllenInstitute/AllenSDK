@@ -333,7 +333,7 @@ class StaticGratings(StimulusAnalysis):
         tuning = np.array(df["spike_mean"].values)
         return osi(orivals_rad, tuning)
 
-    ## VISUALIZATION ##
+    # VISUALIZATION ##
     def plot_raster(self, stimulus_condition_id, unit_id):
         """Plot raster for one condition and one unit"""
 

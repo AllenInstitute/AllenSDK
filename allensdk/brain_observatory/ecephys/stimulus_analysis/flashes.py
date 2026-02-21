@@ -185,7 +185,7 @@ class Flashes(StimulusAnalysis):
         else:
             return np.nan
 
-    ## VISUALIZATION ##
+    # VISUALIZATION ##
     def plot_raster(self, stimulus_condition_id, unit_id):
         """Plot raster for one condition and one unit"""
 

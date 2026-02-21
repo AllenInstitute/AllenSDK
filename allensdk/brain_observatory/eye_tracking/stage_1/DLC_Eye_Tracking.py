@@ -6,7 +6,7 @@ import os
 os.environ["DLClight"] = "True"
 import deeplabcut
 
-from moviepy.editor import *
+from moviepy.editor import *  # noqa: F401
 import argparse
 import logging
 

@@ -118,6 +118,8 @@ line-length = 120
 ignore = [
     "E402",   # module-level import not at top of file
     "E741",   # ambiguous variable name (l, O, I, etc.)
+    "E742",   # ambiguous class name
+    "E743",   # ambiguous function name
     "F403",   # wildcard import used
     "F405",   # name may be undefined from wildcard import
 ]

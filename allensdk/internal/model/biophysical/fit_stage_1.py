@@ -326,7 +326,7 @@ def prepare_stage_1(description, passive_fit_data):
     target_dict = {}
     target_dict["passive"] = [{"ra": ra, "cm": {"soma": cm1, "axon": cm1, "dend": cm2}, "e_pas": baseline_v}]
 
-    swc_data = pd.read_table(swc_path, sep="\s", comment="#", header=None)
+    swc_data = pd.read_table(swc_path, sep=r"\s", comment="#", header=None)
     has_apic = False
     if APICAL_DENDRITE_TYPE in pd.unique(swc_data[1]):
         has_apic = True

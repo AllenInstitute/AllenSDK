@@ -24,7 +24,7 @@ def extract_from_schema(schema):
         if name in fields_to_skip:
             continue
 
-        if type(val) == fields.Nested:
+        if type(val) == fields.Nested:  # noqa: E721
             dataset = _extract_dataset(val=val)
             datasets.append(dataset)
             continue
@@ -108,7 +108,7 @@ def _extract_attributes(attributes, fields_to_skip=None):
         if fields_to_skip and name in fields_to_skip:
             continue
 
-        if type(val) == fields.List:
+        if type(val) == fields.List:  # noqa: E721
             res.append(
                 NWBAttributeSpec(
                     name=name,
@@ -118,7 +118,7 @@ def _extract_attributes(attributes, fields_to_skip=None):
                     required=val.required,
                 )
             )
-        elif type(val) == fields.Nested:
+        elif type(val) == fields.Nested:  # noqa: E721
             continue
         else:
             res.append(NWBAttributeSpec(name=name, dtype=STYPE_DICT[type(val)], doc=val.metadata["doc"]))

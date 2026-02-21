@@ -518,7 +518,7 @@ class EphysFeatureExtractor(object):
         adi /= cnt
         return adi
 
-    ##----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
 
     # trough (AHP) is presently defined as the minimum voltage level
     #   observed between successive spikes in a burst

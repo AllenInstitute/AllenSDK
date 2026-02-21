@@ -177,7 +177,7 @@ def MLIN_list_error(param_guess, experiment, input_data):
             ]
             noSpike_prob = np.append(
                 noSpike_negDiff, noSpike_posDiff
-            )  #!!NOTE: this may not line up correctly in outputs of MLIN HACK
+            )  # !!NOTE: this may not line up correctly in outputs of MLIN HACK
 
             spike_negDiff = (np.log(1.0 - 0.5 * np.exp(np.array(spike_bins["v_th_diff"]) / sv)))[
                 np.array(spike_bins["v_th_diff"]) <= 0.0
