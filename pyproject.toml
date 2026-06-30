@@ -35,7 +35,7 @@ dependencies = [
     "cachetools",
     "glymur",
     "h5py",
-    "hdmf!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*",
+    "hdmf!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*,<6",
     "jinja2",
     "matplotlib",
     "ndx-events",
