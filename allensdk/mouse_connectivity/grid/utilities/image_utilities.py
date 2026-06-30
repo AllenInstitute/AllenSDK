@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from six import iteritems
+
 import numpy as np
 import SimpleITK as sitk
 from skimage.draw import polygon
@@ -21,7 +21,7 @@ else:
 # TODO: check if this already exists. If not: add more dtypes
 # it does not
 NUMPY_SITK_TYPE_LOOKUP = {np.dtype(np.float32): sitk.sitkFloat32}
-SITK_NUMPY_TYPE_LOOKUP = {v: k for k, v in iteritems(NUMPY_SITK_TYPE_LOOKUP)}
+SITK_NUMPY_TYPE_LOOKUP = {v: k for k, v in NUMPY_SITK_TYPE_LOOKUP.items()}
 
 
 # ITK/Numpy

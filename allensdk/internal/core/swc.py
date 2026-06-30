@@ -14,8 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import csv
-import copy
-import math
 from allensdk.internal.morphology.morphology import *
 from allensdk.internal.morphology.node import Node
 

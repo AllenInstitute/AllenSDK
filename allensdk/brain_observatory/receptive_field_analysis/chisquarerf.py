@@ -313,8 +313,8 @@ def interpolate_RF(rf_map, deg_per_pnt):
         1,
     )
 
-    interpolated = si.interp2d(x_coor, y_coor, rf_map)
-    interpolated = interpolated(x_interpolated, y_interpolated)
+    interpolator = si.RectBivariateSpline(y_coor, x_coor, rf_map, kx=1, ky=1)
+    interpolated = interpolator(y_interpolated, x_interpolated, grid=True)
 
     return interpolated
 

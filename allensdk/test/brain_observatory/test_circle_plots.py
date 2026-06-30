@@ -106,7 +106,7 @@ def test_wedge_ring():
     assert len(d.get_paths()) == 2
 
 def test_reset_hex_pack():
-    pos = cplots.hex_pack(1.0, 1)
+    cplots.hex_pack(1.0, 1)
     cplots.reset_hex_pack()
     assert len(cplots.HEX_POSITIONS) == 0
     

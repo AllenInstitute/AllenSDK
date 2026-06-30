@@ -38,13 +38,11 @@ from .utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
-import numpy
 import logging
 import time
 import os
 import multiprocessing as mp
 from functools import partial
-import argschema as ags
 import argparse
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
@@ -78,7 +76,7 @@ def run(args, sweeps=None, procs=6):
         return
 
     if sweeps is None:
-        stimulus_path = description.manifest.get_path('stimulus_path')
+        description.manifest.get_path('stimulus_path')
         run_params = description.data['runs'][0]
         sweeps = run_params['sweeps']
 

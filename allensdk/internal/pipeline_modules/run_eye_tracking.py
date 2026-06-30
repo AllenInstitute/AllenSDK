@@ -2,8 +2,7 @@ import matplotlib
 matplotlib.use('agg')
 
 import logging
-import numpy as np
-import os, sys
+import os
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
 from allensdk.internal.brain_observatory.run_itracker import (run_itracker, 
@@ -70,4 +69,5 @@ def main():
     
     mod.write_output_data(output_data)
   
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main()

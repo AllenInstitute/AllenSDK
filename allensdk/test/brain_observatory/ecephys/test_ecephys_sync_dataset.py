@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 import numpy as np
-import h5py
 
 from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import EcephysSyncDataset
 
@@ -27,7 +26,7 @@ def test_extract_led_times(key, line_labels, led_vals):
     dataset.line_labels = line_labels
     dataset.sample_frequency = 1000
 
-    with mock.patch('allensdk.brain_observatory.sync_dataset.Dataset.get_all_times', return_value=led_vals) as p:
+    with mock.patch('allensdk.brain_observatory.sync_dataset.Dataset.get_all_times', return_value=led_vals):
         with mock.patch("allensdk.brain_observatory.sync_dataset.Dataset.get_bit_changes", return_value=np.ones_like(led_vals)) as q:
             obtained = dataset.extract_led_times(key)
             
@@ -57,7 +56,7 @@ def test_extract_frame_times_from_photodiode(photodiode_times, vsyncs, cycle, ex
                 return vsyncs
 
     dataset = EcephysSyncDataset()
-    with mock.patch('allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset.EcephysSyncDataset.get_edges', new_callable=TimesWrapper) as p:
+    with mock.patch('allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset.EcephysSyncDataset.get_edges', new_callable=TimesWrapper):
         obtained = dataset.extract_frame_times_from_photodiode(photodiode_cycle=cycle)
         assert np.allclose(obtained, expected)
 
@@ -66,5 +65,5 @@ def test_extract_frame_times_from_photodiode(photodiode_times, vsyncs, cycle, ex
 def test_factory():
 
     with mock.patch('allensdk.brain_observatory.sync_dataset.Dataset.load') as p:
-        dataset = EcephysSyncDataset.factory('foo')
+        EcephysSyncDataset.factory('foo')
         p.assert_called_with('foo')

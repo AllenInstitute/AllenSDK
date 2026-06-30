@@ -208,7 +208,7 @@ class Templates(DataObject, StimulusFileReadableInterface,
         image_index = IndexSeries(
             name=nwb_template.name,
             data=stimulus_index['image_index'].values,
-            unit='None',
+            unit='N/A',
             indexed_timeseries=nwb_template,
             timestamps=stimulus_index['start_time'].values)
         nwbfile.add_stimulus(image_index)

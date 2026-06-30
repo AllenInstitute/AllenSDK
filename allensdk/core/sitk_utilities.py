@@ -163,7 +163,7 @@ def write_ndarray_with_sitk(array, path, **information):
 
     '''
 
-    if not 'ncomponents' in information:
+    if 'ncomponents' not in information:
         information['ncomponents'] = 1
     ncomponents = information.pop('ncomponents')
 

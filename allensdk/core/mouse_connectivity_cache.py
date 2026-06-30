@@ -38,6 +38,7 @@ import operator as op
 import os
 import re
 import warnings
+from functools import reduce
 
 import nrrd
 import numpy as np
@@ -46,7 +47,6 @@ import SimpleITK as sitk
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.warehouse_cache.cache import Cache, get_default_manifest_file
 from allensdk.config.manifest import Manifest
-from six.moves import reduce
 
 from .reference_space_cache import ReferenceSpaceCache
 
@@ -734,7 +734,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         ncolumns = len(projection_structure_ids) * len(hemisphere_ids)
 
         matrix = np.empty((nrows, ncolumns))
-        matrix[:] = np.NAN
+        matrix[:] = np.nan
 
         row_lookup = {}
         for idx, e in enumerate(experiment_ids):

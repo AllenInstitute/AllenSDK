@@ -1,5 +1,4 @@
 import pytest
-import mock
 import numpy as np
 
 from allensdk.internal.mouse_connectivity.tissuecyte_stitching.tile import Tile

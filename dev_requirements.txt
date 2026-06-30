@@ -1,5 +1,0 @@
-nbconvert
-papermill
-traitlets
-ipython
-ipykernel

@@ -1,9 +1,9 @@
-import sys, os, shutil
+import os
+import shutil
 import logging
 from collections import defaultdict
 import numpy as np
 import json
-from six import iteritems
 
 from allensdk.config.manifest import Manifest
 from allensdk.core.json_utilities import json_handler
@@ -95,7 +95,7 @@ def find_coarse_long_square_amp_delta(sweeps, decimals=0):
 
 def update_output_sweep_features(cell_features, sweep_features, sweep_index):
     # add peak deflection for subthreshold long squares
-    for sweep_number, sweep in iteritems(sweep_index):
+    for sweep_number, sweep in sweep_index.items():
         pd = sweep_features.get(sweep_number,{}).get('peak_deflect', None)
         if pd is not None:
             sweep['peak_deflection'] = pd[0]
@@ -240,7 +240,7 @@ def extract_data(data, nwb_file):
     for s in iclamp_sweep_list:
         try:
             stimulus_type_name = s['ephys_stimulus']['ephys_stimulus_type']['name']
-        except KeyError as e:
+        except KeyError:
             raise Exception("Sweep %d has no ephys stimulus record in features JSON file: %s" % (s['sweep_number'], json.dumps(s, indent=3, default=json_handler)))
 
         if stimulus_type_name == "Unknown":

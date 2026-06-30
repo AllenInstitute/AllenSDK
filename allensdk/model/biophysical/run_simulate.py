@@ -41,7 +41,7 @@ import traceback
 import subprocess
 import logging.config as lc
 from ..biophys_sim.config import Config
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 
 
 class RunSimulate(object):
@@ -75,20 +75,20 @@ class RunSimulate(object):
         try:
             stimulus_path = self.manifest.get_path('stimulus_path')
             RunSimulate._log.info("stimulus path: %s" % (stimulus_path))
-        except:
+        except Exception:
             raise Exception(
                 'Could not read input stimulus path from input config.')
 
         try:
             out_path = self.manifest.get_path('output_path')
             RunSimulate._log.info("result NWB file: %s" % (out_path))
-        except:
+        except Exception:
             raise Exception('Could not read output path from input config.')
 
         try:
             morphology_path = self.manifest.get_path('MORPHOLOGY')
             RunSimulate._log.info("morphology path: %s" % (morphology_path))
-        except:
+        except Exception:
             raise Exception(
                 'Could not read morphology path from input config.')
 
@@ -118,8 +118,7 @@ def main(command, lims_strategy_json, lims_response_json):
     RunSimulate._log.debug("lims strategy json: %s" % (lims_strategy_json))
     RunSimulate._log.debug("lims upload json: %s" % (lims_response_json))
 
-    log_config = resource_filename('allensdk.model.biophysical.run_simulate',
-                                   'logging.conf')
+    log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
     lc.fileConfig(log_config)
     os.environ['LOG_CFG'] = log_config
 
@@ -135,6 +134,6 @@ if __name__ == '__main__':
     try:
         main(command, input_json, output_json)
         RunSimulate._log.debug("success")
-    except Exception as e:
+    except Exception:
         RunSimulate._log.error(traceback.format_exc())
         exit(1)

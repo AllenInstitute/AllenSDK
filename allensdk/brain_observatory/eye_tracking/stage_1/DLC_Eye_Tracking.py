@@ -1,19 +1,10 @@
 import time
 t0 = time.time()
-import tensorflow as tf
 import os
 os.environ["DLClight"]="True"
 import deeplabcut
 
-from matplotlib.patches import Ellipse
-import matplotlib.pyplot as plt
-from moviepy.video.io.bindings import mplfig_to_npimage
 from moviepy.editor import *
-import numpy as np
-import collections
-import pandas as pd
-import sys
-import re
 import argparse
 import logging
 

@@ -119,7 +119,7 @@ class NaturalMovie(StimulusAnalysis):
         for i in range(10):
             for j in range(10):
                 if i >= j:
-                    mask[i, j] = np.NaN
+                    mask[i, j] = np.nan
 
         for nc in range(self.numbercells):
             peak_movie.cell_specimen_id.iloc[nc] = cids[nc]

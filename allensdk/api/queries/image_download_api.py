@@ -35,8 +35,6 @@
 #
 from .rma_template import RmaTemplate
 from allensdk.api.warehouse_cache.cache import cacheable
-from six import string_types
-
 
 class ImageDownloadApi(RmaTemplate):
     '''HTTP Client to download whole or partial two-dimensional images from the Allen Institute
@@ -384,7 +382,7 @@ class ImageDownloadApi(RmaTemplate):
         colormap_filter = kwargs.get('colormap', None)
         
         if colormap_filter is not None:
-            if isinstance(colormap_filter, string_types):
+            if isinstance(colormap_filter, str):
                 params.append('colormap=%s' % (colormap_filter))
             else:
                 lower_threshold = colormap_filter[0]

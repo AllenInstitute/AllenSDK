@@ -35,7 +35,7 @@
 #
 import numpy as np
 import logging
-import six
+
 from . import ephys_extractor as efex
 from . import ephys_features as ft
 
@@ -59,7 +59,7 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
-    for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
+    for stimulus_type, sweep_numbers in sweeps_by_type.items():
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
         if stimulus_type == "Short Square - Triple":
@@ -137,9 +137,9 @@ def extract_cell_features(data_set,
             hero_sweep = sweep
 
     if hero_sweep:
-        adapt = hero_sweep.sweep_feature("adapt")
-        latency = hero_sweep.sweep_feature("latency")
-        mean_isi = hero_sweep.sweep_feature("mean_isi")
+        hero_sweep.sweep_feature("adapt")
+        hero_sweep.sweep_feature("latency")
+        hero_sweep.sweep_feature("mean_isi")
     else:
         raise ft.FeatureError("Could not find hero sweep.")
 

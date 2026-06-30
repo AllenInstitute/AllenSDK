@@ -34,11 +34,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import patch, mock_open
+from unittest.mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
 
 

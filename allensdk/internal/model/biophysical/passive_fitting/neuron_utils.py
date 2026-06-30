@@ -1,14 +1,13 @@
 # in place of global from neuron import h
 
 def get_h():   
-    if get_h.h == None:
+    if get_h.h is None:
         from neuron import h
         get_h.h = h
     return get_h.h
     
 get_h.h = None
 
-import sys, os
 from .output_grabber import OutputGrabber
 
 def load_morphology(filename):
@@ -31,7 +30,7 @@ def parse_neuron_output(output_str):
             v = toks[1].strip()
             try:
                 v = float(v)
-            except:
+            except Exception:
                 pass
             
             printed_fields[toks[0].strip()] = v

@@ -1,6 +1,4 @@
 import os
-import h5py
-import pandas as pd
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 from allensdk.brain_observatory.behavior.swdb import utilities as ut
 

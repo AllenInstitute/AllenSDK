@@ -5,7 +5,6 @@ import nwb.nwb as nwb
 import nwb.nwbco as nwbco
 import resource_file
 from collections import defaultdict
-from six import iteritems
 
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
@@ -637,7 +636,7 @@ def main(jin):
 
     # TODO describe what's happening here
     sweeps_by_type = defaultdict(list)
-    for sweep_number, sweep_data in iteritems(metadata['sweeps']):
+    for sweep_number, sweep_data in metadata['sweeps'].items():
         if sweep_data["stimulus_units"] in ["pA",
                                             "Amps"]:  # only compute spikes
             # for current clamp sweeps

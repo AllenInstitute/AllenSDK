@@ -1,6 +1,4 @@
-import json, os
-import sys
-import subprocess
+import os
 
 import run_observatory_thumbnails as robsth
 import allensdk.internal.core.lims_utilities as lu
@@ -55,8 +53,6 @@ def main():
 
     for input_file in data:
         exp_input_json = input_file['input_json']
-        exp_output_json = input_file['output_json']
-
         exp_input_data = ju.read(exp_input_json)
 
         nwb_file, analysis_file, output_directory = robsth.parse_input(exp_input_data)
@@ -64,4 +60,5 @@ def main():
         robsth.build_experiment_thumbnails(nwb_file, analysis_file, output_directory, 
                                            types, mod.args.threads)
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main()

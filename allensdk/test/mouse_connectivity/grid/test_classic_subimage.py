@@ -1,5 +1,4 @@
 import pytest
-import mock
 
 import numpy as np
 

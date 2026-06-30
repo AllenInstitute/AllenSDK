@@ -130,7 +130,6 @@ class Utils(HocUtils):
         missing_penalty_value = 20.0
         max_fail_penalty = 250.0
         min_fail_penalty = 75.0
-        overkill_reduction = 0.75
         variance_factor = 0.1
 
         fail_trace = False
@@ -174,7 +173,7 @@ class Utils(HocUtils):
             errs = []
 
             # Calculate additional features not done by swp.process_spikes()
-            baseline_v = swp.sweep_feature("v_baseline")
+            swp.sweep_feature("v_baseline")
             other_features = {}
             threshold_t = swp.spike_feature("threshold_t")
             fast_trough_t = swp.spike_feature("fast_trough_t")

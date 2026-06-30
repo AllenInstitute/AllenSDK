@@ -104,9 +104,9 @@ def get_images_dict(pkl) -> Dict:
             meta = dict(
                 image_category=cat.decode("utf-8"),
                 image_name=img_name.decode("utf-8"),
-                orientation=np.NaN,
-                phase=np.NaN,
-                spatial_frequency=np.NaN,
+                orientation=np.nan,
+                phase=np.nan,
+                spatial_frequency=np.nan,
                 image_index=ii,
             )
 
@@ -341,9 +341,9 @@ def get_stimulus_metadata(pkl) -> pd.DataFrame:
             "image_category": ["omitted"],
             "image_name": ["omitted"],
             "image_set": ["omitted"],
-            "orientation": np.NaN,
-            "phase": np.NaN,
-            "spatial_frequency": np.NaN,
+            "orientation": np.nan,
+            "phase": np.nan,
+            "spatial_frequency": np.nan,
             "image_index": len(stimulus_index_df),
         }
     )

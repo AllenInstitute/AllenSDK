@@ -36,7 +36,7 @@
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 import itertools as it
 
 
@@ -106,7 +106,7 @@ def test_harness(dataset,
                  stimulus,
                  trigger):
     with patch('allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning',
-               mock_speed_tuning()) as get_speed_tuning:
+               mock_speed_tuning()):
         lsn = LocallySparseNoise(dataset, stimulus)
 
         assert lsn._stim_table is StimulusAnalysis._PRELOAD

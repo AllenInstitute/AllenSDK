@@ -1,6 +1,5 @@
 """Module for calculating annotated region metrics from ISI data"""
 import numpy as np
-import logging
 
 # These scaling factors are derived from experimental geometry using
 # screen width 52.0 cm, screen height 32.0 cm (16:10 24 inch monitor)

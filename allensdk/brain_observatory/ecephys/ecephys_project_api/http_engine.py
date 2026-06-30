@@ -118,15 +118,20 @@ class AsyncHttpEngine(HttpEngine):
 
         super(AsyncHttpEngine, self).__init__(scheme, host, **kwargs)
 
+        self._session = None
         if session:
-            self.session = session
+            self._session = session
             warnings.warn(
                 "Recieved preconstructed session, ignoring timeout parameter."
             )
-        else:
-            self.session = aiohttp.ClientSession(
+
+    @property
+    def session(self):
+        if self._session is None:
+            self._session = aiohttp.ClientSession(
                 timeout=aiohttp.client.ClientTimeout(self.timeout)
             )
+        return self._session
 
     async def _stream_coroutine(
         self, 
@@ -169,10 +174,10 @@ class AsyncHttpEngine(HttpEngine):
         return functools.partial(self._stream_coroutine, route)
 
     def __del__(self):
-        if hasattr(self, "session"):
+        if getattr(self, "_session", None) is not None:
             nest_asyncio.apply()
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.session.close())
+            loop.run_until_complete(self._session.close())
 
     @staticmethod
     def write_bytes(

@@ -35,8 +35,6 @@
 #
 import functools
 import operator as op
-from collections import defaultdict
-from six import iteritems
 
 from allensdk.deprecated import deprecated
 
@@ -73,7 +71,7 @@ class SimpleTree( object ):
         '''
 
         self._nodes = { node_id_cb(n):n for n in nodes }
-        self._parent_ids = { nid:parent_id_cb(n) for nid,n in iteritems(self._nodes) }
+        self._parent_ids = { nid:parent_id_cb(n) for nid,n in self._nodes.items() }
         self._child_ids = { nid:[] for nid in self._nodes }
 
         for nid in self._parent_ids:
@@ -159,10 +157,12 @@ class SimpleTree( object ):
         '''
 
         if to_fn is None:
-            to_fn = lambda x: x
+            def to_fn(x):
+                return x
 
         if not callable( key ):
-            from_fn = lambda x: x[key]
+            def from_fn(x):
+                return x[key]
         else:
             from_fn = key
 

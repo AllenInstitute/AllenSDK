@@ -13,7 +13,7 @@ jobs:
         image: ["allensdk_local_py38:latest"]
         branch: ["master", "rc/**"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
       - name: run test in docker
@@ -26,9 +26,7 @@ jobs:
               --mount type=tmpfs,destination=/tmp \
               --rm \
               ${{ matrix.image }} \
-                  /bin/bash -c "pip install -r requirements.txt; \
-                                pip install -r test_requirements.txt; \
-                                pip install -e .; \
+                  /bin/bash -c "pip install -e '.[test]'; \
                                 python -m pytest \
                                     --log-level=INFO \
                                     --capture=no \

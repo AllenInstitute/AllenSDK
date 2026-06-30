@@ -10,7 +10,7 @@ from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit2
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit_elec
-from pkg_resources import resource_filename #@UnresolvedImport
+from importlib.resources import files
 import logging
 import logging.config as lc
 
@@ -37,7 +37,7 @@ def run_passive_fit(description):
 
     if len(cap_check_sweeps) > 0:
         data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
-        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set);
+        d = passive_prep.get_passive_fit_data(cap_check_sweeps, data_set)
 
         grand_up_file = os.path.join(output_directory, 'upbase.dat')
         np.savetxt(grand_up_file, d['grand_up'])
@@ -49,7 +49,7 @@ def run_passive_fit(description):
         passive_fit_data["escape_time"] = d['escape_t']
 
         fit_1_file = description.manifest.get_path('fit_1_file')
-        fit_1_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit.__name__, 
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
@@ -57,14 +57,14 @@ def run_passive_fit(description):
 
         fit_2_file = description.manifest.get_path('fit_2_file')
 
-        fit_2_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit2.__name__,
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
         fit_3_file = description.manifest.get_path('fit_3_file')
-        fit_3_params = subprocess.check_output([sys.executable,
+        subprocess.check_output([sys.executable,
                                                 '-m', neuron_passive_fit_elec.__name__,
                                                 str(d['escape_t']),
                                                 str(d['bridge_avg']),
@@ -128,8 +128,7 @@ def main(limit, manifest_path):
     if 'LOG_CFG' in os.environ:
         log_config = os.environ['LOG_CFG']
     else:
-        log_config = resource_filename('allensdk.model.biophysical',
-                                       'logging.conf')
+        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
         os.environ['LOG_CFG'] = log_config
     lc.fileConfig(log_config)
 

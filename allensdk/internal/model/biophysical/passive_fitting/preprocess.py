@@ -19,7 +19,6 @@ def get_passive_fit_data(cap_check_sweeps, data_set):
             continue
         up_idxs, down_idxs = get_cap_check_indices(i)
 
-        down_idx_interval = down_idxs[1] - down_idxs[0]
         skip_count = 0
         for j in range(len(up_idxs)):
             if j == 0:
@@ -77,4 +76,5 @@ def get_cap_check_indices(i):
 
 def main(): 
     pass
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

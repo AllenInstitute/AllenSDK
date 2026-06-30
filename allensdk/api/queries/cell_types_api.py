@@ -330,7 +330,7 @@ class CellTypesApi(RmaApi):
         try:
             file_url = results[0]['ephys_result'][
                 'well_known_files'][0]['download_link']
-        except Exception as _:
+        except Exception as _:  # noqa: F841
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
@@ -361,7 +361,7 @@ class CellTypesApi(RmaApi):
         try:
             file_url = results[0]['neuron_reconstructions'][
                 0]['well_known_files'][0]['download_link']
-        except:
+        except Exception:
             raise Exception("Specimen %d has no reconstruction" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
@@ -394,7 +394,7 @@ class CellTypesApi(RmaApi):
         try:
             file_url = results[0]['neuron_reconstructions'][
                 0]['well_known_files'][0]['download_link']
-        except:
+        except Exception:
             raise LookupError("Specimen %d has no marker file" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)

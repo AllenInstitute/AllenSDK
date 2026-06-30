@@ -36,15 +36,10 @@
 from allensdk.core.json_utilities import JsonComments
 import argparse
 import os
-import io
 import logging
 import logging.config as lc
-from pkg_resources import resource_filename  # @UnresolvedImport
-
-try:
-    from configparser import ConfigParser  # @UnresolvedImport
-except:
-    from ConfigParser import ConfigParser  # @UnresolvedImport
+from configparser import ConfigParser
+from importlib.resources import files
 
 
 class ApplicationConfig(object):
@@ -55,7 +50,7 @@ class ApplicationConfig(object):
 
     _log = logging.getLogger(__name__)
     _DEFAULT_LOG_CONFIG = os.getenv(
-        'LOG_CFG', resource_filename(__name__, 'logging.conf'))
+        'LOG_CFG', str(files(__package__).joinpath('logging.conf')))
 
     def __init__(self,
                  defaults,
@@ -139,7 +134,7 @@ class ApplicationConfig(object):
             try:
                 lc.fileConfig(self.log_config_path,
                               disable_existing_loggers=disable_existing_loggers)
-            except:
+            except Exception:
                 logging.error("Could not load log configuration file: %s" %
                               (parsed_args.log_config_path))
         else:
@@ -342,17 +337,14 @@ class ApplicationConfig(object):
         try:
             config = ConfigParser(defaults=none_defaults,
                                   allow_no_value=True)
-        except:
+        except Exception:
             logging.warn(
                 "This python installation does not support configuration defaults.")
             config = ConfigParser()
 
         if config_file_path.endswith('.json'):
             cfg_string = self.from_json_file(config_file_path)
-            try:
-                config.readfp(io.BytesIO(cfg_string))
-            except (NameError, TypeError):
-                config.read_string(cfg_string)  # Python 3
+            config.read_string(cfg_string)
         else:
             config.read(config_file_path)
 
@@ -362,6 +354,6 @@ class ApplicationConfig(object):
                 if file_value:
                     logging.info("setting %s to %s" % (key, file_value))
                     setattr(self, key, file_value)
-            except:
+            except Exception:
                 logging.info("Configuration option not specified: %s" %
                              (key))

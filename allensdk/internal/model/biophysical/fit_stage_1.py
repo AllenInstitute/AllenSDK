@@ -185,7 +185,6 @@ def prepare_stage_1(description, passive_fit_data):
     output_directory = description.manifest.get_path('WORKDIR')
     neuronal_model_data = ju.read(description.manifest.get_path('neuronal_model_data'))
     specimen_data = neuronal_model_data['specimen']
-    specimen_id = neuronal_model_data['specimen_id']
     is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
     all_sweeps = specimen_data['ephys_sweeps']
     data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
@@ -242,7 +241,6 @@ def prepare_stage_1(description, passive_fit_data):
     # "Delta" features
     sweep_avg_slow_trough_delta_time = []
     sweep_avg_slow_trough_delta_v = []
-    sweep_avg_peak_trough_delta_time = []
     for swp in ext.sweeps():
         threshold_t = swp.spike_feature("threshold_t")
         fast_trough_t = swp.spike_feature("fast_trough_t")
@@ -280,7 +278,7 @@ def prepare_stage_1(description, passive_fit_data):
     for s in all_sweeps:
         try:
             v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s['sweep_number'])
-        except:
+        except Exception:
             pass
         if np.max(i) > max_i:
             max_i = np.max(i)

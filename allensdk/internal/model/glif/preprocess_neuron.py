@@ -1,5 +1,5 @@
-import argparse, logging
-import itertools
+import argparse
+import logging
 from scipy.optimize import fmin
 import numpy as np
 import os
@@ -28,7 +28,8 @@ SHOW_PLOT = False
 SAVE_FIG =True
 SHORT_RUN = False
 
-class MissingSpikeException(Exception): pass
+class MissingSpikeException(Exception):
+    pass
 
 RESTING_POTENTIAL = 'slow_vm_mv'
 
@@ -116,13 +117,13 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
     ssq_triple_sweeps = ssq_sweeps['triple']
     
     ramp_sweeps = fs.find_ramp_sweeps(sweep_index)['suprathreshold']
-    R2R_sweeps = fs.find_ramp_to_rheo_sweeps(sweep_index)['all']
+    fs.find_ramp_to_rheo_sweeps(sweep_index)['all']
     
     noise1_data = load_sweeps(nwb_file, noise1_sweeps, dt, cut, bessel)
     noise2_data = load_sweeps(nwb_file, noise2_sweeps, dt, cut, bessel)
 
     maximum_subthreshold_short_square_sweeps = ssq_sweeps['maximum_subthreshold']
-    maximum_subthreshold_short_square_data = load_sweeps(nwb_file, [maximum_subthreshold_short_square_sweeps[0]], dt, cut, bessel)
+    load_sweeps(nwb_file, [maximum_subthreshold_short_square_sweeps[0]], dt, cut, bessel)
     minimum_suprathreshold_short_square_sweeps = ssq_sweeps['minimum_suprathreshold']
     minimum_suprathreshold_short_square_data = load_sweeps(nwb_file, [minimum_suprathreshold_short_square_sweeps[0]], dt, cut, bessel)
 
@@ -144,18 +145,16 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
 
     if len(ramp_sweeps):
         logging.info('has ramp')
-        ramp_data = load_sweeps(nwb_file, ramp_sweeps, dt, cut, bessel)
+        load_sweeps(nwb_file, ramp_sweeps, dt, cut, bessel)
         El_ramp=sweep_index[ramp_sweeps[0]][RESTING_POTENTIAL]*1e-3
     else:
         ramp_sweeps=None
-        ramp_data=None
         El_ramp=None
         logging.info("No ramp")
 
     if len(ssq_triple_sweeps):
         logging.info('has multi ss')
         multi_ssq_data = load_sweeps(nwb_file, ssq_triple_sweeps, dt, cut, bessel)
-        El_multi_ssq_data=sweep_index[ssq_triple_sweeps[0]][RESTING_POTENTIAL]*1e-3
         multi_ssq_dv_cutoff, multi_ssq_thresh_frac = estimate_dv_cutoff(multi_ssq_data['voltage'], dt, 
                                                                         efex.SHORT_SQUARE_TRIPLE_WINDOW_START,
                                                                         efex.SHORT_SQUARE_TRIPLE_WINDOW_END)
@@ -165,13 +164,10 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
     else:
         ssq_triple_sweeps=None
         multi_ssq_data = None
-        El_multi_ssq_data = None
         logging.info("No multi short square")
 
     # Needed for MLIN
     long_square_config = fs.find_long_square_sweeps(sweep_index)
-    long_square_sweeps = long_square_config['all']
-    subthreshold_long_square_sweeps = long_square_config['subthreshold']
     maximum_subthreshold_long_square_sweeps = long_square_config['maximum_subthreshold']
     #TODO: Here you are loading just one sweep: probably should load all
     maximum_subthreshold_long_square_data = load_sweeps(nwb_file, [maximum_subthreshold_long_square_sweeps[0]], dt, cut, bessel)
@@ -201,8 +197,7 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
     (R_test_list, C_test_list, El_test_list)=least_squares_RCEl_calc_tested(subthresh_noise_voltage_list, subthresh_noise_current_list, dt)
     R_test_list_mean=np.mean(R_test_list)
     C_test_list_mean=np.mean(C_test_list)
-    El_test_list_mean=np.mean(El_test_list)
-    
+
     #-----------------------------------------------------------------------------------------        
     #------------------------ compute spike cut length----------------------------------------
     #-----------------------------------------------------------------------------------------
@@ -287,7 +282,7 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
             tag_plot(tag)
             plt.savefig(os.path.join(save_figure_path, tag), format='png')
             plt.close()
-    except MissingSpikeException as e:
+    except MissingSpikeException:
         raise MissingSpikeException("The suprathreshold short square sweep must have a spike, but no spike was detected. This means that feature extraction and GLIF spike detection are inconsistent.")
 
     #-----------------------------------------------------------------------------------------------------
@@ -402,8 +397,6 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
 
     #TODO: find out how many are the max number of all_passing_sweeps. 
     El_noise_1=[None, None, None, None, None]
-    WFS_noise_1=[None, None, None, None, None]
-    RTP_noise_1=[None, None, None, None, None]
     sweep_noise_1=[None, None, None, None, None]
     spike_ind_noise_1=[None, None, None, None, None]
 
@@ -417,7 +410,6 @@ def preprocess_neuron(nwb_file, sweep_list, cell_properties=None,
 
     #--initialize output dictionaries
     for_reference_dict={}
-    for_use_dict={}
 
     for_reference_dict['dt_used_for_preprocessor_calculations']=dt
     #for_reference_dict['optional_methods']=self.optional_methods
@@ -491,4 +483,5 @@ def main():
     ju.write(args.output_json, values)
     
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

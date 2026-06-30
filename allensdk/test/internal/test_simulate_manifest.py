@@ -1,14 +1,10 @@
 from allensdk.internal.api.queries.biophysical_module_reader import \
     BiophysicalModuleReader
 import pytest
-from mock import patch, mock_open, MagicMock
-from six import StringIO
-from io import IOBase
+from unittest.mock import patch, mock_open, MagicMock
+from io import StringIO, IOBase
 import json
-try:
-    import __builtin__ as builtins
-except:
-    import builtins
+import builtins
 
 
 LIMS_MESSAGE_ONE_PARAM_FILE = """
@@ -190,7 +186,6 @@ def test_to_manifest(one_param_config):
                mock_open(),
                create=True) as manifest_f:
         manifest_f.return_value = MagicMock(spec=IOBase)
-        file_handle = manifest_f.return_value.__enter__.return_value
         one_param_config.to_manifest("test_manifest.json")
         manifest_f.assert_called_once_with("test_manifest.json", "wb+")
 

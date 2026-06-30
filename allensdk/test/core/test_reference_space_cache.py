@@ -36,7 +36,7 @@
 import os
 
 import pytest
-import mock
+from unittest import mock
 import numpy as np
 import nrrd
 import pandas as pd
@@ -202,7 +202,7 @@ def test_get_structure_mesh(rsp, fn_temp_dir, rsp_version):
 def test_validate_structure_id(inp, fails):
 
     if fails:
-        with pytest.raises(ValueError) as exc:
+        with pytest.raises(ValueError):
             ReferenceSpaceCache.validate_structure_id(inp)
     else:
         out = ReferenceSpaceCache.validate_structure_id(inp)
@@ -215,7 +215,7 @@ def test_validate_structure_id(inp, fails):
 def test_validate_structure_ids(inp, fails):
 
     if fails:
-        with pytest.raises(ValueError) as exc:
+        with pytest.raises(ValueError):
             ReferenceSpaceCache.validate_structure_ids(inp)
     else:
         out = ReferenceSpaceCache.validate_structure_ids(inp)

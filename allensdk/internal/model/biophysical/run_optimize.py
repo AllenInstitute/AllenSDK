@@ -5,13 +5,12 @@ import logging
 import logging.config as lc
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 from allensdk.internal.api.queries.optimize_config_reader import OptimizeConfigReader
 from allensdk.model.biophys_sim.config import Config
 from allensdk.internal.model.biophysical.make_deap_fit_json import Report
 from allensdk.internal.api.queries.biophysical_module_api import BiophysicalModuleApi
-import allensdk.model.biophysical as hoc_location
-from six.moves import reduce
+from functools import reduce
 
 
 class RunOptimize(object):
@@ -74,8 +73,7 @@ class RunOptimize(object):
             RunOptimize._log.debug("copying %s to %s" % (from_file, modfile_dir))
             shutil.copy(from_file, modfile_dir)
 
-        shutil.copy(resource_filename(hoc_location.__name__,
-                                      'cell.hoc'),
+        shutil.copy(str(files('allensdk.model.biophysical').joinpath('cell.hoc')),
                     self.manifest.get_path('BASEDIR'))
 
 
@@ -89,7 +87,6 @@ class RunOptimize(object):
         Other necessary files are also written.
         '''
         import json
-        from allensdk.api.api import Api
 
         bma = BiophysicalModuleApi(api_url)
         data = bma.get_neuronal_models(neuronal_model_id)
@@ -192,8 +189,7 @@ def main(command, input_json, output_json):
     if 'LOG_CFG' in os.environ:
         log_config = os.environ['LOG_CFG']
     else:
-        log_config = resource_filename('allensdk.model.biophysical',
-                                       'logging.conf')
+        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
         os.environ['LOG_CFG'] = log_config
     lc.fileConfig(log_config)
 

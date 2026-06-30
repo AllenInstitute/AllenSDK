@@ -14,22 +14,22 @@ class EcephysProjectFixedApi(EcephysProjectApi):
         raise MissingDataError(f"lfp data for probe {probe_id} not found!")
 
     def get_sessions(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_targeted_regions(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_isi_experiments(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_units(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_channels(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_probes(self, *args, **kwargs):
-        raise MissingDataError(f"Data not found!")
+        raise MissingDataError("Data not found!")
 
     def get_natural_movie_template(self, number, *args, **kwargs):
         raise MissingDataError(f"natural movie template not found for movie {number}")

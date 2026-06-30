@@ -1,6 +1,5 @@
 import sys
 
-import pytest
 
 
 def pytest_ignore_collect(path, config):

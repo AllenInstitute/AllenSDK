@@ -93,7 +93,6 @@ def subsample_data(data, method, present_time_step, desired_time_step):
     # number of elements to average over
     n = int(desired_time_step / present_time_step)
 
-    data_subsampled = None
 
     if method == "mean":
         # if n does not divide evenly into the length of the array, crop off the end

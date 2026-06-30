@@ -415,7 +415,7 @@ class Trial:
         """
         change_frame = trial_dict['change_frame']
         if np.isnan(change_frame):
-            change_time = np.NaN
+            change_time = np.nan
         else:
             change_frame = int(change_frame)
             change_time = self._stimulus_timestamps.value[change_frame]
