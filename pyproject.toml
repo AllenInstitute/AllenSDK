@@ -40,7 +40,7 @@ dependencies = [
     "matplotlib",
     "ndx-events",
     "nest_asyncio",
-    "numpy",
+    "numpy<2.5.0",
     "packaging",
     "pandas>=1.5.3,<3",
     "psycopg2-binary",
