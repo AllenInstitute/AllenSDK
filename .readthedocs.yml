@@ -6,6 +6,7 @@ version: 2
 
 sphinx:
   builder: html
+  configuration: doc_template/conf.py
 
 build:
   os: ubuntu-22.04
