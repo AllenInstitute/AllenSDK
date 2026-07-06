@@ -48,7 +48,7 @@ fluorescence traces, computing dF/F, and computing tuning metrics is available i
 We have also developed a new module to better characterize a cell's receptive field.  Take a look at the  
 `receptive field analysis example notebook <_static/examples/nb/receptive_fields.html>`_ 
 
-For more information about data processing, please `read the technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_.
+For more information about data processing, please `read the technical whitepapers <https://cdn.prod.website-files.com/689cfbd308fa7373b604d290/6a30107b2f53d6743336311d_neuropixels_visual_coding_-_white_paper_v10-compressed.pdf>`_.
 
 
 Getting Started
