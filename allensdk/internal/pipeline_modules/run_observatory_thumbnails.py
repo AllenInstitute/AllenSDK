@@ -1,12 +1,10 @@
 import matplotlib
 matplotlib.use('agg')
 
-import os, shutil
+import os
 import allensdk.core.json_utilities as ju
-import shutil
 import numpy as np
 import argparse
-import scipy.misc
 from scipy.stats import gaussian_kde
 
 import multiprocessing
@@ -24,10 +22,9 @@ from allensdk.core.brain_observatory_nwb_data_set import (BrainObservatoryNwbDat
                                                           MissingStimulusException,
                                                           NoEyeTrackingException)
 from allensdk.config.manifest import Manifest
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
+from allensdk.internal.core.lims_pipeline_module import run_module
 import allensdk.internal.core.lims_utilities as lu
 import allensdk.brain_observatory.stimulus_info as si
-from contextlib import contextmanager
 
 LARGE_HEIGHT = 500
 SMALL_HEIGHT = 150
@@ -63,7 +60,7 @@ def get_experiment_files(experiment_id):
     nwb_file = get_experiment_nwb_file(experiment_id)
     try:
         analysis_file = get_experiment_analysis_file(experiment_id)
-    except:
+    except Exception:
         analysis_file = None
 
     if not os.path.exists(nwb_file):
@@ -119,7 +116,7 @@ def build_plots(prefix, aspect, configs, output_dir, axes=None, transparent=Fals
         file_name = os.path.join(output_dir, config["pattern"] % prefix)
 
         logging.debug("file: %s", file_name)
-        with oplots.figure_in_px(w, h, file_name, transparent=transparent) as fig:
+        with oplots.figure_in_px(w, h, file_name, transparent=transparent):
             matplotlib.rcParams.update({'font.size': config['font_size']})
             yield file_name
 
@@ -464,7 +461,7 @@ def build_type(nwb_file, data_file, configs, output_dir, type_name):
         elif type_name == "eye":
             build_eye_tracking_plots(data_set, configs, output_dir)
 
-    except MissingStimulusException as e:
+    except MissingStimulusException:
         logging.warning("could not load stimulus (%s)", type_name)
     except Exception as e:
         traceback.print_exc()
@@ -516,7 +513,7 @@ def build_experiment_thumbnails(nwb_file, analysis_file, output_directory,
         p = multiprocessing.Pool(threads)
 
         func = functools.partial(build_type, nwb_file, analysis_file, PLOT_CONFIGS, output_directory)
-        results = p.map(func, types)
+        p.map(func, types)
         p.close()
         p.join()
 
@@ -544,4 +541,5 @@ def main():
 
     ju.write(args.output_json, {})
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

@@ -66,12 +66,11 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     assert cell_loc == 97 
     
     # temporal frequency plot
-    response = dg.response[:,1:,cell_loc,0]
-    tfvals = dg.tfvals[1:]
-    orivals = dg.orivals
+    dg.response[:,1:,cell_loc,0]
+    dg.tfvals[1:]
 
     # peak
-    pk = dg.peak.loc[cell_loc]
+    dg.peak.loc[cell_loc]
 
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
@@ -84,12 +83,12 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     assert pref_trials['end'][1] == 897 
 
     # mean sweep response
-    subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
+    dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     subset_mean = dg.mean_sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     assert np.isclose(subset_mean['dx'][1], 0.920868)
 
     # response to each trial
-    trial_timestamps = np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
+    np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
 
 
 @pytest.mark.nightly
@@ -124,7 +123,7 @@ def test_brain_observatory_locally_sparse_noise_notebook(boc):
     lsn = LocallySparseNoise(data_set)
     specimen_ids = data_set.get_cell_specimen_ids()
     cell_loc = np.argwhere(specimen_ids==specimen_id)[0][0]
-    receptive_field = lsn.receptive_field[:,:,cell_loc,0]
+    lsn.receptive_field[:,:,cell_loc,0]
 
     assert True
     #assert cell_loc
@@ -132,14 +131,14 @@ def test_brain_observatory_locally_sparse_noise_notebook(boc):
 
 @pytest.mark.nightly
 def test_brain_observatory_experiment_containers_notebook(boc):
-    targeted_structures = boc.get_all_targeted_structures()
+    boc.get_all_targeted_structures()
     visp_ecs = boc.get_experiment_containers(targeted_structures=['VISp'])
     depths = boc.get_all_imaging_depths()
     stims = boc.get_all_stimuli()
     cre_lines = boc.get_all_cre_lines()
     cux2_ecs = boc.get_experiment_containers(cre_lines=['Cux2-CreERT2'])
     cux2_ec_id = cux2_ecs[-1]['id']
-    exps = boc.get_ophys_experiments(experiment_container_ids=[cux2_ec_id])
+    boc.get_ophys_experiments(experiment_container_ids=[cux2_ec_id])
     exp = boc.get_ophys_experiments(experiment_container_ids=[cux2_ec_id], 
                                     stimuli=[stim_info.STATIC_GRATINGS])[0]
     exp = boc.get_ophys_experiment_data(exp['id'])
@@ -203,7 +202,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     dsi_ec_ids = dsi_cells['experiment_container_id'].unique()
 
     # Download the ophys experiments containing the drifting gratings stimulus for VISp experiment containers
-    dsi_exps = boc.get_ophys_experiments(experiment_container_ids=dsi_ec_ids, stimuli=[stim_info.DRIFTING_GRATINGS])
+    boc.get_ophys_experiments(experiment_container_ids=dsi_ec_ids, stimuli=[stim_info.DRIFTING_GRATINGS])
 
     # pick a direction-selective cell and find its NWB file
     dsi_cell = dsi_cells.iloc[0]
@@ -229,13 +228,13 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     cids = data_set.get_cell_specimen_ids()[:15:5]
     
     # get masks for specific cells
-    roi_mask_list = data_set.get_roi_mask(cell_specimen_ids=cids)
+    data_set.get_roi_mask(cell_specimen_ids=cids)
     
     # make a mask of all ROIs in the experiment    
     all_roi_masks = data_set.get_roi_mask_array()
-    combined_mask = all_roi_masks.max(axis=0)
+    all_roi_masks.max(axis=0)
 
-    max_projection = data_set.get_max_projection()
+    data_set.get_max_projection()
 
     # ROI Analysis
     # example loading drifing grating data
@@ -258,7 +257,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     for i,trial in dg.peak[dsi_cells].iterrows():
         ds[trial.ori_dg, trial.tf_dg-1] += 1
     
-    max_count = max(os.max(), ds.max())
+    max(os.max(), ds.max())
 
     # Neuropil correction
     data_set = boc.get_ophys_experiment_data(569407590)
@@ -269,13 +268,13 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     _, neuropil_traces = data_set.get_neuropil_traces(cell_specimen_ids=[csid])
 
     results = estimate_contamination_ratios(demixed_traces[0], neuropil_traces[0])
-    correction = demixed_traces[0] - results['r'] * neuropil_traces[0]
+    demixed_traces[0] - results['r'] * neuropil_traces[0]
     _, corrected_traces = data_set.get_corrected_fluorescence_traces(
         cell_specimen_ids=[csid])
     
     # Running Speed and Motion Correction
     data_set = boc.get_ophys_experiment_data(512326618)
     dxcm, dxtime = data_set.get_running_speed()
-    mc = data_set.get_motion_correction()
+    data_set.get_motion_correction()
 
     assert True

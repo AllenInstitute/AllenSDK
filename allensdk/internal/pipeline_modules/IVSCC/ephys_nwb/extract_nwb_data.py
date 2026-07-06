@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from six import iteritems
+
 import h5py
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
@@ -90,7 +90,7 @@ def get_sweep_name_by_stimulus_code(stim_name):
         Output: sweep name (string), or None if no sweep found for this stim
     """
     global sweep_stim_map
-    for k, v in iteritems(stim_sweep_map):
+    for k, v in stim_sweep_map.items():
         if k.startswith(stim_name):
             return v
     return None
@@ -371,7 +371,7 @@ def summarize_sweeps(jin, jout):
     global nwb_file_name
     # build stimulus name map
     stim_type_name_map = {}
-    for group_name, raw_names in iteritems(jin["ephys_raw_stimulus_names"]):
+    for group_name, raw_names in jin["ephys_raw_stimulus_names"].items():
         for n in raw_names:
             stim_type_name_map[n] = group_name
 

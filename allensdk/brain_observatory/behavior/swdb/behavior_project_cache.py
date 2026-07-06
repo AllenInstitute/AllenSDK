@@ -419,7 +419,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # What we really want is a dict with image_name as key
         template_dict = {}
         image_index_names = self.get_image_index_names()
-        for image_index, image_name in image_index_names.iteritems():
+        for image_index, image_name in image_index_names.items():
             if image_name != 'omitted':
                 template_dict.update(
                     {image_name: stimulus_template_array[image_index, :, :]})

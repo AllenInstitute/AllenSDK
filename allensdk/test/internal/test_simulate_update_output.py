@@ -1,10 +1,10 @@
 from allensdk.internal.api.queries.biophysical_module_reader import \
     BiophysicalModuleReader
 import pytest
-from mock import patch, mock_open
+from unittest.mock import patch, mock_open
 try:
     import __builtin__ as builtins
-except:
+except Exception:
     import builtins
 
 

@@ -34,16 +34,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import logging
-
-__version__ = '2.16.2'
-
+from importlib.metadata import version, PackageNotFoundError
 
 try:
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
+    __version__ = version("allensdk")
+except PackageNotFoundError:
+    __version__ = "0.0.0.dev0"
 
 
 class OneResultExpectedError(RuntimeError):
@@ -66,7 +62,7 @@ def one(x):
         return x[0]
 
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 if True:
     file_download_log = logging.getLogger(

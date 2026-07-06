@@ -7,13 +7,9 @@ import matplotlib.pyplot as plt
 from moviepy.video.io.bindings import mplfig_to_npimage
 from moviepy.editor import *
 import numpy as np
-import collections
 import pandas as pd
-import sys
-import re
 import argparse
 import logging
-from ellipses import LSqEllipse
 from google.cloud import storage
 
 
@@ -53,7 +49,7 @@ pupil = pd.read_hdf(source_ellipse_data_file, key='pupil')
 
 def make_frame(t):      
 
-    fi = np.int(np.round(t*fps))
+    fi = int(np.round(t*fps))
 
     ax.clear()
     ax.imshow(clip.get_frame(t))

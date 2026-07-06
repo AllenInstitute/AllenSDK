@@ -1,7 +1,7 @@
 import pytest
 import copy as cp
 
-from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
+from allensdk.core.lazy_property import LazyPropertyMixin
 
 
 class CopyApi(object):

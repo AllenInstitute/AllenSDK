@@ -2,17 +2,12 @@
 #a preprocessed model configuration and preprocessed_config file
 #
 #something will have to tell it what parameters to take out of the preprocessed dict
-import os
-import sys
-import logging
-import time
 import numpy as np
 import argparse
 import allensdk.core.json_utilities as ju
-import find_sweeps as fs
-from six import iteritems
 
-class ModelConfigurationException( Exception ): pass
+class ModelConfigurationException( Exception ):
+    pass
 
 DEFAULT_NEURON_PARAMETERS = {
     "type": "GLIF", 
@@ -97,7 +92,7 @@ def specify_parameter_groups(dictionary, dict_specifer, neuron_type):
         elif dict_specifer in ['LIF_ASC', 'LIF_R_ASC', 'LIF_R_ASC_AT']:
             output_dict['R_input']=dictionary['resistance']['R_fit_ASC_and_R']['mean'] 
  
-    for k,v in iteritems(dictionary['sweep_properties']['noise1']):
+    for k,v in dictionary['sweep_properties']['noise1'].items():
         output_dict['spike_inds']['noise1'].append( v['spike_ind'] )
         output_dict['spike_inds']['noise2'].append( v['spike_ind'] )
                 
@@ -408,4 +403,5 @@ def main():
     ju.write(args.output_path, out_config)
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

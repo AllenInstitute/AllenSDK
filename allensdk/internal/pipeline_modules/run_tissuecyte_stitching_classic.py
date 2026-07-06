@@ -3,14 +3,10 @@ import argparse
 import logging
 import os
 
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
-from xml.dom import minidom
 
 import SimpleITK as sitk
 import numpy as np
-from six import iteritems
 
-from allensdk.internal.core.lims_pipeline_module import PipelineModule, run_module
 from allensdk.internal.mouse_connectivity.tissuecyte_stitching.stitcher import Stitcher
 from allensdk.internal.mouse_connectivity.tissuecyte_stitching.tile import Tile
 import allensdk.core.json_utilities as ju
@@ -29,7 +25,7 @@ def get_missing_tile_paths(missing_tiles):
 
     paths = []
 
-    for index, path in iteritems(missing_tiles):
+    for index, path in missing_tiles.items():
         spath = ','.join(map(str, path))
         logging.info('writing missing tile path for tile {0} as {1}'.format(index, spath))
         paths.append(spath)
@@ -63,13 +59,13 @@ def load_average_tile(path):
 def get_average_tiles(average_tile_paths):
 
     average_tiles = {}    
-    for key, path in iteritems(average_tile_paths):
+    for key, path in average_tile_paths.items():
         key = int(key) - 1
 
         try:
             average_tiles[key] = load_average_tile(path)
             logging.info('found average tile for channel {0} (zero-indexed)'.format(key))        
-        except(IOError, OSError, RuntimeError) as err:
+        except(IOError, OSError, RuntimeError):
             average_tiles[key] = None
             logging.info('did not find average tile for channel {0} (zero-indexed)'.format(key))
         
@@ -84,7 +80,7 @@ def generate_tiles(tiles):
         try:
             tile['image'] = read_image(tile['path'])
             tile['is_missing'] = False
-        except (IOError, OSError, RuntimeError) as err:
+        except (IOError, OSError, RuntimeError):
             tile['image'] = None
             tile['is_missing'] = True
         

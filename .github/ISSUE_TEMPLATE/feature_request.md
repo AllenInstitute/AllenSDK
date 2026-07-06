@@ -1,23 +1,42 @@
 ---
 name: Feature request
-about: Suggest a new feature
-title: ''
-labels: enhancement
-assignees: ''
-
+about: Propose a new capability for AllenSDK
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees: ""
 ---
 
-**Describe the use case that is addressed by this feature.**
-The problem that this feature would solve.
+<!--
+Thanks for the suggestion.
 
-**Describe the solution you'd like**
-What you want to happen.
+AllenSDK is in selective maintenance mode:
+- Maintainers are not planning new feature development.
+- Community feature PRs are welcome.
+- Requests or PRs may be closed as "not planned" if maintenance burden is too high.
+-->
 
-**Describe alternatives you've considered**
-Any alternative solutions or features you've considered.
+## Problem / use case
 
-**Additional context**
-Add any other information about the feature request here.
+Describe the user problem this feature would solve and who benefits.
 
-**Do you want to work on this issue?**
-Are you willing and able to work on this feature? If so, let us know here (and see [the guide](https://github.com/AllenInstitute/AllenSDK/blob/master/CONTRIBUTING.md)). Thank you!
+## Proposed solution
+
+Describe what you want to happen.
+
+## Alternatives considered
+
+Describe alternative approaches, including why they are not sufficient.
+
+## Maintenance considerations
+
+Briefly describe any backward compatibility, dependency, or long-term maintenance concerns.
+
+## Additional context
+
+Add examples, mock APIs, references, or related issues/PRs.
+
+## Implementation interest
+
+- [ ] I can work on a PR
+- [ ] I can help with design/review/testing
+- [ ] I cannot contribute implementation right now

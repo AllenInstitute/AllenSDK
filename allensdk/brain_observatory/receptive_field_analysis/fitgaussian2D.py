@@ -37,7 +37,8 @@ import numpy as np
 from scipy import optimize
 
 
-class GaussianFitError(RuntimeError): pass
+class GaussianFitError(RuntimeError):
+    pass
 
 
 def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):

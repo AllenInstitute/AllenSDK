@@ -82,7 +82,6 @@ def plot_masks(dm, save_dir, movie_file, movie_dataset, window=150, add_backgrou
         for p in pair:
             mask += dm.masks[p]
         non_zeros = np.where(mask)
-        non_zeros_mask = np.zeros(mask.shape)
         ylower = np.min(non_zeros[0])
         yupper = np.max(non_zeros[0])
         xlower = np.min(non_zeros[1])

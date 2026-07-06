@@ -1,12 +1,10 @@
 from __future__ import division
 import logging
-from six import iteritems
 
 import numpy as np
 
-from allensdk.core.simple_tree import SimpleTree
 
-from run_tissuecyte_unionize_classic import get_ancestor_id_map, get_volume_scale
+from run_tissuecyte_unionize_classic import get_ancestor_id_map
 from allensdk.internal.mouse_connectivity.interval_unionize.cav_unionizer import CavUnionizer
 import data_utilities as du
 
@@ -36,7 +34,7 @@ def run(input_data):
     max_pixels = float(np.amax(signal_arrays['sum_pixels']))
     logging.info('max pixels per voxel: {}'.format(max_pixels))
 
-    for k, v in iteritems(signal_arrays):
+    for k, v in signal_arrays.items():
         logging.info('sorting {0} array'.format(k))
         signal_arrays[k] = v.flat[unionizer.sort]
     

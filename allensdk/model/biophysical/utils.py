@@ -39,7 +39,7 @@ from math import gcd
 
 import numpy as np
 from allensdk.core.nwb_data_set import NwbDataSet
-from pkg_resources import resource_filename  # @UnresolvedImport
+from importlib.resources import files
 from skimage.measure import block_reduce
 
 from ..biophys_sim.neuron.hoc_utils import HocUtils
@@ -117,7 +117,7 @@ class Utils(HocUtils):
             hfi = hoc_files.index(default_cell_hoc)
 
             if not os.path.exists(default_cell_hoc):
-                abspath_ch = resource_filename(__name__, default_cell_hoc)
+                abspath_ch = str(files(__package__).joinpath(default_cell_hoc))
                 hoc_files[hfi] = abspath_ch
 
                 if not os.path.exists(abspath_ch):

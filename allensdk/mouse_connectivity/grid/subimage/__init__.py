@@ -4,6 +4,8 @@ from .count_subimage import CountSubImage
 from .cav_subimage import CavSubImage
 from .classic_subimage import ClassicSubImage
 
+__all__ = ["CountSubImage", "CavSubImage", "ClassicSubImage"]
+
 
 def run_subimage(input_data):
     

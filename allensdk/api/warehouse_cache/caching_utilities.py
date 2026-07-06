@@ -4,7 +4,7 @@ import warnings
 import os
 import logging
 
-from typing import overload, Callable, Any, Union, Optional, TypeVar
+from typing import overload, Callable, Union, Optional, TypeVar
 
 from allensdk.config.manifest import Manifest
 

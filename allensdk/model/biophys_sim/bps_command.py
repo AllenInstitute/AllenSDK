@@ -35,6 +35,7 @@
 #
 import os
 import subprocess as sp
+import sys
 import logging
 from .config import Config
 
@@ -72,8 +73,8 @@ def run_module(description, module_name, function_name):
 # this module is designed to be called from the bps script,
 # which may use nrniv which does not pass in command line arguments
 # So the configuration file path must be set in an environment variable.
-if __name__ == '__main__':
-    import sys
+def main():
+    """Entry point for the ``bps`` console script."""
     conf_file = None
     argv = sys.argv
 
@@ -91,7 +92,11 @@ if __name__ == '__main__':
     else:
         try:
             conf_file = os.environ['CONF_FILE']
-        except:
+        except Exception:
             pass
 
     choose_bps_command(command, conf_file)
+
+
+if __name__ == '__main__':
+    main()

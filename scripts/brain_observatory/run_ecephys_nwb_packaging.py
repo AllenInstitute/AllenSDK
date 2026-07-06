@@ -2,7 +2,6 @@ import os
 import subprocess
 import glob
 import pandas as pd
-import glob
 
 from create_input_json import createInputJson
 

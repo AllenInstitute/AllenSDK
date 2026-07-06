@@ -1,4 +1,3 @@
-import logging
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 from allensdk.internal.mouse_connectivity.interval_unionize.run_tissuecyte_unionize_classic_counts import run 

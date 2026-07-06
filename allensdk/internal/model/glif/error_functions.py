@@ -1,8 +1,5 @@
 import logging
-import sys
-import os
 
-from scipy.stats import norm
 
 import numpy as np
 
@@ -15,7 +12,6 @@ from allensdk.model.glif.glif_neuron import GlifBadResetException
 
 def MLIN_list_error(param_guess, experiment, input_data):
     #TODO: binning is now done in preprocessor so perhaps should take it out of here.
-    voltage_variance = input_data['subthreshold_long_square_voltage_variance']
 #    voltage_distribution=norm(loc=0, scale=np.sqrt(voltage_variance)*10.)
     sv=input_data['sv_for_expsymm'] #used in the expsymm function
 #    tau_4AC=experiment.neuron.R_input*experiment.neuron.C
@@ -27,7 +23,6 @@ def MLIN_list_error(param_guess, experiment, input_data):
 
     logging.info('running parameter guess: %s' % param_guess)
          
-    dataSpikeTimes=experiment.grid_spike_times   
 
     MLIN_list = []
     try:
@@ -36,8 +31,7 @@ def MLIN_list_error(param_guess, experiment, input_data):
     except GlifNeuronException as e:
         out=e.data
         raise e
-        modelSpikeISI=[e.data['interpolated_ISI']]    
-        
+
     except GlifBadInitializationException as e:
         logging.error('voltage STARTS above threshold: setting error to be large.Difference between thresh and voltage is: %f' % e.dv)
         raise Exception()
@@ -198,7 +192,6 @@ def MLIN_list_error(param_guess, experiment, input_data):
 #-------------------------------------------------------------------
 #--------------------------plotting------------------------------------
 #---------------------------------------------------------------------
-    time=np.arange(0, len(v_model))*experiment.neuron.dt    
 #    plt.subplot(2,1,1)
 #    plt.title('Model', fontsize=16)
 #    plt.plot(time, v_model, 'b-', label='voltage')

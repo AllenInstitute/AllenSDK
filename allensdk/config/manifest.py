@@ -93,7 +93,7 @@ class Manifest(object):
             if path_type == 'file':
                 try:
                     parent_key = path_info['parent_key']
-                except:
+                except Exception:
                     parent_key = None
 
                 self.add_file(path_info['key'],
@@ -103,7 +103,7 @@ class Manifest(object):
             elif path_type == 'dir':
                 try:
                     parent_key = path_info['parent_key']
-                except:
+                except Exception:
                     parent_key = None
 
                 spec = path_info['spec']
@@ -153,7 +153,7 @@ class Manifest(object):
             try:
                 parent_path = self.path_info[parent_key]['spec']
                 path_args.append(parent_path)
-            except:
+            except Exception:
                 Manifest.log.error(
                     "cannot resolve directory key %s" % (parent_key))
                 raise
@@ -224,7 +224,7 @@ class Manifest(object):
             try:
                 dir_path = self.path_info[dir_key]['spec']
                 path_args.append(dir_path)
-            except:
+            except Exception:
                 Manifest.log.error(
                     "cannot resolve directory key %s" % (dir_key))
                 raise

@@ -4,7 +4,7 @@ This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
 .. ATTENTION::
-    As of October 2019, we have dropped Python 2 support.
+    AllenSDK requires Python 3.10 or later.
 
 Quick Start
 --------------------------

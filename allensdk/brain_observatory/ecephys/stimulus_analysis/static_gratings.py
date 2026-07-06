@@ -1,8 +1,6 @@
-from six import string_types
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from functools import partial
 import logging
 
 import matplotlib.pyplot as plt
@@ -388,10 +386,10 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
     :return: index for the preferred sf from the curve fit, prefered sf from the curve fit, low cutoff sf from the
         curve fit, high cutoff sf from the curve fit
     """
-    fit_sf_ind = np.NaN
-    fit_sf = np.NaN
-    sf_low_cutoff = np.NaN
-    sf_high_cutoff = np.NaN
+    fit_sf_ind = np.nan
+    fit_sf = np.nan
+    sf_low_cutoff = np.nan
+    sf_high_cutoff = np.nan
     if pref_sf_index in range(1, len(sf_values)-1):
         # If the prefered spatial freq is an interior case try to fit the tunning curve with a gaussian.
         try:
@@ -408,7 +406,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
             elif high_cut_ind < 4:
                 high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
                 sf_high_cutoff = 0.02*np.power(2, high_cutoff)
-        except Exception as e:
+        except Exception:
             pass
     else:
         # If the prefered spatial freq is a boundary value try to fit the tunning curve with an exponential
@@ -426,7 +424,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
                 low_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[:sf_prediction.argmax()].argmin()
                 low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
                 sf_low_cutoff = 0.02*np.power(2, low_cutoff)
-        except Exception as e:
+        except Exception:
             pass
 
     return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff

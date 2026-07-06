@@ -1,7 +1,7 @@
 import logging
 import operator as op
 from collections import defaultdict
-from six.moves import reduce
+from functools import reduce
 
 import numpy as np
 

@@ -9,7 +9,7 @@ import random
 import numpy as np
 from deap import algorithms, base, creator, tools
 from allensdk.model.biophys_sim.config import Config
-from pkg_resources import resource_filename #@UnresolvedImport
+from importlib.resources import files
 
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
@@ -122,8 +122,7 @@ def main():
     if 'LOG_CFG' in os.environ:
         log_config = os.environ['LOG_CFG']
     else:
-        log_config = resource_filename('allensdk.model.biophysical',
-                                       'logging.conf')
+        log_config = str(files('allensdk.model.biophysical').joinpath('logging.conf'))
         os.environ['LOG_CFG'] = log_config
     lc.fileConfig(log_config)
 

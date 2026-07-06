@@ -36,7 +36,7 @@
 from allensdk.api.queries.annotated_section_data_sets_api import \
     AnnotatedSectionDataSetsApi
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 
 @pytest.fixture

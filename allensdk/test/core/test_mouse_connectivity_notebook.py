@@ -35,7 +35,6 @@
 #
 import pytest
 
-import os
 
 
 @pytest.mark.nightly
@@ -198,7 +197,7 @@ def test_notebook(tmpdir_factory):
     matrix = pm['matrix']
 
     fig, ax = plt.subplots(figsize=(15,15))
-    heatmap = ax.pcolor(matrix, cmap=plt.cm.afmhot)
+    ax.pcolor(matrix, cmap=plt.cm.afmhot)
 
     # put the major ticks at the middle of each cell
     ax.set_xticks(np.arange(matrix.shape[1])+0.5, minor=False)

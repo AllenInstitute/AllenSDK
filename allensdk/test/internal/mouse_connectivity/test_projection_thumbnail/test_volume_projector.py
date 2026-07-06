@@ -54,7 +54,8 @@ def test_extract():
 @pytest.mark.parametrize('angle,exp', [(0.0, 0.0), (2 * np.pi, 0.0)])
 def test_rotate_and_extract(angle, exp, cube_volume):
 
-    cb = lambda x: x.GetPixel(0, 0, 0)
+    def cb(x):
+        return x.GetPixel(0, 0, 0)
     vp = VolumeProjector(cube_volume)
     
     for obt in vp.rotate_and_extract([0], [2], [angle], cb):

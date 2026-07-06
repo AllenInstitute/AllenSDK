@@ -38,7 +38,7 @@ import os
 import json
 import pandas as pd
 from zipfile import ZipFile
-from mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open, MagicMock
 from test_brain_observatory_cache import CACHE_MANIFEST
 from allensdk.core.brain_observatory_cache \
     import BrainObservatoryCache

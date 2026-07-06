@@ -1,3 +1,4 @@
+import warnings as warnings_mod
 import pytest
 import json
 import hashlib
@@ -422,13 +423,14 @@ def test_reconstruction_of_local_manifest(tmpdir):
     cache_dir = pathlib.Path(tmpdir) / 'cache'
 
     # read in v1.0.0 data files using normal S3 cache class
-    with pytest.warns(None) as warnings:
+    with warnings_mod.catch_warnings(record=True) as w:
+        warnings_mod.simplefilter("always")
         cache = S3CloudCache(cache_dir, test_bucket_name, 'project-x')
 
     # make sure no MissingLocalManifestWarnings were raised
     w_type = 'MissingLocalManifestWarning'
-    for w in warnings.list:
-        if w._category_name == w_type:
+    for wi in w:
+        if wi.category.__name__ == w_type:
             msg = 'Raised MissingLocalManifestWarning on empty '
             msg += 'cache dir'
             assert False, msg
@@ -458,7 +460,7 @@ def test_reconstruction_of_local_manifest(tmpdir):
     # files. Verify that paths to files with the correct hashes
     # are returned. This will mean that the local manifest mapping
     # filename to file hash was correctly reconstructed.
-    with pytest.warns(MissingLocalManifestWarning) as warnings:
+    with pytest.warns(MissingLocalManifestWarning):
         dummy = DummyCache(cache_dir, test_bucket_name, 'project-x')
 
     dummy.construct_local_manifest()

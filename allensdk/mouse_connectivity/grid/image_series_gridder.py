@@ -1,13 +1,12 @@
 import multiprocessing as mp
 import logging
 
-from six import iteritems
+
 import SimpleITK as sitk
 import numpy as np
 
 from .subimage import run_subimage
 from .utilities import image_utilities as iu
-from .utilities.downsampling_utilities import block_average, window_average
 
 
 #==============================================================================
@@ -95,7 +94,7 @@ class ImageSeriesGridder(object):
         '''
         '''
         
-        if not key in self.volumes:
+        if key not in self.volumes:
             sitk_type = iu.np_sitk_convert(slice_array.dtype)
             self.initialize_coarse_volume(key, sitk_type)
         
@@ -108,7 +107,7 @@ class ImageSeriesGridder(object):
         '''Inserts planar accumulators into coarse grid volumes
         '''
         
-        for key, array in iteritems(output):
+        for key, array in output.items():
             self.paste_slice(key, index, array)
             output[key] = None
             

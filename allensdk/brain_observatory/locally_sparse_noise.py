@@ -488,7 +488,7 @@ class LocallySparseNoise(StimulusAnalysis):
                 assert len(x) == 3
 
                 if x[-1] is None:
-                    f.attrs[x[-2]] = np.NaN
+                    f.attrs[x[-2]] = np.nan
                 else:
                     f.attrs[x[-2]] = x[-1]
 

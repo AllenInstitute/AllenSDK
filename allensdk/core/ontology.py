@@ -34,7 +34,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from collections import defaultdict
-from six import string_types
 import numpy as np
 import pandas as pd
 
@@ -106,7 +105,7 @@ class Ontology(object):
                 # if it's a pandas series, assume it's a series of structure
                 # ids
                 structure_ids.update(s.tolist())
-            elif isinstance(s, string_types):
+            elif isinstance(s, str):
                 # if it's a string, assume it's an acronym
                 string_strs.append(s)
             else:

@@ -1,10 +1,6 @@
 from __future__ import division
 import logging
-import functools
-from collections import defaultdict
-from six import iteritems
 
-import numpy as np
 
 from interval_unionizer import IntervalUnionizer
 from cav_unionize import CavUnionize
@@ -38,7 +34,7 @@ class CavUnionizer(IntervalUnionizer):
         unionizes = []
         
         logging.info('getting formatted unionize output')
-        for sid, un in iteritems(raw_unionizes):
+        for sid, un in raw_unionizes.items():
             
             if sid < 0:
                 hemisphere = 'left'

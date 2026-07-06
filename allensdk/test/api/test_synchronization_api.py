@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 from allensdk.api.queries.synchronization_api import SynchronizationApi
 
 

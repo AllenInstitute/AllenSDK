@@ -37,10 +37,8 @@ import functools
 import dateutil
 import re
 import os
-import six
-import itertools
 import logging
-from pkg_resources import parse_version
+from packaging.version import Version
 
 import h5py
 import pandas as pd
@@ -145,9 +143,9 @@ class BrainObservatoryNwbDataSet(object):
             meta = self.get_metadata()
             if meta and 'pipeline_version' in meta:
                 pipeline_version_str = meta['pipeline_version']
-                self.pipeline_version = parse_version(pipeline_version_str)
+                self.pipeline_version = Version(pipeline_version_str)
 
-                if self.pipeline_version > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+                if self.pipeline_version > Version(self.SUPPORTED_PIPELINE_VERSION):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
@@ -289,7 +287,7 @@ class BrainObservatoryNwbDataSet(object):
         timestamps = self.get_fluorescence_timestamps()
 
         with h5py.File(self.nwb_file, 'r') as f:
-            if self.pipeline_version >= parse_version("2.0"):
+            if self.pipeline_version >= Version("2.0"):
                 ds = f['processing'][self.PIPELINE_DATASET][
                     'Fluorescence']['imaging_plane_1_neuropil_response']['data']
             else:
@@ -321,7 +319,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         with h5py.File(self.nwb_file, 'r') as f:
-            if self.pipeline_version >= parse_version("2.0"):
+            if self.pipeline_version >= Version("2.0"):
                 r_ds = f['processing'][self.PIPELINE_DATASET][
                     'Fluorescence']['imaging_plane_1_neuropil_response']['r']
             else:
@@ -388,7 +386,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         # starting in version 2.0, neuropil correction follows trace demixing
-        if self.pipeline_version >= parse_version("2.0"):
+        if self.pipeline_version >= Version("2.0"):
             timestamps, cell_traces = self.get_demixed_traces(cell_specimen_ids)
         else:
             timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
@@ -742,7 +740,7 @@ class BrainObservatoryNwbDataSet(object):
                     v = f[disk_key][()]
 
                     # convert numpy strings to python strings
-                    if v.dtype.type is np.string_:
+                    if v.dtype.type is np.bytes_:
                         if len(v.shape) == 0:
                             v = v.decode('UTF-8')
                         elif len(v.shape) == 1:
@@ -751,7 +749,7 @@ class BrainObservatoryNwbDataSet(object):
                             raise Exception("Unrecognized metadata formatting for field %s" % disk_key)
 
                     meta[memory_key] = v
-                except KeyError as e:
+                except KeyError:
                     logging.warning("could not find key %s", disk_key)
 
         # extract cre line from genotype string
@@ -769,7 +767,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance( session_start_time, six.string_types ):
+        if isinstance( session_start_time, str ):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
@@ -894,7 +892,7 @@ class BrainObservatoryNwbDataSet(object):
 
                     # break out if we found it
                     break
-                except KeyError as e:
+                except KeyError:
                     pass
 
         if motion_correction is None:
@@ -1002,11 +1000,11 @@ def align_running_speed(dxcm, dxtime, timestamps):
     if dxtime[0] != timestamps[0]:
         adjust = np.where(timestamps == dxtime[0])[0][0]
         dxtime = np.insert(dxtime, 0, timestamps[:adjust])
-        dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
+        dxcm = np.insert(dxcm, 0, np.repeat(np.nan, adjust))
     adjust = len(timestamps) - len(dxtime)
     if adjust > 0:
         dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
-        dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        dxcm = np.append(dxcm, np.repeat(np.nan, adjust))
 
     return dxcm, dxtime
 

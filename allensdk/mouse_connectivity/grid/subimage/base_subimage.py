@@ -1,11 +1,9 @@
 from __future__ import division
 import logging
-import sys
 import functools
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
-from six import iteritems
 
 from allensdk.mouse_connectivity.grid.utilities import image_utilities as iu
 
@@ -62,7 +60,8 @@ class SubImage(object):
 
 
     def make_pixel_counter(self):
-        fn = lambda x: np.sum(x) * 2 ** ( self.reduce_level + 1) # additional x2 <- is an area
+        def fn(x):
+            return np.sum(x) * 2 ** ( self.reduce_level + 1) # additional x2 <- is an area
         return functools.partial(iu.block_apply, out_shape=self.coarse_dims, 
                                     dtype=np.float32, blocks=self.blocks, 
                                     fn=fn)

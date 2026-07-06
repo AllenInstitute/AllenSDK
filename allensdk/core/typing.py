@@ -1,4 +1,3 @@
-import sys
 try:
     # for Python 3.8 and greater
     from typing import Protocol

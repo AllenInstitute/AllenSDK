@@ -87,7 +87,7 @@ class VBNTrial(Trial):
         """
         change_frame = trial_dict['change_frame']
         if np.isnan(change_frame):
-            change_time = np.NaN
+            change_time = np.nan
         else:
             no_delay = self._stimulus_timestamps.subtract_monitor_delay()
             change_frame = int(change_frame)

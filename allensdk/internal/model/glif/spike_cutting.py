@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import stats
-from scipy.optimize import curve_fit, fmin
 from allensdk.internal.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WINDOW
-import logging
 
 import matplotlib.pyplot as plt 
 
@@ -58,7 +56,6 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
     chi2 = []
     sum_residuals_4_each_time_end=[]
     xdata = np.array([v[all_thresholdInd[ii]] for ii, v in enumerate(all_v_spike_shape_list)])
-    var_of_Vdata_beforeSpike = np.var(xdata)
     for jj, vectorOfIndAcrossWaves in enumerate(list_of_endPointArrays):  # these indices should be in terms of the spike waveforms
 #        print('jj', jj)
         # TODO: Teeter get rid of the nonblipness
@@ -174,7 +171,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
 
     if MAKE_PLOT:
         xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
-        plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.NAN, xlim)
+        plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.nan, xlim)
         plt.legend(loc=2, fontsize=20)
         if SHOW_PLOT:
             plt.show(block=BLOCK)                   

@@ -857,13 +857,13 @@ class CellSpecimens(
             if traces is None:
                 continue
             # validate traces contain expected roi ids
-            if not np.in1d(traces.value.index, cell_roi_ids).all():
+            if not np.isin(traces.value.index, cell_roi_ids).all():
                 raise RuntimeError(
                     f"{traces.name} contains ROI IDs that "
                     f"are not in "
                     f"cell_specimen_table.cell_roi_id"
                 )
-            if not np.in1d(cell_roi_ids, traces.value.index).all():
+            if not np.isin(cell_roi_ids, traces.value.index).all():
                 raise RuntimeError(
                     f"cell_specimen_table contains ROI IDs "
                     f"that are not in {traces.name}"

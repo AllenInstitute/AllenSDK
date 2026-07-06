@@ -1,6 +1,5 @@
 from allensdk.internal.api.queries.pre_release import BrainObservatoryApiPreRelease
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
-from six import integer_types
 import pytest
 import os
 import numpy as np
@@ -30,7 +29,6 @@ def test_pre_release_get_containers(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     containers_extended = boc_extended.get_experiment_containers()
@@ -81,7 +79,6 @@ def test_pre_release_get_experiments(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     experiments_extended = boc_extended.get_ophys_experiments()
@@ -137,7 +134,6 @@ def test_pre_release_get_cell_specimens(tmpdir):
         outfile_extended = os.path.join(temp_dir_extended, 'manifest.json')
         boc_extended = BrainObservatoryCache(manifest_file=outfile_extended, api=BrainObservatoryApiPreRelease())
     except TypeError:
-        import allensdk
         raise RuntimeError('Allensdk out-of-date; upgrade with "pip install --force --upgrade allensdk"')
 
     cell_specimens_extended = boc_extended.get_cell_specimens(include_failed=True)
@@ -158,9 +154,9 @@ def test_pre_release_get_cell_specimens(tmpdir):
                 assert key in c_e
                 if not c_e[key] == c_b[key] and not key == 'specimen_id':       # Failure mode 1: specimen_id changed
 
-                    if isinstance(c_b[key], (float, complex) + integer_types) and isinstance(c_e[key], (float, complex) + integer_types):
+                    if isinstance(c_b[key], (float, complex, int)) and isinstance(c_e[key], (float, complex, int)):
                         assert np.isclose(c_e[key], c_b[key], 1e-12) # Failure mode 2: floating-point precision
-                    elif c_b[key] is None and isinstance(c_e[key], (float, complex) + integer_types):
+                    elif c_b[key] is None and isinstance(c_e[key], (float, complex, int)):
                         pass
                     else:
                         # assert c_b[key] is None and isinstance(c_e[key], (int, long, float, complex))

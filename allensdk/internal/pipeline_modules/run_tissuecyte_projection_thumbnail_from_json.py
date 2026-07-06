@@ -1,17 +1,16 @@
 import logging
 import os
 import functools
-import six
 
 import SimpleITK as sitk
-from scipy.misc import imread, imsave
+from scipy.misc import imsave
 import numpy as np
 import pandas as pd
 
 from allensdk.internal.core.lims_pipeline_module import PipelineModule
 
 from allensdk.internal.mouse_connectivity.projection_thumbnail.volume_utilities import sitk_get_diagonal_length
-from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import run, apply_colormap
+from allensdk.internal.mouse_connectivity.projection_thumbnail.generate_projection_strip import run
 from allensdk.internal.mouse_connectivity.projection_thumbnail.visualization_utilities import convert_discrete_colormap
 
 
@@ -69,7 +68,7 @@ def main():
                                                      path=str(os.path.join(output_dir, rot['depth_path'])))
         output_data['output_file_paths'].append(os.path.join(output_dir, rot['depth_path']))
 
-        if isinstance(rot['window_size'], six.string_types):
+        if isinstance(rot['window_size'], str):
             if rot['window_size'] == 'no_pad':
                 rot['window_size'] = no_pad(volume)
             elif rot['window_size'] == 'pad':
