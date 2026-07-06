@@ -20,6 +20,7 @@ To get started, check out these jupyter notebooks:
 5) `Visual Behavior Neuropixels Quickstart <_static/examples/nb/visual_behavior_neuropixels_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_quickstart.ipynb>`_
 6) `Analyzing LFP data <_static/examples/nb/visual_behavior_neuropixels_LFP_analysis.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_LFP_analysis.ipynb>`_
 7) `Analyzing behavior-only data for one mouse's training history <_static/examples/nb/visual_behavior_neuropixels_analyzing_behavior_only_data.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_analyzing_behavior_only_data.ipynb>`_
+8) `Accessing raw video and ephys data <_static/examples/nb/visual_behavior_neuropixels_raw_ephys_and_video_data_access.html>`_ `(download .ipynb) <_static/examples/nb/visual_behavior_neuropixels_raw_ephys_and_video_data_access.ipynb>`_
 
 You may also find `these tutorials <https://github.com/AllenInstitute/swdb_2022/tree/main/DynamicBrain>`_ helpful, 
 which were made for students in the Summer Workshop for the Dynamic Brain.
